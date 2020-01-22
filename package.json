@@ -20,7 +20,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/ava-labs/slopes/issues"
   },
@@ -42,7 +42,7 @@
     "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typedoc": "^0.15.6",
     "typedoc-ava-theme": "^1.0.6",
-    "typedoc-plugin-external-module-name": "^2.1.0",
+    "typedoc-plugin-external-module-name": "^2.2.1",
     "typedoc-plugin-markdown": "^2.2.14",
     "typescript": "^3.7.4",
     "webpack": "^4.41.5",
