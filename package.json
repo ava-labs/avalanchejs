@@ -3,11 +3,11 @@
   "version": "1.0.3",
   "description": "AVA Platform JS Library",
   "main": "dist/slopes.js",
-  "types": "typings/slopes.d.ts",
+  "types": "typings/slopes/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "webpack --mode production",
-    "prepublish": "npm run build",
+    "prepublish": "tsc",
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
