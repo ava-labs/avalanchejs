@@ -1,6 +1,6 @@
 {
   "name": "slopes",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "AVA Platform JS Library",
   "main": "dist/slopes.js",
   "types": "typings/slopes/src/index.d.ts",
