@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
       "outDir": "./typings/slopes",
+      "baseUrl": ".",
       "module": "commonjs",
       "target": "ES2015",
       "lib": [
@@ -19,7 +20,16 @@
       "typeRoots": [
         "./typings/**",
         "./node_modules/@types"
-      ]
+      ],
+      "paths": {
+        "@slopes/avm/*": ["src/apis/avm/*"],
+        "@slopes/platform/*": ["src/apis/platform/*"],
+        "@slopes/admin/*": ["src/apis/admin/*"],
+        "@slopes/keystore/*": ["src/apis/keystore/*"],
+        "@slopes/utils/*": ["src/utils/*"],
+        "@slopes/core": ["src/slopes"],
+        "@slopes": ["src/"]
+      }
     },
     "exclude": [
       "node_modules",

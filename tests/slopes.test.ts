@@ -1,5 +1,9 @@
 import mockAxios from 'jest-mock-axios';
-import {Slopes, TypesLibrary} from "../src/index";
+import Slopes from "@slopes";
+import AVMAPI  from "@slopes/avm/api";
+import AdminAPI  from "@slopes/admin/api";
+import PlatformAPI  from "@slopes/platform/api";
+import KeystoreAPI  from "@slopes/keystore/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 
@@ -20,17 +24,17 @@ describe('Slopes', () => {
     });
 
     test('Endpoints correct', () => {
-        expect(ava.Admin()).not.toBeInstanceOf(TypesLibrary.AVMAPI.API);
-        expect(ava.Admin()).toBeInstanceOf(TypesLibrary.AdminAPI.API);
+        expect(ava.Admin()).not.toBeInstanceOf(AVMAPI);
+        expect(ava.Admin()).toBeInstanceOf(AdminAPI);
         
-        expect(ava.AVM()).not.toBeInstanceOf(TypesLibrary.AdminAPI.API);
-        expect(ava.AVM()).toBeInstanceOf(TypesLibrary.AVMAPI.API);
+        expect(ava.AVM()).not.toBeInstanceOf(AdminAPI);
+        expect(ava.AVM()).toBeInstanceOf(AVMAPI);
         
-        expect(ava.Platform()).not.toBeInstanceOf(TypesLibrary.KeystoreAPI.API);
-        expect(ava.Platform()).toBeInstanceOf(TypesLibrary.PlatformAPI.API);
+        expect(ava.Platform()).not.toBeInstanceOf(KeystoreAPI);
+        expect(ava.Platform()).toBeInstanceOf(PlatformAPI);
 
-        expect(ava.NodeKeys()).not.toBeInstanceOf(TypesLibrary.PlatformAPI.API);
-        expect(ava.NodeKeys()).toBeInstanceOf(TypesLibrary.KeystoreAPI.API);
+        expect(ava.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
+        expect(ava.NodeKeys()).toBeInstanceOf(KeystoreAPI);
 
         expect(ava.Admin().getRPCID()).toBe(1);
         expect(ava.AVM().getRPCID()).toBe(1);
@@ -39,11 +43,11 @@ describe('Slopes', () => {
     });
 
     test('Create new API', () => {
-        ava.addAPI("admin2", TypesLibrary.AVMAPI.API);
-        expect(ava.api("admin2")).toBeInstanceOf(TypesLibrary.AVMAPI.API);
+        ava.addAPI("admin2", AVMAPI);
+        expect(ava.api("admin2")).toBeInstanceOf(AVMAPI);
 
-        ava.addAPI("keystore2", TypesLibrary.KeystoreAPI.API, "/ext/keystore2");
-        expect(ava.api("keystore2")).toBeInstanceOf(TypesLibrary.KeystoreAPI.API);
+        ava.addAPI("keystore2", KeystoreAPI, "/ext/keystore2");
+        expect(ava.api("keystore2")).toBeInstanceOf(KeystoreAPI);
 
         ava.api("keystore2").setBaseURL("/ext/keystore3");
         expect(ava.api("keystore2").getBaseURL()).toBe("/ext/keystore3");

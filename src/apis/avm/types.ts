@@ -2,9 +2,9 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import { NBytes } from '../../utils/types';
+import { NBytes } from '@slopes/utils/types';
 import BN from "bn.js";
-import BinTools from '../../utils/bintools';
+import BinTools from '@slopes/utils/bintools';
 
 /**
  * @ignore

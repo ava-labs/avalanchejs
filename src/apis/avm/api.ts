@@ -1,15 +1,15 @@
 /**
  * @module AVMAPI
  */
-import AVACore from "../../slopes";
+import AVACore from '@slopes/core';
 import {Buffer} from "buffer/";
-import {JRPCAPI, RequestResponseData} from "../../utils/types";
-import { UTXOSet } from './utxos';
-import { MergeRule, UnixNow } from './types';
-import { AVMKeyChain } from './keychain';
-import { TxUnsigned, Tx } from './tx';
+import {JRPCAPI, RequestResponseData} from "@slopes/utils/types";
+import { UTXOSet } from '@slopes/avm/utxos';
+import { MergeRule, UnixNow } from '@slopes/avm/types';
+import { AVMKeyChain } from '@slopes/avm/keychain';
+import { TxUnsigned, Tx } from '@slopes/avm/tx';
 import BN from "bn.js";
-import BinTools from '../../utils/bintools';
+import BinTools from '@slopes/utils/bintools';
 
 /**
  * @ignore

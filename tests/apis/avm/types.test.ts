@@ -1,6 +1,6 @@
-import { SigIdx, Signature, Address, UnixNow } from '../../../src/apis/avm/types';
+import { SigIdx, Signature, Address, UnixNow } from '@slopes/avm/types';
 import {Buffer} from "buffer/";
-import BinTools from '../../../src/utils/bintools';
+import BinTools from '@slopes/utils/bintools';
 
 let bintools:BinTools = BinTools.getInstance();
 

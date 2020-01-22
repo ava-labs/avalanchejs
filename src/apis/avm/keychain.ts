@@ -3,12 +3,12 @@
  */
 import {Buffer} from "buffer/";
 import * as elliptic from "elliptic";
-import BinTools from '../../utils/bintools';
-import { TxUnsigned, Tx } from './tx';
-import { Signature, SigIdx } from './types';
-import { Input } from './inputs';
+import BinTools from '@slopes/utils/bintools';
+import { TxUnsigned, Tx } from '@slopes/avm/tx';
+import { Signature, SigIdx } from '@slopes/avm/types';
+import { Input } from '@slopes/avm/inputs';
 import createHash from "create-hash";
-import { KeyPair, KeyChain } from '../../utils/types';
+import { KeyPair, KeyChain } from '@slopes/utils/types';
 
 /**
  * @ignore

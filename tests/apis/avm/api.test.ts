@@ -1,16 +1,16 @@
 import mockAxios from 'jest-mock-axios';
-import {Slopes} from "../../../src";
-import AVMAPI, { PersistanceOptions } from "../../../src/apis/avm/api";
-import { AVMKeyPair, AVMKeyChain } from '../../../src/apis/avm/keychain';
+import Slopes from "@slopes";
+import AVMAPI, { PersistanceOptions } from "@slopes/avm/api";
+import { AVMKeyPair, AVMKeyChain } from '@slopes/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
-import BinTools from '../../../src/utils/bintools';
-import { UTXOSet, UTXO } from '../../../src/apis/avm/utxos';
-import { Output, OutPayment, OutTakeOrLeave, OutCreateAsset } from '../../../src/apis/avm/outputs';
-import { Input } from '../../../src/apis/avm/inputs';
+import BinTools from '@slopes/utils/bintools';
+import { UTXOSet, UTXO } from '@slopes/avm/utxos';
+import { Output, OutPayment, OutTakeOrLeave, OutCreateAsset } from '@slopes/avm/outputs';
+import { Input } from '@slopes/avm/inputs';
 import createHash from "create-hash";
-import { TxUnsigned, Tx } from '../../../src/apis/avm/tx';
-import { UnixNow } from '../../../src/apis/avm/types';
+import { TxUnsigned, Tx } from '@slopes/avm/tx';
+import { UnixNow } from '@slopes/avm/types';
 
 /**
  * @ignore

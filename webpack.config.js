@@ -5,6 +5,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const GitRevisionPlugin = require('git-revision-webpack-plugin');
 const gitRevisionPlugin = new GitRevisionPlugin();
 const TerserPlugin = require('terser-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = {
   entry: {
@@ -24,7 +25,8 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: [ '.tsx', '.ts', '.js' ]
+    extensions: [ '.tsx', '.ts', '.js' ],
+    plugins: [new TsconfigPathsPlugin({ configFile: "./tsconfig.json" })]
   },
   output: {
     //filename: '[name]-[git-revision-version].js',

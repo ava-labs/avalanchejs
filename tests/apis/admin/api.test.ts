@@ -1,8 +1,8 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import {Slopes} from "../../../src";
-import AdminAPI from "../../../src/apis/admin/api";
+import Slopes from "@slopes";
+import AdminAPI from "@slopes/admin/api";
 describe("Admin", () => {
     const ip = '127.0.0.1';
     const port = 9650;

@@ -1,11 +1,11 @@
 /**
  * @module Utils
  */
-import AVACore from "../slopes"
+import AVACore from '@slopes/core';
 import {Buffer} from "buffer/";
-import DB from "./db";
+import DB from "@slopes/utils/db";
 import { StoreAPI } from 'store2';
-import BinTools  from './bintools';
+import BinTools  from '@slopes/utils/bintools';
 import { ClientRequest } from "http";
 import { AxiosRequestConfig } from 'axios';
 

@@ -1,8 +1,8 @@
 /**
  * @module PlatformAPI
  */
-import AVACore from "../../slopes"
-import { JRPCAPI, RequestResponseData } from '../../utils/types';
+import AVACore from '@slopes/core';
+import { JRPCAPI, RequestResponseData } from '@slopes/utils/types';
 
 /**
  * Class for interacting with a node's PlatformAPI

@@ -1,11 +1,11 @@
-import { UTXOSet, UTXO } from '../../../src/apis/avm/utxos';
-import { AVMKeyChain } from '../../../src/apis/avm/keychain';
-import { Input } from '../../../src/apis/avm/inputs';
+import { UTXOSet, UTXO } from '@slopes/avm/utxos';
+import { AVMKeyChain } from '@slopes/avm/keychain';
+import { Input } from '@slopes/avm/inputs';
 import createHash from 'create-hash';
-import BinTools from '../../../src/utils/bintools';
+import BinTools from '@slopes/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { Output, OutPayment, OutTakeOrLeave, OutCreateAsset } from '../../../src/apis/avm/outputs';
+import { Output, OutPayment, OutTakeOrLeave, OutCreateAsset } from '@slopes/avm/outputs';
 
 
 /**

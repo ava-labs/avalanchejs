@@ -1,7 +1,6 @@
-import BinTools  from "../../src/utils/bintools";
+import BinTools  from "@slopes/utils/bintools";
 import BN  from "bn.js";
 import {Buffer} from "buffer/";
-import createHash from "create-hash";
 
 const bintools = BinTools.getInstance();
 

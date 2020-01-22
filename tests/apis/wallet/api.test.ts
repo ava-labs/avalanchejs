@@ -1,8 +1,8 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import {Slopes} from "../../../src";
-import KeystoreAPI from "../../../src/apis/keystore/api";
+import Slopes from "@slopes";
+import KeystoreAPI from "@slopes/keystore/api";
 
 describe("Keystore", () => {
     const ip = '127.0.0.1';

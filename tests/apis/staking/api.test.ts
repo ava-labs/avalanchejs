@@ -1,8 +1,8 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import {Slopes} from "../../../src";
-import PlatformAPI from "../../../src/apis/platform/api";
+import Slopes from "@slopes";
+import PlatformAPI from "@slopes/platform/api";
 
 describe("Platform", () => {
     const ip = '127.0.0.1';

@@ -1,8 +1,8 @@
 import BN from "bn.js";
 import {Buffer} from "buffer/";
-import BinTools from '../../../src/utils/bintools';
-import { UnixNow } from '../../../src/apis/avm/types';
-import { UTXO, UTXOSet } from '../../../src/apis/avm/utxos';
+import BinTools from '@slopes/utils/bintools';
+import { UnixNow } from '@slopes/avm/types';
+import { UTXO, UTXOSet } from '@slopes/avm/utxos';
 
 const bintools = BinTools.getInstance();
 

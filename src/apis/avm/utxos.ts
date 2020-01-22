@@ -2,12 +2,12 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import BinTools from '../../utils/bintools';
+import BinTools from '@slopes/utils/bintools';
 import BN from "bn.js";
-import { Output, OutTakeOrLeave, OutPayment, SelectOutputClass, OutCreateAsset } from './outputs';
-import { MergeRule, UnixNow } from './types';
-import { TxUnsigned } from './tx';
-import { Input } from './inputs';
+import { Output, OutTakeOrLeave, OutPayment, SelectOutputClass, OutCreateAsset } from '@slopes/avm/outputs';
+import { MergeRule, UnixNow } from '@slopes/avm/types';
+import { TxUnsigned } from '@slopes/avm/tx';
+import { Input } from '@slopes/avm/inputs';
 
 /**
  * @ignore

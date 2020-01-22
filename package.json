@@ -39,6 +39,7 @@
     "terser-webpack-plugin": "^2.3.1",
     "ts-jest": "^24.2.0",
     "ts-loader": "^6.2.1",
+    "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typedoc": "^0.15.6",
     "typedoc-ava-theme": "^1.0.6",
     "typedoc-plugin-external-module-name": "^2.1.0",
