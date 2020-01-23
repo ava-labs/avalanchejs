@@ -2,7 +2,7 @@
   "name": "slopes",
   "version": "1.0.13",
   "description": "AVA Platform JS Library",
-  "main": "dist/slopes.js",
+  "main": "typings/src/index.js",
   "types": "typings/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --mode development",
