@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios';
-import { Slopes } from "src";
+import { Slopes, TypesLibrary } from "src";
 import AVMAPI  from "src/apis/avm/api";
 import AdminAPI  from "src/apis/admin/api";
 import PlatformAPI  from "src/apis/platform/api";
@@ -26,17 +26,17 @@ describe('Slopes', () => {
     });
 
     test('Endpoints correct', () => {
-        expect(slopes.Admin()).not.toBeInstanceOf(AVMAPI);
-        expect(slopes.Admin()).toBeInstanceOf(AdminAPI);
+        expect(slopes.Admin()).not.toBeInstanceOf(TypesLibrary.AVM.API);
+        expect(slopes.Admin()).toBeInstanceOf(TypesLibrary.Admin.API);
         
-        expect(slopes.AVM()).not.toBeInstanceOf(AdminAPI);
-        expect(slopes.AVM()).toBeInstanceOf(AVMAPI);
+        expect(slopes.AVM()).not.toBeInstanceOf(TypesLibrary.Admin.API);
+        expect(slopes.AVM()).toBeInstanceOf(TypesLibrary.AVM.API);
         
-        expect(slopes.Platform()).not.toBeInstanceOf(KeystoreAPI);
-        expect(slopes.Platform()).toBeInstanceOf(PlatformAPI);
+        expect(slopes.Platform()).not.toBeInstanceOf(TypesLibrary.Keystore.API);
+        expect(slopes.Platform()).toBeInstanceOf(TypesLibrary.Platform.API);
 
-        expect(slopes.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
-        expect(slopes.NodeKeys()).toBeInstanceOf(KeystoreAPI);
+        expect(slopes.NodeKeys()).not.toBeInstanceOf(TypesLibrary.Platform.API);
+        expect(slopes.NodeKeys()).toBeInstanceOf(TypesLibrary.Keystore.API);
 
         expect(slopes.Admin().getRPCID()).toBe(1);
         expect(slopes.AVM().getRPCID()).toBe(1);

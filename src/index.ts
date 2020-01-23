@@ -107,7 +107,8 @@ class AVMTxAPIHolder {
 class AVMTypesHolder {	
     Address = AVMAPITypes.Address;	
     Signature = AVMAPITypes.Signature;	
-    SigIdx = AVMAPITypes.SigIdx;	
+    SigIdx = AVMAPITypes.SigIdx;
+    UnixNow = AVMAPITypes.UnixNow;
     constructor() {}	
 }	
 
