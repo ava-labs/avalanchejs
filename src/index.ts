@@ -1,11 +1,11 @@
 /**
  * @module Slopes
  */
-import AVACore from '@slopes/core';
-import KeystoreAPI from '@slopes/keystore/api';
-import PlatformAPI from '@slopes/platform/api';
-import AVMAPI from '@slopes/avm/api';
-import AdminAPI from '@slopes/admin/api';
+import AVACore from './slopes';
+import KeystoreAPI from './apis/keystore/api';
+import PlatformAPI from './apis/platform/api';
+import AVMAPI from './apis/avm/api';
+import AdminAPI from './apis/admin/api';
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 

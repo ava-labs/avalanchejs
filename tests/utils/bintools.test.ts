@@ -1,4 +1,4 @@
-import BinTools  from "@slopes/utils/bintools";
+import BinTools  from "src/utils/bintools";
 import BN  from "bn.js";
 import {Buffer} from "buffer/";
 

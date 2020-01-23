@@ -1,7 +1,7 @@
 /**
  * @module AVACore
  */
-import { API, RequestResponseData } from '@slopes/utils/types';
+import { API, RequestResponseData } from './utils/types';
 import axios from 'axios';
 import { AxiosRequestConfig, AxiosResponse, Method} from "axios";
 

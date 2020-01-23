@@ -2,8 +2,8 @@
   "name": "slopes",
   "version": "1.0.11",
   "description": "AVA Platform JS Library",
-  "main": "typings/slopes/src/index.js",
-  "types": "typings/slopes/src/index.d.ts",
+  "main": "typings/src/index.js",
+  "types": "typings/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "webpack --mode production",
@@ -39,7 +39,6 @@
     "terser-webpack-plugin": "^2.3.1",
     "ts-jest": "^24.2.0",
     "ts-loader": "^6.2.1",
-    "tsconfig-paths-webpack-plugin": "^3.2.0",
     "typedoc": "^0.15.6",
     "typedoc-ava-theme": "^1.0.6",
     "typedoc-plugin-external-module-name": "^2.2.1",
@@ -61,14 +60,5 @@
     "elliptic": "^6.5.2",
     "secp256k1": "^4.0.0",
     "store2": "^2.10.0"
-  },
-  "_moduleAliases": {
-    "@slopes/avm": "typings/slopes/src/apis/avm",
-    "@slopes/platform": "typings/slopes/src/apis/platform",
-    "@slopes/admin": "typings/slopes/src/apis/admin",
-    "@slopes/keystore": "typings/slopes/src/apis/keystore",
-    "@slopes/utils": "typings/slopes/src/utils",
-    "@slopes/core": "typings/slopes/src/slopes",
-    "@slopes": "typings/slopes/src"
   }
 }

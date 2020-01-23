@@ -1,9 +1,9 @@
 import mockAxios from 'jest-mock-axios';
-import Slopes from "@slopes";
-import AVMAPI  from "@slopes/avm/api";
-import AdminAPI  from "@slopes/admin/api";
-import PlatformAPI  from "@slopes/platform/api";
-import KeystoreAPI  from "@slopes/keystore/api";
+import Slopes from "src";
+import AVMAPI  from "src/apis/avm/api";
+import AdminAPI  from "src/apis/admin/api";
+import PlatformAPI  from "src/apis/platform/api";
+import KeystoreAPI  from "src/apis/keystore/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 

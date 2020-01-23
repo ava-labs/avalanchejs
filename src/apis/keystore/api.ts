@@ -1,8 +1,8 @@
 /**
  * @module KeystoreAPI
  */
-import AVACore from '@slopes/core';
-import {JRPCAPI, RequestResponseData} from "@slopes/utils/types"
+import AVACore from '../../slopes';
+import {JRPCAPI, RequestResponseData} from "../../utils/types"
 
 /**
  * Class for interacting with a node API that is using the node's KeystoreAPI.

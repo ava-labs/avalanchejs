@@ -1,4 +1,4 @@
-import { AVMKeyChain, AVMKeyPair } from '@slopes/avm/keychain';
+import { AVMKeyChain, AVMKeyPair } from 'src/apis/avm/keychain';
 import { Buffer } from 'buffer/';
 import createHash from "create-hash";
 

@@ -1,7 +1,7 @@
 import BN from "bn.js";
 import {Buffer} from "buffer/";
-import BinTools from '@slopes/utils/bintools';
-import { Output, OutTakeOrLeave, OutPayment, SelectOutputClass, OutCreateAsset } from '@slopes/avm/outputs';
+import BinTools from 'src/utils/bintools';
+import { Output, OutTakeOrLeave, OutPayment, SelectOutputClass, OutCreateAsset } from 'src/apis/avm/outputs';
 
 const bintools = BinTools.getInstance();
 

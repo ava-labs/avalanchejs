@@ -2,9 +2,9 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import BinTools from '@slopes/utils/bintools';
+import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { SigIdx } from '@slopes/avm/types';
+import { SigIdx } from './types';
 
 /**
  * @ignore

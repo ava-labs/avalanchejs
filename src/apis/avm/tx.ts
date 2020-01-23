@@ -2,10 +2,10 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import { Signature } from '@slopes/avm/types';
-import { Output, SelectOutputClass } from '@slopes/avm/outputs';
-import { Input } from '@slopes/avm/inputs';
-import BinTools from '@slopes/utils/bintools';
+import { Signature } from './types';
+import { Output, SelectOutputClass } from './outputs';
+import { Input } from './inputs';
+import BinTools from '../../utils/bintools';
 
 /**
  * @ignore

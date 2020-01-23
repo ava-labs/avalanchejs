@@ -1,5 +1,5 @@
-import { API, RequestResponseData } from '@slopes/utils/types';
-import AVACore from '@slopes/core';
+import { API, RequestResponseData } from 'src/utils/types';
+import AVACore from 'src/slopes';
 import { AxiosRequestConfig } from 'axios';
 
 export class TestAPI extends API {
