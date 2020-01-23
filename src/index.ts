@@ -4,18 +4,18 @@
 import AVACore from './slopes';
 import KeystoreAPI from './apis/keystore/api';
 import PlatformAPI from './apis/platform/api';
-import AdminAPI from './apis/admin/api';
 import AVMAPI from './apis/avm/api';
-import * as AVMUTXOs from './apis/avm/utxos';
-import * as AVMTypes from './apis/avm/types';
-import * as AVMTxs from './apis/avm/tx';
-import * as AVMOutputs from './apis/avm/outputs';
-import * as AVMKeychain from './apis/avm/keychain';
-import * as AVMInputs from './apis/avm/inputs';
+import AdminAPI from './apis/admin/api';
 import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 
+import * as AVAAPITxAPI from './apis/avm/tx';	
+import * as AVAAPIUTXOAPI from './apis/avm/utxos';	
+import * as AVAAPITypes from './apis/avm/types';	
+import * as AVAAPIOutputs from './apis/avm/outputs';	
+import * as AVAAPIInput from './apis/avm/inputs';	
+import * as AVAAPIKeyChain from './apis/avm/keychain';
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 
@@ -26,7 +26,7 @@ import DB from './utils/db';
  * ```
  * 
  */
-class Slopes extends AVACore {
+export default class Slopes extends AVACore {
 
     /**
      * Returns a reference to the Admin RPC.
@@ -72,54 +72,131 @@ class Slopes extends AVACore {
     }
 }
 
-declare namespace AVM {
-    export {
-        AVMUTXOs as UTXOs,
-        AVMTypes as Types,
-        AVMTxs as Txs,
-        AVMOutputs as Outputs,
-        AVMKeychain as Keychain, 
-        AVMInputs as Inputs,
-        AVMAPI as API
-    };
-}
+class CoreTypesHolder {	
+    RequestResponseData = CoreTypes.RequestResponseData;	
+    API = CoreTypes.API;	
+    JRPCAPI = CoreTypes.JRPCAPI;	
+    constructor() {}	
+}	
 
-declare namespace Keystore {
-    export {
-        KeystoreAPI as API
-    }
-}
+class AVMInputHolder {	
+    Input = AVAAPIInput.Input;	
+    constructor() {}	
+}	
 
-declare namespace Platform {
-    export {
-        PlatformAPI as API
-    }
-}
+class AVMKeychainHolder {	
+    AVAKeyPair = AVAAPIKeyChain.AVMKeyPair;	
+    AVAKeyChain = AVAAPIKeyChain.AVMKeyChain;	
+    constructor() {}	
+}	
 
-declare namespace Admin {
-    export {
-        AdminAPI as API
-    }
-}
+class AVMOutputHolder {	
+    Output = AVAAPIOutputs.Output;	
+    OutPayment = AVAAPIOutputs.OutPayment;	
+    OutTakeOrLeave = AVAAPIOutputs.OutTakeOrLeave;	
+    constructor() {}	
+}	
 
-declare namespace slopes {
-    export {Slopes, BinTools, CoreTypes, DB, Admin, AVACore, AVM, Keystore, Platform}; 
-}
+class AVMTxAPIHolder {	
+    Tx = AVAAPITxAPI.Tx;	
+    TxUnsigned = AVAAPITxAPI.TxUnsigned;	
+    constructor() {}	
+}	
 
-export default slopes;
+class AVMTypesHolder {	
+    Address = AVAAPITypes.Address;	
+    Signature = AVAAPITypes.Signature;	
+    SigIdx = AVAAPITypes.SigIdx;	
+    constructor() {}	
+}	
 
-/*
-const slopes = {
-    Slopes:Slopes,
-    AVM: {
-        UTXOs,
-        Types,
-        Txs,
-        Outputs,
-        Keychain, 
-        Inputs,
-        AVMAPI
-    }
-}
+class AVMUTXOHolder {	
+    UTXO = AVAAPIUTXOAPI.UTXO;	
+    UTXOSet = AVAAPIUTXOAPI.UTXOSet;	
+    constructor() {}	
+}	
 
-export default slopes;*/
+class APIMiddleware<GE extends CoreTypes.API> {	
+    API: new(ava:AVACore) => GE;	
+    constructor(constructorFN: new(ava:AVACore) => GE){	
+        this.API = constructorFN;	
+    }	
+}	
+
+class AdminMiddleware extends APIMiddleware<AdminAPI> {	
+    constructor(){	
+        super(AdminAPI);	
+    }	
+};	
+class AVMMiddleware extends APIMiddleware<AVMAPI> {	
+    Ins:AVMInputHolder = new AVMInputHolder();	
+    Keychain:AVMKeychainHolder = new AVMKeychainHolder();	
+    Outs:AVMOutputHolder = new AVMOutputHolder();	
+    Tx:AVMTxAPIHolder = new AVMTxAPIHolder();	
+    Types:AVMTypesHolder = new AVMTypesHolder();	
+    UTXO:AVMUTXOHolder = new AVMUTXOHolder();	
+    constructor(){	
+        super(AVMAPI);	
+    }	
+};	
+class PlatformMiddleware extends APIMiddleware<PlatformAPI> {	
+    constructor(){	
+        super(PlatformAPI);	
+    }	
+};	
+class KeystoreAPIMiddleware extends APIMiddleware<KeystoreAPI> {	
+    constructor(){	
+        super(KeystoreAPI);	
+    }	
+};	
+
+/**	
+ * TypesLib contains references to all the classes and types used in this middleware.	
+ * The constructor for the API class is listed in the API variable. 	
+ * In most situations it does not make sense to go through these classes directly.	
+ * 	
+ * Example:	
+ * ```js	
+ * let Keystore = TypesLibrary.KeystoreAPI.API;	
+ * let AVMKeyChain = TypesLibrary.AVMAPI.KeyChain;	
+ * let AVMUTXOSet = TypesLibrary.AVMAPI.UTXO.UTXOSet;	
+ * ```	
+ */	
+class TypesLib {	
+    /**	
+     * Reference to the AdminAPI classes.	
+     */	
+    AdminAPI:AdminMiddleware = new AdminMiddleware();	
+    /**	
+     * Reference to the AVMAPI classes.	
+     */	
+    AVMAPI:AVMMiddleware = new AVMMiddleware();	
+    /**	
+     * Reference to the PlatformAPI classes.	
+     */	
+    PlatformAPI:PlatformMiddleware = new PlatformMiddleware();	
+    /**	
+     * Reference to the KeystoreAPI classes.	
+     */	
+    KeystoreAPI:KeystoreAPIMiddleware = new KeystoreAPIMiddleware();	
+    /**	
+     * Reference to the DB classes.	
+     */	
+    DB:DB = DB.getInstance();	
+    /**	
+     * Reference to the BinTools singleton.	
+     */	
+    BinTools:BinTools = BinTools.getInstance();	
+    /**	
+     * Reference to the AVAJS core's types.	
+     */	
+    CoreTypes:CoreTypesHolder = new CoreTypesHolder();	
+
+    /**	
+     * Returns instance of [[TypesLib]].	
+     */	
+    constructor() {}	
+}	
+
+const TypesLibrary:TypesLib = new TypesLib();	
+export {TypesLibrary} 

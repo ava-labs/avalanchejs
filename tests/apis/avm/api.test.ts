@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios';
-import slopes from "src";
+import Slopes from "src";
 import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
@@ -25,7 +25,7 @@ describe("AVMAPI", () => {
     let username:string = 'AvaLabs';
     let password:string = 'password';
 
-    let ava:slopes.Slopes = new slopes.Slopes(ip,port,protocol);
+    let ava:Slopes = new Slopes(ip,port,protocol);
     let api:AVMAPI;
 
     beforeAll(() => {
