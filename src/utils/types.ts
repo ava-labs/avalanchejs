@@ -1,8 +1,8 @@
 /**
  * @module Utils
  */
-import AVACore from '../slopes';
-import {Buffer} from "buffer/";
+import SlopesCore from '../slopes';
+import { Buffer } from "buffer/";
 import DB from "./db";
 import { StoreAPI } from 'store2';
 import BinTools  from './bintools';
@@ -28,8 +28,8 @@ export class RequestResponseData {
 /**
  * Abstract class defining a generic endpoint that all endpoints must implement (extend).
  */
-export abstract class API {
-    protected ava:AVACore;
+export abstract class APIBase {
+    protected core:SlopesCore;
     protected baseurl:string;
     protected db:StoreAPI;
 
@@ -70,13 +70,13 @@ export abstract class API {
      * @param ava Reference to the AVA instance using this baseurl
      * @param baseurl Path to the baseurl - ex: "/ext/ava"
      */
-    constructor(ava:AVACore, baseurl:string) {
-        this.ava = ava;
+    constructor(core:SlopesCore, baseurl:string) {
+        this.core = core;
         this.setBaseURL(baseurl);
     }
 }
 
-export class JRPCAPI extends API {
+export class JRPCAPI extends APIBase {
     protected jrpcVersion:string = "2.0";
     protected rpcid = 1;
     callMethod = async (method:string, params?:Array<object> | object, baseurl?:string):Promise<RequestResponseData> => {
@@ -99,11 +99,11 @@ export class JRPCAPI extends API {
         let headers:object = {"Content-Type": "application/json;charset=UTF-8"};
 
         let axConf:AxiosRequestConfig = {
-            baseURL:this.ava.getProtocol()+"://"+this.ava.getIP()+":"+this.ava.getPort(),
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
             responseType: 'json'
         };
 
-        return this.ava.post(ep, {}, JSON.stringify(rpc), headers, axConf).then( (resp:RequestResponseData) => {
+        return this.core.post(ep, {}, JSON.stringify(rpc), headers, axConf).then( (resp:RequestResponseData) => {
             if(resp.status >= 200 && resp.status < 300){
                 this.rpcid += 1;
                 if(typeof resp.data === "string"){
@@ -123,12 +123,12 @@ export class JRPCAPI extends API {
 
     /**
      * 
-     * @param ava Reference to the AVA instance using this endpoint
+     * @param core Reference to the Slopes instance using this endpoint
      * @param baseurl Path of the APIs baseurl - ex: "/ext/ava"
      * @param jrpcVersion The jrpc version to use, default "2.0".
      */
-    constructor(ava:AVACore, baseurl:string, jrpcVersion:string = "2.0") {
-        super(ava, baseurl);
+    constructor(core:SlopesCore, baseurl:string, jrpcVersion:string = "2.0") {
+        super(core, baseurl);
         this.jrpcVersion = jrpcVersion;
         this.rpcid = 1;
     }

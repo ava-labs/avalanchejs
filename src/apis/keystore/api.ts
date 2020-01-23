@@ -1,7 +1,7 @@
 /**
  * @module KeystoreAPI
  */
-import AVACore from '../../slopes';
+import SlopesCore from '../../slopes';
 import {JRPCAPI, RequestResponseData} from "../../utils/types"
 
 /**
@@ -272,7 +272,13 @@ class KeystoreAPI extends JRPCAPI{
         });
     }
 
-    constructor(ava:AVACore, baseurl:string = "/ext/keystore"){ super(ava, baseurl); }
+    /**
+     * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
+     * 
+     * @param core A reference to the Slopes class
+     * @param baseurl Defaults to the string "/ext/avm" as the path to subnets baseurl
+     */
+    constructor(core:SlopesCore, baseurl:string = "/ext/keystore"){ super(core, baseurl); }
 }
 
 export default KeystoreAPI;

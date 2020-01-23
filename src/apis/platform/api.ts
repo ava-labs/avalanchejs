@@ -1,7 +1,7 @@
 /**
  * @module PlatformAPI
  */
-import AVACore from '../../slopes';
+import SlopesCore from '../../slopes';
 import { JRPCAPI, RequestResponseData } from '../../utils/types';
 
 /**
@@ -72,7 +72,13 @@ class PlatformAPI extends JRPCAPI{
         });
     }
 
-    constructor(ava:AVACore, baseurl:string = "/ext/platform"){ super(ava, baseurl); }
+    /**
+     * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
+     * 
+     * @param core A reference to the Slopes class
+     * @param baseurl Defaults to the string "/ext/avm" as the path to subnets baseurl
+     */
+    constructor(core:SlopesCore, baseurl:string = "/ext/platform"){ super(core, baseurl); }
 }
 
 export default PlatformAPI;

@@ -1,9 +1,9 @@
 /**
  * @module AVMAPI
  */
-import AVACore from '../../slopes';
-import {Buffer} from "buffer/";
-import {JRPCAPI, RequestResponseData} from "../../utils/types";
+import SlopesCore from '../../slopes';
+import { Buffer } from "buffer/";
+import { JRPCAPI, RequestResponseData } from "../../utils/types";
 import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow } from './types';
 import { AVMKeyChain } from './keychain';
@@ -240,11 +240,11 @@ class AVMAPI extends JRPCAPI{
     /**
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
-     * @param ava A reference to the Slopes class
+     * @param core A reference to the Slopes class
      * @param baseurl Defaults to the string "/ext/avm" as the path to subnets baseurl
      */
-    constructor(ava:AVACore, baseurl:string = "/ext/avm"){ 
-        super(ava, baseurl);
+    constructor(core:SlopesCore, baseurl:string = "/ext/avm"){ 
+        super(core, baseurl);
         this.keychain = new AVMKeyChain();
     }
 }

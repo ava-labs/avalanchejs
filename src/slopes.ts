@@ -1,25 +1,25 @@
 /**
- * @module AVACore
+ * @module SlopesCore
  */
-import { API, RequestResponseData } from './utils/types';
+import { APIBase, RequestResponseData } from './utils/types';
 import axios from 'axios';
-import { AxiosRequestConfig, AxiosResponse, Method} from "axios";
+import { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 /**
- * AVACore is middleware for interacting with AVA node RPC APIs. 
+ * SlopesCore is middleware for interacting with AVA node RPC APIs. 
  * 
  * Example usage:
  * ```js
- * let ava = new AVACore("127.0.0.1", 9650, "https");
+ * let slopes = new SlopesCore("127.0.0.1", 9650, "https");
  * ```
  * 
  */
-export default class AVACore {
+export default class SlopesCore {
     protected protocol:string;
     protected ip:string;
     protected port:number;
     protected url:string;
-    protected apis:{ [k: string]: API } = {};
+    protected apis:{ [k: string]: APIBase } = {};
 
     /**
      * Sets the address and port of the main AVA Client.
@@ -68,12 +68,12 @@ export default class AVACore {
      * 
      * In TypeScript:
      * ```typescript
-     * ava.addAPI<MyVMClass>("mysubnet", "/ext/mysubnet", MyVMClass);
+     * slopes.addAPI<MyVMClass>("mysubnet", "/ext/mysubnet", MyVMClass);
      * ```
      * 
      * In Javascript:
      * ```js
-     * ava.addAPI("mysubnet", "/ext/mysubnet", MyVMClass);
+     * slopes.addAPI("mysubnet", "/ext/mysubnet", MyVMClass);
      * ```
      * 
      * @typeparam GA Class of the API being added
@@ -82,7 +82,7 @@ export default class AVACore {
      * @param constructorFN A reference to the class which instantiates the API
      * 
      */
-    addAPI = <GA extends API>(apiName:string, constructorFN: new(ava:AVACore, baseurl?:string) => GA, baseurl:string = undefined,) => {
+    addAPI = <GA extends APIBase>(apiName:string, constructorFN: new(ava:SlopesCore, baseurl?:string) => GA, baseurl:string = undefined,) => {
         if(baseurl == undefined) {
             this.apis[apiName] = new constructorFN(this);
         } else {
@@ -95,7 +95,7 @@ export default class AVACore {
      * 
      * @param apiName Name of the API to return
      */
-    api = <GA extends API>(apiName:string): GA => {
+    api = <GA extends APIBase>(apiName:string): GA => {
         return this.apis[apiName] as GA;
     }
 

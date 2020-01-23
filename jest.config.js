@@ -5,7 +5,6 @@ module.exports = {
   verbose: true,
   testEnvironment: 'node',
   "roots": [
-    "<rootDir>",
     "<rootDir>/src",
     "<rootDir>/tests",
     "<rootDir>/__mocks__"

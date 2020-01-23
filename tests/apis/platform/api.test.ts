@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import Slopes from "src";
+import { Slopes } from "src";
 import PlatformAPI from "src/apis/platform/api";
 
 describe("Platform", () => {
@@ -12,11 +12,11 @@ describe("Platform", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let ava = new Slopes(ip,port,protocol);
+    let slopes = new Slopes(ip,port,protocol);
     let platform:PlatformAPI;
 
     beforeAll(() => {
-        platform = new PlatformAPI(ava);
+        platform = new PlatformAPI(slopes);
     });
 
     afterEach(() => {
