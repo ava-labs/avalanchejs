@@ -61,5 +61,14 @@
     "elliptic": "^6.5.2",
     "secp256k1": "^4.0.0",
     "store2": "^2.10.0"
+  },
+  "_moduleAliases": {
+    "@slopes/avm": "typings/slopes/src/apis/avm",
+    "@slopes/platform": "typings/slopes/src/apis/platform",
+    "@slopes/admin": "typings/slopes/src/apis/admin",
+    "@slopes/keystore": "typings/slopes/src/apis/keystore",
+    "@slopes/utils": "typings/slopes/src/utils",
+    "@slopes/core": "typings/slopes/src/slopes",
+    "@slopes": "typings/slopes/src"
   }
 }
