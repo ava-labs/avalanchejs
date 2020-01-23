@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import Slopes from "src/slopes";
+import slopes from "src";
 import AdminAPI from "src/apis/admin/api";
 describe("Admin", () => {
     const ip = '127.0.0.1';
@@ -11,7 +11,7 @@ describe("Admin", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let ava = new Slopes(ip,port,protocol);
+    let ava:slopes.Slopes = new slopes.Slopes(ip,port,protocol);
     let admin:AdminAPI;
 
     beforeAll(() => {

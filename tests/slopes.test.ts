@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios';
-import Slopes from "src";
+import slopes from "src";
 import AVMAPI  from "src/apis/avm/api";
 import AdminAPI  from "src/apis/admin/api";
 import PlatformAPI  from "src/apis/platform/api";
@@ -7,13 +7,15 @@ import KeystoreAPI  from "src/apis/keystore/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 
+
+
 describe('Slopes', () => {
     const ip = '127.0.0.1';
     const port = 9650;
     const protocol = "https";
-    let ava:Slopes;
+    let ava:slopes.Slopes;
     beforeAll(() => {
-        ava = new Slopes(ip,port,protocol);
+        ava = new slopes.Slopes(ip,port,protocol);
     });
     test('Can initialize', () => {
         expect(ava.getIP()).toBe(ip);
@@ -62,9 +64,9 @@ describe('HTTP Operations', () => {
     const port = 8080;
     const protocol = "http";
     const path = "/ext/testingrequests";
-    let ava:Slopes;
+    let ava:slopes.Slopes;
     beforeAll(() => {
-        ava = new Slopes(ip,port, protocol);
+        ava = new slopes.Slopes(ip,port, protocol);
         ava.addAPI("testingrequests", TestAPI, path);
     });
 

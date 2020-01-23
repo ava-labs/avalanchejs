@@ -6,8 +6,8 @@
   "types": "typings/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production",
-    "prepublish": "npx tsc",
+    "build": "rm -rf typings/ & webpack --mode production",
+    "prepublish": "npm run build",
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",

@@ -4,8 +4,18 @@
 import AVACore from './slopes';
 import KeystoreAPI from './apis/keystore/api';
 import PlatformAPI from './apis/platform/api';
-import AVMAPI from './apis/avm/api';
 import AdminAPI from './apis/admin/api';
+import AVMAPI from './apis/avm/api';
+import * as AVMUTXOs from './apis/avm/utxos';
+import * as AVMTypes from './apis/avm/types';
+import * as AVMTxs from './apis/avm/tx';
+import * as AVMOutputs from './apis/avm/outputs';
+import * as AVMKeychain from './apis/avm/keychain';
+import * as AVMInputs from './apis/avm/inputs';
+import * as CoreTypes from './utils/types';
+import BinTools from './utils/bintools';
+import DB from './utils/db';
+
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 
@@ -16,7 +26,7 @@ import AdminAPI from './apis/admin/api';
  * ```
  * 
  */
-export default class Slopes extends AVACore {
+class Slopes extends AVACore {
 
     /**
      * Returns a reference to the Admin RPC.
@@ -62,3 +72,54 @@ export default class Slopes extends AVACore {
     }
 }
 
+declare namespace AVM {
+    export {
+        AVMUTXOs as UTXOs,
+        AVMTypes as Types,
+        AVMTxs as Txs,
+        AVMOutputs as Outputs,
+        AVMKeychain as Keychain, 
+        AVMInputs as Inputs,
+        AVMAPI as API
+    };
+}
+
+declare namespace Keystore {
+    export {
+        KeystoreAPI as API
+    }
+}
+
+declare namespace Platform {
+    export {
+        PlatformAPI as API
+    }
+}
+
+declare namespace Admin {
+    export {
+        AdminAPI as API
+    }
+}
+
+declare namespace slopes {
+    export {Slopes, BinTools, CoreTypes, DB, Admin, AVACore, AVM, Keystore, Platform}; 
+}
+
+export default slopes;
+
+/*
+const slopes = {
+    Slopes:Slopes,
+    AVM: {
+        UTXOs,
+        Types,
+        Txs,
+        Outputs,
+        Keychain, 
+        Inputs,
+        AVMAPI
+    }
+}
+
+export default slopes;*/
