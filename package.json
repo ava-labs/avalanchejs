@@ -2,11 +2,11 @@
   "name": "slopes",
   "version": "1.0.12",
   "description": "AVA Platform JS Library",
-  "main": "typings/src/index.js",
+  "main": "dist/slopes.js",
   "types": "typings/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "rm -rf typings/ & webpack --mode production",
+    "build": "rm -rf typings/ && npx tsc -b && webpack --mode production",
     "prepublish": "npm run build",
     "test": "jest",
     "test-watch": "jest --watch",
