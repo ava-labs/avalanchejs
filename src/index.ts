@@ -201,4 +201,23 @@ class TypesLib {
 }	
 
 const TypesLibrary:TypesLib = new TypesLib();	
-export {TypesLibrary} 
+export {TypesLibrary};
+
+export {BinTools};
+export {DB};
+export {CoreTypes};
+export {SlopesCore};
+
+export {AVMAPIUTXOAPI as UTXOs};
+export {AVMAPITxAPI as Txs};
+export {AVMAPITypes as AVMTypes};
+export {AVMAPIOutputs as Outputs};
+export {AVMAPIInput as Inputs};
+export {AVMAPIKeyChain as Keys};
+
+export {AVMAPI as AVM};
+export {KeystoreAPI as Keystore};
+export {PlatformAPI as Platform};
+export {AdminAPI as Admin};
+
+
