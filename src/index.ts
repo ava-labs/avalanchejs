@@ -226,13 +226,6 @@ export {OutCreateAsset, OutPayment, OutTakeOrLeave, Output, SelectOutputClass} f
 export {Input} from './apis/avm/inputs';	
 export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
 
-export {AVMAPIUTXOAPI as UTXOs};
-export {AVMAPITxAPI as Txs};
-export {AVMAPITypes as AVMTypes};
-export {AVMAPIOutputs as Outputs};
-export {AVMAPIInput as Inputs};
-export {AVMAPIKeyChain as Keys};
-
 export {AVMAPI as AVM};
 export {KeystoreAPI as Keystore};
 export {PlatformAPI as Platform};
