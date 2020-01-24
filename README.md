@@ -2,11 +2,11 @@
 
 ## Overview
 
-Slopes is a JavaScript Library interfacing with the **AVA** Platform. It is built using TypeScript and intended to support both browser and Node.js. The Slopes library allows one to issue commands to the AVA node APIs. 
+Slopes is a JavaScript Library for interfacing with the **AVA** Platform. It is built using TypeScript and intended to support both browser and Node.js. The Slopes library allows one to issue commands to the AVA node APIs. 
 
 The APIs currently supported by default are:
 
-  * The AVA Virtual Machine (AVM)
+  * The AVA Virtual Machine (AVM) API
   * The Keystore API
   * The Admin API
   * The Platform API
@@ -77,7 +77,7 @@ import { Buffer } from 'buffer/'; // the slash forces this library over native N
 let bintools = slopes.BinTools.getInstance();
 ```
 
-The above lines import the libraries used in this example:
+The above lines import the libraries used in the below example:
   
   * slopes: Our javascript module
   * bn.js: A bignumber module use by slopes
@@ -90,7 +90,7 @@ Slopes comes with its own AVM Keychain. This keychain is used in the functions o
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");
-let avm = ava.AVM(); //returns a reference to the instance of the AVM used by Slopes
+let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
 
 ### Accessing the keychain
@@ -101,7 +101,7 @@ The keychain is accessed through the AVM API and can be referenced directly or t
 let myKeychain = avm.keyChain();
 ```
 
-This exposes the instance of the class AVMKeyChain which is created when the AVM API is created. Keys managed by this keychain are of type AVMKeyPair. At present, this supports secp256k1 curve for ECDSA key paris. 
+This exposes the instance of the class AVM Keychain which is created when the AVM API is created. At present, this supports secp256k1 curve for ECDSA key pairs. 
 
 ### Creating AVM key pairs
 
@@ -165,7 +165,7 @@ This example creates an asset in the AVM and publishes it to the **AVA** Platfor
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");
-let avm = ava.AVM(); //returns a reference to the instance of the AVM used by Slopes
+let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
 
 ### Describe the new asset
@@ -202,8 +202,8 @@ Now that we know what we want an asset to look like, we create an output to send
 
   1. We instantiate an output of the type "Create Asset" populated with the desired parameters.
   2. We create an unsigned transaction from an array of inputs and outputs.
-    * Inputs come from the UTXOs and are spent in a transaction.
-    * In this case there are no unspent assets, so the input array is blank.
+     * Inputs come from the UTXOs and are spent in a transaction.
+     * In this case there are no unspent assets, so the input array is blank.
   3. We use our AVM Keychain to sign and return the signed transaction.
 
 ```js
