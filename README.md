@@ -2,18 +2,32 @@
 
 ## Overview
 
-Slopes is a JavaScript Library interfacing with the **AVA** Platform. It is built using TypeScript and intended to support both browser and Node.js. 
+Slopes is a JavaScript Library interfacing with the **AVA** Platform. It is built using TypeScript and intended to support both browser and Node.js. The Slopes library allows one to issue commands to the AVA node APIs. 
 
-## Getting Started
-
-We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the **AVA** Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [**AVA** Platform Specification](https://avalabs.org/docs/). 
-
-The Slopes library allows one to issue commands to the AVA node APIs. The APIs currently supported by default are:
+The APIs currently supported by default are:
 
   * The AVA Virtual Machine (AVM)
   * The Keystore API
   * The Admin API
   * The Platform API
+
+## Getting Started
+
+We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the **AVA** Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [**AVA** Platform Specification](https://avalabs.org/docs/). 
+
+  Using Slopes, developers are able to:
+
+  * Locally manage private keys
+  * Retrieve balances on addresses
+  * Get UTXOs for addresses
+  * Build and sign transactions
+  * Issue signed transactions to the AVM
+  * Create a subnetwork
+  * Administer a local node
+  * Retrieve **AVA** network information from a node
+
+The entirety of the Slopes documentation can be found on our [XXX Fix Link XXX Slopes documentation page](https://avalabs.org/docs/slopes).
+
 
 ### Requirements
 
@@ -54,18 +68,6 @@ import * as slopes from "slopes"
 ```
 ### Building with Slopes
 
-Using Slopes, developers are able to:
-
-  * Locally manage private keys
-  * Retrieve balances on addresses
-  * Get UTXOs for addresses
-  * Build and sign transactions
-  * Issue signed transactions to the AVM
-  * Create a subnetwork
-  * Administer a local node
-  * Retrieve **AVA** network information from a node
-
-The entirety of the Slopes documentation can be found on our [XXX Fix Link XXX Slopes documentation page](https://avalabs.org/docs/slopes).
 
 ### Importing essentials
 
