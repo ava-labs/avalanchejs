@@ -1,10 +1,21 @@
-# Slopes - The AVA Platform JavaScript Library
+# Slopes - The **AVA** Platform JavaScript Library
 
 ## Overview
 
-Slopes is a JavaScript Library built using TypeScript and intended to support both browser and Node.js. 
+Slopes is a JavaScript Library interfacing with the **AVA** Platform. It is built using TypeScript and intended to support both browser and Node.js. 
 
 ## Getting Started
+
+We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the **AVA** Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [**AVA** Platform Specification](https://avalabs.org/docs/). 
+
+The Slopes library allows one to issue commands to the AVA node APIs. The APIs currently supported by default are:
+
+  * The AVA Virtual Machine (AVM)
+  * The Keystore API
+  * The Admin API
+  * The Platform API
+
+### Requirements
 
 Slopes requires Node.js LTS version 12.13.1 or higher to compile. 
 
@@ -29,7 +40,7 @@ You can also pull the repo down directly and build it from scratch:
 
 `npm run build`
 
-This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "slopes.js" file can then be dropped into any project as a pure javaescript implementation of Slopes.
+This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "slopes.js" file can then be dropped into any project as a pure javascript implementation of Slopes.
 
 The Slopes library can be imported into your existing Node.js project as follows:
 
@@ -41,9 +52,7 @@ Or into your TypeScript project like this:
 ```js
 import * as slopes from "slopes"
 ```
-### Building With Slopes
-
-We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their RPC endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/). 
+### Building with Slopes
 
 Using Slopes, developers are able to:
 
@@ -54,7 +63,7 @@ Using Slopes, developers are able to:
   * Issue signed transactions to the AVM
   * Create a subnetwork
   * Administer a local node
-  * Retrieve AVA network information from a node
+  * Retrieve **AVA** network information from a node
 
 The entirety of the Slopes documentation can be found on our [XXX Fix Link XXX Slopes documentation page](https://avalabs.org/docs/slopes).
 
@@ -77,7 +86,7 @@ The above lines import the libraries used in this example:
 
 ## Example 1 -- Managing AVM Keys
 
-The AVM API exposed in Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
+Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");
@@ -109,7 +118,7 @@ let mypk = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f60
 let newAddress2 = myKeychain.importKey(mypk);
 ```
 
-... or an AVA serialized string works, too:
+... or an **AVA** serialized string works, too:
 
 ```js
 let mypk = "2azaedFvWZACNfJwiahmUtbpe8WWVPA2nJecjHz7KMfc7yhFfY";
@@ -152,7 +161,7 @@ let isValid = keypair.verify(message, signature, signerPubk); //returns a boolea
 
 ## Example 2 -- Creating An Asset
 
-This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
+This example creates an asset in the AVM and publishes it to the **AVA** Platform. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");
@@ -208,7 +217,7 @@ let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it! 
 
-Using the Slopes AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the Slopes AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string **AVA** serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
