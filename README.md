@@ -94,15 +94,61 @@ let myKeychain = avm.keyChain();
 
 This exposes the instance of the class AVMKeyChain which is created when the AVM API is created. Keys managed by this keychain are of type AVMKeyPair. At present, this supports secp256k1 curve for ECDSA key paris. 
 
-### Creating keypairs
+### Creating AVM key pairs
 
 The keychain has the ability to create new keypairs for you and return the address assocated with the key pair.
 
 ```js
-let newAddress = myKeychain.makeKey();
+let newAddress1 = myKeychain.makeKey();
 ```
 
-You may also import your exsting private key into the 
+You may also import your exsting private key into the keychain using either a Buffer...
+
+```js
+let mypk = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
+let newAddress2 = myKeychain.importKey(mypk);
+```
+
+... or an AVA serialized string works, too:
+
+```js
+let mypk = "2azaedFvWZACNfJwiahmUtbpe8WWVPA2nJecjHz7KMfc7yhFfY";
+let newAddress2 = myKeychain.importKey(mypk);
+```
+
+### Working with keychains
+
+The AVMKeyChain extends the global KeyChain class, which has standardized key management capabilities. The following functions are available on any keychain that implements this interface.
+
+```js
+let addresses = myKeychain.getAddreses(); //returns an array of all addresses managed
+let exists = myKeychain.hasKey(myaddress); //returns true if the address is managed
+let keypair = myKeychain.getKey(myaddress); //returns the keypair class
+```
+
+### Working with keypairs
+
+The AVMKeyPair class implements the global KeyPair class, which has standardized keypair functionality. The following operations are available on any keypair that implements this interface.
+
+```js
+let myaddress = keypair.getAddress();
+
+let pubk = keypair.getPublicKey(); //returns Buffer
+let pubkstr = keypair.getPublicKeyString(); //returns string
+
+let privk = keypair.getPrivateKey(); //returns Buffer
+let privkstr = keypair.getPrivateKeyString(); //returns string
+
+keypair.generateKey(); //creates a new random keypair
+
+let mypk = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
+let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
+
+let message = "Wubalubadubdub";
+let signature = keypair.sign(message); //returns a Buffer with the signature
+let signerPubk = keypair.recover(message, signature);
+let isValid = keypair.verify(message, signature, signerPubk); //returns a boolean
+```
 
 ## Example 2 -- Creating An Asset
 
