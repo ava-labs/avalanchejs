@@ -212,13 +212,19 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     /**
      * Given a private key, makes a new key pair, returns the address.
      * 
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key 
+     * @param privk A {@link https://github.com/feross/buffer|Buffer} or AVA serialized string representing the private key 
      * 
      * @returns Address of the new key pair
      */
-    importKey = (privk:Buffer):string => {
+    importKey = (privk:Buffer | string):string => {
         let keypair:AVMKeyPair = new AVMKeyPair();
-        keypair.importKey(privk);
+        let pk:Buffer;
+        if(typeof privk === 'string'){
+            pk = bintools.avaDeserialize(privk);
+        } else {
+            pk = bintools.copyFrom(privk);
+        }
+        keypair.importKey(pk);
         if(!(keypair.getAddress() in this.keys)){
             this.addKey(keypair);
         }

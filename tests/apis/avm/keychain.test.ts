@@ -1,6 +1,9 @@
 import { AVMKeyChain, AVMKeyPair } from 'src/apis/avm/keychain';
 import { Buffer } from 'buffer/';
 import createHash from "create-hash";
+import BinTools from 'src/utils/bintools';
+
+const bintools = BinTools.getInstance();
 
 describe('AVMKeyPair', () => {
     test('repeatable 1', () => {
@@ -63,11 +66,24 @@ describe('AVMKeyPair', () => {
 });
 
 describe('AVMKeyChain', () => {
-    test('importKey', () => {
+    test('importKey from Buffer', () => {
         let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
         let kc:AVMKeyChain = new AVMKeyChain();
         let kp2:AVMKeyPair = new AVMKeyPair();
         let addr1:string = kc.importKey(keybuff);
+        let kp1:AVMKeyPair = kc.getKey(addr1);
+        kp2.importKey(keybuff);
+        let addr2 = kp1.getAddress();
+        expect(addr1).toBe(addr2);
+        expect(kp1.getPrivateKeyString()).toBe(kp2.getPrivateKeyString());
+        expect(kp1.getPublicKeyString()).toBe(kp2.getPublicKeyString());
+    });
+
+    test('importKey from serialized string', () => {
+        let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
+        let kc:AVMKeyChain = new AVMKeyChain();
+        let kp2:AVMKeyPair = new AVMKeyPair();
+        let addr1:string = kc.importKey(bintools.avaSerialize(keybuff));
         let kp1:AVMKeyPair = kc.getKey(addr1);
         kp2.importKey(keybuff);
         let addr2 = kp1.getAddress();
