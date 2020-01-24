@@ -66,8 +66,6 @@ Or into your TypeScript project like this:
 ```js
 import * as slopes from "slopes"
 ```
-### Building with Slopes
-
 
 ### Importing essentials
 
