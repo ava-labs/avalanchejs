@@ -16,6 +16,7 @@ import * as AVMAPITypes from './apis/avm/types';
 import * as AVMAPIOutputs from './apis/avm/outputs';	
 import * as AVMAPIInput from './apis/avm/inputs';	
 import * as AVMAPIKeyChain from './apis/avm/keychain';
+import { PersistanceOptions } from './apis/avm/api';
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 
@@ -119,8 +120,8 @@ class AVMUTXOHolder {
 }	
 
 class APIMiddleware<GE extends CoreTypes.APIBase> {	
-    API: new(ava:SlopesCore) => GE;	
-    constructor(constructorFN: new(ava:SlopesCore) => GE){	
+    API: new(core:SlopesCore) => GE;	
+    constructor(constructorFN: new(core:SlopesCore) => GE){	
         this.API = constructorFN;	
     }	
 }	
@@ -136,7 +137,8 @@ class AVMMiddleware extends APIMiddleware<AVMAPI> {
     Outputs:AVMOutputHolder = new AVMOutputHolder();	
     Txs:AVMTxAPIHolder = new AVMTxAPIHolder();	
     Types:AVMTypesHolder = new AVMTypesHolder();	
-    UTXOs:AVMUTXOHolder = new AVMUTXOHolder();	
+    UTXOs:AVMUTXOHolder = new AVMUTXOHolder();
+    PersistanceOpts = PersistanceOptions;
     constructor(){	
         super(AVMAPI);	
     }	
@@ -207,6 +209,22 @@ export {BinTools};
 export {DB};
 export {CoreTypes};
 export {SlopesCore};
+
+export * from './slopes';
+export * from './apis/keystore/api';
+export * from './apis/platform/api';
+export * from './apis/avm/api';
+export * from './apis/admin/api';
+export * from './utils/types';
+export * from './utils/bintools';
+export * from './utils/db';
+
+export {Tx, TxUnsigned} from './apis/avm/tx';
+export {UTXO, UTXOSet} from './apis/avm/utxos';	
+export {SigIdx, Signature, UnixNow, Address} from './apis/avm/types';	
+export {OutCreateAsset, OutPayment, OutTakeOrLeave, Output, SelectOutputClass} from './apis/avm/outputs';	
+export {Input} from './apis/avm/inputs';	
+export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
 
 export {AVMAPIUTXOAPI as UTXOs};
 export {AVMAPITxAPI as Txs};
