@@ -79,12 +79,12 @@ let bintools = slopes.BinTools.getInstance();
 
 The above lines import the libraries used in the below example:
   
-  * slopes: Our javascript module
-  * bn.js: A bignumber module use by slopes
-  * buffer: A Buffer library 
-  * BinTools: A singleton built into Slopes that is used for dealing with binary data
+  * slopes: Our javascript module.
+  * bn.js: A bignumber module use by Slopes.
+  * buffer: A Buffer library.
+  * BinTools: A singleton built into Slopes that is used for dealing with binary data.
 
-## Example 1 -- Managing AVM Keys
+## Example 1 &mdash; Managing AVM Keys
 
 Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
 
@@ -159,7 +159,7 @@ let signerPubk = keypair.recover(message, signature);
 let isValid = keypair.verify(message, signature, signerPubk); //returns a boolean
 ```
 
-## Example 2 -- Creating An Asset
+## Example 2 &mdash; Creating An Asset
 
 This example creates an asset in the AVM and publishes it to the **AVA** Platform. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
 
@@ -221,17 +221,17 @@ Using the Slopes AVM API, we going to call the issueTx function. This function c
 
 ```js
 // using the Tx class
-let txid = avm.issueTx(signed); //returns an AVA serialized string for the TxID
+let txid = await avm.issueTx(signed); //returns an AVA serialized string for the TxID
 ```
 
 ```js
 // using the base-58 representation
-let txid = avm.issueTx(signed.toString()); //returns an AVA serialized string for the TxID
+let txid = await avm.issueTx(signed.toString()); //returns an AVA serialized string for the TxID
 ```
 
 ```js
 // using the transaction Buffer
-let txid = avm.issueTx(signed.toBuffer()); //returns an AVA serialized string for the TxID
+let txid = await avm.issueTx(signed.toBuffer()); //returns an AVA serialized string for the TxID
 ```
 
 We assume ONE of those methods are used to issue the transaction.
@@ -241,7 +241,8 @@ We assume ONE of those methods are used to issue the transaction.
 Now that we sent the transaction to the network, it takes a few seconds to determine if the transaction has gone through. We can get an updated status on the transaction using the TxID through the AVM API.
 
 ```js
-let status = avm.getTxStatus(txid); // returns one of: "Accepted", "Processing", "Unknown", and "Rejected"
+// returns one of: "Accepted", "Processing", "Unknown", and "Rejected"
+let status = await avm.getTxStatus(txid); 
 ```
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
@@ -249,4 +250,90 @@ The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
   * "Processing" indicates that the transaction is being voted on.
   * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
   * "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
+
+### Identifying the newly created asset
+
+The AVM uses the TxID of the transaction which created the asset as the unique identifier for the asset. This unique identifier is henceforth known as the "AssetID" of the asset. When assets are traded around the AVM, they always reference the AssetID that they represent. 
+
+## Example 3 &mdash; Sending An Asset
+
+This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
+
+```js
+let ava = new slopes.Slopes("localhost", 9650, "https");
+let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
+```
+
+We're also assuming that the keystore contains a list of addresses used in this transaction.
+
+### Getting the UTXO Set
+
+The AVM stores all available balances in a datastore called Unspent Transaction Outputs (UTXOs). A UTXO consists of a list of outputs produced by transactions, addresses that can spend those outputs, and other variables such as lockout times (a timestamp after which the output can be spent) and thresholds (how many signers are required to spend the output). 
+
+For the case of this example, we're going to create a simple transaction that spends an amount of available coins and sends it to a single address without any restrictions. The management of the UTXOs will mostly be abstracted away. 
+
+However, we do need to get the UTXO Set for the addresses we're managing. 
+
+```js
+let myAddresses = avm.keyChain().getAddresses(); //returns an array of addresses the keychain manages
+let utxos = await avm.getUTXOs();
+```
+
+### Spending the UTXOs
+
+Spends happen on single asset types. We have a particular assetID whose coins we want to send to a recipient address. First, let's verify that we have the funds available for the transaction.
+
+```js
+let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
+let mybalance = utxos.getBalance(myAddresses, assetid); //returns 400 as a BN
+```
+We have 400 coins! We're going to now send 100 of those coins to our friend's address.
+
+```js
+let sendAmount = new BN(100); //amounts are in BN format
+let friendsAddress = "B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized address format
+
+//The below returns a TxUnsigned
+//Parameters sent are (in order of appearance):
+//   * The UTXO Set
+//   * The amount being sent as a BN
+//   * An array of addresses to send the funds
+//   * An array of addresses sending the funds
+//   * An array of addresses any leftover funds are sent
+//   * The AssetID of the funds being sent
+let unsignedTx = avm.makeUnsignedTx(utxos, amount, [friendsAddress], myAddresses, myAddresses, assetid); 
+let signedTx = avm.signTx(unsignedTx);
+let txid = await avm.issueTx(signedTx);
+```
+
+And the transaction is sent!
+
+### Get the status of the transaction
+
+Now that we sent the transaction to the network, it takes a few seconds to determine if the transaction has gone through. We can get an updated status on the transaction using the TxID through the AVM API.
+
+```js
+// returns one of: "Accepted", "Processing", "Unknown", and "Rejected"
+let status = await avm.getTxStatus(txid); 
+```
+
+The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
+  * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
+  * "Processing" indicates that the transaction is being voted on.
+  * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
+  * "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
+
+### Check the results
+
+The transaction finally came back as "Accepted", now let's update the UTXOSet and verify that the transaction balance is as we expected. 
+
+*Note: In a real network the balance isn't guaranteed to be return the same. Transaction fees or additional spends may vary the balance. For the purpose of this example, we assume neither of those cases.*
+
+```js
+let updatedUTXOs = await avm.getUTXOs();
+let newBalance = updatedUTXOs.getBalance(myAddresses, assetid);
+if(newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()){
+    throw Error("heyyy these should equal!");
+}
+```
 
