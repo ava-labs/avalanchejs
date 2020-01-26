@@ -246,6 +246,7 @@ let status = await avm.getTxStatus(txid);
 ```
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
+
   * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
   * "Processing" indicates that the transaction is being voted on.
   * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
@@ -253,10 +254,9 @@ The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 
 ### Identifying the newly created asset
 
-The AVM uses the TxID of the transaction which created the asset as the unique identifier for the asset. This unique identifier is henceforth known as the "AssetID" of the asset. When assets are traded around the AVM, they always reference the AssetID that they represent. 
+The AVM uses the TxID of the transaction which created the asset as the unique identifier for the asset. This unique identifier is henceforth known as the "AssetID" of the asset. When assets are traded around the AVM, they always reference the AssetID that they represent.
 
 ## Example 3 &mdash; Sending An Asset
-
 This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
 
 ```js
@@ -268,7 +268,7 @@ We're also assuming that the keystore contains a list of addresses used in this 
 
 ### Getting the UTXO Set
 
-The AVM stores all available balances in a datastore called Unspent Transaction Outputs (UTXOs). A UTXO consists of a list of outputs produced by transactions, addresses that can spend those outputs, and other variables such as lockout times (a timestamp after which the output can be spent) and thresholds (how many signers are required to spend the output). 
+The AVM stores all available balances in a datastore called Unspent Transaction Outputs (UTXOs). A UTXO Set is the unique list of outputs produced by transactions, addresses that can spend those outputs, and other variables such as lockout times (a timestamp after which the output can be spent) and thresholds (how many signers are required to spend the output). 
 
 For the case of this example, we're going to create a simple transaction that spends an amount of available coins and sends it to a single address without any restrictions. The management of the UTXOs will mostly be abstracted away. 
 
@@ -276,12 +276,12 @@ However, we do need to get the UTXO Set for the addresses we're managing.
 
 ```js
 let myAddresses = avm.keyChain().getAddresses(); //returns an array of addresses the keychain manages
-let utxos = await avm.getUTXOs();
+let utxos = await avm.getUTXOs(myAddresses);
 ```
 
 ### Spending the UTXOs
 
-Spends happen on single asset types. We have a particular assetID whose coins we want to send to a recipient address. First, let's verify that we have the funds available for the transaction.
+The `makeUnsignedTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
 let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
@@ -318,6 +318,7 @@ let status = await avm.getTxStatus(txid);
 ```
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
+
   * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
   * "Processing" indicates that the transaction is being voted on.
   * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
@@ -327,7 +328,7 @@ The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 
 The transaction finally came back as "Accepted", now let's update the UTXOSet and verify that the transaction balance is as we expected. 
 
-*Note: In a real network the balance isn't guaranteed to be return the same. Transaction fees or additional spends may vary the balance. For the purpose of this example, we assume neither of those cases.*
+*Note: In a real network the balance isn't guaranteed to match this scenario. Transaction fees or additional spends may vary the balance. For the purpose of this example, we assume neither of those cases.*
 
 ```js
 let updatedUTXOs = await avm.getUTXOs();
@@ -336,4 +337,3 @@ if(newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()){
     throw Error("heyyy these should equal!");
 }
 ```
-
