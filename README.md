@@ -130,7 +130,7 @@ let newAddress2 = myKeychain.importKey(mypk);
 The AVMKeyChain extends the global KeyChain class, which has standardized key management capabilities. The following functions are available on any keychain that implements this interface.
 
 ```js
-let addresses = myKeychain.getAddreses(); //returns an array of all addresses managed
+let addresses = myKeychain.getAddresses(); //returns an array of all addresses managed
 let exists = myKeychain.hasKey(myaddress); //returns true if the address is managed
 let keypair = myKeychain.getKey(myaddress); //returns the keypair class
 ```
@@ -188,7 +188,7 @@ let address3 = "B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //already serialized! Yay!
 // Note: "address3" is already seralized! Yay!
 let addresses = [
     bintools.avaSerialize(Buffer.from(address1, "hex")),
-    bintools.avaSerialize(Buffer.from(address2, "hex"))
+    bintools.avaSerialize(Buffer.from(address2, "hex")),
     address3
 ];
 

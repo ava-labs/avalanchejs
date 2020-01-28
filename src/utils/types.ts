@@ -261,7 +261,7 @@ export class KeyChain<KPClass extends KeyPair> {
      * 
      * @returns An array of string representations of the addresses
      */
-    getAddreses = ():Array<string> => {
+    getAddresses = ():Array<string> => {
         return Object.keys(this.keys);
     }
 
