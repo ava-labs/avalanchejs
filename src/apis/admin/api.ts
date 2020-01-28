@@ -26,13 +26,15 @@ export class AdminAPI extends JRPCAPI{
     }
 
     /**
-     * Fetches the blockchainID from the node for a given endpoint.
+     * Fetches the blockchainID from the node for a given alias.
+     * 
+     * @param alias The blockchain alias to get the blockchainID
      * 
      * @returns Returns a Promise<string> containing the base 58 string representation of the blockchainID.
      */
-    getBlockchainID = async (baseurl:string):Promise<string> => {
+    getBlockchainID = async (alias:string):Promise<string> => {
         let params = {
-            "endpoint":baseurl
+            "alias":alias
         };
         return this.callMethod("admin.getBlockchainID", params).then((response:RequestResponseData) => {
             return response.data["result"]["blockchainID"];
