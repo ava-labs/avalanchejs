@@ -1,8 +1,8 @@
-# Slopes - The **AVA** Platform JavaScript Library
+# Slopes - The AVA Platform JavaScript Library
 
 ## Overview
 
-Slopes is a JavaScript Library for interfacing with the **AVA** Platform. It is built using TypeScript and intended to support both browser and Node.js. The Slopes library allows one to issue commands to the AVA node APIs. 
+Slopes is a JavaScript Library for interfacing with the AVA Platform. It is built using TypeScript and intended to support both browser and Node.js. The Slopes library allows one to issue commands to the AVA node APIs. 
 
 The APIs currently supported by default are:
 
@@ -13,7 +13,7 @@ The APIs currently supported by default are:
 
 ## Getting Started
 
-We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the **AVA** Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [**AVA** Platform Specification](https://avalabs.org/docs/). 
+We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/). 
 
   Using Slopes, developers are able to:
 
@@ -24,7 +24,7 @@ We built Slopes with ease of use in mind. With this library, any Javascript deve
   * Issue signed transactions to the AVM
   * Create a subnetwork
   * Administer a local node
-  * Retrieve **AVA** network information from a node
+  * Retrieve AVA network information from a node
 
 The entirety of the Slopes documentation can be found on our [XXX Fix Link XXX Slopes documentation page](https://avalabs.org/docs/slopes).
 
@@ -86,7 +86,7 @@ The above lines import the libraries used in the below example:
 
 ## Example 1 &mdash; Managing AVM Keys
 
-Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
+Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");
@@ -118,7 +118,7 @@ let mypk = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f60
 let newAddress2 = myKeychain.importKey(mypk);
 ```
 
-... or an **AVA** serialized string works, too:
+... or an AVA serialized string works, too:
 
 ```js
 let mypk = "2azaedFvWZACNfJwiahmUtbpe8WWVPA2nJecjHz7KMfc7yhFfY";
@@ -143,10 +143,10 @@ The AVMKeyPair class implements the global KeyPair class, which has standardized
 let myaddress = keypair.getAddress();
 
 let pubk = keypair.getPublicKey(); //returns Buffer
-let pubkstr = keypair.getPublicKeyString(); //returns string
+let pubkstr = keypair.getPublicKeyString(); //returns an AVA serialized string
 
 let privk = keypair.getPrivateKey(); //returns Buffer
-let privkstr = keypair.getPrivateKeyString(); //returns string
+let privkstr = keypair.getPrivateKeyString(); //returns an AVA serialized string
 
 keypair.generateKey(); //creates a new random keypair
 
@@ -161,7 +161,7 @@ let isValid = keypair.verify(message, signature, signerPubk); //returns a boolea
 
 ## Example 2 &mdash; Creating An Asset
 
-This example creates an asset in the AVM and publishes it to the **AVA** Platform. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
+This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");
@@ -217,7 +217,7 @@ let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it! 
 
-Using the Slopes AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string **AVA** serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the Slopes AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
@@ -257,7 +257,7 @@ The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 The AVM uses the TxID of the transaction which created the asset as the unique identifier for the asset. This unique identifier is henceforth known as the "AssetID" of the asset. When assets are traded around the AVM, they always reference the AssetID that they represent.
 
 ## Example 3 &mdash; Sending An Asset
-This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our **AVA** Platform endpoint of choice.
+This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
 let ava = new slopes.Slopes("localhost", 9650, "https");

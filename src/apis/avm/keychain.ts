@@ -120,19 +120,19 @@ export class AVMKeyPair extends KeyPair {
     /**
      * Returns a string representation of the private key.
      * 
-     * @returns A string representation of the public key
+     * @returns An AVA serialized string representation of the public key
      */
     getPrivateKeyString = ():string => {
-        return bintools.bufferToB58(this.privk);
+        return bintools.avaSerialize(this.privk);
     }
 
     /**
      * Returns the public key.
      * 
-     * @returns A string representation of the public key
+     * @returns An AVA serialized string representation of the public key
      */
     getPublicKeyString = ():string => {
-        return bintools.bufferToB58(this.pubk);
+        return bintools.avaSerialize(this.pubk);
     }
 
     /**
