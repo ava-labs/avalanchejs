@@ -67,8 +67,8 @@ export abstract class APIBase {
 
     /**
      * 
-     * @param ava Reference to the AVA instance using this baseurl
-     * @param baseurl Path to the baseurl - ex: "/ext/ava"
+     * @param core Reference to the Slopes instance using this baseurl
+     * @param baseurl Path to the baseurl - ex: "/ext/subnet/avm"
      */
     constructor(core:SlopesCore, baseurl:string) {
         this.core = core;
@@ -124,7 +124,7 @@ export class JRPCAPI extends APIBase {
     /**
      * 
      * @param core Reference to the Slopes instance using this endpoint
-     * @param baseurl Path of the APIs baseurl - ex: "/ext/ava"
+     * @param baseurl Path of the APIs baseurl - ex: "/ext/subnet/avm"
      * @param jrpcVersion The jrpc version to use, default "2.0".
      */
     constructor(core:SlopesCore, baseurl:string, jrpcVersion:string = "2.0") {

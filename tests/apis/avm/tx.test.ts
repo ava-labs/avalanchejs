@@ -25,7 +25,8 @@ describe('Transactions', () => {
     let inputs:Array<Input>;
     let outputs:Array<Output>;
     const amnt:number = 10000;
-    let subnetID:Buffer = Buffer.from(createHash("sha256").update("I am the very model of a modern major general").digest());
+    let netid:number = 49;
+    let blockchainID:Buffer = Buffer.from(createHash("sha256").update("I am the very model of a modern major general").digest());
     let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
     beforeEach(() => {
         set = new UTXOSet();
@@ -83,7 +84,7 @@ describe('Transactions', () => {
     });
 
     test('Creation TxUnsigned', () => {
-        let txu:TxUnsigned = new TxUnsigned(inputs, outputs, 99, 49, subnetID);
+        let txu:TxUnsigned = new TxUnsigned(inputs, outputs, netid, blockchainID, 99);
         let txins:Array<Input>  = txu.getIns();
         let txouts:Array<Output> = txu.getOuts();
         expect(txins.length).toBe(inputs.length);
@@ -91,7 +92,7 @@ describe('Transactions', () => {
         
         expect(txu.getCodec()).toBe(99);
         expect(txu.getNetworkID()).toBe(49);
-        expect(txu.getSubnetID().toString("hex")).toBe(subnetID.toString("hex"));
+        expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
         
         let a:Array<string> = [];
         let b:Array<string> = [];
@@ -119,6 +120,7 @@ describe('Transactions', () => {
     test('Creation TxUnsigned Check Amount', () => {
         expect(() => {
             set.makeUnsignedTx(
+                netid, blockchainID,
                 new BN(amnt * 1000), 
                 addrs3, addrs1, addrs1, assetID
             );
@@ -127,6 +129,7 @@ describe('Transactions', () => {
 
     test('Creation Tx1', () => {
         let txu:TxUnsigned = set.makeUnsignedTx(
+            netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID, 
             UnixNow(), UnixNow().add(new BN(50)), 3, 
@@ -140,6 +143,7 @@ describe('Transactions', () => {
     });
     test('Creation Tx2', () => {
         let txu:TxUnsigned = set.makeUnsignedTx(
+            netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID
         );
@@ -151,6 +155,7 @@ describe('Transactions', () => {
     });
     test('Creation Tx3', () => {
         let txu:TxUnsigned = set.makeUnsignedTx(
+            netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1
         );

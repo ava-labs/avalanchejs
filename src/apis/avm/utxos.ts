@@ -428,7 +428,8 @@ export class UTXOSet {
      * Creates an unsigned transaction. For more granular control, you may create your own
      * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s.
      * 
-     * @param utxoset A set of UTXOs that the transaction is built on
+     * @param networkid The number representing NetworkID of the node
+     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param amount The amount of AVA to be spent in NanoAVA
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
@@ -444,7 +445,7 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeUnsignedTx = (amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1, fallAddresses:Array<string> = undefined, fallLocktime:BN = UnixNow(), fallThreshold:number = 1):TxUnsigned => {
+    makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1, fallAddresses:Array<string> = undefined, fallLocktime:BN = UnixNow(), fallThreshold:number = 1):TxUnsigned => {
         const zero:BN = new BN(0);
         let spendamount:BN = zero.clone();
         let utxos:Array<UTXO> = this.getAllUTXOs(this.getUTXOIDsByAddress(fromAddresses));
@@ -506,7 +507,7 @@ export class UTXOSet {
             throw new Error("Error - UTXOSet.signersToUnsignedTx: insufficient funds to create the transaction");
         }
 
-        return new TxUnsigned(ins, outs);
+        return new TxUnsigned(ins, outs, networkid, blockchainid);
     }
 
     /**

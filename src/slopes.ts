@@ -15,6 +15,7 @@ import { AxiosRequestConfig, AxiosResponse, Method } from "axios";
  * 
  */
 export default class SlopesCore {
+    protected networkID:number = 2;
     protected protocol:string;
     protected ip:string;
     protected port:number;
@@ -62,31 +63,42 @@ export default class SlopesCore {
     getURL = ():string => {
         return this.url;
     }
+    
+    getNetworkID = ():number => {
+        return this.networkID;
+    }
+
+    /**
+     * Sets the networkID
+     */
+    protected setNetworkID = (netid:number) => {
+        this.networkID = netid;
+    }
 
     /**
      * Adds an API to the middleware. The API resolves to a registered subnet's RPC. 
      * 
      * In TypeScript:
-     * ```typescript
-     * slopes.addAPI<MyVMClass>("mysubnet", "/ext/mysubnet", MyVMClass);
+     * ```js
+     * slopes.addAPI<MyVMClass>("mysubnet", MyVMClass, "/ext/subnet/mysubnet");
      * ```
      * 
      * In Javascript:
      * ```js
-     * slopes.addAPI("mysubnet", "/ext/mysubnet", MyVMClass);
+     * slopes.addAPI("mysubnet", MyVMClass, "/ext/subnet/mysubnet");
      * ```
      * 
      * @typeparam GA Class of the API being added
      * @param apiName A label for referencing the API in the future
-     * @param baseurl Path to resolve to reach the API
      * @param constructorFN A reference to the class which instantiates the API
+     * @param baseurl Path to resolve to reach the API
      * 
      */
-    addAPI = <GA extends APIBase>(apiName:string, constructorFN: new(ava:SlopesCore, baseurl?:string) => GA, baseurl:string = undefined,) => {
+    addAPI = <GA extends APIBase>(apiName:string, constructorFN: new(ava:SlopesCore, baseurl?:string, ...args:Array<any>) => GA, baseurl:string = undefined, ...args:Array<any>) => {
         if(baseurl == undefined) {
-            this.apis[apiName] = new constructorFN(this);
+            this.apis[apiName] = new constructorFN(this, undefined, ...args);
         } else {
-            this.apis[apiName] = new constructorFN(this, baseurl);
+            this.apis[apiName] = new constructorFN(this, baseurl, ...args);
         }
     }
 

@@ -12,7 +12,7 @@ describe("Keystore", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes = new Slopes(ip,port,protocol);
+    let slopes = new Slopes(ip,port,protocol, 49, true);
     let keystore:KeystoreAPI;
 
     beforeAll(() => {

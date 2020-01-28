@@ -10,12 +10,17 @@ import { AxiosRequestConfig } from 'axios';
 
 
 describe('Slopes', () => {
+    const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF";
     const ip = '127.0.0.1';
     const port = 9650;
     const protocol = "https";
     let slopes:Slopes;
     beforeAll(() => {
-        slopes = new Slopes(ip,port,protocol);
+        slopes = new Slopes(ip,port,protocol, 49, true);
+        slopes.addAPI("admin", AdminAPI);
+        slopes.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
+        slopes.addAPI("keystore", KeystoreAPI);
+        slopes.addAPI("platform", PlatformAPI);
     });
     test('Can initialize', () => {
         expect(slopes.getIP()).toBe(ip);
@@ -45,8 +50,8 @@ describe('Slopes', () => {
     });
 
     test('Create new API', () => {
-        slopes.addAPI("admin2", AVMAPI);
-        expect(slopes.api("admin2")).toBeInstanceOf(AVMAPI);
+        slopes.addAPI("avm2", AVMAPI);
+        expect(slopes.api("avm2")).toBeInstanceOf(AVMAPI);
 
         slopes.addAPI("keystore2", KeystoreAPI, "/ext/keystore2");
         expect(slopes.api("keystore2")).toBeInstanceOf(KeystoreAPI);
@@ -66,7 +71,7 @@ describe('HTTP Operations', () => {
     const path = "/ext/testingrequests";
     let slopes:Slopes;
     beforeAll(() => {
-        slopes = new Slopes(ip,port, protocol);
+        slopes = new Slopes(ip,port, protocol, 49, true);
         slopes.addAPI("testingrequests", TestAPI, path);
     });
 

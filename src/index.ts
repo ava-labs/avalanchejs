@@ -55,13 +55,27 @@ export class Slopes extends SlopesCore {
      * @param ip The hostname to resolve to reach the AVA Client RPC APIs
      * @param port The port to reolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
+     * @param networkid Sets the NetworkID of the class instead of reaching out to the Admin API
+     * @param skipinit Skips creating the APIs
      */
-    constructor(ip:string, port:number, protocol:string = "http") {
+    constructor(ip:string, port:number, protocol:string = "http", networkid:number = undefined, skipinit:boolean = false) {
         super(ip, port, protocol);
-        this.addAPI("admin", AdminAPI);
-        this.addAPI("avm", AVMAPI);
-        this.addAPI("platform", PlatformAPI);
-        this.addAPI("keystore", KeystoreAPI);
+        if(typeof networkid === 'number' && networkid >= 0){
+            this.networkID = networkid;
+        }
+        if(!skipinit){
+            this.addAPI("admin", AdminAPI);
+            if(typeof networkid !== 'number'){
+                this.api["admin"].getNetworkID().then((netid:number) => {
+                    this.networkID = netid;
+                });
+            }
+            this.api["admin"].getBlockchainID("/ext/subnet/avm").then((blockchainid:string) => {
+                this.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid);
+            });
+            this.addAPI("platform", PlatformAPI);
+            this.addAPI("keystore", KeystoreAPI);
+        }
     }
 }
 

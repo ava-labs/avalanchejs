@@ -18,6 +18,8 @@ import { UnixNow } from 'src/apis/avm/types';
 const bintools = BinTools.getInstance();
 
 describe("AVMAPI", () => {
+    const networkid:number = 49;
+    const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
     const ip:string = '127.0.0.1';
     const port:number = 9650;
     const protocol:string = "https";
@@ -25,11 +27,11 @@ describe("AVMAPI", () => {
     let username:string = 'AvaLabs';
     let password:string = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol);
+    let slopes:Slopes = new Slopes(ip,port,protocol, networkid, true);
     let api:AVMAPI;
 
     beforeAll(() => {
-        api = new AVMAPI(slopes);
+        api = new AVMAPI(slopes, "/ext/subnet/avm", blockchainid);
     });
 
     afterEach(() => {
@@ -56,7 +58,7 @@ describe("AVMAPI", () => {
 
         mockAxios.mockResponse(responseObj);
         let response:string = await result;
-
+        
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(assetid);
     });
@@ -196,7 +198,9 @@ describe("AVMAPI", () => {
     
             let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
-                new BN(amnt), addrs3, addrs1, addrs1, assetID, UnixNow(), new BN(0), 1, undefined, UnixNow(), 1
+                networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
+                addrs3, addrs1, addrs1, assetID, 
+                UnixNow(), new BN(0), 1, undefined, UnixNow(), 1
             );
             
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -207,7 +211,9 @@ describe("AVMAPI", () => {
         test('signTx', () => {
             let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
-                new BN(amnt), addrs3, addrs1, addrs1, assetID, UnixNow(), new BN(0), 1, undefined, UnixNow(), 1
+                networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
+                addrs3, addrs1, addrs1, assetID, UnixNow(), 
+                new BN(0), 1, undefined, UnixNow(), 1
             );
             
             let tx1:Tx = api.signTx(txu1);

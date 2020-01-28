@@ -11,7 +11,7 @@ describe("Admin", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol);
+    let slopes:Slopes = new Slopes(ip,port,protocol, 49, true);
     let admin:AdminAPI;
 
     beforeAll(() => {

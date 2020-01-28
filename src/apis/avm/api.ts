@@ -82,6 +82,7 @@ class AVMAPI extends JRPCAPI{
      * @ignore
      */
     protected keychain:AVMKeyChain = new AVMKeyChain();
+    protected blockchainID:string = "";
 
     /**
      * Gets a reference to the keychain for this class.
@@ -192,12 +193,22 @@ class AVMAPI extends JRPCAPI{
      * @remarks
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
-    makeUnsignedTx = (utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:string = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1, fallAddresses:Array<string> = undefined, fallLocktime:BN = UnixNow(), fallThreshold:number = 1):TxUnsigned => {
+    makeUnsignedTx = (
+        utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, 
+        changeAddresses:Array<string>, assetID:string = undefined, asOf:BN = UnixNow(), 
+        locktime:BN = new BN(0), threshold:number = 1, fallAddresses:Array<string> = undefined, 
+        fallLocktime:BN = UnixNow(), fallThreshold:number = 1
+    ):TxUnsigned => {
         let asset:Buffer = undefined;
         if(assetID){
             asset = bintools.avaDeserialize(assetID);
         }
-        return utxoset.makeUnsignedTx(amount, toAddresses, fromAddresses, changeAddresses, asset, asOf, locktime, threshold, fallAddresses, fallLocktime, fallThreshold);
+        return utxoset.makeUnsignedTx(
+            this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
+            amount, toAddresses, fromAddresses, changeAddresses, 
+            asset, asOf, locktime, threshold, 
+            fallAddresses, fallLocktime, fallThreshold
+        );
     }
 
     /**
@@ -241,11 +252,12 @@ class AVMAPI extends JRPCAPI{
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
-     * @param baseurl Defaults to the string "/ext/avm" as the path to subnets baseurl
+     * @param baseurl Defaults to the string "/ext/subnet/avm" as the path to subnets baseurl
      */
-    constructor(core:SlopesCore, baseurl:string = "/ext/avm"){ 
+    constructor(core:SlopesCore, baseurl:string = "/ext/subnet/avm", blockchainID:string = ""){ 
         super(core, baseurl);
         this.keychain = new AVMKeyChain();
+        this.blockchainID = blockchainID
     }
 }
 

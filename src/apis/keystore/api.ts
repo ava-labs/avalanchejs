@@ -276,7 +276,7 @@ class KeystoreAPI extends JRPCAPI{
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
-     * @param baseurl Defaults to the string "/ext/avm" as the path to subnets baseurl
+     * @param baseurl Defaults to the string "/ext/keystore" as the path to subnets baseurl
      */
     constructor(core:SlopesCore, baseurl:string = "/ext/keystore"){ super(core, baseurl); }
 }
