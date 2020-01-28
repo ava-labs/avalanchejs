@@ -19,7 +19,7 @@ const bintools = BinTools.getInstance();
 
 describe("AVMAPI", () => {
     const networkid:number = 49;
-    const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
+    const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF";
     const ip:string = '127.0.0.1';
     const port:number = 9650;
     const protocol:string = "https";
@@ -58,7 +58,7 @@ describe("AVMAPI", () => {
 
         mockAxios.mockResponse(responseObj);
         let response:string = await result;
-        
+
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(assetid);
     });

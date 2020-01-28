@@ -43,7 +43,7 @@ describe("Platform", () => {
     });
 
 
-    test("sreateSubnet", async ()=>{
+    test("createSubnet", async ()=>{
 
         let result:Promise<boolean> = platform.createSubnet('txId');
         let payload:object = {
