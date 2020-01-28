@@ -25,6 +25,7 @@ describe('Transactions', () => {
     let inputs:Array<Input>;
     let outputs:Array<Output>;
     const amnt:number = 10000;
+    let subnetID:Buffer = Buffer.from(createHash("sha256").update("I am the very model of a modern major general").digest());
     let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
     beforeEach(() => {
         set = new UTXOSet();
@@ -82,14 +83,15 @@ describe('Transactions', () => {
     });
 
     test('Creation TxUnsigned', () => {
-        let txu:TxUnsigned = new TxUnsigned(inputs, outputs, 99, 49);
+        let txu:TxUnsigned = new TxUnsigned(inputs, outputs, 99, 49, subnetID);
         let txins:Array<Input>  = txu.getIns();
         let txouts:Array<Output> = txu.getOuts();
         expect(txins.length).toBe(inputs.length);
         expect(txouts.length).toBe(outputs.length);
         
         expect(txu.getCodec()).toBe(99);
-        expect(txu.getVersion()).toBe(49);
+        expect(txu.getNetworkID()).toBe(49);
+        expect(txu.getSubnetID().toString("hex")).toBe(subnetID.toString("hex"));
         
         let a:Array<string> = [];
         let b:Array<string> = [];

@@ -18,7 +18,8 @@ const bintools = BinTools.getInstance();
  * @remarks
  * Unsigned Tx:
  * Codec      | 4 bytes
- * Version    | 4 bytes
+ * NetworkID  | 4 bytes
+ * SubnetID   | 32 bytes
  * NumOuts    | 4 bytes
  * Repeated (NumOuts):
  *     Out    | ? bytes
@@ -37,7 +38,8 @@ const bintools = BinTools.getInstance();
  */
 export class TxUnsigned {
     protected codec:Buffer = Buffer.alloc(4);
-    protected version:Buffer = Buffer.alloc(4);
+    protected networkid:Buffer = Buffer.alloc(4);
+    protected subnetid:Buffer = Buffer.alloc(32);
     protected numouts:Buffer = Buffer.alloc(4);
     protected outs:Array<Output>;
     protected numins:Buffer = Buffer.alloc(4);
@@ -51,10 +53,17 @@ export class TxUnsigned {
     }
 
     /**
-     * Returns the number representation of the version
+     * Returns the number representation of the NetworkID
      */
-    getVersion = ():number => {
-        return this.version.readUInt32BE(0);
+    getNetworkID = ():number => {
+        return this.networkid.readUInt32BE(0);
+    }
+
+    /**
+     * Returns the Buffer representation of the SubnetID
+     */
+    getSubnetID = ():Buffer => {
+        return this.subnetid;
     }
     
     /**
@@ -84,8 +93,10 @@ export class TxUnsigned {
         let offset:number = 0;
         this.codec = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
-        this.version = bintools.copyFrom(bytes, offset, offset + 4);
+        this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
+        this.subnetid = bintools.copyFrom(bytes, offset, offset + 32);
+        offset += 32;
         this.numouts = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let outcount:number = this.numouts.readUInt32BE(0);
@@ -118,8 +129,8 @@ export class TxUnsigned {
             this.ins.sort(Input.comparitor());
             this.numouts.writeUInt32BE(this.outs.length, 0);
             this.numins.writeUInt32BE(this.ins.length, 0);
-            let bsize:number = this.codec.length + this.version.length + this.numouts.length;
-            let barr:Array<Buffer> = [this.codec, this.version, this.numouts];
+            let bsize:number = this.codec.length + this.networkid.length + this.subnetid.length + this.numouts.length;
+            let barr:Array<Buffer> = [this.codec, this.networkid, this.subnetid, this.numouts];
             for(let i = 0; i < this.outs.length; i++) {
                 let b:Buffer = this.outs[i].toBuffer();
                 barr.push(b);
@@ -162,11 +173,13 @@ export class TxUnsigned {
      * @param ins Optional array of the [[Input]]s
      * @param outs Optional array of the [[Output]]s
      * @param codec Optional codec, default 2
-     * @param version Optional version, default 1000
+     * @param networkid Optional networkid, default 2
+     * @param networkid Optional networkid, default Buffer.alloc(32, 16)
      */
-    constructor(ins?:Array<Input>, outs?:Array<Output>,codec:number = 2, version:number = 1000,) {
+    constructor(ins?:Array<Input>, outs?:Array<Output>,codec:number = 2, networkid:number = 2, subnetid:Buffer = Buffer.alloc(32, 16)) {
         this.codec.writeUInt32BE(codec, 0);
-        this.version.writeUInt32BE(version, 0);
+        this.networkid.writeUInt32BE(networkid, 0);
+        this.subnetid = subnetid;
         if(ins && outs){
             this.numouts.writeUInt32BE(outs.length, 0);
             this.outs = outs.sort(Output.comparitor());
