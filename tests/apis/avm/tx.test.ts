@@ -46,8 +46,8 @@ describe('Transactions', () => {
             addrs3.push(keymgr3.makeKey());
         }
         let amount:BN = new BN(amnt);
-        let addresses:Array<string> = keymgr1.getAddreses();
-        let fallAddresses:Array<string> = keymgr2.getAddreses()
+        let addresses:Array<string> = keymgr1.getAddresses();
+        let fallAddresses:Array<string> = keymgr2.getAddresses()
         let locktime:BN = new BN(54321);
         let fallLocktime:BN = locktime.add(new BN(50));
         let threshold:number = 3;
