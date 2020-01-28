@@ -139,7 +139,7 @@ describe('Outputs', () => {
         expect(out.getThreshold()).toBe(3);
         expect(out.getLocktime().toNumber()).toBe(locktime.toNumber());
 
-        expect(out.getAssetID().toString("hex")).toBe("00");
+        expect(out.getAssetID()).toBeUndefined();
 
         let r = out.getAddressIdx(addrs[2]);
         expect(out.getAddress(...r)).toBe(addrs[2]);

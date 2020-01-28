@@ -53,9 +53,16 @@ describe('UTXO', () => {
         test('getAmount', () => {
             expect(u1.getAmount().toNumber()).toBe(12345);
         });
-        test('getAssetID', () => {
+        test('getAssetID NonCA', () => {
             let assetid:Buffer = u1.getAssetID();
             expect(assetid.toString("hex", 0, assetid.length)).toBe("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533");
+        });
+
+        test('getAssetID CA', () => {
+            let ca:UTXO = new UTXO(CAUTXOstr);
+            let assetid:Buffer = ca.getAssetID();
+            let txid:Buffer = ca.getTxID();
+            expect(assetid.toString("hex", 0, assetid.length)).toBe(txid.toString("hex", 0, txid.length));
         });
         test('getTxID', () => {
             let txid:Buffer = u1.getTxID();
