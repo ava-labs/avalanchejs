@@ -58,6 +58,9 @@ export class UTXO {
      * @returns A string representing the address.
      */
     getAddress = (idx:number, tol:boolean):string => {
+        if(this.output.getOutputType() == 2){
+
+        }
         return this.output.getAddress(idx, tol);
     }
 
