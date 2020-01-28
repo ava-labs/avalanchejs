@@ -66,13 +66,13 @@ export class Slopes extends SlopesCore {
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
             if(typeof networkid !== 'number'){
-                this.api["admin"].getNetworkID().then((netid:number) => {
+                (this.apis["admin"] as AdminAPI).getNetworkID().then((netid:number) => {
                     this.networkID = netid;
                 }).catch((err) => {
                     throw err; // completes the promise chain, I believe
                 });;
             }
-            this.api["admin"].getBlockchainID("avm").then((blockchainid:string) => {
+            (this.apis["admin"] as AdminAPI).getBlockchainID("avm").then((blockchainid:string) => {
                 this.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid);
             }).catch((err) => {
                 throw err; // completes the promise chain, I believe
