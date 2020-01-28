@@ -58,9 +58,6 @@ export class UTXO {
      * @returns A string representing the address.
      */
     getAddress = (idx:number, tol:boolean):string => {
-        if(this.output.getOutputType() == 2){
-
-        }
         return this.output.getAddress(idx, tol);
     }
 
@@ -68,7 +65,11 @@ export class UTXO {
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the assetID.
      */
     getAssetID = ():Buffer => {
-        return this.output.getAssetID();
+        let assetID = this.output.getAssetID();
+        if(assetID){
+            return assetID;
+        }
+        return this.getTxID();
     }
 
     /**

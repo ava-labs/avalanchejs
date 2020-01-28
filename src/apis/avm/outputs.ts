@@ -142,7 +142,7 @@ export class OutCreateAsset extends Output {
      * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
      */
     getAssetID = ():Buffer => {
-        return bintools.fromBNToBuffer(new BN(0));
+        return undefined;
     }
 
     /**
