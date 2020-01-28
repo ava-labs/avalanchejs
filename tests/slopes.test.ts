@@ -27,7 +27,11 @@ describe('Slopes', () => {
         expect(slopes.getPort()).toBe(port);
         expect(slopes.getProtocol()).toBe(protocol);
         expect(slopes.getURL()).toBe(`${protocol}://${ip}:${port}`);
-        
+        expect(slopes.getNetworkID()).toBe(49);
+        slopes.setNetworkID(50);
+        expect(slopes.getNetworkID()).toBe(50);
+        slopes.setNetworkID(49);
+        expect(slopes.getNetworkID()).toBe(49);
     });
 
     test('Endpoints correct', () => {

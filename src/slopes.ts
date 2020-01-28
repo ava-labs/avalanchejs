@@ -74,7 +74,7 @@ export default class SlopesCore {
     /**
      * Sets the networkID
      */
-    protected setNetworkID = (netid:number) => {
+    setNetworkID = (netid:number) => {
         this.networkID = netid;
     }
 
