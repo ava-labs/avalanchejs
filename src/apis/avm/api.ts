@@ -85,6 +85,15 @@ class AVMAPI extends JRPCAPI{
     protected blockchainID:string = "";
 
     /**
+     * Gets the blockchainID and returns it.
+     * 
+     * @returns The the provided string representing the blockchainID
+     */
+    getBlockchainID = ():string => {
+        return this.blockchainID;
+    }
+
+    /**
      * Gets a reference to the keychain for this class.
      * 
      * @returns The instance of [[AVMKeyChain]] for this class

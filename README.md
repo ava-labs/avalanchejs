@@ -209,7 +209,7 @@ Now that we know what we want an asset to look like, we create an output to send
 ```js
 //Create an output to issue to the network
 let output = new slopes.OutCreateAsset(amount, addresses, threshold);
-let unsigned = slopes.TxUnsigned([], [output]);
+let unsigned = new slopes.TxUnsigned([], [output]);
 let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 ```
 

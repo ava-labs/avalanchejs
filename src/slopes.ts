@@ -64,6 +64,9 @@ export default class SlopesCore {
         return this.url;
     }
     
+    /**
+     * Returns the networkID;
+     */
     getNetworkID = ():number => {
         return this.networkID;
     }

@@ -176,7 +176,7 @@ export class TxUnsigned {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param codec Optional codec, default 2
      */
-    constructor(ins?:Array<Input>, outs?:Array<Output>, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), codec:number = 2,) {
+    constructor(ins?:Array<Input>, outs?:Array<Output>, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), codec:number = 2) {
         this.codec.writeUInt32BE(codec, 0);
         this.networkid.writeUInt32BE(networkid, 0);
         this.blockchainid = blockchainid;

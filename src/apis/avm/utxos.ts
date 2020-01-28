@@ -381,7 +381,11 @@ export class UTXOSet {
         }        
         let now:BN = UnixNow();
         for(let i = 0; i < address.length; i++){
-            for(let [utxoid, locktime] of Object.entries(this.addressUTXOs[address[i]])){
+            console.log("address", address);
+            console.log("address[i]", address[i]);
+            console.log("this.addressUTXOs[address[i]]", this.addressUTXOs[address[i]]);
+            let entries = Object.entries(this.addressUTXOs[address[i]]);
+            for(let [utxoid, locktime] of entries){
                 if((spendable && locktime.lte(now)) || !spendable) {
                     results.push(utxoid);
                 }

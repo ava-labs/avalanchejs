@@ -335,7 +335,7 @@ export class OutCreateAsset extends Output {
         this.idnum = 2;
         this.id.writeUInt32BE(this.idnum, 0);
         if(amount && addresses){
-            this.amountValue = amount.clone();
+            this.amountValue = amount.clone(); 
             let addrs:Array<Address> = [];
             for(let i = 0; i < addresses.length; i++){
                 addrs[i] = new Address();
