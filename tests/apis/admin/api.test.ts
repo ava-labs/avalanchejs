@@ -11,15 +11,51 @@ describe("Admin", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol, 49, undefined, true);
+    let slopes:Slopes = new Slopes(ip,port,protocol, 49, "What is my purpose? You pass butter. Oh my god.", false);
     let admin:AdminAPI;
 
     beforeAll(() => {
-        admin = new AdminAPI(slopes);
+        admin = slopes.Admin();
     });
 
     afterEach(() => {
         mockAxios.reset();
+    });
+
+    test("getNetworkID", async ()=>{
+        let result:Promise<number> = admin.getNetworkID();
+        let payload:object = {
+            "result": {
+                "networkID": 49
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:number = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(49);
+    });
+
+    test("getBlockchainID", async ()=>{
+        let result:Promise<string> = admin.getBlockchainID('avm');
+        let payload:object = {
+            "result": {
+                "blockchainID": slopes.AVM().getBlockchainID()
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("What is my purpose? You pass butter. Oh my god.");
     });
 
     test("lockProfile", async ()=>{
