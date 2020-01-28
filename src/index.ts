@@ -55,28 +55,22 @@ export class Slopes extends SlopesCore {
      * @param ip The hostname to resolve to reach the AVA Client RPC APIs
      * @param port The port to reolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
-     * @param networkid Sets the NetworkID of the class instead of reaching out to the Admin API
+     * @param networkid Sets the NetworkID of the class. Default 2
+     * @param avmChainID Sets the blockchainID for the AVM. Default "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7"
      * @param skipinit Skips creating the APIs
      */
-    constructor(ip:string, port:number, protocol:string = "http", networkid:number = undefined, skipinit:boolean = false) {
+    constructor(ip:string, port:number, protocol:string = "http", networkID:number = 2, avmChainID:string = undefined, skipinit:boolean = false) {
         super(ip, port, protocol);
-        if(typeof networkid === 'number' && networkid >= 0){
-            this.networkID = networkid;
+        let chainid = avmChainID;
+        if(typeof avmChainID === 'undefined' || !avmChainID){
+            chainid = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
+        }
+        if(typeof networkID === 'number' && networkID >= 0){
+            this.networkID = networkID;
         }
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
-            if(typeof networkid !== 'number'){
-                (this.apis["admin"] as AdminAPI).getNetworkID().then((netid:number) => {
-                    this.networkID = netid;
-                }).catch((err) => {
-                    throw err; // completes the promise chain, I believe
-                });;
-            }
-            (this.apis["admin"] as AdminAPI).getBlockchainID("avm").then((blockchainid:string) => {
-                this.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid);
-            }).catch((err) => {
-                throw err; // completes the promise chain, I believe
-            });
+            this.addAPI("avm", AVMAPI, "/ext/subnet/avm", chainid);
             this.addAPI("platform", PlatformAPI);
             this.addAPI("keystore", KeystoreAPI);
         }

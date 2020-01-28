@@ -16,7 +16,7 @@ describe('Slopes', () => {
     const protocol = "https";
     let slopes:Slopes;
     beforeAll(() => {
-        slopes = new Slopes(ip,port,protocol, 49, true);
+        slopes = new Slopes(ip,port,protocol, 49, undefined, true);
         slopes.addAPI("admin", AdminAPI);
         slopes.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
         slopes.addAPI("keystore", KeystoreAPI);
@@ -71,7 +71,7 @@ describe('HTTP Operations', () => {
     const path = "/ext/testingrequests";
     let slopes:Slopes;
     beforeAll(() => {
-        slopes = new Slopes(ip,port, protocol, 49, true);
+        slopes = new Slopes(ip,port, protocol, 49, undefined, true);
         slopes.addAPI("testingrequests", TestAPI, path);
     });
 

@@ -27,7 +27,7 @@ describe("AVMAPI", () => {
     let username:string = 'AvaLabs';
     let password:string = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol, networkid, true);
+    let slopes:Slopes = new Slopes(ip,port,protocol, networkid, undefined, true);
     let api:AVMAPI;
 
     beforeAll(() => {
