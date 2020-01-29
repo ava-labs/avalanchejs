@@ -89,7 +89,8 @@ The above lines import the libraries used in the below example:
 Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
-let ava = new slopes.Slopes("localhost", 9650, "https");
+let mynetworkID = 12345; //default is 2, we want to override that for our local network
+let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
 let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
 
@@ -164,7 +165,8 @@ let isValid = keypair.verify(message, signature, signerPubk); //returns a boolea
 This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
-let ava = new slopes.Slopes("localhost", 9650, "https");
+let mynetworkID = 12345; //default is 2, we want to override that for our local network
+let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
 let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
 
@@ -271,7 +273,8 @@ The AVM uses the TxID of the transaction which created the asset as the unique i
 This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
-let ava = new slopes.Slopes("localhost", 9650, "https");
+let mynetworkID = 12345; //default is 2, we want to override that for our local network
+let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
 let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
 
