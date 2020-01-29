@@ -184,7 +184,7 @@ let address2 = "51025c61fbcfc078f69334f834be6dd26d55a955";
 let address3 = "B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //already serialized! Yay!
 
 // The AVA addressing format requires base-58 with a checksum
-// This serializes the addreses and places them into an array
+// This serializes the addresses and places them into an array
 // Note: "address3" is already seralized! Yay!
 let addresses = [
     bintools.avaSerialize(Buffer.from(address1, "hex")),
