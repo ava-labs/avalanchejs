@@ -329,7 +329,7 @@ export class UTXOSet {
         let results:Array<UTXO> = [];
         if(typeof utxoids !== 'boolean' && Array.isArray(utxoids)){
             for(let i = 0; i < utxoids.length; i++){
-                if(utxoids[i] in this.utxos){
+                if(utxoids[i] in this.utxos && !(utxoids[i] in results)){
                     results.push(this.utxos[utxoids[i]]);
                 }
             }
@@ -385,11 +385,10 @@ export class UTXOSet {
         }        
         let now:BN = UnixNow();
         for(let i = 0; i < address.length; i++){
-            let exists = this.addressUTXOs[address[i]];
-            if(typeof exists !== 'undefined'){
+            if(address[i] in this.addressUTXOs){
                 let entries = Object.entries(this.addressUTXOs[address[i]]);
                 for(let [utxoid, locktime] of entries){
-                    if((spendable && locktime.lte(now)) || !spendable) {
+                    if(results.indexOf(utxoid) == -1 && (spendable && locktime.lte(now)) || !spendable) {
                         results.push(utxoid);
                     }
                 }
@@ -426,7 +425,7 @@ export class UTXOSet {
         }
         for(let i = 0; i < utxos.length; i++){
             if(utxos[i].getAssetID().toString("hex") == asset.toString("hex") && utxos[i].meetsThreshold(addresses, asOf)){
-                spend.add(utxos[i].getAmount());
+                spend = spend.add(utxos[i].getAmount());
             }
         }
         return spend;
@@ -479,14 +478,14 @@ export class UTXOSet {
 
                 let txid:Buffer = utxos[i].getTxID();
                 let txidx:Buffer = utxos[i].getTxIdx();
-                let input:Input = new Input(txid, txidx, amt);
+                let input:Input = new Input(txid, txidx, amt, assetID);
                 let spenders:Array<string> = utxos[i].getSpenders(fromAddresses, asOf);
                 for(let j = 0; j < spenders.length; j++){
                     let idx:number, tol:boolean;
                     [idx, tol] = utxos[i].getAddressIdx(spenders[j]);
                     if(idx == -1){
                         /* istanbul ignore next */
-                        throw new Error("Error - UTXOSet.signersToUnsignedTx: no such address in output: " + spenders[j]);
+                        throw new Error("Error - UTXOSet.makeUnsignedTx: no such address in output: " + spenders[j]);
                     }
                     input.addSignatureIdx(idx, spenders[j]);
                 }
@@ -512,7 +511,7 @@ export class UTXOSet {
         }
         if(spendamount.lt(amount)){
             /* istanbul ignore next */
-            throw new Error("Error - UTXOSet.signersToUnsignedTx: insufficient funds to create the transaction");
+            throw new Error("Error - UTXOSet.makeUnsignedTx: insufficient funds to create the transaction");
         }
 
         return new TxUnsigned(ins, outs, networkid, blockchainid);

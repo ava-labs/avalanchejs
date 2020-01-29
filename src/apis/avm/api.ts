@@ -160,7 +160,7 @@ class AVMAPI extends JRPCAPI{
             "addresses": addresses
         };
         return this.callMethod("avm.getUTXOs", params).then((response:RequestResponseData) => {
-            let utxos:UTXOSet = new UTXOSet;
+            let utxos:UTXOSet = new UTXOSet();
             let data = response.data["result"]["utxos"];
             if(persistOpts && typeof persistOpts === 'object'){
                 if(this.db.has(persistOpts.getName())){

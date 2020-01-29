@@ -71,8 +71,9 @@ describe('Inputs', () => {
         u = utxos[0];
         txid = u.getTxID();
         txidx = u.getTxIdx();
+        let asset = u.getAssetID();
 
-        input = new Input(txid, txidx, amount);
+        input = new Input(txid, txidx, amount, asset);
         expect(input.getUTXOID()).toBe(u.getUTXOID());
         expect(input.getInputType()).toBe(0);
 
@@ -95,8 +96,9 @@ describe('Inputs', () => {
         u = utxos[1];
         txid = u.getTxID();
         txidx = u.getTxIdx();
+        let asset = u.getAssetID();
 
-        input = new Input(txid, txidx, amount);
+        input = new Input(txid, txidx, amount, asset);
         expect(input.getUTXOID()).toBe(u.getUTXOID());
         expect(input.getInputType()).toBe(0);
 
@@ -119,8 +121,9 @@ describe('Inputs', () => {
         u = utxos[2];
         txid = u.getTxID();
         txidx = u.getTxIdx();
+        let asset = u.getAssetID();
 
-        input = new Input(txid, txidx, amount);
+        input = new Input(txid, txidx, amount, asset);
         expect(input.getUTXOID()).toBe(u.getUTXOID());
         expect(input.getInputType()).toBe(0);
 
@@ -134,9 +137,9 @@ describe('Inputs', () => {
     });
 
     test('comparitor', () => {
-        let in1:Input = new Input(utxos[0].getTxID(), utxos[0].getTxIdx(), utxos[0].getAmount());
-        let in2:Input = new Input(utxos[1].getTxID(), utxos[1].getTxIdx(), utxos[1].getAmount());
-        let in3:Input = new Input(utxos[2].getTxID(), utxos[2].getTxIdx(), utxos[2].getAmount());
+        let in1:Input = new Input(utxos[0].getTxID(), utxos[0].getTxIdx(), utxos[0].getAmount(), utxos[0].getAssetID());
+        let in2:Input = new Input(utxos[1].getTxID(), utxos[1].getTxIdx(), utxos[1].getAmount(), utxos[1].getAssetID());
+        let in3:Input = new Input(utxos[2].getTxID(), utxos[2].getTxIdx(), utxos[2].getAmount(), utxos[2].getAssetID());
 
         let cmp = Input.comparitor();
         expect(cmp(in1, in2)).toBe(-1);

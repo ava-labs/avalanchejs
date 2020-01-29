@@ -108,6 +108,10 @@ export class JRPCAPI extends APIBase {
                 this.rpcid += 1;
                 if(typeof resp.data === "string"){
                     resp.data = JSON.parse(resp.data);
+                    
+                }
+                if(typeof resp.data === 'object' && 'error' in resp.data) {
+                    throw new Error("Error returned: " + JSON.stringify(resp.data));
                 }
                 return resp;
             }

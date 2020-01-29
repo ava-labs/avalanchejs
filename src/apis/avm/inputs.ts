@@ -65,6 +65,13 @@ export class Input {
     };
 
     /**
+     * Returns the assetID of the input.
+     */
+    getAssetID = ():Buffer => {
+        return this.assetid;
+    }
+
+    /**
      * @ignore
      */
     protected _basicTxInBuffer = (): Buffer => {
@@ -155,13 +162,15 @@ export class Input {
      * 
      * @param txid A {@link https://github.com/feross/buffer|Buffer} containing the transaction ID of the referenced UTXO
      * @param txidx A {@link https://github.com/feross/buffer|Buffer} containing the index of the output in the transaction consumed in the [[Input]]
+     * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Input]]
      * @param amount A {@link https://github.com/indutny/bn.js/|BN} containing the amount of the output to be consumed
      */
-    constructor(txid?:Buffer, txidx?:Buffer, amount?:BN) {
-        if(txid && txidx && amount){
+    constructor(txid?:Buffer, txidx?:Buffer, amount?:BN, assetID?:Buffer) {
+        if(txid && txidx && amount && assetID){
             this.id.writeUInt32BE(0,0);
             this.txid = txid;
             this.txidx = txidx;
+            this.assetid = assetID;
             this.amountValue = amount;
             this.amount = bintools.fromBNToBuffer(amount, 8);
             this.sigIdxs = [];

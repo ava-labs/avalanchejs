@@ -78,7 +78,7 @@ export class AVMKeyPair extends KeyPair {
      * @returns true on success, false on failure
      */
     importKey = (privk:Buffer):boolean => {
-        this.keypair = ec.keyFromPrivate(privk);
+        this.keypair = ec.keyFromPrivate(privk.toString("hex"),"hex");
         // doing hex translation to get Buffer class
         this.privk = Buffer.from(this.keypair.getPrivate("hex"), "hex");
         this.pubk = Buffer.from(this.keypair.getPublic(true, "hex"), "hex");
@@ -138,7 +138,7 @@ export class AVMKeyPair extends KeyPair {
     /**
      * Takes a message, signs it, and returns the signature.
      * 
-     * @param msg The message to sign
+     * @param msg The message to sign, be sure to hash first if expected
      * 
      * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
      */
@@ -239,15 +239,17 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * @returns A signed [[Tx]]
      */
     signTx = (utx:TxUnsigned):Tx => {
-        let txbuff = utx.toBuffer(); 
+        let txbuff = utx.toBuffer();
+        let msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest()); 
         let sigs:Array<Signature> = [];
         let ins:Array<Input> = utx.getIns();
         for(let i = 0; i < ins.length; i++){
             let sigidxs:Array<SigIdx> = ins[i].getSigIdxs();
             for(let j = 0; j < sigidxs.length; j++){
                 let keypair:AVMKeyPair = this.getKey(sigidxs[j].getSource());
+                let signval:Buffer = keypair.sign(msg)
                 let sig:Signature = new Signature();
-                sig.fromBuffer(keypair.sign(txbuff));
+                sig.fromBuffer(signval);
                 sigs.push(sig);
             }
         }

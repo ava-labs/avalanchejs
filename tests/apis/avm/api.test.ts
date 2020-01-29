@@ -187,8 +187,9 @@ describe("AVMAPI", () => {
     
                 txid = u.getTxID();
                 txidx = u.getTxIdx();
+                let asset = u.getAssetID();
     
-                let input:Input = new Input(txid, txidx, amount);
+                let input:Input = new Input(txid, txidx, amount, asset);
                 inputs.push(input);
             }
             set.addArray(utxos);
