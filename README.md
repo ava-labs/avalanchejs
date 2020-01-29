@@ -114,14 +114,14 @@ let newAddress1 = myKeychain.makeKey();
 You may also import your exsting private key into the keychain using either a Buffer...
 
 ```js
-let mypk = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
+let mypk = Buffer.from("330530eda3225d280d42efc5f02d31d122da3da3093c739ddd7d16612c7dfd53", "hex");
 let newAddress2 = myKeychain.importKey(mypk);
 ```
 
 ... or an AVA serialized string works, too:
 
 ```js
-let mypk = "2azaedFvWZACNfJwiahmUtbpe8WWVPA2nJecjHz7KMfc7yhFfY";
+let mypk = "2LvB5YuMA4F4fFeeYDFbFxWCNBBW1317L";
 let newAddress2 = myKeychain.importKey(mypk);
 ```
 
@@ -140,7 +140,7 @@ let keypair = myKeychain.getKey(myaddress); //returns the keypair class
 The AVMKeyPair class implements the global KeyPair class, which has standardized keypair functionality. The following operations are available on any keypair that implements this interface.
 
 ```js
-let myaddress = keypair.getAddress();
+let addresses = avm.keyChain().getAddresses();
 
 let pubk = keypair.getPublicKey(); //returns Buffer
 let pubkstr = keypair.getPublicKeyString(); //returns an AVA serialized string
@@ -150,7 +150,7 @@ let privkstr = keypair.getPrivateKeyString(); //returns an AVA serialized string
 
 keypair.generateKey(); //creates a new random keypair
 
-let mypk = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
+let mypk = Buffer.from("263956e2a04bef77ff8c4834a1c26158e28e040c7621c89c5feab1b3054ec699", "hex");
 let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
 
 let message = "Wubalubadubdub";
@@ -176,7 +176,7 @@ The first steps in creating a new asset using Slopes is to determine the qualtie
 
 ```js
 // The amount to mint for the asset
-let amount = new BN(100000)
+let amount = new BN(400)
 
 // The addresses to issue the minted coins, in hex
 let address1 = "c3344128e060128ede3523a24a461c8943ab0859";
@@ -208,8 +208,19 @@ Now that we know what we want an asset to look like, we create an output to send
 
 ```js
 //Create an output to issue to the network
-let output = new slopes.OutCreateAsset(amount, addresses, threshold);
-let unsigned = new slopes.TxUnsigned([], [output]);
+//Parameters sent are (in order of appearance):
+//   * An amount as a BN
+//   * The recipients of the minted assets as an array of address strings
+//   * The locktime is undefined for simplicity, but it's a BN as well
+//   * A threshold number of signatures required to spend the resultant Output
+let output = new slopes.OutCreateAsset(amount, addresses, undefined, threshold);
+
+//A manually created TxUinsigned needs to its networkID and the blockchainID passed in
+let networkID = ava.getNetworkID();
+let blockchainID = bintools.avaDeserialize(ava.AVM().getBlockchainID());
+
+//Creating the unsigned transaction
+let unsigned = new slopes.TxUnsigned([], [output], networkID, blockchainID);
 let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 ```
 
