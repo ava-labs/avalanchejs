@@ -466,7 +466,7 @@ export class UTXOSet {
      * @param amount The amount of AVA to be spent in NanoAVA
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
-     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs, locktime of BN(0) and a threshold of 1
      * @param assetID The assetID of the value being sent as a {@link https://github.com/indutny/bn.js/|BN}
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime The locktime field created in the resulting outputs
@@ -496,7 +496,7 @@ export class UTXOSet {
         }
 
         for(let i = 0; i < utxos.length && spendamount.lt(amount); i++){
-            if((assetID === undefined || utxos[i].getAssetID().compare(assetID) == 0) && utxos[i].meetsThreshold(fromAddresses, asOf) && spendamount.lt(amount)){
+            if((assetID === undefined || (utxos[i].getAssetID().compare(assetID) == 0) && utxos[i].meetsThreshold(fromAddresses, asOf))){
                 let amt:BN = utxos[i].getAmount().clone();
                 spendamount = spendamount.add(amt);
                 change = spendamount.sub(amount);
@@ -518,13 +518,9 @@ export class UTXOSet {
                 ins.push(input);
 
                 if(change.gt(zero)){
-                    if(fallAddresses && assetID){
-                        outs.push(new OutTakeOrLeave(assetID, amount, changeAddresses, fallAddresses, locktime, fallLocktime, threshold, fallThreshold));
-                    } else if(assetID) {
-                        outs.push(new OutPayment(assetID, amount, changeAddresses, locktime, threshold));
-                    } else {
-                        outs.push(new OutCreateAsset(amount, changeAddresses, locktime, threshold))
-                    }
+                    if(assetID) {
+                        outs.push(new OutPayment(assetID, change, changeAddresses, zero.clone(), 1));
+                    } 
                     break;
                 }
                 /* istanbul ignore next */

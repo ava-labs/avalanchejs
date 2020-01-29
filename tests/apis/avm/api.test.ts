@@ -195,7 +195,7 @@ describe("AVMAPI", () => {
             set.addArray(utxos);
         });
 
-        test('makeUnsignedTx', () => {
+        test('makeUnsignedTx1', () => {
     
             let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
@@ -207,6 +207,34 @@ describe("AVMAPI", () => {
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
             
+        });
+
+        test('makeUnsignedTx2', () => {
+            let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
+            let txu2:TxUnsigned = set.makeUnsignedTx(
+                networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
+                addrs3, addrs1, addrs2, assetID, 
+                UnixNow(), new BN(0), 1, undefined, UnixNow(), 1
+            );
+            
+            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
+            expect(txu2.toString()).toBe(txu1.toString());
+            
+            let outies = txu1.getOuts().sort(Output.comparitor());
+
+            expect(outies.length).toBe(2);
+            let outaddr0 = Object.keys(outies[0].getAddresses());
+            let outaddr1 = Object.keys(outies[1].getAddresses());
+
+            let testaddr2 = JSON.stringify(addrs2.sort());
+            let testaddr3 = JSON.stringify(addrs3.sort());
+
+            let testout0 = JSON.stringify(outaddr0.sort());
+            let testout1 = JSON.stringify(outaddr1.sort());
+            expect(
+                (testaddr2 == testout0 && testaddr3 == testout1)
+                ||
+                (testaddr3 == testout0 && testaddr2 == testout1)).toBe(true);
         });
 
         test('signTx', () => {

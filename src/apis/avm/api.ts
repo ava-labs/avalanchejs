@@ -204,18 +204,17 @@ class AVMAPI extends JRPCAPI{
      */
     makeUnsignedTx = (
         utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, 
-        changeAddresses:Array<string>, assetID:string = undefined, asOf:BN = UnixNow(), 
+        changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1, fallAddresses:Array<string> = undefined, 
         fallLocktime:BN = UnixNow(), fallThreshold:number = 1
     ):TxUnsigned => {
-        let asset:Buffer = undefined;
-        if(assetID){
-            asset = bintools.avaDeserialize(assetID);
-        }
+        if(typeof assetID === "string"){
+            assetID = bintools.avaDeserialize(assetID);
+        } 
         return utxoset.makeUnsignedTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
             amount, toAddresses, fromAddresses, changeAddresses, 
-            asset, asOf, locktime, threshold, 
+            assetID, asOf, locktime, threshold, 
             fallAddresses, fallLocktime, fallThreshold
         );
     }
