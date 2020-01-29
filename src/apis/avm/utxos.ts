@@ -432,6 +432,32 @@ export class UTXOSet {
     }
 
     /**
+     * Gets all the Asset IDs, optionally that match with Asset IDs in an array
+     * 
+     * @param utxoids An optional array of Addresses as string or Buffer, returns all Asset IDs if not provided
+     * 
+     * @returns An array of {@link https://github.com/feross/buffer|Buffer} representing the Asset IDs.
+     */
+    getAssetIDs = (addresses:string | Array<string> = undefined ):Array<Buffer> => {
+        let results:Set<Buffer> = new Set();
+        let utxoids:Array<string> = [];
+        if(typeof addresses !== 'undefined'){
+            utxoids = this.getUTXOIDsByAddress(addresses);
+        } else {
+            utxoids = this.getUTXOIDs();
+        }
+        
+        for(let i = 0; i < utxoids.length; i++){
+            if(utxoids[i] in this.utxos && !(utxoids[i] in results)){
+                
+                results.add(this.utxos[utxoids[i]].getAssetID());
+            }
+        }
+        
+        return [...results];
+    }
+
+    /**
      * Creates an unsigned transaction. For more granular control, you may create your own
      * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s.
      * 

@@ -335,6 +335,13 @@ describe('UTXOSet', () => {
             expect(balance1.toString()).toBe(balance2.toString());
         });
 
+        test('getAssetIDs', () => {
+            let assetIDs:Array<Buffer> = set.getAssetIDs();
+            for(let i:number = 0; i < utxos.length; i++){
+                expect(assetIDs).toContain(utxos[i].getAssetID())
+            }
+        });
+
         describe('Merge Rules', () => {
             let setA:UTXOSet;
             let setB:UTXOSet;
