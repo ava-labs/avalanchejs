@@ -9,9 +9,9 @@ import { Address, UnixNow } from './types';
 const bintools = BinTools.getInstance();
 
 /**
+ * Output:
+ * 
  * Output Payment:
- * OutputID  | 04 bytes
- * AssetID   | 32 bytes
  * Amount    | 08 bytes
  * Locktime  | 08 bytes
  * Threshold | 04 bytes

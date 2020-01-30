@@ -492,10 +492,11 @@ export class UTXOSet {
         } else if(assetID) {
             outs.push(new OutPayment(assetID, amount, toAddresses, locktime, threshold));
         } else {
-            outs.push(new OutCreateAsset(amount, toAddresses, locktime, threshold))
+            outs.push(new OutCreateAsset(amount, toAddresses, locktime, threshold));
         }
-
+        console.log("root asset id", assetID.toString("hex"));
         for(let i = 0; i < utxos.length && spendamount.lt(amount); i++){
+            console.log("utxo amount", utxos[i].getAssetID().toString("hex"));
             if((assetID === undefined || (utxos[i].getAssetID().compare(assetID) == 0) && utxos[i].meetsThreshold(fromAddresses, asOf))){
                 let amt:BN = utxos[i].getAmount().clone();
                 spendamount = spendamount.add(amt);
@@ -531,10 +532,14 @@ export class UTXOSet {
                 break;
             }
         }
+
+        console.log(amount.toNumber(), spendamount.toNumber(), assetID.toString("hex"), "ins", JSON.stringify(ins), "outs", JSON.stringify(outs));
         if(spendamount.lt(amount)){
             /* istanbul ignore next */
             throw new Error("Error - UTXOSet.makeUnsignedTx: insufficient funds to create the transaction");
         }
+
+        console.log("ins", JSON.stringify(ins), "outs", JSON.stringify(outs));
 
         return new TxUnsigned(ins, outs, networkid, blockchainid);
     }
