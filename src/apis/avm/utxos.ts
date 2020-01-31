@@ -103,7 +103,7 @@ export abstract class UTXO {
      * @param serialized Optional parameter of the serialized string representing a UTXO
      */
     constructor(txid?:Buffer, txidx?:number) {
-        if(txid && txidx) {
+        if(txid && (typeof txidx !== 'undefined')) {
             this.txid = txid;
             this.txidx.writeUInt32BE(txidx, 0);
         }
