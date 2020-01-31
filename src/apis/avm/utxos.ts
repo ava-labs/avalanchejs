@@ -639,7 +639,7 @@ export class UTXOSet {
                     break;
                 }
             } else {
-                break;
+                continue;
             }
         }
 
