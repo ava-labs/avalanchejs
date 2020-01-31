@@ -193,9 +193,6 @@ class AVMAPI extends JRPCAPI{
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime The locktime field created in the resulting outputs
      * @param threshold The number of signatures required to spend the funds in the resultant UTXO
-     * @param fallAddresses The fallback addresses which can spend the funds in the resultant UTXO
-     * @param fallLocktime The fallback locktime timestamp which is greater than the locktime and used as an expiration date for the locktime as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param fallThreshold The fallback threshold for the number of signatures required from the fallback addresses to spend the resultant UTXO
      * 
      * @returns An unsigned transaction created from the passed in parameters.
      * 
@@ -205,8 +202,7 @@ class AVMAPI extends JRPCAPI{
     makeUnsignedTx = (
         utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, 
         changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
-        locktime:BN = new BN(0), threshold:number = 1, fallAddresses:Array<string> = undefined, 
-        fallLocktime:BN = UnixNow(), fallThreshold:number = 1
+        locktime:BN = new BN(0), threshold:number = 1
     ):TxUnsigned => {
         if(typeof assetID === "string"){
             assetID = bintools.avaDeserialize(assetID);
@@ -214,8 +210,7 @@ class AVMAPI extends JRPCAPI{
         return utxoset.makeUnsignedTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
             amount, toAddresses, fromAddresses, changeAddresses, 
-            assetID, asOf, locktime, threshold, 
-            fallAddresses, fallLocktime, fallThreshold
+            assetID, asOf, locktime, threshold
         );
     }
 

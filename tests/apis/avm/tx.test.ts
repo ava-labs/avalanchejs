@@ -133,8 +133,7 @@ describe('Transactions', () => {
             netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID, 
-            UnixNow(), UnixNow().add(new BN(50)), 3, 
-            addrs2, UnixNow().add(new BN(100)), 2
+            UnixNow(), UnixNow().add(new BN(50)), 3
         );
         let tx:Tx = keymgr1.signTx(txu);
         let tx2:Tx = new Tx();

@@ -241,17 +241,19 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     signTx = (utx:TxUnsigned):Tx => {
         let txbuff = utx.toBuffer();
         let msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest()); 
-        let sigs:Array<Signature> = [];
+        let sigs:Array<Array<Signature>> = [];
         let ins:Array<Input> = utx.getIns();
         for(let i = 0; i < ins.length; i++){
+            let arrsigs:Array<Signature> = [];
             let sigidxs:Array<SigIdx> = ins[i].getSigIdxs();
             for(let j = 0; j < sigidxs.length; j++){
                 let keypair:AVMKeyPair = this.getKey(sigidxs[j].getSource());
                 let signval:Buffer = keypair.sign(msg)
                 let sig:Signature = new Signature();
                 sig.fromBuffer(signval);
-                sigs.push(sig);
+                arrsigs.push(sig);
             }
+            sigs.push(arrsigs);
         }
         return new Tx(utx, sigs);
     }

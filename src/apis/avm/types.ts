@@ -110,6 +110,13 @@ export class Address extends NBytes {
     }
 }
 
+export class Constants {
+    static SECPOUTPUTID:number = 4;
+    static SECPINPUTID:number = 6;
+    static BASETX:number = 0;
+    static SECPCREDENTIAL:number =7;
+}
+
 /**
  * Rules used when merging sets
  */

@@ -6,6 +6,7 @@ import { Signature } from './types';
 import { Output, SelectOutputClass } from './outputs';
 import { Input } from './inputs';
 import BinTools from '../../utils/bintools';
+import { SignatureReflection } from "typedoc";
 
 /**
  * @ignore
@@ -17,7 +18,7 @@ const bintools = BinTools.getInstance();
  * 
  * @remarks
  * Unsigned Tx:
- * Codec      | 4 bytes
+ * TxID      | 4 bytes
  * NetworkID  | 4 bytes
  * BlockchainID   | 32 bytes
  * NumOuts    | 4 bytes
@@ -37,7 +38,7 @@ const bintools = BinTools.getInstance();
  *     Sig    | 65 bytes
  */
 export class TxUnsigned {
-    protected codec:Buffer = Buffer.alloc(4);
+    protected txtype:Buffer = Buffer.alloc(4);
     protected networkid:Buffer = Buffer.alloc(4);
     protected blockchainid:Buffer = Buffer.alloc(32);
     protected numouts:Buffer = Buffer.alloc(4);
@@ -46,10 +47,10 @@ export class TxUnsigned {
     protected ins:Array<Input>;
 
     /**
-     * Returns the number representation of the codec
+     * Returns the number representation of the txtype
      */
-    getCodec = ():number => {
-        return this.codec.readUInt32BE(0);
+    getTxType = ():number => {
+        return this.txtype.readUInt32BE(0);
     }
 
     /**
@@ -91,7 +92,7 @@ export class TxUnsigned {
      */
     fromBuffer = (bytes:Buffer):number => {
         let offset:number = 0;
-        this.codec = bintools.copyFrom(bytes, offset, offset + 4);
+        this.txtype = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
@@ -125,12 +126,12 @@ export class TxUnsigned {
      */
     protected _basicTxBuffer = ():Buffer => {
         try {
-            this.outs.sort(Output.comparitor());
-            this.ins.sort(Input.comparitor());
+            this.outs.sort(Output.comparator());
+            this.ins.sort(Input.comparator());
             this.numouts.writeUInt32BE(this.outs.length, 0);
             this.numins.writeUInt32BE(this.ins.length, 0);
-            let bsize:number = this.codec.length + this.networkid.length + this.blockchainid.length + this.numouts.length;
-            let barr:Array<Buffer> = [this.codec, this.networkid, this.blockchainid, this.numouts];
+            let bsize:number = this.txtype.length + this.networkid.length + this.blockchainid.length + this.numouts.length;
+            let barr:Array<Buffer> = [this.txtype, this.networkid, this.blockchainid, this.numouts];
             for(let i = 0; i < this.outs.length; i++) {
                 let b:Buffer = this.outs[i].toBuffer();
                 barr.push(b);
@@ -174,17 +175,17 @@ export class TxUnsigned {
      * @param outs Optional array of the [[Output]]s
      * @param networkid Optional networkid, default 2
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-     * @param codec Optional codec, default 2
+     * @param txtype Optional txtype, default 2
      */
-    constructor(ins?:Array<Input>, outs?:Array<Output>, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), codec:number = 2) {
-        this.codec.writeUInt32BE(codec, 0);
+    constructor(ins?:Array<Input>, outs?:Array<Output>, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = 2) {
+        this.txtype.writeUInt32BE(txtype, 0);
         this.networkid.writeUInt32BE(networkid, 0);
         this.blockchainid = blockchainid;
         if(ins && outs){
             this.numouts.writeUInt32BE(outs.length, 0);
-            this.outs = outs.sort(Output.comparitor());
+            this.outs = outs.sort(Output.comparator());
             this.numins.writeUInt32BE(ins.length, 0);
-            this.ins = ins.sort(Input.comparitor());
+            this.ins = ins.sort(Input.comparator());
         }
     }
 }
@@ -194,7 +195,7 @@ export class TxUnsigned {
  */
 export class Tx {
     protected tx:TxUnsigned = new TxUnsigned();
-    protected signatures:Array<Signature> = [];
+    protected signatures:Array<Array<Signature>> = [];
 
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.
@@ -241,12 +242,21 @@ export class Tx {
     toBuffer = ():Buffer => {
         try {
             let txbuff: Buffer = this.tx.toBuffer();
-            let barr:Array<Buffer> = [txbuff];
             let bsize:number = txbuff.length;
+            let sigarrlen:Buffer = Buffer.alloc(4);
+            sigarrlen.writeUInt32BE(this.signatures.length, 0);
+            let barr:Array<Buffer> = [txbuff, sigarrlen];
+            bsize += sigarrlen.length;
             for(let i = 0; i < this.signatures.length; i++){
-                let b:Buffer = this.signatures[i].toBuffer();
-                barr.push(b);
-                bsize += b.length
+                let siglen:Buffer = Buffer.alloc(4);
+                siglen.writeUInt32BE(this.signatures[i].length, 0);
+                barr.push(siglen);
+                bsize += siglen.length;
+                for(let j = 0; j < this.signatures[i].length; j++){
+                    let b:Buffer = this.signatures[i][j].toBuffer();
+                    barr.push(b);
+                    bsize += b.length;
+                }
             }
             let buff:Buffer = Buffer.concat(barr, bsize);
             return buff;
@@ -274,7 +284,7 @@ export class Tx {
      * @param tx Optional [[Tx]]
      * @param signatures Optional array of [[Signature]]s
      */
-    constructor(tx?:TxUnsigned, signatures?:Array<Signature>) {
+    constructor(tx?:TxUnsigned, signatures?:Array<Array<Signature>>) {
         if(tx){
             this.tx = tx;
             if(signatures){
