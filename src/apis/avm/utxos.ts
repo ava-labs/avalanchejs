@@ -277,7 +277,7 @@ export class SecpUTXO extends UTXO {
 export const SelectUTXOClass = (utxobuffer:Buffer, args:Array<any> = []):UTXO => {
     let txid:Buffer = bintools.copyFrom(utxobuffer, 0, 32);
     let txidx:number = utxobuffer.readUInt32BE(32);
-    let outputbuff:Buffer = bintools.copyFrom(utxobuffer, 32);
+    let outputbuff:Buffer = bintools.copyFrom(utxobuffer, 36);
     let output = SelectOutputClass(outputbuff);
     let outputid:number = output.getOutputID();
     if(outputid == Constants.SECPOUTPUTID){

@@ -255,9 +255,9 @@ class AVMAPI extends JRPCAPI{
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
-     * @param baseurl Defaults to the string "/ext/subnet/avm" as the path to subnets baseurl
+     * @param baseurl Defaults to the string "/ext/bc/avm" as the path to subnets baseurl
      */
-    constructor(core:SlopesCore, baseurl:string = "/ext/subnet/avm", blockchainID:string = ""){ 
+    constructor(core:SlopesCore, baseurl:string = "/ext/bc/avm", blockchainID:string = ""){ 
         super(core, baseurl);
         this.keychain = new AVMKeyChain();
         this.blockchainID = blockchainID

@@ -2,11 +2,10 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import { Signature } from './types';
+import { Signature, Constants } from './types';
 import { Output, SelectOutputClass } from './outputs';
 import { Input } from './inputs';
 import BinTools from '../../utils/bintools';
-import { SignatureReflection } from "typedoc";
 
 /**
  * @ignore
@@ -177,7 +176,7 @@ export class TxUnsigned {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param txtype Optional txtype, default 2
      */
-    constructor(ins?:Array<Input>, outs?:Array<Output>, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = 2) {
+    constructor(ins?:Array<Input>, outs?:Array<Output>, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = 0) {
         this.txtype.writeUInt32BE(txtype, 0);
         this.networkid.writeUInt32BE(networkid, 0);
         this.blockchainid = blockchainid;
@@ -207,19 +206,25 @@ export class Tx {
     fromBuffer = (bytes:Buffer):number => {
         this.tx = new TxUnsigned();
         let offset:number = this.tx.fromBuffer(bytes);
-        if((bytes.length - offset) % 65 == 0){
-            let numsigs:number = (bytes.length - offset) / 65;
+            let numcreds:number =   bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+            offset += 4;
             this.signatures = [];
-            for(let i = 0; i < numsigs; i++){
-                let sig:Signature = new Signature();
-                sig.fromBuffer(bintools.copyFrom(bytes, offset, offset + 65));
-                this.signatures.push(sig);
-                offset += 65;
+            for(let i = 0; i < numcreds; i++){
+                let sigarray:Array<Signature> = [];
+                let credential:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+                if(credential != Constants.SECPCREDENTIAL){
+                    throw new Error("Error - Tx.fromBuffer: Invalid credentialID " + credential);
+                }
+                let numsigs:number =   bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+                offset += 4;
+                for(let j = 0; j  < numsigs; j++) {
+                    let sig:Signature = new Signature();
+                    sig.fromBuffer(bintools.copyFrom(bytes, offset, offset + 65));
+                    sigarray.push(sig);
+                    offset += 65;
+                }
+                this.signatures.push(sigarray);
             }
-        } else {
-            /* istanbul ignore next */
-            throw new Error("Error - Tx.fromBuffer: the signature block's byte length isn't evenly divisible by 65 and it should be");
-        }
         return offset;
     }
     /**
@@ -250,6 +255,10 @@ export class Tx {
             for(let i = 0; i < this.signatures.length; i++){
                 let siglen:Buffer = Buffer.alloc(4);
                 siglen.writeUInt32BE(this.signatures[i].length, 0);
+                let credentialID = Buffer.alloc(4);
+                credentialID.writeUInt32BE(Constants.SECPCREDENTIAL, 0);
+                barr.push(credentialID);
+                bsize += credentialID.length;
                 barr.push(siglen);
                 bsize += siglen.length;
                 for(let j = 0; j < this.signatures[i].length; j++){

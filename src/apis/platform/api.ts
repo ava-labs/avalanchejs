@@ -76,9 +76,9 @@ class PlatformAPI extends JRPCAPI{
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
-     * @param baseurl Defaults to the string "/ext/subnet/platform" as the path to subnets baseurl
+     * @param baseurl Defaults to the string "/ext/platform" as the path to subnets baseurl
      */
-    constructor(core:SlopesCore, baseurl:string = "/ext/subnet/platform"){ super(core, baseurl); }
+    constructor(core:SlopesCore, baseurl:string = "/ext/platform"){ super(core, baseurl); }
 }
 
 export default PlatformAPI;

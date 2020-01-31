@@ -46,7 +46,8 @@ describe('SecpUTXO', () => {
     });
 
     describe('Funtionality', () => {
-        let u1:SecpUTXO = new SecpUTXO(bintools.avaSerialize(utxobuff));;
+        let u1:SecpUTXO = new SecpUTXO();
+        u1.fromBuffer(utxobuff);
         let u1hex:string = u1.toBuffer().toString("hex"); 
         test('getAmount', () => {
             expect(u1.getAmount().toNumber()).toBe(12345);
@@ -54,13 +55,6 @@ describe('SecpUTXO', () => {
         test('getAssetID NonCA', () => {
             let assetid:Buffer = u1.getAssetID();
             expect(assetid.toString("hex", 0, assetid.length)).toBe("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533");
-        });
-
-        test('getAssetID CA', () => {
-            let ca:SecpUTXO = new SecpUTXO(CAUTXOstr);
-            let assetid:Buffer = ca.getAssetID();
-            let txid:Buffer = ca.getTxID();
-            expect(assetid.toString("hex", 0, assetid.length)).toBe(txid.toString("hex", 0, txid.length));
         });
         test('getTxID', () => {
             let txid:Buffer = u1.getTxID();
@@ -93,19 +87,13 @@ describe('SecpUTXO', () => {
             }
         });
         test('getAddressIdx', () => {
-            let addropinfo:[number, boolean] = u1.getAddressIdx(opaddr);
-            expect(addropinfo[1]).toBe(false);
-            expect(addropinfo[0]).toBe(0);
-            let addrtolinfo:[number, boolean] = u1.getAddressIdx(toladdr);
-            expect(addrtolinfo[1]).toBe(true);
-            expect(addrtolinfo[0]).toBe(0);
+            let addropinfo:number = u1.getAddressIdx(opaddr);
+            expect(addropinfo).toBe(0);
         });
 
         test('getAddress', () => {
             let recaddr1 = u1.getAddress(0, false);
             expect(recaddr1).toBe(opaddr);
-            let recaddr2 = u1.getAddress(0, true);
-            expect(recaddr2).toBe(toladdr);
         });
 
         test('getSpenders', () => {

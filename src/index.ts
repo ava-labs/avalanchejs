@@ -70,7 +70,7 @@ export class Slopes extends SlopesCore {
         }
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
-            this.addAPI("avm", AVMAPI, "/ext/subnet/avm", chainid);
+            this.addAPI("avm", AVMAPI, "/ext/bc/avm", chainid);
             this.addAPI("platform", PlatformAPI);
             this.addAPI("keystore", KeystoreAPI);
         }
@@ -92,10 +92,10 @@ export * from './utils/bintools';
 export * from './utils/db';
 
 export {Tx, TxUnsigned} from './apis/avm/tx';
-export {UTXO, UTXOSet} from './apis/avm/utxos';	
+export {UTXO, SecpUTXO, UTXOSet} from './apis/avm/utxos';	
 export {SigIdx, Signature, UnixNow, Address} from './apis/avm/types';	
-export {OutCreateAsset, OutPayment, OutTakeOrLeave, Output, SelectOutputClass} from './apis/avm/outputs';	
-export {Input} from './apis/avm/inputs';	
+export {SecpOutput, Output, SelectOutputClass} from './apis/avm/outputs';	
+export {SecpInput, Input} from './apis/avm/inputs';	
 export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
 
 export {AVMAPI as AVM};

@@ -4,7 +4,7 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Address, UnixNow } from './types';
+import { Address, UnixNow, Constants } from './types';
 
 const bintools = BinTools.getInstance();
 
@@ -46,7 +46,7 @@ const SECPFXID = 4;
 export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output => {
     let assetid:Buffer = bintools.copyFrom(outbuffer, 0, 32);
     let outputid:number = outbuffer.readUInt32BE(32);
-    if(outputid == SECPFXID){
+    if(outputid == Constants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput(assetid, ...args);
         secpout.fromBuffer(outbuffer);
         return secpout;
@@ -224,7 +224,7 @@ export class SecpOutput extends Output {
     protected _OPBuffer = (): Buffer => {
         try {
             this.addresses.sort(Address.comparitor());
-            let bsize:number =  this.assetid.length + this.outputid.length + + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
+            let bsize:number =  this.assetid.length + this.outputid.length + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
             this.numaddrs.writeUInt32BE(this.addresses.length, 0);
             let barr:Array<Buffer> = [this.assetid, this.outputid, this.amount, this.locktime, this.threshold, this.numaddrs];
             for(let i = 0; i < this.addresses.length; i++) {
@@ -328,7 +328,7 @@ export class SecpOutput extends Output {
         super(SECPFXID, assetid);
         if(amount && addresses){
             this.amountValue = amount.clone();
-            
+            this.amount = bintools.fromBNToBuffer(amount, 8);
             let addrs:Array<Address> = [];
             for(let i = 0; i < addresses.length; i++){
                 addrs[i] = new Address();

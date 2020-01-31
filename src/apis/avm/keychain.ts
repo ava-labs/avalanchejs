@@ -6,7 +6,7 @@ import * as elliptic from "elliptic";
 import BinTools from '../../utils/bintools';
 import { TxUnsigned, Tx } from './tx';
 import { Signature, SigIdx } from './types';
-import { Input } from './inputs';
+import { SecpInput, Input } from './inputs';
 import createHash from "create-hash";
 import { KeyPair, KeyChain } from '../../utils/types';
 
@@ -245,7 +245,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
         let ins:Array<Input> = utx.getIns();
         for(let i = 0; i < ins.length; i++){
             let arrsigs:Array<Signature> = [];
-            let sigidxs:Array<SigIdx> = ins[i].getSigIdxs();
+            let sigidxs:Array<SigIdx> = (ins[i] as SecpInput).getSigIdxs();
             for(let j = 0; j < sigidxs.length; j++){
                 let keypair:AVMKeyPair = this.getKey(sigidxs[j].getSource());
                 let signval:Buffer = keypair.sign(msg)

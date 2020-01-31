@@ -4,7 +4,7 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { SigIdx } from './types';
+import { SigIdx, Constants } from './types';
 
 /**
  * @ignore
@@ -123,7 +123,7 @@ export class Input {
      */
     constructor(txid?:Buffer, txidx?:Buffer, assetID?:Buffer, inputid?:number) {
         if(txid && txidx && assetID && inputid){
-            this.inputid.writeUInt32BE(0,0);
+            this.inputid.writeUInt32BE(inputid,0);
             this.txid = txid;
             this.txidx = txidx;
             this.assetid = assetID;
@@ -235,9 +235,9 @@ export class SecpInput extends Input {
      * @param amount A {@link https://github.com/indutny/bn.js/|BN} containing the amount of the output to be consumed
      */
     constructor(txid?:Buffer, txidx?:Buffer, amount?:BN, assetID?:Buffer) {
-        super(txid, txidx, assetID, SECPINPUTID)
+        super(txid, txidx, assetID, Constants.SECPINPUTID);
         if(txid && txidx && amount && assetID){
-            this.inputid.writeUInt32BE(0,0);
+            this.inputid.writeUInt32BE(Constants.SECPINPUTID,0);
             this.txid = txid;
             this.txidx = txidx;
             this.assetid = assetID;
