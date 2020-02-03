@@ -249,7 +249,7 @@ export class KeyChain<KPClass extends KeyPair> {
      * 
      * @returns Address of the new key pair
      */
-    makeKey:(entropy:Buffer | boolean) => string;
+    makeKey:(entropy?:Buffer) => string;
 
     /**
      * Given a private key, makes a new key pair, returns the address.
@@ -270,12 +270,36 @@ export class KeyChain<KPClass extends KeyPair> {
     }
 
     /**
-     * Adds the key pair to the list of the keys manages in the keychain.
+     * Adds the key pair to the list of the keys managed in the keychain.
      * 
      * @param newKey A key pair of the appropriate class to be added to the keychain
      */
     addKey = (newKey:KPClass) => {
         this.keys[newKey.getAddress()] = newKey;
+    }
+
+    /**
+     * Removes the key pair from the list of they keys managed in the keychain.
+     * 
+     * @param key A string for the address or KPClass to remove
+     * 
+     * @returns The boolean true if a key was removed.
+     */
+    removeKey = (key:KPClass | string) => {
+        let kaddr:string;
+        if(typeof key !== "string"){
+            kaddr = key.getAddress();
+        } else if(typeof key === 'string'){
+            kaddr = key;
+        } else {
+            return false;
+        }
+        if(kaddr in this.keys){
+            delete this.keys[kaddr];
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

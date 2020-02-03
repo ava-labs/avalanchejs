@@ -182,7 +182,7 @@ export class AVMKeyPair extends KeyPair {
     /**
      * Class for representing a private and public keypair in AVAJS. 
      */
-    constructor(entropy:Buffer | boolean = false) {
+    constructor(entropy:Buffer = undefined) {
         super();
         this.generateKey();
     }
@@ -203,7 +203,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * 
      * @returns Address of the new key pair
      */
-    makeKey = (entropy:Buffer | boolean = false):string => {
+    makeKey = (entropy:Buffer = undefined):string => {
         let keypair:AVMKeyPair = new AVMKeyPair(entropy);
         this.addKey(keypair);
         return keypair.getAddress();

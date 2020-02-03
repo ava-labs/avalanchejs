@@ -14,6 +14,28 @@ import { SecpInput } from './inputs';
  */
 const bintools = BinTools.getInstance();
 
+
+/**
+ * Takes a buffer representing the output and returns the proper UTXO instance.
+ * 
+ * @param utxobuffer A {@link https://github.com/feross/buffer|Buffer} containing the [[UTXO]] raw data.
+ * 
+ * @returns An instance of an [[UTXO]]-extended class. ex. [[SecpUTXO]].
+ */
+export const SelectUTXOClass = (utxobuffer:Buffer, args:Array<any> = []):UTXO => {
+    let txid:Buffer = bintools.copyFrom(utxobuffer, 0, 32);
+    let txidx:number = utxobuffer.readUInt32BE(32);
+    let outputbuff:Buffer = bintools.copyFrom(utxobuffer, 36);
+    let output:Output = SelectOutputClass(outputbuff);
+    let outputid:number = output.getOutputID();
+    if(outputid == Constants.SECPOUTPUTID){
+        let secpout:SecpOutput = output as SecpOutput;
+        let utxo:SecpUTXO = new SecpUTXO(txid, txidx, secpout);
+        return utxo;
+    }
+    throw new Error("Error - SelectUTXOClass: unknown outputid " + outputid);
+}
+
 /**
  * Class for representing a single UTXO.
  */
@@ -102,8 +124,8 @@ export abstract class UTXO {
      * 
      * @param serialized Optional parameter of the serialized string representing a UTXO
      */
-    constructor(txid?:Buffer, txidx?:number) {
-        if(txid && (typeof txidx !== 'undefined')) {
+    constructor(txid?:Buffer, txidx:number = undefined) {
+        if(txid && typeof txidx === "number") {
             this.txid = txid;
             this.txidx.writeUInt32BE(txidx, 0);
         }
@@ -148,12 +170,11 @@ export class SecpUTXO extends UTXO {
      * Gets the address at the index.
      * 
      * @param idx The index of the address
-     * @param tol Boolean indicating if this should be looked up in the fallback addresses (TakeItOrLeaveIt)
      * 
      * @returns A string representing the address.
      */
-    getAddress = (idx:number, tol:boolean):string => {
-        return this.output.getAddress(idx, tol);
+    getAddress = (idx:number):string => {
+        return this.output.getAddress(idx);
     }
 
     /**
@@ -243,14 +264,14 @@ export class SecpUTXO extends UTXO {
     /**
      * Given an array of addresses and an optional timestamp, returns an array of address strings of qualified spenders for the output.
      */
-    getSpenders = (addresses:Array<string>, asOf:BN | boolean = false):Array<string> => {
+    getSpenders = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
         return this.output.getSpenders(addresses, asOf);
     }
     
     /**
      * Given an array of addresses and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
      */
-    meetsThreshold = (addresses:Array<string>, asOf:BN | boolean = false) => {
+    meetsThreshold = (addresses:Array<string>, asOf:BN = undefined) => {
         return this.output.meetsThreshold(addresses, asOf);
     }
 
@@ -259,33 +280,15 @@ export class SecpUTXO extends UTXO {
      * 
      * @param serialized Optional parameter of the serialized string representing a UTXO
      */
-    constructor(txid?:Buffer, txidx?:number, secpoutput?:SecpOutput) {
+    constructor(txid:Buffer = undefined, txidx:number = undefined, secpoutput:SecpOutput | string = undefined) {
         super(txid, txidx);
         if(secpoutput){
+            if(typeof secpoutput === 'string'){
+                this.output = SelectOutputClass(secpoutput);
+            }
             this.output = secpoutput;
         }
     }
-}
-
-/**
- * Takes a buffer representing the output and returns the proper Output instance.
- * 
- * @param outbuffer A {@link https://github.com/feross/buffer|Buffer} containing the Output raw data.
- * 
- * @returns An instance of an [[Output]]-extended class: [[OutputPayment]], [[OutTakeOrLeave]], [[OutCreateAsset]].
- */
-export const SelectUTXOClass = (utxobuffer:Buffer, args:Array<any> = []):UTXO => {
-    let txid:Buffer = bintools.copyFrom(utxobuffer, 0, 32);
-    let txidx:number = utxobuffer.readUInt32BE(32);
-    let outputbuff:Buffer = bintools.copyFrom(utxobuffer, 36);
-    let output = SelectOutputClass(outputbuff);
-    let outputid:number = output.getOutputID();
-    if(outputid == Constants.SECPOUTPUTID){
-        let secpout:SecpOutput = output as SecpOutput;
-        let utxo:SecpUTXO = new SecpUTXO(txid, txidx, secpout);
-        return utxo;
-    }
-    throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }
 
 /**
@@ -445,9 +448,9 @@ export class UTXOSet {
      * 
      * @returns An array of [[UTXO]]s.
      */
-    getAllUTXOs = (utxoids:Array<string> | boolean = false ):Array<SecpUTXO> => {
+    getAllUTXOs = (utxoids:Array<string> = undefined):Array<SecpUTXO> => {
         let results:Array<SecpUTXO> = [];
-        if(typeof utxoids !== 'boolean' && Array.isArray(utxoids)){
+        if(typeof utxoids !== 'undefined' && Array.isArray(utxoids)){
             for(let i = 0; i < utxoids.length; i++){
                 if(utxoids[i] in this.utxos && !(utxoids[i] in results)){
                     results.push(this.utxos[utxoids[i]]);
@@ -466,10 +469,10 @@ export class UTXOSet {
      * 
      * @returns An array of [[UTXO]]s as AVA serialized strings.
      */
-    getAllUTXOStrings = (utxoids:Array<string> | boolean = false):Array<string> => {
+    getAllUTXOStrings = (utxoids:Array<string> = undefined):Array<string> => {
         let results:Array<string> = [];
         let utxos = Object.keys(this.utxos);
-        if(typeof utxoids !== 'boolean' && Array.isArray(utxoids)){
+        if(typeof utxoids !== 'undefined' && Array.isArray(utxoids)){
             for(let i = 0; i < utxoids.length; i++){
                 if(utxoids[i] in this.utxos){
                     results.push(this.utxos[utxoids[i]].toString());
@@ -533,7 +536,7 @@ export class UTXOSet {
      * 
      * @returns Returns the total balance as a {@link https://github.com/indutny/bn.js/|BN}.
      */
-    getBalance = (addresses:Array<string>, assetID:Buffer|string, asOf:BN | boolean = false):BN => {
+    getBalance = (addresses:Array<string>, assetID:Buffer|string, asOf:BN = undefined):BN => {
         let utxoids:Array<string> = this.getUTXOIDsByAddress(addresses);
         let utxos:Array<SecpUTXO> = this.getAllUTXOs(utxoids);
         let spend:BN = new BN(0);
@@ -659,7 +662,7 @@ export class UTXOSet {
      * 
      * @returns A new UTXOSet that contains all the filtered elements.
      */
-    merge = (utxoset:UTXOSet, hasUTXOIDs:Array<string> | boolean = false): UTXOSet => {
+    merge = (utxoset:UTXOSet, hasUTXOIDs:Array<string> = undefined): UTXOSet => {
         let results:UTXOSet = new UTXOSet();
         let utxos1:Array<UTXO> = this.getAllUTXOs(hasUTXOIDs);
         let utxos2:Array<UTXO> = utxoset.getAllUTXOs(hasUTXOIDs);

@@ -7,22 +7,18 @@ import { SecpUTXO, UTXOSet } from 'src/apis/avm/utxos';
 const bintools = BinTools.getInstance();
 
 describe('SecpUTXO', () => {
-    let utxohex:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e700000001000000018a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d5330000000000003039000000000000d431000000010000000151025c61fbcfc078f69334f834be6dd26d55a955000000000000ddd50000000100000001c3344128e060128ede3523a24a461c8943ab0859";
-    let outputhex:string = "000000018a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d5330000000000003039000000000000d431000000010000000151025c61fbcfc078f69334f834be6dd26d55a955000000000000ddd50000000100000001c3344128e060128ede3523a24a461c8943ab0859"
+    let utxohex:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000040000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d";
+    let outputhex:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000040000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
     let outputidx:string = "00000001";
-    let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
-    let opaddr:string = "8PLZaKGNoxNDLJ3NRag8Ff1aWUzNe8Kja";
-    let oplocktime:string = "d431";
-    let toladdr:string = "Jo9N7gxKAVy3q58eDYzhXXwGf78xXAMYA";
-    let tollocktime:string = "ddd5";
+    let outtxid:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5";
+    let outaid:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558";
+    let opaddr:string = "FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG";
+    let opamt:string = "4dd5"
+    let oplocktime:string = "00";
     let utxobuff:Buffer = Buffer.from(utxohex, "hex");
-
+    
     //Payment
-    let OPUTXOstr:string = "49N8kgxkXtuTG5tsTy7UccvKgJq9ZvyvXULbyCj2GRuc9Vrn5nv5K8t4NcA4omVjg8iYJ3HhZa3HSyizaWGr9X3XZhBTEweUvuxcaHzd3uGig2q6cESdW5rWqWs5mejSKMiqNBVEPMjfSUv3kvzKnnQPi4v7ejKaurNu";
-    //Take-or-Leave
-    let TOLUTXOstr:string = "2ACVKeLATDeZ9h3MkMbSS7uTfic51anX6GdmaUwBH3Q6poMBGxm4xv5qvaSfpRYATDoffXRVpdUwh2GWxuToTbn67HE42kPH91Lhs2cQqzY76ZXv23z73EUCkoBfmLFjB72SHcT2xsWXx55uv9iSrMjrb5gXhRMCRr2Q59qLEDGogoa1j4XzND82DwmSNcWqXqQCw8Mt6TAJRee2V8pGpC";
-    //CreateAsset
-    let CAUTXOstr:string = "Po53UiAo7yG816YnCjX6ymfxvCHVFyQaUGkVPvovFsg8Q6yUbqrDkwdTffgzH6H9LtqTqBABTgJFXrgRENyHYrkzdAmuCLjf2UuBzDxasSn3tD3UqHRVBzWWVGSHom6e2uffd2Q2xJRLuXAtbuRVAGiS1JofCWQkMh7pxXMAZUEeUfB";
+    let OPUTXOstr:string = "59fmWfk3uwoaCWxeafvtLGvy2LCh8TGiMbAUTs6UnuNobwXZqdZ9u6Tk1y6hBUugi5Z3CnJfXwSDpzE3xGmLrv6EkDGCfSF9XvNmz5WvsMmmMZSRqxFZLTRk1Rv4hMnxV2saV71tBnRcBmcXWVVM8qQcEbirbVw";
     
     //implies fromString and fromBuffer
     test('Creation', () => {
@@ -42,7 +38,7 @@ describe('SecpUTXO', () => {
     test('Creation of Type', () => {
         let op:SecpUTXO = new SecpUTXO();
         op.fromString(OPUTXOstr);
-        expect(op.getOuputID()).toBe(0);
+        expect(op.getOuputID()).toBe(4);
     });
 
     describe('Funtionality', () => {
@@ -54,19 +50,19 @@ describe('SecpUTXO', () => {
         });
         test('getAssetID NonCA', () => {
             let assetid:Buffer = u1.getAssetID();
-            expect(assetid.toString("hex", 0, assetid.length)).toBe("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533");
+            expect(assetid.toString("hex", 0, assetid.length)).toBe(outaid);
         });
         test('getTxID', () => {
             let txid:Buffer = u1.getTxID();
-            expect(txid.toString("hex", 0, txid.length)).toBe("f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7");
+            expect(txid.toString("hex", 0, txid.length)).toBe(outtxid);
         });
         test('getTxIdx', () => {
             let txidx:Buffer = u1.getTxIdx();
-            expect(txidx.toString("hex", 0, txidx.length)).toBe("00000001");
+            expect(txidx.toString("hex", 0, txidx.length)).toBe(outputidx);
         });
         test('getUTXOID', () => {
-            let txid:Buffer = Buffer.from("f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7", "hex");
-            let txidx:Buffer = Buffer.from("00000001", "hex");
+            let txid:Buffer = Buffer.from(outtxid, "hex");
+            let txidx:Buffer = Buffer.from(outputidx, "hex");
             let utxoid:string = bintools.bufferToB58(Buffer.concat([txid, txidx]))
             expect(u1.getUTXOID()).toBe(utxoid);
         });
@@ -79,7 +75,6 @@ describe('SecpUTXO', () => {
             let addresses:{ [address: string]: BN } = u1.getAddresses();
             let expected:{ [address: string]: BN; } = {};
             expected[opaddr] = new BN(oplocktime, "hex");
-            expected[toladdr] = new BN(tollocktime, "hex");
             const addrs = Object.keys(addresses);
             for( let x of addrs ){
                 expect(expected[x]).not.toBeUndefined();
@@ -92,12 +87,12 @@ describe('SecpUTXO', () => {
         });
 
         test('getAddress', () => {
-            let recaddr1 = u1.getAddress(0, false);
+            let recaddr1 = u1.getAddress(0);
             expect(recaddr1).toBe(opaddr);
         });
 
         test('getSpenders', () => {
-            let addrs = [opaddr, toladdr];
+            let addrs = [opaddr];
 
             let thepast = u1.getSpenders(addrs, new BN(1));
             expect(thepast.length).toBe(0);
@@ -116,24 +111,10 @@ describe('SecpUTXO', () => {
         });
 
         test('meetsThreshold', () => {
-            let addrs = [opaddr, toladdr];
+            let addrs = [opaddr];
             let thepast = u1.meetsThreshold(addrs, new BN(1));
-            expect(thepast).toBe(false);
+            expect(thepast).toBe(true);
 
-            let thefuture = u1.meetsThreshold(addrs, new BN(1893529613));
-            expect(thefuture).toBe(true);
-
-            let theinbetween = u1.meetsThreshold(addrs, new BN(55321));
-            expect(theinbetween).toBe(true);
-
-            let exactlyOP = u1.meetsThreshold(addrs, new BN(54321));
-            expect(exactlyOP).toBe(false);
-
-            let exactlyTOL = u1.meetsThreshold(addrs, new BN(56789));
-            expect(exactlyTOL).toBe(true);
-
-            exactlyTOL = u1.meetsThreshold([toladdr], new BN(56789));
-            expect(exactlyTOL).toBe(false);
         });
 
     });

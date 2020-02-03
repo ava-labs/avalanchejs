@@ -168,11 +168,10 @@ export class SecpOutput extends Output {
      * Returns the address from the index provided.
      * 
      * @param idx The index of the address.
-     * @param tol Unused, there for compatibility.
      * 
      * @returns Returns the string representing the address.
      */
-    getAddress = (idx:number, tol:boolean = false):string => {
+    getAddress = (idx:number):string => {
         if(idx < this.addresses.length){
             return this.addresses[idx].toString();
         }
@@ -259,10 +258,10 @@ export class SecpOutput extends Output {
     /**
      * @ignore
      */
-    protected _OPQualified = (addresses:Array<string>, asOf:BN | boolean = false):Array<string> => {
+    protected _OPQualified = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
         let qualified:Array<string> = [];
         let now:BN;
-        if(typeof asOf === 'boolean'){
+        if(typeof asOf === 'undefined'){
             now = UnixNow();
         } else {
             now = asOf;
@@ -288,16 +287,16 @@ export class SecpOutput extends Output {
     /**
      * Given an array of addresses and an optional timestamp, select an array of address strings of qualified spenders for the output.
      */
-    getSpenders = (addresses:Array<string>, asOf:BN | boolean = false):Array<string> => {
+    getSpenders = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
         return this._OPQualified(addresses, asOf);
     }
 
     /**
      * Given an array of addresses and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
      */
-    meetsThreshold = (addresses:Array<string>, asOf:BN | boolean = false):boolean => {
+    meetsThreshold = (addresses:Array<string>, asOf:BN = undefined):boolean => {
         let now:BN;
-        if(typeof asOf === 'boolean'){
+        if(typeof asOf === 'undefined'){
             now = UnixNow();
         } else {
             now = asOf;

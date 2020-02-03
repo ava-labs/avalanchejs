@@ -155,7 +155,7 @@ class AVMAPI extends JRPCAPI{
      * persistOpts is optional and must be of type [[PersistanceOptions]]
      * 
      */
-    getUTXOs = async (addresses:Array<string>, persistOpts:PersistanceOptions | boolean = false ):Promise<UTXOSet> => {
+    getUTXOs = async (addresses:Array<string>, persistOpts:PersistanceOptions = undefined ):Promise<UTXOSet> => {
         let params = {
             "addresses": addresses
         };
