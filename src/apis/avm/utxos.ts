@@ -278,14 +278,12 @@ export class SecpUTXO extends UTXO {
     /**
      * Class for representing a single UTXO.
      * 
-     * @param serialized Optional parameter of the serialized string representing a UTXO
+     * @param txid Optional {@link https://github.com/feross/buffer|Buffer} representing the transaction ID
+     * @param txidx Optional number for the transaction index
      */
-    constructor(txid:Buffer = undefined, txidx:number = undefined, secpoutput:SecpOutput | string = undefined) {
+    constructor(txid:Buffer = undefined, txidx:number = undefined, secpoutput:SecpOutput) {
         super(txid, txidx);
         if(secpoutput){
-            if(typeof secpoutput === 'string'){
-                this.output = SelectOutputClass(secpoutput);
-            }
             this.output = secpoutput;
         }
     }
