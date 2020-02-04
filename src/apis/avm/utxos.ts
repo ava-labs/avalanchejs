@@ -495,13 +495,6 @@ export class UTXOSet {
     }
 
     /**
-     * Returns an array of all the UTXOIDs in the [[UTXOSet]].
-     */
-    getUTXOIDs = ():Array<string> => {
-        return Object.keys(this.utxos);
-    }
-
-    /**
      * Given an address or array of addresses, returns all the UTXOIDs for those addresses
      * 
      * @param address An address or array of addresses
@@ -509,23 +502,26 @@ export class UTXOSet {
      * 
      * @returns An array of addresses.
      */
-    getUTXOIDsByAddress = (address:string | Array<string>, spendable:boolean = true):Array<string> => {
-        let results:Array<string> = [];
-        if(typeof address === 'string'){
-            address = [address];
-        }        
-        let now:BN = UnixNow();
-        for(let i = 0; i < address.length; i++){
-            if(address[i] in this.addressUTXOs){
-                let entries = Object.entries(this.addressUTXOs[address[i]]);
-                for(let [utxoid, locktime] of entries){
-                    if(results.indexOf(utxoid) == -1 && (spendable && locktime.lte(now)) || !spendable) {
-                        results.push(utxoid);
+    getUTXOIDs = (address:string | Array<string> = undefined, spendable:boolean = true):Array<string> => {
+        if(typeof address !== "undefined") {
+            let results:Array<string> = [];
+            if(typeof address === 'string'){
+                address = [address];
+            }        
+            let now:BN = UnixNow();
+            for(let i = 0; i < address.length; i++){
+                if(address[i] in this.addressUTXOs){
+                    let entries = Object.entries(this.addressUTXOs[address[i]]);
+                    for(let [utxoid, locktime] of entries){
+                        if(results.indexOf(utxoid) == -1 && (spendable && locktime.lte(now)) || !spendable) {
+                            results.push(utxoid);
+                        }
                     }
                 }
             }
+            return results;
         }
-        return results;
+        return Object.keys(this.utxos);
     }
 
     /**
@@ -545,7 +541,7 @@ export class UTXOSet {
      * @returns Returns the total balance as a {@link https://github.com/indutny/bn.js/|BN}.
      */
     getBalance = (addresses:Array<string>, assetID:Buffer|string, asOf:BN = undefined):BN => {
-        let utxoids:Array<string> = this.getUTXOIDsByAddress(addresses);
+        let utxoids:Array<string> = this.getUTXOIDs(addresses);
         let utxos:Array<SecpUTXO> = this.getAllUTXOs(utxoids);
         let spend:BN = new BN(0);
         let asset:Buffer;
@@ -573,7 +569,7 @@ export class UTXOSet {
         let results:Set<Buffer> = new Set();
         let utxoids:Array<string> = [];
         if(typeof addresses !== 'undefined'){
-            utxoids = this.getUTXOIDsByAddress(addresses);
+            utxoids = this.getUTXOIDs(addresses);
         } else {
             utxoids = this.getUTXOIDs();
         }
@@ -609,7 +605,7 @@ export class UTXOSet {
     makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:Buffer, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):TxUnsigned => {
         const zero:BN = new BN(0);
         let spendamount:BN = zero.clone();
-        let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDsByAddress(fromAddresses));
+        let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDs(fromAddresses));
         let change:BN = zero.clone();
 
         let outs:Array<SecpOutput> = [];

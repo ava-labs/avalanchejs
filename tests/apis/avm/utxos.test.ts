@@ -253,6 +253,16 @@ describe('UTXOSet', () => {
             }
         });
 
+        test('getUTXOIDs By Address', () => {
+            let utxoids:Array<string>;
+            utxoids = set.getUTXOIDs(addrs[0]);
+            expect(utxoids.length).toBe(1);
+            utxoids = set.getUTXOIDs(addrs);
+            expect(utxoids.length).toBe(3);
+            utxoids = set.getUTXOIDs(addrs, false);
+            expect(utxoids.length).toBe(3);
+        });
+
         test('getAllUTXOStrings', () => {
             let ustrs:Array<string> = set.getAllUTXOStrings();
             for(let i:number = 0; i < utxostrs.length; i++) {
@@ -263,16 +273,6 @@ describe('UTXOSet', () => {
             for(let i:number = 0; i < utxostrs.length; i++) {
                 expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1);
             }
-        });
-
-        test('getUTXOIDsByAddress', () => {
-            let utxoids:Array<string>;
-            utxoids = set.getUTXOIDsByAddress(addrs[0]);
-            expect(utxoids.length).toBe(1);
-            utxoids = set.getUTXOIDsByAddress(addrs);
-            expect(utxoids.length).toBe(3);
-            utxoids = set.getUTXOIDsByAddress(addrs, false);
-            expect(utxoids.length).toBe(3);
         });
 
         test('getAddresses', () => {

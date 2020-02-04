@@ -130,6 +130,26 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
+     * Retrieves an assets name and symbol.
+     * 
+     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the AssetID.
+     * 
+     * @returns Returns a Promise<object> with keys "name" and "symbol".
+     */
+    getAssetDescription = async(assetID:Buffer | string):Promise<{name:string;symbol:string}> => {
+        let asset:string;
+        if(typeof assetID !== "string"){
+            asset = bintools.avaSerialize(assetID);
+        }
+        let params = {
+            "assetID": asset
+        };
+        return this.callMethod("avm.getAssetDescription", params).then((response:RequestResponseData) => {
+            return {name: response.data["result"]["name"], symbol: response.data["result"]["symbol"]};
+        });
+    }
+
+    /**
      * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
      * 
      * @param txid The string representation of the transaction ID

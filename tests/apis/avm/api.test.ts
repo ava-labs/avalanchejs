@@ -83,6 +83,29 @@ describe("AVMAPI", () => {
         expect(response).toBe("accepted");
     });
 
+
+    test('getAssetDescription', async ()=>{
+        let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
+
+        let result:Promise<object> = api.getAssetDescription(assetid);
+        let payload:object = {
+            "result": {
+                'name': "Collin Coin",
+                'symbol': 'CKC'
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:object = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response["name"]).toBe("Collin Coin");
+        expect(response["symbol"]).toBe("CKC");
+    });
+
     test('getUTXOs', async ()=>{
         //Payment
         let OPUTXOstr1:string = "8snom9a21FvVHqyasGGAZKSDjQXJg7CvTvA53is6uyhBxvGbc5WVACRoyscZZ1TGpqiGHTbmMBfMq6qE8fqTBFQTsMGJhQw68T1A9WBcazbMvGv6s6DtKV66sKPXLemTK6miMYWvjcvRCH6rihj7vpDa3Ffp2Jq2QZtJ";
