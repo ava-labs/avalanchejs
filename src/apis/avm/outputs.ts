@@ -161,6 +161,7 @@ export class SecpOutput extends Output {
                 return i
             }
         }
+        /* istanbul ignore next */
         return -1;
     }
 

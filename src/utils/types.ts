@@ -289,10 +289,8 @@ export class KeyChain<KPClass extends KeyPair> {
         let kaddr:string;
         if(typeof key !== "string"){
             kaddr = key.getAddress();
-        } else if(typeof key === 'string'){
-            kaddr = key;
         } else {
-            return false;
+            kaddr = key;
         }
         if(kaddr in this.keys){
             delete this.keys[kaddr];

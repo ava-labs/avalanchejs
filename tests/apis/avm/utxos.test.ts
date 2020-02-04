@@ -307,6 +307,8 @@ describe('UTXOSet', () => {
             for(let i:number = 0; i < utxos.length; i++){
                 expect(assetIDs).toContain(utxos[i].getAssetID())
             }
+            let addresses:Array<string> = set.getAddresses();
+            expect(set.getAssetIDs(addresses)).toEqual(set.getAssetIDs())
         });
 
         describe('Merge Rules', () => {

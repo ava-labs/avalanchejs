@@ -39,6 +39,7 @@ export const SelectInputClass = (inbuffer:Buffer, args:Array<any> = []):Input =>
         secpin.fromBuffer(inbuffer);
         return secpin;
     }
+    /* istanbul ignore next */
     throw new Error("Error - SelectInputClass: unknown inputid " + inputid);
 }
 
@@ -75,6 +76,7 @@ export class Input {
      * Returns the assetID of the input.
      */
     getAssetID = ():Buffer => {
+        /* istanbul ignore next */
         return this.assetid;
     }
 
@@ -116,6 +118,7 @@ export class Input {
      * @returns The length of the raw [[Input]]
      */
     fromBuffer = (bytes:Buffer):number => {
+        /* istanbul ignore next */
         return this._basicInParser(bytes);
     }
 
@@ -123,6 +126,7 @@ export class Input {
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[Input]].
      */
     toBuffer = ():Buffer => {
+        /* istanbul ignore next */
         return this._basicInBuffer();
     }
 
@@ -130,6 +134,7 @@ export class Input {
      * Returns a base-58 representation of the [[Input]].
      */
     toString = ():string => {
+        /* istanbul ignore next */
         return bintools.bufferToB58(this.toBuffer());
     }
 
