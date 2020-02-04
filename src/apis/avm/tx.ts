@@ -214,6 +214,7 @@ export class Tx {
             let credential:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
             offset += 4;
             if(credential != Constants.SECPCREDENTIAL){
+                /* istanbul ignore next */
                 throw new Error("Error - Tx.fromBuffer: Invalid credentialID " + credential);
             }
             let numsigs:number =   bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
