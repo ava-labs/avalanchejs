@@ -281,7 +281,7 @@ export class SecpUTXO extends UTXO {
      * @param txid Optional {@link https://github.com/feross/buffer|Buffer} representing the transaction ID
      * @param txidx Optional number for the transaction index
      */
-    constructor(txid:Buffer = undefined, txidx:number = undefined, secpoutput:SecpOutput) {
+    constructor(txid:Buffer = undefined, txidx:number = undefined, secpoutput:SecpOutput = undefined) {
         super(txid, txidx);
         if(secpoutput){
             this.output = secpoutput;
@@ -596,7 +596,7 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):TxUnsigned => {
+    makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:Buffer, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):TxUnsigned => {
         const zero:BN = new BN(0);
         let spendamount:BN = zero.clone();
         let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDsByAddress(fromAddresses));

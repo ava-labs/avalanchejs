@@ -245,7 +245,7 @@ class AVMAPI extends JRPCAPI{
             throw new Error("Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx");
         }
         let params = {
-            "Tx": Transaction.toString()
+            "tx": Transaction.toString()
         };
         return this.callMethod("avm.issueTx", params).then((response:RequestResponseData) => {
             return response.data["result"]["txID"];

@@ -11,8 +11,6 @@ import { SigIdx, Constants } from './types';
  */
 const bintools = BinTools.getInstance();
 
-const SECPINPUTID = 6;
-
 /**
  * Class representing an Input for a transaction.
  * 
@@ -26,6 +24,24 @@ const SECPINPUTID = 6;
  * Repeated (NumSigs):
  *     SigIdx  | 04 bytes
  */
+
+/**
+ * Takes a buffer representing the output and returns the proper [[Input]] instance.
+ * 
+ * @param inbuffer A {@link https://github.com/feross/buffer|Buffer} containing the [[Input]] raw data.
+ * 
+ * @returns An instance of an [[Input]]-extended class: [[SecpInput]].
+ */
+export const SelectInputClass = (inbuffer:Buffer, args:Array<any> = []):Input => {
+    let inputid:number = inbuffer.readUInt32BE(68);
+    if(inputid == Constants.SECPINPUTID){
+        let secpin:SecpInput = new SecpInput();
+        secpin.fromBuffer(inbuffer);
+        return secpin;
+    }
+    throw new Error("Error - SelectInputClass: unknown inputid " + inputid);
+}
+
 export class Input {
     protected txid:Buffer = Buffer.alloc(32);
     protected txidx:Buffer = Buffer.alloc(4);
@@ -73,20 +89,13 @@ export class Input {
             return buff;
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - TxOut._basicTxBuffer: " + e;
+            let emsg:string = "Error - Input._basicInBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
     }
 
-    /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Input]], parses it, populates the class, and returns the length of the Input in bytes.
-     * 
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Input]]
-     * 
-     * @returns The length of the raw [[Input]]
-     */
-    fromBuffer = (bytes:Buffer):number => {
+    protected _basicInParser = (bytes:Buffer):number => {
         let offset:number = 0;
         this.txid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
@@ -97,6 +106,17 @@ export class Input {
         this.inputid = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         return offset;
+    }
+
+    /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Input]], parses it, populates the class, and returns the length of the Input in bytes.
+     * 
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Input]]
+     * 
+     * @returns The length of the raw [[Input]]
+     */
+    fromBuffer = (bytes:Buffer):number => {
+        return this._basicInParser(bytes);
     }
 
     /**
@@ -149,7 +169,7 @@ export class SecpInput extends Input {
     /**
      * @ignore
      */
-    protected _basicSecpInBuffer = (): Buffer => {
+    protected _SecpInBuffer = (): Buffer => {
         try {
             this.numAddr.writeUInt32BE(this.sigIdxs.length, 0);
             let bsize:number = this.amount.length + this.numAddr.length;
@@ -163,21 +183,14 @@ export class SecpInput extends Input {
             return buff;
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - TxOut._basicTxBuffer: " + e;
+            let emsg:string = "Error - SecpInput._SecpInBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
     }
 
-    /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Input]], parses it, populates the class, and returns the length of the Input in bytes.
-     * 
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Input]]
-     * 
-     * @returns The length of the raw [[Input]]
-     */
-    fromBuffer = (bytes:Buffer):number => {
-        let offset:number = 0;
+    protected _SecpInParser = (bytes:Buffer):number => {
+        let offset:number = this._basicInParser(bytes);
         this.amount = bintools.copyFrom(bytes, offset, offset + 8);
         offset += 8;
         this.amountValue = bintools.fromBufferToBN(this.amount);
@@ -187,7 +200,8 @@ export class SecpInput extends Input {
         this.sigIdxs = [];
         for(let i = 0; i < numaddr; i++){
             let sigidx = new SigIdx();
-            sigidx.fromBuffer(bintools.copyFrom(bytes, offset, offset + 4));
+            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+            sigidx.fromBuffer(sigbuff);
             offset += 4;
             this.sigIdxs.push(sigidx);
         }
@@ -195,11 +209,22 @@ export class SecpInput extends Input {
     }
 
     /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Input]], parses it, populates the class, and returns the length of the [[Input]] in bytes.
+     * 
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Input]]
+     * 
+     * @returns The length of the raw [[Input]]
+     */
+    fromBuffer = (bytes:Buffer):number => {
+        return this._SecpInParser(bytes);
+    }
+
+    /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[Input]].
      */
     toBuffer = ():Buffer => {
         let basicin:Buffer = this._basicInBuffer();
-        let secp:Buffer = this._basicSecpInBuffer();
+        let secp:Buffer = this._SecpInBuffer();
         return Buffer.concat([basicin, secp]);
     }
 

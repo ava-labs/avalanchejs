@@ -4,7 +4,7 @@
 import {Buffer} from "buffer/";
 import { Signature, Constants } from './types';
 import { Output, SelectOutputClass } from './outputs';
-import { Input } from './inputs';
+import { Input, SecpInput, SelectInputClass } from './inputs';
 import BinTools from '../../utils/bintools';
 
 /**
@@ -113,7 +113,7 @@ export class TxUnsigned {
         this.ins = [];
         for(let i = 0; i < incount; i++){
             let inbuff:Buffer = bintools.copyFrom(bytes, offset, bytes.length);
-            let input:Input = new Input();
+            let input:Input = SelectInputClass(inbuff);
             offset += input.fromBuffer(inbuff);
             this.ins.push(input);
         }
@@ -206,25 +206,26 @@ export class Tx {
     fromBuffer = (bytes:Buffer):number => {
         this.tx = new TxUnsigned();
         let offset:number = this.tx.fromBuffer(bytes);
-            let numcreds:number =   bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        let numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.signatures = [];
+        for(let i = 0; i < numcreds; i++){
+            let sigarray:Array<Signature> = [];
+            let credential:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
             offset += 4;
-            this.signatures = [];
-            for(let i = 0; i < numcreds; i++){
-                let sigarray:Array<Signature> = [];
-                let credential:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-                if(credential != Constants.SECPCREDENTIAL){
-                    throw new Error("Error - Tx.fromBuffer: Invalid credentialID " + credential);
-                }
-                let numsigs:number =   bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-                offset += 4;
-                for(let j = 0; j  < numsigs; j++) {
-                    let sig:Signature = new Signature();
-                    sig.fromBuffer(bintools.copyFrom(bytes, offset, offset + 65));
-                    sigarray.push(sig);
-                    offset += 65;
-                }
-                this.signatures.push(sigarray);
+            if(credential != Constants.SECPCREDENTIAL){
+                throw new Error("Error - Tx.fromBuffer: Invalid credentialID " + credential);
             }
+            let numsigs:number =   bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+            offset += 4;
+            for(let j = 0; j  < numsigs; j++) {
+                let sig:Signature = new Signature();
+                sig.fromBuffer(bintools.copyFrom(bytes, offset, offset + 65));
+                sigarray.push(sig);
+                offset += 65;
+            }
+            this.signatures.push(sigarray);
+        }
         return offset;
     }
     /**
