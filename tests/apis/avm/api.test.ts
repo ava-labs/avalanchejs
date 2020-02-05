@@ -84,8 +84,30 @@ describe("AVMAPI", () => {
     });
 
 
-    test('getAssetDescription', async ()=>{
+    test('getAssetDescription as string', async ()=>{
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
+
+        let result:Promise<object> = api.getAssetDescription(assetid);
+        let payload:object = {
+            "result": {
+                'name': "Collin Coin",
+                'symbol': 'CKC'
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:object = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response["name"]).toBe("Collin Coin");
+        expect(response["symbol"]).toBe("CKC");
+    });
+
+    test('getAssetDescription as Buffer', async ()=>{
+        let assetid:Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533");
 
         let result:Promise<object> = api.getAssetDescription(assetid);
         let payload:object = {

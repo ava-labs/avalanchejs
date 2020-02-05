@@ -140,6 +140,8 @@ class AVMAPI extends JRPCAPI{
         let asset:string;
         if(typeof assetID !== "string"){
             asset = bintools.avaSerialize(assetID);
+        } else {
+            asset = assetID;
         }
         let params = {
             "assetID": asset

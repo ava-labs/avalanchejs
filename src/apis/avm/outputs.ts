@@ -11,32 +11,6 @@ const bintools = BinTools.getInstance();
 const SECPFXID = 4;
 
 /**
- * Output:
- * 
- * Output Payment:
- * Amount    | 08 bytes
- * Locktime  | 08 bytes
- * Threshold | 04 bytes
- * NumAddrs  | 04 bytes
- * Repeated (NumAddrs):
- *     Addr  | 20 bytes
- */
-/* Output Take-or-Leave:
- * OutputID      | 04 bytes
- * Amount        | 08 bytes
- * Locktime      | 08 bytes
- * Threshold     | 04 bytes
- * NumAddrs      | 04 bytes
- * Repeated (NumAddrs):
- *     Addr      | 20 bytes
- * FallLocktime  | 08 bytes
- * FallThreshold | 04 bytes
- * NumFallAddrs  | 04 bytes
- * Repeated (NumFallAddrs):
- *     Addr      | 20 bytes
- */
-
-/**
  * Takes a buffer representing the output and returns the proper Output instance.
  * 
  * @param outbuffer A {@link https://github.com/feross/buffer|Buffer} containing the Output raw data.
