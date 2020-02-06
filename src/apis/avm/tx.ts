@@ -3,7 +3,7 @@
  */
 import {Buffer} from "buffer/";
 import { Signature, Constants } from './types';
-import { Output, SelectOutputClass } from './outputs';
+import { Output, SecpOutBasic, SelectOutputClass } from './outputs';
 import { Input, SecpInput, SelectInputClass } from './inputs';
 import BinTools from '../../utils/bintools';
 
@@ -87,10 +87,9 @@ export class TxUnsigned {
      * 
      * @returns The length of the raw [[TxUnsigned]]
      * 
-     * @remarks assume not-checksummed and deserialized
+     * @remarks assume not-checksummed
      */
-    fromBuffer = (bytes:Buffer):number => {
-        let offset:number = 0;
+    fromBuffer = (bytes:Buffer, offset:number = 0):number => {
         this.txtype = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
@@ -121,9 +120,9 @@ export class TxUnsigned {
     }
 
     /**
-     * @ignore
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[TxUnsigned]].
      */
-    protected _basicTxBuffer = ():Buffer => {
+    toBuffer = ():Buffer => {
         try {
             this.outs.sort(Output.comparator());
             this.ins.sort(Input.comparator());
@@ -147,17 +146,10 @@ export class TxUnsigned {
             return buff;
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - TxUnsigned._basicTxBuffer: " + e;
+            let emsg:string = "Error - TxUnsigned.toBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
-    }
-
-    /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[TxUnsigned]].
-     */
-    toBuffer = ():Buffer => {
-        return this._basicTxBuffer();
     }
 
     /**
@@ -185,6 +177,77 @@ export class TxUnsigned {
             this.outs = outs.sort(Output.comparator());
             this.numins.writeUInt32BE(ins.length, 0);
             this.ins = ins.sort(Input.comparator());
+        }
+    }
+}
+
+export class TxCreateAsset extends TxUnsigned {
+    protected name:string = "";
+    protected namebuff:Buffer = Buffer.alloc(2);
+    protected symbol:string = "";
+    protected symbolbuff:Buffer = Buffer.alloc(2);
+    protected numstate:Buffer = Buffer.alloc(4);
+    protected initialstate:Array<Output>;
+
+
+    /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[TxCreateAsset]], parses it, populates the class, and returns the length of the TxUnsigned in bytes.
+     * 
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[TxCreateAsset]]
+     * 
+     * @returns The length of the raw [[TxCreateAsset]]
+     * 
+     * @remarks assume not-checksummed
+     */
+    fromBuffer = (bytes:Buffer, offset:number = 0):number => {
+        offset = super.fromBuffer(bytes, offset);
+        let namesize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+        offset += 2;
+        this.namebuff = bintools.copyFrom(bytes, offset, offset + namesize);
+        offset += namesize;
+        let symsize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+        offset += 2;
+        this.symbolbuff = bintools.copyFrom(bytes, offset, offset + symsize);
+        offset += symsize;
+        this.numstate = bintools.copyFrom(bytes, offset, offset + 4);
+        let numstate:number = this.numstate.readUInt32BE(0);
+        for(let i = 0; i < numstate; i++){
+            let outbuff:Buffer = bintools.copyFrom(bytes, offset)
+            let secpbase:SecpOutBasic = new SecpOutBasic();
+            offset += secpbase.fromBuffer(outbuff, offset);
+            this.initialstate.push(secpbase);
+        }
+
+        return offset;
+    }
+
+    toBuffer = ():Buffer => {
+        let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.numstate];
+        for(let i:number = 0; i < this.initialstate.length; i++){
+            barr.push(this.initialstate[i].toBuffer());
+        }
+        return Buffer.concat(barr);
+    }
+    
+    /**
+     * Class representing an unsigned Create Asset transaction.
+     * 
+     * @param name String for the descriptive name of the asset
+     * @param symbol String for the ticker symbol of the asset
+     * @param initialstate Optional array of [[Output]]s that represent the intial state of a created asset
+     * @param ins Optional array of the [[Input]]s
+     * @param outs Optional array of the [[Output]]s
+     * @param networkid Optional networkid, default 2
+     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+     * @param txtype Optional txtype, default 1
+     */
+    constructor(name:string = undefined, symbol:Buffer = undefined, initialstate:Array<Output> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = Constants.CREATEASSETTX) {
+        super(ins, outs, networkid, blockchainid, txtype);
+        if(typeof name === 'string' && typeof symbol === 'string' && initialstate) {
+            this.initialstate = initialstate;
+            this.namebuff = bintools.stringToBuffer(name);
+            this.symbolbuff = bintools.stringToBuffer(symbol);
+            this.numstate.readUInt32BE(this.initialstate.length);
         }
     }
 }

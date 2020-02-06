@@ -8,8 +8,6 @@ import { Address, UnixNow, Constants } from './types';
 
 const bintools = BinTools.getInstance();
 
-const SECPFXID = 4;
-
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
  * 
@@ -29,19 +27,29 @@ export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output
 }
 
 /**
- * An abstract representing a transaction output. All output types must extend on this class.
+ * A class representing a transaction output. All output types must extend on this class.
  */
-export abstract class Output {
+export  class Output {
     protected outputid:Buffer = Buffer.alloc(4);
     protected outputidnum:number;
-    protected assetid:Buffer = Buffer.alloc(32);
 
-    abstract getOutputID:() => number;
-    abstract getAssetID:() => Buffer;
+    getOutputID = ():number => {
+        return this.outputidnum;
+    };
 
-    abstract fromBuffer:(utxobuff:Buffer) => number;
-    abstract toBuffer:() => Buffer;
-    abstract toString:() => string;
+    fromBuffer = (outbuff:Buffer, offset:number = 0):number => {
+        this.outputid = bintools.copyFrom(outbuff, offset, offset + 4);
+        this.outputidnum = this.outputid.readUInt32BE(0);
+        return offset + 4;
+    };
+
+    toBuffer = ():Buffer => {
+        return this.outputid;
+    };
+
+    toString = ():string => {
+        return bintools.bufferToB58(this.outputid);
+    };
 
     static comparator = ():(a:Output, b:Output) => (1|-1|0) => {
         return function(a:Output, b:Output):(1|-1|0) { 
@@ -49,43 +57,22 @@ export abstract class Output {
         }
     }
 
-    constructor(outputidnum:number, assetID?:Buffer) {
+    constructor(outputidnum:number) {
         this.outputid.writeUInt32BE(outputidnum, 0);
         this.outputidnum = outputidnum;
-        if(assetID){
-            this.assetid = assetID;
-        }
     }
 }
 
 /**
  * An [[Output]] class which issues a payment on an assetID.
  */
-export class SecpOutput extends Output {
+export class SecpOutBasic extends Output {
     protected locktime:Buffer = Buffer.alloc(8);
     protected threshold:Buffer = Buffer.alloc(4);
     protected numaddrs:Buffer = Buffer.alloc(4);
     protected addresses:Array<Address> = [];
     protected amount:Buffer = Buffer.alloc(8);
     protected amountValue:BN = new BN(0);
-
-    /**
-     * @ignore
-     */
-    protected _OPGetAddresses = ():{[address:string]: BN} => {
-        let result:{[address:string]: BN} = {};
-        for(let i = 0; i < this.addresses.length; i++) {
-            result[this.addresses[i].toString()] = bintools.fromBufferToBN(this.locktime);
-        }
-        return result;
-    }
-
-    /**
-     * Returns the number for the output type of the output class.
-     */
-    getOutputID = ():number => {
-        return this.outputidnum;
-    };
 
     /**
      * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
@@ -109,17 +96,14 @@ export class SecpOutput extends Output {
     }
 
     /**
-     * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
-     */
-    getAssetID = ():Buffer => {
-        return this.assetid;
-    }
-
-    /**
      * Returns a map from all addresses as string keys to their locktime represented in {@link https://github.com/indutny/bn.js/|BN}.
      */
     getAddresses = ():{[address:string]: BN} => {
-        return this._OPGetAddresses();
+        let result:{[address:string]: BN} = {};
+        for(let i = 0; i < this.addresses.length; i++) {
+            result[this.addresses[i].toString()] = bintools.fromBufferToBN(this.locktime);
+        }
+        return result;
     }
 
     /**
@@ -154,14 +138,10 @@ export class SecpOutput extends Output {
     }
 
     /**
-     * @ignore
+     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[OutCreateAsset]] and returns the size of the output.
      */
-    protected _OPParseBuffer = (utxobuff:Buffer, offset:number):number => {
-        this.assetid = bintools.copyFrom(utxobuff, offset, offset + 32);
-        offset += 32;
-        this.outputid = bintools.copyFrom(utxobuff, offset, offset + 4); //copied
-        this.outputidnum = this.outputid.readUInt32BE(0);
-        offset += 4;
+    fromBuffer = (utxobuff:Buffer, offset:number = 0):number => {
+        offset = super.fromBuffer(utxobuff, offset);
         this.amount = bintools.copyFrom(utxobuff, offset, offset + 8);
         this.amountValue = bintools.fromBufferToBN(this.amount);
         offset += 8;
@@ -186,41 +166,27 @@ export class SecpOutput extends Output {
     }
 
     /**
-     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[OutCreateAsset]] and returns the size of the output.
+     * Returns the buffer representing the [[OutCreateAsset]] instance.
      */
-    fromBuffer = (utxobuff:Buffer):number => {
-        return this._OPParseBuffer(utxobuff, 0);
-    }
-
-    /**
-     * @ignore
-     */
-    protected _OPBuffer = (): Buffer => {
+    toBuffer = ():Buffer => {
         try {
             this.addresses.sort(Address.comparitor());
-            let bsize:number =  this.assetid.length + this.outputid.length + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
+            let superbuff:Buffer = super.toBuffer();
+            let bsize:number = superbuff.length + this.outputid.length + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
             this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-            let barr:Array<Buffer> = [this.assetid, this.outputid, this.amount, this.locktime, this.threshold, this.numaddrs];
+            let barr:Array<Buffer> = [superbuff, this.outputid, this.amount, this.locktime, this.threshold, this.numaddrs];
             for(let i = 0; i < this.addresses.length; i++) {
                 let b: Buffer = this.addresses[i].toBuffer();
                 barr.push(b);
                 bsize += b.length;
             }
-            let buff: Buffer = Buffer.concat(barr,bsize);
-            return buff;
+            return Buffer.concat(barr,bsize);;
         } catch(e) {
             /* istanbul ignore next */
             let emsg:string = "Error - TxOut._OPTxBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
-    }
-
-    /**
-     * Returns the buffer representing the [[OutCreateAsset]] instance.
-     */
-    toBuffer = ():Buffer => {
-        return this._OPBuffer();
     }
 
     /**
@@ -231,9 +197,9 @@ export class SecpOutput extends Output {
     }
 
     /**
-     * @ignore
+     * Given an array of addresses and an optional timestamp, select an array of address strings of qualified spenders for the output.
      */
-    protected _OPQualified = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
+    getSpenders = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
         let qualified:Array<string> = [];
         let now:BN;
         if(typeof asOf === 'undefined'){
@@ -260,13 +226,6 @@ export class SecpOutput extends Output {
     }
 
     /**
-     * Given an array of addresses and an optional timestamp, select an array of address strings of qualified spenders for the output.
-     */
-    getSpenders = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
-        return this._OPQualified(addresses, asOf);
-    }
-
-    /**
      * Given an array of addresses and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
      */
     meetsThreshold = (addresses:Array<string>, asOf:BN = undefined):boolean => {
@@ -276,12 +235,8 @@ export class SecpOutput extends Output {
         } else {
             now = asOf;
         }
-        let locktime:BN = bintools.fromBufferToBN(this.locktime);
-        let qualified:Array<string> = this._OPQualified(addresses, now);
+        let qualified:Array<string> = this.getSpenders(addresses, now);
         let threshold:number = this.threshold.readUInt32BE(0);
-        if(now.lte(locktime)){
-            return false;
-        }
         if(qualified.length >= threshold){
             return true;
         }
@@ -298,8 +253,8 @@ export class SecpOutput extends Output {
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      */
-    constructor(assetid:Buffer, amount?:BN, addresses?:Array<string>, locktime?:BN, threshold?:number){
-        super(SECPFXID, assetid);
+    constructor(amount?:BN, addresses?:Array<string>, locktime?:BN, threshold?:number){
+        super(Constants.SECPOUTPUTID);
         if(amount && addresses){
             this.amountValue = amount.clone();
             this.amount = bintools.fromBNToBuffer(amount, 8);
@@ -321,4 +276,32 @@ export class SecpOutput extends Output {
     }
 }
 
+export class SecpOutput extends SecpOutBasic {
+    protected assetid:Buffer = Buffer.alloc(32);
 
+    fromBuffer = (outbuff:Buffer, offset:number = 0):number => {
+        this.assetid = bintools.copyFrom(outbuff, offset, offset + 32);
+        offset += 32;
+        offset += super.fromBuffer(outbuff, offset);
+        return offset;
+    }
+
+    toBuffer = ():Buffer => {
+        let superbuff:Buffer = super.toBuffer();
+        return Buffer.concat([this.assetid, superbuff]);
+    }
+
+    /**
+     * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
+     */
+    getAssetID = ():Buffer => {
+        return this.assetid;
+    }
+
+    constructor(assetid?:Buffer, amount?:BN, addresses?:Array<string>, locktime?:BN, threshold?:number){
+        super(amount, addresses, locktime, threshold);
+        if(typeof assetid !== 'undefined' && assetid.length == Constants.ASSETIDLEN) {
+            this.assetid = assetid;
+        }
+    }
+}

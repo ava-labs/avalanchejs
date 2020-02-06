@@ -113,8 +113,13 @@ export class Address extends NBytes {
 export class Constants {
     static SECPOUTPUTID:number = 4;
     static SECPINPUTID:number = 6;
+    static CREATEASSETTX:number = 1;
     static BASETX:number = 0;
-    static SECPCREDENTIAL:number =7;
+    static SECPCREDENTIAL:number = 7;
+    static ASSETIDLEN:number = 32;
+    static BLOCKCHAINIDLEN:number = 32;
+    static SYMBOLMAXLEN:number = 4;
+    static ASSETNAMELEN:number = 128;
 }
 
 /**

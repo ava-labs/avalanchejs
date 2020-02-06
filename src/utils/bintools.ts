@@ -37,6 +37,27 @@ export default class BinTools {
     }
 
     /**
+     * Produces a string from a {@link https://github.com/feross/buffer|Buffer} representing a string. 
+     * 
+     * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to a string
+     */
+    bufferToString = (buff:Buffer):string => {
+        return this.copyFrom(buff, 2).toString("utf8");
+    }
+
+    /**
+     * Produces a {@link https://github.com/feross/buffer|Buffer} from a string. 
+     * 
+     * @param str The string to convert to a {@link https://github.com/feross/buffer|Buffer} 
+     */
+    stringToBuffer = (str:string):Buffer => {
+        let buff:Buffer = Buffer.alloc(2 + str.length);
+        buff.writeUInt16BE(str.length, 0);
+        buff.write(str, 2, str.length, "utf8");
+        return buff;
+    }
+
+    /**
      * Makes a copy (no reference) of a {@link https://github.com/feross/buffer|Buffer} over provided indecies. 
      * 
      * @param buff The {@link https://github.com/feross/buffer|Buffer} to copy
