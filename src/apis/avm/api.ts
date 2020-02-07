@@ -112,20 +112,251 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
-     * Creates an asset of a given amount and assigns it to the address provided.
+     * Gets the balance of a particular asset on a subnet.
      * 
-     * @param amount The amount of the asset to be created. If Amount is 10, for example, there will be exist 10 units of the new asset
-     * @param address The base 58 string representation of the address that holds all units of the new asset upon creation of the asset
+     * @param address The address to pull the asset balance from
+     * @param assetID The assetID to pull the balance from
+     * 
+     * @returns Promise with the balance of the assetID on the provided address for the subnet.
+     */
+    getBalance = async (address:string, assetID:string):Promise<number> => {
+        let params = {
+            "address": address, 
+            "assetID": assetID
+        };
+        return this.callMethod("avm.getBalance", params).then((response:RequestResponseData) => {
+            return response.data["result"]["balance"];
+        });
+    }
+
+
+    /**
+     * Creates an address (and associated private keys) on a user under a subnet.
+     * 
+     * @param username Name of the user to create the address under
+     * @param password Password to unlock the user and encrypt the private key
+     * 
+     * @returns Promise for a string representing the address created by the subnet.
+     */
+    createAddress = async (username:string, password:string):Promise<string> => {
+        let params = {
+            "username": username,
+            "password": password
+        };
+        return this.callMethod("avm.createAddress", params).then((response:RequestResponseData) => {
+            return response.data["result"]["address"];
+        });
+    }
+
+    /**
+     * Create a new fixed-cap, fungible asset. A quantity of it is created at initialization and there no more is ever created.
+     * 
+     * @param username The user paying the transaction fee (in $AVA) for asset creation
+     * @param password The password for the user paying the transaction fee (in $AVA) for asset creation
+     * @param name The human-readable name for the asset
+     * @param symbol Optional. The shorthand symbol for the asset. Between 0 and 4 characters
+     * @param initialHolders An array of objects containing the field "address" and "amount" to establish the genesis values for the new asset
+     * 
+     * ```js
+     * Example initialHolders:
+     * [
+     *     {
+     *         "address": "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+     *         "amount": 10000
+     *     },
+     *     {
+     *         "address": "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+     *         "amount": 50000
+     *     }
+     * ]
+     * ```
      * 
      * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
      */
-    createAsset = async (amount:number, address:string):Promise<string> => {
+    createFixedCapAsset = async (username:string, password:string, name:string, symbol:string, initialHolders:Array<object>):Promise<string> => {
         let params = {
-            "amount": amount,
+            "name": name,
+            "symbol": symbol,
+            "username": username,
+            "password": password,
+            "initialHolders": initialHolders
+        };
+        return this.callMethod("avm.createFixedCapAsset", params).then((response:RequestResponseData) => {
+            return response.data["result"]["assetID"];
+        });
+    }
+
+    /**
+     * Create a new variable-cap, fungible asset. No units of the asset exist at initialization. Minters can mint units of this asset using createMintTx, signMintTx and sendMintTx.
+     * 
+     * @param username The user paying the transaction fee (in $AVA) for asset creation
+     * @param password The password for the user paying the transaction fee (in $AVA) for asset creation
+     * @param name The human-readable name for the asset
+     * @param symbol Optional. The shorthand symbol for the asset -- between 0 and 4 characters
+     * @param minterSets  is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+     * 
+     * ```js
+     * Example minterSets:
+     * [
+     *      {
+     *          "minters":[
+     *              "4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+     *          ],
+     *          "threshold": 1
+     *      },
+     *      {
+     *          "minters": [
+     *              "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+     *              "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+     *              "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+     *          ],
+     *          "threshold": 2
+     *      }
+     * ]
+     * ```
+     * 
+     * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
+     */
+    createVariableCapAsset = async (username:string, password:string, name:string, symbol:string, minterSets:Array<object>):Promise<string> => {
+        let params = {
+            "name": name,
+            "symbol": symbol,
+            "username": username,
+            "password": password,
+            "minterSets": minterSets
+        };
+        return this.callMethod("avm.createVariableCapAsset", params).then((response:RequestResponseData) => {
+            return response.data["result"]["assetID"];
+        });
+    }
+
+    /**
+     * Create an unsigned transaction to mint more of an asset.
+     * 
+     * @param amount The units of the asset to mint
+     * @param assetID The ID of the asset to mint 
+     * @param to The address to assign the units of the minted asset
+     * @param minters Addresses of the minters responsible for signing the transaction
+     * 
+     * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
+     */
+    createMintTx = async (amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
+        let asset:string;
+        let amnt:number;
+        if(typeof assetID !== "string"){
+            asset = bintools.avaSerialize(assetID);
+        } else {
+            asset = assetID;
+        }
+        if(typeof amount !== 'number'){
+            amnt = amount.toNumber();
+        } else {
+            amnt = amount;
+        }
+        let params = {
+            "amount": amnt,
+            "assetID": asset,
+            "to": to,
+            "minters": minters
+        };
+        return this.callMethod("avm.createMintTx", params).then((response:RequestResponseData) => {
+            return response.data["result"]["tx"];
+        });
+    }
+
+    /**
+     * Sign an unsigned or partially signed mint transaction.
+     * 
+     * @param username The user signing
+     * @param password The password for the user signing
+     * @param tx The output of createMintTx or signMintTx
+     * @param minter The minter signing this transaction 
+     * 
+     * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
+     */
+    signMintTx = async (username:string, password:string, tx:string | Buffer, minter:string):Promise<string> => {
+        let params = {
+            "username": username,
+            "password": password,
+            "tx": tx,
+            "minter": minter
+        };
+        return this.callMethod("avm.signMintTx", params).then((response:RequestResponseData) => {
+            return response.data["result"]["tx"];
+        });
+    }
+
+    /**
+     * Exports the private key for an address.
+     * 
+     * @param username The name of the user with the private key
+     * @param password The password used to decrypt the private key
+     * @param address The address whose private key should be exported
+     * 
+     * @returns Promise with the decrypted private key as store in the database
+     */
+    exportKey = async (username:string, password:string, address:string):Promise<string> => {
+        let params = {
+            "username": username,
+            "password": password,
             "address": address
         };
-        return this.callMethod("avm.createAsset", params).then((response:RequestResponseData) => {
-            return response.data["result"]["assetID"];
+        return this.callMethod("avm.exportKey", params).then((response:RequestResponseData) => {
+            return response.data["result"]["privateKey"];
+        });
+    }
+
+    /**
+     * Imports a private key into the node's database under an user and for a subnet.
+     * 
+     * @param username The name of the user to store the private key
+     * @param password The password that unlocks the user
+     * @param privateKey A string representing the private key in the subnet's format
+     * 
+     * @returns The address for the imported private key.
+     */
+    importKey = async (username:string, password:string, privateKey:string):Promise<string> => {
+        let params = {
+            "username": username,
+            "password": password,
+            "privateKey": privateKey
+        };
+        return this.callMethod("avm.importKey", params).then((response:RequestResponseData) => {
+            return response.data["result"]["address"];
+        });
+    }
+
+    /**
+     * Lists all the addresses under a user.
+     * 
+     * @param username The user to list addresses
+     * @param password The password of the user to list the addresses
+     * 
+     * @returns Promise of an array of address strings in the format specified by the subnet.
+     */
+    listAddresses = async (username:string, password:string): Promise<Array<string>> => {
+        let params = {
+            "username": username,
+            "password": password
+        };
+        return this.callMethod("avm.listAddresses", params).then((response:RequestResponseData) => {
+            return response.data["result"]["addresses"];
+        });
+    }
+
+    /**
+     * Lists all assets for an address.
+     * 
+     * @param address The address to get a list of assets
+     * 
+     * @returns Promise of an array of assetIDs for the address on the subnet.
+     */
+    listAssets = async (address:string):Promise<Array<string>> => {
+        let params = {
+            "address": address
+        };
+        return this.callMethod("avm.listAssets", params).then((response:RequestResponseData) => {
+            return response.data["result"]["assets"];
         });
     }
 
@@ -273,6 +504,46 @@ class AVMAPI extends JRPCAPI{
             return response.data["result"]["txID"];
         });
     }
+
+    /**
+     * Sends an amount of assetID to the specified address from a list of owned of addresses.
+     * 
+     * @param username The user that owns the private keys associated with the `from` addresses
+     * @param password The password unlocking the user
+     * @param assetID The assetID of the asset to send
+     * @param amount The amount of the asset to be sent
+     * @param to The address of the recipient
+     * @param from An array of addresses managed by the node for this subnet which will fund this transaction
+     * 
+     * @returns Promise for the string representing the transaction's ID.
+     */
+    send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string>):Promise<string> => {
+        let asset:string;
+        let amnt:number;
+        if(typeof assetID !== "string"){
+            asset = bintools.avaSerialize(assetID);
+        } else {
+            asset = assetID;
+        }
+        if(typeof amount !== 'number'){
+            amnt = amount.toNumber();
+        } else {
+            amnt = amount;
+        }
+
+        let params = {
+            "username": username,
+            "password": password,
+            "assetID": asset,
+            "amount": amnt,
+            "to": to, 
+            "from": from
+        };
+        return this.callMethod("avm.send", params).then((response:RequestResponseData) => {
+            return response.data["result"]["txID"];
+        });
+    }
+
     /**
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 

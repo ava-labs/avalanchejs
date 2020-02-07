@@ -30,18 +30,40 @@ class PlatformAPI extends JRPCAPI{
     }
 
     /**
-     * Creates a new subnet.
+     * Creates a new blockchain.
      * 
-     * @param tx The string representation of a createSubnetTx
+     * @param vmID The VMID used to build the blockchain
+     * @param name A human-readable name for the new blockchain
+     * @param method The VMID's hook method for ingesting genesis data
+     * @param genesis The object used to build the initial state of the blockchain
      * 
-     * @returns Promise for a boolean value, true on success.
+     * @returns Promise for a string for the blockchainID.
      */
-    createSubnet = async (tx:string):Promise<boolean> => {
+    createBlockchain = async (vmID:string, name:string, method:string, genesis:object):Promise<string> => {
         let params = {
-            "tx": tx
+            "vmID": vmID,
+            "name": name,
+            "method": method,
+            "genesis": genesis
         };
-        return this.callMethod("platform.createSubnet", params).then((response:RequestResponseData) => {
-            return response.data["result"]["success"];
+        return this.callMethod("platform.createBlockchain", params).then((response:RequestResponseData) => {
+            return response.data["result"]["blockchainID"];
+        });
+    }
+
+    /**
+     * Creates a new blockchain.
+     * 
+     * @param blockchainID The blockchainID requesting a status update
+     * 
+     * @returns Promise for a string of one of: "Validating", "Created", "Preferred", "Unknown".
+     */
+    getBlockchainStatus = async (blockchainID: string):Promise<string> => {
+        let params = {
+            "blockchainID": blockchainID
+        };
+        return this.callMethod("platform.getBlockchainStatus", params).then((response:RequestResponseData) => {
+            return response.data["result"]["status"];
         });
     }
 
