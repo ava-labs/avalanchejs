@@ -282,7 +282,7 @@ export class SecpOutput extends SecpOutBasic {
     fromBuffer(outbuff:Buffer, offset:number = 0):number {
         this.assetid = bintools.copyFrom(outbuff, offset, offset + 32);
         offset += 32;
-        offset += super.fromBuffer(outbuff, offset);
+        offset = super.fromBuffer(outbuff, offset);
         return offset;
     }
 
