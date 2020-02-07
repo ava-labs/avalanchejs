@@ -350,7 +350,7 @@ export abstract class NBytes {
      * 
      * @returns The size of the {@link https://github.com/feross/buffer|Buffer}
      */
-    fromString = (b58str:string):number => {
+    fromString(b58str:string):number {
         try {
             this.fromBuffer(bintools.b58ToBuffer(b58str));
         } catch(e){
@@ -367,7 +367,7 @@ export abstract class NBytes {
      * 
      * @returns The size of the {@link https://github.com/feross/buffer|Buffer}
      */
-    fromBuffer = (buff:Buffer):number => {
+    fromBuffer(buff:Buffer):number {
         try {
             if(buff.length != this.bsize){
                 /* istanbul ignore next */
@@ -388,7 +388,7 @@ export abstract class NBytes {
      * 
      * @returns A reference to the stored {@link https://github.com/feross/buffer|Buffer}
      */
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         return this.bytes;
     }
 
@@ -397,7 +397,7 @@ export abstract class NBytes {
      * 
      * @returns A base-58 string of the stored {@link https://github.com/feross/buffer|Buffer}
      */
-    toString = ():string => {
+    toString():string {
         return bintools.bufferToB58(this.toBuffer());
     }
     /**

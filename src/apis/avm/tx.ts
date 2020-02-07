@@ -89,7 +89,7 @@ export class TxUnsigned {
      * 
      * @remarks assume not-checksummed
      */
-    fromBuffer = (bytes:Buffer, offset:number = 0):number => {
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
         this.txtype = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
@@ -122,7 +122,7 @@ export class TxUnsigned {
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[TxUnsigned]].
      */
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         try {
             this.outs.sort(Output.comparator());
             this.ins.sort(Input.comparator());
@@ -155,7 +155,7 @@ export class TxUnsigned {
     /**
      * Returns a base-58 representation of the [[TxUnsigned]].
      */
-    toString = ():string => {
+    toString():string {
         return bintools.bufferToB58(this.toBuffer());
     }
 
@@ -199,7 +199,7 @@ export class TxCreateAsset extends TxUnsigned {
      * 
      * @remarks assume not-checksummed
      */
-    fromBuffer = (bytes:Buffer, offset:number = 0):number => {
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(bytes, offset);
         let namesize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
         offset += 2;
@@ -221,7 +221,7 @@ export class TxCreateAsset extends TxUnsigned {
         return offset;
     }
 
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.numstate];
         for(let i:number = 0; i < this.initialstate.length; i++){
             barr.push(this.initialstate[i].toBuffer());
@@ -266,7 +266,7 @@ export class Tx {
      * 
      * @returns The length of the raw [[Tx]]
      */
-    fromBuffer = (bytes:Buffer):number => {
+    fromBuffer(bytes:Buffer):number {
         this.tx = new TxUnsigned();
         let offset:number = this.tx.fromBuffer(bytes);
         let numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
@@ -302,14 +302,14 @@ export class Tx {
      * @remarks 
      * unlike most fromStrings, it expects the string to be serialized in AVA format
      */
-    fromString = (serialized:string):number => {
+    fromString(serialized:string):number {
         return this.fromBuffer(bintools.avaDeserialize(serialized));
     }
 
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[Tx]].
      */
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         try {
             let txbuff: Buffer = this.tx.toBuffer();
             let bsize:number = txbuff.length;
@@ -348,7 +348,7 @@ export class Tx {
      * @remarks 
      * unlike most toStrings, this returns in AVA serialization format
      */
-    toString = ():string => {
+    toString():string {
         return bintools.avaSerialize(this.toBuffer());
     }
 

@@ -16,8 +16,8 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class: [[OutputPayment]], [[OutTakeOrLeave]], [[OutCreateAsset]].
  */
 export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output => {
-    let assetid:Buffer = bintools.copyFrom(outbuffer, 0, 32);
-    let outputid:number = outbuffer.readUInt32BE(32);
+    let assetid:Buffer = bintools.copyFrom(outbuffer, 0, Constants.ASSETIDLEN);
+    let outputid:number = outbuffer.readUInt32BE(Constants.ASSETIDLEN);
     if(outputid == Constants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput(assetid, ...args);
         secpout.fromBuffer(outbuffer);
@@ -29,7 +29,7 @@ export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output
 /**
  * A class representing a transaction output. All output types must extend on this class.
  */
-export  class Output {
+export class Output {
     protected outputid:Buffer = Buffer.alloc(4);
     protected outputidnum:number;
 
@@ -37,17 +37,17 @@ export  class Output {
         return this.outputidnum;
     };
 
-    fromBuffer = (outbuff:Buffer, offset:number = 0):number => {
+    fromBuffer(outbuff:Buffer, offset:number = 0):number {
         this.outputid = bintools.copyFrom(outbuff, offset, offset + 4);
         this.outputidnum = this.outputid.readUInt32BE(0);
         return offset + 4;
     };
 
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         return this.outputid;
     };
 
-    toString = ():string => {
+    toString():string {
         return bintools.bufferToB58(this.outputid);
     };
 
@@ -140,7 +140,7 @@ export class SecpOutBasic extends Output {
     /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[OutCreateAsset]] and returns the size of the output.
      */
-    fromBuffer = (utxobuff:Buffer, offset:number = 0):number => {
+    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(utxobuff, offset);
         this.amount = bintools.copyFrom(utxobuff, offset, offset + 8);
         this.amountValue = bintools.fromBufferToBN(this.amount);
@@ -168,13 +168,13 @@ export class SecpOutBasic extends Output {
     /**
      * Returns the buffer representing the [[OutCreateAsset]] instance.
      */
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         try {
             this.addresses.sort(Address.comparitor());
             let superbuff:Buffer = super.toBuffer();
-            let bsize:number = superbuff.length + this.outputid.length + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
+            let bsize:number = superbuff.length + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
             this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-            let barr:Array<Buffer> = [superbuff, this.outputid, this.amount, this.locktime, this.threshold, this.numaddrs];
+            let barr:Array<Buffer> = [superbuff, this.amount, this.locktime, this.threshold, this.numaddrs];
             for(let i = 0; i < this.addresses.length; i++) {
                 let b: Buffer = this.addresses[i].toBuffer();
                 barr.push(b);
@@ -192,7 +192,7 @@ export class SecpOutBasic extends Output {
     /**
      * Returns a base-58 string representing the [[OutCreateAsset]].
      */
-    toString = ():string => {
+    toString():string {
         return bintools.bufferToB58(this.toBuffer());
     }
 
@@ -279,14 +279,14 @@ export class SecpOutBasic extends Output {
 export class SecpOutput extends SecpOutBasic {
     protected assetid:Buffer = Buffer.alloc(32);
 
-    fromBuffer = (outbuff:Buffer, offset:number = 0):number => {
+    fromBuffer(outbuff:Buffer, offset:number = 0):number {
         this.assetid = bintools.copyFrom(outbuff, offset, offset + 32);
         offset += 32;
         offset += super.fromBuffer(outbuff, offset);
         return offset;
     }
 
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         let superbuff:Buffer = super.toBuffer();
         return Buffer.concat([this.assetid, superbuff]);
     }

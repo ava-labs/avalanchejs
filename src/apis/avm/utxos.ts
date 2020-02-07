@@ -40,11 +40,13 @@ export const SelectUTXOClass = (utxobuffer:Buffer, args:Array<any> = []):UTXO =>
 /**
  * Class for representing a single UTXO.
  */
-export abstract class UTXO {
+export class UTXO {
     protected txid:Buffer = Buffer.alloc(32);
     protected txidx:Buffer = Buffer.alloc(4);
 
-    abstract getOuputID:() => number;
+    getOuputID():number {
+        return undefined;
+    };
 
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -70,19 +72,17 @@ export abstract class UTXO {
         return bintools.bufferToB58(Buffer.concat([this.getTxID(), this.getTxIdx()]));
     }
 
-    _basicUTXOBuffer = (utxobuff) => {
-        this.txid = bintools.copyFrom(utxobuff, 0, 32);
-        this.txidx = bintools.copyFrom(utxobuff, 32, 36);
-    }
-
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
      * 
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[UTXO]]
      */
-    fromBuffer = (utxobuff:Buffer) => {
-        /* istanbul ignore next */
-        this._basicUTXOBuffer(utxobuff);
+    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
+        this.txid = bintools.copyFrom(utxobuff, offset, offset + 32);
+        offset += 32;
+        this.txidx = bintools.copyFrom(utxobuff, offset, offset + 4);
+        offset += 4;
+        return offset;
     }
 
     /**
@@ -95,7 +95,7 @@ export abstract class UTXO {
      * @remarks 
      * unlike most fromStrings, it expects the string to be serialized in AVA format
      */
-    fromString = (serialized:string) => {
+    fromString(serialized:string) {
         /* istanbul ignore next */
         return this.fromBuffer( bintools.avaDeserialize(serialized) );
     }
@@ -103,7 +103,7 @@ export abstract class UTXO {
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[UTXO]].
      */
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         /* istanbul ignore next */
         try {
             let barr:Array<Buffer> = [this.txid, this.txidx];
@@ -122,7 +122,7 @@ export abstract class UTXO {
      * @remarks 
      * unlike most toStrings, this returns in AVA serialization format
      */
-    toString = ():string => {
+    toString():string {
         /* istanbul ignore next */
         return bintools.avaSerialize(this.toBuffer());
     }
@@ -223,11 +223,12 @@ export class SecpUTXO extends UTXO {
      * 
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[UTXO]]
      */
-    fromBuffer = (utxobuff:Buffer) => {
-        this._basicUTXOBuffer(utxobuff);
-        let utxoOut = bintools.copyFrom(utxobuff, 36, utxobuff.length);
+    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(utxobuff, offset);
+        let utxoOut = bintools.copyFrom(utxobuff, offset, utxobuff.length);
         this.output = SelectOutputClass(utxoOut) as SecpOutput;
-        this.output.fromBuffer(utxoOut);
+        offset += this.output.toBuffer().length;
+        return offset;
     }
 
     /**
@@ -240,21 +241,22 @@ export class SecpUTXO extends UTXO {
      * @remarks 
      * unlike most fromStrings, it expects the string to be serialized in AVA format
      */
-    fromString = (serialized:string) => {
+    fromString(serialized:string):number {
         return this.fromBuffer( bintools.avaDeserialize(serialized) );
     }
 
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[UTXO]].
      */
-    toBuffer = ():Buffer => {
+    toBuffer():Buffer {
         try {
+            let superbuff = super.toBuffer();
             let obuff = this.output.toBuffer();
-            let barr:Array<Buffer> = [this.txid, this.txidx, obuff];
-            return Buffer.concat(barr, this.txid.length + this.txidx.length + obuff.length)
+            let barr:Array<Buffer> = [superbuff, obuff];
+            return Buffer.concat(barr, superbuff.length + obuff.length)
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - UTXO.toBuffer: " + e;
+            let emsg:string = "Error - SecpUTXO.toBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
@@ -266,7 +268,7 @@ export class SecpUTXO extends UTXO {
      * @remarks 
      * unlike most toStrings, this returns in AVA serialization format
      */
-    toString = ():string => {
+    toString():string {
         return bintools.avaSerialize(this.toBuffer());
     }
 

@@ -72,7 +72,7 @@ export class Address extends NBytes {
     /**
      * Returns a base-58 representation of the [[Address]].
      */
-    toString = ():string => {
+    toString():string {
         return bintools.avaSerialize(this.toBuffer());
     }
     /**
@@ -82,7 +82,7 @@ export class Address extends NBytes {
      * 
      * @returns The length of the raw [[Address]]
      */
-    fromString = (addr:string):number => {
+    fromString(addr:string):number {
         let addrbuff:Buffer = bintools.b58ToBuffer(addr);
         if(addrbuff.length == 24 && bintools.validateChecksum(addrbuff)) {
             let newbuff:Buffer = bintools.copyFrom(addrbuff, 0,addrbuff.length - 4);
