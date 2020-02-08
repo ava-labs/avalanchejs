@@ -38,15 +38,226 @@ describe("AVMAPI", () => {
         mockAxios.reset();
     });
 
-    test('createAsset', async ()=>{
+    test('can Send 1', async ()=>{
+        let txId = 'asdfhvl234';
+
+        let result:Promise<string> = api.send(username, password, 'assetId', 10, 'toAddress', ['fromAddress']);
+        let payload:object = {
+            "result": {
+                'txID': txId
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(txId);
+    });
+
+    test('can Send 2', async ()=>{
+        let txId = 'asdfhvl234';
+
+        let result:Promise<string> = api.send(username, password, bintools.b58ToBuffer("6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"), new BN(10), 'toAddress', ['fromAddress']);
+        let payload:object = {
+            "result": {
+                'txID': txId
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(txId);
+    });
+
+    test('listAssets', async ()=>{
+        let assets = ['ATH','ETH'];
+
+        let result:Promise<Array<string>> = api.listAssets('address');
+        let payload:object = {
+            "result": {
+                'assets': assets
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:Array<string> = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(assets);
+    });
+
+    test('listAddresses', async ()=>{
+        let addresses = ['acc1','acc2'];
+
+        let result:Promise<Array<string>> = api.listAddresses(username, password);
+        let payload:object = {
+            "result": {
+                'addresses': addresses
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:Array<string> = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(addresses);
+    });
+
+    test('importKey', async ()=>{
+        let address = 'asdflashdvfalsdf';
+
+        let result:Promise<string> = api.importKey(username, password, 'key');
+        let payload:object = {
+            "result": {
+                'address': address
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(address);
+    });
+
+    test('getBalance', async ()=>{
+        let balance = 100;
+
+        let result:Promise<number> = api.getBalance('address', 'ATH');
+        let payload:object = {
+            "result": {
+                "balance": balance
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:number = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(balance);
+    });
+
+    test('exportKey', async ()=>{
+        let key = 'sdfglvlj2h3v45';
+
+        let result:Promise<string> = api.exportKey(username, password, 'address');
+        let payload:object = {
+            "result": {
+                "privateKey": key
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(key);
+    });
+
+    test('createAddress', async ()=>{
+        let alias = 'randomalias';
+
+        let result:Promise<string> = api.createAddress(username, password);
+        let payload:object = {
+            "result": {
+                "address": alias
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(alias);
+    });
+
+    test('createFixedCapAsset', async ()=>{
         let kp:AVMKeyPair = new AVMKeyPair();
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
         
         let amount:number = 10000;
         let address:string = kp.getAddress();
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
+        let initialHolders:Array<object> = [
+            {
+                "address": "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+                "amount": "10000"
+            },
+            {
+                "address": "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+                "amount": "50000"
+            }
+        ]
 
-        let result:Promise<string> = api.createAsset(amount,address);
+        let result:Promise<string> = api.createFixedCapAsset(username, password, "Some Coin", "SCC", initialHolders);
+        let payload:object = {
+            "result": {
+                'assetID': assetid
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(assetid);
+    });
+
+    test('createVariableCapAsset', async ()=>{
+        let kp:AVMKeyPair = new AVMKeyPair();
+        kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
+        
+        let amount:number = 10000;
+        let address:string = kp.getAddress();
+        let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
+        let minterSets:Array<object> = [
+            {
+                "minters":[
+                    "4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+                ],
+                "threshold": 1
+            },
+            {
+                "minters": [
+                    "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+                    "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+                    "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+                ],
+                "threshold": 2
+            }
+        ]
+
+        let result:Promise<string> = api.createVariableCapAsset(username, password, "Some Coin", "SCC", minterSets);
         let payload:object = {
             "result": {
                 'assetID': assetid

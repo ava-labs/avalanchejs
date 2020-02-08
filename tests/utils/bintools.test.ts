@@ -8,6 +8,9 @@ describe('BinTools', () => {
     let hexstr:string = "00112233445566778899aabbccddeeff";
     let hexstr2:string = "0001020304050607080909080706050403020100";
     let hexstr3:string = "0001020304050607080909080706050403020101"
+    let hexbuffstr1:string = "000461736466"; // = asdf
+    let hexbuffstr2:string = "000761626364656667"; // = abcdefg
+    let hexbuffstr3:string = "00076f6b0066696e65"; // = ok<null>fineokfine
     let b58str:string = "1UoWww8DGaVGLtea7zU7p";
     let b58str2:string = "1Bhh3pU9gLXZiJv73kmqZwHJ4F"
     let b58str3:string = "1Bhh3pU9gLXZiJv73kmqZwHJ4G";
@@ -31,6 +34,28 @@ describe('BinTools', () => {
         expect(newbuff2.length).toBe(14);
         expect(newbuff2.readUInt8(0)).toBe(34);
         expect(newbuff2.readUInt8(7)).toBe(153);
+    });
+
+    test('bufferToString', () => {
+        let bres:string = bintools.bufferToString(Buffer.from(hexbuffstr1, "hex"));
+        expect(bres).toBe(Buffer.from(hexbuffstr1.slice(4), "hex").toString("utf8"));
+        // testing null character edge case
+        let bres2:string = bintools.bufferToString(Buffer.from(hexbuffstr2, "hex"));
+        expect(bres2).toBe(Buffer.from(hexbuffstr2.slice(4), "hex").toString("utf8"));
+        // testing null character edge case
+        let bres3:string = bintools.bufferToString(Buffer.from(hexbuffstr3, "hex"));
+        expect(bres3).toBe(Buffer.from(hexbuffstr3.slice(4), "hex").toString("utf8"));
+    });
+
+    test('stringToBuffer', () => {
+        let bres:Buffer = bintools.stringToBuffer("asdf");
+        expect(bres.slice(2).toString()).toBe(Buffer.from(hexbuffstr1.slice(4), "hex").toString("utf8"));
+        // testing null character edge case
+        let bres2:Buffer = bintools.stringToBuffer("abcdefg");
+        expect(bres2.slice(2).toString()).toBe(Buffer.from(hexbuffstr2.slice(4), "hex").toString("utf8"));
+        // testing null character edge case
+        let bres3:Buffer = bintools.stringToBuffer(Buffer.from(hexbuffstr3.slice(4), "hex").toString("utf8")); 
+        expect(bres3.slice(2).toString()).toBe(Buffer.from(hexbuffstr3.slice(4), "hex").toString("utf8"));
     });
 
     test('bufferToB58', () => {

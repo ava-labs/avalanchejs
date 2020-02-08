@@ -42,13 +42,16 @@ describe("Platform", () => {
         expect(response).toBe(true);
     });
 
-
-    test("createSubnet", async ()=>{
-
-        let result:Promise<boolean> = platform.createSubnet('txId');
+    test("createBlockchain", async ()=>{
+        let blockchainID:string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh";
+        let vmID:string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh";
+        let name:string = "Some Blockchain";
+        let method:string = 'avm.Booyashakalah';
+        let genesis:object = {ruh:"roh"};
+        let result:Promise<string> = platform.createBlockchain(vmID, name, method, genesis);
         let payload:object = {
             "result": {
-                "success": true
+                "blockchainID": blockchainID
             }
         };
         let responseObj = {
@@ -56,10 +59,30 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:boolean = await result;
+        let response:string = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(true);
+        expect(response).toBe(blockchainID);
+    });
+
+    test("getBlockchainStatus", async ()=>{
+
+        let blockchainID:string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh";
+        let result:Promise<string> = platform.getBlockchainStatus(blockchainID);
+        let payload:object = {
+            "result": {
+                "status": "Accepted"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("Accepted");
     });
 
     test("listValidators", async ()=>{
