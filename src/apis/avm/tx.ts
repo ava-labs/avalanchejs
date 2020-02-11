@@ -3,7 +3,7 @@
  */
 import {Buffer} from "buffer/";
 import { Signature, Constants } from './types';
-import { Output, SecpOutBasic, SelectOutputClass } from './outputs';
+import { Output, SecpOutBase, SelectOutputClass } from './outputs';
 import { Input, SecpInput, SelectInputClass } from './inputs';
 import BinTools from '../../utils/bintools';
 
@@ -213,7 +213,7 @@ export class TxCreateAsset extends TxUnsigned {
         let numstate:number = this.numstate.readUInt32BE(0);
         for(let i = 0; i < numstate; i++){
             let outbuff:Buffer = bintools.copyFrom(bytes, offset)
-            let secpbase:SecpOutBasic = new SecpOutBasic();
+            let secpbase:SecpOutBase = new SecpOutBase();
             offset += secpbase.fromBuffer(outbuff, offset);
             this.initialstate.push(secpbase);
         }

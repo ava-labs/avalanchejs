@@ -66,7 +66,7 @@ export class Output {
 /**
  * An [[Output]] class which issues a payment on an assetID.
  */
-export class SecpOutBasic extends Output {
+export class SecpOutBase extends Output {
     protected locktime:Buffer = Buffer.alloc(8);
     protected threshold:Buffer = Buffer.alloc(4);
     protected numaddrs:Buffer = Buffer.alloc(4);
@@ -276,7 +276,7 @@ export class SecpOutBasic extends Output {
     }
 }
 
-export class SecpOutput extends SecpOutBasic {
+export class SecpOutput extends SecpOutBase {
     protected assetid:Buffer = Buffer.alloc(32);
 
     fromBuffer(outbuff:Buffer, offset:number = 0):number {
