@@ -91,11 +91,11 @@ export * from './utils/types';
 export * from './utils/bintools';
 export * from './utils/db';
 
-export {Tx, TxUnsigned} from './apis/avm/tx';
-export {UTXO, SecpUTXO, UTXOSet} from './apis/avm/utxos';	
+export {Tx, TxUnsigned, TxCreateAsset} from './apis/avm/tx';
+export {UTXO, SecpUTXO, UTXOSet, SelectUTXOClass} from './apis/avm/utxos';	
 export {SigIdx, Signature, UnixNow, Address} from './apis/avm/types';	
-export {SecpOutput, Output, SelectOutputClass} from './apis/avm/outputs';	
-export {SecpInput, Input} from './apis/avm/inputs';	
+export {SecpOutput, SecpOutBase, Output, SelectOutputClass} from './apis/avm/outputs';	
+export {SecpInput, Input, SelectInputClass} from './apis/avm/inputs';	
 export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
 
 export {AVMAPI as AVM};
