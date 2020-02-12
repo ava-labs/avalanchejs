@@ -296,13 +296,16 @@ describe("AVMAPI", () => {
 
 
     test('getAssetDescription as string', async ()=>{
-        let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
+        let assetid:Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", 'hex');
+        let assetidstr:string = bintools.avaSerialize(assetid);
 
-        let result:Promise<object> = api.getAssetDescription(assetid);
+        let result:Promise<object> = api.getAssetDescription(assetidstr);
         let payload:object = {
             "result": {
                 'name': "Collin Coin",
-                'symbol': 'CKC'
+                'symbol': 'CKC',
+                'assetID': assetidstr,
+                'denomination': '10'
             }
         };
         let responseObj = {
@@ -315,16 +318,21 @@ describe("AVMAPI", () => {
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response["name"]).toBe("Collin Coin");
         expect(response["symbol"]).toBe("CKC");
+        expect(response["assetID"].toString("hex")).toBe(assetid.toString("hex"));
+        expect(response["denomination"]).toBe(10);
     });
 
     test('getAssetDescription as Buffer', async ()=>{
-        let assetid:Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533");
+        let assetid:Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", 'hex');
+        let assetidstr:string = bintools.avaSerialize(Buffer.from('8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533', 'hex'));
 
         let result:Promise<object> = api.getAssetDescription(assetid);
         let payload:object = {
             "result": {
                 'name': "Collin Coin",
-                'symbol': 'CKC'
+                'symbol': 'CKC',
+                'assetID': assetidstr,
+                'denomination': '11'
             }
         };
         let responseObj = {
@@ -337,6 +345,8 @@ describe("AVMAPI", () => {
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response["name"]).toBe("Collin Coin");
         expect(response["symbol"]).toBe("CKC");
+        expect(response["assetID"].toString("hex")).toBe(assetid.toString("hex"));
+        expect(response["denomination"]).toBe(11);
     });
 
     test('getUTXOs', async ()=>{
@@ -439,9 +449,9 @@ describe("AVMAPI", () => {
             set.addArray(utxos);
         });
 
-        test('makeUnsignedTx1', () => {
+        test('makeUnsignedTx1', async () => {
     
-            let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
                 addrs3, addrs1, addrs1, assetID, 
@@ -453,8 +463,8 @@ describe("AVMAPI", () => {
             
         });
 
-        test('makeUnsignedTx2', () => {
-            let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
+        test('makeUnsignedTx2', async () => {
+            let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
                 addrs3, addrs1, addrs2, assetID, 
@@ -481,8 +491,8 @@ describe("AVMAPI", () => {
                 (testaddr3 == testout0 && testaddr2 == testout1)).toBe(true);
         });
 
-        test('signTx', () => {
-            let txu1:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+        test('signTx', async () => {
+            let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
                 addrs3, addrs1, addrs1, assetID, UnixNow(), 
@@ -498,7 +508,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Serialized', async ()=>{
-            let txu:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -521,7 +531,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Buffer', async ()=>{
-            let txu:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -544,7 +554,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Class Tx', async ()=>{
-            let txu:TxUnsigned = api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";

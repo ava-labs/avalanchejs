@@ -382,7 +382,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Returns a Promise<object> with keys "name" and "symbol".
      */
-    getAssetDescription = async(assetID:Buffer | string):Promise<{name:string;symbol:string;assetID:Buffer,denomination:number}> => {
+    getAssetDescription = async(assetID:Buffer | string):Promise<{name:string;symbol:string;assetID:Buffer;denomination:number}> => {
         let asset:string;
         if(typeof assetID !== "string"){
             asset = bintools.avaSerialize(assetID);
