@@ -186,9 +186,59 @@ export class TxCreateAsset extends TxUnsigned {
     protected namebuff:Buffer = Buffer.alloc(2);
     protected symbol:string = "";
     protected symbolbuff:Buffer = Buffer.alloc(2);
+    protected denomination:Buffer = Buffer.alloc(1);
     protected numstate:Buffer = Buffer.alloc(4);
-    protected initialstate:Array<Output>;
+    protected initialstate:Array<Output> = [];
 
+    /**
+     * Returns the array of [[Output]]s for the initial state
+     */
+    getInitialState = ():Array<Output> => {
+        return this.initialstate;
+    }
+
+    /**
+     * Returns the string representation of the name
+     */
+    getName = ():string => {
+        return this.name;
+    }
+
+    /**
+     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the name
+     */
+    getNameBuffer = ():Buffer => {
+        return this.namebuff;
+    }
+
+    /**
+     * Returns the string representation of the symbol
+     */
+    getSymbol = ():string => {
+        return this.symbol;
+    }
+
+    /**
+     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the symbol
+     */
+    getSymbolBuffer = ():Buffer => {
+        return this.symbolbuff;
+    }
+
+    /**
+     * Returns the numeric representation of the denomination
+     */
+    getDenomination = ():number => {
+        return this.denomination.readUInt8(0);
+    }
+
+
+    /**
+     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the denomination
+     */
+    getDenominationBuffer = ():Buffer => {
+        return this.denomination;
+    }
 
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[TxCreateAsset]], parses it, populates the class, and returns the length of the TxUnsigned in bytes.
@@ -202,19 +252,22 @@ export class TxCreateAsset extends TxUnsigned {
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(bytes, offset);
         let namesize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+        this.namebuff = bintools.copyFrom(bytes, offset, offset + 2 + namesize);
         offset += 2;
-        this.namebuff = bintools.copyFrom(bytes, offset, offset + namesize);
         offset += namesize;
         let symsize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+        this.symbolbuff = bintools.copyFrom(bytes, offset, offset + 2 + symsize);
         offset += 2;
-        this.symbolbuff = bintools.copyFrom(bytes, offset, offset + symsize);
         offset += symsize;
+        this.denomination = bintools.copyFrom(bytes, offset, offset + 1);
+        offset += 1;
         this.numstate = bintools.copyFrom(bytes, offset, offset + 4);
         let numstate:number = this.numstate.readUInt32BE(0);
+        offset += 4;
         for(let i = 0; i < numstate; i++){
             let outbuff:Buffer = bintools.copyFrom(bytes, offset)
             let secpbase:SecpOutBase = new SecpOutBase();
-            offset += secpbase.fromBuffer(outbuff, offset);
+            offset += secpbase.fromBuffer(outbuff);
             this.initialstate.push(secpbase);
         }
 
@@ -222,7 +275,7 @@ export class TxCreateAsset extends TxUnsigned {
     }
 
     toBuffer():Buffer {
-        let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.numstate];
+        let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.denomination, this.numstate];
         for(let i:number = 0; i < this.initialstate.length; i++){
             barr.push(this.initialstate[i].toBuffer());
         }
@@ -234,6 +287,7 @@ export class TxCreateAsset extends TxUnsigned {
      * 
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
+     * @param denomination Number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
      * @param initialstate Optional array of [[Output]]s that represent the intial state of a created asset
      * @param ins Optional array of the [[Input]]s
      * @param outs Optional array of the [[Output]]s
@@ -241,13 +295,16 @@ export class TxCreateAsset extends TxUnsigned {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param txtype Optional txtype, default 1
      */
-    constructor(name:string = undefined, symbol:Buffer = undefined, initialstate:Array<Output> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = Constants.CREATEASSETTX) {
+    constructor(name:string = undefined, symbol:string = undefined, denomination:number = 9, initialstate:Array<Output> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = Constants.CREATEASSETTX) {
         super(ins, outs, networkid, blockchainid, txtype);
-        if(typeof name === 'string' && typeof symbol === 'string' && initialstate) {
+        if(typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number' && denomination >= 0 && denomination <= 32 && initialstate) {
             this.initialstate = initialstate;
             this.namebuff = bintools.stringToBuffer(name);
+            this.name = name;
             this.symbolbuff = bintools.stringToBuffer(symbol);
-            this.numstate.readUInt32BE(this.initialstate.length);
+            this.symbol = symbol;
+            this.denomination.writeUInt8(denomination, 0);
+            this.numstate.writeUInt32BE(this.initialstate.length, 0);
         }
     }
 }

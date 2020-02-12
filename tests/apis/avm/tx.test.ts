@@ -1,14 +1,13 @@
 import { UTXOSet, UTXO, SecpUTXO } from 'src/apis/avm/utxos';
-import { TxUnsigned, Tx } from 'src/apis/avm/tx';
+import { TxUnsigned, TxCreateAsset, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
 import { Input, SecpInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { Output, SecpOutput } from 'src/apis/avm/outputs';
-import { UnixNow } from 'src/apis/avm/types';
-
+import { Output, SecpOutput, SecpOutBase } from 'src/apis/avm/outputs';
+import { UnixNow, Constants} from 'src/apis/avm/types';
 /**
  * @ignore
  */
@@ -143,6 +142,64 @@ describe('Transactions', () => {
         tx2.fromString(tx.toString());
         expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
         expect(tx2.toString()).toBe(tx.toString());
+    });
+
+    test('Asset Creation Tx', () => {
+        let secpbase1:SecpOutBase = new SecpOutBase(new BN(777), addrs3);
+        let secpbase2:SecpOutBase = new SecpOutBase(new BN(888), addrs2);
+        let secpbase3:SecpOutBase = new SecpOutBase(new BN(999), addrs2);
+        let initialState:Array<SecpOutBase> = [secpbase1, secpbase2, secpbase3];
+        let name:string = "Rickcoin is the most intelligent coin";
+        let symbol:string = "RICK";
+        let denomination:number = 9;
+        let txu:TxCreateAsset = new TxCreateAsset(name, symbol, denomination, initialState, inputs, outputs, netid, blockchainID, Constants.CREATEASSETTX);
+        let txins:Array<Input>  = txu.getIns();
+        let txouts:Array<Output> = txu.getOuts();
+        let initState:Array<Output> = txu.getInitialState();
+        expect(txins.length).toBe(inputs.length);
+        expect(txouts.length).toBe(outputs.length);
+        expect(initState.length).toBe(initialState.length);
+        
+        expect(txu.getTxType()).toBe(Constants.CREATEASSETTX);
+        expect(txu.getNetworkID()).toBe(49);
+        expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
+        expect(txu.getName()).toBe(name);
+        expect(txu.getNameBuffer().toString("hex")).toBe(bintools.stringToBuffer(name).toString("hex"));
+        expect(txu.getSymbol()).toBe(symbol);
+        expect(txu.getSymbolBuffer().toString("hex")).toBe(bintools.stringToBuffer(symbol).toString("hex"));
+        expect(txu.getDenomination()).toBe(denomination);
+        expect(txu.getDenominationBuffer().readUInt8(0)).toBe(denomination);
+
+        let a:Array<string> = [];
+        let b:Array<string> = [];
+        for(let i:number = 0; i < txins.length; i++){
+            a.push(txins[i].toString());
+            b.push(inputs[i].toString());
+        }
+        expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
+        
+        a = [];
+        b = [];
+
+        for(let i:number = 0; i < txouts.length; i++){
+            a.push(txouts[i].toString());
+            b.push(outputs[i].toString());
+        }
+        expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
+
+        a = [];
+        b = [];
+
+        for(let i:number = 0; i < initialState.length; i++){
+            a.push(initialState[i].toString());
+            b.push(initState[i].toString());
+        }
+        expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
+
+        let txunew:TxCreateAsset = new TxCreateAsset();
+        txunew.fromBuffer(txu.toBuffer());
+        expect(txunew.toBuffer().toString("hex")).toBe(txu.toBuffer().toString("hex"));
+        expect(txunew.toString()).toBe(txu.toString());
     });
 });
     
