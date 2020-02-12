@@ -84,6 +84,7 @@ class AVMAPI extends JRPCAPI{
      */
     protected keychain:AVMKeyChain = new AVMKeyChain();
     protected blockchainID:string = "";
+    protected AVAAssetID:Buffer = undefined;
 
     /**
      * Gets the blockchainID and returns it.
@@ -92,6 +93,19 @@ class AVMAPI extends JRPCAPI{
      */
     getBlockchainID = ():string => {
         return this.blockchainID;
+    }
+
+    /**
+     * Fetches the AVA AssetID and returns it in a Promise.
+     * 
+     * @returns The the provided string representing the blockchainID
+     */
+    getAVAAssetID = async ():Promise<Buffer> => {
+        if(typeof this.AVAAssetID === 'undefined'){
+            let asset:object = await this.getAssetDescription("AVA");
+            this.AVAAssetID = asset["assetID"];
+        }
+        return this.AVAAssetID;
     }
 
     /**
@@ -368,7 +382,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Returns a Promise<object> with keys "name" and "symbol".
      */
-    getAssetDescription = async(assetID:Buffer | string):Promise<{name:string;symbol:string}> => {
+    getAssetDescription = async(assetID:Buffer | string):Promise<{name:string;symbol:string;assetID:Buffer,denomination:number}> => {
         let asset:string;
         if(typeof assetID !== "string"){
             asset = bintools.avaSerialize(assetID);
@@ -382,8 +396,8 @@ class AVMAPI extends JRPCAPI{
             return {
                 name: response.data["result"]["name"], 
                 symbol: response.data["result"]["symbol"], 
-                assetID: response.data["result"]["assetID"], 
-                denomination: response.data["result"]["denomination"]
+                assetID: bintools.avaDeserialize(response.data["result"]["assetID"]), 
+                denomination: parseInt(response.data["result"]["denomination"])
             };
         });
     }
@@ -458,11 +472,11 @@ class AVMAPI extends JRPCAPI{
      * @remarks
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
-    makeUnsignedTx = (
+    makeUnsignedTx = async (
         utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, 
         changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
-    ):TxUnsigned => {
+    ):Promise<TxUnsigned> => {
         if(typeof assetID === "string"){
             assetID = bintools.avaDeserialize(assetID);
         } 
@@ -473,19 +487,20 @@ class AVMAPI extends JRPCAPI{
         );
     }
 
-    makeCreateAssetTx = (
+    makeCreateAssetTx = async (
         utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string>, 
         initialState:Array<Output>, name:string, 
         symbol:string, denomination:number
-    ):TxCreateAsset => {
+    ):Promise<TxCreateAsset> => {
         if(symbol.length > Constants.SYMBOLMAXLEN){
             throw new Error("Error - AVMAPI.makeCreateAssetTx: Symbols may not exceed length of " + Constants.SYMBOLMAXLEN);
         }
         if(name.length > Constants.ASSETNAMELEN) {
             throw new Error("Error - AVMAPI.makeCreateAssetTx: Names may not exceed length of " + Constants.ASSETNAMELEN);
         }
+        let avaAssetID:Buffer = await this.getAVAAssetID();
         return utxoset.makeCreateAssetTx(
-            this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
+            this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             fee, creatorAddresses, initialState, name, symbol, denomination
         );
     }

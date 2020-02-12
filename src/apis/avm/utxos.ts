@@ -661,13 +661,14 @@ export class UTXOSet {
     }
 
     makeCreateAssetTx = (
-        networkid:number, blockchainid:Buffer, fee:BN, creatorAddresses:Array<string>, 
+        networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
+        fee:BN, creatorAddresses:Array<string>, 
         initialState:Array<Output>, name:string, 
         symbol:string, denomination:number
     ):TxCreateAsset => {
-        let assetID:Buffer = Buffer.alloc(Constants.ASSETIDLEN);
-        //cheating and using makeUnsignedTx to get Ins and Outs for fees.
-        let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, creatorAddresses, creatorAddresses, creatorAddresses, assetID);
+        // Cheating and using makeUnsignedTx to get Ins and Outs for fees.
+        // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the creatorAddresses
+        let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
         let ins:Array<Input> = utx.getIns();
         let outs:Array<Output> = utx.getOuts();
         return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, Constants.CREATEASSETTX);
