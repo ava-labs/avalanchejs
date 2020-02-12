@@ -6,8 +6,8 @@ import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { Output, SecpOutput, SelectOutputClass } from './outputs';
 import { MergeRule, UnixNow, Constants } from './types';
-import { TxUnsigned } from './tx';
-import { SecpInput } from './inputs';
+import { TxUnsigned, TxCreateAsset } from './tx';
+import { SecpInput, Input } from './inputs';
 
 /**
  * @ignore
@@ -596,7 +596,7 @@ export class UTXOSet {
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs, locktime of BN(0) and a threshold of 1
-     * @param assetID The assetID of the value being sent as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param assetID The assetID of the value being sent as a {@link https://github.com/feross/buffer|Buffer}
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime The locktime field created in the resulting outputs
      * @param threshold The number of signatures required to spend the funds in the resultant UTXO
@@ -658,6 +658,19 @@ export class UTXOSet {
         }
 
         return new TxUnsigned(ins, outs, networkid, blockchainid);
+    }
+
+    makeCreateAssetTx = (
+        networkid:number, blockchainid:Buffer, fee:BN, creatorAddresses:Array<string>, 
+        initialState:Array<Output>, name:string, 
+        symbol:string, denomination:number
+    ):TxCreateAsset => {
+        let assetID:Buffer = Buffer.alloc(Constants.ASSETIDLEN);
+        //cheating and using makeUnsignedTx to get Ins and Outs for fees.
+        let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, creatorAddresses, creatorAddresses, creatorAddresses, assetID);
+        let ins:Array<Input> = utx.getIns();
+        let outs:Array<Output> = utx.getOuts();
+        return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, Constants.CREATEASSETTX);
     }
 
     /**

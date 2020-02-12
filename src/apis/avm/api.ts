@@ -5,11 +5,12 @@ import SlopesCore from '../../slopes';
 import { Buffer } from "buffer/";
 import { JRPCAPI, RequestResponseData } from "../../utils/types";
 import { UTXOSet } from './utxos';
-import { MergeRule, UnixNow } from './types';
+import { MergeRule, UnixNow, Constants } from './types';
 import { AVMKeyChain } from './keychain';
-import { TxUnsigned, Tx } from './tx';
+import { TxUnsigned, Tx, TxCreateAsset } from './tx';
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
+import { Output } from './outputs';
 
 /**
  * @ignore
@@ -125,7 +126,7 @@ class AVMAPI extends JRPCAPI{
             "assetID": assetID
         };
         return this.callMethod("avm.getBalance", params).then((response:RequestResponseData) => {
-            return response.data["result"]["balance"];
+            return parseInt(response.data["result"]["balance"]);
         });
     }
 
@@ -242,19 +243,19 @@ class AVMAPI extends JRPCAPI{
      */
     createMintTx = async (amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
         let asset:string;
-        let amnt:number;
+        let amnt:BN;
         if(typeof assetID !== "string"){
             asset = bintools.avaSerialize(assetID);
         } else {
             asset = assetID;
         }
-        if(typeof amount !== 'number'){
-            amnt = amount.toNumber();
+        if(typeof amount === 'number'){
+            amnt = new BN(amount);
         } else {
             amnt = amount;
         }
         let params = {
-            "amount": amnt,
+            "amount": amnt.toString(10),
             "assetID": asset,
             "to": to,
             "minters": minters
@@ -363,7 +364,7 @@ class AVMAPI extends JRPCAPI{
     /**
      * Retrieves an assets name and symbol.
      * 
-     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the AssetID.
+     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the AssetID or its alias.
      * 
      * @returns Returns a Promise<object> with keys "name" and "symbol".
      */
@@ -378,7 +379,12 @@ class AVMAPI extends JRPCAPI{
             "assetID": asset
         };
         return this.callMethod("avm.getAssetDescription", params).then((response:RequestResponseData) => {
-            return {name: response.data["result"]["name"], symbol: response.data["result"]["symbol"]};
+            return {
+                name: response.data["result"]["name"], 
+                symbol: response.data["result"]["symbol"], 
+                assetID: response.data["result"]["assetID"], 
+                denomination: response.data["result"]["denomination"]
+            };
         });
     }
 
@@ -467,6 +473,23 @@ class AVMAPI extends JRPCAPI{
         );
     }
 
+    makeCreateAssetTx = (
+        utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string>, 
+        initialState:Array<Output>, name:string, 
+        symbol:string, denomination:number
+    ):TxCreateAsset => {
+        if(symbol.length > Constants.SYMBOLMAXLEN){
+            throw new Error("Error - AVMAPI.makeCreateAssetTx: Symbols may not exceed length of " + Constants.SYMBOLMAXLEN);
+        }
+        if(name.length > Constants.ASSETNAMELEN) {
+            throw new Error("Error - AVMAPI.makeCreateAssetTx: Names may not exceed length of " + Constants.ASSETNAMELEN);
+        }
+        return utxoset.makeCreateAssetTx(
+            this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
+            fee, creatorAddresses, initialState, name, symbol, denomination
+        );
+    }
+
     /**
      * Helper function which takes an unsigned transaction and signs it, returning the resulting [[Tx]].
      * 
@@ -519,14 +542,14 @@ class AVMAPI extends JRPCAPI{
      */
     send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string>):Promise<string> => {
         let asset:string;
-        let amnt:number;
+        let amnt:BN;
         if(typeof assetID !== "string"){
             asset = bintools.avaSerialize(assetID);
         } else {
             asset = assetID;
         }
-        if(typeof amount !== 'number'){
-            amnt = amount.toNumber();
+        if(typeof amount === 'number'){
+            amnt = new BN(amount);
         } else {
             amnt = amount;
         }
@@ -535,7 +558,7 @@ class AVMAPI extends JRPCAPI{
             "username": username,
             "password": password,
             "assetID": asset,
-            "amount": amnt,
+            "amount": amnt.toString(10),
             "to": to, 
             "from": from
         };

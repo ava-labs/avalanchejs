@@ -87,7 +87,7 @@ class PlatformAPI extends JRPCAPI{
      */
     sampleValidators = async (sampleSize:number):Promise<Array<string>> => {
         let params = {
-            "size": sampleSize
+            "size": sampleSize.toString()
         };
         return this.callMethod("platform.sampleValidators", params).then((response:RequestResponseData) => {
             return response.data["result"]["validators"];
