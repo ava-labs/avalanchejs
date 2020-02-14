@@ -70,11 +70,11 @@ describe('AVMKeyChain', () => {
         let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
         let kc:AVMKeyChain = new AVMKeyChain();
         let kp2:AVMKeyPair = new AVMKeyPair();
-        let addr1:string = kc.importKey(keybuff);
+        let addr1:Buffer = kc.importKey(keybuff);
         let kp1:AVMKeyPair = kc.getKey(addr1);
         kp2.importKey(keybuff);
         let addr2 = kp1.getAddress();
-        expect(addr1).toBe(addr2);
+        expect(addr1.toString("hex")).toBe(addr2.toString("hex"));
         expect(kp1.getPrivateKeyString()).toBe(kp2.getPrivateKeyString());
         expect(kp1.getPublicKeyString()).toBe(kp2.getPublicKeyString());
         expect(kc.hasKey(addr1)).toBe(true);
@@ -84,11 +84,11 @@ describe('AVMKeyChain', () => {
         let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
         let kc:AVMKeyChain = new AVMKeyChain();
         let kp2:AVMKeyPair = new AVMKeyPair();
-        let addr1:string = kc.importKey(bintools.avaSerialize(keybuff));
+        let addr1:Buffer = kc.importKey(bintools.avaSerialize(keybuff));
         let kp1:AVMKeyPair = kc.getKey(addr1);
         kp2.importKey(keybuff);
         let addr2 = kp1.getAddress();
-        expect(addr1).toBe(addr2);
+        expect(addr1.toString("hex")).toBe(addr2.toString("hex"));
         expect(kp1.getPrivateKeyString()).toBe(kp2.getPrivateKeyString());
         expect(kp1.getPublicKeyString()).toBe(kp2.getPublicKeyString());
         expect(kc.hasKey(addr1)).toBe(true);
@@ -98,7 +98,7 @@ describe('AVMKeyChain', () => {
         let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
         let kc:AVMKeyChain = new AVMKeyChain();
         let kp1:AVMKeyPair = new AVMKeyPair();
-        let addr1:string = kc.importKey(keybuff);
+        let addr1:Buffer = kc.importKey(keybuff);
         kp1.importKey(keybuff);
         expect(kc.hasKey(addr1)).toBe(true);
         kc.removeKey(kp1);
@@ -108,7 +108,7 @@ describe('AVMKeyChain', () => {
     test('removeKey via string', () => {
         let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
         let kc:AVMKeyChain = new AVMKeyChain();
-        let addr1:string = kc.importKey(keybuff);
+        let addr1:Buffer = kc.importKey(keybuff);
         expect(kc.hasKey(addr1)).toBe(true);
         kc.removeKey(addr1);
         expect(kc.hasKey(addr1)).toBe(false);
@@ -117,8 +117,8 @@ describe('AVMKeyChain', () => {
     test('removeKey bad keys', () => {
         let keybuff:Buffer = Buffer.from("d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475", "hex");
         let kc:AVMKeyChain = new AVMKeyChain();
-        let addr1:string = kc.importKey(keybuff);
+        let addr1:Buffer = kc.importKey(keybuff);
         expect(kc.hasKey(addr1)).toBe(true);
-        expect(kc.removeKey("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")).toBe(false);
+        expect(kc.removeKey(bintools.avaDeserialize("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))).toBe(false);
     });
 });

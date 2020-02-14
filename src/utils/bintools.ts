@@ -4,6 +4,7 @@
 import BN  from "bn.js";
 import {Buffer} from "buffer/";
 import createHash from "create-hash";
+import { Constants } from '../apis/avm/types';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using nodejs & javascript.
@@ -189,6 +190,33 @@ export default class BinTools {
             return this.copyFrom(bytes, 0,bytes.length - 4);
         }
         throw new Error("Error - BinTools.avaDeserialize: invalid checksum");
+    }
+
+    addressToString = (chainid:string, bytes:Buffer):string => {
+        return chainid + "-" + this.avaSerialize(bytes);
+    }
+
+    stringToAddress = (address:string):Buffer => {
+        let parts:Array<string> = address.split("-");
+        return this.avaDeserialize(parts[1]);
+    }
+
+    /**
+     * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid. 
+     * 
+     * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
+     */
+    parseAddress = (addr:string, blockchainID:string, alias:string = undefined, addrlen:number = 20):Buffer => {
+        let abc:Array<string> = addr.split("-");
+        if(abc.length == 2){
+            if((alias && abc[0] == alias) || (blockchainID && abc[0] == blockchainID)) {
+                let addrbuff = this.avaDeserialize(abc[1]);
+                if((addrlen && addrbuff.length == addrlen) || !(addrlen)){
+                    return addrbuff;
+                }
+            }
+        }
+        return undefined;
     }
 
 }

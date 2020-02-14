@@ -110,7 +110,7 @@ export class Input {
             return buff;
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - Input._basicInBuffer: " + e;
+            let emsg:string = "Error - Input.toBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
@@ -200,7 +200,7 @@ export class SecpInput extends Input {
             return Buffer.concat(barr,bsize);
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - SecpInput._SecpInBuffer: " + e;
+            let emsg:string = "Error - SecpInput.toBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
@@ -219,7 +219,7 @@ export class SecpInput extends Input {
      * @param addressIdx The index of the address to reference in the signatures
      * @param address The address of the source of the signature
      */
-    addSignatureIdx = (addressIdx:number, address:string) => {
+    addSignatureIdx = (addressIdx:number, address:Buffer) => {
         let sigidx:SigIdx = new SigIdx();
         let b:Buffer = Buffer.alloc(4);
         b.writeUInt32BE(addressIdx, 0);

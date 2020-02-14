@@ -2,17 +2,16 @@ import BN from "bn.js";
 import {Buffer} from "buffer/";
 import BinTools from 'src/utils/bintools';
 import { Output, SecpOutput, SelectOutputClass } from 'src/apis/avm/outputs';
-import { Constants } from '../../../src/apis/avm/types';
 
 const bintools = BinTools.getInstance();
 
 describe('Outputs', () => {
     let assetID:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
     let assetIDBuff:Buffer = Buffer.from(assetID, "hex");
-    let addrs:Array<string> = [
-        "B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW",
-        "P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF",
-        "6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"
+    let addrs:Array<Buffer> = [
+        bintools.avaDeserialize("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
+        bintools.avaDeserialize("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
+        bintools.avaDeserialize("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
     ].sort();
 
     let locktime:BN = new BN(54321);
@@ -45,10 +44,7 @@ describe('Outputs', () => {
     test('OutPayment', () => {
         let out:SecpOutput = new SecpOutput(assetIDBuff, new BN(10000), addrs, locktime, 3);
         expect(out.getOutputID()).toBe(4);
-        expect(JSON.stringify(Object.keys(out.getAddresses()).sort())).toBe(JSON.stringify(addrs.sort()));
-        expect(out.getAddresses()[addrs[0]].toNumber()).toBe(locktime.toNumber());
-        expect(out.getAddresses()[addrs[1]].toNumber()).toBe(locktime.toNumber());
-        expect(out.getAddresses()[addrs[2]].toNumber()).toBe(locktime.toNumber());
+        expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
         expect(out.getThreshold()).toBe(3);
         expect(out.getLocktime().toNumber()).toBe(locktime.toNumber());
@@ -56,7 +52,7 @@ describe('Outputs', () => {
         expect(out.getAssetID().toString("hex")).toBe(assetID);
 
         let r = out.getAddressIdx(addrs[2]);
-        expect(out.getAddress(r)).toBe(addrs[2]);
+        expect(out.getAddress(r)).toStrictEqual(addrs[2]);
         expect(() => {
             out.getAddress(400)
         }).toThrow();
@@ -66,7 +62,7 @@ describe('Outputs', () => {
         let b:Buffer = out.toBuffer();
         expect(out.toString()).toBe(bintools.bufferToB58(b));
 
-        let s:Array<string> = out.getSpenders(addrs);
+        let s:Array<Buffer> = out.getSpenders(addrs);
         expect(JSON.stringify(s.sort())).toBe(JSON.stringify(addrs.sort()));
 
         let m1:boolean = out.meetsThreshold([addrs[0]]);

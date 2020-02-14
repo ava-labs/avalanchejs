@@ -35,8 +35,8 @@ describe('Signature & NBytes', () => {
 describe('SigIdx', () => {
     let sigidx:SigIdx = new SigIdx();
     expect(sigidx.getSize()).toBe(sigidx.toBuffer().length);
-    sigidx.setSource("abcd");
-    expect(sigidx.getSource()).toBe("abcd");
+    sigidx.setSource(Buffer.from("abcd", "hex"));
+    expect(sigidx.getSource().toString("hex")).toBe("abcd");
 });
 
 describe('Address', () => {

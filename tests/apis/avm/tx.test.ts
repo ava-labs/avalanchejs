@@ -17,9 +17,9 @@ describe('Transactions', () => {
     let keymgr1:AVMKeyChain;
     let keymgr2:AVMKeyChain;
     let keymgr3:AVMKeyChain;
-    let addrs1:Array<string>;
-    let addrs2:Array<string>;
-    let addrs3:Array<string>;
+    let addrs1:Array<Buffer>;
+    let addrs2:Array<Buffer>;
+    let addrs3:Array<Buffer>;
     let utxos:Array<SecpUTXO>;
     let inputs:Array<SecpInput>;
     let outputs:Array<Output>;
@@ -45,13 +45,12 @@ describe('Transactions', () => {
             addrs3.push(keymgr3.makeKey());
         }
         let amount:BN = new BN(amnt);
-        let addresses:Array<string> = keymgr1.getAddresses();
-        let fallAddresses:Array<string> = keymgr2.getAddresses()
+        let addresses:Array<Buffer> = keymgr1.getAddresses();
+        let fallAddresses:Array<Buffer> = keymgr2.getAddresses();
         let locktime:BN = new BN(54321);
         let fallLocktime:BN = locktime.add(new BN(50));
         let threshold:number = 3;
         let fallThreshold:number = 1;
-        
         for(let i:number = 0; i < 5; i++){
             let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
             let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));

@@ -5,7 +5,7 @@ import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { Output, SecpOutput, SelectOutputClass } from './outputs';
-import { MergeRule, UnixNow, Constants } from './types';
+import { MergeRule, UnixNow, Constants, Address } from './types';
 import { TxUnsigned, TxCreateAsset } from './tx';
 import { SecpInput, Input } from './inputs';
 
@@ -130,10 +130,11 @@ export class UTXO {
     /**
      * Class for representing a single UTXO.
      * 
-     * @param serialized Optional parameter of the serialized string representing a UTXO
+     * @param txid Optional {@link https://github.com/feross/buffer|Buffer} of transaction ID for the UTXO
+     * @param txidx Optional number for the index of the transaction's [[Output]]
      */
-    constructor(txid?:Buffer, txidx:number = undefined) {
-        if(txid && typeof txidx === "number") {
+    constructor(txid:Buffer = undefined, txidx:number = undefined) {
+        if(typeof txid !== "undefined" && typeof txidx === "number") {
             this.txid = txid;
             this.txidx.writeUInt32BE(txidx, 0);
         }
@@ -161,7 +162,7 @@ export class SecpUTXO extends UTXO {
     /**
      * Gets the addresses in the UTXO as map of address to the locktime for the address as a {@link https://github.com/indutny/bn.js/|BN}.
      */
-    getAddresses = ():{[address:string]: BN} => {
+    getAddresses = ():Array<Buffer> => {
         return this.output.getAddresses();
     };
 
@@ -170,7 +171,7 @@ export class SecpUTXO extends UTXO {
      * 
      * @returns An array of size two, the first index representing the index of the address, the second a boolean representing whether this result was a fallback (TakeItOrLeaveIt)
      */
-    getAddressIdx = (address:string):number => {
+    getAddressIdx = (address:Buffer):number => {
         return this.output.getAddressIdx(address);
     }
 
@@ -179,9 +180,9 @@ export class SecpUTXO extends UTXO {
      * 
      * @param idx The index of the address
      * 
-     * @returns A string representing the address.
+     * @returns A {@link https://github.com/feross/buffer|Buffer} representing the address.
      */
-    getAddress = (idx:number):string => {
+    getAddress = (idx:number):Buffer => {
         return this.output.getAddress(idx);
     }
 
@@ -209,6 +210,13 @@ export class SecpUTXO extends UTXO {
      */
     getTxIdx = ():Buffer => {
         return this.txidx;
+    }
+
+    /**
+     * Returns a {@link https://github.com/indutny/bn.js/|BN} of the locktime.
+     */
+    getLocktime = ():BN => {
+        return this.output.getLocktime();
     }
 
     /**
@@ -275,14 +283,14 @@ export class SecpUTXO extends UTXO {
     /**
      * Given an array of addresses and an optional timestamp, returns an array of address strings of qualified spenders for the output.
      */
-    getSpenders = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
+    getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
         return this.output.getSpenders(addresses, asOf);
     }
     
     /**
      * Given an array of addresses and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
      */
-    meetsThreshold = (addresses:Array<string>, asOf:BN = undefined) => {
+    meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined) => {
         return this.output.meetsThreshold(addresses, asOf);
     }
 
@@ -340,7 +348,7 @@ export class UTXOSet {
         } else {
             utxoX = SelectUTXOClass(utxo.toBuffer()); //forces a copy
         }
-        let secputxo;
+        let secputxo:SecpUTXO;
         try {
             secputxo = utxoX as SecpUTXO;
         } catch (e) {
@@ -351,8 +359,10 @@ export class UTXOSet {
         if(!(utxoid in this.utxos) || overwrite === true){
             this.utxos[utxoid] = secputxo;
 
-            let addresses:{[address:string]: BN} = secputxo.getAddresses(); //gets addresses and their locktime
-            for(let [address, locktime] of Object.entries(addresses)){
+            let addresses:Array<Buffer> = secputxo.getAddresses();
+            let locktime:BN = secputxo.getLocktime();
+            for(let i = 0; i < addresses.length; i++){
+                let address:string = addresses[i].toString("hex");
                 if(!(address in this.addressUTXOs)){
                     this.addressUTXOs[address] = {};
                 }
@@ -499,21 +509,18 @@ export class UTXOSet {
     /**
      * Given an address or array of addresses, returns all the UTXOIDs for those addresses
      * 
-     * @param address An address or array of addresses
+     * @param address An array of address {@link https://github.com/feross/buffer|Buffer}s
      * @param spendable If true, only retrieves UTXOIDs whose locktime has passed
      * 
      * @returns An array of addresses.
      */
-    getUTXOIDs = (address:string | Array<string> = undefined, spendable:boolean = true):Array<string> => {
-        if(typeof address !== "undefined") {
-            let results:Array<string> = [];
-            if(typeof address === 'string'){
-                address = [address];
-            }        
+    getUTXOIDs = (addresses:Array<Buffer> = undefined, spendable:boolean = true):Array<string> => {
+        if(typeof addresses !== "undefined") {
+            let results:Array<string> = [];       
             let now:BN = UnixNow();
-            for(let i = 0; i < address.length; i++){
-                if(address[i] in this.addressUTXOs){
-                    let entries = Object.entries(this.addressUTXOs[address[i]]);
+            for(let i = 0; i < addresses.length; i++){
+                if(addresses[i].toString("hex") in this.addressUTXOs){
+                    let entries = Object.entries(this.addressUTXOs[addresses[i].toString("hex")]);
                     for(let [utxoid, locktime] of entries){
                         if(results.indexOf(utxoid) == -1 && (spendable && locktime.lte(now)) || !spendable) {
                             results.push(utxoid);
@@ -527,10 +534,10 @@ export class UTXOSet {
     }
 
     /**
-     * Gets the addresses in the [[UTXOSet]].
+     * Gets the addresses in the [[UTXOSet]] and returns an array of {@link https://github.com/feross/buffer|Buffer}.
      */
-    getAddresses = ():Array<string> => {
-        return Object.keys(this.addressUTXOs);
+    getAddresses = ():Array<Buffer> => {
+        return Object.keys(this.addressUTXOs).map(k => Buffer.from(k, "hex"));
     }
 
     /**
@@ -542,7 +549,7 @@ export class UTXOSet {
      * 
      * @returns Returns the total balance as a {@link https://github.com/indutny/bn.js/|BN}.
      */
-    getBalance = (addresses:Array<string>, assetID:Buffer|string, asOf:BN = undefined):BN => {
+    getBalance = (addresses:Array<Buffer>, assetID:Buffer|string, asOf:BN = undefined):BN => {
         let utxoids:Array<string> = this.getUTXOIDs(addresses);
         let utxos:Array<SecpUTXO> = this.getAllUTXOs(utxoids);
         let spend:BN = new BN(0);
@@ -567,7 +574,7 @@ export class UTXOSet {
      * 
      * @returns An array of {@link https://github.com/feross/buffer|Buffer} representing the Asset IDs.
      */
-    getAssetIDs = (addresses:string | Array<string> = undefined ):Array<Buffer> => {
+    getAssetIDs = (addresses:Array<Buffer> = undefined ):Array<Buffer> => {
         let results:Set<Buffer> = new Set();
         let utxoids:Array<string> = [];
         if(typeof addresses !== 'undefined'){
@@ -588,15 +595,13 @@ export class UTXOSet {
 
     /**
      * Creates an unsigned transaction. For more granular control, you may create your own
-     * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s.
+     * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s).
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param amount The amount of AVA to be spent in NanoAVA
      * @param toAddresses The addresses to send the funds
-     * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
-     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs, locktime of BN(0) and a threshold of 1
-     * @param assetID The assetID of the value being sent as a {@link https://github.com/feross/buffer|Buffer}
+     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime The locktime field created in the resulting outputs
      * @param threshold The number of signatures required to spend the funds in the resultant UTXO
@@ -604,7 +609,7 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, changeAddresses:Array<string>, assetID:Buffer, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):TxUnsigned => {
+    makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, changeAddresses:Array<Buffer>, assetID:Buffer, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):TxUnsigned => {
         const zero:BN = new BN(0);
         let spendamount:BN = zero.clone();
         let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDs(fromAddresses));
@@ -625,7 +630,7 @@ export class UTXOSet {
                 let txid:Buffer = utxos[i].getTxID();
                 let txidx:Buffer = utxos[i].getTxIdx();
                 let input:SecpInput = new SecpInput(txid, txidx, amt, assetID);
-                let spenders:Array<string> = utxos[i].getSpenders(fromAddresses, asOf);
+                let spenders:Array<Buffer> = utxos[i].getSpenders(fromAddresses, asOf);
                 for(let j = 0; j < spenders.length; j++){
                     let idx:number;
                     idx = utxos[i].getAddressIdx(spenders[j]);
@@ -660,9 +665,25 @@ export class UTXOSet {
         return new TxUnsigned(ins, outs, networkid, blockchainid);
     }
 
+    /**
+     * Creates an unsigned transaction. For more granular control, you may create your own
+     * [[TxCreateAsset]] manually (with their corresponding [[Input]]s, [[Output]]s).
+     * 
+     * @param networkid The number representing NetworkID of the node
+     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param fee The amount of AVA to be paid for fees, in NanoAVA
+     * @param creatorAddresses The addresses to send the fees
+     * @param initialState The array of [[Output]]s that represent the intial state of a created asset
+     * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param locktime The locktime field created in the resulting outputs
+     * @param threshold The number of signatures required to spend the funds in the resultant UTXO
+     * 
+     * @returns An unsigned transaction created from the passed in parameters.
+     * 
+     */
     makeCreateAssetTx = (
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
-        fee:BN, creatorAddresses:Array<string>, 
+        fee:BN, creatorAddresses:Array<Buffer>, 
         initialState:Array<Output>, name:string, 
         symbol:string, denomination:number
     ):TxCreateAsset => {

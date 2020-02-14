@@ -64,7 +64,7 @@ export class Output {
 }
 
 /**
- * An [[Output]] class which issues a payment on an assetID.
+ * An [[Output]] class which specifies a secp256k1 .
  */
 export class SecpOutBase extends Output {
     protected locktime:Buffer = Buffer.alloc(8);
@@ -96,26 +96,26 @@ export class SecpOutBase extends Output {
     }
 
     /**
-     * Returns a map from all addresses as string keys to their locktime represented in {@link https://github.com/indutny/bn.js/|BN}.
+     * Returns an array of {@link https://github.com/feross/buffer|Buffer}s for the addresses.
      */
-    getAddresses = ():{[address:string]: BN} => {
-        let result:{[address:string]: BN} = {};
+    getAddresses = ():Array<Buffer> => {
+        let result:Array<Buffer> = [];
         for(let i = 0; i < this.addresses.length; i++) {
-            result[this.addresses[i].toString()] = bintools.fromBufferToBN(this.locktime);
+            result.push(this.addresses[i].toBuffer())
         }
         return result;
     }
 
     /**
-     * Returns an array of length 2 with the first index being the index of the provided address and the second being false (as fallback addresses are not available in this output type).
+     * Returns the index of the address.
      * 
-     * @param address Address to look up to return its index.
+     * @param address A {@link https://github.com/feross/buffer|Buffer} of the address to look up to return its index.
      * 
-     * @returns An array of length 2, first index is the index the address resides in, second index is false.
+     * @returns The index of the address.
      */
-    getAddressIdx = (address:string):number => {
+    getAddressIdx = (address:Buffer):number => {
         for(let i = 0; i < this.addresses.length; i++){
-            if(this.addresses[i].toString() == address){
+            if(this.addresses[i].toBuffer().toString("hex") == address.toString("hex")){
                 return i
             }
         }
@@ -130,15 +130,15 @@ export class SecpOutBase extends Output {
      * 
      * @returns Returns the string representing the address.
      */
-    getAddress = (idx:number):string => {
+    getAddress = (idx:number):Buffer => {
         if(idx < this.addresses.length){
-            return this.addresses[idx].toString();
+            return this.addresses[idx].toBuffer();
         }
-        throw new Error("Error - OutPayment.getAddress: idx out of range");
+        throw new Error("Error - SecpOutBase.getAddress: idx out of range");
     }
 
     /**
-     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[OutCreateAsset]] and returns the size of the output.
+     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[SecpOutBase]] and returns the size of the output.
      */
     fromBuffer(utxobuff:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(utxobuff, offset);
@@ -166,7 +166,7 @@ export class SecpOutBase extends Output {
     }
 
     /**
-     * Returns the buffer representing the [[OutCreateAsset]] instance.
+     * Returns the buffer representing the [[SecpOutBase]] instance.
      */
     toBuffer():Buffer {
         try {
@@ -183,24 +183,24 @@ export class SecpOutBase extends Output {
             return Buffer.concat(barr,bsize);;
         } catch(e) {
             /* istanbul ignore next */
-            let emsg:string = "Error - TxOut._OPTxBuffer: " + e;
+            let emsg:string = "Error - SecpOutBase.toBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
     }
 
     /**
-     * Returns a base-58 string representing the [[OutCreateAsset]].
+     * Returns a base-58 string representing the [[SecpOutBase]].
      */
     toString():string {
         return bintools.bufferToB58(this.toBuffer());
     }
 
     /**
-     * Given an array of addresses and an optional timestamp, select an array of address strings of qualified spenders for the output.
+     * Given an array of addresses and an optional timestamp, select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
      */
-    getSpenders = (addresses:Array<string>, asOf:BN = undefined):Array<string> => {
-        let qualified:Array<string> = [];
+    getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
+        let qualified:Array<Buffer> = [];
         let now:BN;
         if(typeof asOf === 'undefined'){
             now = UnixNow();
@@ -216,7 +216,7 @@ export class SecpOutBase extends Output {
 
         for(let i = 0; i < this.addresses.length && qualified.length < threshold; i++) {
             for(let j = 0; j < addresses.length && qualified.length < threshold; j++){
-                if(addresses[j] == this.addresses[i].toString()){
+                if(addresses[j].toString("hex") == this.addresses[i].toBuffer().toString("hex")){
                     qualified.push(addresses[j]);
                 }
             }
@@ -226,16 +226,16 @@ export class SecpOutBase extends Output {
     }
 
     /**
-     * Given an array of addresses and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
+     * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
      */
-    meetsThreshold = (addresses:Array<string>, asOf:BN = undefined):boolean => {
+    meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
         let now:BN;
         if(typeof asOf === 'undefined'){
             now = UnixNow();
         } else {
             now = asOf;
         }
-        let qualified:Array<string> = this.getSpenders(addresses, now);
+        let qualified:Array<Buffer> = this.getSpenders(addresses, now);
         let threshold:number = this.threshold.readUInt32BE(0);
         if(qualified.length >= threshold){
             return true;
@@ -249,11 +249,11 @@ export class SecpOutBase extends Output {
      * 
      * @param assetid A {@link https://github.com/feross/buffer|Buffer} representing the AssetID
      * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
-     * @param addresses An array of strings representing addresses
+     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      */
-    constructor(amount?:BN, addresses?:Array<string>, locktime?:BN, threshold?:number){
+    constructor(amount?:BN, addresses?:Array<Buffer>, locktime?:BN, threshold?:number){
         super(Constants.SECPOUTPUTID);
         if(amount && addresses){
             this.amountValue = amount.clone();
@@ -261,7 +261,7 @@ export class SecpOutBase extends Output {
             let addrs:Array<Address> = [];
             for(let i = 0; i < addresses.length; i++){
                 addrs[i] = new Address();
-                addrs[i].fromString(addresses[i]);
+                addrs[i].fromBuffer(addresses[i]);
             }
             this.addresses = addrs;
             this.addresses.sort(Address.comparitor());
@@ -298,7 +298,7 @@ export class SecpOutput extends SecpOutBase {
         return this.assetid;
     }
 
-    constructor(assetid?:Buffer, amount?:BN, addresses?:Array<string>, locktime?:BN, threshold?:number){
+    constructor(assetid?:Buffer, amount?:BN, addresses?:Array<Buffer>, locktime?:BN, threshold?:number){
         super(amount, addresses, locktime, threshold);
         if(typeof assetid !== 'undefined' && assetid.length == Constants.ASSETIDLEN) {
             this.assetid = assetid;

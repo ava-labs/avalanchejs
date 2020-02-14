@@ -15,19 +15,19 @@ let bintools:BinTools = BinTools.getInstance();
  * Type representing a [[Signature]] index used in [[Input]]
  */
 export class SigIdx extends NBytes {
-    source:string;
+    source:Buffer;
 
     /**
      * Sets the source address for the signature
      */
-    setSource = (address:string) => {
+    setSource = (address:Buffer) => {
         this.source = address;
     }
 
     /**
      * Retrieves the source address for the signature
      */
-    getSource = ():string => {
+    getSource = ():Buffer => {
         return this.source;
     }
 
@@ -120,6 +120,7 @@ export class Constants {
     static BLOCKCHAINIDLEN:number = 32;
     static SYMBOLMAXLEN:number = 4;
     static ASSETNAMELEN:number = 128;
+    static ADDRESSLENGTH:number = 20;
 }
 
 /**

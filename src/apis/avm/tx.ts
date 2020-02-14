@@ -287,7 +287,7 @@ export class TxCreateAsset extends TxUnsigned {
      * 
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
-     * @param denomination Number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
      * @param initialstate Optional array of [[Output]]s that represent the intial state of a created asset
      * @param ins Optional array of the [[Input]]s
      * @param outs Optional array of the [[Output]]s
@@ -295,7 +295,7 @@ export class TxCreateAsset extends TxUnsigned {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param txtype Optional txtype, default 1
      */
-    constructor(name:string = undefined, symbol:string = undefined, denomination:number = 9, initialstate:Array<Output> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = Constants.CREATEASSETTX) {
+    constructor(name:string = undefined, symbol:string = undefined, denomination:number = undefined, initialstate:Array<Output> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = Constants.CREATEASSETTX) {
         super(ins, outs, networkid, blockchainid, txtype);
         if(typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number' && denomination >= 0 && denomination <= 32 && initialstate) {
             this.initialstate = initialstate;

@@ -19,7 +19,7 @@ const bintools = BinTools.getInstance();
 
 describe("AVMAPI", () => {
     const networkid:number = 49;
-    const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF";
+    const blockchainid:string = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
     const ip:string = '127.0.0.1';
     const port:number = 9650;
     const protocol:string = "https";
@@ -30,8 +30,12 @@ describe("AVMAPI", () => {
     let slopes:Slopes = new Slopes(ip,port,protocol, networkid, undefined, true);
     let api:AVMAPI;
 
+    const addrA:string = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW";
+    const addrB:string = "X-P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF";
+    const addrC:string = "X-6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV";
+
     beforeAll(() => {
-        api = new AVMAPI(slopes, "/ext/subnet/avm", blockchainid);
+        api = new AVMAPI(slopes, "/ext/bc/avm", blockchainid);
     });
 
     afterEach(() => {
@@ -41,7 +45,7 @@ describe("AVMAPI", () => {
     test('can Send 1', async ()=>{
         let txId = 'asdfhvl234';
 
-        let result:Promise<string> = api.send(username, password, 'assetId', 10, 'toAddress', ['fromAddress']);
+        let result:Promise<string> = api.send(username, password, 'assetId', 10, addrA, [addrB]);
         let payload:object = {
             "result": {
                 'txID': txId
@@ -61,7 +65,7 @@ describe("AVMAPI", () => {
     test('can Send 2', async ()=>{
         let txId = 'asdfhvl234';
 
-        let result:Promise<string> = api.send(username, password, bintools.b58ToBuffer("6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"), new BN(10), 'toAddress', ['fromAddress']);
+        let result:Promise<string> = api.send(username, password, bintools.b58ToBuffer("6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"), new BN(10), addrA, [addrB]);
         let payload:object = {
             "result": {
                 'txID': txId
@@ -81,7 +85,7 @@ describe("AVMAPI", () => {
     test('listAssets', async ()=>{
         let assets = ['ATH','ETH'];
 
-        let result:Promise<Array<string>> = api.listAssets('address');
+        let result:Promise<Array<string>> = api.listAssets(addrA);
         let payload:object = {
             "result": {
                 'assets': assets
@@ -99,7 +103,7 @@ describe("AVMAPI", () => {
     });
 
     test('listAddresses', async ()=>{
-        let addresses = ['acc1','acc2'];
+        let addresses = [addrA,addrB];
 
         let result:Promise<Array<string>> = api.listAddresses(username, password);
         let payload:object = {
@@ -119,7 +123,7 @@ describe("AVMAPI", () => {
     });
 
     test('importKey', async ()=>{
-        let address = 'asdflashdvfalsdf';
+        let address = addrC;
 
         let result:Promise<string> = api.importKey(username, password, 'key');
         let payload:object = {
@@ -141,7 +145,7 @@ describe("AVMAPI", () => {
     test('getBalance', async ()=>{
         let balance = 100;
 
-        let result:Promise<number> = api.getBalance('address', 'ATH');
+        let result:Promise<number> = api.getBalance(addrA, 'ATH');
         let payload:object = {
             "result": {
                 "balance": balance
@@ -161,7 +165,7 @@ describe("AVMAPI", () => {
     test('exportKey', async ()=>{
         let key = 'sdfglvlj2h3v45';
 
-        let result:Promise<string> = api.exportKey(username, password, 'address');
+        let result:Promise<string> = api.exportKey(username, password, addrA);
         let payload:object = {
             "result": {
                 "privateKey": key
@@ -203,7 +207,7 @@ describe("AVMAPI", () => {
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
         
         let amount:number = 10000;
-        let address:string = kp.getAddress();
+        let address:Buffer = kp.getAddress();
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
         let initialHolders:Array<object> = [
             {
@@ -238,7 +242,7 @@ describe("AVMAPI", () => {
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
         
         let amount:number = 10000;
-        let address:string = kp.getAddress();
+        let address:Buffer = kp.getAddress();
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
         let minterSets:Array<object> = [
             {
@@ -361,8 +365,8 @@ describe("AVMAPI", () => {
 
         let persistOpts:PersistanceOptions = new PersistanceOptions("test", true, "union");
         expect(persistOpts.getMergeRule()).toBe("union");
-
-        let result:Promise<UTXOSet> = api.getUTXOs(set.getAddresses(), persistOpts);
+        let addresses:Array<string> = set.getAddresses().map(a => api.addressFromBuffer(a));
+        let result:Promise<UTXOSet> = api.getUTXOs(addresses, persistOpts);
         let payload:object = {
             "result": {
                 'utxos': [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3]
@@ -378,7 +382,8 @@ describe("AVMAPI", () => {
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
-        result = api.getUTXOs(set.getAddresses(), persistOpts);
+        addresses = set.getAddresses().map(a => api.addressFromBuffer(a));
+        result = api.getUTXOs(addresses, persistOpts);
         
 
         mockAxios.mockResponse(responseObj);
@@ -416,13 +421,14 @@ describe("AVMAPI", () => {
 
 
             for(let i:number = 0; i < 3; i++){
-                addrs1.push(api.keyChain().makeKey());
-                addrs2.push(keymgr2.makeKey());
-                addrs3.push(keymgr3.makeKey());
+                addrs1.push(api.addressFromBuffer(api.keyChain().makeKey()));
+                addrs2.push(api.addressFromBuffer(keymgr2.makeKey()));
+                addrs3.push(api.addressFromBuffer(keymgr3.makeKey()));
             }
             let amount:BN = new BN(amnt);
-            let addresses:Array<string> = api.keyChain().getAddresses();
-            let fallAddresses:Array<string> = keymgr2.getAddresses()
+            let addressbuffs:Array<Buffer> = api.keyChain().getAddresses();
+            let addresses:Array<string> = addressbuffs.map(a => api.addressFromBuffer(a));
+            let fallAddresses:Array<string> = keymgr2.getAddresses().map(a => api.addressFromBuffer(a));
             let locktime:BN = new BN(54321);
             let fallLocktime:BN = locktime.add(new BN(50));
             let threshold:number = 3;
@@ -432,7 +438,7 @@ describe("AVMAPI", () => {
                 let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
                 let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
                 let out:SecpOutput;
-                out = new SecpOutput(assetID, amount, addresses, locktime, threshold);
+                out = new SecpOutput(assetID, amount, addressbuffs, locktime, threshold);
                 outputs.push(out);
     
                 let u:SecpUTXO = new SecpUTXO();
@@ -454,8 +460,10 @@ describe("AVMAPI", () => {
             let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
-                addrs3, addrs1, addrs1, assetID, 
-                UnixNow(), new BN(0), 1
+                addrs3.map(a => api.parseAddress(a)), 
+                addrs1.map(a => api.parseAddress(a)), 
+                addrs1.map(a => api.parseAddress(a)), 
+                assetID, UnixNow(), new BN(0), 1
             );
             
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -467,8 +475,10 @@ describe("AVMAPI", () => {
             let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
-                addrs3, addrs1, addrs2, assetID, 
-                UnixNow(), new BN(0), 1
+                addrs3.map(a => api.parseAddress(a)), 
+                addrs1.map(a => api.parseAddress(a)), 
+                addrs2.map(a => api.parseAddress(a)), 
+                assetID, UnixNow(), new BN(0), 1
             );
             
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -477,8 +487,8 @@ describe("AVMAPI", () => {
             let outies = txu1.getOuts().sort(SecpOutput.comparator()) as Array<SecpOutput>;
 
             expect(outies.length).toBe(2);
-            let outaddr0 = Object.keys(outies[0].getAddresses());
-            let outaddr1 = Object.keys(outies[1].getAddresses());
+            let outaddr0 = outies[0].getAddresses().map(a => api.addressFromBuffer(a));
+            let outaddr1 = outies[1].getAddresses().map(a => api.addressFromBuffer(a));
 
             let testaddr2 = JSON.stringify(addrs2.sort());
             let testaddr3 = JSON.stringify(addrs3.sort());
@@ -495,8 +505,10 @@ describe("AVMAPI", () => {
             let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let txu2:TxUnsigned = set.makeUnsignedTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
-                addrs3, addrs1, addrs1, assetID, UnixNow(), 
-                new BN(0), 1
+                addrs3.map(a => api.parseAddress(a)), 
+                addrs1.map(a => api.parseAddress(a)), 
+                addrs1.map(a => api.parseAddress(a)), 
+                assetID, UnixNow(), new BN(0), 1
             );
             
             let tx1:Tx = api.signTx(txu1);

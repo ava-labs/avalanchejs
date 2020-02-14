@@ -226,9 +226,9 @@ export class KeyPair {
     /**
      * Returns the address.
      * 
-     * @returns A string representation of the address
+     * @returns A {@link https://github.com/feross/buffer|Buffer}  representation of the address
      */
-    getAddress:() => string;
+    getAddress:() => Buffer;
 
     constructor() {}
 }
@@ -249,7 +249,7 @@ export class KeyChain<KPClass extends KeyPair> {
      * 
      * @returns Address of the new key pair
      */
-    makeKey:(entropy?:Buffer) => string;
+    makeKey:(entropy?:Buffer) => Buffer;
 
     /**
      * Given a private key, makes a new key pair, returns the address.
@@ -258,15 +258,15 @@ export class KeyChain<KPClass extends KeyPair> {
      * 
      * @returns Address of the new key pair
      */
-    importKey:(privk:Buffer) => string;
+    importKey:(privk:Buffer) => Buffer;
 
     /**
      * Gets an array of addresses stored in the key chain.
      * 
-     * @returns An array of string representations of the addresses
+     * @returns An array of {@link https://github.com/feross/buffer|Buffer}  representations of the addresses
      */
-    getAddresses = ():Array<string> => {
-        return Object.keys(this.keys);
+    getAddresses = ():Array<Buffer> => {
+        return Object.keys(this.keys).map(k => Buffer.from(k, "hex"));
     }
 
     /**
@@ -275,22 +275,22 @@ export class KeyChain<KPClass extends KeyPair> {
      * @param newKey A key pair of the appropriate class to be added to the keychain
      */
     addKey = (newKey:KPClass) => {
-        this.keys[newKey.getAddress()] = newKey;
+        this.keys[newKey.getAddress().toString("hex")] = newKey;
     }
 
     /**
      * Removes the key pair from the list of they keys managed in the keychain.
      * 
-     * @param key A string for the address or KPClass to remove
+     * @param key A {@link https://github.com/feross/buffer|Buffer} for the address or KPClass to remove
      * 
      * @returns The boolean true if a key was removed.
      */
-    removeKey = (key:KPClass | string) => {
+    removeKey = (key:KPClass | Buffer) => {
         let kaddr:string;
-        if(typeof key !== "string"){
-            kaddr = key.getAddress();
+        if(key instanceof Buffer){
+            kaddr = key.toString("hex");
         } else {
-            kaddr = key;
+            kaddr = key.getAddress().toString("hex");
         }
         if(kaddr in this.keys){
             delete this.keys[kaddr];
@@ -307,19 +307,19 @@ export class KeyChain<KPClass extends KeyPair> {
      * 
      * @returns True on success, false if not found
      */
-    hasKey = (address:string):boolean => {
-        return (address in this.keys);
+    hasKey = (address:Buffer):boolean => {
+        return (address.toString("hex") in this.keys);
     }
 
     /**
      * Returns the key pair listed under the provided address
      * 
-     * @param address The address to retrieve from the keys database
+     * @param address The {@link https://github.com/feross/buffer|Buffer} of the address to retrieve from the keys database
      * 
      * @returns A reference to the key pair in the keys database
      */
-    getKey = (address:string): KPClass => {
-        return this.keys[address];
+    getKey = (address:Buffer): KPClass => {
+        return this.keys[address.toString("hex")];
     }
     /**
      * Returns instance of KeyChain.
@@ -404,4 +404,61 @@ export abstract class NBytes {
      * Returns instance of [[NBytes]].
      */
     constructor() {}
+}
+
+let n2_avm:object = {
+    blockchainID: "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7",
+    alias: "X",
+    vm: "avm"
+};
+
+let n2_platform:object =  {
+    blockchainID: "",
+    alias: "P",
+    vm: "platform"
+};
+
+let n2_contracts:object = {
+    blockchainID: "",
+    alias: "C",
+    vm: "contracts"
+}
+
+export class Defaults {
+    static network = {
+        1: {}, //update before mainnet
+        2: {
+            "avm": n2_avm,
+            "X": n2_avm,
+            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
+            "platform": n2_platform,
+            "P": n2_platform,
+            "BCID1": n2_platform,
+            "contracts": n2_contracts,
+            "C": n2_contracts,
+            "BCID2": n2_contracts
+        },
+        49: {
+            "avm": n2_avm,
+            "X": n2_avm,
+            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
+            "platform": n2_platform,
+            "P": n2_platform,
+            "BCID1": n2_platform,
+            "contracts": n2_contracts,
+            "C": n2_contracts,
+            "BCID2": n2_contracts
+        },
+        12345: {
+            "avm": n2_avm,
+            "X": n2_avm,
+            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
+            "platform": n2_platform,
+            "P": n2_platform,
+            "BCID1": n2_platform,
+            "contracts": n2_contracts,
+            "C": n2_contracts,
+            "BCID2": n2_contracts
+        }
+    };
 }

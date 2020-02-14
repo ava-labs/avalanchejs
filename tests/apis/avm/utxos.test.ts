@@ -74,27 +74,23 @@ describe('SecpUTXO', () => {
         });
 
         test('getAddresses', () => {
-            let addresses:{ [address: string]: BN } = u1.getAddresses();
-            let expected:{ [address: string]: BN; } = {};
-            expected[opaddr] = new BN(oplocktime, "hex");
-            const addrs = Object.keys(addresses);
-            for( let x of addrs ){
-                expect(expected[x]).not.toBeUndefined();
-                expect(expected[x].toNumber()).toBe(addresses[x].toNumber());
+            let addresses:Array<Buffer> = u1.getAddresses();
+            for( let i = 0; i < addresses.length; i++ ){
+                expect(addresses[i]).not.toBeUndefined();
             }
         });
         test('getAddressIdx', () => {
-            let addropinfo:number = u1.getAddressIdx(opaddr);
+            let addropinfo:number = u1.getAddressIdx(bintools.avaDeserialize(opaddr));
             expect(addropinfo).toBe(0);
         });
 
         test('getAddress', () => {
             let recaddr1 = u1.getAddress(0);
-            expect(recaddr1).toBe(opaddr);
+            expect(recaddr1.toString("hex")).toBe(bintools.avaDeserialize(opaddr).toString("hex"));
         });
 
         test('getSpenders', () => {
-            let addrs = [opaddr];
+            let addrs = [bintools.avaDeserialize(opaddr)];
 
             let thepast = u1.getSpenders(addrs, new BN(0));
             expect(thepast.length).toBe(0);
@@ -105,7 +101,7 @@ describe('SecpUTXO', () => {
         });
 
         test('meetsThreshold', () => {
-            let addrs = [opaddr];
+            let addrs = [bintools.avaDeserialize(opaddr)];
             let thepast = u1.meetsThreshold(addrs, new BN(1));
             expect(thepast).toBe(true);
 
@@ -138,9 +134,9 @@ describe('UTXOSet', () => {
         "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8",
         "adUbkxszkX9FbvnyKu6UA4g7XhAmPVj6PgPhLS6dTtUfCCr7oDEEXNYqWD2q5MuKPGgEhX16V451kAEUyYhiFMPYCjsAiCM1oWKnLmeA9joFr9jDYD5AoLAsVEyM13FZPf8vuKmF6JTZdCbMCgzHYrMjnb9i3iDPN4Qg"
     ];
-    let addrs:Array<string> = [
-        "FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG",
-        "MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8"
+    let addrs:Array<Buffer> = [
+        bintools.avaDeserialize("FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG"),
+        bintools.avaDeserialize("MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8")
     ];
     test('Creation', () => {
         let set:UTXOSet = new UTXOSet();
@@ -255,7 +251,7 @@ describe('UTXOSet', () => {
 
         test('getUTXOIDs By Address', () => {
             let utxoids:Array<string>;
-            utxoids = set.getUTXOIDs(addrs[0]);
+            utxoids = set.getUTXOIDs([addrs[0]]);
             expect(utxoids.length).toBe(1);
             utxoids = set.getUTXOIDs(addrs);
             expect(utxoids.length).toBe(3);
@@ -307,7 +303,7 @@ describe('UTXOSet', () => {
             for(let i:number = 0; i < utxos.length; i++){
                 expect(assetIDs).toContain(utxos[i].getAssetID())
             }
-            let addresses:Array<string> = set.getAddresses();
+            let addresses:Array<Buffer> = set.getAddresses();
             expect(set.getAssetIDs(addresses)).toEqual(set.getAssetIDs())
         });
 

@@ -86,11 +86,11 @@ export class AVMKeyPair extends KeyPair {
     }
 
     /**
-     * Returns the address.
+     * Returns the address as a {@link https://github.com/feross/buffer|Buffer}.
      * 
-     * @returns A string representation of the address
+     * @returns A {@link https://github.com/feross/buffer|Buffer} representation of the address
      */
-    getAddress = ():string => {
+    getAddress = ():Buffer => {
         return this.addressFromPublicKey(this.pubk);
     }
 
@@ -99,9 +99,9 @@ export class AVMKeyPair extends KeyPair {
      * 
      * @param pubk A {@link https://github.com/feross/buffer|Buffer} representing the public key
      * 
-     * @returns A string for the address of the public key.
+     * @returns A {@link https://github.com/feross/buffer|Buffer} for the address of the public key.
      */
-    addressFromPublicKey = (pubk:Buffer): string => {
+    addressFromPublicKey = (pubk:Buffer): Buffer => {
         let address:string = "";
         if(pubk.length == 65) {
             /* istanbul ignore next */
@@ -110,8 +110,9 @@ export class AVMKeyPair extends KeyPair {
         if(pubk.length == 33){
             let sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
             let ripesha:Buffer = Buffer.from(createHash('rmd160').update(sha256).digest());
-            address = bintools.avaSerialize(ripesha);
-            return address;
+            return ripesha;
+            //address = bintools.avaSerialize(ripesha);
+            //return address;
         }
         /* istanbul ignore next */
         throw new Error("Unable to make address.");
@@ -203,7 +204,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * 
      * @returns Address of the new key pair
      */
-    makeKey = (entropy:Buffer = undefined):string => {
+    makeKey = (entropy:Buffer = undefined):Buffer => {
         let keypair:AVMKeyPair = new AVMKeyPair(entropy);
         this.addKey(keypair);
         return keypair.getAddress();
@@ -216,7 +217,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * 
      * @returns Address of the new key pair
      */
-    importKey = (privk:Buffer | string):string => {
+    importKey = (privk:Buffer | string):Buffer => {
         let keypair:AVMKeyPair = new AVMKeyPair();
         let pk:Buffer;
         if(typeof privk === 'string'){
@@ -225,7 +226,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
             pk = bintools.copyFrom(privk);
         }
         keypair.importKey(pk);
-        if(!(keypair.getAddress() in this.keys)){
+        if(!(keypair.getAddress().toString("hex") in this.keys)){
             this.addKey(keypair);
         }
         return keypair.getAddress();

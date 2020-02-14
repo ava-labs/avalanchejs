@@ -17,8 +17,8 @@ describe('Inputs', () => {
     let set:UTXOSet;
     let keymgr1:AVMKeyChain;
     let keymgr2:AVMKeyChain;
-    let addrs1:Array<string>;
-    let addrs2:Array<string>;
+    let addrs1:Array<Buffer>;
+    let addrs2:Array<Buffer>;
     let utxos:Array<SecpUTXO>;
     const amnt:number = 10000;
     beforeEach(() => {
@@ -33,8 +33,8 @@ describe('Inputs', () => {
             addrs2.push(keymgr2.makeKey());
         }
         let amount:BN = new BN(amnt);
-        let addresses:Array<string> = keymgr1.getAddresses();
-        let fallAddresses:Array<string> = keymgr2.getAddresses()
+        let addresses:Array<Buffer> = keymgr1.getAddresses();
+        let fallAddresses:Array<Buffer> = keymgr2.getAddresses()
         let locktime:BN = new BN(54321);
         let fallLocktime:BN = locktime.add(new BN(50));
         let threshold:number = 3;
