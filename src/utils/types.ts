@@ -145,6 +145,7 @@ export class JRPCAPI extends APIBase {
 export class KeyPair {
     protected pubk:Buffer;
     protected privk:Buffer;
+    protected chainid:string = "";
 
     /**
      * Generates a new keypair.
@@ -230,56 +231,85 @@ export class KeyPair {
      */
     getAddress:() => Buffer;
 
-    constructor() {}
+    /**
+     * Returns the address's string representation.
+     * 
+     * @returns A string representation of the address
+     */
+    getAddressString:() => string;
+
+    /**
+     * Returns the chainID associated with this key.
+     * 
+     * @returns The [[KeyPair]]'s chainID
+     */
+    getChainID = ():string => {
+        return this.chainid
+    }
+
+    /**
+     * Sets the the chainID associated with this key.
+     * 
+     * @param chainid String for the chainID
+     */
+    setChainID = (chainid:string):void => {
+        this.chainid = chainid;
+    }
+
+    constructor(chainid:string) {
+        this.chainid = chainid
+    }
 }
 
 /**
  * Class for representing a key chain in Slopes. 
  * All endpoints that need key chains should extend on this class.
  * 
- * @typeparam KPClass Class extending [[KeyPair]] which is used as the key in [[KeyChain]]
+ * @typeparam KPClass extending [[KeyPair]] which is used as the key in [[KeyChain]]
  */
 export class KeyChain<KPClass extends KeyPair> {
     protected keys:{[address: string]: KPClass} = {};
+    protected chainid:string = "";
 
     /**
-     * Makes a new key pair, returns the address.
+     * Makes a new [[KeyPair]], returns the address.
      * 
      * @param entropy Optional parameter that may be necessary to produce secure keys
      * 
-     * @returns Address of the new key pair
+     * @returns Address of the new [[KeyPair]]
      */
     makeKey:(entropy?:Buffer) => Buffer;
 
     /**
-     * Given a private key, makes a new key pair, returns the address.
+     * Given a private key, makes a new [[KeyPair]], returns the address.
      * 
      * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key 
      * 
-     * @returns Address of the new key pair
+     * @returns Address of the new [[KeyPair]]
      */
     importKey:(privk:Buffer) => Buffer;
 
     /**
-     * Gets an array of addresses stored in the key chain.
+     * Gets an array of addresses stored in the [[KeyChain]].
      * 
      * @returns An array of {@link https://github.com/feross/buffer|Buffer}  representations of the addresses
      */
     getAddresses = ():Array<Buffer> => {
-        return Object.keys(this.keys).map(k => Buffer.from(k, "hex"));
+        return Object.values(this.keys).map(kp => kp.getAddress());
     }
 
     /**
-     * Adds the key pair to the list of the keys managed in the keychain.
+     * Adds the key pair to the list of the keys managed in the [[KeyChain]].
      * 
-     * @param newKey A key pair of the appropriate class to be added to the keychain
+     * @param newKey A key pair of the appropriate class to be added to the [[KeyChain]]
      */
     addKey = (newKey:KPClass) => {
+        newKey.setChainID(this.chainid);
         this.keys[newKey.getAddress().toString("hex")] = newKey;
     }
 
     /**
-     * Removes the key pair from the list of they keys managed in the keychain.
+     * Removes the key pair from the list of they keys managed in the [[KeyChain]].
      * 
      * @param key A {@link https://github.com/feross/buffer|Buffer} for the address or KPClass to remove
      * 
@@ -312,19 +342,43 @@ export class KeyChain<KPClass extends KeyPair> {
     }
 
     /**
-     * Returns the key pair listed under the provided address
+     * Returns the [[KeyPair]] listed under the provided address
      * 
      * @param address The {@link https://github.com/feross/buffer|Buffer} of the address to retrieve from the keys database
      * 
-     * @returns A reference to the key pair in the keys database
+     * @returns A reference to the [[KeyPair]] in the keys database
      */
     getKey = (address:Buffer): KPClass => {
         return this.keys[address.toString("hex")];
     }
+
     /**
-     * Returns instance of KeyChain.
+     * Returns the chainID associated with this [[KeyChain]].
+     * 
+     * @returns The [[KeyChain]]'s chainID
      */
-    constructor() {}
+    getChainID = ():string => {
+        return this.chainid
+    }
+
+    /**
+     * Sets the the chainID associated with this [[KeyChain]] and all associated keypairs.
+     * 
+     * @param chainid String for the chainID
+     */
+    setChainID = (chainid:string):void => {
+        this.chainid = chainid;
+        for(let address in this.keys){
+            this.keys[address].setChainID(chainid);
+        }
+    }
+
+    /**
+     * Returns instance of [[KeyChain]].
+     */
+    constructor(chainid:string) {
+        this.chainid = chainid;
+    }
 }
 
 /**

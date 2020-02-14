@@ -95,6 +95,16 @@ export class AVMKeyPair extends KeyPair {
     }
 
     /**
+     * Returns the address's string representation.
+     * 
+     * @returns A string representation of the address
+     */
+    getAddressString = ():string => {
+        let addr:Buffer = this.addressFromPublicKey(this.pubk);
+        return bintools.addressToString(this.chainid, addr);
+    }
+
+    /**
      * Returns an address given a public key.
      * 
      * @param pubk A {@link https://github.com/feross/buffer|Buffer} representing the public key
@@ -183,8 +193,8 @@ export class AVMKeyPair extends KeyPair {
     /**
      * Class for representing a private and public keypair in AVAJS. 
      */
-    constructor(entropy:Buffer = undefined) {
-        super();
+    constructor(chainid:string, entropy:Buffer = undefined) {
+        super(chainid);
         this.generateKey();
     }
     
@@ -205,7 +215,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * @returns Address of the new key pair
      */
     makeKey = (entropy:Buffer = undefined):Buffer => {
-        let keypair:AVMKeyPair = new AVMKeyPair(entropy);
+        let keypair:AVMKeyPair = new AVMKeyPair(this.chainid, entropy);
         this.addKey(keypair);
         return keypair.getAddress();
     }
@@ -218,7 +228,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * @returns Address of the new key pair
      */
     importKey = (privk:Buffer | string):Buffer => {
-        let keypair:AVMKeyPair = new AVMKeyPair();
+        let keypair:AVMKeyPair = new AVMKeyPair(this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
             pk = bintools.avaDeserialize(privk);
@@ -262,7 +272,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     /**
      * Returns instance of AVMKeyChain.
      */
-    constructor(){
-        super();
+    constructor(chainid:string){
+        super(chainid);
     }
 }

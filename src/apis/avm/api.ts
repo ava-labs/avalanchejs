@@ -82,7 +82,7 @@ class AVMAPI extends JRPCAPI{
     /**
      * @ignore
      */
-    protected keychain:AVMKeyChain = new AVMKeyChain();
+    protected keychain:AVMKeyChain = new AVMKeyChain("");
     protected blockchainID:string = "";
     protected AVAAssetID:Buffer = undefined;
 
@@ -96,6 +96,7 @@ class AVMAPI extends JRPCAPI{
         if(netid in Defaults.network && this.blockchainID in Defaults.network[netid]){
             return Defaults.network[netid][this.blockchainID].alias;
         }
+        /* istanbul ignore next */
         return undefined;
     }
 
@@ -151,7 +152,12 @@ class AVMAPI extends JRPCAPI{
      */
     newKeyChain = ():AVMKeyChain => {
         //warning, overwrites the old keychain
-        this.keychain = new AVMKeyChain();
+        let alias = this.getBlockchainAlias();
+        if(alias){
+            this.keychain = new AVMKeyChain(alias);
+        } else {
+            this.keychain = new AVMKeyChain(this.blockchainID);
+        }
         return this.keychain;
     }
 
@@ -165,6 +171,7 @@ class AVMAPI extends JRPCAPI{
      */
     getBalance = async (address:string, assetID:string):Promise<number> => {
         if(typeof this.parseAddress(address) === "undefined"){
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.getBalance: Invalid address format " + address);
         }
         let params = {
@@ -323,6 +330,7 @@ class AVMAPI extends JRPCAPI{
      */
     signMintTx = async (username:string, password:string, tx:string | Buffer, minter:string):Promise<string> => {
         if(typeof this.parseAddress(minter) === "undefined"){
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.signMintTx: Invalid address format " + minter);
         }
         let params = {
@@ -347,6 +355,7 @@ class AVMAPI extends JRPCAPI{
      */
     exportKey = async (username:string, password:string, address:string):Promise<string> => {
         if(typeof this.parseAddress(address) === "undefined"){
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.exportKey: Invalid address format " + address);
         }
         let params = {
@@ -406,6 +415,7 @@ class AVMAPI extends JRPCAPI{
      */
     listAssets = async (address:string):Promise<Array<string>> => {
         if(typeof this.parseAddress(address) === "undefined"){
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.listAssets: Invalid address format " + address);
         }
         let params = {
@@ -473,6 +483,7 @@ class AVMAPI extends JRPCAPI{
         if(addresses && addresses.length > 0){
             for(let i = 0; i < addresses.length; i++){
                 if(typeof this.parseAddress(addresses[i]) === "undefined"){
+                    /* istanbul ignore next */
                     throw new Error("Error - AVMAPI.getUTXOs: Invalid address format " + addresses[i]);
                 }
             }
@@ -533,6 +544,7 @@ class AVMAPI extends JRPCAPI{
             for(let i = 0; i < toAddresses.length; i++){
                 let addr = this.parseAddress(toAddresses[i]);
                 if(typeof addr === "undefined"){
+                    /* istanbul ignore next */
                     throw new Error("Error - AVMAPI.makeUnsignedTx: Invalid address format for toAddress " + toAddresses[i]);
                 }
                 to.push(addr);
@@ -543,6 +555,7 @@ class AVMAPI extends JRPCAPI{
             for(let i = 0; i < fromAddresses.length; i++){
                 let addr = this.parseAddress(fromAddresses[i]);
                 if(typeof this.parseAddress(fromAddresses[i]) === "undefined"){
+                    /* istanbul ignore next */
                     throw new Error("Error - AVMAPI.makeUnsignedTx: Invalid address format for fromAddress " + fromAddresses[i]);
                 }
                 from.push(addr);
@@ -553,6 +566,7 @@ class AVMAPI extends JRPCAPI{
             for(let i = 0; i < changeAddresses.length; i++){
                 let addr = this.parseAddress(changeAddresses[i]);
                 if(typeof this.parseAddress(changeAddresses[i]) === "undefined"){
+                    /* istanbul ignore next */
                     throw new Error("Error - AVMAPI.makeUnsignedTx: Invalid address format for changeAddresses " + changeAddresses[i]);
                 }
                 change.push(addr);
@@ -580,16 +594,20 @@ class AVMAPI extends JRPCAPI{
             for(let i = 0; i < creatorAddresses.length; i++){
                 let addr = this.parseAddress(creatorAddresses[i]);
                 if(typeof this.parseAddress(creatorAddresses[i]) === "undefined"){
+                    /* istanbul ignore next */
                     throw new Error("Error - AVMAPI.makeCreateAssetTx: Invalid address format for creatorAddresses " + creatorAddresses[i]);
                 }
                 creators.push(addr);
             }
         }
-
+        /* istanbul ignore next */
         if(symbol.length > Constants.SYMBOLMAXLEN){
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.makeCreateAssetTx: Symbols may not exceed length of " + Constants.SYMBOLMAXLEN);
         }
+        /* istanbul ignore next */
         if(name.length > Constants.ASSETNAMELEN) {
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.makeCreateAssetTx: Names may not exceed length of " + Constants.ASSETNAMELEN);
         }
         let avaAssetID:Buffer = await this.getAVAAssetID();
@@ -654,12 +672,14 @@ class AVMAPI extends JRPCAPI{
         let amnt:BN;
         
         if(typeof this.parseAddress(to) === "undefined"){
+            /* istanbul ignore next */
             throw new Error("Error - AVMAPI.listAssets: Invalid address format " + to);
         }
 
         if(from && from.length > 0){
             for(let i = 0; i < from.length; i++){
                 if(typeof this.parseAddress(from[i]) === "undefined"){
+                    /* istanbul ignore next */
                     throw new Error("Error - AVMAPI.send: Invalid address format " + from[i]);
                 }
             }
@@ -697,7 +717,13 @@ class AVMAPI extends JRPCAPI{
      */
     constructor(core:SlopesCore, baseurl:string = "/ext/bc/avm", blockchainID:string = ""){ 
         super(core, baseurl);
-        this.keychain = new AVMKeyChain();
+        let netid:number = core.getNetworkID();
+        if(netid in Defaults.network && this.blockchainID in Defaults.network[netid]){
+            let alias = Defaults.network[netid][this.blockchainID].alias;
+            this.keychain = new AVMKeyChain(alias);
+        } else {
+            this.keychain = new AVMKeyChain(blockchainID);
+        }
         this.blockchainID = blockchainID
     }
 }

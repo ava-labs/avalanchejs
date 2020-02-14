@@ -6,11 +6,11 @@ import {Buffer} from "buffer/";
 import BN from "bn.js";
 import BinTools from 'src/utils/bintools';
 import { UTXOSet, UTXO, SecpUTXO } from 'src/apis/avm/utxos';
-import { Output, SecpOutput } from 'src/apis/avm/outputs';
+import { Output, SecpOutput, SecpOutBase } from 'src/apis/avm/outputs';
 import { Input, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
-import { TxUnsigned, Tx } from 'src/apis/avm/tx';
-import { UnixNow } from 'src/apis/avm/types';
+import { TxUnsigned, TxCreateAsset, Tx } from 'src/apis/avm/tx';
+import { UnixNow, Constants } from 'src/apis/avm/types';
 
 /**
  * @ignore
@@ -29,6 +29,7 @@ describe("AVMAPI", () => {
 
     let slopes:Slopes = new Slopes(ip,port,protocol, networkid, undefined, true);
     let api:AVMAPI;
+    let alias:string;
 
     const addrA:string = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW";
     const addrB:string = "X-P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF";
@@ -36,6 +37,7 @@ describe("AVMAPI", () => {
 
     beforeAll(() => {
         api = new AVMAPI(slopes, "/ext/bc/avm", blockchainid);
+        alias = api.getBlockchainAlias();
     });
 
     afterEach(() => {
@@ -203,7 +205,7 @@ describe("AVMAPI", () => {
     });
 
     test('createFixedCapAsset', async ()=>{
-        let kp:AVMKeyPair = new AVMKeyPair();
+        let kp:AVMKeyPair = new AVMKeyPair(alias);
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
         
         let amount:number = 10000;
@@ -238,7 +240,7 @@ describe("AVMAPI", () => {
     });
 
     test('createVariableCapAsset', async ()=>{
-        let kp:AVMKeyPair = new AVMKeyPair();
+        let kp:AVMKeyPair = new AVMKeyPair(alias);
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
         
         let amount:number = 10000;
@@ -405,20 +407,23 @@ describe("AVMAPI", () => {
         let outputs:Array<SecpOutput>;
         const amnt:number = 10000;
         let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
+
+        let secpbase1:SecpOutBase;
+        let secpbase2:SecpOutBase;
+        let secpbase3:SecpOutBase;
+        let initialState:Array<SecpOutBase>;
         
         beforeEach(() => {
             set = new UTXOSet();
             api.newKeyChain()
-            keymgr2 = new AVMKeyChain();
-            keymgr3 = new AVMKeyChain();
+            keymgr2 = new AVMKeyChain(alias);
+            keymgr3 = new AVMKeyChain(alias);
             addrs1 = [];
             addrs2 = [];
             addrs3 = [];
             utxos = [];
             inputs = [];
             outputs = [];
-
-
 
             for(let i:number = 0; i < 3; i++){
                 addrs1.push(api.addressFromBuffer(api.keyChain().makeKey()));
@@ -453,6 +458,11 @@ describe("AVMAPI", () => {
                 inputs.push(input);
             }
             set.addArray(utxos);
+
+            secpbase1 = new SecpOutBase(new BN(777), addrs3.map(a => api.parseAddress(a)));
+            secpbase2 = new SecpOutBase(new BN(888), addrs2.map(a => api.parseAddress(a)));
+            secpbase3 = new SecpOutBase(new BN(999), addrs2.map(a => api.parseAddress(a)));
+            initialState = [secpbase1, secpbase2, secpbase3];
         });
 
         test('makeUnsignedTx1', async () => {
@@ -586,6 +596,38 @@ describe("AVMAPI", () => {
     
             expect(mockAxios.request).toHaveBeenCalledTimes(1);
             expect(response).toBe(txid);
+        });
+
+        test('makeCreateAssetTx', async () => {
+            let fee:number = 10;
+            let name:string = "Mortycoin is the dumb as a sack of hammers.";
+            let symbol:string = "morT";
+            let denomination:number = 8;
+
+            let result:Promise<TxCreateAsset> = api.makeCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
+            let payload:object = {
+                "result": {
+                    'name': name, 
+                    'symbol': symbol, 
+                    'assetID': bintools.avaSerialize(assetID), 
+                    'denomination': "" + denomination
+                }
+            };
+            let responseObj = {
+                data: payload
+            };
+    
+            mockAxios.mockResponse(responseObj);
+            let txu1:TxCreateAsset = await result;
+    
+            expect(mockAxios.request).toHaveBeenCalledTimes(1);
+            
+            let txu2:TxCreateAsset = set.makeCreateAssetTx(slopes.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
+
+            
+            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
+            expect(txu2.toString()).toBe(txu1.toString());
+            
         });
 
     });
