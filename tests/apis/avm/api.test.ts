@@ -10,7 +10,8 @@ import { Output, SecpOutput, SecpOutBase } from 'src/apis/avm/outputs';
 import { Input, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { TxUnsigned, TxCreateAsset, Tx } from 'src/apis/avm/tx';
-import { UnixNow, Constants } from 'src/apis/avm/types';
+import { UnixNow, AVMConstants } from 'src/apis/avm/types';
+import { InitialStates } from '../../../src/apis/avm/types';
 
 /**
  * @ignore
@@ -411,7 +412,7 @@ describe("AVMAPI", () => {
         let secpbase1:SecpOutBase;
         let secpbase2:SecpOutBase;
         let secpbase3:SecpOutBase;
-        let initialState:Array<SecpOutBase>;
+        let initialState:InitialStates;
         
         beforeEach(() => {
             set = new UTXOSet();
@@ -462,7 +463,10 @@ describe("AVMAPI", () => {
             secpbase1 = new SecpOutBase(new BN(777), addrs3.map(a => api.parseAddress(a)));
             secpbase2 = new SecpOutBase(new BN(888), addrs2.map(a => api.parseAddress(a)));
             secpbase3 = new SecpOutBase(new BN(999), addrs2.map(a => api.parseAddress(a)));
-            initialState = [secpbase1, secpbase2, secpbase3];
+            initialState = new InitialStates();
+            initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
+            initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
+            initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
         });
 
         test('makeUnsignedTx1', async () => {

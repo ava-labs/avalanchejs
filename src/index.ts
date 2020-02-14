@@ -93,7 +93,7 @@ export * from './utils/db';
 
 export {Tx, TxUnsigned, TxCreateAsset} from './apis/avm/tx';
 export {UTXO, SecpUTXO, UTXOSet, SelectUTXOClass} from './apis/avm/utxos';	
-export {SigIdx, Signature, UnixNow, Address} from './apis/avm/types';	
+export {SigIdx, Signature, UnixNow, Address, AVMConstants, InitialStates} from './apis/avm/types';	
 export {SecpOutput, SecpOutBase, Output, SelectOutputClass} from './apis/avm/outputs';	
 export {SecpInput, Input, SelectInputClass} from './apis/avm/inputs';	
 export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';

@@ -5,7 +5,7 @@ import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { Output, SecpOutput, SelectOutputClass } from './outputs';
-import { MergeRule, UnixNow, Constants, Address } from './types';
+import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { TxUnsigned, TxCreateAsset } from './tx';
 import { SecpInput, Input } from './inputs';
 
@@ -28,7 +28,7 @@ export const SelectUTXOClass = (utxobuffer:Buffer, args:Array<any> = []):UTXO =>
     let outputbuff:Buffer = bintools.copyFrom(utxobuffer, 36);
     let output:Output = SelectOutputClass(outputbuff);
     let outputid:number = output.getOutputID();
-    if(outputid == Constants.SECPOUTPUTID){
+    if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = output as SecpOutput;
         let utxo:SecpUTXO = new SecpUTXO(txid, txidx, secpout);
         return utxo;
@@ -673,10 +673,10 @@ export class UTXOSet {
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param fee The amount of AVA to be paid for fees, in NanoAVA
      * @param creatorAddresses The addresses to send the fees
-     * @param initialState The array of [[Output]]s that represent the intial state of a created asset
-     * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime The locktime field created in the resulting outputs
-     * @param threshold The number of signatures required to spend the funds in the resultant UTXO
+     * @param initialState The [[InitialStates]]that represent the intial state of a created asset
+     * @param name String for the descriptive name of the asset
+     * @param symbol String for the ticker symbol of the asset
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
      * 
      * @returns An unsigned transaction created from the passed in parameters.
      * 
@@ -684,7 +684,7 @@ export class UTXOSet {
     makeCreateAssetTx = (
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
         fee:BN, creatorAddresses:Array<Buffer>, 
-        initialState:Array<Output>, name:string, 
+        initialState:InitialStates, name:string, 
         symbol:string, denomination:number
     ):TxCreateAsset => {
         // Cheating and using makeUnsignedTx to get Ins and Outs for fees.
@@ -692,7 +692,7 @@ export class UTXOSet {
         let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
         let ins:Array<Input> = utx.getIns();
         let outs:Array<Output> = utx.getOuts();
-        return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, Constants.CREATEASSETTX);
+        return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, AVMConstants.CREATEASSETTX);
     }
 
     /**

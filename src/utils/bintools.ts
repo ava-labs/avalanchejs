@@ -4,7 +4,7 @@
 import BN  from "bn.js";
 import {Buffer} from "buffer/";
 import createHash from "create-hash";
-import { Constants } from '../apis/avm/types';
+import { AVMConstants } from '../apis/avm/types';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using nodejs & javascript.

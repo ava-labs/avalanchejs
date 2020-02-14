@@ -6,7 +6,7 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
 import { Output, SecpOutput } from 'src/apis/avm/outputs';
-import { Constants } from 'src/apis/avm/types';
+import { AVMConstants } from 'src/apis/avm/types';
 
 
 /**
@@ -66,7 +66,7 @@ describe('Inputs', () => {
 
         input = new SecpInput(txid, txidx, amount, asset);
         expect(input.getUTXOID()).toBe(u.getUTXOID());
-        expect(input.getInputID()).toBe(Constants.SECPINPUTID);
+        expect(input.getInputID()).toBe(AVMConstants.SECPINPUTID);
 
         input.addSignatureIdx(0, addrs2[0]);
         input.addSignatureIdx(1, addrs2[1]);

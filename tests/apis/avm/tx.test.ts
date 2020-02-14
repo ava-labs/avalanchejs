@@ -7,7 +7,8 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
 import { Output, SecpOutput, SecpOutBase } from 'src/apis/avm/outputs';
-import { UnixNow, Constants} from 'src/apis/avm/types';
+import { UnixNow, AVMConstants} from 'src/apis/avm/types';
+import { InitialStates } from '../../../src/apis/avm/types';
 /**
  * @ignore
  */
@@ -148,19 +149,22 @@ describe('Transactions', () => {
         let secpbase1:SecpOutBase = new SecpOutBase(new BN(777), addrs3);
         let secpbase2:SecpOutBase = new SecpOutBase(new BN(888), addrs2);
         let secpbase3:SecpOutBase = new SecpOutBase(new BN(999), addrs2);
-        let initialState:Array<SecpOutBase> = [secpbase1, secpbase2, secpbase3];
+        let initialState:InitialStates = new InitialStates();
+        initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
+        initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
+        initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
         let name:string = "Rickcoin is the most intelligent coin";
         let symbol:string = "RICK";
         let denomination:number = 9;
-        let txu:TxCreateAsset = new TxCreateAsset(name, symbol, denomination, initialState, inputs, outputs, netid, blockchainID, Constants.CREATEASSETTX);
+        let txu:TxCreateAsset = new TxCreateAsset(name, symbol, denomination, initialState, inputs, outputs, netid, blockchainID, AVMConstants.CREATEASSETTX);
         let txins:Array<Input>  = txu.getIns();
         let txouts:Array<Output> = txu.getOuts();
-        let initState:Array<Output> = txu.getInitialState();
+        let initState:InitialStates = txu.getInitialStates();
         expect(txins.length).toBe(inputs.length);
         expect(txouts.length).toBe(outputs.length);
-        expect(initState.length).toBe(initialState.length);
+        expect(initState.toBuffer().toString("hex")).toBe(initialState.toBuffer().toString("hex"));
         
-        expect(txu.getTxType()).toBe(Constants.CREATEASSETTX);
+        expect(txu.getTxType()).toBe(AVMConstants.CREATEASSETTX);
         expect(txu.getNetworkID()).toBe(49);
         expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
         expect(txu.getName()).toBe(name);
@@ -184,15 +188,6 @@ describe('Transactions', () => {
         for(let i:number = 0; i < txouts.length; i++){
             a.push(txouts[i].toString());
             b.push(outputs[i].toString());
-        }
-        expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
-
-        a = [];
-        b = [];
-
-        for(let i:number = 0; i < initialState.length; i++){
-            a.push(initialState[i].toString());
-            b.push(initState[i].toString());
         }
         expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
 

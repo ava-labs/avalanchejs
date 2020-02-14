@@ -5,12 +5,11 @@ import SlopesCore from '../../slopes';
 import { Buffer } from "buffer/";
 import { JRPCAPI, RequestResponseData, Defaults } from "../../utils/types";
 import { UTXOSet } from './utxos';
-import { MergeRule, UnixNow, Constants } from './types';
+import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { TxUnsigned, Tx, TxCreateAsset } from './tx';
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
-import { Output } from './outputs';
 
 /**
  * @ignore
@@ -117,7 +116,7 @@ class AVMAPI extends JRPCAPI{
     parseAddress = (addr:string):Buffer => {
         let alias:string = this.getBlockchainAlias();
         let blockchainID:string = this.getBlockchainID();
-        return bintools.parseAddress(addr, blockchainID, alias, Constants.ADDRESSLENGTH);
+        return bintools.parseAddress(addr, blockchainID, alias, AVMConstants.ADDRESSLENGTH);
     }
 
     addressFromBuffer = (address:Buffer):string => {
@@ -472,24 +471,18 @@ class AVMAPI extends JRPCAPI{
     /**
      * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
      * 
-     * @param addresses An array of addresses as strings
+     * @param addresses An array of addresses as strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
      * @param persistOpts Options available to persist these UTXOs in local storage
      * 
      * @remarks 
      * persistOpts is optional and must be of type [[PersistanceOptions]]
      * 
      */
-    getUTXOs = async (addresses:Array<string>, persistOpts:PersistanceOptions = undefined ):Promise<UTXOSet> => {
-        if(addresses && addresses.length > 0){
-            for(let i = 0; i < addresses.length; i++){
-                if(typeof this.parseAddress(addresses[i]) === "undefined"){
-                    /* istanbul ignore next */
-                    throw new Error("Error - AVMAPI.getUTXOs: Invalid address format " + addresses[i]);
-                }
-            }
-        }
+    getUTXOs = async (addresses:Array<string> | Array<Buffer>, persistOpts:PersistanceOptions = undefined ):Promise<UTXOSet> => {
+        let addrs:Array<string> = this._cleanAddressArray(addresses, "getUTXOs");
+        
         let params = {
-            "addresses": addresses
+            "addresses": addrs
         };
         return this.callMethod("avm.getUTXOs", params).then((response:RequestResponseData) => {
             let utxos:UTXOSet = new UTXOSet();
@@ -536,42 +529,9 @@ class AVMAPI extends JRPCAPI{
         changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
     ):Promise<TxUnsigned> => {
-        let to:Array<Buffer> = [];
-        let from:Array<Buffer> = [];
-        let change:Array<Buffer> = [];
-
-        if(toAddresses && toAddresses.length > 0){
-            for(let i = 0; i < toAddresses.length; i++){
-                let addr = this.parseAddress(toAddresses[i]);
-                if(typeof addr === "undefined"){
-                    /* istanbul ignore next */
-                    throw new Error("Error - AVMAPI.makeUnsignedTx: Invalid address format for toAddress " + toAddresses[i]);
-                }
-                to.push(addr);
-            }
-        }
-
-        if(fromAddresses && fromAddresses.length > 0){
-            for(let i = 0; i < fromAddresses.length; i++){
-                let addr = this.parseAddress(fromAddresses[i]);
-                if(typeof this.parseAddress(fromAddresses[i]) === "undefined"){
-                    /* istanbul ignore next */
-                    throw new Error("Error - AVMAPI.makeUnsignedTx: Invalid address format for fromAddress " + fromAddresses[i]);
-                }
-                from.push(addr);
-            }
-        }
-
-        if(changeAddresses && changeAddresses.length > 0){
-            for(let i = 0; i < changeAddresses.length; i++){
-                let addr = this.parseAddress(changeAddresses[i]);
-                if(typeof this.parseAddress(changeAddresses[i]) === "undefined"){
-                    /* istanbul ignore next */
-                    throw new Error("Error - AVMAPI.makeUnsignedTx: Invalid address format for changeAddresses " + changeAddresses[i]);
-                }
-                change.push(addr);
-            }
-        }
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedTx").map(a => bintools.stringToAddress(a));;
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedTx").map(a => bintools.stringToAddress(a));;
+        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "makeUnsignedTx").map(a => bintools.stringToAddress(a));;
 
         if(typeof assetID === "string"){
             assetID = bintools.avaDeserialize(assetID);
@@ -584,31 +544,37 @@ class AVMAPI extends JRPCAPI{
         );
     }
 
+    
+    /**
+     * Creates an unsigned transaction. For more granular control, you may create your own
+     * [[TxCreateAsset]] manually (with their corresponding [[Input]]s, [[Output]]s).
+     * 
+     * @param utxoset A set of UTXOs that the transaction is built on
+     * @param fee The amount of AVA to be paid for fees, in NanoAVA
+     * @param creatorAddresses The addresses to send the fees
+     * @param initialState The [[InitialStates]] that represent the intial state of a created asset
+     * @param name String for the descriptive name of the asset
+     * @param symbol String for the ticker symbol of the asset
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * 
+     * @returns An unsigned transaction created from the passed in parameters.
+     * 
+     */
     makeCreateAssetTx = async (
-        utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string>, 
-        initialState:Array<Output>, name:string, 
+        utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
+        initialState:InitialStates, name:string, 
         symbol:string, denomination:number
     ):Promise<TxCreateAsset> => {
-        let creators:Array<Buffer> = [];
-        if(creatorAddresses && creatorAddresses.length > 0){
-            for(let i = 0; i < creatorAddresses.length; i++){
-                let addr = this.parseAddress(creatorAddresses[i]);
-                if(typeof this.parseAddress(creatorAddresses[i]) === "undefined"){
-                    /* istanbul ignore next */
-                    throw new Error("Error - AVMAPI.makeCreateAssetTx: Invalid address format for creatorAddresses " + creatorAddresses[i]);
-                }
-                creators.push(addr);
-            }
+        let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "makeCreateAssetTx").map(a => bintools.stringToAddress(a));
+        /* istanbul ignore next */
+        if(symbol.length > AVMConstants.SYMBOLMAXLEN){
+            /* istanbul ignore next */
+            throw new Error("Error - AVMAPI.makeCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
         }
         /* istanbul ignore next */
-        if(symbol.length > Constants.SYMBOLMAXLEN){
+        if(name.length > AVMConstants.ASSETNAMELEN) {
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.makeCreateAssetTx: Symbols may not exceed length of " + Constants.SYMBOLMAXLEN);
-        }
-        /* istanbul ignore next */
-        if(name.length > Constants.ASSETNAMELEN) {
-            /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.makeCreateAssetTx: Names may not exceed length of " + Constants.ASSETNAMELEN);
+            throw new Error("Error - AVMAPI.makeCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
         }
         let avaAssetID:Buffer = await this.getAVAAssetID();
         return utxoset.makeCreateAssetTx(
@@ -667,7 +633,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Promise for the string representing the transaction's ID.
      */
-    send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string>):Promise<string> => {
+    send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>):Promise<string> => {
         let asset:string;
         let amnt:BN;
         
@@ -676,14 +642,7 @@ class AVMAPI extends JRPCAPI{
             throw new Error("Error - AVMAPI.listAssets: Invalid address format " + to);
         }
 
-        if(from && from.length > 0){
-            for(let i = 0; i < from.length; i++){
-                if(typeof this.parseAddress(from[i]) === "undefined"){
-                    /* istanbul ignore next */
-                    throw new Error("Error - AVMAPI.send: Invalid address format " + from[i]);
-                }
-            }
-        }
+        from = this._cleanAddressArray(from, "send")
 
         if(typeof assetID !== "string"){
             asset = bintools.avaSerialize(assetID);
@@ -707,6 +666,25 @@ class AVMAPI extends JRPCAPI{
         return this.callMethod("avm.send", params).then((response:RequestResponseData) => {
             return response.data["result"]["txID"];
         });
+    }
+
+    protected _cleanAddressArray(addresses:Array<string> | Array<Buffer>, caller:string):Array<string> {
+        let addrs:Array<string> = [];
+        let chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
+        if(addresses && addresses.length > 0){
+            for(let i = 0; i < addresses.length; i++){
+                if(typeof addresses[i] === "string"){
+                    if(typeof this.parseAddress(addresses[i] as string) === "undefined"){
+                        /* istanbul ignore next */
+                        throw new Error("Error - AVMAPI." + caller + ": Invalid address format " + addresses[i]);
+                    }
+                    addrs.push(addresses[i] as string);
+                } else {
+                    addrs.push(bintools.addressToString(chainid, addresses[i] as Buffer))
+                }
+            }
+        }
+        return addrs;
     }
 
     /**

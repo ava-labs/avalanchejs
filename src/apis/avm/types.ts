@@ -5,6 +5,7 @@ import {Buffer} from "buffer/";
 import { NBytes } from '../../utils/types';
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
+import { Output, SelectOutputClass, SecpOutBase } from './outputs';
 
 /**
  * @ignore
@@ -110,7 +111,67 @@ export class Address extends NBytes {
     }
 }
 
-export class Constants {
+export class InitialStates {
+    protected fxs:{[fxid:number]:Array<Output>} = {};
+
+    addOutput(out:Output, fxid:number):void {
+        if(!(fxid in this.fxs)){
+            this.fxs[fxid] = [];
+        }
+        this.fxs[fxid].push(out);
+    }
+
+    fromBuffer(bytes:Buffer, offset:number):number {
+        let result:{[fxid:number]:Array<Output>} = {};
+        let klen:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let klennum:number = klen.readUInt32BE(0);
+        for(let i = 0; i < klennum; i++){
+            let fxidbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+            offset += 4;
+            let fxid:number = fxidbuff.readUInt32BE(0);
+            result[fxid] = [];
+            let statelenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+            offset += 4;
+            let statelen:number = statelenbuff.readUInt32BE(0);
+            for(let j = 0; j < statelen; j++){
+                let abuff:Buffer = bintools.copyFrom(bytes, offset);
+                let out:Output = new SecpOutBase();
+                out.fromBuffer(abuff)
+                let outbuff:Buffer = out.toBuffer();
+                offset += outbuff.length;
+                result[fxid].push(out);
+            }
+        }
+        this.fxs = result;
+        return offset
+    }
+
+    toBuffer():Buffer {
+        let buff:Array<Buffer> = [];
+        let keys:Array<number> = Object.keys(this.fxs).map(k => parseInt(k)).sort();
+        let klen:Buffer = Buffer.alloc(4);
+        klen.writeUInt32BE(keys.length, 0);
+        buff.push(klen);
+        for(let i = 0; i < keys.length; i++){
+            let fxid:number = keys[i];
+            let fxidbuff:Buffer = Buffer.alloc(4);
+            fxidbuff.writeUInt32BE(fxid, 0);
+            buff.push(fxidbuff);
+            let initialState = this.fxs[fxid].sort(Output.comparator());
+            let statelen:Buffer = Buffer.alloc(4);
+            statelen.writeUInt32BE(initialState.length, 0);
+            buff.push(statelen);
+            for(let j = 0; j < initialState.length; j++){
+                buff.push(initialState[j].toBuffer());
+            }
+        }
+        return Buffer.concat(buff);
+    }
+    constructor(){}
+}
+
+export class AVMConstants {
     static SECPOUTPUTID:number = 4;
     static SECPINPUTID:number = 6;
     static CREATEASSETTX:number = 1;
@@ -121,6 +182,7 @@ export class Constants {
     static SYMBOLMAXLEN:number = 4;
     static ASSETNAMELEN:number = 128;
     static ADDRESSLENGTH:number = 20;
+    static SECPFXID:number = 0;
 }
 
 /**

@@ -2,9 +2,9 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import { Signature, Constants } from './types';
+import { Signature, AVMConstants, InitialStates } from './types';
 import { Output, SecpOutBase, SelectOutputClass } from './outputs';
-import { Input, SecpInput, SelectInputClass } from './inputs';
+import { Input, SelectInputClass } from './inputs';
 import BinTools from '../../utils/bintools';
 
 /**
@@ -187,13 +187,12 @@ export class TxCreateAsset extends TxUnsigned {
     protected symbol:string = "";
     protected symbolbuff:Buffer = Buffer.alloc(2);
     protected denomination:Buffer = Buffer.alloc(1);
-    protected numstate:Buffer = Buffer.alloc(4);
-    protected initialstate:Array<Output> = [];
+    protected initialstate:InitialStates = new InitialStates();
 
     /**
-     * Returns the array of [[Output]]s for the initial state
+     * Returns the array of array of [[Output]]s for the initial state
      */
-    getInitialState = ():Array<Output> => {
+    getInitialStates = ():InitialStates => {
         return this.initialstate;
     }
 
@@ -261,24 +260,15 @@ export class TxCreateAsset extends TxUnsigned {
         offset += symsize;
         this.denomination = bintools.copyFrom(bytes, offset, offset + 1);
         offset += 1;
-        this.numstate = bintools.copyFrom(bytes, offset, offset + 4);
-        let numstate:number = this.numstate.readUInt32BE(0);
-        offset += 4;
-        for(let i = 0; i < numstate; i++){
-            let outbuff:Buffer = bintools.copyFrom(bytes, offset)
-            let secpbase:SecpOutBase = new SecpOutBase();
-            offset += secpbase.fromBuffer(outbuff);
-            this.initialstate.push(secpbase);
-        }
+        let inits:InitialStates = new InitialStates();
+        offset = inits.fromBuffer(bytes, offset);
+        this.initialstate = inits;
 
         return offset;
     }
 
     toBuffer():Buffer {
-        let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.denomination, this.numstate];
-        for(let i:number = 0; i < this.initialstate.length; i++){
-            barr.push(this.initialstate[i].toBuffer());
-        }
+        let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.denomination, this.initialstate.toBuffer()];
         return Buffer.concat(barr);
     }
     
@@ -288,14 +278,14 @@ export class TxCreateAsset extends TxUnsigned {
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
-     * @param initialstate Optional array of [[Output]]s that represent the intial state of a created asset
+     * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
      * @param ins Optional array of the [[Input]]s
      * @param outs Optional array of the [[Output]]s
      * @param networkid Optional networkid, default 2
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param txtype Optional txtype, default 1
      */
-    constructor(name:string = undefined, symbol:string = undefined, denomination:number = undefined, initialstate:Array<Output> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = Constants.CREATEASSETTX) {
+    constructor(name:string = undefined, symbol:string = undefined, denomination:number = undefined, initialstate:InitialStates = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = AVMConstants.CREATEASSETTX) {
         super(ins, outs, networkid, blockchainid, txtype);
         if(typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number' && denomination >= 0 && denomination <= 32 && initialstate) {
             this.initialstate = initialstate;
@@ -304,7 +294,6 @@ export class TxCreateAsset extends TxUnsigned {
             this.symbolbuff = bintools.stringToBuffer(symbol);
             this.symbol = symbol;
             this.denomination.writeUInt8(denomination, 0);
-            this.numstate.writeUInt32BE(this.initialstate.length, 0);
         }
     }
 }
@@ -333,7 +322,7 @@ export class Tx {
             let sigarray:Array<Signature> = [];
             let credential:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
             offset += 4;
-            if(credential != Constants.SECPCREDENTIAL){
+            if(credential != AVMConstants.SECPCREDENTIAL){
                 /* istanbul ignore next */
                 throw new Error("Error - Tx.fromBuffer: Invalid credentialID " + credential);
             }
@@ -378,7 +367,7 @@ export class Tx {
                 let siglen:Buffer = Buffer.alloc(4);
                 siglen.writeUInt32BE(this.signatures[i].length, 0);
                 let credentialID = Buffer.alloc(4);
-                credentialID.writeUInt32BE(Constants.SECPCREDENTIAL, 0);
+                credentialID.writeUInt32BE(AVMConstants.SECPCREDENTIAL, 0);
                 barr.push(credentialID);
                 bsize += credentialID.length;
                 barr.push(siglen);

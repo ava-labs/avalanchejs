@@ -4,7 +4,7 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Address, UnixNow, Constants } from './types';
+import { Address, UnixNow, AVMConstants } from './types';
 
 const bintools = BinTools.getInstance();
 
@@ -16,9 +16,9 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class: [[OutputPayment]], [[OutTakeOrLeave]], [[OutCreateAsset]].
  */
 export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output => {
-    let assetid:Buffer = bintools.copyFrom(outbuffer, 0, Constants.ASSETIDLEN);
-    let outputid:number = outbuffer.readUInt32BE(Constants.ASSETIDLEN);
-    if(outputid == Constants.SECPOUTPUTID){
+    let assetid:Buffer = bintools.copyFrom(outbuffer, 0, AVMConstants.ASSETIDLEN);
+    let outputid:number = outbuffer.readUInt32BE(AVMConstants.ASSETIDLEN);
+    if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput(assetid, ...args);
         secpout.fromBuffer(outbuffer);
         return secpout;
@@ -254,7 +254,7 @@ export class SecpOutBase extends Output {
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      */
     constructor(amount?:BN, addresses?:Array<Buffer>, locktime?:BN, threshold?:number){
-        super(Constants.SECPOUTPUTID);
+        super(AVMConstants.SECPOUTPUTID);
         if(amount && addresses){
             this.amountValue = amount.clone();
             this.amount = bintools.fromBNToBuffer(amount, 8);
@@ -300,7 +300,7 @@ export class SecpOutput extends SecpOutBase {
 
     constructor(assetid?:Buffer, amount?:BN, addresses?:Array<Buffer>, locktime?:BN, threshold?:number){
         super(amount, addresses, locktime, threshold);
-        if(typeof assetid !== 'undefined' && assetid.length == Constants.ASSETIDLEN) {
+        if(typeof assetid !== 'undefined' && assetid.length == AVMConstants.ASSETIDLEN) {
             this.assetid = assetid;
         }
     }
