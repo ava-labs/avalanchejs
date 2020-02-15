@@ -618,48 +618,50 @@ export class UTXOSet {
         let outs:Array<SecpOutput> = [];
         let ins:Array<SecpInput> = [];
 
-        outs.push(new SecpOutput(assetID, amount, toAddresses, locktime, threshold));
+        if(amount.toNumber() !== 0){
+            outs.push(new SecpOutput(assetID, amount, toAddresses, locktime, threshold));
 
-        for(let i = 0; i < utxos.length && spendamount.lt(amount); i++){
-            if((assetID === undefined || (utxos[i].getAssetID().compare(assetID) == 0) && utxos[i].meetsThreshold(fromAddresses, asOf))){
-                let amt:BN = utxos[i].getAmount().clone();
-                spendamount = spendamount.add(amt);
-                change = spendamount.sub(amount);
-                change = change.gt(zero) ? change : zero.clone();
+            for(let i = 0; i < utxos.length && spendamount.lt(amount); i++){
+                if((assetID === undefined || (utxos[i].getAssetID().compare(assetID) == 0) && utxos[i].meetsThreshold(fromAddresses, asOf))){
+                    let amt:BN = utxos[i].getAmount().clone();
+                    spendamount = spendamount.add(amt);
+                    change = spendamount.sub(amount);
+                    change = change.gt(zero) ? change : zero.clone();
 
-                let txid:Buffer = utxos[i].getTxID();
-                let txidx:Buffer = utxos[i].getTxIdx();
-                let input:SecpInput = new SecpInput(txid, txidx, amt, assetID);
-                let spenders:Array<Buffer> = utxos[i].getSpenders(fromAddresses, asOf);
-                for(let j = 0; j < spenders.length; j++){
-                    let idx:number;
-                    idx = utxos[i].getAddressIdx(spenders[j]);
-                    if(idx == -1){
-                        /* istanbul ignore next */
-                        throw new Error("Error - UTXOSet.makeUnsignedTx: no such address in output: " + spenders[j]);
+                    let txid:Buffer = utxos[i].getTxID();
+                    let txidx:Buffer = utxos[i].getTxIdx();
+                    let input:SecpInput = new SecpInput(txid, txidx, amt, assetID);
+                    let spenders:Array<Buffer> = utxos[i].getSpenders(fromAddresses, asOf);
+                    for(let j = 0; j < spenders.length; j++){
+                        let idx:number;
+                        idx = utxos[i].getAddressIdx(spenders[j]);
+                        if(idx == -1){
+                            /* istanbul ignore next */
+                            throw new Error("Error - UTXOSet.makeUnsignedTx: no such address in output: " + spenders[j]);
+                        }
+                        input.addSignatureIdx(idx, spenders[j]);
                     }
-                    input.addSignatureIdx(idx, spenders[j]);
-                }
-                ins.push(input);
+                    ins.push(input);
 
-                if(change.gt(zero)){
-                    if(assetID) {
-                        outs.push(new SecpOutput(assetID, change, changeAddresses, zero.clone(), 1));
-                    } 
-                    break;
+                    if(change.gt(zero)){
+                        if(assetID) {
+                            outs.push(new SecpOutput(assetID, change, changeAddresses, zero.clone(), 1));
+                        } 
+                        break;
+                    }
+                    /* istanbul ignore next */
+                    if(spendamount.gte(amount)){
+                        break;
+                    }
+                } else {
+                    continue;
                 }
-                /* istanbul ignore next */
-                if(spendamount.gte(amount)){
-                    break;
-                }
-            } else {
-                continue;
             }
-        }
 
-        if(spendamount.lt(amount)){
-            /* istanbul ignore next */
-            throw new Error("Error - UTXOSet.makeUnsignedTx: insufficient funds to create the transaction");
+            if(spendamount.lt(amount)){
+                /* istanbul ignore next */
+                throw new Error("Error - UTXOSet.makeUnsignedTx: insufficient funds to create the transaction");
+            }
         }
 
         return new TxUnsigned(ins, outs, networkid, blockchainid);

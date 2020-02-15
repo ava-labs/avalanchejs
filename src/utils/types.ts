@@ -299,6 +299,15 @@ export class KeyChain<KPClass extends KeyPair> {
     }
 
     /**
+     * Gets an array of addresses stored in the [[KeyChain]].
+     * 
+     * @returns An array of string representations of the addresses
+     */
+    getAddressStrings = ():Array<string> => {
+        return Object.values(this.keys).map(kp => kp.getAddressString());
+    }
+
+    /**
      * Adds the key pair to the list of the keys managed in the [[KeyChain]].
      * 
      * @param newKey A key pair of the appropriate class to be added to the [[KeyChain]]
@@ -506,7 +515,7 @@ export class Defaults {
         12345: {
             "avm": n2_avm,
             "X": n2_avm,
-            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
+            "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU": n2_avm,
             "platform": n2_platform,
             "P": n2_platform,
             "BCID1": n2_platform,
