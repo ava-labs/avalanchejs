@@ -115,15 +115,15 @@ let newAddress1 = myKeychain.makeKey();
 You may also import your exsting private key into the keychain using either a Buffer...
 
 ```js
-let mypk = Buffer.from("330530eda3225d280d42efc5f02d31d122da3da3093c739ddd7d16612c7dfd53", "hex");
+let mypk = bintools.avaDeserialize("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
 let newAddress2 = myKeychain.importKey(mypk);
 ```
 
 ... or an AVA serialized string works, too:
 
 ```js
-let mypk = "2LvB5YuMA4F4fFeeYDFbFxWCNBBW1317L";
-let newAddress2 = myKeychain.importKey(mypk);
+let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
+let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
 ```
 
 ### Working with keychains
@@ -131,7 +131,8 @@ let newAddress2 = myKeychain.importKey(mypk);
 The AVMKeyChain extends the global KeyChain class, which has standardized key management capabilities. The following functions are available on any keychain that implements this interface.
 
 ```js
-let addresses = myKeychain.getAddresses(); //returns an array of all addresses managed
+let addresses = avm.keyChain().getAddresses(); //returns an array of Buffers for the addresses
+let addressStrings = avm.keyChain().getAddressStrings(); //returns an array of strings for the addresses
 let exists = myKeychain.hasKey(myaddress); //returns true if the address is managed
 let keypair = myKeychain.getKey(myaddress); //returns the keypair class
 ```
@@ -141,7 +142,8 @@ let keypair = myKeychain.getKey(myaddress); //returns the keypair class
 The AVMKeyPair class implements the global KeyPair class, which has standardized keypair functionality. The following operations are available on any keypair that implements this interface.
 
 ```js
-let addresses = avm.keyChain().getAddresses();
+let address = keypair.getAddress(); //returns Buffer
+let addressString = keypair.getAddressString(); //returns string
 
 let pubk = keypair.getPublicKey(); //returns Buffer
 let pubkstr = keypair.getPublicKeyString(); //returns an AVA serialized string
@@ -151,7 +153,7 @@ let privkstr = keypair.getPrivateKeyString(); //returns an AVA serialized string
 
 keypair.generateKey(); //creates a new random keypair
 
-let mypk = Buffer.from("263956e2a04bef77ff8c4834a1c26158e28e040c7621c89c5feab1b3054ec699", "hex");
+let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
 let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
 
 let message = "Wubalubadubdub";
@@ -172,57 +174,56 @@ let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 
 ### Describe the new asset
 
-The first steps in creating a new asset using Slopes is to determine the qualties of the asset. We want to mint an asset with 100,000 coins and issue it to three known addresses we control. We require two of the three addresses to spend this output. 
-
-*Note: This example assumes we have the keys already managed in our AVM Keychain. We are explicit with the addresses to demonstrate serialization.*
+The first steps in creating a new asset using Slopes is to determine the qualties of the asset. We will give the asset a name, a ticker symbol, as well as a denomination. 
 
 ```js
-// The amount to mint for the asset
-let amount = new BN(400)
+// The fee to pay for the asset, we assume this network is fee-less
+let fee = new BN(0);
 
-// The addresses to issue the minted coins, in hex
-let address1 = "c3344128e060128ede3523a24a461c8943ab0859";
-let address2 = "51025c61fbcfc078f69334f834be6dd26d55a955";
-let address3 = "B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //already serialized! Yay!
+// Name our new coin and give it a symbol
+let name = "Rickcoin is the most intelligent coin";
+let symbol = "RICK";
 
-// The AVA addressing format requires base-58 with a checksum
-// This serializes the addresses and places them into an array
-// Note: "address3" is already seralized! Yay!
-let addresses = [
-    bintools.avaSerialize(Buffer.from(address1, "hex")),
-    bintools.avaSerialize(Buffer.from(address2, "hex")),
-    address3
-];
+// Where is the decimal point indicate what 1 asset is and where fractional assets begin
+// Ex: 1 $AVA is denomination 9, so the smallest unit of $AVA is nano-AVA ($nAVA) at 10^-9 $AVA
+let denomination = 9;
+```
 
-// We require 2 addresses to sign in order to spend this initial asset's minted coins
-let threshold = 2;
+### Creating the initial state
+
+We want to mint an asset with 400 coins to all of our managed keys, 500 to the second address we know of, and 600 to the second and third address. This sets up the state that will result from the Create Asset transaction. 
+
+*Note: This example assumes we have the keys already managed in our AVM Keychain.*
+
+```js
+let addresses = avm.keyChain().getAddresses();
+
+// Create outputs for the asset's initial state
+let secpbase1 = new slopes.SecpOutBase(new BN(400), addresses);
+let secpbase2 = new slopes.SecpOutBase(new BN(500), [addresses[1]]);
+let secpbase3 = new slopes.SecpOutBase(new BN(600), [addresses[1], addresses[2]]);
+
+// Populate the initialState array
+// The AVM needs to know what type of output is produced. 
+// The constant slopes.AVMConstants.SECPFXID is the correct output.
+// It specifies that we are using a secp256k1 signature scheme for this output.
+let initialState = new slopes.InitialStates();
+initialState.addOutput(secpbase1, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpbase2, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpbase3, slopes.AVMConstants.SECPFXID);
 ```
 
 ### Creating the signed transaction
 
-Now that we know what we want an asset to look like, we create an output to send to the network. This process is fairly straight-forward:
-
-  1. We instantiate an output of the type "Create Asset" populated with the desired parameters.
-  2. We create an unsigned transaction from an array of inputs and outputs.
-     * Inputs come from the UTXOs and are spent in a transaction.
-     * In this case there are no unspent assets, so the input array is blank.
-  3. We use our AVM Keychain to sign and return the signed transaction.
+Now that we know what we want an asset to look like, we create an output to send to the network. There is an AVM helper function `makeCreateAssetTx()` which does just that. 
 
 ```js
-//Create an output to issue to the network
-//Parameters sent are (in order of appearance):
-//   * An amount as a BN
-//   * The recipients of the minted assets as an array of address strings
-//   * The locktime is undefined for simplicity, but it's a BN as well
-//   * A threshold number of signatures required to spend the resultant Output
-let output = new slopes.OutCreateAsset(amount, addresses, undefined, threshold);
+// Fetch the UTXOSet for our addresses
+let utxos = await avm.getUTXOs(addresses);
 
-//A manually created TxUinsigned needs to its networkID and the blockchainID passed in
-let networkID = ava.getNetworkID();
-let blockchainID = bintools.avaDeserialize(ava.AVM().getBlockchainID());
+// Make an unsigned Create Asset transaction from the data compiled earlier
+let unsigned = await avm.makeCreateAssetTx(utxos, fee, addresses, initialState, name, symbol, denomination);
 
-//Creating the unsigned transaction
-let unsigned = new slopes.TxUnsigned([], [output], networkID, blockchainID);
 let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 ```
 
@@ -305,7 +306,7 @@ We have 400 coins! We're going to now send 100 of those coins to our friend's ad
 
 ```js
 let sendAmount = new BN(100); //amounts are in BN format
-let friendsAddress = "B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized address format
+let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized address format
 
 //The below returns a TxUnsigned
 //Parameters sent are (in order of appearance):
