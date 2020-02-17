@@ -668,6 +668,9 @@ class AVMAPI extends JRPCAPI{
         });
     }
 
+    /**
+     * @ignore
+     */
     protected _cleanAddressArray(addresses:Array<string> | Array<Buffer>, caller:string):Array<string> {
         let addrs:Array<string> = [];
         let chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
@@ -695,14 +698,14 @@ class AVMAPI extends JRPCAPI{
      */
     constructor(core:SlopesCore, baseurl:string = "/ext/bc/avm", blockchainID:string = ""){ 
         super(core, baseurl);
+        this.blockchainID = blockchainID
         let netid:number = core.getNetworkID();
-        if(netid in Defaults.network && this.blockchainID in Defaults.network[netid]){
-            let alias = Defaults.network[netid][this.blockchainID].alias;
+        if(netid in Defaults.network && blockchainID in Defaults.network[netid]){
+            let alias = Defaults.network[netid][blockchainID].alias;
             this.keychain = new AVMKeyChain(alias);
         } else {
             this.keychain = new AVMKeyChain(blockchainID);
         }
-        this.blockchainID = blockchainID
     }
 }
 

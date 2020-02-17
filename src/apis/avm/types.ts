@@ -111,10 +111,18 @@ export class Address extends NBytes {
     }
 }
 
+/**
+ * Class for creating initial output states used in asset creation
+ */
 export class InitialStates {
     protected fxs:{[fxid:number]:Array<Output>} = {};
 
-    addOutput(out:Output, fxid:number):void {
+    /**
+     * 
+     * @param out The output state to add to the collection
+     * @param fxid The FxID that will be used for this output, default AVMConstants.SECPFXID
+     */
+    addOutput(out:Output, fxid:number = AVMConstants.SECPFXID):void {
         if(!(fxid in this.fxs)){
             this.fxs[fxid] = [];
         }
