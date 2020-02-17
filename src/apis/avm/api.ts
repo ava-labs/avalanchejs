@@ -510,7 +510,7 @@ class AVMAPI extends JRPCAPI{
      * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s.
      * 
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param amount The amount of AVA to be spent in NanoAVA
+     * @param amount The amount of AVA to be spent in $nAVA
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
@@ -550,7 +550,7 @@ class AVMAPI extends JRPCAPI{
      * [[TxCreateAsset]] manually (with their corresponding [[Input]]s, [[Output]]s).
      * 
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param fee The amount of AVA to be paid for fees, in NanoAVA
+     * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param creatorAddresses The addresses to send the fees
      * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset

@@ -36,7 +36,7 @@ export abstract class APIBase {
     /**
      * Sets the path of the APIs baseurl.
      * 
-     * @param baseurl Path of the APIs baseurl - ex: "/ext/ava"
+     * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
      */
     setBaseURL = (baseurl:string) => {
         if(this.db && this.baseurl !== baseurl){

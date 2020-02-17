@@ -37,7 +37,7 @@ const bintools = BinTools.getInstance();
 
 
 /**
- * Class for representing a private and public keypair in AVAJS. 
+ * Class for representing a private and public keypair in the AVM. 
  */
 export class AVMKeyPair extends KeyPair {
     protected keypair:elliptic.ec.KeyPair
@@ -191,7 +191,7 @@ export class AVMKeyPair extends KeyPair {
     }
 
     /**
-     * Class for representing a private and public keypair in AVAJS. 
+     * Class for representing a private and public keypair in Slopes. 
      */
     constructor(chainid:string, entropy:Buffer = undefined) {
         super(chainid);
@@ -201,7 +201,7 @@ export class AVMKeyPair extends KeyPair {
 }
 
 /**
- * Class for representing a key chain in AVAJS. 
+ * Class for representing a key chain in Slopes. 
  * 
  * @typeparam AVMKeyPair Class extending [[KeyPair]] which is used as the key in [[AVMKeyChain]]
  */

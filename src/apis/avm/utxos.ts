@@ -599,7 +599,7 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param amount The amount of AVA to be spent in NanoAVA
+     * @param amount The amount of AVA to be spent in $nAVA
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
@@ -673,7 +673,7 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param fee The amount of AVA to be paid for fees, in NanoAVA
+     * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param creatorAddresses The addresses to send the fees
      * @param initialState The [[InitialStates]]that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset

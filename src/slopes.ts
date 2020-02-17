@@ -224,7 +224,7 @@ export default class SlopesCore {
     }
     
     /**
-     * Creates a new AVAJS instance. Sets the address and port of the main AVA Client.
+     * Creates a new Slopes instance. Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client APIs
      * @param port The port to reolve to reach the AVA Client APIs
