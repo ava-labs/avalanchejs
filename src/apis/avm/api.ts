@@ -604,7 +604,7 @@ class AVMAPI extends JRPCAPI{
     issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
         let Transaction = new Tx();
         if(typeof tx === 'string'){
-            Transaction.fromBuffer(bintools.avaDeserialize(tx));
+            Transaction.fromString(tx);
         } else if(tx instanceof Buffer){
             Transaction.fromBuffer(tx);
         } else if(tx instanceof Tx) {
