@@ -12,7 +12,7 @@ import { StoreAPI } from "store2";
  * 
  * ```js
  * const db = DB.getInstance();
- * const subnetdb = db.getNamespace("mysubnet");
+ * const blockchaindb = db.getNamespace("mychain");
  * ```
  */
 export default class DB {

@@ -161,12 +161,12 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
-     * Gets the balance of a particular asset on a subnet.
+     * Gets the balance of a particular asset on a blockchain.
      * 
      * @param address The address to pull the asset balance from
      * @param assetID The assetID to pull the balance from
      * 
-     * @returns Promise with the balance of the assetID on the provided address for the subnet.
+     * @returns Promise with the balance of the assetID on the provided address for the blockchain.
      */
     getBalance = async (address:string, assetID:string):Promise<number> => {
         if(typeof this.parseAddress(address) === "undefined"){
@@ -184,12 +184,12 @@ class AVMAPI extends JRPCAPI{
 
 
     /**
-     * Creates an address (and associated private keys) on a user under a subnet.
+     * Creates an address (and associated private keys) on a user on a blockchain.
      * 
      * @param username Name of the user to create the address under
      * @param password Password to unlock the user and encrypt the private key
      * 
-     * @returns Promise for a string representing the address created by the subnet.
+     * @returns Promise for a string representing the address created by the vm.
      */
     createAddress = async (username:string, password:string):Promise<string> => {
         let params = {
@@ -368,11 +368,11 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
-     * Imports a private key into the node's database under an user and for a subnet.
+     * Imports a private key into the node's keystore under an user and for a blockchain.
      * 
      * @param username The name of the user to store the private key
      * @param password The password that unlocks the user
-     * @param privateKey A string representing the private key in the subnet's format
+     * @param privateKey A string representing the private key in the vm's format
      * 
      * @returns The address for the imported private key.
      */
@@ -393,7 +393,7 @@ class AVMAPI extends JRPCAPI{
      * @param username The user to list addresses
      * @param password The password of the user to list the addresses
      * 
-     * @returns Promise of an array of address strings in the format specified by the subnet.
+     * @returns Promise of an array of address strings in the format specified by the blockchain.
      */
     listAddresses = async (username:string, password:string): Promise<Array<string>> => {
         let params = {
@@ -410,7 +410,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @param address The address to get a list of assets
      * 
-     * @returns Promise of an array of assetIDs for the address on the subnet.
+     * @returns Promise of an array of assetIDs for the address on the blockchain.
      */
     listAssets = async (address:string):Promise<Array<string>> => {
         if(typeof this.parseAddress(address) === "undefined"){
@@ -629,7 +629,7 @@ class AVMAPI extends JRPCAPI{
      * @param assetID The assetID of the asset to send
      * @param amount The amount of the asset to be sent
      * @param to The address of the recipient
-     * @param from An array of addresses managed by the node for this subnet which will fund this transaction
+     * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
      * 
      * @returns Promise for the string representing the transaction's ID.
      */
@@ -694,7 +694,7 @@ class AVMAPI extends JRPCAPI{
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
-     * @param baseurl Defaults to the string "/ext/bc/avm" as the path to subnets baseurl
+     * @param baseurl Defaults to the string "/ext/bc/avm" as the path to blockchain's baseurl
      */
     constructor(core:SlopesCore, baseurl:string = "/ext/bc/avm", blockchainID:string = ""){ 
         super(core, baseurl);

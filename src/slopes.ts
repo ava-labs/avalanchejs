@@ -79,16 +79,16 @@ export default class SlopesCore {
     }
 
     /**
-     * Adds an API to the middleware. The API resolves to a registered subnet's RPC. 
+     * Adds an API to the middleware. The API resolves to a registered blockchain's RPC. 
      * 
      * In TypeScript:
      * ```js
-     * slopes.addAPI<MyVMClass>("mysubnet", MyVMClass, "/ext/subnet/mysubnet");
+     * slopes.addAPI<MyVMClass>("mychain", MyVMClass, "/ext/bc/mychain");
      * ```
      * 
      * In Javascript:
      * ```js
-     * slopes.addAPI("mysubnet", MyVMClass, "/ext/subnet/mysubnet");
+     * slopes.addAPI("mychain", MyVMClass, "/ext/bc/mychain");
      * ```
      * 
      * @typeparam GA Class of the API being added

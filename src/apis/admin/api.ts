@@ -114,7 +114,7 @@ export class AdminAPI extends JRPCAPI{
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
-     * @param baseurl Defaults to the string "/ext/admin" as the path to subnets baseurl
+     * @param baseurl Defaults to the string "/ext/admin" as the path to rpc's baseurl
      */
     constructor(core:SlopesCore, baseurl:string = "/ext/admin"){ super(core, baseurl); }
 }
