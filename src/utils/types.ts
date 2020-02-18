@@ -493,7 +493,7 @@ export class Defaults {
         2: {
             "avm": n2_avm,
             "X": n2_avm,
-            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
+            "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h": n2_avm,
             "platform": n2_platform,
             "P": n2_platform,
             "BCID1": n2_platform,
