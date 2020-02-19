@@ -29,6 +29,7 @@
     "@types/bn.js": "^4.11.6",
     "@types/create-hash": "^1.2.2",
     "@types/jest": "^24.0.25",
+    "@types/libsodium-wrappers": "^0.7.7",
     "@types/node": "^12.12.24",
     "clean-webpack-plugin": "^3.0.0",
     "expose-loader": "^0.7.5",
@@ -58,7 +59,7 @@
     "buffer": "^5.4.3",
     "create-hash": "^1.2.0",
     "elliptic": "^6.5.2",
-    "libsodium": "^0.7.6",
+    "libsodium-wrappers": "^0.7.6",
     "secp256k1": "^4.0.0",
     "store2": "^2.10.0"
   }
