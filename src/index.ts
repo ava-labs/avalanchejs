@@ -90,6 +90,7 @@ export * from './apis/admin/api';
 export * from './utils/types';
 export * from './utils/bintools';
 export * from './utils/db';
+export * from './utils/crypto';
 
 export {Tx, TxUnsigned, TxCreateAsset} from './apis/avm/tx';
 export {UTXO, SecpUTXO, UTXOSet, SelectUTXOClass} from './apis/avm/utxos';	
