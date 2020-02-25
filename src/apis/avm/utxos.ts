@@ -609,7 +609,18 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeUnsignedTx = (networkid:number, blockchainid:Buffer, amount:BN, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, changeAddresses:Array<Buffer>, assetID:Buffer, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):TxUnsigned => {
+    makeUnsignedTx = (
+            networkid:number, 
+            blockchainid:Buffer, 
+            amount:BN, 
+            toAddresses:Array<Buffer>, 
+            fromAddresses:Array<Buffer>, 
+            changeAddresses:Array<Buffer>, 
+            assetID:Buffer, 
+            asOf:BN = UnixNow(), 
+            locktime:BN = new BN(0), 
+            threshold:number = 1
+        ):TxUnsigned => {
         const zero:BN = new BN(0);
         let spendamount:BN = zero.clone();
         let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDs(fromAddresses));
@@ -618,7 +629,7 @@ export class UTXOSet {
         let outs:Array<SecpOutput> = [];
         let ins:Array<SecpInput> = [];
 
-        if(amount.toNumber() !== 0){
+        if(!amount.eq(zero)){
             outs.push(new SecpOutput(assetID, amount, toAddresses, locktime, threshold));
 
             for(let i = 0; i < utxos.length && spendamount.lt(amount); i++){
