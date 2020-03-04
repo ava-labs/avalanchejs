@@ -9,6 +9,7 @@ import AdminAPI from './apis/admin/api';
 import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
+import { Defaults } from './utils/types';
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 
@@ -56,14 +57,18 @@ export class Slopes extends SlopesCore {
      * @param port The port to reolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default 2
-     * @param avmChainID Sets the blockchainID for the AVM. Default "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7"
+     * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect, otherwise default "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7"
      * @param skipinit Skips creating the APIs
      */
     constructor(ip:string, port:number, protocol:string = "http", networkID:number = 2, avmChainID:string = undefined, skipinit:boolean = false) {
         super(ip, port, protocol);
         let chainid = avmChainID;
         if(typeof avmChainID === 'undefined' || !avmChainID){
-            chainid = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
+            if(networkID in Defaults.network){
+                chainid = Defaults.network[networkID]["avm"].blockchainID
+            } else {
+                chainid = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
+            }
         }
         if(typeof networkID === 'number' && networkID >= 0){
             this.networkID = networkID;
