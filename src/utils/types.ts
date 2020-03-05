@@ -470,21 +470,21 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    blockchainID: "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h",
-    alias: "X",
-    vm: "avm"
+    "blockchainID": "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h",
+    "alias": "X",
+    "vm": "avm"
 };
 
 let n2_platform:object =  {
-    blockchainID: "",
-    alias: "P",
-    vm: "platform"
+    "blockchainID": "",
+    "alias": "P",
+    "vm": "platform"
 };
 
 let n2_contracts:object = {
-    blockchainID: "",
-    alias: "C",
-    vm: "contracts"
+    "blockchainID": "",
+    "alias": "C",
+    "vm": "contracts"
 }
 
 let n49_avm = Object.assign({}, n2_avm);
