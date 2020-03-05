@@ -488,13 +488,13 @@ let n2_contracts:object = {
 }
 
 let n49_avm = Object.assign({}, n2_avm);
-n49_avm["blockChainID"] = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
+n49_avm["blockchainID"] = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
 let n49_platform = Object.assign({}, n2_avm);
 let n49_contracts = Object.assign({}, n2_avm);
 
 
 let n12345_avm:object = Object.assign({}, n2_avm);
-n12345_avm["blockChainID"] = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU";
+n12345_avm["blockchainID"] = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU";
 let n12345_platform = Object.assign({}, n2_avm);
 let n12345_contracts = Object.assign({}, n2_avm);
 
