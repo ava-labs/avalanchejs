@@ -489,8 +489,8 @@ let n2_contracts:object = {
 
 export class Defaults {
     static network = {
-        1: {}, //update before mainnet
-        2: {
+        "1": {}, //update before mainnet
+        "2": {
             "avm": n2_avm,
             "X": n2_avm,
             "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h": n2_avm,
@@ -501,7 +501,7 @@ export class Defaults {
             "C": n2_contracts,
             "BCID2": n2_contracts
         },
-        49: {
+        "49": {
             "avm": n2_avm,
             "X": n2_avm,
             "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
@@ -512,7 +512,7 @@ export class Defaults {
             "C": n2_contracts,
             "BCID2": n2_contracts
         },
-        12345: {
+        "12345": {
             "avm": n2_avm,
             "X": n2_avm,
             "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU": n2_avm,
