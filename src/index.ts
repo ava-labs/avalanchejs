@@ -63,7 +63,7 @@ export class Slopes extends SlopesCore {
     constructor(ip:string, port:number, protocol:string = "http", networkID:number = 2, avmChainID:string = undefined, skipinit:boolean = false) {
         super(ip, port, protocol);
         let chainid = avmChainID;
-        if(typeof avmChainID === 'undefined' || !avmChainID){
+        if(typeof avmChainID === 'undefined' || !avmChainID || (typeof avmChainID === "string" && avmChainID.toLowerCase() == "avm")){
             if(networkID in Defaults.network){
                 chainid = Defaults.network[networkID]["avm"].blockchainID
             } else {
