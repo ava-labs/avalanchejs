@@ -470,7 +470,7 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    blockchainID: "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7",
+    blockchainID: "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h",
     alias: "X",
     vm: "avm"
 };
@@ -487,6 +487,17 @@ let n2_contracts:object = {
     vm: "contracts"
 }
 
+let n49_avm = Object.assign({}, n2_avm);
+n49_avm["blockChainID"] = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
+let n49_platform = Object.assign({}, n2_avm);
+let n49_contracts = Object.assign({}, n2_avm);
+
+
+let n12345_avm:object = Object.assign({}, n2_avm);
+n12345_avm["blockChainID"] = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU";
+let n12345_platform = Object.assign({}, n2_avm);
+let n12345_contracts = Object.assign({}, n2_avm);
+
 export class Defaults {
     static network = {
         "1": {}, //update before mainnet
@@ -502,26 +513,26 @@ export class Defaults {
             "BCID2": n2_contracts
         },
         "49": {
-            "avm": n2_avm,
-            "X": n2_avm,
-            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n2_avm,
-            "platform": n2_platform,
-            "P": n2_platform,
-            "BCID1": n2_platform,
-            "contracts": n2_contracts,
-            "C": n2_contracts,
-            "BCID2": n2_contracts
+            "avm": n49_avm,
+            "X": n49_avm,
+            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n49_avm,
+            "platform": n49_platform,
+            "P": n49_platform,
+            "BCID1": n49_platform,
+            "contracts": n49_contracts,
+            "C": n49_contracts,
+            "BCID2": n49_contracts
         },
         "12345": {
-            "avm": n2_avm,
-            "X": n2_avm,
-            "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU": n2_avm,
-            "platform": n2_platform,
-            "P": n2_platform,
-            "BCID1": n2_platform,
-            "contracts": n2_contracts,
-            "C": n2_contracts,
-            "BCID2": n2_contracts
+            "avm": n12345_avm,
+            "X": n12345_avm,
+            "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU": n12345_avm,
+            "platform": n12345_platform,
+            "P": n12345_platform,
+            "BCID1": n12345_platform,
+            "contracts": n12345_contracts,
+            "C": n12345_contracts,
+            "BCID2": n12345_contracts
         }
     };
 }
