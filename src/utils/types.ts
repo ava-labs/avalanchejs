@@ -470,7 +470,7 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    "blockchainID": "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h",
+    "blockchainID": "m383Jyn4z9kYmyMamjHwoExocRRV7ondsci862bbv1FSrqvH9",
     "alias": "X",
     "vm": "avm"
 };
@@ -488,13 +488,13 @@ let n2_contracts:object = {
 }
 
 let n49_avm = Object.assign({}, n2_avm);
-n49_avm["blockchainID"] = "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7";
+n49_avm["blockchainID"] = "tHLiSpCwUQQVZ6W4GMjVzx5JiFRgZBrniTBqaxFLdqBJKk8YN";
 let n49_platform = Object.assign({}, n2_avm);
 let n49_contracts = Object.assign({}, n2_avm);
 
 
 let n12345_avm:object = Object.assign({}, n2_avm);
-n12345_avm["blockchainID"] = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU";
+n12345_avm["blockchainID"] = "ddV3GvdmdeQkaxLRo9LH5AbDNyU9bDu6SqWak7x9UXMbupksK";
 let n12345_platform = Object.assign({}, n2_avm);
 let n12345_contracts = Object.assign({}, n2_avm);
 
@@ -504,7 +504,7 @@ export class Defaults {
         "2": {
             "avm": n2_avm,
             "X": n2_avm,
-            "tgD9UkhtroPPvs3hqfJhNk22bTqpLHBFRKVx2p2WypvUGRg7h": n2_avm,
+            "m383Jyn4z9kYmyMamjHwoExocRRV7ondsci862bbv1FSrqvH9": n2_avm,
             "platform": n2_platform,
             "P": n2_platform,
             "BCID1": n2_platform,
@@ -515,7 +515,7 @@ export class Defaults {
         "49": {
             "avm": n49_avm,
             "X": n49_avm,
-            "HD8HEwNKTXRBcVUqvQW2LRu9izqej91xzGmXATF4KMMV6LLm7": n49_avm,
+            "tHLiSpCwUQQVZ6W4GMjVzx5JiFRgZBrniTBqaxFLdqBJKk8YN": n49_avm,
             "platform": n49_platform,
             "P": n49_platform,
             "BCID1": n49_platform,
@@ -526,7 +526,7 @@ export class Defaults {
         "12345": {
             "avm": n12345_avm,
             "X": n12345_avm,
-            "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU": n12345_avm,
+            "ddV3GvdmdeQkaxLRo9LH5AbDNyU9bDu6SqWak7x9UXMbupksK": n12345_avm,
             "platform": n12345_platform,
             "P": n12345_platform,
             "BCID1": n12345_platform,
