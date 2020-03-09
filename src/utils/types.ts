@@ -487,16 +487,12 @@ let n2_contracts:object = {
     "vm": "contracts"
 }
 
-let n49_avm = Object.assign({}, n2_avm);
-n49_avm["blockchainID"] = "tHLiSpCwUQQVZ6W4GMjVzx5JiFRgZBrniTBqaxFLdqBJKk8YN";
-let n49_platform = Object.assign({}, n2_avm);
-let n49_contracts = Object.assign({}, n2_avm);
-
-
 let n12345_avm:object = Object.assign({}, n2_avm);
-n12345_avm["blockchainID"] = "ddV3GvdmdeQkaxLRo9LH5AbDNyU9bDu6SqWak7x9UXMbupksK";
-let n12345_platform = Object.assign({}, n2_avm);
-let n12345_contracts = Object.assign({}, n2_avm);
+n12345_avm["blockchainID"] = "i8KtK2KwLi1o7WaVBbEKpRLPtAEYayfoptqAFYxfQgrus1g6m";
+let n12345_platform = Object.assign({}, n2_platform);
+n12345_platform["blockchainID"] = "11111111111111111111111111111111LpoYY";
+let n12345_contracts = Object.assign({}, n2_contracts);
+n12345_platform["blockchainID"] = "MTHoZAP3gGHB4cAUpFB1CuYnh3uDoMkte6FjLb9Sn5Hx8Bkvb";
 
 export class Defaults {
     static network = {
@@ -518,13 +514,13 @@ export class Defaults {
         "12345": {
             "avm": n12345_avm,
             "X": n12345_avm,
-            "ddV3GvdmdeQkaxLRo9LH5AbDNyU9bDu6SqWak7x9UXMbupksK": n12345_avm,
+            "i8KtK2KwLi1o7WaVBbEKpRLPtAEYayfoptqAFYxfQgrus1g6m": n12345_avm,
             "platform": n12345_platform,
             "P": n12345_platform,
-            "BCID1": n12345_platform,
+            "11111111111111111111111111111111LpoYY": n12345_platform,
             "contracts": n12345_contracts,
             "C": n12345_contracts,
-            "BCID2": n12345_contracts
+            "MTHoZAP3gGHB4cAUpFB1CuYnh3uDoMkte6FjLb9Sn5Hx8Bkvb": n12345_contracts
         }
     };
 }
