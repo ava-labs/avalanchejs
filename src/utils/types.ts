@@ -501,6 +501,8 @@ let n12345_contracts = Object.assign({}, n2_avm);
 export class Defaults {
     static network = {
         "1": {}, //update before mainnet
+        /* 
+        This will be set on test network.
         "2": {
             "avm": n2_avm,
             "X": n2_avm,
@@ -511,18 +513,8 @@ export class Defaults {
             "contracts": n2_contracts,
             "C": n2_contracts,
             "BCID2": n2_contracts
-        },
-        "49": {
-            "avm": n49_avm,
-            "X": n49_avm,
-            "tHLiSpCwUQQVZ6W4GMjVzx5JiFRgZBrniTBqaxFLdqBJKk8YN": n49_avm,
-            "platform": n49_platform,
-            "P": n49_platform,
-            "BCID1": n49_platform,
-            "contracts": n49_contracts,
-            "C": n49_contracts,
-            "BCID2": n49_contracts
-        },
+        }
+        */
         "12345": {
             "avm": n12345_avm,
             "X": n12345_avm,

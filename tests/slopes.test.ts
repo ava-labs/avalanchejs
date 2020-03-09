@@ -16,7 +16,7 @@ describe('Slopes', () => {
     const protocol = "https";
     let slopes:Slopes;
     beforeAll(() => {
-        slopes = new Slopes(ip,port,protocol, 49, undefined, true);
+        slopes = new Slopes(ip,port,protocol, 12345, undefined, true);
         slopes.addAPI("admin", AdminAPI);
         slopes.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
         slopes.addAPI("keystore", KeystoreAPI);
@@ -27,11 +27,11 @@ describe('Slopes', () => {
         expect(slopes.getPort()).toBe(port);
         expect(slopes.getProtocol()).toBe(protocol);
         expect(slopes.getURL()).toBe(`${protocol}://${ip}:${port}`);
-        expect(slopes.getNetworkID()).toBe(49);
+        expect(slopes.getNetworkID()).toBe(12345);
         slopes.setNetworkID(50);
         expect(slopes.getNetworkID()).toBe(50);
-        slopes.setNetworkID(49);
-        expect(slopes.getNetworkID()).toBe(49);
+        slopes.setNetworkID(12345);
+        expect(slopes.getNetworkID()).toBe(12345);
     });
 
     test('Endpoints correct', () => {
@@ -75,7 +75,7 @@ describe('HTTP Operations', () => {
     const path = "/ext/testingrequests";
     let slopes:Slopes;
     beforeAll(() => {
-        slopes = new Slopes(ip,port, protocol, 49, undefined, true);
+        slopes = new Slopes(ip,port, protocol, 12345, undefined, true);
         slopes.addAPI("testingrequests", TestAPI, path);
     });
 

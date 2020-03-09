@@ -11,7 +11,7 @@ describe("Admin", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol, 49, "What is my purpose? You pass butter. Oh my god.", false);
+    let slopes:Slopes = new Slopes(ip,port,protocol, 12345, "What is my purpose? You pass butter. Oh my god.", false);
     let admin:AdminAPI;
 
     beforeAll(() => {
@@ -26,7 +26,7 @@ describe("Admin", () => {
         let result:Promise<number> = admin.getNetworkID();
         let payload:object = {
             "result": {
-                "networkID": 49
+                "networkID": 12345
             }
         };
         let responseObj = {
@@ -37,7 +37,7 @@ describe("Admin", () => {
         let response:number = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(49);
+        expect(response).toBe(12345);
     });
 
     test("getBlockchainID", async ()=>{

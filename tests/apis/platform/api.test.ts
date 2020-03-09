@@ -12,7 +12,7 @@ describe("Platform", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes = new Slopes(ip,port,protocol, 49, undefined, true);
+    let slopes = new Slopes(ip,port,protocol, 12345, undefined, true);
     let platform:PlatformAPI;
 
     beforeAll(() => {

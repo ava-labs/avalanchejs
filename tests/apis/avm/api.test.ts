@@ -19,8 +19,8 @@ import { InitialStates } from '../../../src/apis/avm/types';
 const bintools = BinTools.getInstance();
 
 describe("AVMAPI", () => {
-    const networkid:number = 49;
-    const blockchainid:string = "tHLiSpCwUQQVZ6W4GMjVzx5JiFRgZBrniTBqaxFLdqBJKk8YN";
+    const networkid:number = 12345;
+    const blockchainid:string = "ddV3GvdmdeQkaxLRo9LH5AbDNyU9bDu6SqWak7x9UXMbupksK";
     const ip:string = '127.0.0.1';
     const port:number = 9650;
     const protocol:string = "https";

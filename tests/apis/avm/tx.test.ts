@@ -25,7 +25,7 @@ describe('Transactions', () => {
     let inputs:Array<SecpInput>;
     let outputs:Array<Output>;
     const amnt:number = 10000;
-    let netid:number = 49;
+    let netid:number = 12345;
     let blockchainID:Buffer = Buffer.from(createHash("sha256").update("I am the very model of a modern major general").digest());
     let alias:string = "X";
     let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
@@ -82,7 +82,7 @@ describe('Transactions', () => {
         expect(txouts.length).toBe(outputs.length);
         
         expect(txu.getTxType()).toBe(99);
-        expect(txu.getNetworkID()).toBe(49);
+        expect(txu.getNetworkID()).toBe(12345);
         expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
         
         let a:Array<string> = [];
@@ -165,7 +165,7 @@ describe('Transactions', () => {
         expect(initState.toBuffer().toString("hex")).toBe(initialState.toBuffer().toString("hex"));
         
         expect(txu.getTxType()).toBe(AVMConstants.CREATEASSETTX);
-        expect(txu.getNetworkID()).toBe(49);
+        expect(txu.getNetworkID()).toBe(12345);
         expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
         expect(txu.getName()).toBe(name);
         expect(txu.getNameBuffer().toString("hex")).toBe(bintools.stringToBuffer(name).toString("hex"));
