@@ -20,7 +20,7 @@ const bintools = BinTools.getInstance();
 
 describe("AVMAPI", () => {
     const networkid:number = 12345;
-    const blockchainid:string = "ddV3GvdmdeQkaxLRo9LH5AbDNyU9bDu6SqWak7x9UXMbupksK";
+    const blockchainid:string = "i8KtK2KwLi1o7WaVBbEKpRLPtAEYayfoptqAFYxfQgrus1g6m";
     const ip:string = '127.0.0.1';
     const port:number = 9650;
     const protocol:string = "https";
