@@ -26,7 +26,7 @@ We built Slopes with ease of use in mind. With this library, any Javascript deve
   * Administer a local node
   * Retrieve AVA network information from a node
 
-The entirety of the Slopes documentation can be found on our [XXX Fix Link XXX Slopes documentation page](https://avalabs.org/docs/slopes).
+The entirety of the Slopes documentation can be found on our [Slopes documentation page](https://docs.ava.network/v1.0/en/tools/slopes/).
 
 
 ### Requirements
