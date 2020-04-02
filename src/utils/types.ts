@@ -470,57 +470,54 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    "blockchainID": "m383Jyn4z9kYmyMamjHwoExocRRV7ondsci862bbv1FSrqvH9",
+    "blockchainID": "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS",
     "alias": "X",
     "vm": "avm"
 };
 
 let n2_platform:object =  {
-    "blockchainID": "",
+    "blockchainID": "11111111111111111111111111111111LpoYY",
     "alias": "P",
     "vm": "platform"
 };
 
 let n2_contracts:object = {
-    "blockchainID": "",
+    "blockchainID": "PTdfcpLb6iQcobWc9E4v77nJZr48h5phGN8SxibuZbv6dkgGA",
     "alias": "C",
     "vm": "contracts"
 }
 
 let n12345_avm:object = Object.assign({}, n2_avm);
-n12345_avm["blockchainID"] = "i8KtK2KwLi1o7WaVBbEKpRLPtAEYayfoptqAFYxfQgrus1g6m";
+n12345_avm["blockchainID"] = "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS";
 let n12345_platform = Object.assign({}, n2_platform);
 n12345_platform["blockchainID"] = "11111111111111111111111111111111LpoYY";
 let n12345_contracts = Object.assign({}, n2_contracts);
-n12345_platform["blockchainID"] = "MTHoZAP3gGHB4cAUpFB1CuYnh3uDoMkte6FjLb9Sn5Hx8Bkvb";
+n12345_platform["blockchainID"] = "tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rmw";
 
 export class Defaults {
     static network = {
         "1": {}, //update before mainnet
-        /* 
-        This will be set on test network.
         "2": {
             "avm": n2_avm,
             "X": n2_avm,
-            "m383Jyn4z9kYmyMamjHwoExocRRV7ondsci862bbv1FSrqvH9": n2_avm,
+            "5bvj58sabWzcCfyiWWjmxX7bayE7nkmaSgBLTgoyEt4cTNSkG": n2_avm,
             "platform": n2_platform,
             "P": n2_platform,
-            "BCID1": n2_platform,
+            "11111111111111111111111111111111LpoYY": n2_platform,
             "contracts": n2_contracts,
             "C": n2_contracts,
-            "BCID2": n2_contracts
-        }
-        */
+            "PTdfcpLb6iQcobWc9E4v77nJZr48h5phGN8SxibuZbv6dkgGA": n2_contracts
+        },
         "12345": {
             "avm": n12345_avm,
             "X": n12345_avm,
-            "i8KtK2KwLi1o7WaVBbEKpRLPtAEYayfoptqAFYxfQgrus1g6m": n12345_avm,
+            "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS": n12345_avm,
             "platform": n12345_platform,
             "P": n12345_platform,
             "11111111111111111111111111111111LpoYY": n12345_platform,
             "contracts": n12345_contracts,
             "C": n12345_contracts,
-            "MTHoZAP3gGHB4cAUpFB1CuYnh3uDoMkte6FjLb9Sn5Hx8Bkvb": n12345_contracts
+            "tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rmw": n12345_contracts
         }
     };
 }

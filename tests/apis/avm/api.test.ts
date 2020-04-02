@@ -20,7 +20,7 @@ const bintools = BinTools.getInstance();
 
 describe("AVMAPI", () => {
     const networkid:number = 12345;
-    const blockchainid:string = "i8KtK2KwLi1o7WaVBbEKpRLPtAEYayfoptqAFYxfQgrus1g6m";
+    const blockchainid:string = "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS";
     const ip:string = '127.0.0.1';
     const port:number = 9650;
     const protocol:string = "https";
@@ -358,9 +358,9 @@ describe("AVMAPI", () => {
 
     test('getUTXOs', async ()=>{
         //Payment
-        let OPUTXOstr1:string = "8snom9a21FvVHqyasGGAZKSDjQXJg7CvTvA53is6uyhBxvGbc5WVACRoyscZZ1TGpqiGHTbmMBfMq6qE8fqTBFQTsMGJhQw68T1A9WBcazbMvGv6s6DtKV66sKPXLemTK6miMYWvjcvRCH6rihj7vpDa3Ffp2Jq2QZtJ";
-        let OPUTXOstr2:string = "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
-        let OPUTXOstr3:string = "adUbkxszkX9FbvnyKu6UA4g7XhAmPVj6PgPhLS6dTtUfCCr7oDEEXNYqWD2q5MuKPGgEhX16V451kAEUyYhiFMPYCjsAiCM1oWKnLmeA9joFr9jDYD5AoLAsVEyM13FZPf8vuKmF6JTZdCbMCgzHYrMjnb9i3iDPN4Qg";
+        let OPUTXOstr1:string = bintools.avaSerialize(Buffer.from("38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d", "hex"));
+        let OPUTXOstr2:string = bintools.avaSerialize(Buffer.from("c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"));
+        let OPUTXOstr3:string = bintools.avaSerialize(Buffer.from("f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"));
 
         let set:UTXOSet = new UTXOSet();
         set.add(OPUTXOstr1);

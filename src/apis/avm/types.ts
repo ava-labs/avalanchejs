@@ -180,11 +180,11 @@ export class InitialStates {
 }
 
 export class AVMConstants {
-    static SECPOUTPUTID:number = 4;
-    static SECPINPUTID:number = 6;
+    static SECPOUTPUTID:number = 7;
+    static SECPINPUTID:number = 5;
     static CREATEASSETTX:number = 1;
     static BASETX:number = 0;
-    static SECPCREDENTIAL:number = 7;
+    static SECPCREDENTIAL:number = 9;
     static ASSETIDLEN:number = 32;
     static BLOCKCHAINIDLEN:number = 32;
     static SYMBOLMAXLEN:number = 4;

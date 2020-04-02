@@ -43,7 +43,7 @@ describe('Outputs', () => {
     });
     test('OutPayment', () => {
         let out:SecpOutput = new SecpOutput(assetIDBuff, new BN(10000), addrs, locktime, 3);
-        expect(out.getOutputID()).toBe(4);
+        expect(out.getOutputID()).toBe(7);
         expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
         expect(out.getThreshold()).toBe(3);

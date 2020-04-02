@@ -7,8 +7,8 @@ import { SecpUTXO, UTXOSet } from 'src/apis/avm/utxos';
 const bintools = BinTools.getInstance();
 
 describe('SecpUTXO', () => {
-    let utxohex:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000040000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d";
-    let outputhex:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000040000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
+    let utxohex:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d";
+    let outputhex:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
     let outputidx:string = "00000001";
     let outtxid:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5";
     let outaid:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558";
@@ -20,7 +20,8 @@ describe('SecpUTXO', () => {
     let otheraddr:string = "MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8";
     
     //Payment
-    let OPUTXOstr:string = "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
+    let OPUTXOstr:string = bintools.avaSerialize(utxobuff);
+    //"U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
     
     //implies fromString and fromBuffer
     test('Creation', () => {
@@ -40,7 +41,7 @@ describe('SecpUTXO', () => {
     test('Creation of Type', () => {
         let op:SecpUTXO = new SecpUTXO();
         op.fromString(OPUTXOstr);
-        expect(op.getOuputID()).toBe(4);
+        expect(op.getOuputID()).toBe(7);
     });
 
     describe('Funtionality', () => {
@@ -130,9 +131,9 @@ let setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXOSe
 
 describe('UTXOSet', () => {
     let utxostrs:Array<string> = [
-        "8snom9a21FvVHqyasGGAZKSDjQXJg7CvTvA53is6uyhBxvGbc5WVACRoyscZZ1TGpqiGHTbmMBfMq6qE8fqTBFQTsMGJhQw68T1A9WBcazbMvGv6s6DtKV66sKPXLemTK6miMYWvjcvRCH6rihj7vpDa3Ffp2Jq2QZtJ",
-        "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8",
-        "adUbkxszkX9FbvnyKu6UA4g7XhAmPVj6PgPhLS6dTtUfCCr7oDEEXNYqWD2q5MuKPGgEhX16V451kAEUyYhiFMPYCjsAiCM1oWKnLmeA9joFr9jDYD5AoLAsVEyM13FZPf8vuKmF6JTZdCbMCgzHYrMjnb9i3iDPN4Qg"
+        bintools.avaSerialize(Buffer.from("38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d", "hex")),
+        bintools.avaSerialize(Buffer.from("c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex")),
+        bintools.avaSerialize(Buffer.from("f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"))
     ];
     let addrs:Array<Buffer> = [
         bintools.avaDeserialize("FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG"),
@@ -317,7 +318,7 @@ describe('UTXOSet', () => {
             let setG:UTXOSet;
             let setH:UTXOSet;
             //Take-or-Leave
-            let newutxo:string = "QyaDeF2yYxzQuatMEgijoYerFBVTwomhaTGraUrCngZomXtxPT2AHaKPVGh8rwtTGKMEYS1YN3CmdZitZKL9ENHRY99uNdQHogV36v8iFCjMsD7Ygm8WWY3xVu19VzJj1anktNPL8xNEN538PFcBv5eTz87jQCsWj4i7";
+            let newutxo:string = bintools.avaSerialize(Buffer.from("acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626", "hex"));
             
             beforeEach(() => {
                 setA = new UTXOSet();
