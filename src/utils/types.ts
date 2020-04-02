@@ -470,7 +470,7 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    "blockchainID": "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS",
+    "blockchainID": "5bvj58sabWzcCfyiWWjmxX7bayE7nkmaSgBLTgoyEt4cTNSkG",
     "alias": "X",
     "vm": "avm"
 };
