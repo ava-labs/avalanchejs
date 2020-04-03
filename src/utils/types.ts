@@ -470,7 +470,7 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    "blockchainID": "5bvj58sabWzcCfyiWWjmxX7bayE7nkmaSgBLTgoyEt4cTNSkG",
+    "blockchainID": "4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM",
     "alias": "X",
     "vm": "avm"
 };
@@ -482,13 +482,13 @@ let n2_platform:object =  {
 };
 
 let n2_contracts:object = {
-    "blockchainID": "PTdfcpLb6iQcobWc9E4v77nJZr48h5phGN8SxibuZbv6dkgGA",
+    "blockchainID": "2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i",
     "alias": "C",
     "vm": "contracts"
 }
 
 let n12345_avm:object = Object.assign({}, n2_avm);
-n12345_avm["blockchainID"] = "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS";
+n12345_avm["blockchainID"] = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH";
 let n12345_platform = Object.assign({}, n2_platform);
 n12345_platform["blockchainID"] = "11111111111111111111111111111111LpoYY";
 let n12345_contracts = Object.assign({}, n2_contracts);
@@ -500,18 +500,18 @@ export class Defaults {
         "2": {
             "avm": n2_avm,
             "X": n2_avm,
-            "5bvj58sabWzcCfyiWWjmxX7bayE7nkmaSgBLTgoyEt4cTNSkG": n2_avm,
+            "4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM": n2_avm,
             "platform": n2_platform,
             "P": n2_platform,
             "11111111111111111111111111111111LpoYY": n2_platform,
             "contracts": n2_contracts,
             "C": n2_contracts,
-            "PTdfcpLb6iQcobWc9E4v77nJZr48h5phGN8SxibuZbv6dkgGA": n2_contracts
+            "2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i": n2_contracts
         },
         "12345": {
             "avm": n12345_avm,
             "X": n12345_avm,
-            "2NmaZmtSWsCeL4F1crsRMtu9qXbJ9ohmv9vdKBr9NdPha2abbS": n12345_avm,
+            "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH": n12345_avm,
             "platform": n12345_platform,
             "P": n12345_platform,
             "11111111111111111111111111111111LpoYY": n12345_platform,
