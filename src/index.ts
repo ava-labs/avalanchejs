@@ -57,7 +57,7 @@ export class Slopes extends SlopesCore {
      * @param port The port to reolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default 12345
-     * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect, otherwise default "m383Jyn4z9kYmyMamjHwoExocRRV7ondsci862bbv1FSrqvH9"
+     * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect, otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
      * @param skipinit Skips creating the APIs
      */
     constructor(ip:string, port:number, protocol:string = "http", networkID:number = 12345, avmChainID:string = undefined, skipinit:boolean = false) {
@@ -67,7 +67,7 @@ export class Slopes extends SlopesCore {
             if(networkID.toString() in Defaults.network){
                 chainid = Defaults.network[networkID]["X"].blockchainID
             } else {
-                chainid = "m383Jyn4z9kYmyMamjHwoExocRRV7ondsci862bbv1FSrqvH9";
+                chainid = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH";
             }
         }
         if(typeof networkID === 'number' && networkID >= 0){
