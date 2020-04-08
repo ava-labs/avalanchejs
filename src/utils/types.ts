@@ -492,7 +492,7 @@ n12345_avm["blockchainID"] = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
 let n12345_platform = Object.assign({}, n2_platform);
 n12345_platform["blockchainID"] = "11111111111111111111111111111111LpoYY";
 let n12345_contracts = Object.assign({}, n2_contracts);
-n12345_platform["blockchainID"] = "tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rmw";
+n12345_contracts["blockchainID"] = "tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rmw";
 
 export class Defaults {
     static network = {
