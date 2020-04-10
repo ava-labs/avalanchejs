@@ -406,13 +406,13 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
-     * Lists all assets for an address.
+     * Retrieves all assets for an address on a server and their associated balances.
      * 
      * @param address The address to get a list of assets
      * 
      * @returns Promise of an array of objects mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
      */
-    listAssets = async (address:string):Promise<object> => {
+    getAllBalances = async (address:string):Promise<object> => {
         if(typeof this.parseAddress(address) === "undefined"){
             /* istanbul ignore next */
             throw new Error("Error - AVMAPI.listAssets: Invalid address format " + address);
@@ -420,7 +420,7 @@ class AVMAPI extends JRPCAPI{
         let params = {
             "address": address
         };
-        return this.callMethod("avm.listAssets", params).then((response:RequestResponseData) => {
+        return this.callMethod("avm.getAllBalances", params).then((response:RequestResponseData) => {
             let r = response.data["result"]["assets"];
             let assetIDs = Object.keys(r);
             for(let i = 0; i < assetIDs.length; i++){

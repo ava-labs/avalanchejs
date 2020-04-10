@@ -88,7 +88,7 @@ describe("AVMAPI", () => {
     test('listAssets', async ()=>{
         let assets = {'ATH': new BN(1) ,'ETH': new BN(3)};
 
-        let result:Promise<object> = api.listAssets(addrA);
+        let result:Promise<object> = api.getAllBalances(addrA);
         let payload:object = {
             "result": {
                 'assets': assets
