@@ -11,7 +11,7 @@
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
-    "docsmd": "npx typedoc --plugin typedoc-plugin-markdown,typedoc-plugin-external-module-name --theme markdown --out docsMD src",
+    "docsmd": "npx typedoc --readme none --plugin typedoc-plugin-markdown,typedoc-plugin-external-module-name --theme markdown --out docsMD src",
     "docs": "npm run docshtml && npm run docsmd"
   },
   "repository": {
