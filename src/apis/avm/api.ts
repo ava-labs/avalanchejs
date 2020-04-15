@@ -410,7 +410,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @param address The address to get a list of assets
      * 
-     * @returns Promise of an array of objects mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
+     * @returns Promise of an object mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
      */
     getAllBalances = async (address:string):Promise<object> => {
         if(typeof this.parseAddress(address) === "undefined"){
