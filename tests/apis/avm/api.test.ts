@@ -86,9 +86,9 @@ describe("AVMAPI", () => {
     });
 
     test('listAssets', async ()=>{
-        let assets = ['ATH','ETH'];
+        let assets = {'ATH': new BN(1) ,'ETH': new BN(3)};
 
-        let result:Promise<Array<string>> = api.listAssets(addrA);
+        let result:Promise<object> = api.getAllBalances(addrA);
         let payload:object = {
             "result": {
                 'assets': assets
@@ -99,7 +99,7 @@ describe("AVMAPI", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:object = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(assets);
@@ -146,9 +146,9 @@ describe("AVMAPI", () => {
     });
 
     test('getBalance', async ()=>{
-        let balance = 100;
+        let balance = new BN("100", 10);
 
-        let result:Promise<number> = api.getBalance(addrA, 'ATH');
+        let result:Promise<BN> = api.getBalance(addrA, 'ATH');
         let payload:object = {
             "result": {
                 "balance": balance
@@ -159,7 +159,7 @@ describe("AVMAPI", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:number = await result;
+        let response:BN = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(balance);

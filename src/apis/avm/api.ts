@@ -166,9 +166,9 @@ class AVMAPI extends JRPCAPI{
      * @param address The address to pull the asset balance from
      * @param assetID The assetID to pull the balance from
      * 
-     * @returns Promise with the balance of the assetID on the provided address for the blockchain.
+     * @returns Promise with the balance of the assetID as a {@link https://github.com/indutny/bn.js/|BN} on the provided address for the blockchain.
      */
-    getBalance = async (address:string, assetID:string):Promise<number> => {
+    getBalance = async (address:string, assetID:string):Promise<BN> => {
         if(typeof this.parseAddress(address) === "undefined"){
             /* istanbul ignore next */
             throw new Error("Error - AVMAPI.getBalance: Invalid address format " + address);
@@ -178,7 +178,7 @@ class AVMAPI extends JRPCAPI{
             "assetID": assetID
         };
         return this.callMethod("avm.getBalance", params).then((response:RequestResponseData) => {
-            return parseInt(response.data["result"]["balance"]);
+            return  new BN(response.data["result"]["balance"], 10);
         });
     }
 
@@ -406,13 +406,13 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
-     * Lists all assets for an address.
+     * Retrieves all assets for an address on a server and their associated balances.
      * 
      * @param address The address to get a list of assets
      * 
-     * @returns Promise of an array of assetIDs for the address on the blockchain.
+     * @returns Promise of an array of objects mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
      */
-    listAssets = async (address:string):Promise<Array<string>> => {
+    getAllBalances = async (address:string):Promise<object> => {
         if(typeof this.parseAddress(address) === "undefined"){
             /* istanbul ignore next */
             throw new Error("Error - AVMAPI.listAssets: Invalid address format " + address);
@@ -420,8 +420,13 @@ class AVMAPI extends JRPCAPI{
         let params = {
             "address": address
         };
-        return this.callMethod("avm.listAssets", params).then((response:RequestResponseData) => {
-            return response.data["result"]["assets"];
+        return this.callMethod("avm.getAllBalances", params).then((response:RequestResponseData) => {
+            let r = response.data["result"]["assets"];
+            let assetIDs = Object.keys(r);
+            for(let i = 0; i < assetIDs.length; i++){
+                r[assetIDs[i]] = new BN(r[assetIDs[i]], 10);
+            }
+            return r;
         });
     }
 
