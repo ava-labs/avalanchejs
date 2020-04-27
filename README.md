@@ -48,7 +48,7 @@ Both of the above modules are extremely useful when interacting with Slopes as t
 
 Slopes is available for install via `npm`:
 
-`npm install --save slopes`
+`npm install --save @avalabs/slopes`
 
 You can also pull the repo down directly and build it from scratch:
 

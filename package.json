@@ -1,5 +1,5 @@
 {
-  "name": "slopes",
+  "name": "@avalabs/slopes",
   "version": "1.4.3",
   "description": "AVA Platform JS Library",
   "main": "typings/src/index.js",
