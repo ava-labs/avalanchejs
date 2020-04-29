@@ -75,7 +75,7 @@ export class Slopes extends SlopesCore {
         }
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
-            this.addAPI("avm", AVMAPI, "/ext/bc/avm", chainid);
+            this.addAPI("avm", AVMAPI, "/ext/bc/X", chainid);
             this.addAPI("platform", PlatformAPI);
             this.addAPI("keystore", KeystoreAPI);
         }
