@@ -6,7 +6,6 @@ import { JRPCAPI, RequestResponseData } from '../../utils/types';
 import { Buffer } from "buffer/";
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
-import { createTypePredicateNodeWithModifier } from 'typescript';
 
 /**
  * @ignore
@@ -199,9 +198,9 @@ class PlatformAPI extends JRPCAPI{
      * @param delegationFeeRate Optional. The percent fee this validator charges when others delegate stake to them, multiplied by 10,000 as a {@link https://github.com/indutny/bn.js/|BN}. For example, suppose a validator has delegationFeeRate 300,000 and someone delegates to that validator. When the delegation period is over, if the delegator is entitled to a reward, 30% of the reward (300,000 / 10,000) goes to the validator and 70% goes to the delegator
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
      * 
-     * @returns Promise for an array of validator's stakingIDs.
+     * @returns Promise for a base58 string of the unsigned transaction.
      */
-    addDefaultSubnetValidator = async (id:string, startTime:Date, endTime:Date, stakeAmount:BN, payerNonce:number, destination:string, delegationFeeRate:BN = undefined):Promise<Array<string>> => {
+    addDefaultSubnetValidator = async (id:string, startTime:Date, endTime:Date, stakeAmount:BN, payerNonce:number, destination:string, delegationFeeRate:BN = undefined):Promise<string> => {
         let params = {
             "id": id,
             "startTime": startTime.getTime()/1000,
@@ -284,11 +283,11 @@ class PlatformAPI extends JRPCAPI{
      * 
      * @returns Promise for a string with the unsigned transaction encoded as base58.
      */
-    createSubnet = async (controlKeys:string, threshold:number, payerNonce:number):Promise<Array<string>> => {
+    createSubnet = async (controlKeys:Array<string>, threshold:number, payerNonce:number):Promise<string> => {
         let params = {
             "controlKeys": controlKeys,
-            "threshold": Math.floor(threshold),
-            "payerNonce": Math.floor(payerNonce)
+            "threshold": threshold,
+            "payerNonce": payerNonce
         }
         return this.callMethod("platform.createSubnet", params).then((response:RequestResponseData) => {
             return response.data["result"]["unsignedTx"];
@@ -316,14 +315,19 @@ class PlatformAPI extends JRPCAPI{
      * 
      * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
      * 
-     * @returns Promise for a string with the unsigned transaction encoded as base58.
+     * @returns Promise for an array of blockchainIDs the subnet validates.
      */
     validates = async (subnetID:Buffer | string):Promise<Array<string>> => {
         let params = {
             "subnetID": subnetID
         }
+        if(typeof subnetID === "string"){
+            params["subnetID"] = subnetID;
+        } else if (typeof subnetID !== "undefined") {
+            params["subnetID"] = bintools.avaSerialize(subnetID);
+        }
         return this.callMethod("platform.validates", params).then((response:RequestResponseData) => {
-            return response.data["result"]["subnetID"];
+            return response.data["result"]["blockchainIDs"];
         });
     }
 
@@ -344,16 +348,16 @@ class PlatformAPI extends JRPCAPI{
     /**
      * Send AVA from an account on the P-Chain to an address on the X-Chain. This transaction must be signed with the key of the account that the AVA is sent from and which pays the transaction fee. After issuing this transaction, you must call the X-Chain’s importAVA method to complete the transfer.
      * 
-     * @param amount Amount of AVA to export as a {@link https://github.com/indutny/bn.js/|BN}
      * @param to The address on the X-Chain to send the AVA to. Do not include X- in the address
+     * @param amount Amount of AVA to export as a {@link https://github.com/indutny/bn.js/|BN}
      * @param payerNonce The next unused nonce of the account paying the tx fee and providing the sent AVA
      * 
      * @returns Promise for an unsigned transaction to be signed by the account the the AVA is sent from and pays the transaction fee.
      */
-    exportAVA = async (amount:BN, to:string, payerNonce:number):Promise<string> => {
+    exportAVA = async (amount:BN, to:string,payerNonce:number):Promise<string> => {
         let params = {
-            "amount": amount,
             "to": to,
+            "amount": amount,
             "payerNonce": payerNonce
         }
         return this.callMethod("platform.exportAVA", params).then((response:RequestResponseData) => {
@@ -364,10 +368,10 @@ class PlatformAPI extends JRPCAPI{
     /**
      * Send AVA from an account on the P-Chain to an address on the X-Chain. This transaction must be signed with the key of the account that the AVA is sent from and which pays the transaction fee. After issuing this transaction, you must call the X-Chain’s importAVA method to complete the transfer.
      * 
-     * @param to The ID of the account the AVA is sent to. This must be the same as the to argument in the corresponding call to the X-Chain’s exportAVA
-     * @param payerNonce The next unused nonce of the account specified in `to`
      * @param username The Keystore user that controls the account specified in `to`
      * @param password The password of the Keystore user
+     * @param to The ID of the account the AVA is sent to. This must be the same as the to argument in the corresponding call to the X-Chain’s exportAVA
+     * @param payerNonce The next unused nonce of the account specified in `to`
      * 
      * @returns Promise for a string for the transaction, which should be sent to the network by calling issueTx.
      */
@@ -388,10 +392,10 @@ class PlatformAPI extends JRPCAPI{
      * 
      * Transactions to add non-default Subnets require signatures from control keys and from the account paying the transaction fee. If `signer` is a control key and the transaction needs more signatures from control keys, `sign` will provide a control signature. Otherwise, `signer` will sign to pay the transaction fee.
      * 
-     * @param tx The unsigned/partially signed transaction
-     * @param signer The address of the key signing `tx`
      * @param username The Keystore user that controls the key signing `tx`
      * @param password The password of the Keystore user
+     * @param tx The unsigned/partially signed transaction
+     * @param signer The address of the key signing `tx`
      * 
      * @returns Promise for an string of the transaction after being signed.
      */

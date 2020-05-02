@@ -185,6 +185,51 @@ describe("AVMAPI", () => {
         expect(response).toBe(key);
     });
 
+    test("exportAVA", async ()=>{
+        let amount = new BN(100);
+        let to = "abcdef";
+        let username = "Robert";
+        let password = "Paulson";
+        let txID = "valid";
+        let result:Promise<string> = api.exportAVA(username, password, to, amount);
+        let payload:object = {
+            "result": {
+                "txID": txID
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(txID);
+    });
+
+    test("importAVA", async ()=>{
+        let to = "abcdef";
+        let username = "Robert";
+        let password = "Paulson";
+        let txID = "valid";
+        let result:Promise<string> = api.importAVA(username, password, to);
+        let payload:object = {
+            "result": {
+                "txID": txID
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(txID);
+    });
+
     test('createAddress', async ()=>{
         let alias = 'randomalias';
 
