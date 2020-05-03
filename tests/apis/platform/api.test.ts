@@ -31,25 +31,6 @@ describe("Platform", () => {
         mockAxios.reset();
     });
 
-    test("addStaker", async ()=>{
-
-        let result:Promise<boolean> = platform.addStaker('txId');
-        let payload:object = {
-            "result": {
-                "success": true
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
-
-        mockAxios.mockResponse(responseObj);
-        let response:boolean = await result;
-
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(true);
-    });
-
     test("createBlockchain 1", async ()=>{
         let blockchainID:string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh";
         let vmID:string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh";
@@ -424,7 +405,7 @@ describe("Platform", () => {
     });
 
 
-    test("sampleValidators 1", async ()=>{
+    test("sampleValidators 3", async ()=>{
         let subnetID = Buffer.from("abcdef", "hex");
         let validators = ['val1', 'val2'];
         let result:Promise<Array<string>> = platform.sampleValidators(10, subnetID);
@@ -443,4 +424,344 @@ describe("Platform", () => {
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);
     });
+
+    test("addDefaultSubnetValidator 1", async ()=>{
+        let id = "abcdef";
+        let startTime = new Date(1985,5,9,12,59,43,9);
+        let endTime = new Date(1982,3,1,12,58,33,7);
+        let stakeAmount = new BN(13);
+        let payerNonce = 3;
+        let destination = "fedcba";
+        let delegationFeeRate = new BN(2);
+        let utx = "valid";
+        let result:Promise<string> = platform.addDefaultSubnetValidator(id, startTime, endTime, stakeAmount, payerNonce, destination, delegationFeeRate);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("addNonDefaultSubnetValidator 1", async ()=>{
+        let id = "abcdef";
+        let subnetID;
+        let startTime = new Date(1985,5,9,12,59,43,9);
+        let endTime = new Date(1982,3,1,12,58,33,7);
+        let weight = 13;
+        let payerNonce = 3;
+        let utx = "valid";
+        let result:Promise<string> = platform.addNonDefaultSubnetValidator(id, subnetID, startTime, endTime, weight, payerNonce);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("addNonDefaultSubnetValidator 2", async ()=>{
+        let id = "abcdef";
+        let subnetID = "abcdef";
+        let startTime = new Date(1985,5,9,12,59,43,9);
+        let endTime = new Date(1982,3,1,12,58,33,7);
+        let weight = 13;
+        let payerNonce = 3;
+        let utx = "valid";
+        let result:Promise<string> = platform.addNonDefaultSubnetValidator(id, subnetID, startTime, endTime, weight, payerNonce);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("addNonDefaultSubnetValidator 3", async ()=>{
+        let id = "abcdef";
+        let subnetID = Buffer.from("abcdef", "hex");
+        let startTime = new Date(1985,5,9,12,59,43,9);
+        let endTime = new Date(1982,3,1,12,58,33,7);
+        let weight = 13;
+        let payerNonce = 3;
+        let utx = "valid";
+        let result:Promise<string> = platform.addNonDefaultSubnetValidator(id, subnetID, startTime, endTime, weight, payerNonce);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("addDefaultSubnetDelegator 1", async ()=>{
+        let id = "abcdef";
+        let startTime = new Date(1985,5,9,12,59,43,9);
+        let endTime = new Date(1982,3,1,12,58,33,7);
+        let stakeAmount = new BN(13);
+        let payerNonce = 3;
+        let destination = "fedcba";
+        let utx = "valid";
+        let result:Promise<string> = platform.addDefaultSubnetDelegator(id, startTime, endTime, stakeAmount, payerNonce, destination);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("createSubnet 1", async ()=>{
+        let controlKeys = ["abcdef"];
+        let threshold = 13;
+        let payerNonce = 3;
+        let utx = "valid";
+        let result:Promise<string> = platform.createSubnet(controlKeys, threshold, payerNonce);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("validatedBy 1", async ()=>{
+        let blockchainID = "abcdef";
+        let resp = "valid";
+        let result:Promise<string> = platform.validatedBy(blockchainID);
+        let payload:object = {
+            "result": {
+                "subnetID": resp
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(resp);
+    });
+
+    test("validates 1", async ()=>{
+        let subnetID;
+        let resp = ["valid"];
+        let result:Promise<Array<string>> = platform.validates(subnetID);
+        let payload:object = {
+            "result": {
+                "blockchainIDs": resp
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:Array<string> = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(resp);
+    });
+
+    test("validates 2", async ()=>{
+        let subnetID = "deadbeef";
+        let resp = ["valid"];
+        let result:Promise<Array<string>> = platform.validates(subnetID);
+        let payload:object = {
+            "result": {
+                "blockchainIDs": resp
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:Array<string> = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(resp);
+    });
+
+    test("validates 3", async ()=>{
+        let subnetID = Buffer.from("abcdef", "hex");
+        let resp = ["valid"];
+        let result:Promise<Array<string>> = platform.validates(subnetID);
+        let payload:object = {
+            "result": {
+                "blockchainIDs": resp
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:Array<string> = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(resp);
+    });
+
+    test("getBlockchains 1", async ()=>{
+        let resp = [{
+            "id": "nodeID",
+            "subnetID": "subnetID",
+            "vmID": "vmID"
+        }];
+        let result:Promise<Array<object>> = platform.getBlockchains();
+        let payload:object = {
+            "result": {
+                "blockchains": resp
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:Array<object> = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(resp);
+    });
+
+    test("exportAVA 1", async ()=>{
+        let amount = new BN(100);
+        let to = "abcdef";
+        let payerNonce = 3;
+        let utx = "valid";
+        let result:Promise<string> = platform.exportAVA(amount, to, payerNonce);
+        let payload:object = {
+            "result": {
+                "unsignedTx": utx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(utx);
+    });
+
+    test("importAVA 1", async ()=>{
+        let to = "abcdef";
+        let payerNonce = 3;
+        let username = "Robert";
+        let password = "Paulson";
+        let tx = "valid";
+        let result:Promise<string> = platform.importAVA(username, password, to, payerNonce);
+        let payload:object = {
+            "result": {
+                "tx": tx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(tx);
+    });
+
+    test("sign 1", async ()=>{
+        let utx = "abcdef";
+        let signer = "fedcba";
+        let username = "Robert";
+        let password = "Paulson";
+        let tx = "valid";
+        let result:Promise<string> = platform.sign(username, password, utx, signer);
+        let payload:object = {
+            "result": {
+                "tx": tx
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(tx);
+    });
+
+    test("issueTx 1", async ()=>{
+        let tx = "abcdef";
+        let txID = "valid";
+        let result:Promise<string> = platform.issueTx(tx);
+        let payload:object = {
+            "result": {
+                "txID": txID
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(txID);
+    });
+
 });
