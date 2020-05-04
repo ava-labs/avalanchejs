@@ -112,6 +112,60 @@ export class Address extends NBytes {
 }
 
 /**
+ * Class for representing a UTXOID used in [[TransferableOp]] types
+ */
+export class UTXOID extends NBytes {
+
+    /**
+     * Returns a function used to sort an array of [[UTXOID]]s
+     */
+    static comparitor = ():(a:UTXOID, b:UTXOID) => (1|-1|0) => {
+        return function(a:UTXOID, b:UTXOID):(1|-1|0) { 
+            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+        }
+    }
+    /**
+     * Returns a base-58 representation of the [[UTXOID]].
+     */
+    toString():string {
+        return bintools.avaSerialize(this.toBuffer());
+    }
+    /**
+     * Takes a base-58 string containing an [[UTXOID]], parses it, populates the class, and returns the length of the UTXOID in bytes.
+     * 
+     * @param bytes A base-58 string containing a raw [[UTXOID]]
+     * 
+     * @returns The length of the raw [[UTXOID]]
+     */
+    fromString(utxoid:string):number {
+        let utxoidbuff:Buffer = bintools.b58ToBuffer(utxoid);
+        if(utxoidbuff.length == 40 && bintools.validateChecksum(utxoidbuff)) {
+            let newbuff:Buffer = bintools.copyFrom(utxoidbuff, 0,utxoidbuff.length - 4);
+            if(newbuff.length == 36){
+                this.bytes = newbuff;
+            }
+        } else if(utxoidbuff.length == 40){
+            throw new Error("Error - UTXOID.fromString: invalid checksum on address");
+        } else if(utxoidbuff.length == 36){
+            this.bytes = utxoidbuff;
+        } else {
+            /* istanbul ignore next */
+            throw new Error("Error - UTXOID.fromString: invalid address");
+        }
+        return this.getSize();
+    }
+
+    /**
+     * Class for representing a UTXOID used in [[TransferableOp]] types
+     */
+    constructor(){
+        super();
+        this.bytes = Buffer.alloc(36);
+        this.bsize = 36;
+    }
+}
+
+/**
  * Class for creating initial output states used in asset creation
  */
 export class InitialStates {
@@ -183,6 +237,7 @@ export class AVMConstants {
     static SECPOUTPUTID:number = 7;
     static SECPINPUTID:number = 5;
     static CREATEASSETTX:number = 1;
+    static OPERATIONTX:number = 1;
     static BASETX:number = 0;
     static SECPCREDENTIAL:number = 9;
     static ASSETIDLEN:number = 32;

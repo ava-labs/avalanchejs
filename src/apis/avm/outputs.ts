@@ -247,7 +247,6 @@ export class SecpOutBase extends Output {
     /**
      * An [[Output]] class which issues a payment on an assetID.
      * 
-     * @param assetid A {@link https://github.com/feross/buffer|Buffer} representing the AssetID
      * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
      * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
@@ -308,7 +307,7 @@ export class SecpOutput extends SecpOutBase {
 
 
 /**
- * An [[Output]] class which specifies a secp256k1 .
+ * An [[Output]] class which specifies an NFT .
  */
 export class NFTOutBase extends Output {
     protected groupID:Buffer = Buffer.alloc(4);
@@ -392,6 +391,7 @@ export class NFTOutBase extends Output {
         let psize:number = this.sizePayload.readUInt32BE(0);
         offset += 4;
         this.payload = bintools.copyFrom(utxobuff, offset, offset + psize);
+        offset += psize;
         this.threshold = bintools.copyFrom(utxobuff, offset, offset + 4);
         offset += 4;
         this.numaddrs = bintools.copyFrom(utxobuff, offset, offset + 4);
@@ -417,15 +417,16 @@ export class NFTOutBase extends Output {
         try {
             this.addresses.sort(Address.comparitor());
             let superbuff:Buffer = super.toBuffer();
-            let bsize:number = superbuff.length + this.amount.length + this.locktime.length + this.threshold.length + this.numaddrs.length;
+            let bsize:number = superbuff.length + this.sizePayload.length + this.payload.length + this.threshold.length + this.numaddrs.length;
             this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-            let barr:Array<Buffer> = [superbuff, this.amount, this.locktime, this.threshold, this.numaddrs];
+            this.sizePayload.writeUInt32BE(this.payload.length, 0);
+            let barr:Array<Buffer> = [superbuff, this.sizePayload, this.payload, this.threshold, this.numaddrs];
             for(let i = 0; i < this.addresses.length; i++) {
                 let b: Buffer = this.addresses[i].toBuffer();
                 barr.push(b);
                 bsize += b.length;
             }
-            return Buffer.concat(barr,bsize);;
+            return Buffer.concat(barr,bsize);
         } catch(e) {
             /* istanbul ignore next */
             let emsg:string = "Error - SecpOutBase.toBuffer: " + e;
@@ -442,7 +443,9 @@ export class NFTOutBase extends Output {
     }
 
     /**
-     * Given an array of addresses and an optional timestamp, select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
+     * Given an array of addresses and an optional timestamp (which is ignored as there's no locktime, to stay in format with others), select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
+     * 
+     * 
      */
     getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
         let qualified:Array<Buffer> = [];
@@ -452,10 +455,11 @@ export class NFTOutBase extends Output {
         } else {
             now = asOf;
         }
+        /*
         let locktime:BN = bintools.fromBufferToBN(this.locktime);
         if(now.lte(locktime)){ //not unlocked, not spendable
             return qualified;
-        }
+        }*/
 
         let threshold:number = this.threshold.readUInt32BE(0);
 
@@ -471,7 +475,7 @@ export class NFTOutBase extends Output {
     }
 
     /**
-     * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
+     * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp (which is ignored as there's no locktime, to stay in format with others), returns true if the addresses meet the threshold required to spend the output.
      */
     meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
         let now:BN;
@@ -490,19 +494,19 @@ export class NFTOutBase extends Output {
     }
 
     /**
-     * An [[Output]] class which issues a payment on an assetID.
+     * An [[Output]] class which contains an NFT on an assetID.
      * 
-     * @param assetid A {@link https://github.com/feross/buffer|Buffer} representing the AssetID
      * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
      * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      */
-    constructor(amount?:BN, addresses?:Array<Buffer>, locktime?:BN, threshold?:number){
+    constructor(groupID?:number, payload?:Buffer, addresses?:Array<Buffer>, threshold?:number){
         super(AVMConstants.SECPOUTPUTID);
-        if(amount && addresses){
-            this.amountValue = amount.clone();
-            this.amount = bintools.fromBNToBuffer(amount, 8);
+        if(groupID && addresses){
+            this.groupID.readUInt32BE(groupID);
+            this.sizePayload.readUInt32BE(payload.length);
+            this.payload = bintools.copyFrom(payload, 0, payload.length);
             let addrs:Array<Address> = [];
             for(let i = 0; i < addresses.length; i++){
                 addrs[i] = new Address();
@@ -512,15 +516,14 @@ export class NFTOutBase extends Output {
             this.addresses.sort(Address.comparitor());
             this.numaddrs.writeUInt32BE(this.addresses.length, 0);
             this.threshold.writeUInt32BE((threshold ? threshold : 1), 0);
-            if(!(locktime)){
-                /* istanbul ignore next */
-                locktime = new BN(0);
-            }
-            this.locktime = bintools.fromBNToBuffer(locktime, 8);
         }
     }
 }
 
+/**
+ * An [[Output]] class which contains an NFT on an assetID.
+ * 
+ */
 export class NFTOutput extends NFTOutBase {
     protected assetid:Buffer = Buffer.alloc(32);
 
@@ -543,10 +546,11 @@ export class NFTOutput extends NFTOutBase {
         return this.assetid;
     }
 
-    constructor(assetid?:Buffer, amount?:BN, addresses?:Array<Buffer>, locktime?:BN, threshold?:number){
-        super(amount, addresses, locktime, threshold);
+    constructor(assetid?:Buffer, groupID?:number, payload?:Buffer, addresses?:Array<Buffer>, threshold?:number){
+        super(groupID, payload, addresses, threshold);
         if(typeof assetid !== 'undefined' && assetid.length == AVMConstants.ASSETIDLEN) {
             this.assetid = assetid;
         }
     }
 }
+
