@@ -3,9 +3,10 @@
  */
 import {Buffer} from "buffer/";
 import { Signature, AVMConstants, InitialStates } from './types';
-import { Output, SecpOutBase, SelectOutputClass } from './outputs';
+import { Output, SelectOutputClass } from './outputs';
 import { Input, SelectInputClass } from './inputs';
 import BinTools from '../../utils/bintools';
+import { Operation, SelectOperationClass } from './ops';
 
 /**
  * @ignore
@@ -267,6 +268,9 @@ export class TxCreateAsset extends TxUnsigned {
         return offset;
     }
 
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[TxCreateAsset]].
+     */
     toBuffer():Buffer {
         let barr:Array<Buffer> = [super.toBuffer(), this.namebuff, this.symbolbuff, this.denomination, this.initialstate.toBuffer()];
         return Buffer.concat(barr);
@@ -283,7 +287,7 @@ export class TxCreateAsset extends TxUnsigned {
      * @param outs Optional array of the [[Output]]s
      * @param networkid Optional networkid, default 2
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-     * @param txtype Optional txtype, default 1
+     * @param txtype Optional txtype, default [[AVMConstants.CREATEASSETTX]]
      */
     constructor(name:string = undefined, symbol:string = undefined, denomination:number = undefined, initialstate:InitialStates = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = AVMConstants.CREATEASSETTX) {
         super(ins, outs, networkid, blockchainid, txtype);
@@ -294,6 +298,77 @@ export class TxCreateAsset extends TxUnsigned {
             this.symbolbuff = bintools.stringToBuffer(symbol);
             this.symbol = symbol;
             this.denomination.writeUInt8(denomination, 0);
+        }
+    }
+}
+
+/**
+ * Class representing an unsigned Operation transaction.
+ */
+export class TxOperation extends TxUnsigned {
+    protected ops:Array<Operation> = [];
+    protected numOps:Buffer = Buffer.alloc(4);
+
+    /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[TxOperation]], parses it, populates the class, and returns the length of the TxUnsigned in bytes.
+     * 
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[TxOperation]]
+     * 
+     * @returns The length of the raw [[TxOperation]]
+     * 
+     * @remarks assume not-checksummed
+     */
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(bytes, offset);
+        this.numOps = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let numOps:number = this.numOps.readUInt32BE(0);
+        for(let i:number = 0; i < numOps; i++) {
+            let op:Operation = SelectOperationClass(bytes);
+            this.ops.push(op);
+            offset += op.toBuffer().length;
+        }
+        return offset;
+    }
+
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[TxCreateAsset]].
+     */
+    toBuffer():Buffer {
+        this.numOps.writeUInt32BE(this.ops.length, 0);
+        let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
+        for(let i = 0; i < this.ops.length; i++) {
+            barr.push(this.ops[i].toBuffer());
+        }
+        return Buffer.concat(barr);
+    }
+
+    /**
+     * Returns an array of [[Operation]]s in this transaction.
+     */
+    getOperations():Array<Operation> {
+        return this.ops;
+    }
+
+    /**
+     * Class representing an unsigned Operation transaction.
+     * 
+     * @param ops Array of [[Operation]]s used in the transaction
+     * @param ins Optional array of the [[Input]]s
+     * @param outs Optional array of the [[Output]]s
+     * @param networkid Optional networkid, default 2
+     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+     * @param txtype Optional txtype, default [[AVMConstants.OPERATIONTX]]
+     */
+    constructor(ops:Array<Operation> = undefined, ins:Array<Input> = undefined, outs:Array<Output> = undefined, networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), txtype:number = AVMConstants.OPERATIONTX) {
+        super(ins, outs, networkid, blockchainid, txtype);
+        if(typeof ops !== 'undefined' && Array.isArray(ops)) {
+            for(let i = 0; i < ops.length; i++) {
+                if(!(ops[i] instanceof Operation)) {
+                    throw new Error("Error - TxOperation.constructor: invalid op in array parameter 'ops'")
+                }
+            }
+            this.ops = ops;
         }
     }
 }

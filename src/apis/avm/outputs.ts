@@ -13,7 +13,7 @@ const bintools = BinTools.getInstance();
  * 
  * @param outbuffer A {@link https://github.com/feross/buffer|Buffer} containing the Output raw data.
  * 
- * @returns An instance of an [[Output]]-extended class: [[OutputPayment]], [[OutTakeOrLeave]], [[OutCreateAsset]].
+ * @returns An instance of an [[Output]]-extended class: [[SecpOutput]], [[NFTOutput]].
  */
 export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output => {
     let assetid:Buffer = bintools.copyFrom(outbuffer, 0, AVMConstants.ASSETIDLEN);
@@ -22,6 +22,10 @@ export const SelectOutputClass = (outbuffer:Buffer, args:Array<any> = []):Output
         let secpout:SecpOutput = new SecpOutput(assetid, ...args);
         secpout.fromBuffer(outbuffer);
         return secpout;
+    } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
+        let nftout:NFTOutput = new NFTOutput(assetid, ...args);
+        nftout.fromBuffer(outbuffer);
+        return nftout;
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }
@@ -502,7 +506,7 @@ export class NFTOutBase extends Output {
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      */
     constructor(groupID?:number, payload?:Buffer, addresses?:Array<Buffer>, threshold?:number){
-        super(AVMConstants.SECPOUTPUTID);
+        super(AVMConstants.NFTXFEROUTPUTID);
         if(groupID && addresses){
             this.groupID.readUInt32BE(groupID);
             this.sizePayload.readUInt32BE(payload.length);
@@ -546,7 +550,7 @@ export class NFTOutput extends NFTOutBase {
         return this.assetid;
     }
 
-    constructor(assetid?:Buffer, groupID?:number, payload?:Buffer, addresses?:Array<Buffer>, threshold?:number){
+    constructor(assetid?:Buffer, groupID?:number, payload?:Buffer, addresses?:Array<Buffer>, threshold?:number) {
         super(groupID, payload, addresses, threshold);
         if(typeof assetid !== 'undefined' && assetid.length == AVMConstants.ASSETIDLEN) {
             this.assetid = assetid;

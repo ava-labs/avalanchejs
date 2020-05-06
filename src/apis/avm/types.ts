@@ -236,8 +236,10 @@ export class InitialStates {
 export class AVMConstants {
     static SECPOUTPUTID:number = 7;
     static SECPINPUTID:number = 5;
+    static NFTXFEROUTPUTID:number = 11;
     static CREATEASSETTX:number = 1;
-    static OPERATIONTX:number = 1;
+    static OPERATIONTX:number = 2;
+    static NFTXFEROP:number = 13;
     static BASETX:number = 0;
     static SECPCREDENTIAL:number = 9;
     static ASSETIDLEN:number = 32;
