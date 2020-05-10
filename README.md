@@ -131,10 +131,10 @@ let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
 The AVMKeyChain extends the global KeyChain class, which has standardized key management capabilities. The following functions are available on any keychain that implements this interface.
 
 ```js
-let addresses = avm.keyChain().getAddresses(); //returns an array of Buffers for the addresses
-let addressStrings = avm.keyChain().getAddressStrings(); //returns an array of strings for the addresses
-let exists = myKeychain.hasKey(myaddress); //returns true if the address is managed
-let keypair = myKeychain.getKey(myaddress); //returns the keypair class
+let addresses = myKeychain.getAddresses(); //returns an array of Buffers for the addresses
+let addressStrings = myKeychain.getAddressStrings(); //returns an array of strings for the addresses
+let exists = myKeychain.hasKey(newAddress1); //returns true if the address is managed
+let keypair = myKeychain.getKey(newAddress1); //returns the keypair class
 ```
 
 ### Working with keypairs
@@ -156,10 +156,10 @@ keypair.generateKey(); //creates a new random keypair
 let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
 let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
 
-let message = "Wubalubadubdub";
+let message = Buffer.from("Wubalubadubdub");
 let signature = keypair.sign(message); //returns a Buffer with the signature
 let signerPubk = keypair.recover(message, signature);
-let isValid = keypair.verify(message, signature, signerPubk); //returns a boolean
+let isValid = keypair.verify(message, signature); //returns a boolean
 ```
 
 ## Example 2 &mdash; Creating An Asset
@@ -318,7 +318,7 @@ let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized add
 //   * An array of addresses sending the funds
 //   * An array of addresses any leftover funds are sent
 //   * The AssetID of the funds being sent
-let unsignedTx = avm.makeUnsignedTx(utxos, amount, [friendsAddress], myAddresses, myAddresses, assetid); 
+let unsignedTx = avm.makeUnsignedTx(utxos, amount, [friendsAddress], myAddresses, myAddresses, assetid);
 let signedTx = avm.signTx(unsignedTx);
 let txid = await avm.issueTx(signedTx);
 ```
