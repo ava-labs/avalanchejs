@@ -3,7 +3,7 @@
  */
 import {Buffer} from "buffer/";
 import { Signature, AVMConstants, InitialStates } from './types';
-import { Output, SelectOutputClass } from './outputs';
+import { Output, TransferableOutput, SelectOutputClass } from './outputs';
 import { Input, SelectInputClass } from './inputs';
 import BinTools from '../../utils/bintools';
 import { Operation, SelectOperationClass } from './ops';
@@ -14,35 +14,13 @@ import { Operation, SelectOperationClass } from './ops';
 const bintools = BinTools.getInstance();
 
 /** 
- * Class representing an unsigned transaction.
- * 
- * @remarks
- * Unsigned Tx:
- * TxID      | 4 bytes
- * NetworkID  | 4 bytes
- * BlockchainID   | 32 bytes
- * NumOuts    | 4 bytes
- * Repeated (NumOuts):
- *     Out    | ? bytes
- * NumIns     | 4 bytes
- * Repeated (NumIns):
- *     In     | ? bytes
+ * Class representing a base for all transactions.
  */
-/* Tx:
- * Unsigned Tx | ? bytes
- * Repeated (NumIns):
- *     Sig     | ? bytes
- */
-/* Sig:
- * Repeated (NumSigs):
- *     Sig    | 65 bytes
- */
-export class TxUnsigned {
-    protected txtype:Buffer = Buffer.alloc(4);
+export class BaseTx {
     protected networkid:Buffer = Buffer.alloc(4);
     protected blockchainid:Buffer = Buffer.alloc(32);
     protected numouts:Buffer = Buffer.alloc(4);
-    protected outs:Array<Output>;
+    protected outs:Array<TransferableOutput>;
     protected numins:Buffer = Buffer.alloc(4);
     protected ins:Array<Input>;
 
@@ -377,7 +355,8 @@ export class TxOperation extends TxUnsigned {
  * Class representing a signed transaction.
  */
 export class Tx {
-    protected tx:TxUnsigned = new TxUnsigned();
+    protected txtype:Buffer = Buffer.alloc(4);
+    protected tx:UnsignedTx = new UnsignedTx();
     protected signatures:Array<Array<Signature>> = [];
 
     /**
@@ -388,7 +367,7 @@ export class Tx {
      * @returns The length of the raw [[Tx]]
      */
     fromBuffer(bytes:Buffer):number {
-        this.tx = new TxUnsigned();
+        this.tx = new UnsignedTx();
         let offset:number = this.tx.fromBuffer(bytes);
         let numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;

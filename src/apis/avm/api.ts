@@ -557,6 +557,38 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
+     * Helper function which creates an unsigned NFT Transfer. For more granular control, you may create your own
+     * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s.
+     * 
+     * @param utxoset  A set of UTXOs that the transaction is built on
+     * @param utxoid A UTXOID that the transaction is sending
+     * @param toAddresses The addresses to send the NFT
+     * @param fromAddresses The addresses being used to send the NFT from the UTXOID provided
+     * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
+     * @param feeAmount The amount of fees being paid for this transaction
+     * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param threshold The number of signatures required to spend the funds in the resultant UTXO
+     * 
+     * @returns An unsigned NFT transaction created from the passed in parameters.
+     * 
+     * @remarks
+     * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+     */
+    makeUnsignedNFTTx = async (
+        utxoset:UTXOSet, utxoid:string, toAddresses:Array<string>, fromAddresses:Array<string>, 
+        feeAddresses:Array<string>, feeAmount:BN, threshold:number = 1
+    ):Promise<TxUnsigned> => {
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTx").map(a => bintools.stringToAddress(a));;
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTx").map(a => bintools.stringToAddress(a));;
+        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "makeUnsignedNFTTx").map(a => bintools.stringToAddress(a));;
+
+        return utxoset.makeUnsignedNFTTx(
+            this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
+            utxoid, to, from, feeAddrs, feeAmount, threshold
+        );
+    }
+
+    /**
      * Helper function which creates an unsigned transaction. For more granular control, you may create your own
      * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s.
      * 

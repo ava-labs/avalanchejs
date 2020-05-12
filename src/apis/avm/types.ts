@@ -234,20 +234,27 @@ export class InitialStates {
 }
 
 export class AVMConstants {
+    static SECPFXID:number = 0;
+
     static SECPOUTPUTID:number = 7;
-    static SECPINPUTID:number = 5;
     static NFTXFEROUTPUTID:number = 11;
+
+    static SECPINPUTID:number = 5;
+    static NFTXFEROP:number = 13;
+
+    static BASETX:number = 0;
     static CREATEASSETTX:number = 1;
     static OPERATIONTX:number = 2;
-    static NFTXFEROP:number = 13;
-    static BASETX:number = 0;
+
     static SECPCREDENTIAL:number = 9;
+    static NFTCREDENTIAL:number = 16;
+
     static ASSETIDLEN:number = 32;
     static BLOCKCHAINIDLEN:number = 32;
     static SYMBOLMAXLEN:number = 4;
     static ASSETNAMELEN:number = 128;
     static ADDRESSLENGTH:number = 20;
-    static SECPFXID:number = 0;
+    
 }
 
 /**

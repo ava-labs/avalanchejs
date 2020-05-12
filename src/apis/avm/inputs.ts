@@ -12,20 +12,6 @@ import { SigIdx, AVMConstants } from './types';
 const bintools = BinTools.getInstance();
 
 /**
- * Class representing an Input for a transaction.
- * 
- * @remarks 
- * Input:
- * ObjectID | 04 bytes
- * TxID     | 32 bytes
- * TxIndex  | 04 bytes
- * Amount   | 08 bytes
- * NumSigs  | 04 bytes
- * Repeated (NumSigs):
- *     SigIdx  | 04 bytes
- */
-
-/**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
  * 
  * @param inbuffer A {@link https://github.com/feross/buffer|Buffer} containing the [[Input]] raw data.
@@ -43,33 +29,51 @@ export const SelectInputClass = (inbuffer:Buffer, args:Array<any> = []):Input =>
     throw new Error("Error - SelectInputClass: unknown inputid " + inputid);
 }
 
-export class Input {
+export class TransferableInput {
     protected txid:Buffer = Buffer.alloc(32);
-    protected txidx:Buffer = Buffer.alloc(4);
+    protected outputidx:Buffer = Buffer.alloc(4);
     protected assetid:Buffer = Buffer.alloc(32);
-    protected inputid:Buffer = Buffer.alloc(4);
+    protected input:Input = Buffer.alloc(4);
 
     /**
-     * Returns a function used to sort an array of [[Input]]s
+     * Returns a function used to sort an array of [[TransferableInput]]s
      */
-    static comparator = ():(a:Input, b:Input) => (1|-1|0) => {
-        return function(a:Input, b:Input):(1|-1|0) { 
-            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+    static comparator = ():(a:TransferableInput, b:TransferableInput) => (1|-1|0) => {
+        return function(a:TransferableInput, b:TransferableInput):(1|-1|0) { 
+            let sorta = Buffer.concat([a.getTxID(), a.getOutputIdx()]);
+            let sortb = Buffer.concat([b.getTxID(), b.getOutputIdx()]);
+            return Buffer.compare(sorta, sortb) as (1|-1|0);
         }
+    }
+
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
+     */
+    getTxID = ():Buffer => {
+        /* istanbul ignore next */
+        return this.txid;
+    }
+
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer}  of the OutputIdx.
+     */
+    getOutputIdx = ():Buffer => {
+        /* istanbul ignore next */
+        return this.outputidx;
     }
 
     /**
      * Returns a base-58 string representation of the UTXOID this [[Input]] references.
      */
     getUTXOID = ():string => {
-        return bintools.bufferToB58(Buffer.concat([this.txid, this.txidx]));
+        return bintools.bufferToB58(Buffer.concat([this.txid, this.outputidx]));
     }
 
     /**
      * Returns the number for the input type of the output class.
      */
     getInputID = ():number => {
-        return this.inputid.readUInt32BE(0);
+        return this.input.getInputID().readUInt32BE(0);
     };
 
     /**
@@ -130,7 +134,7 @@ export class Input {
      * @param txid A {@link https://github.com/feross/buffer|Buffer} containing the transaction ID of the referenced UTXO
      * @param txidx A {@link https://github.com/feross/buffer|Buffer} containing the index of the output in the transaction consumed in the [[Input]]
      * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Input]]
-     * @param inputid A number representing the InputID of the [[Input]]
+     * @param input A number representing the InputID of the [[Input]]
      */
     constructor(txid?:Buffer, txidx?:Buffer, assetID?:Buffer, inputid?:number) {
         if(txid && txidx && assetID && inputid){
@@ -139,6 +143,28 @@ export class Input {
             this.txidx = txidx;
             this.assetid = assetID;
         }
+    }
+}
+
+export class TransferableInput {
+
+    protected assetID:Buffer = Buffer.alloc(AVMConstants.ASSETIDLEN);
+    protected input:Input;
+
+    fromBuffer(tranbuff:Buffer, offset:number = 0):number {
+        this.assetID = bintools.copyFrom(tranbuff, offset, offset + AVMConstants.ASSETIDLEN);
+        offset += AVMConstants.ASSETIDLEN;
+        let outputid:number = bintools.copyFrom(tranbuff, offset, offset + 4).readUInt32BE(0);
+        this.output = SelectOutputClass(outputid, bintools.copyFrom(tranbuff, offset));
+        return offset + this.output.toBuffer().length;
+    }
+
+    toBuffer():Buffer {
+        let outbuff:Buffer = this.output.toBuffer();
+        let outid:Buffer = Buffer.alloc(4)
+        outid.writeUInt32BE(this.output.getOutputID(), 0);
+        let barr:Array<Buffer> = [this.assetID, outid, outbuff];
+        return Buffer.concat(barr, this.assetID.length + outid.length + outbuff.length);
     }
 }
 

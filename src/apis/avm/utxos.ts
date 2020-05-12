@@ -4,9 +4,9 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Output, SecpOutput, SelectOutputClass } from './outputs';
-import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
-import { TxUnsigned, TxCreateAsset } from './tx';
+import { Output, SecpOutput, AmountOutput, SelectOutputClass, NFTOutput } from './outputs';
+import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
+import { TxUnsigned, TxCreateAsset, TxOperation } from './tx';
 import { SecpInput, Input } from './inputs';
 
 /**
@@ -14,39 +14,14 @@ import { SecpInput, Input } from './inputs';
  */
 const bintools = BinTools.getInstance();
 
-
-/**
- * Takes a buffer representing the output and returns the proper UTXO instance.
- * 
- * @param utxobuffer A {@link https://github.com/feross/buffer|Buffer} containing the [[UTXO]] raw data.
- * 
- * @returns An instance of an [[UTXO]]-extended class. ex. [[SecpUTXO]].
- */
-export const SelectUTXOClass = (utxobuffer:Buffer, args:Array<any> = []):UTXO => {
-    let txid:Buffer = bintools.copyFrom(utxobuffer, 0, 32);
-    let txidx:number = utxobuffer.readUInt32BE(32);
-    let outputbuff:Buffer = bintools.copyFrom(utxobuffer, 36);
-    let output:Output = SelectOutputClass(outputbuff);
-    let outputid:number = output.getOutputID();
-    if(outputid == AVMConstants.SECPOUTPUTID){
-        let secpout:SecpOutput = output as SecpOutput;
-        let utxo:SecpUTXO = new SecpUTXO(txid, txidx, secpout);
-        return utxo;
-    }
-    /* istanbul ignore next */
-    throw new Error("Error - SelectUTXOClass: unknown outputid " + outputid);
-}
-
 /**
  * Class for representing a single UTXO.
  */
 export class UTXO {
     protected txid:Buffer = Buffer.alloc(32);
-    protected txidx:Buffer = Buffer.alloc(4);
-
-    getOuputID():number {
-        return undefined;
-    };
+    protected outputidx:Buffer = Buffer.alloc(4);
+    protected assetid:Buffer = Buffer.alloc(32);
+    protected output:Output = undefined;
 
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -59,9 +34,16 @@ export class UTXO {
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer}  of the TxIdx.
      */
-    getTxIdx = ():Buffer => {
+    getOutputIdx = ():Buffer => {
         /* istanbul ignore next */
-        return this.txidx;
+        return this.outputidx;
+    }
+
+    /**
+     * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
+     */
+    getAssetID = ():Buffer => {
+        return this.assetid;
     }
 
     /**
@@ -69,8 +51,17 @@ export class UTXO {
      */
     getUTXOID = ():string => {
         /* istanbul ignore next */
-        return bintools.bufferToB58(Buffer.concat([this.getTxID(), this.getTxIdx()]));
+        return bintools.bufferToB58(Buffer.concat([this.getTxID(), this.getOutputIdx()]));
     }
+
+
+    /**
+     * Returns a reference to the output;
+    */
+    getOutput = ():Output => {
+        return this.output;
+    }
+
 
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
@@ -80,8 +71,13 @@ export class UTXO {
     fromBuffer(utxobuff:Buffer, offset:number = 0):number {
         this.txid = bintools.copyFrom(utxobuff, offset, offset + 32);
         offset += 32;
-        this.txidx = bintools.copyFrom(utxobuff, offset, offset + 4);
+        this.outputidx = bintools.copyFrom(utxobuff, offset, offset + 4);
         offset += 4;
+        this.assetid = bintools.copyFrom(utxobuff, offset, offset + 32);
+        offset += 32;
+        let outputid:number = bintools.copyFrom(utxobuff, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.output = SelectOutputClass(outputid, bintools.copyFrom(utxobuff, offset)); 
         return offset;
     }
 
@@ -106,8 +102,11 @@ export class UTXO {
     toBuffer():Buffer {
         /* istanbul ignore next */
         try {
-            let barr:Array<Buffer> = [this.txid, this.txidx];
-            return Buffer.concat(barr, this.txid.length + this.txidx.length)
+            let outbuff:Buffer = this.output.toBuffer();
+            let outputidbuffer:Buffer = Buffer.alloc(4);
+            outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
+            let barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
+            return Buffer.concat(barr, this.txid.length + this.outputidx.length + this.assetid.length + outputidbuffer.length + outbuff.length);
         } catch(e) {
             /* istanbul ignore next */
             let emsg:string = "Error - UTXO.toBuffer: " + e;
@@ -131,179 +130,16 @@ export class UTXO {
      * Class for representing a single UTXO.
      * 
      * @param txid Optional {@link https://github.com/feross/buffer|Buffer} of transaction ID for the UTXO
-     * @param txidx Optional number for the index of the transaction's [[Output]]
+     * @param txidx Optional {@link https://github.com/feross/buffer|Buffer} or number for the index of the transaction's [[Output]]
+     * @param assetid Optional {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
+     * @param outputid Optional {@link https://github.com/feross/buffer|Buffer} or number of the output ID for the UTXO
      */
-    constructor(txid:Buffer = undefined, txidx:number = undefined) {
-        if(typeof txid !== "undefined" && typeof txidx === "number") {
+    constructor(txid:Buffer = undefined, outputidx:Buffer | number = undefined, assetid:Buffer = undefined, output:Output = undefined) {
+        if(typeof txid !== "undefined" && typeof outputidx === "number") {
             this.txid = txid;
-            this.txidx.writeUInt32BE(txidx, 0);
-        }
-    }
-}
-
-
-/**
- * Class for representing a single UTXO.
- */
-export class SecpUTXO extends UTXO {
-    protected output:SecpOutput = undefined;
-
-    getOuputID = ():number => {
-        return this.output.getOutputID();
-    }
-
-    /**
-     * Gets the amount in the UTXO as a {@link https://github.com/indutny/bn.js/|BN}.
-     */
-    getAmount = ():BN => {
-        return this.output.getAmount();
-    }
-
-    /**
-     * Gets the addresses in the UTXO as map of address to the locktime for the address as a {@link https://github.com/indutny/bn.js/|BN}.
-     */
-    getAddresses = ():Array<Buffer> => {
-        return this.output.getAddresses();
-    };
-
-    /**
-     * Gets the index of the address in the output.
-     * 
-     * @returns An array of size two, the first index representing the index of the address, the second a boolean representing whether this result was a fallback (TakeItOrLeaveIt)
-     */
-    getAddressIdx = (address:Buffer):number => {
-        return this.output.getAddressIdx(address);
-    }
-
-    /**
-     * Gets the address at the index.
-     * 
-     * @param idx The index of the address
-     * 
-     * @returns A {@link https://github.com/feross/buffer|Buffer} representing the address.
-     */
-    getAddress = (idx:number):Buffer => {
-        return this.output.getAddress(idx);
-    }
-
-    /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} of the assetID.
-     */
-    getAssetID = ():Buffer => {
-        let assetID = this.output.getAssetID();
-        if(assetID){
-            return assetID;
-        }
-        /* istanbul ignore next */
-        return this.getTxID();
-    }
-
-    /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
-     */
-    getTxID = ():Buffer => {
-        return this.txid;
-    }
-
-    /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer}  of the TxIdx.
-     */
-    getTxIdx = ():Buffer => {
-        return this.txidx;
-    }
-
-    /**
-     * Returns a {@link https://github.com/indutny/bn.js/|BN} of the locktime.
-     */
-    getLocktime = ():BN => {
-        return this.output.getLocktime();
-    }
-
-    /**
-     * Returns the UTXOID as a base-58 string (UTXOID is a string )
-     */
-    getUTXOID = ():string => {
-        return bintools.bufferToB58(Buffer.concat([this.getTxID(), this.getTxIdx()]));
-    }
-
-    /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
-     * 
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[UTXO]]
-     */
-    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
-        offset = super.fromBuffer(utxobuff, offset);
-        let utxoOut = bintools.copyFrom(utxobuff, offset, utxobuff.length);
-        this.output = SelectOutputClass(utxoOut) as SecpOutput;
-        offset += this.output.toBuffer().length;
-        return offset;
-    }
-
-    /**
-     * Takes a base-58 string containing an [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
-     * 
-     * @param serialized A base-58 string containing a raw [[UTXO]]
-     * 
-     * @returns The length of the raw [[UTXO]]
-     * 
-     * @remarks 
-     * unlike most fromStrings, it expects the string to be serialized in AVA format
-     */
-    fromString(serialized:string):number {
-        return this.fromBuffer( bintools.avaDeserialize(serialized) );
-    }
-
-    /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[UTXO]].
-     */
-    toBuffer():Buffer {
-        try {
-            let superbuff = super.toBuffer();
-            let obuff = this.output.toBuffer();
-            let barr:Array<Buffer> = [superbuff, obuff];
-            return Buffer.concat(barr, superbuff.length + obuff.length)
-        } catch(e) {
-            /* istanbul ignore next */
-            let emsg:string = "Error - SecpUTXO.toBuffer: " + e;
-            /* istanbul ignore next */
-            throw new Error(emsg);
-        }
-    }
-
-    /**
-     * Returns a base-58 representation of the [[UTXO]].
-     * 
-     * @remarks 
-     * unlike most toStrings, this returns in AVA serialization format
-     */
-    toString():string {
-        return bintools.avaSerialize(this.toBuffer());
-    }
-
-    /**
-     * Given an array of addresses and an optional timestamp, returns an array of address strings of qualified spenders for the output.
-     */
-    getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
-        return this.output.getSpenders(addresses, asOf);
-    }
-    
-    /**
-     * Given an array of addresses and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
-     */
-    meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined) => {
-        return this.output.meetsThreshold(addresses, asOf);
-    }
-
-    /**
-     * Class for representing a single UTXO.
-     * 
-     * @param txid Optional {@link https://github.com/feross/buffer|Buffer} representing the transaction ID
-     * @param txidx Optional number for the transaction index
-     */
-    constructor(txid:Buffer = undefined, txidx:number = undefined, secpoutput:SecpOutput = undefined) {
-        super(txid, txidx);
-        if(secpoutput){
-            this.output = secpoutput;
+            this.outputidx.writeUInt32BE(outputidx, 0);
+            this.assetid = assetid;
+            this.output = output;
         }
     }
 }
@@ -312,7 +148,7 @@ export class SecpUTXO extends UTXO {
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet {
-    protected utxos:{[utxoid: string]: SecpUTXO } =  {};
+    protected utxos:{[utxoid: string]: UTXO } =  {};
     protected addressUTXOs:{[address: string]: {[utxoid: string]: BN}} = {}; // maps address to utxoids:locktime
 
     /**
@@ -324,9 +160,9 @@ export class UTXOSet {
         let utxoX:UTXO;
         //force a copy
         if(typeof utxo === 'string') {
-            utxoX = SelectUTXOClass(bintools.avaDeserialize(utxo));
+            utxoX.fromBuffer(bintools.avaDeserialize(utxo));
         } else {
-            utxoX = utxo; //forces a copy
+            utxoX.fromBuffer(utxo.toBuffer()); //forces a copy
         }
         let utxoid:string = utxoX.getUTXOID();
         return (utxoid in this.utxos);
@@ -338,29 +174,22 @@ export class UTXOSet {
      * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
      * @param overwrite If true, if the UTXOID already exists, overwrite it... default false
      * 
-     * @returns A true value if a [[UTXO]] was added and false if nothing was added.
+     * @returns A [[UTXO]] if one was added and undefined if nothing was added.
      */
-    add = (utxo:UTXO | string, overwrite:boolean = false):boolean => {
-        let utxoX:UTXO;
+    add = (utxo:UTXO | string, overwrite:boolean = false):UTXO => {
+        let utxovar:UTXO;
         //force a copy
         if(typeof utxo === 'string') {
-            utxoX = SelectUTXOClass(bintools.avaDeserialize(utxo));
+            utxovar.fromBuffer(bintools.avaDeserialize(utxo));
         } else {
-            utxoX = SelectUTXOClass(utxo.toBuffer()); //forces a copy
+            utxovar.fromBuffer(utxo.toBuffer()); //forces a copy
         }
-        let secputxo:SecpUTXO;
-        try {
-            secputxo = utxoX as SecpUTXO;
-        } catch (e) {
-            /* istanbul ignore next */
-            return false;
-        }
-        let utxoid:string = secputxo.getUTXOID();
+        let utxoid:string = utxovar.getUTXOID();
         if(!(utxoid in this.utxos) || overwrite === true){
-            this.utxos[utxoid] = secputxo;
+            this.utxos[utxoid] = utxovar;
 
-            let addresses:Array<Buffer> = secputxo.getAddresses();
-            let locktime:BN = secputxo.getLocktime();
+            let addresses:Array<Buffer> = utxovar.getOutput().getAddresses();
+            let locktime:BN = utxovar.getOutput().getLocktime();
             for(let i = 0; i < addresses.length; i++){
                 let address:string = addresses[i].toString("hex");
                 if(!(address in this.addressUTXOs)){
@@ -368,9 +197,9 @@ export class UTXOSet {
                 }
                 this.addressUTXOs[address][utxoid] = locktime;
             }
-            return true;
+            return utxovar;
         }
-        return false;
+        return undefined;
     }
 
     /**
@@ -384,14 +213,9 @@ export class UTXOSet {
     addArray = (utxos:Array<string | UTXO>, overwrite:boolean = false):Array<UTXO> => {
         let added:Array<UTXO> = [];
         for(let i = 0; i < utxos.length; i++){
-            let u:UTXO;
-            if(typeof utxos[i]  === 'string') {
-                u = SelectUTXOClass(bintools.avaDeserialize(utxos[i] as string));
-            } else {
-                u = SelectUTXOClass((utxos[i] as UTXO).toBuffer()); //forces a copy
-            }
-            if(this.add(u, overwrite)){
-                added.push(u);
+            let result:UTXO = this.add(utxos[i], overwrite)
+            if(typeof result !== 'undefined'){
+                added.push(result);
             }
         }
         return added;
@@ -402,19 +226,19 @@ export class UTXOSet {
      * 
      * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
      * 
-     * @returns A true value if a [[UTXO]] was removed and false if nothing was removed.
+     * @returns A [[UTXO]] if it was removed and undefined if nothing was removed.
      */ 
-    remove = (utxo:UTXO | string):boolean => {
-        let utxoX:UTXO;
+    remove = (utxo:UTXO | string):UTXO => {
+        let utxovar:UTXO;
         //force a copy
         if(typeof utxo === 'string') {
-            utxoX = SelectUTXOClass(bintools.avaDeserialize(utxo));
+            utxovar.fromBuffer(bintools.avaDeserialize(utxo));
         } else {
-            utxoX = SelectUTXOClass(utxo.toBuffer()); //forces a copy
+            utxovar.fromBuffer(utxo.toBuffer()); //forces a copy
         }
-        let utxoid:string = utxoX.getUTXOID();
+        let utxoid:string = utxovar.getUTXOID();
         if(!(utxoid in this.utxos)){
-            return false;
+            return undefined;
         }
         delete this.utxos[utxoid];
         let addresses = Object.keys(this.addressUTXOs);
@@ -423,7 +247,7 @@ export class UTXOSet {
                 delete this.addressUTXOs[addresses[i]][utxoid];
             }
         }
-        return true;
+        return utxovar;
     }
 
     /**
@@ -437,14 +261,9 @@ export class UTXOSet {
     removeArray = (utxos:Array<string | UTXO>):Array<UTXO> => {
         let removed:Array<UTXO> = [];
         for(let i = 0; i < utxos.length; i++){
-            let u:UTXO;
-            if(typeof utxos[i]  === 'string') {
-                u = SelectUTXOClass(bintools.avaDeserialize(utxos[i] as string));
-            } else {
-                u = SelectUTXOClass((utxos[i] as UTXO).toBuffer()); //forces a copy
-            }
-            if(this.remove(u)){
-                removed.push(u);
+            let result:UTXO = this.remove(utxos[i]);
+            if(typeof result !== 'undefined'){
+                removed.push(result);
             }
         }
         return removed;
@@ -468,8 +287,8 @@ export class UTXOSet {
      * 
      * @returns An array of [[UTXO]]s.
      */
-    getAllUTXOs = (utxoids:Array<string> = undefined):Array<SecpUTXO> => {
-        let results:Array<SecpUTXO> = [];
+    getAllUTXOs = (utxoids:Array<string> = undefined):Array<UTXO> => {
+        let results:Array<UTXO> = [];
         if(typeof utxoids !== 'undefined' && Array.isArray(utxoids)){
             for(let i = 0; i < utxoids.length; i++){
                 if(utxoids[i] in this.utxos && !(utxoids[i] in results)){
@@ -551,7 +370,7 @@ export class UTXOSet {
      */
     getBalance = (addresses:Array<Buffer>, assetID:Buffer|string, asOf:BN = undefined):BN => {
         let utxoids:Array<string> = this.getUTXOIDs(addresses);
-        let utxos:Array<SecpUTXO> = this.getAllUTXOs(utxoids);
+        let utxos:Array<UTXO> = this.getAllUTXOs(utxoids);
         let spend:BN = new BN(0);
         let asset:Buffer;
         if(typeof assetID === 'string'){
@@ -560,8 +379,8 @@ export class UTXOSet {
             asset = assetID;
         }
         for(let i = 0; i < utxos.length; i++){
-            if(utxos[i].getAssetID().toString("hex") == asset.toString("hex") && utxos[i].meetsThreshold(addresses, asOf)){
-                spend = spend.add(utxos[i].getAmount());
+            if(utxos[i].getOutput() instanceof AmountOutput && utxos[i].getAssetID().toString("hex") == asset.toString("hex") && utxos[i].getOutput().meetsThreshold(addresses, asOf)){
+                spend = spend.add((utxos[i].getOutput() as AmountOutput).getAmount());
             }
         }
         return spend;
@@ -599,9 +418,97 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param utxoid A UTXOID that the transaction is sending
+     * @param toAddresses The addresses to send the funds
+     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+     * @param threshold The number of signatures required to spend the funds in the resultant UTXO
+     * 
+     * @returns An unsigned transaction created from the passed in parameters.
+     * 
+     */
+    makeUnsignedNFTTx = (
+            networkid:number, 
+            blockchainid:Buffer, 
+            utxoid:string,
+            toAddresses:Array<Buffer>, 
+            fromAddresses:Array<Buffer>, 
+            // these things will be added later
+            //feeAddresses:Array<Buffer>,
+            //feeAmount:BN,
+            //asOf:BN = UnixNow(), 
+            threshold:number = 1
+        ):TxUnsigned => {
+        const zero:BN = new BN(0);
+        let spendamount:BN = zero.clone();
+        //let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDs(feeAddresses));
+        let change:BN = zero.clone();
+        //let assetid = 
+
+        let outs:Array<SecpOutput> = [];
+        let ins:Array<SecpInput> = [];
+        //the below code can be used for fees once implemented
+        /* 
+        if(!feeAmount.gte(zero)){
+            outs.push(new SecpOutput(assetID, feeAmount, [], locktime, threshold));
+
+            for(let i = 0; i < utxos.length && spendamount.lt(feeAmount); i++){
+                if((assetID === undefined || (utxos[i].getAssetID().compare(assetID) == 0) && utxos[i].meetsThreshold(feeAddresses, asOf))){
+                    let amt:BN = utxos[i].getAmount().clone();
+                    spendamount = spendamount.add(amt);
+                    change = spendamount.sub(feeAmount);
+                    change = change.gt(zero) ? change : zero.clone();
+
+                    let txid:Buffer = utxos[i].getTxID();
+                    let txidx:Buffer = utxos[i].getTxIdx();
+                    let input:SecpInput = new SecpInput(txid, txidx, amt, assetID);
+                    let spenders:Array<Buffer> = utxos[i].getSpenders(feeAddresses, asOf);
+                    for(let j = 0; j < spenders.length; j++){
+                        let idx:number;
+                        idx = utxos[i].getAddressIdx(spenders[j]);
+                        if(idx == -1){
+                            
+                            throw new Error("Error - UTXOSet.makeUnsignedTx: no such address in output: " + spenders[j]);
+                        }
+                        input.addSignatureIdx(idx, spenders[j]);
+                    }
+                    ins.push(input);
+
+                    if(change.gt(zero)){
+                        if(assetID) {
+                            outs.push(new SecpOutput(assetID, change, feeAddresses, zero.clone(), 1));
+                        } 
+                        break;
+                    }
+                    if(spendamount.gte(feeAmount)){
+                        break;
+                    }
+                } else {
+                    continue;
+                }
+            }
+
+            if(spendamount.lt(feeAmount)){
+                throw new Error("Error - UTXOSet.makeUnsignedNFTTx: insufficient funds to create the transaction");
+            }
+        }
+        */
+
+        let nftutxo = this.getUTXO(utxoid);
+        nftutxo.
+
+        return new TxOperation(ops, ins, outs, networkid, blockchainid);
+    }
+
+    /**
+     * Creates an unsigned transaction. For more granular control, you may create your own
+     * [[TxUnsigned]] manually (with their corresponding [[Input]]s and [[Output]]s).
+     * 
+     * @param networkid The number representing NetworkID of the node
+     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param amount The amount of AVA to be spent in $nAVA
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime The locktime field created in the resulting outputs
      * @param threshold The number of signatures required to spend the funds in the resultant UTXO
@@ -676,6 +583,36 @@ export class UTXOSet {
         }
 
         return new TxUnsigned(ins, outs, networkid, blockchainid);
+    }
+
+    /**
+     * Creates an unsigned NFT transfer transaction. For more granular control, you may create your own
+     * [[TxOperation]] manually (with their corresponding [[Input]]s, [[Output]]s).
+     * 
+     * @param networkid The number representing NetworkID of the node
+     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param fee The amount of AVA to be paid for fees, in $nAVA
+     * @param creatorAddresses The addresses to send the fees
+     * @param initialState The [[InitialStates]]that represent the intial state of a created asset
+     * @param name String for the descriptive name of the asset
+     * @param symbol String for the ticker symbol of the asset
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * 
+     * @returns An unsigned transaction created from the passed in parameters.
+     * 
+     */
+    makeOperationTx = (
+        networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
+        fee:BN, creatorAddresses:Array<Buffer>, 
+        initialState:InitialStates, name:string, 
+        symbol:string, denomination:number
+    ):TxCreateAsset => {
+        // Cheating and using makeUnsignedTx to get Ins and Outs for fees.
+        // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the creatorAddresses
+        let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
+        let ins:Array<Input> = utx.getIns();
+        let outs:Array<Output> = utx.getOuts();
+        return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, AVMConstants.CREATEASSETTX);
     }
 
     /**
