@@ -291,7 +291,7 @@ For the case of this example, we're going to create a simple transaction that sp
 However, we do need to get the UTXO Set for the addresses we're managing.
 
 ```js
-let myAddresses = avm.keyChain().getAddresses(); //returns an array of addresses the keychain manages as strings
+let myAddresses = avm.keyChain().getAddresses(); //returns an array of addresses the keychain manages
 let addressStrings = avm.keyChain().getAddressStrings(); //returns an array of addresses the keychain manages as strings
 let utxos = await avm.getUTXOs(myAddresses);
 ```
