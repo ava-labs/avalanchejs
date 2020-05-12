@@ -42,6 +42,25 @@ describe("Keystore", () => {
         expect(response).toBe(true);
     });
 
+    test("deleteUser", async ()=>{
+
+        let result:Promise<boolean> = keystore.deleteUser(username, password);
+        let payload:object = {
+            "result": {
+                "success": true
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:boolean = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(true);
+    });
+
     test('exportUser', async ()=>{
         let data = 'data';
 

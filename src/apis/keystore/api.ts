@@ -83,6 +83,24 @@ class KeystoreAPI extends JRPCAPI{
     }
 
     /**
+     * Deletes a user in the node's database.
+     * 
+     * @param username Name of the user to delete
+     * @param password Password for the user
+     * 
+     * @returns Promise for a boolean with true on success
+     */
+    deleteUser = async (username:string, password:string):Promise<boolean> => {
+        let params = {
+            "username": username,
+            "password": password
+        };
+        return this.callMethod("keystore.deleteUser", params).then((response:RequestResponseData) => {
+            return response.data["result"]["success"];
+        });
+    }
+
+    /**
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
