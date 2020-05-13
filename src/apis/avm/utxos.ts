@@ -4,9 +4,9 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Output, SecpOutput, AmountOutput, SelectOutputClass, NFTOutput } from './outputs';
-import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
-import { TxUnsigned, TxCreateAsset, TxOperation } from './tx';
+import { Output, SecpOutput, AmountOutput, SelectOutputClass, NFTTransferOutput } from './outputs';
+import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
+import { UnsignedTx, CreateAssetTx, OperationTx } from './tx';
 import { SecpInput, Input } from './inputs';
 
 /**
@@ -582,7 +582,7 @@ export class UTXOSet {
             }
         }
 
-        return new TxUnsigned(ins, outs, networkid, blockchainid);
+        return new UnsignedTx(networkid, blockchainid, outs, ins);
     }
 
     /**
@@ -606,13 +606,13 @@ export class UTXOSet {
         fee:BN, creatorAddresses:Array<Buffer>, 
         initialState:InitialStates, name:string, 
         symbol:string, denomination:number
-    ):TxCreateAsset => {
+    ):CreateAssetTx => {
         // Cheating and using makeUnsignedTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the creatorAddresses
-        let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
+        let utx:UnsignedTx = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
         let ins:Array<Input> = utx.getIns();
         let outs:Array<Output> = utx.getOuts();
-        return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, AVMConstants.CREATEASSETTX);
+        return new CreateAssetTx(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, AVMConstants.CREATEASSETTX);
     }
 
     /**
@@ -636,13 +636,13 @@ export class UTXOSet {
         fee:BN, creatorAddresses:Array<Buffer>, 
         initialState:InitialStates, name:string, 
         symbol:string, denomination:number
-    ):TxCreateAsset => {
+    ):CreateAssetTx => {
         // Cheating and using makeUnsignedTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the creatorAddresses
-        let utx:TxUnsigned = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
+        let utx:UnsignedTx = this.makeUnsignedTx(networkid, blockchainid, fee, [], creatorAddresses, creatorAddresses, avaAssetID);
         let ins:Array<Input> = utx.getIns();
         let outs:Array<Output> = utx.getOuts();
-        return new TxCreateAsset(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, AVMConstants.CREATEASSETTX);
+        return new CreateAssetTx(name, symbol, denomination, initialState, ins, outs, networkid, blockchainid, AVMConstants.CREATEASSETTX);
     }
 
     /**

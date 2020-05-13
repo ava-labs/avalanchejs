@@ -14,15 +14,15 @@ const bintools = BinTools.getInstance();
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
  * 
- * @param inbuffer A {@link https://github.com/feross/buffer|Buffer} containing the [[Input]] raw data.
+ * @param inputid A number representing the inputID parsed prior to the bytes passed in
+ * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the [[Input]] raw data.
  * 
- * @returns An instance of an [[Input]]-extended class: [[SecpInput]].
+ * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inbuffer:Buffer, args:Array<any> = []):Input => {
-    let inputid:number = inbuffer.readUInt32BE(68);
+export const SelectInputClass = (inputid:number, bytes:Buffer, args:Array<any> = []):Input => {
     if(inputid == AVMConstants.SECPINPUTID){
-        let secpin:SecpInput = new SecpInput();
-        secpin.fromBuffer(inbuffer);
+        let secpin:SecpInput = new SecpInput(...args);
+        secpin.fromBuffer(bytes);
         return secpin;
     }
     /* istanbul ignore next */
@@ -33,7 +33,7 @@ export class TransferableInput {
     protected txid:Buffer = Buffer.alloc(32);
     protected outputidx:Buffer = Buffer.alloc(4);
     protected assetid:Buffer = Buffer.alloc(32);
-    protected input:Input = Buffer.alloc(4);
+    protected input:Input;
 
     /**
      * Returns a function used to sort an array of [[TransferableInput]]s
@@ -63,7 +63,7 @@ export class TransferableInput {
     }
 
     /**
-     * Returns a base-58 string representation of the UTXOID this [[Input]] references.
+     * Returns a base-58 string representation of the UTXOID this [[TransferableInput]] references.
      */
     getUTXOID = ():string => {
         return bintools.bufferToB58(Buffer.concat([this.txid, this.outputidx]));
@@ -73,7 +73,7 @@ export class TransferableInput {
      * Returns the number for the input type of the output class.
      */
     getInputID = ():number => {
-        return this.input.getInputID().readUInt32BE(0);
+        return this.input.getInputID();
     };
 
     /**
@@ -85,43 +85,40 @@ export class TransferableInput {
     }
 
     /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Input]], parses it, populates the class, and returns the length of the Input in bytes.
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[TransferableInput]], parses it, populates the class, and returns the length of the [[TransferableInput]] in bytes.
      * 
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Input]]
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[TransferableInput]]
      * 
-     * @returns The length of the raw [[Input]]
+     * @returns The length of the raw [[TransferableInput]]
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         this.txid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
-        this.txidx = bintools.copyFrom(bytes, offset, offset + 4);
+        this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
-        this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
+        this.assetid = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
         offset += 32;
-        this.inputid = bintools.copyFrom(bytes, offset, offset + 4);
+        let inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        return offset;
+        this.input = SelectInputClass(inputid, bintools.copyFrom(bytes, offset));
+        return offset + this.input.toBuffer().length;
     }
 
     /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[Input]].
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[TransferableInput]].
      */
     toBuffer():Buffer {
-        try {
-            let bsize:number = this.txid.length + this.txidx.length + this.assetid.length + this.inputid.length ;
-            let barr:Array<Buffer> = [this.txid, this.txidx, this.assetid, this.inputid];
-            let buff: Buffer = Buffer.concat(barr,bsize);
-            return buff;
-        } catch(e) {
-            /* istanbul ignore next */
-            let emsg:string = "Error - Input.toBuffer: " + e;
-            /* istanbul ignore next */
-            throw new Error(emsg);
-        }
+        let inbuff:Buffer = this.input.toBuffer();
+        let inputid:Buffer = Buffer.alloc(4);
+        inputid.writeInt32BE(this.input.getInputID(), 0);
+        let bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + inputid.length + inbuff.length ;
+        let barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, inputid, inbuff];
+        let buff: Buffer = Buffer.concat(barr,bsize);
+        return buff;
     }
 
     /**
-     * Returns a base-58 representation of the [[Input]].
+     * Returns a base-58 representation of the [[TransferableInput]].
      */
     toString():string {
         /* istanbul ignore next */
@@ -129,114 +126,34 @@ export class TransferableInput {
     }
 
     /**
-     * Class representing an Input for a transaction.
+     * Class representing an [[TransferableInput]] for a transaction.
      * 
      * @param txid A {@link https://github.com/feross/buffer|Buffer} containing the transaction ID of the referenced UTXO
-     * @param txidx A {@link https://github.com/feross/buffer|Buffer} containing the index of the output in the transaction consumed in the [[Input]]
+     * @param outputidx A {@link https://github.com/feross/buffer|Buffer} containing the index of the output in the transaction consumed in the [[TransferableInput]]
      * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Input]]
-     * @param input A number representing the InputID of the [[Input]]
+     * @param input An [[Input]] to be made transferable
      */
-    constructor(txid?:Buffer, txidx?:Buffer, assetID?:Buffer, inputid?:number) {
-        if(txid && txidx && assetID && inputid){
-            this.inputid.writeUInt32BE(inputid,0);
+    constructor(txid:Buffer = undefined, outputidx:Buffer = undefined, assetID:Buffer = undefined, input:Input = undefined) {
+        if(typeof txid !== 'undefined' && typeof outputidx !== 'undefined' && typeof assetID !== 'undefined' && input instanceof Input){
+            this.input = input;
             this.txid = txid;
-            this.txidx = txidx;
+            this.outputidx = outputidx;
             this.assetid = assetID;
         }
     }
 }
 
-export class TransferableInput {
-
-    protected assetID:Buffer = Buffer.alloc(AVMConstants.ASSETIDLEN);
-    protected input:Input;
-
-    fromBuffer(tranbuff:Buffer, offset:number = 0):number {
-        this.assetID = bintools.copyFrom(tranbuff, offset, offset + AVMConstants.ASSETIDLEN);
-        offset += AVMConstants.ASSETIDLEN;
-        let outputid:number = bintools.copyFrom(tranbuff, offset, offset + 4).readUInt32BE(0);
-        this.output = SelectOutputClass(outputid, bintools.copyFrom(tranbuff, offset));
-        return offset + this.output.toBuffer().length;
-    }
-
-    toBuffer():Buffer {
-        let outbuff:Buffer = this.output.toBuffer();
-        let outid:Buffer = Buffer.alloc(4)
-        outid.writeUInt32BE(this.output.getOutputID(), 0);
-        let barr:Array<Buffer> = [this.assetID, outid, outbuff];
-        return Buffer.concat(barr, this.assetID.length + outid.length + outbuff.length);
-    }
-}
-
-
-export class SecpInput extends Input {
-    protected amount:Buffer = Buffer.alloc(8);
-    protected amountValue:BN = new BN(0);
-    protected numAddr:Buffer = Buffer.alloc(4);
+export abstract class Input {
+    protected sigCount:Buffer = Buffer.alloc(4);
     protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
 
+    abstract getInputID():number;
 
     /**
      * Returns the array of [[SigIdx]] for this [[Input]] 
      */
     getSigIdxs = ():Array<SigIdx> => {
         return this.sigIdxs;
-    }
-
-    /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Input]], parses it, populates the class, and returns the length of the [[Input]] in bytes.
-     * 
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Input]]
-     * 
-     * @returns The length of the raw [[Input]]
-     */
-    fromBuffer(bytes:Buffer, offset:number = 0):number {
-        offset = super.fromBuffer(bytes, offset);
-        this.amount = bintools.copyFrom(bytes, offset, offset + 8);
-        offset += 8;
-        this.amountValue = bintools.fromBufferToBN(this.amount);
-        this.numAddr = bintools.copyFrom(bytes, offset, offset + 4);
-        offset += 4;
-        let numaddr:number = this.numAddr.readUInt32BE(0);
-        this.sigIdxs = [];
-        for(let i = 0; i < numaddr; i++){
-            let sigidx = new SigIdx();
-            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
-            sigidx.fromBuffer(sigbuff);
-            offset += 4;
-            this.sigIdxs.push(sigidx);
-        }
-        return offset;
-    }
-
-    /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[Input]].
-     */
-    toBuffer():Buffer {
-        try {
-            let basicin:Buffer = super.toBuffer();
-            this.numAddr.writeUInt32BE(this.sigIdxs.length, 0);
-            let bsize:number = basicin.length + this.amount.length + this.numAddr.length;
-            let barr:Array<Buffer> = [basicin, this.amount, this.numAddr];
-            for(let i = 0; i < this.sigIdxs.length; i++) {
-                let b:Buffer = this.sigIdxs[i].toBuffer();
-                barr.push(b);
-                bsize += b.length;
-            }
-            return Buffer.concat(barr,bsize);
-        } catch(e) {
-            /* istanbul ignore next */
-            let emsg:string = "Error - SecpInput.toBuffer: " + e;
-            /* istanbul ignore next */
-            throw new Error(emsg);
-        }
-    }
-
-    /**
-     * Returns a base-58 representation of the [[Input]].
-     */
-    toString():string {
-        return bintools.bufferToB58(this.toBuffer());
     }
 
     /**
@@ -252,28 +169,100 @@ export class SecpInput extends Input {
         sigidx.fromBuffer(b);
         sigidx.setSource(address);
         this.sigIdxs.push(sigidx);
-        this.numAddr.writeUInt32BE(this.sigIdxs.length,0);
+        this.sigCount.writeUInt32BE(this.sigIdxs.length,0);
+    }
+
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.sigCount = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let sigCount:number = this.sigCount.readUInt32BE(0);
+        this.sigIdxs = [];
+        for(let i = 0; i < sigCount; i++){
+            let sigidx = new SigIdx();
+            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+            sigidx.fromBuffer(sigbuff);
+            offset += 4;
+            this.sigIdxs.push(sigidx);
+        }
+        return offset;
+    }
+
+    toBuffer():Buffer {
+        this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
+        let bsize:number = this.sigCount.length;
+        let barr:Array<Buffer> = [this.sigCount];
+        for(let i = 0; i < this.sigIdxs.length; i++) {
+            let b:Buffer = this.sigIdxs[i].toBuffer();
+            barr.push(b);
+            bsize += b.length;
+        }
+        return Buffer.concat(barr,bsize);
     }
 
     /**
-     * Class representing an Input for a transaction.
-     * 
-     * @param txid A {@link https://github.com/feross/buffer|Buffer} containing the transaction ID of the referenced UTXO
-     * @param txidx A {@link https://github.com/feross/buffer|Buffer} containing the index of the output in the transaction consumed in the [[Input]]
-     * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Input]]
-     * @param amount A {@link https://github.com/indutny/bn.js/|BN} containing the amount of the output to be consumed
+     * Returns a base-58 representation of the [[Input]].
      */
-    constructor(txid?:Buffer, txidx?:Buffer, amount?:BN, assetID?:Buffer) {
-        super(txid, txidx, assetID, AVMConstants.SECPINPUTID);
-        if(txid && txidx && amount && assetID){
-            this.inputid.writeUInt32BE(AVMConstants.SECPINPUTID,0);
-            this.txid = txid;
-            this.txidx = txidx;
-            this.assetid = assetID;
-            this.amountValue = amount;
+    toString():string {
+        return bintools.bufferToB58(this.toBuffer());
+    }
+
+    constructor(){};
+
+}
+
+/**
+ * An [[Input]] class which specifies a token amount .
+ */
+export abstract class AmountInput extends Input {
+    protected amount:Buffer = Buffer.alloc(8);
+    protected amountValue:BN = new BN(0);
+
+    /**
+     * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
+     */
+    getAmount = ():BN => {
+        return this.amountValue.clone();
+    }
+
+    /**
+     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[AmountInput]] and returns the size of the output.
+     */
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.amount = bintools.copyFrom(bytes, offset, offset + 8);
+        this.amountValue = bintools.fromBufferToBN(this.amount);
+        offset += 8;
+        return super.fromBuffer(bytes, offset);
+    }
+
+    /**
+     * Returns the buffer representing the [[AmountInput]] instance.
+     */
+    toBuffer():Buffer {
+        let superbuff:Buffer = super.toBuffer();
+        let bsize:number = this.amount.length + superbuff.length;
+        let barr:Array<Buffer> = [this.amount,superbuff];
+        return Buffer.concat(barr,bsize);
+    }
+
+    /**
+     * An [[AmountInput]] class which issues a payment on an assetID.
+     * 
+     * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the input
+     */
+    constructor(amount:BN = undefined) {
+        super();
+        if(amount) {
+            this.amountValue = amount.clone();
             this.amount = bintools.fromBNToBuffer(amount, 8);
-            this.sigIdxs = [];
         }
-        
+    }
+}
+
+export class SecpInput extends AmountInput {
+    /**
+     * Returns the inputID for this input
+     */
+    getInputID():number {
+        return AVMConstants.SECPINPUTID;
     }
 }

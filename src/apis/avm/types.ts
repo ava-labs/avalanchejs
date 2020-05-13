@@ -2,10 +2,11 @@
  * @module AVMAPI
  */
 import {Buffer} from "buffer/";
-import { NBytes } from '../../utils/types';
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
-import { Output, SelectOutputClass, SecpOutBase } from './outputs';
+
+import { NBytes } from '../../utils/types';
+import { Output, SelectOutputClass } from './outputs';
 
 /**
  * @ignore
@@ -197,9 +198,10 @@ export class InitialStates {
             offset += 4;
             let statelen:number = statelenbuff.readUInt32BE(0);
             for(let j = 0; j < statelen; j++){
+                let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+                offset += 4;
                 let abuff:Buffer = bintools.copyFrom(bytes, offset);
-                let out:Output = new SecpOutBase();
-                out.fromBuffer(abuff)
+                let out:Output = SelectOutputClass(outputid, abuff);
                 let outbuff:Buffer = out.toBuffer();
                 offset += outbuff.length;
                 result[fxid].push(out);
@@ -225,6 +227,9 @@ export class InitialStates {
             statelen.writeUInt32BE(initialState.length, 0);
             buff.push(statelen);
             for(let j = 0; j < initialState.length; j++){
+                let outputid:Buffer = Buffer.alloc(4);
+                outputid.writeInt32BE(initialState[j].getOutputID(), 0);
+                buff.push(outputid);
                 buff.push(initialState[j].toBuffer());
             }
         }
@@ -232,6 +237,7 @@ export class InitialStates {
     }
     constructor(){}
 }
+
 
 export class AVMConstants {
     static SECPFXID:number = 0;

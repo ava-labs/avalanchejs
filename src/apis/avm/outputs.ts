@@ -11,18 +11,19 @@ const bintools = BinTools.getInstance();
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
  * 
- * @param outbuffer A {@link https://github.com/feross/buffer|Buffer} containing the Output raw data.
+ * @param outputid A number representing the inputID parsed prior to the bytes passed in
+ * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the Output raw data.
  * 
- * @returns An instance of an [[Output]]-extended class: [[SecpOutput]], [[NFTOutput]].
+ * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, outbuffer:Buffer, args:Array<any> = []):Output => {
+export const SelectOutputClass = (outputid:number, bytes:Buffer, args:Array<any> = []):Output => {
     if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput( ...args);
-        secpout.fromBuffer(outbuffer);
+        secpout.fromBuffer(bytes);
         return secpout;
     } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
-        let nftout:NFTOutput = new NFTOutput(...args);
-        nftout.fromBuffer(outbuffer);
+        let nftout:NFTTransferOutput = new NFTTransferOutput(...args);
+        nftout.fromBuffer(bytes);
         return nftout;
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
@@ -142,33 +143,11 @@ export abstract class Output {
 
         return qualified;
     }
-    /**
-     * Returns the buffer representing the [[Output]] instance.
-     */
-    toBuffer():Buffer {
-        try {
-            this.addresses.sort(Address.comparitor());
-            this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-            let bsize:number = this.locktime.length + this.threshold.length + this.numaddrs.length;
-            let barr:Array<Buffer> = [this.locktime, this.threshold, this.numaddrs];
-            for(let i = 0; i < this.addresses.length; i++) {
-                let b: Buffer = this.addresses[i].toBuffer();
-                barr.push(b);
-                bsize += b.length;
-            }
-            return Buffer.concat(barr,bsize);;
-        } catch(e) {
-            /* istanbul ignore next */
-            let emsg:string = "Error - SecpOutBase.toBuffer: " + e;
-            /* istanbul ignore next */
-            throw new Error(emsg);
-        }
-    };
 
     /**
      * Returns a base-58 string representing the [[Output]].
      */
-    fromBuffer(outbuff:Buffer, offset:number):number {
+    fromBuffer(outbuff:Buffer, offset:number = 0):number {
         this.locktime = bintools.copyFrom(outbuff, offset, offset + 8);
         offset += 8;
         this.threshold = bintools.copyFrom(outbuff, offset, offset + 4);
@@ -190,6 +169,22 @@ export abstract class Output {
     };
 
     /**
+     * Returns the buffer representing the [[Output]] instance.
+     */
+    toBuffer():Buffer {
+        this.addresses.sort(Address.comparitor());
+        this.numaddrs.writeUInt32BE(this.addresses.length, 0);
+        let bsize:number = this.locktime.length + this.threshold.length + this.numaddrs.length;
+        let barr:Array<Buffer> = [this.locktime, this.threshold, this.numaddrs];
+        for(let i = 0; i < this.addresses.length; i++) {
+            let b: Buffer = this.addresses[i].toBuffer();
+            barr.push(b);
+            bsize += b.length;
+        }
+        return Buffer.concat(barr,bsize);;
+    };
+
+    /**
      * Returns a base-58 string representing the [[Output]].
      */
     toString():string {
@@ -201,7 +196,7 @@ export abstract class Output {
      * @param assetID An assetID which is wrapped around the Buffer of the Output
      */
     makeTransferable(assetID:Buffer):TransferableOutput {
-
+        return new TransferableOutput(assetID, this);
     }
 
     static comparator = ():(a:Output, b:Output) => (1|-1|0) => {
@@ -241,10 +236,30 @@ export class TransferableOutput {
     protected assetID:Buffer = Buffer.alloc(AVMConstants.ASSETIDLEN);
     protected output:Output;
 
+    /**
+     * Returns a function used to sort an array of [[TransferableOutput]]s
+     */
+    static comparator = ():(a:TransferableOutput, b:TransferableOutput) => (1|-1|0) => {
+        return function(a:TransferableOutput, b:TransferableOutput):(1|-1|0) { 
+            let sorta = a.toBuffer();
+            let sortb = b.toBuffer();
+            return Buffer.compare(sorta, sortb) as (1|-1|0);
+        }
+    }
+
+    getAssetID = ():Buffer => {
+        return this.assetID;
+    }
+
+    getOutput = ():Output => {
+        return this.output;
+    }
+
     fromBuffer(tranbuff:Buffer, offset:number = 0):number {
         this.assetID = bintools.copyFrom(tranbuff, offset, offset + AVMConstants.ASSETIDLEN);
         offset += AVMConstants.ASSETIDLEN;
         let outputid:number = bintools.copyFrom(tranbuff, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
         this.output = SelectOutputClass(outputid, bintools.copyFrom(tranbuff, offset));
         return offset + this.output.toBuffer().length;
     }
@@ -255,6 +270,19 @@ export class TransferableOutput {
         outid.writeUInt32BE(this.output.getOutputID(), 0);
         let barr:Array<Buffer> = [this.assetID, outid, outbuff];
         return Buffer.concat(barr, this.assetID.length + outid.length + outbuff.length);
+    }
+
+    /**
+     * Class representing an [[TransferableOutput]] for a transaction.
+     * 
+     * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Output]]
+     * @param output A number representing the InputID of the [[TransferableOutput]]
+     */
+    constructor(assetID:Buffer = undefined, output:Output = undefined) {
+        if(typeof assetID !== 'undefined' && output instanceof Output){
+            this.assetID = assetID;
+            this.output = output;
+        }
     }
 }
 
@@ -283,7 +311,7 @@ export abstract class AmountOutput extends Output {
     }
 
     /**
-     * Returns the buffer representing the [[SecpOutBase]] instance.
+     * Returns the buffer representing the [[AmountInput]] instance.
      */
     toBuffer():Buffer {
         let superbuff:Buffer = super.toBuffer();
@@ -392,7 +420,7 @@ export abstract class NFTOutBase extends Output {
 /**
  * An [[Output]] class which specifies an Output that carries an NFT and uses secp256k1 signature scheme.
  */
-export class NFTOutput extends NFTOutBase {
+export class NFTTransferOutput extends NFTOutBase {
     /**
      * Returns the outputID for this output
      */
