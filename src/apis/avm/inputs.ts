@@ -18,7 +18,7 @@ const bintools = BinTools.getInstance();
  * 
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, args:Array<any> = []):Input => {
+export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
     if(inputid == AVMConstants.SECPINPUTID){
         let secpin:SecpInput = new SecpInput(...args);
         return secpin;
@@ -68,10 +68,10 @@ export class TransferableInput {
     }
 
     /**
-     * Returns the number for the input type of the output class.
+     * Returns the input.
      */
-    getInputID = ():number => {
-        return this.input.getInputID();
+    getInput = ():Input => {
+        return this.input;
     };
 
     /**

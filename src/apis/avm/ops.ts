@@ -3,7 +3,7 @@
  */
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
-import { Address, UTXOID, UnixNow, AVMConstants } from './types';
+import { UTXOID, AVMConstants } from './types';
 import { NFTTransferOutput } from './outputs';
 
 const bintools = BinTools.getInstance();
@@ -15,7 +15,7 @@ const bintools = BinTools.getInstance();
  * 
  * @returns An instance of an [[Operation]]-extended class.
  */
-export const SelectOperationClass = (opid:number, args:Array<any> = []):Operation => {
+export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation => {
     if(opid == AVMConstants.NFTXFEROP){
         let nftop:NFTTransferOperation = new NFTTransferOperation(...args);
         return nftop;

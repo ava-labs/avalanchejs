@@ -15,7 +15,7 @@ const bintools = BinTools.getInstance();
  * 
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, args:Array<any> = []):Output => {
+export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
     if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput( ...args);
         return secpout;

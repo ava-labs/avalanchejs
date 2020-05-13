@@ -19,7 +19,7 @@ let bintools:BinTools = BinTools.getInstance();
  * 
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid:number, args:Array<any> = []):Credential => {
+export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
     if(credid == AVMConstants.SECPCREDENTIAL){
         let secpcred:SecpCredential = new SecpCredential(...args);
         return secpcred;

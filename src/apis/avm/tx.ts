@@ -22,7 +22,7 @@ const bintools = BinTools.getInstance();
  * 
  * @returns An instance of an [[BaseTx]]-extended class.
  */
-export const SelectTxClass = (txtype:number, args:Array<any> = []):BaseTx => {
+export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
     if(txtype == AVMConstants.BASETX){
         let tx:BaseTx = new BaseTx(...args);
         return tx;
