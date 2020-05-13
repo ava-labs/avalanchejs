@@ -7,7 +7,7 @@ import BinTools from '../../utils/bintools';
 import { AVMConstants, InitialStates } from './types';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
-import { Operation, SelectOperationClass, TransferableOperation } from './ops';
+import { TransferableOperation } from './ops';
 import { Credential, SelectCredentialClass } from './credentials';
 
 /**
@@ -19,22 +19,18 @@ const bintools = BinTools.getInstance();
  * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
  * 
  * @param txtype The id of the transaction type 
- * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the [[BaseTx]] raw data.
  * 
  * @returns An instance of an [[BaseTx]]-extended class.
  */
-export const SelectTxClass = (txtype:number, bytes:Buffer, args:Array<any> = []):BaseTx => {
+export const SelectTxClass = (txtype:number, args:Array<any> = []):BaseTx => {
     if(txtype == AVMConstants.BASETX){
         let tx:BaseTx = new BaseTx(...args);
-        tx.fromBuffer(bytes);
         return tx;
     } else if(txtype == AVMConstants.CREATEASSETTX){
         let tx:CreateAssetTx = new CreateAssetTx(...args);
-        tx.fromBuffer(bytes);
         return tx;
     } else if(txtype == AVMConstants.OPERATIONTX){
         let tx:OperationTx = new OperationTx(...args);
-        tx.fromBuffer(bytes);
         return tx;
     }
     /* istanbul ignore next */
@@ -401,8 +397,8 @@ export class UnsignedTx {
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         let txtype:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        this.transaction = SelectTxClass(txtype, bytes);
-        return offset + this.transaction.toBuffer().length;
+        this.transaction = SelectTxClass(txtype);
+        return offset + this.transaction.fromBuffer(bytes, offset);
     }
 
     toBuffer():Buffer {
@@ -441,8 +437,8 @@ export class Tx {
         for(let i = 0; i < numcreds; i++){
             let credid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
             offset += 4;
-            let cred:Credential = SelectCredentialClass(credid, bytes);
-            offset += cred.toBuffer().length;
+            let cred:Credential = SelectCredentialClass(credid);
+            offset += cred.fromBuffer(bytes, offset);
             this.signatures.push(cred);
         }
         return offset;

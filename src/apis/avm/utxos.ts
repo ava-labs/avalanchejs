@@ -68,32 +68,17 @@ export class UTXO {
      * 
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[UTXO]]
      */
-    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
-        this.txid = bintools.copyFrom(utxobuff, offset, offset + 32);
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.txid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
-        this.outputidx = bintools.copyFrom(utxobuff, offset, offset + 4);
+        this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
-        this.assetid = bintools.copyFrom(utxobuff, offset, offset + 32);
+        this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
-        let outputid:number = bintools.copyFrom(utxobuff, offset, offset + 4).readUInt32BE(0);
+        let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        this.output = SelectOutputClass(outputid, bintools.copyFrom(utxobuff, offset)); 
-        return offset;
-    }
-
-    /**
-     * Takes a base-58 string containing an [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
-     * 
-     * @param serialized A base-58 string containing a raw [[UTXO]]
-     * 
-     * @returns The length of the raw [[UTXO]]
-     * 
-     * @remarks 
-     * unlike most fromStrings, it expects the string to be serialized in AVA format
-     */
-    fromString(serialized:string) {
-        /* istanbul ignore next */
-        return this.fromBuffer( bintools.avaDeserialize(serialized) );
+        this.output = SelectOutputClass(outputid);
+        return offset + this.output.fromBuffer(bytes, offset);
     }
 
     /**
@@ -113,6 +98,21 @@ export class UTXO {
             /* istanbul ignore next */
             throw new Error(emsg);
         }
+    }
+
+    /**
+     * Takes a base-58 string containing an [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
+     * 
+     * @param serialized A base-58 string containing a raw [[UTXO]]
+     * 
+     * @returns The length of the raw [[UTXO]]
+     * 
+     * @remarks 
+     * unlike most fromStrings, it expects the string to be serialized in AVA format
+     */
+    fromString(serialized:string) {
+        /* istanbul ignore next */
+        return this.fromBuffer( bintools.avaDeserialize(serialized) );
     }
 
     /**
@@ -527,10 +527,10 @@ export class UTXOSet {
             asOf:BN = UnixNow(), 
             locktime:BN = new BN(0), 
             threshold:number = 1
-        ):TxUnsigned => {
+        ):UnsignedTx => {
         const zero:BN = new BN(0);
         let spendamount:BN = zero.clone();
-        let utxos:Array<SecpUTXO> = this.getAllUTXOs(this.getUTXOIDs(fromAddresses));
+        let utxos:Array<UTXO> = this.getAllUTXOs(this.getUTXOIDs(fromAddresses));
         let change:BN = zero.clone();
 
         let outs:Array<SecpOutput> = [];

@@ -15,14 +15,12 @@ const bintools = BinTools.getInstance();
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
  * 
  * @param inputid A number representing the inputID parsed prior to the bytes passed in
- * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the [[Input]] raw data.
  * 
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, bytes:Buffer, args:Array<any> = []):Input => {
+export const SelectInputClass = (inputid:number, args:Array<any> = []):Input => {
     if(inputid == AVMConstants.SECPINPUTID){
         let secpin:SecpInput = new SecpInput(...args);
-        secpin.fromBuffer(bytes);
         return secpin;
     }
     /* istanbul ignore next */
@@ -100,8 +98,8 @@ export class TransferableInput {
         offset += 32;
         let inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        this.input = SelectInputClass(inputid, bintools.copyFrom(bytes, offset));
-        return offset + this.input.toBuffer().length;
+        this.input = SelectInputClass(inputid);
+        return offset + this.input.fromBuffer(bytes, offset);
     }
 
     /**

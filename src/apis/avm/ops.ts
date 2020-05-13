@@ -12,14 +12,12 @@ const bintools = BinTools.getInstance();
  * Takes a buffer representing the output and returns the proper [[Operation]] instance.
  * 
  * @param opid A number representing the operation ID parsed prior to the bytes passed in
- * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the [[Operation]] raw data.
  * 
  * @returns An instance of an [[Operation]]-extended class.
  */
-export const SelectOperationClass = (opid:number, bytes:Buffer, args:Array<any> = []):Operation => {
+export const SelectOperationClass = (opid:number, args:Array<any> = []):Operation => {
     if(opid == AVMConstants.NFTXFEROP){
         let nftop:NFTTransferOperation = new NFTTransferOperation(...args);
-        nftop.fromBuffer(bytes);
         return nftop;
     }
     /* istanbul ignore next */
@@ -53,25 +51,25 @@ export class TransferableOperation {
     protected utxoIDs:Array<UTXOID> = [];
     protected operation:Operation;
 
-    fromBuffer(opbuff:Buffer, offset:number = 0):number {
-        this.assetid = bintools.copyFrom(opbuff, offset, offset + 32);
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
-        this.numutxoIDs = bintools.copyFrom(opbuff, offset, offset + 4);
+        this.numutxoIDs = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let numutxoIDs:number = this.numutxoIDs.readUInt32BE(0);
         this.utxoIDs = [];
         for(let i = 0; i < numutxoIDs; i++) {
             let utxoid:UTXOID = new UTXOID();
             let offsetEnd:number = offset + utxoid.getSize();
-            let copied:Buffer = bintools.copyFrom(opbuff, offset, offsetEnd);
+            let copied:Buffer = bintools.copyFrom(bytes, offset, offsetEnd);
             utxoid.fromBuffer(copied);
             this.utxoIDs.push(utxoid);
             offset = offsetEnd;
         }
-        let opid:number = bintools.copyFrom(opbuff, offset, offset + 4).readUInt32BE(0);
-        this.operation = SelectOperationClass(opid, opbuff);
-        offset += this.operation.toBuffer().length;
-        return offset;
+        let opid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.operation = SelectOperationClass(opid);
+        return offset + this.operation.fromBuffer(bytes, offset);
     }
 
     toBuffer():Buffer {

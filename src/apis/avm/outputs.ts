@@ -12,18 +12,15 @@ const bintools = BinTools.getInstance();
  * Takes a buffer representing the output and returns the proper Output instance.
  * 
  * @param outputid A number representing the inputID parsed prior to the bytes passed in
- * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the Output raw data.
  * 
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, bytes:Buffer, args:Array<any> = []):Output => {
+export const SelectOutputClass = (outputid:number, args:Array<any> = []):Output => {
     if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput( ...args);
-        secpout.fromBuffer(bytes);
         return secpout;
     } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
         let nftout:NFTTransferOutput = new NFTTransferOutput(...args);
-        nftout.fromBuffer(bytes);
         return nftout;
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
@@ -255,13 +252,13 @@ export class TransferableOutput {
         return this.output;
     }
 
-    fromBuffer(tranbuff:Buffer, offset:number = 0):number {
-        this.assetID = bintools.copyFrom(tranbuff, offset, offset + AVMConstants.ASSETIDLEN);
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
         offset += AVMConstants.ASSETIDLEN;
-        let outputid:number = bintools.copyFrom(tranbuff, offset, offset + 4).readUInt32BE(0);
+        let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        this.output = SelectOutputClass(outputid, bintools.copyFrom(tranbuff, offset));
-        return offset + this.output.toBuffer().length;
+        this.output = SelectOutputClass(outputid);
+        return offset + this.output.fromBuffer(bytes, offset);
     }
 
     toBuffer():Buffer {

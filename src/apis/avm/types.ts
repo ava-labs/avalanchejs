@@ -200,10 +200,8 @@ export class InitialStates {
             for(let j = 0; j < statelen; j++){
                 let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
                 offset += 4;
-                let abuff:Buffer = bintools.copyFrom(bytes, offset);
-                let out:Output = SelectOutputClass(outputid, abuff);
-                let outbuff:Buffer = out.toBuffer();
-                offset += outbuff.length;
+                let out:Output = SelectOutputClass(outputid);
+                offset += out.fromBuffer(bytes, offset)
                 result[fxid].push(out);
             }
         }

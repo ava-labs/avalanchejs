@@ -16,18 +16,15 @@ let bintools:BinTools = BinTools.getInstance();
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.
  * 
  * @param credid A number representing the credential ID parsed prior to the bytes passed in
- * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing the [[Credential]] raw data.
  * 
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid:number, bytes:Buffer, args:Array<any> = []):Credential => {
+export const SelectCredentialClass = (credid:number, args:Array<any> = []):Credential => {
     if(credid == AVMConstants.SECPCREDENTIAL){
         let secpcred:SecpCredential = new SecpCredential(...args);
-        secpcred.fromBuffer(bytes);
         return secpcred;
     } else if(credid == AVMConstants.NFTCREDENTIAL){
         let nftcred:NFTCredential = new NFTCredential(...args);
-        nftcred.fromBuffer(bytes);
         return nftcred;
     }
     throw new Error("Error - SelectCredentialClass: unknown credid " + credid);
@@ -46,7 +43,7 @@ export abstract class Credential {
         return this.sigArray.length - 1;
     }
 
-    fromBuffer(bytes, offset:number = 0) {
+    fromBuffer(bytes, offset:number = 0):number {
         let siglen:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         this.sigArray = [];
         for(let i:number = 0; i < siglen; i++){
@@ -56,6 +53,7 @@ export abstract class Credential {
             offset += sig.getSize();
             this.sigArray.push(sig);
         }
+        return offset;
     }
 
     toBuffer():Buffer {
