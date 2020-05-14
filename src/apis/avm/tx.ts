@@ -3,12 +3,13 @@
  */
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
-
-import { AVMConstants, InitialStates } from './types';
+import createHash from "create-hash";
+import { AVMConstants, InitialStates, Signature, SigIdx } from './types';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { TransferableOperation } from './ops';
-import { Credential, SelectCredentialClass } from './credentials';
+import { Credential, SelectCredentialClass, SecpCredential } from './credentials';
+import { AVMKeyChain, AVMKeyPair } from './keychain';
 
 /**
  * @ignore
@@ -154,7 +155,32 @@ export class BaseTx {
     }
 
     /**
-     * Class representing an unsigned transaction.
+     * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+     * 
+     * @param msg A Buffer for the [[UnsignedTx]] 
+     * @param kc An [[AVMKeyChain]] used in signing
+     * 
+     * @returns An array of [[Credential]]s
+     */
+    sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
+        let sigs:Array<Credential> = [];
+        for(let i = 0; i < this.ins.length; i++) {
+            let cred:Credential = new SecpCredential();
+            let sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
+            for(let j = 0; j < sigidxs.length; j++) {
+                let keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
+                let signval:Buffer = keypair.sign(msg);
+                let sig:Signature = new Signature();
+                sig.fromBuffer(signval);
+                cred.addSignature(sig);
+            }
+            sigs.push(cred);
+        }
+        return sigs;
+    }
+
+    /**
+     * Class representing a BaseTx which is the foundation for all transactions.
      * 
      * @param networkid Optional networkid, default 2
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
@@ -359,6 +385,31 @@ export class OperationTx extends BaseTx {
     }
 
     /**
+     * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+     * 
+     * @param msg A Buffer for the [[UnsignedTx]] 
+     * @param kc An [[AVMKeyChain]] used in signing
+     * 
+     * @returns An array of [[Credential]]s
+     */
+    sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
+        let sigs:Array<Credential> = super.sign(msg, kc);
+        for(let i = 0; i < this.ops.length; i++) {
+            let cred:Credential = new SecpCredential();
+            let sigidxs:Array<SigIdx> = this.ops[i].getOperation().getSigIdxs();
+            for(let j = 0; j < sigidxs.length; j++) {
+                let keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
+                let signval:Buffer = keypair.sign(msg);
+                let sig:Signature = new Signature();
+                sig.fromBuffer(signval);
+                cred.addSignature(sig);
+            }
+            sigs.push(cred);
+        }
+        return sigs;
+    }
+
+    /**
      * Class representing an unsigned Operation transaction.
      * 
      * @param networkid Optional networkid, default 2
@@ -406,6 +457,20 @@ export class UnsignedTx {
         txtype.writeInt32BE(this.transaction.getTxType(), 0);
         let basebuff = this.transaction.toBuffer();
         return Buffer.concat([txtype, basebuff], txtype.length + basebuff.length);
+    }
+
+    /**
+     * Signs this [[UnsignedTx]] and returns signed [[Tx]]
+     * 
+     * @param kc An [[AVMKeyChain]] used in signing
+     * 
+     * @returns A signed [[Tx]]
+     */
+    sign(kc:AVMKeyChain):Tx {
+        let txbuff = this.toBuffer();
+        let msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest()); 
+        let sigs:Array<Credential> = this.transaction.sign(msg, kc);
+        return new Tx(this, sigs);
     }
 
     constructor(transaction:BaseTx = undefined) {
@@ -506,5 +571,4 @@ export class Tx {
         }
     }
 }
-
 

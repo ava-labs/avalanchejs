@@ -3,7 +3,7 @@
  */
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
-import { UTXOID, AVMConstants } from './types';
+import { UTXOID, AVMConstants, SigIdx } from './types';
 import { NFTTransferOutput } from './outputs';
 
 const bintools = BinTools.getInstance();
@@ -29,13 +29,59 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
  * A class representing an operation. All operation types must extend on this class.
  */
 export abstract class Operation {
+    protected sigCount:Buffer = Buffer.alloc(4);
+    protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
 
     abstract getOperationID():number;
 
-    fromBuffer(bytes:Buffer, offset:number = 0):number {
-        return 0;
+    /**
+     * Returns the array of [[SigIdx]] for this [[Operation]] 
+     */
+    getSigIdxs = ():Array<SigIdx> => {
+        return this.sigIdxs;
     }
-    abstract toBuffer():Buffer;
+
+    /**
+     * Creates and adds a [[SigIdx]] to the [[Operation]].
+     * 
+     * @param addressIdx The index of the address to reference in the signatures
+     * @param address The address of the source of the signature
+     */
+    addSignatureIdx = (addressIdx:number, address:Buffer) => {
+        let sigidx:SigIdx = new SigIdx();
+        let b:Buffer = Buffer.alloc(4);
+        b.writeUInt32BE(addressIdx, 0);
+        sigidx.fromBuffer(b);
+        sigidx.setSource(address);
+        this.sigIdxs.push(sigidx);
+        this.sigCount.writeUInt32BE(this.sigIdxs.length,0);
+    }
+
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.sigCount = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let sigCount:number = this.sigCount.readUInt32BE(0);
+        this.sigIdxs = [];
+        for(let i:number = 0; i < sigCount; i++) {
+            let sigidx:SigIdx = new SigIdx();
+            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+            sigidx.fromBuffer(sigbuff);
+            offset += 4;
+            this.sigIdxs.push(sigidx)
+        }
+        return offset;
+    }
+    toBuffer():Buffer {
+        this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
+        let bsize:number = this.sigCount.length;
+        let barr:Array<Buffer> = [this.sigCount];
+        for(let i = 0; i < this.sigIdxs.length; i++) {
+            let b:Buffer = this.sigIdxs[i].toBuffer();
+            barr.push(b);
+            bsize += b.length;
+        }
+        return Buffer.concat(barr,bsize);
+    }
 
     constructor(){}
 
@@ -140,8 +186,6 @@ export class TransferableOperation {
  * A [[Operation]] class which specifies a NFT Transfer Op.
  */
 export class NFTTransferOperation extends Operation {
-    protected sizeAddrIndecies:Buffer;
-    protected addrIndecies:Array<number> = [];
     protected output:NFTTransferOutput;
 
     /**
@@ -151,13 +195,6 @@ export class NFTTransferOperation extends Operation {
         return AVMConstants.NFTXFEROP;
     }
 
-    /**
-     * Returns the address  as a number.
-     */
-    getAddressIndecies = ():Array<number> => {
-        return this.addrIndecies;
-    }
-
     getOutput = ():NFTTransferOutput => {
         return this.output;
     }
@@ -165,34 +202,19 @@ export class NFTTransferOperation extends Operation {
     /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOperation]] and returns the size of the output.
      */
-    fromBuffer(opbuff:Buffer, offset:number = 0):number {
-        this.sizeAddrIndecies = bintools.copyFrom(opbuff, offset, offset + 4);
-        let sizeAddrIndecies:number = this.sizeAddrIndecies.readUInt32BE(0);
-        offset += 4;
-        for(let i:number = 0; i < sizeAddrIndecies; i++) {
-            this.addrIndecies[i] = bintools.copyFrom(opbuff, offset, offset + 4).readUInt32BE(0);
-            offset += 4;
-        }
-        return this.output.fromBuffer(opbuff, offset);
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(bytes, offset);
+        return this.output.fromBuffer(bytes, offset);
     }
 
     /**
      * Returns the buffer representing the [[NFTTransferOperation]] instance.
      */
     toBuffer():Buffer {
-        this.addrIndecies.sort();
-        let idxarr:Array<Buffer> = [];
-        let s:number = 0;
-        for(let i = 0; i < this.addrIndecies.length; i++) {
-            let b:Buffer = Buffer.alloc(4);
-            s += 4;
-            b.readUInt32BE(this.addrIndecies[i]);
-            idxarr.push(b)
-        }
-        let addrIdxs:Buffer = Buffer.concat(idxarr, s);
         let outbuff:Buffer = this.output.toBuffer();
-        let bsize:number = this.sizeAddrIndecies.length + addrIdxs.length + outbuff.length;
-        let barr:Array<Buffer> = [this.sizeAddrIndecies, addrIdxs, outbuff];
+        let superbuff:Buffer = super.toBuffer();
+        let bsize:number = superbuff.length + outbuff.length;
+        let barr:Array<Buffer> = [superbuff, outbuff];
         return Buffer.concat(barr,bsize);
     }
 
@@ -206,13 +228,12 @@ export class NFTTransferOperation extends Operation {
     /**
      * An [[Operation]] class which contains an NFT on an assetID.
      * 
-     * @param addressIndecies An array of numbers representing the indecies in the addresses array of the UTXO this operation is consuming 
+     * @param addressIndecies An array of numbers representing the indecies in the addresses array of the [[UTXO]] this operation is consuming 
      * @param output An [[NFTTransferOutput]]
      */
-    constructor(addressIndecies:Array<number> = undefined, output:NFTTransferOutput = undefined){
+    constructor(output:NFTTransferOutput = undefined){
         super()
-        if(typeof addressIndecies !== 'undefined' && typeof output !== 'undefined'){
-            this.addrIndecies = addressIndecies;
+        if( typeof output !== 'undefined'){
             this.output = output;
         }
     }

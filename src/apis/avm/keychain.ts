@@ -4,9 +4,9 @@
 import {Buffer} from "buffer/";
 import * as elliptic from "elliptic";
 import BinTools from '../../utils/bintools';
-import { TxUnsigned, Tx } from './tx';
+import { Tx, UnsignedTx } from './tx';
 import { Signature, SigIdx } from './types';
-import { SecpInput, Input } from './inputs';
+import { SecpInput, TransferableInput } from './inputs';
 import createHash from "create-hash";
 import { KeyPair, KeyChain } from '../../utils/types';
 
@@ -243,30 +243,15 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     }
 
     /**
-     * Signs a [[TxUnsigned]] and returns signed [[Tx]]
+     * DEPRECATED: use UnsignedTx.sign(keychain) instead
+     * Signs a [[UnsignedTx]] and returns signed [[Tx]]
      * 
-     * @param utx A [[TxUnsigned]] that needs to be signed
+     * @param utx A [[UnsignedTx]] that needs to be signed
      * 
      * @returns A signed [[Tx]]
      */
-    signTx = (utx:TxUnsigned):Tx => {
-        let txbuff = utx.toBuffer();
-        let msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest()); 
-        let sigs:Array<Array<Signature>> = [];
-        let ins:Array<Input> = utx.getIns();
-        for(let i = 0; i < ins.length; i++){
-            let arrsigs:Array<Signature> = [];
-            let sigidxs:Array<SigIdx> = (ins[i] as SecpInput).getSigIdxs();
-            for(let j = 0; j < sigidxs.length; j++){
-                let keypair:AVMKeyPair = this.getKey(sigidxs[j].getSource());
-                let signval:Buffer = keypair.sign(msg)
-                let sig:Signature = new Signature();
-                sig.fromBuffer(signval);
-                arrsigs.push(sig);
-            }
-            sigs.push(arrsigs);
-        }
-        return new Tx(utx, sigs);
+    signTx = (utx:UnsignedTx):Tx => {
+        return utx.sign(this); 
     }
 
     /**
