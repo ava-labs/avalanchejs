@@ -26,7 +26,7 @@ export default class SlopesCore {
      * Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client RPC APIs
-     * @param port The port to reolve to reach the AVA Client RPC APIs
+     * @param port The port to resolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      */
     setAddress = (ip:string, port:number, protocol:string = "http") => {
@@ -227,7 +227,7 @@ export default class SlopesCore {
      * Creates a new Slopes instance. Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client APIs
-     * @param port The port to reolve to reach the AVA Client APIs
+     * @param port The port to resolve to reach the AVA Client APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      */
     constructor(ip:string, port:number, protocol:string = "http"){

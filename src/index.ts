@@ -10,6 +10,8 @@ import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
+import { Credential } from './apis/avm/credentials';
+import { SelectOperationClass } from './apis/avm/ops';
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 
@@ -54,7 +56,7 @@ export class Slopes extends SlopesCore {
      * Creates a new AVA instance. Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client RPC APIs
-     * @param port The port to reolve to reach the AVA Client RPC APIs
+     * @param port The port to resolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default 12345
      * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect, otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
@@ -97,12 +99,14 @@ export * from './utils/bintools';
 export * from './utils/db';
 export * from './utils/crypto';
 
-export {Tx, TxUnsigned, TxCreateAsset} from './apis/avm/tx';
-export {UTXO, SecpUTXO, UTXOSet, SelectUTXOClass} from './apis/avm/utxos';	
-export {SigIdx, Signature, UnixNow, Address, AVMConstants, InitialStates} from './apis/avm/types';	
-export {SecpOutput, SecpOutBase, Output, SelectOutputClass} from './apis/avm/outputs';	
-export {SecpInput, Input, SelectInputClass} from './apis/avm/inputs';	
+export {SelectCredentialClass, Credential, SecpCredential, NFTCredential} from './apis/avm/credentials';
+export {SelectInputClass, Input, TransferableInput, AmountInput, SecpInput} from './apis/avm/inputs';
 export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
+export {SelectOperationClass,Operation, TransferableOperation, NFTTransferOperation} from  './apis/avm/ops';
+export {SelectOutputClass, Output, TransferableOutput, AmountOutput, SecpOutput, NFTOutBase, NFTTransferOutput} from './apis/avm/outputs';
+export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx';
+export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
+export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
 export {AVMAPI as AVM};
 export {KeystoreAPI as Keystore};
