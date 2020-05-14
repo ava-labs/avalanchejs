@@ -1,12 +1,13 @@
-import { UTXOSet, UTXO, SecpUTXO } from 'src/apis/avm/utxos';
+import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { Input, SecpInput } from 'src/apis/avm/inputs';
+import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
 import { Output, SecpOutput } from 'src/apis/avm/outputs';
 import { AVMConstants } from 'src/apis/avm/types';
+import { AmountOutput, TransferableOutput } from '../../../src/apis/avm/outputs';
 
 
 /**
@@ -19,7 +20,7 @@ describe('Inputs', () => {
     let keymgr2:AVMKeyChain;
     let addrs1:Array<Buffer>;
     let addrs2:Array<Buffer>;
-    let utxos:Array<SecpUTXO>;
+    let utxos:Array<UTXO>;
     const amnt:number = 10000;
     beforeEach(() => {
         set = new UTXOSet();
@@ -45,27 +46,30 @@ describe('Inputs', () => {
             let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
             let assetID:Buffer = Buffer.from(createHash("sha256").update(txid).digest());
             let out:Output;
-            out = new SecpOutput(assetID, amount, addresses, locktime, threshold);
-            let u:SecpUTXO = new SecpUTXO();
-            u.fromBuffer(Buffer.concat([txid, txidx, out.toBuffer()]));
+            out = new SecpOutput(amount, locktime, threshold, addresses);
+            let xferout:TransferableOutput = new TransferableOutput(assetID, out);
+            let u:UTXO = new UTXO();
+            u.fromBuffer(Buffer.concat([txid, txidx, xferout.toBuffer()]));
             utxos.push(u);
         }
         set.addArray(utxos);
     });
     test('SecpInput', () => {
-        let u:SecpUTXO;
+        let u:UTXO;
         let txid:Buffer;
         let txidx:Buffer;
         let amount:BN = new BN(amnt);
         let input:SecpInput;
+        let xferinput:TransferableInput;
 
         u = utxos[0];
         txid = u.getTxID();
-        txidx = u.getTxIdx();
+        txidx = u.getOutputIdx();
         let asset = u.getAssetID();
 
-        input = new SecpInput(txid, txidx, amount, asset);
-        expect(input.getUTXOID()).toBe(u.getUTXOID());
+        input = new SecpInput(amount);
+        xferinput = new TransferableInput(txid, txidx, asset, input);
+        expect(xferinput.getUTXOID()).toBe(u.getUTXOID());
         expect(input.getInputID()).toBe(AVMConstants.SECPINPUTID);
 
         input.addSignatureIdx(0, addrs2[0]);
@@ -77,11 +81,17 @@ describe('Inputs', () => {
         expect(newin.getSigIdxs().toString()).toBe(input.getSigIdxs().toString());
     });
     test('comparitor', () => {
-        let in1:SecpInput = new SecpInput(utxos[0].getTxID(), utxos[0].getTxIdx(), utxos[0].getAmount(), utxos[0].getAssetID());
-        let in2:SecpInput = new SecpInput(utxos[1].getTxID(), utxos[1].getTxIdx(), utxos[1].getAmount(), utxos[1].getAssetID());
-        let in3:SecpInput = new SecpInput(utxos[2].getTxID(), utxos[2].getTxIdx(), utxos[2].getAmount(), utxos[2].getAssetID());
+        let inpt1:SecpInput = new SecpInput((utxos[0].getOutput() as AmountOutput).getAmount());
+        let in1:TransferableInput = new TransferableInput(utxos[0].getTxID(), utxos[0].getOutputIdx(), utxos[0].getAssetID(), inpt1);
 
-        let cmp = SecpInput.comparator();
+        let inpt2:SecpInput = new SecpInput((utxos[1].getOutput() as AmountOutput).getAmount());
+        let in2:TransferableInput = new TransferableInput(utxos[1].getTxID(), utxos[1].getOutputIdx(), utxos[1].getAssetID(), inpt2);
+
+
+        let inpt3:SecpInput = new SecpInput((utxos[2].getOutput() as AmountOutput).getAmount());
+        let in3:TransferableInput = new TransferableInput(utxos[2].getTxID(), utxos[2].getOutputIdx(), utxos[2].getAssetID(), inpt3);
+
+        let cmp = TransferableInput.comparator();
         expect(cmp(in1, in2)).toBe(-1);
         expect(cmp(in1, in3)).toBe(-1);
         expect(cmp(in1, in1)).toBe(0);

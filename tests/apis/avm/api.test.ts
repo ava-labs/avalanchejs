@@ -5,13 +5,16 @@ import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
 import BinTools from 'src/utils/bintools';
-import { UTXOSet, UTXO, SecpUTXO } from 'src/apis/avm/utxos';
-import { Output, SecpOutput, SecpOutBase } from 'src/apis/avm/outputs';
-import { Input, SecpInput } from 'src/apis/avm/inputs';
+import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
+import { Output } from 'src/apis/avm/outputs';
+import { Input, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
-import { TxUnsigned, TxCreateAsset, Tx } from 'src/apis/avm/tx';
+import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { UnixNow, AVMConstants } from 'src/apis/avm/types';
 import { InitialStates } from '../../../src/apis/avm/types';
+import { TransferableOutput, SecpOutput } from '../../../src/apis/avm/outputs';
+import { SecpInput } from '../../../src/apis/avm/inputs';
+import { CreateAssetTx } from '../../../src/apis/avm/tx';
 
 /**
  * @ignore
@@ -448,15 +451,15 @@ describe("AVMAPI", () => {
         let addrs1:Array<string>;
         let addrs2:Array<string>;
         let addrs3:Array<string>;
-        let utxos:Array<SecpUTXO>;
-        let inputs:Array<SecpInput>;
-        let outputs:Array<SecpOutput>;
+        let utxos:Array<UTXO>;
+        let inputs:Array<TransferableInput>;
+        let outputs:Array<TransferableOutput>;
         const amnt:number = 10000;
         let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
 
-        let secpbase1:SecpOutBase;
-        let secpbase2:SecpOutBase;
-        let secpbase3:SecpOutBase;
+        let secpbase1:SecpOutput;
+        let secpbase2:SecpOutput;
+        let secpbase3:SecpOutput;
         let initialState:InitialStates;
         
         beforeEach(() => {
@@ -488,36 +491,37 @@ describe("AVMAPI", () => {
             for(let i:number = 0; i < 5; i++){
                 let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
                 let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
-                let out:SecpOutput;
-                out = new SecpOutput(assetID, amount, addressbuffs, locktime, threshold);
-                outputs.push(out);
+                let out:SecpOutput = new SecpOutput(amount, locktime, threshold, addressbuffs);
+                let xferout:TransferableOutput = new TransferableOutput(assetID, out);
+                outputs.push(xferout);
     
-                let u:SecpUTXO = new SecpUTXO();
+                let u:UTXO = new UTXO();
                 u.fromBuffer(Buffer.concat([txid, txidx, out.toBuffer()]));
                 utxos.push(u);
     
                 txid = u.getTxID();
-                txidx = u.getTxIdx();
+                txidx = u.getOutputIdx();
                 let asset = u.getAssetID();
     
-                let input:SecpInput = new SecpInput(txid, txidx, amount, asset);
-                inputs.push(input);
+                let input:SecpInput = new SecpInput(amount);
+                let xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
+                inputs.push(xferinput);
             }
             set.addArray(utxos);
 
-            secpbase1 = new SecpOutBase(new BN(777), addrs3.map(a => api.parseAddress(a)));
-            secpbase2 = new SecpOutBase(new BN(888), addrs2.map(a => api.parseAddress(a)));
-            secpbase3 = new SecpOutBase(new BN(999), addrs2.map(a => api.parseAddress(a)));
+            secpbase1 = new SecpOutput(new BN(777), UnixNow(), 1, addrs3.map(a => api.parseAddress(a)));
+            secpbase2 = new SecpOutput(new BN(888), UnixNow(), 1, addrs2.map(a => api.parseAddress(a)));
+            secpbase3 = new SecpOutput(new BN(999), UnixNow(), 1, addrs2.map(a => api.parseAddress(a)));
             initialState = new InitialStates();
             initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
             initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
             initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
         });
 
-        test('makeUnsignedTx1', async () => {
+        test('makeBaseTx1', async () => {
     
-            let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
-            let txu2:TxUnsigned = set.makeUnsignedTx(
+            let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu2:UnsignedTx = set.makeBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -530,9 +534,9 @@ describe("AVMAPI", () => {
             
         });
 
-        test('makeUnsignedTx2', async () => {
-            let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
-            let txu2:TxUnsigned = set.makeUnsignedTx(
+        test('makeBaseTx1', async () => {
+            let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
+            let txu2:UnsignedTx = set.makeBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -543,11 +547,11 @@ describe("AVMAPI", () => {
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
             
-            let outies = txu1.getOuts().sort(SecpOutput.comparator()) as Array<SecpOutput>;
+            let outies = txu1.getTransaction().getOuts().sort(TransferableOutput.comparator()) as Array<TransferableOutput>;
 
             expect(outies.length).toBe(2);
-            let outaddr0 = outies[0].getAddresses().map(a => api.addressFromBuffer(a));
-            let outaddr1 = outies[1].getAddresses().map(a => api.addressFromBuffer(a));
+            let outaddr0 = outies[0].getOutput().getAddresses().map(a => api.addressFromBuffer(a));
+            let outaddr1 = outies[1].getOutput().getAddresses().map(a => api.addressFromBuffer(a));
 
             let testaddr2 = JSON.stringify(addrs2.sort());
             let testaddr3 = JSON.stringify(addrs3.sort());
@@ -561,8 +565,8 @@ describe("AVMAPI", () => {
         });
 
         test('signTx', async () => {
-            let txu1:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
-            let txu2:TxUnsigned = set.makeUnsignedTx(
+            let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu2:UnsignedTx = set.makeBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -579,7 +583,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Serialized', async ()=>{
-            let txu:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -602,7 +606,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Buffer', async ()=>{
-            let txu:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -625,7 +629,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Class Tx', async ()=>{
-            let txu:TxUnsigned = await api.makeUnsignedTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -653,7 +657,7 @@ describe("AVMAPI", () => {
             let symbol:string = "morT";
             let denomination:number = 8;
 
-            let result:Promise<TxCreateAsset> = api.makeCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
+            let result:Promise<UnsignedTx> = api.makeCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
             let payload:object = {
                 "result": {
                     'name': name, 
@@ -667,11 +671,11 @@ describe("AVMAPI", () => {
             };
     
             mockAxios.mockResponse(responseObj);
-            let txu1:TxCreateAsset = await result;
+            let txu1:UnsignedTx = await result;
     
             expect(mockAxios.request).toHaveBeenCalledTimes(1);
             
-            let txu2:TxCreateAsset = set.makeCreateAssetTx(slopes.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
+            let txu2:UnsignedTx = set.makeCreateAssetTx(slopes.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
 
             
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));

@@ -198,7 +198,17 @@ export abstract class Output {
 
     static comparator = ():(a:Output, b:Output) => (1|-1|0) => {
         return function(a:Output, b:Output):(1|-1|0) { 
-            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+            let aoutid:Buffer = Buffer.alloc(4);
+            aoutid.writeUInt32BE(a.getOutputID(), 0);
+            let abuff:Buffer = a.toBuffer();
+
+            let boutid:Buffer = Buffer.alloc(4);
+            boutid.writeUInt32BE(b.getOutputID(), 0);
+            let bbuff:Buffer = b.toBuffer();
+
+            let asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+            let bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+            return Buffer.compare(asort, bsort) as (1|-1|0);
         }
     }
 

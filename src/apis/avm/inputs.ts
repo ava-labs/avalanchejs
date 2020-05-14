@@ -90,6 +90,22 @@ export abstract class Input {
         return bintools.bufferToB58(this.toBuffer());
     }
 
+    static comparator = ():(a:Input, b:Input) => (1|-1|0) => {
+        return function(a:Input, b:Input):(1|-1|0) { 
+            let aoutid:Buffer = Buffer.alloc(4);
+            aoutid.writeUInt32BE(a.getInputID(), 0);
+            let abuff:Buffer = a.toBuffer();
+
+            let boutid:Buffer = Buffer.alloc(4);
+            boutid.writeUInt32BE(b.getInputID(), 0);
+            let bbuff:Buffer = b.toBuffer();
+
+            let asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+            let bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+            return Buffer.compare(asort, bsort) as (1|-1|0);
+        }
+    }
+
     constructor(){};
 
 }

@@ -24,7 +24,6 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
     throw new Error("Error - SelectOperationClass: unknown opid " + opid);
 }
 
-
 /**
  * A class representing an operation. All operation types must extend on this class.
  */
@@ -71,6 +70,7 @@ export abstract class Operation {
         }
         return offset;
     }
+
     toBuffer():Buffer {
         this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
         let bsize:number = this.sigCount.length;
@@ -81,6 +81,22 @@ export abstract class Operation {
             bsize += b.length;
         }
         return Buffer.concat(barr,bsize);
+    }
+
+    static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => {
+        return function(a:Operation, b:Operation):(1|-1|0) { 
+            let aoutid:Buffer = Buffer.alloc(4);
+            aoutid.writeUInt32BE(a.getOperationID(), 0);
+            let abuff:Buffer = a.toBuffer();
+
+            let boutid:Buffer = Buffer.alloc(4);
+            boutid.writeUInt32BE(b.getOperationID(), 0);
+            let bbuff:Buffer = b.toBuffer();
+
+            let asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+            let bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+            return Buffer.compare(asort, bsort) as (1|-1|0);
+        }
     }
 
     constructor(){}

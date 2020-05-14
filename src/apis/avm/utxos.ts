@@ -34,7 +34,7 @@ export class UTXO {
     }
 
     /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer}  of the TxIdx.
+     * Returns a {@link https://github.com/feross/buffer|Buffer}  of the OutputIdx.
      */
     getOutputIdx = ():Buffer => {
         /* istanbul ignore next */
