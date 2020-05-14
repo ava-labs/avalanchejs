@@ -27,6 +27,73 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
     throw new Error("Error - SelectInputClass: unknown inputid " + inputid);
 }
 
+export abstract class Input {
+    protected sigCount:Buffer = Buffer.alloc(4);
+    protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
+
+    abstract getInputID():number;
+
+    /**
+     * Returns the array of [[SigIdx]] for this [[Input]] 
+     */
+    getSigIdxs = ():Array<SigIdx> => {
+        return this.sigIdxs;
+    }
+
+    /**
+     * Creates and adds a [[SigIdx]] to the [[Input]].
+     * 
+     * @param addressIdx The index of the address to reference in the signatures
+     * @param address The address of the source of the signature
+     */
+    addSignatureIdx = (addressIdx:number, address:Buffer) => {
+        let sigidx:SigIdx = new SigIdx();
+        let b:Buffer = Buffer.alloc(4);
+        b.writeUInt32BE(addressIdx, 0);
+        sigidx.fromBuffer(b);
+        sigidx.setSource(address);
+        this.sigIdxs.push(sigidx);
+        this.sigCount.writeUInt32BE(this.sigIdxs.length,0);
+    }
+
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.sigCount = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let sigCount:number = this.sigCount.readUInt32BE(0);
+        this.sigIdxs = [];
+        for(let i = 0; i < sigCount; i++){
+            let sigidx = new SigIdx();
+            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+            sigidx.fromBuffer(sigbuff);
+            offset += 4;
+            this.sigIdxs.push(sigidx);
+        }
+        return offset;
+    }
+
+    toBuffer():Buffer {
+        this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
+        let bsize:number = this.sigCount.length;
+        let barr:Array<Buffer> = [this.sigCount];
+        for(let i = 0; i < this.sigIdxs.length; i++) {
+            let b:Buffer = this.sigIdxs[i].toBuffer();
+            barr.push(b);
+            bsize += b.length;
+        }
+        return Buffer.concat(barr,bsize);
+    }
+
+    /**
+     * Returns a base-58 representation of the [[Input]].
+     */
+    toString():string {
+        return bintools.bufferToB58(this.toBuffer());
+    }
+
+    constructor(){};
+
+}
+
 export class TransferableInput {
     protected txid:Buffer = Buffer.alloc(32);
     protected outputidx:Buffer = Buffer.alloc(4);
@@ -139,73 +206,6 @@ export class TransferableInput {
             this.assetid = assetID;
         }
     }
-}
-
-export abstract class Input {
-    protected sigCount:Buffer = Buffer.alloc(4);
-    protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
-
-    abstract getInputID():number;
-
-    /**
-     * Returns the array of [[SigIdx]] for this [[Input]] 
-     */
-    getSigIdxs = ():Array<SigIdx> => {
-        return this.sigIdxs;
-    }
-
-    /**
-     * Creates and adds a [[SigIdx]] to the [[Input]].
-     * 
-     * @param addressIdx The index of the address to reference in the signatures
-     * @param address The address of the source of the signature
-     */
-    addSignatureIdx = (addressIdx:number, address:Buffer) => {
-        let sigidx:SigIdx = new SigIdx();
-        let b:Buffer = Buffer.alloc(4);
-        b.writeUInt32BE(addressIdx, 0);
-        sigidx.fromBuffer(b);
-        sigidx.setSource(address);
-        this.sigIdxs.push(sigidx);
-        this.sigCount.writeUInt32BE(this.sigIdxs.length,0);
-    }
-
-    fromBuffer(bytes:Buffer, offset:number = 0):number {
-        this.sigCount = bintools.copyFrom(bytes, offset, offset + 4);
-        offset += 4;
-        let sigCount:number = this.sigCount.readUInt32BE(0);
-        this.sigIdxs = [];
-        for(let i = 0; i < sigCount; i++){
-            let sigidx = new SigIdx();
-            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
-            sigidx.fromBuffer(sigbuff);
-            offset += 4;
-            this.sigIdxs.push(sigidx);
-        }
-        return offset;
-    }
-
-    toBuffer():Buffer {
-        this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
-        let bsize:number = this.sigCount.length;
-        let barr:Array<Buffer> = [this.sigCount];
-        for(let i = 0; i < this.sigIdxs.length; i++) {
-            let b:Buffer = this.sigIdxs[i].toBuffer();
-            barr.push(b);
-            bsize += b.length;
-        }
-        return Buffer.concat(barr,bsize);
-    }
-
-    /**
-     * Returns a base-58 representation of the [[Input]].
-     */
-    toString():string {
-        return bintools.bufferToB58(this.toBuffer());
-    }
-
-    constructor(){};
-
 }
 
 /**
