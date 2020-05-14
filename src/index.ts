@@ -54,7 +54,7 @@ export class Slopes extends SlopesCore {
      * Creates a new AVA instance. Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client RPC APIs
-     * @param port The port to reolve to reach the AVA Client RPC APIs
+     * @param port The port to resolve to reach the AVA Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default 12345
      * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect, otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
