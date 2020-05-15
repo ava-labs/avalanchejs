@@ -482,7 +482,7 @@ export class UnsignedTx {
  */
 export class Tx {
     protected unsignedTx:UnsignedTx = new UnsignedTx();
-    protected signatures:Array<Credential> = [];
+    protected credentials:Array<Credential> = [];
 
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.
@@ -497,13 +497,13 @@ export class Tx {
         offset = this.unsignedTx.fromBuffer(bytes, offset);
         let numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        this.signatures = [];
-        for(let i = 0; i < numcreds; i++){
+        this.credentials = [];
+        for(let i = 0; i < numcreds; i++) {
             let credid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
             offset += 4;
             let cred:Credential = SelectCredentialClass(credid);
-            offset += cred.fromBuffer(bytes, offset);
-            this.signatures.push(cred);
+            offset = cred.fromBuffer(bytes, offset);
+            this.credentials.push(cred);
         }
         return offset;
     }
@@ -514,18 +514,18 @@ export class Tx {
     toBuffer():Buffer {
         let txbuff:Buffer = this.unsignedTx.toBuffer();
         let bsize:number = txbuff.length;
-        let sigarrlen:Buffer = Buffer.alloc(4);
-        sigarrlen.writeUInt32BE(this.signatures.length, 0);
-        let barr:Array<Buffer> = [txbuff, sigarrlen];
-        bsize += sigarrlen.length;
-        for(let i = 0; i < this.signatures.length; i++){
+        let credlen:Buffer = Buffer.alloc(4);
+        credlen.writeUInt32BE(this.credentials.length, 0);
+        let barr:Array<Buffer> = [txbuff, credlen];
+        bsize += credlen.length;
+        for(let i = 0; i < this.credentials.length; i++) {
             let credid:Buffer = Buffer.alloc(4);
-            credid.writeInt32BE(this.signatures[i].getCredentialID(), 0);
+            credid.writeInt32BE(this.credentials[i].getCredentialID(), 0);
             barr.push(credid);
             bsize += credid.length;
-            let sigbuff:Buffer = this.signatures[i].toBuffer();
-            bsize += sigbuff.length;
-            barr.push(sigbuff)
+            let credbuff:Buffer = this.credentials[i].toBuffer();
+            bsize += credbuff.length;
+            barr.push(credbuff)
         }
         let buff:Buffer = Buffer.concat(barr, bsize);
         return buff;
@@ -561,11 +561,11 @@ export class Tx {
      * @param unsignedTx Optional [[UnsignedTx]]
      * @param signatures Optional array of [[Credential]]s
      */
-    constructor(unsignedTx:UnsignedTx = undefined, signatures:Array<Credential> = undefined) {
+    constructor(unsignedTx:UnsignedTx = undefined, credentials:Array<Credential> = undefined) {
         if(typeof unsignedTx !== 'undefined'){
             this.unsignedTx = unsignedTx;
-            if(typeof signatures !== 'undefined'){
-                this.signatures = signatures
+            if(typeof credentials !== 'undefined'){
+                this.credentials = credentials
             }
         }
     }

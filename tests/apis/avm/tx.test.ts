@@ -126,7 +126,7 @@ describe('Transactions', () => {
         }).toThrow();
     });
 
-    test('Creation Tx1', () => {
+    test('Creation Tx1 with asof, locktime, threshold', () => {
         let txu:UnsignedTx = set.makeBaseTx(
             netid, blockchainID,
             new BN(9000), 
@@ -140,7 +140,7 @@ describe('Transactions', () => {
         expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
         expect(tx2.toString()).toBe(tx.toString());
     });
-    test('Creation Tx2', () => {
+    test('Creation Tx2 without asof, locktime, threshold', () => {
         let txu:UnsignedTx = set.makeBaseTx(
             netid, blockchainID,
             new BN(9000), 

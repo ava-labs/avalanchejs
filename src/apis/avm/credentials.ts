@@ -48,9 +48,7 @@ export abstract class Credential {
         this.sigArray = [];
         for(let i:number = 0; i < siglen; i++){
             let sig:Signature = new Signature();
-            let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + sig.getSize());
-            sig.fromBuffer(sigbuff);
-            offset += sig.getSize();
+            offset = sig.fromBuffer(bytes, offset);
             this.sigArray.push(sig);
         }
         return offset;

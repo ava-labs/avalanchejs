@@ -184,7 +184,7 @@ export class InitialStates {
         this.fxs[fxid].push(out);
     }
 
-    fromBuffer(bytes:Buffer, offset:number):number {
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
         let result:{[fxid:number]:Array<Output>} = {};
         let klen:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
