@@ -45,6 +45,7 @@ export abstract class Credential {
 
     fromBuffer(bytes, offset:number = 0):number {
         let siglen:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
         this.sigArray = [];
         for(let i:number = 0; i < siglen; i++){
             let sig:Signature = new Signature();
