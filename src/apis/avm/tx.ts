@@ -10,6 +10,7 @@ import { TransferableInput } from './inputs';
 import { TransferableOperation } from './ops';
 import { Credential, SelectCredentialClass, SecpCredential } from './credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
+import { ConsoleLogger } from "typedoc/dist/lib/utils";
 
 /**
  * @ignore
@@ -200,9 +201,7 @@ export class BaseTx {
 
 export class CreateAssetTx extends BaseTx {
     protected name:string = "";
-    protected namebuff:Buffer = Buffer.alloc(2);
     protected symbol:string = "";
-    protected symbolbuff:Buffer = Buffer.alloc(2);
     protected denomination:Buffer = Buffer.alloc(1);
     protected initialstate:InitialStates = new InitialStates();
 
@@ -227,12 +226,6 @@ export class CreateAssetTx extends BaseTx {
         return this.name;
     }
 
-    /**
-     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the name
-     */
-    getNameBuffer = ():Buffer => {
-        return this.namebuff;
-    }
 
     /**
      * Returns the string representation of the symbol
@@ -241,12 +234,7 @@ export class CreateAssetTx extends BaseTx {
         return this.symbol;
     }
 
-    /**
-     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the symbol
-     */
-    getSymbolBuffer = ():Buffer => {
-        return this.symbolbuff;
-    }
+
 
     /**
      * Returns the numeric representation of the denomination
@@ -274,19 +262,24 @@ export class CreateAssetTx extends BaseTx {
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(bytes, offset);
+
         let namesize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
-        this.namebuff = bintools.copyFrom(bytes, offset, offset + 2 + namesize);
         offset += 2;
+        this.name = bintools.copyFrom(bytes, offset, offset + namesize).toString("utf8");
         offset += namesize;
+
         let symsize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
-        this.symbolbuff = bintools.copyFrom(bytes, offset, offset + 2 + symsize);
         offset += 2;
+        this.symbol = bintools.copyFrom(bytes, offset, offset + symsize).toString("utf8");
         offset += symsize;
+
         this.denomination = bintools.copyFrom(bytes, offset, offset + 1);
         offset += 1;
+
         let inits:InitialStates = new InitialStates();
         offset = inits.fromBuffer(bytes, offset);
         this.initialstate = inits;
+
         return offset;
     }
 
@@ -296,8 +289,19 @@ export class CreateAssetTx extends BaseTx {
     toBuffer():Buffer {
         let superbuff:Buffer = super.toBuffer();
         let initstatebuff:Buffer = this.initialstate.toBuffer();
-        let bsize:number = superbuff.length + this.namebuff.length + this.symbolbuff.length + this.denomination.length + initstatebuff.length;
-        let barr:Array<Buffer> = [superbuff, this.namebuff, this.symbolbuff, this.denomination, initstatebuff];
+
+        let namebuff:Buffer = Buffer.alloc(this.name.length);
+        namebuff.write(this.name, 0, this.name.length, "utf8");
+        let namesize:Buffer = Buffer.alloc(2);
+        namesize.writeUInt16BE(this.name.length, 0);
+
+        let symbuff:Buffer = Buffer.alloc(this.symbol.length);
+        symbuff.write(this.symbol, 0, this.symbol.length, "utf8");
+        let symsize:Buffer  = Buffer.alloc(2);
+        symsize.writeUInt16BE(this.symbol.length, 0);
+
+        let bsize:number = superbuff.length + namesize.length + namebuff.length + symsize.length + symbuff.length + this.denomination.length + initstatebuff.length;
+        let barr:Array<Buffer> = [superbuff, namesize, namebuff, symsize, symbuff, this.denomination, initstatebuff];
         return Buffer.concat(barr, bsize);
     }
     
@@ -325,9 +329,7 @@ export class CreateAssetTx extends BaseTx {
             denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
         ) {
             this.initialstate = initialstate;
-            this.namebuff = bintools.stringToBuffer(name);
             this.name = name;
-            this.symbolbuff = bintools.stringToBuffer(symbol);
             this.symbol = symbol;
             this.denomination.writeUInt8(denomination, 0);
         }

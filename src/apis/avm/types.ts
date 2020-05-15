@@ -185,11 +185,11 @@ export class InitialStates {
     }
 
     fromBuffer(bytes:Buffer, offset:number = 0):number {
-        let result:{[fxid:number]:Array<Output>} = {};
+        let result:{[fxid:number]:Array<Output>} = [];
         let klen:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let klennum:number = klen.readUInt32BE(0);
-        for(let i = 0; i < klennum; i++){
+        for(let i = 0; i < klennum; i++) {
             let fxidbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
             offset += 4;
             let fxid:number = fxidbuff.readUInt32BE(0);
@@ -197,11 +197,11 @@ export class InitialStates {
             let statelenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
             offset += 4;
             let statelen:number = statelenbuff.readUInt32BE(0);
-            for(let j = 0; j < statelen; j++){
+            for(let j = 0; j < statelen; j++) {
                 let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
                 offset += 4;
                 let out:Output = SelectOutputClass(outputid);
-                offset += out.fromBuffer(bytes, offset)
+                offset = out.fromBuffer(bytes, offset)
                 result[fxid].push(out);
             }
         }

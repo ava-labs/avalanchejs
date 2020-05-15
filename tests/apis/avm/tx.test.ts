@@ -175,10 +175,9 @@ describe('Transactions', () => {
         expect(txu.getTxType()).toBe(AVMConstants.CREATEASSETTX);
         expect(txu.getNetworkID()).toBe(12345);
         expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
+
         expect(txu.getName()).toBe(name);
-        expect(txu.getNameBuffer().toString("hex")).toBe(bintools.stringToBuffer(name).toString("hex"));
         expect(txu.getSymbol()).toBe(symbol);
-        expect(txu.getSymbolBuffer().toString("hex")).toBe(bintools.stringToBuffer(symbol).toString("hex"));
         expect(txu.getDenomination()).toBe(denomination);
         expect(txu.getDenominationBuffer().readUInt8(0)).toBe(denomination);
 
