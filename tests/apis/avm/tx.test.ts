@@ -63,8 +63,7 @@ describe('Transactions', () => {
         for(let i:number = 0; i < 5; i++){
             let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
             let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
-            let out:SecpOutput;
-            out = new SecpOutput(amount, locktime, threshold, addresses);
+            let out:SecpOutput = new SecpOutput(amount, locktime, threshold, addresses);
             let xferout:TransferableOutput = new TransferableOutput(assetID, out);
             outputs.push(xferout);
 
@@ -90,7 +89,7 @@ describe('Transactions', () => {
         expect(txins.length).toBe(inputs.length);
         expect(txouts.length).toBe(outputs.length);
         
-        expect(txu.getTransaction().getTxType()).toBe(99);
+        expect(txu.getTransaction().getTxType()).toBe(0);
         expect(txu.getTransaction().getNetworkID()).toBe(12345);
         expect(txu.getTransaction().getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
         

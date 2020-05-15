@@ -115,11 +115,11 @@ describe('UTXOSet', () => {
     test('Mutliple add', () => {
         let set:UTXOSet = new UTXOSet();
         //first add
-        for(let i:number = 0; i < utxostrs.length; i++){
+        for(let i:number = 0; i < utxostrs.length; i++) {
             set.add(utxostrs[i]);
         }
         //the verify (do these steps separate to ensure no overwrites)
-        for(let i:number = 0; i < utxostrs.length; i++){
+        for(let i:number = 0; i < utxostrs.length; i++) {
             expect(set.includes(utxostrs[i])).toBe(true);
             let utxo:UTXO = new UTXO();
             utxo.fromString(utxostrs[i]);
@@ -156,8 +156,10 @@ describe('UTXOSet', () => {
     test('overwriting UTXO', () => {
         let set:UTXOSet = new UTXOSet();
         set.addArray(utxostrs);
-        expect(set.add(utxostrs[0], true)).toBe(true);
-        expect(set.add(utxostrs[0], false)).toBe(false);
+        let testutxo:UTXO = new UTXO();
+        testutxo.fromString(utxostrs[0]);
+        expect(set.add(utxostrs[0], true).toString()).toBe(testutxo.toString());
+        expect(set.add(utxostrs[0], false)).toBeUndefined();
         expect(set.addArray(utxostrs, true).length).toBe(3);
         expect(set.addArray(utxostrs, false).length).toBe(0);
     });
@@ -172,16 +174,20 @@ describe('UTXOSet', () => {
         });
         
         test('remove', () => {
-            expect(set.remove(utxostrs[0])).toBe(true);
-            expect(set.remove(utxostrs[0])).toBe(false);
-            expect(set.add(utxostrs[0], false)).toBe(true);
-            expect(set.remove(utxostrs[0])).toBe(true);
+            let testutxo:UTXO = new UTXO();
+            testutxo.fromString(utxostrs[0]);
+            expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
+            expect(set.remove(utxostrs[0])).toBeUndefined();
+            expect(set.add(utxostrs[0], false).toString()).toBe(testutxo.toString());
+            expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
         });
 
         test('removeArray', () => {
+            let testutxo:UTXO = new UTXO();
+            testutxo.fromString(utxostrs[0]);
             expect(set.removeArray(utxostrs).length).toBe(3);
             expect(set.removeArray(utxostrs).length).toBe(0);
-            expect(set.add(utxostrs[0], false)).toBe(true);
+            expect(set.add(utxostrs[0], false).toString()).toBe(testutxo.toString());
             expect(set.removeArray(utxostrs).length).toBe(1);
             expect(set.addArray(utxostrs, false).length).toBe(3);
             expect(set.removeArray(utxos).length).toBe(3);

@@ -80,26 +80,18 @@ export class UTXO {
         let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.output = SelectOutputClass(outputid);
-        return offset + this.output.fromBuffer(bytes, offset);
+        return this.output.fromBuffer(bytes, offset);
     }
 
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[UTXO]].
      */
     toBuffer():Buffer {
-        /* istanbul ignore next */
-        try {
-            let outbuff:Buffer = this.output.toBuffer();
-            let outputidbuffer:Buffer = Buffer.alloc(4);
-            outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
-            let barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
-            return Buffer.concat(barr, this.txid.length + this.outputidx.length + this.assetid.length + outputidbuffer.length + outbuff.length);
-        } catch(e) {
-            /* istanbul ignore next */
-            let emsg:string = "Error - UTXO.toBuffer: " + e;
-            /* istanbul ignore next */
-            throw new Error(emsg);
-        }
+        let outbuff:Buffer = this.output.toBuffer();
+        let outputidbuffer:Buffer = Buffer.alloc(4);
+        outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
+        let barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
+        return Buffer.concat(barr, this.txid.length + this.outputidx.length + this.assetid.length + outputidbuffer.length + outbuff.length);
     }
 
     /**
@@ -137,9 +129,16 @@ export class UTXO {
      * @param outputid Optional {@link https://github.com/feross/buffer|Buffer} or number of the output ID for the UTXO
      */
     constructor(txid:Buffer = undefined, outputidx:Buffer | number = undefined, assetid:Buffer = undefined, output:Output = undefined) {
-        if(typeof txid !== "undefined" && typeof outputidx === "number") {
+        if(typeof txid !== "undefined" && typeof outputidx !== "undefined" && typeof assetid !== "undefined" && typeof output !== "undefined") {
             this.txid = txid;
-            this.outputidx.writeUInt32BE(outputidx, 0);
+            if(typeof outputidx === "number"){
+                this.outputidx.writeUInt32BE(outputidx, 0);
+            } else if(outputidx instanceof Buffer){
+                this.outputidx = outputidx;
+            } else {
+                throw new Error("Error - UTXO.constructor: outputidx parameter is not a number or a Buffer: " + outputidx);
+            }
+            
             this.assetid = assetid;
             this.output = output;
         }
@@ -159,7 +158,7 @@ export class UTXOSet {
      * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
      */
     includes = (utxo:UTXO | string):boolean => {
-        let utxoX:UTXO;
+        let utxoX:UTXO = new UTXO();
         //force a copy
         if(typeof utxo === 'string') {
             utxoX.fromBuffer(bintools.avaDeserialize(utxo));
@@ -179,12 +178,14 @@ export class UTXOSet {
      * @returns A [[UTXO]] if one was added and undefined if nothing was added.
      */
     add = (utxo:UTXO | string, overwrite:boolean = false):UTXO => {
-        let utxovar:UTXO;
+        let utxovar:UTXO = new UTXO();
         //force a copy
         if(typeof utxo === 'string') {
             utxovar.fromBuffer(bintools.avaDeserialize(utxo));
-        } else {
+        } else if (utxo instanceof UTXO){
             utxovar.fromBuffer(utxo.toBuffer()); //forces a copy
+        } else {
+            throw new Error("Error - UTXOSet.add: utxo parameter is not a UTXO or string: " + utxo);
         }
         let utxoid:string = utxovar.getUTXOID();
         if(!(utxoid in this.utxos) || overwrite === true){
@@ -214,7 +215,7 @@ export class UTXOSet {
      */
     addArray = (utxos:Array<string | UTXO>, overwrite:boolean = false):Array<UTXO> => {
         let added:Array<UTXO> = [];
-        for(let i = 0; i < utxos.length; i++){
+        for(let i = 0; i < utxos.length; i++) {
             let result:UTXO = this.add(utxos[i], overwrite)
             if(typeof result !== 'undefined'){
                 added.push(result);
@@ -231,7 +232,7 @@ export class UTXOSet {
      * @returns A [[UTXO]] if it was removed and undefined if nothing was removed.
      */ 
     remove = (utxo:UTXO | string):UTXO => {
-        let utxovar:UTXO;
+        let utxovar:UTXO = new UTXO();
         //force a copy
         if(typeof utxo === 'string') {
             utxovar.fromBuffer(bintools.avaDeserialize(utxo));
@@ -464,13 +465,12 @@ export class UTXOSet {
 
         let outs:Array<TransferableOutput> = [];
         let ins:Array<TransferableInput> = [];
-        
         if(!(SelectOutputClass(outputID) instanceof AmountOutput)){
             throw new Error("Error - UTXOSet.makeUnsignedTx: outputID does not implement AmountOutput: " + outputID);
         }
 
         if(!amount.eq(zero)){
-            let sndout:AmountOutput = SelectOutputClass(outputID, amount, toAddresses, locktime, threshold) as AmountOutput;
+            let sndout:AmountOutput = SelectOutputClass(outputID, amount, locktime, threshold, toAddresses) as AmountOutput;
             let mainXferout:TransferableOutput = new TransferableOutput(assetID, sndout);
             outs.push(mainXferout);
 
@@ -507,7 +507,7 @@ export class UTXOSet {
 
                     if(change.gt(zero)){
                         if(assetID) {
-                            let changeout:AmountOutput = SelectOutputClass(outputID, change, changeAddresses, zero.clone(), 1) as AmountOutput;
+                            let changeout:AmountOutput = SelectOutputClass(outputID, change, zero.clone(), 1, changeAddresses) as AmountOutput;
                             let xferout:TransferableOutput = new TransferableOutput(assetID, changeout);
                             outs.push(xferout);
                         } 

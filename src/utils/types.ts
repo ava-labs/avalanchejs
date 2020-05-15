@@ -430,20 +430,21 @@ export abstract class NBytes {
      * 
      * @returns The size of the {@link https://github.com/feross/buffer|Buffer}
      */
-    fromBuffer(buff:Buffer):number {
+    fromBuffer(buff:Buffer, offset:number = 0):number {
         try {
-            if(buff.length != this.bsize){
+            if(buff.length - offset < this.bsize){
                 /* istanbul ignore next */
-                throw new Error("Buffer length must be exactly " + this.bsize + " bytes.");
+                throw new Error("Buffer length must be at least " + this.bsize + " bytes.");
             }
-            this.bytes = Buffer.from(buff);
+            
+            this.bytes = bintools.copyFrom(buff, offset, offset + this.bsize);
         } catch(e) {
             /* istanbul ignore next */
             let emsg:string = "Error - NBytes.fromBuffer: " + e;
             /* istanbul ignore next */
             throw new Error(emsg);
         }
-        return this.bsize;
+        return offset + this.bsize;
     }
 
     /**

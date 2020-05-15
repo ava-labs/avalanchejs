@@ -144,22 +144,19 @@ export abstract class Output {
     /**
      * Returns a base-58 string representing the [[Output]].
      */
-    fromBuffer(outbuff:Buffer, offset:number = 0):number {
-        this.locktime = bintools.copyFrom(outbuff, offset, offset + 8);
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        this.locktime = bintools.copyFrom(bytes, offset, offset + 8);
         offset += 8;
-        this.threshold = bintools.copyFrom(outbuff, offset, offset + 4);
+        this.threshold = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
-        this.numaddrs = bintools.copyFrom(outbuff, offset, offset + 4);
+        this.numaddrs = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let numaddrs:number = this.numaddrs.readUInt32BE(0);
         this.addresses = [];
         for(let i = 0; i < numaddrs; i++){
             let addr:Address = new Address();
-            let offsetEnd:number = offset + addr.getSize();
-            let copied:Buffer = bintools.copyFrom(outbuff, offset, offsetEnd);
-            addr.fromBuffer(copied);
+            offset = addr.fromBuffer(bytes, offset);
             this.addresses.push(addr);
-            offset = offsetEnd;
         }
         this.addresses.sort(Address.comparitor());
         return offset;
@@ -268,7 +265,7 @@ export class TransferableOutput {
         let outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.output = SelectOutputClass(outputid);
-        return offset + this.output.fromBuffer(bytes, offset);
+        return this.output.fromBuffer(bytes, offset);
     }
 
     toBuffer():Buffer {

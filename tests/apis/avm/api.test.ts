@@ -486,13 +486,14 @@ describe("AVMAPI", () => {
             
             for(let i:number = 0; i < 5; i++){
                 let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
-                let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
+                let txidx:Buffer = Buffer.alloc(4);
+                txidx.writeInt32BE(i, 0)
                 let out:SecpOutput = new SecpOutput(amount, locktime, threshold, addressbuffs);
                 let xferout:TransferableOutput = new TransferableOutput(assetID, out);
                 outputs.push(xferout);
     
                 let u:UTXO = new UTXO();
-                u.fromBuffer(Buffer.concat([txid, txidx, out.toBuffer()]));
+                u.fromBuffer(Buffer.concat([txid, txidx, xferout.toBuffer()]));
                 utxos.push(u);
     
                 txid = u.getTxID();
@@ -530,7 +531,7 @@ describe("AVMAPI", () => {
             
         });
 
-        test('makeBaseTx1', async () => {
+        test('makeBaseTx2', async () => {
             let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
             let txu2:UnsignedTx = set.makeBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
@@ -606,7 +607,6 @@ describe("AVMAPI", () => {
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
-    
             let result:Promise<string> = api.issueTx(tx.toBuffer());
             let payload:object = {
                 "result": {

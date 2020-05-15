@@ -182,7 +182,7 @@ export class TransferableInput {
         let inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.input = SelectInputClass(inputid);
-        return offset + this.input.fromBuffer(bytes, offset);
+        return this.input.fromBuffer(bytes, offset);
     }
 
     /**

@@ -103,19 +103,18 @@ export class BaseTx {
         let outcount:number = this.numouts.readUInt32BE(0);
         this.outs = [];
         for(let i = 0; i < outcount; i++){
-            let outbuff:Buffer = bintools.copyFrom(bytes, offset, bytes.length);
             let xferout:TransferableOutput = new TransferableOutput();
-            offset = xferout.fromBuffer(outbuff, 0);
+            offset = xferout.fromBuffer(bytes, offset);
             this.outs.push(xferout);
         }
+
         this.numins = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let incount:number = this.numins.readUInt32BE(0);
         this.ins = [];
         for(let i = 0; i < incount; i++){
-            let inbuff:Buffer = bintools.copyFrom(bytes, offset, bytes.length);
             let xferin:TransferableInput = new TransferableInput();
-            offset = xferin.fromBuffer(inbuff, 0);
+            offset = xferin.fromBuffer(bytes, offset);
             this.ins.push(xferin);
         }
         return offset;
@@ -449,7 +448,7 @@ export class UnsignedTx {
         let txtype:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.transaction = SelectTxClass(txtype);
-        return offset + this.transaction.fromBuffer(bytes, offset);
+        return this.transaction.fromBuffer(bytes, offset);
     }
 
     toBuffer():Buffer {

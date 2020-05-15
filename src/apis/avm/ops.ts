@@ -131,7 +131,7 @@ export class TransferableOperation {
         let opid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.operation = SelectOperationClass(opid);
-        return offset + this.operation.fromBuffer(bytes, offset);
+        return this.operation.fromBuffer(bytes, offset);
     }
 
     toBuffer():Buffer {

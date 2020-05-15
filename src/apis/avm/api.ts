@@ -696,13 +696,15 @@ class AVMAPI extends JRPCAPI{
      * @returns A Promise<string> representing the transaction ID of the posted transaction.
      */
     issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
-        let Transaction = new Tx();
+        let Transaction = "";
         if(typeof tx === 'string'){
-            Transaction.fromString(tx);
-        } else if(tx instanceof Buffer){
-            Transaction.fromBuffer(tx);
-        } else if(tx instanceof Tx) {
             Transaction = tx;
+        } else if(tx instanceof Buffer){
+            let txobj:Tx = new Tx();
+            txobj.fromBuffer(tx);
+            Transaction = txobj.toString();
+        } else if(tx instanceof Tx) {
+            Transaction = tx.toString();
         } else {
             /* istanbul ignore next */
             throw new Error("Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx");
