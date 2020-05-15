@@ -20,20 +20,18 @@ describe('Outputs', () => {
     let fallLocktime:BN = locktime.add(new BN(50));
 
     test('SelectOutputClass', () => {
-        let goodout:SecpOutput = new SecpOutput(assetIDBuff, new BN(2600), addrpay, locktime, 1);
-        let badoutbuff:Buffer = bintools.copyFrom(goodout.toBuffer());
-        badoutbuff.write("00000099", 32, 4, "hex");
-        let outpayment:Output = SelectOutputClass(goodout.toBuffer());
+        let goodout:SecpOutput = new SecpOutput(new BN(2600), locktime, 1, addrpay);
+        let outpayment:Output = SelectOutputClass(goodout.getOutputID());
         expect(outpayment).toBeInstanceOf(SecpOutput);
         expect(() => {
-            SelectOutputClass(badoutbuff);
+            SelectOutputClass(99);
         }).toThrow("Error - SelectOutputClass: unknown outputid");
     });
 
     test('comparator', () => {
-        let outpayment1:Output = new SecpOutput(assetIDBuff, new BN(10000), addrs, locktime, 3);
-        let outpayment2:Output = new SecpOutput(assetIDBuff, new BN(10001), addrs, locktime, 3);
-        let outpayment3:Output = new SecpOutput(assetIDBuff, new BN(9999), addrs, locktime, 3);
+        let outpayment1:Output = new SecpOutput(new BN(10000), locktime, 3, addrs);
+        let outpayment2:Output = new SecpOutput(new BN(10001), locktime, 3, addrs);
+        let outpayment3:Output = new SecpOutput(new BN(9999), locktime, 3, addrs);
         let cmp = Output.comparator();
         expect(cmp(outpayment1, outpayment1)).toBe(0);
         expect(cmp(outpayment2, outpayment2)).toBe(0);
@@ -42,14 +40,12 @@ describe('Outputs', () => {
         expect(cmp(outpayment1, outpayment3)).toBe(1);
     });
     test('OutPayment', () => {
-        let out:SecpOutput = new SecpOutput(assetIDBuff, new BN(10000), addrs, locktime, 3);
+        let out:SecpOutput = new SecpOutput(new BN(10000), locktime, 3, addrs, );
         expect(out.getOutputID()).toBe(7);
         expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
         expect(out.getThreshold()).toBe(3);
         expect(out.getLocktime().toNumber()).toBe(locktime.toNumber());
-
-        expect(out.getAssetID().toString("hex")).toBe(assetID);
 
         let r = out.getAddressIdx(addrs[2]);
         expect(out.getAddress(r)).toStrictEqual(addrs[2]);

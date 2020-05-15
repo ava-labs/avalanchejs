@@ -5,9 +5,8 @@ import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { Output, SecpOutput } from 'src/apis/avm/outputs';
+import { Output, SecpOutput, AmountOutput, TransferableOutput } from 'src/apis/avm/outputs';
 import { AVMConstants } from 'src/apis/avm/types';
-import { AmountOutput, TransferableOutput } from '../../../src/apis/avm/outputs';
 
 
 /**
@@ -45,10 +44,9 @@ describe('Inputs', () => {
             let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
             let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
             let assetID:Buffer = Buffer.from(createHash("sha256").update(txid).digest());
-            let out:Output;
-            out = new SecpOutput(amount, locktime, threshold, addresses);
+            let out:Output = new SecpOutput(amount, locktime, threshold, addresses);
             let xferout:TransferableOutput = new TransferableOutput(assetID, out);
-            let u:UTXO = new UTXO();
+            let u:UTXO = new UTXO(txid, txidx, assetID, out);
             u.fromBuffer(Buffer.concat([txid, txidx, xferout.toBuffer()]));
             utxos.push(u);
         }
@@ -86,7 +84,6 @@ describe('Inputs', () => {
 
         let inpt2:SecpInput = new SecpInput((utxos[1].getOutput() as AmountOutput).getAmount());
         let in2:TransferableInput = new TransferableInput(utxos[1].getTxID(), utxos[1].getOutputIdx(), utxos[1].getAssetID(), inpt2);
-
 
         let inpt3:SecpInput = new SecpInput((utxos[2].getOutput() as AmountOutput).getAmount());
         let in3:TransferableInput = new TransferableInput(utxos[2].getTxID(), utxos[2].getOutputIdx(), utxos[2].getAssetID(), inpt3);

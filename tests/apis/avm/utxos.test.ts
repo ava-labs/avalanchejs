@@ -2,11 +2,12 @@ import BN from "bn.js";
 import {Buffer} from "buffer/";
 import BinTools from 'src/utils/bintools';
 import { UnixNow } from 'src/apis/avm/types';
-import { SecpUTXO, UTXOSet } from 'src/apis/avm/utxos';
+import { UTXO, UTXOSet } from 'src/apis/avm/utxos';
+import { AmountOutput } from 'src/apis/avm/outputs';
 
 const bintools = BinTools.getInstance();
 
-describe('SecpUTXO', () => {
+describe('UTXO', () => {
     let utxohex:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d";
     let outputhex:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
     let outputidx:string = "00000001";
@@ -25,32 +26,29 @@ describe('SecpUTXO', () => {
     
     //implies fromString and fromBuffer
     test('Creation', () => {
-        let u1:SecpUTXO = new SecpUTXO();
+        let u1:UTXO = new UTXO();
         u1.fromBuffer(utxobuff);
         let u1hex:string = u1.toBuffer().toString("hex");
         expect(u1hex).toBe(utxohex);
     });
 
     test('Empty Creation', () => {
-        let u1:SecpUTXO = new SecpUTXO();
+        let u1:UTXO = new UTXO();
         expect(() => {
             u1.toBuffer();
         }).toThrow();
     });
 
     test('Creation of Type', () => {
-        let op:SecpUTXO = new SecpUTXO();
+        let op:UTXO = new UTXO();
         op.fromString(OPUTXOstr);
-        expect(op.getOuputID()).toBe(7);
+        expect(op.getOutput().getOutputID()).toBe(7);
     });
 
     describe('Funtionality', () => {
-        let u1:SecpUTXO = new SecpUTXO();
+        let u1:UTXO = new UTXO();
         u1.fromBuffer(utxobuff);
         let u1hex:string = u1.toBuffer().toString("hex"); 
-        test('getAmount', () => {
-            expect(u1.getAmount().toNumber()).toBe(19925);
-        });
         test('getAssetID NonCA', () => {
             let assetid:Buffer = u1.getAssetID();
             expect(assetid.toString("hex", 0, assetid.length)).toBe(outaid);
@@ -59,8 +57,8 @@ describe('SecpUTXO', () => {
             let txid:Buffer = u1.getTxID();
             expect(txid.toString("hex", 0, txid.length)).toBe(outtxid);
         });
-        test('getTxIdx', () => {
-            let txidx:Buffer = u1.getTxIdx();
+        test('getOutputIdx', () => {
+            let txidx:Buffer = u1.getOutputIdx();
             expect(txidx.toString("hex", 0, txidx.length)).toBe(outputidx);
         });
         test('getUTXOID', () => {
@@ -72,40 +70,6 @@ describe('SecpUTXO', () => {
         test('toString', () => {
             let serialized:string = u1.toString();
             expect(serialized).toBe(bintools.avaSerialize(utxobuff));
-        });
-
-        test('getAddresses', () => {
-            let addresses:Array<Buffer> = u1.getAddresses();
-            for( let i = 0; i < addresses.length; i++ ){
-                expect(addresses[i]).not.toBeUndefined();
-            }
-        });
-        test('getAddressIdx', () => {
-            let addropinfo:number = u1.getAddressIdx(bintools.avaDeserialize(opaddr));
-            expect(addropinfo).toBe(0);
-        });
-
-        test('getAddress', () => {
-            let recaddr1 = u1.getAddress(0);
-            expect(recaddr1.toString("hex")).toBe(bintools.avaDeserialize(opaddr).toString("hex"));
-        });
-
-        test('getSpenders', () => {
-            let addrs = [bintools.avaDeserialize(opaddr)];
-
-            let thepast = u1.getSpenders(addrs, new BN(0));
-            expect(thepast.length).toBe(0);
-
-            let thefuture = u1.getSpenders(addrs, new BN(1));
-            expect(thefuture.length).toBe(1);
-
-        });
-
-        test('meetsThreshold', () => {
-            let addrs = [bintools.avaDeserialize(opaddr)];
-            let thepast = u1.meetsThreshold(addrs, new BN(1));
-            expect(thepast).toBe(true);
-
         });
 
     });
@@ -142,9 +106,9 @@ describe('UTXOSet', () => {
     test('Creation', () => {
         let set:UTXOSet = new UTXOSet();
         set.add(utxostrs[0]);
-        let utxo:SecpUTXO = new SecpUTXO();
+        let utxo:UTXO = new UTXO();
         utxo.fromString(utxostrs[0]);
-        let setArray:Array<SecpUTXO> = set.getAllUTXOs();
+        let setArray:Array<UTXO> = set.getAllUTXOs();
         expect(utxo.toString()).toBe(setArray[0].toString());
     });
 
@@ -157,9 +121,9 @@ describe('UTXOSet', () => {
         //the verify (do these steps separate to ensure no overwrites)
         for(let i:number = 0; i < utxostrs.length; i++){
             expect(set.includes(utxostrs[i])).toBe(true);
-            let utxo:SecpUTXO = new SecpUTXO();
+            let utxo:UTXO = new UTXO();
             utxo.fromString(utxostrs[i]);
-            let veriutxo:SecpUTXO = set.getUTXO(utxo.getUTXOID()) as SecpUTXO;
+            let veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
             expect(veriutxo.toString()).toBe(utxostrs[i]);
         }
 
@@ -169,27 +133,27 @@ describe('UTXOSet', () => {
         let set:UTXOSet = new UTXOSet();
         set.addArray(utxostrs);
         for(let i:number = 0; i < utxostrs.length; i++){
-            let e1:SecpUTXO = new SecpUTXO();
+            let e1:UTXO = new UTXO();
             e1.fromString(utxostrs[i]);
             expect(set.includes(e1)).toBe(true);
-            let utxo:SecpUTXO = new SecpUTXO();
+            let utxo:UTXO = new UTXO();
             utxo.fromString(utxostrs[i]);
-            let veriutxo:SecpUTXO = set.getUTXO(utxo.getUTXOID()) as SecpUTXO;
+            let veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
             expect(veriutxo.toString()).toBe(utxostrs[i]);
         }
 
         set.addArray(set.getAllUTXOs());
         for(let i:number = 0; i < utxostrs.length; i++){
-            let utxo:SecpUTXO = new SecpUTXO();
+            let utxo:UTXO = new UTXO();
             utxo.fromString(utxostrs[i]);
             expect(set.includes(utxo)).toBe(true);
 
-            let veriutxo:SecpUTXO = set.getUTXO(utxo.getUTXOID()) as SecpUTXO;
+            let veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
             expect(veriutxo.toString()).toBe(utxostrs[i]);
         }
     });
 
-    test('overwriting SecpUTXOs', () => {
+    test('overwriting UTXO', () => {
         let set:UTXOSet = new UTXOSet();
         set.addArray(utxostrs);
         expect(set.add(utxostrs[0], true)).toBe(true);
@@ -200,7 +164,7 @@ describe('UTXOSet', () => {
 
     describe('Functionality', () => {
         let set:UTXOSet;
-        let utxos:Array<SecpUTXO>;
+        let utxos:Array<UTXO>;
         beforeEach(() => {
             set = new UTXOSet();
             set.addArray(utxostrs);
@@ -231,7 +195,7 @@ describe('UTXOSet', () => {
         });
 
         test('getAllUTXOs', () => {
-            let allutxos:Array<SecpUTXO> = set.getAllUTXOs();
+            let allutxos:Array<UTXO> = set.getAllUTXOs();
             let ustrs:Array<string> = [];
             for(let i:number = 0; i < allutxos.length; i++){
                 ustrs.push(allutxos[i].toString());
@@ -240,7 +204,7 @@ describe('UTXOSet', () => {
                 expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
             }
             let uids:Array<string> = set.getUTXOIDs();
-            let allutxos2:Array<SecpUTXO> = set.getAllUTXOs(uids);
+            let allutxos2:Array<UTXO> = set.getAllUTXOs(uids);
             let ustrs2:Array<string> = [];
             for(let i:number = 0; i < allutxos.length; i++){
                 ustrs2.push(allutxos2[i].toString());
@@ -284,7 +248,7 @@ describe('UTXOSet', () => {
             for(let i:number = 0; i < utxos.length; i++){
                 let assetid = utxos[i].getAssetID();
                 balance1.add(set.getBalance(addrs, assetid));
-                balance2.add(utxos[i].getAmount());
+                balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
             }
             expect(balance1.toString()).toBe(balance2.toString());
 
@@ -294,7 +258,7 @@ describe('UTXOSet', () => {
             for(let i:number = 0; i < utxos.length; i++){
                 let assetid = bintools.avaSerialize(utxos[i].getAssetID());
                 balance1.add(set.getBalance(addrs, assetid, now));
-                balance2.add(utxos[i].getAmount());
+                balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
             }
             expect(balance1.toString()).toBe(balance2.toString());
         });
@@ -350,7 +314,7 @@ describe('UTXOSet', () => {
                 expect(() => {
                     set.mergeByRule(setA, "ERROR");
                 }).toThrow();
-                let setArray:Array<SecpUTXO> = setG.getAllUTXOs();      
+                let setArray:Array<UTXO> = setG.getAllUTXOs();      
             });
 
             test('intersection', () => {

@@ -1,14 +1,14 @@
-import { UTXOSet, UTXO, SecpUTXO } from 'src/apis/avm/utxos';
-import { TxUnsigned, TxCreateAsset, Tx } from 'src/apis/avm/tx';
+import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
+import { BaseTx, CreateAssetTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { Input, SecpInput } from 'src/apis/avm/inputs';
+import { Input, SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { Output, SecpOutput, SecpOutBase } from 'src/apis/avm/outputs';
-import { UnixNow, AVMConstants} from 'src/apis/avm/types';
-import { InitialStates } from '../../../src/apis/avm/types';
+import { Output, SecpOutput, TransferableOutput} from 'src/apis/avm/outputs';
+import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+
 /**
  * @ignore
  */
@@ -21,14 +21,21 @@ describe('Transactions', () => {
     let addrs1:Array<Buffer>;
     let addrs2:Array<Buffer>;
     let addrs3:Array<Buffer>;
-    let utxos:Array<SecpUTXO>;
-    let inputs:Array<SecpInput>;
-    let outputs:Array<Output>;
+    let utxos:Array<UTXO>;
+    let inputs:Array<TransferableInput>;
+    let outputs:Array<TransferableOutput>;
     const amnt:number = 10000;
     let netid:number = 12345;
     let blockchainID:Buffer = Buffer.from(createHash("sha256").update("I am the very model of a modern major general").digest());
     let alias:string = "X";
     let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
+    let amount:BN;
+    let addresses:Array<Buffer>;
+    let fallAddresses:Array<Buffer>;
+    let locktime:BN;
+    let fallLocktime:BN;
+    let threshold:number;
+    let fallThreshold:number;
     beforeEach(() => {
         set = new UTXOSet();
         keymgr1 = new AVMKeyChain(alias);
@@ -46,44 +53,46 @@ describe('Transactions', () => {
             addrs2.push(keymgr2.makeKey());
             addrs3.push(keymgr3.makeKey());
         }
-        let amount:BN = new BN(amnt);
-        let addresses:Array<Buffer> = keymgr1.getAddresses();
-        let fallAddresses:Array<Buffer> = keymgr2.getAddresses();
-        let locktime:BN = new BN(54321);
-        let fallLocktime:BN = locktime.add(new BN(50));
-        let threshold:number = 3;
-        let fallThreshold:number = 1;
+        amount = new BN(amnt);
+        addresses = keymgr1.getAddresses();
+        fallAddresses = keymgr2.getAddresses();
+        locktime = new BN(54321);
+        fallLocktime = locktime.add(new BN(50));
+        threshold = 3;
+        fallThreshold = 1;
         for(let i:number = 0; i < 5; i++){
             let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
             let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
             let out:SecpOutput;
-            out = new SecpOutput(assetID, amount, addresses, locktime, threshold);
-            outputs.push(out);
+            out = new SecpOutput(amount, locktime, threshold, addresses);
+            let xferout:TransferableOutput = new TransferableOutput(assetID, out);
+            outputs.push(xferout);
 
-            let u:SecpUTXO = new SecpUTXO();
-            u.fromBuffer(Buffer.concat([txid, txidx, out.toBuffer()]));
+            let u:UTXO = new UTXO(txid, txidx, assetID, out);
             utxos.push(u);
 
             txid = u.getTxID();
-            txidx = u.getTxIdx();
+            txidx = u.getOutputIdx();
             let asset = u.getAssetID();
 
-            let input:SecpInput = new SecpInput(txid, txidx, amount, asset);
-            inputs.push(input);
+            let input:SecpInput = new SecpInput(amount);
+            let xferin:TransferableInput = new TransferableInput(txid, txidx, assetID, input);
+            inputs.push(xferin);
         }
         set.addArray(utxos);
     });
 
-    test('Creation TxUnsigned', () => {
-        let txu:TxUnsigned = new TxUnsigned(inputs, outputs, netid, blockchainID, 99);
-        let txins:Array<Input>  = txu.getIns();
-        let txouts:Array<Output> = txu.getOuts();
+    test('Creation UnsignedTx', () => {
+        let baseTx:BaseTx = new BaseTx(netid, blockchainID, outputs, inputs);
+        let txu:UnsignedTx = new UnsignedTx(baseTx);
+        let txins:Array<TransferableInput>  = txu.getTransaction().getIns();
+        let txouts:Array<TransferableOutput> = txu.getTransaction().getOuts();
         expect(txins.length).toBe(inputs.length);
         expect(txouts.length).toBe(outputs.length);
         
-        expect(txu.getTxType()).toBe(99);
-        expect(txu.getNetworkID()).toBe(12345);
-        expect(txu.getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
+        expect(txu.getTransaction().getTxType()).toBe(99);
+        expect(txu.getTransaction().getNetworkID()).toBe(12345);
+        expect(txu.getTransaction().getBlockchainID().toString("hex")).toBe(blockchainID.toString("hex"));
         
         let a:Array<string> = [];
         let b:Array<string> = [];
@@ -102,15 +111,15 @@ describe('Transactions', () => {
         }
         expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
 
-        let txunew:TxUnsigned = new TxUnsigned();
+        let txunew:UnsignedTx = new UnsignedTx();
         txunew.fromBuffer(txu.toBuffer());
         expect(txunew.toBuffer().toString("hex")).toBe(txu.toBuffer().toString("hex"));
         expect(txunew.toString()).toBe(txu.toString());
     });
 
-    test('Creation TxUnsigned Check Amount', () => {
+    test('Creation UnsignedTx Check Amount', () => {
         expect(() => {
-            set.makeUnsignedTx(
+            set.makeBaseTx(
                 netid, blockchainID,
                 new BN(amnt * 1000), 
                 addrs3, addrs1, addrs1, assetID
@@ -119,7 +128,7 @@ describe('Transactions', () => {
     });
 
     test('Creation Tx1', () => {
-        let txu:TxUnsigned = set.makeUnsignedTx(
+        let txu:UnsignedTx = set.makeBaseTx(
             netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID, 
@@ -133,7 +142,7 @@ describe('Transactions', () => {
         expect(tx2.toString()).toBe(tx.toString());
     });
     test('Creation Tx2', () => {
-        let txu:TxUnsigned = set.makeUnsignedTx(
+        let txu:UnsignedTx = set.makeBaseTx(
             netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID
@@ -145,10 +154,10 @@ describe('Transactions', () => {
         expect(tx2.toString()).toBe(tx.toString());
     });
 
-    test('Asset Creation Tx', () => {
-        let secpbase1:SecpOutBase = new SecpOutBase(new BN(777), addrs3);
-        let secpbase2:SecpOutBase = new SecpOutBase(new BN(888), addrs2);
-        let secpbase3:SecpOutBase = new SecpOutBase(new BN(999), addrs2);
+    test('CreateAssetTX', () => {
+        let secpbase1:SecpOutput = new SecpOutput(new BN(777), locktime, 1, addrs3);
+        let secpbase2:SecpOutput = new SecpOutput(new BN(888), locktime, 1, addrs2);
+        let secpbase3:SecpOutput = new SecpOutput(new BN(999), locktime, 1, addrs2);
         let initialState:InitialStates = new InitialStates();
         initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
         initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
@@ -156,9 +165,9 @@ describe('Transactions', () => {
         let name:string = "Rickcoin is the most intelligent coin";
         let symbol:string = "RICK";
         let denomination:number = 9;
-        let txu:TxCreateAsset = new TxCreateAsset(name, symbol, denomination, initialState, inputs, outputs, netid, blockchainID, AVMConstants.CREATEASSETTX);
-        let txins:Array<Input>  = txu.getIns();
-        let txouts:Array<Output> = txu.getOuts();
+        let txu:CreateAssetTx = new CreateAssetTx(netid, blockchainID, outputs, inputs, name, symbol, denomination, initialState);
+        let txins:Array<TransferableInput>  = txu.getIns();
+        let txouts:Array<TransferableOutput> = txu.getOuts();
         let initState:InitialStates = txu.getInitialStates();
         expect(txins.length).toBe(inputs.length);
         expect(txouts.length).toBe(outputs.length);
@@ -191,7 +200,7 @@ describe('Transactions', () => {
         }
         expect(JSON.stringify(a.sort())).toBe(JSON.stringify(b.sort()));
 
-        let txunew:TxCreateAsset = new TxCreateAsset();
+        let txunew:CreateAssetTx = new CreateAssetTx();
         txunew.fromBuffer(txu.toBuffer());
         expect(txunew.toBuffer().toString("hex")).toBe(txu.toBuffer().toString("hex"));
         expect(txunew.toString()).toBe(txu.toString());

@@ -6,15 +6,11 @@ import {Buffer} from "buffer/";
 import BN from "bn.js";
 import BinTools from 'src/utils/bintools';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import { Output } from 'src/apis/avm/outputs';
-import { Input, TransferableInput } from 'src/apis/avm/inputs';
+import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
-import { UnixNow, AVMConstants } from 'src/apis/avm/types';
-import { InitialStates } from '../../../src/apis/avm/types';
-import { TransferableOutput, SecpOutput } from '../../../src/apis/avm/outputs';
-import { SecpInput } from '../../../src/apis/avm/inputs';
-import { CreateAssetTx } from '../../../src/apis/avm/tx';
+import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+import { TransferableOutput, SecpOutput } from 'src/apis/avm/outputs';
 
 /**
  * @ignore
