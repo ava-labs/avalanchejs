@@ -27,6 +27,7 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
         let nftcred:NFTCredential = new NFTCredential(...args);
         return nftcred;
     }
+    /* istanbul ignore next */
     throw new Error("Error - SelectCredentialClass: unknown credid " + credid);
 }
 
@@ -70,6 +71,7 @@ export abstract class Credential {
 
     constructor(sigarray:Array<Signature> = undefined) {
         if(typeof sigarray !== 'undefined') {
+            /* istanbul ignore next */
             this.sigArray = sigarray;
         }
     }

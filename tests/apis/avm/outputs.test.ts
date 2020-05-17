@@ -39,7 +39,7 @@ describe('Outputs', () => {
         expect(cmp(outpayment1, outpayment2)).toBe(-1);
         expect(cmp(outpayment1, outpayment3)).toBe(1);
     });
-    test('OutPayment', () => {
+    test('SecpOutput', () => {
         let out:SecpOutput = new SecpOutput(new BN(10000), locktime, 3, addrs, );
         expect(out.getOutputID()).toBe(7);
         expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));

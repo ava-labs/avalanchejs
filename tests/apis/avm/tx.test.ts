@@ -1,13 +1,14 @@
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import { BaseTx, CreateAssetTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
+import { BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { Input, SecpInput, TransferableInput } from 'src/apis/avm/inputs';
+import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { Output, SecpOutput, TransferableOutput} from 'src/apis/avm/outputs';
+import { SecpOutput, NFTTransferOutput, TransferableOutput} from 'src/apis/avm/outputs';
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 
 /**
  * @ignore
@@ -24,11 +25,13 @@ describe('Transactions', () => {
     let utxos:Array<UTXO>;
     let inputs:Array<TransferableInput>;
     let outputs:Array<TransferableOutput>;
+    let ops:Array<TransferableOperation>;
     const amnt:number = 10000;
     let netid:number = 12345;
-    let blockchainID:Buffer = Buffer.from(createHash("sha256").update("I am the very model of a modern major general").digest());
+    let blockchainID:Buffer = Buffer.from(createHash("sha256").update("Foot on the pedal, never ever false metal, engine running hotter than a boiling kettle.").digest());
     let alias:string = "X";
-    let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
+    let assetID:Buffer = Buffer.from(createHash("sha256").update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
+    let NFTassetID:Buffer = Buffer.from(createHash("sha256").update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
     let amount:BN;
     let addresses:Array<Buffer>;
     let fallAddresses:Array<Buffer>;
@@ -36,6 +39,7 @@ describe('Transactions', () => {
     let fallLocktime:BN;
     let threshold:number;
     let fallThreshold:number;
+    let nftutxoids:Array<string> = [];
     beforeEach(() => {
         set = new UTXOSet();
         keymgr1 = new AVMKeyChain(alias);
@@ -47,7 +51,7 @@ describe('Transactions', () => {
         utxos = [];
         inputs = [];
         outputs = [];
-
+        ops = [];
         for(let i:number = 0; i < 3; i++){
             addrs1.push(keymgr1.makeKey());
             addrs2.push(keymgr2.makeKey());
@@ -60,6 +64,11 @@ describe('Transactions', () => {
         fallLocktime = locktime.add(new BN(50));
         threshold = 3;
         fallThreshold = 1;
+
+        
+        let payload:Buffer = Buffer.alloc(1024);
+        payload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
+
         for(let i:number = 0; i < 5; i++){
             let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
             let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
@@ -72,11 +81,19 @@ describe('Transactions', () => {
 
             txid = u.getTxID();
             txidx = u.getOutputIdx();
-            let asset = u.getAssetID();
 
             let input:SecpInput = new SecpInput(amount);
             let xferin:TransferableInput = new TransferableInput(txid, txidx, assetID, input);
             inputs.push(xferin);
+
+            let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, locktime, threshold, addresses);
+            let op:NFTTransferOperation = new NFTTransferOperation(nout);
+            let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
+            let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
+            nftutxoids.push(nftutxo.getUTXOID());
+            let xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
+            ops.push(xferop);
+            utxos.push(nftutxo);
         }
         set.addArray(utxos);
     });
@@ -124,33 +141,6 @@ describe('Transactions', () => {
                 addrs3, addrs1, addrs1, assetID
             );
         }).toThrow();
-    });
-
-    test('Creation Tx1 with asof, locktime, threshold', () => {
-        let txu:UnsignedTx = set.makeBaseTx(
-            netid, blockchainID,
-            new BN(9000), 
-            addrs3, addrs1, addrs1, assetID, 
-            UnixNow(), UnixNow().add(new BN(50)), 1
-        );
-        let tx:Tx = keymgr1.signTx(txu);
-
-        let tx2:Tx = new Tx();
-        tx2.fromString(tx.toString());
-        expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
-        expect(tx2.toString()).toBe(tx.toString());
-    });
-    test('Creation Tx2 without asof, locktime, threshold', () => {
-        let txu:UnsignedTx = set.makeBaseTx(
-            netid, blockchainID,
-            new BN(9000), 
-            addrs3, addrs1, addrs1, assetID
-        );
-        let tx:Tx = keymgr1.signTx(txu);
-        let tx2:Tx = new Tx();
-        tx2.fromString(tx.toString());
-        expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
-        expect(tx2.toString()).toBe(tx.toString());
     });
 
     test('CreateAssetTX', () => {
@@ -203,5 +193,59 @@ describe('Transactions', () => {
         expect(txunew.toBuffer().toString("hex")).toBe(txu.toBuffer().toString("hex"));
         expect(txunew.toString()).toBe(txu.toString());
     });
+
+    test('Creation OperationTx', () => {
+        
+        let optx:OperationTx = new OperationTx(
+            netid, blockchainID, outputs, inputs, ops
+        );
+        let txunew:OperationTx = new OperationTx();
+        let opbuff:Buffer = optx.toBuffer();
+        txunew.fromBuffer(opbuff);
+        expect(txunew.toBuffer().toString("hex")).toBe(optx.toBuffer().toString("hex"));
+        expect(txunew.toString()).toBe(optx.toString());
+        expect(optx.getOperations().length).toBe(5);
+    });
+
+    test('Creation Tx1 with asof, locktime, threshold', () => {
+        let txu:UnsignedTx = set.makeBaseTx(
+            netid, blockchainID,
+            new BN(9000), 
+            addrs3, addrs1, addrs1, assetID, 
+            UnixNow(), UnixNow().add(new BN(50)), 1
+        );
+        let tx:Tx = keymgr1.signTx(txu);
+
+        let tx2:Tx = new Tx();
+        tx2.fromString(tx.toString());
+        expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
+        expect(tx2.toString()).toBe(tx.toString());
+    });
+    test('Creation Tx2 without asof, locktime, threshold', () => {
+        let txu:UnsignedTx = set.makeBaseTx(
+            netid, blockchainID,
+            new BN(9000), 
+            addrs3, addrs1, addrs1, assetID
+        );
+        let tx:Tx = keymgr1.signTx(txu);
+        let tx2:Tx = new Tx();
+        tx2.fromBuffer(tx.toBuffer());
+        expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
+        expect(tx2.toString()).toBe(tx.toString());
+    });
+
+    test('Creation Tx3 using OperationTx', () => {
+        let txu:UnsignedTx = set.makeNFTTransferTx(
+            netid, blockchainID, assetID, new BN(90), 
+            addrs1, addresses, addresses, nftutxoids,
+            UnixNow(), UnixNow().add(new BN(50)), 1
+        );
+        let tx:Tx = keymgr1.signTx(txu);
+        let tx2:Tx = new Tx();
+        tx2.fromBuffer(tx.toBuffer());
+        expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
+        expect(tx2.toString()).toBe(tx.toString());
+    });
+
 });
     

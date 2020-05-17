@@ -634,7 +634,7 @@ class AVMAPI extends JRPCAPI{
 
         return utxoset.makeNFTTransferTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
-            feeAmount, to, from, feeAddrs, utxoidArray, asOf, locktime, threshold
+            feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold
         );
     }
 
