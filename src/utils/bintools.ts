@@ -172,8 +172,8 @@ export default class BinTools {
      * @returns A serialized base-58 strig of the Buffer.
      */
     avaSerialize = (bytes:Buffer):string => {
-        bytes = this.addChecksum(bytes);
-        return this.bufferToB58(bytes);
+        let x:Buffer = this.addChecksum(bytes);
+        return this.bufferToB58(x);
     }
 
     /**

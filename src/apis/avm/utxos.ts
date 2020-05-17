@@ -136,6 +136,7 @@ export class UTXO {
             } else if(outputidx instanceof Buffer){
                 this.outputidx = outputidx;
             } else {
+                /* istanbul ignore next */
                 throw new Error("Error - UTXO.constructor: outputidx parameter is not a number or a Buffer: " + outputidx);
             }
             
@@ -185,6 +186,7 @@ export class UTXOSet {
         } else if (utxo instanceof UTXO){
             utxovar.fromBuffer(utxo.toBuffer()); //forces a copy
         } else {
+            /* istanbul ignore next */
             throw new Error("Error - UTXOSet.add: utxo parameter is not a UTXO or string: " + utxo);
         }
         let utxoid:string = utxovar.getUTXOID();
@@ -416,18 +418,6 @@ export class UTXOSet {
     }
 
     /**
-     * Given an assetID as a {@link https://github.com/feross/buffer|Buffer}, returns the outputID associated with the assetID and 'undefined' if not found.
-     */
-    getOutputIDFromAssetID = (assetID:Buffer):number => {
-        for(const utxoid in this.utxos){
-            if(this.utxos[utxoid].getAssetID().compare(assetID) == 0){
-                return this.utxos[utxoid].getOutput().getOutputID();
-            }
-        }
-        return undefined;
-    }
-
-    /**
      * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
      * [[UnsignedTx]] wrapping a [[BaseTx]] manually (with their corresponding [[TransferableInput]]s and [[TransferableOutput]]s).
      * 
@@ -466,14 +456,14 @@ export class UTXOSet {
         let outs:Array<TransferableOutput> = [];
         let ins:Array<TransferableInput> = [];
         if(!(SelectOutputClass(outputID) instanceof AmountOutput)){
-            throw new Error("Error - UTXOSet.makeUnsignedTx: outputID does not implement AmountOutput: " + outputID);
+            /* istanbul ignore next */
+            throw new Error("Error - UTXOSet.makeBaseTx: outputID does not implement AmountOutput: " + outputID);
         }
 
         if(!amount.eq(zero)){
             let sndout:AmountOutput = SelectOutputClass(outputID, amount, locktime, threshold, toAddresses) as AmountOutput;
             let mainXferout:TransferableOutput = new TransferableOutput(assetID, sndout);
             outs.push(mainXferout);
-
             for(let i = 0; i < utxos.length && spendamount.lt(amount); i++){
                 if(
                     utxos[i].getOutput() instanceof AmountOutput &&
@@ -499,7 +489,7 @@ export class UTXOSet {
                         idx = output.getAddressIdx(spenders[j]);
                         if(idx == -1){
                             /* istanbul ignore next */
-                            throw new Error("Error - UTXOSet.makeUnsignedTx: no such address in output: " + spenders[j]);
+                            throw new Error("Error - UTXOSet.makeBaseTx: no such address in output: " + spenders[j]);
                         }
                         xferin.getInput().addSignatureIdx(idx, spenders[j]);
                     }
@@ -522,7 +512,7 @@ export class UTXOSet {
 
             if(spendamount.lt(amount)){
                 /* istanbul ignore next */
-                throw new Error("Error - UTXOSet.makeUnsignedTx: insufficient funds to create the transaction");
+                throw new Error("Error - UTXOSet.makeBaseTx: insufficient funds to create the transaction");
             }
         }
         let baseTx:BaseTx = new BaseTx(networkid, blockchainid, outs, ins);
@@ -566,6 +556,7 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param feeAssetID The assetID for the AVA fee to be paid
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feeSenderAddresses The addresses to send the fees
      * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
@@ -578,14 +569,16 @@ export class UTXOSet {
      * 
      */
     makeNFTTransferTx = (
-        networkid:number, blockchainid:Buffer, avaAssetID:Buffer, fee:BN, 
+        networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
         utxoids:Array<string>, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
     ):UnsignedTx => {
         // Cheating and using makeBaseTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
-        let utx:UnsignedTx = this.makeBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
+        let utx:UnsignedTx = this.makeBaseTx(
+            networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID
+        );
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let ops:Array<TransferableOperation> = []

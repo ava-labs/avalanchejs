@@ -40,6 +40,10 @@ export abstract class Input {
         return this.sigIdxs;
     }
 
+    getCredentialID = ():number => {
+        return AVMConstants.SECPCREDENTIAL;
+    }
+
     /**
      * Creates and adds a [[SigIdx]] to the [[Input]].
      * 
@@ -161,7 +165,6 @@ export class TransferableInput {
      * Returns the assetID of the input.
      */
     getAssetID = ():Buffer => {
-        /* istanbul ignore next */
         return this.assetid;
     }
 

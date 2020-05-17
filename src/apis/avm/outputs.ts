@@ -414,8 +414,8 @@ export abstract class NFTOutBase extends Output {
     constructor(groupID:number = undefined, payload:Buffer = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
         super(locktime, threshold, addresses);
         if(typeof groupID !== 'undefined' && typeof payload !== 'undefined') {
-            this.groupID.readUInt32BE(groupID);
-            this.sizePayload.readUInt32BE(payload.length);
+            this.groupID.writeUInt32BE(groupID, 0);
+            this.sizePayload.writeUInt32BE(payload.length, 0);
             this.payload = bintools.copyFrom(payload, 0, payload.length);
         }
     }

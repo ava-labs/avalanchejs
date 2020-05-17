@@ -11,6 +11,8 @@ import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
 import { TransferableOutput, SecpOutput } from 'src/apis/avm/outputs';
+import { NFTTransferOutput } from '../../../src/apis/avm/outputs';
+import { NFTTransferOperation, TransferableOperation } from '../../../src/apis/avm/ops';
 
 /**
  * @ignore
@@ -325,6 +327,102 @@ describe("AVMAPI", () => {
         expect(response).toBe(assetid);
     });
 
+    test('createMintTx 1', async ()=>{
+        let amount:number = 2;
+        let assetID:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
+        let to:string = "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF";
+        let minters:Array<string> = [
+            "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+            "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+            "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+        ]
+        let result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+        let payload:object = {
+            "result": {
+                'tx': "sometx"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("sometx");
+    });
+
+    test('createMintTx 2', async ()=>{
+        let amount:BN = new BN(1);
+        let assetID:Buffer = Buffer.from("f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7", "hex");
+        let to:string = "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF";
+        let minters:Array<string> = [
+            "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+            "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+            "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+        ]
+        let result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+        let payload:object = {
+            "result": {
+                'tx': "sometx"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("sometx");
+    });
+
+    test('signMintTx 1', async ()=>{
+        let username:string = "Collin";
+        let password:string = "Cusce";
+        let tx:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
+        let minter:string = addrA;
+        let result:Promise<string> = api.signMintTx(username, password, tx, minter);
+        let payload:object = {
+            "result": {
+                'tx': "sometx"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("sometx");
+    });
+
+    test('signMintTx 2', async ()=>{
+        let username:string = "Collin";
+        let password:string = "Cusce";
+        let tx:Buffer = Buffer.from("f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7", "hex");
+        let minter:string = addrA;
+        let result:Promise<string> = api.signMintTx(username, password, tx, minter);
+        let payload:object = {
+            "result": {
+                'tx': "sometx"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("sometx");
+    });
+
     test('getTxStatus', async ()=>{
         let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
 
@@ -447,16 +545,20 @@ describe("AVMAPI", () => {
         let addrs1:Array<string>;
         let addrs2:Array<string>;
         let addrs3:Array<string>;
+        let addressbuffs:Array<Buffer> =[];
+        let addresses:Array<string> = [];
         let utxos:Array<UTXO>;
         let inputs:Array<TransferableInput>;
         let outputs:Array<TransferableOutput>;
+        let ops:Array<TransferableOperation>;
         const amnt:number = 10000;
         let assetID:Buffer = Buffer.from(createHash("sha256").update("mary had a little lamb").digest());
-
+        let NFTassetID:Buffer = Buffer.from(createHash("sha256").update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
         let secpbase1:SecpOutput;
         let secpbase2:SecpOutput;
         let secpbase3:SecpOutput;
         let initialState:InitialStates;
+        let nftutxoids:Array<string> = [];
         
         beforeEach(() => {
             set = new UTXOSet();
@@ -469,6 +571,10 @@ describe("AVMAPI", () => {
             utxos = [];
             inputs = [];
             outputs = [];
+            ops = [];
+            let pload:Buffer = Buffer.alloc(1024);
+            pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
+
 
             for(let i:number = 0; i < 3; i++){
                 addrs1.push(api.addressFromBuffer(api.keyChain().makeKey()));
@@ -476,8 +582,8 @@ describe("AVMAPI", () => {
                 addrs3.push(api.addressFromBuffer(keymgr3.makeKey()));
             }
             let amount:BN = new BN(amnt);
-            let addressbuffs:Array<Buffer> = api.keyChain().getAddresses();
-            let addresses:Array<string> = addressbuffs.map(a => api.addressFromBuffer(a));
+            addressbuffs = api.keyChain().getAddresses();
+            addresses = addressbuffs.map(a => api.addressFromBuffer(a));
             let fallAddresses:Array<string> = keymgr2.getAddresses().map(a => api.addressFromBuffer(a));
             let locktime:BN = new BN(54321);
             let fallLocktime:BN = locktime.add(new BN(50));
@@ -487,7 +593,7 @@ describe("AVMAPI", () => {
             for(let i:number = 0; i < 5; i++){
                 let txid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
                 let txidx:Buffer = Buffer.alloc(4);
-                txidx.writeInt32BE(i, 0)
+                txidx.writeUInt32BE(i, 0)
                 let out:SecpOutput = new SecpOutput(amount, locktime, threshold, addressbuffs);
                 let xferout:TransferableOutput = new TransferableOutput(assetID, out);
                 outputs.push(xferout);
@@ -503,6 +609,15 @@ describe("AVMAPI", () => {
                 let input:SecpInput = new SecpInput(amount);
                 let xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
                 inputs.push(xferinput);
+
+                let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, locktime, threshold, addressbuffs);
+                let op:NFTTransferOperation = new NFTTransferOperation(nout);
+                let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
+                let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
+                nftutxoids.push(nftutxo.getUTXOID());
+                let xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
+                ops.push(xferop);
+                utxos.push(nftutxo);
             }
             set.addArray(utxos);
 
@@ -674,6 +789,28 @@ describe("AVMAPI", () => {
             let txu2:UnsignedTx = set.makeCreateAssetTx(slopes.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
 
             
+            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
+            expect(txu2.toString()).toBe(txu1.toString());
+            
+        });
+
+        test('makeNFTTransferTx', async () => {
+            let pload:Buffer = Buffer.alloc(1024);
+            pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
+            let addrbuff1 = addrs1.map(a => api.parseAddress(a));
+            let addrbuff3 = addrs3.map(a => api.parseAddress(a));
+            let fee:BN = new BN(90);
+            let txu1:UnsignedTx = await api.makeNFTTransferTx(
+                set, nftutxoids[1], addrs3, addrs3, fee, addrs1,
+                UnixNow(), new BN(0), 1
+            );
+           
+            let txu2:UnsignedTx = set.makeNFTTransferTx(
+                networkid, bintools.avaDeserialize(blockchainid), assetID,
+                fee, addrbuff1, addrbuff3, addrbuff3, 
+                [nftutxoids[1]], UnixNow(), new BN(0), 1
+            )
+
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
             

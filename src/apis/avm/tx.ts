@@ -8,9 +8,8 @@ import { AVMConstants, InitialStates, Signature, SigIdx } from './types';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { TransferableOperation } from './ops';
-import { Credential, SelectCredentialClass, SecpCredential } from './credentials';
+import { Credential, SelectCredentialClass } from './credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
-import { ConsoleLogger } from "typedoc/dist/lib/utils";
 
 /**
  * @ignore
@@ -165,7 +164,7 @@ export class BaseTx {
     sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
         let sigs:Array<Credential> = [];
         for(let i = 0; i < this.ins.length; i++) {
-            let cred:Credential = new SecpCredential();
+            let cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
             let sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
             for(let j = 0; j < sigidxs.length; j++) {
                 let keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
@@ -343,6 +342,12 @@ export class OperationTx extends BaseTx {
     protected numOps:Buffer = Buffer.alloc(4);
     protected ops:Array<TransferableOperation> = [];
     
+    /**
+     * Returns the id of the [[OperationTx]]
+     */
+    getTxType():number {
+        return AVMConstants.OPERATIONTX;
+    }
 
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[OperationTx]], parses it, populates the class, and returns the length of the [[OperationTx]] in bytes.
@@ -396,7 +401,7 @@ export class OperationTx extends BaseTx {
     sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
         let sigs:Array<Credential> = super.sign(msg, kc);
         for(let i = 0; i < this.ops.length; i++) {
-            let cred:Credential = new SecpCredential();
+            let cred:Credential = SelectCredentialClass(this.ops[i].getOperation().getCredentialID());
             let sigidxs:Array<SigIdx> = this.ops[i].getOperation().getSigIdxs();
             for(let j = 0; j < sigidxs.length; j++) {
                 let keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
@@ -455,7 +460,7 @@ export class UnsignedTx {
 
     toBuffer():Buffer {
         let txtype:Buffer = Buffer.alloc(4);
-        txtype.writeInt32BE(this.transaction.getTxType(), 0);
+        txtype.writeUInt32BE(this.transaction.getTxType(), 0);
         let basebuff = this.transaction.toBuffer();
         return Buffer.concat([txtype, basebuff], txtype.length + basebuff.length);
     }
@@ -522,7 +527,7 @@ export class Tx {
         bsize += credlen.length;
         for(let i = 0; i < this.credentials.length; i++) {
             let credid:Buffer = Buffer.alloc(4);
-            credid.writeInt32BE(this.credentials[i].getCredentialID(), 0);
+            credid.writeUInt32BE(this.credentials[i].getCredentialID(), 0);
             barr.push(credid);
             bsize += credid.length;
             let credbuff:Buffer = this.credentials[i].toBuffer();

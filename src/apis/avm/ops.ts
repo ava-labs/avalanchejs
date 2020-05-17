@@ -4,7 +4,7 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import { UTXOID, AVMConstants, SigIdx } from './types';
-import { NFTTransferOutput } from './outputs';
+import { NFTTransferOutput, SelectOutputClass } from './outputs';
 
 const bintools = BinTools.getInstance();
 
@@ -38,6 +38,10 @@ export abstract class Operation {
      */
     getSigIdxs = ():Array<SigIdx> => {
         return this.sigIdxs;
+    }
+
+    getCredentialID = ():number => {
+        return AVMConstants.NFTCREDENTIAL;
     }
 
     /**
@@ -109,24 +113,19 @@ export abstract class Operation {
  */
 export class TransferableOperation {
     protected assetid:Buffer = Buffer.alloc(32);
-    protected numutxoIDs:Buffer = Buffer.alloc(4);
     protected utxoIDs:Array<UTXOID> = [];
     protected operation:Operation;
 
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
-        this.numutxoIDs = bintools.copyFrom(bytes, offset, offset + 4);
+        let numutxoIDs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
-        let numutxoIDs:number = this.numutxoIDs.readUInt32BE(0);
         this.utxoIDs = [];
         for(let i = 0; i < numutxoIDs; i++) {
             let utxoid:UTXOID = new UTXOID();
-            let offsetEnd:number = offset + utxoid.getSize();
-            let copied:Buffer = bintools.copyFrom(bytes, offset, offsetEnd);
-            utxoid.fromBuffer(copied);
+            offset = utxoid.fromBuffer(bytes, offset);
             this.utxoIDs.push(utxoid);
-            offset = offsetEnd;
         }
         let opid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
@@ -135,8 +134,10 @@ export class TransferableOperation {
     }
 
     toBuffer():Buffer {
-        let bsize:number = this.assetid.length + this.numutxoIDs.length;
-        let barr:Array<Buffer> = [this.assetid, this.numutxoIDs];
+        let numutxoIDs = Buffer.alloc(4);
+        numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
+        let bsize:number = this.assetid.length + numutxoIDs.length;
+        let barr:Array<Buffer> = [this.assetid, numutxoIDs];
         for(let i = 0; i < this.utxoIDs.length; i++) {
             let b:Buffer = this.utxoIDs[i].toBuffer();
             barr.push(b);
@@ -189,8 +190,6 @@ export class TransferableOperation {
                     utxoid.fromBuffer(utxoids[i] as Buffer);
                 } else if(utxoids[i] instanceof UTXOID){
                     utxoid.fromString(utxoids[i].toString()); //clone
-                } else {
-                    throw new Error("Error - TransferableOperation.constructor: invalid utxoid in array parameter 'utxoids'");
                 }
                 this.utxoIDs.push(utxoid);
             }
@@ -220,6 +219,7 @@ export class NFTTransferOperation extends Operation {
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(bytes, offset);
+        this.output = new NFTTransferOutput();
         return this.output.fromBuffer(bytes, offset);
     }
 
@@ -227,8 +227,8 @@ export class NFTTransferOperation extends Operation {
      * Returns the buffer representing the [[NFTTransferOperation]] instance.
      */
     toBuffer():Buffer {
-        let outbuff:Buffer = this.output.toBuffer();
         let superbuff:Buffer = super.toBuffer();
+        let outbuff:Buffer = this.output.toBuffer();
         let bsize:number = superbuff.length + outbuff.length;
         let barr:Array<Buffer> = [superbuff, outbuff];
         return Buffer.concat(barr,bsize);
@@ -244,7 +244,6 @@ export class NFTTransferOperation extends Operation {
     /**
      * An [[Operation]] class which contains an NFT on an assetID.
      * 
-     * @param addressIndecies An array of numbers representing the indecies in the addresses array of the [[UTXO]] this operation is consuming 
      * @param output An [[NFTTransferOutput]]
      */
     constructor(output:NFTTransferOutput = undefined){
