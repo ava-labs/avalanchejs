@@ -109,6 +109,25 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
+     * Refresh blockchainID, and if a blockchainID is passed in, use that.
+     * 
+     * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
+     * 
+     * @returns The blockchainID
+     */
+    refreshBlockchainID = (blockchainID:string = undefined):boolean => {
+        let netid:number = this.core.getNetworkID();
+        if(typeof blockchainID === "undefined" && netid in Defaults.network) {
+            this.blockchainID = Defaults.network[netid]["avm"].blockchainID;
+            return true
+        } else if(typeof blockchainID === "string") {
+            this.blockchainID = blockchainID;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid. 
      * 
      * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
