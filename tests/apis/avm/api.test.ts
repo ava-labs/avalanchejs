@@ -85,10 +85,28 @@ describe("AVMAPI", () => {
         expect(response).toBe(txId);
     });
 
+/*going through revision
     test('listAssets', async ()=>{
-        let assets = {'ATH': new BN(1) ,'ETH': new BN(3)};
+        let assets = [
+            {
+                'symbol':'ATH',
+                'name': "Athereum", 
+                "assetID": "ath123", 
+                "alias": "ath", 
+                "denomination" : 9, 
+                "balance": new BN(1)
+            } ,
+            {
+                'symbol':'ETH', 
+                'name': "Ethereum", 
+                "assetID": "eth123", 
+                "alias": "eth", 
+                "denomination" : 18, 
+                "balance": new BN(10)
+            } 
+        ];
 
-        let result:Promise<object> = api.getAllBalances(addrA);
+        let result:Promise<Array<object>> = api.getAllBalances(addrA);
         let payload:object = {
             "result": {
                 'assets': assets
@@ -104,6 +122,7 @@ describe("AVMAPI", () => {
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(assets);
     });
+    */
 
     test('listAddresses', async ()=>{
         let addresses = [addrA,addrB];

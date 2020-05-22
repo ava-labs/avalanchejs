@@ -22,6 +22,64 @@ describe("Admin", () => {
         mockAxios.reset();
     });
 
+    test("getNodeID", async ()=>{
+        let result:Promise<string> = admin.getNodeID();
+        let payload:object = {
+            "result": {
+                "nodeID": "abcd"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("abcd");
+    });
+
+    test("alias", async ()=>{
+        let ep:string = "/ext/something";
+        let al:string = "/ext/anotherthing";
+        let result:Promise<boolean> = admin.alias(ep,al);
+        let payload:object = {
+            "result": {
+                "success": true
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:boolean = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(true);
+    });
+
+    test("aliasChain", async ()=>{
+        let ch:string = "abcd";
+        let al:string = "myChain";
+        let result:Promise<boolean> = admin.aliasChain(ch,al);
+        let payload:object = {
+            "result": {
+                "success": true
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:boolean = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(true);
+    });
+
     test("getNetworkID", async ()=>{
         let result:Promise<number> = admin.getNetworkID();
         let payload:object = {
