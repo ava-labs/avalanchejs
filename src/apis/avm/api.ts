@@ -788,7 +788,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @param genesisData The blockchain's genesis data object
      * 
-     * @returns Promise of a string a bytes
+     * @returns Promise of a string of bytes
      */
     buildGenesis = async (genesisData:object):Promise<object> => {
         let params = {
