@@ -765,14 +765,16 @@ describe("Platform", () => {
     });
 
     test("getSubnets 1", async ()=>{
-        let resp: object[] = [{
+        let resp: Array<object> = [{
             "id": "id",
             "controlKeys": ["controlKeys"],
             "threshold": "threshold"
         }];
         let result:Promise<object> = platform.getSubnets();
         let payload:object = {
-            "result": resp
+            "result": {
+                "subnets": resp
+            }
         };
         let responseObj = {
             data: payload

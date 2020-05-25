@@ -790,7 +790,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Promise of a string of bytes
      */
-    buildGenesis = async (genesisData:object):Promise<object> => {
+    buildGenesis = async (genesisData:object):Promise<string> => {
         let params = {
             "genesisData": genesisData
         };

@@ -433,7 +433,7 @@ class PlatformAPI extends JRPCAPI{
     getSubnets = async ():Promise<Array<object>> => {
         let params = {}
         return this.callMethod("platform.getSubnets", params).then((response:RequestResponseData) => {
-            return response.data["result"];
+            return response.data["result"]["subnets"];
         });
     }
 
