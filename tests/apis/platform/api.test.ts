@@ -784,7 +784,7 @@ describe("Platform", () => {
         let response:object = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(resp);
+        expect(response).toEqual(resp);
     });
 
 });
