@@ -764,4 +764,25 @@ describe("Platform", () => {
         expect(response).toBe(txID);
     });
 
+    test("getSubnets 1", async ()=>{
+        let resp: object[] = [{
+            "id": "id",
+            "controlKeys": ["controlKeys"],
+            "threshold": "threshold"
+        }];
+        let result:Promise<object> = platform.getSubnets();
+        let payload:object = {
+            "result": resp
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:object = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(resp);
+    });
+
 });

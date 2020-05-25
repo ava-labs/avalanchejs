@@ -817,6 +817,69 @@ describe("AVMAPI", () => {
         });
 
     });
+
+    test('buildGenesis', async ()=>{
+        let genesisData:object = {
+            genesisData : {
+                assetAlias1: {
+                    name: "human readable name",
+                    symbol: "AVAL",
+                    initialState: {
+                        fixedCap : [
+                            {
+                                amount: 1000,
+                                address: "A"
+                            },
+                            {
+                                amount: 5000,
+                                address: "B"
+                            },
+                        ]
+                    }
+                },
+                assetAliasCanBeAnythingUnique: {
+                    name: "human readable name",
+                    symbol: "AVAL",
+                    initialState: {
+                        variableCap : [
+                            {
+                                minters: [
+                                    "A",
+                                    "B"
+                                ],
+                                threshold: 1
+                            },
+                            {
+                                minters: [
+                                    "A",
+                                    "B",
+                                    "C"
+                                ],
+                                threshold: 2
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        let bytes:string = "111TNWzUtHKoSvxohjyfEwE2X228ZDGBngZ4mdMUVMnVnjtnawW1b1zbAhzyAM1v6d7ECNj6DXsT7qDmhSEf3DWgXRj7ECwBX36ZXFc9tWVB2qHURoUfdDvFsBeSRqatCmj76eZQMGZDgBFRNijRhPNKUap7bCeKpHDtuCZc4YpPkd4mR84dLL2AL1b4K46eirWKMaFVjA5btYS4DnyUx5cLpAq3d35kEdNdU5zH3rTU18S4TxYV8voMPcLCTZ3h4zRsM5jW1cUzjWVvKg7uYS2oR9qXRFcgy1gwNTFZGstySuvSF7MZeZF4zSdNgC4rbY9H94RVhqe8rW7MXqMSZB6vBTB2BpgF6tNFehmYxEXwjaKRrimX91utvZe9YjgGbDr8XHsXCnXXg4ZDCjapCy4HmmRUtUoAduGNBdGVMiwE9WvVbpMFFcNfgDXGz9NiatgSnkxQALTHvGXXm8bn4CoLFzKnAtq3KwiWqHmV3GjFYeUm3m8Zee9VDfZAvDsha51acxfto1htstxYu66DWpT36YT18WSbxibZcKXa7gZrrsCwyzid8CCWw79DbaLCUiq9u47VqofG1kgxwuuyHb8NVnTgRTkQASSbj232fyG7YeX4mAvZY7a7K7yfSyzJaXdUdR7aLeCdLP6mbFDqUMrN6YEkU2X8d4Ck3T"
+
+        let result:Promise<object> = api.buildGenesis(genesisData);
+        let payload:object = {
+            "result": {
+                'bytes': bytes
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:object = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(bytes);
+    });
     
 
 });

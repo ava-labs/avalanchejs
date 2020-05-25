@@ -784,6 +784,23 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
+     * Given a JSON representation of this Virtual Machine’s genesis state, create the byte representation of that state.
+     * 
+     * @param genesisData The blockchain's genesis data object
+     * 
+     * @returns Promise of a string a bytes
+     */
+    buildGenesis = async (genesisData:object):Promise<object> => {
+        let params = {
+            "genesisData": genesisData
+        };
+        return this.callMethod("avm.buildGenesis", params).then((response:RequestResponseData) => {
+            let r = response.data["result"]["bytes"];
+            return r;
+        });
+    }
+
+    /**
      * @ignore
      */
     protected _cleanAddressArray(addresses:Array<string> | Array<Buffer>, caller:string):Array<string> {

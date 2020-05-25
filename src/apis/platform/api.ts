@@ -334,8 +334,6 @@ class PlatformAPI extends JRPCAPI{
     /**
      * Get all the blockchains that exist (excluding the P-Chain).
      * 
-     * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
-     * 
      * @returns Promise for an array of objects containing fields "id", "subnetID", and "vmID".
      */
     getBlockchains = async ():Promise<Array<object>> => {
@@ -424,6 +422,18 @@ class PlatformAPI extends JRPCAPI{
         }
         return this.callMethod("platform.issueTx", params).then((response:RequestResponseData) => {
             return response.data["result"]["txID"];
+        });
+    }
+
+    /**
+     * Get all the subnets that exist.
+     * 
+     * @returns Promise for an array of objects containing fields "id", "controlKeys", and "threshold".
+     */
+    getSubnets = async ():Promise<Array<object>> => {
+        let params = {}
+        return this.callMethod("platform.getSubnets", params).then((response:RequestResponseData) => {
+            return response.data["result"];
         });
     }
 
