@@ -479,21 +479,16 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Promise of an object mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
      */
-    getAllBalances = async (address:string):Promise<object> => {
+    getAllBalances = async (address:string):Promise<Array<object>> => {
         if(typeof this.parseAddress(address) === "undefined"){
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.listAssets: Invalid address format " + address);
+            throw new Error("Error - AVMAPI.getAllBalances: Invalid address format " + address);
         }
         let params = {
             "address": address
         };
         return this.callMethod("avm.getAllBalances", params).then((response:RequestResponseData) => {
-            let r = response.data["result"]["assets"];
-            let assetIDs = Object.keys(r);
-            for(let i = 0; i < assetIDs.length; i++){
-                r[assetIDs[i]] = new BN(r[assetIDs[i]], 10);
-            }
-            return r;
+            return response.data["result"]["balances"];
         });
     }
 
@@ -754,7 +749,7 @@ class AVMAPI extends JRPCAPI{
         
         if(typeof this.parseAddress(to) === "undefined"){
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.listAssets: Invalid address format " + to);
+            throw new Error("Error - AVMAPI.sen: Invalid address format " + to);
         }
 
         from = this._cleanAddressArray(from, "send")
