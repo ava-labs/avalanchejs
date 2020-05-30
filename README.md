@@ -6,45 +6,44 @@ Slopes is a JavaScript Library for interfacing with the AVA Platform. It is buil
 
 The APIs currently supported by default are:
 
-  * The AVA Virtual Machine (AVM) API
-  * The Keystore API
-  * The Admin API
-  * The Platform API
+* The AVA Virtual Machine (AVM) API
+* The Keystore API
+* The Admin API
+* The Platform API
 
 ## Getting Started
 
 We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/).
 
-  Using Slopes, developers are able to:
+Using Slopes, developers are able to:
 
-  * Locally manage private keys
-  * Retrieve balances on addresses
-  * Get UTXOs for addresses
-  * Build and sign transactions
-  * Issue signed transactions to the AVM
-  * Create a subnetwork
-  * Administer a local node
-  * Retrieve AVA network information from a node
+* Locally manage private keys
+* Retrieve balances on addresses
+* Get UTXOs for addresses
+* Build and sign transactions
+* Issue signed transactions to the AVM
+* Create a subnetwork
+* Administer a local node
+* Retrieve AVA network information from a node
 
 The entirety of the Slopes documentation can be found on our [Slopes documentation page](https://docs.ava.network/v1.0/en/tools/slopes/).
 
-
 ### Requirements
 
-Slopes requires Node.js LTS version 12.13.1 or higher to compile. 
+Slopes requires Node.js LTS version 12.13.1 or higher to compile.
 
 Slopes depends on the following two Node.js modules internally, and we suggest that your project uses them as well:
 
- * Buffer: Enables Node.js's Buffer library in the browser.
-   * https://github.com/feross/buffer
-   * `npm install --save buffer`
- * BN.js: A bignumber library for Node.js and browser.
-   * https://github.com/indutny/bn.js/
-   * `npm install --save bn.js`
+* Buffer: Enables Node.js's Buffer library in the browser.
+  * [https://github.com/feross/buffer](https://github.com/feross/buffer)
+  * `npm install --save buffer`
+* BN.js: A bignumber library for Node.js and browser.
+  * [https://github.com/indutny/bn.js](https://github.com/indutny/bn.js)
+  * `npm install --save bn.js`
 
-Both of the above modules are extremely useful when interacting with Slopes as they are the input and output types of many base classes in the library. 
+Both of the above modules are extremely useful when interacting with Slopes as they are the input and output types of many base classes in the library.
 
-### Installation 
+### Installation
 
 Slopes is available for install via `npm`:
 
@@ -61,6 +60,7 @@ The Slopes library can be imported into your existing Node.js project as follows
 ```js
 const slopes = require("slopes");
 ```
+
 Or into your TypeScript project like this:
 
 ```js
@@ -79,10 +79,10 @@ let bintools = slopes.BinTools.getInstance();
 
 The above lines import the libraries used in the below example:
   
-  * slopes: Our javascript module.
-  * bn.js: A bignumber module use by Slopes.
-  * buffer: A Buffer library.
-  * BinTools: A singleton built into Slopes that is used for dealing with binary data.
+* slopes: Our javascript module.
+* bn.js: A bignumber module use by Slopes.
+* buffer: A Buffer library.
+* BinTools: A singleton built into Slopes that is used for dealing with binary data.
 
 ## Example 1 &mdash; Managing AVM Keys
 
@@ -102,7 +102,7 @@ The keychain is accessed through the AVM API and can be referenced directly or t
 let myKeychain = avm.keyChain();
 ```
 
-This exposes the instance of the class AVM Keychain which is created when the AVM API is created. At present, this supports secp256k1 curve for ECDSA key pairs. 
+This exposes the instance of the class AVM Keychain which is created when the AVM API is created. At present, this supports secp256k1 curve for ECDSA key pairs.
 
 ### Creating AVM key pairs
 
@@ -204,7 +204,7 @@ let secpbase2 = new slopes.SecpOutBase(new BN(500), [addresses[1]]);
 let secpbase3 = new slopes.SecpOutBase(new BN(600), [addresses[1], addresses[2]]);
 
 // Populate the initialState array
-// The AVM needs to know what type of output is produced. 
+// The AVM needs to know what type of output is produced.
 // The constant slopes.AVMConstants.SECPFXID is the correct output.
 // It specifies that we are using a secp256k1 signature scheme for this output.
 let initialState = new slopes.InitialStates();
@@ -261,10 +261,10 @@ let status = await avm.getTxStatus(txid);
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 
-  * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
-  * "Processing" indicates that the transaction is being voted on.
-  * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
-  * "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
+* "Accepted" indicates that the transaction has been accepted as valid by the network and executed
+* "Processing" indicates that the transaction is being voted on.
+* "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
+* "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
 
 ### Identifying the newly created asset
 
@@ -337,10 +337,10 @@ let status = await avm.getTxStatus(txid);
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 
-  * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
-  * "Processing" indicates that the transaction is being voted on.
-  * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
-  * "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
+* "Accepted" indicates that the transaction has been accepted as valid by the network and executed
+* "Processing" indicates that the transaction is being voted on.
+* "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
+* "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
 
 ### Check the results
 

@@ -90,7 +90,7 @@ export abstract class Output {
         if(idx < this.addresses.length){
             return this.addresses[idx].toBuffer();
         }
-        throw new Error("Error - SecpOutBase.getAddress: idx out of range");
+        throw new Error("Error - Output.getAddress: idx out of range");
     }
 
     /**
