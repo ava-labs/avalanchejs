@@ -14,6 +14,18 @@ import {JRPCAPI, RequestResponseData} from "../../utils/types"
 export class AdminAPI extends JRPCAPI{
 
     /**
+     * Fetches the nodeID from the node.
+     * 
+     * @returns Returns a Promise<string> of the nodeID.
+     */
+    getNodeID = async ():Promise<string> => {
+        let params = {};
+        return this.callMethod("admin.getNodeID", params).then((response:RequestResponseData) => {
+            return response.data["result"]["nodeID"];
+        });
+    }
+
+    /**
      * Fetches the networkID from the node.
      * 
      * @returns Returns a Promise<number> of the networkID.
@@ -22,6 +34,42 @@ export class AdminAPI extends JRPCAPI{
         let params = {};
         return this.callMethod("admin.getNetworkID", params).then((response:RequestResponseData) => {
             return response.data["result"]["networkID"];
+        });
+    }
+
+    /**
+     * Assign an API an alias, a different endpoint for the API. The original endpoint will still work. This change only affects this node; other nodes will not know about this alias.
+     * 
+     * @param endpoint The original endpoint of the API. endpoint should only include the part of the endpoint after /ext/
+     * @param alias The API being aliased can now be called at ext/alias
+     * 
+     * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
+     */
+    alias = async (endpoint:string, alias:string):Promise<boolean> => {
+        let params = {
+            "endpoint": endpoint,
+            "alias":alias
+        };
+        return this.callMethod("admin.alias", params).then((response:RequestResponseData) => {
+            return response.data["result"]["success"];
+        });
+    }
+
+    /**
+     * Give a blockchain an alias, a different name that can be used any place the blockchain’s ID is used.
+     * 
+     * @param endpoint The blockchain’s ID
+     * @param alias Can now be used in place of the blockchain’s ID (in API endpoints, for example)
+     * 
+     * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
+     */
+    aliasChain = async (chain:string, alias:string):Promise<boolean> => {
+        let params = {
+            "chain": chain,
+            "alias":alias
+        };
+        return this.callMethod("admin.aliasChain", params).then((response:RequestResponseData) => {
+            return response.data["result"]["success"];
         });
     }
 
