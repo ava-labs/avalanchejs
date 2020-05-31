@@ -247,7 +247,7 @@ describe("Platform", () => {
     test("getCurrentValidators 1", async ()=>{
 
         let validators = ['val1', 'val2'];
-        let result:Promise<Array<string>> = platform.getCurrentValidators();
+        let result:Promise<Array<object>> = platform.getCurrentValidators();
         let payload:object = {
             "result": {
                 "validators": validators
@@ -258,7 +258,7 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:Array<object> = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);
@@ -267,7 +267,7 @@ describe("Platform", () => {
     test("getCurrentValidators 2", async ()=>{
         let subnetID:string = "abcdef"
         let validators = ['val1', 'val2'];
-        let result:Promise<Array<string>> = platform.getCurrentValidators(subnetID);
+        let result:Promise<Array<object>> = platform.getCurrentValidators(subnetID);
         let payload:object = {
             "result": {
                 "validators": validators
@@ -278,7 +278,7 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:Array<object> = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);
@@ -287,7 +287,7 @@ describe("Platform", () => {
     test("getCurrentValidators 3", async ()=>{
         let subnetID:Buffer = Buffer.from("abcdef", "hex");
         let validators = ['val1', 'val2'];
-        let result:Promise<Array<string>> = platform.getCurrentValidators(subnetID);
+        let result:Promise<Array<object>> = platform.getCurrentValidators(subnetID);
         let payload:object = {
             "result": {
                 "validators": validators
@@ -298,7 +298,7 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:Array<object> = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);
@@ -307,7 +307,7 @@ describe("Platform", () => {
     test("getPendingValidators 1", async ()=>{
 
         let validators = ['val1', 'val2'];
-        let result:Promise<Array<string>> = platform.getPendingValidators();
+        let result:Promise<Array<object>> = platform.getPendingValidators();
         let payload:object = {
             "result": {
                 "validators": validators
@@ -318,7 +318,7 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:Array<object> = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);
@@ -327,7 +327,7 @@ describe("Platform", () => {
     test("getPendingValidators 2", async ()=>{
         let subnetID:string = "abcdef"
         let validators = ['val1', 'val2'];
-        let result:Promise<Array<string>> = platform.getPendingValidators(subnetID);
+        let result:Promise<Array<object>> = platform.getPendingValidators(subnetID);
         let payload:object = {
             "result": {
                 "validators": validators
@@ -338,7 +338,7 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:Array<object> = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);
@@ -347,7 +347,7 @@ describe("Platform", () => {
     test("getPendingValidators 3", async ()=>{
         let subnetID:Buffer = Buffer.from("abcdef", "hex");
         let validators = ['val1', 'val2'];
-        let result:Promise<Array<string>> = platform.getPendingValidators(subnetID);
+        let result:Promise<Array<object>> = platform.getPendingValidators(subnetID);
         let payload:object = {
             "result": {
                 "validators": validators
@@ -358,7 +358,7 @@ describe("Platform", () => {
         };
 
         mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
+        let response:Array<object> = await result;
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(validators);

@@ -131,7 +131,7 @@ class PlatformAPI extends JRPCAPI{
      * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.ava.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
      * 
      */
-    getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<Array<string>> => {
+    getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
         let params = {};
         if(typeof subnetID === "string"){
             params["subnetID"] = subnetID;
@@ -151,7 +151,7 @@ class PlatformAPI extends JRPCAPI{
      * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.ava.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
      * 
      */
-    getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<Array<string>> => {
+    getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
         let params = {};
         if(typeof subnetID === "string"){
             params["subnetID"] = subnetID;
