@@ -154,7 +154,7 @@ let privkstr = keypair.getPrivateKeyString(); //returns an AVA serialized string
 keypair.generateKey(); //creates a new random keypair
 
 let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
-let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
+let successful = keypair.importKey(mypk); //returns boolean if private key imported successfully
 
 let message = Buffer.from("Wubalubadubdub");
 let signature = keypair.sign(message); //returns a Buffer with the signature
