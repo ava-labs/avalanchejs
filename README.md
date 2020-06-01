@@ -89,7 +89,7 @@ The above lines import the libraries used in the below example:
 Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
-let mynetworkID = 12345; //default is 2, we want to override that for our local network
+let mynetworkID = 12345; //default is 3, we want to override that for our local network
 let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
 let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
@@ -167,7 +167,7 @@ let isValid = keypair.verify(message, signature); //returns a boolean
 This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
-let mynetworkID = 12345; //default is 2, we want to override that for our local network
+let mynetworkID = 12345; //default is 3, we want to override that for our local network
 let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
 let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
@@ -199,18 +199,18 @@ We want to mint an asset with 400 coins to all of our managed keys, 500 to the s
 let addresses = avm.keyChain().getAddresses();
 
 // Create outputs for the asset's initial state
-let secpbase1 = new slopes.SecpOutBase(new BN(400), addresses);
-let secpbase2 = new slopes.SecpOutBase(new BN(500), [addresses[1]]);
-let secpbase3 = new slopes.SecpOutBase(new BN(600), [addresses[1], addresses[2]]);
+let secpOutput1 = new slopes.SecpOutput(new BN(400), new BN(400), 1, addresses);
+let secpOutput2 = new slopes.SecpOutput(new BN(500), new BN(400), 1, [addresses[1]]);
+let secpOutput3 = new slopes.SecpOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
 
 // Populate the initialState array
 // The AVM needs to know what type of output is produced.
 // The constant slopes.AVMConstants.SECPFXID is the correct output.
 // It specifies that we are using a secp256k1 signature scheme for this output.
 let initialState = new slopes.InitialStates();
-initialState.addOutput(secpbase1, slopes.AVMConstants.SECPFXID);
-initialState.addOutput(secpbase2, slopes.AVMConstants.SECPFXID);
-initialState.addOutput(secpbase3, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput1, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput2, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput3, slopes.AVMConstants.SECPFXID);
 ```
 
 ### Creating the signed transaction
@@ -275,7 +275,7 @@ The AVM uses the TxID of the transaction which created the asset as the unique i
 This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
 
 ```js
-let mynetworkID = 12345; //default is 2, we want to override that for our local network
+let mynetworkID = 12345; //default is 3, we want to override that for our local network
 let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
 let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
 ```
@@ -311,7 +311,7 @@ We have 400 coins! We're going to now send 100 of those coins to our friend's ad
 let sendAmount = new BN(100); //amounts are in BN format
 let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized address format
 
-//The below returns a TxUnsigned
+//The below returns a UnsignedTx
 //Parameters sent are (in order of appearance):
 //   * The UTXO Set
 //   * The amount being sent as a BN

@@ -15,7 +15,7 @@ import { AxiosRequestConfig, AxiosResponse, Method } from "axios";
  * 
  */
 export default class SlopesCore {
-    protected networkID:number = 2;
+    protected networkID:number = 3;
     protected protocol:string;
     protected ip:string;
     protected port:number;
