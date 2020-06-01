@@ -200,8 +200,8 @@ let addresses = avm.keyChain().getAddresses();
 
 // Create outputs for the asset's initial state
 let secpOutput1 = new slopes.SecpOutput(new BN(400), new BN(400), 1, addresses);
-let secpOutput2 = new slopes.SecpOutput(new BN(500000), new BN(400), 1, [addresses[1]]);
-let secpOutput3 = new slopes.SecpOutput(new BN(600000), new BN(400), 1, [addresses[1], addresses[2]]);
+let secpOutput2 = new slopes.SecpOutput(new BN(500), new BN(400), 1, [addresses[1]]);
+let secpOutput3 = new slopes.SecpOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
 
 // Populate the initialState array
 // The AVM needs to know what type of output is produced.
