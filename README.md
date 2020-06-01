@@ -191,7 +191,7 @@ let denomination = 9;
 
 ### Creating the initial state
 
-We want to mint an asset with 400 coins to all of our managed keys. This sets up the state that will result from the Create Asset transaction.
+We want to mint an asset with 400 coins to all of our managed keys, 500 to the second address we know of, and 600 to the second and third address. This sets up the state that will result from the Create Asset transaction.
 
 *Note: This example assumes we have the keys already managed in our AVM Keychain.*
 
@@ -199,14 +199,18 @@ We want to mint an asset with 400 coins to all of our managed keys. This sets up
 let addresses = avm.keyChain().getAddresses();
 
 // Create an output for the asset's initial state
-let secpOutput = new slopes.SecpOutput(new BN(400), new BN(400), 1, addresses);
+let secpOutput1 = new slopes.SecpOutput(new BN(400), new BN(400), 1, addresses);
+let secpOutput2 = new slopes.SecpOutput(new BN(500000), new BN(400), 1, [addresses[1]]);
+let secpOutput3 = new slopes.SecpOutput(new BN(600000), new BN(400), 1, [addresses[1], addresses[2]]);
 
 // Populate the initialState array
 // The AVM needs to know what type of output is produced.
 // The constant slopes.AVMConstants.SECPFXID is the correct output.
 // It specifies that we are using a secp256k1 signature scheme for this output.
 let initialState = new slopes.InitialStates();
-initialState.addOutput(secpOutput, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput1, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput2, slopes.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput3, slopes.AVMConstants.SECPFXID);
 ```
 
 ### Creating the signed transaction
