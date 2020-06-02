@@ -541,7 +541,7 @@ export class UTXOSet {
         initialState:InitialStates, name:string, 
         symbol:string, denomination:number
     ):UnsignedTx => {
-        // Cheating and using makeUnsignedTx to get Ins and Outs for fees.
+        // Cheating and using makeBaseTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the feeSenderAddresses
         let utx:UnsignedTx = this.makeBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();

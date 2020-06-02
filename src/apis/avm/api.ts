@@ -596,9 +596,9 @@ class AVMAPI extends JRPCAPI{
         changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedTx").map(a => bintools.stringToAddress(a));;
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedTx").map(a => bintools.stringToAddress(a));;
-        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "makeUnsignedTx").map(a => bintools.stringToAddress(a));;
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeBaseTx").map(a => bintools.stringToAddress(a));;
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeBaseTx").map(a => bintools.stringToAddress(a));;
+        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "makeBaseTx").map(a => bintools.stringToAddress(a));;
 
         if(typeof assetID === "string"){
             assetID = bintools.avaDeserialize(assetID);
@@ -694,7 +694,7 @@ class AVMAPI extends JRPCAPI{
     /**
      * Helper function which takes an unsigned transaction and signs it, returning the resulting [[Tx]].
      * 
-     * @param utx The unsigned transaction of type [[TxUnsigned]]
+     * @param utx The unsigned transaction of type [[UnsignedTx]]
      * 
      * @returns A signed transaction of type [[Tx]]
      */
