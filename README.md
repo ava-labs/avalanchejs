@@ -298,7 +298,7 @@ let utxos = await avm.getUTXOs(myAddresses);
 
 ### Spending the UTXOs
 
-The `makeUnsignedTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
+The `makeBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
 let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
@@ -319,7 +319,7 @@ let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized add
 //   * An array of addresses sending the funds
 //   * An array of addresses any leftover funds are sent
 //   * The AssetID of the funds being sent
-let unsignedTx = await avm.makeUnsignedTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
+let unsignedTx = await avm.makeBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
 let signedTx = avm.signTx(unsignedTx);
 let txid = await avm.issueTx(signedTx);
 ```
