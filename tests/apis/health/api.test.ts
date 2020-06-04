@@ -13,7 +13,7 @@ import HealthAPI from "../../../src/apis/health/api";
  */
 const bintools = BinTools.getInstance();
 
-describe("Platform", () => {
+describe("Health", () => {
     const ip = '127.0.0.1';
     const port = 9650;
     const protocol = "https";
