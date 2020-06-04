@@ -15,11 +15,11 @@ class HealthAPI extends JRPCAPI{
 
     /**
      *
-     * @returns Promise for an object containing the health check
+     * @returns Promise for an object containing the health check response
      */
-    getliveness = async ():Promise<boolean> => {
+    getLiveness = async ():Promise<object> => {
         return this.callMethod("health.getLiveness").then((response:RequestResponseData) => {
-            return response.data["result"]["success"];
+            return response.data["result"];
         });
     }
 

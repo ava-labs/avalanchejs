@@ -121,5 +121,6 @@ export {AVMAPI as AVM};
 export {KeystoreAPI as Keystore};
 export {PlatformAPI as Platform};
 export {AdminAPI as Admin};
+export {HealthAPI as Health};
 
 
