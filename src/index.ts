@@ -12,6 +12,7 @@ import DB from './utils/db';
 import { Defaults } from './utils/types';
 import { Credential } from './apis/avm/credentials';
 import { SelectOperationClass } from './apis/avm/ops';
+import HealthAPI from "./apis/health/api";
 
 /**
  * Slopes is middleware for interacting with AVA node RPC APIs. 
@@ -53,6 +54,13 @@ export class Slopes extends SlopesCore {
     }
 
     /**
+     * Returns a reference to the Health RPC for a node.
+     */
+    Health = () => {
+        return this.apis["health"] as HealthAPI;
+    }
+
+    /**
      * Creates a new AVA instance. Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client RPC APIs
@@ -80,6 +88,7 @@ export class Slopes extends SlopesCore {
             this.addAPI("avm", AVMAPI, "/ext/bc/X", chainid);
             this.addAPI("platform", PlatformAPI);
             this.addAPI("keystore", KeystoreAPI);
+            this.addAPI('health', HealthAPI);
         }
     }
 }
