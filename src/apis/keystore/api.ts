@@ -29,7 +29,7 @@ class KeystoreAPI extends JRPCAPI{
             "password": password
         };
         return this.callMethod("keystore.createUser", params).then((response:RequestResponseData) => {
-            return response.data["result"];
+            return response.data["result"]["success"];
         });
     }
 
