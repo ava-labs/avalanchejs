@@ -181,12 +181,12 @@ export class BaseTx {
     /**
      * Class representing a BaseTx which is the foundation for all transactions.
      * 
-     * @param networkid Optional networkid, default 2
+     * @param networkid Optional networkid, default 3
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      */
-    constructor(networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined) {
+    constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined) {
         this.networkid.writeUInt32BE(networkid, 0);
         this.blockchainid = blockchainid;
         if(typeof ins !== 'undefined' && typeof outs !== 'undefined'){
@@ -307,7 +307,7 @@ export class CreateAssetTx extends BaseTx {
     /**
      * Class representing an unsigned Create Asset transaction.
      * 
-     * @param networkid Optional networkid, default 2
+     * @param networkid Optional networkid, default 3
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
@@ -317,7 +317,7 @@ export class CreateAssetTx extends BaseTx {
      * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
      */
     constructor(
-            networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16), 
+            networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), 
             outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, 
             name:string = undefined, symbol:string = undefined, denomination:number = undefined, 
             initialstate:InitialStates = undefined
@@ -418,14 +418,14 @@ export class OperationTx extends BaseTx {
     /**
      * Class representing an unsigned Operation transaction.
      * 
-     * @param networkid Optional networkid, default 2
+     * @param networkid Optional networkid, default 3
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      * @param ops Array of [[Operation]]s used in the transaction
      */
     constructor(
-        networkid:number = 2, blockchainid:Buffer = Buffer.alloc(32, 16),
+        networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16),
         outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, 
         ops:Array<TransferableOperation> = undefined
         ) {
