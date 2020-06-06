@@ -229,6 +229,7 @@ class AVMAPI extends JRPCAPI{
      * @param password The password for the user paying the transaction fee (in $AVA) for asset creation
      * @param name The human-readable name for the asset
      * @param symbol Optional. The shorthand symbol for the asset. Between 0 and 4 characters
+     * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
      * @param initialHolders An array of objects containing the field "address" and "amount" to establish the genesis values for the new asset
      * 
      * ```js
@@ -247,10 +248,11 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
      */
-    createFixedCapAsset = async (username:string, password:string, name:string, symbol:string, initialHolders:Array<object>):Promise<string> => {
+    createFixedCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, initialHolders:Array<object>):Promise<string> => {
         let params = {
             "name": name,
             "symbol": symbol,
+            "denomination": denomination,
             "username": username,
             "password": password,
             "initialHolders": initialHolders
@@ -267,6 +269,7 @@ class AVMAPI extends JRPCAPI{
      * @param password The password for the user paying the transaction fee (in $AVA) for asset creation
      * @param name The human-readable name for the asset
      * @param symbol Optional. The shorthand symbol for the asset -- between 0 and 4 characters
+     * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
      * @param minterSets  is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
      * 
      * ```js
@@ -291,10 +294,11 @@ class AVMAPI extends JRPCAPI{
      * 
      * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
      */
-    createVariableCapAsset = async (username:string, password:string, name:string, symbol:string, minterSets:Array<object>):Promise<string> => {
+    createVariableCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, minterSets:Array<object>):Promise<string> => {
         let params = {
             "name": name,
             "symbol": symbol,
+            "denomination": denomination,
             "username": username,
             "password": password,
             "minterSets": minterSets

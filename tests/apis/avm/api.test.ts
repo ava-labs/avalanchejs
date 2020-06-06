@@ -276,6 +276,7 @@ describe("AVMAPI", () => {
         
         let amount:number = 10000;
         let address:Buffer = kp.getAddress();
+        let denomination:number = 0
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
         let initialHolders:Array<object> = [
             {
@@ -288,7 +289,7 @@ describe("AVMAPI", () => {
             }
         ]
 
-        let result:Promise<string> = api.createFixedCapAsset(username, password, "Some Coin", "SCC", initialHolders);
+        let result:Promise<string> = api.createFixedCapAsset(username, password, "Some Coin", "SCC", denomination, initialHolders);
         let payload:object = {
             "result": {
                 'assetID': assetid
@@ -311,6 +312,7 @@ describe("AVMAPI", () => {
         
         let amount:number = 10000;
         let address:Buffer = kp.getAddress();
+        let denomination:number = 0;
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
         let minterSets:Array<object> = [
             {
@@ -329,7 +331,7 @@ describe("AVMAPI", () => {
             }
         ]
 
-        let result:Promise<string> = api.createVariableCapAsset(username, password, "Some Coin", "SCC", minterSets);
+        let result:Promise<string> = api.createVariableCapAsset(username, password, "Some Coin", "SCC", denomination, minterSets);
         let payload:object = {
             "result": {
                 'assetID': assetid
