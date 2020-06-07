@@ -33,6 +33,9 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
     } else if(txtype == AVMConstants.OPERATIONTX){
         let tx:OperationTx = new OperationTx(...args);
         return tx;
+    } else if(txtype == AVMConstants.CREATENFTTX){
+        let tx:OperationTx = new OperationTx(...args);
+        return tx;
     }
     /* istanbul ignore next */
     throw new Error("Error - SelectTxClass: unknown txtype " + txtype);
@@ -198,18 +201,10 @@ export class BaseTx {
     }
 }
 
-export class CreateAssetTx extends BaseTx {
+export class CreateFXTx extends BaseTx {
     protected name:string = "";
     protected symbol:string = "";
-    protected denomination:Buffer = Buffer.alloc(1);
     protected initialstate:InitialStates = new InitialStates();
-
-    /**
-     * Returns the id of the [[CreateAssetTx]]
-     */
-    getTxType():number {
-        return AVMConstants.CREATEASSETTX;
-    }
 
     /**
      * Returns the array of array of [[Output]]s for the initial state
@@ -232,8 +227,17 @@ export class CreateAssetTx extends BaseTx {
     getSymbol = ():string => {
         return this.symbol;
     }
+}
 
+export class CreateAssetTx extends CreateFXTx {
+    protected denomination:Buffer = Buffer.alloc(1);
 
+    /**
+     * Returns the id of the [[CreateAssetTx]]
+     */
+    getTxType():number {
+        return AVMConstants.CREATEASSETTX;
+    }
 
     /**
      * Returns the numeric representation of the denomination
@@ -241,7 +245,6 @@ export class CreateAssetTx extends BaseTx {
     getDenomination = ():number => {
         return this.denomination.readUInt8(0);
     }
-
 
     /**
      * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the denomination
@@ -331,6 +334,93 @@ export class CreateAssetTx extends BaseTx {
             this.name = name;
             this.symbol = symbol;
             this.denomination.writeUInt8(denomination, 0);
+        }
+    }
+}
+
+export class CreateNFTTx extends CreateFXTx {
+    /**
+     * Returns the id of the [[CreateNFTTx]]
+     */
+    getTxType():number {
+        return AVMConstants.CREATENFTTX;
+    }
+
+    /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[CreateNFTTx]], parses it, populates the class, and returns the length of the [[CreateNFTTx]] in bytes.
+     * 
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[CreateNFTTx]]
+     * 
+     * @returns The length of the raw [[CreateNFTTx]]
+     * 
+     * @remarks assume not-checksummed
+     */
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(bytes, offset);
+
+        let namesize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+        offset += 2;
+        this.name = bintools.copyFrom(bytes, offset, offset + namesize).toString("utf8");
+        offset += namesize;
+
+        let symsize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+        offset += 2;
+        this.symbol = bintools.copyFrom(bytes, offset, offset + symsize).toString("utf8");
+        offset += symsize;
+
+        let inits:InitialStates = new InitialStates();
+        offset = inits.fromBuffer(bytes, offset);
+        this.initialstate = inits;
+
+        return offset;
+    }
+
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateNFTTx]].
+     */
+    toBuffer():Buffer {
+        let superbuff:Buffer = super.toBuffer();
+        let initstatebuff:Buffer = this.initialstate.toBuffer();
+
+        let namebuff:Buffer = Buffer.alloc(this.name.length);
+        namebuff.write(this.name, 0, this.name.length, "utf8");
+        let namesize:Buffer = Buffer.alloc(2);
+        namesize.writeUInt16BE(this.name.length, 0);
+
+        let symbuff:Buffer = Buffer.alloc(this.symbol.length);
+        symbuff.write(this.symbol, 0, this.symbol.length, "utf8");
+        let symsize:Buffer  = Buffer.alloc(2);
+        symsize.writeUInt16BE(this.symbol.length, 0);
+
+        let bsize:number = superbuff.length + namesize.length + namebuff.length + symsize.length + symbuff.length + initstatebuff.length;
+        let barr:Array<Buffer> = [superbuff, namesize, namebuff, symsize, symbuff, initstatebuff];
+        return Buffer.concat(barr, bsize);
+    }
+    
+    /**
+     * Class representing an unsigned Create NFT transaction.
+     * 
+     * @param networkid Optional networkid, default 3
+     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+     * @param outs Optional array of the [[TransferableOutput]]s
+     * @param ins Optional array of the [[TransferableInput]]s
+     * @param name String for the descriptive name of the nft
+     * @param symbol String for the ticker symbol of the nft
+     * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
+     */
+    constructor(
+            networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), 
+            outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, 
+            name:string = undefined, symbol:string = undefined, 
+            initialstate:InitialStates = undefined
+        ) {
+        super(networkid, blockchainid, outs, ins);
+        if(
+            typeof name === 'string' && typeof symbol === 'string' && typeof initialstate !== 'undefined'
+        ) {
+            this.initialstate = initialstate;
+            this.name = name;
+            this.symbol = symbol;
         }
     }
 }
