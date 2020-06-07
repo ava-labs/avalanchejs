@@ -62,7 +62,7 @@ class KeystoreAPI extends JRPCAPI{
      */
     importUser = async (username:string, user:string, password:string):Promise<boolean> => {
         let params = {
-            "usermame": username,
+            "username": username,
             "user": user,
             "password": password
         };
