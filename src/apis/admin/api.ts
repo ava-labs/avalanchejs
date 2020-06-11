@@ -90,6 +90,17 @@ export class AdminAPI extends JRPCAPI{
     }
 
     /**
+     * Fetches the version of Gecko this node is running
+     *
+     * @returns Returns a Promise<string> containing the version of Gecko.
+     */
+    getNodeVersion = async ():Promise<string> => {
+        return this.callMethod("admin.getNodeVersion").then((response:RequestResponseData) => {
+            return response.data["result"]["version"];
+        });
+    }
+
+    /**
      * Dump the mutex statistics of the node to the specified file.
      * 
      * @param filename Name of the file to write the statistics.
