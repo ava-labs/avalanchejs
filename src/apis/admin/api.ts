@@ -97,6 +97,18 @@ export class AdminAPI extends JRPCAPI{
     getNodeVersion = async ():Promise<string> => {
         return this.callMethod("admin.getNodeVersion").then((response:RequestResponseData) => {
             return response.data["result"]["version"];
+          >>>>>>> user_changes
+        });
+    }
+
+    /**
+     * Fetches the network name this node is running on
+     *
+     * @returns Returns a Promise<string> containing the network name.
+     */
+    getNetworkName = async ():Promise<string> => {
+        return this.callMethod("admin.getNetworkName").then((response:RequestResponseData) => {
+            return response.data["result"]["networkName"];
         });
     }
 
