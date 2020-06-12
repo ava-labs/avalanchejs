@@ -90,6 +90,17 @@ export class AdminAPI extends JRPCAPI{
     }
 
     /**
+     * Fetches the network name this node is running on
+     *
+     * @returns Returns a Promise<string> containing the network name.
+     */
+    getNetworkName = async ():Promise<string> => {
+        return this.callMethod("admin.getNetworkName").then((response:RequestResponseData) => {
+            return response.data["result"]["networkName"];
+        });
+    }
+
+    /**
      * Dump the mutex statistics of the node to the specified file.
      * 
      * @param filename Name of the file to write the statistics.
