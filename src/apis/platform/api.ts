@@ -438,6 +438,46 @@ class PlatformAPI extends JRPCAPI{
     }
 
     /**
+     * Exports the private key for an address.
+     *
+     * @param username The name of the user with the private key
+     * @param password The password used to decrypt the private key
+     * @param address The address whose private key should be exported
+     *
+     * @returns Promise with the decrypted private key as store in the database
+     */
+    exportKey = async (username:string, password:string, address:string):Promise<string> => {
+        let params = {
+            "username": username,
+            "password": password,
+            "address": address
+        };
+        return this.callMethod("platform.exportKey", params).then((response:RequestResponseData) => {
+            return response.data["result"]["privateKey"];
+        });
+    }
+
+    /**
+     * Give a user control over an address by providing the private key that controls the address.
+     *
+     * @param username The name of the user to store the private key
+     * @param password The password that unlocks the user
+     * @param privateKey A string representing the private key in the vm's format
+     *
+     * @returns The address for the imported private key.
+     */
+    importKey = async (username:string, password:string, privateKey:string):Promise<string> => {
+        let params = {
+            "username": username,
+            "password": password,
+            "privateKey": privateKey
+        };
+        return this.callMethod("platform.importKey", params).then((response:RequestResponseData) => {
+            return response.data["result"]["address"];
+        });
+    }
+
+    /**
      * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
      * 
      * @param core A reference to the Slopes class
