@@ -97,7 +97,6 @@ export class AdminAPI extends JRPCAPI{
     getNodeVersion = async ():Promise<string> => {
         return this.callMethod("admin.getNodeVersion").then((response:RequestResponseData) => {
             return response.data["result"]["version"];
-          >>>>>>> user_changes
         });
     }
 
