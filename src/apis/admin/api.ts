@@ -90,6 +90,18 @@ export class AdminAPI extends JRPCAPI{
     }
 
     /**
+     * Fetches the version of Gecko this node is running
+     *
+     * @returns Returns a Promise<string> containing the version of Gecko.
+     */
+    getNodeVersion = async ():Promise<string> => {
+        return this.callMethod("admin.getNodeVersion").then((response:RequestResponseData) => {
+            return response.data["result"]["version"];
+          >>>>>>> user_changes
+        });
+    }
+
+    /**
      * Fetches the network name this node is running on
      *
      * @returns Returns a Promise<string> containing the network name.
