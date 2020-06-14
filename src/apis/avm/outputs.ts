@@ -19,6 +19,9 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
     if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput( ...args);
         return secpout;
+    } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
+        let nftout:NFTMintOutput = new NFTMintOutput(...args);
+        return nftout;
     } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
         let nftout:NFTTransferOutput = new NFTTransferOutput(...args);
         return nftout;
@@ -418,6 +421,18 @@ export abstract class NFTOutBase extends Output {
             this.sizePayload.writeUInt32BE(payload.length, 0);
             this.payload = bintools.copyFrom(payload, 0, payload.length);
         }
+    }
+}
+
+/**
+ * An [[Output]] class which specifies an Output that carries an NFT Mint and uses secp256k1 signature scheme.
+ */
+export class NFTMintOutput extends NFTOutBase {
+    /**
+     * Returns the outputID for this output
+     */
+    getOutputID():number {
+        return AVMConstants.NFTMINTOUTPUTID;
     }
 }
 
