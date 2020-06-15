@@ -246,12 +246,12 @@ export class AVMConstants {
     static NFTXFEROUTPUTID:number = 11;
 
     static SECPINPUTID:number = 5;
+    static NFTMINTINPUTID:number = 10;
     static NFTXFEROP:number = 13;
 
     static BASETX:number = 0;
     static CREATEASSETTX:number = 1;
     static OPERATIONTX:number = 2;
-    static CREATENFTTX:number = 3;
 
     static SECPCREDENTIAL:number = 9;
     static NFTCREDENTIAL:number = 16;

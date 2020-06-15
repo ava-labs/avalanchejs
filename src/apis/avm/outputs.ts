@@ -30,7 +30,7 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
 }
 
 export abstract class Output {
-    protected locktime:Buffer = Buffer.alloc(8);
+    // protected locktime:Buffer = Buffer.alloc(8);
     protected threshold:Buffer = Buffer.alloc(4);
     protected numaddrs:Buffer = Buffer.alloc(4);
     protected addresses:Array<Address> = [];
@@ -50,9 +50,9 @@ export abstract class Output {
     /**
      * Returns the a {@link https://github.com/indutny/bn.js/|BN} repersenting the UNIX Timestamp when the lock is made available.
      */
-    getLocktime = ():BN => {
-        return bintools.fromBufferToBN(this.locktime);
-    }
+    // getLocktime = ():BN => {
+    //     return bintools.fromBufferToBN(this.locktime);
+    // }
 
         /**
      * Returns an array of {@link https://github.com/feross/buffer|Buffer}s for the addresses.
@@ -126,10 +126,10 @@ export abstract class Output {
         } else {
             now = asOf;
         }
-        let locktime:BN = bintools.fromBufferToBN(this.locktime);
-        if(now.lte(locktime)) { //not unlocked, not spendable
-            return qualified;
-        }
+        // let locktime:BN = bintools.fromBufferToBN(this.locktime);
+        // if(now.lte(locktime)) { //not unlocked, not spendable
+        //     return qualified;
+        // }
 
         let threshold:number = this.threshold.readUInt32BE(0);
 
@@ -148,8 +148,8 @@ export abstract class Output {
      * Returns a base-58 string representing the [[Output]].
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
-        this.locktime = bintools.copyFrom(bytes, offset, offset + 8);
-        offset += 8;
+        // this.locktime = bintools.copyFrom(bytes, offset, offset + 8);
+        // offset += 8;
         this.threshold = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         this.numaddrs = bintools.copyFrom(bytes, offset, offset + 4);
@@ -171,8 +171,8 @@ export abstract class Output {
     toBuffer():Buffer {
         this.addresses.sort(Address.comparitor());
         this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-        let bsize:number = this.locktime.length + this.threshold.length + this.numaddrs.length;
-        let barr:Array<Buffer> = [this.locktime, this.threshold, this.numaddrs];
+        let bsize:number = this.threshold.length + this.numaddrs.length;
+        let barr:Array<Buffer> = [this.threshold, this.numaddrs];
         for(let i = 0; i < this.addresses.length; i++) {
             let b: Buffer = this.addresses[i].toBuffer();
             barr.push(b);
@@ -230,11 +230,11 @@ export abstract class Output {
             this.addresses.sort(Address.comparitor());
             this.numaddrs.writeUInt32BE(this.addresses.length, 0);
             this.threshold.writeUInt32BE((threshold ? threshold : 1), 0);
-            if(!(locktime)){
-                /* istanbul ignore next */
-                locktime = new BN(0);
-            }
-            this.locktime = bintools.fromBNToBuffer(locktime, 8);
+            // if(!(locktime)){
+            //     /* istanbul ignore next */
+            //     locktime = new BN(0);
+            // }
+            // this.locktime = bintools.fromBNToBuffer(locktime, 8);
         }
     }
 }

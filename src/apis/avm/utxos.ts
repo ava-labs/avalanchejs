@@ -194,13 +194,13 @@ export class UTXOSet {
             this.utxos[utxoid] = utxovar;
 
             let addresses:Array<Buffer> = utxovar.getOutput().getAddresses();
-            let locktime:BN = utxovar.getOutput().getLocktime();
+            // let locktime:BN = utxovar.getOutput().getLocktime();
             for(let i = 0; i < addresses.length; i++){
                 let address:string = addresses[i].toString("hex");
                 if(!(address in this.addressUTXOs)){
                     this.addressUTXOs[address] = {};
                 }
-                this.addressUTXOs[address][utxoid] = locktime;
+                // this.addressUTXOs[address][utxoid] = locktime;
             }
             return utxovar;
         }
