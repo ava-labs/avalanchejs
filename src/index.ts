@@ -112,8 +112,8 @@ export {SelectCredentialClass, Credential, SecpCredential, NFTCredential} from '
 export {SelectInputClass, Input, TransferableInput, AmountInput, SecpInput} from './apis/avm/inputs';
 export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
 export {SelectOperationClass,Operation, TransferableOperation, NFTTransferOperation} from  './apis/avm/ops';
-export {SelectOutputClass, Output, TransferableOutput, AmountOutput, SecpOutput, NFTOutBase, NFTTransferOutput} from './apis/avm/outputs';
-export {BaseTx, CreateAssetTx, CreateNFTTx, CreateFXTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx';
+export {SelectOutputClass, Output, TransferableOutput, AmountOutput, SecpOutput, NFTOutBase, NFTTransferOutput, NFTMintOutput, NFTMintBase} from './apis/avm/outputs';
+export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx';
 export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 

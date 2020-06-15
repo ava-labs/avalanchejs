@@ -357,7 +357,6 @@ export class SecpOutput extends AmountOutput {
     }
 }
 
-
 /**
  * An [[Output]] class which specifies an NFT.
  */
@@ -424,10 +423,59 @@ export abstract class NFTOutBase extends Output {
     }
 }
 
+
+/**
+ * An [[Output]] class which specifies an NFT Mint.
+ */
+export abstract class NFTMintBase extends Output {
+    protected groupID:Buffer = Buffer.alloc(4);
+
+    /**
+     * Returns the groupID as a number.
+     */
+    getGroupID = ():number => {
+        return this.groupID.readUInt32BE(0);
+    }
+
+    /**
+     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTOutBase]] and returns the size of the output.
+     */
+    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
+        this.groupID = bintools.copyFrom(utxobuff, offset, offset + 4);
+        offset += 4;
+        return super.fromBuffer(utxobuff, offset);
+    }
+
+    /**
+     * Returns the buffer representing the [[NFTOutBase]] instance.
+     */
+    toBuffer():Buffer {
+        let superbuff:Buffer = super.toBuffer();
+        let bsize:number = this.groupID.length + superbuff.length;
+        let barr:Array<Buffer> = [this.groupID, superbuff];
+        return Buffer.concat(barr,bsize);
+    }
+
+    /**
+     * An [[Output]] class which contains an NFT Mint.
+     * 
+     * @param groupID A number representing the amount in the output
+     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+     * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
+     * @param threshold A number representing the the threshold number of signers required to sign the transaction
+     */
+    constructor(groupID:number = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
+        super(locktime, threshold, addresses);
+        if(typeof groupID !== 'undefined') {
+            this.groupID.writeUInt32BE(groupID, 0);
+        }
+    }
+}
+
 /**
  * An [[Output]] class which specifies an Output that carries an NFT Mint and uses secp256k1 signature scheme.
  */
-export class NFTMintOutput extends NFTOutBase {
+export class NFTMintOutput extends NFTMintBase {
     /**
      * Returns the outputID for this output
      */
