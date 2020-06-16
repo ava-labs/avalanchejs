@@ -211,6 +211,53 @@ describe("Platform", () => {
         expect(response).toBe(resultobj);
     });
 
+    test("exportPrivateKey", async ()=> {
+
+        let address = "deadbeef";
+        let username = "Robert";
+        let password = "Paulson";
+        let privateKey = "abcdef";
+        let result: Promise<string> = platform.exportKey(username, password, address);
+        let resultobj = {
+            "privateKey": privateKey
+        };
+        let payload:object = {
+            "result": resultobj
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(privateKey);
+    });
+
+    test("importPrivateKey", async ()=> {
+
+        let address = "deadbeef";
+        let username = "Robert";
+        let password = "Paulson";
+        let privateKey;
+        let result: Promise<string> = platform.importKey(username, password, privateKey);
+        let resultobj = {
+            "address": address
+        };
+        let payload:object = {
+            "result": resultobj
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe(address);
+    });
 
     test("listAccounts", async ()=>{
 

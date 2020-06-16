@@ -40,6 +40,24 @@ describe("Admin", () => {
         expect(response).toBe("abcd");
     });
 
+    test("getNodeVersion", async ()=>{
+        let result:Promise<string> = admin.getNodeVersion();
+        let payload:object = {
+            "result": {
+                "version": "avalanche/0.5.5"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("avalanche/0.5.5");
+    });
+
     test("alias", async ()=>{
         let ep:string = "/ext/something";
         let al:string = "/ext/anotherthing";
@@ -114,6 +132,24 @@ describe("Admin", () => {
 
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe("What is my purpose? You pass butter. Oh my god.");
+    });
+
+    test("getNetworkName", async ()=>{
+        let result:Promise<string> = admin.getNetworkName();
+        let payload:object = {
+            "result": {
+                "networkName": "denali"
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
+
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
+
+        expect(mockAxios.request).toHaveBeenCalledTimes(1);
+        expect(response).toBe("denali");
     });
 
     test("lockProfile", async ()=>{
