@@ -419,10 +419,10 @@ class AVMAPI extends JRPCAPI{
      * 
      * @param username The Keystore user that controls the P-Chain account specified in `to`
      * @param password The password of the Keystore user
-     * @param to The acount on the P-Chain to send the AVA to. Do not include P- in the address
+     * @param to The account on the P-Chain to send the AVA to. Do not include P- in the address
      * @param amount Amount of AVA to export as a {@link https://github.com/indutny/bn.js/|BN}
      * 
-     * @returns Promise for an unsigned transaction to be signed by the account the the AVA is sent from and pays the transaction fee.
+     * @returns String representing the transaction id
      */
     exportAVA = async (username: string, password:string, to:string, amount:BN):Promise<string> => {
         let params = {
@@ -445,7 +445,7 @@ class AVMAPI extends JRPCAPI{
      * @param username The Keystore user that controls the address specified in `to`
      * @param password The password of the Keystore user
      * 
-     * @returns Promise for a string for the transaction, which should be sent to the network by calling issueTx.
+     * @returns String representing the transaction id
      */
     importAVA = async (username: string, password:string, to:string):Promise<string> => {
         let params = {
