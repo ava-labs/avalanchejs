@@ -4,12 +4,17 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput } from './outputs';
+import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput } from './outputs';
 import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
-import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx } from './tx';
+import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, Tx } from './tx';
 import { SecpInput, Input, TransferableInput } from './inputs';
 import { textChangeRangeIsUnchanged } from "typescript";
-import { Operation, NFTTransferOperation, TransferableOperation } from './ops';
+import { Operation, NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
+
+interface MinterSet {
+    threshold:number
+    minters:Array<Buffer>
+}
 
 /**
  * @ignore
@@ -521,13 +526,14 @@ export class UTXOSet {
 
     /**
      * Creates an unsigned transaction. For more granular control, you may create your own
-     * [[TxCreateAsset]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
+     * [[CreateAssetTX]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param avaAssetId The AVA Asset ID
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feeSenderAddresses The addresses to send the fees
-     * @param initialState The [[InitialStates]]that represent the intial state of a created asset
+     * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
@@ -548,6 +554,118 @@ export class UTXOSet {
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, denomination, initialState);
         return new UnsignedTx(CAtx);
+    }
+
+    /**
+     * Creates an unsigned transaction. For more granular control, you may create your own
+     * [[CreateAssetTX]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
+     * 
+     * @param networkid The number representing NetworkID of the node
+     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param avaAssetId The AVA Asset ID
+     * @param fee The amount of AVA to be paid for fees, in $nAVA
+     * @param feeSenderAddresses The addresses to send the fees
+     * @param initialState Any [[InitialStates]] to add to the transaction
+     * @param mintersSets The minters and thresholds required to mint this nft asset
+     * @param name String for the descriptive name of the nft asset
+     * @param symbol String for the ticker symbol of the nft asset
+     * 
+     * @returns An unsigned transaction created from the passed in parameters.
+     * 
+     */
+    makeCreateNFTAssetTx = (
+        networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
+        fee:BN, feeSenderAddresses:Array<Buffer>, 
+        initialState:InitialStates, 
+        mintersSets: MinterSet[],
+        name:string, symbol:string
+    ):UnsignedTx => {
+        let utx:UnsignedTx = this.makeBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
+        let ins:Array<TransferableInput> = utx.getTransaction().getIns();
+        let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
+        mintersSets.forEach((minterSet:MinterSet, index:number) => {
+          let nftMintOutput:NFTMintOutput = new NFTMintOutput(
+            index, 
+            minterSet.threshold, 
+            minterSet.minters
+           );
+          initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
+        });
+        let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, 0, initialState);
+        return new UnsignedTx(CAtx);
+    }
+
+    makeCreateNFTMintTx = async (
+        networkid:number = undefined, 
+        blockchainid:Buffer = undefined,
+        groupID:number = undefined, 
+        bytestring:Buffer = undefined, 
+        svg:Buffer = undefined,
+        url:string = undefined,
+        threshold:number = undefined, 
+        utxoids:Array<string> = undefined,
+        addresses:Array<Buffer> = undefined
+    ): Promise<any> => {
+        // * 1 byte - version (255 will mean version field is 2 bytes)
+        // * 1 byte - type (inline or external)
+        //   * 0x00 uniterpreted bytestring
+        //   * 0x01 inline svg
+        //   * 0x02 ascii url
+        if(threshold > addresses.length) {
+            // TODO error handling
+          }
+  
+          let version:number = 0;
+          let type:number = 0;
+          let bytes:Buffer;
+          if(bytestring instanceof Buffer) {
+              if(svg instanceof Buffer || url !== 'undefined') {
+                // TODO error handling
+              }
+              type = 0;
+              bytes = bytestring;
+          }   
+  
+          if(svg instanceof Buffer) {
+              if(bytestring instanceof Buffer || url !== 'undefined') {
+                // TODO error handling
+              }
+              type = 1;
+              bytes = svg;
+          }   
+  
+          if(url !== 'undefined') {
+              if(bytestring instanceof Buffer || svg instanceof Buffer) {
+                // TODO error handling
+              }
+              type = 2;
+              bytes = Buffer.from(url);
+          }   
+  
+          let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
+          let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, threshold, addresses);
+          addresses.forEach((address, index:number) => {
+            // TODO - Confirm address order is the same as minters set address order
+            nftMintOperation.addSignatureIdx(index, addresses[index]);
+          })
+  
+          let ins:TransferableInput[] = [];
+          let outs:TransferableOutput[] = [];
+          let ops:TransferableOperation[] = [];
+  
+          let assetIDs:Array<Buffer> = this.getAssetIDs();
+
+          let transferableOperation:TransferableOperation = new TransferableOperation(assetIDs[0], utxoids, nftMintOperation);
+  
+          ops.push(transferableOperation);
+          let operationTx:OperationTx = new OperationTx(
+            networkid, 
+            blockchainid, 
+            outs, 
+            ins, 
+            ops
+          )
+          return new UnsignedTx(operationTx);
     }
 
     /**

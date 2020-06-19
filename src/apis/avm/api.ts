@@ -2,15 +2,18 @@
  * @module AVMAPI
  */
 import SlopesCore from '../../slopes';
-import BN from "bn.js";
+import BN, { max } from "bn.js";
 import BinTools from '../../utils/bintools';
 import { Buffer } from "buffer/";
 
 import { JRPCAPI, RequestResponseData, Defaults } from "../../utils/types";
-import { UTXOSet } from './utxos';
+import { UTXOSet, UTXO } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
-import { Tx, UnsignedTx, CreateAssetTx } from './tx';
+import { Tx, UnsignedTx, CreateAssetTx, OperationTx } from './tx';
+import { NFTMintOutput, TransferableOutput } from './outputs';
+import { TransferableInput } from './inputs';
+import { NFTMintOperation, TransferableOperation } from './ops';
 
 
 /**
@@ -692,6 +695,72 @@ class AVMAPI extends JRPCAPI{
         return utxoset.makeCreateAssetTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             fee, creators, initialStates, name, symbol, denomination
+        );
+    }
+        
+    makeCreateNFTAssetTx = async (
+        utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
+        initialStates:InitialStates, name:string, symbol:string,
+        mintersSet: {
+            threshold: number
+            minters:Array<string>|Array<Buffer>
+        }[]
+    ): Promise<UnsignedTx> => {
+        let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "makeCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+        let mappedMintersSet: {
+            threshold: number;
+            minters: Buffer[];
+        }[] = mintersSet.map((set:{
+            threshold: number
+            minters:Array<string>|Array<Buffer>
+          }, indx:number) => {
+          return {
+            threshold: set.threshold,
+            minters: this._cleanAddressArray(set.minters, "makeCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
+          }
+        });
+        
+        /* istanbul ignore next */
+        if(name.length > AVMConstants.ASSETNAMELEN) {
+            /* istanbul ignore next */
+            throw new Error("Error - AVMAPI.makeCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+        }
+        /* istanbul ignore next */
+        if(symbol.length > AVMConstants.SYMBOLMAXLEN){
+            /* istanbul ignore next */
+            throw new Error("Error - AVMAPI.makeCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+        }
+        let avaAssetID:Buffer = await this.getAVAAssetID();
+        return utxoset.makeCreateNFTAssetTx(
+            this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
+            fee, creators, initialStates,
+            mappedMintersSet, name, symbol
+        );
+    }
+
+    makeCreateNFTMintTx = async (
+        utxoset:UTXOSet = undefined,
+        utxoid:string | Array<string>,
+        groupID:number = undefined, 
+        bytestring:Buffer = undefined, 
+        svg:Buffer = undefined,
+        url: string = undefined,
+        threshold: number = undefined, 
+        addresses:Array<Buffer> = undefined
+    ): Promise<any> => {
+        if(typeof utxoid === 'string') {
+            utxoid = [utxoid];
+        }
+        return utxoset.makeCreateNFTMintTx(
+            this.core.getNetworkID(),
+            bintools.avaDeserialize(this.blockchainID),
+            groupID,
+            bytestring,
+            svg,
+            url,
+            threshold,
+            utxoid,
+            addresses
         );
     }
 

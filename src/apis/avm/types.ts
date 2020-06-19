@@ -246,7 +246,7 @@ export class AVMConstants {
     static NFTXFEROUTPUTID:number = 11;
 
     static SECPINPUTID:number = 5;
-    static NFTMINTINPUTID:number = 10;
+    static NFTMINTOPID:number = 12;
     static NFTXFEROP:number = 13;
 
     static BASETX:number = 0;
@@ -254,7 +254,7 @@ export class AVMConstants {
     static OPERATIONTX:number = 2;
 
     static SECPCREDENTIAL:number = 9;
-    static NFTCREDENTIAL:number = 16;
+    static NFTCREDENTIAL:number = 14;
 
     static ASSETIDLEN:number = 32;
     static BLOCKCHAINIDLEN:number = 32;

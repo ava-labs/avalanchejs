@@ -3,8 +3,9 @@
  */
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
-import { UTXOID, AVMConstants, SigIdx } from './types';
+import { UTXOID, AVMConstants, SigIdx, UnixNow } from './types';
 import { NFTTransferOutput, SelectOutputClass } from './outputs';
+import BN from "bn.js";
 
 const bintools = BinTools.getInstance();
 
@@ -104,7 +105,6 @@ export abstract class Operation {
     }
 
     constructor(){}
-
 }
 
 /**
@@ -193,6 +193,132 @@ export class TransferableOperation {
                 }
                 this.utxoIDs.push(utxoid);
             }
+        }
+    }
+}
+
+/**
+ * A [[Operation]] class which specifies a NFT Mint Op.
+ */
+export class NFTMintOperation extends Operation {
+    protected groupID:Buffer = Buffer.alloc(4);
+    protected payload:Buffer;
+    protected threshold:Buffer = Buffer.alloc(4);
+    protected addresses:Array<Buffer> = [];
+
+    /**
+     * Returns the operation ID.
+     */
+    getOperationID():number {
+        return AVMConstants.NFTMINTOPID;
+    }
+
+    /**
+     * Returns the payload.
+     */
+    getPayload = ():Buffer => {
+        return this.payload;
+    }
+
+    /**
+     * Returns the outputs.
+     */
+    getAddresses = ():Array<Buffer> => {
+        return this.addresses;
+    }
+
+    /**
+     * Returns the threshold of signers required to spend this output.
+     */
+    getThreshold = ():number => {
+        return this.threshold.readUInt32BE(0);
+    }
+
+    /**
+     * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
+     */
+    meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
+        // let now:BN;
+        // if(typeof asOf === 'undefined'){
+        //     now = UnixNow();
+        // } else {
+        //     now = asOf;
+        // }
+        // let qualified:Array<Buffer> = this.getSpenders(addresses, now);
+        // let threshold:number = this.threshold.readUInt32BE(0);
+        // if(qualified.length >= threshold){
+        //     return true;
+        // }
+
+        return false;
+    }
+
+    /**
+     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the size of the output.
+     */
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(bytes, offset);
+        return new NFTMintOperation().fromBuffer(bytes, offset);
+    }
+
+    /**
+     * Returns the buffer representing the [[NFTMintOperation]] instance.
+     */
+    toBuffer():Buffer {
+        let superbuff:Buffer = super.toBuffer();
+        let payloadlen:Buffer = Buffer.alloc(4);
+        payloadlen.writeUInt32BE(this.payload.length, 0);
+        let outputlen:Buffer = Buffer.alloc(4);
+        outputlen.writeUInt32BE(this.addresses.length, 0);
+        let bsize:number = 
+          superbuff.length + 
+          this.groupID.length + 
+          payloadlen.length + 
+          this.payload.length +
+          this.threshold.length +
+          outputlen.length + 
+          this.threshold.length +
+          this.addresses[0].length;
+        let barr:Array<Buffer> = [
+            superbuff, 
+            this.groupID,
+            payloadlen,
+            this.payload, 
+            this.threshold,
+            outputlen,
+            this.threshold,
+            this.addresses[0]
+        ];
+        return Buffer.concat(barr,bsize);
+    }
+
+    /**
+     * Returns a base-58 string representing the [[NFTMintOperation]].
+     */
+    toString():string {
+        return bintools.bufferToB58(this.toBuffer());
+    }
+
+    /**
+     * An [[Operation]] class which contains an NFT on an assetID.
+     * 
+     * @param groupID The group to which to issue the NFT Output
+     * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
+     * @param threshold The threshold needed to spend the output
+     * @param addresses The addresses to receive the NFT Output
+     */
+    constructor(groupID: number = undefined, payload:Buffer = undefined, threshold:number = undefined, addresses:Array<string>|Array<Buffer> = undefined){
+        super()
+        if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && typeof threshold !== 'undefined' && typeof addresses !== 'undefined'){
+            this.groupID.writeUInt32BE((groupID ? groupID : 0), 0);
+            this.payload = payload;
+            addresses.forEach((address:Buffer|string) => {
+              if(typeof address === 'string'){
+                address = Buffer.from(address);
+              }
+              this.addresses.push(address)
+            })
+            this.threshold.writeUInt32BE((threshold ? threshold : 1), 0);
         }
     }
 }
