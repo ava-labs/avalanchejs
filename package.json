@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "9.9.9",
+  "version": "0.9.9",
   "description": "AVA Platform JS Library",
   "main": "typings/src/index.js",
   "types": "typings/src/index.d.ts",
