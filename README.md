@@ -2,7 +2,7 @@
 
 ## Overview
 
-Avalanche is a JavaScript Library for interfacing with the AVA Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche library allows one to issue commands to the AVA node APIs.
+Avalanche.js is a JavaScript Library for interfacing with the AVA Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche.js library allows one to issue commands to the AVA node APIs.
 
 The APIs currently supported by default are:
 
@@ -13,9 +13,9 @@ The APIs currently supported by default are:
 
 ## Getting Started
 
-We built Avalanche with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/).
+We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/).
 
-Using Avalanche, developers are able to:
+Using Avalanche.js, developers are able to:
 
 * Locally manage private keys
 * Retrieve balances on addresses
@@ -26,13 +26,13 @@ Using Avalanche, developers are able to:
 * Administer a local node
 * Retrieve AVA network information from a node
 
-The entirety of the Avalanche documentation can be found on our [Avalanche documentation page](https://docs.ava.network/v1.0/en/tools/avalanche/).
+The entirety of the Avalanche.js documentation can be found on our [Avalanche.js documentation page](https://docs.ava.network/v1.0/en/tools/avalanche.js/).
 
 ### Requirements
 
-Avalanche requires Node.js LTS version 12.13.1 or higher to compile.
+Avalanche.js requires Node.js LTS version 12.13.1 or higher to compile.
 
-Avalanche depends on the following two Node.js modules internally, and we suggest that your project uses them as well:
+Avalanche.js depends on the following two Node.js modules internally, and we suggest that your project uses them as well:
 
 * Buffer: Enables Node.js's Buffer library in the browser.
   * [https://github.com/feross/buffer](https://github.com/feross/buffer)
@@ -41,11 +41,11 @@ Avalanche depends on the following two Node.js modules internally, and we sugges
   * [https://github.com/indutny/bn.js](https://github.com/indutny/bn.js)
   * `npm install --save bn.js`
 
-Both of the above modules are extremely useful when interacting with Avalanche as they are the input and output types of many base classes in the library.
+Both of the above modules are extremely useful when interacting with Avalanche.js as they are the input and output types of many base classes in the library.
 
 ### Installation
 
-Avalanche is available for install via `npm`:
+Avalanche.js is available for install via `npm`:
 
 `npm install --save avalanche`
 
@@ -53,9 +53,9 @@ You can also pull the repo down directly and build it from scratch:
 
 `npm run build`
 
-This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.
+This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.js.
 
-The Avalanche library can be imported into your existing Node.js project as follows:
+The Avalanche.js library can be imported into your existing Node.js project as follows:
 
 ```js
 const avalanche = require("avalanche");
@@ -80,18 +80,18 @@ let bintools = avalanche.BinTools.getInstance();
 The above lines import the libraries used in the below example:
   
 * avalanche: Our javascript module.
-* bn.js: A bignumber module use by Avalanche.
+* bn.js: A bignumber module use by Avalanche.js.
 * buffer: A Buffer library.
-* BinTools: A singleton built into Avalanche that is used for dealing with binary data.
+* BinTools: A singleton built into Avalanche.js that is used for dealing with binary data.
 
 ## Example 1 &mdash; Managing AVM Keys
 
-Avalanche comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Avalanche connected to our AVA Platform endpoint of choice.
+Avalanche.js comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
 let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche
+let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 ### Accessing the keychain
@@ -164,17 +164,17 @@ let isValid = keypair.verify(message, signature); //returns a boolean
 
 ## Example 2 &mdash; Creating An Asset
 
-This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Avalanche connected to our AVA Platform endpoint of choice.
+This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
 let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche
+let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 ### Describe the new asset
 
-The first steps in creating a new asset using Avalanche is to determine the qualties of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
+The first steps in creating a new asset using Avalanche.js is to determine the qualties of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
 
 ```js
 // The fee to pay for the asset, we assume this network is fee-less
@@ -231,7 +231,7 @@ let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it!
 
-Using the Avalanche AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the Avalanche.js AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
@@ -272,12 +272,12 @@ The AVM uses the TxID of the transaction which created the asset as the unique i
 
 ## Example 3 &mdash; Sending An Asset
 
-This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Avalanche connected to our AVA Platform endpoint of choice.
+This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
 let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche
+let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
