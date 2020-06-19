@@ -1,4 +1,5 @@
 /**
+ * @packageDocumentation
  * @module Avalanche
  */
 import AvalancheCore from './avalanche';
@@ -10,8 +11,6 @@ import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
-import { Credential } from './apis/avm/credentials';
-import { SelectOperationClass } from './apis/avm/ops';
 import HealthAPI from "./apis/health/api";
 
 /**

@@ -1,5 +1,6 @@
 /**
- * @module AVMAPI
+ * @packageDocumentation
+ * @module AVMAPI-KeyChain
  */
 import {Buffer} from "buffer/";
 import * as elliptic from "elliptic";

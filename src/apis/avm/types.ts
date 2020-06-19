@@ -1,5 +1,6 @@
 /**
- * @module AVMAPI
+ * @packageDocumentation
+ * @module AVMAPI-Types
  */
 import {Buffer} from "buffer/";
 import BN from "bn.js";

@@ -1,5 +1,6 @@
 /**
- * @module Utils
+ * @packageDocumentation
+ * @module Utils-Types
  */
 import AvalancheCore from '../avalanche';
 import { Buffer } from "buffer/";

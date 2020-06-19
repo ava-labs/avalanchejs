@@ -1,4 +1,5 @@
 /**
+ * @packageDocumentation
  * @module AdminAPI
  */
 import AvalancheCore from '../../avalanche';

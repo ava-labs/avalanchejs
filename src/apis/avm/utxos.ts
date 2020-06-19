@@ -1,5 +1,6 @@
 /**
- * @module AVMAPI
+ * @packageDocumentation
+ * @module AVMAPI-UTXOs
  */
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';

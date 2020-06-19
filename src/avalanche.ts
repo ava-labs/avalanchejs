@@ -1,4 +1,5 @@
 /**
+ * @packageDocumentation
  * @module AvalancheCore
  */
 import { APIBase, RequestResponseData } from './utils/types';

@@ -1,4 +1,5 @@
 /**
+ * @packageDocumentation
  * @module HealthAPI
  */
 import AvalancheCore from '../../avalanche';

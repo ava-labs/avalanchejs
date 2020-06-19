@@ -1,4 +1,5 @@
 /**
+ * @packageDocumentation
  * @module AVMAPI
  */
 import AvalancheCore from '../../avalanche';
