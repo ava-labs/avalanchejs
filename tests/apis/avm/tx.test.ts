@@ -135,7 +135,7 @@ describe('Transactions', () => {
 
     test('Creation UnsignedTx Check Amount', () => {
         expect(() => {
-            set.makeBaseTx(
+            set.buildBaseTx(
                 netid, blockchainID,
                 new BN(amnt * 1000), 
                 addrs3, addrs1, addrs1, assetID
@@ -208,7 +208,7 @@ describe('Transactions', () => {
     });
 
     test('Creation Tx1 with asof, locktime, threshold', () => {
-        let txu:UnsignedTx = set.makeBaseTx(
+        let txu:UnsignedTx = set.buildBaseTx(
             netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID, 
@@ -222,7 +222,7 @@ describe('Transactions', () => {
         expect(tx2.toString()).toBe(tx.toString());
     });
     test('Creation Tx2 without asof, locktime, threshold', () => {
-        let txu:UnsignedTx = set.makeBaseTx(
+        let txu:UnsignedTx = set.buildBaseTx(
             netid, blockchainID,
             new BN(9000), 
             addrs3, addrs1, addrs1, assetID
@@ -235,7 +235,7 @@ describe('Transactions', () => {
     });
 
     test('Creation Tx3 using OperationTx', () => {
-        let txu:UnsignedTx = set.makeNFTTransferTx(
+        let txu:UnsignedTx = set.buildNFTTransferTx(
             netid, blockchainID, assetID, new BN(90), 
             addrs1, addresses, addresses, nftutxoids,
             UnixNow(), UnixNow().add(new BN(50)), 1

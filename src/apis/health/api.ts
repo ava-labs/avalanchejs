@@ -1,7 +1,7 @@
 /**
  * @module HealthAPI
  */
-import SlopesCore from '../../slopes';
+import AvalancheCore from '../../avalanche';
 import {JRPCAPI, RequestResponseData} from "../../utils/types"
 
 /**
@@ -9,7 +9,7 @@ import {JRPCAPI, RequestResponseData} from "../../utils/types"
  *
  * @category RPCAPIs
  * 
- * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Slopes.addAPI]] function to register this interface with Slopes.
+ * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */ 
 class HealthAPI extends JRPCAPI{
 
@@ -24,12 +24,12 @@ class HealthAPI extends JRPCAPI{
     }
 
     /**
-     * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
+     * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
      * 
-     * @param core A reference to the Slopes class
+     * @param core A reference to the Avalanche class
      * @param baseurl Defaults to the string "/ext/health" as the path to blockchain's baseurl
      */
-    constructor(core:SlopesCore, baseurl:string = "/ext/health"){ super(core, baseurl); }
+    constructor(core:AvalancheCore, baseurl:string = "/ext/health"){ super(core, baseurl); }
 }
 
 export default HealthAPI;

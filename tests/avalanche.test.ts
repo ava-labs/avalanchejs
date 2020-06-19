@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios';
-import { Slopes } from "src";
+import { Avalanche } from "src";
 import AVMAPI  from "src/apis/avm/api";
 import AdminAPI  from "src/apis/admin/api";
 import PlatformAPI  from "src/apis/platform/api";
@@ -9,61 +9,61 @@ import { AxiosRequestConfig } from 'axios';
 
 
 
-describe('Slopes', () => {
+describe('Avalanche', () => {
     const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF";
     const ip = '127.0.0.1';
     const port = 9650;
     const protocol = "https";
-    let slopes:Slopes;
+    let avalanche:Avalanche;
     beforeAll(() => {
-        slopes = new Slopes(ip,port,protocol, 12345, undefined, true);
-        slopes.addAPI("admin", AdminAPI);
-        slopes.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
-        slopes.addAPI("keystore", KeystoreAPI);
-        slopes.addAPI("platform", PlatformAPI);
+        avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
+        avalanche.addAPI("admin", AdminAPI);
+        avalanche.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
+        avalanche.addAPI("keystore", KeystoreAPI);
+        avalanche.addAPI("platform", PlatformAPI);
     });
     test('Can initialize', () => {
-        expect(slopes.getIP()).toBe(ip);
-        expect(slopes.getPort()).toBe(port);
-        expect(slopes.getProtocol()).toBe(protocol);
-        expect(slopes.getURL()).toBe(`${protocol}://${ip}:${port}`);
-        expect(slopes.getNetworkID()).toBe(12345);
-        slopes.setNetworkID(50);
-        expect(slopes.getNetworkID()).toBe(50);
-        slopes.setNetworkID(12345);
-        expect(slopes.getNetworkID()).toBe(12345);
+        expect(avalanche.getIP()).toBe(ip);
+        expect(avalanche.getPort()).toBe(port);
+        expect(avalanche.getProtocol()).toBe(protocol);
+        expect(avalanche.getURL()).toBe(`${protocol}://${ip}:${port}`);
+        expect(avalanche.getNetworkID()).toBe(12345);
+        avalanche.setNetworkID(50);
+        expect(avalanche.getNetworkID()).toBe(50);
+        avalanche.setNetworkID(12345);
+        expect(avalanche.getNetworkID()).toBe(12345);
     });
 
     test('Endpoints correct', () => {
-        expect(slopes.Admin()).not.toBeInstanceOf(AVMAPI);
-        expect(slopes.Admin()).toBeInstanceOf(AdminAPI);
+        expect(avalanche.Admin()).not.toBeInstanceOf(AVMAPI);
+        expect(avalanche.Admin()).toBeInstanceOf(AdminAPI);
         
-        expect(slopes.AVM()).not.toBeInstanceOf(AdminAPI);
-        expect(slopes.AVM()).toBeInstanceOf(AVMAPI);
+        expect(avalanche.AVM()).not.toBeInstanceOf(AdminAPI);
+        expect(avalanche.AVM()).toBeInstanceOf(AVMAPI);
         
-        expect(slopes.Platform()).not.toBeInstanceOf(KeystoreAPI);
-        expect(slopes.Platform()).toBeInstanceOf(PlatformAPI);
+        expect(avalanche.Platform()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Platform()).toBeInstanceOf(PlatformAPI);
 
-        expect(slopes.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
-        expect(slopes.NodeKeys()).toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
+        expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
 
-        expect(slopes.Admin().getRPCID()).toBe(1);
-        expect(slopes.AVM().getRPCID()).toBe(1);
-        expect(slopes.Platform().getRPCID()).toBe(1);
-        expect(slopes.NodeKeys().getRPCID()).toBe(1);
+        expect(avalanche.Admin().getRPCID()).toBe(1);
+        expect(avalanche.AVM().getRPCID()).toBe(1);
+        expect(avalanche.Platform().getRPCID()).toBe(1);
+        expect(avalanche.NodeKeys().getRPCID()).toBe(1);
     });
 
     test('Create new API', () => {
-        slopes.addAPI("avm2", AVMAPI);
-        expect(slopes.api("avm2")).toBeInstanceOf(AVMAPI);
+        avalanche.addAPI("avm2", AVMAPI);
+        expect(avalanche.api("avm2")).toBeInstanceOf(AVMAPI);
 
-        slopes.addAPI("keystore2", KeystoreAPI, "/ext/keystore2");
-        expect(slopes.api("keystore2")).toBeInstanceOf(KeystoreAPI);
+        avalanche.addAPI("keystore2", KeystoreAPI, "/ext/keystore2");
+        expect(avalanche.api("keystore2")).toBeInstanceOf(KeystoreAPI);
 
-        slopes.api("keystore2").setBaseURL("/ext/keystore3");
-        expect(slopes.api("keystore2").getBaseURL()).toBe("/ext/keystore3");
+        avalanche.api("keystore2").setBaseURL("/ext/keystore3");
+        expect(avalanche.api("keystore2").getBaseURL()).toBe("/ext/keystore3");
 
-        expect(slopes.api("keystore2").getDB()).toHaveProperty("namespace");
+        expect(avalanche.api("keystore2").getDB()).toHaveProperty("namespace");
     });
 
 });
@@ -73,10 +73,10 @@ describe('HTTP Operations', () => {
     const port = 8080;
     const protocol = "http";
     const path = "/ext/testingrequests";
-    let slopes:Slopes;
+    let avalanche:Avalanche;
     beforeAll(() => {
-        slopes = new Slopes(ip,port, protocol, 12345, undefined, true);
-        slopes.addAPI("testingrequests", TestAPI, path);
+        avalanche = new Avalanche(ip,port, protocol, 12345, undefined, true);
+        avalanche.addAPI("testingrequests", TestAPI, path);
     });
 
     afterEach(() => {
@@ -85,7 +85,7 @@ describe('HTTP Operations', () => {
 
     test('GET works', async () => {
         let input:string = "TestGET";
-        let api:TestAPI = slopes.api("testingrequests");
+        let api:TestAPI = avalanche.api("testingrequests");
         let result:Promise<object> = api.TestGET(input, `/${input}`);
         let payload:object = {
             "result": {
@@ -103,7 +103,7 @@ describe('HTTP Operations', () => {
 
     test('DELETE works', async () => {
         let input:string = "TestDELETE";
-        let api:TestAPI = slopes.api("testingrequests");
+        let api:TestAPI = avalanche.api("testingrequests");
         let axiosConfig:AxiosRequestConfig = {
             baseURL:`${protocol}://${ip}:${port}`,
             responseType: 'text'
@@ -125,7 +125,7 @@ describe('HTTP Operations', () => {
 
     test('POST works', async () => {
         let input:string = "TestPOST";
-        let api:TestAPI = slopes.api("testingrequests");
+        let api:TestAPI = avalanche.api("testingrequests");
         let result:Promise<object> = api.TestPOST(input, `/${input}`);
         let payload:object = {
             "result": {
@@ -143,7 +143,7 @@ describe('HTTP Operations', () => {
 
     test('PUT works', async () => {
         let input:string = "TestPUT";
-        let api:TestAPI = slopes.api("testingrequests");
+        let api:TestAPI = avalanche.api("testingrequests");
         let result:Promise<object> = api.TestPUT(input, `/${input}`);
         let payload:object = {
             "result": {
@@ -161,7 +161,7 @@ describe('HTTP Operations', () => {
 
     test('PATCH works', async () => {
         let input:string = "TestPATCH";
-        let api:TestAPI = slopes.api("testingrequests");
+        let api:TestAPI = avalanche.api("testingrequests");
         let result:Promise<object> = api.TestPATCH(input, `/${input}`);
         let payload:object = {
             "result": {

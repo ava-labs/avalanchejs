@@ -1,6 +1,6 @@
 {
-  "name": "slopes",
-  "version": "1.7.5",
+  "name": "avalanche",
+  "version": "9.9.9",
   "description": "AVA Platform JS Library",
   "main": "typings/src/index.js",
   "types": "typings/src/index.d.ts",
@@ -16,15 +16,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ava-labs/slopes.git"
+    "url": "git+https://github.com/ava-labs/avalanche.js.git"
   },
   "keywords": [],
   "author": "",
   "license": "BSD-3-Clause",
   "bugs": {
-    "url": "https://github.com/ava-labs/slopes/issues"
+    "url": "https://github.com/ava-labs/avalanche.js/issues"
   },
-  "homepage": "https://github.com/ava-labs/slopes#readme",
+  "homepage": "https://github.com/ava-labs/avalanche.js#readme",
   "devDependencies": {
     "@types/bn.js": "^4.11.6",
     "@types/create-hash": "^1.2.2",

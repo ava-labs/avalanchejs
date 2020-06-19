@@ -1,16 +1,15 @@
 /**
  * @module AVMAPI
  */
-import SlopesCore from '../../slopes';
+import AvalancheCore from '../../avalanche';
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
 import { Buffer } from "buffer/";
-
 import { JRPCAPI, RequestResponseData, Defaults } from "../../utils/types";
 import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
-import { Tx, UnsignedTx, CreateAssetTx } from './tx';
+import { Tx, UnsignedTx } from './tx';
 
 
 /**
@@ -76,7 +75,7 @@ export class PersistanceOptions {
  * 
  * @category RPCAPIs
  * 
- * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Slopes.addAPI]] function to register this interface with Slopes.
+ * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */ 
 class AVMAPI extends JRPCAPI{
 
@@ -595,20 +594,20 @@ class AVMAPI extends JRPCAPI{
      * @remarks
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
-    makeBaseTx = async (
+    buildBaseTx = async (
         utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>, 
         changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeBaseTx").map(a => bintools.stringToAddress(a));;
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeBaseTx").map(a => bintools.stringToAddress(a));;
-        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "makeBaseTx").map(a => bintools.stringToAddress(a));;
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));;
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));;
+        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));;
 
         if(typeof assetID === "string"){
             assetID = bintools.avaDeserialize(assetID);
         } 
 
-        return utxoset.makeBaseTx(
+        return utxoset.buildBaseTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), 
             amount, to, from, change, 
             assetID, asOf, locktime, threshold
@@ -634,13 +633,13 @@ class AVMAPI extends JRPCAPI{
      * @remarks
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
-    makeNFTTransferTx = async (
+    buildNFTTransferTx = async (
         utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
         feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
-        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
 
         let avaAssetID:Buffer = await this.getAVAAssetID();
         let utxoidArray:Array<string> = [];
@@ -650,7 +649,7 @@ class AVMAPI extends JRPCAPI{
             utxoidArray = utxoid;
         }
 
-        return utxoset.makeNFTTransferTx(
+        return utxoset.buildNFTTransferTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold
         );
@@ -672,24 +671,24 @@ class AVMAPI extends JRPCAPI{
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
      * 
      */
-    makeCreateAssetTx = async (
+    buildCreateAssetTx = async (
         utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
         initialStates:InitialStates, name:string, 
         symbol:string, denomination:number
     ):Promise<UnsignedTx> => {
-        let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "makeCreateAssetTx").map(a => bintools.stringToAddress(a));
+        let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
         /* istanbul ignore next */
         if(symbol.length > AVMConstants.SYMBOLMAXLEN){
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.makeCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+            throw new Error("Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
         }
         /* istanbul ignore next */
         if(name.length > AVMConstants.ASSETNAMELEN) {
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.makeCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+            throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
         }
         let avaAssetID:Buffer = await this.getAVAAssetID();
-        return utxoset.makeCreateAssetTx(
+        return utxoset.buildCreateAssetTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             fee, creators, initialStates, name, symbol, denomination
         );
@@ -822,12 +821,12 @@ class AVMAPI extends JRPCAPI{
     }
 
     /**
-     * This class should not be instantiated directly. Instead use the [[Slopes.addAPI]] method.
+     * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
      * 
-     * @param core A reference to the Slopes class
+     * @param core A reference to the Avalanche class
      * @param baseurl Defaults to the string "/ext/bc/avm" as the path to blockchain's baseurl
      */
-    constructor(core:SlopesCore, baseurl:string = "/ext/bc/avm", blockchainID:string = ""){ 
+    constructor(core:AvalancheCore, baseurl:string = "/ext/bc/avm", blockchainID:string = ""){ 
         super(core, baseurl);
         this.blockchainID = blockchainID
         let netid:number = core.getNetworkID();

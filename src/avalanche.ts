@@ -1,20 +1,20 @@
 /**
- * @module SlopesCore
+ * @module AvalancheCore
  */
 import { APIBase, RequestResponseData } from './utils/types';
 import axios from 'axios';
 import { AxiosRequestConfig, AxiosResponse, Method } from "axios";
 
 /**
- * SlopesCore is middleware for interacting with AVA node RPC APIs. 
+ * AvalancheCore is middleware for interacting with AVA node RPC APIs. 
  * 
  * Example usage:
  * ```js
- * let slopes = new SlopesCore("127.0.0.1", 9650, "https");
+ * let avalanche = new AvalancheCore("127.0.0.1", 9650, "https");
  * ```
  * 
  */
-export default class SlopesCore {
+export default class AvalancheCore {
     protected networkID:number = 3;
     protected protocol:string;
     protected ip:string;
@@ -83,12 +83,12 @@ export default class SlopesCore {
      * 
      * In TypeScript:
      * ```js
-     * slopes.addAPI<MyVMClass>("mychain", MyVMClass, "/ext/bc/mychain");
+     * avalanche.addAPI<MyVMClass>("mychain", MyVMClass, "/ext/bc/mychain");
      * ```
      * 
      * In Javascript:
      * ```js
-     * slopes.addAPI("mychain", MyVMClass, "/ext/bc/mychain");
+     * avalanche.addAPI("mychain", MyVMClass, "/ext/bc/mychain");
      * ```
      * 
      * @typeparam GA Class of the API being added
@@ -97,7 +97,7 @@ export default class SlopesCore {
      * @param baseurl Path to resolve to reach the API
      * 
      */
-    addAPI = <GA extends APIBase>(apiName:string, constructorFN: new(ava:SlopesCore, baseurl?:string, ...args:Array<any>) => GA, baseurl:string = undefined, ...args:Array<any>) => {
+    addAPI = <GA extends APIBase>(apiName:string, constructorFN: new(ava:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA, baseurl:string = undefined, ...args:Array<any>) => {
         if(baseurl == undefined) {
             this.apis[apiName] = new constructorFN(this, undefined, ...args);
         } else {
@@ -224,7 +224,7 @@ export default class SlopesCore {
     }
     
     /**
-     * Creates a new Slopes instance. Sets the address and port of the main AVA Client.
+     * Creates a new Avalanche instance. Sets the address and port of the main AVA Client.
      * 
      * @param ip The hostname to resolve to reach the AVA Client APIs
      * @param port The port to resolve to reach the AVA Client APIs

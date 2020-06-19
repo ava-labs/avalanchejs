@@ -5,8 +5,6 @@ import {Buffer} from "buffer/";
 import * as elliptic from "elliptic";
 import BinTools from '../../utils/bintools';
 import { Tx, UnsignedTx } from './tx';
-import { Signature, SigIdx } from './types';
-import { SecpInput, TransferableInput } from './inputs';
 import createHash from "create-hash";
 import { KeyPair, KeyChain } from '../../utils/types';
 
@@ -191,7 +189,7 @@ export class AVMKeyPair extends KeyPair {
     }
 
     /**
-     * Class for representing a private and public keypair in Slopes. 
+     * Class for representing a private and public keypair in Avalanche. 
      */
     constructor(chainid:string, entropy:Buffer = undefined) {
         super(chainid);
@@ -201,7 +199,7 @@ export class AVMKeyPair extends KeyPair {
 }
 
 /**
- * Class for representing a key chain in Slopes. 
+ * Class for representing a key chain in Avalanche. 
  * 
  * @typeparam AVMKeyPair Class extending [[KeyPair]] which is used as the key in [[AVMKeyChain]]
  */

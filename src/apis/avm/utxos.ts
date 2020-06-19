@@ -4,12 +4,11 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput } from './outputs';
-import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
+import { Output, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput } from './outputs';
+import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx } from './tx';
-import { SecpInput, Input, TransferableInput } from './inputs';
-import { textChangeRangeIsUnchanged } from "typescript";
-import { Operation, NFTTransferOperation, TransferableOperation } from './ops';
+import { SecpInput, TransferableInput } from './inputs';
+import { NFTTransferOperation, TransferableOperation } from './ops';
 
 /**
  * @ignore
@@ -435,7 +434,7 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeBaseTx = (
+    buildBaseTx = (
             networkid:number, 
             blockchainid:Buffer, 
             amount:BN, 
@@ -457,7 +456,7 @@ export class UTXOSet {
         let ins:Array<TransferableInput> = [];
         if(!(SelectOutputClass(outputID) instanceof AmountOutput)){
             /* istanbul ignore next */
-            throw new Error("Error - UTXOSet.makeBaseTx: outputID does not implement AmountOutput: " + outputID);
+            throw new Error("Error - UTXOSet.buildBaseTx: outputID does not implement AmountOutput: " + outputID);
         }
 
         if(!amount.eq(zero)){
@@ -489,7 +488,7 @@ export class UTXOSet {
                         idx = output.getAddressIdx(spenders[j]);
                         if(idx == -1){
                             /* istanbul ignore next */
-                            throw new Error("Error - UTXOSet.makeBaseTx: no such address in output: " + spenders[j]);
+                            throw new Error("Error - UTXOSet.buildBaseTx: no such address in output: " + spenders[j]);
                         }
                         xferin.getInput().addSignatureIdx(idx, spenders[j]);
                     }
@@ -512,7 +511,7 @@ export class UTXOSet {
 
             if(spendamount.lt(amount)){
                 /* istanbul ignore next */
-                throw new Error("Error - UTXOSet.makeBaseTx: insufficient funds to create the transaction");
+                throw new Error("Error - UTXOSet.buildBaseTx: insufficient funds to create the transaction");
             }
         }
         let baseTx:BaseTx = new BaseTx(networkid, blockchainid, outs, ins);
@@ -535,15 +534,15 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeCreateAssetTx = (
+    buildCreateAssetTx = (
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
         fee:BN, feeSenderAddresses:Array<Buffer>, 
         initialState:InitialStates, name:string, 
         symbol:string, denomination:number
     ):UnsignedTx => {
-        // Cheating and using makeBaseTx to get Ins and Outs for fees.
+        // Cheating and using buildBaseTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the feeSenderAddresses
-        let utx:UnsignedTx = this.makeBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
+        let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, denomination, initialState);
@@ -568,15 +567,15 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    makeNFTTransferTx = (
+    buildNFTTransferTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
         utxoids:Array<string>, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
     ):UnsignedTx => {
-        // Cheating and using makeBaseTx to get Ins and Outs for fees.
+        // Cheating and using buildBaseTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
-        let utx:UnsignedTx = this.makeBaseTx(
+        let utx:UnsignedTx = this.buildBaseTx(
             networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID
         );
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
@@ -598,7 +597,7 @@ export class UTXOSet {
                 idx = out.getAddressIdx(spenders[j]);
                 if(idx == -1){
                     /* istanbul ignore next */
-                    throw new Error("Error - UTXOSet.makeNFTTransferTx: no such address in output: " + spenders[j]);
+                    throw new Error("Error - UTXOSet.buildNFTTransferTx: no such address in output: " + spenders[j]);
                 }
                 op.addSignatureIdx(idx, spenders[j]);
             }

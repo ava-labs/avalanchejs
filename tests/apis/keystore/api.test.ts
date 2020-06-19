@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import { Slopes } from "src";
+import { Avalanche } from "src";
 import KeystoreAPI from "src/apis/keystore/api";
 
 describe("Keystore", () => {
@@ -12,11 +12,11 @@ describe("Keystore", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes = new Slopes(ip,port,protocol, 12345, undefined, true);
+    let avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
     let keystore:KeystoreAPI;
 
     beforeAll(() => {
-        keystore = new KeystoreAPI(slopes);
+        keystore = new KeystoreAPI(avalanche);
     });
 
     afterEach(() => {
