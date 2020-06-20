@@ -637,14 +637,14 @@ class AVMAPI extends JRPCAPI{
      * @remarks
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
-    // makeNFTTransferTx = async (
-    //     utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-    //     feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
-    // ):Promise<UnsignedTx> => {
     buildNFTTransferTx = async (
         utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-        feeAddresses:Array<string>, threshold:number = 1
+        feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
+    // buildNFTTransferTx = async (
+    //     utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
+    //     feeAddresses:Array<string>, threshold:number = 1
+    // ):Promise<UnsignedTx> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
@@ -659,7 +659,7 @@ class AVMAPI extends JRPCAPI{
 
         return utxoset.buildNFTTransferTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
-            feeAmount, feeAddrs, to, from, utxoidArray, threshold
+            feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold
         );
     }
 

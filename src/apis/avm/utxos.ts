@@ -587,6 +587,7 @@ export class UTXOSet {
         mintersSets.forEach((minterSet:MinterSet, index:number) => {
           let nftMintOutput:NFTMintOutput = new NFTMintOutput(
             index, 
+            new BN(minterSet.threshold), 
             minterSet.threshold, 
             minterSet.minters
            );
@@ -685,17 +686,17 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    // buildNFTTransferTx = (
-    //     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
-    //     feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-    //     utxoids:Array<string>, asOf:BN = UnixNow(), 
-    //     locktime:BN = new BN(0), threshold:number = 1
-    // ):UnsignedTx => {
     buildNFTTransferTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, threshold:number = 1
+        utxoids:Array<string>, asOf:BN = UnixNow(), 
+        locktime:BN = new BN(0), threshold:number = 1
     ):UnsignedTx => {
+    // buildNFTTransferTx = (
+    //     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
+    //     feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
+    //     utxoids:Array<string>, threshold:number = 1
+    // ):UnsignedTx => {
         // Cheating and using buildBaseTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
         let utx:UnsignedTx = this.buildBaseTx(
@@ -709,15 +710,15 @@ export class UTXOSet {
             let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
             let groupID:number = out.getGroupID();
             let payload:Buffer = out.getPayload();
-            // let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
-            let spenders:Array<Buffer> = out.getSpenders(fromAddresses);
+            let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
+            // let spenders:Array<Buffer> = out.getSpenders(fromAddresses);
 
-            // let outbound:NFTTransferOutput = new NFTTransferOutput(
-            //     out.getGroupID(), out.getPayload(), locktime, threshold, toAddresses
-            // )
             let outbound:NFTTransferOutput = new NFTTransferOutput(
-                groupID, payload, threshold, toAddresses
+                out.getGroupID(), out.getPayload(), locktime, threshold, toAddresses
             )
+            // let outbound:NFTTransferOutput = new NFTTransferOutput(
+            //     groupID, payload, threshold, toAddresses
+            // )
             let op:NFTTransferOperation = new NFTTransferOperation(outbound);
 
             spenders.forEach((spender:Buffer, i:number) => {
