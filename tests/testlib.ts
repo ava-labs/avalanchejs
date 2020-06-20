@@ -1,5 +1,5 @@
 import { APIBase, RequestResponseData } from 'src/utils/types';
-import SlopesCore from 'src/slopes';
+import AvalancheCore from 'src/avalanche';
 import { AxiosRequestConfig } from 'axios';
 
 export class TestAPI extends APIBase {
@@ -46,5 +46,5 @@ export class TestAPI extends APIBase {
         });
     }
 
-    constructor(ava:SlopesCore, endpoint:string = "/ext/testing"){ super(ava, endpoint); }
+    constructor(ava:AvalancheCore, endpoint:string = "/ext/testing"){ super(ava, endpoint); }
 }

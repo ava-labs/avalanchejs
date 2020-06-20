@@ -1,8 +1,8 @@
-# Slopes - The AVA Platform JavaScript Library
+# Avalanche.js - The AVA Platform JavaScript Library
 
 ## Overview
 
-Slopes is a JavaScript Library for interfacing with the AVA Platform. It is built using TypeScript and intended to support both browser and Node.js. The Slopes library allows one to issue commands to the AVA node APIs.
+Avalanche.js is a JavaScript Library for interfacing with the AVA Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche.js library allows one to issue commands to the AVA node APIs.
 
 The APIs currently supported by default are:
 
@@ -13,9 +13,9 @@ The APIs currently supported by default are:
 
 ## Getting Started
 
-We built Slopes with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/).
+We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/).
 
-Using Slopes, developers are able to:
+Using Avalanche.js, developers are able to:
 
 * Locally manage private keys
 * Retrieve balances on addresses
@@ -26,13 +26,13 @@ Using Slopes, developers are able to:
 * Administer a local node
 * Retrieve AVA network information from a node
 
-The entirety of the Slopes documentation can be found on our [Slopes documentation page](https://docs.ava.network/v1.0/en/tools/slopes/).
+The entirety of the Avalanche.js documentation can be found on our [Avalanche.js documentation page](https://docs.ava.network/v1.0/en/tools/avalanche.js/).
 
 ### Requirements
 
-Slopes requires Node.js LTS version 12.13.1 or higher to compile.
+Avalanche.js requires Node.js LTS version 12.13.1 or higher to compile.
 
-Slopes depends on the following two Node.js modules internally, and we suggest that your project uses them as well:
+Avalanche.js depends on the following two Node.js modules internally, and we suggest that your project uses them as well:
 
 * Buffer: Enables Node.js's Buffer library in the browser.
   * [https://github.com/feross/buffer](https://github.com/feross/buffer)
@@ -41,57 +41,57 @@ Slopes depends on the following two Node.js modules internally, and we suggest t
   * [https://github.com/indutny/bn.js](https://github.com/indutny/bn.js)
   * `npm install --save bn.js`
 
-Both of the above modules are extremely useful when interacting with Slopes as they are the input and output types of many base classes in the library.
+Both of the above modules are extremely useful when interacting with Avalanche.js as they are the input and output types of many base classes in the library.
 
 ### Installation
 
-Slopes is available for install via `npm`:
+Avalanche.js is available for install via `npm`:
 
-`npm install --save slopes`
+`npm install --save avalanche`
 
 You can also pull the repo down directly and build it from scratch:
 
 `npm run build`
 
-This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "slopes.js" file can then be dropped into any project as a pure javascript implementation of Slopes.
+This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.js.
 
-The Slopes library can be imported into your existing Node.js project as follows:
+The Avalanche.js library can be imported into your existing Node.js project as follows:
 
 ```js
-const slopes = require("slopes");
+const avalanche = require("avalanche");
 ```
 
 Or into your TypeScript project like this:
 
 ```js
-import * as slopes from "slopes"
+import * as avalanche from "avalanche"
 ```
 
 ### Importing essentials
 
 ```js
-import * as slopes from "slopes";
+import * as avalanche from "avalanche";
 import BN from 'bn.js';
 import { Buffer } from 'buffer/'; // the slash forces this library over native Node.js Buffer
 
-let bintools = slopes.BinTools.getInstance();
+let bintools = avalanche.BinTools.getInstance();
 ```
 
 The above lines import the libraries used in the below example:
   
-* slopes: Our javascript module.
-* bn.js: A bignumber module use by Slopes.
+* avalanche: Our javascript module.
+* bn.js: A bignumber module use by Avalanche.js.
 * buffer: A Buffer library.
-* BinTools: A singleton built into Slopes that is used for dealing with binary data.
+* BinTools: A singleton built into Avalanche.js that is used for dealing with binary data.
 
 ## Example 1 &mdash; Managing AVM Keys
 
-Slopes comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
+Avalanche.js comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
-let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
+let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
+let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 ### Accessing the keychain
@@ -164,17 +164,17 @@ let isValid = keypair.verify(message, signature); //returns a boolean
 
 ## Example 2 &mdash; Creating An Asset
 
-This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
+This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
-let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
+let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
+let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 ### Describe the new asset
 
-The first steps in creating a new asset using Slopes is to determine the qualties of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
+The first steps in creating a new asset using Avalanche.js is to determine the qualties of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
 
 ```js
 // The fee to pay for the asset, we assume this network is fee-less
@@ -199,30 +199,30 @@ We want to mint an asset with 400 coins to all of our managed keys, 500 to the s
 let addresses = avm.keyChain().getAddresses();
 
 // Create outputs for the asset's initial state
-let secpOutput1 = new slopes.SecpOutput(new BN(400), new BN(400), 1, addresses);
-let secpOutput2 = new slopes.SecpOutput(new BN(500), new BN(400), 1, [addresses[1]]);
-let secpOutput3 = new slopes.SecpOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
+let secpOutput1 = new avalanche.SecpOutput(new BN(400), new BN(400), 1, addresses);
+let secpOutput2 = new avalanche.SecpOutput(new BN(500), new BN(400), 1, [addresses[1]]);
+let secpOutput3 = new avalanche.SecpOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
 
 // Populate the initialState array
 // The AVM needs to know what type of output is produced.
-// The constant slopes.AVMConstants.SECPFXID is the correct output.
+// The constant avalanche.AVMConstants.SECPFXID is the correct output.
 // It specifies that we are using a secp256k1 signature scheme for this output.
-let initialState = new slopes.InitialStates();
-initialState.addOutput(secpOutput1, slopes.AVMConstants.SECPFXID);
-initialState.addOutput(secpOutput2, slopes.AVMConstants.SECPFXID);
-initialState.addOutput(secpOutput3, slopes.AVMConstants.SECPFXID);
+let initialState = new avalanche.InitialStates();
+initialState.addOutput(secpOutput1, avalanche.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput2, avalanche.AVMConstants.SECPFXID);
+initialState.addOutput(secpOutput3, avalanche.AVMConstants.SECPFXID);
 ```
 
 ### Creating the signed transaction
 
-Now that we know what we want an asset to look like, we create an output to send to the network. There is an AVM helper function `makeCreateAssetTx()` which does just that.
+Now that we know what we want an asset to look like, we create an output to send to the network. There is an AVM helper function `buildCreateAssetTx()` which does just that.
 
 ```js
 // Fetch the UTXOSet for our addresses
 let utxos = await avm.getUTXOs(addresses);
 
 // Make an unsigned Create Asset transaction from the data compiled earlier
-let unsigned = await avm.makeCreateAssetTx(utxos, fee, addresses, initialState, name, symbol, denomination);
+let unsigned = await avm.buildCreateAssetTx(utxos, fee, addresses, initialState, name, symbol, denomination);
 
 let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 ```
@@ -231,7 +231,7 @@ let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it!
 
-Using the Slopes AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the Avalanche.js AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
@@ -272,12 +272,12 @@ The AVM uses the TxID of the transaction which created the asset as the unique i
 
 ## Example 3 &mdash; Sending An Asset
 
-This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Slopes connected to our AVA Platform endpoint of choice.
+This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
-let ava = new slopes.Slopes("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Slopes
+let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
+let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
@@ -298,7 +298,7 @@ let utxos = await avm.getUTXOs(myAddresses);
 
 ### Spending the UTXOs
 
-The `makeBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
+The `buildBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
 let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
@@ -319,7 +319,7 @@ let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized add
 //   * An array of addresses sending the funds
 //   * An array of addresses any leftover funds are sent
 //   * The AssetID of the funds being sent
-let unsignedTx = await avm.makeBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
+let unsignedTx = await avm.buildBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
 let signedTx = avm.signTx(unsignedTx);
 let txid = await avm.issueTx(signedTx);
 ```

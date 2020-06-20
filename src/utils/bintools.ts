@@ -1,5 +1,6 @@
 /**
- * @module Utils
+ * @packageDocumentation
+ * @module Utils-BinTools
  */
 import BN  from "bn.js";
 import {Buffer} from "buffer/";

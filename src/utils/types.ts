@@ -1,7 +1,8 @@
 /**
- * @module Utils
+ * @packageDocumentation
+ * @module Utils-Types
  */
-import SlopesCore from '../slopes';
+import AvalancheCore from '../avalanche';
 import { Buffer } from "buffer/";
 import DB from "./db";
 import { StoreAPI } from 'store2';
@@ -29,7 +30,7 @@ export class RequestResponseData {
  * Abstract class defining a generic endpoint that all endpoints must implement (extend).
  */
 export abstract class APIBase {
-    protected core:SlopesCore;
+    protected core:AvalancheCore;
     protected baseurl:string;
     protected db:StoreAPI;
 
@@ -67,10 +68,10 @@ export abstract class APIBase {
 
     /**
      * 
-     * @param core Reference to the Slopes instance using this baseurl
+     * @param core Reference to the Avalanche instance using this baseurl
      * @param baseurl Path to the baseurl - ex: "/ext/bc/avm"
      */
-    constructor(core:SlopesCore, baseurl:string) {
+    constructor(core:AvalancheCore, baseurl:string) {
         this.core = core;
         this.setBaseURL(baseurl);
     }
@@ -127,11 +128,11 @@ export class JRPCAPI extends APIBase {
 
     /**
      * 
-     * @param core Reference to the Slopes instance using this endpoint
+     * @param core Reference to the Avalanche instance using this endpoint
      * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
      * @param jrpcVersion The jrpc version to use, default "2.0".
      */
-    constructor(core:SlopesCore, baseurl:string, jrpcVersion:string = "2.0") {
+    constructor(core:AvalancheCore, baseurl:string, jrpcVersion:string = "2.0") {
         super(core, baseurl);
         this.jrpcVersion = jrpcVersion;
         this.rpcid = 1;
@@ -139,7 +140,7 @@ export class JRPCAPI extends APIBase {
 }
 
 /**
- * Class for representing a private and public keypair in Slopes. 
+ * Class for representing a private and public keypair in Avalanche. 
  * All APIs that need key pairs should extend on this class.
  */
 export class KeyPair {
@@ -262,7 +263,7 @@ export class KeyPair {
 }
 
 /**
- * Class for representing a key chain in Slopes. 
+ * Class for representing a key chain in Avalanche. 
  * All endpoints that need key chains should extend on this class.
  * 
  * @typeparam KPClass extending [[KeyPair]] which is used as the key in [[KeyChain]]

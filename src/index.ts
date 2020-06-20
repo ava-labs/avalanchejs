@@ -1,7 +1,8 @@
 /**
- * @module Slopes
+ * @packageDocumentation
+ * @module Avalanche
  */
-import SlopesCore from './slopes';
+import AvalancheCore from './avalanche';
 import KeystoreAPI from './apis/keystore/api';
 import PlatformAPI from './apis/platform/api';
 import AVMAPI from './apis/avm/api';
@@ -10,20 +11,18 @@ import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
-import { Credential } from './apis/avm/credentials';
-import { SelectOperationClass } from './apis/avm/ops';
 import HealthAPI from "./apis/health/api";
 
 /**
- * Slopes is middleware for interacting with AVA node RPC APIs. 
+ * Avalanche.js is middleware for interacting with AVA node RPC APIs. 
  * 
  * Example usage:
  * ```js
- * let slopes = new Slopes("127.0.0.1", 9650, "https");
+ * let avalanche = new Avalanche("127.0.0.1", 9650, "https");
  * ```
  * 
  */
-export class Slopes extends SlopesCore {
+export class Avalanche extends AvalancheCore {
 
     /**
      * Returns a reference to the Admin RPC.
@@ -96,9 +95,9 @@ export class Slopes extends SlopesCore {
 export {BinTools};
 export {DB};
 export {CoreTypes};
-export {SlopesCore};
+export {AvalancheCore};
 
-export * from './slopes';
+export * from './avalanche';
 export * from './apis/keystore/api';
 export * from './apis/platform/api';
 export * from './apis/avm/api';

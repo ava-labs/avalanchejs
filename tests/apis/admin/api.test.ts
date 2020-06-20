@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import { Slopes } from "src";
+import { Avalanche } from "src";
 import AdminAPI from "src/apis/admin/api";
 describe("Admin", () => {
     const ip = '127.0.0.1';
@@ -11,11 +11,11 @@ describe("Admin", () => {
     let username = 'AvaLabs';
     let password = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol, 12345, "What is my purpose? You pass butter. Oh my god.", false);
+    let avalanche:Avalanche = new Avalanche(ip,port,protocol, 12345, "What is my purpose? You pass butter. Oh my god.", false);
     let admin:AdminAPI;
 
     beforeAll(() => {
-        admin = slopes.Admin();
+        admin = avalanche.Admin();
     });
 
     afterEach(() => {
@@ -120,7 +120,7 @@ describe("Admin", () => {
         let result:Promise<string> = admin.getBlockchainID('avm');
         let payload:object = {
             "result": {
-                "blockchainID": slopes.AVM().getBlockchainID()
+                "blockchainID": avalanche.AVM().getBlockchainID()
             }
         };
         let responseObj = {

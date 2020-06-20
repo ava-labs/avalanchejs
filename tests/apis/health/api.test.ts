@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 
-import { Slopes } from "src";
+import { Avalanche } from "src";
 import PlatformAPI from "src/apis/platform/api";
 import { Buffer } from "buffer/";
 import BN from "bn.js";
@@ -18,11 +18,11 @@ describe("Health", () => {
     const port = 9650;
     const protocol = "https";
 
-    let slopes = new Slopes(ip,port,protocol, 12345, undefined, true);
+    let avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
     let health:HealthAPI;
 
     beforeAll(() => {
-        health = new HealthAPI(slopes);
+        health = new HealthAPI(avalanche);
     });
 
     afterEach(() => {

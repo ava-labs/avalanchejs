@@ -1,5 +1,6 @@
 /**
- * @module Utils
+ * @packageDocumentation
+ * @module Utils-DB
  */
 import store from "store2";
 import { StoreAPI } from "store2";

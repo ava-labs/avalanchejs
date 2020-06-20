@@ -1,5 +1,6 @@
 /**
- * @module Utils
+ * @packageDocumentation
+ * @module Utils-Crypto
  */
 import { Buffer } from "buffer/";
 import libsodiumWrapper from 'libsodium-wrappers';

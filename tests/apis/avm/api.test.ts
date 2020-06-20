@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios';
-import { Slopes } from "src";
+import { Avalanche } from "src";
 import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
@@ -29,7 +29,7 @@ describe("AVMAPI", () => {
     let username:string = 'AvaLabs';
     let password:string = 'password';
 
-    let slopes:Slopes = new Slopes(ip,port,protocol, networkid, undefined, true);
+    let avalanche:Avalanche = new Avalanche(ip,port,protocol, networkid, undefined, true);
     let api:AVMAPI;
     let alias:string;
 
@@ -38,7 +38,7 @@ describe("AVMAPI", () => {
     const addrC:string = "X-6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV";
 
     beforeAll(() => {
-        api = new AVMAPI(slopes, "/ext/bc/avm", blockchainid);
+        api = new AVMAPI(avalanche, "/ext/bc/avm", blockchainid);
         alias = api.getBlockchainAlias();
     });
 
@@ -85,45 +85,6 @@ describe("AVMAPI", () => {
         expect(mockAxios.request).toHaveBeenCalledTimes(1);
         expect(response).toBe(txId);
     });
-
-/*going through revision
-    test('listAssets', async ()=>{
-        let assets = [
-            {
-                'symbol':'ATH',
-                'name': "Athereum", 
-                "assetID": "ath123", 
-                "alias": "ath", 
-                "denomination" : 9, 
-                "balance": new BN(1)
-            } ,
-            {
-                'symbol':'ETH', 
-                'name': "Ethereum", 
-                "assetID": "eth123", 
-                "alias": "eth", 
-                "denomination" : 18, 
-                "balance": new BN(10)
-            } 
-        ];
-
-        let result:Promise<Array<object>> = api.getAllBalances(addrA);
-        let payload:object = {
-            "result": {
-                'assets': assets
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
-
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
-
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(assets);
-    });
-    */
 
     test('listAddresses', async ()=>{
         let addresses = [addrA,addrB];
@@ -274,8 +235,6 @@ describe("AVMAPI", () => {
         let kp:AVMKeyPair = new AVMKeyPair(alias);
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
         
-        let amount:number = 10000;
-        let address:Buffer = kp.getAddress();
         let denomination:number = 0
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
         let initialHolders:Array<object> = [
@@ -309,9 +268,7 @@ describe("AVMAPI", () => {
     test('createVariableCapAsset', async ()=>{
         let kp:AVMKeyPair = new AVMKeyPair(alias);
         kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"));
-        
-        let amount:number = 10000;
-        let address:Buffer = kp.getAddress();
+
         let denomination:number = 0;
         let assetid:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
         let minterSets:Array<object> = [
@@ -652,10 +609,10 @@ describe("AVMAPI", () => {
             initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
         });
 
-        test('makeBaseTx1', async () => {
+        test('buildBaseTx1', async () => {
     
-            let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
-            let txu2:UnsignedTx = set.makeBaseTx(
+            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu2:UnsignedTx = set.buildBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -668,9 +625,9 @@ describe("AVMAPI", () => {
             
         });
 
-        test('makeBaseTx2', async () => {
-            let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
-            let txu2:UnsignedTx = set.makeBaseTx(
+        test('buildBaseTx2', async () => {
+            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
+            let txu2:UnsignedTx = set.buildBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -699,8 +656,8 @@ describe("AVMAPI", () => {
         });
 
         test('signTx', async () => {
-            let txu1:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
-            let txu2:UnsignedTx = set.makeBaseTx(
+            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu2:UnsignedTx = set.buildBaseTx(
                 networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -717,7 +674,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Serialized', async ()=>{
-            let txu:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -740,7 +697,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Buffer', async ()=>{
-            let txu:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -762,7 +719,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Class Tx', async ()=>{
-            let txu:UnsignedTx = await api.makeBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -784,13 +741,13 @@ describe("AVMAPI", () => {
             expect(response).toBe(txid);
         });
 
-        test('makeCreateAssetTx', async () => {
+        test('buildCreateAssetTx', async () => {
             let fee:number = 10;
             let name:string = "Mortycoin is the dumb as a sack of hammers.";
             let symbol:string = "morT";
             let denomination:number = 8;
 
-            let result:Promise<UnsignedTx> = api.makeCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
+            let result:Promise<UnsignedTx> = api.buildCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
             let payload:object = {
                 "result": {
                     'name': name, 
@@ -808,7 +765,7 @@ describe("AVMAPI", () => {
     
             expect(mockAxios.request).toHaveBeenCalledTimes(1);
             
-            let txu2:UnsignedTx = set.makeCreateAssetTx(slopes.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
+            let txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
 
             
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -816,7 +773,7 @@ describe("AVMAPI", () => {
             
         });
 
-        test('makeNFTTransferTx', async () => {
+        test('buildNFTTransferTx', async () => {
             let pload:Buffer = Buffer.alloc(1024);
             pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
             let addrbuff1 = addrs1.map(a => api.parseAddress(a));
@@ -826,7 +783,7 @@ describe("AVMAPI", () => {
             //     set, nftutxoids[1], addrs3, addrs3, fee, addrs1,
             //     UnixNow(), new BN(0), 1
             // );
-            let txu1:UnsignedTx = await api.makeNFTTransferTx(
+            let txu1:UnsignedTx = await api.buildNFTTransferTx(
                 set, nftutxoids[1], addrs3, addrs3, fee, addrs1, 1
             );
            
@@ -835,7 +792,7 @@ describe("AVMAPI", () => {
             //     fee, addrbuff1, addrbuff3, addrbuff3, 
             //     [nftutxoids[1]], UnixNow(), new BN(0), 1
             // )
-            let txu2:UnsignedTx = set.makeNFTTransferTx(
+            let txu2:UnsignedTx = set.buildNFTTransferTx(
                 networkid, bintools.avaDeserialize(blockchainid), assetID,
                 fee, addrbuff1, addrbuff3, addrbuff3, 
                 [nftutxoids[1]], 1
