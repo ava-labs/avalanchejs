@@ -736,7 +736,7 @@ class AVMAPI extends JRPCAPI{
             throw new Error("Error - AVMAPI.makeCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
         }
         let avaAssetID:Buffer = await this.getAVAAssetID();
-        return utxoset.makeCreateNFTAssetTx(
+        return utxoset.buildCreateNFTAssetTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             fee, creators, initialStates,
             mappedMintersSet, name, symbol
@@ -762,7 +762,7 @@ class AVMAPI extends JRPCAPI{
 
         let avaAssetID:Buffer = await this.getAVAAssetID();
 
-        return utxoset.makeCreateNFTMintTx(
+        return utxoset.buildCreateNFTMintTx(
             this.core.getNetworkID(),
             bintools.avaDeserialize(this.blockchainID),
             avaAssetID,
