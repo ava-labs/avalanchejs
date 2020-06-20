@@ -631,7 +631,8 @@ describe("AVMAPI", () => {
                 let xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
                 inputs.push(xferinput);
 
-                let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, locktime, threshold, addressbuffs);
+                // let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, locktime, threshold, addressbuffs);
+                let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, threshold, addressbuffs);
                 let op:NFTTransferOperation = new NFTTransferOperation(nout);
                 let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
                 let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
@@ -821,15 +822,23 @@ describe("AVMAPI", () => {
             let addrbuff1 = addrs1.map(a => api.parseAddress(a));
             let addrbuff3 = addrs3.map(a => api.parseAddress(a));
             let fee:BN = new BN(90);
+            // let txu1:UnsignedTx = await api.makeNFTTransferTx(
+            //     set, nftutxoids[1], addrs3, addrs3, fee, addrs1,
+            //     UnixNow(), new BN(0), 1
+            // );
             let txu1:UnsignedTx = await api.makeNFTTransferTx(
-                set, nftutxoids[1], addrs3, addrs3, fee, addrs1,
-                UnixNow(), new BN(0), 1
+                set, nftutxoids[1], addrs3, addrs3, fee, addrs1, 1
             );
            
+            // let txu2:UnsignedTx = set.makeNFTTransferTx(
+            //     networkid, bintools.avaDeserialize(blockchainid), assetID,
+            //     fee, addrbuff1, addrbuff3, addrbuff3, 
+            //     [nftutxoids[1]], UnixNow(), new BN(0), 1
+            // )
             let txu2:UnsignedTx = set.makeNFTTransferTx(
                 networkid, bintools.avaDeserialize(blockchainid), assetID,
                 fee, addrbuff1, addrbuff3, addrbuff3, 
-                [nftutxoids[1]], UnixNow(), new BN(0), 1
+                [nftutxoids[1]], 1
             )
 
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));

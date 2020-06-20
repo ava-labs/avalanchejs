@@ -637,9 +637,13 @@ class AVMAPI extends JRPCAPI{
      * @remarks
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
+    // makeNFTTransferTx = async (
+    //     utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
+    //     feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
+    // ):Promise<UnsignedTx> => {
     makeNFTTransferTx = async (
         utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-        feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
+        feeAddresses:Array<string>, threshold:number = 1
     ):Promise<UnsignedTx> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
@@ -655,7 +659,7 @@ class AVMAPI extends JRPCAPI{
 
         return utxoset.makeNFTTransferTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
-            feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold
+            feeAmount, feeAddrs, to, from, utxoidArray, threshold
         );
     }
 
@@ -700,7 +704,8 @@ class AVMAPI extends JRPCAPI{
         
     makeCreateNFTAssetTx = async (
         utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
-        initialStates:InitialStates, name:string, symbol:string,
+        initialStates:InitialStates, name:string, 
+        symbol:string,
         mintersSet: {
             threshold: number
             minters:Array<string>|Array<Buffer>
@@ -739,28 +744,38 @@ class AVMAPI extends JRPCAPI{
     }
 
     makeCreateNFTMintTx = async (
-        utxoset:UTXOSet = undefined,
-        utxoid:string | Array<string>,
+        utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, 
+        fromAddresses:Array<string>, fee:BN,
+        feeAddresses:Array<string>, threshold:number = 1,
         groupID:number = undefined, 
         bytestring:Buffer = undefined, 
         svg:Buffer = undefined,
-        url: string = undefined,
-        threshold: number = undefined, 
-        addresses:Array<Buffer> = undefined
+        url: string = undefined
     ): Promise<any> => {
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
+
         if(typeof utxoid === 'string') {
             utxoid = [utxoid];
         }
+
+        let avaAssetID:Buffer = await this.getAVAAssetID();
+
         return utxoset.makeCreateNFTMintTx(
             this.core.getNetworkID(),
             bintools.avaDeserialize(this.blockchainID),
+            avaAssetID,
+            fee,
+            feeAddrs,
+            to,
+            from,
+            utxoid,
+            threshold,
             groupID,
             bytestring,
             svg,
-            url,
-            threshold,
-            utxoid,
-            addresses
+            url
         );
     }
 

@@ -86,7 +86,8 @@ describe('Transactions', () => {
             let xferin:TransferableInput = new TransferableInput(txid, txidx, assetID, input);
             inputs.push(xferin);
 
-            let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, locktime, threshold, addresses);
+            // let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, locktime, threshold, addresses);
+            let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, threshold, addresses);
             let op:NFTTransferOperation = new NFTTransferOperation(nout);
             let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
             let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
@@ -235,10 +236,14 @@ describe('Transactions', () => {
     });
 
     test('Creation Tx3 using OperationTx', () => {
+        // let txu:UnsignedTx = set.makeNFTTransferTx(
+        //     netid, blockchainID, assetID, new BN(90), 
+        //     addrs1, addresses, addresses, nftutxoids,
+        //     UnixNow(), UnixNow().add(new BN(50)), 1
+        // );
         let txu:UnsignedTx = set.makeNFTTransferTx(
             netid, blockchainID, assetID, new BN(90), 
-            addrs1, addresses, addresses, nftutxoids,
-            UnixNow(), UnixNow().add(new BN(50)), 1
+            addrs1, addresses, addresses, nftutxoids, 1
         );
         let tx:Tx = keymgr1.signTx(txu);
         let tx2:Tx = new Tx();

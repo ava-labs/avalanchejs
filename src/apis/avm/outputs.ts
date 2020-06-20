@@ -488,7 +488,8 @@ export class NFTTransferOutput extends NFTOutBase {
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      */
-    constructor(groupID:number = undefined, payload:Buffer = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
+    // constructor(groupID:number = undefined, payload:Buffer = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
+    constructor(groupID:number = undefined, payload:Buffer = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
         // super(locktime, threshold, addresses);
         super(threshold, addresses);
         if(typeof groupID !== 'undefined' && typeof payload !== 'undefined') {

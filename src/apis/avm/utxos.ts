@@ -8,7 +8,6 @@ import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput
 import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, Tx } from './tx';
 import { SecpInput, Input, TransferableInput } from './inputs';
-import { textChangeRangeIsUnchanged } from "typescript";
 import { Operation, NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
 
 interface MinterSet {
@@ -569,6 +568,7 @@ export class UTXOSet {
      * @param mintersSets The minters and thresholds required to mint this nft asset
      * @param name String for the descriptive name of the nft asset
      * @param symbol String for the ticker symbol of the nft asset
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
      * 
      * @returns An unsigned transaction created from the passed in parameters.
      * 
@@ -596,22 +596,17 @@ export class UTXOSet {
     }
 
     makeCreateNFTMintTx = async (
-        networkid:number = undefined, 
-        blockchainid:Buffer = undefined,
-        groupID:number = undefined, 
-        bytestring:Buffer = undefined, 
-        svg:Buffer = undefined,
-        url:string = undefined,
-        threshold:number = undefined, 
-        utxoids:Array<string> = undefined,
-        addresses:Array<Buffer> = undefined
+        networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
+        feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
+        utxoids:Array<string>, threshold:number = 1,
+        groupID:number = undefined, bytestring:Buffer = undefined, 
+        svg:Buffer = undefined, url:string = undefined,
     ): Promise<any> => {
-        // * 1 byte - version (255 will mean version field is 2 bytes)
-        // * 1 byte - type (inline or external)
-        //   * 0x00 uniterpreted bytestring
-        //   * 0x01 inline svg
-        //   * 0x02 ascii url
-        if(threshold > addresses.length) {
+        let utx:UnsignedTx = this.makeBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
+        let ins:Array<TransferableInput> = utx.getTransaction().getIns();
+        let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
+        let ops:TransferableOperation[] = [];
+        if(threshold > fromAddresses.length) {
             // TODO error handling
           }
   
@@ -642,22 +637,25 @@ export class UTXOSet {
               bytes = Buffer.from(url);
           }   
   
+          // * 1 byte - version (255 will mean version field is 2 bytes)
+          // * 1 byte - type (inline or external)
+          //   * 0x00 uniterpreted bytestring
+          //   * 0x01 inline svg
+          //   * 0x02 ascii url
           let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
-          let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, threshold, addresses);
-          addresses.forEach((address, index:number) => {
+          let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, threshold, toAddresses);
+          fromAddresses.forEach((address, index:number) => {
             // TODO - Confirm address order is the same as minters set address order
-            nftMintOperation.addSignatureIdx(index, addresses[index]);
+            nftMintOperation.addSignatureIdx(index, fromAddresses[index]);
+          })
+
+          // TODO 
+          utxoids.forEach((utxoid:string) => {
+              let utxo: UTXO = this.getUTXO(utxoid)
+              let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
+              ops.push(transferableOperation);
           })
   
-          let ins:TransferableInput[] = [];
-          let outs:TransferableOutput[] = [];
-          let ops:TransferableOperation[] = [];
-  
-          let assetIDs:Array<Buffer> = this.getAssetIDs();
-
-          let transferableOperation:TransferableOperation = new TransferableOperation(assetIDs[0], utxoids, nftMintOperation);
-  
-          ops.push(transferableOperation);
           let operationTx:OperationTx = new OperationTx(
             networkid, 
             blockchainid, 
@@ -686,11 +684,16 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
+    // makeNFTTransferTx = (
+    //     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
+    //     feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
+    //     utxoids:Array<string>, asOf:BN = UnixNow(), 
+    //     locktime:BN = new BN(0), threshold:number = 1
+    // ):UnsignedTx => {
     makeNFTTransferTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, asOf:BN = UnixNow(), 
-        locktime:BN = new BN(0), threshold:number = 1
+        utxoids:Array<string>, threshold:number = 1
     ):UnsignedTx => {
         // Cheating and using makeBaseTx to get Ins and Outs for fees.
         // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
@@ -699,32 +702,38 @@ export class UTXOSet {
         );
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-        let ops:Array<TransferableOperation> = []
-        for(let i:number = 0; i < utxoids.length; i++){
-            let utxo:UTXO = this.getUTXO(utxoids[i]);
-            
+        let ops:Array<TransferableOperation> = [];
+        utxoids.forEach((utxoid:string) => {
+            let utxo:UTXO = this.getUTXO(utxoid);
             let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
-            let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
+            let groupID:number = out.getGroupID();
+            let payload:Buffer = out.getPayload();
+            // let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
+            let spenders:Array<Buffer> = out.getSpenders(fromAddresses);
 
+            // let outbound:NFTTransferOutput = new NFTTransferOutput(
+            //     out.getGroupID(), out.getPayload(), locktime, threshold, toAddresses
+            // )
             let outbound:NFTTransferOutput = new NFTTransferOutput(
-                out.getGroupID(), out.getPayload(), locktime, threshold, toAddresses
+                groupID, payload, threshold, toAddresses
             )
             let op:NFTTransferOperation = new NFTTransferOperation(outbound);
 
-            for(let j = 0; j < spenders.length; j++) {
+            spenders.forEach((spender:Buffer, i:number) => {
                 let idx:number;
-                idx = out.getAddressIdx(spenders[j]);
+                idx = out.getAddressIdx(spenders[i]);
                 if(idx == -1){
                     /* istanbul ignore next */
-                    throw new Error("Error - UTXOSet.makeNFTTransferTx: no such address in output: " + spenders[j]);
+                    throw new Error(`Error - UTXOSet.makeNFTTransferTx: no such address in output: ${spenders[i]}`);
                 }
-                op.addSignatureIdx(idx, spenders[j]);
-            }
+                op.addSignatureIdx(idx, spenders[i]);
+
+            })
             
-            
-            let xferop:TransferableOperation = new TransferableOperation(utxo.getAssetID(), [utxoids[i]], op);
+            let xferop:TransferableOperation = new TransferableOperation(utxo.getAssetID(), [utxoid], op);
             ops.push(xferop);
-        }
+
+        })
         let OpTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, ops);
         return new UnsignedTx(OpTx);
     }
