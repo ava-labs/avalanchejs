@@ -603,9 +603,9 @@ class AVMAPI extends JRPCAPI{
         changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(), 
         locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));;
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));;
-        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));;
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));
+        let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildBaseTx").map(a => bintools.stringToAddress(a));
 
         if(typeof assetID === "string"){
             assetID = bintools.avaDeserialize(assetID);
@@ -645,9 +645,9 @@ class AVMAPI extends JRPCAPI{
     //     utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
     //     feeAddresses:Array<string>, threshold:number = 1
     // ):Promise<UnsignedTx> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
-        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
+        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
 
         let avaAssetID:Buffer = await this.getAVAAssetID();
         let utxoidArray:Array<string> = [];
@@ -752,9 +752,9 @@ class AVMAPI extends JRPCAPI{
         svg:Buffer = undefined,
         url: string = undefined
     ): Promise<any> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
-        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));;
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));
+        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));
 
         if(typeof utxoid === 'string') {
             utxoid = [utxoid];

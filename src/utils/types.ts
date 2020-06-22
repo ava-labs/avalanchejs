@@ -472,7 +472,7 @@ export abstract class NBytes {
 }
 
 let n2_avm:object = {
-    "blockchainID": "4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM",
+    "blockchainID": "2NyJW9NB9eJ2prZEPR96E77fb9HRg1fJjnqfMmZwuM36Hy89K3",
     "alias": "X",
     "vm": "avm"
 };
@@ -520,7 +520,7 @@ export class Defaults {
         "2": {
             "avm": n2_avm,
             "X": n2_avm,
-            "4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM": n2_avm,
+            "2NyJW9NB9eJ2prZEPR96E77fb9HRg1fJjnqfMmZwuM36Hy89K3": n2_avm,
             "platform": n2_platform,
             "P": n2_platform,
             "11111111111111111111111111111111LpoYY": n2_platform,

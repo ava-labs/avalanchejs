@@ -589,7 +589,6 @@ describe("AVMAPI", () => {
                 inputs.push(xferinput);
 
                 let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, locktime, threshold, addressbuffs);
-                // let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, threshold, addressbuffs);
                 let op:NFTTransferOperation = new NFTTransferOperation(nout);
                 let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
                 let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
@@ -783,20 +782,12 @@ describe("AVMAPI", () => {
                 set, nftutxoids[1], addrs3, addrs3, fee, addrs1,
                 UnixNow(), new BN(0), 1
             );
-            // let txu1:UnsignedTx = await api.buildNFTTransferTx(
-            //     set, nftutxoids[1], addrs3, addrs3, fee, addrs1, 1
-            // );
            
             let txu2:UnsignedTx = set.buildNFTTransferTx(
                 networkid, bintools.avaDeserialize(blockchainid), assetID,
                 fee, addrbuff1, addrbuff3, addrbuff3, 
                 [nftutxoids[1]], UnixNow(), new BN(0), 1
             )
-            // let txu2:UnsignedTx = set.buildNFTTransferTx(
-            //     networkid, bintools.avaDeserialize(blockchainid), assetID,
-            //     fee, addrbuff1, addrbuff3, addrbuff3, 
-            //     [nftutxoids[1]], 1
-            // )
 
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());

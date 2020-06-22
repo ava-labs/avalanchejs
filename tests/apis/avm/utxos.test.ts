@@ -474,4 +474,3 @@ describe('UTXOSet', () => {
 
     });
 });
-
