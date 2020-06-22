@@ -113,7 +113,7 @@ describe('Outputs', () => {
           expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
           expect(out.getThreshold()).toBe(3);
-          // expect(out.getLocktime().toNumber()).toBe(locktime.toNumber());
+          expect(out.getLocktime().toNumber()).toBe(locktime.toNumber());
 
           let r = out.getAddressIdx(addrs[2]);
           expect(out.getAddress(r)).toStrictEqual(addrs[2]);
