@@ -208,6 +208,7 @@ describe('Transactions', () => {
         expect(optx.getOperations().length).toBe(5);
     });
 
+
     test('Creation Tx1 with asof, locktime, threshold', () => {
         let txu:UnsignedTx = set.buildBaseTx(
             netid, blockchainID,
@@ -241,10 +242,6 @@ describe('Transactions', () => {
             addrs1, addresses, addresses, nftutxoids,
             UnixNow(), UnixNow().add(new BN(50)), 1
         );
-        // let txu:UnsignedTx = set.buildNFTTransferTx(
-        //     netid, blockchainID, assetID, new BN(90), 
-        //     addrs1, addresses, addresses, nftutxoids, 1
-        // );
         let tx:Tx = keymgr1.signTx(txu);
         let tx2:Tx = new Tx();
         tx2.fromBuffer(tx.toBuffer());
