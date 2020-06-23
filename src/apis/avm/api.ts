@@ -702,7 +702,7 @@ class AVMAPI extends JRPCAPI{
         );
     }
         
-    makeCreateNFTAssetTx = async (
+    buildCreateNFTAssetTx = async (
         utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
         initialStates:InitialStates, name:string, 
         symbol:string,
@@ -711,7 +711,7 @@ class AVMAPI extends JRPCAPI{
             minters:Array<string>|Array<Buffer>
         }[]
     ): Promise<UnsignedTx> => {
-        let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "makeCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+        let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
         let mappedMintersSet: {
             threshold: number;
             minters: Buffer[];
@@ -721,19 +721,19 @@ class AVMAPI extends JRPCAPI{
           }, indx:number) => {
           return {
             threshold: set.threshold,
-            minters: this._cleanAddressArray(set.minters, "makeCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
+            minters: this._cleanAddressArray(set.minters, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
           }
         });
         
         /* istanbul ignore next */
         if(name.length > AVMConstants.ASSETNAMELEN) {
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.makeCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+            throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
         }
         /* istanbul ignore next */
         if(symbol.length > AVMConstants.SYMBOLMAXLEN){
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.makeCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+            throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
         }
         let avaAssetID:Buffer = await this.getAVAAssetID();
         return utxoset.buildCreateNFTAssetTx(
@@ -743,18 +743,18 @@ class AVMAPI extends JRPCAPI{
         );
     }
 
-    makeCreateNFTMintTx = async (
+    buildCreateNFTMintTx = async (
         utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, 
         fromAddresses:Array<string>, fee:BN,
-        feeAddresses:Array<string>, threshold:number = 1,
+        feeAddresses:Array<string>, locktime:BN = new BN(0), threshold:number = 1,
         groupID:number = undefined, 
         bytestring:Buffer = undefined, 
         svg:Buffer = undefined,
         url: string = undefined
     ): Promise<any> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));
-        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));
-        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "makeUnsignedNFTTransferTx").map(a => bintools.stringToAddress(a));
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+        let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+        let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
 
         if(typeof utxoid === 'string') {
             utxoid = [utxoid];
@@ -771,6 +771,7 @@ class AVMAPI extends JRPCAPI{
             to,
             from,
             utxoid,
+            locktime,
             threshold,
             groupID,
             bytestring,
