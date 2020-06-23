@@ -661,18 +661,21 @@ export class UTXOSet {
             type = 2;
             bytes = Buffer.from(url);
         }   
-  
+
+        let maxlen:number = 1024;
+        let versionlen:number = 1;
+        let typelen:number = 1;
         // * 1 byte - version (255 will mean version field is 2 bytes)
         // * 1 byte - type (inline or external)
         //   * 0x00 uniterpreted bytestring
         //   * 0x01 inline svg
         //   * 0x02 ascii url
-        let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
+        let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length + versionlen + typelen, maxlen));
         let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
 
         for(let i:number = 0; i < fromAddresses.length; i++) {
-        // TODO - Confirm address order is the same as minters set address order
-        nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
+          // TODO - Confirm address order is the same as minters set address order
+          nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
         }
 
         for(let i:number = 0; i < utxoids.length; i++) {
