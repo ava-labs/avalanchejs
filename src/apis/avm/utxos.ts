@@ -584,15 +584,15 @@ export class UTXOSet {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-        mintersSets.forEach((minterSet:MinterSet, index:number) => {
+        for(let i:number = 0; i < mintersSets.length; i++) {
           let nftMintOutput:NFTMintOutput = new NFTMintOutput(
-            index, 
+            i, 
             new BN(0), 
-            minterSet.threshold, 
-            minterSet.minters
+            mintersSets[i].threshold, 
+            mintersSets[i].minters
            );
           initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
-        });
+        }
         let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, 0, initialState);
         return new UnsignedTx(CAtx);
     }
@@ -664,17 +664,17 @@ export class UTXOSet {
           //   * 0x02 ascii url
           let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
           let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
-          fromAddresses.forEach((address, index:number) => {
-            // TODO - Confirm address order is the same as minters set address order
-            nftMintOperation.addSignatureIdx(index, fromAddresses[index]);
-          })
 
-          // TODO 
-          utxoids.forEach((utxoid:string) => {
-              let utxo: UTXO = this.getUTXO(utxoid)
+          for(let i:number = 0; i < fromAddresses.length; i++) {
+            // TODO - Confirm address order is the same as minters set address order
+            nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
+          }
+
+          for(let i:number = 0; i < utxoids.length; i++) {
+              let utxo: UTXO = this.getUTXO(utxoids[i])
               let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
               ops.push(transferableOperation);
-          })
+          }
   
           let operationTx:OperationTx = new OperationTx(
             networkid, 
@@ -718,8 +718,8 @@ export class UTXOSet {
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let ops:Array<TransferableOperation> = [];
-        utxoids.forEach((utxoid:string) => {
-            let utxo:UTXO = this.getUTXO(utxoid);
+        for(let i:number = 0; i <= utxoids.length; i++) {
+            let utxo:UTXO = this.getUTXO(utxoids[i]);
             let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
             let groupID:number = out.getGroupID();
             let payload:Buffer = out.getPayload();
@@ -730,7 +730,7 @@ export class UTXOSet {
             )
             let op:NFTTransferOperation = new NFTTransferOperation(outbound);
 
-            spenders.forEach((spender:Buffer, i:number) => {
+            for(let j:number = 0; j <= utxoids.length; j++) {
                 let idx:number;
                 idx = out.getAddressIdx(spenders[i]);
                 if(idx == -1){
@@ -738,13 +738,11 @@ export class UTXOSet {
                     throw new Error(`Error - UTXOSet.buildNFTTransferTx: no such address in output: ${spenders[i]}`);
                 }
                 op.addSignatureIdx(idx, spenders[i]);
-
-            })
+            }
             
-            let xferop:TransferableOperation = new TransferableOperation(utxo.getAssetID(), [utxoid], op);
+            let xferop:TransferableOperation = new TransferableOperation(utxo.getAssetID(), [utxoids[i]], op);
             ops.push(xferop);
-
-        })
+        }
         let OpTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, ops);
         return new UnsignedTx(OpTx);
     }
