@@ -204,6 +204,7 @@ export class TransferableOperation {
 export class NFTMintOperation extends Operation {
     protected groupID:Buffer = Buffer.alloc(4);
     protected payload:Buffer;
+    protected locktime:Buffer = Buffer.alloc(8);
     protected threshold:Buffer = Buffer.alloc(4);
     protected addresses:Array<Buffer> = [];
 
@@ -219,6 +220,13 @@ export class NFTMintOperation extends Operation {
      */
     getPayload = ():Buffer => {
         return this.payload;
+    }
+
+    /**
+     * Returns the a {@link https://github.com/indutny/bn.js/|BN} repersenting the UNIX Timestamp when the lock is made available.
+     */
+    getLocktime = ():BN => {
+        return bintools.fromBufferToBN(this.locktime);
     }
 
     /**
@@ -276,6 +284,7 @@ export class NFTMintOperation extends Operation {
           this.groupID.length + 
           payloadlen.length + 
           this.payload.length +
+          this.locktime.length +
           this.threshold.length +
           outputlen.length + 
           this.threshold.length +
@@ -285,6 +294,7 @@ export class NFTMintOperation extends Operation {
             this.groupID,
             payloadlen,
             this.payload, 
+            this.locktime,
             this.threshold,
             outputlen,
             this.threshold,
@@ -305,14 +315,20 @@ export class NFTMintOperation extends Operation {
      * 
      * @param groupID The group to which to issue the NFT Output
      * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
+     * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold The threshold needed to spend the output
      * @param addresses The addresses to receive the NFT Output
      */
-    constructor(groupID: number = undefined, payload:Buffer = undefined, threshold:number = undefined, addresses:Array<string>|Array<Buffer> = undefined){
+    constructor(groupID: number = undefined, payload:Buffer = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<string>|Array<Buffer> = undefined){
         super()
         if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && typeof threshold !== 'undefined' && typeof addresses !== 'undefined'){
             this.groupID.writeUInt32BE((groupID ? groupID : 0), 0);
             this.payload = payload;
+            if(!(locktime)){
+                /* istanbul ignore next */
+                locktime = new BN(0);
+            }
+            this.locktime = bintools.fromBNToBuffer(locktime, 8);
             addresses.forEach((address:Buffer|string) => {
               if(typeof address === 'string'){
                 address = Buffer.from(address);

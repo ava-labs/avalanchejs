@@ -587,7 +587,7 @@ export class UTXOSet {
         mintersSets.forEach((minterSet:MinterSet, index:number) => {
           let nftMintOutput:NFTMintOutput = new NFTMintOutput(
             index, 
-            new BN(minterSet.threshold), 
+            new BN(0), 
             minterSet.threshold, 
             minterSet.minters
            );
@@ -597,12 +597,30 @@ export class UTXOSet {
         return new UnsignedTx(CAtx);
     }
 
+    /**
+     * Creates an unsigned NFT mint transaction. For more granular control, you may create your own
+     * [[NFTMintTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+     * 
+     * @param networkid The number representing NetworkID of the node
+     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param feeAssetID The assetID for the AVA fee to be paid
+     * @param fee The amount of AVA to be paid for fees, in $nAVA
+     * @param feeSenderAddresses The addresses to send the fees
+     * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
+     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
+     * @param utxoids An array of strings for the NFTs being transferred
+     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param locktime Optional. The locktime field created in the resulting outputs
+     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+     * @returns An unsigned transaction created from the passed in parameters.
+     * 
+     */
     buildCreateNFTMintTx = async (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, threshold:number = 1,
+        utxoids:Array<string>, locktime:BN = new BN(0), threshold:number = 1,
         groupID:number = undefined, bytestring:Buffer = undefined, 
-        svg:Buffer = undefined, url:string = undefined,
+        svg:Buffer = undefined, url:string = undefined
     ): Promise<any> => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
@@ -645,7 +663,7 @@ export class UTXOSet {
           //   * 0x01 inline svg
           //   * 0x02 ascii url
           let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
-          let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, threshold, toAddresses);
+          let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
           fromAddresses.forEach((address, index:number) => {
             // TODO - Confirm address order is the same as minters set address order
             nftMintOperation.addSignatureIdx(index, fromAddresses[index]);
