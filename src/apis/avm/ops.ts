@@ -81,7 +81,7 @@ export abstract class Operation {
         this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
         let bsize:number = this.sigCount.length;
         let barr:Array<Buffer> = [this.sigCount];
-        for(let i = 0; i < this.sigIdxs.length; i++) {
+        for(let i:number = 0; i < this.sigIdxs.length; i++) {
             let b:Buffer = this.sigIdxs[i].toBuffer();
             barr.push(b);
             bsize += b.length;
@@ -247,6 +247,7 @@ export class NFTMintOperation extends Operation {
      * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
      */
     meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
+        // TODO implement this
         // let now:BN;
         // if(typeof asOf === 'undefined'){
         //     now = UnixNow();
@@ -266,6 +267,7 @@ export class NFTMintOperation extends Operation {
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the size of the output.
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
+        // TODO confirm all .fromBuffer calls work
         offset = super.fromBuffer(bytes, offset);
         return new NFTMintOperation().fromBuffer(bytes, offset);
     }
@@ -284,20 +286,26 @@ export class NFTMintOperation extends Operation {
           this.groupID.length + 
           payloadlen.length + 
           this.payload.length +
-          this.locktime.length +
-          this.threshold.length +
           outputlen.length + 
+          // TODO loop over outputs
+          this.locktime.length +
+          // TODO get addr count
           this.threshold.length +
+          this.threshold.length +
+          // TODO loop over addresses
           this.addresses[0].length;
         let barr:Array<Buffer> = [
             superbuff, 
             this.groupID,
             payloadlen,
             this.payload, 
+            outputlen,
+            // TODO loop over outputs
             this.locktime,
             this.threshold,
-            outputlen,
+            // TODO get addr count
             this.threshold,
+            // TODO loop over addresses
             this.addresses[0]
         ];
         return Buffer.concat(barr,bsize);
