@@ -279,34 +279,48 @@ export class NFTMintOperation extends Operation {
         let superbuff:Buffer = super.toBuffer();
         let payloadlen:Buffer = Buffer.alloc(4);
         payloadlen.writeUInt32BE(this.payload.length, 0);
+
         let outputlen:Buffer = Buffer.alloc(4);
-        outputlen.writeUInt32BE(this.addresses.length, 0);
+        // TODO Should this be hardcoded to length of 1?
+        outputlen.writeUInt32BE(1, 0);
+
+        let addrlen:Buffer = Buffer.alloc(4);
+        addrlen.writeUInt32BE(this.addresses.length, 0);
+
+        let addrbuffsize:number = 0;
+        for(let i:number = 0; i < this.addresses.length; i++) {
+            addrbuffsize += (i+1)*20;
+        }
+        let addrbuff:Buffer = Buffer.concat(this.addresses);
+
         let bsize:number = 
           superbuff.length + 
+          // 4 bytes
           this.groupID.length + 
+          // 4 bytes
           payloadlen.length + 
+          // n bytes
           this.payload.length +
+          // 4 bytes
           outputlen.length + 
-          // TODO loop over outputs
+          // 8 bytes
           this.locktime.length +
-          // TODO get addr count
+          // 4 bytes
           this.threshold.length +
-          this.threshold.length +
-          // TODO loop over addresses
-          this.addresses[0].length;
+          // 4 bytes
+          addrlen.length +
+          // n bytes
+          addrbuff.length;
         let barr:Array<Buffer> = [
             superbuff, 
             this.groupID,
             payloadlen,
             this.payload, 
             outputlen,
-            // TODO loop over outputs
             this.locktime,
             this.threshold,
-            // TODO get addr count
-            this.threshold,
-            // TODO loop over addresses
-            this.addresses[0]
+            addrlen,
+            addrbuff
         ];
         return Buffer.concat(barr,bsize);
     }
