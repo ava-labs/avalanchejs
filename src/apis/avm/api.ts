@@ -641,10 +641,6 @@ class AVMAPI extends JRPCAPI{
         utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
         feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
-    // buildNFTTransferTx = async (
-    //     utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-    //     feeAddresses:Array<string>, threshold:number = 1
-    // ):Promise<UnsignedTx> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));

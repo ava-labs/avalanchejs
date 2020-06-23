@@ -718,7 +718,7 @@ export class UTXOSet {
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let ops:Array<TransferableOperation> = [];
-        for(let i:number = 0; i <= utxoids.length; i++) {
+        for(let i:number = 0; i < utxoids.length; i++) {
             let utxo:UTXO = this.getUTXO(utxoids[i]);
             let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
             let groupID:number = out.getGroupID();
@@ -730,7 +730,7 @@ export class UTXOSet {
             )
             let op:NFTTransferOperation = new NFTTransferOperation(outbound);
 
-            for(let j:number = 0; j <= utxoids.length; j++) {
+            for(let j:number = 0; j < utxoids.length; j++) {
                 let idx:number;
                 idx = out.getAddressIdx(spenders[i]);
                 if(idx == -1){
