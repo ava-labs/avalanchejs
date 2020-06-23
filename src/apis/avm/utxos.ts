@@ -626,64 +626,69 @@ export class UTXOSet {
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let ops:TransferableOperation[] = [];
+
         if(threshold > fromAddresses.length) {
-            // TODO error handling
-          }
+            /* istanbul ignore next */
+            throw new Error(`Error - UTXOSet.buildNFTTransferTx: threshold is greater than number of addresses`);
+        }
   
-          let version:number = 0;
-          let type:number = 0;
-          let bytes:Buffer;
-          if(bytestring instanceof Buffer) {
-              if(svg instanceof Buffer || url !== 'undefined') {
-                // TODO error handling
-              }
-              type = 0;
-              bytes = bytestring;
-          }   
+        let version:number = 0;
+        let type:number = 0;
+        let bytes:Buffer;
+        if(bytestring instanceof Buffer) {
+            if(svg instanceof Buffer || url !== 'undefined') {
+                /* istanbul ignore next */
+                throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in bytestring along with svg and/or url`);
+            }
+            type = 0;
+            bytes = bytestring;
+        }   
   
-          if(svg instanceof Buffer) {
-              if(bytestring instanceof Buffer || url !== 'undefined') {
-                // TODO error handling
-              }
-              type = 1;
-              bytes = svg;
-          }   
+        if(svg instanceof Buffer) {
+            if(bytestring instanceof Buffer || url !== 'undefined') {
+                /* istanbul ignore next */
+                throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in svg along with bytestring and/or url`);
+            }
+            type = 1;
+            bytes = svg;
+        }   
   
-          if(url !== 'undefined') {
-              if(bytestring instanceof Buffer || svg instanceof Buffer) {
-                // TODO error handling
-              }
-              type = 2;
-              bytes = Buffer.from(url);
-          }   
+        if(url !== 'undefined') {
+            if(bytestring instanceof Buffer || svg instanceof Buffer) {
+                /* istanbul ignore next */
+                throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in url along with bytestring and/or svg`);
+            }
+            type = 2;
+            bytes = Buffer.from(url);
+        }   
   
-          // * 1 byte - version (255 will mean version field is 2 bytes)
-          // * 1 byte - type (inline or external)
-          //   * 0x00 uniterpreted bytestring
-          //   * 0x01 inline svg
-          //   * 0x02 ascii url
-          let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
-          let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
+        // * 1 byte - version (255 will mean version field is 2 bytes)
+        // * 1 byte - type (inline or external)
+        //   * 0x00 uniterpreted bytestring
+        //   * 0x01 inline svg
+        //   * 0x02 ascii url
+        let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length+2, 1024));
+        let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
 
-          for(let i:number = 0; i < fromAddresses.length; i++) {
-            // TODO - Confirm address order is the same as minters set address order
-            nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
-          }
+        for(let i:number = 0; i < fromAddresses.length; i++) {
+        // TODO - Confirm address order is the same as minters set address order
+        nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
+        }
 
-          for(let i:number = 0; i < utxoids.length; i++) {
-              let utxo: UTXO = this.getUTXO(utxoids[i])
-              let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
-              ops.push(transferableOperation);
-          }
+        for(let i:number = 0; i < utxoids.length; i++) {
+            let utxo: UTXO = this.getUTXO(utxoids[i])
+            let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
+            ops.push(transferableOperation);
+        }
   
-          let operationTx:OperationTx = new OperationTx(
-            networkid, 
-            blockchainid, 
-            outs, 
-            ins, 
-            ops
-          )
-          return new UnsignedTx(operationTx);
+        let operationTx:OperationTx = new OperationTx(
+        networkid, 
+        blockchainid, 
+        outs, 
+        ins, 
+        ops
+        )
+        return new UnsignedTx(operationTx);
     }
 
     /**
