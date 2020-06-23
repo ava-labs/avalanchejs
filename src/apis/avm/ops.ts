@@ -244,26 +244,6 @@ export class NFTMintOperation extends Operation {
     }
 
     /**
-     * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
-     */
-    meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
-        // TODO implement this
-        // let now:BN;
-        // if(typeof asOf === 'undefined'){
-        //     now = UnixNow();
-        // } else {
-        //     now = asOf;
-        // }
-        // let qualified:Array<Buffer> = this.getSpenders(addresses, now);
-        // let threshold:number = this.threshold.readUInt32BE(0);
-        // if(qualified.length >= threshold){
-        //     return true;
-        // }
-
-        return false;
-    }
-
-    /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the size of the output.
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {

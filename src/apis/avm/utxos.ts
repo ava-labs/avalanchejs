@@ -730,14 +730,14 @@ export class UTXOSet {
             )
             let op:NFTTransferOperation = new NFTTransferOperation(outbound);
 
-            for(let j:number = 0; j < utxoids.length; j++) {
+            for(let j:number = 0; j < spenders.length; j++) {
                 let idx:number;
-                idx = out.getAddressIdx(spenders[i]);
+                idx = out.getAddressIdx(spenders[j]);
                 if(idx == -1){
                     /* istanbul ignore next */
-                    throw new Error(`Error - UTXOSet.buildNFTTransferTx: no such address in output: ${spenders[i]}`);
+                    throw new Error(`Error - UTXOSet.buildNFTTransferTx: no such address in output: ${spenders[j]}`);
                 }
-                op.addSignatureIdx(idx, spenders[i]);
+                op.addSignatureIdx(idx, spenders[j]);
             }
             
             let xferop:TransferableOperation = new TransferableOperation(utxo.getAssetID(), [utxoids[i]], op);
