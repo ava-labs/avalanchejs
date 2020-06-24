@@ -15,6 +15,10 @@ import { NFTMintOutput, TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { NFTMintOperation, TransferableOperation } from './ops';
 
+export interface MinterSet {
+    threshold:number
+    minters:Array<string>|Array<Buffer>
+}
 
 /**
  * @ignore
@@ -658,7 +662,6 @@ class AVMAPI extends JRPCAPI{
             feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold
         );
     }
-
     
     /**
      * Creates an unsigned transaction. For more granular control, you may create your own
@@ -698,26 +701,55 @@ class AVMAPI extends JRPCAPI{
         );
     }
         
+    /**
+     * Creates an unsigned transaction. For more granular control, you may create your own
+     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+     * 
+     * @param utxoset A set of UTXOs that the transaction is built on
+     * @param fee The amount of AVA to be paid for fees, in $nAVA
+     * @param creatorAddresses The addresses to send the fees
+     * @param initialStates The [[InitialStates]] that represent the intial state of an nft asset
+     * @param name String for the descriptive name of the asset
+     * @param symbol String for the ticker symbol of the asset
+     * @param minterSets  is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+     * 
+     * ```js
+     * Example minterSets:
+     * [
+     *      {
+     *          "minters":[
+     *              "X-4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+     *          ],
+     *          "threshold": 1
+     *      },
+     *      {
+     *          "minters": [
+     *              "X-dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+     *              "X-2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+     *              "X-7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+     *          ],
+     *          "threshold": 2
+     *      }
+     * ]
+     * ```
+     * 
+     * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
+     * 
+     */
     buildCreateNFTAssetTx = async (
         utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
         initialStates:InitialStates, name:string, 
         symbol:string,
-        mintersSet: {
-            threshold: number
-            minters:Array<string>|Array<Buffer>
-        }[]
+        minterSets:MinterSet[]
     ): Promise<UnsignedTx> => {
         let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
-        let mappedMintersSet: {
+        let mappedMintersSet:{
             threshold: number;
             minters: Buffer[];
-        }[] = mintersSet.map((set:{
-            threshold: number
-            minters:Array<string>|Array<Buffer>
-          }, indx:number) => {
+        }[] = minterSets.map((minterSet:MinterSet) => {
           return {
-            threshold: set.threshold,
-            minters: this._cleanAddressArray(set.minters, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
+            threshold: minterSet.threshold,
+            minters: this._cleanAddressArray(minterSet.minters, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
           }
         });
         
@@ -739,14 +771,31 @@ class AVMAPI extends JRPCAPI{
         );
     }
 
+    /**
+     * Creates an unsigned transaction. For more granular control, you may create your own
+     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+     * 
+     * @param utxoset  A set of UTXOs that the transaction is built on
+     * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
+     * @param toAddresses The addresses to send the outputs
+     * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
+     * @param fee The amount of fees being paid for this transaction
+     * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
+     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param locktime Optional. The locktime field created in the resulting outputs
+     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+     * 
+     * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
+     * 
+     */
     buildCreateNFTMintTx = async (
         utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, 
         fromAddresses:Array<string>, fee:BN,
         feeAddresses:Array<string>, locktime:BN = new BN(0), threshold:number = 1,
-        groupID:number = undefined, 
-        bytestring:Buffer = undefined, 
-        svg:Buffer = undefined,
-        url: string = undefined
+        groupID:number, 
+        bytestring:Buffer|undefined, 
+        svg:Buffer|undefined,
+        url: string|undefined
     ): Promise<any> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));

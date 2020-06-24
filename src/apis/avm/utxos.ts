@@ -10,11 +10,7 @@ import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, Tx } from './tx';
 import { SecpInput, Input, TransferableInput } from './inputs';
 import { Operation, NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
-
-interface MinterSet {
-    threshold:number
-    minters:Array<Buffer>
-}
+import { MinterSet } from "./api";
 
 /**
  * @ignore
@@ -578,18 +574,18 @@ export class UTXOSet {
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
         fee:BN, feeSenderAddresses:Array<Buffer>, 
         initialState:InitialStates, 
-        mintersSets: MinterSet[],
+        minterSets,
         name:string, symbol:string
     ):UnsignedTx => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-        for(let i:number = 0; i < mintersSets.length; i++) {
+        for(let i:number = 0; i < minterSets.length; i++) {
           let nftMintOutput:NFTMintOutput = new NFTMintOutput(
             i, 
             new BN(0), 
-            mintersSets[i].threshold, 
-            mintersSets[i].minters
+            minterSets[i].threshold, 
+            minterSets[i].minters
            );
           initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
         }
@@ -619,8 +615,8 @@ export class UTXOSet {
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
         utxoids:Array<string>, locktime:BN = new BN(0), threshold:number = 1,
-        groupID:number = undefined, bytestring:Buffer = undefined, 
-        svg:Buffer = undefined, url:string = undefined
+        groupID:number, bytestring:Buffer|undefined, 
+        svg:Buffer|undefined, url:string|undefined
     ): Promise<any> => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
@@ -629,32 +625,32 @@ export class UTXOSet {
 
         if(threshold > fromAddresses.length) {
             /* istanbul ignore next */
-            throw new Error(`Error - UTXOSet.buildNFTTransferTx: threshold is greater than number of addresses`);
+            throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
         }
   
         let version:number = 0;
         let type:number = 0;
         let bytes:Buffer;
-        if(bytestring instanceof Buffer) {
-            if(svg instanceof Buffer || url !== 'undefined') {
+        if(Buffer.isBuffer(bytestring)) {
+            if(Buffer.isBuffer(svg) || url !== undefined) {
                 /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in bytestring along with svg and/or url`);
+                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: can't pass in bytestring along with svg and/or url`);
             }
             type = 0;
             bytes = bytestring;
         }   
   
         if(svg instanceof Buffer) {
-            if(bytestring instanceof Buffer || url !== 'undefined') {
+            if(Buffer.isBuffer(bytestring) || url !== undefined) {
                 /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in svg along with bytestring and/or url`);
+                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: can't pass in svg along with bytestring and/or url`);
             }
             type = 1;
             bytes = svg;
         }   
   
-        if(url !== 'undefined') {
-            if(bytestring instanceof Buffer || svg instanceof Buffer) {
+        if(url !== undefined) {
+            if(Buffer.isBuffer(bytestring) || svg instanceof Buffer) {
                 /* istanbul ignore next */
                 throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in url along with bytestring and/or svg`);
             }
@@ -675,6 +671,7 @@ export class UTXOSet {
 
         for(let i:number = 0; i < fromAddresses.length; i++) {
           // TODO - Confirm address order is the same as minters set address order
+          // this.addresses.sort(Address.comparitor());
           nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
         }
 

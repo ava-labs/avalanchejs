@@ -793,7 +793,6 @@ describe("AVMAPI", () => {
             expect(txu2.toString()).toBe(txu1.toString());
             
         });
-
     });
 
     test('buildGenesis', async ()=>{
