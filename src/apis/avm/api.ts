@@ -7,13 +7,11 @@ import BN from "bn.js";
 import BinTools from '../../utils/bintools';
 import { Buffer } from "buffer/";
 import { JRPCAPI, RequestResponseData, Defaults } from "../../utils/types";
-import { UTXOSet, UTXO } from './utxos';
+import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
-import { Tx, UnsignedTx, CreateAssetTx, OperationTx } from './tx';
-import { NFTMintOutput, TransferableOutput, OutputOwners } from './outputs';
-import { TransferableInput } from './inputs';
-import { NFTMintOperation, TransferableOperation } from './ops';
+import { Tx, UnsignedTx } from './tx';
+import { OutputOwners } from './outputs';
 
 export interface MinterSet {
     threshold:number
