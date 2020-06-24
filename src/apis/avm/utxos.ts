@@ -615,7 +615,7 @@ export class UTXOSet {
     buildCreateNFTMintTx = async (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, locktime:BN = new BN(0), threshold:number = 1,
+        utxoids:Array<string>, asOf:BN, locktime:BN = new BN(0), threshold:number = 1,
         groupID:number, bytestring:Buffer|undefined, 
         svg:Buffer|undefined, url:string|undefined
     ): Promise<any> => {
@@ -670,14 +670,22 @@ export class UTXOSet {
         let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length + versionlen + typelen, maxlen));
         let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
 
-        for(let i:number = 0; i < fromAddresses.length; i++) {
-          // TODO - Confirm address order is the same as minters set address order
-          // this.addresses.sort(Address.comparitor());
-          nftMintOperation.addSignatureIdx(i, fromAddresses[i]);
-        }
-
         for(let i:number = 0; i < utxoids.length; i++) {
-            let utxo: UTXO = this.getUTXO(utxoids[i])
+            let utxo:UTXO = this.getUTXO(utxoids[i]);
+            let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
+            let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
+
+
+            for(let j:number = 0; j < spenders.length; j++) {
+                let idx:number;
+                idx = out.getAddressIdx(spenders[j]);
+                if(idx == -1){
+                    /* istanbul ignore next */
+                    throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: no such address in output: ${spenders[j]}`);
+                }
+                nftMintOperation.addSignatureIdx(idx, spenders[j]);
+            }
+            
             let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
             ops.push(transferableOperation);
         }

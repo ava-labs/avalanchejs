@@ -791,13 +791,11 @@ class AVMAPI extends JRPCAPI{
      * 
      */
     buildCreateNFTMintTx = async (
-        utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, 
+        utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>, 
         fromAddresses:Array<string>, fee:BN,
-        feeAddresses:Array<string>, locktime:BN = new BN(0), threshold:number = 1,
-        groupID:number, 
-        bytestring:Buffer|undefined, 
-        svg:Buffer|undefined,
-        url: string|undefined
+        feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), 
+        threshold:number = 1, groupID:number, bytestring:Buffer|undefined, 
+        svg:Buffer|undefined, url: string|undefined
     ): Promise<any> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
@@ -818,6 +816,7 @@ class AVMAPI extends JRPCAPI{
             to,
             from,
             utxoid,
+            asOf,
             locktime,
             threshold,
             groupID,
