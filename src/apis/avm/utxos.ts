@@ -10,7 +10,7 @@ import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, Tx } from './tx';
 import { SecpInput, Input, TransferableInput } from './inputs';
 import { Operation, NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
-import { MinterSet } from "./api";
+import { MappedMinterSet } from "./api";
 
 /**
  * @ignore
@@ -561,11 +561,10 @@ export class UTXOSet {
      * @param avaAssetId The AVA Asset ID
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feeSenderAddresses The addresses to send the fees
-     * @param initialState Any [[InitialStates]] to add to the transaction
-     * @param mintersSets The minters and thresholds required to mint this nft asset
+     * @param minterSets The minters and thresholds required to mint this nft asset
      * @param name String for the descriptive name of the nft asset
      * @param symbol String for the ticker symbol of the nft asset
-     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * @param locktime Optional. The locktime field created in the resulting mint output
      * 
      * @returns An unsigned transaction created from the passed in parameters.
      * 
@@ -574,8 +573,9 @@ export class UTXOSet {
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
         fee:BN, feeSenderAddresses:Array<Buffer>, 
         initialState:InitialStates, 
-        minterSets,
-        name:string, symbol:string
+        minterSets:Array<MappedMinterSet>,
+        name:string, symbol:string,
+        locktime:BN
     ):UnsignedTx => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
@@ -583,13 +583,14 @@ export class UTXOSet {
         for(let i:number = 0; i < minterSets.length; i++) {
           let nftMintOutput:NFTMintOutput = new NFTMintOutput(
             i, 
-            new BN(0), 
+            locktime, 
             minterSets[i].threshold, 
             minterSets[i].minters
            );
           initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
         }
-        let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, 0, initialState);
+        let denomination:number = 0; // NFTs are non-fungible
+        let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, denomination, initialState);
         return new UnsignedTx(CAtx);
     }
 

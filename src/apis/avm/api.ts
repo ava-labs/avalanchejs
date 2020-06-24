@@ -20,6 +20,11 @@ export interface MinterSet {
     minters:Array<string>|Array<Buffer>
 }
 
+export interface MappedMinterSet {
+    threshold:number
+    minters:Array<Buffer>
+}
+
 /**
  * @ignore
  */
@@ -277,7 +282,7 @@ class AVMAPI extends JRPCAPI{
      * @param name The human-readable name for the asset
      * @param symbol Optional. The shorthand symbol for the asset -- between 0 and 4 characters
      * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
-     * @param minterSets  is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+     * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
      * 
      * ```js
      * Example minterSets:
@@ -711,7 +716,8 @@ class AVMAPI extends JRPCAPI{
      * @param initialStates The [[InitialStates]] that represent the intial state of an nft asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
-     * @param minterSets  is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+     * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+     * @param locktime Optional. The locktime field created in the resulting mint output
      * 
      * ```js
      * Example minterSets:
@@ -739,14 +745,10 @@ class AVMAPI extends JRPCAPI{
     buildCreateNFTAssetTx = async (
         utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
         initialStates:InitialStates, name:string, 
-        symbol:string,
-        minterSets:MinterSet[]
+        symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0), 
     ): Promise<UnsignedTx> => {
         let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
-        let mappedMintersSet:{
-            threshold: number;
-            minters: Buffer[];
-        }[] = minterSets.map((minterSet:MinterSet) => {
+        let mappedMinterSets:Array<MappedMinterSet> = minterSets.map((minterSet:MinterSet):MappedMinterSet => {
           return {
             threshold: minterSet.threshold,
             minters: this._cleanAddressArray(minterSet.minters, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
@@ -767,7 +769,7 @@ class AVMAPI extends JRPCAPI{
         return utxoset.buildCreateNFTAssetTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             fee, creators, initialStates,
-            mappedMintersSet, name, symbol
+            mappedMinterSets, name, symbol, locktime
         );
     }
 
