@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from "src";
-import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
+import AVMAPI, { PersistanceOptions, MinterSet, MappedMinterSet } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
@@ -10,7 +10,7 @@ import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
-import { TransferableOutput, SecpOutput } from 'src/apis/avm/outputs';
+import { TransferableOutput, SecpOutput, NFTMintOutput } from 'src/apis/avm/outputs';
 import { NFTTransferOutput } from '../../../src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from '../../../src/apis/avm/ops';
 
@@ -521,6 +521,7 @@ describe("AVMAPI", () => {
         let keymgr2:AVMKeyChain;
         let keymgr3:AVMKeyChain;
         let addrs1:Array<string>;
+        let addrs1Buf:Array<Buffer>;
         let addrs2:Array<string>;
         let addrs3:Array<string>;
         let addressbuffs:Array<Buffer> =[];
@@ -535,7 +536,11 @@ describe("AVMAPI", () => {
         let secpbase1:SecpOutput;
         let secpbase2:SecpOutput;
         let secpbase3:SecpOutput;
+        let nftpbase1:NFTMintOutput;
+        let nftpbase2:NFTMintOutput;
+        let nftpbase3:NFTMintOutput;
         let initialState:InitialStates;
+        let nftInitialState:InitialStates;
         let nftutxoids:Array<string> = [];
         
         beforeEach(() => {
@@ -544,6 +549,7 @@ describe("AVMAPI", () => {
             keymgr2 = new AVMKeyChain(alias);
             keymgr3 = new AVMKeyChain(alias);
             addrs1 = [];
+            addrs1Buf = [];
             addrs2 = [];
             addrs3 = [];
             utxos = [];
@@ -553,11 +559,13 @@ describe("AVMAPI", () => {
             let pload:Buffer = Buffer.alloc(1024);
             pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
 
-
             for(let i:number = 0; i < 3; i++){
                 addrs1.push(api.addressFromBuffer(api.keyChain().makeKey()));
                 addrs2.push(api.addressFromBuffer(keymgr2.makeKey()));
                 addrs3.push(api.addressFromBuffer(keymgr3.makeKey()));
+            }
+            for(let i:number = 0; i < 3; i++){
+                addrs1Buf.push(bintools.stringToBuffer(addrs1[i]));
             }
             let amount:BN = new BN(amnt);
             addressbuffs = api.keyChain().getAddresses();
@@ -606,6 +614,14 @@ describe("AVMAPI", () => {
             initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
             initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
             initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
+
+            nftpbase1 = new NFTMintOutput(0, locktime, 1, addrs3.map(a => api.parseAddress(a)));
+            nftpbase2 = new NFTMintOutput(1, locktime, 1, addrs2.map(a => api.parseAddress(a)));
+            nftpbase3 = new NFTMintOutput(2, locktime, 1, addrs2.map(a => api.parseAddress(a)));
+            nftInitialState = new InitialStates();
+            nftInitialState.addOutput(nftpbase1, AVMConstants.NFTFXID);
+            nftInitialState.addOutput(nftpbase2, AVMConstants.NFTFXID);
+            nftInitialState.addOutput(nftpbase3, AVMConstants.NFTFXID);
         });
 
         test('buildBaseTx1', async () => {
@@ -770,6 +786,38 @@ describe("AVMAPI", () => {
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
             
+        });
+
+        test('buildCreateNFTAssetTx', async () => {
+            let fee:number = 10;
+            let name:string = "Coincert";
+            let symbol:string = "TIXX";
+            let minterSets:Array<MinterSet> = [{minters:addrs1,threshold:1}]
+            let locktime:BN = new BN(0);
+
+            let result:Promise<UnsignedTx> = api.buildCreateNFTAssetTx(set, new BN(fee), addrs1, nftInitialState, name, symbol, minterSets, locktime);
+            let payload:object = {
+                "result": {
+                    'name': name, 
+                    'symbol': symbol, 
+                    'assetID': bintools.avaSerialize(assetID)
+                }
+            };
+            let responseObj = {
+                data: payload
+            };
+    
+            mockAxios.mockResponse(responseObj);
+            let txu1:UnsignedTx = await result;
+    
+            expect(mockAxios.request).toHaveBeenCalledTimes(1);
+
+            let mappedMinterSets:Array<MappedMinterSet> = [{ threshold: 1, minters: addrs1Buf }]
+            
+            let txu2:UnsignedTx = set.buildCreateNFTAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), nftInitialState, mappedMinterSets, name, symbol, locktime);
+
+            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
+            expect(txu2.toString()).toBe(txu1.toString());
         });
 
         test('buildNFTTransferTx', async () => {
