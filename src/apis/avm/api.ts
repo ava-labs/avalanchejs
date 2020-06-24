@@ -785,7 +785,11 @@ class AVMAPI extends JRPCAPI{
      * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime Optional. The locktime field created in the resulting outputs
+     * @param groupID Optional. The group this NFT is issued to.
      * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+     * @param bytestring Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
+     * @param svg Optional. SVG to use for token artwork. **Only 1 of bytestring, svg and url may be passed in at a time**
+     * @param url Optional. URL which contains token artwork. **Only 1 of bytestring, svg and url may be passed in at a time**
      * 
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
      * 
@@ -793,9 +797,9 @@ class AVMAPI extends JRPCAPI{
     buildCreateNFTMintTx = async (
         utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>, 
         fromAddresses:Array<string>, fee:BN,
-        feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), 
-        threshold:number = 1, groupID:number, bytestring:Buffer|undefined, 
-        svg:Buffer|undefined, url: string|undefined
+        feeAddresses:Array<string>, asOf:BN = UnixNow(), groupID:number = 0, 
+        locktime:BN = new BN(0), threshold:number = 1, bytestring:Buffer|undefined = undefined, 
+        svg:Buffer|undefined = undefined, url: string|undefined = undefined
     ): Promise<any> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
@@ -817,9 +821,9 @@ class AVMAPI extends JRPCAPI{
             from,
             utxoid,
             asOf,
+            groupID,
             locktime,
             threshold,
-            groupID,
             bytestring,
             svg,
             url

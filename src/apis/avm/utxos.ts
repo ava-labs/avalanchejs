@@ -612,13 +612,13 @@ export class UTXOSet {
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
-    buildCreateNFTMintTx = async (
+    buildCreateNFTMintTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, asOf:BN, locktime:BN = new BN(0), threshold:number = 1,
-        groupID:number, bytestring:Buffer|undefined, 
+        utxoids:Array<string>, asOf:BN, groupID:number, locktime:BN = new BN(0), 
+        threshold:number = 1, bytestring:Buffer|undefined, 
         svg:Buffer|undefined, url:string|undefined
-    ): Promise<any> => {
+    ):UnsignedTx => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();

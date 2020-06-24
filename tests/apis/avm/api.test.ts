@@ -521,11 +521,10 @@ describe("AVMAPI", () => {
         let keymgr2:AVMKeyChain;
         let keymgr3:AVMKeyChain;
         let addrs1:Array<string>;
-        let addrs1Buf:Array<Buffer>;
         let addrs2:Array<string>;
         let addrs3:Array<string>;
-        let addressbuffs:Array<Buffer> =[];
-        let addresses:Array<string> = [];
+        let addressbuffs:Array<Buffer>;
+        let addresses:Array<string>;
         let utxos:Array<UTXO>;
         let inputs:Array<TransferableInput>;
         let outputs:Array<TransferableOutput>;
@@ -541,7 +540,7 @@ describe("AVMAPI", () => {
         let nftpbase3:NFTMintOutput;
         let initialState:InitialStates;
         let nftInitialState:InitialStates;
-        let nftutxoids:Array<string> = [];
+        let nftutxoids:Array<string>;
         
         beforeEach(() => {
             set = new UTXOSet();
@@ -549,9 +548,11 @@ describe("AVMAPI", () => {
             keymgr2 = new AVMKeyChain(alias);
             keymgr3 = new AVMKeyChain(alias);
             addrs1 = [];
-            addrs1Buf = [];
             addrs2 = [];
             addrs3 = [];
+            addressbuffs = [];
+            addresses = [];
+            nftutxoids = [];
             utxos = [];
             inputs = [];
             outputs = [];
@@ -563,9 +564,6 @@ describe("AVMAPI", () => {
                 addrs1.push(api.addressFromBuffer(api.keyChain().makeKey()));
                 addrs2.push(api.addressFromBuffer(keymgr2.makeKey()));
                 addrs3.push(api.addressFromBuffer(keymgr3.makeKey()));
-            }
-            for(let i:number = 0; i < 3; i++){
-                addrs1Buf.push(bintools.stringToBuffer(addrs1[i]));
             }
             let amount:BN = new BN(amnt);
             addressbuffs = api.keyChain().getAddresses();
@@ -596,10 +594,10 @@ describe("AVMAPI", () => {
                 let xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
                 inputs.push(xferinput);
 
-                let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, locktime, threshold, addressbuffs);
+                let nout:NFTTransferOutput = new NFTTransferOutput(i, pload, locktime, threshold, addressbuffs);
                 let op:NFTTransferOperation = new NFTTransferOperation(nout);
                 let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-                let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
+                let nftutxo:UTXO = new UTXO(nfttxid, i, NFTassetID, nout);
                 nftutxoids.push(nftutxo.getUTXOID());
                 let xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
                 ops.push(xferop);
@@ -615,13 +613,20 @@ describe("AVMAPI", () => {
             initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
             initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
 
-            nftpbase1 = new NFTMintOutput(0, locktime, 1, addrs3.map(a => api.parseAddress(a)));
+            nftpbase1 = new NFTMintOutput(0, locktime, 1, addrs1.map(a => api.parseAddress(a)));
             nftpbase2 = new NFTMintOutput(1, locktime, 1, addrs2.map(a => api.parseAddress(a)));
-            nftpbase3 = new NFTMintOutput(2, locktime, 1, addrs2.map(a => api.parseAddress(a)));
+            nftpbase3 = new NFTMintOutput(2, locktime, 1, addrs3.map(a => api.parseAddress(a)));
             nftInitialState = new InitialStates();
             nftInitialState.addOutput(nftpbase1, AVMConstants.NFTFXID);
             nftInitialState.addOutput(nftpbase2, AVMConstants.NFTFXID);
             nftInitialState.addOutput(nftpbase3, AVMConstants.NFTFXID);
+            // let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000), 32)).digest());
+            // let nftutxo1:UTXO = new UTXO(nfttxid, 0, NFTassetID, nftpbase1);
+            // let nftutxo2:UTXO = new UTXO(nfttxid, 1, NFTassetID, nftpbase2);
+            // let nftutxo3:UTXO = new UTXO(nfttxid, 2, NFTassetID, nftpbase3);
+            // nftutxoids.push(nftutxo1.getUTXOID());
+            // nftutxoids.push(nftutxo2.getUTXOID());
+            // nftutxoids.push(nftutxo3.getUTXOID());
         });
 
         test('buildBaseTx1', async () => {
@@ -789,34 +794,52 @@ describe("AVMAPI", () => {
         });
 
         test('buildCreateNFTAssetTx', async () => {
-            let fee:number = 10;
+            let fee:number = 0;
             let name:string = "Coincert";
             let symbol:string = "TIXX";
             let minterSets:Array<MinterSet> = [{minters:addrs1,threshold:1}]
             let locktime:BN = new BN(0);
+            let addrbuff1 = addrs1.map(a => api.parseAddress(a));
 
-            let result:Promise<UnsignedTx> = api.buildCreateNFTAssetTx(set, new BN(fee), addrs1, nftInitialState, name, symbol, minterSets, locktime);
-            let payload:object = {
-                "result": {
-                    'name': name, 
-                    'symbol': symbol, 
-                    'assetID': bintools.avaSerialize(assetID)
-                }
-            };
-            let responseObj = {
-                data: payload
-            };
-    
-            mockAxios.mockResponse(responseObj);
-            let txu1:UnsignedTx = await result;
-    
-            expect(mockAxios.request).toHaveBeenCalledTimes(1);
-
-            let mappedMinterSets:Array<MappedMinterSet> = [{ threshold: 1, minters: addrs1Buf }]
+            let txu1:UnsignedTx = await api.buildCreateNFTAssetTx(
+                set, new BN(fee), addrs1, nftInitialState, 
+                name, symbol, minterSets, locktime
+            );
             
+            let mappedMinterSets:Array<MappedMinterSet> = [{ threshold: 1, minters: addrbuff1 }]
             let txu2:UnsignedTx = set.buildCreateNFTAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), nftInitialState, mappedMinterSets, name, symbol, locktime);
 
-            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
+            let hex1:string = txu1.toBuffer().toString("hex");
+            let hex2:string = txu2.toBuffer().toString("hex");
+            expect(hex1).toBe(hex2);
+            expect(txu2.toString()).toBe(txu1.toString());
+        });
+
+        test('buildCreateNFTMintTx', async () => {
+            let fee:number = 0;
+            let groupID:number = 0;
+            let locktime:BN = new BN(0);
+            let threshold:number = 1;
+            let bytestring:Buffer = undefined;
+            let svg:Buffer = undefined;
+            let url:string = "https://example.com";
+            let addrbuff1 = addrs1.map(a => api.parseAddress(a));
+            let addrbuff3 = addrs3.map(a => api.parseAddress(a));
+
+            let txu1:UnsignedTx = await api.buildCreateNFTMintTx(
+                set, nftutxoids, addrs3, addrs3, new BN(fee), addrs1,
+                UnixNow(), groupID, locktime, threshold, bytestring, svg, url
+            );
+    
+            let txu2:UnsignedTx = set.buildCreateNFTMintTx(
+                avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), 
+                assetID, new BN(fee), addrbuff1, addrbuff3, addrbuff3, nftutxoids, UnixNow(), 
+                groupID, locktime, threshold, bytestring, svg, url
+            );
+
+            let hex1:string = txu1.toBuffer().toString("hex");
+            let hex2:string = txu2.toBuffer().toString("hex");
+            expect(hex1).toBe(hex2);
             expect(txu2.toString()).toBe(txu1.toString());
         });
 
