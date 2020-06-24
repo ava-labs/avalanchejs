@@ -39,7 +39,7 @@ export abstract class Output {
     /**
      * Returns the outputID for the output which tells parsers what type it is
      */
-    abstract getOutputID():number;
+    getOutputID?():number;
 
     /**
      * Returns the threshold of signers required to spend this output.
@@ -293,6 +293,8 @@ export class TransferableOutput {
         }
     }
 }
+
+export class OutputOwners extends Output {}
 
 /**
  * An [[Output]] class which specifies a token amount .

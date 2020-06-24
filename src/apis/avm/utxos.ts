@@ -5,7 +5,7 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput } from './outputs';
+import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput, OutputOwners } from './outputs';
 import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, Tx } from './tx';
 import { SecpInput, Input, TransferableInput } from './inputs';
@@ -614,9 +614,8 @@ export class UTXOSet {
      */
     buildCreateNFTMintTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
-        feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, asOf:BN, groupID:number, locktime:BN = new BN(0), 
-        threshold:number = 1, bytestring:Buffer|undefined, 
+        feeSenderAddresses:Array<Buffer>, outputOwners:Array<OutputOwners>, fromAddresses:Array<Buffer>, 
+        utxoids:Array<string>, asOf:BN, groupID:number, bytestring:Buffer|undefined, 
         svg:Buffer|undefined, url:string|undefined
     ):UnsignedTx => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
@@ -624,9 +623,11 @@ export class UTXOSet {
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let ops:TransferableOperation[] = [];
 
-        if(threshold > fromAddresses.length) {
-            /* istanbul ignore next */
-            throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
+        for(let i:number = 0; i < outputOwners.length; i++) {
+            if(outputOwners[i].getThreshold() > outputOwners[i].getAddresses().length) {
+                /* istanbul ignore next */
+                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
+            }
         }
   
         let version:number = 0;
@@ -668,7 +669,7 @@ export class UTXOSet {
         //   * 0x01 inline svg
         //   * 0x02 ascii url
         let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length + versionlen + typelen, maxlen));
-        let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, locktime, threshold, toAddresses);
+        let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, outputOwners);
 
         for(let i:number = 0; i < utxoids.length; i++) {
             let utxo:UTXO = this.getUTXO(utxoids[i]);

@@ -5,7 +5,7 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import { UTXOID, AVMConstants, SigIdx, UnixNow } from './types';
-import { NFTTransferOutput, SelectOutputClass } from './outputs';
+import { NFTTransferOutput, SelectOutputClass, Output, OutputOwners } from './outputs';
 import BN from "bn.js";
 
 const bintools = BinTools.getInstance();
@@ -204,9 +204,7 @@ export class TransferableOperation {
 export class NFTMintOperation extends Operation {
     protected groupID:Buffer = Buffer.alloc(4);
     protected payload:Buffer;
-    protected locktime:Buffer = Buffer.alloc(8);
-    protected threshold:Buffer = Buffer.alloc(4);
-    protected addresses:Array<Buffer> = [];
+    protected outputOwners:Array<OutputOwners> = [];
 
     /**
      * Returns the operation ID.
@@ -223,31 +221,16 @@ export class NFTMintOperation extends Operation {
     }
 
     /**
-     * Returns the a {@link https://github.com/indutny/bn.js/|BN} repersenting the UNIX Timestamp when the lock is made available.
+     * Returns the outputOwners.
      */
-    getLocktime = ():BN => {
-        return bintools.fromBufferToBN(this.locktime);
-    }
-
-    /**
-     * Returns the outputs.
-     */
-    getAddresses = ():Array<Buffer> => {
-        return this.addresses;
-    }
-
-    /**
-     * Returns the threshold of signers required to spend this output.
-     */
-    getThreshold = ():number => {
-        return this.threshold.readUInt32BE(0);
+    getOutputOwners = ():Array<OutputOwners> => {
+        return this.outputOwners;
     }
 
     /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the size of the output.
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
-        // TODO confirm all .fromBuffer calls work
         offset = super.fromBuffer(bytes, offset);
         return new NFTMintOperation().fromBuffer(bytes, offset);
     }
@@ -260,49 +243,30 @@ export class NFTMintOperation extends Operation {
         let payloadlen:Buffer = Buffer.alloc(4);
         payloadlen.writeUInt32BE(this.payload.length, 0);
 
-        let outputlen:Buffer = Buffer.alloc(4);
-        // TODO accept multiple Output Owners and not have value hard coded
-        let outlen:number = 1;
-        outputlen.writeUInt32BE(outlen, 0);
-
-        let addrlen:Buffer = Buffer.alloc(4);
-        addrlen.writeUInt32BE(this.addresses.length, 0);
-
-        let addrbuffsize:number = 0;
-        for(let i:number = 0; i < this.addresses.length; i++) {
-            addrbuffsize += (i+1)*20;
-        }
-        let addrbuff:Buffer = Buffer.concat(this.addresses);
+        let outputownerslen:Buffer = Buffer.alloc(4);
+        outputownerslen.writeUInt32BE(this.outputOwners.length, 0);
 
         let bsize:number = 
           superbuff.length + 
-          // 4 bytes
           this.groupID.length + 
-          // 4 bytes
           payloadlen.length + 
-          // n bytes
           this.payload.length +
-          // 4 bytes
-          outputlen.length + 
-          // 8 bytes
-          this.locktime.length +
-          // 4 bytes
-          this.threshold.length +
-          // 4 bytes
-          addrlen.length +
-          // n bytes
-          addrbuff.length;
+          outputownerslen.length; 
+
         let barr:Array<Buffer> = [
             superbuff, 
             this.groupID,
             payloadlen,
             this.payload, 
-            outputlen,
-            this.locktime,
-            this.threshold,
-            addrlen,
-            addrbuff
+            outputownerslen
         ];
+
+        for(let i = 0; i < this.outputOwners.length; i++) {
+            let b:Buffer = this.outputOwners[i].toBuffer();
+            barr.push(b);
+            bsize += b.length;
+        }
+
         return Buffer.concat(barr,bsize);
     }
 
@@ -318,27 +282,14 @@ export class NFTMintOperation extends Operation {
      * 
      * @param groupID The group to which to issue the NFT Output
      * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
-     * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-     * @param threshold The threshold needed to spend the output
-     * @param addresses The addresses to receive the NFT Output
+     * @param outputs 
      */
-    constructor(groupID: number = undefined, payload:Buffer = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<string>|Array<Buffer> = undefined){
-        super()
-        if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && typeof threshold !== 'undefined' && typeof addresses !== 'undefined'){
+    constructor(groupID: number = undefined, payload:Buffer = undefined, outputOwners:Array<OutputOwners> = undefined){
+        super();
+        if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && outputOwners.length) {
             this.groupID.writeUInt32BE((groupID ? groupID : 0), 0);
             this.payload = payload;
-            if(!(locktime)){
-                /* istanbul ignore next */
-                locktime = new BN(0);
-            }
-            this.locktime = bintools.fromBNToBuffer(locktime, 8);
-            addresses.forEach((address:Buffer|string) => {
-              if(typeof address === 'string'){
-                address = Buffer.from(address);
-              }
-              this.addresses.push(address)
-            })
-            this.threshold.writeUInt32BE((threshold ? threshold : 1), 0);
+            this.outputOwners = outputOwners
         }
     }
 }

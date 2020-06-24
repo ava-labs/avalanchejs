@@ -11,7 +11,7 @@ import { UTXOSet, UTXO } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx, CreateAssetTx, OperationTx } from './tx';
-import { NFTMintOutput, TransferableOutput } from './outputs';
+import { NFTMintOutput, TransferableOutput, OutputOwners } from './outputs';
 import { TransferableInput } from './inputs';
 import { NFTMintOperation, TransferableOperation } from './ops';
 
@@ -795,13 +795,18 @@ class AVMAPI extends JRPCAPI{
      * 
      */
     buildCreateNFTMintTx = async (
-        utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>, 
+        utxoset:UTXOSet, utxoid:string|Array<string>, outputOwners:Array<OutputOwners>, 
         fromAddresses:Array<string>, fee:BN,
         feeAddresses:Array<string>, asOf:BN = UnixNow(), groupID:number = 0, 
-        locktime:BN = new BN(0), threshold:number = 1, bytestring:Buffer|undefined = undefined, 
+        bytestring:Buffer|undefined = undefined, 
         svg:Buffer|undefined = undefined, url: string|undefined = undefined
     ): Promise<any> => {
-        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+        let formattedOutputOwners:Array<OutputOwners> = [];
+        for(let i:number = 0; i < outputOwners.length; i++) {
+            let cleanAddrs:Array<Buffer> = this._cleanAddressArray(outputOwners[i].getAddresses(), "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+            let outpOwners:OutputOwners = new OutputOwners(outputOwners[i].getLocktime(), outputOwners[i].getThreshold(), cleanAddrs);
+            formattedOutputOwners.push(outpOwners);
+        }
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
 
@@ -812,18 +817,16 @@ class AVMAPI extends JRPCAPI{
         let avaAssetID:Buffer = await this.getAVAAssetID();
 
         return utxoset.buildCreateNFTMintTx(
-            this.core.getNetworkID(),
+            this.   core.getNetworkID(),
             bintools.avaDeserialize(this.blockchainID),
             avaAssetID,
             fee,
             feeAddrs,
-            to,
+            formattedOutputOwners,
             from,
             utxoid,
             asOf,
             groupID,
-            locktime,
-            threshold,
             bytestring,
             svg,
             url

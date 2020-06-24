@@ -10,7 +10,7 @@ import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
-import { TransferableOutput, SecpOutput, NFTMintOutput } from 'src/apis/avm/outputs';
+import { TransferableOutput, SecpOutput, NFTMintOutput, OutputOwners } from 'src/apis/avm/outputs';
 import { NFTTransferOutput } from '../../../src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from '../../../src/apis/avm/ops';
 
@@ -786,8 +786,8 @@ describe("AVMAPI", () => {
             expect(mockAxios.request).toHaveBeenCalledTimes(1);
             
             let txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
-
             
+            expect(txu1.fromBuffer(txu2.toBuffer())).toBe(txu2.fromBuffer(txu1.toBuffer()));
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
             
@@ -799,7 +799,7 @@ describe("AVMAPI", () => {
             let symbol:string = "TIXX";
             let minterSets:Array<MinterSet> = [{minters:addrs1,threshold:1}]
             let locktime:BN = new BN(0);
-            let addrbuff1 = addrs1.map(a => api.parseAddress(a));
+            let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
 
             let txu1:UnsignedTx = await api.buildCreateNFTAssetTx(
                 set, new BN(fee), addrs1, nftInitialState, 
@@ -809,9 +809,7 @@ describe("AVMAPI", () => {
             let mappedMinterSets:Array<MappedMinterSet> = [{ threshold: 1, minters: addrbuff1 }]
             let txu2:UnsignedTx = set.buildCreateNFTAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), nftInitialState, mappedMinterSets, name, symbol, locktime);
 
-            let hex1:string = txu1.toBuffer().toString("hex");
-            let hex2:string = txu2.toBuffer().toString("hex");
-            expect(hex1).toBe(hex2);
+            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
         });
 
@@ -823,23 +821,23 @@ describe("AVMAPI", () => {
             let bytestring:Buffer = undefined;
             let svg:Buffer = undefined;
             let url:string = "https://example.com";
-            let addrbuff1 = addrs1.map(a => api.parseAddress(a));
-            let addrbuff3 = addrs3.map(a => api.parseAddress(a));
+            let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
+            let addrbuff3: Buffer[] = addrs3.map(a => api.parseAddress(a));
+            let outputOwners:Array<OutputOwners> = [];
+            outputOwners.push(new OutputOwners(locktime, threshold, addrbuff3));
 
             let txu1:UnsignedTx = await api.buildCreateNFTMintTx(
-                set, nftutxoids, addrs3, addrs3, new BN(fee), addrs1,
-                UnixNow(), groupID, locktime, threshold, bytestring, svg, url
+                set, nftutxoids, outputOwners, addrs3, new BN(fee), addrs1,
+                UnixNow(), groupID, bytestring, svg, url
             );
     
             let txu2:UnsignedTx = set.buildCreateNFTMintTx(
                 avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), 
-                assetID, new BN(fee), addrbuff1, addrbuff3, addrbuff3, nftutxoids, UnixNow(), 
-                groupID, locktime, threshold, bytestring, svg, url
+                assetID, new BN(fee), addrbuff1, outputOwners, addrbuff3, nftutxoids, UnixNow(), 
+                groupID, bytestring, svg, url
             );
 
-            let hex1:string = txu1.toBuffer().toString("hex");
-            let hex2:string = txu2.toBuffer().toString("hex");
-            expect(hex1).toBe(hex2);
+            expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
         });
 
