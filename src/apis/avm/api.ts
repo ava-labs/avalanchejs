@@ -784,12 +784,12 @@ class AVMAPI extends JRPCAPI{
      * @param fee The amount of fees being paid for this transaction
      * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
      * @param groupID Optional. The group this NFT is issued to.
+     * @param locktime Optional. The locktime field created in the resulting outputs
      * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
      * @param bytestring Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
-     * @param svg Optional. SVG to use for token artwork. **Only 1 of bytestring, svg and url may be passed in at a time**
-     * @param url Optional. URL which contains token artwork. **Only 1 of bytestring, svg and url may be passed in at a time**
+     * @param svg Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
+     * @param url Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
      * 
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
      * 

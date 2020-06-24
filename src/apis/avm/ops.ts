@@ -261,8 +261,9 @@ export class NFTMintOperation extends Operation {
         payloadlen.writeUInt32BE(this.payload.length, 0);
 
         let outputlen:Buffer = Buffer.alloc(4);
-        // TODO Should this be hardcoded to length of 1?
-        outputlen.writeUInt32BE(1, 0);
+        // TODO accept multiple Output Owners and not have value hard coded
+        let outlen:number = 1;
+        outputlen.writeUInt32BE(outlen, 0);
 
         let addrlen:Buffer = Buffer.alloc(4);
         addrlen.writeUInt32BE(this.addresses.length, 0);
