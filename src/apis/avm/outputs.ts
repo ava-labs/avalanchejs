@@ -30,16 +30,12 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }
 
-export abstract class Output {
+
+export class OutputOwners {
     protected locktime:Buffer = Buffer.alloc(8);
     protected threshold:Buffer = Buffer.alloc(4);
     protected numaddrs:Buffer = Buffer.alloc(4);
     protected addresses:Array<Address> = [];
-
-    /**
-     * Returns the outputID for the output which tells parsers what type it is
-     */
-    getOutputID?():number;
 
     /**
      * Returns the threshold of signers required to spend this output.
@@ -189,14 +185,6 @@ export abstract class Output {
         return bintools.bufferToB58(this.toBuffer());
     }
 
-    /**
-     * 
-     * @param assetID An assetID which is wrapped around the Buffer of the Output
-     */
-    makeTransferable(assetID:Buffer):TransferableOutput {
-        return new TransferableOutput(assetID, this);
-    }
-
     static comparator = ():(a:Output, b:Output) => (1|-1|0) => {
         return function(a:Output, b:Output):(1|-1|0) { 
             let aoutid:Buffer = Buffer.alloc(4);
@@ -237,6 +225,21 @@ export abstract class Output {
             }
             this.locktime = bintools.fromBNToBuffer(locktime, 8);
         }
+    }
+}
+
+export abstract class Output extends OutputOwners {
+    /**
+     * Returns the outputID for the output which tells parsers what type it is
+     */
+    abstract getOutputID():number;
+
+    /**
+     * 
+     * @param assetID An assetID which is wrapped around the Buffer of the Output
+     */
+    makeTransferable(assetID:Buffer):TransferableOutput {
+        return new TransferableOutput(assetID, this);
     }
 }
 
@@ -293,8 +296,6 @@ export class TransferableOutput {
         }
     }
 }
-
-export class OutputOwners extends Output {}
 
 /**
  * An [[Output]] class which specifies a token amount .

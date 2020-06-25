@@ -41,6 +41,20 @@ describe('Operations', () => {
             }).toThrow("Error - SelectOperationClass: unknown opid");
         });
 
+        test('comparator', () => {
+            let outputOwners:Array<OutputOwners> = [];
+            outputOwners.push(new OutputOwners(locktime, 1, addrs));
+            let op1:NFTMintOperation = new NFTMintOperation(1, payload, outputOwners);
+            let op2:NFTMintOperation = new NFTMintOperation(2, payload, outputOwners);
+            let op3:NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
+            let cmp = NFTMintOperation.comparator();
+            expect(cmp(op1, op1)).toBe(0);
+            expect(cmp(op2, op2)).toBe(0);
+            expect(cmp(op3, op3)).toBe(0);
+            expect(cmp(op1, op2)).toBe(-1);
+            expect(cmp(op1, op3)).toBe(1);
+        });
+
         test('Functionality', () => {
             let outputOwners:Array<OutputOwners> = [];
             outputOwners.push(new OutputOwners(locktime, 1, addrs));
@@ -48,6 +62,11 @@ describe('Operations', () => {
         
             expect(op.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
             expect(op.getOutputOwners().toString()).toBe(outputOwners.toString());
+        
+            let opcopy:NFTMintOperation = new NFTMintOperation();
+            let opb:Buffer = op.toBuffer();
+            opcopy.fromBuffer(opb);
+            expect(opcopy.toString()).toBe(op.toString());
         });
     })
 

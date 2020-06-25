@@ -813,7 +813,7 @@ class AVMAPI extends JRPCAPI{
         let avaAssetID:Buffer = await this.getAVAAssetID();
 
         return utxoset.buildCreateNFTMintTx(
-            this.   core.getNetworkID(),
+            this.core.getNetworkID(),
             bintools.avaDeserialize(this.blockchainID),
             avaAssetID,
             fee,

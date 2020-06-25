@@ -70,7 +70,7 @@ export abstract class Operation {
         offset += 4;
         let sigCount:number = this.sigCount.readUInt32BE(0);
         this.sigIdxs = [];
-        for(let i = 0; i < sigCount; i++) {
+        for(let i:number = 0; i < sigCount; i++) {
             let sigidx:SigIdx = new SigIdx();
             let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
             sigidx.fromBuffer(sigbuff);
@@ -247,7 +247,7 @@ export class NFTMintOperation extends Operation {
         offset += 4;
         this.outputOwners = [];
         for(let i:number = 0; i < numoutputs; i++) {
-            let locktime:BN = new BN(bintools.copyFrom(bytes, offset, offset + 8).readUInt32BE(0));
+            let locktime:BN = bintools.fromBufferToBN(bintools.copyFrom(bytes, offset, offset + 8));
             offset += 8;
             let threshold:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
             offset += 4;
