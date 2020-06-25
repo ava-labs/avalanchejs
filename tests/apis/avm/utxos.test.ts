@@ -470,7 +470,5 @@ describe('UTXOSet', () => {
                 expect(test).toBe(true);
             });
         });
-
-
     });
 });
