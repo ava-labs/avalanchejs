@@ -372,17 +372,6 @@ export abstract class NFTOutBase extends Output {
     getGroupID = ():number => {
         return this.groupID.readUInt32BE(0);
     }
-
-    /**
-     * An [[Output]] class which contains an NFT on an assetID.
-     * 
-     * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-     * @param threshold A number representing the the threshold number of signers required to sign the transaction
-     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
-     */
-    constructor(locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
-        super(locktime, threshold, addresses);
-    }
 }
 
 /**
