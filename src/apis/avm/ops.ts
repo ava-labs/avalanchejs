@@ -4,9 +4,8 @@
  */
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
-import { UTXOID, AVMConstants, SigIdx, UnixNow } from './types';
-import { NFTTransferOutput, SelectOutputClass, Output, OutputOwners } from './outputs';
-import BN from "bn.js";
+import { UTXOID, AVMConstants, SigIdx } from './types';
+import { NFTTransferOutput, OutputOwners } from './outputs';
 
 const bintools = BinTools.getInstance();
 
@@ -67,7 +66,7 @@ export abstract class Operation {
         offset += 4;
         let sigCount:number = this.sigCount.readUInt32BE(0);
         this.sigIdxs = [];
-        for(let i:number = 0; i < sigCount; i++) {
+        for(let i = 0; i < sigCount; i++) {
             let sigidx:SigIdx = new SigIdx();
             let sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
             sigidx.fromBuffer(sigbuff);
@@ -284,12 +283,12 @@ export class NFTMintOperation extends Operation {
      * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
      * @param outputs 
      */
-    constructor(groupID: number = undefined, payload:Buffer = undefined, outputOwners:Array<OutputOwners> = undefined){
+    constructor(groupID:number = undefined, payload:Buffer = undefined, outputOwners:Array<OutputOwners> = undefined){
         super();
         if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && outputOwners.length) {
             this.groupID.writeUInt32BE((groupID ? groupID : 0), 0);
             this.payload = payload;
-            this.outputOwners = outputOwners
+            this.outputOwners = outputOwners;
         }
     }
 }

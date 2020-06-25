@@ -783,9 +783,9 @@ class AVMAPI extends JRPCAPI{
      * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param groupID Optional. The group this NFT is issued to.
-     * @param bytestring Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
-     * @param svg Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
-     * @param url Optional. Data for NFT Payload. **Only 1 of bytestring, svg and url may be passed in at a time**
+     * @param bytestring Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
+     * @param svg Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
+     * @param url Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
      * 
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
      * 
@@ -800,8 +800,8 @@ class AVMAPI extends JRPCAPI{
         let formattedOutputOwners:Array<OutputOwners> = [];
         for(let i:number = 0; i < outputOwners.length; i++) {
             let cleanAddrs:Array<Buffer> = this._cleanAddressArray(outputOwners[i].getAddresses(), "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-            let outpOwners:OutputOwners = new OutputOwners(outputOwners[i].getLocktime(), outputOwners[i].getThreshold(), cleanAddrs);
-            formattedOutputOwners.push(outpOwners);
+            let outOwners:OutputOwners = new OutputOwners(outputOwners[i].getLocktime(), outputOwners[i].getThreshold(), cleanAddrs);
+            formattedOutputOwners.push(outOwners);
         }
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));

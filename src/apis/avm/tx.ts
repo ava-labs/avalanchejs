@@ -200,10 +200,17 @@ export class BaseTx {
 }
 
 export class CreateAssetTx extends BaseTx {
-    protected denomination:Buffer = Buffer.alloc(1);
     protected name:string = "";
     protected symbol:string = "";
+    protected denomination:Buffer = Buffer.alloc(1);
     protected initialstate:InitialStates = new InitialStates();
+
+    /**
+     * Returns the id of the [[CreateAssetTx]]
+     */
+    getTxType():number {
+        return AVMConstants.CREATEASSETTX;
+    }
 
     /**
      * Returns the array of array of [[Output]]s for the initial state
@@ -228,13 +235,6 @@ export class CreateAssetTx extends BaseTx {
     }
 
     /**
-     * Returns the id of the [[CreateAssetTx]]
-     */
-    getTxType():number {
-        return AVMConstants.CREATEASSETTX;
-    }
-
-    /**
      * Returns the numeric representation of the denomination
      */
     getDenomination = ():number => {
@@ -244,6 +244,7 @@ export class CreateAssetTx extends BaseTx {
     /**
      * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the denomination
      */
+
     getDenominationBuffer = ():Buffer => {
         return this.denomination;
     }
