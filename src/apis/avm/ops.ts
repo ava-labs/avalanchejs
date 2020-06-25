@@ -17,7 +17,10 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Operation]]-extended class.
  */
 export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation => {
-    if(opid == AVMConstants.NFTXFEROP){
+    if(opid == AVMConstants.NFTMINTOPID){
+        let nftop:NFTMintOperation = new NFTMintOperation(...args);
+        return nftop;
+    } else if(opid == AVMConstants.NFTXFEROP){
         let nftop:NFTTransferOperation = new NFTTransferOperation(...args);
         return nftop;
     }
@@ -91,11 +94,13 @@ export abstract class Operation {
     static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => {
         return function(a:Operation, b:Operation):(1|-1|0) { 
             let aoutid:Buffer = Buffer.alloc(4);
-            aoutid.writeUInt32BE(a.getOperationID(), 0);
+            let aid:number = a.getOperationID();
+            aoutid.writeUInt32BE(aid, 0);
             let abuff:Buffer = a.toBuffer();
 
             let boutid:Buffer = Buffer.alloc(4);
-            boutid.writeUInt32BE(b.getOperationID(), 0);
+            let bid:number = b.getOperationID();
+            boutid.writeUInt32BE(bid, 0);
             let bbuff:Buffer = b.toBuffer();
 
             let asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
@@ -281,7 +286,7 @@ export class NFTMintOperation extends Operation {
      * 
      * @param groupID The group to which to issue the NFT Output
      * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
-     * @param outputs 
+     * @param outputOwners An array of outputOwners
      */
     constructor(groupID:number = undefined, payload:Buffer = undefined, outputOwners:Array<OutputOwners> = undefined){
         super();

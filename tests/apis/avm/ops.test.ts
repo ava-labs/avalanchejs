@@ -6,9 +6,9 @@ import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { SecpOutput, NFTTransferOutput, TransferableOutput} from 'src/apis/avm/outputs';
+import { SecpOutput, NFTTransferOutput, TransferableOutput, OutputOwners} from 'src/apis/avm/outputs';
 import { SigIdx, UTXOID, UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
-import { SelectOperationClass, Operation, TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
+import { SelectOperationClass, Operation, TransferableOperation, NFTTransferOperation, NFTMintOperation } from 'src/apis/avm/ops';
 
 
 /**
@@ -31,46 +31,68 @@ describe('Operations', () => {
     let payload:Buffer = Buffer.alloc(1024);
     payload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
 
+    describe('NFTMintOperation', () => {
+        test('SelectOperationClass', () => {
+            let goodop:NFTMintOperation = new NFTMintOperation(0, Buffer.from(""), []);
+            let operation:Operation = SelectOperationClass(goodop.getOperationID());
+            expect(operation).toBeInstanceOf(NFTMintOperation);
+            expect(() => {
+                SelectOperationClass(99);
+            }).toThrow("Error - SelectOperationClass: unknown opid");
+        });
 
-    test('SelectOperationClass', () => {
-        let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
-        let goodop:NFTTransferOperation = new NFTTransferOperation(nout);
-        let operation:Operation = SelectOperationClass(goodop.getOperationID());
-        expect(operation).toBeInstanceOf(NFTTransferOperation);
-        expect(() => {
-            SelectOperationClass(99);
-        }).toThrow("Error - SelectOperationClass: unknown opid");
-    });
+        test('Functionality', () => {
+            let outputOwners:Array<OutputOwners> = [];
+            outputOwners.push(new OutputOwners(locktime, 1, addrs));
+            let op:NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
+        
+            expect(op.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
+            expect(op.getOutputOwners().toString()).toBe(outputOwners.toString());
+        });
+    })
 
-    test('comparator', () => {
-        let op1:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, locktime, 1, addrs));
-        let op2:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1001, payload, locktime, 1, addrs));
-        let op3:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(999, payload, locktime, 1, addrs));
-        let cmp = NFTTransferOperation.comparator();
-        expect(cmp(op1, op1)).toBe(0);
-        expect(cmp(op2, op2)).toBe(0);
-        expect(cmp(op3, op3)).toBe(0);
-        expect(cmp(op1, op2)).toBe(-1);
-        expect(cmp(op1, op3)).toBe(1);
-    });
+    describe('NFTTransferOperation', () => {
+        test('SelectOperationClass', () => {
+            let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
+            let goodop:NFTTransferOperation = new NFTTransferOperation(nout);
+            let operation:Operation = SelectOperationClass(goodop.getOperationID());
+            expect(operation).toBeInstanceOf(NFTTransferOperation);
+            expect(() => {
+                SelectOperationClass(99);
+            }).toThrow("Error - SelectOperationClass: unknown opid");
+        });
 
-    test('NFTTransferOperation', () => {
-        let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
-        let op:NFTTransferOperation = new NFTTransferOperation(nout);
+        test('comparator', () => {
+            let op1:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, locktime, 1, addrs));
+            let op2:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1001, payload, locktime, 1, addrs));
+            let op3:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(999, payload, locktime, 1, addrs));
+            let cmp = NFTTransferOperation.comparator();
+            expect(cmp(op1, op1)).toBe(0);
+            expect(cmp(op2, op2)).toBe(0);
+            expect(cmp(op3, op3)).toBe(0);
+            expect(cmp(op1, op2)).toBe(-1);
+            expect(cmp(op1, op3)).toBe(1);
+        });
+
+        test('Functionality', () => {
+            let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
+            let op:NFTTransferOperation = new NFTTransferOperation(nout);
         
-        expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROP);
-        expect(op.getOutput().toString()).toBe(nout.toString());
+            expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROP);
+            expect(op.getOutput().toString()).toBe(nout.toString());
         
-        let opcopy:NFTTransferOperation = new NFTTransferOperation();
-        opcopy.fromBuffer(op.toBuffer());
-        expect(opcopy.toString()).toBe(op.toString());
+            let opcopy:NFTTransferOperation = new NFTTransferOperation();
+            opcopy.fromBuffer(op.toBuffer());
+            expect(opcopy.toString()).toBe(op.toString());
         
-        op.addSignatureIdx(0, addrs[0]);
-        let sigidx:Array<SigIdx> = op.getSigIdxs();
-        expect(sigidx[0].getSource().toString("hex")).toBe(addrs[0].toString("hex"));
-        opcopy.fromBuffer(op.toBuffer());
-        expect(opcopy.toString()).toBe(op.toString());
-    });
+            op.addSignatureIdx(0, addrs[0]);
+            let sigidx:Array<SigIdx> = op.getSigIdxs();
+            expect(sigidx[0].getSource().toString("hex")).toBe(addrs[0].toString("hex"));
+            opcopy.fromBuffer(op.toBuffer());
+            expect(opcopy.toString()).toBe(op.toString());
+        });
+    })
+
 
     test('TransferableOperation', () => {
         let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
