@@ -6,6 +6,7 @@ import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import { UTXOID, AVMConstants, SigIdx } from './types';
 import { NFTTransferOutput, OutputOwners } from './outputs';
+import BN from "bn.js";
 
 const bintools = BinTools.getInstance();
 
@@ -236,7 +237,32 @@ export class NFTMintOperation extends Operation {
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(bytes, offset);
-        return new NFTMintOperation().fromBuffer(bytes, offset);
+        this.groupID = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let payloadLen:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.payload = bintools.copyFrom(bytes, offset, offset + payloadLen);
+        offset += payloadLen;
+        let numoutputs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.outputOwners = [];
+        for(let i:number = 0; i < numoutputs; i++) {
+            let locktime:BN = new BN(bintools.copyFrom(bytes, offset, offset + 8).readUInt32BE(0));
+            offset += 8;
+            let threshold:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+            offset += 4;
+            let numaddrs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+            offset += 4;
+            let addrs:Array<Buffer> = [];
+            for(let j:number = 0; j < numaddrs; j++) {
+                let addr:Buffer = bintools.copyFrom(bytes, offset, offset + 20);
+                addrs.push(addr);
+                offset += 20;
+            }
+            let outputOwner:OutputOwners = new OutputOwners(locktime, threshold, addrs);
+            this.outputOwners.push(outputOwner);
+        }
+        return offset;
     }
 
     /**
