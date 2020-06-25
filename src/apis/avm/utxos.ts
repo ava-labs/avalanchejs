@@ -680,7 +680,6 @@ export class UTXOSet {
             let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
             let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
 
-
             for(let j:number = 0; j < spenders.length; j++) {
                 let idx:number;
                 idx = out.getAddressIdx(spenders[j]);
@@ -695,13 +694,7 @@ export class UTXOSet {
             ops.push(transferableOperation);
         }
   
-        let operationTx:OperationTx = new OperationTx(
-        networkid, 
-        blockchainid, 
-        outs, 
-        ins, 
-        ops
-        )
+        let operationTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, ops);
         return new UnsignedTx(operationTx);
     }
 

@@ -87,7 +87,6 @@ describe('Transactions', () => {
             inputs.push(xferin);
 
             let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, locktime, threshold, addresses);
-            // let nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, threshold, addresses);
             let op:NFTTransferOperation = new NFTTransferOperation(nout);
             let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
             let nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
@@ -208,7 +207,6 @@ describe('Transactions', () => {
         expect(optx.getOperations().length).toBe(5);
     });
 
-
     test('Creation Tx1 with asof, locktime, threshold', () => {
         let txu:UnsignedTx = set.buildBaseTx(
             netid, blockchainID,
@@ -223,6 +221,7 @@ describe('Transactions', () => {
         expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
         expect(tx2.toString()).toBe(tx.toString());
     });
+
     test('Creation Tx2 without asof, locktime, threshold', () => {
         let txu:UnsignedTx = set.buildBaseTx(
             netid, blockchainID,
@@ -248,6 +247,5 @@ describe('Transactions', () => {
         expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
         expect(tx2.toString()).toBe(tx.toString());
     });
-
 });
     
