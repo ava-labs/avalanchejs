@@ -5,11 +5,11 @@
 import {Buffer} from "buffer/";
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { Output, SecpOutput, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput, OutputOwners } from './outputs';
-import { MergeRule, UnixNow, AVMConstants, InitialStates, UTXOID } from './types';
-import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, Tx } from './tx';
-import { SecpInput, Input, TransferableInput } from './inputs';
-import { Operation, NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
+import { Output, AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput, OutputOwners } from './outputs';
+import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
+import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx } from './tx';
+import { SecpInput, TransferableInput } from './inputs';
+import { NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
 import { MappedMinterSet } from "./api";
 
 /**
@@ -561,6 +561,7 @@ export class UTXOSet {
      * @param avaAssetId The AVA Asset ID
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feeSenderAddresses The addresses to send the fees
+     * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param minterSets The minters and thresholds required to mint this nft asset
      * @param name String for the descriptive name of the nft asset
      * @param symbol String for the ticker symbol of the nft asset
@@ -603,20 +604,23 @@ export class UTXOSet {
      * @param feeAssetID The assetID for the AVA fee to be paid
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feeSenderAddresses The addresses to send the fees
-     * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
+     * @param outputOwners:Array An array of OutputOwners
      * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
      * @param utxoids An array of strings for the NFTs being transferred
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
-     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+     * @param groupID Optional. The group this NFT is issued to.
+     * @param bytestring Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
+     * @param svg Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
+     * @param url Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */
     buildCreateNFTMintTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
         feeSenderAddresses:Array<Buffer>, outputOwners:Array<OutputOwners>, fromAddresses:Array<Buffer>, 
-        utxoids:Array<string>, asOf:BN, groupID:number, bytestring:Buffer|undefined, 
-        svg:Buffer|undefined, url:string|undefined
+        utxoids:Array<string>, asOf:BN, groupID:number = 0, 
+        bytestring:Buffer|undefined = undefined, 
+        svg:Buffer|undefined = undefined, url: string|undefined = undefined
     ):UnsignedTx => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
