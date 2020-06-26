@@ -77,6 +77,201 @@ export abstract class APIBase {
     }
 }
 
+export class RESTAPI extends APIBase {
+    protected contentType:string;
+    protected acceptType:string;
+
+    get = async (baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
+        }
+
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.get(ep, {}, headers, axConf).then((resp:RequestResponseData) => {
+            return resp;
+        });
+    }
+
+    post = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
+        }
+
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.post(ep, {}, JSON.stringify(rpc), headers, axConf).then((resp:RequestResponseData) => {
+            return resp;
+        });
+    }
+
+    put = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
+        }
+
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.put(ep, {}, JSON.stringify(rpc), headers, axConf).then((resp:RequestResponseData) => {
+            return resp;
+        });
+    }
+
+    delete = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
+        }
+
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.delete(ep, {}, headers, axConf).then((resp:RequestResponseData) => {
+            return resp;
+        });
+    }
+
+    patch = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
+        }
+
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.patch(ep, {}, JSON.stringify(rpc), headers, axConf).then((resp:RequestResponseData) => {
+            return resp;
+        });
+    }
+
+    /**
+     * Returns the type of the entity attached to the incoming request
+     */
+    getContentType = ():string => {
+        return this.contentType;
+    }
+
+    /**
+     * Returns what type of representation is desired at the client side
+     */
+    getAcceptType = ():string => {
+        return this.acceptType;
+    }
+
+    /**
+     * 
+     * @param core Reference to the Avalanche instance using this endpoint
+     * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
+     * @param contentType Optional Determines the type of the entity attached to the incoming request
+     * @param acceptType Optional Determines the type of representation which is desired on the client side
+     */
+    constructor(core:AvalancheCore, baseurl:string, contentType:string = "application/json;charset=UTF-8", acceptType:string = undefined) {
+        super(core, baseurl);
+        this.contentType = contentType;
+        this.acceptType = acceptType;
+    }
+}
+
 export class JRPCAPI extends APIBase {
     protected jrpcVersion:string = "2.0";
     protected rpcid = 1;

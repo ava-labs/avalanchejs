@@ -3,16 +3,17 @@
  * @module Avalanche
  */
 import AvalancheCore from './avalanche';
-import KeystoreAPI from './apis/keystore/api';
-import PlatformAPI from './apis/platform/api';
-import AVMAPI from './apis/avm/api';
 import AdminAPI from './apis/admin/api';
+import AVMAPI from './apis/avm/api';
+import HealthAPI from "./apis/health/api";
+import InfoAPI from './apis/info/api';
+import KeystoreAPI from './apis/keystore/api';
+import MetricsAPI from './apis/metrics/api';
+import PlatformAPI from './apis/platform/api';
 import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
-import HealthAPI from "./apis/health/api";
-import InfoAPI from "./apis/info/api"
 
 /**
  * Avalanche.js is middleware for interacting with AVA node RPC APIs. 
@@ -51,6 +52,13 @@ export class Avalanche extends AvalancheCore {
      */
     Info = () => {
         return this.apis["info"] as InfoAPI;
+    }
+
+    /**
+     * Returns a reference to the Metrics RPC.
+     */
+    Metrics = () => {
+        return this.apis["metrics"] as MetricsAPI;
     }
 
     /**
@@ -96,6 +104,7 @@ export class Avalanche extends AvalancheCore {
             this.addAPI('health', HealthAPI);
             this.addAPI('info', InfoAPI);
             this.addAPI("keystore", KeystoreAPI);
+            this.addAPI("metrics", MetricsAPI);
             this.addAPI("platform", PlatformAPI);
         }
     }
@@ -125,10 +134,9 @@ export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx'
 export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
-export {AVMAPI as AVM};
-export {KeystoreAPI as Keystore};
-export {PlatformAPI as Platform};
 export {AdminAPI as Admin};
+export {AVMAPI as AVM};
 export {HealthAPI as Health};
-
-
+export {KeystoreAPI as Keystore};
+export {MetricsAPI as Metrics};
+export {PlatformAPI as Platform};

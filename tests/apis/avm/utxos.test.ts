@@ -79,14 +79,12 @@ let setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXOSe
     let instr:string = JSON.stringify(input.getUTXOIDs().sort());
     for(let i:number = 0; i < equal.length; i++){
         if(JSON.stringify(equal[i].getUTXOIDs().sort()) != instr){
-            console.log("equal failed: ", input.getUTXOIDs().sort(), i, equal[i].getUTXOIDs().sort());
             return false;
         }
     }
 
     for(let i:number = 0; i < notEqual.length; i++){
         if(JSON.stringify(notEqual[i].getUTXOIDs().sort()) == instr){
-            console.log("notEqual failed: ", input.getUTXOIDs().sort(), i, notEqual[i].getUTXOIDs().sort());
             return false;
         }
     }
