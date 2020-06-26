@@ -12,6 +12,7 @@ import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
 import HealthAPI from "./apis/health/api";
+import MetricsAPI from './apis/metrics/api';
 
 /**
  * Avalanche.js is middleware for interacting with AVA node RPC APIs. 
@@ -39,10 +40,17 @@ export class Avalanche extends AvalancheCore {
     }
 
     /**
-     * Returns a reference to the Platform RPC.
+     * Returns a reference to the Health RPC for a node.
      */
-    Platform = () => {
-        return this.apis["platform"] as PlatformAPI;
+    Health = () => {
+        return this.apis["health"] as HealthAPI;
+    }
+
+    /**
+     * Returns a reference to the Metrics RPC.
+     */
+    Metrics = () => {
+        return this.apis["metrics"] as MetricsAPI;
     }
 
     /**
@@ -53,10 +61,10 @@ export class Avalanche extends AvalancheCore {
     }
 
     /**
-     * Returns a reference to the Health RPC for a node.
+     * Returns a reference to the Platform RPC.
      */
-    Health = () => {
-        return this.apis["health"] as HealthAPI;
+    Platform = () => {
+        return this.apis["platform"] as PlatformAPI;
     }
 
     /**
@@ -85,9 +93,10 @@ export class Avalanche extends AvalancheCore {
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
             this.addAPI("avm", AVMAPI, "/ext/bc/X", chainid);
-            this.addAPI("platform", PlatformAPI);
-            this.addAPI("keystore", KeystoreAPI);
             this.addAPI('health', HealthAPI);
+            this.addAPI("keystore", KeystoreAPI);
+            this.addAPI("metrics", MetricsAPI);
+            this.addAPI("platform", PlatformAPI);
         }
     }
 }
@@ -116,10 +125,11 @@ export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx'
 export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
-export {AVMAPI as AVM};
-export {KeystoreAPI as Keystore};
-export {PlatformAPI as Platform};
 export {AdminAPI as Admin};
+export {AVMAPI as AVM};
 export {HealthAPI as Health};
+export {KeystoreAPI as Keystore};
+export {MetricsAPI as Metrics};
+export {PlatformAPI as Platform};
 
 
