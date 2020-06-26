@@ -121,6 +121,8 @@ export class RESTAPI extends APIBase {
      * 
      * @param core Reference to the Avalanche instance using this endpoint
      * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
+     * @param contentType Determines the type of the entity attached to the incoming request
+     * @param acceptType Determines what type of representation is desired at the client side
      */
     constructor(core:AvalancheCore, baseurl:string, contentType:string = "application/json;charset=UTF-8", acceptType:string = "application/json") {
         super(core, baseurl);
