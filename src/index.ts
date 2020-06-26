@@ -50,7 +50,7 @@ export class Avalanche extends AvalancheCore {
      * Returns a reference to the Info RPC for a node.
      */
     Info = () => {
-        return this.apis["info"] as HealthAPI;
+        return this.apis["info"] as InfoAPI;
     }
 
     /**
