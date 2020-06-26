@@ -78,17 +78,30 @@ export abstract class APIBase {
 }
 
 export class RESTAPI extends APIBase {
-    post = async (method:string, params?:Array<object> | object, baseurl?:string):Promise<RequestResponseData> => {
+    protected contentType:string;
+    protected acceptType:string;
+    post = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
         let rpc:object = {};
         rpc["method"] = method;
 
         // Set parameters if exists
-        if(params){
+        if(params) {
             rpc['params'] = params;
         }
 
-        let headers:object = {"Content-Type": "application/json;charset=UTF-8"};
+        if(contentType) {
+            this.contentType = contentType;
+        }
+
+        if(acceptType) {
+            this.acceptType = acceptType;
+        }
+
+        let headers:object = {
+            "Content-Type": this.contentType,
+            "Accept": this.acceptType
+        };
         let axConf:AxiosRequestConfig = {
             baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
             responseType: 'json'
@@ -109,8 +122,10 @@ export class RESTAPI extends APIBase {
      * @param core Reference to the Avalanche instance using this endpoint
      * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
      */
-    constructor(core:AvalancheCore, baseurl:string) {
+    constructor(core:AvalancheCore, baseurl:string, contentType:string = "application/json;charset=UTF-8", acceptType:string = "application/json") {
         super(core, baseurl);
+        this.contentType = contentType;
+        this.acceptType = acceptType;
     }
 }
 

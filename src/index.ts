@@ -140,5 +140,3 @@ export {HealthAPI as Health};
 export {KeystoreAPI as Keystore};
 export {MetricsAPI as Metrics};
 export {PlatformAPI as Platform};
-
-
