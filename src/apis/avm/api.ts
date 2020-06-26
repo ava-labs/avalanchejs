@@ -6,22 +6,12 @@ import AvalancheCore from '../../avalanche';
 import BN from "bn.js";
 import BinTools from '../../utils/bintools';
 import { Buffer } from "buffer/";
-import { JRPCAPI, RequestResponseData, Defaults } from "../../utils/types";
+import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from "../../utils/types";
 import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { OutputOwners } from './outputs';
-
-export interface MinterSet {
-    threshold:number
-    minters:Array<string>|Array<Buffer>
-}
-
-export interface MappedMinterSet {
-    threshold:number
-    minters:Array<Buffer>
-}
 
 /**
  * @ignore
@@ -746,12 +736,6 @@ class AVMAPI extends JRPCAPI{
         symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0), 
     ): Promise<UnsignedTx> => {
         let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
-        let mappedMinterSets:Array<MappedMinterSet> = minterSets.map((minterSet:MinterSet):MappedMinterSet => {
-          return {
-            threshold: minterSet.threshold,
-            minters: this._cleanAddressArray(minterSet.minters, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
-          }
-        });
         
         /* istanbul ignore next */
         if(name.length > AVMConstants.ASSETNAMELEN) {
@@ -767,7 +751,7 @@ class AVMAPI extends JRPCAPI{
         return utxoset.buildCreateNFTAssetTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
             fee, creators, initialStates,
-            mappedMinterSets, name, symbol, locktime
+            minterSets, name, symbol, locktime
         );
     }
 

@@ -10,7 +10,7 @@ import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx } from './tx';
 import { SecpInput, TransferableInput } from './inputs';
 import { NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
-import { MappedMinterSet } from "./api";
+import { MinterSet } from "src/utils/types";
 
 /**
  * @ignore
@@ -574,7 +574,7 @@ export class UTXOSet {
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
         fee:BN, feeSenderAddresses:Array<Buffer>, 
         initialState:InitialStates, 
-        minterSets:Array<MappedMinterSet>,
+        minterSets:Array<MinterSet>,
         name:string, symbol:string,
         locktime:BN
     ):UnsignedTx => {
@@ -585,8 +585,8 @@ export class UTXOSet {
           let nftMintOutput:NFTMintOutput = new NFTMintOutput(
             i, 
             locktime, 
-            minterSets[i].threshold, 
-            minterSets[i].minters
+            minterSets[i].getThreshold(), 
+            minterSets[i].getMinters()
            );
           initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
         }

@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
-import { Avalanche } from "src";
-import AVMAPI, { PersistanceOptions, MinterSet, MappedMinterSet } from "src/apis/avm/api";
+import { Avalanche, MinterSet } from "src";
+import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
@@ -790,7 +790,7 @@ describe("AVMAPI", () => {
             let fee:number = 0;
             let name:string = "Coincert";
             let symbol:string = "TIXX";
-            let minterSets:Array<MinterSet> = [{minters:addrs1,threshold:1}];
+            let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
             let locktime:BN = new BN(0);
             let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
 
@@ -799,8 +799,7 @@ describe("AVMAPI", () => {
                 name, symbol, minterSets, locktime
             );
             
-            let mappedMinterSets:Array<MappedMinterSet> = [{ threshold: 1, minters: addrbuff1 }];
-            let txu2:UnsignedTx = set.buildCreateNFTAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), nftInitialState, mappedMinterSets, name, symbol, locktime);
+            let txu2:UnsignedTx = set.buildCreateNFTAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), nftInitialState, minterSets, name, symbol, locktime);
 
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());
