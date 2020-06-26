@@ -80,6 +80,39 @@ export abstract class APIBase {
 export class RESTAPI extends APIBase {
     protected contentType:string;
     protected acceptType:string;
+
+    get = async (baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+
+        // Set contentType if exists
+        if(contentType) {
+            this.contentType = contentType;
+        }
+
+        // Set acceptType if exists
+        if(acceptType) {
+            this.acceptType = acceptType;
+        }
+
+        let headers:object = {
+            "Content-Type": this.contentType,
+            "Accept": this.acceptType
+        };
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.get(ep, {}, headers, axConf).then((resp:RequestResponseData) => {
+            if(resp.status >= 200 && resp.status < 300){
+                if(typeof resp.data === 'object' && 'error' in resp.data) {
+                    throw new Error("Error returned: " + JSON.stringify(resp.data));
+                }
+                return resp;
+            }
+        });
+    }
+
     post = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
         let rpc:object = {};
@@ -90,10 +123,12 @@ export class RESTAPI extends APIBase {
             rpc['params'] = params;
         }
 
+        // Set contentType if exists
         if(contentType) {
             this.contentType = contentType;
         }
 
+        // Set acceptType if exists
         if(acceptType) {
             this.acceptType = acceptType;
         }
@@ -108,6 +143,123 @@ export class RESTAPI extends APIBase {
         };
 
         return this.core.post(ep, {}, JSON.stringify(rpc), headers, axConf).then((resp:RequestResponseData) => {
+            if(resp.status >= 200 && resp.status < 300){
+                if(typeof resp.data === 'object' && 'error' in resp.data) {
+                    throw new Error("Error returned: " + JSON.stringify(resp.data));
+                }
+                return resp;
+            }
+        });
+    }
+
+    put = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        // Set contentType if exists
+        if(contentType) {
+            this.contentType = contentType;
+        }
+
+        // Set acceptType if exists
+        if(acceptType) {
+            this.acceptType = acceptType;
+        }
+
+        let headers:object = {
+            "Content-Type": this.contentType,
+            "Accept": this.acceptType
+        };
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.put(ep, {}, JSON.stringify(rpc), headers, axConf).then((resp:RequestResponseData) => {
+            if(resp.status >= 200 && resp.status < 300){
+                if(typeof resp.data === 'object' && 'error' in resp.data) {
+                    throw new Error("Error returned: " + JSON.stringify(resp.data));
+                }
+                return resp;
+            }
+        });
+    }
+
+    delete = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        // Set contentType if exists
+        if(contentType) {
+            this.contentType = contentType;
+        }
+
+        // Set acceptType if exists
+        if(acceptType) {
+            this.acceptType = acceptType;
+        }
+
+        let headers:object = {
+            "Content-Type": this.contentType,
+            "Accept": this.acceptType
+        };
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.delete(ep, {}, headers, axConf).then((resp:RequestResponseData) => {
+            if(resp.status >= 200 && resp.status < 300){
+                if(typeof resp.data === 'object' && 'error' in resp.data) {
+                    throw new Error("Error returned: " + JSON.stringify(resp.data));
+                }
+                return resp;
+            }
+        });
+    }
+
+    patch = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+        let ep:string = baseurl ? baseurl : this.baseurl;
+        let rpc:object = {};
+        rpc["method"] = method;
+
+        // Set parameters if exists
+        if(params) {
+            rpc['params'] = params;
+        }
+
+        // Set contentType if exists
+        if(contentType) {
+            this.contentType = contentType;
+        }
+
+        // Set acceptType if exists
+        if(acceptType) {
+            this.acceptType = acceptType;
+        }
+
+        let headers:object = {
+            "Content-Type": this.contentType,
+            "Accept": this.acceptType
+        };
+        let axConf:AxiosRequestConfig = {
+            baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
+            responseType: 'json'
+        };
+
+        return this.core.patch(ep, {}, JSON.stringify(rpc), headers, axConf).then((resp:RequestResponseData) => {
             if(resp.status >= 200 && resp.status < 300){
                 if(typeof resp.data === 'object' && 'error' in resp.data) {
                     throw new Error("Error returned: " + JSON.stringify(resp.data));
