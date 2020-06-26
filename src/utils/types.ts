@@ -81,12 +81,21 @@ export class RESTAPI extends APIBase {
     protected contentType:string;
     protected acceptType:string;
 
-    get = async (baseurl?:string):Promise<RequestResponseData> => {
+    get = async (baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
 
-        let headers:object = { "Content-Type": this.contentType };
-        if(this.acceptType) {
-            headers["Accept"] = this.acceptType;
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
         }
 
         let axConf:AxiosRequestConfig = {
@@ -99,7 +108,7 @@ export class RESTAPI extends APIBase {
         });
     }
 
-    post = async (method:string, params?:Array<object> | object, baseurl?:string):Promise<RequestResponseData> => {
+    post = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
         let rpc:object = {};
         rpc["method"] = method;
@@ -109,9 +118,18 @@ export class RESTAPI extends APIBase {
             rpc['params'] = params;
         }
 
-        let headers:object = { "Content-Type": this.contentType };
-        if(this.acceptType) {
-            headers["Accept"] = this.acceptType;
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
         }
 
         let axConf:AxiosRequestConfig = {
@@ -124,7 +142,7 @@ export class RESTAPI extends APIBase {
         });
     }
 
-    put = async (method:string, params?:Array<object> | object, baseurl?:string):Promise<RequestResponseData> => {
+    put = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
         let rpc:object = {};
         rpc["method"] = method;
@@ -134,10 +152,20 @@ export class RESTAPI extends APIBase {
             rpc['params'] = params;
         }
 
-        let headers:object = {
-            "Content-Type": this.contentType,
-            "Accept": this.acceptType
-        };
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
+        }
+
         let axConf:AxiosRequestConfig = {
             baseURL:this.core.getProtocol()+"://"+this.core.getIP()+":"+this.core.getPort(),
             responseType: 'json'
@@ -148,7 +176,7 @@ export class RESTAPI extends APIBase {
         });
     }
 
-    delete = async (method:string, params?:Array<object> | object, baseurl?:string):Promise<RequestResponseData> => {
+    delete = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
         let rpc:object = {};
         rpc["method"] = method;
@@ -158,9 +186,18 @@ export class RESTAPI extends APIBase {
             rpc['params'] = params;
         }
 
-        let headers:object = { "Content-Type": this.contentType };
-        if(this.acceptType) {
-            headers["Accept"] = this.acceptType;
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
         }
 
         let axConf:AxiosRequestConfig = {
@@ -173,7 +210,7 @@ export class RESTAPI extends APIBase {
         });
     }
 
-    patch = async (method:string, params?:Array<object> | object, baseurl?:string):Promise<RequestResponseData> => {
+    patch = async (method:string, params?:Array<object> | object, baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
         let ep:string = baseurl ? baseurl : this.baseurl;
         let rpc:object = {};
         rpc["method"] = method;
@@ -183,9 +220,18 @@ export class RESTAPI extends APIBase {
             rpc['params'] = params;
         }
 
-        let headers:object = { "Content-Type": this.contentType };
-        if(this.acceptType) {
-            headers["Accept"] = this.acceptType;
+        let headers:object = {};
+        if(contentType !== undefined) {
+            headers["Content-Type"] = contentType;
+        } else {
+            headers["Content-Type"] = this.contentType;
+        }
+
+        let acceptTypeStr:string = this.acceptType;
+        if(acceptType !== undefined) {
+            headers["Accept"] = acceptType;
+        } else if(acceptTypeStr !== undefined) {
+            headers["Accept"] = acceptTypeStr;
         }
 
         let axConf:AxiosRequestConfig = {
@@ -222,7 +268,9 @@ export class RESTAPI extends APIBase {
     constructor(core:AvalancheCore, baseurl:string, contentType:string = "application/json;charset=UTF-8", acceptType?:string) {
         super(core, baseurl);
         this.contentType = contentType;
-        this.acceptType = acceptType;
+        if(acceptType !== undefined) {
+            this.acceptType = acceptType;
+        }
     }
 }
 
