@@ -115,7 +115,21 @@ export class RESTAPI extends APIBase {
                 return resp;
             }
         });
-    }   
+    }
+
+    /**
+     * Returns the contentType
+     */
+    getContentType = ():string => {
+        return this.contentType;
+    }
+
+    /**
+     * Returns the acceptType
+     */
+    getAcceptType = ():string => {
+        return this.acceptType;
+    }
 
     /**
      * 
