@@ -93,9 +93,10 @@ export class Avalanche extends AvalancheCore {
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
             this.addAPI("avm", AVMAPI, "/ext/bc/X", chainid);
-            this.addAPI("platform", PlatformAPI);
-            this.addAPI("keystore", KeystoreAPI);
             this.addAPI('health', HealthAPI);
+            this.addAPI('info', InfoAPI);
+            this.addAPI("keystore", KeystoreAPI);
+            this.addAPI("platform", PlatformAPI);
         }
     }
 }
