@@ -270,14 +270,14 @@ export class RESTAPI extends APIBase {
     }
 
     /**
-     * Returns the contentType
+     * Returns the type of the entity attached to the incoming request
      */
     getContentType = ():string => {
         return this.contentType;
     }
 
     /**
-     * Returns the acceptType
+     * Returns what type of representation is desired at the client side
      */
     getAcceptType = ():string => {
         return this.acceptType;
