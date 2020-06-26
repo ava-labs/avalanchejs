@@ -12,6 +12,7 @@ import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
 import HealthAPI from "./apis/health/api";
+import InfoAPI from "./apis/info/api"
 
 /**
  * Avalanche.js is middleware for interacting with AVA node RPC APIs. 
@@ -39,10 +40,17 @@ export class Avalanche extends AvalancheCore {
     }
 
     /**
-     * Returns a reference to the Platform RPC.
+     * Returns a reference to the Health RPC for a node.
      */
-    Platform = () => {
-        return this.apis["platform"] as PlatformAPI;
+    Health = () => {
+        return this.apis["health"] as HealthAPI;
+    }
+
+    /**
+     * Returns a reference to the Info RPC for a node.
+     */
+    Info = () => {
+        return this.apis["info"] as InfoAPI;
     }
 
     /**
@@ -53,10 +61,10 @@ export class Avalanche extends AvalancheCore {
     }
 
     /**
-     * Returns a reference to the Health RPC for a node.
+     * Returns a reference to the Platform RPC.
      */
-    Health = () => {
-        return this.apis["health"] as HealthAPI;
+    Platform = () => {
+        return this.apis["platform"] as PlatformAPI;
     }
 
     /**
@@ -85,9 +93,10 @@ export class Avalanche extends AvalancheCore {
         if(!skipinit){
             this.addAPI("admin", AdminAPI);
             this.addAPI("avm", AVMAPI, "/ext/bc/X", chainid);
-            this.addAPI("platform", PlatformAPI);
-            this.addAPI("keystore", KeystoreAPI);
             this.addAPI('health', HealthAPI);
+            this.addAPI('info', InfoAPI);
+            this.addAPI("keystore", KeystoreAPI);
+            this.addAPI("platform", PlatformAPI);
         }
     }
 }
