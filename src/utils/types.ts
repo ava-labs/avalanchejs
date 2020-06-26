@@ -265,12 +265,10 @@ export class RESTAPI extends APIBase {
      * @param contentType Optional Determines the type of the entity attached to the incoming request
      * @param acceptType Optional Determines the type of representation which is desired on the client side
      */
-    constructor(core:AvalancheCore, baseurl:string, contentType:string = "application/json;charset=UTF-8", acceptType?:string) {
+    constructor(core:AvalancheCore, baseurl:string, contentType:string = "application/json;charset=UTF-8", acceptType:string = undefined) {
         super(core, baseurl);
         this.contentType = contentType;
-        if(acceptType !== undefined) {
-            this.acceptType = acceptType;
-        }
+        this.acceptType = acceptType;
     }
 }
 
