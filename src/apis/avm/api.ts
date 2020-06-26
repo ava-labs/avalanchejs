@@ -761,7 +761,7 @@ class AVMAPI extends JRPCAPI{
      * 
      * @param utxoset  A set of UTXOs that the transaction is built on
      * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
-     * @param outputOwners Array of OutputOwners
+     * @param toAddresses The addresses to send the nft output
      * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
      * @param fee The amount of fees being paid for this transaction
      * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
@@ -775,18 +775,12 @@ class AVMAPI extends JRPCAPI{
      * 
      */
     buildCreateNFTMintTx = async (
-        utxoset:UTXOSet, utxoid:string|Array<string>, outputOwners:Array<OutputOwners>, 
+        utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>, 
         fromAddresses:Array<string>, fee:BN,
         feeAddresses:Array<string>, asOf:BN = UnixNow(), groupID:number = 0, 
-        bytestring:Buffer|undefined = undefined, 
-        svg:Buffer|undefined = undefined, url: string|undefined = undefined
+        locktime:BN = new BN(0), threshold:number = 1, payload:Buffer = undefined
     ): Promise<any> => {
-        let formattedOutputOwners:Array<OutputOwners> = [];
-        for(let i:number = 0; i < outputOwners.length; i++) {
-            let cleanAddrs:Array<Buffer> = this._cleanAddressArray(outputOwners[i].getAddresses(), "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-            let outOwners:OutputOwners = new OutputOwners(outputOwners[i].getLocktime(), outputOwners[i].getThreshold(), cleanAddrs);
-            formattedOutputOwners.push(outOwners);
-        }
+        let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
 
@@ -802,14 +796,14 @@ class AVMAPI extends JRPCAPI{
             avaAssetID,
             fee,
             feeAddrs,
-            formattedOutputOwners,
+            to,
             from,
             utxoid,
             asOf,
             groupID,
-            bytestring,
-            svg,
-            url
+            locktime,
+            threshold,
+            payload,
         );
     }
 

@@ -617,63 +617,20 @@ export class UTXOSet {
      */
     buildCreateNFTMintTx = (
         networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
-        feeSenderAddresses:Array<Buffer>, outputOwners:Array<OutputOwners>, fromAddresses:Array<Buffer>, 
+        feeSenderAddresses:Array<Buffer>, to:Array<Buffer>, fromAddresses:Array<Buffer>, 
         utxoids:Array<string>, asOf:BN, groupID:number = 0, 
-        bytestring:Buffer|undefined = undefined, 
-        svg:Buffer|undefined = undefined, url: string|undefined = undefined
+        locktime:BN, threshold:number = 1, payload:Buffer = undefined, 
     ):UnsignedTx => {
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         let ops:TransferableOperation[] = [];
 
-        for(let i:number = 0; i < outputOwners.length; i++) {
-            if(outputOwners[i].getThreshold() > outputOwners[i].getAddresses().length) {
-                /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
-            }
+        if(threshold > to.length) {
+            /* istanbul ignore next */
+            throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
         }
-  
-        let version:number = 0;
-        let type:number = 0;
-        let bytes:Buffer;
-        if(Buffer.isBuffer(bytestring)) {
-            if(Buffer.isBuffer(svg) || url !== undefined) {
-                /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: can't pass in bytestring along with svg and/or url`);
-            }
-            type = 0;
-            bytes = bytestring;
-        }   
-  
-        if(svg instanceof Buffer) {
-            if(Buffer.isBuffer(bytestring) || url !== undefined) {
-                /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: can't pass in svg along with bytestring and/or url`);
-            }
-            type = 1;
-            bytes = svg;
-        }   
-  
-        if(url !== undefined) {
-            if(Buffer.isBuffer(bytestring) || svg instanceof Buffer) {
-                /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildNFTTransferTx: can't pass in url along with bytestring and/or svg`);
-            }
-            type = 2;
-            bytes = Buffer.from(url);
-        }   
-
-        let maxlen:number = 1024;
-        let versionlen:number = 1;
-        let typelen:number = 1;
-        // * 1 byte - version (255 will mean version field is 2 bytes)
-        // * 1 byte - type (inline or external)
-        //   * 0x00 uniterpreted bytestring
-        //   * 0x01 inline svg
-        //   * 0x02 ascii url
-        let payload:Buffer = Buffer.concat([Buffer.from([version, type]), bytes], Math.min(bytes.length + versionlen + typelen, maxlen));
-        let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, outputOwners);
+        let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, [new OutputOwners(locktime, threshold, to)]);
 
         for(let i:number = 0; i < utxoids.length; i++) {
             let utxo:UTXO = this.getUTXO(utxoids[i]);

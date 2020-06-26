@@ -341,7 +341,7 @@ export class JRPCAPI extends APIBase {
  */
 export class MinterSet {
     protected threshold:number;
-    protected minters:Array<Buffer>
+    protected minters:Array<Buffer> = [];
 
     /**
      * Returns the threshold.
@@ -366,7 +366,7 @@ export class MinterSet {
                 addrs.push(addresses[i] as Buffer)
             }
         }
-        return this.minters;
+        return addrs;
     }
 
     /**

@@ -810,23 +810,21 @@ describe("AVMAPI", () => {
             let groupID:number = 0;
             let locktime:BN = new BN(0);
             let threshold:number = 1;
-            let bytestring:Buffer = undefined;
-            let svg:Buffer = undefined;
-            let url:string = "https://example.com";
+            let payload:Buffer = undefined;
             let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
             let addrbuff3: Buffer[] = addrs3.map(a => api.parseAddress(a));
             let outputOwners:Array<OutputOwners> = [];
             outputOwners.push(new OutputOwners(locktime, threshold, addrbuff3));
 
             let txu1:UnsignedTx = await api.buildCreateNFTMintTx(
-                set, nftutxoids, outputOwners, addrs3, new BN(fee), addrs1,
-                UnixNow(), groupID, bytestring, svg, url
+                set, nftutxoids, addrs3, addrs3, new BN(fee), addrs1,
+                UnixNow(), groupID, locktime, threshold, payload
             );
     
             let txu2:UnsignedTx = set.buildCreateNFTMintTx(
                 avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), 
-                assetID, new BN(fee), addrbuff1, outputOwners, addrbuff3, nftutxoids, UnixNow(), 
-                groupID, bytestring, svg, url
+                assetID, new BN(fee), addrbuff1, addrbuff3, addrbuff3, nftutxoids, UnixNow(), 
+                groupID, locktime, threshold, payload
             );
 
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
