@@ -560,7 +560,7 @@ export class UTXOSet {
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param avaAssetId The AVA Asset ID
      * @param fee The amount of AVA to be paid for fees, in $nAVA
-     * @param feeSenderAddresses The addresses to send the fees
+     * @param feePayingAddresses The addresses to pay the fees
      * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param minterSets The minters and thresholds required to mint this nft asset
      * @param name String for the descriptive name of the nft asset
@@ -572,13 +572,13 @@ export class UTXOSet {
      */
     buildCreateNFTAssetTx = (
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
-        fee:BN, feeSenderAddresses:Array<Buffer>, 
+        fee:BN, feePayingAddresses:Array<Buffer>, 
         initialState:InitialStates, 
         minterSets:Array<MinterSet>,
         name:string, symbol:string,
         locktime:BN
     ):UnsignedTx => {
-        let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID);
+        let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
         for(let i:number = 0; i < minterSets.length; i++) {
