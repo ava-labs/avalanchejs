@@ -609,9 +609,7 @@ export class UTXOSet {
      * @param utxoids An array of strings for the NFTs being transferred
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param groupID Optional. The group this NFT is issued to.
-     * @param bytestring Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
-     * @param svg Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
-     * @param url Optional. Data for NFT Payload. **Only 1 of bytestring, svg or url may be passed in at a time**
+     * @param payload Optional. Data for NFT Payload.
      * @returns An unsigned transaction created from the passed in parameters.
      * 
      */

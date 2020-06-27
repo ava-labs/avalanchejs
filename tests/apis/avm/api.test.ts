@@ -810,7 +810,7 @@ describe("AVMAPI", () => {
             let groupID:number = 0;
             let locktime:BN = new BN(0);
             let threshold:number = 1;
-            let payload:Buffer = undefined;
+            let payload:Buffer = Buffer.from("Avalanche");
             let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
             let addrbuff3: Buffer[] = addrs3.map(a => api.parseAddress(a));
             let outputOwners:Array<OutputOwners> = [];
