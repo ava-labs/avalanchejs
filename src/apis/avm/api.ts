@@ -634,8 +634,8 @@ class AVMAPI extends JRPCAPI{
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
     buildNFTTransferTx = async (
-        utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-        feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
+        utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
+        feeAddresses:Array<string>|Array<Buffer>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
     ):Promise<UnsignedTx> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map(a => bintools.stringToAddress(a));
@@ -730,7 +730,7 @@ class AVMAPI extends JRPCAPI{
      */
     buildCreateNFTAssetTx = async (
         utxoset:UTXOSet, fee:BN, feePayingAddresses:Array<string> | Array<Buffer>, 
-        name:string, symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0), 
+        name:string, symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0)
     ): Promise<UnsignedTx> => {
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
         
@@ -769,9 +769,9 @@ class AVMAPI extends JRPCAPI{
      * 
      */
     buildCreateNFTMintTx = async (
-        utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>, 
-        fromAddresses:Array<string>, fee:BN,
-        feeAddresses:Array<string>, asOf:BN = UnixNow(), groupID:number = 0, 
+        utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>|Array<Buffer>, 
+        fromAddresses:Array<string>|Array<Buffer>, fee:BN,
+        feeAddresses:Array<string>|Array<Buffer>, asOf:BN = UnixNow(), groupID:number = 0, 
         locktime:BN = new BN(0), threshold:number = 1, payload:Buffer = undefined
     ): Promise<any> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));

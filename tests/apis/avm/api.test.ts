@@ -792,7 +792,6 @@ describe("AVMAPI", () => {
             let symbol:string = "TIXX";
             let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
             let locktime:BN = new BN(0);
-            let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
 
             let txu1:UnsignedTx = await api.buildCreateNFTAssetTx(
                 set, new BN(fee), addrs1, 
