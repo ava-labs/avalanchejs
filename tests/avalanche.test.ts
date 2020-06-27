@@ -2,8 +2,11 @@ import mockAxios from 'jest-mock-axios';
 import { Avalanche } from "src";
 import AVMAPI  from "src/apis/avm/api";
 import AdminAPI  from "src/apis/admin/api";
-import PlatformAPI  from "src/apis/platform/api";
+import HealthAPI from 'src/apis/health/api';
+import InfoAPI  from "src/apis/info/api";
 import KeystoreAPI  from "src/apis/keystore/api";
+import MetricsAPI  from "src/apis/metrics/api";
+import PlatformAPI  from "src/apis/platform/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 
@@ -19,7 +22,10 @@ describe('Avalanche', () => {
         avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
         avalanche.addAPI("admin", AdminAPI);
         avalanche.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
+        avalanche.addAPI("health", HealthAPI);
+        avalanche.addAPI("info", InfoAPI);
         avalanche.addAPI("keystore", KeystoreAPI);
+        avalanche.addAPI("metrics", MetricsAPI);
         avalanche.addAPI("platform", PlatformAPI);
     });
     test('Can initialize', () => {
@@ -40,12 +46,21 @@ describe('Avalanche', () => {
         
         expect(avalanche.AVM()).not.toBeInstanceOf(AdminAPI);
         expect(avalanche.AVM()).toBeInstanceOf(AVMAPI);
+
+        expect(avalanche.Health()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Health()).toBeInstanceOf(HealthAPI);
+
+        expect(avalanche.Info()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Info()).toBeInstanceOf(InfoAPI);
         
         expect(avalanche.Platform()).not.toBeInstanceOf(KeystoreAPI);
         expect(avalanche.Platform()).toBeInstanceOf(PlatformAPI);
 
         expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
         expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
+
+        expect(avalanche.Metrics()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Metrics()).toBeInstanceOf(MetricsAPI);
 
         expect(avalanche.Admin().getRPCID()).toBe(1);
         expect(avalanche.AVM().getRPCID()).toBe(1);
