@@ -330,6 +330,13 @@ export abstract class ChainAddressPayload extends PayloadBase {
     protected chainid:string = "";
 
     /**
+     * Returns the chainid.
+     */
+    returnChainID():string {
+        return this.chainid;
+    }
+
+    /**
      * Returns an address string for the payload.
      */
     returnType():string {
