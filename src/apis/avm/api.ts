@@ -11,6 +11,7 @@ import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
+import { PayloadBase } from 'src/utils/payload';
 
 /**
  * @ignore
@@ -772,11 +773,12 @@ class AVMAPI extends JRPCAPI{
         utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>|Array<Buffer>, 
         fromAddresses:Array<string>|Array<Buffer>, fee:BN,
         feeAddresses:Array<string>|Array<Buffer>, asOf:BN = UnixNow(), groupID:number = 0, 
-        locktime:BN = new BN(0), threshold:number = 1, payload:Buffer = undefined
+        locktime:BN = new BN(0), threshold:number = 1, payload:PayloadBase|Buffer = undefined
     ): Promise<any> => {
         let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+        let payloadBuf:Buffer = payload as Buffer;
 
         if(typeof utxoid === 'string') {
             utxoid = [utxoid];
@@ -797,7 +799,7 @@ class AVMAPI extends JRPCAPI{
             groupID,
             locktime,
             threshold,
-            payload,
+            payloadBuf,
         );
     }
 
