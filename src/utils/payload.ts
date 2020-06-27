@@ -202,7 +202,6 @@ export class BINPayload extends PayloadBase {
 
     constructor(payload:Buffer = undefined){
         super();
-        this.typeid = BINPayload.typeid;
         if(payload) {
             this.payload = payload;
         }
@@ -224,7 +223,6 @@ export class UTF8Payload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        this.typeid = UTF8Payload.typeid;
         if(payload instanceof Buffer){
             this.payload = payload;
         } else {
@@ -248,7 +246,6 @@ export class HEXSTRPayload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        this.typeid = HEXSTRPayload.typeid;
         if(payload instanceof Buffer){
             this.payload = payload;
         } else {
@@ -272,7 +269,6 @@ export class B58STRPayload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        this.typeid = B58STRPayload.typeid;
         if(payload instanceof Buffer){
             this.payload = payload;
         } else {
@@ -296,7 +292,6 @@ export class B64STRPayload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        this.typeid = B64STRPayload.typeid;
         if(payload instanceof Buffer){
             this.payload = payload;
         } else {
@@ -320,7 +315,6 @@ export class BIGNUMPayload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        this.typeid = BIGNUMPayload.typeid;
         if(payload instanceof Buffer){
             this.payload = payload;
         } else {
@@ -518,7 +512,6 @@ export class JSONPayload extends PayloadBase {
 
     constructor(payload:any|string|Buffer = undefined){
         super();
-        this.typeid = JSONPayload.typeid;
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(typeof payload === "string") {
