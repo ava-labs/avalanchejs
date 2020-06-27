@@ -223,10 +223,12 @@ export class UTF8Payload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        if(payload instanceof Buffer){
-            this.payload = payload;
-        } else {
-            this.payload = Buffer.from(payload, "utf8");
+        if(payload !== undefined) {
+            if(payload instanceof Buffer){
+                this.payload = payload;
+            } else {
+                this.payload = Buffer.from(payload, "utf8");
+            }
         }
     }
 }

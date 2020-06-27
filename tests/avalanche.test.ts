@@ -10,8 +10,6 @@ import PlatformAPI  from "src/apis/platform/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 
-
-
 describe('Avalanche', () => {
     const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF";
     const ip = '127.0.0.1';
