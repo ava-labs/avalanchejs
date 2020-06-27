@@ -1,5 +1,5 @@
 import { Buffer } from "buffer/";
-import { UTF8Payload, PayloadTypes, BINPayload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINPayload, PCHAINPayload, CCHAINPayload, TXIDPayload, ASSETIDPayload, UTXOIDPayload, NFTIDPayload, SUBNETIDPayload, CHAINIDPayload, NODEIDPayload, SECPSIGPayload, SECPENCPayload, JPEGPayload, PNGPayload, BMPPayload, ICOPayload, SVGPayload, CSVPayload, JSONPayload, PROTOBUFPayload, YAMLPayload } from "src";
+import { UTF8Payload, PayloadTypes, BINPayload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINPayload, PCHAINPayload, CCHAINPayload, TXIDPayload, ASSETIDPayload, UTXOIDPayload, NFTIDPayload, SUBNETIDPayload, CHAINIDPayload, NODEIDPayload, SECPSIGPayload, SECPENCPayload, JPEGPayload, PNGPayload, BMPPayload, ICOPayload, SVGPayload, CSVPayload, JSONPayload, PROTOBUFPayload, YAMLPayload, EMAILPayload, URLPayload, IPFSPayload, ONIONPayload, MAGNETPayload } from "src";
 
 describe("Payload", () => {
     // beforeAll(() => {
@@ -271,5 +271,50 @@ describe("Payload", () => {
 
         expect(yaml.typeID()).toBe(26);
         expect(yaml.typeName()).toBe("YAML");
+    });
+
+    test("EMAILPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let email:EMAILPayload = new EMAILPayload(serialized);
+
+        expect(email.typeID()).toBe(27);
+        expect(email.typeName()).toBe("EMAIL");
+    });
+
+    test("URLPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let url:URLPayload = new URLPayload(serialized);
+
+        expect(url.typeID()).toBe(28);
+        expect(url.typeName()).toBe("URL");
+    });
+
+    test("IPFSPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let ipfs:IPFSPayload = new IPFSPayload(serialized);
+
+        expect(ipfs.typeID()).toBe(29);
+        expect(ipfs.typeName()).toBe("IPFS");
+    });
+
+    test("ONIONPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let onion:ONIONPayload = new ONIONPayload(serialized);
+
+        expect(onion.typeID()).toBe(30);
+        expect(onion.typeName()).toBe("ONION");
+    });
+
+    test("MAGNETPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let magnet:MAGNETPayload = new MAGNETPayload(serialized);
+
+        expect(magnet.typeID()).toBe(26);
+        expect(magnet.typeName()).toBe("MAGNET");
     });
 });
