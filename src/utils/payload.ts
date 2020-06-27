@@ -16,7 +16,6 @@ const bintools = BinTools.getInstance();
  * Class for determining payload types and managing the lookup table.
  */
 export class PayloadTypes {
-
     private static instance: PayloadTypes;
     protected types:Array<string> = [];
 
@@ -138,7 +137,7 @@ export class PayloadTypes {
  * Base class for payloads.
  */
 export abstract class PayloadBase {
-    protected payload:Buffer;
+    protected payload:Buffer = Buffer.alloc(0);
     protected typeid:number = undefined;
     
     /**
@@ -159,7 +158,7 @@ export abstract class PayloadBase {
      * Decodes the payload as a {@link https://github.com/feross/buffer|Buffer} including 4 bytes for the length and TypeID.
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
-        let size:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt8(0);
+        let size:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.typeid = bintools.copyFrom(bytes, offset, offset + 1).readUInt8(0);
         offset += 1
@@ -223,12 +222,10 @@ export class UTF8Payload extends PayloadBase {
 
     constructor(payload:string|Buffer = undefined){
         super();
-        if(payload !== undefined) {
-            if(payload instanceof Buffer){
-                this.payload = payload;
-            } else {
-                this.payload = Buffer.from(payload, "utf8");
-            }
+        if(payload instanceof Buffer){
+            this.payload = payload;
+        } else if(payload) {
+            this.payload = Buffer.from(payload, "utf8");
         }
     }
 }
@@ -250,7 +247,7 @@ export class HEXSTRPayload extends PayloadBase {
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else {
+        } else if(payload) {
             this.payload = Buffer.from(payload, "hex");
         }
     }
@@ -273,7 +270,7 @@ export class B58STRPayload extends PayloadBase {
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else {
+        } else if(payload) {
             this.payload = bintools.b58ToBuffer(payload);
         }
     }
@@ -296,7 +293,7 @@ export class B64STRPayload extends PayloadBase {
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else {
+        } else if(payload) {
             this.payload = Buffer.from(payload, "base64");
         }
     }
@@ -319,7 +316,7 @@ export class BIGNUMPayload extends PayloadBase {
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else {
+        } else if(payload) {
             this.payload = Buffer.from(payload, "base64");
         }
     }
@@ -343,7 +340,7 @@ export abstract class ChainAddressPayload extends PayloadBase {
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else {
+        } else if(payload) {
             this.payload = bintools.stringToAddress(payload);
         }
     }
@@ -389,7 +386,7 @@ export abstract class AvaSerializedPayload extends PayloadBase {
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else {
+        } else if(payload) {
             this.payload = bintools.avaDeserialize(payload);
         }
     }
@@ -518,7 +515,7 @@ export class JSONPayload extends PayloadBase {
             this.payload = payload;
         } else if(typeof payload === "string") {
             this.payload = Buffer.from(payload, "utf8");
-        } else {
+        } else if(payload) {
             let jsonstr:string = JSON.stringify(payload);
             this.payload = Buffer.from(jsonstr, "utf8");
         }
