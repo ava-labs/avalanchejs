@@ -191,7 +191,7 @@ export abstract class PayloadBase {
  * Class for payloads representing simple binary blobs.
  */
 export class BINPayload extends PayloadBase {
-    static typeid = 0;
+    protected typeid = 0;
 
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} for the payload.
@@ -212,7 +212,7 @@ export class BINPayload extends PayloadBase {
  * Class for payloads representing UTF8 encoding.
  */
 export class UTF8Payload extends PayloadBase {
-    static typeid = 1;
+    protected typeid = 1;
 
     /**
      * Returns a string for the payload.
@@ -235,7 +235,7 @@ export class UTF8Payload extends PayloadBase {
  * Class for payloads representing Hexadecimal encoding.
  */
 export class HEXSTRPayload extends PayloadBase {
-    static typeid = 2;
+    protected typeid = 2;
 
     /**
      * Returns a hex string for the payload.
@@ -258,7 +258,7 @@ export class HEXSTRPayload extends PayloadBase {
  * Class for payloads representing Base58 encoding (Bitcoin standard).
  */
 export class B58STRPayload extends PayloadBase {
-    static typeid = 3;
+    protected typeid = 3;
 
     /**
      * Returns a base58 string for the payload.
@@ -281,7 +281,7 @@ export class B58STRPayload extends PayloadBase {
  * Class for payloads representing Base64 encoding.
  */
 export class B64STRPayload extends PayloadBase {
-    static typeid = 4;
+    protected typeid = 4;
 
     /**
      * Returns a base64 string for the payload.
@@ -304,7 +304,7 @@ export class B64STRPayload extends PayloadBase {
  * Class for payloads representing Big Numbers.
  */
 export class BIGNUMPayload extends PayloadBase {
-    static typeid = 5;
+    protected typeid = 5;
 
     /**
      * Returns a {@link https://github.com/indutny/bn.js/|BN} for the payload.
@@ -327,7 +327,7 @@ export class BIGNUMPayload extends PayloadBase {
  * Class for payloads representing chain addresses.
  */
 export abstract class ChainAddressPayload extends PayloadBase {
-    static typeid = 6;
+    protected typeid = 6;
     protected chainid:string = "";
 
     /**
@@ -351,24 +351,24 @@ export abstract class ChainAddressPayload extends PayloadBase {
  * Class for payloads representing X-Chin addresses.
  */
 export class XCHAINPayload extends ChainAddressPayload {
-    static typeid = 6;
-    static chainid = "X";
+    protected typeid = 6;
+    protected chainid = "X";
 }
 
 /**
  * Class for payloads representing P-Chain addresses.
  */
 export class PCHAINPayload extends ChainAddressPayload {
-    static typeid = 7;
-    static chainid = "P";
+    protected typeid = 7;
+    protected chainid = "P";
 }
 
 /**
  * Class for payloads representing C-Chain addresses.
  */
 export class CCHAINPayload extends ChainAddressPayload {
-    static typeid = 8;
-    static chainid = "C";
+    protected typeid = 8;
+    protected chainid = "C";
 }
 
 /**
@@ -397,49 +397,49 @@ export abstract class AvaSerializedPayload extends PayloadBase {
  * Class for payloads representing TxIDs.
  */
 export class TXIDPayload extends AvaSerializedPayload {
-    static typeid = 9;
+    protected typeid = 9;
 }
 
 /**
  * Class for payloads representing AssetIDs.
  */
 export class ASSETIDPayload extends AvaSerializedPayload {
-    static typeid = 10;
+    protected typeid = 10;
 }
 
 /**
  * Class for payloads representing NODEIDs.
  */
 export class UTXOIDPayload extends AvaSerializedPayload {
-    static typeid = 11;
+    protected typeid = 11;
 }
 
 /**
  * Class for payloads representing NFTIDs (UTXOIDs in an NFT context).
  */
 export class NFTIDPayload extends UTXOIDPayload {
-    static typeid = 12;
+    protected typeid = 12;
 }
 
 /**
  * Class for payloads representing SubnetIDs.
  */
 export class SUBNETIDPayload extends AvaSerializedPayload {
-    static typeid = 13;
+    protected typeid = 13;
 }
 
 /**
  * Class for payloads representing ChainIDs.
  */
 export class CHAINIDPayload extends AvaSerializedPayload {
-    static typeid = 14;
+    protected typeid = 14;
 }
 
 /**
  * Class for payloads representing NodeIDs.
  */
 export class NODEIDPayload extends AvaSerializedPayload {
-    static typeid = 15;
+    protected typeid = 15;
 }
 
 /**
@@ -447,7 +447,7 @@ export class NODEIDPayload extends AvaSerializedPayload {
  * convention: secp256k1 signature (130 bytes)
  */
 export class SECPSIGPayload extends B58STRPayload {
-    static typeid = 16;
+    protected typeid = 16;
 }
 
 /**
@@ -455,53 +455,53 @@ export class SECPSIGPayload extends B58STRPayload {
  * convention: public key (65 bytes) + secp256k1 encrypted message for that public key
  */
 export class SECPENCPayload extends B58STRPayload {
-    static typeid = 17;
+    protected typeid = 17;
 }
 
 /**
  * Class for payloads representing JPEG images.
  */
 export class JPEGPayload extends BINPayload {
-    static typeid = 18;
+    protected typeid = 18;
 }
 
 export class PNGPayload extends BINPayload {
-    static typeid = 19;
+    protected typeid = 19;
 }
 
 /**
  * Class for payloads representing BMP images.
  */
 export class BMPPayload extends BINPayload {
-    static typeid = 20;
+    protected typeid = 20;
 }
 
 /**
  * Class for payloads representing ICO images.
  */
 export class ICOPayload extends BINPayload {
-    static typeid = 21;
+    protected typeid = 21;
 }
 
 /**
  * Class for payloads representing SVG images.
  */
 export class SVGPayload extends UTF8Payload {
-    static typeid = 22;
+    protected typeid = 22;
 }
 
 /**
  * Class for payloads representing CSV files.
  */
 export class CSVPayload extends UTF8Payload {
-    static typeid = 23;
+    protected typeid = 23;
 }
 
 /**
  * Class for payloads representing JSON strings.
  */
 export class JSONPayload extends PayloadBase {
-    static typeid = 24;
+    protected typeid = 24;
 
     /**
      * Returns a JSON-decoded object for the payload.
@@ -527,47 +527,47 @@ export class JSONPayload extends PayloadBase {
  * Class for payloads representing protobuf definitions.
  */
 export class PROTOBUFPayload extends BINPayload {
-    static typeid = 25;
+    protected typeid = 25;
 }
 
 /**
  * Class for payloads representing YAML definitions.
  */
 export class YAMLPayload extends UTF8Payload {
-    static typeid = 26;
+    protected typeid = 26;
 }
 
 /**
  * Class for payloads representing email addresses.
  */
 export class EMAILPayload extends UTF8Payload {
-    static typeid = 27;
+    protected typeid = 27;
 }
 
 /**
  * Class for payloads representing URL strings.
  */
 export class URLPayload extends UTF8Payload {
-    static typeid = 28;
+    protected typeid = 28;
 }
 
 /**
  * Class for payloads representing IPFS addresses.
  */
 export class IPFSPayload extends B58STRPayload {
-    static typeid = 29;
+    protected typeid = 29;
 }
 
 /**
  * Class for payloads representing onion URLs.
  */
 export class ONIONPayload extends UTF8Payload {
-    static typeid = 30;
+    protected typeid = 30;
 }
 
 /**
  * Class for payloads representing torrent magnet links.
  */
 export class MAGNETPayload extends UTF8Payload {
-    static typeid = 31;
+    protected typeid = 31;
 }
