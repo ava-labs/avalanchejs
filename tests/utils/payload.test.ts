@@ -20,11 +20,7 @@ describe("Payload", () => {
         let binPayload:BINPayload = new BINPayload();
         expect(payloadTypes.select(0).toBuffer().toString()).toBe(binPayload.toBuffer().toString());
         // TODO
-        // expect(binp.returnType()).toBe(str);
-        // let utf8pcopy:BINPayload = new BINPayload();
-        // utf8pcopy.fromBuffer(utf8pbuf);
-        // expect(utf8pcopy.toString()).toBe(binp.toString());
-        // expect(binp.toBuffer().toString()).toBe(utf8pcopy.toBuffer().toString());
+        // how to best test returnType() ?
     });
 
     test("UTF8Payload", () => {
