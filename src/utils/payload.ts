@@ -8,171 +8,115 @@ import BinTools  from './bintools';
 import BN from "bn.js";
 
 /**
-
-    // the basic
-    static BIN:number = 0;
-    //formatted output types
-    static UTF8:number = 1;
-    static HEXSTR:number = 2;
-    static B58STR:number = 3;
-    static B64STR:number = 4;
-    static BIGNUM:number = 5;
-    //avalanche types
-    static XCHAINADDR:number = 6;
-    static PCHAINADDR:number = 7;
-    static CCHAINADDR:number = 8;
-    static TXID:number = 9;
-    static ASSETID:number = 10;
-    static UTXOID:number = 11;
-    static NFTID:number = 12;
-    static SUBNETID:number = 13;
-    static CHAINID:number = 14;
-    static NODEID:number = 15;
-    static SECPSIG:number = 16; // convention: secp256k1 signature (130 bytes)
-    static SECPENC:number = 17; // convention: public key (65 bytes) + secp256k1 encrypted message for that public key
-    //image types
-    static JPEG:number = 18; //note, we're not handling creation or conversion
-    static PNG:number = 19; //note, we're not handling creation or conversion
-    static BMP:number = 20; //note, we're not handling creation or conversion
-    static ICO:number = 21; //note, we're not handling creation or conversion
-    static SVG:number = 22; //note, we're not handling creation or conversion
-    //text file types
-    static CSV:number = 23; //note, we're not handling creation or conversion
-    static JSON:number = 24; 
-    static PROTOBUF:number = 25; //note, we're not handling creation or conversion
-    static YAML:number = 26; //note, we're not handling creation or conversion
-    //resolved types
-    static EMAIL:number = 27;
-    static URL:number = 28;
-    static IPFS:number = 29;
-    static ONION:number = 30;
-    static MAGNET:number = 30;
-    // 0x1F, next index 0x20
-
- */
-
-/**
  * @ignore
  */
 const bintools = BinTools.getInstance();
 
+/**
+ * Class for determining payload types and managing the lookup table.
+ */
 export class PayloadTypes {
 
     private static instance: PayloadTypes;
     protected types:Array<string> = [];
 
+    /**
+     * Given a type string returns a the proper TypeID.
+     */
     lookupID(typestr:string) {
         return this.types.indexOf(typestr);
     }
 
+    /**
+     * Given a TypeID returns a string describing the payload type.
+     */
     lookupType(value:number):string {
         return this.types[value];
     }
 
-    recast(unknowPayload:PayloadBase):PayloadBase {
-        let retType:PayloadBase;
-        switch(unknowPayload.typeID()) {
+    /**
+     * Given a TypeID returns a the proper [[PayloadBase]].
+     */
+    select(typeid:number, ...args:Array<any>):PayloadBase {
+        switch(typeid) {
             case 0:
-                retType = new BINPayload();
-                break;
+                return new BINPayload(...args);
             case 1:
-                retType = new UTF8Payload();
-                break;
+                return new UTF8Payload(...args);
             case 2:
-                retType = new HEXSTRPayload();
-                break;
+                return new HEXSTRPayload(...args);
             case 3:
-                retType = new B58STRPayload();
-                break;
+                return new B58STRPayload(...args);
             case 4:
-                retType = new B64STRPayload();
-                break;
+                return new B64STRPayload(...args);
             case 5:
-                retType = new BIGNUMPayload();
-                break;
+                return new BIGNUMPayload(...args);
             case 6:
-                retType = new XCHAINPayload();
-                break;
+                return new XCHAINPayload(...args);
             case 7:
-                retType = new PCHAINPayload();
-                break;
+                return new PCHAINPayload(...args);
             case 8:
-                retType = new CCHAINPayload();
-                break;
+                return new CCHAINPayload(...args);
             case 9:
-                retType = new TXIDPayload();
-                break;
+                return new TXIDPayload(...args);
             case 10:
-                retType = new ASSETIDPayload();
-                break;
+                return new ASSETIDPayload(...args);
             case 11:
-                retType = new UTXOIDPayload();
-                break;
+                return new UTXOIDPayload(...args);
             case 12:
-                retType = new NFTIDPayload();
-                break;
+                return new NFTIDPayload(...args);
             case 13:
-                retType = new SUBNETIDPayload();
-                break;
+                return new SUBNETIDPayload(...args);
             case 14:
-                retType = new CHAINIDPayload();
-                break;
+                return new CHAINIDPayload(...args);
             case 15:
-                retType = new NODEIDPayload();
-                break;
+                return new NODEIDPayload(...args);
             case 16:
-                retType = new SECPSIGPayload();
-                break;
+                return new SECPSIGPayload(...args);
             case 17:
-                retType = new SECPENCPayload();
-                break;
+                return new SECPENCPayload(...args);
             case 18:
-                retType = new JPEGPayload();
-                break;
+                return new JPEGPayload(...args);
             case 19:
-                retType = new PNGPayload();
-                break;
+                return new PNGPayload(...args);
             case 20:
-                retType = new BMPPayload();
-                break;
+                return new BMPPayload(...args);
             case 21:
-                retType = new ICOPayload();
-                break;
+                return new ICOPayload(...args);
             case 22:
-                retType = new SVGPayload();
-                break;
+                return new SVGPayload(...args);
             case 23:
-                retType = new CSVPayload();
-                break;
+                return new CSVPayload(...args);
             case 24:
-                retType = new JSONPayload();
-                break;
+                return new JSONPayload(...args);
             case 25:
-                retType = new PROTOBUFPayload();
-                break;
+                return new PROTOBUFPayload(...args);
             case 26:
-                retType = new YAMLPayload();
-                break;
+                return new YAMLPayload(...args);
             case 27:
-                retType = new EMAILPayload();
-                break;
+                return new EMAILPayload(...args);
             case 28:
-                retType = new URLPayload();
-                break;
+                return new URLPayload(...args);
             case 29:
-                retType = new IPFSPayload();
-                break;
+                return new IPFSPayload(...args);
             case 30:
-                retType = new ONIONPayload();
-                break;
+                return new ONIONPayload(...args);
             case 31:
-                retType = new MAGNETPayload();
-                break;
+                return new MAGNETPayload(...args);
         }
-        retType.fromBuffer(unknowPayload.toBuffer());
-        return retType;
+        throw new Error("Error - PayloadTypes.select: unknown typeid " + typeid);
     }
 
+    /**
+     * Given a [[PayloadBase]] which may not be cast properly, returns a properly cast [[PayloadBase]].
+     */
+    recast(unknowPayload:PayloadBase):PayloadBase {
+        return this.select(unknowPayload.typeID(), unknowPayload.returnType());
+    }
+
+    /**
+     * Returns the [[PayloadTypes]] singleton.
+     */
     static getInstance(): PayloadTypes {
         if (!PayloadTypes.instance) {
             PayloadTypes.instance = new PayloadTypes();
@@ -190,18 +134,30 @@ export class PayloadTypes {
     }
 }
 
+/**
+ * Base class for payloads.
+ */
 export abstract class PayloadBase {
     protected payload:Buffer;
     protected typeid:number = undefined;
     
+    /**
+     * Returns the TypeID for the payload.
+     */
     typeID():number {
         return this.typeid;
     }
 
+    /**
+     * Returns the string name for the payload's type.
+     */
     typeName():string {
         return PayloadTypes.getInstance().lookupType(this.typeid);
     }
 
+    /**
+     * Decodes the payload as a {@link https://github.com/feross/buffer|Buffer} including 4 bytes for the length and TypeID.
+     */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         let size:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt8(0);
         offset += 4;
@@ -211,6 +167,9 @@ export abstract class PayloadBase {
         return offset + this.payload.length - 1;
     }
 
+    /**
+     * Encodes the payload as a {@link https://github.com/feross/buffer|Buffer} including 4 bytes for the length and TypeID.
+     */
     toBuffer():Buffer {
         let sizebuff:Buffer = Buffer.alloc(4);
         sizebuff.writeUInt32BE(this.payload.length + 1, 0);
@@ -219,15 +178,24 @@ export abstract class PayloadBase {
         return Buffer.concat([sizebuff, typebuff, this.payload]);
     }
 
+    /**
+     * Returns the expected type for the payload.
+     */
     abstract returnType():any;
 
     constructor(){}
 
 }
 
+/**
+ * Class for payloads representing simple binary blobs.
+ */
 export class BINPayload extends PayloadBase {
     static typeid = 0;
 
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} for the payload.
+     */
     returnType():Buffer {
         return this.payload;
     }
@@ -240,9 +208,15 @@ export class BINPayload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing UTF8 encoding.
+ */
 export class UTF8Payload extends PayloadBase {
     static typeid = 1;
 
+    /**
+     * Returns a string for the payload.
+     */
     returnType():string {
         return this.payload.toString("utf8");
     }
@@ -257,9 +231,15 @@ export class UTF8Payload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing Hexadecimal encoding.
+ */
 export class HEXSTRPayload extends PayloadBase {
     static typeid = 2;
 
+    /**
+     * Returns a hex string for the payload.
+     */
     returnType():string {
         return this.payload.toString("hex");
     }
@@ -274,9 +254,15 @@ export class HEXSTRPayload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing Base58 encoding (Bitcoin standard).
+ */
 export class B58STRPayload extends PayloadBase {
     static typeid = 3;
 
+    /**
+     * Returns a base58 string for the payload.
+     */
     returnType():string {
         return bintools.bufferToB58(this.payload);
     }
@@ -291,9 +277,15 @@ export class B58STRPayload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing Base64 encoding.
+ */
 export class B64STRPayload extends PayloadBase {
     static typeid = 4;
 
+    /**
+     * Returns a base64 string for the payload.
+     */
     returnType():string {
         return this.payload.toString("base64");
     }
@@ -308,9 +300,15 @@ export class B64STRPayload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing Big Numbers.
+ */
 export class BIGNUMPayload extends PayloadBase {
     static typeid = 5;
 
+    /**
+     * Returns a {@link https://github.com/indutny/bn.js/|BN} for the payload.
+     */
     returnType():BN {
         return bintools.fromBufferToBN(this.payload);
     }
@@ -325,10 +323,16 @@ export class BIGNUMPayload extends PayloadBase {
     }
 }
 
-class ChainAddressPayload extends PayloadBase {
+/**
+ * Class for payloads representing chain addresses.
+ */
+export abstract class ChainAddressPayload extends PayloadBase {
     static typeid = 6;
     protected chainid:string = "";
 
+    /**
+     * Returns an address string for the payload.
+     */
     returnType():string {
         return bintools.addressToString(this.chainid, this.payload);
     }
@@ -343,22 +347,38 @@ class ChainAddressPayload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing X-Chin addresses.
+ */
 export class XCHAINPayload extends ChainAddressPayload {
     static typeid = 6;
     static chainid = "X";
 }
 
+/**
+ * Class for payloads representing P-Chain addresses.
+ */
 export class PCHAINPayload extends ChainAddressPayload {
     static typeid = 7;
     static chainid = "P";
 }
 
+/**
+ * Class for payloads representing C-Chain addresses.
+ */
 export class CCHAINPayload extends ChainAddressPayload {
     static typeid = 8;
     static chainid = "C";
 }
 
-abstract class AVASerializedPayload extends PayloadBase {
+/**
+ * Class for payloads representing data serialized by bintools.avaSerialize().
+ */
+export abstract class AvaSerializedPayload extends PayloadBase {
+
+    /**
+     * Returns a bintools.avaSerialized string for the payload.
+     */
     returnType():string {
         return bintools.avaSerialize(this.payload);
     }
@@ -373,42 +393,74 @@ abstract class AVASerializedPayload extends PayloadBase {
     }
 }
 
-export class TXIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing TxIDs.
+ */
+export class TXIDPayload extends AvaSerializedPayload {
     static typeid = 9;
 }
 
-export class ASSETIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing AssetIDs.
+ */
+export class ASSETIDPayload extends AvaSerializedPayload {
     static typeid = 10;
 }
 
-export class UTXOIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing NODEIDs.
+ */
+export class UTXOIDPayload extends AvaSerializedPayload {
     static typeid = 11;
 }
 
-export class NFTIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing NFTIDs (UTXOIDs in an NFT context).
+ */
+export class NFTIDPayload extends UTXOIDPayload {
     static typeid = 12;
 }
 
-export class SUBNETIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing SubnetIDs.
+ */
+export class SUBNETIDPayload extends AvaSerializedPayload {
     static typeid = 13;
 }
 
-export class CHAINIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing ChainIDs.
+ */
+export class CHAINIDPayload extends AvaSerializedPayload {
     static typeid = 14;
 }
 
-export class NODEIDPayload extends AVASerializedPayload {
+/**
+ * Class for payloads representing NodeIDs.
+ */
+export class NODEIDPayload extends AvaSerializedPayload {
     static typeid = 15;
 }
 
+/**
+ * Class for payloads representing secp256k1 signatures.
+ * convention: secp256k1 signature (130 bytes)
+ */
 export class SECPSIGPayload extends B58STRPayload {
     static typeid = 16;
 }
 
+/**
+ * Class for payloads representing secp256k1 encrypted messages.
+ * convention: public key (65 bytes) + secp256k1 encrypted message for that public key
+ */
 export class SECPENCPayload extends B58STRPayload {
     static typeid = 17;
 }
 
+/**
+ * Class for payloads representing JPEG images.
+ */
 export class JPEGPayload extends BINPayload {
     static typeid = 18;
 }
@@ -417,25 +469,43 @@ export class PNGPayload extends BINPayload {
     static typeid = 19;
 }
 
+/**
+ * Class for payloads representing BMP images.
+ */
 export class BMPPayload extends BINPayload {
     static typeid = 20;
 }
 
+/**
+ * Class for payloads representing ICO images.
+ */
 export class ICOPayload extends BINPayload {
     static typeid = 21;
 }
 
+/**
+ * Class for payloads representing SVG images.
+ */
 export class SVGPayload extends UTF8Payload {
     static typeid = 22;
 }
 
+/**
+ * Class for payloads representing CSV files.
+ */
 export class CSVPayload extends UTF8Payload {
     static typeid = 23;
 }
 
+/**
+ * Class for payloads representing JSON strings.
+ */
 export class JSONPayload extends PayloadBase {
     static typeid = 24;
 
+    /**
+     * Returns a JSON-decoded object for the payload.
+     */
     returnType():any {
         return JSON.parse(this.payload.toString("utf8"));
     }
@@ -453,30 +523,51 @@ export class JSONPayload extends PayloadBase {
     }
 }
 
+/**
+ * Class for payloads representing protobuf definitions.
+ */
 export class PROTOBUFPayload extends BINPayload {
     static typeid = 25;
 }
 
+/**
+ * Class for payloads representing YAML definitions.
+ */
 export class YAMLPayload extends UTF8Payload {
     static typeid = 26;
 }
 
+/**
+ * Class for payloads representing email addresses.
+ */
 export class EMAILPayload extends UTF8Payload {
     static typeid = 27;
 }
 
+/**
+ * Class for payloads representing URL strings.
+ */
 export class URLPayload extends UTF8Payload {
     static typeid = 28;
 }
 
+/**
+ * Class for payloads representing IPFS addresses.
+ */
 export class IPFSPayload extends B58STRPayload {
     static typeid = 29;
 }
 
+/**
+ * Class for payloads representing onion URLs.
+ */
 export class ONIONPayload extends UTF8Payload {
     static typeid = 30;
 }
 
+/**
+ * Class for payloads representing torrent magnet links.
+ */
 export class MAGNETPayload extends UTF8Payload {
     static typeid = 31;
 }
