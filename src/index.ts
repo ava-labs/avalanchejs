@@ -116,14 +116,15 @@ export {CoreTypes};
 export {AvalancheCore};
 
 export * from './avalanche';
-export * from './apis/keystore/api';
-export * from './apis/platform/api';
 export * from './apis/avm/api';
 export * from './apis/admin/api';
-export * from './utils/types';
+export * from './apis/keystore/api';
+export * from './apis/platform/api';
 export * from './utils/bintools';
-export * from './utils/db';
 export * from './utils/crypto';
+export * from './utils/db';
+export * from './utils/payload';
+export * from './utils/types';
 
 export {SelectCredentialClass, Credential, SecpCredential, NFTCredential} from './apis/avm/credentials';
 export {SelectInputClass, Input, TransferableInput, AmountInput, SecpInput} from './apis/avm/inputs';
