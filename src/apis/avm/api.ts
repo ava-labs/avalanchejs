@@ -11,7 +11,6 @@ import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
-import { OutputOwners } from './outputs';
 
 /**
  * @ignore
@@ -701,7 +700,6 @@ class AVMAPI extends JRPCAPI{
      * @param utxoset A set of UTXOs that the transaction is built on
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feePayingAddresses The addresses to pay the fees
-     * @param initialStates The [[InitialStates]] that represent the intial state of an nft asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
      * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
@@ -732,8 +730,7 @@ class AVMAPI extends JRPCAPI{
      */
     buildCreateNFTAssetTx = async (
         utxoset:UTXOSet, fee:BN, feePayingAddresses:Array<string> | Array<Buffer>, 
-        initialStates:InitialStates, name:string, 
-        symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0), 
+        name:string, symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0), 
     ): Promise<UnsignedTx> => {
         let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
         
@@ -750,8 +747,7 @@ class AVMAPI extends JRPCAPI{
         let avaAssetID:Buffer = await this.getAVAAssetID();
         return utxoset.buildCreateNFTAssetTx(
             this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
-            fee, feeAddrs, initialStates,
-            minterSets, name, symbol, locktime
+            fee, feeAddrs, minterSets, name, symbol, locktime
         );
     }
 

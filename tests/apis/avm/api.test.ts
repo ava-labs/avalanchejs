@@ -795,11 +795,15 @@ describe("AVMAPI", () => {
             let addrbuff1: Buffer[] = addrs1.map(a => api.parseAddress(a));
 
             let txu1:UnsignedTx = await api.buildCreateNFTAssetTx(
-                set, new BN(fee), addrs1, nftInitialState, 
+                set, new BN(fee), addrs1, 
                 name, symbol, minterSets, locktime
             );
             
-            let txu2:UnsignedTx = set.buildCreateNFTAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), nftInitialState, minterSets, name, symbol, locktime);
+            let txu2:UnsignedTx = set.buildCreateNFTAssetTx(
+                avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), 
+                assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), minterSets, 
+                name, symbol, locktime
+            );
 
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
             expect(txu2.toString()).toBe(txu1.toString());

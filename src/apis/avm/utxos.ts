@@ -562,7 +562,6 @@ export class UTXOSet {
      * @param avaAssetId The AVA Asset ID
      * @param fee The amount of AVA to be paid for fees, in $nAVA
      * @param feePayingAddresses The addresses to pay the fees
-     * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param minterSets The minters and thresholds required to mint this nft asset
      * @param name String for the descriptive name of the nft asset
      * @param symbol String for the ticker symbol of the nft asset
@@ -574,11 +573,11 @@ export class UTXOSet {
     buildCreateNFTAssetTx = (
         networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
         fee:BN, feePayingAddresses:Array<Buffer>, 
-        initialState:InitialStates, 
         minterSets:Array<MinterSet>,
         name:string, symbol:string,
         locktime:BN
     ):UnsignedTx => {
+        let initialState:InitialStates = new InitialStates();
         let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaAssetID);
         let ins:Array<TransferableInput> = utx.getTransaction().getIns();
         let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
