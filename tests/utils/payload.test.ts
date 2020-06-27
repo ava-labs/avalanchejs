@@ -1,26 +1,24 @@
 import { Buffer } from "buffer/";
 import { UTF8Payload, PayloadTypes, BINPayload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINPayload, PCHAINPayload, CCHAINPayload, TXIDPayload, ASSETIDPayload, UTXOIDPayload, NFTIDPayload, SUBNETIDPayload, CHAINIDPayload, NODEIDPayload, SECPSIGPayload, SECPENCPayload, JPEGPayload, PNGPayload, BMPPayload, ICOPayload, SVGPayload, CSVPayload, JSONPayload, PROTOBUFPayload, YAMLPayload, EMAILPayload, URLPayload, IPFSPayload, ONIONPayload, MAGNETPayload } from "src";
+let payloadTypes:PayloadTypes = PayloadTypes.getInstance();
 
 describe("Payload", () => {
-    // beforeAll(() => {
-    //     let payloadTypes:PayloadTypes;
-    // });
     test("PayloadTypes", () => {
-        let payloadTypes:PayloadTypes = PayloadTypes.getInstance();
         expect(payloadTypes.lookupID("BIN")).toBe(0);
         expect(payloadTypes.lookupType(0)).toBe("BIN");
-        let binPayload:BINPayload = new BINPayload();
-        expect(payloadTypes.select(0).toBuffer().toString()).toBe(binPayload.toBuffer().toString());
     });
 
     test("BINPayload", () => {
         let str:string = "Avalanche.js";
         let serialized:Buffer = Buffer.from(str);
         let binp:BINPayload = new BINPayload(serialized);
-        let utf8pbuf:Buffer = binp.toBuffer();
+        let binpbuf:Buffer = binp.toBuffer();
 
         expect(binp.typeID()).toBe(0);
         expect(binp.typeName()).toBe("BIN");
+
+        let binPayload:BINPayload = new BINPayload();
+        expect(payloadTypes.select(0).toBuffer().toString()).toBe(binPayload.toBuffer().toString());
         // TODO
         // expect(binp.returnType()).toBe(str);
         // let utf8pcopy:BINPayload = new BINPayload();
@@ -40,6 +38,7 @@ describe("Payload", () => {
         expect(utf8p.returnType()).toBe(str);
 
         let utf8pcopy:UTF8Payload = new UTF8Payload();
+        expect(payloadTypes.select(1).toBuffer().toString()).toBe(utf8pcopy.toBuffer().toString());
         utf8pcopy.fromBuffer(utf8pbuf);
         expect(utf8pcopy.toString()).toBe(utf8p.toString());
         expect(utf8p.toBuffer().toString()).toBe(utf8pcopy.toBuffer().toString());
@@ -52,6 +51,9 @@ describe("Payload", () => {
 
         expect(hexp.typeID()).toBe(2);
         expect(hexp.typeName()).toBe("HEXSTR");
+
+        let hexpcopy:HEXSTRPayload = new HEXSTRPayload();
+        expect(payloadTypes.select(2).toBuffer().toString()).toBe(hexpcopy.toBuffer().toString());
     });
 
     test("B58STRPayload", () => {
@@ -61,6 +63,9 @@ describe("Payload", () => {
 
         expect(b58.typeID()).toBe(3);
         expect(b58.typeName()).toBe("B58STR");
+
+        let b58copy:B58STRPayload = new B58STRPayload();
+        expect(payloadTypes.select(3).toBuffer().toString()).toBe(b58copy.toBuffer().toString());
     });
 
     test("B64STRPayload", () => {
@@ -70,6 +75,9 @@ describe("Payload", () => {
 
         expect(b64.typeID()).toBe(4);
         expect(b64.typeName()).toBe("B64STR");
+
+        let b64copy:B64STRPayload = new B64STRPayload();
+        expect(payloadTypes.select(4).toBuffer().toString()).toBe(b64copy.toBuffer().toString());
     });
 
     test("BIGNUMPayload", () => {
@@ -79,6 +87,9 @@ describe("Payload", () => {
 
         expect(bn.typeID()).toBe(5);
         expect(bn.typeName()).toBe("BIGNUM");
+
+        let bncopy:BIGNUMPayload = new BIGNUMPayload();
+        expect(payloadTypes.select(5).toBuffer().toString()).toBe(bncopy.toBuffer().toString());
     });
 
     test("XCHAINPayload", () => {
@@ -89,6 +100,9 @@ describe("Payload", () => {
         expect(x.typeID()).toBe(6);
         expect(x.returnChainID()).toBe("X");
         expect(x.typeName()).toBe("XCHAINADDR");
+
+        let xcopy:XCHAINPayload = new XCHAINPayload();
+        expect(payloadTypes.select(6).toBuffer().toString()).toBe(xcopy.toBuffer().toString());
     });
 
     test("PCHAINPayload", () => {
@@ -99,6 +113,9 @@ describe("Payload", () => {
         expect(p.typeID()).toBe(7);
         expect(p.returnChainID()).toBe("P");
         expect(p.typeName()).toBe("PCHAINADDR");
+
+        let pcopy:PCHAINPayload = new PCHAINPayload();
+        expect(payloadTypes.select(7).toBuffer().toString()).toBe(pcopy.toBuffer().toString());
     });
 
     test("CCHAINPayload", () => {
@@ -109,6 +126,9 @@ describe("Payload", () => {
         expect(c.typeID()).toBe(8);
         expect(c.returnChainID()).toBe("C");
         expect(c.typeName()).toBe("CCHAINADDR");
+
+        let ccopy:CCHAINPayload = new CCHAINPayload();
+        expect(payloadTypes.select(8).toBuffer().toString()).toBe(ccopy.toBuffer().toString());
     });
 
     test("TXIDPayload", () => {
@@ -118,6 +138,9 @@ describe("Payload", () => {
 
         expect(txid.typeID()).toBe(9);
         expect(txid.typeName()).toBe("TXID");
+
+        let txidcopy:TXIDPayload = new TXIDPayload();
+        expect(payloadTypes.select(9).toBuffer().toString()).toBe(txidcopy.toBuffer().toString());
     });
 
     test("ASSETIDPayload", () => {
@@ -127,6 +150,9 @@ describe("Payload", () => {
 
         expect(assetid.typeID()).toBe(10);
         expect(assetid.typeName()).toBe("ASSETID");
+
+        let assetidcopy:ASSETIDPayload = new ASSETIDPayload();
+        expect(payloadTypes.select(10).toBuffer().toString()).toBe(assetidcopy.toBuffer().toString());
     });
 
     test("UTXOIDPayload", () => {
@@ -136,6 +162,9 @@ describe("Payload", () => {
 
         expect(utxoid.typeID()).toBe(11);
         expect(utxoid.typeName()).toBe("UTXOID");
+
+        let utxoidcopy:UTXOIDPayload = new UTXOIDPayload();
+        expect(payloadTypes.select(11).toBuffer().toString()).toBe(utxoidcopy.toBuffer().toString());
     });
 
     test("NFTIDPayload", () => {
@@ -145,6 +174,9 @@ describe("Payload", () => {
 
         expect(nftid.typeID()).toBe(12);
         expect(nftid.typeName()).toBe("NFTID");
+
+        let nftidcopy:NFTIDPayload = new NFTIDPayload();
+        expect(payloadTypes.select(12).toBuffer().toString()).toBe(nftidcopy.toBuffer().toString());
     });
 
     test("SUBNETIDPayload", () => {
@@ -154,6 +186,9 @@ describe("Payload", () => {
 
         expect(subnetid.typeID()).toBe(13);
         expect(subnetid.typeName()).toBe("SUBNETID");
+
+        let subnetidcopy:SUBNETIDPayload = new SUBNETIDPayload();
+        expect(payloadTypes.select(13).toBuffer().toString()).toBe(subnetidcopy.toBuffer().toString());
     });
 
     test("CHAINIDPayload", () => {
@@ -163,6 +198,9 @@ describe("Payload", () => {
 
         expect(chainid.typeID()).toBe(14);
         expect(chainid.typeName()).toBe("CHAINID");
+
+        let chainidcopy:CHAINIDPayload = new CHAINIDPayload();
+        expect(payloadTypes.select(14).toBuffer().toString()).toBe(chainidcopy.toBuffer().toString());
     });
 
     test("NODEIDPayload", () => {
@@ -172,6 +210,9 @@ describe("Payload", () => {
 
         expect(nodeid.typeID()).toBe(15);
         expect(nodeid.typeName()).toBe("NODEID");
+
+        let nodeidcopy:NODEIDPayload = new NODEIDPayload();
+        expect(payloadTypes.select(15).toBuffer().toString()).toBe(nodeidcopy.toBuffer().toString());
     });
 
     test("SECPSIGPayload", () => {
@@ -181,6 +222,9 @@ describe("Payload", () => {
 
         expect(secpsig.typeID()).toBe(16);
         expect(secpsig.typeName()).toBe("SECPSIG");
+
+        let secpsigcopy:SECPSIGPayload = new SECPSIGPayload();
+        expect(payloadTypes.select(16).toBuffer().toString()).toBe(secpsigcopy.toBuffer().toString());
     });
 
     test("SECPENCPayload", () => {
@@ -190,6 +234,9 @@ describe("Payload", () => {
 
         expect(secpenc.typeID()).toBe(17);
         expect(secpenc.typeName()).toBe("SECPENC");
+
+        let secpenccopy:SECPENCPayload = new SECPENCPayload();
+        expect(payloadTypes.select(17).toBuffer().toString()).toBe(secpenccopy.toBuffer().toString());
     });
 
     test("JPEGPayload", () => {
@@ -199,6 +246,9 @@ describe("Payload", () => {
 
         expect(jpeg.typeID()).toBe(18);
         expect(jpeg.typeName()).toBe("JPEG");
+
+        let jpegcopy:JPEGPayload = new JPEGPayload();
+        expect(payloadTypes.select(18).toBuffer().toString()).toBe(jpegcopy.toBuffer().toString());
     });
 
     test("PNGPayload", () => {
@@ -208,6 +258,9 @@ describe("Payload", () => {
 
         expect(png.typeID()).toBe(19);
         expect(png.typeName()).toBe("PNG");
+
+        let pngcopy:PNGPayload = new PNGPayload();
+        expect(payloadTypes.select(19).toBuffer().toString()).toBe(pngcopy.toBuffer().toString());
     });
 
     test("BMPPayload", () => {
@@ -217,6 +270,9 @@ describe("Payload", () => {
 
         expect(bmp.typeID()).toBe(20);
         expect(bmp.typeName()).toBe("BMP");
+
+        let bmpcopy:BMPPayload = new BMPPayload();
+        expect(payloadTypes.select(20).toBuffer().toString()).toBe(bmpcopy.toBuffer().toString());
     });
 
     test("ICOPayload", () => {
@@ -226,6 +282,9 @@ describe("Payload", () => {
 
         expect(ico.typeID()).toBe(21);
         expect(ico.typeName()).toBe("ICO");
+
+        let icocopy:ICOPayload = new ICOPayload();
+        expect(payloadTypes.select(21).toBuffer().toString()).toBe(icocopy.toBuffer().toString());
     });
 
     test("SVGPayload", () => {
@@ -235,6 +294,9 @@ describe("Payload", () => {
 
         expect(svg.typeID()).toBe(22);
         expect(svg.typeName()).toBe("SVG");
+
+        let svgcopy:SVGPayload = new SVGPayload();
+        expect(payloadTypes.select(22).toBuffer().toString()).toBe(svgcopy.toBuffer().toString());
     });
 
     test("CSVPayload", () => {
@@ -244,6 +306,9 @@ describe("Payload", () => {
 
         expect(csv.typeID()).toBe(23);
         expect(csv.typeName()).toBe("CSV");
+
+        let csvcopy:CSVPayload = new CSVPayload();
+        expect(payloadTypes.select(23).toBuffer().toString()).toBe(csvcopy.toBuffer().toString());
     });
 
     test("JSONPayload", () => {
@@ -253,6 +318,9 @@ describe("Payload", () => {
 
         expect(json.typeID()).toBe(24);
         expect(json.typeName()).toBe("JSON");
+
+        let jsoncopy:JSONPayload = new JSONPayload();
+        expect(payloadTypes.select(24).toBuffer().toString()).toBe(jsoncopy.toBuffer().toString());
     });
 
     test("PROTOBUFPayload", () => {
@@ -262,6 +330,9 @@ describe("Payload", () => {
 
         expect(protobuf.typeID()).toBe(25);
         expect(protobuf.typeName()).toBe("PROTOBUF");
+
+        let protobufcopy:PROTOBUFPayload = new PROTOBUFPayload();
+        expect(payloadTypes.select(25).toBuffer().toString()).toBe(protobufcopy.toBuffer().toString());
     });
 
     test("YAMLPayload", () => {
@@ -271,6 +342,9 @@ describe("Payload", () => {
 
         expect(yaml.typeID()).toBe(26);
         expect(yaml.typeName()).toBe("YAML");
+
+        let yamlcopy:YAMLPayload = new YAMLPayload();
+        expect(payloadTypes.select(26).toBuffer().toString()).toBe(yamlcopy.toBuffer().toString());
     });
 
     test("EMAILPayload", () => {
@@ -280,6 +354,9 @@ describe("Payload", () => {
 
         expect(email.typeID()).toBe(27);
         expect(email.typeName()).toBe("EMAIL");
+
+        let emailcopy:EMAILPayload = new EMAILPayload();
+        expect(payloadTypes.select(27).toBuffer().toString()).toBe(emailcopy.toBuffer().toString());
     });
 
     test("URLPayload", () => {
@@ -289,6 +366,9 @@ describe("Payload", () => {
 
         expect(url.typeID()).toBe(28);
         expect(url.typeName()).toBe("URL");
+
+        let urlcopy:URLPayload = new URLPayload();
+        expect(payloadTypes.select(28).toBuffer().toString()).toBe(urlcopy.toBuffer().toString());
     });
 
     test("IPFSPayload", () => {
@@ -298,6 +378,9 @@ describe("Payload", () => {
 
         expect(ipfs.typeID()).toBe(29);
         expect(ipfs.typeName()).toBe("IPFS");
+
+        let ipfscopy:IPFSPayload = new IPFSPayload();
+        expect(payloadTypes.select(29).toBuffer().toString()).toBe(ipfscopy.toBuffer().toString());
     });
 
     test("ONIONPayload", () => {
@@ -307,6 +390,9 @@ describe("Payload", () => {
 
         expect(onion.typeID()).toBe(30);
         expect(onion.typeName()).toBe("ONION");
+
+        let onioncopy:ONIONPayload = new ONIONPayload();
+        expect(payloadTypes.select(30).toBuffer().toString()).toBe(onioncopy.toBuffer().toString());
     });
 
     test("MAGNETPayload", () => {
@@ -314,7 +400,10 @@ describe("Payload", () => {
         let serialized:Buffer = Buffer.from(str)
         let magnet:MAGNETPayload = new MAGNETPayload(serialized);
 
-        expect(magnet.typeID()).toBe(26);
+        expect(magnet.typeID()).toBe(31);
         expect(magnet.typeName()).toBe("MAGNET");
+
+        let magnetcopy:MAGNETPayload = new MAGNETPayload();
+        expect(payloadTypes.select(31).toBuffer().toString()).toBe(magnetcopy.toBuffer().toString());
     });
 });
