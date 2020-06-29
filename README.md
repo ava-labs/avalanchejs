@@ -1,4 +1,4 @@
-# Avalanche.js - The Avalanhe Platform JavaScript Library
+# Avalanche.js - The Avalanche Platform JavaScript Library
 
 ## Overview
 
