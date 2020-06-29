@@ -10,7 +10,7 @@ import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx } from './tx';
 import { SecpInput, TransferableInput } from './inputs';
 import { NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
-import { MinterSet } from "src/utils/types";
+import { MinterSet } from "../../utils/types";
 
 /**
  * @ignore

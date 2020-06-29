@@ -11,7 +11,7 @@ import { UTXOSet } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
-import { PayloadBase } from 'src/utils/payload';
+import { PayloadBase } from '../../utils/payload';
 
 /**
  * @ignore
