@@ -233,7 +233,6 @@ class PlatformAPI extends JRPCAPI{
     addNonDefaultSubnetValidator = async (id:string, subnetID:Buffer | string, startTime:Date, endTime:Date, weight:number, payerNonce:number):Promise<string> => {
         let params = {
             "id": id,
-            "subnet": subnetID,
             "startTime": startTime.getTime()/1000,
             "endTime": endTime.getTime()/1000,
             "weight": weight,
