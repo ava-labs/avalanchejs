@@ -427,7 +427,7 @@ class AVMAPI extends JRPCAPI{
     exportAVA = async (username: string, password:string, to:string, amount:BN):Promise<string> => {
         let params = {
             "to": to,
-            "amount": amount,
+            "amount": amount.toString(10),
             "username": username,
             "password": password
         }

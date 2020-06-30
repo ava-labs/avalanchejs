@@ -356,7 +356,7 @@ class PlatformAPI extends JRPCAPI{
     exportAVA = async (amount:BN, to:string,payerNonce:number):Promise<string> => {
         let params = {
             "to": to,
-            "amount": amount,
+            "amount": amount.toString(10),
             "payerNonce": payerNonce
         }
         return this.callMethod("platform.exportAVA", params).then((response:RequestResponseData) => {
