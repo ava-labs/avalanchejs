@@ -13,7 +13,7 @@ The APIs currently supported by default are:
 
 ## Getting Started
 
-We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://avalabs.org/docs/).
+We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network/).
 
 Using Avalanche.js, developers are able to:
 
@@ -26,7 +26,7 @@ Using Avalanche.js, developers are able to:
 * Administer a local node
 * Retrieve Avalanche network information from a node
 
-The entirety of the Avalanche.js documentation can be found on our [Avalanche.js documentation page](https://docs.ava.network/v1.0/en/tools/avalanche.js/).
+The entirety of the Avalanche.js documentation can be found on our [Avalanche.js documentation page](https://docs.avax.network/v1.0/en/tools/avalanche.js/).
 
 ### Requirements
 

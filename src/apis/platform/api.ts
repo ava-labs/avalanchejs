@@ -129,7 +129,7 @@ class PlatformAPI extends JRPCAPI{
      * 
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
      * 
-     * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.ava.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
+     * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
      * 
      */
     getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
@@ -149,7 +149,7 @@ class PlatformAPI extends JRPCAPI{
      * 
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
      * 
-     * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.ava.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
+     * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
      * 
      */
     getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
