@@ -52,6 +52,7 @@
     "npm": ">=6.12.1"
   },
   "dependencies": {
+    "@peculiar/webcrypto": "^1.1.1",
     "axios": "^0.19.2",
     "bn.js": "^4.11.8",
     "buffer": "^5.5.0",

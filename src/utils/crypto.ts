@@ -3,7 +3,7 @@
  * @module Utils-Crypto
  */
 import { Buffer } from "buffer/";
-import libsodiumWrapper from 'libsodium-wrappers';
+import {Crypto} from  "@peculiar/webcrypto";
 import createHash from "create-hash";
 
 /**
