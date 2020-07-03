@@ -137,6 +137,7 @@ export {UTXO, UTXOSet} from './apis/avm/utxos';
 export {AdminAPI as Admin};
 export {AVMAPI as AVM};
 export {HealthAPI as Health};
+export {InfoAPI as Info};
 export {KeystoreAPI as Keystore};
 export {MetricsAPI as Metrics};
 export {PlatformAPI as Platform};
