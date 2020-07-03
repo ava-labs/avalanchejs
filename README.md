@@ -1,6 +1,6 @@
 # Avalanche.js - The Avalanche Platform JavaScript Library
 
-## Overview
+## Overview 
 
 Avalanche.js is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche.js library allows one to issue commands to the Avalanche node APIs.
 
