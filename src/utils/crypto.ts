@@ -2,179 +2,199 @@
  * @packageDocumentation
  * @module Utils-Crypto
  */
-import { Buffer } from "buffer/";
-import libsodiumWrapper from 'libsodium-wrappers';
-import createHash from "create-hash";
+import { Buffer } from 'buffer/';
+import { Crypto } from '@peculiar/webcrypto';
+import createHash from 'create-hash';
+import BinTools from './bintools';
+
+/**
+ * @ignore
+ */
+const bintools = BinTools.getInstance();
 
 /**
  * Helper utility for encryption and password hashing, browser-safe.
  * Encryption is using XChaCha20Poly1305 with a random public nonce.
  */
-export class CryptoHelpers {
+export default class CryptoHelpers {
+  protected crypto: Crypto = new Crypto();
 
-    protected memlimit:number = 524288000;
-    protected opslimit:number = 3;
-    protected libsodium:typeof libsodiumWrapper;
+  protected ivSize: number = 12;
 
-    /**
-     * Retrieves the memory limit that can be spent generating password-safe hashes.
-     */
-    getMemoryLimit():number {
-        return this.memlimit;
-    }
+  protected saltSize: number = 16;
 
-    /**
-     * Sets the memory limit that can be spent generating password-safe hashes.
-     * 
-     * @param memlimit The number representing the memory limit, in bytes, that the password-safe algorithm can use
-     */
-    setMemoryLimit(memlimit:number) {
-        this.memlimit = memlimit;
-    }
+  protected tagLength: number = 128;
 
-    /**
-     * Retrieves the cpu limit that can be spent generating password-safe hashes.
-     */
-    getOpsLimit():number {
-        return this.opslimit;
-    }
+  protected aesLength: number = 256;
 
-    /**
-     * Retrieves the cpu limit that can be spent generating password-safe hashes.
-     * 
-     * @param opslimit The number representing the cpu limit that the password-safe algorithm can use. Lower is faster.
-     */
-    setOpsLimit(opslimit:number) {
-        this.opslimit = opslimit;
-    }
+  protected keygenIterations: number = 100000;
 
-    /**
-     * @ignore
-     */
-    protected async sodium(): Promise<typeof libsodiumWrapper> {
-        if(!this.libsodium) this.libsodium = (libsodiumWrapper as typeof libsodiumWrapper);
-        await this.libsodium.ready;
-      
-        return this.libsodium;
-      }
-      
-
-    /**
+  /**
      * Internal-intended function for cleaning passwords.
-     * 
-     * @param password 
-     * @param salt 
+     *
+     * @param password
+     * @param salt
      */
-    async _pwcleaner(password:string,salt:Uint8Array):Promise<Uint8Array> {
-        let sodium:typeof libsodiumWrapper = await this.sodium();
-        let pw:Buffer = Buffer.from(password, 'utf8');
-        let slt:Buffer;
-        if(typeof salt === "undefined"){
-            slt = Buffer.from(sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES));
-        } else {
-            slt = Buffer.from(salt);
-        }
-        let sha:Buffer = this.sha256(Buffer.concat([pw, slt]));
-        let pwsalted:Uint8Array = Uint8Array.from(sha);
-        return sodium.crypto_generichash(sodium.crypto_aead_xchacha20poly1305_ietf_KEYBYTES, pwsalted);
-    }
+  _pwcleaner(password:string, slt:Buffer):Buffer {
+    const pw:Buffer = Buffer.from(password, 'utf8');
+    return this.sha256(Buffer.concat([pw, slt]));
+  }
+  /**
+     * Internal-intended function for producing an intermediate key.
+     *
+     * @param pwkey
+     */
 
-    /**
+  async _keyMaterial(pwkey:Buffer):Promise<CryptoKey> {
+    return this.crypto.subtle.importKey(
+      'raw',
+      bintools.fromBufferToArrayBuffer(pwkey),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey'],
+    );
+  }
+
+  /**
+     * Internal-intended function for turning an intermediate key into a salted key.
+     *
+     * @param keyMaterial
+     * @param salt
+     */
+  async _deriveKey(keyMaterial:CryptoKey, salt:Buffer):Promise<CryptoKey> {
+    return this.crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt,
+        iterations: this.keygenIterations,
+        hash: 'SHA-256',
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: this.aesLength },
+      false,
+      ['encrypt', 'decrypt'],
+    );
+  }
+
+  /**
      * A SHA256 helper function.
-     * 
+     *
      * @param message The message to hash
-     * 
+     *
      * @returns A {@link https://github.com/feross/buffer|Buffer} containing the SHA256 hash of the message
      */
-    sha256(message:string | Buffer | Uint8Array):Buffer {
-        let buff:Buffer;
-        if(typeof message === "string"){
-            buff = Buffer.from(message, "utf8");
-        } else {
-            buff = Buffer.from(message);
-        }
-        return Buffer.from(createHash('sha256').update(buff).digest()); // ensures correct Buffer class is used
+  sha256(message:string | Buffer):Buffer {
+    let buff:Buffer;
+    if (typeof message === 'string') {
+      buff = Buffer.from(message, 'utf8');
+    } else {
+      buff = Buffer.from(message);
     }
+    return Buffer.from(createHash('sha256').update(buff).digest()); // ensures correct Buffer class is used
+  }
 
-    /**
+  /**
      * Generates a randomized {@link https://github.com/feross/buffer|Buffer} to be used as a salt
      */
-    async makeSalt():Promise<Buffer> {
-        let sodium:typeof libsodiumWrapper = await this.sodium();
-        return Buffer.from(sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES));
-    }
+  makeSalt():Buffer {
+    const salt = Buffer.alloc(this.saltSize);
+    this.crypto.getRandomValues(salt);
+    return salt;
+  }
 
-    /**
+  /**
      * Produces a password-safe hash.
-     * 
-     * @param password A string for the password 
+     *
+     * @param password A string for the password
      * @param salt An optional {@link https://github.com/feross/buffer|Buffer} containing a salt used in the password hash
-     * 
+     *
      * @returns An object containing the "salt" and the "hash" produced by this function, both as {@link https://github.com/feross/buffer|Buffer}.
      */
-    async pwhash(password:string, salt:Buffer):Promise< {salt:Buffer; hash:Buffer} > {
-        let sodium:typeof libsodiumWrapper = await this.sodium();
-
-        let slt:Uint8Array;
-        if(typeof salt === "undefined"){
-            slt = await this.makeSalt();
-        } else {
-            slt = Uint8Array.from(salt);
-        }
-        let hash:Uint8Array = sodium.crypto_pwhash(32, password, slt, this.opslimit, this.memlimit, sodium.crypto_pwhash_ALG_DEFAULT);
-        return {salt:Buffer.from(slt), hash:Buffer.from(hash)};
+  async pwhash(password:string, salt:Buffer):Promise< {salt:Buffer; hash:Buffer} > {
+    let slt:Buffer;
+    if (salt instanceof Buffer) {
+      slt = salt;
+    } else {
+      slt = this.makeSalt();
     }
 
-    /**
+    const hash:Buffer = this._pwcleaner(password, slt);
+    return { salt: slt, hash };
+  }
+
+  /**
      * Encrypts plaintext with the provided password using XChaCha20Poly1305.
-     * 
+     *
      * @param password A string for the password
      * @param plaintext The plaintext to encrypt
      * @param salt An optional {@link https://github.com/feross/buffer|Buffer} for the salt to use in the encryption process
-     * 
-     * @returns An object containing the "salt", "nonce", and "ciphertext", all as {@link https://github.com/feross/buffer|Buffer}.
+     *
+     * @returns An object containing the "salt", "iv", and "ciphertext", all as {@link https://github.com/feross/buffer|Buffer}.
      */
-    async encrypt(password:string, plaintext:Buffer | string, salt:Buffer = undefined):Promise< {salt:Buffer; nonce:Buffer; ciphertext:Buffer} > {
-        let sodium:typeof libsodiumWrapper = await this.sodium();
-        let slt:Uint8Array;
-        if(typeof salt === "undefined"){
-            slt = await this.makeSalt();
-        } else {
-            slt = Uint8Array.from(salt);
-        }
-
-        let pt:Uint8Array;
-        if(plaintext instanceof Buffer){
-            pt = Uint8Array.from(plaintext);
-        } else {
-            pt = Uint8Array.from(Buffer.from(plaintext, "utf8"));
-        }
-        let nonce:Uint8Array = sodium.randombytes_buf(sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
-        let pkey:Uint8Array = await this._pwcleaner(password, slt);
-        let ciphertext:Uint8Array = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(pt, "AVALANCHE", null, nonce, pkey);
-    
-        return {
-            salt:Buffer.from(slt), 
-            nonce:Buffer.from(nonce), 
-            ciphertext:Buffer.from(ciphertext)
-        }
-
+  async encrypt(password:string,
+    plaintext:Buffer | string,
+    salt:Buffer = undefined):Promise< {salt:Buffer; iv:Buffer; ciphertext:Buffer} > {
+    let slt:Buffer;
+    if (plaintext instanceof Buffer) {
+      slt = salt;
+    } else {
+      slt = this.makeSalt();
     }
 
-    /**
-     * Decrypts ciphertext with the provided password, nonce, ans salt. 
-     * 
+    let pt:Buffer;
+    if (plaintext instanceof Buffer) {
+      pt = plaintext;
+    } else {
+      pt = Buffer.from(plaintext, 'utf8');
+    }
+    const pwkey:Buffer = this._pwcleaner(password, slt);
+    const keyMaterial:CryptoKey = await this._keyMaterial(pwkey);
+    const pkey:CryptoKey = await this._deriveKey(keyMaterial, slt);
+    const iv:Buffer = Buffer.from(this.crypto.getRandomValues(new Uint8Array(this.ivSize)));
+
+    const ciphertext:Buffer = Buffer.from(await this.crypto.subtle.encrypt(
+      {
+        name: 'AES-GCM',
+        iv,
+        additionalData: slt,
+        tagLength: this.tagLength,
+      },
+      pkey,
+      pt,
+
+    ));
+
+    return {
+      salt: slt,
+      iv,
+      ciphertext,
+    };
+  }
+
+  /**
+     * Decrypts ciphertext with the provided password, iv, and salt.
+     *
      * @param password A string for the password
      * @param ciphertext A {@link https://github.com/feross/buffer|Buffer} for the ciphertext
      * @param salt A {@link https://github.com/feross/buffer|Buffer} for the salt
-     * @param nonce A {@link https://github.com/feross/buffer|Buffer} for the nonce
+     * @param iv A {@link https://github.com/feross/buffer|Buffer} for the iv
      */
-    async decrypt(password:string, ciphertext:Buffer, salt:Buffer, nonce:Buffer):Promise<Buffer> {
-        let sodium:typeof libsodiumWrapper = await this.sodium();
-        let pkey:Uint8Array = await this._pwcleaner(password, Uint8Array.from(salt));
-        let pt:Uint8Array = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null, Uint8Array.from(ciphertext), "AVALANCHE", Uint8Array.from(nonce), pkey);
-        return Buffer.from(pt);
-    } 
+  async decrypt(password:string, ciphertext:Buffer, salt:Buffer, iv:Buffer):Promise<Buffer> {
+    const pwkey:Buffer = this._pwcleaner(password, salt);
+    const keyMaterial:CryptoKey = await this._keyMaterial(pwkey);
+    const pkey:CryptoKey = await this._deriveKey(keyMaterial, salt);
+    const pt:Buffer = Buffer.from(await this.crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv, // The initialization vector you used to encrypt
+        additionalData: salt, // The addtionalData you used to encrypt (if any)
+        tagLength: 128, // The tagLength you used to encrypt (if any)
+      },
+      pkey, // from generateKey or importKey above
+      ciphertext, // ArrayBuffer of the data
+    ));
+    return pt;
+  }
 
-    constructor() {}
+  constructor() {}
 }

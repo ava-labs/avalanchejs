@@ -1,60 +1,59 @@
 import mockAxios from 'jest-mock-axios';
 
-
-import { Avalanche } from "src";
-import PlatformAPI from "src/apis/platform/api";
-import { Buffer } from "buffer/";
-import BN from "bn.js";
+import { Avalanche } from 'src';
+import PlatformAPI from 'src/apis/platform/api';
+import { Buffer } from 'buffer/';
+import BN from 'bn.js';
 import BinTools from 'src/utils/bintools';
-import HealthAPI from "../../../src/apis/health/api";
+import HealthAPI from '../../../src/apis/health/api';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
 
-describe("Health", () => {
-    const ip = '127.0.0.1';
-    const port = 9650;
-    const protocol = "https";
+describe('Health', () => {
+  const ip = '127.0.0.1';
+  const port = 9650;
+  const protocol = 'https';
 
-    let avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
-    let health:HealthAPI;
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+  let health:HealthAPI;
 
-    beforeAll(() => {
-        health = new HealthAPI(avalanche);
-    });
+  beforeAll(() => {
+    health = new HealthAPI(avalanche);
+  });
 
-    afterEach(() => {
-        mockAxios.reset();
-    });
+  afterEach(() => {
+    mockAxios.reset();
+  });
 
-    test("getLiveness ", async ()=>{
-        let result:Promise<object> = health.getLiveness();
-        let payload:object = {
-            "result": {
-                "checks":{
-                    "network.validators.heartbeat":{
-                        "message":{
-                            "heartbeat":1591041377
-                        },
-                        "timestamp":"2020-06-01T15:56:18.554202-04:00",
-                        "duration":23201,
-                        "contiguousFailures":0,
-                        "timeOfFirstFailure":null
-                    }
-                },
-                "healthy":true
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
+  test('getLiveness ', async () => {
+    const result:Promise<object> = health.getLiveness();
+    const payload:any = {
+      result: {
+        checks: {
+          'network.validators.heartbeat': {
+            message: {
+              heartbeat: 1591041377,
+            },
+            timestamp: '2020-06-01T15:56:18.554202-04:00',
+            duration: 23201,
+            contiguousFailures: 0,
+            timeOfFirstFailure: null,
+          },
+        },
+        healthy: true,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
 
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
+    mockAxios.mockResponse(responseObj);
+    const response:any = await result;
 
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(payload['result']);
-    });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(payload.result);
+  });
 });
