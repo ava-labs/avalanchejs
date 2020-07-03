@@ -98,7 +98,8 @@ export default class CryptoHelpers {
      */
   makeSalt():Buffer {
     let salt = Buffer.alloc(this.saltSize);
-    return Buffer.from(this.crypto.getRandomValues(new Uint8Array(salt)));
+    salt = Buffer.from(this.crypto.getRandomValues(new Uint8Array(salt)));
+    return salt;
   }
 
   /**
