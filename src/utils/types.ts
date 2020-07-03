@@ -325,7 +325,7 @@ export class JRPCAPI extends APIBase {
           if (typeof resp.data === 'string') {
             resp.data = JSON.parse(resp.data);
           }
-          if (typeof resp.data === 'object' && 'error' in resp.data) {
+          if (typeof resp.data === 'object' && (resp.data === null || 'error' in resp.data)) {
             throw new Error(`Error returned: ${JSON.stringify(resp.data)}`);
           }
         }
