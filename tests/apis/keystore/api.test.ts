@@ -1,123 +1,118 @@
 import mockAxios from 'jest-mock-axios';
 
+import { Avalanche } from 'src';
+import KeystoreAPI from 'src/apis/keystore/api';
 
-import { Avalanche } from "src";
-import KeystoreAPI from "src/apis/keystore/api";
+describe('Keystore', () => {
+  const ip = '127.0.0.1';
+  const port = 9650;
+  const protocol = 'https';
 
-describe("Keystore", () => {
-    const ip = '127.0.0.1';
-    const port = 9650;
-    const protocol = "https";
+  const username = 'AvaLabs';
+  const password = 'password';
 
-    let username = 'AvaLabs';
-    let password = 'password';
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+  let keystore:KeystoreAPI;
 
-    let avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
-    let keystore:KeystoreAPI;
+  beforeAll(() => {
+    keystore = new KeystoreAPI(avalanche);
+  });
 
-    beforeAll(() => {
-        keystore = new KeystoreAPI(avalanche);
-    });
+  afterEach(() => {
+    mockAxios.reset();
+  });
 
-    afterEach(() => {
-        mockAxios.reset();
-    });
+  test('createUser', async () => {
+    const result:Promise<boolean> = keystore.createUser(username, password);
+    const payload:object = {
+      result: {
+        success: true,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
 
-    test("createUser", async ()=>{
+    mockAxios.mockResponse(responseObj);
+    const response:boolean = await result;
 
-        let result:Promise<boolean> = keystore.createUser(username, password);
-        let payload:object = {
-            "result": {
-                "success": true
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(true);
+  });
 
-        mockAxios.mockResponse(responseObj);
-        let response:boolean = await result;
+  test('deleteUser', async () => {
+    const result:Promise<boolean> = keystore.deleteUser(username, password);
+    const payload:object = {
+      result: {
+        success: true,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
 
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(true);
-    });
+    mockAxios.mockResponse(responseObj);
+    const response:boolean = await result;
 
-    test("deleteUser", async ()=>{
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(true);
+  });
 
-        let result:Promise<boolean> = keystore.deleteUser(username, password);
-        let payload:object = {
-            "result": {
-                "success": true
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
+  test('exportUser', async () => {
+    const data = 'data';
 
-        mockAxios.mockResponse(responseObj);
-        let response:boolean = await result;
+    const result:Promise<string> = keystore.exportUser(username, password);
+    const payload:object = {
+      result: {
+        user: data,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
 
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(true);
-    });
+    mockAxios.mockResponse(responseObj);
+    const response:string = await result;
 
-    test('exportUser', async ()=>{
-        let data = 'data';
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(data);
+  });
 
-        let result:Promise<string> = keystore.exportUser(username, password);
-        let payload:object = {
-            "result": {
-                "user": data
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
+  test('importUser', async () => {
+    const result:Promise<boolean> = keystore.importUser(username, 'data', password);
+    const payload:object = {
+      result: {
+        success: true,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
 
-        mockAxios.mockResponse(responseObj);
-        let response:string = await result;
+    mockAxios.mockResponse(responseObj);
+    const response:boolean = await result;
 
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(data);
-    });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(true);
+  });
 
-    test('importUser', async ()=>{
+  test('listUsers', async () => {
+    const accounts = ['acc1', 'acc2'];
 
-        let result:Promise<boolean> = keystore.importUser(username, 'data', password);
-        let payload:object = {
-            "result": {
-                'success': true
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
+    const result:Promise<Array<string>> = keystore.listUsers();
+    const payload:object = {
+      result: {
+        users: accounts,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
 
-        mockAxios.mockResponse(responseObj);
-        let response:boolean = await result;
+    mockAxios.mockResponse(responseObj);
+    const response:Array<string> = await result;
 
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(true);
-    });
-
-    test('listUsers', async ()=>{
-        let accounts = ['acc1','acc2'];
-
-        let result:Promise<Array<string>> = keystore.listUsers();
-        let payload:object = {
-            "result": {
-                'users': accounts
-            }
-        };
-        let responseObj = {
-            data: payload
-        };
-
-        mockAxios.mockResponse(responseObj);
-        let response:Array<string> = await result;
-
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response).toBe(accounts);
-    });
-
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(accounts);
+  });
 });

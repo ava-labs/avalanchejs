@@ -1,5 +1,5 @@
-import BN from "bn.js";
-import {Buffer} from "buffer/";
+import BN from 'bn.js';
+import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
 import { UnixNow } from 'src/apis/avm/types';
 import { UTXO, UTXOSet } from 'src/apis/avm/utxos';
@@ -8,468 +8,463 @@ import { AmountOutput } from 'src/apis/avm/outputs';
 const bintools = BinTools.getInstance();
 
 describe('UTXO', () => {
-    let utxohex:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d";
-    let outputhex:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
-    let outputidx:string = "00000001";
-    let outtxid:string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5";
-    let outaid:string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558";
-    let opaddr:string = "FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG";
-    let opamt:string = "4dd5"
-    let oplocktime:string = "00";
-    let utxobuff:Buffer = Buffer.from(utxohex, "hex");
+  const utxohex:string = '38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d';
+  const outputhex:string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d';
+  const outputidx:string = '00000001';
+  const outtxid:string = '38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5';
+  const outaid:string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558';
+  const opaddr:string = 'FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG';
+  const opamt:string = '4dd5';
+  const oplocktime:string = '00';
+  const utxobuff:Buffer = Buffer.from(utxohex, 'hex');
 
-    let otheraddr:string = "MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8";
-    
-    //Payment
-    let OPUTXOstr:string = bintools.avaSerialize(utxobuff);
-    //"U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
-    
-    //implies fromString and fromBuffer
-    test('Creation', () => {
-        let u1:UTXO = new UTXO();
-        u1.fromBuffer(utxobuff);
-        let u1hex:string = u1.toBuffer().toString("hex");
-        expect(u1hex).toBe(utxohex);
+  const otheraddr:string = 'MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8';
+
+  // Payment
+  const OPUTXOstr:string = bintools.avaSerialize(utxobuff);
+  // "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
+
+  // implies fromString and fromBuffer
+  test('Creation', () => {
+    const u1:UTXO = new UTXO();
+    u1.fromBuffer(utxobuff);
+    const u1hex:string = u1.toBuffer().toString('hex');
+    expect(u1hex).toBe(utxohex);
+  });
+
+  test('Empty Creation', () => {
+    const u1:UTXO = new UTXO();
+    expect(() => {
+      u1.toBuffer();
+    }).toThrow();
+  });
+
+  test('Creation of Type', () => {
+    const op:UTXO = new UTXO();
+    op.fromString(OPUTXOstr);
+    expect(op.getOutput().getOutputID()).toBe(7);
+  });
+
+  describe('Funtionality', () => {
+    const u1:UTXO = new UTXO();
+    u1.fromBuffer(utxobuff);
+    const u1hex:string = u1.toBuffer().toString('hex');
+    test('getAssetID NonCA', () => {
+      const assetid:Buffer = u1.getAssetID();
+      expect(assetid.toString('hex', 0, assetid.length)).toBe(outaid);
     });
-
-    test('Empty Creation', () => {
-        let u1:UTXO = new UTXO();
-        expect(() => {
-            u1.toBuffer();
-        }).toThrow();
+    test('getTxID', () => {
+      const txid:Buffer = u1.getTxID();
+      expect(txid.toString('hex', 0, txid.length)).toBe(outtxid);
     });
-
-    test('Creation of Type', () => {
-        let op:UTXO = new UTXO();
-        op.fromString(OPUTXOstr);
-        expect(op.getOutput().getOutputID()).toBe(7);
+    test('getOutputIdx', () => {
+      const txidx:Buffer = u1.getOutputIdx();
+      expect(txidx.toString('hex', 0, txidx.length)).toBe(outputidx);
     });
-
-    describe('Funtionality', () => {
-        let u1:UTXO = new UTXO();
-        u1.fromBuffer(utxobuff);
-        let u1hex:string = u1.toBuffer().toString("hex"); 
-        test('getAssetID NonCA', () => {
-            let assetid:Buffer = u1.getAssetID();
-            expect(assetid.toString("hex", 0, assetid.length)).toBe(outaid);
-        });
-        test('getTxID', () => {
-            let txid:Buffer = u1.getTxID();
-            expect(txid.toString("hex", 0, txid.length)).toBe(outtxid);
-        });
-        test('getOutputIdx', () => {
-            let txidx:Buffer = u1.getOutputIdx();
-            expect(txidx.toString("hex", 0, txidx.length)).toBe(outputidx);
-        });
-        test('getUTXOID', () => {
-            let txid:Buffer = Buffer.from(outtxid, "hex");
-            let txidx:Buffer = Buffer.from(outputidx, "hex");
-            let utxoid:string = bintools.bufferToB58(Buffer.concat([txid, txidx]))
-            expect(u1.getUTXOID()).toBe(utxoid);
-        });
-        test('toString', () => {
-            let serialized:string = u1.toString();
-            expect(serialized).toBe(bintools.avaSerialize(utxobuff));
-        });
-
+    test('getUTXOID', () => {
+      const txid:Buffer = Buffer.from(outtxid, 'hex');
+      const txidx:Buffer = Buffer.from(outputidx, 'hex');
+      const utxoid:string = bintools.bufferToB58(Buffer.concat([txid, txidx]));
+      expect(u1.getUTXOID()).toBe(utxoid);
     });
+    test('toString', () => {
+      const serialized:string = u1.toString();
+      expect(serialized).toBe(bintools.avaSerialize(utxobuff));
+    });
+  });
 });
 
-let setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXOSet>):boolean => {
-    let instr:string = JSON.stringify(input.getUTXOIDs().sort());
-    for(let i:number = 0; i < equal.length; i++){
-        if(JSON.stringify(equal[i].getUTXOIDs().sort()) != instr){
-            return false;
-        }
+const setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXOSet>):boolean => {
+  const instr:string = JSON.stringify(input.getUTXOIDs().sort());
+  for (let i:number = 0; i < equal.length; i++) {
+    if (JSON.stringify(equal[i].getUTXOIDs().sort()) != instr) {
+      return false;
     }
+  }
 
-    for(let i:number = 0; i < notEqual.length; i++){
-        if(JSON.stringify(notEqual[i].getUTXOIDs().sort()) == instr){
-            return false;
-        }
+  for (let i:number = 0; i < notEqual.length; i++) {
+    if (JSON.stringify(notEqual[i].getUTXOIDs().sort()) == instr) {
+      return false;
     }
-    return true;
-}
+  }
+  return true;
+};
 
 describe('UTXOSet', () => {
-    let utxostrs:Array<string> = [
-        bintools.avaSerialize(Buffer.from("38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d", "hex")),
-        bintools.avaSerialize(Buffer.from("c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex")),
-        bintools.avaSerialize(Buffer.from("f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"))
-    ];
-    let addrs:Array<Buffer> = [
-        bintools.avaDeserialize("FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG"),
-        bintools.avaDeserialize("MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8")
-    ];
-    test('Creation', () => {
-        let set:UTXOSet = new UTXOSet();
-        set.add(utxostrs[0]);
-        let utxo:UTXO = new UTXO();
-        utxo.fromString(utxostrs[0]);
-        let setArray:Array<UTXO> = set.getAllUTXOs();
-        expect(utxo.toString()).toBe(setArray[0].toString());
+  const utxostrs:Array<string> = [
+    bintools.avaSerialize(Buffer.from('38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex')),
+    bintools.avaSerialize(Buffer.from('c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
+    bintools.avaSerialize(Buffer.from('f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
+  ];
+  const addrs:Array<Buffer> = [
+    bintools.avaDeserialize('FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG'),
+    bintools.avaDeserialize('MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8'),
+  ];
+  test('Creation', () => {
+    const set:UTXOSet = new UTXOSet();
+    set.add(utxostrs[0]);
+    const utxo:UTXO = new UTXO();
+    utxo.fromString(utxostrs[0]);
+    const setArray:Array<UTXO> = set.getAllUTXOs();
+    expect(utxo.toString()).toBe(setArray[0].toString());
+  });
+
+  test('Mutliple add', () => {
+    const set:UTXOSet = new UTXOSet();
+    // first add
+    for (let i:number = 0; i < utxostrs.length; i++) {
+      set.add(utxostrs[i]);
+    }
+    // the verify (do these steps separate to ensure no overwrites)
+    for (let i:number = 0; i < utxostrs.length; i++) {
+      expect(set.includes(utxostrs[i])).toBe(true);
+      const utxo:UTXO = new UTXO();
+      utxo.fromString(utxostrs[i]);
+      const veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
+      expect(veriutxo.toString()).toBe(utxostrs[i]);
+    }
+  });
+
+  test('addArray', () => {
+    const set:UTXOSet = new UTXOSet();
+    set.addArray(utxostrs);
+    for (let i:number = 0; i < utxostrs.length; i++) {
+      const e1:UTXO = new UTXO();
+      e1.fromString(utxostrs[i]);
+      expect(set.includes(e1)).toBe(true);
+      const utxo:UTXO = new UTXO();
+      utxo.fromString(utxostrs[i]);
+      const veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
+      expect(veriutxo.toString()).toBe(utxostrs[i]);
+    }
+
+    set.addArray(set.getAllUTXOs());
+    for (let i:number = 0; i < utxostrs.length; i++) {
+      const utxo:UTXO = new UTXO();
+      utxo.fromString(utxostrs[i]);
+      expect(set.includes(utxo)).toBe(true);
+
+      const veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
+      expect(veriutxo.toString()).toBe(utxostrs[i]);
+    }
+  });
+
+  test('overwriting UTXO', () => {
+    const set:UTXOSet = new UTXOSet();
+    set.addArray(utxostrs);
+    const testutxo:UTXO = new UTXO();
+    testutxo.fromString(utxostrs[0]);
+    expect(set.add(utxostrs[0], true).toString()).toBe(testutxo.toString());
+    expect(set.add(utxostrs[0], false)).toBeUndefined();
+    expect(set.addArray(utxostrs, true).length).toBe(3);
+    expect(set.addArray(utxostrs, false).length).toBe(0);
+  });
+
+  describe('Functionality', () => {
+    let set:UTXOSet;
+    let utxos:Array<UTXO>;
+    beforeEach(() => {
+      set = new UTXOSet();
+      set.addArray(utxostrs);
+      utxos = set.getAllUTXOs();
     });
 
-    test('Mutliple add', () => {
-        let set:UTXOSet = new UTXOSet();
-        //first add
-        for(let i:number = 0; i < utxostrs.length; i++) {
-            set.add(utxostrs[i]);
-        }
-        //the verify (do these steps separate to ensure no overwrites)
-        for(let i:number = 0; i < utxostrs.length; i++) {
-            expect(set.includes(utxostrs[i])).toBe(true);
-            let utxo:UTXO = new UTXO();
-            utxo.fromString(utxostrs[i]);
-            let veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
-            expect(veriutxo.toString()).toBe(utxostrs[i]);
-        }
-
+    test('remove', () => {
+      const testutxo:UTXO = new UTXO();
+      testutxo.fromString(utxostrs[0]);
+      expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
+      expect(set.remove(utxostrs[0])).toBeUndefined();
+      expect(set.add(utxostrs[0], false).toString()).toBe(testutxo.toString());
+      expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
     });
 
-    test('addArray', () => {
-        let set:UTXOSet = new UTXOSet();
-        set.addArray(utxostrs);
-        for(let i:number = 0; i < utxostrs.length; i++){
-            let e1:UTXO = new UTXO();
-            e1.fromString(utxostrs[i]);
-            expect(set.includes(e1)).toBe(true);
-            let utxo:UTXO = new UTXO();
-            utxo.fromString(utxostrs[i]);
-            let veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
-            expect(veriutxo.toString()).toBe(utxostrs[i]);
-        }
-
-        set.addArray(set.getAllUTXOs());
-        for(let i:number = 0; i < utxostrs.length; i++){
-            let utxo:UTXO = new UTXO();
-            utxo.fromString(utxostrs[i]);
-            expect(set.includes(utxo)).toBe(true);
-
-            let veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
-            expect(veriutxo.toString()).toBe(utxostrs[i]);
-        }
+    test('removeArray', () => {
+      const testutxo:UTXO = new UTXO();
+      testutxo.fromString(utxostrs[0]);
+      expect(set.removeArray(utxostrs).length).toBe(3);
+      expect(set.removeArray(utxostrs).length).toBe(0);
+      expect(set.add(utxostrs[0], false).toString()).toBe(testutxo.toString());
+      expect(set.removeArray(utxostrs).length).toBe(1);
+      expect(set.addArray(utxostrs, false).length).toBe(3);
+      expect(set.removeArray(utxos).length).toBe(3);
     });
 
-    test('overwriting UTXO', () => {
-        let set:UTXOSet = new UTXOSet();
-        set.addArray(utxostrs);
-        let testutxo:UTXO = new UTXO();
-        testutxo.fromString(utxostrs[0]);
-        expect(set.add(utxostrs[0], true).toString()).toBe(testutxo.toString());
-        expect(set.add(utxostrs[0], false)).toBeUndefined();
-        expect(set.addArray(utxostrs, true).length).toBe(3);
-        expect(set.addArray(utxostrs, false).length).toBe(0);
+    test('getUTXOIDs', () => {
+      const uids:Array<string> = set.getUTXOIDs();
+      for (let i:number = 0; i < utxos.length; i++) {
+        expect(uids.indexOf(utxos[i].getUTXOID())).not.toBe(-1);
+      }
     });
 
-    describe('Functionality', () => {
-        let set:UTXOSet;
-        let utxos:Array<UTXO>;
-        beforeEach(() => {
-            set = new UTXOSet();
-            set.addArray(utxostrs);
-            utxos = set.getAllUTXOs();
-        });
-        
-        test('remove', () => {
-            let testutxo:UTXO = new UTXO();
-            testutxo.fromString(utxostrs[0]);
-            expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
-            expect(set.remove(utxostrs[0])).toBeUndefined();
-            expect(set.add(utxostrs[0], false).toString()).toBe(testutxo.toString());
-            expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
-        });
-
-        test('removeArray', () => {
-            let testutxo:UTXO = new UTXO();
-            testutxo.fromString(utxostrs[0]);
-            expect(set.removeArray(utxostrs).length).toBe(3);
-            expect(set.removeArray(utxostrs).length).toBe(0);
-            expect(set.add(utxostrs[0], false).toString()).toBe(testutxo.toString());
-            expect(set.removeArray(utxostrs).length).toBe(1);
-            expect(set.addArray(utxostrs, false).length).toBe(3);
-            expect(set.removeArray(utxos).length).toBe(3);
-        });
-
-        test('getUTXOIDs', () => {
-            let uids:Array<string> = set.getUTXOIDs();
-            for(let i:number = 0; i < utxos.length; i++){
-                expect(uids.indexOf(utxos[i].getUTXOID())).not.toBe(-1);
-            }
-        });
-
-        test('getAllUTXOs', () => {
-            let allutxos:Array<UTXO> = set.getAllUTXOs();
-            let ustrs:Array<string> = [];
-            for(let i:number = 0; i < allutxos.length; i++){
-                ustrs.push(allutxos[i].toString());
-            }
-            for(let i:number = 0; i < utxostrs.length; i++) {
-                expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
-            }
-            let uids:Array<string> = set.getUTXOIDs();
-            let allutxos2:Array<UTXO> = set.getAllUTXOs(uids);
-            let ustrs2:Array<string> = [];
-            for(let i:number = 0; i < allutxos.length; i++){
-                ustrs2.push(allutxos2[i].toString());
-            }
-            for(let i:number = 0; i < utxostrs.length; i++) {
-                expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1);
-            }
-        });
-
-        test('getUTXOIDs By Address', () => {
-            let utxoids:Array<string>;
-            utxoids = set.getUTXOIDs([addrs[0]]);
-            expect(utxoids.length).toBe(1);
-            utxoids = set.getUTXOIDs(addrs);
-            expect(utxoids.length).toBe(3);
-            utxoids = set.getUTXOIDs(addrs, false);
-            expect(utxoids.length).toBe(3);
-        });
-
-        test('getAllUTXOStrings', () => {
-            let ustrs:Array<string> = set.getAllUTXOStrings();
-            for(let i:number = 0; i < utxostrs.length; i++) {
-                expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
-            }
-            let uids:Array<string> = set.getUTXOIDs();
-            let ustrs2:Array<string> = set.getAllUTXOStrings(uids);
-            for(let i:number = 0; i < utxostrs.length; i++) {
-                expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1);
-            }
-        });
-
-        test('getAddresses', () => {
-            expect(set.getAddresses().sort()).toStrictEqual(addrs.sort());
-        });
-
-        test('getBalance', () => {
-            let balance1:BN;
-            let balance2:BN;
-            balance1 = new BN(0);
-            balance2 = new BN(0);
-            for(let i:number = 0; i < utxos.length; i++){
-                let assetid = utxos[i].getAssetID();
-                balance1.add(set.getBalance(addrs, assetid));
-                balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
-            }
-            expect(balance1.toString()).toBe(balance2.toString());
-
-            balance1 = new BN(0);
-            balance2 = new BN(0);
-            let now:BN = UnixNow();
-            for(let i:number = 0; i < utxos.length; i++){
-                let assetid = bintools.avaSerialize(utxos[i].getAssetID());
-                balance1.add(set.getBalance(addrs, assetid, now));
-                balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
-            }
-            expect(balance1.toString()).toBe(balance2.toString());
-        });
-
-        test('getAssetIDs', () => {
-            let assetIDs:Array<Buffer> = set.getAssetIDs();
-            for(let i:number = 0; i < utxos.length; i++){
-                expect(assetIDs).toContain(utxos[i].getAssetID())
-            }
-            let addresses:Array<Buffer> = set.getAddresses();
-            expect(set.getAssetIDs(addresses)).toEqual(set.getAssetIDs())
-        });
-
-        describe('Merge Rules', () => {
-            let setA:UTXOSet;
-            let setB:UTXOSet;
-            let setC:UTXOSet;
-            let setD:UTXOSet;
-            let setE:UTXOSet;
-            let setF:UTXOSet;
-            let setG:UTXOSet;
-            let setH:UTXOSet;
-            //Take-or-Leave
-            let newutxo:string = bintools.avaSerialize(Buffer.from("acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626", "hex"));
-            
-            beforeEach(() => {
-                setA = new UTXOSet();
-                setA.addArray([utxostrs[0], utxostrs[2]]);
-                
-                setB = new UTXOSet();
-                setB.addArray([utxostrs[1], utxostrs[2]]);
-                
-                setC = new UTXOSet();
-                setC.addArray([utxostrs[0], utxostrs[1]]);
-                
-                setD = new UTXOSet();
-                setD.addArray([utxostrs[1]]);
-
-                setE = new UTXOSet();
-                setE.addArray([]);//empty set
-
-                setF = new UTXOSet();
-                setF.addArray(utxostrs); //full set, separate from self
-
-                setG = new UTXOSet();
-                setG.addArray([newutxo, ...utxostrs]); //full set with new element
-
-                setH = new UTXOSet();
-                setH.addArray([newutxo]); //set with only a new element
-            });
-
-            test('unknown merge rule',  () => {
-                expect(() => {
-                    set.mergeByRule(setA, "ERROR");
-                }).toThrow();
-                let setArray:Array<UTXO> = setG.getAllUTXOs();      
-            });
-
-            test('intersection', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "intersection");
-                test = setMergeTester(results, [setA], [setB, setC, setD, setE, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "intersection");
-                test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "intersection");
-                test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "intersection");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-            });
-
-            test('differenceSelf', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "differenceSelf");
-                test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "differenceSelf");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "differenceSelf");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "differenceSelf");
-                test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
-                expect(test).toBe(true);
-            });
-
-            test('differenceNew', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "differenceNew");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "differenceNew");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "differenceNew");
-                test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "differenceNew");
-                test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
-                expect(test).toBe(true);
-            });
-
-            test('symDifference', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "symDifference");
-                test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "symDifference");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "symDifference");
-                test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "symDifference");
-                test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH]);
-                expect(test).toBe(true);
-            });
-
-            test('union', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "union");
-                test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "union");
-                test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "union");
-                test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "union");
-                test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH]);
-                expect(test).toBe(true);
-            });
-
-            test('unionMinusNew', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "unionMinusNew");
-                test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "unionMinusNew");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "unionMinusNew");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "unionMinusNew");
-                test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
-                expect(test).toBe(true);
-            });
-
-            test('unionMinusSelf', () => {
-                let results:UTXOSet;
-                let test:boolean;
-
-                results = set.mergeByRule(setA, "unionMinusSelf");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setF, "unionMinusSelf");
-                test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setG, "unionMinusSelf");
-                test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
-                expect(test).toBe(true);
-
-                results = set.mergeByRule(setH, "unionMinusSelf");
-                test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
-                expect(test).toBe(true);
-            });
-        });
-
-
+    test('getAllUTXOs', () => {
+      const allutxos:Array<UTXO> = set.getAllUTXOs();
+      const ustrs:Array<string> = [];
+      for (let i:number = 0; i < allutxos.length; i++) {
+        ustrs.push(allutxos[i].toString());
+      }
+      for (let i:number = 0; i < utxostrs.length; i++) {
+        expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
+      }
+      const uids:Array<string> = set.getUTXOIDs();
+      const allutxos2:Array<UTXO> = set.getAllUTXOs(uids);
+      const ustrs2:Array<string> = [];
+      for (let i:number = 0; i < allutxos.length; i++) {
+        ustrs2.push(allutxos2[i].toString());
+      }
+      for (let i:number = 0; i < utxostrs.length; i++) {
+        expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1);
+      }
     });
+
+    test('getUTXOIDs By Address', () => {
+      let utxoids:Array<string>;
+      utxoids = set.getUTXOIDs([addrs[0]]);
+      expect(utxoids.length).toBe(1);
+      utxoids = set.getUTXOIDs(addrs);
+      expect(utxoids.length).toBe(3);
+      utxoids = set.getUTXOIDs(addrs, false);
+      expect(utxoids.length).toBe(3);
+    });
+
+    test('getAllUTXOStrings', () => {
+      const ustrs:Array<string> = set.getAllUTXOStrings();
+      for (let i:number = 0; i < utxostrs.length; i++) {
+        expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
+      }
+      const uids:Array<string> = set.getUTXOIDs();
+      const ustrs2:Array<string> = set.getAllUTXOStrings(uids);
+      for (let i:number = 0; i < utxostrs.length; i++) {
+        expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1);
+      }
+    });
+
+    test('getAddresses', () => {
+      expect(set.getAddresses().sort()).toStrictEqual(addrs.sort());
+    });
+
+    test('getBalance', () => {
+      let balance1:BN;
+      let balance2:BN;
+      balance1 = new BN(0);
+      balance2 = new BN(0);
+      for (let i:number = 0; i < utxos.length; i++) {
+        const assetid = utxos[i].getAssetID();
+        balance1.add(set.getBalance(addrs, assetid));
+        balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
+      }
+      expect(balance1.toString()).toBe(balance2.toString());
+
+      balance1 = new BN(0);
+      balance2 = new BN(0);
+      const now:BN = UnixNow();
+      for (let i:number = 0; i < utxos.length; i++) {
+        const assetid = bintools.avaSerialize(utxos[i].getAssetID());
+        balance1.add(set.getBalance(addrs, assetid, now));
+        balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
+      }
+      expect(balance1.toString()).toBe(balance2.toString());
+    });
+
+    test('getAssetIDs', () => {
+      const assetIDs:Array<Buffer> = set.getAssetIDs();
+      for (let i:number = 0; i < utxos.length; i++) {
+        expect(assetIDs).toContain(utxos[i].getAssetID());
+      }
+      const addresses:Array<Buffer> = set.getAddresses();
+      expect(set.getAssetIDs(addresses)).toEqual(set.getAssetIDs());
+    });
+
+    describe('Merge Rules', () => {
+      let setA:UTXOSet;
+      let setB:UTXOSet;
+      let setC:UTXOSet;
+      let setD:UTXOSet;
+      let setE:UTXOSet;
+      let setF:UTXOSet;
+      let setG:UTXOSet;
+      let setH:UTXOSet;
+      // Take-or-Leave
+      const newutxo:string = bintools.avaSerialize(Buffer.from('acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626', 'hex'));
+
+      beforeEach(() => {
+        setA = new UTXOSet();
+        setA.addArray([utxostrs[0], utxostrs[2]]);
+
+        setB = new UTXOSet();
+        setB.addArray([utxostrs[1], utxostrs[2]]);
+
+        setC = new UTXOSet();
+        setC.addArray([utxostrs[0], utxostrs[1]]);
+
+        setD = new UTXOSet();
+        setD.addArray([utxostrs[1]]);
+
+        setE = new UTXOSet();
+        setE.addArray([]);// empty set
+
+        setF = new UTXOSet();
+        setF.addArray(utxostrs); // full set, separate from self
+
+        setG = new UTXOSet();
+        setG.addArray([newutxo, ...utxostrs]); // full set with new element
+
+        setH = new UTXOSet();
+        setH.addArray([newutxo]); // set with only a new element
+      });
+
+      test('unknown merge rule', () => {
+        expect(() => {
+          set.mergeByRule(setA, 'ERROR');
+        }).toThrow();
+        const setArray:Array<UTXO> = setG.getAllUTXOs();
+      });
+
+      test('intersection', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'intersection');
+        test = setMergeTester(results, [setA], [setB, setC, setD, setE, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'intersection');
+        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'intersection');
+        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'intersection');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+      });
+
+      test('differenceSelf', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'differenceSelf');
+        test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'differenceSelf');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'differenceSelf');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'differenceSelf');
+        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
+        expect(test).toBe(true);
+      });
+
+      test('differenceNew', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'differenceNew');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'differenceNew');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'differenceNew');
+        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'differenceNew');
+        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
+        expect(test).toBe(true);
+      });
+
+      test('symDifference', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'symDifference');
+        test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'symDifference');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'symDifference');
+        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'symDifference');
+        test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH]);
+        expect(test).toBe(true);
+      });
+
+      test('union', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'union');
+        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'union');
+        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'union');
+        test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'union');
+        test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH]);
+        expect(test).toBe(true);
+      });
+
+      test('unionMinusNew', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'unionMinusNew');
+        test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'unionMinusNew');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'unionMinusNew');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'unionMinusNew');
+        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH]);
+        expect(test).toBe(true);
+      });
+
+      test('unionMinusSelf', () => {
+        let results:UTXOSet;
+        let test:boolean;
+
+        results = set.mergeByRule(setA, 'unionMinusSelf');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setF, 'unionMinusSelf');
+        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setG, 'unionMinusSelf');
+        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
+        expect(test).toBe(true);
+
+        results = set.mergeByRule(setH, 'unionMinusSelf');
+        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG]);
+        expect(test).toBe(true);
+      });
+    });
+  });
 });
-
