@@ -135,14 +135,14 @@ export default class CryptoHelpers {
     plaintext:Buffer | string,
     salt:Buffer = undefined):Promise< {salt:Buffer; iv:Buffer; ciphertext:Buffer} > {
     let slt:Buffer;
-    if (plaintext instanceof Buffer) {
+    if (typeof salt !== 'undefined' && salt instanceof Buffer) {
       slt = salt;
     } else {
       slt = this.makeSalt();
     }
 
     let pt:Buffer;
-    if (plaintext instanceof Buffer) {
+    if (typeof plaintext !== 'undefined' && plaintext instanceof Buffer) {
       pt = plaintext;
     } else {
       pt = Buffer.from(plaintext, 'utf8');
