@@ -97,9 +97,8 @@ export default class CryptoHelpers {
      * Generates a randomized {@link https://github.com/feross/buffer|Buffer} to be used as a salt
      */
   makeSalt():Buffer {
-    const salt = Buffer.alloc(this.saltSize);
-    this.crypto.getRandomValues(salt);
-    return salt;
+    let salt = Buffer.alloc(this.saltSize);
+    return Buffer.from(this.crypto.getRandomValues(new Uint8Array(salt)));
   }
 
   /**
@@ -155,12 +154,12 @@ export default class CryptoHelpers {
     const ciphertext:Buffer = Buffer.from(await this.crypto.subtle.encrypt(
       {
         name: 'AES-GCM',
-        iv,
-        additionalData: slt,
+        iv: new Uint8Array(iv),
+        additionalData: new Uint8Array(slt),
         tagLength: this.tagLength,
       },
       pkey,
-      pt,
+      new Uint8Array(pt),
 
     ));
 
@@ -186,12 +185,12 @@ export default class CryptoHelpers {
     const pt:Buffer = Buffer.from(await this.crypto.subtle.decrypt(
       {
         name: 'AES-GCM',
-        iv, // The initialization vector you used to encrypt
-        additionalData: salt, // The addtionalData you used to encrypt (if any)
+        iv: new Uint8Array(iv), // The initialization vector you used to encrypt
+        additionalData: new Uint8Array(salt), // The addtionalData you used to encrypt (if any)
         tagLength: 128, // The tagLength you used to encrypt (if any)
       },
       pkey, // from generateKey or importKey above
-      ciphertext, // ArrayBuffer of the data
+      new Uint8Array(ciphertext), // ArrayBuffer of the data
     ));
     return pt;
   }
