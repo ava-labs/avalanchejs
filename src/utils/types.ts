@@ -297,7 +297,7 @@ export class JRPCAPI extends APIBase {
     baseurl?:string):Promise<RequestResponseData> => {
     const ep = baseurl || this.baseurl;
     const rpc:any = {};
-    rpc.ic = this.rpcid;
+    rpc.id = this.rpcid;
     rpc.method = method;
 
     // Set parameters if exists
