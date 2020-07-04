@@ -8,7 +8,7 @@
     "start": "webpack-dev-server --mode development",
     "build": "rm -rf typings/ && npx tsc -b && webpack --mode production",
     "lint": "npx eslint ./",
-    "prepublish": "npm run lint && npm run build",
+    "prepublish": "npm run build",
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
