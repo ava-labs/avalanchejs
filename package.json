@@ -7,7 +7,7 @@
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "rm -rf typings/ && npx tsc -b && webpack --mode production",
-    "lint": "npx eslint ./",
+    "lint": "eslint ./",
     "prepublish": "npm run build",
     "test": "jest",
     "test-watch": "jest --watch",
@@ -35,6 +35,7 @@
     "acorn": "^7.3.1",
     "clean-webpack-plugin": "^3.0.0",
     "eslint": "^7.3.1",
+    "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-airbnb-typescript": "^8.0.2",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "^6.3.1",
