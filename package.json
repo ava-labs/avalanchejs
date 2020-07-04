@@ -60,7 +60,6 @@
     "npm": ">=6.12.1"
   },
   "dependencies": {
-    "@peculiar/webcrypto": "^1.1.1",
     "axios": "^0.19.2",
     "bn.js": "^4.11.8",
     "buffer": "^5.5.0",
@@ -68,6 +67,7 @@
     "elliptic": "^6.5.2",
     "secp256k1": "^4.0.0",
     "store2": "^2.11.0",
-    "typedoc": "^0.17.7"
+    "typedoc": "^0.17.7",
+    "webcrypto": "^0.1.1"
   }
 }

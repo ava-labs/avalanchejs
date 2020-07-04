@@ -14,7 +14,6 @@ import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 import { Defaults } from './utils/types';
-import CryptoHelpers from './utils/crypto';
 
 /**
  * Avalanche.js is middleware for interacting with AVA node RPC APIs.
@@ -112,7 +111,6 @@ export { BinTools };
 export { DB };
 export { CoreTypes };
 export { AvalancheCore };
-export { CryptoHelpers };
 
 export * from './apis/avm/api';
 export * from './utils/types';
