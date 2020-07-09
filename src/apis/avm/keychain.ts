@@ -127,7 +127,7 @@ export class AVMKeyPair extends KeyPair {
   /**
      * Returns a string representation of the private key.
      *
-     * @returns An AVA serialized string representation of the public key
+     * @returns An AVA serialized string representation of the private key
      */
   getPrivateKeyString = ():string => bintools.cb58Encode(this.privk);
 
