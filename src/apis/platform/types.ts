@@ -5,10 +5,6 @@
 import { Buffer } from 'buffer/';
 import { NBytes } from '../../utils/types';
 
-export class PlatformConstants {
-    static ADDDEFAULTSUBNETDELEGATORTX:number = 15;
-}
-
 /**
  * Type representing a [[Signature]] index used in [[Input]]
  */
