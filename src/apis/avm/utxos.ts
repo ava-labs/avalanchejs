@@ -109,7 +109,7 @@ export class UTXO {
      */
   fromString(serialized:string) {
     /* istanbul ignore next */
-    return this.fromBuffer(bintools.avaDeserialize(serialized));
+    return this.fromBuffer(bintools.cb58Decode(serialized));
   }
 
   /**
@@ -120,7 +120,7 @@ export class UTXO {
      */
   toString():string {
     /* istanbul ignore next */
-    return bintools.avaSerialize(this.toBuffer());
+    return bintools.cb58Encode(this.toBuffer());
   }
 
   /**
@@ -173,7 +173,7 @@ export class UTXOSet {
     const utxoX:UTXO = new UTXO();
     // force a copy
     if (typeof utxo === 'string') {
-      utxoX.fromBuffer(bintools.avaDeserialize(utxo));
+      utxoX.fromBuffer(bintools.cb58Decode(utxo));
     } else {
       utxoX.fromBuffer(utxo.toBuffer()); // forces a copy
     }
@@ -193,7 +193,7 @@ export class UTXOSet {
     const utxovar:UTXO = new UTXO();
     // force a copy
     if (typeof utxo === 'string') {
-      utxovar.fromBuffer(bintools.avaDeserialize(utxo));
+      utxovar.fromBuffer(bintools.cb58Decode(utxo));
     } else if (utxo instanceof UTXO) {
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     } else {
@@ -248,7 +248,7 @@ export class UTXOSet {
     const utxovar:UTXO = new UTXO();
     // force a copy
     if (typeof utxo === 'string') {
-      utxovar.fromBuffer(bintools.avaDeserialize(utxo));
+      utxovar.fromBuffer(bintools.cb58Decode(utxo));
     } else {
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     }
@@ -389,7 +389,7 @@ export class UTXOSet {
     let spend:BN = new BN(0);
     let asset:Buffer;
     if (typeof assetID === 'string') {
-      asset = bintools.avaDeserialize(assetID);
+      asset = bintools.cb58Decode(assetID);
     } else {
       asset = assetID;
     }

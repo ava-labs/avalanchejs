@@ -142,21 +142,21 @@ describe('BinTools', () => {
     expect(bintools.validateChecksum(Buffer.from(badsummed, 'hex'))).toBe(false);
   });
 
-  test('avaSerialize', () => {
-    const fromBuff:string = bintools.avaSerialize(buff);
+  test('cb58Encode', () => {
+    const fromBuff:string = bintools.cb58Encode(buff);
     expect(fromBuff).toBe(serializedChecksum);
   });
 
-  test('avaDeserialize', () => {
+  test('cb58Decode', () => {
     const serbuff:Buffer = bintools.b58ToBuffer(serializedChecksum);
-    const dsr1:Buffer = bintools.avaDeserialize(serializedChecksum);
-    const dsr2:Buffer = bintools.avaDeserialize(serbuff);
+    const dsr1:Buffer = bintools.cb58Decode(serializedChecksum);
+    const dsr2:Buffer = bintools.cb58Decode(serbuff);
     const serbufffaulty:Buffer = bintools.copyFrom(serbuff);
     serbufffaulty[serbufffaulty.length - 1] = serbufffaulty[serbufffaulty.length - 1] - 1;
     expect(dsr1.toString('hex')).toBe(hexstr);
     expect(dsr2.toString('hex')).toBe(hexstr);
     expect(() => {
-      bintools.avaDeserialize(serbufffaulty);
-    }).toThrow('Error - BinTools.avaDeserialize: invalid checksum');
+      bintools.cb58Decode(serbufffaulty);
+    }).toThrow('Error - BinTools.cb58Decode: invalid checksum');
   });
 });

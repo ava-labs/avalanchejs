@@ -516,7 +516,7 @@ export class Tx {
      * unlike most fromStrings, it expects the string to be serialized in AVA format
      */
   fromString(serialized:string):number {
-    return this.fromBuffer(bintools.avaDeserialize(serialized));
+    return this.fromBuffer(bintools.cb58Decode(serialized));
   }
 
   /**
@@ -526,7 +526,7 @@ export class Tx {
      * unlike most toStrings, this returns in AVA serialization format
      */
   toString():string {
-    return bintools.avaSerialize(this.toBuffer());
+    return bintools.cb58Encode(this.toBuffer());
   }
 
   /**

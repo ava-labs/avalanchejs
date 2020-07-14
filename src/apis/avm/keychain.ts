@@ -129,14 +129,14 @@ export class AVMKeyPair extends KeyPair {
      *
      * @returns An AVA serialized string representation of the public key
      */
-  getPrivateKeyString = ():string => bintools.avaSerialize(this.privk);
+  getPrivateKeyString = ():string => bintools.cb58Encode(this.privk);
 
   /**
      * Returns the public key.
      *
      * @returns An AVA serialized string representation of the public key
      */
-  getPublicKeyString = ():string => bintools.avaSerialize(this.pubk);
+  getPublicKeyString = ():string => bintools.cb58Encode(this.pubk);
 
   /**
      * Takes a message, signs it, and returns the signature.
@@ -222,7 +222,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     const keypair:AVMKeyPair = new AVMKeyPair(this.chainid);
     let pk:Buffer;
     if (typeof privk === 'string') {
-      pk = bintools.avaDeserialize(privk);
+      pk = bintools.cb58Decode(privk);
     } else {
       pk = bintools.copyFrom(privk);
     }

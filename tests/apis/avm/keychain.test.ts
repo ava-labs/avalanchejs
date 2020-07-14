@@ -80,7 +80,7 @@ describe('AVMKeyChain', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
     const kc:AVMKeyChain = new AVMKeyChain(alias);
     const kp2:AVMKeyPair = new AVMKeyPair(alias);
-    const addr1:Buffer = kc.importKey(bintools.avaSerialize(keybuff));
+    const addr1:Buffer = kc.importKey(bintools.cb58Encode(keybuff));
     const kp1:AVMKeyPair = kc.getKey(addr1);
     kp2.importKey(keybuff);
     const addr2 = kp1.getAddress();
@@ -115,6 +115,6 @@ describe('AVMKeyChain', () => {
     const kc:AVMKeyChain = new AVMKeyChain(alias);
     const addr1:Buffer = kc.importKey(keybuff);
     expect(kc.hasKey(addr1)).toBe(true);
-    expect(kc.removeKey(bintools.avaDeserialize('6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV'))).toBe(false);
+    expect(kc.removeKey(bintools.cb58Decode('6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV'))).toBe(false);
   });
 });

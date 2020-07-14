@@ -47,7 +47,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
     } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.avaSerialize(subnetID);
+      params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.createBlockchain', params)
       .then((response:RequestResponseData) => response.data.result.blockchainID);
@@ -88,7 +88,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof privateKey === 'string') {
       params.privateKey = privateKey;
     } else if (typeof privateKey !== 'undefined') {
-      params.privateKey = bintools.avaSerialize(privateKey);
+      params.privateKey = bintools.cb58Encode(privateKey);
     }
     return this.callMethod('platform.createAccount', params)
       .then((response:RequestResponseData) => response.data.result.address);
@@ -140,7 +140,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
     } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.avaSerialize(subnetID);
+      params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.getCurrentValidators', params)
       .then((response:RequestResponseData) => response.data.result.validators);
@@ -160,7 +160,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
     } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.avaSerialize(subnetID);
+      params.subnetID = bintools.cb58Encode(subnetID);
     }
 
     return this.callMethod('platform.getPendingValidators', params)
@@ -185,7 +185,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
     } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.avaSerialize(subnetID);
+      params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.sampleValidators', params)
       .then((response:RequestResponseData) => response.data.result.validators);
@@ -267,7 +267,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
     } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.avaSerialize(subnetID);
+      params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.addNonDefaultSubnetValidator', params)
       .then((response:RequestResponseData) => response.data.result.unsignedTx);
@@ -360,7 +360,7 @@ class PlatformAPI extends JRPCAPI {
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
     } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.avaSerialize(subnetID);
+      params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.validates', params)
       .then((response:RequestResponseData) => response.data.result.blockchainIDs);
