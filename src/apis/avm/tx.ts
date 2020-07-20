@@ -440,24 +440,6 @@ export class UnsignedTx {
      * @returns A signed [[Tx]]
      */
   sign(kc:AVMKeyChain):Tx {
-    let inputTotal:BN = new BN(0);
-    let outputTotal:BN = new BN(0);
-    this.transaction.getIns().forEach((value:TransferableInput) => {
-      const input:AmountInput = value.getInput() as AmountInput; 
-      if(input.getInputID() === AVMConstants.SECPINPUTID) {
-        inputTotal = inputTotal.add(input.getAmount());
-      }
-    })
-    this.transaction.getOuts().forEach((value:TransferableOutput) => {
-      const output:AmountOutput = value.getOutput() as AmountOutput; 
-      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-        outputTotal = outputTotal.add(output.getAmount());
-      }
-    })
-    const fee:BN = inputTotal.sub(outputTotal);
-    if(fee.gte(outputTotal.div(new BN(100)))) {
-      throw new Error(`Error - sign: fee total is greater than output amount total`);
-    }
     const txbuff = this.toBuffer();
     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);

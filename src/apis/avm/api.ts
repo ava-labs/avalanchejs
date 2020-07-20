@@ -12,7 +12,9 @@ import {
   MergeRule, UnixNow, AVMConstants, InitialStates,
 } from './types';
 import { AVMKeyChain } from './keychain';
-import { Tx, UnsignedTx } from './tx';
+import { Tx, UnsignedTx, BaseTx } from './tx';
+import { TransferableInput, AmountInput } from './inputs';
+import { TransferableOutput, AmountOutput } from './outputs';
 
 /**
  * @ignore
@@ -547,6 +549,40 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
+     * Helper function which determines if a tx is a goose egg transaction. 
+     *
+     * @param utx An UnsignedTx
+     *
+     * @returns bool indicating if the transaction is a goose egg transaction
+     *
+     * @remarks
+     * A "Goose Egg Transaction" is when the fee far exceeds a reasonable size.
+     */
+  checkGooseEgg = (utx:UnsignedTx): boolean => {
+    let inputTotal:BN = new BN(0);
+    let outputTotal:BN = new BN(0);
+    const tx:BaseTx = utx.getTransaction();
+    tx.getIns().forEach((value:TransferableInput) => {
+      const input:AmountInput = value.getInput() as AmountInput; 
+      if(input.getInputID() === AVMConstants.SECPINPUTID) {
+        inputTotal = inputTotal.add(input.getAmount());
+      }
+    })
+    tx.getOuts().forEach((value:TransferableOutput) => {
+      const output:AmountOutput = value.getOutput() as AmountOutput; 
+      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
+        outputTotal = outputTotal.add(output.getAmount());
+      }
+    })
+    const fee:BN = inputTotal.sub(outputTotal);
+    if(fee.gte(outputTotal.div(new BN(100)))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
      * Helper function which creates an unsigned transaction. For more granular control, you may create your own
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
@@ -671,7 +707,15 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns A signed transaction of type [[Tx]]
      */
-  signTx = (utx:UnsignedTx):Tx => this.keychain.signTx(utx);
+  signTx = (utx:UnsignedTx):Tx => {
+    try {
+      this.checkGooseEgg(utx);
+    } catch (error) {
+      throw new Error(`Error - sign: fee is too large`);
+      console.log(error)
+    }
+    return this.keychain.signTx(utx);
+  }
 
   /**
      * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
