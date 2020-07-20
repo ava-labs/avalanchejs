@@ -300,7 +300,7 @@ export default class BinTools {
      *
      * @returns A serialized base-58 strig of the Buffer.
      */
-  avaSerialize = (bytes:Buffer):string => {
+  cb58Encode = (bytes:Buffer):string => {
     const x:Buffer = this.addChecksum(bytes);
     return this.bufferToB58(x);
   };
@@ -311,22 +311,22 @@ export default class BinTools {
      *
      * @param bytes An AVA serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
      */
-  avaDeserialize = (bytes:Buffer | string):Buffer => {
+  cb58Decode = (bytes:Buffer | string):Buffer => {
     if (typeof bytes === 'string') {
       bytes = this.b58ToBuffer(bytes);
     }
     if (this.validateChecksum(bytes)) {
       return this.copyFrom(bytes, 0, bytes.length - 4);
     }
-    throw new Error('Error - BinTools.avaDeserialize: invalid checksum');
+    throw new Error('Error - BinTools.cb58Decode: invalid checksum');
   };
 
   addressToString = (chainid:string, bytes:Buffer)
-  :string => `${chainid}-${this.avaSerialize(bytes)}`;
+  :string => `${chainid}-${this.cb58Encode(bytes)}`;
 
   stringToAddress = (address:string):Buffer => {
     const parts:Array<string> = address.split('-');
-    return this.avaDeserialize(parts[1]);
+    return this.cb58Decode(parts[1]);
   };
 
   /**
@@ -343,7 +343,7 @@ export default class BinTools {
     const abc:Array<string> = addr.split('-');
     if (abc.length === 2) {
       if ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID)) {
-        const addrbuff = this.avaDeserialize(abc[1]);
+        const addrbuff = this.cb58Decode(abc[1]);
         if ((addrlen && addrbuff.length === addrlen) || !(addrlen)) {
           return addrbuff;
         }
