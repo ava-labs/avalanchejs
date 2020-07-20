@@ -561,21 +561,41 @@ class AVMAPI extends JRPCAPI {
   checkGooseEgg = (utx:UnsignedTx): boolean => {
     let inputTotal:BN = new BN(0);
     let outputTotal:BN = new BN(0);
+    let outcome:boolean = false;
     const tx:BaseTx = utx.getTransaction();
-    tx.getIns().forEach((value:TransferableInput) => {
-      const input:AmountInput = value.getInput() as AmountInput; 
-      if(input.getInputID() === AVMConstants.SECPINPUTID) {
+    const avaxAssetID:string = "n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL";
+    const ins:Array<TransferableInput> = tx.getIns();
+    for(let i:number = 0; i < ins.length; i++){
+      const input:AmountInput = ins[i].getInput() as AmountInput; 
+      if(input.getInputID() !== AVMConstants.SECPINPUTID) {
+        // only check secpinputs
+        const assetID:Buffer = ins[i].getAssetID();
+        if(bintools.cb58Encode(assetID) !== avaxAssetID) {
+          // assetid other than avax so disable check
+          outcome = true;
+          break;
+        }
         inputTotal = inputTotal.add(input.getAmount());
       }
-    })
-    tx.getOuts().forEach((value:TransferableOutput) => {
-      const output:AmountOutput = value.getOutput() as AmountOutput; 
-      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-        outputTotal = outputTotal.add(output.getAmount());
+    }
+    if(!outcome) {
+      let outs:Array<TransferableOutput> = tx.getOuts();
+      for(let i:number = 0; i < outs.length; i++){
+        const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
+        if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
+          // only check secpoutputs
+          const assetID:Buffer = outs[i].getAssetID();
+          if(bintools.cb58Encode(assetID) === avaxAssetID) {
+            // assetid other than avax so disable check
+            outcome = true;
+            break;
+          }
+          outputTotal = outputTotal.add(output.getAmount());
+        }
       }
-    })
+    }
     const fee:BN = inputTotal.sub(outputTotal);
-    if(fee.gte(outputTotal.div(new BN(100)))) {
+    if(outcome === true || fee.gte(outputTotal.div(new BN(100)))) {
       return true;
     } else {
       return false;
