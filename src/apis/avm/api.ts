@@ -562,23 +562,23 @@ class AVMAPI extends JRPCAPI {
     let inputTotal:BN = new BN(0);
     let outputTotal:BN = new BN(0);
     const tx:BaseTx = utx.getTransaction();
+
     const ins:Array<TransferableInput> = tx.getIns();
     for(let i:number = 0; i < ins.length; i++){
       const input:AmountInput = ins[i].getInput() as AmountInput; 
 
       // only check secpinputs
-      if(input.getInputID() !== AVMConstants.SECPINPUTID) {
-        const assetID:Buffer = ins[i].getAssetID();
+      if(input.getInputID() === AVMConstants.SECPINPUTID) {
         inputTotal = inputTotal.add(input.getAmount());
       }
     }
-    let outs:Array<TransferableOutput> = tx.getOuts();
+
+    const outs:Array<TransferableOutput> = tx.getOuts();
     for(let i:number = 0; i < outs.length; i++){
       const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
 
       // only check secpoutputs
       if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-        const assetID:Buffer = outs[i].getAssetID();
         outputTotal = outputTotal.add(output.getAmount());
       }
     }
@@ -589,7 +589,7 @@ class AVMAPI extends JRPCAPI {
       // If fee is entirely avax and amount is not small then the fee should be small percentage
       return false;
     } else {
-      return false;
+      return true;
     }
   }
 
@@ -719,7 +719,7 @@ class AVMAPI extends JRPCAPI {
      * @returns A signed transaction of type [[Tx]]
      */
   signTx = (utx:UnsignedTx):Tx => {
-    let nonAVAXFee:boolean = false;
+    let onlyAVAXFee:boolean = true;
     const tx:BaseTx = utx.getTransaction();
     const avaxAssetID:string = "n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL";
     const ins:Array<TransferableInput> = tx.getIns();
@@ -727,17 +727,18 @@ class AVMAPI extends JRPCAPI {
       const input:AmountInput = ins[i].getInput() as AmountInput; 
 
       // only check secpinputs
-      if(input.getInputID() !== AVMConstants.SECPINPUTID) {
+      if(input.getInputID() === AVMConstants.SECPINPUTID) {
         const assetID:Buffer = ins[i].getAssetID();
 
-        // assetid other than avax so disable check
+        // if assetid other than avax then disable check
         if(bintools.cb58Encode(assetID) !== avaxAssetID) {
-          nonAVAXFee = true;
+          onlyAVAXFee = false;
           break;
         }
       }
     }
-    if(!nonAVAXFee) {
+
+    if(onlyAVAXFee) {
       let outs:Array<TransferableOutput> = tx.getOuts();
       for(let i:number = 0; i < outs.length; i++){
         const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
@@ -746,15 +747,16 @@ class AVMAPI extends JRPCAPI {
         if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
           const assetID:Buffer = outs[i].getAssetID();
 
-          // assetid other than avax so disable check
+          // if assetid other than avax then disable check
           if(bintools.cb58Encode(assetID) !== avaxAssetID) {
-            nonAVAXFee = true;
+            onlyAVAXFee = false;
             break;
           }
         }
       }
     }
-    if(!nonAVAXFee && this.checkGooseEgg(utx)) {
+
+    if(onlyAVAXFee && this.checkGooseEgg(utx)) {
       throw new Error(`Error - sign: fee is too large`);
     }
     return this.keychain.signTx(utx);
