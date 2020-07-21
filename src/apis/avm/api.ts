@@ -584,7 +584,7 @@ class AVMAPI extends JRPCAPI {
     }
 
     const fee:BN = inputTotal.sub(outputTotal);
-    if(outputTotal.lte(new BN(10000000)) || fee.lte(outputTotal.div(new BN(100)))) {
+    if((outputTotal.lte(new BN(10000000)) && fee.lte(outputTotal.div(new BN(2)))) || fee.lte(outputTotal.div(new BN(10000)))) {
       // If amout transacting is really small, <= 1/10 of 1 AVAX, then it's ok if the fee is larger than the amount in % but nevertheless both are low
       // If amount is not small then the fee should be small percentage, 1%,
       return false;
