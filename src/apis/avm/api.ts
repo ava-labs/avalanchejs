@@ -553,50 +553,41 @@ class AVMAPI extends JRPCAPI {
      *
      * @param utx An UnsignedTx
      *
-     * @returns bool indicating if the transaction is a goose egg transaction
+     * @returns boolean indicating if the transaction is a goose egg transaction
      *
      * @remarks
-     * A "Goose Egg Transaction" is when the fee far exceeds a reasonable size.
+     * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
      */
   checkGooseEgg = (utx:UnsignedTx): boolean => {
     let inputTotal:BN = new BN(0);
     let outputTotal:BN = new BN(0);
-    let outcome:boolean = false;
     const tx:BaseTx = utx.getTransaction();
-    const avaxAssetID:string = "n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL";
     const ins:Array<TransferableInput> = tx.getIns();
     for(let i:number = 0; i < ins.length; i++){
       const input:AmountInput = ins[i].getInput() as AmountInput; 
+
+      // only check secpinputs
       if(input.getInputID() !== AVMConstants.SECPINPUTID) {
-        // only check secpinputs
         const assetID:Buffer = ins[i].getAssetID();
-        if(bintools.cb58Encode(assetID) !== avaxAssetID) {
-          // assetid other than avax so disable check
-          outcome = true;
-          break;
-        }
         inputTotal = inputTotal.add(input.getAmount());
       }
     }
-    if(!outcome) {
-      let outs:Array<TransferableOutput> = tx.getOuts();
-      for(let i:number = 0; i < outs.length; i++){
-        const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
-        if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-          // only check secpoutputs
-          const assetID:Buffer = outs[i].getAssetID();
-          if(bintools.cb58Encode(assetID) === avaxAssetID) {
-            // assetid other than avax so disable check
-            outcome = true;
-            break;
-          }
-          outputTotal = outputTotal.add(output.getAmount());
-        }
+    let outs:Array<TransferableOutput> = tx.getOuts();
+    for(let i:number = 0; i < outs.length; i++){
+      const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
+
+      // only check secpoutputs
+      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
+        const assetID:Buffer = outs[i].getAssetID();
+        outputTotal = outputTotal.add(output.getAmount());
       }
     }
+
     const fee:BN = inputTotal.sub(outputTotal);
-    if(outcome === true || fee.gte(outputTotal.div(new BN(100)))) {
-      return true;
+    if((outputTotal.lte(new BN(10000000)) || fee.gte(outputTotal.div(new BN(100))))) {
+      // If fee is entirely avax and amout transacting is really small, <= 1/10 of 1 AVAX, then it's ok if the fee is larger than the amount in % but nevertheless both are low
+      // If fee is entirely avax and amount is not small then the fee should be small percentage
+      return false;
     } else {
       return false;
     }
@@ -728,11 +719,43 @@ class AVMAPI extends JRPCAPI {
      * @returns A signed transaction of type [[Tx]]
      */
   signTx = (utx:UnsignedTx):Tx => {
-    try {
-      this.checkGooseEgg(utx);
-    } catch (error) {
+    let nonAVAXFee:boolean = false;
+    const tx:BaseTx = utx.getTransaction();
+    const avaxAssetID:string = "n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL";
+    const ins:Array<TransferableInput> = tx.getIns();
+    for(let i:number = 0; i < ins.length; i++){
+      const input:AmountInput = ins[i].getInput() as AmountInput; 
+
+      // only check secpinputs
+      if(input.getInputID() !== AVMConstants.SECPINPUTID) {
+        const assetID:Buffer = ins[i].getAssetID();
+
+        // assetid other than avax so disable check
+        if(bintools.cb58Encode(assetID) !== avaxAssetID) {
+          nonAVAXFee = true;
+          break;
+        }
+      }
+    }
+    if(!nonAVAXFee) {
+      let outs:Array<TransferableOutput> = tx.getOuts();
+      for(let i:number = 0; i < outs.length; i++){
+        const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
+
+        // only check secpoutputs
+        if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
+          const assetID:Buffer = outs[i].getAssetID();
+
+          // assetid other than avax so disable check
+          if(bintools.cb58Encode(assetID) !== avaxAssetID) {
+            nonAVAXFee = true;
+            break;
+          }
+        }
+      }
+    }
+    if(!nonAVAXFee && this.checkGooseEgg(utx)) {
       throw new Error(`Error - sign: fee is too large`);
-      console.log(error)
     }
     return this.keychain.signTx(utx);
   }
