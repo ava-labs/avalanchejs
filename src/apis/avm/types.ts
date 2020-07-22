@@ -103,7 +103,7 @@ export class Address extends NBytes {
      * Returns a base-58 representation of the [[Address]].
      */
   toString():string {
-    return bintools.avaSerialize(this.toBuffer());
+    return bintools.cb58Encode(this.toBuffer());
   }
 
   /**
@@ -155,7 +155,7 @@ export class UTXOID extends NBytes {
      * Returns a base-58 representation of the [[UTXOID]].
      */
   toString():string {
-    return bintools.avaSerialize(this.toBuffer());
+    return bintools.cb58Encode(this.toBuffer());
   }
 
   /**

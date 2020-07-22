@@ -21,7 +21,7 @@ describe('UTXO', () => {
   const otheraddr:string = 'MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8';
 
   // Payment
-  const OPUTXOstr:string = bintools.avaSerialize(utxobuff);
+  const OPUTXOstr:string = bintools.cb58Encode(utxobuff);
   // "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
 
   // implies fromString and fromBuffer
@@ -69,7 +69,7 @@ describe('UTXO', () => {
     });
     test('toString', () => {
       const serialized:string = u1.toString();
-      expect(serialized).toBe(bintools.avaSerialize(utxobuff));
+      expect(serialized).toBe(bintools.cb58Encode(utxobuff));
     });
   });
 });
@@ -92,13 +92,13 @@ const setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXO
 
 describe('UTXOSet', () => {
   const utxostrs:Array<string> = [
-    bintools.avaSerialize(Buffer.from('38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex')),
-    bintools.avaSerialize(Buffer.from('c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
-    bintools.avaSerialize(Buffer.from('f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
+    bintools.cb58Encode(Buffer.from('38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex')),
+    bintools.cb58Encode(Buffer.from('c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
+    bintools.cb58Encode(Buffer.from('f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
   ];
   const addrs:Array<Buffer> = [
-    bintools.avaDeserialize('FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG'),
-    bintools.avaDeserialize('MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8'),
+    bintools.cb58Decode('FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG'),
+    bintools.cb58Decode('MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8'),
   ];
   test('Creation', () => {
     const set:UTXOSet = new UTXOSet();
@@ -258,7 +258,7 @@ describe('UTXOSet', () => {
       balance2 = new BN(0);
       const now:BN = UnixNow();
       for (let i:number = 0; i < utxos.length; i++) {
-        const assetid = bintools.avaSerialize(utxos[i].getAssetID());
+        const assetid = bintools.cb58Encode(utxos[i].getAssetID());
         balance1.add(set.getBalance(addrs, assetid, now));
         balance2.add((utxos[i].getOutput() as AmountOutput).getAmount());
       }
@@ -284,7 +284,7 @@ describe('UTXOSet', () => {
       let setG:UTXOSet;
       let setH:UTXOSet;
       // Take-or-Leave
-      const newutxo:string = bintools.avaSerialize(Buffer.from('acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626', 'hex'));
+      const newutxo:string = bintools.cb58Encode(Buffer.from('acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626', 'hex'));
 
       beforeEach(() => {
         setA = new UTXOSet();

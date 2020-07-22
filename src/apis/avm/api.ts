@@ -312,7 +312,7 @@ class AVMAPI extends JRPCAPI {
     let asset:string;
     let amnt:BN;
     if (typeof assetID !== 'string') {
-      asset = bintools.avaSerialize(assetID);
+      asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
     }
@@ -480,7 +480,7 @@ class AVMAPI extends JRPCAPI {
   getAssetDescription = async (assetID:Buffer | string):Promise<{name:string;symbol:string;assetID:Buffer;denomination:number}> => {
     let asset:string;
     if (typeof assetID !== 'string') {
-      asset = bintools.avaSerialize(assetID);
+      asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
     }
@@ -490,7 +490,7 @@ class AVMAPI extends JRPCAPI {
     return this.callMethod('avm.getAssetDescription', params).then((response:RequestResponseData) => ({
       name: response.data.result.name,
       symbol: response.data.result.symbol,
-      assetID: bintools.avaDeserialize(response.data.result.assetID),
+      assetID: bintools.cb58Decode(response.data.result.assetID),
       denomination: parseInt(response.data.result.denomination, 10),
     }));
   };
@@ -575,11 +575,11 @@ class AVMAPI extends JRPCAPI {
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
     if (typeof assetID === 'string') {
-      assetID = bintools.avaDeserialize(assetID);
+      assetID = bintools.cb58Decode(assetID);
     }
 
     return utxoset.buildBaseTx(
-      this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID),
+      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID),
       amount, to, from, change,
       assetID, asOf, locktime, threshold,
     );
@@ -621,7 +621,7 @@ class AVMAPI extends JRPCAPI {
     }
 
     return utxoset.buildNFTTransferTx(
-      this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
+      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
       feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold,
     );
   };
@@ -659,7 +659,7 @@ class AVMAPI extends JRPCAPI {
     }
     const avaAssetID:Buffer = await this.getAVAAssetID();
     return utxoset.buildCreateAssetTx(
-      this.core.getNetworkID(), bintools.avaDeserialize(this.blockchainID), avaAssetID,
+      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
       fee, creators, initialStates, name, symbol, denomination,
     );
   };
@@ -724,7 +724,7 @@ class AVMAPI extends JRPCAPI {
     from = this._cleanAddressArray(from, 'send');
 
     if (typeof assetID !== 'string') {
-      asset = bintools.avaSerialize(assetID);
+      asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
     }
