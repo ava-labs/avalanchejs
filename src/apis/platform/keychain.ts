@@ -131,7 +131,7 @@ export class PlatformKeyPair extends KeyPair {
      * @returns An AVA serialized string representation of the public key
      */
     getPrivateKeyString = ():string => {
-        return bintools.avaSerialize(this.privk);
+        return bintools.cb58Encode(this.privk);
     }
 
     /**
@@ -140,7 +140,7 @@ export class PlatformKeyPair extends KeyPair {
      * @returns An AVA serialized string representation of the public key
      */
     getPublicKeyString = ():string => {
-        return bintools.avaSerialize(this.pubk);
+        return bintools.cb58Encode(this.pubk);
     }
 
 
@@ -229,7 +229,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
         let keypair:PlatformKeyPair = new PlatformKeyPair(this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
-            pk = bintools.avaDeserialize(privk);
+            pk = bintools.cb58Decode(privk);
         } else {
             pk = bintools.copyFrom(privk);
         }
