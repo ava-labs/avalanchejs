@@ -757,9 +757,10 @@ class AVMAPI extends JRPCAPI {
     }
 
     if(onlyAVAXFee && this.checkGooseEgg(utx)) {
-      throw new Error(`Error - sign: fee is too large`);
+      throw new Error(`Error - signTx: fee is too large`);
+    } else {
+      return this.keychain.signTx(utx);
     }
-    return this.keychain.signTx(utx);
   }
 
   /**
