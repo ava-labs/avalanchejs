@@ -20,7 +20,20 @@ export class PayloadTypes {
     protected types:Array<string> = [];
 
     /**
-     * Given a type string returns the proper TypeID.
+     * Given an encoded payload buffer returns the payload content.
+     */
+    parsePayload(payload:Buffer):Buffer {
+        let offset:number = 0;
+        const size:number = bintools.copyFrom(payload, offset, 4).readUInt32BE(0);
+        offset += 4;
+        const typeid:number = bintools.copyFrom(payload, offset, offset + 1).readUInt8(0);
+        offset += 1
+        const pl: Buffer = bintools.copyFrom(payload, offset, offset + size - 1);
+        return pl;
+    }
+
+    /**
+     * Given a payload buffer returns the proper TypeID.
      */
     getTypeID(payload:Buffer):number {
         let offset:number = 0;
