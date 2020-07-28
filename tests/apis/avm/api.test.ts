@@ -424,7 +424,7 @@ describe("AVMAPI", () => {
 
     test('getAssetDescription as string', async ()=>{
         let assetid:Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", 'hex');
-        let assetidstr:string = bintools.avaSerialize(assetid);
+        let assetidstr:string = bintools.cb58Encode(assetid);
 
         let result:Promise<object> = api.getAssetDescription(assetidstr);
         let payload:object = {
@@ -451,7 +451,7 @@ describe("AVMAPI", () => {
 
     test('getAssetDescription as Buffer', async ()=>{
         let assetid:Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", 'hex');
-        let assetidstr:string = bintools.avaSerialize(Buffer.from('8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533', 'hex'));
+        let assetidstr:string = bintools.cb58Encode(Buffer.from('8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533', 'hex'));
 
         let result:Promise<object> = api.getAssetDescription(assetid);
         let payload:object = {
@@ -478,9 +478,9 @@ describe("AVMAPI", () => {
 
     test('getUTXOs', async ()=>{
         //Payment
-        let OPUTXOstr1:string = bintools.avaSerialize(Buffer.from("38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d", "hex"));
-        let OPUTXOstr2:string = bintools.avaSerialize(Buffer.from("c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"));
-        let OPUTXOstr3:string = bintools.avaSerialize(Buffer.from("f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"));
+        let OPUTXOstr1:string = bintools.cb58Encode(Buffer.from("38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d", "hex"));
+        let OPUTXOstr2:string = bintools.cb58Encode(Buffer.from("c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"));
+        let OPUTXOstr3:string = bintools.cb58Encode(Buffer.from("f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex"));
 
         let set:UTXOSet = new UTXOSet();
         set.add(OPUTXOstr1);
@@ -624,9 +624,9 @@ describe("AVMAPI", () => {
 
         test('buildBaseTx1', async () => {
     
-            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
             let txu2:UnsignedTx = set.buildBaseTx(
-                networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
+                networkid, bintools.cb58Decode(blockchainid), new BN(amnt), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -639,9 +639,9 @@ describe("AVMAPI", () => {
         });
 
         test('buildBaseTx2', async () => {
-            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.avaSerialize(assetID));
+            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.cb58Encode(assetID));
             let txu2:UnsignedTx = set.buildBaseTx(
-                networkid, bintools.avaDeserialize(blockchainid), new BN(amnt).sub(new BN(100)), 
+                networkid, bintools.cb58Decode(blockchainid), new BN(amnt).sub(new BN(100)), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
                 addrs2.map(a => api.parseAddress(a)), 
@@ -669,9 +669,9 @@ describe("AVMAPI", () => {
         });
 
         test('signTx', async () => {
-            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu1:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
             let txu2:UnsignedTx = set.buildBaseTx(
-                networkid, bintools.avaDeserialize(blockchainid), new BN(amnt), 
+                networkid, bintools.cb58Decode(blockchainid), new BN(amnt), 
                 addrs3.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
                 addrs1.map(a => api.parseAddress(a)), 
@@ -687,7 +687,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Serialized', async ()=>{
-            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -710,7 +710,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Buffer', async ()=>{
-            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -732,7 +732,7 @@ describe("AVMAPI", () => {
         });
 
         test('issueTx Class Tx', async ()=>{
-            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.avaSerialize(assetID));
+            let txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
             let tx = api.signTx(txu);
 
             let txid:string = "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7";
@@ -765,7 +765,7 @@ describe("AVMAPI", () => {
                 "result": {
                     'name': name, 
                     'symbol': symbol, 
-                    'assetID': bintools.avaSerialize(assetID), 
+                    'assetID': bintools.cb58Encode(assetID), 
                     'denomination': "" + denomination
                 }
             };
@@ -778,7 +778,7 @@ describe("AVMAPI", () => {
     
             expect(mockAxios.request).toHaveBeenCalledTimes(1);
             
-            let txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
+            let txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.cb58Decode(api.getBlockchainID()), assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), initialState, name, symbol, denomination);
             
             expect(txu1.fromBuffer(txu2.toBuffer())).toBe(txu2.fromBuffer(txu1.toBuffer()));
             expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -799,7 +799,7 @@ describe("AVMAPI", () => {
             );
             
             let txu2:UnsignedTx = set.buildCreateNFTAssetTx(
-                avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), 
+                avalanche.getNetworkID(), bintools.cb58Decode(api.getBlockchainID()), 
                 assetID, new BN(fee), addrs1.map(a => api.parseAddress(a)), minterSets, 
                 name, symbol, locktime
             );
@@ -825,7 +825,7 @@ describe("AVMAPI", () => {
             );
     
             let txu2:UnsignedTx = set.buildCreateNFTMintTx(
-                avalanche.getNetworkID(), bintools.avaDeserialize(api.getBlockchainID()), 
+                avalanche.getNetworkID(), bintools.cb58Decode(api.getBlockchainID()), 
                 assetID, new BN(fee), addrbuff1, addrbuff3, addrbuff3, nftutxoids, UnixNow(), 
                 groupID, locktime, threshold, payload
             );
@@ -846,7 +846,7 @@ describe("AVMAPI", () => {
             );
            
             let txu2:UnsignedTx = set.buildNFTTransferTx(
-                networkid, bintools.avaDeserialize(blockchainid), assetID,
+                networkid, bintools.cb58Decode(blockchainid), assetID,
                 fee, addrbuff1, addrbuff3, addrbuff3, 
                 [nftutxoids[1]], UnixNow(), new BN(0), 1
             )
