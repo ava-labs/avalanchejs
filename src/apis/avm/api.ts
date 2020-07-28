@@ -704,14 +704,10 @@ class AVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
       let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
         
-      /* istanbul ignore next */
       if(name.length > AVMConstants.ASSETNAMELEN) {
-          /* istanbul ignore next */
           throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
       }
-      /* istanbul ignore next */
       if(symbol.length > AVMConstants.SYMBOLMAXLEN){
-          /* istanbul ignore next */
           throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
       }
       let avaAssetID:Buffer = await this.getAVAAssetID();
