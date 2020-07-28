@@ -22,7 +22,18 @@ export class PayloadTypes {
     /**
      * Given a type string returns the proper TypeID.
      */
-    lookupID(typestr:string) {
+    getTypeId(payload:Buffer):number {
+        let offset:number = 0;
+        const size:number = bintools.copyFrom(payload, offset, 4).readUInt32BE(0);
+        offset += 4;
+        const typeid:number = bintools.copyFrom(payload, offset, offset + 1).readUInt8(0);
+        return typeid;
+    }
+
+    /**
+     * Given a type string returns the proper TypeID.
+     */
+    lookupID(typestr:string):number {
         return this.types.indexOf(typestr);
     }
 
