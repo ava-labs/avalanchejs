@@ -39,7 +39,7 @@ export class AVMConstants {
 
   static SECPCREDENTIAL:number = 9;
 
-  static NFTCREDENTIAL:number = 16;
+  static NFTCREDENTIAL:number = 14;
 
   static ASSETIDLEN:number = 32;
 
