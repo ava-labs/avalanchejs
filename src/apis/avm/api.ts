@@ -764,6 +764,8 @@ class AVMAPI extends JRPCAPI{
      * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param groupID Optional. The group this NFT is issued to.
+     * @param locktime Optional. The locktime field created in the resulting mint output
+     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
      * @param payload Optional. Data for NFT Payload.
      * 
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
