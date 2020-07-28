@@ -20,7 +20,7 @@ export class PayloadTypes {
     protected types:Array<string> = [];
 
     /**
-     * Given a type string returns a the proper TypeID.
+     * Given a type string returns the proper TypeID.
      */
     lookupID(typestr:string) {
         return this.types.indexOf(typestr);
@@ -34,7 +34,7 @@ export class PayloadTypes {
     }
 
     /**
-     * Given a TypeID returns a the proper [[PayloadBase]].
+     * Given a TypeID returns the proper [[PayloadBase]].
      */
     select(typeid:number, ...args:Array<any>):PayloadBase {
         switch(typeid) {
