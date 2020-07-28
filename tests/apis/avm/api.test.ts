@@ -659,8 +659,8 @@ describe('AVMAPI', () => {
         assetID, UnixNow(), new BN(0), 1,
       );
 
-      const tx1:Tx = api.signTx(txu1);
-      const tx2:Tx = api.signTx(txu2);
+      const tx1:Tx = await api.signTx(txu1);
+      const tx2:Tx = await api.signTx(txu2);
 
       expect(tx2.toBuffer().toString('hex')).toBe(tx1.toBuffer().toString('hex'));
       expect(tx2.toString()).toBe(tx1.toString());
@@ -668,7 +668,7 @@ describe('AVMAPI', () => {
 
     test('issueTx Serialized', async () => {
       const txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
-      const tx = api.signTx(txu);
+      const tx = await api.signTx(txu);
 
       const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
@@ -691,7 +691,7 @@ describe('AVMAPI', () => {
 
     test('issueTx Buffer', async () => {
       const txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
-      const tx = api.signTx(txu);
+      const tx = await api.signTx(txu);
 
       const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
       const result:Promise<string> = api.issueTx(tx.toBuffer());
@@ -713,7 +713,7 @@ describe('AVMAPI', () => {
 
     test('issueTx Class Tx', async () => {
       const txu:UnsignedTx = await api.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
-      const tx = api.signTx(txu);
+      const tx = await api.signTx(txu);
 
       const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 

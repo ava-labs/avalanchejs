@@ -156,6 +156,7 @@ class AVMAPI extends JRPCAPI {
         assetID: Buffer;
         denomination: number;
       } = await this.getAssetDescription('AVA');
+      // TODO - Remove hardcoded 'AVA'
       this.AVAAssetID = asset.assetID;
     }
     return this.AVAAssetID;
@@ -623,6 +624,7 @@ class AVMAPI extends JRPCAPI {
 
     if (typeof assetID === 'string') {
       assetID = bintools.cb58Decode(assetID);
+      this.AVAAssetID = assetID;
     }
 
     return utxoset.buildBaseTx(
@@ -660,6 +662,8 @@ class AVMAPI extends JRPCAPI {
     const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
 
     const avaAssetID:Buffer = await this.getAVAAssetID();
+    this.AVAAssetID = avaAssetID;
+
     let utxoidArray:Array<string> = [];
     if (typeof utxoid === 'string') {
       utxoidArray = [utxoid];
@@ -705,6 +709,7 @@ class AVMAPI extends JRPCAPI {
       throw new Error(`Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of ${AVMConstants.ASSETNAMELEN}`);
     }
     const avaAssetID:Buffer = await this.getAVAAssetID();
+    this.AVAAssetID = avaAssetID;
     return utxoset.buildCreateAssetTx(
       this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
       fee, creators, initialStates, name, symbol, denomination,
@@ -718,10 +723,14 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns A signed transaction of type [[Tx]]
      */
-  signTx = (utx:UnsignedTx):Tx => {
+  signTx = async (utx:UnsignedTx) => {
     let onlyAVAXFee:boolean = true;
     const tx:BaseTx = utx.getTransaction();
-    const avaxAssetID:string = "n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL";
+    
+    if(this.AVAAssetID.length === 0) {
+      this.AVAAssetID = await this.getAVAAssetID();;
+    }
+
     const ins:Array<TransferableInput> = tx.getIns();
     for(let i:number = 0; i < ins.length; i++){
       const input:AmountInput = ins[i].getInput() as AmountInput; 
@@ -731,7 +740,7 @@ class AVMAPI extends JRPCAPI {
         const assetID:Buffer = ins[i].getAssetID();
 
         // if assetid other than avax then disable check
-        if(bintools.cb58Encode(assetID) !== avaxAssetID) {
+        if(assetID.toString('hex') !== this.AVAAssetID.toString('hex')) {
           onlyAVAXFee = false;
           break;
         }
@@ -748,7 +757,7 @@ class AVMAPI extends JRPCAPI {
           const assetID:Buffer = outs[i].getAssetID();
 
           // if assetid other than avax then disable check
-          if(bintools.cb58Encode(assetID) !== avaxAssetID) {
+          if(assetID.toString('hex') !== this.AVAAssetID.toString('hex')) {
             onlyAVAXFee = false;
             break;
           }
