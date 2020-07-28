@@ -11,7 +11,7 @@ import BinTools from '../../utils/bintools';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
+const bintools:BinTools = BinTools.getInstance();
 
 /**
  * Class for interacting with a node's PlatformAPI
