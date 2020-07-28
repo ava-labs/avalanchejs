@@ -591,6 +591,8 @@ export class KeyChain<KPClass extends KeyPair> {
 
   /**
      * Returns instance of [[KeyChain]].
+     *
+     * @param chainid The hostname to resolve to reach the AVA Client APIs
      */
   constructor(chainid:string) {
     this.chainid = chainid;
@@ -656,8 +658,6 @@ export abstract class NBytes {
   }
 
   /**
-     * Returns the stored {@link https://github.com/feross/buffer|Buffer}.
-     *
      * @returns A reference to the stored {@link https://github.com/feross/buffer|Buffer}
      */
   toBuffer():Buffer {
@@ -665,8 +665,6 @@ export abstract class NBytes {
   }
 
   /**
-     * Returns a base-58 string of the stored {@link https://github.com/feross/buffer|Buffer}.
-     *
      * @returns A base-58 string of the stored {@link https://github.com/feross/buffer|Buffer}
      */
   toString():string {

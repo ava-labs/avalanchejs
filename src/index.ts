@@ -138,6 +138,8 @@ export {
 } from './apis/avm/types';
 export { UTXO, UTXOSet } from './apis/avm/utxos';
 
+export { PlatformKeyPair, PlatformKeyChain } from './apis/platform/keychain';
+
 export { AdminAPI as Admin };
 export { AVMAPI as AVM };
 export { HealthAPI as Health };
