@@ -415,7 +415,71 @@ export class OperationTx extends BaseTx {
  */
 export class UnsignedTx {
   protected transaction:BaseTx;
+  protected inputTotal:BN = new BN(0);
+  protected outputTotal:BN = new BN(0);
+  protected fee:BN = new BN(0);
 
+  /**
+     * @ignore
+     */
+  protected _getTotals() {
+    const tx:BaseTx = this.getTransaction();
+    const ins:Array<TransferableInput> = tx.getIns();
+    for(let i:number = 0; i < ins.length; i++){
+      const input = ins[i].getInput() as AmountInput; 
+
+      // only check secpinputs
+      if(input.getInputID() === AVMConstants.SECPINPUTID) {
+        this.inputTotal = this.inputTotal.add(input.getAmount());
+      }
+    }
+
+    const outs:Array<TransferableOutput> = tx.getOuts();
+    for(let i:number = 0; i < outs.length; i++){
+      const output = outs[i].getOutput() as AmountOutput; 
+
+      // only check secpoutputs
+      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
+        this.outputTotal = this.outputTotal.add(output.getAmount());
+      }
+    }
+
+    this.fee = this.inputTotal.sub(this.outputTotal)
+  }
+
+  /**
+     * Returns the inputTotal as a BN 
+     */
+  getInputTotal = ():BN=> {
+    if(this.inputTotal.lte(new BN(0))) {
+      this._getTotals();
+    }
+    return this.inputTotal;
+  }
+
+  /**
+     * Returns the outputTotal as a BN
+     */
+  getOutputTotal = ():BN => {
+    if(this.outputTotal.lte(new BN(0))) {
+      this._getTotals();
+    }
+    return this.outputTotal;
+  }
+
+  /**
+     * Returns the fee as a BN
+     */
+  getFee = ():BN => {
+    if(this.fee.lte(new BN(0))) {
+      this._getTotals();
+    }
+    return this.fee;
+  }
+
+  /**
+     * Returns the Transaction
+     */
   getTransaction = ():BaseTx => this.transaction;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {

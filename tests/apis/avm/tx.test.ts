@@ -138,6 +138,36 @@ describe('Transactions', () => {
     expect(api.checkGooseEgg(unsignedTx)).toBe(true);
   });
 
+  test('confirm inputTotal, outputTotal and fee are correct', async () => {
+    const bintools: BinTools = BinTools.getInstance();
+    const networkID: number = 12345;
+    // local network X Chain ID
+    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    // AVA assetID
+    const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
+    const outs:TransferableOutput[] = [];
+    const ins:TransferableInput[] = [];
+    const outputAmt:BN = new BN("266");
+    const output:SecpOutput = new SecpOutput(outputAmt, new BN(0), 1, addrs1);
+    const transferableOutput:TransferableOutput = new TransferableOutput(assetID, output);
+    outs.push(transferableOutput);
+    const inputAmt:BN = new BN("400");
+    const input:SecpInput = new SecpInput(inputAmt);
+    input.addSignatureIdx(0, addrs1[0]);
+    const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
+    const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
+    const transferableInput:TransferableInput = new TransferableInput(txid, outputIndex, assetID, input);
+    ins.push(transferableInput);
+    const baseTx:BaseTx = new BaseTx(networkID, blockchainID, outs, ins);
+    const unsignedTx:UnsignedTx = new UnsignedTx(baseTx);
+    const inputTotal:BN = unsignedTx.getInputTotal();
+    const outputTotal:BN = unsignedTx.getOutputTotal();
+    const fee:BN = unsignedTx.getFee();
+    expect(inputTotal.toNumber()).toEqual(new BN(400).toNumber());
+    expect(outputTotal.toNumber()).toEqual(new BN(266).toNumber());
+    expect(fee.toNumber()).toEqual(new BN(134).toNumber());
+  });
+
 
   test("Create small BaseTx that isn't Goose Egg Tx", async () => {
     const bintools: BinTools = BinTools.getInstance();

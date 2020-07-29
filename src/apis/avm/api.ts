@@ -560,34 +560,14 @@ class AVMAPI extends JRPCAPI {
      * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
      */
   checkGooseEgg = (utx:UnsignedTx): boolean => {
-    let inputTotal:BN = new BN(0);
-    let outputTotal:BN = new BN(0);
-    const tx:BaseTx = utx.getTransaction();
-
-    const ins:Array<TransferableInput> = tx.getIns();
-    for(let i:number = 0; i < ins.length; i++){
-      const input:AmountInput = ins[i].getInput() as AmountInput; 
-
-      // only check secpinputs
-      if(input.getInputID() === AVMConstants.SECPINPUTID) {
-        inputTotal = inputTotal.add(input.getAmount());
-      }
-    }
-
-    const outs:Array<TransferableOutput> = tx.getOuts();
-    for(let i:number = 0; i < outs.length; i++){
-      const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
-
-      // only check secpoutputs
-      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-        outputTotal = outputTotal.add(output.getAmount());
-      }
-    }
-
+    const inputTotal:BN = utx.getInputTotal();
+    const outputTotal:BN = utx.getOutputTotal();
     const fee:BN = inputTotal.sub(outputTotal);
-    if((outputTotal.lte(new BN(10000000)) && fee.lte(outputTotal.div(new BN(2)))) || fee.lte(outputTotal.div(new BN(10000)))) {
-      // If amout transacting is really small, <= 1/10 of 1 AVAX, then it's ok if the fee is larger than the amount in % but nevertheless both are low
-      // If amount is not small then the fee should be small percentage
+    const totalLessThan1TenthAVAX:boolean = outputTotal.lte(new BN(10000000));
+    const feeLessThanHalf:boolean = fee.lte(outputTotal.div(new BN(2)));
+    const feeLessThan1TenThousandth:boolean = fee.lte(outputTotal.div(new BN(10000)));
+
+    if((totalLessThan1TenthAVAX && feeLessThanHalf) || feeLessThan1TenThousandth) {
       return false;
     } else {
       return true;
@@ -723,7 +703,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns A signed transaction of type [[Tx]]
      */
-  signTx = async (utx:UnsignedTx) => {
+  signTx = async (utx:UnsignedTx):Promise<Tx> => {
     let onlyAVAXFee:boolean = true;
     const tx:BaseTx = utx.getTransaction();
     
