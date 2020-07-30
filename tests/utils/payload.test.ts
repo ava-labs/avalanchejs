@@ -1,6 +1,10 @@
 import { Buffer } from "buffer/";
 import { UTF8Payload, PayloadTypes, BINPayload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINPayload, PCHAINPayload, CCHAINPayload, TXIDPayload, ASSETIDPayload, UTXOIDPayload, NFTIDPayload, SUBNETIDPayload, CHAINIDPayload, NODEIDPayload, SECPSIGPayload, SECPENCPayload, JPEGPayload, PNGPayload, BMPPayload, ICOPayload, SVGPayload, CSVPayload, JSONPayload, PROTOBUFPayload, YAMLPayload, EMAILPayload, URLPayload, IPFSPayload, ONIONPayload, MAGNETPayload } from "src";
+import BinTools from '../../src/utils/bintools';
+import BN from "bn.js";
+import { collapseTextChangeRangesAcrossMultipleVersions } from "typescript";
 let payloadTypes:PayloadTypes = PayloadTypes.getInstance();
+let bintools = BinTools.getInstance();
 
 describe("Payload", () => {
     test("PayloadTypes", () => {
@@ -9,59 +13,74 @@ describe("Payload", () => {
     });
 
     test("BINPayload", () => {
-        let str:string = "Avalanche.js";
-        let serialized:Buffer = Buffer.from(str);
-        let binp:BINPayload = new BINPayload(serialized);
-        let binpbuf:Buffer = binp.toBuffer();
+        const bin:string = "01000001 01110110 01100001 01101100 01100001 01101110 01100011 01101000 01100101 00100000 01101001 01110011 00100000 01100001 01101110 00100000 01101111 01110000 01100101 01101110 00101101 01110011 01101111 01110101 01110010 01100011 01100101 00100000 01110000 01101100 01100001 01110100 01100110 01101111 01110010 01101101 00100000 01100110 01101111 01110010 00100000 01101100 01100001 01110101 01101110 01100011 01101000 01101001 01101110 01100111 00100000 01101000 01101001 01100111 01101000 01101100 01111001 00100000 01100100 01100101 01100011 01100101 01101110 01110100 01110010 01100001 01101100 01101001 01111010 01100101 01100100 00100000 01100001 01110000 01110000 01101100 01101001 01100011 01100001 01110100 01101001 01101111 01101110 01110011 00101100 00100000 01101110 01100101 01110111 00100000 01100110 01101001 01101110 01100001 01101110 01100011 01101001 01100001 01101100 00100000 01110000 01110010 01101001 01101101 01101001 01110100 01101001 01110110 01100101 01110011 00101100 00100000 01100001 01101110 01100100 00100000 01101110 01100101 01110111 00100000 01101001 01101110 01110100 01100101 01110010 01101111 01110000 01100101 01110010 01100001 01100010 01101100 01100101 00100000 01100010 01101100 01101111 01100011 01101011 01100011 01101000 01100001 01101001 01101110 01110011 00101110"
+        const binBuf:Buffer = bintools.fromBNToBuffer(new BN(bin));
+        const binPayload:BINPayload = new BINPayload(binBuf);
+        const binpBuf:Buffer = binPayload.toBuffer();
 
-        expect(binp.typeID()).toBe(0);
-        expect(binp.typeName()).toBe("BIN");
+        expect(binPayload.typeID()).toBe(0);
+        expect(binPayload.typeName()).toBe("BIN");
+        expect(payloadTypes.select(0, binBuf).toBuffer().toString()).toBe(binPayload.toBuffer().toString());
+        expect(payloadTypes.select(0, binBuf)).toEqual(binBuf)
 
-        let binPayload:BINPayload = new BINPayload();
-        expect(payloadTypes.select(0).toBuffer().toString()).toBe(binPayload.toBuffer().toString());
-        // TODO
-        // how to best test returnType() ?
+        let bincopy:BINPayload = new BINPayload();
+        bincopy.fromBuffer(binpBuf)
+        expect(bincopy.toBuffer().toString()).toBe(binPayload.toBuffer().toString());
+
+        const returnType:Buffer = binPayload.returnType();
+        expect(returnType).toEqual(binBuf);
     });
 
     test("UTF8Payload", () => {
-        let str:string = "Avalanche.js";
-        let serialized:Buffer = Buffer.from(str, "utf8");
-        let utf8p:UTF8Payload = new UTF8Payload(serialized);
-        let utf8pbuf:Buffer = utf8p.toBuffer();
+        const utf8: string = "₠ ₡ ₢ ₣ ₤ ₥ ₦ ₧ ₨ ₩ ₪ ₫ € ₭ ₮ ₯ ₰ ₱ ₲ ₳ ₴ ₵ ₶ ₷ ₸ ₹ ₺ ₻ ₼ ₽ ₾ ₿"
+        const utf8Payload:UTF8Payload = new UTF8Payload(utf8);
+        const utf8pbuf:Buffer = utf8Payload.toBuffer();
 
-        expect(utf8p.typeID()).toBe(1);
-        expect(utf8p.typeName()).toBe("UTF8");
-        expect(utf8p.returnType()).toBe(str);
+        expect(utf8Payload.typeID()).toBe(1);
+        expect(utf8Payload.typeName()).toBe("UTF8");
+        expect(payloadTypes.select(1, utf8)).toEqual(utf8Payload)
 
         let utf8pcopy:UTF8Payload = new UTF8Payload();
-        expect(payloadTypes.select(1).toBuffer().toString()).toBe(utf8pcopy.toBuffer().toString());
         utf8pcopy.fromBuffer(utf8pbuf);
-        expect(utf8pcopy.toString()).toBe(utf8p.toString());
-        expect(utf8p.toBuffer().toString()).toBe(utf8pcopy.toBuffer().toString());
+        expect(utf8pcopy.toBuffer().toString()).toBe(utf8Payload.toBuffer().toString());
+
+        const returnType:string = utf8Payload.returnType();
+        expect(returnType).toEqual(utf8);
     });
 
     test("HEXSTRPayload", () => {
-        let str:string = "Avalanche.js";
-        let serialized:Buffer = Buffer.from(str)
-        let hexp:HEXSTRPayload = new HEXSTRPayload(serialized);
+        const hex:string = "4176616c616e63686520697320616e206f70656e2d736f7572636520706c6174666f726d20666f72206c61756e6368696e6720686967686c7920646563656e7472616c697a6564206170706c69636174696f6e732c206e65772066696e616e6369616c207072696d6974697665732c20616e64206e657720696e7465726f70657261626c6520626c6f636b636861696e732e";
+        const hexPayload:HEXSTRPayload = new HEXSTRPayload(hex);
+        const hexBuf:Buffer = hexPayload.toBuffer();
 
-        expect(hexp.typeID()).toBe(2);
-        expect(hexp.typeName()).toBe("HEXSTR");
+        expect(hexPayload.typeID()).toBe(2);
+        expect(hexPayload.typeName()).toBe("HEXSTR");
+        expect(payloadTypes.select(2, hex)).toEqual(hexPayload)
 
         let hexpcopy:HEXSTRPayload = new HEXSTRPayload();
-        expect(payloadTypes.select(2).toBuffer().toString()).toBe(hexpcopy.toBuffer().toString());
+        hexpcopy.fromBuffer(hexBuf);
+        expect(hexpcopy.toBuffer().toString()).toBe(hexPayload.toBuffer().toString());
+
+        const returnType:string = hexPayload.returnType();
+        expect(returnType).toEqual(hex);
     });
 
     test("B58STRPayload", () => {
-        let str:string = "Avalanche.js";
-        let serialized:Buffer = Buffer.from(str)
-        let b58:B58STRPayload = new B58STRPayload(serialized);
+        const str:Buffer = bintools.stringToBuffer("Avalanche is an open-source platform for launching highly decentralized applications, new financial primitives, and new interoperable blockchains.")
+        const b58Str:string = bintools.cb58Encode(str);
+        const b58Payload:B58STRPayload = new B58STRPayload(b58Str);
+        const b58Buf:Buffer = b58Payload.toBuffer();
 
-        expect(b58.typeID()).toBe(3);
-        expect(b58.typeName()).toBe("B58STR");
+        expect(b58Payload.typeID()).toBe(3);
+        expect(b58Payload.typeName()).toBe("B58STR");
+        expect(payloadTypes.select(3, b58Str)).toEqual(b58Payload)
 
         let b58copy:B58STRPayload = new B58STRPayload();
-        expect(payloadTypes.select(3).toBuffer().toString()).toBe(b58copy.toBuffer().toString());
+        b58copy.fromBuffer(b58Buf);
+        expect(b58copy.toBuffer().toString()).toBe(b58Payload.toBuffer().toString());
+
+        const returnType:string = b58Payload.returnType();
+        expect(returnType).toEqual(b58Str);
     });
 
     test("B64STRPayload", () => {
