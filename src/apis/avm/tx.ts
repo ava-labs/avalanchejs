@@ -415,66 +415,51 @@ export class OperationTx extends BaseTx {
  */
 export class UnsignedTx {
   protected transaction:BaseTx;
-  protected inputTotal:BN = new BN(0);
-  protected outputTotal:BN = new BN(0);
   protected fee:BN = new BN(0);
-
-  /**
-     * @ignore
-     */
-  protected _getTotals() {
-    const tx:BaseTx = this.getTransaction();
-    const ins:Array<TransferableInput> = tx.getIns();
-    for(let i:number = 0; i < ins.length; i++){
-      const input = ins[i].getInput() as AmountInput; 
-
-      // only check secpinputs
-      if(input.getInputID() === AVMConstants.SECPINPUTID) {
-        this.inputTotal = this.inputTotal.add(input.getAmount());
-      }
-    }
-
-    const outs:Array<TransferableOutput> = tx.getOuts();
-    for(let i:number = 0; i < outs.length; i++){
-      const output = outs[i].getOutput() as AmountOutput; 
-
-      // only check secpoutputs
-      if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-        this.outputTotal = this.outputTotal.add(output.getAmount());
-      }
-    }
-
-    this.fee = this.inputTotal.sub(this.outputTotal)
-  }
 
   /**
      * Returns the inputTotal as a BN 
      */
-  getInputTotal = ():BN=> {
-    if(this.inputTotal.lte(new BN(0))) {
-      this._getTotals();
+  getInputTotal = (assetID:Buffer):BN=> {
+    const ins:Array<TransferableInput> = this.getTransaction().getIns();
+    const aIDHex:string = assetID.toString('hex');
+    let total:BN = new BN(0);
+
+    for(let i:number = 0; i < ins.length; i++){
+      const input = ins[i].getInput() as AmountInput; 
+
+      // only check secpinputs
+      if(input.getInputID() === AVMConstants.SECPINPUTID && aIDHex === ins[i].getAssetID().toString('hex')) {
+        total = total.add(input.getAmount());
+      }
     }
-    return this.inputTotal;
+    return total;
   }
 
   /**
      * Returns the outputTotal as a BN
      */
-  getOutputTotal = ():BN => {
-    if(this.outputTotal.lte(new BN(0))) {
-      this._getTotals();
+  getOutputTotal = (assetID:Buffer):BN => {
+    const outs:Array<TransferableOutput> = this.getTransaction().getOuts();
+    const aIDHex:string = assetID.toString('hex');
+    let total:BN = new BN(0);
+
+    for(let i:number = 0; i < outs.length; i++){
+      const output = outs[i].getOutput() as AmountOutput; 
+
+      // only check secpoutputs
+      if(output.getOutputID() === AVMConstants.SECPOUTPUTID && aIDHex === outs[i].getAssetID().toString('hex')) {
+        total = total.add(output.getAmount());
+      }
     }
-    return this.outputTotal;
+    return total;
   }
 
   /**
-     * Returns the fee as a BN
+     * Returns the number of burned tokens as a BN
      */
-  getFee = ():BN => {
-    if(this.fee.lte(new BN(0))) {
-      this._getTotals();
-    }
-    return this.fee;
+  getBurn = (assetID:Buffer):BN => {
+    return this.getInputTotal(assetID).sub(this.getOutputTotal(assetID));
   }
 
   /**
@@ -522,6 +507,13 @@ export class Tx {
   protected unsignedTx:UnsignedTx = new UnsignedTx();
 
   protected credentials:Array<Credential> = [];
+
+  /**
+     * Returns the [[UnsignedTx]]
+     */
+  getUnsignedTx = ():UnsignedTx => {
+    return this.unsignedTx;
+  }
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.

@@ -15,6 +15,7 @@ import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx, BaseTx } from './tx';
 import { TransferableInput, AmountInput } from './inputs';
 import { TransferableOutput, AmountOutput } from './outputs';
+import { AVM } from 'src';
 
 /**
  * @ignore
@@ -554,22 +555,20 @@ class AVMAPI extends JRPCAPI {
      *
      * @param utx An UnsignedTx
      *
-     * @returns boolean indicating if the transaction is a goose egg transaction
+     * @returns boolean true if passes goose egg test and false if fails.
      *
      * @remarks
      * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
      */
-  checkGooseEgg = (utx:UnsignedTx): boolean => {
-    const outputTotal:BN = utx.getOutputTotal();
-    const fee:BN = utx.getFee();
-    const totalLessThan1TenthAVAX:boolean = outputTotal.lte(new BN(10000000));
-    const feeLessThanHalf:boolean = fee.lte(outputTotal.div(new BN(2)));
-    const feeLessThan1TenThousandth:boolean = fee.lte(outputTotal.div(new BN(10000)));
+  checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
+    const avaxAssetID:Buffer = await this.getAVAAssetID();
+    const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    const fee:BN = utx.getBurn(avaxAssetID);
 
-    if((totalLessThan1TenthAVAX && feeLessThanHalf) || feeLessThan1TenThousandth) {
-      return false;
-    } else {
+    if(fee.lte(AVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
+    } else {
+      return false;
     }
   }
 
@@ -603,14 +602,19 @@ class AVMAPI extends JRPCAPI {
 
     if (typeof assetID === 'string') {
       assetID = bintools.cb58Decode(assetID);
-      this.AVAAssetID = assetID;
     }
 
-    return utxoset.buildBaseTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildBaseTx(
       this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID),
       amount, to, from, change,
       assetID, asOf, locktime, threshold,
     );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
   };
 
   /**
@@ -641,7 +645,6 @@ class AVMAPI extends JRPCAPI {
     const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
 
     const avaAssetID:Buffer = await this.getAVAAssetID();
-    this.AVAAssetID = avaAssetID;
 
     let utxoidArray:Array<string> = [];
     if (typeof utxoid === 'string') {
@@ -650,10 +653,16 @@ class AVMAPI extends JRPCAPI {
       utxoidArray = utxoid;
     }
 
-    return utxoset.buildNFTTransferTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildNFTTransferTx(
       this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
       feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold,
     );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
   };
 
   /**
@@ -688,11 +697,16 @@ class AVMAPI extends JRPCAPI {
       throw new Error(`Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of ${AVMConstants.ASSETNAMELEN}`);
     }
     const avaAssetID:Buffer = await this.getAVAAssetID();
-    this.AVAAssetID = avaAssetID;
-    return utxoset.buildCreateAssetTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
       this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
       fee, creators, initialStates, name, symbol, denomination,
     );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
   };
 
   /**
@@ -702,54 +716,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns A signed transaction of type [[Tx]]
      */
-  signTx = async (utx:UnsignedTx):Promise<Tx> => {
-    let onlyAVAXFee:boolean = true;
-    const tx:BaseTx = utx.getTransaction();
-    
-    if(this.AVAAssetID.length === 0) {
-      this.AVAAssetID = await this.getAVAAssetID();;
-    }
-
-    const ins:Array<TransferableInput> = tx.getIns();
-    for(let i:number = 0; i < ins.length; i++){
-      const input:AmountInput = ins[i].getInput() as AmountInput; 
-
-      // only check secpinputs
-      if(input.getInputID() === AVMConstants.SECPINPUTID) {
-        const assetID:Buffer = ins[i].getAssetID();
-
-        // if assetid other than avax then disable check
-        if(assetID.toString('hex') !== this.AVAAssetID.toString('hex')) {
-          onlyAVAXFee = false;
-          break;
-        }
-      }
-    }
-
-    if(onlyAVAXFee) {
-      let outs:Array<TransferableOutput> = tx.getOuts();
-      for(let i:number = 0; i < outs.length; i++){
-        const output:AmountOutput = outs[i].getOutput() as AmountOutput; 
-
-        // only check secpoutputs
-        if(output.getOutputID() === AVMConstants.SECPOUTPUTID) {
-          const assetID:Buffer = outs[i].getAssetID();
-
-          // if assetid other than avax then disable check
-          if(assetID.toString('hex') !== this.AVAAssetID.toString('hex')) {
-            onlyAVAXFee = false;
-            break;
-          }
-        }
-      }
-    }
-
-    if(onlyAVAXFee && this.checkGooseEgg(utx)) {
-      throw new Error(`Error - signTx: fee is too large`);
-    } else {
-      return this.keychain.signTx(utx);
-    }
-  }
+  signTx = (utx:UnsignedTx):Tx => this.keychain.signTx(utx);
 
   /**
      * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
