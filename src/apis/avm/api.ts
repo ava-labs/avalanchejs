@@ -560,9 +560,8 @@ class AVMAPI extends JRPCAPI {
      * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
      */
   checkGooseEgg = (utx:UnsignedTx): boolean => {
-    const inputTotal:BN = utx.getInputTotal();
     const outputTotal:BN = utx.getOutputTotal();
-    const fee:BN = inputTotal.sub(outputTotal);
+    const fee:BN = utx.getFee();
     const totalLessThan1TenthAVAX:boolean = outputTotal.lte(new BN(10000000));
     const feeLessThanHalf:boolean = fee.lte(outputTotal.div(new BN(2)));
     const feeLessThan1TenThousandth:boolean = fee.lte(outputTotal.div(new BN(10000)));
