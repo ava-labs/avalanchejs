@@ -325,7 +325,10 @@ export default class BinTools {
   :string => `${chainid}-${this.cb58Encode(bytes)}`;
 
   stringToAddress = (address:string):Buffer => {
-    const parts:Array<string> = address.split('-');
+    const parts:Array<string> = address.trim().split('-');
+    if(parts[1].startsWith("0x") || parts[1].match(/^[0-9A-F]+$/i)){
+      return Buffer.from(parts[1].replace("0x", ""), "hex");
+    }
     return this.cb58Decode(parts[1]);
   };
 

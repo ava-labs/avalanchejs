@@ -1,16 +1,173 @@
 import { Buffer } from "buffer/";
-import { UTF8Payload, PayloadTypes, BINPayload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINPayload, PCHAINPayload, CCHAINPayload, TXIDPayload, ASSETIDPayload, UTXOIDPayload, NFTIDPayload, SUBNETIDPayload, CHAINIDPayload, NODEIDPayload, SECPSIGPayload, SECPENCPayload, JPEGPayload, PNGPayload, BMPPayload, ICOPayload, SVGPayload, CSVPayload, JSONPayload, PROTOBUFPayload, YAMLPayload, EMAILPayload, URLPayload, IPFSPayload, ONIONPayload, MAGNETPayload } from "src";
+import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, cb58EncodedPayload, TXIDPayload, JSONPayload } from '../../src/utils/payload';
 import BinTools from '../../src/utils/bintools';
 import BN from "bn.js";
+import { utf8ToHex } from "web3-utils";
 let payloadTypes:PayloadTypes = PayloadTypes.getInstance();
-let bintools = BinTools.getInstance();
+let bintools = BinTools.getInstance()
 
 describe("Payload", () => {
+    let cb58str:string = "MBcQpm1PsdfBKYscN3AYP56MusRDMZGF9";
+    let cb58buf:string = bintools.bufferToB58(bintools.cb58Decode(cb58str));
+    let chex:string = "849c0F8c6d9942a2605517AeaBe00133Cb159f8D";
+    let binstr:string = "Bx4v7ytutz3";
+    let utf8str:string = "I am the very model of a modern Major-General.";
+    let utf8b58:string = bintools.bufferToB58(Buffer.from(utf8str));
+    let utf8hex:string = Buffer.from(utf8str).toString("hex");
+    let utf8b64:string = Buffer.from(utf8str).toString("base64");
+    let bnhex:string = "deadbeef";
+    let svgstr:string = "<svg>hi mom</svg>";
+    let csvstr:string = "1,2,3,4,5\neverybody,in the,house,come along, let's ride";
+    let jsonobj:object = {boom:"goes the dynamite"};
+    let yamlstr:string = "---\nrootproperty: blah\nsection:\n  one: two\n  three: four\n  Foo: Bar\n  empty: ~";
+    let emailstr:string = "example@example.com";
+    let urlstr:string = "https://example.com";
+    let ipfsstr:string = "QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV";
+    let onionstr:string = "https://el33th4xor.onion";
+    let magnetstr:string = "magnet:?xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a";
+
     test("PayloadTypes", () => {
+        expect(() => {payloadTypes.select(867309)}).toThrow();
+
         expect(payloadTypes.lookupID("BIN")).toBe(0);
+
+        let pl:BINPayload = payloadTypes.select(0, binstr) as BINPayload;
+
+        expect(payloadTypes.getTypeID(pl.toBuffer())).toBe(0);
+
+        let pp:Buffer = payloadTypes.parsePayload(pl.toBuffer());
+
+        expect(bintools.b58ToBuffer(binstr).toString("hex")).toBe(pp.toString("hex"));
         expect(payloadTypes.lookupType(0)).toBe("BIN");
+        expect(payloadTypes.recast(pl).toBuffer().toString("hex")).toBe(pl.toBuffer().toString("hex"));
     });
 
+    let testTable = [
+        ["BIN", binstr, binstr], 
+        ["UTF8", utf8str, utf8b58], 
+        ["HEXSTR", utf8hex, utf8b58], 
+        ["B58STR", utf8b58, utf8b58], 
+        ["B64STR", utf8b64, utf8b58], 
+        ["BIGNUM", bnhex, bintools.bufferToB58(Buffer.from(bnhex, "hex"))], 
+        ["XCHAINADDR", "X-" + cb58str, cb58buf], 
+        ["PCHAINADDR", "P-" +  cb58str, cb58buf], 
+        ["CCHAINADDR", "C-0x" + chex, bintools.bufferToB58(Buffer.from(chex, "hex"))], 
+        ["TXID", cb58str, cb58buf], 
+        ["ASSETID", cb58str, cb58buf], 
+        ["UTXOID",  cb58str, cb58buf], 
+        ["NFTID", cb58str, cb58buf], 
+        ["SUBNETID", cb58str, cb58buf], 
+        ["CHAINID", cb58str, cb58buf], 
+        ["NODEID", cb58str, cb58buf], 
+        ["SECPSIG", cb58str, cb58str], 
+        ["SECPENC", cb58str, cb58str], 
+        ["JPEG", binstr, binstr], 
+        ["PNG", binstr, binstr], 
+        ["BMP", binstr, binstr], 
+        ["ICO", binstr, binstr], 
+        ["SVG", svgstr, bintools.bufferToB58(Buffer.from(svgstr))], 
+        ["CSV", csvstr, bintools.bufferToB58(Buffer.from(csvstr))], 
+        ["JSON", JSON.stringify(jsonobj), bintools.bufferToB58(Buffer.from(JSON.stringify(jsonobj)))], 
+        ["PROTOBUF", binstr, binstr], 
+        ["YAML", yamlstr, bintools.bufferToB58(Buffer.from(yamlstr))], 
+        ["EMAIL", emailstr, bintools.bufferToB58(Buffer.from(emailstr))], 
+        ["URL", urlstr, bintools.bufferToB58(Buffer.from(urlstr))], 
+        ["IPFS", ipfsstr, ipfsstr], 
+        ["ONION", onionstr, bintools.bufferToB58(Buffer.from(onionstr))], 
+        ["MAGNET", magnetstr, bintools.bufferToB58(Buffer.from(magnetstr))]
+    ];
+    test.each(testTable)(
+        'Basic Payload Test: typestr %s; input %s; inputbuff %s',
+        (
+            typestr:string, inputstr:string, inputbuff:string
+        ) => {
+            let buff:Buffer = bintools.b58ToBuffer(inputbuff);
+            let typeid:number = payloadTypes.lookupID(typestr);
+            let typename:string = payloadTypes.lookupType(typeid);
+            expect(typename).toBe(typestr);
+            let c0:PayloadBase = payloadTypes.select(typeid);
+            expect(c0.typeID()).toBe(typeid);
+            expect(c0.typeName()).toBe(typename);
+            let c1:PayloadBase = payloadTypes.select(typeid, buff);
+            let c2:PayloadBase = payloadTypes.select(typeid, inputstr);
+            let c3:PayloadBase = payloadTypes.select(typeid);
+            c3.fromBuffer(c1.toBuffer());
+            let c4:PayloadBase = payloadTypes.select(typeid);
+            c4.fromBuffer(c2.toBuffer());
+            
+            let s1:string = c1.toBuffer().toString("hex");
+            let s2:string = c2.toBuffer().toString("hex");
+            let s3:string = c3.toBuffer().toString("hex");
+            let s4:string = c4.toBuffer().toString("hex");
+
+            expect(s1).toBe(s2);
+            expect(s2).toBe(s3);
+            expect(s3).toBe(s4);
+        });
+
+        test("BINPayload special cases", () => {
+            let pl:BINPayload = payloadTypes.select(0, binstr) as BINPayload;
+            expect(bintools.bufferToB58(pl.returnType())).toBe(binstr);
+        });
+
+        test("UTF8Payload special cases", () => {
+            let pl:UTF8Payload = new UTF8Payload(utf8str);
+            expect(pl.returnType()).toBe(utf8str);
+        });
+
+        test("HEXSTRPayload special cases", () => {
+            let pl:HEXSTRPayload = new HEXSTRPayload(utf8hex);
+            expect(pl.returnType()).toBe(utf8hex);
+        });
+
+        test("B58STRPayload special cases", () => {
+            let pl:B58STRPayload = new B58STRPayload(utf8b58);
+            expect(pl.returnType()).toBe(utf8b58);
+        });
+
+        test("B64STRPayload special cases", () => {
+            let pl:B64STRPayload = new B64STRPayload(utf8b64);
+            expect(pl.returnType()).toBe(utf8b64);
+        });
+
+        test("BIGNUMPayload special cases", () => {
+            let jenny:BN = new BN(8675309);
+            let pl:BIGNUMPayload = new BIGNUMPayload(jenny);
+            expect(pl.returnType().toString("hex")).toBe(jenny.toString("hex"));
+        });
+
+        test("XCHAINADDRPayload special cases", () => {
+            let addr:string = "X-" + cb58str;
+            let pl:XCHAINADDRPayload = new XCHAINADDRPayload(addr);
+            expect(pl.returnType()).toBe(addr);
+            expect(pl.returnChainID()).toBe("X");
+        });
+
+        test("PCHAINADDRPayload special cases", () => {
+            let addr:string = "P-" + cb58str;
+            let pl:PCHAINADDRPayload = new PCHAINADDRPayload(addr);
+            expect(pl.returnType()).toBe(addr);
+            expect(pl.returnChainID()).toBe("P");
+        });
+
+        test("CCHAINADDRPayload special cases", () => {
+            let addr:string = "C-0x" + chex;
+            let pl:CCHAINADDRPayload = new CCHAINADDRPayload(addr);
+            expect(pl.returnType()).toBe(addr);
+            expect(pl.returnChainID()).toBe("C");
+        });
+
+        //handles all of cb58EncodedPayload
+        test("TXIDPayload special cases", () => {
+            let pl:TXIDPayload = new TXIDPayload(cb58str);
+            expect(pl.returnType()).toBe(cb58str);
+        });
+
+        test("JSONPayload special cases", () => {
+            let pl:JSONPayload = new JSONPayload(jsonobj);
+            expect(JSON.stringify(pl.returnType())).toBe(JSON.stringify(jsonobj));
+        });
+/*
     test("BINPayload", () => {
         const bin:string = "01000001 01110110 01100001 01101100 01100001 01101110 01100011 01101000 01100101 00100000 01101001 01110011 00100000 01100001 01101110 00100000 01101111 01110000 01100101 01101110 00101101 01110011 01101111 01110101 01110010 01100011 01100101 00100000 01110000 01101100 01100001 01110100 01100110 01101111 01110010 01101101 00100000 01100110 01101111 01110010 00100000 01101100 01100001 01110101 01101110 01100011 01101000 01101001 01101110 01100111 00100000 01101000 01101001 01100111 01101000 01101100 01111001 00100000 01100100 01100101 01100011 01100101 01101110 01110100 01110010 01100001 01101100 01101001 01111010 01100101 01100100 00100000 01100001 01110000 01110000 01101100 01101001 01100011 01100001 01110100 01101001 01101111 01101110 01110011 00101100 00100000 01101110 01100101 01110111 00100000 01100110 01101001 01101110 01100001 01101110 01100011 01101001 01100001 01101100 00100000 01110000 01110010 01101001 01101101 01101001 01110100 01101001 01110110 01100101 01110011 00101100 00100000 01100001 01101110 01100100 00100000 01101110 01100101 01110111 00100000 01101001 01101110 01110100 01100101 01110010 01101111 01110000 01100101 01110010 01100001 01100010 01101100 01100101 00100000 01100010 01101100 01101111 01100011 01101011 01100011 01101000 01100001 01101001 01101110 01110011 00101110"
         const binBuf:Buffer = bintools.fromBNToBuffer(new BN(bin));
@@ -116,13 +273,67 @@ describe("Payload", () => {
         const returnType:BN = bignumPayload.returnType();
         expect(returnType.toNumber()).toBe(bn.toNumber());
         expect(returnType.toString()).toBe(bn.toString());
-        // expect(payloadTypes.select(10).toBuffer().toString()).toBe(assetidcopy.toBuffer().toString());
-        // let assetid:ASSETIDPayload = new ASSETIDPayload(serialized);
+    });
 
-        // expect(assetid.typeID()).toBe(10);
-        // expect(assetid.typeName()).toBe("ASSETID");
+    test("XCHAINADDRPayload", () => {
+        let str:string = "X-MBcQpm1PsdfBKYscN3AYP56MusRDMZGF9";
+        let serialized:Buffer = bintools.stringToAddress(str);
+        let address:XCHAINADDRPayload = new XCHAINADDRPayload(serialized);
 
-        // let assetidcopy:ASSETIDPayload = new ASSETIDPayload();
+        expect(address.typeID()).toBe(6);
+        expect(address.typeName()).toBe("XCHAINADDR");
+
+        let addresscopy:XCHAINADDRPayload = new XCHAINADDRPayload(str);
+        expect(payloadTypes.select(6).toBuffer().toString("hex")).toBe(new XCHAINADDRPayload().toBuffer().toString("hex"));
+        expect(addresscopy.toBuffer().toString("hex")).toBe(addresscopy.toBuffer().toString());
+    });
+
+    test("PCHAINADDRPayload", () => {
+        let str:string = "P-MBcQpm1PsdfBKYscN3AYP56MusRDMZGF9";
+        let serialized:Buffer = bintools.stringToAddress(str);
+        let address:PCHAINADDRPayload = new PCHAINADDRPayload(serialized);
+
+        expect(address.typeID()).toBe(7);
+        expect(address.typeName()).toBe("PCHAINADDR");
+
+        let addresscopy:PCHAINADDRPayload = new PCHAINADDRPayload(str);
+        expect(payloadTypes.select(7).toBuffer().toString()).toBe(new PCHAINADDRPayload().toBuffer().toString());
+    });
+
+    test("CCHAINADDRPayload", () => {
+        let str:string = "0x849c0F8c6d9942a2605517AeaBe00133Cb159f8D";
+        let serialized:Buffer = Buffer.from(str.slice(2), "hex");
+        let address:CCHAINADDRPayload = new CCHAINADDRPayload(serialized);
+
+        expect(address.typeID()).toBe(8);
+        expect(address.typeName()).toBe("CCHAINADDR");
+
+        let addresscopy:CCHAINADDRPayload = new CCHAINADDRPayload("C-" + str);
+        expect(payloadTypes.select(8).toBuffer().toString()).toBe(new CCHAINADDRPayload().toBuffer().toString());
+    });
+
+    test("TXIDPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let txid:TXIDPayload = new TXIDPayload(serialized);
+
+        expect(txid.typeID()).toBe(9);
+        expect(txid.typeName()).toBe("TXID");
+
+        let txidcopy:TXIDPayload = new TXIDPayload();
+        expect(payloadTypes.select(9).toBuffer().toString()).toBe(new TXIDPayload().toBuffer().toString());
+    });
+
+    test("ASSETIDPayload", () => {
+        let str:string = "Avalanche.js";
+        let serialized:Buffer = Buffer.from(str)
+        let assetid:ASSETIDPayload = new ASSETIDPayload(serialized);
+
+        expect(assetid.typeID()).toBe(10);
+        expect(assetid.typeName()).toBe("ASSETID");
+
+        let assetidcopy:ASSETIDPayload = new ASSETIDPayload();
+        expect(payloadTypes.select(10).toBuffer().toString()).toBe(new ASSETIDPayload().toBuffer().toString());
     });
 
     test("UTXOIDPayload", () => {
@@ -134,7 +345,7 @@ describe("Payload", () => {
         expect(utxoid.typeName()).toBe("UTXOID");
 
         let utxoidcopy:UTXOIDPayload = new UTXOIDPayload();
-        expect(payloadTypes.select(11).toBuffer().toString()).toBe(utxoidcopy.toBuffer().toString());
+        expect(payloadTypes.select(11).toBuffer().toString()).toBe(new UTXOIDPayload().toBuffer().toString());
     });
 
     test("NFTIDPayload", () => {
@@ -146,7 +357,7 @@ describe("Payload", () => {
         expect(nftid.typeName()).toBe("NFTID");
 
         let nftidcopy:NFTIDPayload = new NFTIDPayload();
-        expect(payloadTypes.select(12).toBuffer().toString()).toBe(nftidcopy.toBuffer().toString());
+        expect(payloadTypes.select(12).toBuffer().toString()).toBe(new NFTIDPayload().toBuffer().toString());
     });
 
     test("SUBNETIDPayload", () => {
@@ -158,7 +369,7 @@ describe("Payload", () => {
         expect(subnetid.typeName()).toBe("SUBNETID");
 
         let subnetidcopy:SUBNETIDPayload = new SUBNETIDPayload();
-        expect(payloadTypes.select(13).toBuffer().toString()).toBe(subnetidcopy.toBuffer().toString());
+        expect(payloadTypes.select(13).toBuffer().toString()).toBe(new SUBNETIDPayload().toBuffer().toString());
     });
 
     test("CHAINIDPayload", () => {
@@ -170,7 +381,7 @@ describe("Payload", () => {
         expect(chainid.typeName()).toBe("CHAINID");
 
         let chainidcopy:CHAINIDPayload = new CHAINIDPayload();
-        expect(payloadTypes.select(14).toBuffer().toString()).toBe(chainidcopy.toBuffer().toString());
+        expect(payloadTypes.select(14).toBuffer().toString()).toBe(new CHAINIDPayload().toBuffer().toString());
     });
 
     test("NODEIDPayload", () => {
@@ -182,7 +393,7 @@ describe("Payload", () => {
         expect(nodeid.typeName()).toBe("NODEID");
 
         let nodeidcopy:NODEIDPayload = new NODEIDPayload();
-        expect(payloadTypes.select(15).toBuffer().toString()).toBe(nodeidcopy.toBuffer().toString());
+        expect(payloadTypes.select(15).toBuffer().toString()).toBe(new NODEIDPayload().toBuffer().toString());
     });
 
     test("SECPSIGPayload", () => {
@@ -194,7 +405,7 @@ describe("Payload", () => {
         expect(secpsig.typeName()).toBe("SECPSIG");
 
         let secpsigcopy:SECPSIGPayload = new SECPSIGPayload();
-        expect(payloadTypes.select(16).toBuffer().toString()).toBe(secpsigcopy.toBuffer().toString());
+        expect(payloadTypes.select(16).toBuffer().toString()).toBe(new SECPSIGPayload().toBuffer().toString());
     });
 
     test("SECPENCPayload", () => {
@@ -206,7 +417,7 @@ describe("Payload", () => {
         expect(secpenc.typeName()).toBe("SECPENC");
 
         let secpenccopy:SECPENCPayload = new SECPENCPayload();
-        expect(payloadTypes.select(17).toBuffer().toString()).toBe(secpenccopy.toBuffer().toString());
+        expect(payloadTypes.select(17).toBuffer().toString()).toBe(new SECPENCPayload().toBuffer().toString());
     });
 
     test("JPEGPayload", () => {
@@ -218,7 +429,7 @@ describe("Payload", () => {
         expect(jpeg.typeName()).toBe("JPEG");
 
         let jpegcopy:JPEGPayload = new JPEGPayload();
-        expect(payloadTypes.select(18).toBuffer().toString()).toBe(jpegcopy.toBuffer().toString());
+        expect(payloadTypes.select(18).toBuffer().toString()).toBe(new JPEGPayload().toBuffer().toString());
     });
 
     test("PNGPayload", () => {
@@ -230,7 +441,7 @@ describe("Payload", () => {
         expect(png.typeName()).toBe("PNG");
 
         let pngcopy:PNGPayload = new PNGPayload();
-        expect(payloadTypes.select(19).toBuffer().toString()).toBe(pngcopy.toBuffer().toString());
+        expect(payloadTypes.select(19).toBuffer().toString()).toBe(new PNGPayload().toBuffer().toString());
     });
 
     test("BMPPayload", () => {
@@ -242,7 +453,7 @@ describe("Payload", () => {
         expect(bmp.typeName()).toBe("BMP");
 
         let bmpcopy:BMPPayload = new BMPPayload();
-        expect(payloadTypes.select(20).toBuffer().toString()).toBe(bmpcopy.toBuffer().toString());
+        expect(payloadTypes.select(20).toBuffer().toString()).toBe(new BMPPayload().toBuffer().toString());
     });
 
     test("ICOPayload", () => {
@@ -254,7 +465,7 @@ describe("Payload", () => {
         expect(ico.typeName()).toBe("ICO");
 
         let icocopy:ICOPayload = new ICOPayload();
-        expect(payloadTypes.select(21).toBuffer().toString()).toBe(icocopy.toBuffer().toString());
+        expect(payloadTypes.select(21).toBuffer().toString()).toBe(new ICOPayload().toBuffer().toString());
     });
 
     test("SVGPayload", () => {
@@ -266,7 +477,7 @@ describe("Payload", () => {
         expect(svg.typeName()).toBe("SVG");
 
         let svgcopy:SVGPayload = new SVGPayload();
-        expect(payloadTypes.select(22).toBuffer().toString()).toBe(svgcopy.toBuffer().toString());
+        expect(payloadTypes.select(22).toBuffer().toString()).toBe(new SVGPayload().toBuffer().toString());
     });
 
     test("CSVPayload", () => {
@@ -376,4 +587,5 @@ describe("Payload", () => {
         let magnetcopy:MAGNETPayload = new MAGNETPayload();
         expect(payloadTypes.select(31).toBuffer().toString()).toBe(magnetcopy.toBuffer().toString());
     });
+    */
 });

@@ -6,6 +6,7 @@
 import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
+import Web3Utils from "web3-utils";
 
 /**
  * @ignore
@@ -70,11 +71,11 @@ export class PayloadTypes {
             case 5:
                 return new BIGNUMPayload(...args);
             case 6:
-                return new XCHAINPayload(...args);
+                return new XCHAINADDRPayload(...args);
             case 7:
-                return new PCHAINPayload(...args);
+                return new PCHAINADDRPayload(...args);
             case 8:
-                return new CCHAINPayload(...args);
+                return new CCHAINADDRPayload(...args);
             case 9:
                 return new TXIDPayload(...args);
             case 10:
@@ -217,11 +218,15 @@ export class BINPayload extends PayloadBase {
     returnType():Buffer {
         return this.payload;
     }
-
-    constructor(payload:Buffer = undefined){
+    /**
+     * @param payload Buffer only
+     */
+    constructor(payload:any = undefined){
         super();
-        if(payload) {
+        if(payload instanceof Buffer) {
             this.payload = payload;
+        } else if(typeof payload === "string") {
+            this.payload = bintools.b58ToBuffer(payload);
         }
     }
 }
@@ -238,12 +243,14 @@ export class UTF8Payload extends PayloadBase {
     returnType():string {
         return this.payload.toString("utf8");
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer utf8 string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
+        } else if(typeof payload === "string") {
             this.payload = Buffer.from(payload, "utf8");
         }
     }
@@ -261,13 +268,15 @@ export class HEXSTRPayload extends PayloadBase {
     returnType():string {
         return this.payload.toString("hex");
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer or hex string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
-            this.payload = Buffer.from(payload, "hex");
+        } else if(typeof payload === "string") {
+            this.payload = Buffer.from(payload.replace("0x", ""), "hex");
         }
     }
 }
@@ -284,12 +293,14 @@ export class B58STRPayload extends PayloadBase {
     returnType():string {
         return bintools.bufferToB58(this.payload);
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer or cb58 encoded string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
+        } else if(typeof payload === "string") {
             this.payload = bintools.b58ToBuffer(payload);
         }
     }
@@ -307,12 +318,14 @@ export class B64STRPayload extends PayloadBase {
     returnType():string {
         return this.payload.toString("base64");
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer of base64 string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
+        } else if(typeof payload === "string") {
             this.payload = Buffer.from(payload, "base64");
         }
     }
@@ -320,6 +333,8 @@ export class B64STRPayload extends PayloadBase {
 
 /**
  * Class for payloads representing Big Numbers.
+ * 
+ * @param payload Accepts a Buffer, BN, or base64 string
  */
 export class BIGNUMPayload extends PayloadBase {
     protected typeid = 5;
@@ -330,19 +345,24 @@ export class BIGNUMPayload extends PayloadBase {
     returnType():BN {
         return bintools.fromBufferToBN(this.payload);
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer, BN, or base64 string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
-            this.payload = Buffer.from(payload, "base64");
+        } else if (payload instanceof BN) {
+            this.payload = bintools.fromBNToBuffer(payload);
+        } else if(typeof payload === "string") {
+            this.payload = Buffer.from(payload, "hex");
         }
     }
 }
 
 /**
  * Class for payloads representing chain addresses.
+ * 
  */
 export abstract class ChainAddressPayload extends PayloadBase {
     protected typeid = 6;
@@ -361,12 +381,14 @@ export abstract class ChainAddressPayload extends PayloadBase {
     returnType():string {
         return bintools.addressToString(this.chainid, this.payload);
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer or address string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
+        } else if(typeof payload === "string") {
             this.payload = bintools.stringToAddress(payload);
         }
     }
@@ -375,7 +397,7 @@ export abstract class ChainAddressPayload extends PayloadBase {
 /**
  * Class for payloads representing X-Chin addresses.
  */
-export class XCHAINPayload extends ChainAddressPayload {
+export class XCHAINADDRPayload extends ChainAddressPayload {
     protected typeid = 6;
     protected chainid = "X";
 }
@@ -383,7 +405,7 @@ export class XCHAINPayload extends ChainAddressPayload {
 /**
  * Class for payloads representing P-Chain addresses.
  */
-export class PCHAINPayload extends ChainAddressPayload {
+export class PCHAINADDRPayload extends ChainAddressPayload {
     protected typeid = 7;
     protected chainid = "P";
 }
@@ -391,9 +413,16 @@ export class PCHAINPayload extends ChainAddressPayload {
 /**
  * Class for payloads representing C-Chain addresses.
  */
-export class CCHAINPayload extends ChainAddressPayload {
+export class CCHAINADDRPayload extends ChainAddressPayload {
     protected typeid = 8;
     protected chainid = "C";
+
+    /**
+     * Returns an address string for the payload.
+     */
+    returnType():string {
+        return this.chainid + "-" + Web3Utils.toChecksumAddress("0x" + this.payload.toString("hex"));
+    }
 }
 
 /**
@@ -407,12 +436,14 @@ export abstract class cb58EncodedPayload extends PayloadBase {
     returnType():string {
         return bintools.cb58Encode(this.payload);
     }
-
-    constructor(payload:string|Buffer = undefined){
+    /**
+     * @param payload Buffer or cb58 encoded string
+     */
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
-        } else if(payload) {
+        } else if(typeof payload === "string") {
             this.payload = bintools.cb58Decode(payload);
         }
     }
@@ -535,7 +566,7 @@ export class JSONPayload extends PayloadBase {
         return JSON.parse(this.payload.toString("utf8"));
     }
 
-    constructor(payload:any|string|Buffer = undefined){
+    constructor(payload:any = undefined){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
