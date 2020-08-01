@@ -1,12 +1,13 @@
 {
   "name": "avalanche",
-  "version": "2.0.2",
+  "version": "2.2.1",
   "description": "AVA Platform JS Library",
   "main": "typings/src/index.js",
   "types": "typings/src/index.d.ts",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "rm -rf typings/ && npx tsc -b && webpack --mode production",
+    "lint": "eslint ./",
     "prepublish": "npm run build",
     "test": "jest",
     "test-watch": "jest --watch",
@@ -29,9 +30,17 @@
     "@types/bn.js": "^4.11.6",
     "@types/create-hash": "^1.2.2",
     "@types/jest": "^24.9.1",
-    "@types/libsodium-wrappers": "^0.7.7",
     "@types/node": "^12.12.34",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "acorn": "^7.3.1",
     "clean-webpack-plugin": "^3.0.0",
+    "eslint": "^7.3.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-airbnb-typescript": "^8.0.2",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react-hooks": "^2.5.1",
     "expose-loader": "^0.7.5",
     "git-revision-webpack-plugin": "^3.0.4",
     "html-webpack-plugin": "^3.2.0",
@@ -57,9 +66,9 @@
     "buffer": "^5.5.0",
     "create-hash": "^1.2.0",
     "elliptic": "^6.5.2",
-    "libsodium-wrappers": "^0.7.6",
     "secp256k1": "^4.0.0",
     "store2": "^2.11.0",
-    "typedoc": "^0.17.7"
+    "typedoc": "^0.17.7",
+    "webcrypto": "^0.1.1"
   }
 }

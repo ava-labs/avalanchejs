@@ -1,12 +1,14 @@
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import { BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
+import {
+  BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx,
+} from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
 import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
-import {Buffer} from "buffer/";
-import { SecpOutput, NFTTransferOutput, TransferableOutput} from 'src/apis/avm/outputs';
+import { Buffer } from 'buffer/';
+import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/outputs';
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 
@@ -248,4 +250,3 @@ describe('Transactions', () => {
         expect(tx2.toString()).toBe(tx.toString());
     });
 });
-    

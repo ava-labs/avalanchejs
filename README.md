@@ -1,19 +1,19 @@
-# Avalanche.js - The AVA Platform JavaScript Library
+# Avalanche.js - The Avalanche Platform JavaScript Library
 
-## Overview
+## Overview 
 
-Avalanche.js is a JavaScript Library for interfacing with the AVA Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche.js library allows one to issue commands to the AVA node APIs.
+Avalanche.js is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche.js library allows one to issue commands to the Avalanche node APIs.
 
 The APIs currently supported by default are:
 
-* The AVA Virtual Machine (AVM) API
+* The Avalanche Virtual Machine (AVM) API
 * The Keystore API
 * The Admin API
 * The Platform API
 
 ## Getting Started
 
-We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the AVA Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [AVA Platform Specification](https://avalabs.org/docs/).
+We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network/).
 
 Using Avalanche.js, developers are able to:
 
@@ -24,9 +24,9 @@ Using Avalanche.js, developers are able to:
 * Issue signed transactions to the AVM
 * Create a subnetwork
 * Administer a local node
-* Retrieve AVA network information from a node
+* Retrieve Avalanche network information from a node
 
-The entirety of the Avalanche.js documentation can be found on our [Avalanche.js documentation page](https://docs.ava.network/v1.0/en/tools/avalanche.js/).
+The entirety of the Avalanche.js documentation can be found on our [Avalanche.js documentation page](https://docs.avax.network/v1.0/en/tools/avalanche.js/).
 
 ### Requirements
 
@@ -86,7 +86,7 @@ The above lines import the libraries used in the below example:
 
 ## Example 1 &mdash; Managing AVM Keys
 
-Avalanche.js comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
+Avalanche.js comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Avalanche.js connected to our Avalanche Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
@@ -115,11 +115,11 @@ let newAddress1 = myKeychain.makeKey();
 You may also import your exsting private key into the keychain using either a Buffer...
 
 ```js
-let mypk = bintools.avaDeserialize("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
+let mypk = bintools.cb58Decode("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
 let newAddress2 = myKeychain.importKey(mypk);
 ```
 
-... or an AVA serialized string works, too:
+... or an Avalanche serialized string works, too:
 
 ```js
 let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
@@ -146,10 +146,10 @@ let address = keypair.getAddress(); //returns Buffer
 let addressString = keypair.getAddressString(); //returns string
 
 let pubk = keypair.getPublicKey(); //returns Buffer
-let pubkstr = keypair.getPublicKeyString(); //returns an AVA serialized string
+let pubkstr = keypair.getPublicKeyString(); //returns an Avalanche serialized string
 
 let privk = keypair.getPrivateKey(); //returns Buffer
-let privkstr = keypair.getPrivateKeyString(); //returns an AVA serialized string
+let privkstr = keypair.getPrivateKeyString(); //returns an Avalanche serialized string
 
 keypair.generateKey(); //creates a new random keypair
 
@@ -164,7 +164,7 @@ let isValid = keypair.verify(message, signature); //returns a boolean
 
 ## Example 2 &mdash; Creating An Asset
 
-This example creates an asset in the AVM and publishes it to the AVA Platform. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
+This example creates an asset in the AVM and publishes it to the Avalanche Platform. The first step in this process is to create an instance of Avalanche.js connected to our Avalanche Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
@@ -185,7 +185,7 @@ let name = "Rickcoin is the most intelligent coin";
 let symbol = "RICK";
 
 // Where is the decimal point indicate what 1 asset is and where fractional assets begin
-// Ex: 1 $AVA is denomination 9, so the smallest unit of $AVA is nano-AVA ($nAVA) at 10^-9 $AVA
+// Ex: 1 $AVAX is denomination 9, so the smallest unit of $AVAX is nano-AVAX ($nAVAX) at 10^-9 $AVAX
 let denomination = 9;
 ```
 
@@ -231,21 +231,21 @@ let signed = avm.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it!
 
-Using the Avalanche.js AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string AVA serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the Avalanche.js AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a base-58 string Avalanche serialized representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
-let txid = await avm.issueTx(signed); //returns an AVA serialized string for the TxID
+let txid = await avm.issueTx(signed); //returns an Avalanche serialized string for the TxID
 ```
 
 ```js
 // using the base-58 representation
-let txid = await avm.issueTx(signed.toString()); //returns an AVA serialized string for the TxID
+let txid = await avm.issueTx(signed.toString()); //returns an Avalanche serialized string for the TxID
 ```
 
 ```js
 // using the transaction Buffer
-let txid = await avm.issueTx(signed.toBuffer()); //returns an AVA serialized string for the TxID
+let txid = await avm.issueTx(signed.toBuffer()); //returns an Avalanche serialized string for the TxID
 ```
 
 We assume ONE of those methods are used to issue the transaction.
@@ -301,7 +301,7 @@ let utxos = await avm.getUTXOs(myAddresses);
 The `buildBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
-let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
+let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //cb58Encoded string
 let mybalance = utxos.getBalance(myAddresses, assetid); //returns 400 as a BN
 ```
 
@@ -309,7 +309,7 @@ We have 400 coins! We're going to now send 100 of those coins to our friend's ad
 
 ```js
 let sendAmount = new BN(100); //amounts are in BN format
-let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //AVA serialized address format
+let friendsAddress = "X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"; //Avalanche serialized address format
 
 //The below returns a UnsignedTx
 //Parameters sent are (in order of appearance):

@@ -20,9 +20,28 @@ export class PayloadTypes {
     protected types:Array<string> = [];
 
     /**
-     * Given a type string returns a the proper TypeID.
+     * Given an encoded payload buffer returns the payload content.
      */
-    lookupID(typestr:string) {
+    parsePayload(payload:Buffer):Buffer {
+        const pl: Buffer = bintools.copyFrom(payload, 5);
+        return pl;
+    }
+
+    /**
+     * Given a payload buffer returns the proper TypeID.
+     */
+    getTypeID(payload:Buffer):number {
+        let offset:number = 0;
+        const size:number = bintools.copyFrom(payload, offset, 4).readUInt32BE(0);
+        offset += 4;
+        const typeid:number = bintools.copyFrom(payload, offset, offset + 1).readUInt8(0);
+        return typeid;
+    }
+
+    /**
+     * Given a type string returns the proper TypeID.
+     */
+    lookupID(typestr:string):number {
         return this.types.indexOf(typestr);
     }
 
@@ -34,7 +53,7 @@ export class PayloadTypes {
     }
 
     /**
-     * Given a TypeID returns a the proper [[PayloadBase]].
+     * Given a TypeID returns the proper [[PayloadBase]].
      */
     select(typeid:number, ...args:Array<any>):PayloadBase {
         switch(typeid) {
@@ -378,15 +397,15 @@ export class CCHAINPayload extends ChainAddressPayload {
 }
 
 /**
- * Class for payloads representing data serialized by bintools.avaSerialize().
+ * Class for payloads representing data serialized by bintools.cb58Encode().
  */
-export abstract class AvaSerializedPayload extends PayloadBase {
+export abstract class cb58EncodedPayload extends PayloadBase {
 
     /**
-     * Returns a bintools.avaSerialized string for the payload.
+     * Returns a bintools.cb58Encoded string for the payload.
      */
     returnType():string {
-        return bintools.avaSerialize(this.payload);
+        return bintools.cb58Encode(this.payload);
     }
 
     constructor(payload:string|Buffer = undefined){
@@ -394,7 +413,7 @@ export abstract class AvaSerializedPayload extends PayloadBase {
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(payload) {
-            this.payload = bintools.avaDeserialize(payload);
+            this.payload = bintools.cb58Decode(payload);
         }
     }
 }
@@ -402,21 +421,21 @@ export abstract class AvaSerializedPayload extends PayloadBase {
 /**
  * Class for payloads representing TxIDs.
  */
-export class TXIDPayload extends AvaSerializedPayload {
+export class TXIDPayload extends cb58EncodedPayload {
     protected typeid = 9;
 }
 
 /**
  * Class for payloads representing AssetIDs.
  */
-export class ASSETIDPayload extends AvaSerializedPayload {
+export class ASSETIDPayload extends cb58EncodedPayload {
     protected typeid = 10;
 }
 
 /**
  * Class for payloads representing NODEIDs.
  */
-export class UTXOIDPayload extends AvaSerializedPayload {
+export class UTXOIDPayload extends cb58EncodedPayload {
     protected typeid = 11;
 }
 
@@ -430,21 +449,21 @@ export class NFTIDPayload extends UTXOIDPayload {
 /**
  * Class for payloads representing SubnetIDs.
  */
-export class SUBNETIDPayload extends AvaSerializedPayload {
+export class SUBNETIDPayload extends cb58EncodedPayload {
     protected typeid = 13;
 }
 
 /**
  * Class for payloads representing ChainIDs.
  */
-export class CHAINIDPayload extends AvaSerializedPayload {
+export class CHAINIDPayload extends cb58EncodedPayload {
     protected typeid = 14;
 }
 
 /**
  * Class for payloads representing NodeIDs.
  */
-export class NODEIDPayload extends AvaSerializedPayload {
+export class NODEIDPayload extends cb58EncodedPayload {
     protected typeid = 15;
 }
 

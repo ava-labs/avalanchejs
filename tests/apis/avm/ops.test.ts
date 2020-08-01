@@ -20,9 +20,9 @@ describe('Operations', () => {
     let assetID:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
     let assetIDBuff:Buffer = Buffer.from(assetID, "hex");
     let addrs:Array<Buffer> = [
-        bintools.avaDeserialize("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
-        bintools.avaDeserialize("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
-        bintools.avaDeserialize("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
+        bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
+        bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
+        bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
     ].sort();
 
     let locktime:BN = new BN(54321);
@@ -127,7 +127,7 @@ describe('Operations', () => {
         let xferop3:TransferableOperation = new TransferableOperation(assetIDBuff, [uid], op);
 
         expect(xferop.getAssetID().toString("hex")).toBe(assetID);
-        let utxoiddeserialized:Buffer = bintools.avaDeserialize(xferop.getUTXOIDs()[0].toString());
+        let utxoiddeserialized:Buffer = bintools.cb58Decode(xferop.getUTXOIDs()[0].toString());
         expect(bintools.bufferToB58(utxoiddeserialized)).toBe(nftutxo.getUTXOID());
         expect(xferop.getOperation().toString()).toBe(op.toString());
 

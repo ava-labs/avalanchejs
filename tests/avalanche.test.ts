@@ -82,111 +82,111 @@ describe('Avalanche', () => {
 });
 
 describe('HTTP Operations', () => {
-    const ip = '127.0.0.1';
-    const port = 8080;
-    const protocol = "http";
-    const path = "/ext/testingrequests";
-    let avalanche:Avalanche;
-    beforeAll(() => {
-        avalanche = new Avalanche(ip,port, protocol, 12345, undefined, true);
-        avalanche.addAPI("testingrequests", TestAPI, path);
-    });
+  const ip = '127.0.0.1';
+  const port = 8080;
+  const protocol = 'http';
+  const path = '/ext/testingrequests';
+  let avalanche:Avalanche;
+  beforeAll(() => {
+    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+    avalanche.addAPI('testingrequests', TestAPI, path);
+  });
 
-    afterEach(() => {
-        mockAxios.reset();
-    });
+  afterEach(() => {
+    mockAxios.reset();
+  });
 
-    test('GET works', async () => {
-        let input:string = "TestGET";
-        let api:TestAPI = avalanche.api("testingrequests");
-        let result:Promise<object> = api.TestGET(input, `/${input}`);
-        let payload:object = {
-            "result": {
-                "output":input
-            }
-        };
-        let responseObj = {
-            data:payload
-        };
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response["output"]).toBe(input);
-    });
+  test('GET works', async () => {
+    const input:string = 'TestGET';
+    const api:TestAPI = avalanche.api('testingrequests');
+    const result:Promise<object> = api.TestGET(input, `/${input}`);
+    const payload:object = {
+      result: {
+        output: input,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+    mockAxios.mockResponse(responseObj);
+    const response:any = await result;
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.output).toBe(input);
+  });
 
-    test('DELETE works', async () => {
-        let input:string = "TestDELETE";
-        let api:TestAPI = avalanche.api("testingrequests");
-        let axiosConfig:AxiosRequestConfig = {
-            baseURL:`${protocol}://${ip}:${port}`,
-            responseType: 'text'
-        };
-        let result:Promise<object> = api.TestDELETE(input, `/${input}`, axiosConfig);
-        let payload:object = {
-            "result": {
-                "output":input
-            }
-        };
-        let responseObj = {
-            data:payload
-        };
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response["output"]).toBe(input);
-    });
+  test('DELETE works', async () => {
+    const input:string = 'TestDELETE';
+    const api:TestAPI = avalanche.api('testingrequests');
+    const axiosConfig:AxiosRequestConfig = {
+      baseURL: `${protocol}://${ip}:${port}`,
+      responseType: 'text',
+    };
+    const result:Promise<object> = api.TestDELETE(input, `/${input}`, axiosConfig);
+    const payload:object = {
+      result: {
+        output: input,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+    mockAxios.mockResponse(responseObj);
+    const response:any = await result;
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.output).toBe(input);
+  });
 
-    test('POST works', async () => {
-        let input:string = "TestPOST";
-        let api:TestAPI = avalanche.api("testingrequests");
-        let result:Promise<object> = api.TestPOST(input, `/${input}`);
-        let payload:object = {
-            "result": {
-                "output":input
-            }
-        };
-        let responseObj = {
-            data:payload
-        };
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response["output"]).toBe(input);
-    });
+  test('POST works', async () => {
+    const input:string = 'TestPOST';
+    const api:TestAPI = avalanche.api('testingrequests');
+    const result:Promise<object> = api.TestPOST(input, `/${input}`);
+    const payload:object = {
+      result: {
+        output: input,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+    mockAxios.mockResponse(responseObj);
+    const response:any = await result;
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.output).toBe(input);
+  });
 
-    test('PUT works', async () => {
-        let input:string = "TestPUT";
-        let api:TestAPI = avalanche.api("testingrequests");
-        let result:Promise<object> = api.TestPUT(input, `/${input}`);
-        let payload:object = {
-            "result": {
-                "output":input
-            }
-        };
-        let responseObj = {
-            data:payload
-        };
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response["output"]).toBe(input);
-    });
+  test('PUT works', async () => {
+    const input:string = 'TestPUT';
+    const api:TestAPI = avalanche.api('testingrequests');
+    const result:Promise<object> = api.TestPUT(input, `/${input}`);
+    const payload:object = {
+      result: {
+        output: input,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+    mockAxios.mockResponse(responseObj);
+    const response:any = await result;
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.output).toBe(input);
+  });
 
-    test('PATCH works', async () => {
-        let input:string = "TestPATCH";
-        let api:TestAPI = avalanche.api("testingrequests");
-        let result:Promise<object> = api.TestPATCH(input, `/${input}`);
-        let payload:object = {
-            "result": {
-                "output":input
-            }
-        };
-        let responseObj = {
-            data:payload
-        };
-        mockAxios.mockResponse(responseObj);
-        let response:object = await result;
-        expect(mockAxios.request).toHaveBeenCalledTimes(1);
-        expect(response["output"]).toBe(input);
-    });
+  test('PATCH works', async () => {
+    const input:string = 'TestPATCH';
+    const api:TestAPI = avalanche.api('testingrequests');
+    const result:Promise<object> = api.TestPATCH(input, `/${input}`);
+    const payload:object = {
+      result: {
+        output: input,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+    mockAxios.mockResponse(responseObj);
+    const response:any = await result;
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.output).toBe(input);
+  });
 });
