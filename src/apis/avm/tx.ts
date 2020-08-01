@@ -8,7 +8,7 @@ import createHash from "create-hash";
 import { AVMConstants, InitialStates, Signature, SigIdx } from './types';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
-import { TransferableOperation } from './ops';
+import { TransferableOperation, Operation } from './ops';
 import { Credential, SelectCredentialClass } from './credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
 
@@ -376,6 +376,7 @@ export class OperationTx extends BaseTx {
     toBuffer():Buffer {
         this.numOps.writeUInt32BE(this.ops.length, 0);
         let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
+        this.ops = this.ops.sort(TransferableOperation.comparitor());
         for(let i = 0; i < this.ops.length; i++) {
             barr.push(this.ops[i].toBuffer());
         }

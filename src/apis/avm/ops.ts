@@ -122,6 +122,15 @@ export class TransferableOperation {
     protected utxoIDs:Array<UTXOID> = [];
     protected operation:Operation;
 
+    /**
+     * Returns a function used to sort an array of [[TransferableOperation]]s
+     */
+    static comparitor = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
+        return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
+            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+        }
+    }
+
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
         offset += 32;
@@ -144,6 +153,7 @@ export class TransferableOperation {
         numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
         let bsize:number = this.assetid.length + numutxoIDs.length;
         let barr:Array<Buffer> = [this.assetid, numutxoIDs];
+        this.utxoIDs = this.utxoIDs.sort(UTXOID.comparitor());
         for(let i = 0; i < this.utxoIDs.length; i++) {
             let b:Buffer = this.utxoIDs[i].toBuffer();
             barr.push(b);
