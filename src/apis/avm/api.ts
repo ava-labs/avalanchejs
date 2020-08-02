@@ -6,16 +6,12 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
-import { JRPCAPI, RequestResponseData, Defaults } from '../../utils/types';
+import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from "../../utils/types";
 import { UTXOSet } from './utxos';
-import {
-  MergeRule, UnixNow, AVMConstants, InitialStates,
-} from './types';
+import { MergeRule, UnixNow, AVMConstants, InitialStates, } from './types';
 import { AVMKeyChain } from './keychain';
-import { Tx, UnsignedTx, BaseTx } from './tx';
-import { TransferableInput, AmountInput } from './inputs';
-import { TransferableOutput, AmountOutput } from './outputs';
-import { AVM } from 'src';
+import { Tx, UnsignedTx } from './tx';
+import { PayloadBase } from '../../utils/payload';
 
 /**
  * @ignore
@@ -185,6 +181,28 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
+   * Helper function which determines if a tx is a goose egg transaction. 
+   *
+   * @param utx An UnsignedTx
+   *
+   * @returns boolean true if passes goose egg test and false if fails.
+   *
+   * @remarks
+   * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
+   */
+  checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
+    const avaxAssetID:Buffer = await this.getAVAAssetID();
+    const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    const fee:BN = utx.getBurn(avaxAssetID);
+
+    if(fee.lte(AVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
      * Gets the balance of a particular asset on a blockchain.
      *
      * @param address The address to pull the asset balance from
@@ -266,8 +284,8 @@ class AVMAPI extends JRPCAPI {
      * @param name The human-readable name for the asset
      * @param symbol Optional. The shorthand symbol for the asset -- between 0 and 4 characters
      * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
-     * @param minterSets  is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
-     *
+     * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+     * 
      * ```js
      * Example minterSets:
      * [
@@ -551,28 +569,6 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Helper function which determines if a tx is a goose egg transaction. 
-     *
-     * @param utx An UnsignedTx
-     *
-     * @returns boolean true if passes goose egg test and false if fails.
-     *
-     * @remarks
-     * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
-     */
-  checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
-    const avaxAssetID:Buffer = await this.getAVAAssetID();
-    const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
-    const fee:BN = utx.getBurn(avaxAssetID);
-
-    if(fee.lte(AVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
      * Helper function which creates an unsigned transaction. For more granular control, you may create your own
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
@@ -678,44 +674,160 @@ class AVMAPI extends JRPCAPI {
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
      *
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
-     *
+     * 
      */
   buildCreateAssetTx = async (
-    utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>,
-    initialStates:InitialStates, name:string,
-    symbol:string, denomination:number,
+      utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
+      initialStates:InitialStates, name:string, 
+      symbol:string, denomination:number
   ):Promise<UnsignedTx> => {
-    const creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, 'buildCreateAssetTx').map((a) => bintools.stringToAddress(a));
-    /* istanbul ignore next */
-    if (symbol.length > AVMConstants.SYMBOLMAXLEN) {
+      let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of ${AVMConstants.SYMBOLMAXLEN}`);
-    }
-    /* istanbul ignore next */
-    if (name.length > AVMConstants.ASSETNAMELEN) {
+      if(symbol.length > AVMConstants.SYMBOLMAXLEN){
+          /* istanbul ignore next */
+          throw new Error("Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+      }
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of ${AVMConstants.ASSETNAMELEN}`);
-    }
-    const avaAssetID:Buffer = await this.getAVAAssetID();
-    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
-      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
-      fee, creators, initialStates, name, symbol, denomination,
-    );
+      if(name.length > AVMConstants.ASSETNAMELEN) {
+        /* istanbul ignore next */
+        throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+      }
 
+      const avaAssetID:Buffer = await this.getAVAAssetID();
+      const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        fee, creators, initialStates, name, symbol, denomination,
+      );
+  
+      if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        throw new Error("Failed Goose Egg Check");
+      }
+  
+      return builtUnsignedTx;
+    };
+
+  /**
+   * Creates an unsigned transaction. For more granular control, you may create your own
+    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+    * 
+    * @param utxoset A set of UTXOs that the transaction is built on
+    * @param fee The amount of AVA to be paid for fees, in $nAVA
+    * @param feePayingAddresses The addresses to pay the fees
+    * @param name String for the descriptive name of the asset
+    * @param symbol String for the ticker symbol of the asset
+    * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+    * @param locktime Optional. The locktime field created in the resulting mint output
+    * 
+    * ```js
+    * Example minterSets:
+    * [
+    *      {
+    *          "minters":[
+    *              "X-4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+    *          ],
+    *          "threshold": 1
+    *      },
+    *      {
+    *          "minters": [
+    *              "X-dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+    *              "X-2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+    *              "X-7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+    *          ],
+    *          "threshold": 2
+    *      }
+    * ]
+    * ```
+    * 
+    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
+    * 
+    */
+   buildCreateNFTAssetTx = async (
+    utxoset:UTXOSet, fee:BN, feePayingAddresses:Array<string> | Array<Buffer>, 
+    name:string, symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0)
+      ): Promise<UnsignedTx> => {
+    let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+      
+    if(name.length > AVMConstants.ASSETNAMELEN) {
+        throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+    }
+    if(symbol.length > AVMConstants.SYMBOLMAXLEN){
+        throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+    }
+    let avaAssetID:Buffer = await this.getAVAAssetID();
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTAssetTx(
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        fee, feeAddrs, minterSets, name, symbol, locktime
+    );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       throw new Error("Failed Goose Egg Check");
     }
-
     return builtUnsignedTx;
-  };
+}
 
   /**
-     * Helper function which takes an unsigned transaction and signs it, returning the resulting [[Tx]].
-     *
-     * @param utx The unsigned transaction of type [[UnsignedTx]]
-     *
-     * @returns A signed transaction of type [[Tx]]
-     */
+   * Creates an unsigned transaction. For more granular control, you may create your own
+    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+    * 
+    * @param utxoset  A set of UTXOs that the transaction is built on
+    * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
+    * @param toAddresses The addresses to send the nft output
+    * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
+    * @param fee The amount of fees being paid for this transaction
+    * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param groupID Optional. The group this NFT is issued to.
+    * @param locktime Optional. The locktime field created in the resulting mint output
+    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+    * @param payload Optional. Data for NFT Payload.
+    * 
+    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
+    * 
+    */
+  buildCreateNFTMintTx = async (
+      utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>|Array<Buffer>, 
+      fromAddresses:Array<string>|Array<Buffer>, fee:BN,
+      feeAddresses:Array<string>|Array<Buffer>, asOf:BN = UnixNow(), groupID:number = 0, 
+      locktime:BN = new BN(0), threshold:number = 1, payload:PayloadBase|Buffer = undefined
+  ): Promise<any> => {
+      let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+      let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+      let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+      let payloadBuf:Buffer = payload as Buffer;
+
+      if(typeof utxoid === 'string') {
+          utxoid = [utxoid];
+      }
+
+      let avaAssetID:Buffer = await this.getAVAAssetID();
+
+      const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
+          this.core.getNetworkID(),
+          bintools.cb58Decode(this.blockchainID),
+          avaAssetID,
+          fee,
+          feeAddrs,
+          to,
+          from,
+          utxoid,
+          asOf,
+          groupID,
+          locktime,
+          threshold,
+          payloadBuf,
+      );
+      if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        throw new Error("Failed Goose Egg Check");
+      }
+      return builtUnsignedTx;
+  }
+
+  /**
+   * Helper function which takes an unsigned transaction and signs it, returning the resulting [[Tx]].
+    *
+    * @param utx The unsigned transaction of type [[UnsignedTx]]
+    *
+    * @returns A signed transaction of type [[Tx]]
+    */
   signTx = (utx:UnsignedTx):Tx => this.keychain.signTx(utx);
 
   /**

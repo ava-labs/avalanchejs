@@ -27,11 +27,17 @@ export class AVMConstants {
 
   static SECPFXID:number = 0;
 
+  static NFTFXID:number = 1;
+
   static SECPOUTPUTID:number = 7;
 
   static NFTXFEROUTPUTID:number = 11;
 
+  static NFTMINTOUTPUTID:number = 10;
+
   static SECPINPUTID:number = 5;
+
+  static NFTMINTOPID:number = 12;
 
   static NFTXFEROP:number = 13;
 
@@ -43,7 +49,7 @@ export class AVMConstants {
 
   static SECPCREDENTIAL:number = 9;
 
-  static NFTCREDENTIAL:number = 16;
+  static NFTCREDENTIAL:number = 14;
 
   static ASSETIDLEN:number = 32;
 

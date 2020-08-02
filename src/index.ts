@@ -112,31 +112,24 @@ export { DB };
 export { CoreTypes };
 export { AvalancheCore };
 
+export * from './avalanche';
 export * from './apis/avm/api';
-export * from './utils/types';
+export * from './apis/admin/api';
+export * from './apis/keystore/api';
+export * from './apis/platform/api';
 export * from './utils/bintools';
+export * from './utils/db';
+export * from './utils/payload';
+export * from './utils/types';
 
-export {
-  SelectCredentialClass, Credential, SecpCredential, NFTCredential,
-} from './apis/avm/credentials';
-export {
-  SelectInputClass, Input, TransferableInput, AmountInput, SecpInput,
-} from './apis/avm/inputs';
-export { AVMKeyPair, AVMKeyChain } from './apis/avm/keychain';
-export {
-  SelectOperationClass, Operation, TransferableOperation, NFTTransferOperation,
-} from './apis/avm/ops';
-export {
-  SelectOutputClass, Output, TransferableOutput, AmountOutput, SecpOutput,
-  NFTOutBase, NFTTransferOutput,
-} from './apis/avm/outputs';
-export {
-  BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx,
-} from './apis/avm/tx';
-export {
-  SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow,
-} from './apis/avm/types';
-export { UTXO, UTXOSet } from './apis/avm/utxos';
+export {SelectCredentialClass, Credential, SecpCredential, NFTCredential} from './apis/avm/credentials';
+export {SelectInputClass, Input, TransferableInput, AmountInput, SecpInput} from './apis/avm/inputs';
+export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
+export {SelectOperationClass,Operation, TransferableOperation, NFTTransferOperation, NFTMintOperation} from  './apis/avm/ops';
+export {SelectOutputClass, Output, TransferableOutput, AmountOutput, SecpOutput, NFTOutBase, NFTTransferOutput, NFTMintOutput} from './apis/avm/outputs';
+export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx';
+export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
+export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
 export { PlatformKeyPair, PlatformKeyChain } from './apis/platform/keychain';
 

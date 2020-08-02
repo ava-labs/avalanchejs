@@ -5,7 +5,8 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { UTXOID, AVMConstants, SigIdx } from './types';
-import { NFTTransferOutput } from './outputs';
+import { NFTTransferOutput, OutputOwners } from './outputs';
+import BN from "bn.js";
 
 const bintools = BinTools.getInstance();
 
@@ -17,13 +18,16 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Operation]]-extended class.
  */
 export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation => {
-  if (opid === AVMConstants.NFTXFEROP) {
-    const nftop:NFTTransferOperation = new NFTTransferOperation(...args);
-    return nftop;
-  }
-  /* istanbul ignore next */
-  throw new Error(`Error - SelectOperationClass: unknown opid ${opid}`);
-};
+    if(opid == AVMConstants.NFTMINTOPID){
+        let nftop:NFTMintOperation = new NFTMintOperation(...args);
+        return nftop;
+    } else if(opid == AVMConstants.NFTXFEROP){
+        let nftop:NFTTransferOperation = new NFTTransferOperation(...args);
+        return nftop;
+    }
+    /* istanbul ignore next */
+    throw new Error("Error - SelectOperationClass: unknown opid " + opid);
+}
 
 /**
  * A class representing an operation. All operation types must extend on this class.
@@ -113,6 +117,15 @@ export class TransferableOperation {
 
   protected operation:Operation;
 
+    /**
+     * Returns a function used to sort an array of [[TransferableOperation]]s
+     */
+    static comparitor = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
+        return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
+            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+        }
+    }
+
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
@@ -135,6 +148,7 @@ export class TransferableOperation {
     numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
     let bsize:number = this.assetid.length + numutxoIDs.length;
     const barr:Array<Buffer> = [this.assetid, numutxoIDs];
+    this.utxoIDs = this.utxoIDs.sort(UTXOID.comparitor());
     for (let i = 0; i < this.utxoIDs.length; i++) {
       const b:Buffer = this.utxoIDs[i].toBuffer();
       barr.push(b);
@@ -186,6 +200,127 @@ export class TransferableOperation {
       }
     }
   }
+}
+
+/**
+ * A [[Operation]] class which specifies a NFT Mint Op.
+ */
+export class NFTMintOperation extends Operation {
+    protected groupID:Buffer = Buffer.alloc(4);
+    protected payload:Buffer;
+    protected outputOwners:Array<OutputOwners> = [];
+
+    /**
+     * Returns the operation ID.
+     */
+    getOperationID():number {
+        return AVMConstants.NFTMINTOPID;
+    }
+
+    /**
+     * Returns the payload.
+     */
+    getPayload = ():Buffer => {
+        return this.payload;
+    }
+
+    /**
+     * Returns the outputOwners.
+     */
+    getOutputOwners = ():Array<OutputOwners> => {
+        return this.outputOwners;
+    }
+
+    /**
+     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the size of the output.
+     */
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(bytes, offset);
+        this.groupID = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let payloadLen:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.payload = bintools.copyFrom(bytes, offset, offset + payloadLen);
+        offset += payloadLen;
+        let numoutputs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+        offset += 4;
+        this.outputOwners = [];
+        for(let i:number = 0; i < numoutputs; i++) {
+            let locktime:BN = bintools.fromBufferToBN(bintools.copyFrom(bytes, offset, offset + 8));
+            offset += 8;
+            let threshold:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+            offset += 4;
+            let numaddrs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+            offset += 4;
+            let addrs:Array<Buffer> = [];
+            for(let j:number = 0; j < numaddrs; j++) {
+                let addr:Buffer = bintools.copyFrom(bytes, offset, offset + 20);
+                addrs.push(addr);
+                offset += 20;
+            }
+            let outputOwner:OutputOwners = new OutputOwners(locktime, threshold, addrs);
+            this.outputOwners.push(outputOwner);
+        }
+        return offset;
+    }
+
+    /**
+     * Returns the buffer representing the [[NFTMintOperation]] instance.
+     */
+    toBuffer():Buffer {
+        let superbuff:Buffer = super.toBuffer();
+        let payloadlen:Buffer = Buffer.alloc(4);
+        payloadlen.writeUInt32BE(this.payload.length, 0);
+
+        let outputownerslen:Buffer = Buffer.alloc(4);
+        outputownerslen.writeUInt32BE(this.outputOwners.length, 0);
+
+        let bsize:number = 
+          superbuff.length + 
+          this.groupID.length + 
+          payloadlen.length + 
+          this.payload.length +
+          outputownerslen.length; 
+
+        let barr:Array<Buffer> = [
+            superbuff, 
+            this.groupID,
+            payloadlen,
+            this.payload, 
+            outputownerslen
+        ];
+
+        for(let i = 0; i < this.outputOwners.length; i++) {
+            let b:Buffer = this.outputOwners[i].toBuffer();
+            barr.push(b);
+            bsize += b.length;
+        }
+
+        return Buffer.concat(barr,bsize);
+    }
+
+    /**
+     * Returns a base-58 string representing the [[NFTMintOperation]].
+     */
+    toString():string {
+        return bintools.bufferToB58(this.toBuffer());
+    }
+
+    /**
+     * An [[Operation]] class which contains an NFT on an assetID.
+     * 
+     * @param groupID The group to which to issue the NFT Output
+     * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
+     * @param outputOwners An array of outputOwners
+     */
+    constructor(groupID:number = undefined, payload:Buffer = undefined, outputOwners:Array<OutputOwners> = undefined){
+        super();
+        if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && outputOwners.length) {
+            this.groupID.writeUInt32BE((groupID ? groupID : 0), 0);
+            this.payload = payload;
+            this.outputOwners = outputOwners;
+        }
+    }
 }
 
 /**

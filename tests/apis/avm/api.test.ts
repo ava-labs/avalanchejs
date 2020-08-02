@@ -1,16 +1,16 @@
 import mockAxios from 'jest-mock-axios';
-import { Avalanche, AVM } from 'src';
-import AVMAPI, { PersistanceOptions } from 'src/apis/avm/api';
+import { Avalanche, MinterSet } from "src";
+import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
+import {Buffer} from "buffer/";
+import BN from "bn.js";
 import BinTools from 'src/utils/bintools';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
-import createHash from 'create-hash';
+import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
-import { TransferableOutput, SecpOutput } from 'src/apis/avm/outputs';
+import { TransferableOutput, SecpOutput, NFTMintOutput, OutputOwners } from 'src/apis/avm/outputs';
 import { NFTTransferOutput } from '../../../src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from '../../../src/apis/avm/ops';
 
@@ -166,50 +166,50 @@ describe('AVMAPI', () => {
     expect(response).toBe(key);
   });
 
-  test('exportAVA', async () => {
-    const amount = new BN(100);
-    const to = 'abcdef';
-    const username = 'Robert';
-    const password = 'Paulson';
-    const txID = 'valid';
-    const result:Promise<string> = api.exportAVA(username, password, to, amount);
-    const payload:object = {
-      result: {
-        txID,
-      },
+  test("exportAVA", async ()=>{
+    let amount = new BN(100);
+    let to = "abcdef";
+    let username = "Robert";
+    let password = "Paulson";
+    let txID = "valid";
+    let result:Promise<string> = api.exportAVA(username, password, to, amount);
+    let payload:object = {
+        "result": {
+            "txID": txID
+        }
     };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(txID);
-  });
-
-  test('importAVA', async () => {
-    const to = 'abcdef';
-    const username = 'Robert';
-    const password = 'Paulson';
-    const txID = 'valid';
-    const result:Promise<string> = api.importAVA(username, password, to);
-    const payload:object = {
-      result: {
-        txID,
-      },
-    };
-    const responseObj = {
-      data: payload,
+    let responseObj = {
+        data: payload
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+    let response:string = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(txID);
-  });
+});
+
+  test("importAVA", async ()=>{
+    let to = "abcdef";
+    let username = "Robert";
+    let password = "Paulson";
+    let txID = "valid";
+    let result:Promise<string> = api.importAVA(username, password, to);
+    let payload:object = {
+        "result": {
+            "txID": txID
+        }
+    };
+    let responseObj = {
+        data: payload
+    };
+
+    mockAxios.mockResponse(responseObj);
+    let response:string = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(txID);
+});
 
   test('createAddress', async () => {
     const alias = 'randomalias';
@@ -534,7 +534,11 @@ describe('AVMAPI', () => {
     let secpbase2:SecpOutput;
     let secpbase3:SecpOutput;
     let initialState:InitialStates;
-    const nftutxoids:Array<string> = [];
+    let nftpbase1:NFTMintOutput;
+    let nftpbase2:NFTMintOutput;
+    let nftpbase3:NFTMintOutput;
+    let nftInitialState:InitialStates;
+    let nftutxoids:Array<string> = [];
     let avm:AVMAPI;
     const fee:number = 10;
     const name:string = 'Mortycoin is the dumb as a sack of hammers.';
@@ -569,6 +573,7 @@ describe('AVMAPI', () => {
       inputs = [];
       outputs = [];
       ops = [];
+      nftutxoids = [];
       const pload:Buffer = Buffer.alloc(1024);
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
 
@@ -621,6 +626,14 @@ describe('AVMAPI', () => {
       initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
       initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
       initialState.addOutput(secpbase3, AVMConstants.SECPFXID);
+
+      nftpbase1 = new NFTMintOutput(0, locktime, 1, addrs1.map(a => api.parseAddress(a)));
+      nftpbase2 = new NFTMintOutput(1, locktime, 1, addrs2.map(a => api.parseAddress(a)));
+      nftpbase3 = new NFTMintOutput(2, locktime, 1, addrs3.map(a => api.parseAddress(a)));
+      nftInitialState = new InitialStates();
+      nftInitialState.addOutput(nftpbase1, AVMConstants.NFTFXID);
+      nftInitialState.addOutput(nftpbase2, AVMConstants.NFTFXID);
+      nftInitialState.addOutput(nftpbase3, AVMConstants.NFTFXID);
     });
 
     test('buildBaseTx1', async () => {
@@ -687,7 +700,6 @@ describe('AVMAPI', () => {
     test('issueTx Serialized', async () => {
       const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
       const tx = avm.signTx(txu);
-
       const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
       const result:Promise<string> = avm.issueTx(tx.toString());
@@ -699,66 +711,107 @@ describe('AVMAPI', () => {
       const responseObj = {
         data: payload,
       };
-
       mockAxios.mockResponse(responseObj);
-      const response:string = await result;
+        let response:string = await result;
 
-      expect(response).toBe(txid);
-    });
+        expect(response).toBe(txid);
+      });
 
-    test('issueTx Buffer', async () => {
-      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
-      const tx = avm.signTx(txu);
+      test('issueTx Buffer', async () => {
+        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
+        const tx = avm.signTx(txu);
+  
+        const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+        const result:Promise<string> = avm.issueTx(tx.toBuffer());
+        const payload:object = {
+          result: {
+            txID: txid,
+          },
+        };
+        const responseObj = {
+          data: payload,
+        };
+  
+        mockAxios.mockResponse(responseObj);
+        const response:string = await result;
+  
+        expect(response).toBe(txid);
+      });
+      test('issueTx Class Tx', async () => {
+        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
+        const tx = avm.signTx(txu);
+  
+        const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+  
+        const result:Promise<string> = avm.issueTx(tx);
+        const payload:object = {
+          result: {
+            txID: txid,
+          },
+        };
+        const responseObj = {
+          data: payload,
+        };
+  
+        mockAxios.mockResponse(responseObj);
+        const response:string = await result;
+  
+        expect(response).toBe(txid);
+      });
 
-      const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-      const result:Promise<string> = avm.issueTx(tx.toBuffer());
-      const payload:object = {
-        result: {
-          txID: txid,
-        },
-      };
-      const responseObj = {
-        data: payload,
-      };
+      test('buildCreateAssetTx', async () => {
+        const txu1:UnsignedTx = await avm.buildCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
+  
+        const txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), assetID, new BN(fee), addrs1.map((a) => avm.parseAddress(a)), initialState, name, symbol, denomination);
+  
+        expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+        expect(txu2.toString()).toBe(txu1.toString());
+      });
 
-      mockAxios.mockResponse(responseObj);
-      const response:string = await result;
+      test('buildCreateNFTAssetTx', async () => {
+        let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
+        let locktime:BN = new BN(0);
 
-      expect(response).toBe(txid);
-    });
+        let txu1:UnsignedTx = await avm.buildCreateNFTAssetTx(
+            set, new BN(fee), addrs1, 
+            name, symbol, minterSets, locktime
+        );
+        
+        let txu2:UnsignedTx = set.buildCreateNFTAssetTx(
+            avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
+            assetID, new BN(fee), addrs1.map(a => avm.parseAddress(a)), minterSets, 
+            name, symbol, locktime
+        );
 
-    test('issueTx Class Tx', async () => {
-      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
-      const tx = avm.signTx(txu);
+        expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
+        expect(txu2.toString()).toBe(txu1.toString());
+    }); 
 
-      const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+    test('buildCreateNFTMintTx', async () => {
+      let fee:number = 0;
+      let groupID:number = 0;
+      let locktime:BN = new BN(0);
+      let threshold:number = 1;
+      let payload:Buffer = Buffer.from("Avalanche");
+      let addrbuff1: Buffer[] = addrs1.map(a => avm.parseAddress(a));
+      let addrbuff3: Buffer[] = addrs3.map(a => avm.parseAddress(a));
+      let outputOwners:Array<OutputOwners> = [];
+      outputOwners.push(new OutputOwners(locktime, threshold, addrbuff3));
 
-      const result:Promise<string> = avm.issueTx(tx);
-      const payload:object = {
-        result: {
-          txID: txid,
-        },
-      };
-      const responseObj = {
-        data: payload,
-      };
+      let txu1:UnsignedTx = await avm.buildCreateNFTMintTx(
+          set, nftutxoids, addrs3, addrs3, new BN(fee), addrs1,
+          UnixNow(), groupID, locktime, threshold, payload
+      );
 
-      mockAxios.mockResponse(responseObj);
-      const response:string = await result;
+      let txu2:UnsignedTx = set.buildCreateNFTMintTx(
+          avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
+          assetID, new BN(fee), addrbuff1, addrbuff3, addrbuff3, nftutxoids, UnixNow(), 
+          groupID, locktime, threshold, payload
+      );
 
-      expect(response).toBe(txid);
-    });
-
-    test('buildCreateAssetTx', async () => {
-      const txu1:UnsignedTx = await avm.buildCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
-
-      expect(mockAxios.request).toHaveBeenCalledTimes(1);
-
-      const txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), assetID, new BN(fee), addrs1.map((a) => avm.parseAddress(a)), initialState, name, symbol, denomination);
-
-      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
       expect(txu2.toString()).toBe(txu1.toString());
-    });
+  });
 
     test('buildNFTTransferTx', async () => {
       const pload:Buffer = Buffer.alloc(1024);
@@ -779,69 +832,69 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
     });
-  });
 
-  test('buildGenesis', async () => {
-    const genesisData:object = {
-      genesisData: {
-        assetAlias1: {
-          name: 'human readable name',
-          symbol: 'AVAL',
-          initialState: {
-            fixedCap: [
-              {
-                amount: 1000,
-                address: 'A',
-              },
-              {
-                amount: 5000,
-                address: 'B',
-              },
-            ],
-          },
-        },
-        assetAliasCanBeAnythingUnique: {
-          name: 'human readable name',
-          symbol: 'AVAL',
-          initialState: {
-            variableCap: [
-              {
-                minters: [
-                  'A',
-                  'B',
-                ],
-                threshold: 1,
-              },
-              {
-                minters: [
-                  'A',
-                  'B',
-                  'C',
-                ],
-                threshold: 2,
-              },
-            ],
-          },
-        },
-      },
-    };
-    const bytes:string = '111TNWzUtHKoSvxohjyfEwE2X228ZDGBngZ4mdMUVMnVnjtnawW1b1zbAhzyAM1v6d7ECNj6DXsT7qDmhSEf3DWgXRj7ECwBX36ZXFc9tWVB2qHURoUfdDvFsBeSRqatCmj76eZQMGZDgBFRNijRhPNKUap7bCeKpHDtuCZc4YpPkd4mR84dLL2AL1b4K46eirWKMaFVjA5btYS4DnyUx5cLpAq3d35kEdNdU5zH3rTU18S4TxYV8voMPcLCTZ3h4zRsM5jW1cUzjWVvKg7uYS2oR9qXRFcgy1gwNTFZGstySuvSF7MZeZF4zSdNgC4rbY9H94RVhqe8rW7MXqMSZB6vBTB2BpgF6tNFehmYxEXwjaKRrimX91utvZe9YjgGbDr8XHsXCnXXg4ZDCjapCy4HmmRUtUoAduGNBdGVMiwE9WvVbpMFFcNfgDXGz9NiatgSnkxQALTHvGXXm8bn4CoLFzKnAtq3KwiWqHmV3GjFYeUm3m8Zee9VDfZAvDsha51acxfto1htstxYu66DWpT36YT18WSbxibZcKXa7gZrrsCwyzid8CCWw79DbaLCUiq9u47VqofG1kgxwuuyHb8NVnTgRTkQASSbj232fyG7YeX4mAvZY7a7K7yfSyzJaXdUdR7aLeCdLP6mbFDqUMrN6YEkU2X8d4Ck3T';
+    test('buildGenesis', async ()=>{
+        let genesisData:object = {
+            genesisData : {
+                assetAlias1: {
+                    name: "human readable name",
+                    symbol: "AVAL",
+                    initialState: {
+                        fixedCap : [
+                            {
+                                amount: 1000,
+                                address: "A"
+                            },
+                            {
+                                amount: 5000,
+                                address: "B"
+                            },
+                        ]
+                    }
+                },
+                assetAliasCanBeAnythingUnique: {
+                    name: "human readable name",
+                    symbol: "AVAL",
+                    initialState: {
+                        variableCap : [
+                            {
+                                minters: [
+                                    "A",
+                                    "B"
+                                ],
+                                threshold: 1
+                            },
+                            {
+                                minters: [
+                                    "A",
+                                    "B",
+                                    "C"
+                                ],
+                                threshold: 2
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+        let bytes:string = "111TNWzUtHKoSvxohjyfEwE2X228ZDGBngZ4mdMUVMnVnjtnawW1b1zbAhzyAM1v6d7ECNj6DXsT7qDmhSEf3DWgXRj7ECwBX36ZXFc9tWVB2qHURoUfdDvFsBeSRqatCmj76eZQMGZDgBFRNijRhPNKUap7bCeKpHDtuCZc4YpPkd4mR84dLL2AL1b4K46eirWKMaFVjA5btYS4DnyUx5cLpAq3d35kEdNdU5zH3rTU18S4TxYV8voMPcLCTZ3h4zRsM5jW1cUzjWVvKg7uYS2oR9qXRFcgy1gwNTFZGstySuvSF7MZeZF4zSdNgC4rbY9H94RVhqe8rW7MXqMSZB6vBTB2BpgF6tNFehmYxEXwjaKRrimX91utvZe9YjgGbDr8XHsXCnXXg4ZDCjapCy4HmmRUtUoAduGNBdGVMiwE9WvVbpMFFcNfgDXGz9NiatgSnkxQALTHvGXXm8bn4CoLFzKnAtq3KwiWqHmV3GjFYeUm3m8Zee9VDfZAvDsha51acxfto1htstxYu66DWpT36YT18WSbxibZcKXa7gZrrsCwyzid8CCWw79DbaLCUiq9u47VqofG1kgxwuuyHb8NVnTgRTkQASSbj232fyG7YeX4mAvZY7a7K7yfSyzJaXdUdR7aLeCdLP6mbFDqUMrN6YEkU2X8d4Ck3T"
 
-    const result:Promise<string> = api.buildGenesis(genesisData);
-    const payload:object = {
-      result: {
-        bytes,
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
+        let result:Promise<string> = api.buildGenesis(genesisData);
+        let payload:object = {
+            "result": {
+                'bytes': bytes
+            }
+        };
+        let responseObj = {
+            data: payload
+        };
 
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+        mockAxios.mockResponse(responseObj);
+        let response:string = await result;
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(bytes);
+        expect(response).toBe(bytes);
+    });
   });
 });

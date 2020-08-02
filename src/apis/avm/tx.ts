@@ -213,10 +213,13 @@ export class CreateAssetTx extends BaseTx {
      */
   getDenomination = ():number => this.denomination.readUInt8(0);
 
-  /**
+    /**
      * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the denomination
      */
-  getDenominationBuffer = ():Buffer => this.denomination;
+
+    getDenominationBuffer = ():Buffer => {
+        return this.denomination;
+    }
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[CreateAssetTx]], parses it, populates the class, and returns the length of the [[CreateAssetTx]] in bytes.
@@ -343,15 +346,15 @@ export class OperationTx extends BaseTx {
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
      */
-  toBuffer():Buffer {
-    this.numOps.writeUInt32BE(this.ops.length, 0);
-    const barr:Array<Buffer> = [super.toBuffer(), this.numOps];
-    for (let i = 0; i < this.ops.length; i++) {
-      barr.push(this.ops[i].toBuffer());
+    toBuffer():Buffer {
+        this.numOps.writeUInt32BE(this.ops.length, 0);
+        let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
+        this.ops = this.ops.sort(TransferableOperation.comparitor());
+        for(let i = 0; i < this.ops.length; i++) {
+            barr.push(this.ops[i].toBuffer());
+        }
+        return Buffer.concat(barr);
     }
-    return Buffer.concat(barr);
-  }
-
   /**
      * Returns an array of [[Operation]]s in this transaction.
      */

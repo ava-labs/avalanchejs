@@ -1,68 +1,84 @@
 import mockAxios from 'jest-mock-axios';
-import { Avalanche } from 'src';
-import AVMAPI from 'src/apis/avm/api';
-import AdminAPI from 'src/apis/admin/api';
-import PlatformAPI from 'src/apis/platform/api';
-import KeystoreAPI from 'src/apis/keystore/api';
-import { AxiosRequestConfig } from 'axios';
+import { Avalanche } from "src";
+import AVMAPI  from "src/apis/avm/api";
+import AdminAPI  from "src/apis/admin/api";
+import HealthAPI from 'src/apis/health/api';
+import InfoAPI  from "src/apis/info/api";
+import KeystoreAPI  from "src/apis/keystore/api";
+import MetricsAPI  from "src/apis/metrics/api";
+import PlatformAPI  from "src/apis/platform/api";
 import { TestAPI } from './testlib';
+import { AxiosRequestConfig } from 'axios';
 
 describe('Avalanche', () => {
-  const blockchainid:string = '6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF';
-  const ip = '127.0.0.1';
-  const port = 9650;
-  const protocol = 'https';
-  let avalanche:Avalanche;
-  beforeAll(() => {
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
-    avalanche.addAPI('admin', AdminAPI);
-    avalanche.addAPI('avm', AVMAPI, '/ext/subnet/avm', blockchainid);
-    avalanche.addAPI('keystore', KeystoreAPI);
-    avalanche.addAPI('platform', PlatformAPI);
-  });
-  test('Can initialize', () => {
-    expect(avalanche.getIP()).toBe(ip);
-    expect(avalanche.getPort()).toBe(port);
-    expect(avalanche.getProtocol()).toBe(protocol);
-    expect(avalanche.getURL()).toBe(`${protocol}://${ip}:${port}`);
-    expect(avalanche.getNetworkID()).toBe(12345);
-    avalanche.setNetworkID(50);
-    expect(avalanche.getNetworkID()).toBe(50);
-    avalanche.setNetworkID(12345);
-    expect(avalanche.getNetworkID()).toBe(12345);
-  });
+    const blockchainid:string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF";
+    const ip = '127.0.0.1';
+    const port = 9650;
+    const protocol = "https";
+    let avalanche:Avalanche;
+    beforeAll(() => {
+        avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
+        avalanche.addAPI("admin", AdminAPI);
+        avalanche.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
+        avalanche.addAPI("health", HealthAPI);
+        avalanche.addAPI("info", InfoAPI);
+        avalanche.addAPI("keystore", KeystoreAPI);
+        avalanche.addAPI("metrics", MetricsAPI);
+        avalanche.addAPI("platform", PlatformAPI);
+    });
+    test('Can initialize', () => {
+        expect(avalanche.getIP()).toBe(ip);
+        expect(avalanche.getPort()).toBe(port);
+        expect(avalanche.getProtocol()).toBe(protocol);
+        expect(avalanche.getURL()).toBe(`${protocol}://${ip}:${port}`);
+        expect(avalanche.getNetworkID()).toBe(12345);
+        avalanche.setNetworkID(50);
+        expect(avalanche.getNetworkID()).toBe(50);
+        avalanche.setNetworkID(12345);
+        expect(avalanche.getNetworkID()).toBe(12345);
+    });
 
-  test('Endpoints correct', () => {
-    expect(avalanche.Admin()).not.toBeInstanceOf(AVMAPI);
-    expect(avalanche.Admin()).toBeInstanceOf(AdminAPI);
+    test('Endpoints correct', () => {
+        expect(avalanche.Admin()).not.toBeInstanceOf(AVMAPI);
+        expect(avalanche.Admin()).toBeInstanceOf(AdminAPI);
+        
+        expect(avalanche.AVM()).not.toBeInstanceOf(AdminAPI);
+        expect(avalanche.AVM()).toBeInstanceOf(AVMAPI);
 
-    expect(avalanche.AVM()).not.toBeInstanceOf(AdminAPI);
-    expect(avalanche.AVM()).toBeInstanceOf(AVMAPI);
+        expect(avalanche.Health()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Health()).toBeInstanceOf(HealthAPI);
 
-    expect(avalanche.Platform()).not.toBeInstanceOf(KeystoreAPI);
-    expect(avalanche.Platform()).toBeInstanceOf(PlatformAPI);
+        expect(avalanche.Info()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Info()).toBeInstanceOf(InfoAPI);
+        
+        expect(avalanche.Platform()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Platform()).toBeInstanceOf(PlatformAPI);
 
-    expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
-    expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
+        expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
 
-    expect(avalanche.Admin().getRPCID()).toBe(1);
-    expect(avalanche.AVM().getRPCID()).toBe(1);
-    expect(avalanche.Platform().getRPCID()).toBe(1);
-    expect(avalanche.NodeKeys().getRPCID()).toBe(1);
-  });
+        expect(avalanche.Metrics()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.Metrics()).toBeInstanceOf(MetricsAPI);
 
-  test('Create new API', () => {
-    avalanche.addAPI('avm2', AVMAPI);
-    expect(avalanche.api('avm2')).toBeInstanceOf(AVMAPI);
+        expect(avalanche.Admin().getRPCID()).toBe(1);
+        expect(avalanche.AVM().getRPCID()).toBe(1);
+        expect(avalanche.Platform().getRPCID()).toBe(1);
+        expect(avalanche.NodeKeys().getRPCID()).toBe(1);
+    });
 
-    avalanche.addAPI('keystore2', KeystoreAPI, '/ext/keystore2');
-    expect(avalanche.api('keystore2')).toBeInstanceOf(KeystoreAPI);
+    test('Create new API', () => {
+        avalanche.addAPI("avm2", AVMAPI);
+        expect(avalanche.api("avm2")).toBeInstanceOf(AVMAPI);
 
-    avalanche.api('keystore2').setBaseURL('/ext/keystore3');
-    expect(avalanche.api('keystore2').getBaseURL()).toBe('/ext/keystore3');
+        avalanche.addAPI("keystore2", KeystoreAPI, "/ext/keystore2");
+        expect(avalanche.api("keystore2")).toBeInstanceOf(KeystoreAPI);
 
-    expect(avalanche.api('keystore2').getDB()).toHaveProperty('namespace');
-  });
+        avalanche.api("keystore2").setBaseURL("/ext/keystore3");
+        expect(avalanche.api("keystore2").getBaseURL()).toBe("/ext/keystore3");
+
+        expect(avalanche.api("keystore2").getDB()).toHaveProperty("namespace");
+    });
+
 });
 
 describe('HTTP Operations', () => {
