@@ -419,7 +419,7 @@ export class OperationTx extends BaseTx {
 export class ImportTx extends BaseTx {
   protected numIns:Buffer = Buffer.alloc(4);
 
-  protected ins:Array<TransferableInput> = [];
+  protected importIns:Array<TransferableInput> = [];
 
   /**
      * Returns the id of the [[ImportTx]]
@@ -445,28 +445,28 @@ export class ImportTx extends BaseTx {
     for (let i:number = 0; i < numIns; i++) {
       const anIn:TransferableInput = new TransferableInput();
       offset = anIn.fromBuffer(bytes, offset);
-      this.ins.push(anIn);
+      this.importIns.push(anIn);
     }
     return offset;
   }
 
   /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
-     */
-    toBuffer():Buffer {
-        this.numIns.writeUInt32BE(this.ins.length, 0);
-        let barr:Array<Buffer> = [super.toBuffer(), this.numIns];
-        this.ins = this.ins.sort(TransferableInput.comparator());
-        for(let i = 0; i < this.ins.length; i++) {
-            barr.push(this.ins[i].toBuffer());
-        }
-        return Buffer.concat(barr);
-    }
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
+   */
+  toBuffer():Buffer {
+      this.numIns.writeUInt32BE(this.importIns.length, 0);
+      let barr:Array<Buffer> = [super.toBuffer(), this.numIns];
+      this.importIns = this.importIns.sort(TransferableInput.comparator());
+      for(let i = 0; i < this.importIns.length; i++) {
+          barr.push(this.importIns[i].toBuffer());
+      }
+      return Buffer.concat(barr);
+  }
   /**
      * Returns an array of [[TransferableInput]]s in this transaction.
      */
   getImportInputs():Array<TransferableInput> {
-    return this.ins;
+    return this.importIns;
   }
 
   /**
@@ -479,9 +479,9 @@ export class ImportTx extends BaseTx {
      */
   sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
     const sigs:Array<Credential> = super.sign(msg, kc);
-    for (let i = 0; i < this.ins.length; i++) {
-      const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
+    for (let i = 0; i < this.importIns.length; i++) {
+      const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
+      const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
       for (let j = 0; j < sigidxs.length; j++) {
         const keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
@@ -515,7 +515,7 @@ export class ImportTx extends BaseTx {
           throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       }
-      this.ins = importIns;
+      this.importIns = importIns;
     }
   }
 }
@@ -526,7 +526,7 @@ export class ImportTx extends BaseTx {
 export class ExportTx extends BaseTx {
   protected numOuts:Buffer = Buffer.alloc(4);
 
-  protected outs:Array<TransferableOutput> = [];
+  protected exportOuts:Array<TransferableOutput> = [];
 
   /**
      * Returns the id of the [[ExportTx]]
@@ -552,7 +552,7 @@ export class ExportTx extends BaseTx {
     for (let i:number = 0; i < numOuts; i++) {
       const anOut:TransferableOutput = new TransferableOutput();
       offset = anOut.fromBuffer(bytes, offset);
-      this.outs.push(anOut);
+      this.exportOuts.push(anOut);
     }
     return offset;
   }
@@ -561,11 +561,11 @@ export class ExportTx extends BaseTx {
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
      */
     toBuffer():Buffer {
-        this.numOuts.writeUInt32BE(this.outs.length, 0);
+        this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
         let barr:Array<Buffer> = [super.toBuffer(), this.numOuts];
-        this.outs = this.outs.sort(TransferableOutput.comparator());
-        for(let i = 0; i < this.outs.length; i++) {
-            barr.push(this.outs[i].toBuffer());
+        this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
+        for(let i = 0; i < this.exportOuts.length; i++) {
+            barr.push(this.exportOuts[i].toBuffer());
         }
         return Buffer.concat(barr);
     }
@@ -573,7 +573,7 @@ export class ExportTx extends BaseTx {
      * Returns an array of [[TransferableOutput]]s in this transaction.
      */
   getExportOutputs():Array<TransferableOutput> {
-    return this.outs;
+    return this.exportOuts;
   }
 
   /**
@@ -597,7 +597,7 @@ export class ExportTx extends BaseTx {
           throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
         }
       }
-      this.outs = exportOuts;
+      this.exportOuts = exportOuts;
     }
   }
 }
@@ -806,11 +806,17 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
   if (txtype === AVMConstants.BASETX) {
     const tx:BaseTx = new BaseTx(...args);
     return tx;
-  } if (txtype === AVMConstants.CREATEASSETTX) {
+  } else if (txtype === AVMConstants.CREATEASSETTX) {
     const tx:CreateAssetTx = new CreateAssetTx(...args);
     return tx;
-  } if (txtype === AVMConstants.OPERATIONTX) {
+  } else if (txtype === AVMConstants.OPERATIONTX) {
     const tx:OperationTx = new OperationTx(...args);
+    return tx;
+  } else if (txtype === AVMConstants.IMPORTTX) {
+    const tx:ImportTx = new ImportTx(...args);
+    return tx;
+  } else if (txtype === AVMConstants.EXPORTTX) {
+    const tx:ExportTx = new ExportTx(...args);
     return tx;
   }
   /* istanbul ignore next */

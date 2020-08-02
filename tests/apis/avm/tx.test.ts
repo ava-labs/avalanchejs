@@ -14,6 +14,7 @@ import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 import { Avalanche } from 'src/index';
+import { ImportTx, ExportTx } from '../../../src/apis/avm/tx';
 
 /**
  * @ignore
@@ -31,6 +32,8 @@ describe('Transactions', () => {
   let inputs:Array<TransferableInput>;
   let outputs:Array<TransferableOutput>;
   let ops:Array<TransferableOperation>;
+  let importIns:Array<TransferableInput>;
+  let exportOuts:Array<TransferableOutput>;
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
@@ -88,6 +91,8 @@ describe('Transactions', () => {
     utxos = [];
     inputs = [];
     outputs = [];
+    importIns = [];
+    exportOuts = [];
     ops = [];
     for (let i:number = 0; i < 3; i++) {
       addrs1.push(keymgr1.makeKey());
@@ -130,6 +135,10 @@ describe('Transactions', () => {
       const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
       ops.push(xferop);
       utxos.push(nftutxo);
+    }
+    for(let i:number = 1; i < 4; i++){
+      importIns.push(inputs[i]);
+      exportOuts.push(outputs[i]);
     }
     set.addArray(utxos);
   });
@@ -359,9 +368,35 @@ describe('Transactions', () => {
     const txunew:OperationTx = new OperationTx();
     const opbuff:Buffer = optx.toBuffer();
     txunew.fromBuffer(opbuff);
-    expect(txunew.toBuffer().toString('hex')).toBe(optx.toBuffer().toString('hex'));
+    expect(txunew.toBuffer().toString('hex')).toBe(opbuff.toString('hex'));
     expect(txunew.toString()).toBe(optx.toString());
-    expect(optx.getOperations().length).toBe(5);
+    expect(optx.getOperations().length).toBe(ops.length);
+  });
+
+  test('Creation ImportTx', () => {
+    const importtx:ImportTx = new ImportTx(
+      netid, blockchainID, outputs, inputs, importIns
+    );
+    const txunew:ImportTx = new ImportTx();
+    const importbuff:Buffer = importtx.toBuffer();
+    txunew.fromBuffer(importbuff);
+    
+    expect(txunew.toBuffer().toString('hex')).toBe(importbuff.toString('hex'));
+    expect(txunew.toString()).toBe(importtx.toString());
+    expect(importtx.getImportInputs().length).toBe(importIns.length);
+  });
+
+  test('Creation ExportTx', () => {
+    const exporttx:ExportTx = new ExportTx(
+      netid, blockchainID, outputs, inputs, exportOuts
+    );
+    const txunew:ExportTx = new ExportTx();
+    const exportbuff:Buffer = exporttx.toBuffer();
+    txunew.fromBuffer(exportbuff);
+
+    expect(txunew.toBuffer().toString('hex')).toBe(exportbuff.toString('hex'));
+    expect(txunew.toString()).toBe(exporttx.toString());
+    expect(exporttx.getExportOutputs().length).toBe(exportOuts.length);
   });
 
   test('Creation Tx1 with asof, locktime, threshold', () => {
@@ -402,4 +437,5 @@ describe('Transactions', () => {
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
   });
+
 });
