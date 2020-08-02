@@ -15,6 +15,16 @@ import { Output, SelectOutputClass } from './outputs';
 const bintools:BinTools = BinTools.getInstance();
 
 export class AVMConstants {
+  static ONEAVAX:BN = new BN(1000000000);
+
+  static DECIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(10));
+
+  static CENTIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(100));
+
+  static MILLIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(1000));
+
+  static MICROAVAX:BN = AVMConstants.ONEAVAX.div(new BN(1000000));
+
   static SECPFXID:number = 0;
 
   static NFTFXID:number = 1;

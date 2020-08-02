@@ -153,6 +153,7 @@ class AVMAPI extends JRPCAPI {
         assetID: Buffer;
         denomination: number;
       } = await this.getAssetDescription('AVA');
+      // TODO - Remove hardcoded 'AVA'
       this.AVAAssetID = asset.assetID;
     }
     return this.AVAAssetID;
@@ -178,6 +179,28 @@ class AVMAPI extends JRPCAPI {
     }
     return this.keychain;
   };
+
+  /**
+   * Helper function which determines if a tx is a goose egg transaction. 
+   *
+   * @param utx An UnsignedTx
+   *
+   * @returns boolean true if passes goose egg test and false if fails.
+   *
+   * @remarks
+   * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
+   */
+  checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
+    const avaxAssetID:Buffer = await this.getAVAAssetID();
+    const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    const fee:BN = utx.getBurn(avaxAssetID);
+
+    if(fee.lte(AVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /**
      * Gets the balance of a particular asset on a blockchain.
@@ -577,11 +600,17 @@ class AVMAPI extends JRPCAPI {
       assetID = bintools.cb58Decode(assetID);
     }
 
-    return utxoset.buildBaseTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildBaseTx(
       this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID),
       amount, to, from, change,
       assetID, asOf, locktime, threshold,
     );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
   };
 
   /**
@@ -612,6 +641,7 @@ class AVMAPI extends JRPCAPI {
     const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
 
     const avaAssetID:Buffer = await this.getAVAAssetID();
+
     let utxoidArray:Array<string> = [];
     if (typeof utxoid === 'string') {
       utxoidArray = [utxoid];
@@ -619,10 +649,16 @@ class AVMAPI extends JRPCAPI {
       utxoidArray = utxoid;
     }
 
-    return utxoset.buildNFTTransferTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildNFTTransferTx(
       this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
       feeAmount, feeAddrs, to, from, utxoidArray, asOf, locktime, threshold,
     );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
   };
 
   /**
@@ -653,16 +689,23 @@ class AVMAPI extends JRPCAPI {
       }
       /* istanbul ignore next */
       if(name.length > AVMConstants.ASSETNAMELEN) {
-          /* istanbul ignore next */
-          throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+        /* istanbul ignore next */
+        throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
       }
-      let avaAssetID:Buffer = await this.getAVAAssetID();
-      return utxoset.buildCreateAssetTx(
-          this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
-          fee, creators, initialStates, name, symbol, denomination
+
+      const avaAssetID:Buffer = await this.getAVAAssetID();
+      const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        fee, creators, initialStates, name, symbol, denomination,
       );
-  }
-        
+  
+      if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        throw new Error("Failed Goose Egg Check");
+      }
+  
+      return builtUnsignedTx;
+    };
+
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
@@ -698,24 +741,28 @@ class AVMAPI extends JRPCAPI {
     * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
     * 
     */
-  buildCreateNFTAssetTx = async (
-      utxoset:UTXOSet, fee:BN, feePayingAddresses:Array<string> | Array<Buffer>, 
-      name:string, symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0)
-  ): Promise<UnsignedTx> => {
-      let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
-        
-      if(name.length > AVMConstants.ASSETNAMELEN) {
-          throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
-      }
-      if(symbol.length > AVMConstants.SYMBOLMAXLEN){
-          throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
-      }
-      let avaAssetID:Buffer = await this.getAVAAssetID();
-      return utxoset.buildCreateNFTAssetTx(
-          this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
-          fee, feeAddrs, minterSets, name, symbol, locktime
-      );
-  }
+   buildCreateNFTAssetTx = async (
+    utxoset:UTXOSet, fee:BN, feePayingAddresses:Array<string> | Array<Buffer>, 
+    name:string, symbol:string, minterSets:MinterSet[], locktime:BN = new BN(0)
+      ): Promise<UnsignedTx> => {
+    let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+      
+    if(name.length > AVMConstants.ASSETNAMELEN) {
+        throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+    }
+    if(symbol.length > AVMConstants.SYMBOLMAXLEN){
+        throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+    }
+    let avaAssetID:Buffer = await this.getAVAAssetID();
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTAssetTx(
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        fee, feeAddrs, minterSets, name, symbol, locktime
+    );
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      throw new Error("Failed Goose Egg Check");
+    }
+    return builtUnsignedTx;
+}
 
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
@@ -753,7 +800,7 @@ class AVMAPI extends JRPCAPI {
 
       let avaAssetID:Buffer = await this.getAVAAssetID();
 
-      return utxoset.buildCreateNFTMintTx(
+      const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
           this.core.getNetworkID(),
           bintools.cb58Decode(this.blockchainID),
           avaAssetID,
@@ -768,6 +815,10 @@ class AVMAPI extends JRPCAPI {
           threshold,
           payloadBuf,
       );
+      if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        throw new Error("Failed Goose Egg Check");
+      }
+      return builtUnsignedTx;
   }
 
   /**

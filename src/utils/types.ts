@@ -727,36 +727,42 @@ const n2Avm:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: 'X',
   vm: 'avm',
+  fee: 0
 };
 
 const n2Platform:object = {
   blockchainID: '11111111111111111111111111111111LpoYY',
   alias: 'P',
   vm: 'platform',
+  fee: 0
 };
 
 const n2Contracts:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
   alias: 'C',
   vm: 'contracts',
+  fee: 0
 };
 
 const n3Avm:object = {
   blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
   alias: 'X',
   vm: 'avm',
+  fee: 0
 };
 
 const n3Platform:object = {
   blockchainID: '11111111111111111111111111111111LpoYY',
   alias: 'P',
   vm: 'platform',
+  fee: 0
 };
 
 const n3Contracts:object = {
   blockchainID: 'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9',
   alias: 'C',
   vm: 'contracts',
+  fee: 0
 };
 
 const n12345Avm:any = { ...n2Avm };
