@@ -13,6 +13,8 @@ import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
 import { TransferableOutput, SecpOutput, NFTMintOutput, OutputOwners } from 'src/apis/avm/outputs';
 import { NFTTransferOutput } from '../../../src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from '../../../src/apis/avm/ops';
+import { ImportTx } from '../../../src/apis/avm/tx';
+import { Defaults } from '../../../src/utils/types';
 
 /**
  * @ignore
@@ -84,6 +86,23 @@ describe('AVMAPI', () => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(txId);
+  });
+
+  test('refreshBlockchainID', async () => {
+    let n3bcID:string = Defaults.network[3].X["blockchainID"];
+    let n12345bcID:string = Defaults.network[12345].X["blockchainID"];
+    let testAPI:AVMAPI = new AVMAPI(avalanche, '/ext/bc/avm', n3bcID);
+    let bc1:string = testAPI.getBlockchainID();
+    expect(bc1).toBe(n3bcID);
+
+    testAPI.refreshBlockchainID();
+    let bc2:string = testAPI.getBlockchainID();
+    expect(bc2).toBe(n12345bcID);
+
+    testAPI.refreshBlockchainID(n3bcID);
+    let bc3:string = testAPI.getBlockchainID();
+    expect(bc3).toBe(n3bcID);
+
   });
 
   test('listAddresses', async () => {
@@ -535,6 +554,45 @@ describe('AVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
   });
 
+  test('getAtomicUTXOs', async () => {
+    // Payment
+    const OPUTXOstr1:string = bintools.cb58Encode(Buffer.from('38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex'));
+    const OPUTXOstr2:string = bintools.cb58Encode(Buffer.from('c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
+    const OPUTXOstr3:string = bintools.cb58Encode(Buffer.from('f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
+
+    const set:UTXOSet = new UTXOSet();
+    set.add(OPUTXOstr1);
+    set.addArray([OPUTXOstr2, OPUTXOstr3]);
+
+    const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
+    expect(persistOpts.getMergeRule()).toBe('union');
+    let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
+    let result:Promise<UTXOSet> = api.getAtomicUTXOs(addresses, persistOpts);
+    const payload:object = {
+      result: {
+        utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    let response:UTXOSet = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
+
+    addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
+    result = api.getUTXOs(addresses, persistOpts);
+
+    mockAxios.mockResponse(responseObj);
+    response = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
+  });
+
   describe('Transactions', () => {
     let set:UTXOSet;
     let keymgr2:AVMKeyChain;
@@ -560,6 +618,7 @@ describe('AVMAPI', () => {
     let nftpbase3:NFTMintOutput;
     let nftInitialState:InitialStates;
     let nftutxoids:Array<string> = [];
+    let fungutxoids:Array<string> = [];
     let avm:AVMAPI;
     const fee:number = 10;
     const name:string = 'Mortycoin is the dumb as a sack of hammers.';
@@ -595,6 +654,7 @@ describe('AVMAPI', () => {
       outputs = [];
       ops = [];
       nftutxoids = [];
+      fungutxoids = [];
       const pload:Buffer = Buffer.alloc(1024);
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
 
@@ -619,6 +679,7 @@ describe('AVMAPI', () => {
 
         const u:UTXO = new UTXO();
         u.fromBuffer(Buffer.concat([txid, txidx, xferout.toBuffer()]));
+        fungutxoids.push(u.getUTXOID());
         utxos.push(u);
 
         txid = u.getTxID();
@@ -853,6 +914,68 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+    });
+
+    test('buildImportTx', async () => {
+      const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
+      const fee:BN = new BN(90);
+      const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
+      const result:Promise<UnsignedTx> = avm.buildImportTx(
+        set, addrs3, fee, addrs1, UnixNow()
+      );
+      const payload:object = {
+        result: {
+          utxos:[fungutxo]
+        },
+      };
+      const responseObj = {
+        data: payload,
+      };
+
+      mockAxios.mockResponse(responseObj);
+      const txu1:UnsignedTx = await result;
+
+      const txin:ImportTx = txu1.getTransaction() as ImportTx;
+      const importIns:Array<TransferableInput> = txin.getImportInputs();
+
+      const txu2:UnsignedTx = set.buildImportTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        assetID, fee, addrbuff1, importIns, UnixNow()
+      );
+
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+    });
+
+    test('buildExportTx', async () => {
+      const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => avm.parseAddress(a));
+      const fee:BN = new BN(90);
+      const txu1:UnsignedTx = await avm.buildExportTx(
+        set, fungutxoids[1], fee, addrs1, UnixNow()
+      );
+
+      const txu2:UnsignedTx = set.buildExportTx(
+        networkid, bintools.cb58Decode(blockchainid), assetID,
+        fee, addrbuff1, [fungutxoids[1]], UnixNow()
+      );
+
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+      const txu3:UnsignedTx = await avm.buildExportTx(
+        set, fungutxoids, fee, addrs1, UnixNow()
+      );
+
+      const txu4:UnsignedTx = set.buildExportTx(
+        networkid, bintools.cb58Decode(blockchainid), assetID,
+        fee, addrbuff1, fungutxoids, UnixNow()
+      );
+
+      expect(txu4.toBuffer().toString('hex')).toBe(txu3.toBuffer().toString('hex'));
+      expect(txu4.toString()).toBe(txu3.toString());
 
     });
 

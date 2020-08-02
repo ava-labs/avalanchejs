@@ -116,7 +116,7 @@ class AVMAPI extends JRPCAPI {
      */
   refreshBlockchainID = (blockchainID:string = undefined):boolean => {
     const netid:number = this.core.getNetworkID();
-    if (typeof blockchainID === 'undefined' && netid in Defaults.network) {
+    if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
       this.blockchainID = Defaults.network[netid].avm.blockchainID;
       return true;
     } if (typeof blockchainID === 'string') {
@@ -660,6 +660,7 @@ class AVMAPI extends JRPCAPI {
     );
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }
 
@@ -708,6 +709,7 @@ class AVMAPI extends JRPCAPI {
     );
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }
 
@@ -737,10 +739,11 @@ class AVMAPI extends JRPCAPI {
     ):Promise<UnsignedTx> => {
       const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
       const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-  
+
+      const atomicUTXOs:UTXOSet = await this.getAtomicUTXOs(owners);
       const avaxAssetID:Buffer = await this.getAVAAssetID();
       const avaxAssetIDStr:string = avaxAssetID.toString("hex");
-      const atomicUTXOs:UTXOSet = await this.getAtomicUTXOs(owners);
+      
       const atomics = atomicUTXOs.getAllUTXOs();
       const importIns:Array<TransferableInput> = [];
       for(let i:number = 0; i < atomics.length; i++) {
@@ -774,6 +777,7 @@ class AVMAPI extends JRPCAPI {
       );
   
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        /* istanbul ignore next */
         throw new Error("Failed Goose Egg Check");
       }
   
@@ -786,13 +790,9 @@ class AVMAPI extends JRPCAPI {
      *
      * @param utxoset  A set of UTXOs that the transaction is built on
      * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
-     * @param toAddresses The addresses to send the NFT
-     * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
      * @param feeAmount The amount of fees being paid for this transaction
      * @param feeAddresses The addresses that have the AVA funds to pay for fees of the UTXO
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
-     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
      *
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ExportTx]].
      *
@@ -800,11 +800,9 @@ class AVMAPI extends JRPCAPI {
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
     buildExportTx = async (
-      utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-      feeAddresses:Array<string>, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1,
+      utxoset:UTXOSet, utxoid:string | Array<string>, feeAmount:BN,
+      feeAddresses:Array<string>, asOf:BN = UnixNow()
     ):Promise<UnsignedTx> => {
-      const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-      const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
       const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
   
       const avaAssetID:Buffer = await this.getAVAAssetID();
@@ -822,6 +820,7 @@ class AVMAPI extends JRPCAPI {
       );
   
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        /* istanbul ignore next */
         throw new Error("Failed Goose Egg Check");
       }
   
@@ -867,6 +866,7 @@ class AVMAPI extends JRPCAPI {
       );
   
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        /* istanbul ignore next */
         throw new Error("Failed Goose Egg Check");
       }
   
@@ -915,9 +915,11 @@ class AVMAPI extends JRPCAPI {
     let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
       
     if(name.length > AVMConstants.ASSETNAMELEN) {
+      /* istanbul ignore next */
         throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
     }
     if(symbol.length > AVMConstants.SYMBOLMAXLEN){
+      /* istanbul ignore next */
         throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
     }
     let avaAssetID:Buffer = await this.getAVAAssetID();
@@ -926,6 +928,7 @@ class AVMAPI extends JRPCAPI {
         fee, feeAddrs, minterSets, name, symbol, asOf, locktime
     );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }
     return builtUnsignedTx;
@@ -983,6 +986,7 @@ class AVMAPI extends JRPCAPI {
           threshold,
       );
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
+        /* istanbul ignore next */
         throw new Error("Failed Goose Egg Check");
       }
       return builtUnsignedTx;
