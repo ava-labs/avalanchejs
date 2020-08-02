@@ -34,6 +34,8 @@ describe('Transactions', () => {
   let ops:Array<TransferableOperation>;
   let importIns:Array<TransferableInput>;
   let exportOuts:Array<TransferableOutput>;
+  let fungutxos:Array<UTXO>;
+  let exportUTXOIDS:Array<string>;
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
@@ -93,6 +95,8 @@ describe('Transactions', () => {
     outputs = [];
     importIns = [];
     exportOuts = [];
+    fungutxos = [];
+    exportUTXOIDS = [];
     ops = [];
     for (let i:number = 0; i < 3; i++) {
       addrs1.push(keymgr1.makeKey());
@@ -119,6 +123,7 @@ describe('Transactions', () => {
 
       const u:UTXO = new UTXO(txid, txidx, assetID, out);
       utxos.push(u);
+      fungutxos.push(u);
 
       txid = u.getTxID();
       txidx = u.getOutputIdx();
@@ -139,6 +144,7 @@ describe('Transactions', () => {
     for(let i:number = 1; i < 4; i++){
       importIns.push(inputs[i]);
       exportOuts.push(outputs[i]);
+      exportUTXOIDS.push(fungutxos[i].getUTXOID());
     }
     set.addArray(utxos);
   });
@@ -380,7 +386,7 @@ describe('Transactions', () => {
     const txunew:ImportTx = new ImportTx();
     const importbuff:Buffer = importtx.toBuffer();
     txunew.fromBuffer(importbuff);
-    
+
     expect(txunew.toBuffer().toString('hex')).toBe(importbuff.toString('hex'));
     expect(txunew.toString()).toBe(importtx.toString());
     expect(importtx.getImportInputs().length).toBe(importIns.length);
@@ -432,6 +438,27 @@ describe('Transactions', () => {
       addrs1, addrs3, addrs1, nftutxoids,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
+    const tx:Tx = keymgr1.signTx(txu);
+    const tx2:Tx = new Tx();
+    tx2.fromBuffer(tx.toBuffer());
+    expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
+  });
+
+  test('Creation Tx4 using ImportTx', () => {
+    const txu:UnsignedTx = set.buildImportTx(
+      netid, blockchainID, avaxAssetID, new BN(90), 
+      addrs1, importIns, UnixNow());
+    const tx:Tx = keymgr1.signTx(txu);
+    const tx2:Tx = new Tx();
+    tx2.fromBuffer(tx.toBuffer());
+    expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
+  });
+
+  test('Creation Tx5 using ExportTx', () => {
+    const txu:UnsignedTx = set.buildExportTx(
+      netid, blockchainID, avaxAssetID, new BN(90), 
+      addrs1, exportUTXOIDS, UnixNow()
+    )
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
