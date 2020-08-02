@@ -401,6 +401,27 @@ describe('AVMAPI', () => {
     expect(response).toBe('sometx');
   });
 
+  test('getTx', async () => {
+    const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+
+    const result:Promise<string> = api.getTx(txid);
+    const payload:object = {
+      result: {
+        tx: 'sometx',
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:string = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe('sometx');
+  });
+
+
   test('getTxStatus', async () => {
     const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
