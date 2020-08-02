@@ -154,7 +154,7 @@ export class OutputOwners {
       offset = addr.fromBuffer(bytes, offset);
       this.addresses.push(addr);
     }
-    this.addresses.sort(Address.comparitor());
+    this.addresses.sort(Address.comparator());
     return offset;
   }
 
@@ -162,7 +162,7 @@ export class OutputOwners {
      * Returns the buffer representing the [[Output]] instance.
      */
   toBuffer():Buffer {
-    this.addresses.sort(Address.comparitor());
+    this.addresses.sort(Address.comparator());
     this.numaddrs.writeUInt32BE(this.addresses.length, 0);
     let bsize:number = this.locktime.length + this.threshold.length + this.numaddrs.length;
     const barr:Array<Buffer> = [this.locktime, this.threshold, this.numaddrs];
@@ -196,13 +196,13 @@ export class OutputOwners {
   };
 
   /**
-     * An [[Output]] class which contains locktimes, thresholds, and addresses.
+     * An [[Output]] class which contains addresses, locktimes, and thresholds.
      *
+     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing output owner's addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
-     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      */
-  constructor(locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined) {
+  constructor(addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
     if (addresses) {
       const addrs:Array<Address> = [];
       for (let i = 0; i < addresses.length; i++) {
@@ -210,7 +210,7 @@ export class OutputOwners {
         addrs[i].fromBuffer(addresses[i]);
       }
       this.addresses = addrs;
-      this.addresses.sort(Address.comparitor());
+      this.addresses.sort(Address.comparator());
       this.numaddrs.writeUInt32BE(this.addresses.length, 0);
       this.threshold.writeUInt32BE((threshold || 1), 0);
       if (!(locktime)) {
@@ -324,12 +324,13 @@ export abstract class AmountOutput extends Output {
      * An [[AmountOutput]] class which issues a payment on an assetID.
      *
      * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
+     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
-     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+
      */
-  constructor(amount:BN = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined) {
-    super(locktime, threshold, addresses);
+  constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
+    super(addresses, locktime, threshold);
     if (amount) {
       this.amountValue = amount.clone();
       this.amount = bintools.fromBNToBuffer(amount, 8);
@@ -401,8 +402,8 @@ export class NFTMintOutput extends NFTOutBase {
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      */
-    constructor(groupID:number = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined){
-        super(locktime, threshold, addresses);
+    constructor(groupID:number = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined){
+        super(addresses, locktime, threshold);
         if(typeof groupID !== 'undefined') {
             this.groupID.writeUInt32BE(groupID, 0);
         }
@@ -458,12 +459,13 @@ export class NFTTransferOutput extends NFTOutBase {
      *
      * @param groupID A number representing the amount in the output
      * @param payload A {@link https://github.com/feross/buffer|Buffer} of max length 1024 
+     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
-     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+
      */
-  constructor(groupID:number = undefined, payload:Buffer = undefined, locktime:BN = undefined, threshold:number = undefined, addresses:Array<Buffer> = undefined) {
-    super(locktime, threshold, addresses);
+  constructor(groupID:number = undefined, payload:Buffer = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined, ) {
+    super(addresses, locktime, threshold);
     if (typeof groupID !== 'undefined' && typeof payload !== 'undefined') {
       this.groupID.writeUInt32BE(groupID, 0);
       this.sizePayload.writeUInt32BE(payload.length, 0);

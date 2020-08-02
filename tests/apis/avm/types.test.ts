@@ -50,20 +50,20 @@ describe('Address', () => {
   const addr2bytes:Buffer = Buffer.from(bigger);
   addr1.fromBuffer(addr1bytes);
   addr2.fromBuffer(addr2bytes);
-  expect(Address.comparitor()(addr1, addr2)).toBe(-1);
-  expect(Address.comparitor()(addr2, addr1)).toBe(1);
+  expect(Address.comparator()(addr1, addr2)).toBe(-1);
+  expect(Address.comparator()(addr2, addr1)).toBe(1);
 
   const addr2str:string = addr2.toString();
 
   addr2.fromBuffer(addr1bytes);
-  expect(Address.comparitor()(addr1, addr2)).toBe(0);
+  expect(Address.comparator()(addr1, addr2)).toBe(0);
 
   addr2.fromString(addr2str);
-  expect(Address.comparitor()(addr1, addr2)).toBe(-1);
+  expect(Address.comparator()(addr1, addr2)).toBe(-1);
   const a1b:Buffer = addr1.toBuffer();
   const a1s:string = bintools.bufferToB58(a1b);
   addr2.fromString(a1s);
-  expect(Address.comparitor()(addr1, addr2)).toBe(0);
+  expect(Address.comparator()(addr1, addr2)).toBe(0);
 
   const badbuff:Buffer = bintools.copyFrom(addr1bytes);
   let badbuffout:Buffer = Buffer.concat([badbuff, Buffer.from([1, 2])]);

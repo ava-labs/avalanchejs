@@ -1,13 +1,10 @@
-import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import { BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
-import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
+import { UTXO } from 'src/apis/avm/utxos';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
-import { SecpOutput, NFTTransferOutput, TransferableOutput, OutputOwners} from 'src/apis/avm/outputs';
-import { SigIdx, UTXOID, UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+import { NFTTransferOutput, OutputOwners} from 'src/apis/avm/outputs';
+import { SigIdx, UTXOID, UnixNow, AVMConstants } from 'src/apis/avm/types';
 import { SelectOperationClass, Operation, TransferableOperation, NFTTransferOperation, NFTMintOperation } from 'src/apis/avm/ops';
 
 
@@ -43,7 +40,7 @@ describe('Operations', () => {
 
         test('comparator', () => {
             let outputOwners:Array<OutputOwners> = [];
-            outputOwners.push(new OutputOwners(locktime, 1, addrs));
+            outputOwners.push(new OutputOwners(addrs, locktime, 1));
             let op1:NFTMintOperation = new NFTMintOperation(1, payload, outputOwners);
             let op2:NFTMintOperation = new NFTMintOperation(2, payload, outputOwners);
             let op3:NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
@@ -57,7 +54,7 @@ describe('Operations', () => {
 
         test('Functionality', () => {
             let outputOwners:Array<OutputOwners> = [];
-            outputOwners.push(new OutputOwners(locktime, 1, addrs));
+            outputOwners.push(new OutputOwners(addrs, locktime, 1));
             let op:NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
         
             expect(op.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
@@ -72,7 +69,7 @@ describe('Operations', () => {
 
     describe('NFTTransferOperation', () => {
         test('SelectOperationClass', () => {
-            let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
+            let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1);
             let goodop:NFTTransferOperation = new NFTTransferOperation(nout);
             let operation:Operation = SelectOperationClass(goodop.getOperationID());
             expect(operation).toBeInstanceOf(NFTTransferOperation);
@@ -82,9 +79,9 @@ describe('Operations', () => {
         });
 
         test('comparator', () => {
-            let op1:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, locktime, 1, addrs));
-            let op2:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1001, payload, locktime, 1, addrs));
-            let op3:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(999, payload, locktime, 1, addrs));
+            let op1:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
+            let op2:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1001, payload, addrs, locktime, 1));
+            let op3:NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(999, payload, addrs, locktime, 1));
             let cmp = NFTTransferOperation.comparator();
             expect(cmp(op1, op1)).toBe(0);
             expect(cmp(op2, op2)).toBe(0);
@@ -94,7 +91,7 @@ describe('Operations', () => {
         });
 
         test('Functionality', () => {
-            let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
+            let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1);
             let op:NFTTransferOperation = new NFTTransferOperation(nout);
         
             expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROP);
@@ -114,7 +111,7 @@ describe('Operations', () => {
 
 
     test('TransferableOperation', () => {
-        let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, locktime, 1, addrs);
+        let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1);
         let op:NFTTransferOperation = new NFTTransferOperation(nout);
         let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000), 32)).digest());
         let nftoutputidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(1000), 4));

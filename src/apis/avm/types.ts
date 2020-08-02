@@ -47,6 +47,10 @@ export class AVMConstants {
 
   static OPERATIONTX:number = 2;
 
+  static IMPORTTX:number = 3;
+
+  static EXPORTTX:number = 4;
+
   static SECPCREDENTIAL:number = 9;
 
   static NFTCREDENTIAL:number = 14;
@@ -111,7 +115,7 @@ export class Address extends NBytes {
   /**
      * Returns a function used to sort an array of [[Address]]es
      */
-  static comparitor = ()
+  static comparator = ()
     :(a:Address, b:Address) => (1|-1|0) => (a:Address, b:Address)
     :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
 
@@ -164,7 +168,7 @@ export class UTXOID extends NBytes {
   /**
      * Returns a function used to sort an array of [[UTXOID]]s
      */
-  static comparitor = ():(a:UTXOID, b:UTXOID) => (1|-1|0) => (a:UTXOID, b:UTXOID)
+  static comparator = ():(a:UTXOID, b:UTXOID) => (1|-1|0) => (a:UTXOID, b:UTXOID)
     :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
 
   /**
