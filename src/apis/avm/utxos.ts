@@ -530,7 +530,7 @@ export class UTXOSet {
 
       if (spendamount.lt(amount)) {
         /* istanbul ignore next */
-        throw new Error('Error - UTXOSet.buildBaseTx: insufficient'
+        throw new Error('Error - UTXOSet.buildBaseTx: insufficient '
         + 'funds to create the transaction');
       }
     }
