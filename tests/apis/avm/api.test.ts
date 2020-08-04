@@ -693,7 +693,7 @@ describe('AVMAPI', () => {
         const nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, pload, addressbuffs, locktime, threshold);
         const op:NFTTransferOperation = new NFTTransferOperation(nout);
         const nfttxid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-        const nftutxo:UTXO = new UTXO(0, nfttxid, 1000 + i, NFTassetID, nout);
+        const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, 1000 + i, NFTassetID, nout);
         nftutxoids.push(nftutxo.getUTXOID());
         const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
         ops.push(xferop);
