@@ -45,7 +45,7 @@ describe('Inputs', () => {
       const out:Output = new SecpOutput(amount.add(new BN(i)), addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
       const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
-      u.fromBuffer(Buffer.concat([u.getCodedIDBuffer(), txid, txidx, xferout.toBuffer()]));
+      u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
       utxos.push(u);
     }
     set.addArray(utxos);

@@ -34,14 +34,14 @@ export class UTXO {
   /**
      * Returns the numeric representation of the CodecID.
      */
-  getCodedID = ()
+  getCodecID = ()
   /* istanbul ignore next */
   :number => this.codecID.readUInt8(0);
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
     */
-   getCodedIDBuffer = ():Buffer => this.codecID;
+   getCodecIDBuffer = ():Buffer => this.codecID;
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.

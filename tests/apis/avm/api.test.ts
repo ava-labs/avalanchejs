@@ -678,7 +678,7 @@ describe('AVMAPI', () => {
         outputs.push(xferout);
 
         const u:UTXO = new UTXO();
-        u.fromBuffer(Buffer.concat([u.getCodedIDBuffer(), txid, txidx, xferout.toBuffer()]));
+        u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
         fungutxoids.push(u.getUTXOID());
         utxos.push(u);
 
