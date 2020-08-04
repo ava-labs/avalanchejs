@@ -21,6 +21,8 @@ const bintools = BinTools.getInstance();
  * Class for representing a single UTXO.
  */
 export class UTXO {
+  protected codecID:Buffer = Buffer.alloc(2);
+
   protected txid:Buffer = Buffer.alloc(32);
 
   protected outputidx:Buffer = Buffer.alloc(4);
@@ -28,6 +30,18 @@ export class UTXO {
   protected assetid:Buffer = Buffer.alloc(32);
 
   protected output:Output = undefined;
+
+  /**
+     * Returns the numeric representation of the CodecID.
+     */
+  getCodedID = ()
+  /* istanbul ignore next */
+  :number => this.codecID.readUInt8(0);
+
+  /**
+   * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
+    */
+   getCodedIDBuffer = ():Buffer => this.codecID;
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -66,6 +80,8 @@ export class UTXO {
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[UTXO]]
      */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.codecID = bintools.copyFrom(bytes, offset, offset + 2);
+    offset += 2;
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
@@ -85,10 +101,10 @@ export class UTXO {
     const outbuff:Buffer = this.output.toBuffer();
     const outputidbuffer:Buffer = Buffer.alloc(4);
     outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
-    const barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
-    return Buffer.concat(barr,
-      this.txid.length + this.outputidx.length
-      + this.assetid.length
+    const barr:Array<Buffer> = [this.codecID, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
+    return Buffer.concat(barr, 
+      this.codecID.length + this.txid.length 
+      + this.outputidx.length + this.assetid.length
       + outputidbuffer.length + outbuff.length);
   }
 
@@ -126,14 +142,15 @@ export class UTXO {
      * @param assetid Optional {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
      * @param outputid Optional {@link https://github.com/feross/buffer|Buffer} or number of the output ID for the UTXO
      */
-  constructor(txid:Buffer = undefined,
+  constructor(codecID:number = AVMConstants.LATESTCODEC, txid:Buffer = undefined,
     outputidx:Buffer | number = undefined,
     assetid:Buffer = undefined,
     output:Output = undefined) {
-    if (typeof txid !== 'undefined'
+    if (typeof codecID !== 'undefined' && typeof txid !== 'undefined'
     && typeof outputidx !== 'undefined'
     && typeof assetid !== 'undefined'
     && typeof output !== 'undefined') {
+      this.codecID .writeUInt8(codecID, 0);
       this.txid = txid;
       if (typeof outputidx === 'number') {
         this.outputidx.writeUInt32BE(outputidx, 0);

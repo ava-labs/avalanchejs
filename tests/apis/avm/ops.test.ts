@@ -115,7 +115,7 @@ describe('Operations', () => {
         let op:NFTTransferOperation = new NFTTransferOperation(nout);
         let nfttxid:Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000), 32)).digest());
         let nftoutputidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(1000), 4));
-        let nftutxo:UTXO = new UTXO(nfttxid, nftoutputidx, assetIDBuff, nout);
+        let nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, nftoutputidx, assetIDBuff, nout);
         let xferop:TransferableOperation = new TransferableOperation(assetIDBuff, [nftutxo.getUTXOID()], op);
 
         let xferop2:TransferableOperation = new TransferableOperation(assetIDBuff, [Buffer.concat([nfttxid, nftoutputidx])], op); 
