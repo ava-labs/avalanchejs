@@ -353,7 +353,53 @@ export class JRPCAPI extends APIBase {
 }
 
 /**
- * Class for representing a private and public keypair in Avalanche.
+ * Class for representing a threshold and set of minting addresses in Avalanche. 
+ * 
+ * @typeparam MinterSet including a threshold and array of addresses
+ */
+export class MinterSet {
+    protected threshold:number;
+    protected minters:Array<Buffer> = [];
+
+    /**
+     * Returns the threshold.
+     */
+    getThreshold = ():number => {
+        return this.threshold;
+    }
+
+    /**
+     * Returns the minters.
+     */
+    getMinters = ():Array<Buffer> => {
+        return this.minters;
+    }
+
+   protected  _cleanAddresses = (addresses:Array<string|Buffer>):Array<Buffer> => {
+        let addrs:Array<Buffer> = [];
+        for(let i:number = 0; i < addresses.length; i++) {
+            if(!Buffer.isBuffer(addresses[i])) {
+                addrs.push(bintools.stringToBuffer(addresses[i] as string))
+            } else {
+                addrs.push(addresses[i] as Buffer)
+            }
+        }
+        return addrs;
+    }
+
+    /**
+     * 
+     * @param threshold The number of signatures required to mint more of an asset by signing a minting transaction
+     * @param minters Array of addresss which are authorized to sign a minting transaction
+     */
+    constructor(threshold:number, minters:Array<string|Buffer>) {
+        this.threshold = threshold;
+        this.minters = this._cleanAddresses(minters);
+    }
+}
+
+/**
+ * Class for representing a private and public keypair in Avalanche. 
  * All APIs that need key pairs should extend on this class.
  */
 export class KeyPair {
@@ -681,36 +727,42 @@ const n2Avm:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: 'X',
   vm: 'avm',
+  fee: 0
 };
 
 const n2Platform:object = {
   blockchainID: '11111111111111111111111111111111LpoYY',
   alias: 'P',
   vm: 'platform',
+  fee: 0
 };
 
 const n2Contracts:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
   alias: 'C',
   vm: 'contracts',
+  fee: 0
 };
 
 const n3Avm:object = {
   blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
   alias: 'X',
   vm: 'avm',
+  fee: 0
 };
 
 const n3Platform:object = {
   blockchainID: '11111111111111111111111111111111LpoYY',
   alias: 'P',
   vm: 'platform',
+  fee: 0
 };
 
 const n3Contracts:object = {
   blockchainID: 'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9',
   alias: 'C',
   vm: 'contracts',
+  fee: 0
 };
 
 const n12345Avm:any = { ...n2Avm };

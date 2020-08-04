@@ -8,11 +8,12 @@ import BinTools from '../../utils/bintools';
 import {
   AVMConstants, InitialStates, Signature, SigIdx,
 } from './types';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
+import { TransferableOutput, AmountOutput } from './outputs';
+import { TransferableInput, AmountInput } from './inputs';
 import { TransferableOperation } from './ops';
 import { Credential, SelectCredentialClass } from './credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
+import BN from 'bn.js';
 
 /**
  * @ignore
@@ -242,10 +243,13 @@ export class CreateAssetTx extends BaseTx {
      */
   getDenomination = ():number => this.denomination.readUInt8(0);
 
-  /**
+    /**
      * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the denomination
      */
-  getDenominationBuffer = ():Buffer => this.denomination;
+
+    getDenominationBuffer = ():Buffer => {
+        return this.denomination;
+    }
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[CreateAssetTx]], parses it, populates the class, and returns the length of the [[CreateAssetTx]] in bytes.
@@ -372,15 +376,15 @@ export class OperationTx extends BaseTx {
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
      */
-  toBuffer():Buffer {
-    this.numOps.writeUInt32BE(this.ops.length, 0);
-    const barr:Array<Buffer> = [super.toBuffer(), this.numOps];
-    for (let i = 0; i < this.ops.length; i++) {
-      barr.push(this.ops[i].toBuffer());
+    toBuffer():Buffer {
+        this.numOps.writeUInt32BE(this.ops.length, 0);
+        let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
+        this.ops = this.ops.sort(TransferableOperation.comparitor());
+        for(let i = 0; i < this.ops.length; i++) {
+            barr.push(this.ops[i].toBuffer());
+        }
+        return Buffer.concat(barr);
     }
-    return Buffer.concat(barr);
-  }
-
   /**
      * Returns an array of [[Operation]]s in this transaction.
      */
@@ -444,7 +448,56 @@ export class OperationTx extends BaseTx {
  */
 export class UnsignedTx {
   protected transaction:BaseTx;
+  protected fee:BN = new BN(0);
 
+  /**
+     * Returns the inputTotal as a BN 
+     */
+  getInputTotal = (assetID:Buffer):BN=> {
+    const ins:Array<TransferableInput> = this.getTransaction().getIns();
+    const aIDHex:string = assetID.toString('hex');
+    let total:BN = new BN(0);
+
+    for(let i:number = 0; i < ins.length; i++){
+      const input = ins[i].getInput() as AmountInput; 
+
+      // only check secpinputs
+      if(input.getInputID() === AVMConstants.SECPINPUTID && aIDHex === ins[i].getAssetID().toString('hex')) {
+        total = total.add(input.getAmount());
+      }
+    }
+    return total;
+  }
+
+  /**
+     * Returns the outputTotal as a BN
+     */
+  getOutputTotal = (assetID:Buffer):BN => {
+    const outs:Array<TransferableOutput> = this.getTransaction().getOuts();
+    const aIDHex:string = assetID.toString('hex');
+    let total:BN = new BN(0);
+
+    for(let i:number = 0; i < outs.length; i++){
+      const output = outs[i].getOutput() as AmountOutput; 
+
+      // only check secpoutputs
+      if(output.getOutputID() === AVMConstants.SECPOUTPUTID && aIDHex === outs[i].getAssetID().toString('hex')) {
+        total = total.add(output.getAmount());
+      }
+    }
+    return total;
+  }
+
+  /**
+     * Returns the number of burned tokens as a BN
+     */
+  getBurn = (assetID:Buffer):BN => {
+    return this.getInputTotal(assetID).sub(this.getOutputTotal(assetID));
+  }
+
+  /**
+     * Returns the Transaction
+     */
   getTransaction = ():BaseTx => this.transaction;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
@@ -487,6 +540,13 @@ export class Tx {
   protected unsignedTx:UnsignedTx = new UnsignedTx();
 
   protected credentials:Array<Credential> = [];
+
+  /**
+     * Returns the [[UnsignedTx]]
+     */
+  getUnsignedTx = ():UnsignedTx => {
+    return this.unsignedTx;
+  }
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.
