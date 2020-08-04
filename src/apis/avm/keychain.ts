@@ -8,6 +8,7 @@ import createHash from 'create-hash';
 import BinTools from '../../utils/bintools';
 import { Tx, UnsignedTx } from './tx';
 import { KeyPair, KeyChain } from '../../utils/types';
+import { AVMConstants } from './types';
 
 /**
  * @ignore
@@ -100,7 +101,7 @@ export class AVMKeyPair extends KeyPair {
      */
   getAddressString = ():string => {
     const addr:Buffer = this.addressFromPublicKey(this.pubk);
-    return bintools.addressToString(this.chainid, addr);
+    return bintools.addressToString(this.chainid, AVMConstants.ADDRESSHRP, addr);
   };
 
   /**

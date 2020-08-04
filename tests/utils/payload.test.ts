@@ -2,7 +2,8 @@ import { Buffer } from "buffer/";
 import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, cb58EncodedPayload, TXIDPayload, JSONPayload } from '../../src/utils/payload';
 import BinTools from '../../src/utils/bintools';
 import BN from "bn.js";
-import { utf8ToHex } from "web3-utils";
+import { AVMConstants } from 'src/apis/avm/types';
+import * as bech32 from 'bech32';
 let payloadTypes:PayloadTypes = PayloadTypes.getInstance();
 let bintools = BinTools.getInstance()
 
@@ -10,6 +11,7 @@ describe("Payload", () => {
     let cb58str:string = "MBcQpm1PsdfBKYscN3AYP56MusRDMZGF9";
     let cb58buf:string = bintools.bufferToB58(bintools.cb58Decode(cb58str));
     let chex:string = "849c0F8c6d9942a2605517AeaBe00133Cb159f8D";
+    let bech:string = bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.b58ToBuffer(cb58buf)));
     let binstr:string = "Bx4v7ytutz3";
     let utf8str:string = "I am the very model of a modern Major-General.";
     let utf8b58:string = bintools.bufferToB58(Buffer.from(utf8str));
@@ -49,8 +51,8 @@ describe("Payload", () => {
         ["B58STR", utf8b58, utf8b58], 
         ["B64STR", utf8b64, utf8b58], 
         ["BIGNUM", bnhex, bintools.bufferToB58(Buffer.from(bnhex, "hex"))], 
-        ["XCHAINADDR", "X-" + cb58str, cb58buf], 
-        ["PCHAINADDR", "P-" +  cb58str, cb58buf], 
+        ["XCHAINADDR", "X-" + bech, cb58buf], 
+        ["PCHAINADDR", "P-" + bech, cb58buf], 
         ["CCHAINADDR", "C-0x" + chex, bintools.bufferToB58(Buffer.from(chex, "hex"))], 
         ["TXID", cb58str, cb58buf], 
         ["ASSETID", cb58str, cb58buf], 
@@ -137,14 +139,14 @@ describe("Payload", () => {
         });
 
         test("XCHAINADDRPayload special cases", () => {
-            let addr:string = "X-" + cb58str;
+            let addr:string = "X-" + bech;
             let pl:XCHAINADDRPayload = new XCHAINADDRPayload(addr);
             expect(pl.returnType()).toBe(addr);
             expect(pl.returnChainID()).toBe("X");
         });
 
         test("PCHAINADDRPayload special cases", () => {
-            let addr:string = "P-" + cb58str;
+            let addr:string = "P-" + bech;
             let pl:PCHAINADDRPayload = new PCHAINADDRPayload(addr);
             expect(pl.returnType()).toBe(addr);
             expect(pl.returnChainID()).toBe("P");

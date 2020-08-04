@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module PlatformAPI
+ * @module PlatformVMAPI
  */
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
@@ -14,13 +14,13 @@ import BinTools from '../../utils/bintools';
 const bintools:BinTools = BinTools.getInstance();
 
 /**
- * Class for interacting with a node's PlatformAPI
+ * Class for interacting with a node's PlatformVMAPI
  *
  * @category RPCAPIs
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-class PlatformAPI extends JRPCAPI {
+class PlatformVMAPI extends JRPCAPI {
   /**
      * Creates a new blockchain.
      *
@@ -529,4 +529,4 @@ class PlatformAPI extends JRPCAPI {
   constructor(core:AvalancheCore, baseurl:string = '/ext/P') { super(core, baseurl); }
 }
 
-export default PlatformAPI;
+export default PlatformVMAPI;

@@ -15,6 +15,8 @@ import { Output, SelectOutputClass } from './outputs';
 const bintools:BinTools = BinTools.getInstance();
 
 export class AVMConstants {
+  static ADDRESSHRP:string = "avax1";
+
   static ONEAVAX:BN = new BN(1000000000);
 
   static DECIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(10));

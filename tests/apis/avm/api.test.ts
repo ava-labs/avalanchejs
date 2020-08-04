@@ -15,6 +15,7 @@ import { NFTTransferOutput } from '../../../src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from '../../../src/apis/avm/ops';
 import { ImportTx } from '../../../src/apis/avm/tx';
 import { Defaults } from '../../../src/utils/types';
+import * as bech32 from 'bech32';
 
 /**
  * @ignore
@@ -35,9 +36,9 @@ describe('AVMAPI', () => {
   let api:AVMAPI;
   let alias:string;
 
-  const addrA:string = 'X-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW';
-  const addrB:string = 'X-P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF';
-  const addrC:string = 'X-6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV';
+  const addrA:string = 'X-' + bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")));
+  const addrB:string = 'X-' + bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")));
+  const addrC:string = 'X-' + bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")));
 
   beforeAll(() => {
     api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
@@ -50,7 +51,7 @@ describe('AVMAPI', () => {
 
   test('can Send 1', async () => {
     const txId = 'asdfhvl234';
-
+console.log("addrA", addrA, "addrB", addrB);
     const result:Promise<string> = api.send(username, password, 'assetId', 10, addrA, [addrB]);
     const payload:object = {
       result: {

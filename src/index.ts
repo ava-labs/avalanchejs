@@ -9,7 +9,7 @@ import HealthAPI from './apis/health/api';
 import InfoAPI from './apis/info/api';
 import KeystoreAPI from './apis/keystore/api';
 import MetricsAPI from './apis/metrics/api';
-import PlatformAPI from './apis/platform/api';
+import PlatformVMAPI from './apis/platform/api';
 import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
@@ -59,7 +59,7 @@ export default class Avalanche extends AvalancheCore {
   /**
      * Returns a reference to the Platform RPC.
      */
-  Platform = () => this.apis.platform as PlatformAPI;
+  Platform = () => this.apis.platform as PlatformVMAPI;
 
   /**
      * Creates a new AVA instance. Sets the address and port of the main AVA Client.
@@ -101,7 +101,7 @@ export default class Avalanche extends AvalancheCore {
       this.addAPI('info', InfoAPI);
       this.addAPI('keystore', KeystoreAPI);
       this.addAPI('metrics', MetricsAPI);
-      this.addAPI('platform', PlatformAPI);
+      this.addAPI('platform', PlatformVMAPI);
     }
   }
 }
@@ -139,4 +139,4 @@ export { HealthAPI as Health };
 export { InfoAPI as Info };
 export { KeystoreAPI as Keystore };
 export { MetricsAPI as Metrics };
-export { PlatformAPI as Platform };
+export { PlatformVMAPI as Platform };

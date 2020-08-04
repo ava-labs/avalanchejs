@@ -8,7 +8,7 @@ import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
 import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from "../../utils/types";
 import { UTXOSet, UTXO } from './utxos';
-import { MergeRule, UnixNow, AVMConstants, InitialStates, } from './types';
+import { MergeRule, UnixNow, AVMConstants, InitialStates,  } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../utils/payload';
@@ -139,7 +139,7 @@ class AVMAPI extends JRPCAPI {
 
   addressFromBuffer = (address:Buffer):string => {
     const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
-    return bintools.addressToString(chainid, address);
+    return bintools.addressToString(chainid, AVMConstants.ADDRESSHRP, address);
   };
 
   /**
@@ -1105,7 +1105,7 @@ class AVMAPI extends JRPCAPI {
           }
           addrs.push(addresses[i] as string);
         } else {
-          addrs.push(bintools.addressToString(chainid, addresses[i] as Buffer));
+          addrs.push(bintools.addressToString(chainid, AVMConstants.ADDRESSHRP, addresses[i] as Buffer));
         }
       }
     }

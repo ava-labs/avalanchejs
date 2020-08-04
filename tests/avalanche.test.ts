@@ -6,7 +6,7 @@ import HealthAPI from 'src/apis/health/api';
 import InfoAPI  from "src/apis/info/api";
 import KeystoreAPI  from "src/apis/keystore/api";
 import MetricsAPI  from "src/apis/metrics/api";
-import PlatformAPI  from "src/apis/platform/api";
+import PlatformVMAPI  from "src/apis/platform/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 
@@ -24,7 +24,7 @@ describe('Avalanche', () => {
         avalanche.addAPI("info", InfoAPI);
         avalanche.addAPI("keystore", KeystoreAPI);
         avalanche.addAPI("metrics", MetricsAPI);
-        avalanche.addAPI("platform", PlatformAPI);
+        avalanche.addAPI("platform", PlatformVMAPI);
     });
     test('Can initialize', () => {
         expect(avalanche.getIP()).toBe(ip);
@@ -52,9 +52,9 @@ describe('Avalanche', () => {
         expect(avalanche.Info()).toBeInstanceOf(InfoAPI);
         
         expect(avalanche.Platform()).not.toBeInstanceOf(KeystoreAPI);
-        expect(avalanche.Platform()).toBeInstanceOf(PlatformAPI);
+        expect(avalanche.Platform()).toBeInstanceOf(PlatformVMAPI);
 
-        expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformAPI);
+        expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformVMAPI);
         expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
 
         expect(avalanche.Metrics()).not.toBeInstanceOf(KeystoreAPI);

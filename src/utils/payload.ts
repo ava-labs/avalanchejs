@@ -7,6 +7,7 @@ import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
+import { AVMConstants } from '../apis/avm/types';
 
 /**
  * @ignore
@@ -379,7 +380,7 @@ export abstract class ChainAddressPayload extends PayloadBase {
      * Returns an address string for the payload.
      */
     returnType():string {
-        return bintools.addressToString(this.chainid, this.payload);
+        return bintools.addressToString(this.chainid, AVMConstants.ADDRESSHRP, this.payload);
     }
     /**
      * @param payload Buffer or address string

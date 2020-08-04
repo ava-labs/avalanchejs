@@ -1,12 +1,13 @@
 /**
  * @packageDocumentation
- * @module PlatformAPI-KeyChain
+ * @module PlatformVMAPI-KeyChain
  */
 import { Buffer } from "buffer/";
 import * as elliptic from "elliptic";
 import createHash from "create-hash";
 import BinTools from '../../utils/bintools';
 import { KeyPair, KeyChain } from '../../utils/types';
+import { PlatformVMConstants } from './types';
 
 /**
  * @ignore
@@ -101,7 +102,7 @@ export class PlatformKeyPair extends KeyPair {
      */
     getAddressString = ():string => {
         const addr:Buffer = this.addressFromPublicKey(this.pubk);
-        return bintools.addressToString(this.chainid, addr);
+        return bintools.addressToString(this.chainid, PlatformVMConstants.ADDRESSHRP, addr);
     }
 
     /**
