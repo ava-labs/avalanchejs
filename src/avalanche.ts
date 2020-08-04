@@ -6,7 +6,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 import { APIBase, RequestResponseData } from './utils/types';
 
 /**
- * AvalancheCore is middleware for interacting with AVA node RPC APIs.
+ * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
  *
  * Example usage:
  * ```js
@@ -28,10 +28,10 @@ export default class AvalancheCore {
   protected apis:{ [k: string]: APIBase } = {};
 
   /**
-     * Sets the address and port of the main AVA Client.
+     * Sets the address and port of the main Avalanche Client.
      *
-     * @param ip The hostname to resolve to reach the AVA Client RPC APIs
-     * @param port The port to resolve to reach the AVA Client RPC APIs
+     * @param ip The hostname to resolve to reach the Avalanche Client RPC APIs
+     * @param port The port to resolve to reach the Avalanche Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request,
      * ex: "http", "https", "git", "ws", etc ...
      */
@@ -48,17 +48,17 @@ export default class AvalancheCore {
   getProtocol = ():string => this.protocol;
 
   /**
-     * Returns the IP for the AVA node.
+     * Returns the IP for the Avalanche node.
      */
   getIP = ():string => this.ip;
 
   /**
-     * Returns the port for the AVA node.
+     * Returns the port for the Avalanche node.
      */
   getPort = ():number => this.port;
 
   /**
-     * Returns the URL of the AVA node (ip + port);
+     * Returns the URL of the Avalanche node (ip + port);
      */
   getURL = ():string => this.url;
 
@@ -268,10 +268,10 @@ export default class AvalancheCore {
     axiosConfig);
 
   /**
-     * Creates a new Avalanche instance. Sets the address and port of the main AVA Client.
+     * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
      *
-     * @param ip The hostname to resolve to reach the AVA Client APIs
-     * @param port The port to resolve to reach the AVA Client APIs
+     * @param ip The hostname to resolve to reach the Avalanche Client APIs
+     * @param port The port to resolve to reach the Avalanche Client APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      */
   constructor(ip:string, port:number, protocol:string = 'http') {

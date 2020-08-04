@@ -121,7 +121,7 @@ describe('Transactions', () => {
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
       outputs.push(xferout);
 
-      const u:UTXO = new UTXO(txid, txidx, assetID, out);
+      const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
       utxos.push(u);
       fungutxos.push(u);
 
@@ -135,7 +135,7 @@ describe('Transactions', () => {
       const nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, addresses, locktime, threshold);
       const op:NFTTransferOperation = new NFTTransferOperation(nout);
       const nfttxid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-      const nftutxo:UTXO = new UTXO(nfttxid, 1000 + i, NFTassetID, nout);
+      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, 1000 + i, NFTassetID, nout);
       nftutxoids.push(nftutxo.getUTXOID());
       const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
       ops.push(xferop);
@@ -176,7 +176,7 @@ describe('Transactions', () => {
     const networkID: number = 12345;
     // local network X Chain ID
     const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
-    // AVA assetID
+    // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];

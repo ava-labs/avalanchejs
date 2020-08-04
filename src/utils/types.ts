@@ -638,7 +638,7 @@ export class KeyChain<KPClass extends KeyPair> {
   /**
      * Returns instance of [[KeyChain]].
      *
-     * @param chainid The hostname to resolve to reach the AVA Client APIs
+     * @param chainid The hostname to resolve to reach the Avalanche Client APIs
      */
   constructor(chainid:string) {
     this.chainid = chainid;

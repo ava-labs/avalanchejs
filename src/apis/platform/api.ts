@@ -28,7 +28,7 @@ class PlatformVMAPI extends JRPCAPI {
      * @param name A human-readable name for the new blockchain
      * @param payerNonce The next unused nonce of the account paying the transaction fee
      * @param genesis The base 58 (with checksum) representation of the genesis state of the new blockchain. Virtual Machines should have a static API method named buildGenesis that can be used to generate genesisData.
-     * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
+     * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an cb58 serialized string for the SubnetID or its alias.
      *
      * @returns Promise for the unsigned transaction to create this blockchain. Must be signed by a sufficient number of the Subnet’s control keys and by the account paying the transaction fee.
      */
@@ -130,7 +130,7 @@ class PlatformVMAPI extends JRPCAPI {
      * Lists the set of current validators.
      *
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
-     * AVA serialized string for the SubnetID or its alias.
+     * cb58 serialized string for the SubnetID or its alias.
      *
      * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
      *
@@ -150,7 +150,7 @@ class PlatformVMAPI extends JRPCAPI {
      * Lists the set of pending validators.
      *
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer}
-     * or an AVA serialized string for the SubnetID or its alias.
+     * or a cb58 serialized string for the SubnetID or its alias.
      *
      * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
      *
@@ -172,7 +172,7 @@ class PlatformVMAPI extends JRPCAPI {
      *
      * @param sampleSize Of the total universe of validators, select this many at random
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
-     * AVA serialized string for the SubnetID or its alias.
+     * cb58 serialized string for the SubnetID or its alias.
      *
      * @returns Promise for an array of validator's stakingIDs.
      */
@@ -197,11 +197,11 @@ class PlatformVMAPI extends JRPCAPI {
      * @param id The node ID of the validator
      * @param startTime Javascript Date object for the start time to validate
      * @param endTime Javascript Date object for the end time to validate
-     * @param stakeAmount The amount of nAVA the validator is staking as
+     * @param stakeAmount The amount of nAVAX the validator is staking as
      * a {@link https://github.com/indutny/bn.js/|BN}
      * @param payerNonce The next unused nonce of the account that is providing the staked
-     * AVA and paying the transaction fee
-     * @param destination The P-Chain address of the account that the staked AVA will be returned
+     * AVAX and paying the transaction fee
+     * @param destination The P-Chain address of the account that the staked AVAX will be returned
      * to, as well as a validation reward if the validator is sufficiently responsive and correct
      * while it validated
      * @param delegationFeeRate Optional. The percent fee this validator charges when others
@@ -211,7 +211,7 @@ class PlatformVMAPI extends JRPCAPI {
      * period is over, if the delegator is entitled to a reward, 30% of the reward
      * (300,000 / 10,000) goes to the validator and 70% goes to the delegator
      * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or
-     * an AVA serialized string for the SubnetID or its alias.
+     * an cb58 serialized string for the SubnetID or its alias.
      *
      * @returns Promise for a base58 string of the unsigned transaction.
      */
@@ -242,11 +242,11 @@ class PlatformVMAPI extends JRPCAPI {
      * Add a validator to a Subnet other than the Default Subnet. The validator must validate the Default Subnet for the entire duration they validate this Subnet.
      *
      * @param id The node ID of the validator
-     * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the SubnetID or its alias.
+     * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58 serialized string for the SubnetID or its alias.
      * @param startTime Javascript Date object for the start time to validate
      * @param endTime Javascript Date object for the end time to validate
      * @param weight The validator’s weight used for sampling
-     * @param payerNonce The next unused nonce of the account that is providing the staked AVA and paying the transaction fee
+     * @param payerNonce The next unused nonce of the account that is providing the staked AVAX and paying the transaction fee
      *
      * @returns Promise for the unsigned transaction. It must be signed (using sign) by the proper number of the Subnet’s control keys and by the key of the account paying the transaction fee before it can be issued.
      */
@@ -279,11 +279,11 @@ class PlatformVMAPI extends JRPCAPI {
      * @param id The node ID of the delegatee
      * @param startTime Javascript Date object for when the delegator starts delegating
      * @param endTime Javascript Date object for when the delegator starts delegating
-     * @param stakeAmount The amount of nAVA the delegator is staking as
+     * @param stakeAmount The amount of nAVAX the delegator is staking as
      * a {@link https://github.com/indutny/bn.js/|BN}
      * @param payerNonce The next unused nonce of the account that will provide the staked
-     * AVA and pay the transaction fee
-     * @param destination The address of the account the staked AVA and validation reward
+     * AVAX and pay the transaction fee
+     * @param destination The address of the account the staked AVAX and validation reward
      * (if applicable) are sent to at endTime
      *
      * @returns Promise for an array of validator's stakingIDs.
@@ -378,17 +378,17 @@ class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-     * Send AVA from an account on the P-Chain to an address on the X-Chain. This transaction
-     * must be signed with the key of the account that the AVA is sent from and which pays the
+     * Send AVAX from an account on the P-Chain to an address on the X-Chain. This transaction
+     * must be signed with the key of the account that the AVAX is sent from and which pays the
      * transaction fee. After issuing this transaction, you must call the X-Chain’s importAVA
      * method to complete the transfer.
      *
-     * @param to The address on the X-Chain to send the AVA to. Do not include X- in the address
-     * @param amount Amount of AVA to export as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param to The address on the X-Chain to send the AVAX to. Do not include X- in the address
+     * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
      * @param payerNonce The next unused nonce of the account paying the tx fee and providing
      * the sent AVA
      *
-     * @returns Promise for an unsigned transaction to be signed by the account the the AVA is
+     * @returns Promise for an unsigned transaction to be signed by the account the the AVAX is
      * sent from and pays the transaction fee.
      */
   exportAVA = async (amount:BN, to:string, payerNonce:number):Promise<string> => {
@@ -402,14 +402,14 @@ class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-     * Send AVA from an account on the P-Chain to an address on the X-Chain. This transaction
-     * must be signed with the key of the account that the AVA is sent from and which pays
+     * Send AVAX from an account on the P-Chain to an address on the X-Chain. This transaction
+     * must be signed with the key of the account that the AVAX is sent from and which pays
      * the transaction fee. After issuing this transaction, you must call the X-Chain’s
      * importAVA method to complete the transfer.
      *
      * @param username The Keystore user that controls the account specified in `to`
      * @param password The password of the Keystore user
-     * @param to The ID of the account the AVA is sent to. This must be the same as the to
+     * @param to The ID of the account the AVAX is sent to. This must be the same as the to
      * argument in the corresponding call to the X-Chain’s exportAVA
      * @param payerNonce The next unused nonce of the account specified in `to`
      *

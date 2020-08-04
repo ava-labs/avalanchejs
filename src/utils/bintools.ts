@@ -295,7 +295,7 @@ export default class BinTools {
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string with
-     * checksum as per the AVA standard.
+     * checksum as per the cb58 standard.
      *
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} to serialize
      *
@@ -307,10 +307,10 @@ export default class BinTools {
   };
 
   /**
-     * Takes an AVA serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+     * Takes a cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
      * and returns a {@link https://github.com/feross/buffer|Buffer} of the original data. Throws on error.
      *
-     * @param bytes An AVA serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+     * @param bytes A cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
      */
   cb58Decode = (bytes:Buffer | string):Buffer => {
     if (typeof bytes === 'string') {

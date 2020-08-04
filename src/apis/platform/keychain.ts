@@ -129,7 +129,7 @@ export class PlatformKeyPair extends KeyPair {
     /**
      * Returns a string representation of the private key.
      * 
-     * @returns An AVA serialized string representation of the public key
+     * @returns A cb58 serialized string representation of the public key
      */
     getPrivateKeyString = ():string => {
         return bintools.cb58Encode(this.privk);
@@ -138,7 +138,7 @@ export class PlatformKeyPair extends KeyPair {
     /**
      * Returns the public key.
      * 
-     * @returns An AVA serialized string representation of the public key
+     * @returns A cb58 serialized string representation of the public key
      */
     getPublicKeyString = ():string => {
         return bintools.cb58Encode(this.pubk);
@@ -222,7 +222,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
     /**
      * Given a private key, makes a new key pair, returns the address.
      * 
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} or AVA serialized string representing the private key 
+     * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
      * 
      * @returns Address of the new key pair
      */

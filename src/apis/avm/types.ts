@@ -16,6 +16,8 @@ const bintools:BinTools = BinTools.getInstance();
 
 export class AVMConstants {
   static ADDRESSHRP:string = "avax1";
+  
+  static LATESTCODEC:number = 0;
 
   static ONEAVAX:BN = new BN(1000000000);
 

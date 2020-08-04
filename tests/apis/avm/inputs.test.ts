@@ -44,8 +44,8 @@ describe('Inputs', () => {
       const assetID:Buffer = Buffer.from(createHash('sha256').update(txid).digest());
       const out:Output = new SecpOutput(amount.add(new BN(i)), addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
-      const u:UTXO = new UTXO(txid, txidx, assetID, out);
-      u.fromBuffer(Buffer.concat([txid, txidx, xferout.toBuffer()]));
+      const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
+      u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
       utxos.push(u);
     }
     set.addArray(utxos);
