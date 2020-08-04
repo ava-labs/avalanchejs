@@ -100,7 +100,7 @@ export class UTXO {
      * @returns The length of the raw [[UTXO]]
      *
      * @remarks
-     * unlike most fromStrings, it expects the string to be serialized in AVA format
+     * unlike most fromStrings, it expects the string to be serialized in cb58 format
      */
   fromString(serialized:string) {
     /* istanbul ignore next */
@@ -111,7 +111,7 @@ export class UTXO {
      * Returns a base-58 representation of the [[UTXO]].
      *
      * @remarks
-     * unlike most toStrings, this returns in AVA serialization format
+     * unlike most toStrings, this returns in cb58 serialization format
      */
   toString():string {
     /* istanbul ignore next */
@@ -162,7 +162,7 @@ export class UTXOSet {
   /**
      * Returns true if the [[UTXO]] is in the UTXOSet.
      *
-     * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
+     * @param utxo Either a [[UTXO]] a cb58 serialized string representing a UTXO
      */
   includes = (utxo:UTXO | string):boolean => {
     const utxoX:UTXO = new UTXO();
@@ -179,7 +179,7 @@ export class UTXOSet {
   /**
      * Adds a UTXO to the UTXOSet.
      *
-     * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
+     * @param utxo Either a [[UTXO]] an cb58 serialized string representing a UTXO
      * @param overwrite If true, if the UTXOID already exists, overwrite it... default false
      *
      * @returns A [[UTXO]] if one was added and undefined if nothing was added.
@@ -216,7 +216,7 @@ export class UTXOSet {
   /**
      * Adds an array of [[UTXO]]s to the [[UTXOSet]].
      *
-     * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
+     * @param utxo Either a [[UTXO]] an cb58 serialized string representing a UTXO
      * @param overwrite If true, if the UTXOID already exists, overwrite it... default false
      *
      * @returns An array of UTXOs which were added.
@@ -235,7 +235,7 @@ export class UTXOSet {
   /**
      * Removes a [[UTXO]] from the [[UTXOSet]] if it exists.
      *
-     * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
+     * @param utxo Either a [[UTXO]] an cb58 serialized string representing a UTXO
      *
      * @returns A [[UTXO]] if it was removed and undefined if nothing was removed.
      */
@@ -264,7 +264,7 @@ export class UTXOSet {
   /**
      * Removes an array of [[UTXO]]s to the [[UTXOSet]].
      *
-     * @param utxo Either a [[UTXO]] an AVA serialized string representing a UTXO
+     * @param utxo Either a [[UTXO]] an cb58 serialized string representing a UTXO
      * @param overwrite If true, if the UTXOID already exists, overwrite it... default false
      *
      * @returns An array of UTXOs which were removed.
@@ -315,7 +315,7 @@ export class UTXOSet {
      *
      * @param utxoids An optional array of UTXOIDs, returns all [[UTXO]]s if not provided
      *
-     * @returns An array of [[UTXO]]s as AVA serialized strings.
+     * @returns An array of [[UTXO]]s as cb58 serialized strings.
      */
   getAllUTXOStrings = (utxoids:Array<string> = undefined):Array<string> => {
     const results:Array<string> = [];
@@ -373,7 +373,7 @@ export class UTXOSet {
      * Returns the balance of a set of addresses in the UTXOSet.
      *
      * @param addresses An array of addresses
-     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized representation of an AssetID
+     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an cb58 serialized representation of an AssetID
      * @param asOf The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      *
      * @returns Returns the total balance as a {@link https://github.com/indutny/bn.js/|BN}.
@@ -429,7 +429,7 @@ export class UTXOSet {
      *
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param amount The amount of AVA to be spent in $nAVA
+     * @param amount The amount of AVAX to be spent in $nAVA
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
@@ -540,13 +540,13 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param avaAssetId The AVA Asset ID
-     * @param fee The amount of AVA to be paid for fees, in $nAVA
+     * @param avaAssetId The AVAX Asset ID
+     * @param fee The amount of AVAX to be paid for fees, in $nAVA
      * @param feeSenderAddresses The addresses to send the fees
      * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
-     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      *
      * @returns An unsigned transaction created from the passed in parameters.
@@ -573,8 +573,8 @@ export class UTXOSet {
     * 
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param avaAssetId The AVA Asset ID
-    * @param fee The amount of AVA to be paid for fees, in $nAVA
+    * @param avaAssetId The AVAX Asset ID
+    * @param fee The amount of AVAX to be paid for fees, in $nAVA
     * @param feePayingAddresses The addresses to pay the fees
     * @param minterSets The minters and thresholds required to mint this nft asset
     * @param name String for the descriptive name of the nft asset
@@ -617,8 +617,8 @@ export class UTXOSet {
     * 
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVA fee to be paid
-    * @param fee The amount of AVA to be paid for fees, in $nAVA
+    * @param feeAssetID The assetID for the AVAX fee to be paid
+    * @param fee The amount of AVAX to be paid for fees, in $nAVA
     * @param feeSenderAddresses The addresses to send the fees
     * @param outputOwners:Array An array of OutputOwners
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
@@ -678,8 +678,8 @@ export class UTXOSet {
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVA fee to be paid
-    * @param fee The amount of AVA to be paid for fees, in $nAVA
+    * @param feeAssetID The assetID for the AVAX fee to be paid
+    * @param fee The amount of AVAX to be paid for fees, in $nAVA
     * @param feeSenderAddresses The addresses to send the fees
     * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
@@ -739,8 +739,8 @@ export class UTXOSet {
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVA fee to be paid
-    * @param fee The amount of AVA to be paid for fees, in $nAVA
+    * @param feeAssetID The assetID for the AVAX fee to be paid
+    * @param fee The amount of AVAX to be paid for fees, in $nAVA
     * @param feeSenderAddresses The addresses to send the fees
     * @param importIns An array of [[TransferableInput]]s being imported
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
