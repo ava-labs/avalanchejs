@@ -284,7 +284,7 @@ export class CreateAssetTx extends BaseTx {
      * @param ins Optional array of the [[TransferableInput]]s
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
-     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
      * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
      */
   constructor(
@@ -763,7 +763,7 @@ export class Tx {
      * @returns The length of the raw [[Tx]]
      *
      * @remarks
-     * unlike most fromStrings, it expects the string to be serialized in AVA format
+     * unlike most fromStrings, it expects the string to be serialized in cb58 format
      */
   fromString(serialized:string):number {
     return this.fromBuffer(bintools.cb58Decode(serialized));
@@ -773,7 +773,7 @@ export class Tx {
      * Returns a base-58 AVA-serialized representation of the [[Tx]].
      *
      * @remarks
-     * unlike most toStrings, this returns in AVA serialization format
+     * unlike most toStrings, this returns in cb58 serialization format
      */
   toString():string {
     return bintools.cb58Encode(this.toBuffer());

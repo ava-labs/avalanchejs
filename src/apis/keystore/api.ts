@@ -53,7 +53,7 @@ class KeystoreAPI extends JRPCAPI {
      * Imports a user file into the node's user database and assigns it to a username.
      *
      * @param username The name the user file should be imported into
-     * @param user AVA serialized string represetning a user's data
+     * @param user cb58 serialized string represetning a user's data
      * @param password The user's password
      *
      * @returns A promise with a true-value on success.

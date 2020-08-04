@@ -176,7 +176,7 @@ describe('Transactions', () => {
     const networkID: number = 12345;
     // local network X Chain ID
     const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
-    // AVA assetID
+    // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];

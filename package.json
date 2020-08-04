@@ -1,7 +1,7 @@
 {
   "name": "avalanche",
   "version": "2.2.1",
-  "description": "AVA Platform JS Library",
+  "description": "Avalanche Platform JS Library",
   "main": "typings/src/index.js",
   "types": "typings/src/index.d.ts",
   "scripts": {

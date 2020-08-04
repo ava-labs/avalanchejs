@@ -90,8 +90,8 @@ Avalanche.js comes with its own AVM Keychain. This keychain is used in the funct
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
-let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
+let avalanche = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
+let avm = avalanche.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 ### Accessing the keychain
@@ -168,8 +168,8 @@ This example creates an asset in the AVM and publishes it to the Avalanche Platf
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
-let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
+let avalanche = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
+let avm = avalanche.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 ### Describe the new asset
@@ -272,12 +272,12 @@ The AVM uses the TxID of the transaction which created the asset as the unique i
 
 ## Example 3 &mdash; Sending An Asset
 
-This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Avalanche.js connected to our AVA Platform endpoint of choice.
+This example sends an asset in the AVM to a single recipient. The first step in this process is to create an instance of Avalanche.js connected to our Avalanche Platform endpoint of choice.
 
 ```js
 let mynetworkID = 12345; //default is 3, we want to override that for our local network
-let ava = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
-let avm = ava.AVM(); //returns a reference to the AVM API used by Avalanche.js
+let avalanche = new avalanche.Avalanche("localhost", 9650, "https", mynetworkID);
+let avm = avalanche.AVM(); //returns a reference to the AVM API used by Avalanche.js
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.

@@ -143,7 +143,7 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Fetches the AVA AssetID and returns it in a Promise.
+     * Fetches the AVAX AssetID and returns it in a Promise.
      *
      * @returns The the provided string representing the blockchainID
      */
@@ -419,14 +419,14 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Send AVA from the X-Chain to an account on the P-Chain.
+     * Send AVAX from the X-Chain to an account on the P-Chain.
      *
      * After calling this method, you must call the P-Chain’s importAVA method to complete the transfer.
      *
      * @param username The Keystore user that controls the P-Chain account specified in `to`
      * @param password The password of the Keystore user
-     * @param to The account on the P-Chain to send the AVA to. Do not include P- in the address
-     * @param amount Amount of AVA to export as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param to The account on the P-Chain to send the AVAX to. Do not include P- in the address
+     * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
      *
      * @returns String representing the transaction id
      */
@@ -441,11 +441,11 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Finalize a transfer of AVA from the P-Chain to the X-Chain.
+     * Finalize a transfer of AVAX from the P-Chain to the X-Chain.
      *
      * Before this method is called, you must call the P-Chain’s `exportAVA` method to initiate the transfer.
      *
-     * @param to The address the AVA is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVA, except that the prepended X- should be included in this argument
+     * @param to The address the AVAX is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVA, except that the prepended X- should be included in this argument
      * @param username The Keystore user that controls the address specified in `to`
      * @param password The password of the Keystore user
      *
@@ -497,7 +497,7 @@ class AVMAPI extends JRPCAPI {
   /**
      * Retrieves an assets name and symbol.
      *
-     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA serialized string for the AssetID or its alias.
+     * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an b58 serialized string for the AssetID or its alias.
      *
      * @returns Returns a Promise<object> with keys "name" and "symbol".
      */
@@ -626,7 +626,7 @@ class AVMAPI extends JRPCAPI {
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param amount The amount of AVA to be spent in $nAVA
+     * @param amount The amount of AVAX to be spent in $nAVAX
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
@@ -832,12 +832,12 @@ class AVMAPI extends JRPCAPI {
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param fee The amount of AVA to be paid for fees, in $nAVA
+     * @param fee The amount of AVAX to be paid for fees, in $nAVA
      * @param creatorAddresses The addresses to send the fees
      * @param initialStates The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
-     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
      *
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
      * 
@@ -878,7 +878,7 @@ class AVMAPI extends JRPCAPI {
     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
     * 
     * @param utxoset A set of UTXOs that the transaction is built on
-    * @param fee The amount of AVA to be paid for fees, in $nAVA
+    * @param fee The amount of AVAX to be paid for fees, in $nAVA
     * @param feePayingAddresses The addresses to pay the fees
     * @param name String for the descriptive name of the asset
     * @param symbol String for the ticker symbol of the asset
