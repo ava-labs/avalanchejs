@@ -24,6 +24,8 @@ const bintools = BinTools.getInstance();
  * Class representing a base for all transactions.
  */
 export class BaseTx {
+  protected codecversion:Buffer = Buffer.alloc(2);
+
   protected networkid:Buffer = Buffer.alloc(4);
 
   protected blockchainid:Buffer = Buffer.alloc(32);
@@ -36,12 +38,21 @@ export class BaseTx {
 
   protected ins:Array<TransferableInput>;
 
+  protected memolength:Buffer = Buffer.alloc(4);
+
+  protected memo:Buffer = Buffer.alloc(256);
+
   /**
      * Returns the id of the [[BaseTx]]
      */
   getTxType():number {
     return AVMConstants.BASETX;
   }
+
+  /**
+     * Returns the CodecVersion as a number
+     */
+  getCodedVersion = ():number => this.codecversion.readUInt16BE(0);
 
   /**
      * Returns the NetworkID as a number
@@ -64,6 +75,11 @@ export class BaseTx {
   getOuts = ():Array<TransferableOutput> => this.outs;
 
   /**
+     * Returns the memo
+     */
+  getMemo = ():Buffer => this.memo;
+
+  /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[BaseTx]], parses it, populates the class, and returns the length of the BaseTx in bytes.
      *
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[BaseTx]]
@@ -73,6 +89,8 @@ export class BaseTx {
      * @remarks assume not-checksummed
      */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.codecversion = bintools.copyFrom(bytes, offset, offset + 2);
+    offset += 2;
     this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
     this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -96,6 +114,10 @@ export class BaseTx {
       offset = xferin.fromBuffer(bytes, offset);
       this.ins.push(xferin);
     }
+    this.memolength = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    this.memo = bintools.copyFrom(bytes, offset, offset + this.memolength.length);
+    offset += this.memolength.length;
     return offset;
   }
 
@@ -107,8 +129,8 @@ export class BaseTx {
     this.ins.sort(TransferableInput.comparator());
     this.numouts.writeUInt32BE(this.outs.length, 0);
     this.numins.writeUInt32BE(this.ins.length, 0);
-    let bsize:number = this.networkid.length + this.blockchainid.length + this.numouts.length;
-    const barr:Array<Buffer> = [this.networkid, this.blockchainid, this.numouts];
+    let bsize:number = this.codecversion.length + this.networkid.length + this.blockchainid.length + this.numouts.length;
+    const barr:Array<Buffer> = [this.codecversion, this.networkid, this.blockchainid, this.numouts];
     for (let i = 0; i < this.outs.length; i++) {
       const b:Buffer = this.outs[i].toBuffer();
       barr.push(b);
@@ -121,6 +143,11 @@ export class BaseTx {
       barr.push(b);
       bsize += b.length;
     }
+    this.memolength.writeUInt32BE(this.memo.length, 0);
+    barr.push(this.memolength);
+    barr.push(this.memo);
+    bsize += this.memolength.length;
+    bsize += this.memo.length;
     const buff:Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -164,8 +191,9 @@ export class BaseTx {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
+     * @param memo Optional contains arbitrary bytes, up to 256 bytes, default Buffer.alloc(256, 0)
      */
-  constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined) {
+  constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, memo:Buffer = Buffer.alloc(256, 0)) {
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
     if (typeof ins !== 'undefined' && typeof outs !== 'undefined') {
@@ -173,6 +201,8 @@ export class BaseTx {
       this.outs = outs.sort(TransferableOutput.comparator());
       this.numins.writeUInt32BE(ins.length, 0);
       this.ins = ins.sort(TransferableInput.comparator());
+      this.memolength .writeUInt32BE(memo.length, 0);
+      this.memo = memo;
     }
   }
 }
