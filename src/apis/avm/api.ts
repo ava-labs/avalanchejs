@@ -642,8 +642,8 @@ class AVMAPI extends JRPCAPI {
      */
   buildBaseTx = async (
     utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>,
-    changeAddresses:Array<string>, assetID:Buffer | string = undefined, asOf:BN = UnixNow(),
-    locktime:BN = new BN(0), threshold:number = 1,
+    changeAddresses:Array<string>, assetID:Buffer | string = undefined, memo:PayloadBase = undefined, asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), threshold:number = 1
   ):Promise<UnsignedTx> => {
     const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
@@ -651,6 +651,10 @@ class AVMAPI extends JRPCAPI {
 
     if (typeof assetID === 'string') {
       assetID = bintools.cb58Decode(assetID);
+    }
+
+    if(typeof memo === 'undefined') {
+      memo = new PayloadBase();
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildBaseTx(
@@ -956,8 +960,8 @@ class AVMAPI extends JRPCAPI {
   buildCreateNFTMintTx = async (
       utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>|Array<Buffer>, 
       fromAddresses:Array<string>|Array<Buffer>, fee:BN,
-      feeAddresses:Array<string>|Array<Buffer>, asOf:BN = UnixNow(), groupID:number = 0, 
-      locktime:BN = new BN(0), threshold:number = 1, payload:PayloadBase|Buffer = undefined
+      feeAddresses:Array<string>|Array<Buffer>, groupID:number = 0, payload:PayloadBase|Buffer = undefined, 
+      asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
   ): Promise<any> => {
       let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
       let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));

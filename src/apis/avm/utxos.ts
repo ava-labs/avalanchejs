@@ -21,7 +21,7 @@ const bintools = BinTools.getInstance();
  * Class for representing a single UTXO.
  */
 export class UTXO {
-  protected codecID:Buffer = Buffer.alloc(2);
+  protected codecid:Buffer = Buffer.alloc(2);
 
   protected txid:Buffer = Buffer.alloc(32);
 
@@ -36,12 +36,12 @@ export class UTXO {
      */
   getCodecID = ()
   /* istanbul ignore next */
-  :number => this.codecID.readUInt8(0);
+  :number => this.codecid.readUInt8(0);
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
     */
-   getCodecIDBuffer = ():Buffer => this.codecID;
+   getCodecIDBuffer = ():Buffer => this.codecid;
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -80,7 +80,7 @@ export class UTXO {
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[UTXO]]
      */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
-    this.codecID = bintools.copyFrom(bytes, offset, offset + 2);
+    this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
     offset += 2;
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
@@ -101,9 +101,9 @@ export class UTXO {
     const outbuff:Buffer = this.output.toBuffer();
     const outputidbuffer:Buffer = Buffer.alloc(4);
     outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
-    const barr:Array<Buffer> = [this.codecID, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
+    const barr:Array<Buffer> = [this.codecid, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
     return Buffer.concat(barr, 
-      this.codecID.length + this.txid.length 
+      this.codecid.length + this.txid.length 
       + this.outputidx.length + this.assetid.length
       + outputidbuffer.length + outbuff.length);
   }
@@ -150,7 +150,7 @@ export class UTXO {
     && typeof outputidx !== 'undefined'
     && typeof assetid !== 'undefined'
     && typeof output !== 'undefined') {
-      this.codecID .writeUInt8(codecID, 0);
+      this.codecid .writeUInt8(codecID, 0);
       this.txid = txid;
       if (typeof outputidx === 'number') {
         this.outputidx.writeUInt32BE(outputidx, 0);
@@ -455,6 +455,7 @@ export class UTXOSet {
      * @param locktime Optional. The locktime field created in the resulting outputs
      * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
      * @param outputID Optional. The outputID used for this transaction, must implement AmountOutput, default AVMConstants.SECPOUTPUTID
+     * @param memo Optional contains arbitrary bytes, up to 256 bytes, default Buffer.alloc(256, 0)
      *
      * @returns An unsigned transaction created from the passed in parameters.
      *
@@ -471,6 +472,7 @@ export class UTXOSet {
     locktime:BN = new BN(0),
     threshold:number = 1,
     outputID = AVMConstants.SECPOUTPUTID,
+    memo:Buffer = Buffer.alloc(0, 0)
   ):UnsignedTx => {
     const zero:BN = new BN(0);
     let spendamount:BN = zero.clone();
@@ -547,7 +549,7 @@ export class UTXOSet {
         + 'funds to create the transaction');
       }
     }
-    const baseTx:BaseTx = new BaseTx(networkid, blockchainid, outs, ins);
+    const baseTx:BaseTx = new BaseTx(networkid, blockchainid, outs, ins, memo);
     return new UnsignedTx(baseTx);
   };
 
@@ -565,6 +567,7 @@ export class UTXOSet {
      * @param symbol String for the ticker symbol of the asset
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+     * @param memo Optional contains arbitrary bytes, up to 256 bytes
      *
      * @returns An unsigned transaction created from the passed in parameters.
      *
@@ -598,7 +601,7 @@ export class UTXOSet {
     * @param symbol String for the ticker symbol of the nft asset
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting mint output
-    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * 
     * @returns An unsigned transaction created from the passed in parameters.
     * 
@@ -650,7 +653,7 @@ export class UTXOSet {
     * 
     */
   buildCreateNFTMintTx = (
-      networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
+    networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
       feeSenderAddresses:Array<Buffer>, to:Array<Buffer>, fromAddresses:Array<Buffer>, 
       utxoids:Array<string>, groupID:number = 0, payload:Buffer = undefined,
       asOf:BN = UnixNow(), locktime:BN, threshold:number = 1 

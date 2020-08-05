@@ -39,6 +39,7 @@ describe('Transactions', () => {
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
+  const memo:Buffer = bintools.stringToBuffer("Avalanche.js");
   const blockchainID:Buffer = Buffer.from(createHash('sha256').update('Foot on the pedal, never ever false metal, engine running hotter than a boiling kettle.').digest());
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
@@ -135,7 +136,7 @@ describe('Transactions', () => {
       const nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, addresses, locktime, threshold);
       const op:NFTTransferOperation = new NFTTransferOperation(nout);
       const nfttxid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, 1000 + i, NFTassetID, nout);
+      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC,nfttxid, 1000 + i, NFTassetID, nout);
       nftutxoids.push(nftutxo.getUTXOID());
       const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
       ops.push(xferop);
@@ -408,8 +409,7 @@ describe('Transactions', () => {
   test('Creation Tx1 with asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000),
-      addrs3, addrs1, addrs1, assetID,
+      new BN(9000), addrs3, addrs1, addrs1, assetID,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
     const tx:Tx = keymgr1.signTx(txu);
@@ -423,7 +423,7 @@ describe('Transactions', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
       new BN(9000),
-      addrs3, addrs1, addrs1, assetID,
+      addrs3, addrs1, addrs1, assetID
     );
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
@@ -459,10 +459,12 @@ describe('Transactions', () => {
       netid, blockchainID, avaxAssetID, new BN(90), 
       addrs1, exportUTXOIDS, UnixNow()
     )
+    console.log(txu.toBuffer().toString('hex'))
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
-    expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
+    console.log(tx2.toBuffer().toString('hex'))
+    expect(tx.toBuffer().toString('hex')).toBe(tx2.toBuffer().toString('hex'));
   });
 
 });

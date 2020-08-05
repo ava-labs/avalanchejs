@@ -958,7 +958,7 @@ describe('AVMAPI', () => {
       );
 
       const txu2:UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid), assetID,
+      networkid, bintools.cb58Decode(blockchainid), assetID,
         fee, addrbuff1, [fungutxoids[1]], UnixNow()
       );
 
@@ -970,7 +970,7 @@ describe('AVMAPI', () => {
       );
 
       const txu4:UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid), assetID,
+      networkid, bintools.cb58Decode(blockchainid), assetID,
         fee, addrbuff1, fungutxoids, UnixNow()
       );
 
