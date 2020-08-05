@@ -35,7 +35,7 @@ describe("Payload", () => {
 
         expect(payloadTypes.getTypeID(pl.toBuffer())).toBe(0);
 
-        let pp:Buffer = payloadTypes.parsePayload(pl.toBuffer());
+        let pp:Buffer = payloadTypes.getContent(pl.toBuffer());
 
         expect(bintools.b58ToBuffer(binstr).toString("hex")).toBe(pp.toString("hex"));
         expect(payloadTypes.lookupType(0)).toBe("BIN");

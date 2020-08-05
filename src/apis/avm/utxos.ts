@@ -451,12 +451,12 @@ export class UTXOSet {
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
      * @param assetid {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
+     * @param memo Optional contains arbitrary bytes, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime Optional. The locktime field created in the resulting outputs
      * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
      * @param outputID Optional. The outputID used for this transaction, must implement AmountOutput, default AVMConstants.SECPOUTPUTID
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes, default Buffer.alloc(256, 0)
-     *
+     * 
      * @returns An unsigned transaction created from the passed in parameters.
      *
      */
@@ -468,11 +468,11 @@ export class UTXOSet {
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
     assetID:Buffer,
+    memo:Buffer = undefined,
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0),
     threshold:number = 1,
-    outputID = AVMConstants.SECPOUTPUTID,
-    memo:Buffer = Buffer.alloc(0, 0)
+    outputID = AVMConstants.SECPOUTPUTID
   ):UnsignedTx => {
     const zero:BN = new BN(0);
     let spendamount:BN = zero.clone();
@@ -566,8 +566,8 @@ export class UTXOSet {
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param memo Optional contains arbitrary bytes, up to 256 bytes
+     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      *
      * @returns An unsigned transaction created from the passed in parameters.
      *
@@ -576,14 +576,14 @@ export class UTXOSet {
       networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
       fee:BN, feeSenderAddresses:Array<Buffer>, 
       initialState:InitialStates, name:string, 
-      symbol:string, denomination:number, asOf:BN = UnixNow()
+      symbol:string, denomination:number, memo:Buffer = undefined, asOf:BN = UnixNow()
   ):UnsignedTx => {
       // Cheating and using buildBaseTx to get Ins and Outs for fees.
       // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the feeSenderAddresses
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID, asOf);
+      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID, undefined, asOf);
       let ins:Array<TransferableInput> = utx.getTransaction().getIns();
       let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-      let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, denomination, initialState);
+      let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
       return new UnsignedTx(CAtx);
   }
 
@@ -599,9 +599,9 @@ export class UTXOSet {
     * @param minterSets The minters and thresholds required to mint this nft asset
     * @param name String for the descriptive name of the nft asset
     * @param symbol String for the ticker symbol of the nft asset
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting mint output
-    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * 
     * @returns An unsigned transaction created from the passed in parameters.
     * 
@@ -610,11 +610,11 @@ export class UTXOSet {
       networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
       fee:BN, feePayingAddresses:Array<Buffer>, 
       minterSets:Array<MinterSet>,
-      name:string, symbol:string, asOf:BN = UnixNow(),
-      locktime:BN
+      name:string, symbol:string, memo:Buffer = undefined, asOf:BN = UnixNow(),
+      locktime:BN = undefined
   ):UnsignedTx => {
       let initialState:InitialStates = new InitialStates();
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaAssetID, asOf);
+      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaAssetID, undefined, asOf);
       let ins:Array<TransferableInput> = utx.getTransaction().getIns();
       let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
       for(let i:number = 0; i < minterSets.length; i++) {
@@ -627,7 +627,7 @@ export class UTXOSet {
         initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
       }
       let denomination:number = 0; // NFTs are non-fungible
-      let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, name, symbol, denomination, initialState);
+      let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
       return new UnsignedTx(CAtx);
   }
 
@@ -645,6 +645,7 @@ export class UTXOSet {
     * @param utxoids An array of strings for the NFTs being transferred
     * @param groupID Optional. The group this NFT is issued to.
     * @param payload Optional. Data for NFT Payload.
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting mint output
     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -655,10 +656,10 @@ export class UTXOSet {
   buildCreateNFTMintTx = (
     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
       feeSenderAddresses:Array<Buffer>, to:Array<Buffer>, fromAddresses:Array<Buffer>, 
-      utxoids:Array<string>, groupID:number = 0, payload:Buffer = undefined,
+      utxoids:Array<string>, groupID:number = 0, payload:Buffer = undefined, memo:Buffer = undefined,
       asOf:BN = UnixNow(), locktime:BN, threshold:number = 1 
   ):UnsignedTx => {
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, asOf);
+      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf);
       let ins:Array<TransferableInput> = utx.getTransaction().getIns();
       let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
       let ops:TransferableOperation[] = [];
@@ -688,7 +689,7 @@ export class UTXOSet {
           ops.push(transferableOperation);
       }
   
-      let operationTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, ops);
+      let operationTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, memo, ops);
       return new UnsignedTx(operationTx);
   }
 
@@ -704,6 +705,7 @@ export class UTXOSet {
     * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
     * @param utxoids An array of strings for the NFTs being transferred
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting outputs
     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -713,13 +715,13 @@ export class UTXOSet {
   buildNFTTransferTx = (
     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN,
     feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>,
-    utxoids:Array<string>, asOf:BN = UnixNow(),
+    utxoids:Array<string>, memo:Buffer = undefined, asOf:BN = UnixNow(),
     locktime:BN = new BN(0), threshold:number = 1,
   ):UnsignedTx => {
     // Cheating and using buildBaseTx to get Ins and Outs for fees.
     // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
     const utx:UnsignedTx = this.buildBaseTx(
-      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, asOf
+      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf
     );
     const ins:Array<TransferableInput> = utx.getTransaction().getIns();
     const outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
@@ -750,7 +752,7 @@ export class UTXOSet {
         op);
       ops.push(xferop);
     }
-    const OpTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, ops);
+    const OpTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, memo, ops);
     return new UnsignedTx(OpTx);
   };
 
@@ -763,23 +765,24 @@ export class UTXOSet {
     * @param fee The amount of AVAX to be paid for fees, in $nAVA
     * @param feeSenderAddresses The addresses to send the fees
     * @param importIns An array of [[TransferableInput]]s being imported
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @returns An unsigned transaction created from the passed in parameters.
     *
     */
    buildImportTx = (
     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN,
-    feeSenderAddresses:Array<Buffer>, importIns:Array<TransferableInput>, asOf:BN = UnixNow(),
+    feeSenderAddresses:Array<Buffer>, importIns:Array<TransferableInput>, memo:Buffer = undefined, asOf:BN = UnixNow(),
   ):UnsignedTx => {
     // Cheating and using buildBaseTx to get Ins and Outs for fees.
     // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
     const utx:UnsignedTx = this.buildBaseTx(
-      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, asOf
+      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf
     );
     const ins:Array<TransferableInput> = utx.getTransaction().getIns();
     const outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
 
-    const importTx:ImportTx = new ImportTx(networkid, blockchainid, outs, ins, importIns);
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid, outs, ins, memo, importIns);
     return new UnsignedTx(importTx);
   };
 
@@ -792,18 +795,19 @@ export class UTXOSet {
     * @param fee The amount of AVAX to be paid for fees, in $nAVAX
     * @param feeSenderAddresses The addresses to send the fees
     * @param utxoids An array of strings for the [[TransferableOutput]]s being exported
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @returns An unsigned transaction created from the passed in parameters.
     *
     */
    buildExportTx = (
     networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN,
-    feeSenderAddresses:Array<Buffer>, utxoids:Array<string>, asOf:BN = UnixNow()
+    feeSenderAddresses:Array<Buffer>, utxoids:Array<string>, memo:Buffer = undefined, asOf:BN = UnixNow()
   ):UnsignedTx => {
     // Cheating and using buildBaseTx to get Ins and Outs for fees.
     // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
     const utx:UnsignedTx = this.buildBaseTx(
-      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, asOf
+      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf
     );
     const ins:Array<TransferableInput> = utx.getTransaction().getIns();
     const outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
@@ -832,7 +836,7 @@ export class UTXOSet {
       const xferOut:TransferableOutput = new TransferableOutput(assetID, output);
       exportOuts.push(xferOut)
     }
-    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, exportOuts);
+    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, exportOuts);
     return new UnsignedTx(exportTx);
   };
 
