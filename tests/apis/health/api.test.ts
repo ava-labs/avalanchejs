@@ -1,9 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 
 import { Avalanche } from 'src';
-import PlatformVMAPI from 'src/apis/platform/api';
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
 import BinTools from 'src/utils/bintools';
 import HealthAPI from '../../../src/apis/health/api';
 

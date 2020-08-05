@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from 'src';
-import MetricsAPI from '../../../src/apis/metrics/api';
+import MetricsAPI from 'src/apis/metrics/api';
 
 describe('Metrics', () => {
   const ip = '127.0.0.1';

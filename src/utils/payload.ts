@@ -22,10 +22,18 @@ export class PayloadTypes {
     protected types:Array<string> = [];
 
     /**
-     * Given an encoded payload buffer returns the payload content.
+     * Given an encoded payload buffer returns the payload content (minus typeID).
      */
-    parsePayload(payload:Buffer):Buffer {
+    getContent(payload:Buffer):Buffer {
         const pl: Buffer = bintools.copyFrom(payload, 5);
+        return pl;
+    }
+
+    /**
+     * Given an encoded payload buffer returns the payload (with typeID).
+     */
+    getPayload(payload:Buffer):Buffer {
+        const pl: Buffer = bintools.copyFrom(payload, 4);
         return pl;
     }
 
@@ -173,6 +181,24 @@ export abstract class PayloadBase {
      */
     typeName():string {
         return PayloadTypes.getInstance().lookupType(this.typeid);
+    }
+
+    /**
+     * Returns the payload content (minus typeID).
+     */
+    getContent():Buffer {
+        const pl: Buffer = bintools.copyFrom(this.payload);
+        return pl;
+    }
+
+    /**
+     * Returns the payload (with typeID).
+     */
+    getPayload():Buffer {
+        let typeid:Buffer = Buffer.alloc(4);
+        typeid.writeUInt32BE(this.typeid, 0);
+        const pl: Buffer = Buffer.concat([typeid, bintools.copyFrom(this.payload)]);
+        return pl; 
     }
 
     /**

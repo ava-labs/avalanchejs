@@ -4,7 +4,7 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import {Buffer} from "buffer/";
 import { NFTTransferOutput, OutputOwners} from 'src/apis/avm/outputs';
-import { SigIdx, UTXOID, UnixNow, AVMConstants } from 'src/apis/avm/types';
+import { SigIdx, UTXOID, AVMConstants } from 'src/apis/avm/types';
 import { SelectOperationClass, Operation, TransferableOperation, NFTTransferOperation, NFTMintOperation } from 'src/apis/avm/ops';
 
 

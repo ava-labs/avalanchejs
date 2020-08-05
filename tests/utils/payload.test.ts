@@ -1,8 +1,7 @@
 import { Buffer } from "buffer/";
 import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, cb58EncodedPayload, TXIDPayload, JSONPayload } from '../../src/utils/payload';
-import BinTools from '../../src/utils/bintools';
+import BinTools from 'src/utils/bintools';
 import BN from "bn.js";
-import { AVMConstants } from 'src/apis/avm/types';
 import * as bech32 from 'bech32';
 let payloadTypes:PayloadTypes = PayloadTypes.getInstance();
 let bintools = BinTools.getInstance()
@@ -41,7 +40,7 @@ describe("Payload", () => {
 
         expect(payloadTypes.getTypeID(pl.toBuffer())).toBe(0);
 
-        let pp:Buffer = payloadTypes.parsePayload(pl.toBuffer());
+        let pp:Buffer = payloadTypes.getContent(pl.toBuffer());
 
         expect(bintools.b58ToBuffer(binstr).toString("hex")).toBe(pp.toString("hex"));
         expect(payloadTypes.lookupType(0)).toBe("BIN");

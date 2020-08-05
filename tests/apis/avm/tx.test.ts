@@ -2,7 +2,7 @@ import mockAxios from 'jest-mock-axios';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import AVMAPI from 'src/apis/avm/api';
 import {
-  BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx,
+  BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx, ImportTx, ExportTx 
 } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
 import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
@@ -14,7 +14,7 @@ import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/
 import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 import { Avalanche } from 'src/index';
-import { ImportTx, ExportTx } from '../../../src/apis/avm/tx';
+import { UTF8Payload } from 'src/utils/payload';
 
 /**
  * @ignore
@@ -39,6 +39,7 @@ describe('Transactions', () => {
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
+  const memo:Buffer = bintools.stringToBuffer("Avalanche.js");
   const blockchainID:Buffer = Buffer.from(createHash('sha256').update('Foot on the pedal, never ever false metal, engine running hotter than a boiling kettle.').digest());
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
@@ -135,7 +136,7 @@ describe('Transactions', () => {
       const nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, addresses, locktime, threshold);
       const op:NFTTransferOperation = new NFTTransferOperation(nout);
       const nfttxid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, 1000 + i, NFTassetID, nout);
+      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC,nfttxid, 1000 + i, NFTassetID, nout);
       nftutxoids.push(nftutxo.getUTXOID());
       const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
       ops.push(xferop);
@@ -327,7 +328,7 @@ describe('Transactions', () => {
     const name:string = 'Rickcoin is the most intelligent coin';
     const symbol:string = 'RICK';
     const denomination:number = 9;
-    const txu:CreateAssetTx = new CreateAssetTx(netid, blockchainID, outputs, inputs, name, symbol, denomination, initialState);
+    const txu:CreateAssetTx = new CreateAssetTx(netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), name, symbol, denomination, initialState);
     const txins:Array<TransferableInput> = txu.getIns();
     const txouts:Array<TransferableOutput> = txu.getOuts();
     const initState:InitialStates = txu.getInitialStates();
@@ -369,7 +370,7 @@ describe('Transactions', () => {
 
   test('Creation OperationTx', () => {
     const optx:OperationTx = new OperationTx(
-      netid, blockchainID, outputs, inputs, ops,
+      netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), ops,
     );
     const txunew:OperationTx = new OperationTx();
     const opbuff:Buffer = optx.toBuffer();
@@ -381,7 +382,7 @@ describe('Transactions', () => {
 
   test('Creation ImportTx', () => {
     const importtx:ImportTx = new ImportTx(
-      netid, blockchainID, outputs, inputs, importIns
+      netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
     );
     const txunew:ImportTx = new ImportTx();
     const importbuff:Buffer = importtx.toBuffer();
@@ -394,7 +395,7 @@ describe('Transactions', () => {
 
   test('Creation ExportTx', () => {
     const exporttx:ExportTx = new ExportTx(
-      netid, blockchainID, outputs, inputs, exportOuts
+      netid, blockchainID, outputs, inputs, undefined, exportOuts
     );
     const txunew:ExportTx = new ExportTx();
     const exportbuff:Buffer = exporttx.toBuffer();
@@ -408,8 +409,7 @@ describe('Transactions', () => {
   test('Creation Tx1 with asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000),
-      addrs3, addrs1, addrs1, assetID,
+      new BN(9000), addrs3, addrs1, addrs1, assetID, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
     const tx:Tx = keymgr1.signTx(txu);
@@ -423,7 +423,7 @@ describe('Transactions', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
       new BN(9000),
-      addrs3, addrs1, addrs1, assetID,
+      addrs3, addrs1, addrs1, assetID, undefined
     );
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
@@ -435,7 +435,7 @@ describe('Transactions', () => {
   test('Creation Tx3 using OperationTx', () => {
     const txu:UnsignedTx = set.buildNFTTransferTx(
       netid, blockchainID, avaxAssetID, new BN(90),
-      addrs1, addrs3, addrs1, nftutxoids,
+      addrs1, addrs3, addrs1, nftutxoids, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
     const tx:Tx = keymgr1.signTx(txu);
@@ -447,7 +447,8 @@ describe('Transactions', () => {
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
       netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, importIns, UnixNow());
+      addrs1, importIns,
+      new UTF8Payload("hello world").getPayload(), UnixNow());
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
@@ -457,12 +458,12 @@ describe('Transactions', () => {
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
       netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, exportUTXOIDS, UnixNow()
+      addrs1, exportUTXOIDS, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
-    expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
+    expect(tx.toBuffer().toString('hex')).toBe(tx2.toBuffer().toString('hex'));
   });
 
 });
