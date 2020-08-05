@@ -80,7 +80,7 @@ class AVMAPI extends JRPCAPI {
   /**
      * @ignore
      */
-  protected keychain:AVMKeyChain = new AVMKeyChain('');
+  protected keychain:AVMKeyChain = new AVMKeyChain('', '');
 
   protected blockchainID:string = '';
 
@@ -139,7 +139,7 @@ class AVMAPI extends JRPCAPI {
 
   addressFromBuffer = (address:Buffer):string => {
     const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
-    return bintools.addressToString(chainid, AVMConstants.ADDRESSHRP, address);
+    return bintools.addressToString(this.core.getHRP(), chainid, address);
   };
 
   /**
@@ -175,9 +175,9 @@ class AVMAPI extends JRPCAPI {
     // warning, overwrites the old keychain
     const alias = this.getBlockchainAlias();
     if (alias) {
-      this.keychain = new AVMKeyChain(alias);
+      this.keychain = new AVMKeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new AVMKeyChain(this.blockchainID);
+      this.keychain = new AVMKeyChain(this.core.getHRP(), this.blockchainID);
     }
     return this.keychain;
   };
@@ -1105,7 +1105,7 @@ class AVMAPI extends JRPCAPI {
           }
           addrs.push(addresses[i] as string);
         } else {
-          addrs.push(bintools.addressToString(chainid, AVMConstants.ADDRESSHRP, addresses[i] as Buffer));
+          addrs.push(bintools.addressToString(this.core.getHRP(), chainid, addresses[i] as Buffer));
         }
       }
     }
@@ -1124,9 +1124,9 @@ class AVMAPI extends JRPCAPI {
     const netid:number = core.getNetworkID();
     if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
       const { alias } = Defaults.network[netid][blockchainID];
-      this.keychain = new AVMKeyChain(alias);
+      this.keychain = new AVMKeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new AVMKeyChain(blockchainID);
+      this.keychain = new AVMKeyChain(this.core.getHRP(), blockchainID);
     }
   }
 }

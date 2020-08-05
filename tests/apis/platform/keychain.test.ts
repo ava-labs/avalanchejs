@@ -5,9 +5,10 @@ import BinTools from 'src/utils/bintools';
 
 const bintools = BinTools.getInstance();
 const alias = 'P';
+const hrp = "tests";
 describe('PlatformKeyPair', () => {
   test('repeatable 1', () => {
-    const kp:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kp:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     kp.importKey(Buffer.from('ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676', 'hex'));
     expect(kp.getPublicKey().toString('hex')).toBe('033fad3644deb20d7a210d12757092312451c112d04773cee2699fbb59dc8bb2ef');
 
@@ -20,7 +21,7 @@ describe('PlatformKeyPair', () => {
   });
 
   test('repeatable 2', () => {
-    const kp:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kp:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     kp.importKey(Buffer.from('17c692d4a99d12f629d9f0ff92ec0dba15c9a83e85487b085c1a3018286995c6', 'hex'));
     expect(kp.getPublicKey().toString('hex')).toBe('02486553b276cfe7abf0efbcd8d173e55db9c03da020c33d0b219df24124da18ee');
 
@@ -33,7 +34,7 @@ describe('PlatformKeyPair', () => {
   });
 
   test('repeatable 3', () => {
-    const kp:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kp:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     kp.importKey(Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex'));
     expect(kp.getPublicKey().toString('hex')).toBe('031475b91d4fcf52979f1cf107f058088cc2bea6edd51915790f27185a7586e2f2');
 
@@ -46,7 +47,7 @@ describe('PlatformKeyPair', () => {
   });
 
   test('Creation Empty', () => {
-    const kp:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kp:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     expect(kp.getPrivateKey()).not.toBeUndefined();
     expect(kp.getAddress()).not.toBeUndefined();
     expect(kp.getPrivateKeyString()).not.toBeUndefined();
@@ -64,8 +65,8 @@ describe('PlatformKeyPair', () => {
 describe('PlatformKeyChain', () => {
   test('importKey from Buffer', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
-    const kc:PlatformKeyChain = new PlatformKeyChain(alias);
-    const kp2:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kc:PlatformKeyChain = new PlatformKeyChain(hrp, alias);
+    const kp2:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     const addr1:Buffer = kc.importKey(keybuff);
     const kp1:PlatformKeyPair = kc.getKey(addr1);
     kp2.importKey(keybuff);
@@ -78,8 +79,8 @@ describe('PlatformKeyChain', () => {
 
   test('importKey from serialized string', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
-    const kc:PlatformKeyChain = new PlatformKeyChain(alias);
-    const kp2:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kc:PlatformKeyChain = new PlatformKeyChain(hrp, alias);
+    const kp2:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     const addr1:Buffer = kc.importKey(bintools.cb58Encode(keybuff));
     const kp1:PlatformKeyPair = kc.getKey(addr1);
     kp2.importKey(keybuff);
@@ -92,8 +93,8 @@ describe('PlatformKeyChain', () => {
 
   test('removeKey via keypair', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
-    const kc:PlatformKeyChain = new PlatformKeyChain(alias);
-    const kp1:PlatformKeyPair = new PlatformKeyPair(alias);
+    const kc:PlatformKeyChain = new PlatformKeyChain(hrp, alias);
+    const kp1:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
     const addr1:Buffer = kc.importKey(keybuff);
     kp1.importKey(keybuff);
     expect(kc.hasKey(addr1)).toBe(true);
@@ -103,7 +104,7 @@ describe('PlatformKeyChain', () => {
 
   test('removeKey via string', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
-    const kc:PlatformKeyChain = new PlatformKeyChain(alias);
+    const kc:PlatformKeyChain = new PlatformKeyChain(hrp, alias);
     const addr1:Buffer = kc.importKey(keybuff);
     expect(kc.hasKey(addr1)).toBe(true);
     kc.removeKey(addr1);
@@ -112,7 +113,7 @@ describe('PlatformKeyChain', () => {
 
   test('removeKey bad keys', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
-    const kc:PlatformKeyChain = new PlatformKeyChain(alias);
+    const kc:PlatformKeyChain = new PlatformKeyChain(hrp, alias);
     const addr1:Buffer = kc.importKey(keybuff);
     expect(kc.hasKey(addr1)).toBe(true);
     expect(kc.removeKey(bintools.cb58Decode('6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV'))).toBe(false);

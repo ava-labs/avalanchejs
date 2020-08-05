@@ -62,7 +62,7 @@ describe('Transactions', () => {
   let avaxAssetID:Buffer;
 
   beforeAll(async () => {
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, null, true);
     api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
 
     const result:Promise<Buffer> = api.getAVAAssetID();
@@ -84,9 +84,9 @@ describe('Transactions', () => {
 
   beforeEach(() => {
     set = new UTXOSet();
-    keymgr1 = new AVMKeyChain(alias);
-    keymgr2 = new AVMKeyChain(alias);
-    keymgr3 = new AVMKeyChain(alias);
+    keymgr1 = new AVMKeyChain(avalanche.getHRP(), alias);
+    keymgr2 = new AVMKeyChain(avalanche.getHRP(), alias);
+    keymgr3 = new AVMKeyChain(avalanche.getHRP(), alias);
     addrs1 = [];
     addrs2 = [];
     addrs3 = [];

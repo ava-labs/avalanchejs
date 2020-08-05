@@ -3,7 +3,7 @@
  * @module AvalancheCore
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
-import { APIBase, RequestResponseData } from './utils/types';
+import { APIBase, RequestResponseData, Defaults } from './utils/types';
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
@@ -15,7 +15,9 @@ import { APIBase, RequestResponseData } from './utils/types';
  *
  */
 export default class AvalancheCore {
-  protected networkID:number = 3;
+  protected networkID:number = 0;
+
+  protected hrp:string = '';
 
   protected protocol:string;
 
@@ -72,6 +74,25 @@ export default class AvalancheCore {
      */
   setNetworkID = (netid:number) => {
     this.networkID = netid;
+    if (netid in Defaults.network && this.hrp in Defaults.network[netid]) {
+      this.hrp = Defaults.network[netid].hrp;
+    } // otherwise keep this.hrp whatever it already is
+  };
+
+  /**
+   * Returns the Human-Readable-Part of the network associated with this key.
+   *
+   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
+   */
+  getHRP = ():string => this.hrp;
+
+  /**
+   * Sets the the Human-Readable-Part of the network associated with this key.
+   *
+   * @param hrp String for the Human-Readable-Part of Bech32 addresses
+   */
+  setHRP = (hrp:string):void => {
+    this.hrp = hrp;
   };
 
   /**

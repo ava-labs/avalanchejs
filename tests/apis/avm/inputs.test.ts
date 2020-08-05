@@ -21,11 +21,12 @@ describe('Inputs', () => {
   let addrs1:Array<Buffer>;
   let addrs2:Array<Buffer>;
   let utxos:Array<UTXO>;
+  let hrp:string = "tests";
   const amnt:number = 10000;
   beforeEach(() => {
     set = new UTXOSet();
-    keymgr1 = new AVMKeyChain('X');
-    keymgr2 = new AVMKeyChain('X');
+    keymgr1 = new AVMKeyChain(hrp, 'X');
+    keymgr2 = new AVMKeyChain(hrp, 'X');
     addrs1 = [];
     addrs2 = [];
     utxos = [];

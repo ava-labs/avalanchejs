@@ -102,7 +102,7 @@ export class PlatformKeyPair extends KeyPair {
      */
     getAddressString = ():string => {
         const addr:Buffer = this.addressFromPublicKey(this.pubk);
-        return bintools.addressToString(this.chainid, PlatformVMConstants.ADDRESSHRP, addr);
+        return bintools.addressToString(this.hrp, this.chainid, addr);
     }
 
     /**
@@ -190,10 +190,10 @@ export class PlatformKeyPair extends KeyPair {
     }
 
     /**
-     * Class for representing a private and public keypair in Avalanche. 
+     * Class for representing a private and public keypair in Avalanche PlatformVM. 
      */
-    constructor(chainid:string, entropy:Buffer = undefined) {
-        super(chainid);
+    constructor(hrp:string, chainid:string, entropy:Buffer = undefined) {
+        super(hrp, chainid);
         this.generateKey();
     }
     
@@ -214,7 +214,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
      * @returns Address of the new key pair
      */
     makeKey = (entropy:Buffer = undefined):Buffer => {
-        let keypair:PlatformKeyPair = new PlatformKeyPair(this.chainid, entropy);
+        let keypair:PlatformKeyPair = new PlatformKeyPair(this.hrp, this.chainid, entropy);
         this.addKey(keypair);
         return keypair.getAddress();
     }
@@ -227,7 +227,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
      * @returns Address of the new key pair
      */
     importKey = (privk:Buffer | string):Buffer => {
-        let keypair:PlatformKeyPair = new PlatformKeyPair(this.chainid);
+        let keypair:PlatformKeyPair = new PlatformKeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
             pk = bintools.cb58Decode(privk);
@@ -244,7 +244,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
     /**
      * Returns instance of PlatformKeyChain.
      */
-    constructor(chainid:string){
-        super(chainid);
+    constructor(hrp:string, chainid:string){
+        super(hrp, chainid);
     }
 }

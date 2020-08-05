@@ -19,7 +19,7 @@ describe('Platform', () => {
   const username = 'AvaLabs';
   const password = 'password';
 
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
   let platform:PlatformVMAPI;
 
   beforeAll(() => {

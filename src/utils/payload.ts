@@ -201,7 +201,7 @@ export abstract class PayloadBase {
     /**
      * Returns the expected type for the payload.
      */
-    abstract returnType():any;
+    abstract returnType(...args:any):any;
 
     constructor(){}
 
@@ -379,8 +379,8 @@ export abstract class ChainAddressPayload extends PayloadBase {
     /**
      * Returns an address string for the payload.
      */
-    returnType():string {
-        return bintools.addressToString(this.chainid, AVMConstants.ADDRESSHRP, this.payload);
+    returnType(hrp:string):string {
+        return bintools.addressToString(hrp, this.chainid, this.payload);
     }
     /**
      * @param payload Buffer or address string

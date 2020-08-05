@@ -322,8 +322,8 @@ export default class BinTools {
     throw new Error('Error - BinTools.cb58Decode: invalid checksum');
   };
 
-  addressToString = (chainid:string, prefix:string, bytes:Buffer)
-  :string => `${chainid}-${bech32.encode(prefix, bech32.toWords(bytes))}`;
+  addressToString = (hrp:string, chainid:string, bytes:Buffer)
+  :string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
   stringToAddress = (address:string):Buffer => {
     const parts:Array<string> = address.trim().split('-');

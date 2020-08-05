@@ -17,7 +17,7 @@ describe('Avalanche', () => {
     const protocol = "https";
     let avalanche:Avalanche;
     beforeAll(() => {
-        avalanche = new Avalanche(ip,port,protocol, 12345, undefined, true);
+        avalanche = new Avalanche(ip,port,protocol, 12345, undefined, undefined, true);
         avalanche.addAPI("admin", AdminAPI);
         avalanche.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
         avalanche.addAPI("health", HealthAPI);
@@ -88,7 +88,7 @@ describe('HTTP Operations', () => {
   const path = '/ext/testingrequests';
   let avalanche:Avalanche;
   beforeAll(() => {
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
     avalanche.addAPI('testingrequests', TestAPI, path);
   });
 

@@ -13,8 +13,6 @@ import BinTools from '../../utils/bintools';
 const bintools:BinTools = BinTools.getInstance();
 
 export class PlatformVMConstants {
-  static ADDRESSHRP:string = "avax1";
-
   static ONEAVAX:BN = new BN(1000000000);
 
   static DECIAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(10));

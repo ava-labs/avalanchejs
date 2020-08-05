@@ -101,7 +101,7 @@ export class AVMKeyPair extends KeyPair {
      */
   getAddressString = ():string => {
     const addr:Buffer = this.addressFromPublicKey(this.pubk);
-    return bintools.addressToString(this.chainid, AVMConstants.ADDRESSHRP, addr);
+    return bintools.addressToString(this.hrp, this.chainid, addr);
   };
 
   /**
@@ -186,8 +186,8 @@ export class AVMKeyPair extends KeyPair {
   /**
      * Class for representing a private and public keypair in Avalanche.
      */
-  constructor(chainid:string, entropy:Buffer = undefined) {
-    super(chainid);
+  constructor(hrp:string, chainid:string, entropy:Buffer = undefined) {
+    super(hrp, chainid);
     this.entropy = entropy;
     this.generateKey();
   }
@@ -207,7 +207,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * @returns Address of the new key pair
      */
   makeKey = (entropy:Buffer = undefined):Buffer => {
-    const keypair:AVMKeyPair = new AVMKeyPair(this.chainid, entropy);
+    const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid, entropy);
     this.addKey(keypair);
     return keypair.getAddress();
   };
@@ -220,7 +220,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * @returns Address of the new key pair
      */
   importKey = (privk:Buffer | string):Buffer => {
-    const keypair:AVMKeyPair = new AVMKeyPair(this.chainid);
+    const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
     let pk:Buffer;
     if (typeof privk === 'string') {
       pk = bintools.cb58Decode(privk);
@@ -247,7 +247,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
   /**
      * Returns instance of AVMKeyChain.
      */
-  constructor(chainid:string) {
-    super(chainid);
+  constructor(hrp:string, chainid:string) {
+    super(hrp, chainid);
   }
 }

@@ -408,6 +408,7 @@ export class KeyPair {
   protected privk:Buffer;
 
   protected chainid:string = '';
+  protected hrp:string = '';
 
   /**
      * Generates a new keypair.
@@ -515,8 +516,25 @@ export class KeyPair {
     this.chainid = chainid;
   };
 
-  constructor(chainid:string) {
+  /**
+   * Returns the Human-Readable-Part of the network associated with this key.
+   *
+   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
+   */
+  getHRP = ():string => this.hrp;
+
+  /**
+   * Sets the the Human-Readable-Part of the network associated with this key.
+   *
+   * @param hrp String for the Human-Readable-Part of Bech32 addresses
+   */
+  setHRP = (hrp:string):void => {
+    this.hrp = hrp;
+  };
+
+  constructor(hrp:string, chainid:string) {
     this.chainid = chainid;
+    this.hrp = hrp;
   }
 }
 
@@ -530,6 +548,7 @@ export class KeyChain<KPClass extends KeyPair> {
   protected keys:{[address: string]: KPClass} = {};
 
   protected chainid:string = '';
+  protected hrp:string = '';
 
   /**
      * Makes a new [[KeyPair]], returns the address.
@@ -636,12 +655,31 @@ export class KeyChain<KPClass extends KeyPair> {
   };
 
   /**
+   * Returns the Human-Readable-Part of the network associated with this key.
+   *
+   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
+   */
+  getHRP = ():string => this.hrp;
+
+  /**
+   * Sets the the Human-Readable-Part of the network associated with this key.
+   *
+   * @param hrp String for the Human-Readable-Part of Bech32 addresses
+   */
+  setHRP = (hrp:string):void => {
+    this.hrp = hrp;
+  };
+
+  /**
      * Returns instance of [[KeyChain]].
      *
+     * @param hrp String for the Human-Readable-Part of Bech32 addresses 
      * @param chainid The hostname to resolve to reach the Avalanche Client APIs
+     * 
      */
-  constructor(chainid:string) {
+  constructor(hrp:string, chainid:string) {
     this.chainid = chainid;
+    this.hrp = hrp;
   }
 }
 
@@ -774,8 +812,11 @@ n12345Contracts.blockchainID = 'tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rm
 
 export class Defaults {
   static network = {
-    1: {}, // update before mainnet
+    1: { // update before mainnet
+      hrp: 'avax1'
+    }, 
     2: {
+      hrp: 'cascade1',
       avm: n2Avm,
       X: n2Avm,
       '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n2Avm,
@@ -787,6 +828,7 @@ export class Defaults {
       '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n2Contracts,
     },
     3: {
+      hrp: 'denali1',
       avm: n3Avm,
       X: n3Avm,
       rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L: n3Avm,
@@ -798,6 +840,7 @@ export class Defaults {
       zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n3Contracts,
     },
     12345: {
+      hrp: 'local1',
       avm: n12345Avm,
       X: n12345Avm,
       '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH': n12345Avm,

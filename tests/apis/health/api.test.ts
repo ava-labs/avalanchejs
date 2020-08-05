@@ -17,7 +17,7 @@ describe('Health', () => {
   const port = 9650;
   const protocol = 'https';
 
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
   let health:HealthAPI;
 
   beforeAll(() => {

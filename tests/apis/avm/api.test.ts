@@ -32,13 +32,13 @@ describe('AVMAPI', () => {
   const username:string = 'AvaLabs';
   const password:string = 'password';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, true);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, true);
   let api:AVMAPI;
   let alias:string;
 
-  const addrA:string = 'X-' + bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")));
-  const addrB:string = 'X-' + bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")));
-  const addrC:string = 'X-' + bech32.encode(AVMConstants.ADDRESSHRP, bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")));
+  const addrA:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")));
+  const addrB:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")));
+  const addrC:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")));
 
   beforeAll(() => {
     api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
@@ -51,7 +51,6 @@ describe('AVMAPI', () => {
 
   test('can Send 1', async () => {
     const txId = 'asdfhvl234';
-console.log("addrA", addrA, "addrB", addrB);
     const result:Promise<string> = api.send(username, password, 'assetId', 10, addrA, [addrB]);
     const payload:object = {
       result: {
@@ -252,7 +251,7 @@ console.log("addrA", addrA, "addrB", addrB);
   });
 
   test('createFixedCapAsset', async () => {
-    const kp:AVMKeyPair = new AVMKeyPair(alias);
+    const kp:AVMKeyPair = new AVMKeyPair(avalanche.getHRP(), alias);
     kp.importKey(Buffer.from('ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676', 'hex'));
 
     const denomination:number = 0;
@@ -286,7 +285,7 @@ console.log("addrA", addrA, "addrB", addrB);
   });
 
   test('createVariableCapAsset', async () => {
-    const kp:AVMKeyPair = new AVMKeyPair(alias);
+    const kp:AVMKeyPair = new AVMKeyPair(avalanche.getHRP(), alias);
     kp.importKey(Buffer.from('ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676', 'hex'));
 
     const denomination:number = 0;
@@ -645,8 +644,8 @@ console.log("addrA", addrA, "addrB", addrB);
       await result;
       set = new UTXOSet();
       avm.newKeyChain();
-      keymgr2 = new AVMKeyChain(alias);
-      keymgr3 = new AVMKeyChain(alias);
+      keymgr2 = new AVMKeyChain(avalanche.getHRP(), alias);
+      keymgr3 = new AVMKeyChain(avalanche.getHRP(), alias);
       addrs1 = [];
       addrs2 = [];
       addrs3 = [];

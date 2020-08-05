@@ -78,6 +78,7 @@ export default class Avalanche extends AvalancheCore {
     protocol:string = 'http',
     networkID:number = 3,
     avmChainID:string = undefined,
+    hrp:string = undefined,
     skipinit:boolean = false) {
     super(ip, port, protocol);
     let chainid = avmChainID;
@@ -94,6 +95,14 @@ export default class Avalanche extends AvalancheCore {
     if (typeof networkID === 'number' && networkID >= 0) {
       this.networkID = networkID;
     }
+    if(typeof hrp !== "undefined"){
+      this.hrp = hrp;
+    } else if(networkID.toString() in Defaults.network){
+      this.hrp = Defaults.network[networkID].hrp;
+    } else {
+       this.hrp = "tests";
+    }
+    
     if (!skipinit) {
       this.addAPI('admin', AdminAPI);
       this.addAPI('avm', AVMAPI, '/ext/bc/X', chainid);
