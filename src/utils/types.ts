@@ -804,7 +804,7 @@ const n3Contracts:object = {
 };
 
 const n12345Avm:any = { ...n2Avm };
-n12345Avm.blockchainID = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
+n12345Avm.blockchainID = '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD';
 const n12345Platform:any = { ...n2Platform };
 n12345Platform.blockchainID = '11111111111111111111111111111111LpoYY';
 const n12345Contracts:any = { ...n2Contracts };
@@ -843,7 +843,7 @@ export class Defaults {
       hrp: 'local1',
       avm: n12345Avm,
       X: n12345Avm,
-      '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH': n12345Avm,
+      '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD': n12345Avm,
       platform: n12345Platform,
       P: n12345Platform,
       '11111111111111111111111111111111LpoYY': n12345Platform,

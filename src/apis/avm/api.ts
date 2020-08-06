@@ -747,8 +747,8 @@ class AVMAPI extends JRPCAPI {
       utxoset:UTXOSet, ownerAddresses:Array<string>, feeAmount:BN, 
       feeAddresses:Array<string>, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), 
     ):Promise<UnsignedTx> => {
-      const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-      const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
+      const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+      const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
 
       const atomicUTXOs:UTXOSet = await this.getAtomicUTXOs(owners);
       const avaxAssetID:Buffer = await this.getAVAAssetID();
@@ -819,7 +819,7 @@ class AVMAPI extends JRPCAPI {
       utxoset:UTXOSet, utxoid:string | Array<string>, feeAmount:BN,
       feeAddresses:Array<string>, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
     ):Promise<UnsignedTx> => {
-      const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
+      const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
   
       if( memo instanceof PayloadBase) {
         memo = memo.getPayload();
