@@ -966,7 +966,7 @@ class AVMAPI extends JRPCAPI {
       throw new Error("Failed Goose Egg Check");
     }
     return builtUnsignedTx;
-}
+  }
 
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
