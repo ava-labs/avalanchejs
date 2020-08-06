@@ -186,7 +186,7 @@ export class BaseTx {
     } else {
       let memolen = Buffer.alloc(4)
       memolen.writeUInt32BE(memo.length, 0);
-      this.memo = Buffer.concat([memolen, memo], memolen.length + memo.length);
+      this.memo = memo;
     }
     
     if (typeof ins !== 'undefined' && typeof outs !== 'undefined') {

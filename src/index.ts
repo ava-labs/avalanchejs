@@ -70,7 +70,7 @@ export default class Avalanche extends AvalancheCore {
      * ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default 3
      * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect,
-     * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
+     * otherwise default "2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD"
      * @param skipinit Skips creating the APIs
      */
   constructor(ip:string,
@@ -88,7 +88,7 @@ export default class Avalanche extends AvalancheCore {
       if (networkID.toString() in Defaults.network) {
         chainid = Defaults.network[networkID].X.blockchainID;
       } else {
-        chainid = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
+        chainid = '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD';
       }
     }
     if (typeof networkID === 'number' && networkID >= 0) {
