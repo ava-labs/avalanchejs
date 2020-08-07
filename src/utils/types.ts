@@ -813,10 +813,10 @@ n12345Contracts.blockchainID = 'tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rm
 export class Defaults {
   static network = {
     1: { // update before mainnet
-      hrp: 'avax1'
+      hrp: 'avax'
     }, 
     2: {
-      hrp: 'cascade1',
+      hrp: 'cascade',
       avm: n2Avm,
       X: n2Avm,
       '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n2Avm,
@@ -828,7 +828,7 @@ export class Defaults {
       '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n2Contracts,
     },
     3: {
-      hrp: 'denali1',
+      hrp: 'denali',
       avm: n3Avm,
       X: n3Avm,
       rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L: n3Avm,
@@ -840,7 +840,7 @@ export class Defaults {
       zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n3Contracts,
     },
     12345: {
-      hrp: 'local1',
+      hrp: 'local',
       avm: n12345Avm,
       X: n12345Avm,
       '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD': n12345Avm,
