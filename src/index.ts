@@ -9,7 +9,7 @@ import HealthAPI from './apis/health/api';
 import InfoAPI from './apis/info/api';
 import KeystoreAPI from './apis/keystore/api';
 import MetricsAPI from './apis/metrics/api';
-import PlatformVMAPI from './apis/platform/api';
+import PlatformVMAPI from './apis/platformvm/api';
 import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
@@ -125,7 +125,7 @@ export * from './avalanche';
 export * from './apis/avm/api';
 export * from './apis/admin/api';
 export * from './apis/keystore/api';
-export * from './apis/platform/api';
+export * from './apis/platformvm/api';
 export * from './utils/bintools';
 export * from './utils/db';
 export * from './utils/payload';
@@ -140,7 +140,7 @@ export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx'
 export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
-export { PlatformKeyPair, PlatformKeyChain } from './apis/platform/keychain';
+export { PlatformKeyPair, PlatformKeyChain } from './apis/platformvm/keychain';
 
 export { AdminAPI as Admin };
 export { AVMAPI as AVM };

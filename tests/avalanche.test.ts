@@ -6,7 +6,7 @@ import HealthAPI from 'src/apis/health/api';
 import InfoAPI  from "src/apis/info/api";
 import KeystoreAPI  from "src/apis/keystore/api";
 import MetricsAPI  from "src/apis/metrics/api";
-import PlatformVMAPI  from "src/apis/platform/api";
+import PlatformVMAPI  from "src/apis/platformvm/api";
 import { TestAPI } from './testlib';
 import { AxiosRequestConfig } from 'axios';
 

@@ -1,4 +1,4 @@
-import { PlatformKeyChain, PlatformKeyPair } from 'src/apis/platform/keychain';
+import { PlatformKeyChain, PlatformKeyPair } from 'src/apis/platformvm/keychain';
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
