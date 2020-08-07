@@ -8,7 +8,7 @@ import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
 import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from "../../utils/types";
 import { UTXOSet, UTXO } from './utxos';
-import { MergeRule, UnixNow, AVMConstants, InitialStates,  } from './types';
+import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../utils/payload';
