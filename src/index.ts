@@ -13,7 +13,7 @@ import PlatformVMAPI from './apis/platform/api';
 import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
-import { Defaults } from './utils/types';
+import { Defaults, DefaultNetworkID, NetworkIDToHRP, FallbackHRP } from './utils/types';
 
 /**
  * Avalanche.js is middleware for interacting with Avalanche node RPC APIs.
@@ -76,7 +76,7 @@ export default class Avalanche extends AvalancheCore {
   constructor(ip:string,
     port:number,
     protocol:string = 'http',
-    networkID:number = 3,
+    networkID:number = DefaultNetworkID,
     avmChainID:string = undefined,
     hrp:string = undefined,
     skipinit:boolean = false) {
@@ -94,13 +94,15 @@ export default class Avalanche extends AvalancheCore {
     }
     if (typeof networkID === 'number' && networkID >= 0) {
       this.networkID = networkID;
+    } else if(typeof networkID === "undefined"){
+      networkID = DefaultNetworkID;
     }
     if(typeof hrp !== "undefined"){
       this.hrp = hrp;
-    } else if(networkID.toString() in Defaults.network){
-      this.hrp = Defaults.network[networkID].hrp;
+    } else if(networkID.toString() in NetworkIDToHRP){
+      this.hrp = NetworkIDToHRP[networkID];
     } else {
-       this.hrp = "tests";
+       this.hrp = FallbackHRP;
     }
     
     if (!skipinit) {
