@@ -130,7 +130,7 @@ export class AVMKeyPair extends KeyPair {
      *
      * @returns A b58 serialized string representation of the private key
      */
-  getPrivateKeyString = ():string => bintools.cb58Encode(this.privk);
+  getPrivateKeyString = ():string => "PrivateKey-" + bintools.cb58Encode(this.privk);
 
   /**
      * Returns the public key.
@@ -223,7 +223,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
     let pk:Buffer;
     if (typeof privk === 'string') {
-      pk = bintools.cb58Decode(privk);
+      pk = bintools.cb58Decode(privk.split('-')[1]);
     } else {
       pk = bintools.copyFrom(privk);
     }

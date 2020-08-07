@@ -132,7 +132,7 @@ export class PlatformKeyPair extends KeyPair {
      * @returns A cb58 serialized string representation of the public key
      */
     getPrivateKeyString = ():string => {
-        return bintools.cb58Encode(this.privk);
+        return "PrivateKey-" + bintools.cb58Encode(this.privk);
     }
 
     /**
@@ -230,7 +230,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
         let keypair:PlatformKeyPair = new PlatformKeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
-            pk = bintools.cb58Decode(privk);
+            pk = bintools.cb58Decode(privk.split('-')[1]);
         } else {
             pk = bintools.copyFrom(privk);
         }

@@ -81,7 +81,7 @@ describe('PlatformKeyChain', () => {
     const keybuff:Buffer = Buffer.from('d0e17d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
     const kc:PlatformKeyChain = new PlatformKeyChain(hrp, alias);
     const kp2:PlatformKeyPair = new PlatformKeyPair(hrp, alias);
-    const addr1:Buffer = kc.importKey(bintools.cb58Encode(keybuff));
+    const addr1:Buffer = kc.importKey("PrivateKey-" + bintools.cb58Encode(keybuff));
     const kp1:PlatformKeyPair = kc.getKey(addr1);
     kp2.importKey(keybuff);
     const addr2 = kp1.getAddress();
