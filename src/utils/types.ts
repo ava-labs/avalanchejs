@@ -779,9 +779,18 @@ export const HRPToNetworkID:object = {
 
 export const FallbackHRP:string = "custom";
 
-// TODO: UPDATE FOR MAINNET
-
 export const DefaultNetworkID:number = 3;
+
+export function getPreferredHRP(networkID:number = undefined) {
+  if (networkID in NetworkIDToHRP) {
+    return NetworkIDToHRP[networkID];
+  } else if(typeof networkID === "undefined") {
+    return DefaultNetworkID;
+  }
+  return FallbackHRP;
+}
+
+// TODO: UPDATE FOR MAINNET
 
 const n1Avm:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
