@@ -3,7 +3,7 @@
  * @module AvalancheCore
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
-import { APIBase, RequestResponseData, Defaults } from './utils/types';
+import { APIBase, RequestResponseData, NetworkIDToHRP, FallbackHRP } from './utils/types';
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
@@ -74,9 +74,11 @@ export default class AvalancheCore {
      */
   setNetworkID = (netid:number) => {
     this.networkID = netid;
-    if (netid in Defaults.network && this.hrp in Defaults.network[netid]) {
-      this.hrp = Defaults.network[netid].hrp;
-    } // otherwise keep this.hrp whatever it already is
+    if (netid in NetworkIDToHRP) {
+      this.hrp = NetworkIDToHRP[netid];
+    } else {
+      this.hrp = FallbackHRP;
+    }
   };
 
   /**
