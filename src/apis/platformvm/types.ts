@@ -4,13 +4,6 @@
  */
 
 import BN from 'bn.js';
-import BinTools from '../../utils/bintools';
-
-
-/**
- * @ignore
- */
-const bintools:BinTools = BinTools.getInstance();
 
 export class PlatformVMConstants {
   static ONEAVAX:BN = new BN(1000000000);

@@ -140,7 +140,8 @@ export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx'
 export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
-export { PlatformKeyPair, PlatformKeyChain } from './apis/platformvm/keychain';
+export { PlatformVMKeyPair, PlatformVMKeyChain } from './apis/platformvm/keychain';
+export { PlatformVMConstants } from './apis/platformvm/types';
 
 export { AdminAPI as Admin };
 export { AVMAPI as AVM };

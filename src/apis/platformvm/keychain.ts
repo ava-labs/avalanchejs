@@ -38,7 +38,7 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on the Platform Chain. 
  */
-export class PlatformKeyPair extends KeyPair {
+export class PlatformVMKeyPair extends KeyPair {
     protected keypair:elliptic.ec.KeyPair
     protected entropy:Buffer;
 
@@ -202,9 +202,9 @@ export class PlatformKeyPair extends KeyPair {
 /**
  * Class for representing a key chain in Avalanche. 
  * 
- * @typeparam PlatformKeyPair Class extending [[KeyPair]] which is used as the key in [[PlatformKeyChain]]
+ * @typeparam PlatformVMKeyPair Class extending [[KeyPair]] which is used as the key in [[PlatformVMKeyChain]]
  */
-export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
+export class PlatformVMKeyChain extends KeyChain<PlatformVMKeyPair> {
 
     /**
      * Makes a new key pair, returns the address.
@@ -214,7 +214,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
      * @returns Address of the new key pair
      */
     makeKey = (entropy:Buffer = undefined):Buffer => {
-        let keypair:PlatformKeyPair = new PlatformKeyPair(this.hrp, this.chainid, entropy);
+        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid, entropy);
         this.addKey(keypair);
         return keypair.getAddress();
     }
@@ -227,7 +227,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
      * @returns Address of the new key pair
      */
     importKey = (privk:Buffer | string):Buffer => {
-        let keypair:PlatformKeyPair = new PlatformKeyPair(this.hrp, this.chainid);
+        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
             pk = bintools.cb58Decode(privk.split('-')[1]);
@@ -242,7 +242,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
     }
 
     /**
-     * Returns instance of PlatformKeyChain.
+     * Returns instance of PlatformVMKeyChain.
      */
     constructor(hrp:string, chainid:string){
         super(hrp, chainid);
