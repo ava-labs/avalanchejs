@@ -51,8 +51,8 @@ describe('Avalanche', () => {
         expect(avalanche.Info()).not.toBeInstanceOf(KeystoreAPI);
         expect(avalanche.Info()).toBeInstanceOf(InfoAPI);
         
-        expect(avalanche.Platform()).not.toBeInstanceOf(KeystoreAPI);
-        expect(avalanche.Platform()).toBeInstanceOf(PlatformVMAPI);
+        expect(avalanche.PlatformVM()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.PlatformVM()).toBeInstanceOf(PlatformVMAPI);
 
         expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformVMAPI);
         expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
@@ -62,7 +62,7 @@ describe('Avalanche', () => {
 
         expect(avalanche.Admin().getRPCID()).toBe(1);
         expect(avalanche.AVM().getRPCID()).toBe(1);
-        expect(avalanche.Platform().getRPCID()).toBe(1);
+        expect(avalanche.PlatformVM().getRPCID()).toBe(1);
         expect(avalanche.NodeKeys().getRPCID()).toBe(1);
     });
 
