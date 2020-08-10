@@ -57,9 +57,9 @@ export default class Avalanche extends AvalancheCore {
   NodeKeys = () => this.apis.keystore as KeystoreAPI;
 
   /**
-     * Returns a reference to the Platform RPC.
+     * Returns a reference to the PlatformVM RPC.
      */
-  Platform = () => this.apis.platform as PlatformVMAPI;
+  PlatformVM = () => this.apis.platform as PlatformVMAPI;
 
   /**
      * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
@@ -140,7 +140,8 @@ export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx'
 export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
-export { PlatformKeyPair, PlatformKeyChain } from './apis/platformvm/keychain';
+export { PlatformVMKeyPair, PlatformVMKeyChain } from './apis/platformvm/keychain';
+export { PlatformVMConstants } from './apis/platformvm/types';
 
 export { AdminAPI as Admin };
 export { AVMAPI as AVM };
