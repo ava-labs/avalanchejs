@@ -15,6 +15,8 @@ import { Output, SelectOutputClass } from './outputs';
 const bintools:BinTools = BinTools.getInstance();
 
 export class AVMConstants {
+  static LATESTCODEC:number = 0;
+
   static ONEAVAX:BN = new BN(1000000000);
 
   static DECIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(10));
@@ -46,6 +48,10 @@ export class AVMConstants {
   static CREATEASSETTX:number = 1;
 
   static OPERATIONTX:number = 2;
+
+  static IMPORTTX:number = 3;
+
+  static EXPORTTX:number = 4;
 
   static SECPCREDENTIAL:number = 9;
 
@@ -111,7 +117,7 @@ export class Address extends NBytes {
   /**
      * Returns a function used to sort an array of [[Address]]es
      */
-  static comparitor = ()
+  static comparator = ()
     :(a:Address, b:Address) => (1|-1|0) => (a:Address, b:Address)
     :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
 
@@ -164,7 +170,7 @@ export class UTXOID extends NBytes {
   /**
      * Returns a function used to sort an array of [[UTXOID]]s
      */
-  static comparitor = ():(a:UTXOID, b:UTXOID) => (1|-1|0) => (a:UTXOID, b:UTXOID)
+  static comparator = ():(a:UTXOID, b:UTXOID) => (1|-1|0) => (a:UTXOID, b:UTXOID)
     :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
 
   /**

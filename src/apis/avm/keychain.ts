@@ -8,6 +8,7 @@ import createHash from 'create-hash';
 import BinTools from '../../utils/bintools';
 import { Tx, UnsignedTx } from './tx';
 import { KeyPair, KeyChain } from '../../utils/types';
+import { AVMConstants } from './types';
 
 /**
  * @ignore
@@ -100,7 +101,7 @@ export class AVMKeyPair extends KeyPair {
      */
   getAddressString = ():string => {
     const addr:Buffer = this.addressFromPublicKey(this.pubk);
-    return bintools.addressToString(this.chainid, addr);
+    return bintools.addressToString(this.hrp, this.chainid, addr);
   };
 
   /**
@@ -127,14 +128,14 @@ export class AVMKeyPair extends KeyPair {
   /**
      * Returns a string representation of the private key.
      *
-     * @returns An AVA serialized string representation of the private key
+     * @returns A b58 serialized string representation of the private key
      */
-  getPrivateKeyString = ():string => bintools.cb58Encode(this.privk);
+  getPrivateKeyString = ():string => "PrivateKey-" + bintools.cb58Encode(this.privk);
 
   /**
      * Returns the public key.
      *
-     * @returns An AVA serialized string representation of the public key
+     * @returns A b58 serialized string representation of the public key
      */
   getPublicKeyString = ():string => bintools.cb58Encode(this.pubk);
 
@@ -185,8 +186,8 @@ export class AVMKeyPair extends KeyPair {
   /**
      * Class for representing a private and public keypair in Avalanche.
      */
-  constructor(chainid:string, entropy:Buffer = undefined) {
-    super(chainid);
+  constructor(hrp:string, chainid:string, entropy:Buffer = undefined) {
+    super(hrp, chainid);
     this.entropy = entropy;
     this.generateKey();
   }
@@ -206,7 +207,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
      * @returns Address of the new key pair
      */
   makeKey = (entropy:Buffer = undefined):Buffer => {
-    const keypair:AVMKeyPair = new AVMKeyPair(this.chainid, entropy);
+    const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid, entropy);
     this.addKey(keypair);
     return keypair.getAddress();
   };
@@ -214,15 +215,15 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
   /**
      * Given a private key, makes a new key pair, returns the address.
      *
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} or AVA serialized string representing the private key
+     * @param privk A {@link https://github.com/feross/buffer|Buffer} or b58 serialized string representing the private key
      *
      * @returns Address of the new key pair
      */
   importKey = (privk:Buffer | string):Buffer => {
-    const keypair:AVMKeyPair = new AVMKeyPair(this.chainid);
+    const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
     let pk:Buffer;
     if (typeof privk === 'string') {
-      pk = bintools.cb58Decode(privk);
+      pk = bintools.cb58Decode(privk.split('-')[1]);
     } else {
       pk = bintools.copyFrom(privk);
     }
@@ -246,7 +247,7 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
   /**
      * Returns instance of AVMKeyChain.
      */
-  constructor(chainid:string) {
-    super(chainid);
+  constructor(hrp:string, chainid:string) {
+    super(hrp, chainid);
   }
 }

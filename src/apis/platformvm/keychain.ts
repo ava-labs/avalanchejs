@@ -1,12 +1,13 @@
 /**
  * @packageDocumentation
- * @module PlatformAPI-KeyChain
+ * @module PlatformVMAPI-KeyChain
  */
 import { Buffer } from "buffer/";
 import * as elliptic from "elliptic";
 import createHash from "create-hash";
 import BinTools from '../../utils/bintools';
 import { KeyPair, KeyChain } from '../../utils/types';
+import { PlatformVMConstants } from './types';
 
 /**
  * @ignore
@@ -37,7 +38,7 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on the Platform Chain. 
  */
-export class PlatformKeyPair extends KeyPair {
+export class PlatformVMKeyPair extends KeyPair {
     protected keypair:elliptic.ec.KeyPair
     protected entropy:Buffer;
 
@@ -101,7 +102,7 @@ export class PlatformKeyPair extends KeyPair {
      */
     getAddressString = ():string => {
         const addr:Buffer = this.addressFromPublicKey(this.pubk);
-        return bintools.addressToString(this.chainid, addr);
+        return bintools.addressToString(this.hrp, this.chainid, addr);
     }
 
     /**
@@ -128,16 +129,16 @@ export class PlatformKeyPair extends KeyPair {
     /**
      * Returns a string representation of the private key.
      * 
-     * @returns An AVA serialized string representation of the public key
+     * @returns A cb58 serialized string representation of the public key
      */
     getPrivateKeyString = ():string => {
-        return bintools.cb58Encode(this.privk);
+        return "PrivateKey-" + bintools.cb58Encode(this.privk);
     }
 
     /**
      * Returns the public key.
      * 
-     * @returns An AVA serialized string representation of the public key
+     * @returns A cb58 serialized string representation of the public key
      */
     getPublicKeyString = ():string => {
         return bintools.cb58Encode(this.pubk);
@@ -189,10 +190,10 @@ export class PlatformKeyPair extends KeyPair {
     }
 
     /**
-     * Class for representing a private and public keypair in Avalanche. 
+     * Class for representing a private and public keypair in Avalanche PlatformVM. 
      */
-    constructor(chainid:string, entropy:Buffer = undefined) {
-        super(chainid);
+    constructor(hrp:string, chainid:string, entropy:Buffer = undefined) {
+        super(hrp, chainid);
         this.generateKey();
     }
     
@@ -201,9 +202,9 @@ export class PlatformKeyPair extends KeyPair {
 /**
  * Class for representing a key chain in Avalanche. 
  * 
- * @typeparam PlatformKeyPair Class extending [[KeyPair]] which is used as the key in [[PlatformKeyChain]]
+ * @typeparam PlatformVMKeyPair Class extending [[KeyPair]] which is used as the key in [[PlatformVMKeyChain]]
  */
-export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
+export class PlatformVMKeyChain extends KeyChain<PlatformVMKeyPair> {
 
     /**
      * Makes a new key pair, returns the address.
@@ -213,7 +214,7 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
      * @returns Address of the new key pair
      */
     makeKey = (entropy:Buffer = undefined):Buffer => {
-        let keypair:PlatformKeyPair = new PlatformKeyPair(this.chainid, entropy);
+        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid, entropy);
         this.addKey(keypair);
         return keypair.getAddress();
     }
@@ -221,15 +222,15 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
     /**
      * Given a private key, makes a new key pair, returns the address.
      * 
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} or AVA serialized string representing the private key 
+     * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
      * 
      * @returns Address of the new key pair
      */
     importKey = (privk:Buffer | string):Buffer => {
-        let keypair:PlatformKeyPair = new PlatformKeyPair(this.chainid);
+        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
-            pk = bintools.cb58Decode(privk);
+            pk = bintools.cb58Decode(privk.split('-')[1]);
         } else {
             pk = bintools.copyFrom(privk);
         }
@@ -241,9 +242,9 @@ export class PlatformKeyChain extends KeyChain<PlatformKeyPair> {
     }
 
     /**
-     * Returns instance of PlatformKeyChain.
+     * Returns instance of PlatformVMKeyChain.
      */
-    constructor(chainid:string){
-        super(chainid);
+    constructor(hrp:string, chainid:string){
+        super(hrp, chainid);
     }
 }

@@ -7,7 +7,7 @@ describe('Info', () => {
   const port:number = 9650;
   const protocol:string = 'https';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', false);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, false);
   let info:InfoAPI;
 
   beforeAll(() => {
@@ -22,7 +22,7 @@ describe('Info', () => {
     const result:Promise<string> = info.getBlockchainID('avm');
     const payload:object = {
       result: {
-        blockchainID: avalanche.AVM().getBlockchainID(),
+        blockchainID: avalanche.XChain().getBlockchainID(),
       },
     };
     const responseObj = {

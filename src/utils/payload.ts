@@ -7,6 +7,7 @@ import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
+import { AVMConstants } from '../apis/avm/types';
 
 /**
  * @ignore
@@ -21,10 +22,18 @@ export class PayloadTypes {
     protected types:Array<string> = [];
 
     /**
-     * Given an encoded payload buffer returns the payload content.
+     * Given an encoded payload buffer returns the payload content (minus typeID).
      */
-    parsePayload(payload:Buffer):Buffer {
+    getContent(payload:Buffer):Buffer {
         const pl: Buffer = bintools.copyFrom(payload, 5);
+        return pl;
+    }
+
+    /**
+     * Given an encoded payload buffer returns the payload (with typeID).
+     */
+    getPayload(payload:Buffer):Buffer {
+        const pl: Buffer = bintools.copyFrom(payload, 4);
         return pl;
     }
 
@@ -175,6 +184,24 @@ export abstract class PayloadBase {
     }
 
     /**
+     * Returns the payload content (minus typeID).
+     */
+    getContent():Buffer {
+        const pl: Buffer = bintools.copyFrom(this.payload);
+        return pl;
+    }
+
+    /**
+     * Returns the payload (with typeID).
+     */
+    getPayload():Buffer {
+        let typeid:Buffer = Buffer.alloc(4);
+        typeid.writeUInt32BE(this.typeid, 0);
+        const pl: Buffer = Buffer.concat([typeid, bintools.copyFrom(this.payload)]);
+        return pl; 
+    }
+
+    /**
      * Decodes the payload as a {@link https://github.com/feross/buffer|Buffer} including 4 bytes for the length and TypeID.
      */
     fromBuffer(bytes:Buffer, offset:number = 0):number {
@@ -200,7 +227,7 @@ export abstract class PayloadBase {
     /**
      * Returns the expected type for the payload.
      */
-    abstract returnType():any;
+    abstract returnType(...args:any):any;
 
     constructor(){}
 
@@ -378,8 +405,8 @@ export abstract class ChainAddressPayload extends PayloadBase {
     /**
      * Returns an address string for the payload.
      */
-    returnType():string {
-        return bintools.addressToString(this.chainid, this.payload);
+    returnType(hrp:string):string {
+        return bintools.addressToString(hrp, this.chainid, this.payload);
     }
     /**
      * @param payload Buffer or address string

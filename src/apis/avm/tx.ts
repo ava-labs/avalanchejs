@@ -25,16 +25,12 @@ const bintools = BinTools.getInstance();
  */
 export class BaseTx {
   protected networkid:Buffer = Buffer.alloc(4);
-
   protected blockchainid:Buffer = Buffer.alloc(32);
-
   protected numouts:Buffer = Buffer.alloc(4);
-
   protected outs:Array<TransferableOutput>;
-
   protected numins:Buffer = Buffer.alloc(4);
-
   protected ins:Array<TransferableInput>;
+  protected memo:Buffer = Buffer.alloc(4);
 
   /**
      * Returns the id of the [[BaseTx]]
@@ -62,6 +58,11 @@ export class BaseTx {
      * Returns the array of [[TransferableOutput]]s
      */
   getOuts = ():Array<TransferableOutput> => this.outs;
+
+  /**
+   * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo 
+   */
+  getMemo = ():Buffer => this.memo;
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[BaseTx]], parses it, populates the class, and returns the length of the BaseTx in bytes.
@@ -96,6 +97,10 @@ export class BaseTx {
       offset = xferin.fromBuffer(bytes, offset);
       this.ins.push(xferin);
     }
+    let memolen:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    offset += 4;
+    this.memo = bintools.copyFrom(bytes, offset, offset + memolen);
+    offset += memolen;
     return offset;
   }
 
@@ -121,6 +126,12 @@ export class BaseTx {
       barr.push(b);
       bsize += b.length;
     }
+    let memolen:Buffer = Buffer.alloc(4);
+    memolen.writeUInt32BE(this.memo.length, 0);
+    barr.push(memolen);
+    bsize += 4;
+    barr.push(this.memo);
+    bsize += this.memo.length;
     const buff:Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -164,10 +175,20 @@ export class BaseTx {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
+     * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
      */
-  constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined) {
+  constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, memo:Buffer = undefined) {
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
+    if(typeof memo === "undefined"){
+      this.memo = Buffer.alloc(4);
+      this.memo.writeUInt32BE(0,0);
+    } else {
+      let memolen = Buffer.alloc(4)
+      memolen.writeUInt32BE(memo.length, 0);
+      this.memo = memo;
+    }
+    
     if (typeof ins !== 'undefined' && typeof outs !== 'undefined') {
       this.numouts.writeUInt32BE(outs.length, 0);
       this.outs = outs.sort(TransferableOutput.comparator());
@@ -179,11 +200,8 @@ export class BaseTx {
 
 export class CreateAssetTx extends BaseTx {
   protected name:string = '';
-
   protected symbol:string = '';
-
   protected denomination:Buffer = Buffer.alloc(1);
-
   protected initialstate:InitialStates = new InitialStates();
 
   /**
@@ -282,18 +300,19 @@ export class CreateAssetTx extends BaseTx {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
+     * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
-     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVA = 10^9 $nAVA
+     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
      * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
      */
   constructor(
     networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16),
     outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    name:string = undefined, symbol:string = undefined, denomination:number = undefined,
-    initialstate:InitialStates = undefined,
+    memo:Buffer = undefined, name:string = undefined, symbol:string = undefined, denomination:number = undefined,
+    initialstate:InitialStates = undefined
   ) {
-    super(networkid, blockchainid, outs, ins);
+    super(networkid, blockchainid, outs, ins, memo);
     if (
       typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number'
             && denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
@@ -311,7 +330,6 @@ export class CreateAssetTx extends BaseTx {
  */
 export class OperationTx extends BaseTx {
   protected numOps:Buffer = Buffer.alloc(4);
-
   protected ops:Array<TransferableOperation> = [];
 
   /**
@@ -330,7 +348,7 @@ export class OperationTx extends BaseTx {
      *
      * @remarks assume not-checksummed
      */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes:Buffer, offset:number = 0, codecid:number = AVMConstants.LATESTCODEC):number {
     offset = super.fromBuffer(bytes, offset);
     this.numOps = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
@@ -349,14 +367,14 @@ export class OperationTx extends BaseTx {
     toBuffer():Buffer {
         this.numOps.writeUInt32BE(this.ops.length, 0);
         let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
-        this.ops = this.ops.sort(TransferableOperation.comparitor());
+        this.ops = this.ops.sort(TransferableOperation.comparator());
         for(let i = 0; i < this.ops.length; i++) {
             barr.push(this.ops[i].toBuffer());
         }
         return Buffer.concat(barr);
     }
   /**
-     * Returns an array of [[Operation]]s in this transaction.
+     * Returns an array of [[TransferableOperation]]s in this transaction.
      */
   getOperations():Array<TransferableOperation> {
     return this.ops;
@@ -394,14 +412,15 @@ export class OperationTx extends BaseTx {
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
+     * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
      * @param ops Array of [[Operation]]s used in the transaction
      */
   constructor(
     networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16),
     outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    ops:Array<TransferableOperation> = undefined,
+    memo:Buffer = undefined, ops:Array<TransferableOperation> = undefined
   ) {
-    super(networkid, blockchainid, outs, ins);
+    super(networkid, blockchainid, outs, ins, memo);
     if (typeof ops !== 'undefined' && Array.isArray(ops)) {
       for (let i = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {
@@ -414,11 +433,216 @@ export class OperationTx extends BaseTx {
 }
 
 /**
+ * Class representing an unsigned Import transaction.
+ */
+export class ImportTx extends BaseTx {
+  protected numIns:Buffer = Buffer.alloc(4);
+  protected importIns:Array<TransferableInput> = [];
+
+  /**
+     * Returns the id of the [[ImportTx]]
+     */
+  getTxType():number {
+    return AVMConstants.IMPORTTX;
+  }
+
+  /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, populates the class, and returns the length of the [[ImportTx]] in bytes.
+     *
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ImportTx]]
+     *
+     * @returns The length of the raw [[ImportTx]]
+     *
+     * @remarks assume not-checksummed
+     */
+  fromBuffer(bytes:Buffer, offset:number = 0, codecid:number = AVMConstants.LATESTCODEC):number {
+    offset = super.fromBuffer(bytes, offset);
+    this.numIns = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    const numIns:number = this.numIns.readUInt32BE(0);
+    for (let i:number = 0; i < numIns; i++) {
+      const anIn:TransferableInput = new TransferableInput();
+      offset = anIn.fromBuffer(bytes, offset);
+      this.importIns.push(anIn);
+    }
+    return offset;
+  }
+
+  /**
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
+   */
+  toBuffer():Buffer {
+      this.numIns.writeUInt32BE(this.importIns.length, 0);
+      let barr:Array<Buffer> = [super.toBuffer(), this.numIns];
+      this.importIns = this.importIns.sort(TransferableInput.comparator());
+      for(let i = 0; i < this.importIns.length; i++) {
+          barr.push(this.importIns[i].toBuffer());
+      }
+      return Buffer.concat(barr);
+  }
+  /**
+     * Returns an array of [[TransferableInput]]s in this transaction.
+     */
+  getImportInputs():Array<TransferableInput> {
+    return this.importIns;
+  }
+
+  /**
+     * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+     *
+     * @param msg A Buffer for the [[UnsignedTx]]
+     * @param kc An [[AVMKeyChain]] used in signing
+     *
+     * @returns An array of [[Credential]]s
+     */
+  sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
+    const sigs:Array<Credential> = super.sign(msg, kc);
+    for (let i = 0; i < this.importIns.length; i++) {
+      const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
+      const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
+      for (let j = 0; j < sigidxs.length; j++) {
+        const keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
+        const signval:Buffer = keypair.sign(msg);
+        const sig:Signature = new Signature();
+        sig.fromBuffer(signval);
+        cred.addSignature(sig);
+      }
+      sigs.push(cred);
+    }
+    return sigs;
+  }
+
+  /**
+     * Class representing an unsigned Import transaction.
+     *
+     * @param networkid Optional networkid, default 3
+     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+     * @param outs Optional array of the [[TransferableOutput]]s
+     * @param ins Optional array of the [[TransferableInput]]s
+     * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+     * @param importIns Array of [[TransferableInput]]s used in the transaction
+     */
+  constructor(
+    networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16),
+    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
+    memo:Buffer = undefined, importIns:Array<TransferableInput> = undefined
+  ) {
+    super(networkid, blockchainid, outs, ins, memo);
+    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+      for (let i = 0; i < importIns.length; i++) {
+        if (!(importIns[i] instanceof TransferableInput)) {
+          throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
+        }
+      }
+      this.importIns = importIns;
+    }
+  }
+}
+
+/**
+ * Class representing an unsigned Export transaction.
+ */
+export class ExportTx extends BaseTx {
+  protected numOuts:Buffer = Buffer.alloc(4);
+  protected exportOuts:Array<TransferableOutput> = [];
+
+  /**
+     * Returns the id of the [[ExportTx]]
+     */
+  getTxType():number {
+    return AVMConstants.EXPORTTX;
+  }
+
+  /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.
+     *
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ExportTx]]
+     *
+     * @returns The length of the raw [[ExportTx]]
+     *
+     * @remarks assume not-checksummed
+     */
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    // this.codecid.writeUInt8(offset, 0);
+    // offset += 6;
+    offset = super.fromBuffer(bytes, offset);
+    this.numOuts = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    const numOuts:number = this.numOuts.readUInt32BE(0);
+    for (let i:number = 0; i < numOuts; i++) {
+      const anOut:TransferableOutput = new TransferableOutput();
+      offset = anOut.fromBuffer(bytes, offset);
+      this.exportOuts.push(anOut);
+    }
+    return offset;
+  }
+
+  /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
+     */
+  toBuffer():Buffer {
+      this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
+      let barr:Array<Buffer> = [super.toBuffer(), this.numOuts];
+      this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
+      for(let i = 0; i < this.exportOuts.length; i++) {
+          barr.push(this.exportOuts[i].toBuffer());
+      }
+      return Buffer.concat(barr);
+  }
+  /**
+     * Returns an array of [[TransferableOutput]]s in this transaction.
+     */
+  getExportOutputs():Array<TransferableOutput> {
+    return this.exportOuts;
+  }
+
+  /**
+     * Class representing an unsigned Export transaction.
+     *
+     * @param networkid Optional networkid, default 3
+     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+     * @param outs Optional array of the [[TransferableOutput]]s
+     * @param ins Optional array of the [[TransferableInput]]s
+     * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
+     */
+  constructor(
+    networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16),
+    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
+    memo:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
+  ) {
+    super(networkid, blockchainid, outs, ins, memo);
+    if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
+      for (let i = 0; i < exportOuts.length; i++) {
+        if (!(exportOuts[i] instanceof TransferableOutput)) {
+          throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
+        }
+      }
+      this.exportOuts = exportOuts;
+    }
+  }
+}
+
+
+/**
  * Class representing an unsigned transaction.
  */
 export class UnsignedTx {
+  protected codecid:number = AVMConstants.LATESTCODEC;
   protected transaction:BaseTx;
-  protected fee:BN = new BN(0);
+
+  /**
+     * Returns the CodecID as a number
+     */
+    getCodecID = ():number => this.codecid;
+
+    /**
+     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
+      */
+     getCodecIDBuffer = ():Buffer => {
+       let codecBuf:Buffer = Buffer.alloc(2);
+       codecBuf.writeUInt16BE(this.codecid, 0);
+       return codecBuf;
+     } 
 
   /**
      * Returns the inputTotal as a BN 
@@ -471,6 +695,8 @@ export class UnsignedTx {
   getTransaction = ():BaseTx => this.transaction;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
     const txtype:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.transaction = SelectTxClass(txtype);
@@ -478,10 +704,11 @@ export class UnsignedTx {
   }
 
   toBuffer():Buffer {
+    const codecid:Buffer = this.getCodecIDBuffer();
     const txtype:Buffer = Buffer.alloc(4);
     txtype.writeUInt32BE(this.transaction.getTxType(), 0);
     const basebuff = this.transaction.toBuffer();
-    return Buffer.concat([txtype, basebuff], txtype.length + basebuff.length);
+    return Buffer.concat([codecid, txtype, basebuff], codecid.length + txtype.length + basebuff.length);
   }
 
   /**
@@ -498,7 +725,7 @@ export class UnsignedTx {
     return new Tx(this, sigs);
   }
 
-  constructor(transaction:BaseTx = undefined) {
+  constructor(transaction:BaseTx = undefined, codecid:number = AVMConstants.LATESTCODEC) {
     this.transaction = transaction;
   }
 }
@@ -508,7 +735,6 @@ export class UnsignedTx {
  */
 export class Tx {
   protected unsignedTx:UnsignedTx = new UnsignedTx();
-
   protected credentials:Array<Credential> = [];
 
   /**
@@ -573,17 +799,17 @@ export class Tx {
      * @returns The length of the raw [[Tx]]
      *
      * @remarks
-     * unlike most fromStrings, it expects the string to be serialized in AVA format
+     * unlike most fromStrings, it expects the string to be serialized in cb58 format
      */
   fromString(serialized:string):number {
     return this.fromBuffer(bintools.cb58Decode(serialized));
   }
 
   /**
-     * Returns a base-58 AVA-serialized representation of the [[Tx]].
+     * Returns a base-58 AVAX-serialized representation of the [[Tx]].
      *
      * @remarks
-     * unlike most toStrings, this returns in AVA serialization format
+     * unlike most toStrings, this returns in cb58 serialization format
      */
   toString():string {
     return bintools.cb58Encode(this.toBuffer());
@@ -616,11 +842,17 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
   if (txtype === AVMConstants.BASETX) {
     const tx:BaseTx = new BaseTx(...args);
     return tx;
-  } if (txtype === AVMConstants.CREATEASSETTX) {
+  } else if (txtype === AVMConstants.CREATEASSETTX) {
     const tx:CreateAssetTx = new CreateAssetTx(...args);
     return tx;
-  } if (txtype === AVMConstants.OPERATIONTX) {
+  } else if (txtype === AVMConstants.OPERATIONTX) {
     const tx:OperationTx = new OperationTx(...args);
+    return tx;
+  } else if (txtype === AVMConstants.IMPORTTX) {
+    const tx:ImportTx = new ImportTx(...args);
+    return tx;
+  } else if (txtype === AVMConstants.EXPORTTX) {
+    const tx:ExportTx = new ExportTx(...args);
     return tx;
   }
   /* istanbul ignore next */

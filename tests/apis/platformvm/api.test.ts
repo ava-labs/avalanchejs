@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 import { Avalanche } from 'src';
-import PlatformAPI from 'src/apis/platform/api';
+import PlatformVMAPI from 'src/apis/platformvm/api';
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from 'src/utils/bintools';
@@ -19,11 +19,11 @@ describe('Platform', () => {
   const username = 'AvaLabs';
   const password = 'password';
 
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
-  let platform:PlatformAPI;
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
+  let platform:PlatformVMAPI;
 
   beforeAll(() => {
-    platform = new PlatformAPI(avalanche);
+    platform = new PlatformVMAPI(avalanche);
   });
 
   afterEach(() => {
@@ -711,12 +711,12 @@ describe('Platform', () => {
     expect(response).toBe(resp);
   });
 
-  test('exportAVA 1', async () => {
+  test('exportAVAX 1', async () => {
     const amount = new BN(100);
     const to = 'abcdef';
     const payerNonce = 3;
     const utx = 'valid';
-    const result:Promise<string> = platform.exportAVA(amount, to, payerNonce);
+    const result:Promise<string> = platform.exportAVAX(amount, to, payerNonce);
     const payload:object = {
       result: {
         unsignedTx: utx,
@@ -733,13 +733,13 @@ describe('Platform', () => {
     expect(response).toBe(utx);
   });
 
-  test('importAVA 1', async () => {
+  test('importAVAX 1', async () => {
     const to = 'abcdef';
     const payerNonce = 3;
     const username = 'Robert';
     const password = 'Paulson';
     const tx = 'valid';
-    const result:Promise<string> = platform.importAVA(username, password, to, payerNonce);
+    const result:Promise<string> = platform.importAVAX(username, password, to, payerNonce);
     const payload:object = {
       result: {
         tx,

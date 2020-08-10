@@ -5,6 +5,7 @@
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
+import * as bech32 from 'bech32';
 
 /**
  * A Base58 class that uses the cross-platform Buffer module. Built so that Typescript
@@ -294,7 +295,7 @@ export default class BinTools {
 
   /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string with
-     * checksum as per the AVA standard.
+     * checksum as per the cb58 standard.
      *
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} to serialize
      *
@@ -306,10 +307,10 @@ export default class BinTools {
   };
 
   /**
-     * Takes an AVA serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+     * Takes a cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
      * and returns a {@link https://github.com/feross/buffer|Buffer} of the original data. Throws on error.
      *
-     * @param bytes An AVA serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+     * @param bytes A cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
      */
   cb58Decode = (bytes:Buffer | string):Buffer => {
     if (typeof bytes === 'string') {
@@ -321,36 +322,34 @@ export default class BinTools {
     throw new Error('Error - BinTools.cb58Decode: invalid checksum');
   };
 
-  addressToString = (chainid:string, bytes:Buffer)
-  :string => `${chainid}-${this.cb58Encode(bytes)}`;
+  addressToString = (hrp:string, chainid:string, bytes:Buffer)
+  :string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
   stringToAddress = (address:string):Buffer => {
     const parts:Array<string> = address.trim().split('-');
     if(parts[1].startsWith("0x") || parts[1].match(/^[0-9A-F]+$/i)){
       return Buffer.from(parts[1].replace("0x", ""), "hex");
     }
-    return this.cb58Decode(parts[1]);
+    return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words));
   };
 
   /**
-     * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer}
-     * representation if valid.
-     *
-     * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
-     * undefined if not valid.
-     */
+   * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer}
+   * representation if valid. A more strict version of stringToAddress.
+   *
+   * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
+   * undefined if not valid.
+   */
   parseAddress = (addr:string,
     blockchainID:string,
     alias:string = undefined,
     addrlen:number = 20):Buffer => {
     const abc:Array<string> = addr.split('-');
-    if (abc.length === 2) {
-      if ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID)) {
-        const addrbuff = this.cb58Decode(abc[1]);
+    if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
+        const addrbuff = this.stringToAddress(addr);
         if ((addrlen && addrbuff.length === addrlen) || !(addrlen)) {
           return addrbuff;
         }
-      }
     }
     return undefined;
   };

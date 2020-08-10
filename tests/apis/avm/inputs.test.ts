@@ -21,11 +21,12 @@ describe('Inputs', () => {
   let addrs1:Array<Buffer>;
   let addrs2:Array<Buffer>;
   let utxos:Array<UTXO>;
+  let hrp:string = "tests";
   const amnt:number = 10000;
   beforeEach(() => {
     set = new UTXOSet();
-    keymgr1 = new AVMKeyChain('X');
-    keymgr2 = new AVMKeyChain('X');
+    keymgr1 = new AVMKeyChain(hrp, 'X');
+    keymgr2 = new AVMKeyChain(hrp, 'X');
     addrs1 = [];
     addrs2 = [];
     utxos = [];
@@ -35,20 +36,17 @@ describe('Inputs', () => {
     }
     const amount:BN = new BN(amnt);
     const addresses:Array<Buffer> = keymgr1.getAddresses();
-    const fallAddresses:Array<Buffer> = keymgr2.getAddresses();
     const locktime:BN = new BN(54321);
-    const fallLocktime:BN = locktime.add(new BN(50));
     const threshold:number = 3;
-    const fallThreshold:number = 1;
 
     for (let i:number = 0; i < 3; i++) {
       const txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
       const txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
       const assetID:Buffer = Buffer.from(createHash('sha256').update(txid).digest());
-      const out:Output = new SecpOutput(amount.add(new BN(i)), locktime, threshold, addresses);
+      const out:Output = new SecpOutput(amount.add(new BN(i)), addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
-      const u:UTXO = new UTXO(txid, txidx, assetID, out);
-      u.fromBuffer(Buffer.concat([txid, txidx, xferout.toBuffer()]));
+      const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
+      u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
       utxos.push(u);
     }
     set.addArray(utxos);
@@ -80,7 +78,7 @@ describe('Inputs', () => {
     expect(newin.getSigIdxs().toString()).toBe(input.getSigIdxs().toString());
   });
 
-  test('Input comparitor', () => {
+  test('Input comparator', () => {
     const inpt1:SecpInput = new SecpInput((utxos[0].getOutput() as AmountOutput).getAmount());
 
     const inpt2:SecpInput = new SecpInput((utxos[1].getOutput() as AmountOutput).getAmount());
@@ -95,7 +93,7 @@ describe('Inputs', () => {
     expect(cmp(inpt3, inpt3)).toBe(0);
   });
 
-  test('TransferableInput comparitor', () => {
+  test('TransferableInput comparator', () => {
     const inpt1:SecpInput = new SecpInput((utxos[0].getOutput() as AmountOutput).getAmount());
     const in1:TransferableInput = new TransferableInput(utxos[0].getTxID(), utxos[0].getOutputIdx(), utxos[0].getAssetID(), inpt1);
 

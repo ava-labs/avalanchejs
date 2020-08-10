@@ -120,7 +120,7 @@ export class TransferableOperation {
     /**
      * Returns a function used to sort an array of [[TransferableOperation]]s
      */
-    static comparitor = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
+    static comparator = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
         return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
             return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
         }
@@ -148,7 +148,7 @@ export class TransferableOperation {
     numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
     let bsize:number = this.assetid.length + numutxoIDs.length;
     const barr:Array<Buffer> = [this.assetid, numutxoIDs];
-    this.utxoIDs = this.utxoIDs.sort(UTXOID.comparitor());
+    this.utxoIDs = this.utxoIDs.sort(UTXOID.comparator());
     for (let i = 0; i < this.utxoIDs.length; i++) {
       const b:Buffer = this.utxoIDs[i].toBuffer();
       barr.push(b);
@@ -258,7 +258,7 @@ export class NFTMintOperation extends Operation {
                 addrs.push(addr);
                 offset += 20;
             }
-            let outputOwner:OutputOwners = new OutputOwners(locktime, threshold, addrs);
+            let outputOwner:OutputOwners = new OutputOwners(addrs, locktime, threshold);
             this.outputOwners.push(outputOwner);
         }
         return offset;

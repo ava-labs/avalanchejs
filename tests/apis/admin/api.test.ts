@@ -11,7 +11,7 @@ describe('Admin', () => {
   const username = 'AvaLabs';
   const password = 'password';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', false);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, false);
   let admin:AdminAPI;
 
   beforeAll(() => {
@@ -120,7 +120,7 @@ describe('Admin', () => {
     const result:Promise<string> = admin.getBlockchainID('avm');
     const payload:object = {
       result: {
-        blockchainID: avalanche.AVM().getBlockchainID(),
+        blockchainID: avalanche.XChain().getBlockchainID(),
       },
     };
     const responseObj = {

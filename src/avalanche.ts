@@ -3,10 +3,10 @@
  * @module AvalancheCore
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
-import { APIBase, RequestResponseData } from './utils/types';
+import { APIBase, RequestResponseData, getPreferredHRP } from './utils/types';
 
 /**
- * AvalancheCore is middleware for interacting with AVA node RPC APIs.
+ * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
  *
  * Example usage:
  * ```js
@@ -15,7 +15,9 @@ import { APIBase, RequestResponseData } from './utils/types';
  *
  */
 export default class AvalancheCore {
-  protected networkID:number = 3;
+  protected networkID:number = 0;
+
+  protected hrp:string = '';
 
   protected protocol:string;
 
@@ -28,10 +30,10 @@ export default class AvalancheCore {
   protected apis:{ [k: string]: APIBase } = {};
 
   /**
-     * Sets the address and port of the main AVA Client.
+     * Sets the address and port of the main Avalanche Client.
      *
-     * @param ip The hostname to resolve to reach the AVA Client RPC APIs
-     * @param port The port to resolve to reach the AVA Client RPC APIs
+     * @param ip The hostname to resolve to reach the Avalanche Client RPC APIs
+     * @param port The port to resolve to reach the Avalanche Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request,
      * ex: "http", "https", "git", "ws", etc ...
      */
@@ -48,17 +50,17 @@ export default class AvalancheCore {
   getProtocol = ():string => this.protocol;
 
   /**
-     * Returns the IP for the AVA node.
+     * Returns the IP for the Avalanche node.
      */
   getIP = ():string => this.ip;
 
   /**
-     * Returns the port for the AVA node.
+     * Returns the port for the Avalanche node.
      */
   getPort = ():number => this.port;
 
   /**
-     * Returns the URL of the AVA node (ip + port);
+     * Returns the URL of the Avalanche node (ip + port);
      */
   getURL = ():string => this.url;
 
@@ -72,6 +74,23 @@ export default class AvalancheCore {
      */
   setNetworkID = (netid:number) => {
     this.networkID = netid;
+    this.hrp = getPreferredHRP(this.networkID);
+  };
+
+  /**
+   * Returns the Human-Readable-Part of the network associated with this key.
+   *
+   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
+   */
+  getHRP = ():string => this.hrp;
+
+  /**
+   * Sets the the Human-Readable-Part of the network associated with this key.
+   *
+   * @param hrp String for the Human-Readable-Part of Bech32 addresses
+   */
+  setHRP = (hrp:string):void => {
+    this.hrp = hrp;
   };
 
   /**
@@ -94,7 +113,7 @@ export default class AvalancheCore {
      *
      */
   addAPI = <GA extends APIBase>(apiName:string,
-    ConstructorFN: new(ava:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA,
+    ConstructorFN: new(avax:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA,
     baseurl:string = undefined,
     ...args:Array<any>) => {
     if (typeof baseurl === 'undefined') {
@@ -268,10 +287,10 @@ export default class AvalancheCore {
     axiosConfig);
 
   /**
-     * Creates a new Avalanche instance. Sets the address and port of the main AVA Client.
+     * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
      *
-     * @param ip The hostname to resolve to reach the AVA Client APIs
-     * @param port The port to resolve to reach the AVA Client APIs
+     * @param ip The hostname to resolve to reach the Avalanche Client APIs
+     * @param port The port to resolve to reach the Avalanche Client APIs
      * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
      */
   constructor(ip:string, port:number, protocol:string = 'http') {

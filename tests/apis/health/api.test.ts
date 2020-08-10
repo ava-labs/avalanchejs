@@ -1,9 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 
 import { Avalanche } from 'src';
-import PlatformAPI from 'src/apis/platform/api';
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
 import BinTools from 'src/utils/bintools';
 import HealthAPI from '../../../src/apis/health/api';
 
@@ -17,7 +14,7 @@ describe('Health', () => {
   const port = 9650;
   const protocol = 'https';
 
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, true);
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
   let health:HealthAPI;
 
   beforeAll(() => {
