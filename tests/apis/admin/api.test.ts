@@ -120,7 +120,7 @@ describe('Admin', () => {
     const result:Promise<string> = admin.getBlockchainID('avm');
     const payload:object = {
       result: {
-        blockchainID: avalanche.AVM().getBlockchainID(),
+        blockchainID: avalanche.XChain().getBlockchainID(),
       },
     };
     const responseObj = {

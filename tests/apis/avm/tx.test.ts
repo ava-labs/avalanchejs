@@ -66,7 +66,7 @@ describe('Transactions', () => {
     avalanche = new Avalanche(ip, port, protocol, 12345, undefined, null, true);
     api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
 
-    const result:Promise<Buffer> = api.getAVAAssetID();
+    const result:Promise<Buffer> = api.getAVAXAssetID();
     const payload:object = {
       result: {
         name,

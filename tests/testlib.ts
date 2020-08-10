@@ -33,5 +33,5 @@ export class TestAPI extends APIBase {
     });
   };
 
-  constructor(ava:AvalancheCore, endpoint:string = '/ext/testing') { super(ava, endpoint); }
+  constructor(avax:AvalancheCore, endpoint:string = '/ext/testing') { super(avax, endpoint); }
 }

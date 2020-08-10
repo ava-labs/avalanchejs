@@ -19,12 +19,12 @@ describe('Avalanche', () => {
     beforeAll(() => {
         avalanche = new Avalanche(ip,port,protocol, 12345, undefined, undefined, true);
         avalanche.addAPI("admin", AdminAPI);
-        avalanche.addAPI("avm", AVMAPI, "/ext/subnet/avm", blockchainid)
+        avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainid)
         avalanche.addAPI("health", HealthAPI);
         avalanche.addAPI("info", InfoAPI);
         avalanche.addAPI("keystore", KeystoreAPI);
         avalanche.addAPI("metrics", MetricsAPI);
-        avalanche.addAPI("platform", PlatformVMAPI);
+        avalanche.addAPI("pchain", PlatformVMAPI);
     });
     test('Can initialize', () => {
         expect(avalanche.getIP()).toBe(ip);
@@ -42,8 +42,8 @@ describe('Avalanche', () => {
         expect(avalanche.Admin()).not.toBeInstanceOf(AVMAPI);
         expect(avalanche.Admin()).toBeInstanceOf(AdminAPI);
         
-        expect(avalanche.AVM()).not.toBeInstanceOf(AdminAPI);
-        expect(avalanche.AVM()).toBeInstanceOf(AVMAPI);
+        expect(avalanche.XChain()).not.toBeInstanceOf(AdminAPI);
+        expect(avalanche.XChain()).toBeInstanceOf(AVMAPI);
 
         expect(avalanche.Health()).not.toBeInstanceOf(KeystoreAPI);
         expect(avalanche.Health()).toBeInstanceOf(HealthAPI);
@@ -51,8 +51,8 @@ describe('Avalanche', () => {
         expect(avalanche.Info()).not.toBeInstanceOf(KeystoreAPI);
         expect(avalanche.Info()).toBeInstanceOf(InfoAPI);
         
-        expect(avalanche.PlatformVM()).not.toBeInstanceOf(KeystoreAPI);
-        expect(avalanche.PlatformVM()).toBeInstanceOf(PlatformVMAPI);
+        expect(avalanche.PChain()).not.toBeInstanceOf(KeystoreAPI);
+        expect(avalanche.PChain()).toBeInstanceOf(PlatformVMAPI);
 
         expect(avalanche.NodeKeys()).not.toBeInstanceOf(PlatformVMAPI);
         expect(avalanche.NodeKeys()).toBeInstanceOf(KeystoreAPI);
@@ -61,8 +61,8 @@ describe('Avalanche', () => {
         expect(avalanche.Metrics()).toBeInstanceOf(MetricsAPI);
 
         expect(avalanche.Admin().getRPCID()).toBe(1);
-        expect(avalanche.AVM().getRPCID()).toBe(1);
-        expect(avalanche.PlatformVM().getRPCID()).toBe(1);
+        expect(avalanche.XChain().getRPCID()).toBe(1);
+        expect(avalanche.PChain().getRPCID()).toBe(1);
         expect(avalanche.NodeKeys().getRPCID()).toBe(1);
     });
 

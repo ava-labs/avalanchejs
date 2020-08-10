@@ -806,7 +806,7 @@ export class Tx {
   }
 
   /**
-     * Returns a base-58 AVA-serialized representation of the [[Tx]].
+     * Returns a base-58 AVAX-serialized representation of the [[Tx]].
      *
      * @remarks
      * unlike most toStrings, this returns in cb58 serialization format

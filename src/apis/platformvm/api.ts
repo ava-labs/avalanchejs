@@ -332,8 +332,8 @@ class PlatformVMAPI extends JRPCAPI {
   /**
    * Get the Subnet that validates a given blockchain.
    *
-   * @param blockchainID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA
-   * serialized string for the blockchainID or its alias.
+   * @param blockchainID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58 
+   * encoded string for the blockchainID or its alias.
    *
    * @returns Promise for a string of the subnetID that validates the blockchain.
    */
@@ -348,7 +348,7 @@ class PlatformVMAPI extends JRPCAPI {
   /**
    * Get the IDs of the blockchains a Subnet validates.
    *
-   * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVA
+   * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVAX
    * serialized string for the SubnetID or its alias.
    *
    * @returns Promise for an array of blockchainIDs the subnet validates.
@@ -380,24 +380,24 @@ class PlatformVMAPI extends JRPCAPI {
   /**
    * Send AVAX from an account on the P-Chain to an address on the X-Chain. This transaction
    * must be signed with the key of the account that the AVAX is sent from and which pays the
-   * transaction fee. After issuing this transaction, you must call the X-Chain’s importAVA
+   * transaction fee. After issuing this transaction, you must call the X-Chain’s importAVAX
    * method to complete the transfer.
    *
    * @param to The address on the X-Chain to send the AVAX to. Do not include X- in the address
    * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
    * @param payerNonce The next unused nonce of the account paying the tx fee and providing
-   * the sent AVA
+   * the sent AVAX
    *
    * @returns Promise for an unsigned transaction to be signed by the account the the AVAX is
    * sent from and pays the transaction fee.
    */
-  exportAVA = async (amount:BN, to:string, payerNonce:number):Promise<string> => {
+  exportAVAX = async (amount:BN, to:string, payerNonce:number):Promise<string> => {
     const params:any = {
       to,
       amount: amount.toString(10),
       payerNonce,
     };
-    return this.callMethod('platform.exportAVA', params)
+    return this.callMethod('platform.exportAVAX', params)
       .then((response:RequestResponseData) => response.data.result.unsignedTx);
   };
 
@@ -405,18 +405,18 @@ class PlatformVMAPI extends JRPCAPI {
    * Send AVAX from an account on the P-Chain to an address on the X-Chain. This transaction
    * must be signed with the key of the account that the AVAX is sent from and which pays
    * the transaction fee. After issuing this transaction, you must call the X-Chain’s
-   * importAVA method to complete the transfer.
+   * importAVAX method to complete the transfer.
    *
    * @param username The Keystore user that controls the account specified in `to`
    * @param password The password of the Keystore user
    * @param to The ID of the account the AVAX is sent to. This must be the same as the to
-   * argument in the corresponding call to the X-Chain’s exportAVA
+   * argument in the corresponding call to the X-Chain’s exportAVAX
    * @param payerNonce The next unused nonce of the account specified in `to`
    *
    * @returns Promise for a string for the transaction, which should be sent to the network
    * by calling issueTx.
    */
-  importAVA = async (username: string, password:string, to:string, payerNonce:number)
+  importAVAX = async (username: string, password:string, to:string, payerNonce:number)
   :Promise<string> => {
     const params:any = {
       to,
@@ -424,7 +424,7 @@ class PlatformVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('platform.importAVA', params)
+    return this.callMethod('platform.importAVAX', params)
       .then((response:RequestResponseData) => response.data.result.tx);
   };
 
