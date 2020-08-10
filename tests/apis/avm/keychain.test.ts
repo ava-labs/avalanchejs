@@ -1,5 +1,5 @@
 import { AVMKeyChain, AVMKeyPair } from 'src/apis/avm/keychain';
-import { Avalanche } from './../../../src/index'
+import { Avalanche } from 'src/index'
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
@@ -17,43 +17,43 @@ describe('AVMKeyPair', () => {
 
   test('human readable part', () => {
     let hrp:string = avalanche.getHRP();
-    let networkID:number = avalanche.getNetworkID()
+    let networkID:number = avalanche.getNetworkID();
     expect(hrp).toBe("local");
     expect(networkID).toBe(12345);
 
     avalanche.setNetworkID(2);
     hrp = avalanche.getHRP();
-    networkID = avalanche.getNetworkID()
+    networkID = avalanche.getNetworkID();
     expect(hrp).toBe("cascade");
     expect(networkID).toBe(2);
 
     avalanche.setNetworkID(3);
     hrp = avalanche.getHRP();
-    networkID = avalanche.getNetworkID()
+    networkID = avalanche.getNetworkID();
     expect(hrp).toBe("denali");
     expect(networkID).toBe(3);
 
     avalanche.setNetworkID(4);
     hrp = avalanche.getHRP();
-    networkID = avalanche.getNetworkID()
+    networkID = avalanche.getNetworkID();
     expect(hrp).toBe("everest");
     expect(networkID).toBe(4);
 
     avalanche.setNetworkID(0);
     hrp = avalanche.getHRP();
-    networkID = avalanche.getNetworkID()
+    networkID = avalanche.getNetworkID();
     expect(hrp).toBe("custom");
     expect(networkID).toBe(0);
 
     avalanche.setNetworkID(1);
     hrp = avalanche.getHRP();
-    networkID = avalanche.getNetworkID()
+    networkID = avalanche.getNetworkID();
     expect(hrp).toBe("avax");
     expect(networkID).toBe(1);
 
     avalanche.setNetworkID(12345);
     hrp = avalanche.getHRP();
-    networkID = avalanche.getNetworkID()
+    networkID = avalanche.getNetworkID();
     expect(hrp).toBe("local");
     expect(networkID).toBe(12345);
   });
