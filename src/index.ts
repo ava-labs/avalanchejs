@@ -31,9 +31,9 @@ export default class Avalanche extends AvalancheCore {
   Admin = () => this.apis.admin as AdminAPI;
 
   /**
-     * Returns a reference to the AVM RPC.
+     * Returns a reference to the AVM RPC pointed at the X-Chain.
      */
-  AVM = () => this.apis.avm as AVMAPI;
+  XChain = () => this.apis.xchain as AVMAPI;
 
   /**
      * Returns a reference to the Health RPC for a node.
@@ -57,9 +57,9 @@ export default class Avalanche extends AvalancheCore {
   NodeKeys = () => this.apis.keystore as KeystoreAPI;
 
   /**
-     * Returns a reference to the PlatformVM RPC.
+     * Returns a reference to the PlatformVM RPC pointed at the P-Chain.
      */
-  PlatformVM = () => this.apis.platform as PlatformVMAPI;
+  PChain = () => this.apis.pchain as PlatformVMAPI;
 
   /**
      * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
@@ -105,12 +105,12 @@ export default class Avalanche extends AvalancheCore {
     
     if (!skipinit) {
       this.addAPI('admin', AdminAPI);
-      this.addAPI('avm', AVMAPI, '/ext/bc/X', chainid);
+      this.addAPI('xchain', AVMAPI, '/ext/bc/X', chainid);
       this.addAPI('health', HealthAPI);
       this.addAPI('info', InfoAPI);
       this.addAPI('keystore', KeystoreAPI);
       this.addAPI('metrics', MetricsAPI);
-      this.addAPI('platform', PlatformVMAPI);
+      this.addAPI('pchain', PlatformVMAPI);
     }
   }
 }

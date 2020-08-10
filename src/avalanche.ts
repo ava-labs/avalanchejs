@@ -3,7 +3,7 @@
  * @module AvalancheCore
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
-import { APIBase, RequestResponseData, NetworkIDToHRP, FallbackHRP, getPreferredHRP } from './utils/types';
+import { APIBase, RequestResponseData, getPreferredHRP } from './utils/types';
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
@@ -113,7 +113,7 @@ export default class AvalancheCore {
      *
      */
   addAPI = <GA extends APIBase>(apiName:string,
-    ConstructorFN: new(ava:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA,
+    ConstructorFN: new(avax:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA,
     baseurl:string = undefined,
     ...args:Array<any>) => {
     if (typeof baseurl === 'undefined') {

@@ -184,13 +184,13 @@ describe('AVMAPI', () => {
     expect(response).toBe(key);
   });
 
-  test("exportAVA", async ()=>{
+  test("exportAVAX", async ()=>{
     let amount = new BN(100);
     let to = "abcdef";
     let username = "Robert";
     let password = "Paulson";
     let txID = "valid";
-    let result:Promise<string> = api.exportAVA(username, password, to, amount);
+    let result:Promise<string> = api.exportAVAX(username, password, to, amount);
     let payload:object = {
         "result": {
             "txID": txID
@@ -207,12 +207,12 @@ describe('AVMAPI', () => {
     expect(response).toBe(txID);
 });
 
-  test("importAVA", async ()=>{
+  test("importAVAX", async ()=>{
     let to = "abcdef";
     let username = "Robert";
     let password = "Paulson";
     let txID = "valid";
-    let result:Promise<string> = api.importAVA(username, password, to);
+    let result:Promise<string> = api.importAVAX(username, password, to);
     let payload:object = {
         "result": {
             "txID": txID
@@ -626,7 +626,7 @@ describe('AVMAPI', () => {
 
     beforeEach(async () => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainid);
-      const result:Promise<Buffer> = avm.getAVAAssetID();
+      const result:Promise<Buffer> = avm.getAVAXAssetID();
       const payload:object = {
         result: {
           name,

@@ -446,7 +446,7 @@ export class UTXOSet {
      *
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param amount The amount of AVAX to be spent in $nAVA
+     * @param amount The amount of AVAX to be spent in $nAVAX
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
@@ -559,8 +559,8 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param avaAssetId The AVAX Asset ID
-     * @param fee The amount of AVAX to be paid for fees, in $nAVA
+     * @param avaxAssetId The AVAX Asset ID
+     * @param fee The amount of AVAX to be paid for fees, in $nAVAX
      * @param feeSenderAddresses The addresses to send the fees
      * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
@@ -573,14 +573,14 @@ export class UTXOSet {
      *
      */
   buildCreateAssetTx = (
-      networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
+      networkid:number, blockchainid:Buffer, avaxAssetID:Buffer, 
       fee:BN, feeSenderAddresses:Array<Buffer>, 
       initialState:InitialStates, name:string, 
       symbol:string, denomination:number, memo:Buffer = undefined, asOf:BN = UnixNow()
   ):UnsignedTx => {
       // Cheating and using buildBaseTx to get Ins and Outs for fees.
       // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the feeSenderAddresses
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaAssetID, undefined, asOf);
+      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaxAssetID, undefined, asOf);
       let ins:Array<TransferableInput> = utx.getTransaction().getIns();
       let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
       let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
@@ -593,8 +593,8 @@ export class UTXOSet {
     * 
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param avaAssetId The AVAX Asset ID
-    * @param fee The amount of AVAX to be paid for fees, in $nAVA
+    * @param avaxAssetId The AVAX Asset ID
+    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
     * @param feePayingAddresses The addresses to pay the fees
     * @param minterSets The minters and thresholds required to mint this nft asset
     * @param name String for the descriptive name of the nft asset
@@ -607,14 +607,14 @@ export class UTXOSet {
     * 
     */
   buildCreateNFTAssetTx = (
-      networkid:number, blockchainid:Buffer, avaAssetID:Buffer, 
+      networkid:number, blockchainid:Buffer, avaxAssetID:Buffer, 
       fee:BN, feePayingAddresses:Array<Buffer>, 
       minterSets:Array<MinterSet>,
       name:string, symbol:string, memo:Buffer = undefined, asOf:BN = UnixNow(),
       locktime:BN = undefined
   ):UnsignedTx => {
       let initialState:InitialStates = new InitialStates();
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaAssetID, undefined, asOf);
+      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaxAssetID, undefined, asOf);
       let ins:Array<TransferableInput> = utx.getTransaction().getIns();
       let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
       for(let i:number = 0; i < minterSets.length; i++) {
@@ -638,7 +638,7 @@ export class UTXOSet {
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVA
+    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
     * @param feeSenderAddresses The addresses to send the fees
     * @param outputOwners:Array An array of OutputOwners
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
@@ -700,7 +700,7 @@ export class UTXOSet {
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVA
+    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
     * @param feeSenderAddresses The addresses to send the fees
     * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
@@ -762,7 +762,7 @@ export class UTXOSet {
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVA
+    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
     * @param feeSenderAddresses The addresses to send the fees
     * @param importIns An array of [[TransferableInput]]s being imported
     * @param memo Optional contains arbitrary bytes, up to 256 bytes

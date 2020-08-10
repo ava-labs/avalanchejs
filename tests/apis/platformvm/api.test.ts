@@ -711,12 +711,12 @@ describe('Platform', () => {
     expect(response).toBe(resp);
   });
 
-  test('exportAVA 1', async () => {
+  test('exportAVAX 1', async () => {
     const amount = new BN(100);
     const to = 'abcdef';
     const payerNonce = 3;
     const utx = 'valid';
-    const result:Promise<string> = platform.exportAVA(amount, to, payerNonce);
+    const result:Promise<string> = platform.exportAVAX(amount, to, payerNonce);
     const payload:object = {
       result: {
         unsignedTx: utx,
@@ -733,13 +733,13 @@ describe('Platform', () => {
     expect(response).toBe(utx);
   });
 
-  test('importAVA 1', async () => {
+  test('importAVAX 1', async () => {
     const to = 'abcdef';
     const payerNonce = 3;
     const username = 'Robert';
     const password = 'Paulson';
     const tx = 'valid';
-    const result:Promise<string> = platform.importAVA(username, password, to, payerNonce);
+    const result:Promise<string> = platform.importAVAX(username, password, to, payerNonce);
     const payload:object = {
       result: {
         tx,

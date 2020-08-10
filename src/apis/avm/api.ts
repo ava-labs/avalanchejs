@@ -84,7 +84,7 @@ class AVMAPI extends JRPCAPI {
 
   protected blockchainID:string = '';
 
-  protected AVAAssetID:Buffer = undefined;
+  protected AVAXAssetID:Buffer = undefined;
 
   /**
      * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -147,18 +147,18 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns The the provided string representing the blockchainID
      */
-  getAVAAssetID = async ():Promise<Buffer> => {
-    if (typeof this.AVAAssetID === 'undefined') {
+  getAVAXAssetID = async ():Promise<Buffer> => {
+    if (typeof this.AVAXAssetID === 'undefined') {
       const asset:{
         name: string;
         symbol: string;
         assetID: Buffer;
         denomination: number;
-      } = await this.getAssetDescription('AVA');
-      // TODO - Remove hardcoded 'AVA'
-      this.AVAAssetID = asset.assetID;
+      } = await this.getAssetDescription('AVAX');
+      // TODO - Remove hardcoded 'AVAX'
+      this.AVAXAssetID = asset.assetID;
     }
-    return this.AVAAssetID;
+    return this.AVAXAssetID;
   };
 
   /**
@@ -193,7 +193,7 @@ class AVMAPI extends JRPCAPI {
    * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
    */
   checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
-    const avaxAssetID:Buffer = await this.getAVAAssetID();
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
     const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
 
@@ -243,8 +243,8 @@ class AVMAPI extends JRPCAPI {
   /**
      * Create a new fixed-cap, fungible asset. A quantity of it is created at initialization and there no more is ever created.
      *
-     * @param username The user paying the transaction fee (in $AVA) for asset creation
-     * @param password The password for the user paying the transaction fee (in $AVA) for asset creation
+     * @param username The user paying the transaction fee (in $AVAX) for asset creation
+     * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
      * @param name The human-readable name for the asset
      * @param symbol Optional. The shorthand symbol for the asset. Between 0 and 4 characters
      * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
@@ -281,8 +281,8 @@ class AVMAPI extends JRPCAPI {
   /**
      * Create a new variable-cap, fungible asset. No units of the asset exist at initialization. Minters can mint units of this asset using createMintTx, signMintTx and sendMintTx.
      *
-     * @param username The user paying the transaction fee (in $AVA) for asset creation
-     * @param password The password for the user paying the transaction fee (in $AVA) for asset creation
+     * @param username The user paying the transaction fee (in $AVAX) for asset creation
+     * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
      * @param name The human-readable name for the asset
      * @param symbol Optional. The shorthand symbol for the asset -- between 0 and 4 characters
      * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
@@ -421,7 +421,7 @@ class AVMAPI extends JRPCAPI {
   /**
      * Send AVAX from the X-Chain to an account on the P-Chain.
      *
-     * After calling this method, you must call the P-Chain’s importAVA method to complete the transfer.
+     * After calling this method, you must call the P-Chain’s importAVAX method to complete the transfer.
      *
      * @param username The Keystore user that controls the P-Chain account specified in `to`
      * @param password The password of the Keystore user
@@ -430,34 +430,34 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns String representing the transaction id
      */
-  exportAVA = async (username: string, password:string, to:string, amount:BN):Promise<string> => {
+  exportAVAX = async (username: string, password:string, to:string, amount:BN):Promise<string> => {
     const params:any = {
       to,
       amount: amount.toString(10),
       username,
       password,
     };
-    return this.callMethod('avm.exportAVA', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod('avm.exportAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
      * Finalize a transfer of AVAX from the P-Chain to the X-Chain.
      *
-     * Before this method is called, you must call the P-Chain’s `exportAVA` method to initiate the transfer.
+     * Before this method is called, you must call the P-Chain’s `exportAVAX` method to initiate the transfer.
      *
-     * @param to The address the AVAX is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVA, except that the prepended X- should be included in this argument
+     * @param to The address the AVAX is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVAX, except that the prepended X- should be included in this argument
      * @param username The Keystore user that controls the address specified in `to`
      * @param password The password of the Keystore user
      *
      * @returns String representing the transaction id
      */
-  importAVA = async (username: string, password:string, to:string):Promise<string> => {
+  importAVAX = async (username: string, password:string, to:string):Promise<string> => {
     const params:any = {
       to,
       username,
       password,
     };
-    return this.callMethod('avm.importAVA', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod('avm.importAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -703,7 +703,7 @@ class AVMAPI extends JRPCAPI {
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
     }
-    const avaAssetID:Buffer = await this.getAVAAssetID();
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
     let utxoidArray:Array<string> = [];
     if (typeof utxoid === 'string') {
@@ -713,7 +713,7 @@ class AVMAPI extends JRPCAPI {
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildNFTTransferTx(
-      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
       feeAmount, feeAddrs, to, from, utxoidArray, memo, asOf, locktime, threshold,
     );
 
@@ -751,7 +751,7 @@ class AVMAPI extends JRPCAPI {
       const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
 
       const atomicUTXOs:UTXOSet = await this.getAtomicUTXOs(owners);
-      const avaxAssetID:Buffer = await this.getAVAAssetID();
+      const avaxAssetID:Buffer = await this.getAVAXAssetID();
       const avaxAssetIDStr:string = avaxAssetID.toString("hex");
 
 
@@ -825,7 +825,7 @@ class AVMAPI extends JRPCAPI {
         memo = memo.getPayload();
       }
 
-      const avaAssetID:Buffer = await this.getAVAAssetID();
+      const avaxAssetID:Buffer = await this.getAVAXAssetID();
   
       let utxoidArray:Array<string> = [];
       if (typeof utxoid === 'string') {
@@ -835,7 +835,7 @@ class AVMAPI extends JRPCAPI {
       }
   
       const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
         feeAmount, feeAddrs, utxoidArray, memo, asOf
       );
   
@@ -852,7 +852,7 @@ class AVMAPI extends JRPCAPI {
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param fee The amount of AVAX to be paid for fees, in $nAVA
+     * @param fee The amount of AVAX to be paid for fees, in $nAVAX
      * @param creatorAddresses The addresses to send the fees
      * @param initialStates The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
@@ -887,9 +887,9 @@ class AVMAPI extends JRPCAPI {
         throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
       }
 
-      const avaAssetID:Buffer = await this.getAVAAssetID();
+      const avaxAssetID:Buffer = await this.getAVAXAssetID();
       const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
         fee, creators, initialStates, name, symbol, denomination, memo, asOf
       );
   
@@ -906,7 +906,7 @@ class AVMAPI extends JRPCAPI {
     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
     * 
     * @param utxoset A set of UTXOs that the transaction is built on
-    * @param fee The amount of AVAX to be paid for fees, in $nAVA
+    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
     * @param feePayingAddresses The addresses to pay the fees
     * @param name String for the descriptive name of the asset
     * @param symbol String for the ticker symbol of the asset
@@ -956,9 +956,9 @@ class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
         throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
     }
-    let avaAssetID:Buffer = await this.getAVAAssetID();
+    let avaxAssetID:Buffer = await this.getAVAXAssetID();
     const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTAssetTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaAssetID,
+        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
         fee, feeAddrs, minterSets, name, symbol, memo, asOf, locktime
     );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
@@ -1011,12 +1011,12 @@ class AVMAPI extends JRPCAPI {
           utxoid = [utxoid];
       }
 
-      let avaAssetID:Buffer = await this.getAVAAssetID();
+      let avaxAssetID:Buffer = await this.getAVAXAssetID();
 
       const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
           this.core.getNetworkID(),
           bintools.cb58Decode(this.blockchainID),
-          avaAssetID,
+          avaxAssetID,
           fee,
           feeAddrs,
           to,

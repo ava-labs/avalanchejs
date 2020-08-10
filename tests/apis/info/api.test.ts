@@ -22,7 +22,7 @@ describe('Info', () => {
     const result:Promise<string> = info.getBlockchainID('avm');
     const payload:object = {
       result: {
-        blockchainID: avalanche.AVM().getBlockchainID(),
+        blockchainID: avalanche.XChain().getBlockchainID(),
       },
     };
     const responseObj = {
