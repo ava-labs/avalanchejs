@@ -726,7 +726,7 @@ class AVMAPI extends JRPCAPI {
   };
 
     /**
-     * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
+     * In-Development, do not use: Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset  A set of UTXOs that the transaction is built on
@@ -800,7 +800,7 @@ class AVMAPI extends JRPCAPI {
     };
 
   /**
-     * Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
+     * In-Development, do not use: Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset A set of UTXOs that the transaction is built on

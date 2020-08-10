@@ -757,7 +757,7 @@ export class UTXOSet {
   };
 
     /**
-    * Creates an unsigned ImportTx transaction.
+    * In-Development, do not use: Creates an unsigned ImportTx transaction.
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
@@ -787,7 +787,7 @@ export class UTXOSet {
   };
 
     /**
-    * Creates an unsigned ExportTx transaction.
+    * In-Development, do not use: Creates an unsigned ExportTx transaction. 
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
