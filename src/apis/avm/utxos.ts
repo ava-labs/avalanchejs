@@ -625,7 +625,7 @@ export class UTXOSet {
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
-     * @param assetid {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
+     * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
@@ -1039,7 +1039,7 @@ export class UTXOSet {
     avaxAssetID:Buffer,
     toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
-    changeAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer> = undefined,
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
     memo:Buffer = undefined, 

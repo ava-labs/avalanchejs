@@ -6,7 +6,7 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
-import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from "../../utils/types";
+import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from '../../utils/types';
 import { UTXOSet, UTXO } from './utxos';
 import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
 import { AVMKeyChain } from './keychain';
@@ -86,6 +86,8 @@ class AVMAPI extends JRPCAPI {
 
   protected AVAXAssetID:Buffer = undefined;
 
+  protected fee:BN = undefined;
+
   /**
      * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
      *
@@ -143,10 +145,10 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Fetches the AVAX AssetID and returns it in a Promise.
-     *
-     * @returns The the provided string representing the blockchainID
-     */
+   * Fetches the AVAX AssetID and returns it in a Promise.
+   *
+   * @returns The the provided string representing the blockchainID
+   */
   getAVAXAssetID = async ():Promise<Buffer> => {
     if (typeof this.AVAXAssetID === 'undefined') {
       const asset:{
@@ -162,15 +164,45 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Gets a reference to the keychain for this class.
-     *
-     * @returns The instance of [[AVMKeyChain]] for this class
-     */
+   * Gets the default fee for this chain.
+   *
+   * @returns The default fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getDefaultFee =  ():BN => {
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["fee"]) : new BN(0);
+  }
+
+  /**
+   * Gets the fee for this chain.
+   *
+   * @returns The fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getFee = ():BN => {
+    if(typeof this.fee === "undefined") {
+      this.fee = this.getDefaultFee();
+    }
+    return this.fee;
+  }
+
+  /**
+   * Sets the fee for this chain.
+   *
+   * @param fee The fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   */
+  setFee = (fee:BN) => {
+    this.fee = fee;
+  }
+
+  /**
+   * Gets a reference to the keychain for this class.
+   *
+   * @returns The instance of [[AVMKeyChain]] for this class
+   */
   keyChain = ():AVMKeyChain => this.keychain;
 
   /**
-     * @ignore
-     */
+   * @ignore
+   */
   newKeyChain = ():AVMKeyChain => {
     // warning, overwrites the old keychain
     const alias = this.getBlockchainAlias();
@@ -626,11 +658,11 @@ class AVMAPI extends JRPCAPI {
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param amount The amount of AVAX to be spent in $nAVAX
+     * @param amount The amount of AssetID to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
+     * @param assetID The assetID of the value being sent
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
      * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-     * @param assetID The assetID of the value being sent
      * @param memo Optional contains arbitrary bytes, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime Optional. The locktime field created in the resulting outputs
@@ -642,9 +674,16 @@ class AVMAPI extends JRPCAPI {
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
   buildBaseTx = async (
-    utxoset:UTXOSet, amount:BN, toAddresses:Array<string>, fromAddresses:Array<string>,
-    changeAddresses:Array<string>, assetID:Buffer | string = undefined, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(),
-    locktime:BN = new BN(0), threshold:number = 1
+    utxoset:UTXOSet, 
+    amount:BN, 
+    assetID:Buffer | string = undefined, 
+    toAddresses:Array<string>, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>, 
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), 
+    threshold:number = 1
   ):Promise<UnsignedTx> => {
     const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
@@ -659,9 +698,16 @@ class AVMAPI extends JRPCAPI {
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildBaseTx(
-      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID),
-      amount, to, from, change,
-      assetID, memo, asOf, locktime, threshold,
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID),
+      amount, 
+      assetID, 
+      to, 
+      from, 
+      change, 
+      this.getFee(), 
+      await this.getAVAXAssetID(),
+      memo, asOf, locktime, threshold,
     );
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
@@ -677,11 +723,9 @@ class AVMAPI extends JRPCAPI {
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset  A set of UTXOs that the transaction is built on
-     * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
      * @param toAddresses The addresses to send the NFT
      * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
-     * @param feeAmount The amount of fees being paid for this transaction
-     * @param feeAddresses The addresses that have the AVAX funds to pay for fees of the UTXO
+     * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
      * @param memo Optional contains arbitrary bytes, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime Optional. The locktime field created in the resulting outputs
@@ -693,12 +737,17 @@ class AVMAPI extends JRPCAPI {
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
   buildNFTTransferTx = async (
-    utxoset:UTXOSet, utxoid:string | Array<string>, toAddresses:Array<string>, fromAddresses:Array<string>, feeAmount:BN,
-    feeAddresses:Array<string>, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1,
+    utxoset:UTXOSet, 
+    toAddresses:Array<string>, 
+    fromAddresses:Array<string>, 
+    utxoid:string | Array<string>, 
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow(), 
+    locktime:BN = new BN(0), 
+    threshold:number = 1,
   ):Promise<UnsignedTx> => {
     const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-    const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -713,8 +762,14 @@ class AVMAPI extends JRPCAPI {
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildNFTTransferTx(
-      this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
-      feeAmount, feeAddrs, to, from, utxoidArray, memo, asOf, locktime, threshold,
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      to, 
+      from, 
+      utxoidArray, 
+      this.getFee(),
+      avaxAssetID, 
+      memo, asOf, locktime, threshold,
     );
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
@@ -726,17 +781,13 @@ class AVMAPI extends JRPCAPI {
   };
 
     /**
-     * In-Development, do not use: Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
+     * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset  A set of UTXOs that the transaction is built on
      * @param ownerAddresses The addresses being used to import
-     * @param feeAmount The amount of fees being paid for this transaction
-     * @param feeAddresses The addresses that have the AVAX funds to pay for fees of the UTXO
      * @param memo Optional contains arbitrary bytes, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
-     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
      *
      * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
      *
@@ -744,12 +795,13 @@ class AVMAPI extends JRPCAPI {
      * This helper exists because the endpoint API should be the primary point of entry for most functionality.
      */
     buildImportTx = async (
-      utxoset:UTXOSet, ownerAddresses:Array<string>, feeAmount:BN, 
-      feeAddresses:Array<string>, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), 
+      utxoset:UTXOSet, 
+      ownerAddresses:Array<string>, 
+      memo:PayloadBase|Buffer = undefined, 
+      asOf:BN = UnixNow(), 
     ):Promise<UnsignedTx> => {
       const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-      const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-
+     
       const atomicUTXOs:UTXOSet = await this.getAtomicUTXOs(owners);
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
       const avaxAssetIDStr:string = avaxAssetID.toString("hex");
@@ -777,7 +829,7 @@ class AVMAPI extends JRPCAPI {
             const idx:number = output.getAddressIdx(spenders[j]);
             if (idx === -1) {
               /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.buildBaseTx: no such '
+              throw new Error('Error - UTXOSet.buildImportTx: no such '
               + `address in output: ${spenders[j]}`);
             }
             xferin.getInput().addSignatureIdx(idx, spenders[j]);
@@ -787,8 +839,13 @@ class AVMAPI extends JRPCAPI {
       }
   
       const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
-        feeAmount, feeAddrs, importIns, memo, asOf
+        this.core.getNetworkID(), 
+        bintools.cb58Decode(this.blockchainID), 
+        owners,
+        importIns, 
+        this.getFee(), 
+        avaxAssetID, 
+        memo, asOf
       );
   
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
@@ -800,26 +857,35 @@ class AVMAPI extends JRPCAPI {
     };
 
   /**
-     * In-Development, do not use: Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
-     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-     *
-     * @param utxoset A set of UTXOs that the transaction is built on
-     * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the AVAX this transaction is exporting
-     * @param feeAmount The amount of fees being paid for this transaction
-     * @param feeAddresses The addresses that have the AVAX funds to pay for fees of the UTXO
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     *
-     * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
-     *
-     * @remarks
-     * This helper exists because the endpoint API should be the primary point of entry for most functionality.
-     */
+   * Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
+   */
     buildExportTx = async (
-      utxoset:UTXOSet, utxoid:string | Array<string>, feeAmount:BN,
-      feeAddresses:Array<string>, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
+      utxoset:UTXOSet, 
+      amount:BN,
+      toAddresses:Array<string>, 
+      fromAddresses:Array<string>,
+      changeAddresses:Array<Buffer> = undefined,
+      memo:PayloadBase|Buffer = undefined, 
+      asOf:BN = UnixNow(),
+      locktime:BN = new BN(0), 
+      threshold:number = 1
     ):Promise<UnsignedTx> => {
-      const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
+      const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+      const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+      const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
   
       if( memo instanceof PayloadBase) {
         memo = memo.getPayload();
@@ -827,16 +893,17 @@ class AVMAPI extends JRPCAPI {
 
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
   
-      let utxoidArray:Array<string> = [];
-      if (typeof utxoid === 'string') {
-        utxoidArray = [utxoid];
-      } else if (Array.isArray(utxoid)) {
-        utxoidArray = utxoid;
-      }
-  
       const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
-        feeAmount, feeAddrs, utxoidArray, memo, asOf
+        this.core.getNetworkID(), 
+        bintools.cb58Decode(this.blockchainID), 
+        amount,
+        avaxAssetID, 
+        to,
+        from,
+        change,
+        this.getFee(), 
+        avaxAssetID,
+        memo, asOf, locktime, threshold
       );
   
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
@@ -852,9 +919,8 @@ class AVMAPI extends JRPCAPI {
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
      * @param utxoset A set of UTXOs that the transaction is built on
-     * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-     * @param creatorAddresses The addresses to send the fees
-     * @param initialStates The [[InitialStates]] that represent the intial state of a created asset
+     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+     * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
@@ -865,12 +931,16 @@ class AVMAPI extends JRPCAPI {
      * 
      */
   buildCreateAssetTx = async (
-      utxoset:UTXOSet, fee:BN, creatorAddresses:Array<string> | Array<Buffer>, 
-      initialStates:InitialStates, name:string, 
-      symbol:string, denomination:number, memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(),
-      locktime:BN = undefined
+      utxoset:UTXOSet, 
+      fromAddresses:Array<string> | Array<Buffer>, 
+      initialStates:InitialStates, 
+      name:string, 
+      symbol:string, 
+      denomination:number, 
+      memo:PayloadBase|Buffer = undefined, 
+      asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
-      let creators:Array<Buffer> = this._cleanAddressArray(creatorAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
+      let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
 
       if( memo instanceof PayloadBase) {
         memo = memo.getPayload();
@@ -889,8 +959,16 @@ class AVMAPI extends JRPCAPI {
 
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
       const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
-        fee, creators, initialStates, name, symbol, denomination, memo, asOf
+        this.core.getNetworkID(), 
+        bintools.cb58Decode(this.blockchainID), 
+        from,
+        initialStates,
+        name, 
+        symbol, 
+        denomination, 
+        this.getFee(), 
+        avaxAssetID,
+        memo, asOf
       );
   
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
@@ -906,11 +984,10 @@ class AVMAPI extends JRPCAPI {
     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
     * 
     * @param utxoset A set of UTXOs that the transaction is built on
-    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-    * @param feePayingAddresses The addresses to pay the fees
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+    * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
     * @param name String for the descriptive name of the asset
     * @param symbol String for the ticker symbol of the asset
-    * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting mint output
@@ -939,10 +1016,14 @@ class AVMAPI extends JRPCAPI {
     * 
     */
    buildCreateNFTAssetTx = async (
-    utxoset:UTXOSet, fee:BN, feePayingAddresses:Array<string> | Array<Buffer>, 
-    name:string, symbol:string, minterSets:MinterSet[], memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0)
-      ): Promise<UnsignedTx> => {
-    let feeAddrs:Array<Buffer> = this._cleanAddressArray(feePayingAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+    utxoset:UTXOSet, 
+    fromAddresses:Array<string> | Array<Buffer>, 
+    minterSets:MinterSet[], 
+    name:string, 
+    symbol:string, 
+    memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0)
+   ): Promise<UnsignedTx> => {
+    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -958,8 +1039,15 @@ class AVMAPI extends JRPCAPI {
     }
     let avaxAssetID:Buffer = await this.getAVAXAssetID();
     const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTAssetTx(
-        this.core.getNetworkID(), bintools.cb58Decode(this.blockchainID), avaxAssetID,
-        fee, feeAddrs, minterSets, name, symbol, memo, asOf, locktime
+        this.core.getNetworkID(), 
+        bintools.cb58Decode(this.blockchainID),
+        from,
+        minterSets,
+        name, 
+        symbol,
+        this.getFee(), 
+        avaxAssetID,
+        memo, asOf, locktime
     );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
@@ -973,11 +1061,9 @@ class AVMAPI extends JRPCAPI {
     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
     * 
     * @param utxoset  A set of UTXOs that the transaction is built on
-    * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
     * @param toAddresses The addresses to send the nft output
     * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
-    * @param fee The amount of fees being paid for this transaction
-    * @param feeAddresses The addresses that have the AVAX funds to pay for fees of the UTXO
+    * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
     * @param groupID Optional. The group this NFT is issued to.
     * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -990,15 +1076,17 @@ class AVMAPI extends JRPCAPI {
     * 
     */
   buildCreateNFTMintTx = async (
-      utxoset:UTXOSet, utxoid:string|Array<string>, toAddresses:Array<string>|Array<Buffer>, 
-      fromAddresses:Array<string>|Array<Buffer>, fee:BN,
-      feeAddresses:Array<string>|Array<Buffer>, groupID:number = 0, payload:PayloadBase|Buffer = undefined, 
+      utxoset:UTXOSet,  
+      toAddresses:Array<string>|Array<Buffer>, 
+      fromAddresses:Array<string>|Array<Buffer>, 
+      utxoid:string|Array<string>,
+      groupID:number = 0, 
+      payload:PayloadBase|Buffer = undefined, 
       memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
   ): Promise<any> => {
       let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
       let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-      let feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-      
+     
       if( memo instanceof PayloadBase) {
         memo = memo.getPayload();
       }
@@ -1016,18 +1104,14 @@ class AVMAPI extends JRPCAPI {
       const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
           this.core.getNetworkID(),
           bintools.cb58Decode(this.blockchainID),
-          avaxAssetID,
-          fee,
-          feeAddrs,
           to,
           from,
           utxoid,
           groupID,
           payload,
-          memo, 
-          asOf,
-          locktime,
-          threshold
+          this.getFee(),
+          avaxAssetID,
+          memo, asOf, locktime, threshold
       );
       if(! await this.checkGooseEgg(builtUnsignedTx)) {
         /* istanbul ignore next */
