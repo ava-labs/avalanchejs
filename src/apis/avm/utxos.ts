@@ -169,6 +169,129 @@ export class UTXO {
 }
 
 /**
+ * Class for managing asset amounts in the UTXOSet fee calcuation
+ */
+class AssetAmount {
+  protected assetID:Buffer = Buffer.alloc(32);
+  protected amount:BN = new BN(0);
+  protected burn:BN = new BN(0);
+  protected spent:BN = new BN(0);
+  protected change:BN = new BN(0);
+  protected finished:boolean = false;
+
+
+  getAssetID = ():Buffer => {
+    return this.assetID;
+  }
+
+  getAssetIDString = ():string => {
+    return this.assetID.toString("hex");
+  }
+
+  getAmount = ():BN => {
+    return this.amount
+  }
+
+  getSpent = ():BN => {
+    return this.spent;
+  }
+
+  getChange = ():BN => {
+    return this.change;
+  }
+
+  isFinished = ():boolean => {
+    return this.finished;
+  }
+
+  spendAmount = (amt:BN):boolean => {
+    if(!this.finished) {
+      let total:BN = this.amount.add(this.burn);
+      this.spent = this.spent.add(amt);
+      if(this.spent.gte(total)) {
+        this.change = this.change.add(this.spent.sub(total));
+        this.spent = total;
+        this.finished = true;
+      }
+    }
+    return this.finished;
+  }
+
+  constructor(assetID:Buffer, amount:BN, burn:BN) {
+    this.assetID = assetID;
+    this.amount = amount;
+    this.burn = burn;
+    this.spent = new BN(0);
+  }
+}
+
+class AssetAmountDestination {
+  protected amounts:Array<AssetAmount> = [];
+  protected destinations:Array<Buffer> = [];
+  protected changeAddresses:Array<Buffer> = [];
+  protected amountkey:object = {};
+  protected inputs:Array<TransferableInput> = [];
+  protected outputs:Array<TransferableOutput> = [];
+
+  addAssetAmount = (assetID:Buffer, amount:BN, burn:BN) => {
+    let aa:AssetAmount = new AssetAmount(assetID, amount, burn);
+    this.amounts.push();
+    this.amountkey[aa.getAssetIDString()] = aa;
+  }
+
+  addInput = (input:TransferableInput) => {
+    this.inputs.push(input);
+  }
+
+  addOutput = (output:TransferableOutput) => {
+    this.outputs.push(output);
+  }
+
+  getAmounts = ():Array<AssetAmount> => {
+    return this.amounts;
+  }
+
+  getDestinations = ():Array<Buffer> => {
+    return this.destinations;
+  }
+
+  getChangeAddresses = ():Array<Buffer> => {
+    return this.changeAddresses;
+  }
+
+  getAssetAmount = (assetHexStr:string):AssetAmount => {
+    return this.amountkey[assetHexStr];
+  }
+
+  assetExists = (assetHexStr:string):boolean => {
+    return (assetHexStr in this.amountkey);
+  }
+
+  getInputs = ():Array<TransferableInput> => {
+    return this.inputs;
+  }
+
+  getOutputs = ():Array<TransferableOutput> => {
+    return this.outputs;
+  }
+
+  canComplete = ():boolean => {
+    for(let i = 0; i < this.amounts.length; i++){
+      if(!this.amounts[i].isFinished()){
+        return false;
+      }
+    }
+    return true;
+  }
+
+  constructor(destinations:Array<Buffer>, changeAddresses:Array<Buffer>) {
+    this.destinations = destinations;
+    this.changeAddresses = changeAddresses;
+  }
+
+}
+
+/**
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet {
@@ -439,6 +562,51 @@ export class UTXOSet {
 
     return [...results];
   };
+
+  getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN):boolean => {
+    const utxoArray:Array<UTXO> = this.getAllUTXOs();
+    const outids:object = {};
+    for(let i = 0; i < utxoArray.length; i++) {
+      const u:UTXO = utxoArray[i];
+      const assetKey:string = u.getAssetID().toString("hex");
+      if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(aad.getDestination(), asOf)) {
+        const am:AssetAmount = aad.getAssetAmount(assetKey);
+        
+        if(!am.isFinished()){
+          const uout:AmountOutput = u.getOutput() as AmountOutput;
+          outids[assetKey] = uout.getOutputID();
+          const amount = uout.getAmount();
+          am.spendAmount(amount);
+          const txid:Buffer = u.getTxID();
+          const outputidx:Buffer = u.getOutputIdx();
+          const input:SecpInput = new SecpInput(amount);
+          const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
+          aad.addInput(xferin);
+        }
+      }
+    }
+    if(!aad.canComplete()) {
+      return undefined;
+    }
+    const amounts:Array<AssetAmount> = aad.getAmounts();
+    const zero:BN = new BN(0);
+    for(let i = 0; i < amounts.length; i++) {
+      const assetKey:string = amounts[i].getAssetIDString();
+      const amount:BN = amounts[i].getAmount();
+      const change:BN = amounts[i].getChange();
+      const spendout:AmountOutput = SelectOutputClass(outids[assetKey],
+        amount, aad.getDestinations()) as AmountOutput;
+      const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+      aad.addOutput(xferout);
+      if (change.gt(zero)) {
+        const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
+          change, aad.getChangeAddresses()) as AmountOutput;
+        const chgxferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
+        aad.addOutput(chgxferout);
+      }
+    }
+    return true;
+  }
 
   /**
      * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
