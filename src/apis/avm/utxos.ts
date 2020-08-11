@@ -179,7 +179,6 @@ class AssetAmount {
   protected change:BN = new BN(0);
   protected finished:boolean = false;
 
-
   getAssetID = ():Buffer => {
     return this.assetID;
   }
@@ -205,22 +204,20 @@ class AssetAmount {
   }
 
   spendAmount = (amt:BN):boolean => {
-    if(!this.finished) {
-      let total:BN = this.amount.add(this.burn);
+    let total:BN = this.amount.add(this.burn);
+    if(!this.finished && this.spent.gte(total)) {
       this.spent = this.spent.add(amt);
-      if(this.spent.gte(total)) {
-        this.change = this.change.add(this.spent.sub(total));
-        this.spent = total;
-        this.finished = true;
-      }
+      this.change = this.change.add(this.spent.sub(total));
+      this.spent = total;
+      this.finished = true;
     }
     return this.finished;
   }
 
   constructor(assetID:Buffer, amount:BN, burn:BN) {
     this.assetID = assetID;
-    this.amount = amount;
-    this.burn = burn;
+    this.amount = typeof amount === "undefined" ? new BN(0) : amount;
+    this.burn = typeof burn === "undefined" ? new BN(0) : burn;
     this.spent = new BN(0);
   }
 }
@@ -677,7 +674,9 @@ export class UTXOSet {
     const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if(assetID.toString("hex") === feeAssetID.toString("hex")){
       aad.addAssetAmount(assetID, amount, fee);
+      console.log("A");
     } else {
+      console.log("B");
       aad.addAssetAmount(assetID, amount, zero);
       aad.addAssetAmount(feeAssetID, zero, fee);
     }
@@ -686,10 +685,17 @@ export class UTXOSet {
     let outs:Array<TransferableOutput> = [];
     
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    console.log("success", success);
+    //let a = aad.getAmounts()[0].getAmount();
+    //let s = aad.getAmounts()[0].getSpent();
+    //let b = aad.getAmounts()[0].getChange();
+    //let f = aad.getAmounts()[0].isFinished();
+    console.log("hmph", aad.getAmounts());//, a)// s, b, f);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
       outs = aad.getOutputs();
     } else {
+      
       throw success;
     }
 

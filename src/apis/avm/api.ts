@@ -877,7 +877,7 @@ class AVMAPI extends JRPCAPI {
       amount:BN,
       toAddresses:Array<string>, 
       fromAddresses:Array<string>,
-      changeAddresses:Array<Buffer> = undefined,
+      changeAddresses:Array<string> = undefined,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow(),
       locktime:BN = new BN(0), 

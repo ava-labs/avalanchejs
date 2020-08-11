@@ -311,8 +311,8 @@ describe('Transactions', () => {
     expect(() => {
       set.buildBaseTx(
         netid, blockchainID,
-        new BN(amnt * 1000),
-        addrs3, addrs1, addrs1, assetID,
+        new BN(amnt * 1000), assetID,
+        addrs3, addrs1, addrs1, 
       );
     }).toThrow();
   });
@@ -409,7 +409,7 @@ describe('Transactions', () => {
   test('Creation Tx1 with asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000), addrs3, addrs1, addrs1, assetID, undefined,
+      new BN(9000), assetID, addrs3, addrs1, addrs1, undefined, undefined, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
     const tx:Tx = keymgr1.signTx(txu);
@@ -422,8 +422,8 @@ describe('Transactions', () => {
   test('Creation Tx2 without asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000),
-      addrs3, addrs1, addrs1, assetID, undefined
+      new BN(9000), assetID,
+      addrs3, addrs1, addrs1
     );
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
@@ -434,8 +434,8 @@ describe('Transactions', () => {
 
   test('Creation Tx3 using OperationTx', () => {
     const txu:UnsignedTx = set.buildNFTTransferTx(
-      netid, blockchainID, avaxAssetID, new BN(90),
-      addrs1, addrs3, addrs1, nftutxoids, undefined,
+      netid, blockchainID, 
+      addrs1, addrs3, nftutxoids, new BN(90), avaxAssetID, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
     const tx:Tx = keymgr1.signTx(txu);
@@ -446,8 +446,7 @@ describe('Transactions', () => {
 
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
-      netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, importIns,
+      netid, blockchainID, addrs1, importIns, new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
@@ -457,8 +456,8 @@ describe('Transactions', () => {
 
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
-      netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, exportUTXOIDS, new UTF8Payload("hello world").getPayload(), UnixNow()
+      netid, blockchainID, new BN(90), avaxAssetID,
+      addrs1, addrs3, addrs3, undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
