@@ -171,7 +171,7 @@ export class UTXO {
 /**
  * Class for managing asset amounts in the UTXOSet fee calcuation
  */
-class AssetAmount {
+export class AssetAmount {
   protected assetID:Buffer = Buffer.alloc(32);
   protected amount:BN = new BN(0);
   protected burn:BN = new BN(0);
@@ -233,7 +233,7 @@ class AssetAmount {
   }
 }
 
-class AssetAmountDestination {
+export class AssetAmountDestination {
   protected amounts:Array<AssetAmount> = [];
   protected destinations:Array<Buffer> = [];
   protected senders:Array<Buffer> = [];
