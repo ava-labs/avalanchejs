@@ -323,7 +323,9 @@ describe('AVMAPI', () => {
     expect(response).toBe(assetid);
   });
 
-  test('createMintTx 1', async () => {
+  test('mint 1', async () => {
+    const username:string = 'Collin';
+    const password:string = 'Cusce';
     const amount:number = 2;
     const assetID:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
@@ -332,10 +334,10 @@ describe('AVMAPI', () => {
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ];
-    const result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+    const result:Promise<string> = api.mint(username, password, amount, assetID, to, minters);
     const payload:object = {
       result: {
-        tx: 'sometx',
+        txID: 'sometx',
       },
     };
     const responseObj = {
@@ -349,7 +351,9 @@ describe('AVMAPI', () => {
     expect(response).toBe('sometx');
   });
 
-  test('createMintTx 2', async () => {
+  test('mint 2', async () => {
+    const username:string = 'Collin';
+    const password:string = 'Cusce';
     const amount:BN = new BN(1);
     const assetID:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
@@ -358,54 +362,10 @@ describe('AVMAPI', () => {
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ];
-    const result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+    const result:Promise<string> = api.mint(username, password, amount, assetID, to, minters);
     const payload:object = {
       result: {
-        tx: 'sometx',
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('sometx');
-  });
-
-  test('signMintTx 1', async () => {
-    const username:string = 'Collin';
-    const password:string = 'Cusce';
-    const tx:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-    const minter:string = addrA;
-    const result:Promise<string> = api.signMintTx(username, password, tx, minter);
-    const payload:object = {
-      result: {
-        tx: 'sometx',
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('sometx');
-  });
-
-  test('signMintTx 2', async () => {
-    const username:string = 'Collin';
-    const password:string = 'Cusce';
-    const tx:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
-    const minter:string = addrA;
-    const result:Promise<string> = api.signMintTx(username, password, tx, minter);
-    const payload:object = {
-      result: {
-        tx: 'sometx',
+        txID: 'sometx',
       },
     };
     const responseObj = {

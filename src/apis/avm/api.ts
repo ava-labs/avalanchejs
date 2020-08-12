@@ -332,7 +332,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
      */
-  createMintTx = async (amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
+  mint = async (username:string, password:string, amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
     let asset:string;
     let amnt:BN;
     if (typeof assetID !== 'string') {
@@ -346,36 +346,14 @@ class AVMAPI extends JRPCAPI {
       amnt = amount;
     }
     const params:any = {
+      username: username,
+      password: password,
       amount: amnt.toString(10),
       assetID: asset,
       to,
-      minters,
+      minters
     };
-    return this.callMethod('avm.createMintTx', params).then((response:RequestResponseData) => response.data.result.tx);
-  };
-
-  /**
-     * Sign an unsigned or partially signed mint transaction.
-     *
-     * @param username The user signing
-     * @param password The password for the user signing
-     * @param tx The output of createMintTx or signMintTx
-     * @param minter The minter signing this transaction
-     *
-     * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
-     */
-  signMintTx = async (username:string, password:string, tx:string | Buffer, minter:string):Promise<string> => {
-    if (typeof this.parseAddress(minter) === 'undefined') {
-      /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.signMintTx: Invalid address format ${minter}`);
-    }
-    const params:any = {
-      username,
-      password,
-      tx,
-      minter,
-    };
-    return this.callMethod('avm.signMintTx', params).then((response:RequestResponseData) => response.data.result.tx);
+    return this.callMethod('avm.mint', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
