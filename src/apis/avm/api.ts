@@ -408,7 +408,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns String representing the transaction id
      */
-  exportAVAX = async (username: string, password:string, to:string, amount:BN):Promise<string> => {
+  exportAVAX = async (username:string, password:string, to:string, amount:BN):Promise<string> => {
     const params:any = {
       to,
       amount: amount.toString(10),
@@ -429,7 +429,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns String representing the transaction id
      */
-  importAVAX = async (username: string, password:string, to:string):Promise<string> => {
+  importAVAX = async (username:string, password:string, to:string):Promise<string> => {
     const params:any = {
       to,
       username,
