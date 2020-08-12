@@ -195,6 +195,10 @@ class AssetAmount {
     return this.spent;
   }
 
+  getBurn = ():BN => {
+    return this.burn;
+  }
+
   getChange = ():BN => {
     return this.change;
   }
@@ -204,12 +208,19 @@ class AssetAmount {
   }
 
   spendAmount = (amt:BN):boolean => {
-    let total:BN = this.amount.add(this.burn);
-    if(!this.finished && this.spent.gte(total)) {
+    
+    if(!this.finished) {
+      let total:BN = this.amount.add(this.burn);
       this.spent = this.spent.add(amt);
-      this.change = this.change.add(this.spent.sub(total));
-      this.spent = total;
-      this.finished = true;
+      if(this.spent.gte(this.amount)){
+        if(this.spent.gte(total)){
+          this.change = this.change.add(this.spent.sub(total));
+        } else {
+          this.change = new BN(0);
+        }
+        this.spent = total;
+        this.finished = true;
+      }
     }
     return this.finished;
   }
@@ -233,7 +244,7 @@ class AssetAmountDestination {
 
   addAssetAmount = (assetID:Buffer, amount:BN, burn:BN) => {
     let aa:AssetAmount = new AssetAmount(assetID, amount, burn);
-    this.amounts.push();
+    this.amounts.push(aa);
     this.amountkey[aa.getAssetIDString()] = aa;
   }
 
@@ -278,8 +289,9 @@ class AssetAmountDestination {
   }
 
   canComplete = ():boolean => {
-    for(let i = 0; i < this.amounts.length; i++){
-      if(!this.amounts[i].isFinished()){
+    for(let i = 0; i < this.amounts.length; i++) {
+      if(!this.amounts[i].isFinished()) {
+
         return false;
       }
     }
@@ -569,10 +581,9 @@ export class UTXOSet {
   getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
     const utxoArray:Array<UTXO> = this.getAllUTXOs();
     const outids:object = {};
-    for(let i = 0; i < utxoArray.length; i++) {
+    for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
       const u:UTXO = utxoArray[i];
       const assetKey:string = u.getAssetID().toString("hex");
-      
       if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(aad.getSenders(), asOf)) {
         const am:AssetAmount = aad.getAssetAmount(assetKey);
         if(!am.isFinished()){
@@ -674,9 +685,7 @@ export class UTXOSet {
     const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if(assetID.toString("hex") === feeAssetID.toString("hex")){
       aad.addAssetAmount(assetID, amount, fee);
-      console.log("A");
     } else {
-      console.log("B");
       aad.addAssetAmount(assetID, amount, zero);
       aad.addAssetAmount(feeAssetID, zero, fee);
     }
@@ -685,12 +694,6 @@ export class UTXOSet {
     let outs:Array<TransferableOutput> = [];
     
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-    console.log("success", success);
-    //let a = aad.getAmounts()[0].getAmount();
-    //let s = aad.getAmounts()[0].getSpent();
-    //let b = aad.getAmounts()[0].getChange();
-    //let f = aad.getAmounts()[0].isFinished();
-    console.log("hmph", aad.getAmounts());//, a)// s, b, f);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
       outs = aad.getOutputs();
@@ -859,7 +862,7 @@ export class UTXOSet {
     let outs:Array<TransferableOutput> = [];
     
     if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
-      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
+      const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
@@ -1028,7 +1031,9 @@ export class UTXOSet {
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
     * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-    * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
+    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover of the AVAX
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes

@@ -435,7 +435,7 @@ describe('Transactions', () => {
   test('Creation Tx3 using OperationTx', () => {
     const txu:UnsignedTx = set.buildNFTTransferTx(
       netid, blockchainID, 
-      addrs1, addrs3, nftutxoids, new BN(90), avaxAssetID, undefined,
+      addrs3, addrs1, nftutxoids, new BN(90), avaxAssetID, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
     const tx:Tx = keymgr1.signTx(txu);
@@ -457,7 +457,7 @@ describe('Transactions', () => {
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
       netid, blockchainID, new BN(90), avaxAssetID,
-      addrs1, addrs3, addrs3, undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
+      addrs3, addrs1, addrs2, undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
     const tx:Tx = keymgr1.signTx(txu);
     const tx2:Tx = new Tx();
