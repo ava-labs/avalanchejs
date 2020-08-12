@@ -323,7 +323,9 @@ describe('AVMAPI', () => {
     expect(response).toBe(assetid);
   });
 
-  test('createMintTx 1', async () => {
+  test('mint 1', async () => {
+    const username:string = 'Collin';
+    const password:string = 'Cusce';
     const amount:number = 2;
     const assetID:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
@@ -332,10 +334,10 @@ describe('AVMAPI', () => {
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ];
-    const result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+    const result:Promise<string> = api.mint(username, password, amount, assetID, to, minters);
     const payload:object = {
       result: {
-        tx: 'sometx',
+        txID: 'sometx',
       },
     };
     const responseObj = {
@@ -349,7 +351,9 @@ describe('AVMAPI', () => {
     expect(response).toBe('sometx');
   });
 
-  test('createMintTx 2', async () => {
+  test('mint 2', async () => {
+    const username:string = 'Collin';
+    const password:string = 'Cusce';
     const amount:BN = new BN(1);
     const assetID:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
@@ -358,54 +362,10 @@ describe('AVMAPI', () => {
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ];
-    const result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+    const result:Promise<string> = api.mint(username, password, amount, assetID, to, minters);
     const payload:object = {
       result: {
-        tx: 'sometx',
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('sometx');
-  });
-
-  test('signMintTx 1', async () => {
-    const username:string = 'Collin';
-    const password:string = 'Cusce';
-    const tx:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-    const minter:string = addrA;
-    const result:Promise<string> = api.signMintTx(username, password, tx, minter);
-    const payload:object = {
-      result: {
-        tx: 'sometx',
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('sometx');
-  });
-
-  test('signMintTx 2', async () => {
-    const username:string = 'Collin';
-    const password:string = 'Cusce';
-    const tx:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
-    const minter:string = addrA;
-    const result:Promise<string> = api.signMintTx(username, password, tx, minter);
-    const payload:object = {
-      result: {
-        tx: 'sometx',
+        txID: 'sometx',
       },
     };
     const responseObj = {
@@ -528,45 +488,6 @@ describe('AVMAPI', () => {
     expect(persistOpts.getMergeRule()).toBe('union');
     let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
     let result:Promise<UTXOSet> = api.getUTXOs(addresses, persistOpts);
-    const payload:object = {
-      result: {
-        utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    let response:UTXOSet = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
-
-    addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, persistOpts);
-
-    mockAxios.mockResponse(responseObj);
-    response = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(2);
-    expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
-  });
-
-  test('getAtomicUTXOs', async () => {
-    // Payment
-    const OPUTXOstr1:string = bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex'));
-    const OPUTXOstr2:string = bintools.cb58Encode(Buffer.from('0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
-    const OPUTXOstr3:string = bintools.cb58Encode(Buffer.from('0000f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
-
-    const set:UTXOSet = new UTXOSet();
-    set.add(OPUTXOstr1);
-    set.addArray([OPUTXOstr2, OPUTXOstr3]);
-
-    const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
-    expect(persistOpts.getMergeRule()).toBe('union');
-    let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:Promise<UTXOSet> = api.getAtomicUTXOs(addresses, persistOpts);
     const payload:object = {
       result: {
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],

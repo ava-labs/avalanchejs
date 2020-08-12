@@ -332,7 +332,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
      */
-  createMintTx = async (amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
+  mint = async (username:string, password:string, amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
     let asset:string;
     let amnt:BN;
     if (typeof assetID !== 'string') {
@@ -346,36 +346,14 @@ class AVMAPI extends JRPCAPI {
       amnt = amount;
     }
     const params:any = {
+      username: username,
+      password: password,
       amount: amnt.toString(10),
       assetID: asset,
       to,
-      minters,
+      minters
     };
-    return this.callMethod('avm.createMintTx', params).then((response:RequestResponseData) => response.data.result.tx);
-  };
-
-  /**
-     * Sign an unsigned or partially signed mint transaction.
-     *
-     * @param username The user signing
-     * @param password The password for the user signing
-     * @param tx The output of createMintTx or signMintTx
-     * @param minter The minter signing this transaction
-     *
-     * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
-     */
-  signMintTx = async (username:string, password:string, tx:string | Buffer, minter:string):Promise<string> => {
-    if (typeof this.parseAddress(minter) === 'undefined') {
-      /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.signMintTx: Invalid address format ${minter}`);
-    }
-    const params:any = {
-      username,
-      password,
-      tx,
-      minter,
-    };
-    return this.callMethod('avm.signMintTx', params).then((response:RequestResponseData) => response.data.result.tx);
+    return this.callMethod('avm.mint', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -430,7 +408,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns String representing the transaction id
      */
-  exportAVAX = async (username: string, password:string, to:string, amount:BN):Promise<string> => {
+  exportAVAX = async (username:string, password:string, to:string, amount:BN):Promise<string> => {
     const params:any = {
       to,
       amount: amount.toString(10),
@@ -451,7 +429,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @returns String representing the transaction id
      */
-  importAVAX = async (username: string, password:string, to:string):Promise<string> => {
+  importAVAX = async (username:string, password:string, to:string):Promise<string> => {
     const params:any = {
       to,
       username,
@@ -585,43 +563,6 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Retrieves the UTXOs able to be imported by the addresses, provided from the node's `getAtomicUTXOs` method.
-     *
-     * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
-     * @param persistOpts Options available to persist these UTXOs in local storage
-     *
-     * @remarks
-     * persistOpts is optional and must be of type [[PersistanceOptions]]
-     *
-     */
-    getAtomicUTXOs = async (addresses:Array<string> | Array<Buffer>, persistOpts:PersistanceOptions = undefined):Promise<UTXOSet> => {
-      const addrs:Array<string> = this._cleanAddressArray(addresses, 'getAtomicUTXOs');
-  
-      const params:any = {
-        addresses: addrs,
-      };
-      return this.callMethod('avm.getAtomicUTXOs', params).then((response:RequestResponseData) => {
-        const utxos:UTXOSet = new UTXOSet();
-        let data = response.data.result.utxos;
-        if (persistOpts && typeof persistOpts === 'object') {
-          if (this.db.has(persistOpts.getName())) {
-            const selfArray:Array<string> = this.db.get(persistOpts.getName());
-            if (Array.isArray(selfArray)) {
-              utxos.addArray(data);
-              const self:UTXOSet = new UTXOSet();
-              self.addArray(selfArray);
-              self.mergeByRule(utxos, persistOpts.getMergeRule());
-              data = self.getAllUTXOStrings();
-            }
-          }
-          this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
-        }
-        utxos.addArray(data);
-        return utxos;
-      });
-    };
-
-  /**
      * Helper function which creates an unsigned transaction. For more granular control, you may create your own
      * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
      *
@@ -750,7 +691,7 @@ class AVMAPI extends JRPCAPI {
       const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
       const feeAddrs:Array<Buffer> = this._cleanAddressArray(feeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
 
-      const atomicUTXOs:UTXOSet = await this.getAtomicUTXOs(owners);
+      const atomicUTXOs:UTXOSet = await this.getUTXOs(owners);
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
       const avaxAssetIDStr:string = avaxAssetID.toString("hex");
 
