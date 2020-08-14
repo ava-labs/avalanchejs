@@ -84,6 +84,7 @@ export class RESTAPI extends APIBase {
 
   protected acceptType:string;
 
+    /* EGS: there is a LOT of duplication in the code that follows, esp post/put/etc */
   get = async (baseurl?:string,
     contentType?:string,
     acceptType?:string):Promise<RequestResponseData> => {
@@ -789,6 +790,8 @@ export function getPreferredHRP(networkID:number = undefined) {
   }
   return FallbackHRP;
 }
+
+/* EGS move all network-specific magic numbers to a single, separate file, with no repeated magic numbers */
 
 // TODO: UPDATE FOR MAINNET
 
