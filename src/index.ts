@@ -82,6 +82,9 @@ export default class Avalanche extends AvalancheCore {
     skipinit:boolean = false) {
     super(ip, port, protocol);
     let chainid = avmChainID;
+
+    /* EGS: why is avm so special? */
+    /* EGS: can we externalize the default 2oAL* network id in a different file, instead of hardcoding here? */
     if (typeof avmChainID === 'undefined'
     || !avmChainID
     || avmChainID.toLowerCase() === 'avm'

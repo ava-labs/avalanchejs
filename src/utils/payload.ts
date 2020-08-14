@@ -65,6 +65,7 @@ export class PayloadTypes {
     /**
      * Given a TypeID returns the proper [[PayloadBase]].
      */
+    /* EGS: wouldn't it make more sense to look up the right constructor in an array and invoke that? */
     select(typeid:number, ...args:Array<any>):PayloadBase {
         switch(typeid) {
             case 0:
@@ -114,14 +115,17 @@ export class PayloadTypes {
             case 22:
                 return new SVGPayload(...args);
             case 23:
+	    /* EGS do we need this? */
                 return new CSVPayload(...args);
             case 24:
                 return new JSONPayload(...args);
             case 25:
+	    /* EGS do we need this? */
                 return new PROTOBUFPayload(...args);
             case 26:
                 return new YAMLPayload(...args);
             case 27:
+	    /* EGS do we need this? */
                 return new EMAILPayload(...args);
             case 28:
                 return new URLPayload(...args);
@@ -210,6 +214,10 @@ export abstract class PayloadBase {
         this.typeid = bintools.copyFrom(bytes, offset, offset + 1).readUInt8(0);
         offset += 1
         this.payload = bintools.copyFrom(bytes, offset, offset + size - 1);
+	/* EGS shouldn't we do:
+	   offset += size-1
+	   return offset
+	   less can go wrong this way. */
         return offset + this.payload.length - 1;
     }
 
@@ -303,13 +311,15 @@ export class HEXSTRPayload extends PayloadBase {
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(typeof payload === "string") {
+	    /* EGS do we always require that the payload arrive with a "0x" in front of it? 
+	       If so, we should check the arg and reject if it doesn't have "0x" */
             this.payload = Buffer.from(payload.replace("0x", ""), "hex");
         }
     }
 }
 
 /**
- * Class for payloads representing Base58 encoding (Bitcoin standard).
+ * Class for payloads representing Base58 encoding.
  */
 export class B58STRPayload extends PayloadBase {
     protected typeid = 3;

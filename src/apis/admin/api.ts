@@ -13,6 +13,10 @@ import { JRPCAPI, RequestResponseData } from '../../utils/types';
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called.
  * Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
+
+/* EGS 
+   can't we generate all of these calls from a single template? 
+   this is a lot of boilerplate code that doesn't do much */
 export default class AdminAPI extends JRPCAPI {
 
   /**

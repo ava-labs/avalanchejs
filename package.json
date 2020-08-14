@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Avalanche Platform JS Library",
   "main": "typings/src/index.js",
   "types": "typings/src/index.d.ts",

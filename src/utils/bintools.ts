@@ -87,7 +87,7 @@ export class Base58 {
   };
 
   /**
-     * Dencodes a base-58 into a {@link https://github.com/feross/buffer|Buffer}
+     * Decodes a base-58 into a {@link https://github.com/feross/buffer|Buffer}
      *
      * @param b A base-58 string to decode
      *
@@ -108,9 +108,11 @@ export class Base58 {
       j.imul(this.big58Radix);
     }
 
+    /* EGS: why are we converting to hex and back from hex? */
     let anshex = answer.toString('hex');
     anshex = anshex.length % 2 ? `0${anshex}` : anshex;
 
+    /* EGS: what's the point of counting these zeroes? */
     const tmpval:Buffer = Buffer.from(anshex, 'hex');
     let numZeros:number;
     for (numZeros = 0; numZeros < b.length; numZeros++) {
@@ -190,6 +192,7 @@ export default class BinTools {
      * @param end The index to end the copy
      */
   copyFrom = (buff:Buffer, start:number = 0, end:number = undefined):Buffer => {
+    /* EGS: why introduce theEnd as a new variable? */
     let theEnd = end;
     if (end === undefined) {
       theEnd = buff.length;
@@ -220,6 +223,7 @@ export default class BinTools {
      * convert to an ArrayBuffer
      */
   fromBufferToArrayBuffer = (buff:Buffer):ArrayBuffer => {
+	/* EGS: isn't there a more efficient buffer/array concat operator we could use? */
     const ab = new ArrayBuffer(buff.length);
     const view = new Uint8Array(ab);
     for (let i = 0; i < buff.length; ++i) {
@@ -234,6 +238,7 @@ export default class BinTools {
      * @param ab The ArrayBuffer to convert to a {@link https://github.com/feross/buffer|Buffer}
      */
   fromArrayBufferToBuffer = (ab:ArrayBuffer):Buffer => {
+	/* EGS: isn't there a more efficient buffer/array concat operator we could use? */
     const buf = Buffer.alloc(ab.byteLength);
     for (let i = 0; i < ab.byteLength; ++i) {
       buf[i] = ab[i];
@@ -260,6 +265,7 @@ export default class BinTools {
      */
   fromBNToBuffer = (bn:BN, length?:number):Buffer => {
     const newarr = bn.toArray('be');
+      /* EGS: sounds weird that toArray with the length param doesn't work */
     if (length) { // bn toArray with the length parameter doesn't work correctly, need this.
       const x = length - newarr.length;
       for (let i:number = 0; i < x; i++) {
@@ -288,8 +294,7 @@ export default class BinTools {
      */
   validateChecksum = (buff:Buffer):boolean => {
     const checkslice:Buffer = buff.slice(buff.length - 4);
-    const hashslice:Buffer = Buffer.from(createHash('sha256')
-      .update(buff.slice(0, buff.length - 4)).digest().slice(28));
+    const hashslice:Buffer = Buffer.from(createHash('sha256').update(buff.slice(0, buff.length - 4)).digest().slice(28));
     return checkslice.toString('hex') === hashslice.toString('hex');
   };
 
@@ -337,6 +342,8 @@ export default class BinTools {
    * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer}
    * representation if valid. A more strict version of stringToAddress.
    *
+   * EGS: need to document the alias argument and the function it serves
+   *
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
    * undefined if not valid.
    */
@@ -344,6 +351,7 @@ export default class BinTools {
     blockchainID:string,
     alias:string = undefined,
     addrlen:number = 20):Buffer => {
+	/* EGS: is addrlen necessary? are we guaranteed that all addresses will be this exact number of bytes? */
     const abc:Array<string> = addr.split('-');
     if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
         const addrbuff = this.stringToAddress(addr);
