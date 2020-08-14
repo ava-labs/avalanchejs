@@ -742,7 +742,7 @@ class AVMAPI extends JRPCAPI {
       asOf:BN = UnixNow(), 
     ):Promise<UnsignedTx> => {
       const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-      
+
       const atomicUTXOs:UTXOSet = await this.getUTXOs(owners);
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
       const avaxAssetIDStr:string = avaxAssetID.toString("hex");
@@ -1068,7 +1068,7 @@ class AVMAPI extends JRPCAPI {
     *
     * @returns A signed transaction of type [[Tx]]
     */
-  signTx = (utx:UnsignedTx):Tx => this.keychain.signTx(utx);
+  signTx = (utx:UnsignedTx):Tx => utx.sign(this.keychain);
 
   /**
      * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.

@@ -235,16 +235,6 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
   };
 
   /**
-     * DEPRECATED: use UnsignedTx.sign(keychain) instead
-     * Signs a [[UnsignedTx]] and returns signed [[Tx]]
-     *
-     * @param utx A [[UnsignedTx]] that needs to be signed
-     *
-     * @returns A signed [[Tx]]
-     */
-  signTx = (utx:UnsignedTx):Tx => utx.sign(this);
-
-  /**
      * Returns instance of AVMKeyChain.
      */
   constructor(hrp:string, chainid:string) {

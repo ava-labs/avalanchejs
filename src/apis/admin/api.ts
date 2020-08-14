@@ -14,27 +14,6 @@ import { JRPCAPI, RequestResponseData } from '../../utils/types';
  * Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
 export default class AdminAPI extends JRPCAPI {
-  /**
-     * Fetches the nodeID from the node.
-     *
-     * @returns Returns a Promise<string> of the nodeID.
-     */
-  getNodeID = async ():Promise<string> => {
-    const params:any = {};
-    return this.callMethod('admin.getNodeID', params)
-      .then((response:RequestResponseData) => response.data.result.nodeID);
-  };
-
-  /**
-     * Fetches the networkID from the node.
-     *
-     * @returns Returns a Promise<number> of the networkID.
-     */
-  getNetworkID = async ():Promise<number> => {
-    const params:any = {};
-    return this.callMethod('admin.getNetworkID', params)
-      .then((response:RequestResponseData) => response.data.result.networkID);
-  };
 
   /**
      * Assign an API an alias, a different endpoint for the API. The original endpoint will still
@@ -74,48 +53,12 @@ export default class AdminAPI extends JRPCAPI {
   };
 
   /**
-     * Fetches the blockchainID from the node for a given alias.
-     *
-     * @param alias The blockchain alias to get the blockchainID
-     *
-     * @returns Returns a Promise<string> containing the base 58 string representation of the
-     * blockchainID.
-     */
-  getBlockchainID = async (alias:string):Promise<string> => {
-    const params:any = {
-      alias,
-    };
-    return this.callMethod('admin.getBlockchainID', params)
-      .then((response:RequestResponseData) => response.data.result.blockchainID);
-  };
-
-  /**
-     * Fetches the version of Gecko this node is running
-     *
-     * @returns Returns a Promise<string> containing the version of Gecko.
-     */
-  getNodeVersion = async ():Promise<string> => this.callMethod('admin.getNodeVersion')
-    .then((response:RequestResponseData) => response.data.result.version);
-
-  /**
-     * Fetches the network name this node is running on
-     *
-     * @returns Returns a Promise<string> containing the network name.
-     */
-  getNetworkName = async ():Promise<string> => this.callMethod('admin.getNetworkName')
-    .then((response:RequestResponseData) => response.data.result.networkName);
-
-  /**
      * Dump the mutex statistics of the node to the specified file.
-     *
-     * @param filename Name of the file to write the statistics.
      *
      * @returns Promise for a boolean that is true on success.
      */
-  lockProfile = async (filename:string):Promise<boolean> => {
-    const params:any = {
-      fileName: filename,
-    };
+  lockProfile = async ():Promise<boolean> => {
+    const params:any = {};
     return this.callMethod('admin.lockProfile', params)
       .then((response:RequestResponseData) => response.data.result.success);
   };
@@ -123,38 +66,22 @@ export default class AdminAPI extends JRPCAPI {
   /**
      * Dump the current memory footprint of the node to the specified file.
      *
-     * @param filename Name of the file to write the profile information.
-     *
      * @returns Promise for a boolean that is true on success.
      */
-  memoryProfile = async (filename:string):Promise<boolean> => {
-    const params:any = {
-      fileName: filename,
-    };
+  memoryProfile = async ():Promise<boolean> => {
+    const params:any = {};
     return this.callMethod('admin.memoryProfile', params)
       .then((response:RequestResponseData) => response.data.result.success);
   };
 
   /**
-     * Returns the peers connected to the node.
-     *
-     * @returns Promise for the list of connected peers in <ip>:<port> format.
-     */
-  peers = async ():Promise<Array<string>> => this.callMethod('admin.peers')
-    .then((response:RequestResponseData) => response.data.result.peers);
-
-  /**
      * Start profiling the cpu utilization of the node. Will dump the profile information into
      * the specified file on stop.
      *
-     * @param filename Name of the file to write the profile information on stop.
-     *
      * @returns Promise for a boolean that is true on success.
      */
-  startCPUProfiler = async (filename:string):Promise<boolean> => {
-    const params:any = {
-      fileName: filename,
-    };
+  startCPUProfiler = async ():Promise<boolean> => {
+    const params:any = {};
     return this.callMethod('admin.startCPUProfiler', params)
       .then((response:RequestResponseData) => response.data.result.success);
   };

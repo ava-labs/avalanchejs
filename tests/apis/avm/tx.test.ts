@@ -412,7 +412,7 @@ describe('Transactions', () => {
       new BN(9000), assetID, addrs3, addrs1, addrs1, undefined, undefined, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
 
     const tx2:Tx = new Tx();
     tx2.fromString(tx.toString());
@@ -425,7 +425,7 @@ describe('Transactions', () => {
       new BN(9000), assetID,
       addrs3, addrs1, addrs1
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -438,7 +438,7 @@ describe('Transactions', () => {
       addrs3, addrs1, nftutxoids, new BN(90), avaxAssetID, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -448,7 +448,7 @@ describe('Transactions', () => {
     const txu:UnsignedTx = set.buildImportTx(
       netid, blockchainID, addrs1, importIns, new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -459,7 +459,7 @@ describe('Transactions', () => {
       netid, blockchainID, new BN(90), avaxAssetID,
       addrs3, addrs1, addrs2, undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx.toBuffer().toString('hex')).toBe(tx2.toBuffer().toString('hex'));
