@@ -591,13 +591,15 @@ export class UTXOSet {
     return [...results];
   };
 
-  getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
+
+  protected getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
     const utxoArray:Array<UTXO> = this.getAllUTXOs();
     const outids:object = {};
     for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
       const u:UTXO = utxoArray[i];
       const assetKey:string = u.getAssetID().toString("hex");
-      if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(aad.getSenders(), asOf)) {
+      const fromAddresses:Array<Buffer> = aad.getSenders();
+      if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(fromAddresses, asOf)) {
         const am:AssetAmount = aad.getAssetAmount(assetKey);
         if(!am.isFinished()){
           const uout:AmountOutput = u.getOutput() as AmountOutput;
@@ -608,6 +610,16 @@ export class UTXOSet {
           const outputidx:Buffer = u.getOutputIdx();
           const input:SecpInput = new SecpInput(amount);
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
+          const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
+          for (let j = 0; j < spenders.length; j++) {
+            const idx:number = uout.getAddressIdx(spenders[j]);
+            if (idx === -1) {
+              /* istanbul ignore next */
+              throw new Error('Error - UTXOSet.buildBaseTx: no such '
+              + `address in output: ${spenders[j]}`);
+            }
+            xferin.getInput().addSignatureIdx(idx, spenders[j]);
+          }
           aad.addInput(xferin);
         } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)){
           /**
@@ -719,7 +731,6 @@ export class UTXOSet {
       ins = aad.getInputs();
       outs = aad.getAllOutputs();
     } else {
-      
       throw success;
     }
 
