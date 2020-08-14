@@ -108,11 +108,14 @@ export class Base58 {
       j.imul(this.big58Radix);
     }
 
-    /* EGS: why are we converting to hex and back from hex? */
+    /* we need to make sure the prefaced 0's are put back to be even in this string */
     let anshex = answer.toString('hex');
     anshex = anshex.length % 2 ? `0${anshex}` : anshex;
 
-    /* EGS: what's the point of counting these zeroes? */
+    /**
+     * We need to replace all zeros that were removed during our conversation process.
+     * This ensures the buffer returns is the appropriate length.
+    */
     const tmpval:Buffer = Buffer.from(anshex, 'hex');
     let numZeros:number;
     for (numZeros = 0; numZeros < b.length; numZeros++) {
@@ -192,12 +195,10 @@ export default class BinTools {
      * @param end The index to end the copy
      */
   copyFrom = (buff:Buffer, start:number = 0, end:number = undefined):Buffer => {
-    /* EGS: why introduce theEnd as a new variable? */
-    let theEnd = end;
     if (end === undefined) {
-      theEnd = buff.length;
+      end = buff.length;
     }
-    return Buffer.from(Uint8Array.prototype.slice.call(buff.slice(start, theEnd)));
+    return Buffer.from(Uint8Array.prototype.slice.call(buff.slice(start, end)));
   };
 
   /**
@@ -223,7 +224,6 @@ export default class BinTools {
      * convert to an ArrayBuffer
      */
   fromBufferToArrayBuffer = (buff:Buffer):ArrayBuffer => {
-	/* EGS: isn't there a more efficient buffer/array concat operator we could use? */
     const ab = new ArrayBuffer(buff.length);
     const view = new Uint8Array(ab);
     for (let i = 0; i < buff.length; ++i) {
@@ -238,7 +238,6 @@ export default class BinTools {
      * @param ab The ArrayBuffer to convert to a {@link https://github.com/feross/buffer|Buffer}
      */
   fromArrayBufferToBuffer = (ab:ArrayBuffer):Buffer => {
-	/* EGS: isn't there a more efficient buffer/array concat operator we could use? */
     const buf = Buffer.alloc(ab.byteLength);
     for (let i = 0; i < ab.byteLength; ++i) {
       buf[i] = ab[i];
@@ -265,7 +264,9 @@ export default class BinTools {
      */
   fromBNToBuffer = (bn:BN, length?:number):Buffer => {
     const newarr = bn.toArray('be');
-      /* EGS: sounds weird that toArray with the length param doesn't work */
+    /**
+     * CKC: Still unsure why bn.toArray with a "be" and a length do not work right. Bug?
+     */
     if (length) { // bn toArray with the length parameter doesn't work correctly, need this.
       const x = length - newarr.length;
       for (let i:number = 0; i < x; i++) {
@@ -342,7 +343,10 @@ export default class BinTools {
    * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer}
    * representation if valid. A more strict version of stringToAddress.
    *
-   * EGS: need to document the alias argument and the function it serves
+   * @param addr A string representation of the address
+   * @param blockchainID A cb58 encoded string representation of the blockchainID
+   * @param alias A chainID alias, if any, that the address can also parse from.
+   * @param addrlen VMs can use any addressing scheme that they like, so this is the appropriate number of address bytes. Default 20.
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
    * undefined if not valid.
@@ -351,7 +355,6 @@ export default class BinTools {
     blockchainID:string,
     alias:string = undefined,
     addrlen:number = 20):Buffer => {
-	/* EGS: is addrlen necessary? are we guaranteed that all addresses will be this exact number of bytes? */
     const abc:Array<string> = addr.split('-');
     if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
         const addrbuff = this.stringToAddress(addr);

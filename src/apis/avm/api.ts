@@ -119,7 +119,7 @@ class AVMAPI extends JRPCAPI {
   refreshBlockchainID = (blockchainID:string = undefined):boolean => {
     const netid:number = this.core.getNetworkID();
     if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
-      this.blockchainID = Defaults.network[netid].avm.blockchainID;
+      this.blockchainID = Defaults.network[netid].X.blockchainID; //default to X-Chain
       return true;
     } if (typeof blockchainID === 'string') {
       this.blockchainID = blockchainID;

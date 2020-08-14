@@ -84,39 +84,40 @@ export class RESTAPI extends APIBase {
 
   protected acceptType:string;
 
-    /* EGS: there is a LOT of duplication in the code that follows, esp post/put/etc */
-  get = async (baseurl?:string,
-    contentType?:string,
-    acceptType?:string):Promise<RequestResponseData> => {
-    const ep:string = baseurl || this.baseurl;
-
-    const headers:any = {};
+  protected prepHeaders = (contentType?:string, acceptType?:string):object => {
+    const headers:object = {};
     if (contentType !== undefined) {
       headers['Content-Type'] = contentType;
     } else {
       headers['Content-Type'] = this.contentType;
     }
 
-    const acceptTypeStr:string = this.acceptType;
     if (acceptType !== undefined) {
-      headers.Accept = acceptType;
-    } else if (acceptTypeStr !== undefined) {
-      headers.Accept = acceptTypeStr;
+      headers["Accept"] = acceptType;
+    } else if (this.acceptType !== undefined) {
+      headers["Accept"] = this.acceptType;
     }
+    return headers;
+  }
 
-    const axConf:AxiosRequestConfig = {
+  protected axConf = ():AxiosRequestConfig => {
+    return  {
       baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
       responseType: 'json',
     };
 
-    return this.core.get(ep, {}, headers, axConf).then((resp:RequestResponseData) => resp);
+  }
+
+  get = async (baseurl?:string, contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
+    const ep:string = baseurl || this.baseurl;
+
+    let headers:object = this.prepHeaders(contentType, acceptType);
+
+    return this.core.get(ep, {}, headers, this.axConf()).then((resp:RequestResponseData) => resp);
   };
 
-  post = async (method:string,
-    params?:Array<object> | object,
-    baseurl?:string,
-    contentType?:string,
-    acceptType?:string):Promise<RequestResponseData> => {
+  post = async (method:string, params?:Array<object> | object, baseurl?:string,
+    contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
     const ep:string = baseurl || this.baseurl;
     const rpc:any = {};
     rpc.method = method;
@@ -126,26 +127,9 @@ export class RESTAPI extends APIBase {
       rpc.params = params;
     }
 
-    const headers:any = {};
-    if (contentType !== undefined) {
-      headers['Content-Type'] = contentType;
-    } else {
-      headers['Content-Type'] = this.contentType;
-    }
+    const headers:object = this.prepHeaders(contentType, acceptType);
 
-    const acceptTypeStr:string = this.acceptType;
-    if (acceptType !== undefined) {
-      headers.Accept = acceptType;
-    } else if (acceptTypeStr !== undefined) {
-      headers.Accept = acceptTypeStr;
-    }
-
-    const axConf:AxiosRequestConfig = {
-      baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
-      responseType: 'json',
-    };
-
-    return this.core.post(ep, {}, JSON.stringify(rpc), headers, axConf)
+    return this.core.post(ep, {}, JSON.stringify(rpc), headers, this.axConf())
       .then((resp:RequestResponseData) => resp);
   };
 
@@ -163,34 +147,14 @@ export class RESTAPI extends APIBase {
       rpc.params = params;
     }
 
-    const headers:any = {};
-    if (contentType !== undefined) {
-      headers['Content-Type'] = contentType;
-    } else {
-      headers['Content-Type'] = this.contentType;
-    }
+    const headers:object = this.prepHeaders(contentType, acceptType);
 
-    const acceptTypeStr:string = this.acceptType;
-    if (acceptType !== undefined) {
-      headers.Accept = acceptType;
-    } else if (acceptTypeStr !== undefined) {
-      headers.Accept = acceptTypeStr;
-    }
-
-    const axConf:AxiosRequestConfig = {
-      baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
-      responseType: 'json',
-    };
-
-    return this.core.put(ep, {}, JSON.stringify(rpc), headers, axConf)
+    return this.core.put(ep, {}, JSON.stringify(rpc), headers, this.axConf())
       .then((resp:RequestResponseData) => resp);
   };
 
-  delete = async (method:string,
-    params?:Array<object> | object,
-    baseurl?:string,
-    contentType?:string,
-    acceptType?:string):Promise<RequestResponseData> => {
+  delete = async (method:string, params?:Array<object> | object, baseurl?:string,
+    contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
     const ep:string = baseurl || this.baseurl;
     const rpc:any = {};
     rpc.method = method;
@@ -200,33 +164,13 @@ export class RESTAPI extends APIBase {
       rpc.params = params;
     }
 
-    const headers:any = {};
-    if (contentType !== undefined) {
-      headers['Content-Type'] = contentType;
-    } else {
-      headers['Content-Type'] = this.contentType;
-    }
+    const headers:object = this.prepHeaders(contentType, acceptType);
 
-    const acceptTypeStr:string = this.acceptType;
-    if (acceptType !== undefined) {
-      headers.Accept = acceptType;
-    } else if (acceptTypeStr !== undefined) {
-      headers.Accept = acceptTypeStr;
-    }
-
-    const axConf:AxiosRequestConfig = {
-      baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
-      responseType: 'json',
-    };
-
-    return this.core.delete(ep, {}, headers, axConf).then((resp:RequestResponseData) => resp);
+    return this.core.delete(ep, {}, headers, this.axConf()).then((resp:RequestResponseData) => resp);
   };
 
-  patch = async (method:string,
-    params?:Array<object> | object,
-    baseurl?:string,
-    contentType?:string,
-    acceptType?:string):Promise<RequestResponseData> => {
+  patch = async (method:string, params?:Array<object> | object, baseurl?:string,
+    contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
     const ep:string = baseurl || this.baseurl;
     const rpc:any = {};
     rpc.method = method;
@@ -236,26 +180,9 @@ export class RESTAPI extends APIBase {
       rpc.params = params;
     }
 
-    const headers:any = {};
-    if (contentType !== undefined) {
-      headers['Content-Type'] = contentType;
-    } else {
-      headers['Content-Type'] = this.contentType;
-    }
+    const headers:object = this.prepHeaders(contentType, acceptType);
 
-    const acceptTypeStr:string = this.acceptType;
-    if (acceptType !== undefined) {
-      headers.Accept = acceptType;
-    } else if (acceptTypeStr !== undefined) {
-      headers.Accept = acceptTypeStr;
-    }
-
-    const axConf:AxiosRequestConfig = {
-      baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
-      responseType: 'json',
-    };
-
-    return this.core.patch(ep, {}, JSON.stringify(rpc), headers, axConf)
+    return this.core.patch(ep, {}, JSON.stringify(rpc), headers, this.axConf())
       .then((resp:RequestResponseData) => resp);
   };
 
@@ -791,167 +718,158 @@ export function getPreferredHRP(networkID:number = undefined) {
   return FallbackHRP;
 }
 
-/* EGS move all network-specific magic numbers to a single, separate file, with no repeated magic numbers */
-
 // TODO: UPDATE FOR MAINNET
 
-const n1Avm:object = {
+const platformChainID:string = "11111111111111111111111111111111LpoYY";
+const XChainAlias:string = "X";
+const CChainAlias:string = "C";
+const PChainAlias:string = "P";
+const XChainVMName:string = "avm";
+const CChainVMName:string = "evm";
+const PChainVMName:string = "platformvm";
+
+const n1X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
-  alias: 'X',
-  vm: 'avm',
+  alias: XChainAlias,
+  vm: XChainVMName,
   fee: 0
 };
 
-const n1Platform:object = {
-  blockchainID: '11111111111111111111111111111111LpoYY',
-  alias: 'P',
-  vm: 'platform',
+const n1P:object = {
+  blockchainID: platformChainID,
+  alias: PChainAlias,
+  vm: PChainVMName,
   fee: 0
 };
 
-const n1Contracts:object = {
+const n1C:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
-  alias: 'C',
-  vm: 'contracts',
+  alias: CChainAlias,
+  vm: CChainVMName,
   fee: 0
 };
 
 // END TODO
 
-const n2Avm:object = {
+const n2X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
-  alias: 'X',
-  vm: 'avm',
+  alias: XChainAlias,
+  vm: XChainVMName,
   fee: 0
 };
 
-const n2Platform:object = {
-  blockchainID: '11111111111111111111111111111111LpoYY',
-  alias: 'P',
-  vm: 'platform',
+const n2P:object = {
+  blockchainID: platformChainID,
+  alias: PChainAlias,
+  vm: PChainVMName,
   fee: 0
 };
 
-const n2Contracts:object = {
+const n2C:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
-  alias: 'C',
-  vm: 'contracts',
+  alias: CChainAlias,
+  vm: CChainVMName,
   fee: 0
 };
 
-const n3Avm:object = {
+const n3X:object = {
   blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
-  alias: 'X',
-  vm: 'avm',
+  alias: XChainAlias,
+  vm: XChainVMName,
   fee: 0
 };
 
-const n3Platform:object = {
-  blockchainID: '11111111111111111111111111111111LpoYY',
-  alias: 'P',
-  vm: 'platform',
+const n3P:object = {
+  blockchainID: '',
+  alias: PChainAlias,
+  vm: PChainVMName,
   fee: 0
 };
 
-const n3Contracts:object = {
+const n3C:object = {
   blockchainID: 'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9',
-  alias: 'C',
-  vm: 'contracts',
+  alias: CChainAlias,
+  vm: CChainVMName,
   fee: 0
 };
 
 // TODO: UPDATE FOR EVEREST
-const n4Avm:object = {
+const n4X:object = {
   blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
-  alias: 'X',
-  vm: 'avm',
+  alias: XChainAlias,
+  vm: XChainVMName,
   fee: 0
 };
 
-const n4Platform:object = {
-  blockchainID: '11111111111111111111111111111111LpoYY',
-  alias: 'P',
-  vm: 'platform',
+const n4P:object = {
+  blockchainID: platformChainID,
+  alias: PChainAlias,
+  vm: PChainVMName,
   fee: 0
 };
 
-const n4Contracts:object = {
+const n4C:object = {
   blockchainID: 'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9',
-  alias: 'C',
-  vm: 'contracts',
+  alias: CChainAlias,
+  vm: CChainVMName,
   fee: 0
 };
 
 // END TODO
 
-const n12345Avm:any = { ...n2Avm };
-n12345Avm.blockchainID = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
-const n12345Platform:any = { ...n2Platform };
-n12345Platform.blockchainID = '11111111111111111111111111111111LpoYY';
-const n12345Contracts:any = { ...n2Contracts };
-n12345Contracts.blockchainID = 'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq';
+const n12345X:any = { ...n2X };
+n12345X.blockchainID = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
+const n12345P:any = { ...n2P };
+n12345P.blockchainID = platformChainID;
+const n12345C:any = { ...n2C };
+n12345C.blockchainID = 'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq';
 
 export class Defaults {
   static network = {
     1: { // update before mainnet
       hrp: NetworkIDToHRP[1],
-      avm: n1Avm,
-      X: n1Avm,
-      '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n1Avm,
-      platform: n1Platform,
-      P: n1Platform,
-      '11111111111111111111111111111111LpoYY': n1Platform,
-      contracts: n1Contracts,
-      C: n1Contracts,
-      '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n1Contracts,
+      X: n1X,
+      '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n1X,
+      P: n1P,
+      '11111111111111111111111111111111LpoYY': n1P,
+      C: n1C,
+      '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n1C,
     }, 
     2: {
       hrp: NetworkIDToHRP[2],
-      avm: n2Avm,
-      X: n2Avm,
-      '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n2Avm,
-      platform: n2Platform,
-      P: n2Platform,
-      '11111111111111111111111111111111LpoYY': n2Platform,
-      contracts: n2Contracts,
-      C: n2Contracts,
-      '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n2Contracts,
+      X: n2X,
+      '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n2X,
+      P: n2P,
+      '11111111111111111111111111111111LpoYY': n2P,
+      C: n2C,
+      '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n2C,
     },
     3: {
       hrp: NetworkIDToHRP[3],
-      avm: n3Avm,
-      X: n3Avm,
-      rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L: n3Avm,
-      platform: n3Platform,
-      P: n3Platform,
-      '11111111111111111111111111111111LpoYY': n3Platform,
-      contracts: n3Contracts,
-      C: n3Contracts,
-      zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n3Contracts,
+      X: n3X,
+      'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L': n3X,
+      P: n3P,
+      '11111111111111111111111111111111LpoYY': n3P,
+      C: n3C,
+      'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9': n3C,
     },
     4: { // update before everest
       hrp: NetworkIDToHRP[4],
-      avm: n4Avm,
-      X: n4Avm,
-      rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L: n4Avm,
-      platform: n4Platform,
-      P: n4Platform,
-      '11111111111111111111111111111111LpoYY': n4Platform,
-      contracts: n4Contracts,
-      C: n4Contracts,
-      zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n4Contracts,
+      X: n4X,
+      'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L': n4X,
+      P: n4P,
+      '11111111111111111111111111111111LpoYY': n4P,
+      C: n4C,
+      'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9': n4C,
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
-      avm: n12345Avm,
-      X: n12345Avm,
-      '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH': n12345Avm,
-      platform: n12345Platform,
-      P: n12345Platform,
-      '11111111111111111111111111111111LpoYY': n12345Platform,
-      contracts: n12345Contracts,
-      C: n12345Contracts,
-      jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq: n12345Contracts,
+      X: n12345X,
+      '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH': n12345X,
+      P: n12345P,
+      '11111111111111111111111111111111LpoYY': n12345P,
+      C: n12345C,
+      'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq': n12345C,
     },
   };
 }

@@ -77,22 +77,19 @@ export default class Avalanche extends AvalancheCore {
     port:number,
     protocol:string = 'http',
     networkID:number = DefaultNetworkID,
-    avmChainID:string = undefined,
+    XChainID:string = undefined,
     hrp:string = undefined,
     skipinit:boolean = false) {
     super(ip, port, protocol);
-    let chainid = avmChainID;
+    let chainid = XChainID;
 
-    /* EGS: why is avm so special? */
-    /* EGS: can we externalize the default 2oAL* network id in a different file, instead of hardcoding here? */
-    if (typeof avmChainID === 'undefined'
-    || !avmChainID
-    || avmChainID.toLowerCase() === 'avm'
-    || avmChainID.toLowerCase() === 'x') {
+    if (typeof XChainID === 'undefined'
+    || !XChainID
+    || XChainID.toLowerCase() === 'x') {
       if (networkID.toString() in Defaults.network) {
         chainid = Defaults.network[networkID].X.blockchainID;
       } else {
-        chainid = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
+        chainid = Defaults.network[12345].X.blockchainID;
       }
     }
     if (typeof networkID === 'number' && networkID >= 0) {
