@@ -241,6 +241,7 @@ export class AssetAmountDestination {
   protected amountkey:object = {};
   protected inputs:Array<TransferableInput> = [];
   protected outputs:Array<TransferableOutput> = [];
+  protected change:Array<TransferableOutput> = [];
 
   addAssetAmount = (assetID:Buffer, amount:BN, burn:BN) => {
     let aa:AssetAmount = new AssetAmount(assetID, amount, burn);
@@ -254,6 +255,10 @@ export class AssetAmountDestination {
 
   addOutput = (output:TransferableOutput) => {
     this.outputs.push(output);
+  }
+
+  addChange = (output:TransferableOutput) => {
+    this.change.push(output);
   }
 
   getAmounts = ():Array<AssetAmount> => {
@@ -286,6 +291,14 @@ export class AssetAmountDestination {
 
   getOutputs = ():Array<TransferableOutput> => {
     return this.outputs;
+  }
+
+  getChangeOutputs = ():Array<TransferableOutput> => {
+    return this.change;
+  }
+
+  getAllOutputs = ():Array<TransferableOutput> => {
+    return this.outputs.concat(this.change);
   }
 
   canComplete = ():boolean => {
@@ -597,8 +610,16 @@ export class UTXOSet {
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
           aad.addInput(xferin);
         } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)){
-          return new Error('Error - UTXOSet.getMinimumSpendable: outputID does not '
-            + `implement AmountOutput: ${u.getOutput().getOutputID}`);
+          /**
+           * Leaving the below lines, not simply for posterity, but for clarification.
+           * AssetIDs may have mixed OutputTypes. 
+           * Some of those OutputTypes may implement AmountOutput.
+           * Others may not.
+           * Simply continue in this condition.
+           */
+          /*return new Error('Error - UTXOSet.getMinimumSpendable: outputID does not '
+            + `implement AmountOutput: ${u.getOutput().getOutputID}`);*/
+            continue;
         }
       }
     }
@@ -696,7 +717,7 @@ export class UTXOSet {
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
-      outs = aad.getOutputs();
+      outs = aad.getAllOutputs();
     } else {
       
       throw success;
@@ -749,7 +770,7 @@ export class UTXOSet {
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
-        outs = aad.getOutputs();
+        outs = aad.getAllOutputs();
       } else {
         throw success;
       }
@@ -800,7 +821,7 @@ export class UTXOSet {
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
-        outs = aad.getOutputs();
+        outs = aad.getAllOutputs();
       } else {
         throw success;
       }
@@ -867,7 +888,7 @@ export class UTXOSet {
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
-        outs = aad.getOutputs();
+        outs = aad.getAllOutputs();
       } else {
         throw success;
       }
@@ -944,7 +965,7 @@ export class UTXOSet {
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
-        outs = aad.getOutputs();
+        outs = aad.getAllOutputs();
       } else {
         throw success;
       }
@@ -1008,13 +1029,14 @@ export class UTXOSet {
     let ins:Array<TransferableInput> = [];
     let outs:Array<TransferableOutput> = [];
     
+    // Not implemented: Fees can be paid from importIns
     if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
-        outs = aad.getOutputs();
+        outs = aad.getAllOutputs();
       } else {
         throw success;
       }
@@ -1090,6 +1112,7 @@ export class UTXOSet {
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
+      outs = aad.getChangeOutputs();
       exportouts = aad.getOutputs();
     } else {
       throw success;
