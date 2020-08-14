@@ -125,7 +125,6 @@ export class OutputOwners {
     }
 
     const threshold:number = this.threshold.readUInt32BE(0);
-
     for (let i = 0; i < this.addresses.length && qualified.length < threshold; i++) {
       for (let j = 0; j < addresses.length && qualified.length < threshold; j++) {
         if (addresses[j].toString('hex') === this.addresses[i].toBuffer().toString('hex')) {

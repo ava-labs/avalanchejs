@@ -68,8 +68,8 @@ export class AVMKeyPair extends KeyPair {
     this.keypair = ec.genKeyPair();
 
     // doing hex translation to get Buffer class
-    this.privk = Buffer.from(this.keypair.getPrivate('hex'), 'hex');
-    this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex'), 'hex');
+    this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
+    this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
   };
 
   /**
@@ -82,8 +82,8 @@ export class AVMKeyPair extends KeyPair {
   importKey = (privk:Buffer):boolean => {
     this.keypair = ec.keyFromPrivate(privk.toString('hex'), 'hex');
     // doing hex translation to get Buffer class
-    this.privk = Buffer.from(this.keypair.getPrivate('hex'), 'hex');
-    this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex'), 'hex');
+    this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
+    this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
     return true; // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
   };
 
@@ -114,7 +114,7 @@ export class AVMKeyPair extends KeyPair {
   addressFromPublicKey = (pubk:Buffer): Buffer => {
     if (pubk.length === 65) {
       /* istanbul ignore next */
-      pubk = Buffer.from(ec.keyFromPublic(pubk).getPublic(true, 'hex'), 'hex'); // make compact, stick back into buffer
+      pubk = Buffer.from(ec.keyFromPublic(pubk).getPublic(true, 'hex').padStart(66, '0'), 'hex'); // make compact, stick back into buffer
     }
     if (pubk.length === 33) {
       const sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
@@ -233,16 +233,6 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
     }
     return keypair.getAddress();
   };
-
-  /**
-     * DEPRECATED: use UnsignedTx.sign(keychain) instead
-     * Signs a [[UnsignedTx]] and returns signed [[Tx]]
-     *
-     * @param utx A [[UnsignedTx]] that needs to be signed
-     *
-     * @returns A signed [[Tx]]
-     */
-  signTx = (utx:UnsignedTx):Tx => utx.sign(this);
 
   /**
      * Returns instance of AVMKeyChain.

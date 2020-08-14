@@ -3,6 +3,7 @@ import { Avalanche } from 'src/index'
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
+import BN from 'bn.js';
 
 const bintools = BinTools.getInstance();
 const alias = 'X';
@@ -125,6 +126,26 @@ describe('AVMKeyChain', () => {
     expect(addr1.toString('hex')).toBe(addr2.toString('hex'));
     expect(kp1.getPrivateKeyString()).toBe(kp2.getPrivateKeyString());
     expect(kp1.getPublicKeyString()).toBe(kp2.getPublicKeyString());
+    expect(kc.hasKey(addr1)).toBe(true);
+  });
+
+
+  test('importKey from Buffer with leading zeros', () => {
+    const keybuff:Buffer = Buffer.from('00007d4b31380f96a42b3e9ffc4c1b2a93589a1e51d86d7edc107f602fbc7475', 'hex');
+    expect(keybuff.length).toBe(32);
+    const kc:AVMKeyChain = new AVMKeyChain(hrp, alias);
+    const kp2:AVMKeyPair = new AVMKeyPair(hrp, alias);
+    const addr1:Buffer = kc.importKey(keybuff);
+    const kp1:AVMKeyPair = kc.getKey(addr1);
+    kp2.importKey(keybuff);
+    const addr2 = kp1.getAddress();
+    expect(addr1.toString('hex')).toBe(addr2.toString('hex'));
+    expect(kp1.getPrivateKeyString()).toBe(kp2.getPrivateKeyString());
+    expect(kp1.getPrivateKey().length).toBe(32);
+    expect(kp2.getPrivateKey().length).toBe(32);
+    expect(kp1.getPublicKeyString()).toBe(kp2.getPublicKeyString());
+    expect(kp1.getPublicKey().length).toBe(33);
+    expect(kp2.getPublicKey().length).toBe(33);
     expect(kc.hasKey(addr1)).toBe(true);
   });
 

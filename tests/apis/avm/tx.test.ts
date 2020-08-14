@@ -153,7 +153,7 @@ describe('Transactions', () => {
   test('Create small BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
+    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
@@ -176,7 +176,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
+    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
     // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outs:TransferableOutput[] = [];
@@ -207,7 +207,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
+    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("267");
@@ -230,7 +230,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
+    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("609555500000");
@@ -253,7 +253,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
+    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("44995609555500000");
@@ -311,8 +311,8 @@ describe('Transactions', () => {
     expect(() => {
       set.buildBaseTx(
         netid, blockchainID,
-        new BN(amnt * 1000),
-        addrs3, addrs1, addrs1, assetID,
+        new BN(amnt * 1000), assetID,
+        addrs3, addrs1, addrs1, 
       );
     }).toThrow();
   });
@@ -409,10 +409,10 @@ describe('Transactions', () => {
   test('Creation Tx1 with asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000), addrs3, addrs1, addrs1, assetID, undefined,
+      new BN(9000), assetID, addrs3, addrs1, addrs1, undefined, undefined, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
 
     const tx2:Tx = new Tx();
     tx2.fromString(tx.toString());
@@ -422,10 +422,10 @@ describe('Transactions', () => {
   test('Creation Tx2 without asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000),
-      addrs3, addrs1, addrs1, assetID, undefined
+      new BN(9000), assetID,
+      addrs3, addrs1, addrs1
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -434,11 +434,11 @@ describe('Transactions', () => {
 
   test('Creation Tx3 using OperationTx', () => {
     const txu:UnsignedTx = set.buildNFTTransferTx(
-      netid, blockchainID, avaxAssetID, new BN(90),
-      addrs1, addrs3, addrs1, nftutxoids, undefined,
+      netid, blockchainID, 
+      addrs3, addrs1, nftutxoids, new BN(90), avaxAssetID, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -446,10 +446,9 @@ describe('Transactions', () => {
 
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
-      netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, importIns,
+      netid, blockchainID, addrs1, importIns, new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -457,10 +456,10 @@ describe('Transactions', () => {
 
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
-      netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, exportUTXOIDS, new UTF8Payload("hello world").getPayload(), UnixNow()
+      netid, blockchainID, new BN(90), avaxAssetID,
+      addrs3, addrs1, addrs2, undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx.toBuffer().toString('hex')).toBe(tx2.toBuffer().toString('hex'));

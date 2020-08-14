@@ -169,6 +169,157 @@ export class UTXO {
 }
 
 /**
+ * Class for managing asset amounts in the UTXOSet fee calcuation
+ */
+export class AssetAmount {
+  protected assetID:Buffer = Buffer.alloc(32);
+  protected amount:BN = new BN(0);
+  protected burn:BN = new BN(0);
+  protected spent:BN = new BN(0);
+  protected change:BN = new BN(0);
+  protected finished:boolean = false;
+
+  getAssetID = ():Buffer => {
+    return this.assetID;
+  }
+
+  getAssetIDString = ():string => {
+    return this.assetID.toString("hex");
+  }
+
+  getAmount = ():BN => {
+    return this.amount
+  }
+
+  getSpent = ():BN => {
+    return this.spent;
+  }
+
+  getBurn = ():BN => {
+    return this.burn;
+  }
+
+  getChange = ():BN => {
+    return this.change;
+  }
+
+  isFinished = ():boolean => {
+    return this.finished;
+  }
+
+  spendAmount = (amt:BN):boolean => {
+    
+    if(!this.finished) {
+      let total:BN = this.amount.add(this.burn);
+      this.spent = this.spent.add(amt);
+      if(this.spent.gte(this.amount)){
+        if(this.spent.gte(total)){
+          this.change = this.change.add(this.spent.sub(total));
+        } else {
+          this.change = new BN(0);
+        }
+        this.spent = total;
+        this.finished = true;
+      }
+    }
+    return this.finished;
+  }
+
+  constructor(assetID:Buffer, amount:BN, burn:BN) {
+    this.assetID = assetID;
+    this.amount = typeof amount === "undefined" ? new BN(0) : amount;
+    this.burn = typeof burn === "undefined" ? new BN(0) : burn;
+    this.spent = new BN(0);
+  }
+}
+
+export class AssetAmountDestination {
+  protected amounts:Array<AssetAmount> = [];
+  protected destinations:Array<Buffer> = [];
+  protected senders:Array<Buffer> = [];
+  protected changeAddresses:Array<Buffer> = [];
+  protected amountkey:object = {};
+  protected inputs:Array<TransferableInput> = [];
+  protected outputs:Array<TransferableOutput> = [];
+  protected change:Array<TransferableOutput> = [];
+
+  addAssetAmount = (assetID:Buffer, amount:BN, burn:BN) => {
+    let aa:AssetAmount = new AssetAmount(assetID, amount, burn);
+    this.amounts.push(aa);
+    this.amountkey[aa.getAssetIDString()] = aa;
+  }
+
+  addInput = (input:TransferableInput) => {
+    this.inputs.push(input);
+  }
+
+  addOutput = (output:TransferableOutput) => {
+    this.outputs.push(output);
+  }
+
+  addChange = (output:TransferableOutput) => {
+    this.change.push(output);
+  }
+
+  getAmounts = ():Array<AssetAmount> => {
+    return this.amounts;
+  }
+
+  getDestinations = ():Array<Buffer> => {
+    return this.destinations;
+  }
+
+  getSenders = ():Array<Buffer> => {
+    return this.senders;
+  }
+
+  getChangeAddresses = ():Array<Buffer> => {
+    return this.changeAddresses;
+  }
+
+  getAssetAmount = (assetHexStr:string):AssetAmount => {
+    return this.amountkey[assetHexStr];
+  }
+
+  assetExists = (assetHexStr:string):boolean => {
+    return (assetHexStr in this.amountkey);
+  }
+
+  getInputs = ():Array<TransferableInput> => {
+    return this.inputs;
+  }
+
+  getOutputs = ():Array<TransferableOutput> => {
+    return this.outputs;
+  }
+
+  getChangeOutputs = ():Array<TransferableOutput> => {
+    return this.change;
+  }
+
+  getAllOutputs = ():Array<TransferableOutput> => {
+    return this.outputs.concat(this.change);
+  }
+
+  canComplete = ():boolean => {
+    for(let i = 0; i < this.amounts.length; i++) {
+      if(!this.amounts[i].isFinished()) {
+
+        return false;
+      }
+    }
+    return true;
+  }
+
+  constructor(destinations:Array<Buffer>, senders:Array<Buffer>, changeAddresses:Array<Buffer>) {
+    this.destinations = destinations;
+    this.changeAddresses = changeAddresses;
+    this.senders = senders;
+  }
+
+}
+
+/**
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet {
@@ -440,22 +591,91 @@ export class UTXOSet {
     return [...results];
   };
 
+
+  protected getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
+    const utxoArray:Array<UTXO> = this.getAllUTXOs();
+    const outids:object = {};
+    for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
+      const u:UTXO = utxoArray[i];
+      const assetKey:string = u.getAssetID().toString("hex");
+      const fromAddresses:Array<Buffer> = aad.getSenders();
+      if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(fromAddresses, asOf)) {
+        const am:AssetAmount = aad.getAssetAmount(assetKey);
+        if(!am.isFinished()){
+          const uout:AmountOutput = u.getOutput() as AmountOutput;
+          outids[assetKey] = uout.getOutputID();
+          const amount = uout.getAmount();
+          am.spendAmount(amount);
+          const txid:Buffer = u.getTxID();
+          const outputidx:Buffer = u.getOutputIdx();
+          const input:SecpInput = new SecpInput(amount);
+          const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
+          const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
+          for (let j = 0; j < spenders.length; j++) {
+            const idx:number = uout.getAddressIdx(spenders[j]);
+            if (idx === -1) {
+              /* istanbul ignore next */
+              throw new Error('Error - UTXOSet.buildBaseTx: no such '
+              + `address in output: ${spenders[j]}`);
+            }
+            xferin.getInput().addSignatureIdx(idx, spenders[j]);
+          }
+          aad.addInput(xferin);
+        } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)){
+          /**
+           * Leaving the below lines, not simply for posterity, but for clarification.
+           * AssetIDs may have mixed OutputTypes. 
+           * Some of those OutputTypes may implement AmountOutput.
+           * Others may not.
+           * Simply continue in this condition.
+           */
+          /*return new Error('Error - UTXOSet.getMinimumSpendable: outputID does not '
+            + `implement AmountOutput: ${u.getOutput().getOutputID}`);*/
+            continue;
+        }
+      }
+    }
+    if(!aad.canComplete()) {
+      return new Error('Error - UTXOSet.getMinimumSpendable: insufficient '
+      + 'funds to create the transaction');
+    }
+    const amounts:Array<AssetAmount> = aad.getAmounts();
+    const zero:BN = new BN(0);
+    for(let i = 0; i < amounts.length; i++) {
+      const assetKey:string = amounts[i].getAssetIDString();
+      const amount:BN = amounts[i].getAmount();
+      const change:BN = amounts[i].getChange();
+      const spendout:AmountOutput = SelectOutputClass(outids[assetKey],
+        amount, aad.getDestinations(), locktime, threshold) as AmountOutput;
+      const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+      aad.addOutput(xferout);
+      if (change.gt(zero)) {
+        const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
+          change, aad.getChangeAddresses()) as AmountOutput;
+        const chgxferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
+        aad.addOutput(chgxferout);
+      }
+    }
+    return undefined;
+  }
+
   /**
      * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
      * [[UnsignedTx]] wrapping a [[BaseTx]] manually (with their corresponding [[TransferableInput]]s and [[TransferableOutput]]s).
      *
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param amount The amount of AVAX to be spent in $nAVAX
+     * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
+     * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
-     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-     * @param assetid {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes
+     * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
+     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+     * @param feeAssetID Optional. The assetID of the fees being burned. Default: assetID
+     * @param memo Optional. Contains arbitrary data, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      * @param locktime Optional. The locktime field created in the resulting outputs
      * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-     * @param outputID Optional. The outputID used for this transaction, must implement AmountOutput, default AVMConstants.SECPOUTPUTID
      * 
      * @returns An unsigned transaction created from the passed in parameters.
      *
@@ -464,93 +684,59 @@ export class UTXOSet {
     networkid:number,
     blockchainid:Buffer,
     amount:BN,
+    assetID:Buffer,
     toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
-    changeAddresses:Array<Buffer>,
-    assetID:Buffer,
+    changeAddresses:Array<Buffer> = undefined,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined,
     memo:Buffer = undefined,
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0),
-    threshold:number = 1,
-    outputID = AVMConstants.SECPOUTPUTID
+    threshold:number = 1
   ):UnsignedTx => {
-    const zero:BN = new BN(0);
-    let spendamount:BN = zero.clone();
-    const utxos:Array<UTXO> = this.getAllUTXOs(this.getUTXOIDs(fromAddresses));
-    let change:BN = zero.clone();
 
-    const outs:Array<TransferableOutput> = [];
-    const ins:Array<TransferableInput> = [];
-    if (!(SelectOutputClass(outputID) instanceof AmountOutput)) {
+    if(threshold > toAddresses.length) {
       /* istanbul ignore next */
-      throw new Error('Error - UTXOSet.buildBaseTx: outputID does not '
-      + `implement AmountOutput: ${outputID}`);
+      throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
     }
 
-    if (!amount.eq(zero)) {
-      const sndout:AmountOutput = SelectOutputClass(outputID,
-        amount,
-        toAddresses,
-        locktime,
-        threshold) as AmountOutput;
-      const mainXferout:TransferableOutput = new TransferableOutput(assetID, sndout);
-      outs.push(mainXferout);
-      for (let i = 0; i < utxos.length && spendamount.lt(amount); i++) {
-        if (
-          utxos[i].getOutput() instanceof AmountOutput
-                    && (
-                      assetID === undefined
-                        || utxos[i].getAssetID().compare(assetID) === 0
-                    )
-                    && utxos[i].getOutput().meetsThreshold(fromAddresses, asOf)
-        ) {
-          const output:AmountOutput = utxos[i].getOutput() as AmountOutput;
-          const amt:BN = output.getAmount().clone();
-          spendamount = spendamount.add(amt);
-          change = spendamount.sub(amount);
-          change = change.gt(zero) ? change : zero.clone();
-
-          const txid:Buffer = utxos[i].getTxID();
-          const outputidx:Buffer = utxos[i].getOutputIdx();
-          const input:SecpInput = new SecpInput(amt);
-          const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
-          const spenders:Array<Buffer> = output.getSpenders(fromAddresses, asOf);
-          for (let j = 0; j < spenders.length; j++) {
-            const idx:number = output.getAddressIdx(spenders[j]);
-            if (idx === -1) {
-              /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.buildBaseTx: no such '
-              + `address in output: ${spenders[j]}`);
-            }
-            xferin.getInput().addSignatureIdx(idx, spenders[j]);
-          }
-          ins.push(xferin);
-
-          if (change.gt(zero)) {
-            if (assetID) {
-              const changeout:AmountOutput = SelectOutputClass(outputID,
-                change, changeAddresses, zero.clone(),
-                1) as AmountOutput;
-              const xferout:TransferableOutput = new TransferableOutput(assetID, changeout);
-              outs.push(xferout);
-            }
-            break;
-          }
-          /* istanbul ignore next */
-          if (spendamount.gte(amount)) {
-            break;
-          }
-        }
-      }
-
-      if (spendamount.lt(amount)) {
-        /* istanbul ignore next */
-        throw new Error('Error - UTXOSet.buildBaseTx: insufficient '
-        + 'funds to create the transaction');
-      }
+    if(typeof changeAddresses === "undefined") {
+      changeAddresses = toAddresses;
     }
+
+    if(typeof feeAssetID === "undefined") {
+      feeAssetID = assetID;
+    }
+
+    const zero:BN = new BN(0);
+    
+    if (amount.eq(zero)) {
+      return undefined;
+    }
+
+    const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+    if(assetID.toString("hex") === feeAssetID.toString("hex")){
+      aad.addAssetAmount(assetID, amount, fee);
+    } else {
+      aad.addAssetAmount(assetID, amount, zero);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+    }
+
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    if(typeof success === "undefined") {
+      ins = aad.getInputs();
+      outs = aad.getAllOutputs();
+    } else {
+      throw success;
+    }
+
     const baseTx:BaseTx = new BaseTx(networkid, blockchainid, outs, ins, memo);
     return new UnsignedTx(baseTx);
+
   };
 
   /**
@@ -559,13 +745,13 @@ export class UTXOSet {
      * 
      * @param networkid The number representing NetworkID of the node
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param avaxAssetId The AVAX Asset ID
-     * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-     * @param feeSenderAddresses The addresses to send the fees
+     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param initialState The [[InitialStates]] that represent the intial state of a created asset
      * @param name String for the descriptive name of the asset
      * @param symbol String for the ticker symbol of the asset
      * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
+     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+     * @param feeAssetID Optional. The assetID of the fees being burned.
      * @param memo Optional contains arbitrary bytes, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      *
@@ -573,18 +759,35 @@ export class UTXOSet {
      *
      */
   buildCreateAssetTx = (
-      networkid:number, blockchainid:Buffer, avaxAssetID:Buffer, 
-      fee:BN, feeSenderAddresses:Array<Buffer>, 
-      initialState:InitialStates, name:string, 
-      symbol:string, denomination:number, memo:Buffer = undefined, asOf:BN = UnixNow()
+      networkid:number, 
+      blockchainid:Buffer, 
+      fromAddresses:Array<Buffer>,
+      initialState:InitialStates, 
+      name:string, 
+      symbol:string, 
+      denomination:number, 
+      fee:BN = undefined,
+      feeAssetID:Buffer = undefined, 
+      memo:Buffer = undefined, 
+      asOf:BN = UnixNow()
   ):UnsignedTx => {
-      // Cheating and using buildBaseTx to get Ins and Outs for fees.
-      // Fees are burned, so no toAddresses, only fromAddresses and changeAddresses, both are the feeSenderAddresses
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, avaxAssetID, undefined, asOf);
-      let ins:Array<TransferableInput> = utx.getTransaction().getIns();
-      let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-      let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
-      return new UnsignedTx(CAtx);
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined"){
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
+      }
+    }
+    let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
+    return new UnsignedTx(CAtx);
   }
 
   /**
@@ -593,12 +796,12 @@ export class UTXOSet {
     * 
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param avaxAssetId The AVAX Asset ID
-    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-    * @param feePayingAddresses The addresses to pay the fees
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
     * @param minterSets The minters and thresholds required to mint this nft asset
     * @param name String for the descriptive name of the nft asset
     * @param symbol String for the ticker symbol of the nft asset
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned.
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting mint output
@@ -607,28 +810,46 @@ export class UTXOSet {
     * 
     */
   buildCreateNFTAssetTx = (
-      networkid:number, blockchainid:Buffer, avaxAssetID:Buffer, 
-      fee:BN, feePayingAddresses:Array<Buffer>, 
+      networkid:number, 
+      blockchainid:Buffer, 
+      fromAddresses:Array<Buffer>,
       minterSets:Array<MinterSet>,
-      name:string, symbol:string, memo:Buffer = undefined, asOf:BN = UnixNow(),
+      name:string, 
+      symbol:string,
+      fee:BN = undefined,
+      feeAssetID:Buffer = undefined,  
+      memo:Buffer = undefined, 
+      asOf:BN = UnixNow(),
       locktime:BN = undefined
   ):UnsignedTx => {
-      let initialState:InitialStates = new InitialStates();
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feePayingAddresses, feePayingAddresses, avaxAssetID, undefined, asOf);
-      let ins:Array<TransferableInput> = utx.getTransaction().getIns();
-      let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-      for(let i:number = 0; i < minterSets.length; i++) {
-        let nftMintOutput:NFTMintOutput = new NFTMintOutput(
-          i,
-          minterSets[i].getMinters(),
-          locktime, 
-          minterSets[i].getThreshold()
-          );
-        initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
       }
-      let denomination:number = 0; // NFTs are non-fungible
-      let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
-      return new UnsignedTx(CAtx);
+    }
+    let initialState:InitialStates = new InitialStates();
+    for(let i:number = 0; i < minterSets.length; i++) {
+      let nftMintOutput:NFTMintOutput = new NFTMintOutput(
+        i,
+        minterSets[i].getMinters(),
+        locktime, 
+        minterSets[i].getThreshold()
+        );
+      initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID);
+    }
+    let denomination:number = 0; // NFTs are non-fungible
+    let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
+    return new UnsignedTx(CAtx);
   }
 
   /**
@@ -637,14 +858,13 @@ export class UTXOSet {
     * 
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-    * @param feeSenderAddresses The addresses to send the fees
-    * @param outputOwners:Array An array of OutputOwners
-    * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
+    * @param toAddresses The addresses to send the funds
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs
     * @param utxoids An array of strings for the NFTs being transferred
     * @param groupID Optional. The group this NFT is issued to.
     * @param payload Optional. Data for NFT Payload.
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting mint output
@@ -654,43 +874,65 @@ export class UTXOSet {
     * 
     */
   buildCreateNFTMintTx = (
-    networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN, 
-      feeSenderAddresses:Array<Buffer>, to:Array<Buffer>, fromAddresses:Array<Buffer>, 
-      utxoids:Array<string>, groupID:number = 0, payload:Buffer = undefined, memo:Buffer = undefined,
-      asOf:BN = UnixNow(), locktime:BN, threshold:number = 1 
+    networkid:number, 
+    blockchainid:Buffer, 
+    toAddresses:Array<Buffer>, 
+    fromAddresses:Array<Buffer>, 
+    utxoids:Array<string>, 
+    groupID:number = 0, 
+    payload:Buffer = undefined, 
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined,  
+    memo:Buffer = undefined,
+    asOf:BN = UnixNow(), 
+    locktime:BN, 
+    threshold:number = 1 
   ):UnsignedTx => {
-      let utx:UnsignedTx = this.buildBaseTx(networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf);
-      let ins:Array<TransferableInput> = utx.getTransaction().getIns();
-      let outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-      let ops:TransferableOperation[] = [];
 
-      if(threshold > to.length) {
-          /* istanbul ignore next */
-          throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+      const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, fromAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
       }
-      let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, [new OutputOwners(to, locktime, threshold)]);
+    }
+    let ops:TransferableOperation[] = [];
 
-      for(let i:number = 0; i < utxoids.length; i++) {
-          let utxo:UTXO = this.getUTXO(utxoids[i]);
-          let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
-          let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
+    if(threshold > toAddresses.length) {
+        /* istanbul ignore next */
+        throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
+    }
+    let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, [new OutputOwners(toAddresses, locktime, threshold)]);
 
-          for(let j:number = 0; j < spenders.length; j++) {
-              let idx:number;
-              idx = out.getAddressIdx(spenders[j]);
-              if(idx == -1){
-                  /* istanbul ignore next */
-                  throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: no such address in output: ${spenders[j]}`);
-              }
-              nftMintOperation.addSignatureIdx(idx, spenders[j]);
-          }
-            
-          let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
-          ops.push(transferableOperation);
-      }
-  
-      let operationTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, memo, ops);
-      return new UnsignedTx(operationTx);
+    for(let i:number = 0; i < utxoids.length; i++) {
+        let utxo:UTXO = this.getUTXO(utxoids[i]);
+        let out:NFTTransferOutput = utxo.getOutput() as NFTTransferOutput;
+        let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
+
+        for(let j:number = 0; j < spenders.length; j++) {
+            let idx:number;
+            idx = out.getAddressIdx(spenders[j]);
+            if(idx == -1){
+                /* istanbul ignore next */
+                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: no such address in output: ${spenders[j]}`);
+            }
+            nftMintOperation.addSignatureIdx(idx, spenders[j]);
+        }
+          
+        let transferableOperation:TransferableOperation = new TransferableOperation(utxo.getAssetID(), utxoids, nftMintOperation);
+        ops.push(transferableOperation);
+    }
+
+    let operationTx:OperationTx = new OperationTx(networkid, blockchainid, outs, ins, memo, ops);
+    return new UnsignedTx(operationTx);
   }
 
   /**
@@ -699,12 +941,11 @@ export class UTXOSet {
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-    * @param feeSenderAddresses The addresses to send the fees
     * @param toAddresses An array of {@link https://github.com/feross/buffer|Buffer}s which indicate who recieves the NFT
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the NFT
     * @param utxoids An array of strings for the NFTs being transferred
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting outputs
@@ -713,18 +954,33 @@ export class UTXOSet {
     *
     */
   buildNFTTransferTx = (
-    networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN,
-    feeSenderAddresses:Array<Buffer>, toAddresses:Array<Buffer>, fromAddresses:Array<Buffer>,
-    utxoids:Array<string>, memo:Buffer = undefined, asOf:BN = UnixNow(),
-    locktime:BN = new BN(0), threshold:number = 1,
+    networkid:number, 
+    blockchainid:Buffer, 
+    toAddresses:Array<Buffer>, 
+    fromAddresses:Array<Buffer>,
+    utxoids:Array<string>,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), 
+    threshold:number = 1,
   ):UnsignedTx => {
-    // Cheating and using buildBaseTx to get Ins and Outs for fees.
-    // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
-    const utx:UnsignedTx = this.buildBaseTx(
-      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf
-    );
-    const ins:Array<TransferableInput> = utx.getTransaction().getIns();
-    const outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
+      }
+    }
     const ops:Array<TransferableOperation> = [];
     for (let i:number = 0; i < utxoids.length; i++) {
       const utxo:UTXO = this.getUTXO(utxoids[i]);
@@ -757,86 +1013,123 @@ export class UTXOSet {
   };
 
     /**
-    * In-Development, do not use: Creates an unsigned ImportTx transaction.
+    * Creates an unsigned ImportTx transaction.
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-    * @param feeSenderAddresses The addresses to send the fees
+    * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
     * @param importIns An array of [[TransferableInput]]s being imported
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @returns An unsigned transaction created from the passed in parameters.
     *
     */
    buildImportTx = (
-    networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN,
-    feeSenderAddresses:Array<Buffer>, importIns:Array<TransferableInput>, memo:Buffer = undefined, asOf:BN = UnixNow(),
+    networkid:number, 
+    blockchainid:Buffer,
+    fromAddresses:Array<Buffer>,
+    importIns:Array<TransferableInput>,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
   ):UnsignedTx => {
-    // Cheating and using buildBaseTx to get Ins and Outs for fees.
-    // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
-    const utx:UnsignedTx = this.buildBaseTx(
-      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf
-    );
-    const ins:Array<TransferableInput> = utx.getTransaction().getIns();
-    const outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    // Not implemented: Fees can be paid from importIns
+    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
+      }
+    }
 
     const importTx:ImportTx = new ImportTx(networkid, blockchainid, outs, ins, memo, importIns);
     return new UnsignedTx(importTx);
   };
 
     /**
-    * In-Development, do not use: Creates an unsigned ExportTx transaction. 
+    * Creates an unsigned ExportTx transaction. 
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param feeAssetID The assetID for the AVAX fee to be paid
-    * @param fee The amount of AVAX to be paid for fees, in $nAVAX
-    * @param feeSenderAddresses The addresses to send the fees
-    * @param utxoids An array of strings for the [[TransferableOutput]]s being exported
+    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
+    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
+    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover of the AVAX
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param locktime Optional. The locktime field created in the resulting outputs
+    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
     * @returns An unsigned transaction created from the passed in parameters.
     *
     */
    buildExportTx = (
-    networkid:number, blockchainid:Buffer, feeAssetID:Buffer, fee:BN,
-    feeSenderAddresses:Array<Buffer>, utxoids:Array<string>, memo:Buffer = undefined, asOf:BN = UnixNow()
+    networkid:number, 
+    blockchainid:Buffer,
+    amount:BN,
+    avaxAssetID:Buffer,
+    toAddresses:Array<Buffer>,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer> = undefined,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), 
+    threshold:number = 1,
   ):UnsignedTx => {
-    // Cheating and using buildBaseTx to get Ins and Outs for fees.
-    // Fees are burned, so no toAddresses, only feeSenderAddresses and changeAddresses, both are the feeSenderAddresses
-    const utx:UnsignedTx = this.buildBaseTx(
-      networkid, blockchainid, fee, [], feeSenderAddresses, feeSenderAddresses, feeAssetID, undefined, asOf
-    );
-    const ins:Array<TransferableInput> = utx.getTransaction().getIns();
-    const outs:Array<TransferableOutput> = utx.getTransaction().getOuts();
-    const exportOuts:Array<TransferableOutput> = [];
-    for (let i:number = 0; i < utxoids.length; i++) {
-      const utxo:UTXO = this.getUTXO(utxoids[i]);
-      const assetID:Buffer = utxo.getAssetID();
-      const output:AmountOutput = utxo.getOutput() as AmountOutput;
-      const amt:BN = output.getAmount().clone();
-      const txid:Buffer = utxo.getTxID();
-      const outputidx:Buffer = utxo.getOutputIdx();
-      const input:SecpInput = new SecpInput(amt);
-      const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
-      const fromAddresses:Array<Buffer> = output.getAddresses(); // Verify correct approach
-      const spenders:Array<Buffer> = output.getSpenders(fromAddresses, asOf);
-      for (let j = 0; j < spenders.length; j++) {
-        const idx:number = output.getAddressIdx(spenders[j]);
-        if (idx === -1) {
-          /* istanbul ignore next */
-          throw new Error('Error - UTXOSet.buildBaseTx: no such '
-          + `address in output: ${spenders[j]}`);
-        }
-        xferin.getInput().addSignatureIdx(idx, spenders[j]);
-      }
-      ins.push(xferin);
-      const xferOut:TransferableOutput = new TransferableOutput(assetID, output);
-      exportOuts.push(xferOut)
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    let exportouts:Array<TransferableOutput> = [];
+    
+    if(typeof changeAddresses === "undefined") {
+      changeAddresses = toAddresses;
     }
-    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, exportOuts);
+
+    const zero:BN = new BN(0);
+    
+    if (amount.eq(zero)) {
+      return undefined;
+    }
+
+    if(typeof feeAssetID === "undefined") {
+      feeAssetID = avaxAssetID;
+    } else if (feeAssetID.toString("hex") !== avaxAssetID.toString("hex")) {
+      /* istanbul ignore next */
+      throw new Error('Error - UTXOSet.buildExportTx: '
+      + `feeAssetID must match avaxAssetID`);
+    }
+
+    const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
+      aad.addAssetAmount(avaxAssetID, amount, fee);
+    } else {
+      aad.addAssetAmount(avaxAssetID, amount, zero);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+    }
+    const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    if(typeof success === "undefined") {
+      ins = aad.getInputs();
+      outs = aad.getChangeOutputs();
+      exportouts = aad.getOutputs();
+    } else {
+      throw success;
+    }
+
+    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, exportouts);
     return new UnsignedTx(exportTx);
   };
 
