@@ -882,11 +882,11 @@ const n4Contracts:object = {
 // END TODO
 
 const n12345Avm:any = { ...n2Avm };
-n12345Avm.blockchainID = '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD';
+n12345Avm.blockchainID = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
 const n12345Platform:any = { ...n2Platform };
 n12345Platform.blockchainID = '11111111111111111111111111111111LpoYY';
 const n12345Contracts:any = { ...n2Contracts };
-n12345Contracts.blockchainID = 'tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rmw';
+n12345Contracts.blockchainID = 'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq';
 
 export class Defaults {
   static network = {
@@ -942,13 +942,13 @@ export class Defaults {
       hrp: NetworkIDToHRP[12345],
       avm: n12345Avm,
       X: n12345Avm,
-      '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD': n12345Avm,
+      '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH': n12345Avm,
       platform: n12345Platform,
       P: n12345Platform,
       '11111111111111111111111111111111LpoYY': n12345Platform,
       contracts: n12345Contracts,
       C: n12345Contracts,
-      tZGm6RCkeGpVETUTp11DW3UYFZmm69zfqxchpHrSF7wgy8rmw: n12345Contracts,
+      jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq: n12345Contracts,
     },
   };
 }
