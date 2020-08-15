@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
-import { Input, StandardTransferableInput, BaseAmountInput } from '../../common/input';
+import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
 
 /**
  * @ignore
@@ -51,7 +51,7 @@ export class TransferableInput extends StandardTransferableInput {
   }
 }
 
-export class SecpInput extends BaseAmountInput {
+export class SecpInput extends StandardAmountInput {
   /**
      * Returns the inputID for this input
      */

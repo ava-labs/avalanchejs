@@ -56,22 +56,3 @@ export class PlatformVMConstants {
 
   static ADDRESSLENGTH:number = 20;
 }
-
-/**
- * Rules used when merging sets
- */
-export type MergeRule = 'intersection' // Self INTERSECT New
-| 'differenceSelf' // Self MINUS New
-| 'differenceNew' // New MINUS Self
-| 'symDifference' // differenceSelf UNION differenceNew
-| 'union' // Self UNION New
-| 'unionMinusNew' // union MINUS differenceNew
-| 'unionMinusSelf' // union MINUS differenceSelf
-| 'ERROR'; // generate error for testing
-
-/**
- * Function providing the current UNIX time using a {@link https://github.com/indutny/bn.js/|BN}
- */
-export function UnixNow():BN {
-  return new BN(Math.round((new Date()).getTime() / 1000));
-}

@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
-import { Output, BaseAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
+import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
 
 const bintools = BinTools.getInstance();
 
