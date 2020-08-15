@@ -6,14 +6,20 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
-import { JRPCAPI, RequestResponseData, Defaults, MinterSet } from '../../utils/types';
 import { UTXOSet, UTXO } from './utxos';
-import { MergeRule, UnixNow, AVMConstants, InitialStates } from './types';
+import {  AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
-import { PayloadBase } from '../../utils/payload';
+import { PayloadBase } from '../../common/payload';
 import { TransferableInput, SecpInput } from './inputs';
 import { AmountOutput } from './outputs';
+import { InitialStates } from './initialstates';
+import { UnixNow } from '../../utils/helperfunctions';
+import { JRPCAPI } from '../../common/jrpcapi';
+import { RequestResponseData } from '../../common/apibase';
+import { Defaults } from '../../common/constants';
+import { MinterSet } from './minterset';
+import { MergeRule } from '../../common/utxos';
 
 /**
  * @ignore
@@ -78,8 +84,8 @@ export class PersistanceOptions {
  */
 class AVMAPI extends JRPCAPI {
   /**
-     * @ignore
-     */
+   * @ignore
+   */
   protected keychain:AVMKeyChain = new AVMKeyChain('', '');
 
   protected blockchainID:string = '';

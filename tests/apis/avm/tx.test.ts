@@ -11,10 +11,10 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/outputs';
-import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/constants';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 import { Avalanche } from 'src/index';
-import { UTF8Payload } from 'src/utils/payload';
+import { UTF8Payload } from 'src/common/payload';
 
 /**
  * @ignore

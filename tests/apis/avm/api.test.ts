@@ -9,12 +9,12 @@ import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { ImportTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
-import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/constants';
 import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput, OutputOwners } from 'src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from 'src/apis/avm/ops';
 import { Defaults } from 'src/utils/types';
 import * as bech32 from 'bech32';
-import { UTF8Payload } from 'src/utils/payload';
+import { UTF8Payload } from 'src/common/payload';
 
 /**
  * @ignore

@@ -3,7 +3,9 @@
  * @module MetricsAPI
  */
 import AvalancheCore from '../../avalanche';
-import { RESTAPI, RequestResponseData } from '../../utils/types';
+import { RESTAPI } from '../../common/restapi';
+import { RequestResponseData } from '../../common/apibase';
+
 
 /**
  * Class for interacting with a node API that is using the node's MetricsApi.

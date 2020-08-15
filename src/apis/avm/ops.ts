@@ -4,9 +4,12 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { UTXOID, AVMConstants, SigIdx } from './types';
-import { NFTTransferOutput, OutputOwners } from './outputs';
+import { AVMConstants } from './constants';
+import { NFTTransferOutput } from './outputs';
 import BN from "bn.js";
+import { NBytes } from '../../common/nbytes';
+import { SigIdx } from '../../common/credentials';
+import { OutputOwners } from '../../common/output';
 
 const bintools = BinTools.getInstance();
 
@@ -375,5 +378,58 @@ export class NFTTransferOperation extends Operation {
     if (typeof output !== 'undefined') {
       this.output = output;
     }
+  }
+}
+
+
+/**
+ * Class for representing a UTXOID used in [[TransferableOp]] types
+ */
+export class UTXOID extends NBytes {
+  /**
+     * Returns a function used to sort an array of [[UTXOID]]s
+     */
+  static comparator = ():(a:UTXOID, b:UTXOID) => (1|-1|0) => (a:UTXOID, b:UTXOID)
+    :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+
+  /**
+     * Returns a base-58 representation of the [[UTXOID]].
+     */
+  toString():string {
+    return bintools.cb58Encode(this.toBuffer());
+  }
+
+  /**
+     * Takes a base-58 string containing an [[UTXOID]], parses it, populates the class, and returns the length of the UTXOID in bytes.
+     *
+     * @param bytes A base-58 string containing a raw [[UTXOID]]
+     *
+     * @returns The length of the raw [[UTXOID]]
+     */
+  fromString(utxoid:string):number {
+    const utxoidbuff:Buffer = bintools.b58ToBuffer(utxoid);
+    if (utxoidbuff.length === 40 && bintools.validateChecksum(utxoidbuff)) {
+      const newbuff:Buffer = bintools.copyFrom(utxoidbuff, 0, utxoidbuff.length - 4);
+      if (newbuff.length === 36) {
+        this.bytes = newbuff;
+      }
+    } else if (utxoidbuff.length === 40) {
+      throw new Error('Error - UTXOID.fromString: invalid checksum on address');
+    } else if (utxoidbuff.length === 36) {
+      this.bytes = utxoidbuff;
+    } else {
+      /* istanbul ignore next */
+      throw new Error('Error - UTXOID.fromString: invalid address');
+    }
+    return this.getSize();
+  }
+
+  /**
+     * Class for representing a UTXOID used in [[TransferableOp]] types
+     */
+  constructor() {
+    super();
+    this.bytes = Buffer.alloc(36);
+    this.bsize = 36;
   }
 }

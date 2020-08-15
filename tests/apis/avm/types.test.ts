@@ -1,6 +1,6 @@
 import {
   SigIdx, Signature, Address, UnixNow,
-} from 'src/apis/avm/types';
+} from 'src/apis/avm/constants';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
 

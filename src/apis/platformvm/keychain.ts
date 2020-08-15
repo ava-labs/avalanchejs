@@ -3,30 +3,8 @@
  * @module PlatformVMAPI-KeyChain
  */
 import { Buffer } from "buffer/";
-import * as elliptic from "elliptic";
-import createHash from "create-hash";
 import BinTools from '../../utils/bintools';
-import { KeyPair, KeyChain } from '../../utils/types';
-
-/**
- * @ignore
- */
-const EC: typeof elliptic.ec = elliptic.ec;
-
-/**
- * @ignore
- */
-const ec: elliptic.ec = new EC('secp256k1');
-
-/**
- * @ignore
- */
-const ecparams = ec.curve;
-
-/**
- * @ignore
- */
-const BN = ecparams.n.constructor;
+import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../keychains/secp256k1';
 
 /**
  * @ignore
@@ -37,58 +15,10 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on the Platform Chain. 
  */
-export class PlatformVMKeyPair extends KeyPair {
-    protected keypair:elliptic.ec.KeyPair
+export class PlatformVMKeyPair extends SECP256k1KeyPair {
 
-    /**
-     * @ignore
-     */
-    protected _sigFromSigBuffer = (sig:Buffer):elliptic.ec.SignatureOptions => {
-        const r = new BN(bintools.copyFrom(sig, 0, 32));
-        const s = new BN(bintools.copyFrom(sig, 32, 64));
-        const recoveryParam:number = bintools.copyFrom(sig, 64, 65).readUIntBE(0, 1);
-        const sigOpt = {
-            r:r,
-            s:s,
-            recoveryParam:recoveryParam
-        };
-        return sigOpt;
-    }
-
-  /**
-     * Generates a new keypair.
-     */
-    generateKey = () => {
-        this.keypair = ec.genKeyPair();
-    
-        // doing hex translation to get Buffer class
-        this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
-        this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
-      };
-
-  /**
-     * Imports a private key and generates the appropriate public key.
-     *
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key
-     *
-     * @returns true on success, false on failure
-     */
-    importKey = (privk:Buffer):boolean => {
-        this.keypair = ec.keyFromPrivate(privk.toString('hex'), 'hex');
-        // doing hex translation to get Buffer class
-        this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
-        this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
-        return true; // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
-      };
-
-    /**
-     * Returns the address as a {@link https://github.com/feross/buffer|Buffer}.
-     * 
-     * @returns A {@link https://github.com/feross/buffer|Buffer} representation of the address
-     */
-    getAddress = ():Buffer => {
-        return this.addressFromPublicKey(this.pubk);
-    }
+    protected chainid:string = '';
+    protected hrp:string = '';
 
     /**
      * Returns the address's string representation.
@@ -100,95 +30,43 @@ export class PlatformVMKeyPair extends KeyPair {
         return bintools.addressToString(this.hrp, this.chainid, addr);
     }
 
-  /**
-     * Returns an address given a public key.
+    /**
+       * Returns the chainID associated with this key.
+       *
+       * @returns The [[KeyPair]]'s chainID
+       */
+    getChainID = ():string => this.chainid;
+
+    /**
+     * Sets the the chainID associated with this key.
      *
-     * @param pubk A {@link https://github.com/feross/buffer|Buffer} representing the public key
-     *
-     * @returns A {@link https://github.com/feross/buffer|Buffer} for the address of the public key.
+     * @param chainid String for the chainID
      */
-    addressFromPublicKey = (pubk:Buffer): Buffer => {
-        if (pubk.length === 65) {
-          /* istanbul ignore next */
-          pubk = Buffer.from(ec.keyFromPublic(pubk).getPublic(true, 'hex').padStart(66, '0'), 'hex'); // make compact, stick back into buffer
-        }
-        if (pubk.length === 33) {
-          const sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
-          const ripesha:Buffer = Buffer.from(createHash('rmd160').update(sha256).digest());
-          return ripesha;
-        }
-        /* istanbul ignore next */
-        throw new Error('Unable to make address.');
-      };
-
-    /**
-     * Returns a string representation of the private key.
-     * 
-     * @returns A cb58 serialized string representation of the public key
-     */
-    getPrivateKeyString = ():string => {
-        return "PrivateKey-" + bintools.cb58Encode(this.privk);
-    }
-
-    /**
-     * Returns the public key.
-     * 
-     * @returns A cb58 serialized string representation of the public key
-     */
-    getPublicKeyString = ():string => {
-        return bintools.cb58Encode(this.pubk);
-    }
-
-
-    /**
-     * Takes a message, signs it, and returns the signature.
-     * 
-     * @param msg The message to sign, be sure to hash first if expected
-     * 
-     * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
-     */
-    sign = (msg:Buffer):Buffer => {
-        const sigObj = this.keypair.sign(msg, undefined, { canonical: true });
-        const recovery:Buffer = Buffer.alloc(1);
-        recovery.writeUInt8(sigObj.recoveryParam, 0);
-        const r:Buffer = Buffer.from(sigObj.r.toArray("be", 32)); //we have to skip native Buffer class, so this is the way
-        const s:Buffer = Buffer.from(sigObj.s.toArray("be", 32)); //we have to skip native Buffer class, so this is the way
-        const result:Buffer = Buffer.concat([r,s, recovery], 65);
-        return result;
-    }
+    setChainID = (chainid:string):void => {
+        this.chainid = chainid;
+    };
     
-    /**
-     * Verifies that the private key associated with the provided public key produces the signature associated with the given message.
-     * 
-     * @param msg The message associated with the signature
-     * @param sig The signature of the signed message
-     * 
-     * @returns True on success, false on failure
-     */
-    verify = (msg:Buffer, sig:Buffer):boolean => { 
-        const sigObj:elliptic.ec.SignatureOptions = this._sigFromSigBuffer(sig);
-        return ec.verify(msg, sigObj, this.keypair);
-    }
 
     /**
-     * Recovers the public key of a message signer from a message and its associated signature.
-     * 
-     * @param msg The message that's signed
-     * @param sig The signature that's signed on the message
-     * 
-     * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public key of the signer
+     * Returns the Human-Readable-Part of the network associated with this key.
+     *
+     * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
      */
-    recover = (msg:Buffer, sig:Buffer):Buffer => {
-        const sigObj:elliptic.ec.SignatureOptions = this._sigFromSigBuffer(sig);
-        const pubk = ec.recoverPubKey(msg, sigObj, sigObj.recoveryParam);
-        return Buffer.from(pubk.encodeCompressed());
-    }
-
+    getHRP = ():string => this.hrp;
+  
     /**
-     * Class for representing a private and public keypair in Avalanche PlatformVM. 
+     * Sets the the Human-Readable-Part of the network associated with this key.
+     *
+     * @param hrp String for the Human-Readable-Part of Bech32 addresses
      */
+    setHRP = (hrp:string):void => {
+      this.hrp = hrp;
+    };
+
     constructor(hrp:string, chainid:string) {
-        super(hrp, chainid);
+        super();
+        this.chainid = chainid;
+        this.hrp = hrp;
         this.generateKey();
     }
     
@@ -199,7 +77,10 @@ export class PlatformVMKeyPair extends KeyPair {
  * 
  * @typeparam PlatformVMKeyPair Class extending [[KeyPair]] which is used as the key in [[PlatformVMKeyChain]]
  */
-export class PlatformVMKeyChain extends KeyChain<PlatformVMKeyPair> {
+export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
+
+    hrp:string = '';
+    chainid:string = '';
 
     /**
      * Makes a new key pair, returns the address.
@@ -210,6 +91,11 @@ export class PlatformVMKeyChain extends KeyChain<PlatformVMKeyPair> {
         let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
         this.addKey(keypair);
         return keypair.getAddress();
+    }
+
+    addKey = (newKey:PlatformVMKeyPair) => {
+        newKey.setChainID(this.chainid);
+        super.addKey(newKey);
     }
 
     /**
@@ -238,6 +124,8 @@ export class PlatformVMKeyChain extends KeyChain<PlatformVMKeyPair> {
      * Returns instance of PlatformVMKeyChain.
      */
     constructor(hrp:string, chainid:string){
-        super(hrp, chainid);
+        super();
+        this.hrp = hrp;
+        this.chainid = chainid;
     }
 }

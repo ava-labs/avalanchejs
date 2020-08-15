@@ -3,7 +3,9 @@
  * @module HealthAPI
  */
 import AvalancheCore from '../../avalanche';
-import { JRPCAPI, RequestResponseData } from '../../utils/types';
+import { JRPCAPI } from '../../common/jrpcapi';
+import { RequestResponseData } from '../../common/apibase';
+
 
 /**
  * Class for interacting with a node API that is using the node's HealthApi.

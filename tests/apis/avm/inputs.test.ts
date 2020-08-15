@@ -8,7 +8,7 @@ import { Buffer } from 'buffer/';
 import {
   Output, SecpOutput, AmountOutput, TransferableOutput,
 } from 'src/apis/avm/outputs';
-import { AVMConstants } from 'src/apis/avm/types';
+import { AVMConstants } from 'src/apis/avm/constants';
 
 /**
  * @ignore

@@ -3,7 +3,8 @@
  * @module InfoAPI
  */
 import AvalancheCore from '../../avalanche';
-import { JRPCAPI, RequestResponseData } from '../../utils/types';
+import { JRPCAPI } from '../../common/jrpcapi';
+import { RequestResponseData } from '../../common/apibase';
 
 /**
  * Class for interacting with a node's InfoAPI.

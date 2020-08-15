@@ -10,10 +10,12 @@ import InfoAPI from './apis/info/api';
 import KeystoreAPI from './apis/keystore/api';
 import MetricsAPI from './apis/metrics/api';
 import PlatformVMAPI from './apis/platformvm/api';
-import * as CoreTypes from './utils/types';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
-import { Defaults, DefaultNetworkID, getPreferredHRP } from './utils/types';
+import { DefaultNetworkID, Defaults } from './common/constants';
+import { getPreferredHRP } from './utils/helperfunctions';
+import { Credential } from './common/credentials';
+import { Input, BaseAmountInput } from './common/input';
 
 /**
  * Avalanche.js is middleware for interacting with Avalanche node RPC APIs.
@@ -118,7 +120,6 @@ export default class Avalanche extends AvalancheCore {
 export { Avalanche };
 export { BinTools };
 export { DB };
-export { CoreTypes };
 export { AvalancheCore };
 
 export * from './avalanche';
@@ -128,8 +129,7 @@ export * from './apis/keystore/api';
 export * from './apis/platformvm/api';
 export * from './utils/bintools';
 export * from './utils/db';
-export * from './utils/payload';
-export * from './utils/types';
+export * from './common/payload';
 
 export {SelectCredentialClass, Credential, SecpCredential, NFTCredential} from './apis/avm/credentials';
 export {SelectInputClass, Input, TransferableInput, AmountInput, SecpInput} from './apis/avm/inputs';
@@ -137,7 +137,7 @@ export {AVMKeyPair, AVMKeyChain} from './apis/avm/keychain';
 export {SelectOperationClass,Operation, TransferableOperation, NFTTransferOperation, NFTMintOperation} from  './apis/avm/ops';
 export {SelectOutputClass, Output, TransferableOutput, AmountOutput, SecpOutput, NFTOutBase, NFTTransferOutput, NFTMintOutput} from './apis/avm/outputs';
 export {BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx} from './apis/avm/tx';
-export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/types';
+export {SigIdx, Signature, Address, UTXOID, InitialStates, AVMConstants, MergeRule, UnixNow} from './apis/avm/constants';
 export {UTXO, UTXOSet} from './apis/avm/utxos';	
 
 export { PlatformVMKeyPair, PlatformVMKeyChain } from './apis/platformvm/keychain';

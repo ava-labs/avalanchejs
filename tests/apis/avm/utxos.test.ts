@@ -1,7 +1,7 @@
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
-import { UnixNow } from 'src/apis/avm/types';
+import { UnixNow } from 'src/apis/avm/constants';
 import { UTXO, UTXOSet } from 'src/apis/avm/utxos';
 import { AmountOutput } from 'src/apis/avm/outputs';
 

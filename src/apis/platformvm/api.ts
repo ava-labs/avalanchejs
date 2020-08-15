@@ -5,7 +5,8 @@
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import AvalancheCore from '../../avalanche';
-import { JRPCAPI, RequestResponseData } from '../../utils/types';
+import { JRPCAPI } from '../../common/jrpcapi';
+import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 
 /**

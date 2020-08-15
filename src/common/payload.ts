@@ -1,10 +1,10 @@
 /**
  * @packageDocumentation
- * @module Payload
+ * @module Common-Payload
  */
 
 import { Buffer } from "buffer/";
-import BinTools  from './bintools';
+import BinTools  from '../utils/bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
 
