@@ -12,6 +12,8 @@ import MetricsAPI from './apis/metrics/api';
 import PlatformVMAPI from './apis/platformvm/api';
 import { DefaultNetworkID, Defaults } from './common/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
+import BinTools from './utils/bintools';
+import DB from './utils/db';
 
 /**
  * Avalanche.js is middleware for interacting with Avalanche node RPC APIs.
@@ -112,6 +114,11 @@ export default class Avalanche extends AvalancheCore {
     }
   }
 }
+
+export { Avalanche };
+export { BinTools };
+export { DB };
+export { AvalancheCore };
 
 export * as utils from './utils';
 export * as common from './common';
