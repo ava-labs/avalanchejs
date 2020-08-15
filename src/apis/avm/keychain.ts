@@ -41,8 +41,6 @@ const bintools = BinTools.getInstance();
 export class AVMKeyPair extends KeyPair {
   protected keypair:elliptic.ec.KeyPair;
 
-  protected entropy:Buffer;
-
   /**
      * @ignore
      */
@@ -60,11 +58,8 @@ export class AVMKeyPair extends KeyPair {
 
   /**
      * Generates a new keypair.
-     *
-     * @param entropy Optional parameter that may be necessary to produce secure keys
      */
-  generateKey = (entropy?:Buffer) => {
-    this.entropy = entropy;
+  generateKey = () => {
     this.keypair = ec.genKeyPair();
 
     // doing hex translation to get Buffer class
@@ -186,9 +181,8 @@ export class AVMKeyPair extends KeyPair {
   /**
      * Class for representing a private and public keypair in Avalanche.
      */
-  constructor(hrp:string, chainid:string, entropy:Buffer = undefined) {
+  constructor(hrp:string, chainid:string) {
     super(hrp, chainid);
-    this.entropy = entropy;
     this.generateKey();
   }
 }
@@ -202,12 +196,10 @@ export class AVMKeyChain extends KeyChain<AVMKeyPair> {
   /**
      * Makes a new key pair, returns the address.
      *
-     * @param entropy Optional parameter that may be necessary to produce secure keys
-     *
      * @returns Address of the new key pair
      */
-  makeKey = (entropy:Buffer = undefined):Buffer => {
-    const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid, entropy);
+  makeKey = ():Buffer => {
+    const keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
     this.addKey(keypair);
     return keypair.getAddress();
   };

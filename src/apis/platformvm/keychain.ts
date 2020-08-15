@@ -7,7 +7,6 @@ import * as elliptic from "elliptic";
 import createHash from "create-hash";
 import BinTools from '../../utils/bintools';
 import { KeyPair, KeyChain } from '../../utils/types';
-import { PlatformVMConstants } from './types';
 
 /**
  * @ignore
@@ -40,7 +39,6 @@ const bintools: BinTools = BinTools.getInstance();
  */
 export class PlatformVMKeyPair extends KeyPair {
     protected keypair:elliptic.ec.KeyPair
-    protected entropy:Buffer;
 
     /**
      * @ignore
@@ -57,34 +55,31 @@ export class PlatformVMKeyPair extends KeyPair {
         return sigOpt;
     }
 
-    /**
+  /**
      * Generates a new keypair.
-     * 
-     * @param entropy Optional parameter that may be necessary to produce secure keys
      */
-    generateKey = (entropy?:Buffer) => {
-        this.entropy = entropy;
+    generateKey = () => {
         this.keypair = ec.genKeyPair();
-
+    
         // doing hex translation to get Buffer class
-        this.privk = Buffer.from(this.keypair.getPrivate("hex"), "hex");
-        this.pubk = Buffer.from(this.keypair.getPublic(true, "hex"), "hex");
-    }
+        this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
+        this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
+      };
 
-    /**
+  /**
      * Imports a private key and generates the appropriate public key.
-     * 
-     * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key 
-     * 
+     *
+     * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key
+     *
      * @returns true on success, false on failure
      */
     importKey = (privk:Buffer):boolean => {
-        this.keypair = ec.keyFromPrivate(privk.toString("hex"),"hex");
+        this.keypair = ec.keyFromPrivate(privk.toString('hex'), 'hex');
         // doing hex translation to get Buffer class
-        this.privk = Buffer.from(this.keypair.getPrivate("hex"), "hex");
-        this.pubk = Buffer.from(this.keypair.getPublic(true, "hex"), "hex");
-        return true;
-    }
+        this.privk = Buffer.from(this.keypair.getPrivate('hex').padStart(64, '0'), 'hex');
+        this.pubk = Buffer.from(this.keypair.getPublic(true, 'hex').padStart(66, '0'), 'hex');
+        return true; // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
+      };
 
     /**
      * Returns the address as a {@link https://github.com/feross/buffer|Buffer}.
@@ -105,26 +100,26 @@ export class PlatformVMKeyPair extends KeyPair {
         return bintools.addressToString(this.hrp, this.chainid, addr);
     }
 
-    /**
+  /**
      * Returns an address given a public key.
-     * 
+     *
      * @param pubk A {@link https://github.com/feross/buffer|Buffer} representing the public key
-     * 
+     *
      * @returns A {@link https://github.com/feross/buffer|Buffer} for the address of the public key.
      */
     addressFromPublicKey = (pubk:Buffer): Buffer => {
-        if(pubk.length == 65) {
-            /* istanbul ignore next */
-            pubk = Buffer.from(ec.keyFromPublic(pubk).getPublic(true, "hex"), "hex"); //make compact, stick back into buffer
-        } 
-        if(pubk.length == 33){
-            const sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
-            const ripesha:Buffer = Buffer.from(createHash('rmd160').update(sha256).digest());
-            return ripesha;
+        if (pubk.length === 65) {
+          /* istanbul ignore next */
+          pubk = Buffer.from(ec.keyFromPublic(pubk).getPublic(true, 'hex').padStart(66, '0'), 'hex'); // make compact, stick back into buffer
+        }
+        if (pubk.length === 33) {
+          const sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
+          const ripesha:Buffer = Buffer.from(createHash('rmd160').update(sha256).digest());
+          return ripesha;
         }
         /* istanbul ignore next */
-        throw new Error("Unable to make address.");
-    }
+        throw new Error('Unable to make address.');
+      };
 
     /**
      * Returns a string representation of the private key.
@@ -192,7 +187,7 @@ export class PlatformVMKeyPair extends KeyPair {
     /**
      * Class for representing a private and public keypair in Avalanche PlatformVM. 
      */
-    constructor(hrp:string, chainid:string, entropy:Buffer = undefined) {
+    constructor(hrp:string, chainid:string) {
         super(hrp, chainid);
         this.generateKey();
     }
@@ -209,12 +204,10 @@ export class PlatformVMKeyChain extends KeyChain<PlatformVMKeyPair> {
     /**
      * Makes a new key pair, returns the address.
      * 
-     * @param entropy Optional parameter that may be necessary to produce secure keys
-     * 
      * @returns Address of the new key pair
      */
-    makeKey = (entropy:Buffer = undefined):Buffer => {
-        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid, entropy);
+    makeKey = ():Buffer => {
+        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
         this.addKey(keypair);
         return keypair.getAddress();
     }
