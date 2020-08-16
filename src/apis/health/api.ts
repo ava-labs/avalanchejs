@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module HealthAPI
+ * @module API-Health
  */
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';

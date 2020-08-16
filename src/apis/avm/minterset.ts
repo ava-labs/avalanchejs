@@ -1,12 +1,10 @@
 /**
  * @packageDocumentation
- * @module AVMAPI-MinterSet
+ * @module API-AVM-MinterSet
  */
 
 import { Buffer } from "buffer/";
 import BinTools  from '../../utils/bintools';
-import BN from "bn.js";
-import Web3Utils from "web3-utils";
 
 /**
  * @ignore

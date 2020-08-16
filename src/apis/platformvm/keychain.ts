@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module PlatformVMAPI-KeyChain
+ * @module API-PlatformVM-KeyChain
  */
 import { Buffer } from "buffer/";
 import BinTools from '../../utils/bintools';

@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module AVMAPI-InitialStates
+ * @module API-AVM-InitialStates
  */
 
 import { Buffer } from "buffer/";

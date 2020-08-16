@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module AVMAPI-Types
+ * @module API-AVM-Types
  */
 
 import BN from 'bn.js';

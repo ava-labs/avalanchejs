@@ -1,11 +1,11 @@
 /**
  * @packageDocumentation
- * @module API-AVM-Outputs
+ * @module API-PlatformVM-Outputs
  */
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
+import { PlatformVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
 
 const bintools = BinTools.getInstance();
@@ -18,13 +18,13 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == AVMConstants.SECPOUTPUTID){
+    if(outputid == PlatformVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput( ...args);
         return secpout;
-    } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
+    } else if(outputid == PlatformVMConstants.NFTMINTOUTPUTID){
         let nftout:NFTMintOutput = new NFTMintOutput(...args);
         return nftout;
-    } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
+    } else if(outputid == PlatformVMConstants.NFTXFEROUTPUTID){
         let nftout:NFTTransferOutput = new NFTTransferOutput(...args);
         return nftout;
     }
@@ -33,8 +33,8 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
 
 export class TransferableOutput extends StandardTransferableOutput{
     fromBuffer(bytes:Buffer, offset:number = 0):number {
-        this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
-        offset += AVMConstants.ASSETIDLEN;
+        this.assetID = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
+        offset += PlatformVMConstants.ASSETIDLEN;
         const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         this.output = SelectOutputClass(outputid);
@@ -70,7 +70,7 @@ export class SecpOutput extends AmountOutput {
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return AVMConstants.SECPOUTPUTID;
+    return PlatformVMConstants.SECPOUTPUTID;
   }
 }
 
@@ -82,7 +82,7 @@ export class NFTMintOutput extends NFTOutput {
      * Returns the outputID for this output
      */
     getOutputID():number {
-        return AVMConstants.NFTMINTOUTPUTID;
+        return PlatformVMConstants.NFTMINTOUTPUTID;
     }
 
     /**
@@ -131,7 +131,7 @@ export class NFTTransferOutput extends NFTOutput {
      * Returns the outputID for this output
      */
     getOutputID():number {
-        return AVMConstants.NFTXFEROUTPUTID;
+        return PlatformVMConstants.NFTXFEROUTPUTID;
     }
 
   /**

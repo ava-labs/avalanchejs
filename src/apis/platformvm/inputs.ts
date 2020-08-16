@@ -1,10 +1,10 @@
 /**
  * @packageDocumentation
- * @module API-AVM-Inputs
+ * @module API-PlatformVM-Inputs
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
+import { PlatformVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
 
 
@@ -21,7 +21,7 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Input]]-extended class.
  */
 export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
-  if (inputid === AVMConstants.SECPINPUTID) {
+  if (inputid === PlatformVMConstants.SECPINPUTID) {
     const secpin:SecpInput = new SecpInput(...args);
     return secpin;
   }
@@ -42,7 +42,7 @@ export class TransferableInput extends StandardTransferableInput {
     offset += 32;
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    this.assetid = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
+    this.assetid = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
     offset += 32;
     const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
@@ -59,8 +59,8 @@ export class SecpInput extends StandardAmountInput {
      * Returns the inputID for this input
      */
   getInputID():number {
-    return AVMConstants.SECPINPUTID;
+    return PlatformVMConstants.SECPINPUTID;
   }
 
-  getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
+  getCredentialID = ():number => PlatformVMConstants.SECPCREDENTIAL;
 }

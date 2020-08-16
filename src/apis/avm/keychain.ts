@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module AVMAPI-KeyChain
+ * @module API-AVM-KeyChain
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';

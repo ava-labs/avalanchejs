@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module MetricsAPI
+ * @module API-Metrics
  */
 import AvalancheCore from '../../avalanche';
 import { RESTAPI } from '../../common/restapi';

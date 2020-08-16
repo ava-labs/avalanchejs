@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module KeystoreAPI
+ * @module API-Keystore
  */
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';

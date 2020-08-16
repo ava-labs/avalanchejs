@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module PlatformVMAPI
+ * @module API-PlatformVM
  */
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';

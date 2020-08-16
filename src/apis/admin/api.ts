@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module AdminAPI
+ * @module API-Admin
  */
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';

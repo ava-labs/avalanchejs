@@ -1,10 +1,10 @@
 /**
  * @packageDocumentation
- * @module API-AVM-Credentials
+ * @module API-PlatformVM-Credentials
  */
 import BinTools from '../../utils/bintools';
 
-import { AVMConstants } from './constants';
+import { PlatformVMConstants } from './constants';
 import { Signature, Credential } from '../../common/credentials';
 Signature
 
@@ -21,10 +21,10 @@ const bintools:BinTools = BinTools.getInstance();
  * @returns An instance of an [[Credential]]-extended class.
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
-  if (credid === AVMConstants.SECPCREDENTIAL) {
+  if (credid === PlatformVMConstants.SECPCREDENTIAL) {
     const secpcred:SecpCredential = new SecpCredential(...args);
     return secpcred;
-  } if (credid === AVMConstants.NFTCREDENTIAL) {
+  } if (credid === PlatformVMConstants.NFTCREDENTIAL) {
     const nftcred:NFTCredential = new NFTCredential(...args);
     return nftcred;
   }
@@ -34,12 +34,12 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 
 export class SecpCredential extends Credential {
   getCredentialID():number {
-    return AVMConstants.SECPCREDENTIAL;
+    return PlatformVMConstants.SECPCREDENTIAL;
   }
 }
 
 export class NFTCredential extends Credential {
   getCredentialID():number {
-    return AVMConstants.NFTCREDENTIAL;
+    return PlatformVMConstants.NFTCREDENTIAL;
   }
 }

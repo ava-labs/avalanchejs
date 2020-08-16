@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module AVMAPI-Operations
+ * @module API-AVM-Operations
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';

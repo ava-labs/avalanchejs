@@ -1,11 +1,13 @@
 /**
  * @packageDocumentation
- * @module PVMAPI-Types
+ * @module API-PlatformVM-Constants
  */
 
 import BN from 'bn.js';
 
 export class PlatformVMConstants {
+  static LATESTCODEC:number = 0;
+
   static ONEAVAX:BN = new BN(1000000000);
 
   static DECIAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(10));
