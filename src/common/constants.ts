@@ -11,28 +11,28 @@ export const NetworkIDToHRP:object = {
     12345: "local"
   };
   
-  export const HRPToNetworkID:object = {
-    "avax": 1,
-    "cascade": 2,
-    "denali": 3,
-    "everest": 4,
-    "local": 12345
-  };
-  
-  export const FallbackHRP:string = "custom";
-  
-  export const DefaultNetworkID:number = 3;
+export const HRPToNetworkID:object = {
+  "avax": 1,
+  "cascade": 2,
+  "denali": 3,
+  "everest": 4,
+  "local": 12345
+};
+
+export const FallbackHRP:string = "custom";
+
+export const DefaultNetworkID:number = 3;
 
 
 // TODO: UPDATE FOR MAINNET
 
-const platformChainID:string = "11111111111111111111111111111111LpoYY";
-const XChainAlias:string = "X";
-const CChainAlias:string = "C";
-const PChainAlias:string = "P";
-const XChainVMName:string = "avm";
-const CChainVMName:string = "evm";
-const PChainVMName:string = "platformvm";
+export const platformChainID:string = "11111111111111111111111111111111LpoYY";
+export const XChainAlias:string = "X";
+export const CChainAlias:string = "C";
+export const PChainAlias:string = "P";
+export const XChainVMName:string = "avm";
+export const CChainVMName:string = "evm";
+export const PChainVMName:string = "platformvm";
 
 const n1X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',

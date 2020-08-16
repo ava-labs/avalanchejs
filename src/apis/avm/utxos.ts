@@ -7,7 +7,7 @@ import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput } from './outputs';
 import { AVMConstants } from './constants';
-import { UnsignedTx, CreateAssetTx, OperationTx, BaseTx, ExportTx, ImportTx } from './tx';
+import { UnsignedTx,  } from './tx';
 import { SecpInput, TransferableInput } from './inputs';
 import { NFTTransferOperation, TransferableOperation, NFTMintOperation } from './ops';
 import { Output, OutputOwners } from '../../common/output';
@@ -15,6 +15,12 @@ import { UnixNow } from '../../utils/helperfunctions';
 import { InitialStates } from './initialstates';
 import { MinterSet } from './minterset';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
+import { CreateAssetTx } from './createassettx';
+import { OperationTx } from './operationtx';
+import { BaseTx } from './basetx';
+import { ExportTx } from './exporttx';
+import { ImportTx } from './importtx';
+import { platformChainID } from '../../common/constants';
 
 /**
  * @ignore
@@ -693,6 +699,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
     * @param importIns An array of [[TransferableInput]]s being imported
+    * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -705,6 +712,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     blockchainid:Buffer,
     fromAddresses:Array<Buffer>,
     importIns:Array<TransferableInput>,
+    destinationChain:Buffer = undefined, 
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
     memo:Buffer = undefined, 
@@ -727,7 +735,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const importTx:ImportTx = new ImportTx(networkid, blockchainid, outs, ins, memo, importIns);
+    if(typeof destinationChain === "undefined") {
+      destinationChain = bintools.cb58Decode(platformChainID);
+    }
+
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid, destinationChain, outs, ins, memo, importIns);
     return new UnsignedTx(importTx);
   };
 
@@ -742,6 +754,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
     * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover of the AVAX
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param destinationChain Optional. A {@link https://github.com/feross/buffer|Buffer} for the chainid where to send the asset.
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
@@ -758,6 +771,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer> = undefined,
+    destinationChain:Buffer = undefined,
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
     memo:Buffer = undefined, 
@@ -787,6 +801,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       + `feeAssetID must match avaxAssetID`);
     }
 
+    if(typeof destinationChain === "undefined") {
+      destinationChain = bintools.cb58Decode(platformChainID);
+    }
+
     const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
       aad.addAssetAmount(avaxAssetID, amount, fee);
@@ -803,7 +821,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, exportouts);
+    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, destinationChain, outs, ins, memo, exportouts);
     return new UnsignedTx(exportTx);
   };
 }

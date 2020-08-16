@@ -1,9 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import AVMAPI from 'src/apis/avm/api';
-import {
-  BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx, ImportTx, ExportTx 
-} from 'src/apis/avm/tx';
+import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
 import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
@@ -17,6 +15,13 @@ import { Avalanche } from 'src/index';
 import { UTF8Payload } from 'src/common/payload';
 import { InitialStates } from 'src/apis/avm/initialstates';
 import { UnixNow } from 'src/utils/helperfunctions';
+import { BaseTx } from 'src/apis/avm/basetx';
+import { CreateAssetTx } from 'src/apis/avm/createassettx';
+import { OperationTx } from 'src/apis/avm/operationtx';
+import { ImportTx } from 'src/apis/avm/importtx';
+import { ExportTx } from 'src/apis/avm/exporttx';
+import { platformChainID } from '../../../src/common/constants';
+
 
 /**
  * @ignore
@@ -384,7 +389,7 @@ describe('Transactions', () => {
 
   test('Creation ImportTx', () => {
     const importtx:ImportTx = new ImportTx(
-      netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
+      netid, blockchainID, undefined, outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
     );
     const txunew:ImportTx = new ImportTx();
     const importbuff:Buffer = importtx.toBuffer();
@@ -397,7 +402,7 @@ describe('Transactions', () => {
 
   test('Creation ExportTx', () => {
     const exporttx:ExportTx = new ExportTx(
-      netid, blockchainID, outputs, inputs, undefined, exportOuts
+      netid, blockchainID, undefined, outputs, inputs, undefined, exportOuts
     );
     const txunew:ExportTx = new ExportTx();
     const exportbuff:Buffer = exporttx.toBuffer();
@@ -448,7 +453,7 @@ describe('Transactions', () => {
 
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
-      netid, blockchainID, addrs1, importIns, new BN(90), assetID,
+      netid, blockchainID, addrs1, importIns, bintools.cb58Decode(platformChainID), new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
     const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
@@ -459,7 +464,8 @@ describe('Transactions', () => {
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
       netid, blockchainID, new BN(90), avaxAssetID,
-      addrs3, addrs1, addrs2, undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
+      addrs3, addrs1, addrs2, bintools.cb58Decode(platformChainID), 
+      undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
     const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();

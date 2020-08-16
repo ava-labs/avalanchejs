@@ -7,7 +7,7 @@ import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
 import { UTXOSet, UTXO } from './utxos';
-import {  AVMConstants } from './constants';
+import { AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../common/payload';
@@ -17,9 +17,10 @@ import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import { Defaults } from '../../common/constants';
+import { Defaults, platformChainID } from '../../common/constants';
 import { MinterSet } from './minterset';
 import { MergeRule } from '../../common/utxos';
+import { type } from 'os';
 
 /**
  * @ignore
@@ -733,6 +734,7 @@ class AVMAPI extends JRPCAPI {
      *
      * @param utxoset  A set of UTXOs that the transaction is built on
      * @param ownerAddresses The addresses being used to import
+     * @param sourceChain The chainid for where the import is coming from. Default, platform chainid. 
      * @param memo Optional contains arbitrary bytes, up to 256 bytes
      * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
      *
@@ -744,6 +746,7 @@ class AVMAPI extends JRPCAPI {
     buildImportTx = async (
       utxoset:UTXOSet, 
       ownerAddresses:Array<string>, 
+      sourceChain:Buffer | string = platformChainID,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow(), 
     ):Promise<UnsignedTx> => {
@@ -756,6 +759,14 @@ class AVMAPI extends JRPCAPI {
 
       if( memo instanceof PayloadBase) {
         memo = memo.getPayload();
+      }
+
+      if(typeof sourceChain === "undefined") {
+        sourceChain = bintools.cb58Decode(platformChainID);
+      } else if (typeof sourceChain === "string") {
+        sourceChain = bintools.cb58Decode(platformChainID);
+      } else if(!(sourceChain instanceof Buffer)) {
+        throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
       }
       
       const atomics = atomicUTXOs.getAllUTXOs();
@@ -790,6 +801,7 @@ class AVMAPI extends JRPCAPI {
         bintools.cb58Decode(this.blockchainID), 
         owners,
         importIns, 
+        sourceChain,
         this.getFee(), 
         avaxAssetID, 
         memo, asOf
@@ -812,6 +824,7 @@ class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param destinationChain The chainid for where the assets will be sent. Default platform chainid.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
@@ -825,6 +838,7 @@ class AVMAPI extends JRPCAPI {
       toAddresses:Array<string>, 
       fromAddresses:Array<string>,
       changeAddresses:Array<string> = undefined,
+      destinationChain:Buffer | string = platformChainID,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow(),
       locktime:BN = new BN(0), 
@@ -839,6 +853,14 @@ class AVMAPI extends JRPCAPI {
       }
 
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
+
+      if(typeof destinationChain === "undefined") {
+        destinationChain = bintools.cb58Decode(platformChainID);
+      } else if (typeof destinationChain === "string") {
+        destinationChain = bintools.cb58Decode(platformChainID);
+      } else if(!(destinationChain instanceof Buffer)) {
+        throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
+      }
   
       const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
         this.core.getNetworkID(), 
@@ -848,6 +870,7 @@ class AVMAPI extends JRPCAPI {
         to,
         from,
         change,
+        destinationChain,
         this.getFee(), 
         avaxAssetID,
         memo, asOf, locktime, threshold

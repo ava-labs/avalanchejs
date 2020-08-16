@@ -8,7 +8,7 @@ import BinTools from 'src/utils/bintools';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
-import { ImportTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
+import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMConstants } from 'src/apis/avm/constants';
 import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput } from 'src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from 'src/apis/avm/ops';
@@ -19,6 +19,8 @@ import { Defaults } from 'src/common/constants';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { OutputOwners } from 'src/common/output';
 import { MinterSet } from 'src/apis/avm/minterset';
+import { ImportTx } from 'src/apis/avm/importtx';
+import { platformChainID } from '../../../src/common/constants';
 
 /**
  * @ignore
@@ -870,7 +872,7 @@ describe('AVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
       const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
       const result:Promise<UnsignedTx> = avm.buildImportTx(
-        set, addrs1, new UTF8Payload("hello world"), UnixNow()
+        set, addrs1, platformChainID, new UTF8Payload("hello world"), UnixNow()
       );
       const payload:object = {
         result: {
@@ -889,7 +891,7 @@ describe('AVMAPI', () => {
 
       const txu2:UnsignedTx = set.buildImportTx(
         networkid, bintools.cb58Decode(blockchainid), 
-        addrbuff1, importIns, avm.getFee(), assetID, 
+        addrbuff1, importIns, undefined, avm.getFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
@@ -910,6 +912,7 @@ describe('AVMAPI', () => {
         addrs3, 
         addrs1, 
         addrs2,
+        platformChainID, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -920,6 +923,7 @@ describe('AVMAPI', () => {
         addrbuff3, 
         addrbuff1, 
         addrbuff2, 
+        bintools.cb58Decode(platformChainID), 
         avm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -929,13 +933,13 @@ describe('AVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
       const txu3:UnsignedTx = await avm.buildExportTx(
-        set, amount, addrs3, addrs1, addrs2,
+        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(platformChainID),
         new UTF8Payload("hello world"), UnixNow()
       );
 
       const txu4:UnsignedTx = set.buildExportTx(
         networkid, bintools.cb58Decode(blockchainid), amount,
-        assetID, addrbuff3, addrbuff1, addrbuff2, avm.getFee(), assetID, 
+        assetID, addrbuff3, addrbuff1, addrbuff2, undefined, avm.getFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
