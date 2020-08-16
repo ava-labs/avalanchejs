@@ -3,13 +3,12 @@
  * @module Common-Transactions
  */
 import { Buffer } from 'buffer/';
-import createHash from 'create-hash';
 import BinTools from '../utils/bintools';
 import { Credential } from './credentials';
 import BN from 'bn.js';
 import { KeyChain, KeyPair } from '../keychains/keychain';
-import { BaseAmountInput, StandardTransferableInput } from './input';
-import { BaseAmountOutput, StandardTransferableOutput } from './output';
+import { StandardAmountInput, StandardTransferableInput } from './input';
+import { StandardAmountOutput, StandardTransferableOutput } from './output';
 
 /**
  * @ignore
@@ -174,9 +173,9 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     for(let i:number = 0; i < ins.length; i++){
        
 
-      // only check BaseAmountInputs
-      if(ins[i].getInput() instanceof BaseAmountInput && aIDHex === ins[i].getAssetID().toString('hex')) {
-        const input = ins[i].getInput() as BaseAmountInput;
+      // only check StandardAmountInputs
+      if(ins[i].getInput() instanceof StandardAmountInput && aIDHex === ins[i].getAssetID().toString('hex')) {
+        const input = ins[i].getInput() as StandardAmountInput;
         total = total.add(input.getAmount());
       }
     }
@@ -193,9 +192,9 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
 
     for(let i:number = 0; i < outs.length; i++){
 
-      // only check BaseAmountOutputs
-      if(outs[i].getOutput() instanceof BaseAmountOutput && aIDHex === outs[i].getAssetID().toString('hex')) {
-        const output:BaseAmountOutput = outs[i].getOutput() as BaseAmountOutput;
+      // only check StandardAmountOutput
+      if(outs[i].getOutput() instanceof StandardAmountOutput && aIDHex === outs[i].getAssetID().toString('hex')) {
+        const output:StandardAmountOutput = outs[i].getOutput() as StandardAmountOutput;
         total = total.add(output.getAmount());
       }
     }
@@ -214,7 +213,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
      */
   getTransaction = ():SBTx => this.transaction;
 
-  fromBuffer:(bytes:Buffer, offset?:number) => number;
+  abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
   toBuffer():Buffer {
     const codecid:Buffer = this.getCodecIDBuffer();

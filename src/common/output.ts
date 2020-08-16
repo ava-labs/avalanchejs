@@ -319,7 +319,7 @@ export abstract class StandardTransferableOutput {
   /**
  * An [[Output]] class which specifies a token amount .
  */
-export abstract class BaseAmountOutput extends Output {
+export abstract class StandardAmountOutput extends Output {
     protected amount:Buffer = Buffer.alloc(8);
   
     protected amountValue:BN = new BN(0);
@@ -330,7 +330,7 @@ export abstract class BaseAmountOutput extends Output {
     getAmount = ():BN => this.amountValue.clone();
   
     /**
-       * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[BaseAmountOutput]] and returns the size of the output.
+       * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StandardAmountOutput]] and returns the size of the output.
        */
     fromBuffer(outbuff:Buffer, offset:number = 0):number {
       this.amount = bintools.copyFrom(outbuff, offset, offset + 8);
@@ -340,7 +340,7 @@ export abstract class BaseAmountOutput extends Output {
     }
   
     /**
-       * Returns the buffer representing the [[AmountInput]] instance.
+       * Returns the buffer representing the [[StandardAmountOutput]] instance.
        */
     toBuffer():Buffer {
       const superbuff:Buffer = super.toBuffer();

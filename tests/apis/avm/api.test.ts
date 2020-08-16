@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios';
-import { Avalanche, MinterSet } from "src";
+import { Avalanche } from "src";
 import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
@@ -9,12 +9,16 @@ import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { ImportTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
-import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/constants';
-import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput, OutputOwners } from 'src/apis/avm/outputs';
+import { AVMConstants } from 'src/apis/avm/constants';
+import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput } from 'src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from 'src/apis/avm/ops';
-import { Defaults } from 'src/utils/types';
 import * as bech32 from 'bech32';
 import { UTF8Payload } from 'src/common/payload';
+import { InitialStates } from 'src/apis/avm/initialstates';
+import { Defaults } from 'src/common/constants';
+import { UnixNow } from 'src/utils/helperfunctions';
+import { OutputOwners } from 'src/common/output';
+import { MinterSet } from 'src/apis/avm/minterset';
 
 /**
  * @ignore

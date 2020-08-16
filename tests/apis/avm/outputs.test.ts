@@ -1,7 +1,8 @@
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
-import { Output, SecpOutput, SelectOutputClass, NFTMintOutput } from 'src/apis/avm/outputs';
+import { SecpOutput, SelectOutputClass, NFTMintOutput } from 'src/apis/avm/outputs';
+import { Output } from 'src/common/output';
 
 const bintools = BinTools.getInstance();
 

@@ -534,19 +534,29 @@ export class ExportTx extends BaseTx {
 }
 
 export class UnsignedTx extends StandardUnsignedTx<AVMKeyPair, AVMKeyChain, BaseTx> {
-    /**
-     * Signs this [[UnsignedTx]] and returns signed [[StandardTx]]
-     *
-     * @param kc An [[KeyChain]] used in signing
-     *
-     * @returns A signed [[StandardTx]]
-     */
-    sign(kc:AVMKeyChain):StandardTx<AVMKeyPair, AVMKeyChain, UnsignedTx> {
-      const txbuff = this.toBuffer();
-      const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
-      const sigs:Array<Credential> = this.transaction.sign(msg, kc);
-      return new Tx(this, sigs);
-    }
+
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
+    const txtype:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    offset += 4;
+    this.transaction = SelectTxClass(txtype);
+    return this.transaction.fromBuffer(bytes, offset);
+  }
+  
+  /**
+   * Signs this [[UnsignedTx]] and returns signed [[StandardTx]]
+   *
+   * @param kc An [[KeyChain]] used in signing
+   *
+   * @returns A signed [[StandardTx]]
+   */
+  sign(kc:AVMKeyChain):StandardTx<AVMKeyPair, AVMKeyChain, UnsignedTx> {
+    const txbuff = this.toBuffer();
+    const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
+    const sigs:Array<Credential> = this.transaction.sign(msg, kc);
+    return new Tx(this, sigs);
+  }
 }
 
 export class Tx extends StandardTx<AVMKeyPair, AVMKeyChain, UnsignedTx> {

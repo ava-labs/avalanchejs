@@ -196,7 +196,7 @@ export class SECP256k1KeyPair extends KeyPair {
  * 
  * @typeparam SECP256k1KeyPair Class extending [[KeyPair]] which is used as the key in [[SECP256k1KeyChain]]
  */
-export class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> extends KeyChain<SECPKPClass> {
+export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> extends KeyChain<SECPKPClass> {
 
     /**
      * Makes a new key pair, returns the address.
@@ -204,8 +204,10 @@ export class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> extends Key
      * @returns Address of the new key pair
      */
     makeKey:() => Buffer; 
-    
-    addKey:(newKey:SECPKPClass) => void;
+
+    addKey(newKey:SECPKPClass) {
+        super.addKey(newKey);
+    }
 
     /**
      * Given a private key, makes a new key pair, returns the address.

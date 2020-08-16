@@ -1,5 +1,5 @@
 import { Buffer } from "buffer/";
-import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, cb58EncodedPayload, TXIDPayload, JSONPayload } from '../../src/common/payload';
+import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, TXIDPayload, JSONPayload } from 'src/common/payload';
 import BinTools from 'src/utils/bintools';
 import BN from "bn.js";
 import * as bech32 from 'bech32';

@@ -3,7 +3,6 @@ import { Avalanche } from 'src/index'
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
-import BN from 'bn.js';
 
 const bintools = BinTools.getInstance();
 const alias = 'X';

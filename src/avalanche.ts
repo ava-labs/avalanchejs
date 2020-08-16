@@ -3,7 +3,8 @@
  * @module AvalancheCore
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
-import { APIBase, RequestResponseData, getPreferredHRP } from './utils/types';
+import { APIBase, RequestResponseData } from './common/apibase';
+import { getPreferredHRP } from './utils/helperfunctions';
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.

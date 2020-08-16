@@ -42,7 +42,7 @@ export class TransferableOutput extends StandardTransferableOutput{
       }
 }
 
-export abstract class AmountOutput extends BaseAmountOutput {
+export abstract class AmountOutput extends StandardAmountOutput {
     /**
      * 
      * @param assetID An assetID which is wrapped around the Buffer of the Output

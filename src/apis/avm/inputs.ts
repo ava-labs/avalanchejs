@@ -3,10 +3,10 @@
  * @module AVMAPI-Inputs
  */
 import { Buffer } from 'buffer/';
-import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
+
 
 /**
  * @ignore
@@ -49,7 +49,10 @@ export class TransferableInput extends StandardTransferableInput {
     this.input = SelectInputClass(inputid);
     return this.input.fromBuffer(bytes, offset);
   }
+  
 }
+
+export abstract class AmountInput extends StandardAmountInput {}
 
 export class SecpInput extends StandardAmountInput {
   /**
@@ -58,4 +61,6 @@ export class SecpInput extends StandardAmountInput {
   getInputID():number {
     return AVMConstants.SECPINPUTID;
   }
+
+  getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
 }

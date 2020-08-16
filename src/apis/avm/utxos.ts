@@ -26,7 +26,7 @@ const bintools = BinTools.getInstance();
  */
 export class UTXO extends StandardUTXO {
 
-  fromBuffer = (bytes:Buffer, offset:number = 0):number => {
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
     offset += 2;
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -40,6 +40,49 @@ export class UTXO extends StandardUTXO {
     this.output = SelectOutputClass(outputid);
     return this.output.fromBuffer(bytes, offset);
   }
+
+  /**
+   * Takes a base-58 string containing a [[UTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
+   *
+   * @param serialized A base-58 string containing a raw [[UTXO]]
+   *
+   * @returns The length of the raw [[UTXO]]
+   *
+   * @remarks
+   * unlike most fromStrings, it expects the string to be serialized in cb58 format
+   */
+  fromString(serialized:string):number {
+      /* istanbul ignore next */
+      return this.fromBuffer(bintools.cb58Decode(serialized));
+  }
+
+  /**
+   * Returns a base-58 representation of the [[UTXO]].
+   *
+   * @remarks
+   * unlike most toStrings, this returns in cb58 serialization format
+   */
+  toString():string {
+    /* istanbul ignore next */
+    return bintools.cb58Encode(this.toBuffer());
+  }
+
+  clone():this {
+    const utxo:UTXO = new UTXO();
+    utxo.fromBuffer(this.toBuffer());
+    return utxo as this;
+  }
+
+  create(
+    codecID:number = AVMConstants.LATESTCODEC, 
+    txid:Buffer = undefined,
+    outputidx:Buffer | number = undefined,
+    assetid:Buffer = undefined,
+    output:Output = undefined):this 
+  {
+    return new UTXO(codecID, txid, outputidx, assetid, output) as this;
+  }
+
 }
 
 /**
@@ -196,7 +239,32 @@ export class AssetAmountDestination {
 /**
  * Class representing a set of [[UTXO]]s.
  */
-export class UTXOSet extends StandardUTXOSet{
+export class UTXOSet extends StandardUTXOSet<UTXO>{
+
+  parseUTXO(utxo:UTXO | string):UTXO {
+    const utxovar:UTXO = new UTXO();
+    // force a copy
+    if (typeof utxo === 'string') {
+      utxovar.fromBuffer(bintools.cb58Decode(utxo));
+    } else if (utxo instanceof StandardUTXO) {
+      utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
+    } else {
+      /* istanbul ignore next */
+      throw new Error(`Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string: ${utxo}`);
+    }
+    return utxovar
+  }
+
+  create():this{
+    return new UTXOSet() as this;
+  }
+
+  clone():this {
+    const newset:UTXOSet = this.create();
+    const allUTXOs:Array<UTXO> = this.getAllUTXOs();
+    newset.addArray(allUTXOs)
+    return newset as this;
+  }
 
   protected getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
     const utxoArray:Array<UTXO> = this.getAllUTXOs();

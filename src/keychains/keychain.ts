@@ -153,7 +153,7 @@ export class KeyPair {
        *
        * @param newKey A key pair of the appropriate class to be added to the [[KeyChain]]
        */
-    addKey = (newKey:KPClass) => {
+    addKey(newKey:KPClass) {
       this.keys[newKey.getAddress().toString('hex')] = newKey;
     };
   

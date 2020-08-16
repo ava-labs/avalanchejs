@@ -21,11 +21,11 @@ export abstract class Input {
     abstract getInputID():number;
   
     /**
-       * Returns the array of [[SigIdx]] for this [[Input]]
-       */
+     * Returns the array of [[SigIdx]] for this [[Input]]
+     */
     getSigIdxs = ():Array<SigIdx> => this.sigIdxs;
   
-    getCredentialID:() => number;
+    abstract getCredentialID():number;
   
     /**
        * Creates and adds a [[SigIdx]] to the [[Input]].
@@ -141,6 +141,9 @@ export abstract class Input {
        */
     getAssetID = ():Buffer => this.assetid;
   
+    // must be implemented to select output types for the VM in question
+    abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+
     /**
        * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTransferableInput]].
        */

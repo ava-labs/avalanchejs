@@ -5,7 +5,6 @@
 
 import { AxiosRequestConfig } from 'axios';
 import BinTools from '../utils/bintools';
-
 import AvalancheCore from '../avalanche';
 import { APIBase, RequestResponseData } from './apibase';
 

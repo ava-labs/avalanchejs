@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import BN from "bn.js";
-import { Output, BaseAmountOutput } from './output';
+import { Output, StandardAmountOutput } from './output';
 import { UnixNow } from '../utils/helperfunctions';
 
 /**
@@ -29,7 +29,7 @@ export type MergeRule = 'intersection' // Self INTERSECT New
 /**
  * Class for representing a single StandardUTXO.
  */
-export class StandardUTXO {
+export abstract class StandardUTXO {
   protected codecid:Buffer = Buffer.alloc(2);
 
   protected txid:Buffer = Buffer.alloc(32);
@@ -79,16 +79,16 @@ export class StandardUTXO {
   :string => bintools.bufferToB58(Buffer.concat([this.getTxID(), this.getOutputIdx()]));
 
   /**
-     * Returns a reference to the output;
-    */
+   * Returns a reference to the output;
+  */
   getOutput = ():Output => this.output;
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[StandardUTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
-     *
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[StandardUTXO]]
-     */
-  fromBuffer:(bytes:Buffer, offset?:number) => number;
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[StandardUTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[StandardUTXO]]
+   */
+  abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardUTXO]].
@@ -104,31 +104,16 @@ export class StandardUTXO {
       + outputidbuffer.length + outbuff.length);
   }
 
-  /**
-     * Takes a base-58 string containing an [[StandardUTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
-     *
-     * @param serialized A base-58 string containing a raw [[StandardUTXO]]
-     *
-     * @returns The length of the raw [[StandardUTXO]]
-     *
-     * @remarks
-     * unlike most fromStrings, it expects the string to be serialized in cb58 format
-     */
-  fromString(serialized:string) {
-    /* istanbul ignore next */
-    return this.fromBuffer(bintools.cb58Decode(serialized));
-  }
+  abstract fromString(serialized:string):number;
 
-  /**
-     * Returns a base-58 representation of the [[StandardUTXO]].
-     *
-     * @remarks
-     * unlike most toStrings, this returns in cb58 serialization format
-     */
-  toString():string {
-    /* istanbul ignore next */
-    return bintools.cb58Encode(this.toBuffer());
-  }
+  abstract toString():string;
+
+  abstract clone():this;
+
+  abstract create(codecID?:number, txid?:Buffer,
+    outputidx?:Buffer | number,
+    assetid?:Buffer,
+    output?:Output):this;
 
   /**
      * Class for representing a single StandardUTXO.
@@ -142,50 +127,45 @@ export class StandardUTXO {
   constructor(codecID:number = 0, txid:Buffer = undefined,
     outputidx:Buffer | number = undefined,
     assetid:Buffer = undefined,
-    output:Output = undefined) {
-    if (typeof codecID !== 'undefined' && typeof txid !== 'undefined'
-    && typeof outputidx !== 'undefined'
-    && typeof assetid !== 'undefined'
-    && typeof output !== 'undefined') {
+    output:Output = undefined){
+    if (typeof codecID !== 'undefined') {
       this.codecid .writeUInt8(codecID, 0);
+    }
+    if(typeof txid !== 'undefined') {
       this.txid = txid;
-      if (typeof outputidx === 'number') {
-        this.outputidx.writeUInt32BE(outputidx, 0);
-      } else if (outputidx instanceof Buffer) {
-        this.outputidx = outputidx;
-      } else {
-        /* istanbul ignore next */
-        throw new Error('Error - StandardUTXO.constructor: outputidx parameter is not a '
-        + `number or a Buffer: ${outputidx}`);
-      }
+    }
+    if (typeof outputidx === 'number') {
+      this.outputidx.writeUInt32BE(outputidx, 0);
+    } else if (outputidx instanceof Buffer) {
+      this.outputidx = outputidx;
+    } 
 
+    if(typeof assetid !== 'undefined') {
       this.assetid = assetid;
+    }
+    if(typeof output !== 'undefined') {
       this.output = output;
     }
+      
   }
 }
-
 /**
  * Class representing a set of [[StandardUTXO]]s.
  */
-export class StandardUTXOSet {
-  protected utxos:{[utxoid: string]: StandardUTXO } = {};
+export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
+  protected utxos:{[utxoid: string]: UTXOClass } = {};
 
   protected addressUTXOs:{[address: string]: {[utxoid: string]: BN}} = {}; // maps address to utxoids:locktime
 
+  abstract parseUTXO(utxo:UTXOClass | string):UTXOClass;
+
   /**
-     * Returns true if the [[StandardUTXO]] is in the StandardUTXOSet.
-     *
-     * @param utxo Either a [[StandardUTXO]] a cb58 serialized string representing a StandardUTXO
-     */
-  includes = (utxo:StandardUTXO | string):boolean => {
-    const utxoX:StandardUTXO = new StandardUTXO();
-    // force a copy
-    if (typeof utxo === 'string') {
-      utxoX.fromBuffer(bintools.cb58Decode(utxo));
-    } else {
-      utxoX.fromBuffer(utxo.toBuffer()); // forces a copy
-    }
+   * Returns true if the [[StandardUTXO]] is in the StandardUTXOSet.
+   *
+   * @param utxo Either a [[StandardUTXO]] a cb58 serialized string representing a StandardUTXO
+   */
+  includes = (utxo:UTXOClass | string):boolean => {
+    const utxoX:UTXOClass = this.parseUTXO(utxo);
     const utxoid:string = utxoX.getUTXOID();
     return (utxoid in this.utxos);
   };
@@ -198,21 +178,12 @@ export class StandardUTXOSet {
      *
      * @returns A [[StandardUTXO]] if one was added and undefined if nothing was added.
      */
-  add = (utxo:StandardUTXO | string, overwrite:boolean = false):StandardUTXO => {
-    const utxovar:StandardUTXO = new StandardUTXO();
-    // force a copy
-    if (typeof utxo === 'string') {
-      utxovar.fromBuffer(bintools.cb58Decode(utxo));
-    } else if (utxo instanceof StandardUTXO) {
-      utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
-    } else {
-      /* istanbul ignore next */
-      throw new Error(`Error - StandardUTXOSet.add: utxo parameter is not a UTXO or string: ${utxo}`);
-    }
+  add(utxo:UTXOClass | string, overwrite:boolean = false):UTXOClass {
+    const utxovar:UTXOClass = this.parseUTXO(utxo);
+
     const utxoid:string = utxovar.getUTXOID();
     if (!(utxoid in this.utxos) || overwrite === true) {
       this.utxos[utxoid] = utxovar;
-
       const addresses:Array<Buffer> = utxovar.getOutput().getAddresses();
       const locktime:BN = utxovar.getOutput().getLocktime();
       for (let i = 0; i < addresses.length; i++) {
@@ -235,10 +206,10 @@ export class StandardUTXOSet {
      *
      * @returns An array of StandardUTXOs which were added.
      */
-  addArray = (utxos:Array<string | StandardUTXO>, overwrite:boolean = false):Array<StandardUTXO> => {
-    const added:Array<StandardUTXO> = [];
+  addArray(utxos:Array<string | UTXOClass>, overwrite:boolean = false):Array<StandardUTXO> {
+    const added:Array<UTXOClass> = [];
     for (let i = 0; i < utxos.length; i++) {
-      const result:StandardUTXO = this.add(utxos[i], overwrite);
+      const result:UTXOClass = this.add(utxos[i], overwrite);
       if (typeof result !== 'undefined') {
         added.push(result);
       }
@@ -253,14 +224,9 @@ export class StandardUTXOSet {
      *
      * @returns A [[StandardUTXO]] if it was removed and undefined if nothing was removed.
      */
-  remove = (utxo:StandardUTXO | string):StandardUTXO => {
-    const utxovar:StandardUTXO = new StandardUTXO();
-    // force a copy
-    if (typeof utxo === 'string') {
-      utxovar.fromBuffer(bintools.cb58Decode(utxo));
-    } else {
-      utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
-    }
+  remove = (utxo:UTXOClass | string):UTXOClass => {
+    const utxovar:UTXOClass = this.parseUTXO(utxo);
+
     const utxoid:string = utxovar.getUTXOID();
     if (!(utxoid in this.utxos)) {
       return undefined;
@@ -283,10 +249,10 @@ export class StandardUTXOSet {
      *
      * @returns An array of UTXOs which were removed.
      */
-  removeArray = (utxos:Array<string | StandardUTXO>):Array<StandardUTXO> => {
-    const removed:Array<StandardUTXO> = [];
+  removeArray = (utxos:Array<string | UTXOClass>):Array<UTXOClass> => {
+    const removed:Array<UTXOClass> = [];
     for (let i = 0; i < utxos.length; i++) {
-      const result:StandardUTXO = this.remove(utxos[i]);
+      const result:UTXOClass = this.remove(utxos[i]);
       if (typeof result !== 'undefined') {
         removed.push(result);
       }
@@ -301,7 +267,7 @@ export class StandardUTXOSet {
      *
      * @returns A [[StandardUTXO]] if it exists in the set.
      */
-  getUTXO = (utxoid:string):StandardUTXO => this.utxos[utxoid];
+  getUTXO = (utxoid:string):UTXOClass => this.utxos[utxoid];
 
   /**
      * Gets all the [[StandardUTXO]]s, optionally that match with UTXOIDs in an array
@@ -310,8 +276,8 @@ export class StandardUTXOSet {
      *
      * @returns An array of [[StandardUTXO]]s.
      */
-  getAllUTXOs = (utxoids:Array<string> = undefined):Array<StandardUTXO> => {
-    let results:Array<StandardUTXO> = [];
+  getAllUTXOs = (utxoids:Array<string> = undefined):Array<UTXOClass> => {
+    let results:Array<UTXOClass> = [];
     if (typeof utxoids !== 'undefined' && Array.isArray(utxoids)) {
       for (let i = 0; i < utxoids.length; i++) {
         if (utxoids[i] in this.utxos && !(utxoids[i] in results)) {
@@ -403,10 +369,10 @@ export class StandardUTXOSet {
       asset = assetID;
     }
     for (let i = 0; i < utxos.length; i++) {
-      if (utxos[i].getOutput() instanceof BaseAmountOutput
+      if (utxos[i].getOutput() instanceof StandardAmountOutput
       && utxos[i].getAssetID().toString('hex') === asset.toString('hex')
       && utxos[i].getOutput().meetsThreshold(addresses, asOf)) {
-        spend = spend.add((utxos[i].getOutput() as BaseAmountOutput).getAmount());
+        spend = spend.add((utxos[i].getOutput() as StandardAmountOutput).getAmount());
       }
     }
     return spend;
@@ -437,6 +403,10 @@ export class StandardUTXOSet {
     return [...results];
   };
 
+  abstract clone():this;
+
+  abstract create():this;
+
   /**
      * Returns a new set with copy of UTXOs in this and set parameter.
      *
@@ -445,16 +415,16 @@ export class StandardUTXOSet {
      *
      * @returns A new StandardUTXOSet that contains all the filtered elements.
      */
-  merge = (utxoset:StandardUTXOSet, hasUTXOIDs:Array<string> = undefined): StandardUTXOSet => {
-    const results:StandardUTXOSet = new StandardUTXOSet();
-    const utxos1:Array<StandardUTXO> = this.getAllUTXOs(hasUTXOIDs);
-    const utxos2:Array<StandardUTXO> = utxoset.getAllUTXOs(hasUTXOIDs);
-    const process = (utxo:StandardUTXO) => {
+  merge = (utxoset:this, hasUTXOIDs:Array<string> = undefined):this => {
+    const results:this = this.create();
+    const utxos1:Array<UTXOClass> = this.getAllUTXOs(hasUTXOIDs);
+    const utxos2:Array<UTXOClass> = utxoset.getAllUTXOs(hasUTXOIDs);
+    const process = (utxo:UTXOClass) => {
       results.add(utxo);
     };
     utxos1.forEach(process);
     utxos2.forEach(process);
-    return results;
+    return results as this;
   };
 
   /**
@@ -464,11 +434,11 @@ export class StandardUTXOSet {
      *
      * @returns A new StandardUTXOSet containing the intersection
      */
-  intersection = (utxoset:StandardUTXOSet):StandardUTXOSet => {
+  intersection = (utxoset:this):this => {
     const us1:Array<string> = this.getUTXOIDs();
     const us2:Array<string> = utxoset.getUTXOIDs();
     const results:Array<string> = us1.filter((utxoid) => us2.includes(utxoid));
-    return this.merge(utxoset, results);
+    return this.merge(utxoset, results) as this;
   };
 
   /**
@@ -478,11 +448,11 @@ export class StandardUTXOSet {
      *
      * @returns A new StandardUTXOSet containing the difference
      */
-  difference = (utxoset:StandardUTXOSet):StandardUTXOSet => {
+  difference = (utxoset:this):this => {
     const us1:Array<string> = this.getUTXOIDs();
     const us2:Array<string> = utxoset.getUTXOIDs();
     const results:Array<string> = us1.filter((utxoid) => !us2.includes(utxoid));
-    return this.merge(utxoset, results);
+    return this.merge(utxoset, results) as this;
   };
 
   /**
@@ -492,12 +462,12 @@ export class StandardUTXOSet {
      *
      * @returns A new StandardUTXOSet containing the symmetrical difference
      */
-  symDifference = (utxoset:StandardUTXOSet):StandardUTXOSet => {
+  symDifference = (utxoset:this):this => {
     const us1:Array<string> = this.getUTXOIDs();
     const us2:Array<string> = utxoset.getUTXOIDs();
     const results:Array<string> = us1.filter((utxoid) => !us2.includes(utxoid))
       .concat(us2.filter((utxoid) => !us1.includes(utxoid)));
-    return this.merge(utxoset, results);
+    return this.merge(utxoset, results) as this;
   };
 
   /**
@@ -507,7 +477,7 @@ export class StandardUTXOSet {
      *
      * @returns A new StandardUTXOSet containing the union
      */
-  union = (utxoset:StandardUTXOSet):StandardUTXOSet => this.merge(utxoset);
+  union = (utxoset:this):this => this.merge(utxoset) as this;
 
   /**
      * Merges a set by the rule provided.
@@ -527,25 +497,25 @@ export class StandardUTXOSet {
      *   * "unionMinusNew" - the unique set of all elements contained in both sets, excluding values only found in the new set
      *   * "unionMinusSelf" - the unique set of all elements contained in both sets, excluding values only found in the existing set
      */
-  mergeByRule = (utxoset:StandardUTXOSet, mergeRule:MergeRule):StandardUTXOSet => {
-    let uSet:StandardUTXOSet;
+  mergeByRule = (utxoset:this, mergeRule:MergeRule):this => {
+    let uSet:this;
     switch (mergeRule) {
       case 'intersection':
         return this.intersection(utxoset);
       case 'differenceSelf':
         return this.difference(utxoset);
       case 'differenceNew':
-        return utxoset.difference(this);
+        return utxoset.difference(this) as this;
       case 'symDifference':
         return this.symDifference(utxoset);
       case 'union':
         return this.union(utxoset);
       case 'unionMinusNew':
         uSet = this.union(utxoset);
-        return uSet.difference(utxoset);
+        return uSet.difference(utxoset) as this;
       case 'unionMinusSelf':
         uSet = this.union(utxoset);
-        return uSet.difference(this);
+        return uSet.difference(this) as this;
       default:
         throw new Error(`Error - StandardUTXOSet.mergeByRule: bad MergeRule - ${mergeRule}`);
     }

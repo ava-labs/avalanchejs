@@ -2,31 +2,16 @@
  * @packageDocumentation
  * @module Common-JRPCAPI
  */
-import { ClientRequest } from 'http';
+
 import { AxiosRequestConfig } from 'axios';
 import BinTools from '../utils/bintools';
 import AvalancheCore from '../avalanche';
-import { APIBase } from './apibase';
+import { APIBase, RequestResponseData } from './apibase';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
-
-/**
- * Response data for HTTP requests.
- */
-export class RequestResponseData {
-  data: any;
-
-  headers:any;
-
-  status: number;
-
-  statusText: string;
-
-  request:ClientRequest | XMLHttpRequest;
-}
 
 export class JRPCAPI extends APIBase {
   protected jrpcVersion:string = '2.0';

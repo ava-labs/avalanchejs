@@ -2,7 +2,7 @@ import mockAxios from 'jest-mock-axios';
 
 import { Avalanche } from 'src';
 import BinTools from 'src/utils/bintools';
-import HealthAPI from '../../../src/apis/health/api';
+import HealthAPI from 'src/apis/health/api';
 
 /**
  * @ignore

@@ -11,10 +11,12 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/outputs';
-import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/constants';
+import { AVMConstants } from 'src/apis/avm/constants';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 import { Avalanche } from 'src/index';
 import { UTF8Payload } from 'src/common/payload';
+import { InitialStates } from 'src/apis/avm/initialstates';
+import { UnixNow } from 'src/utils/helperfunctions';
 
 /**
  * @ignore
@@ -136,7 +138,7 @@ describe('Transactions', () => {
       const nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, addresses, locktime, threshold);
       const op:NFTTransferOperation = new NFTTransferOperation(nout);
       const nfttxid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC,nfttxid, 1000 + i, NFTassetID, nout);
+      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, 1000 + i, NFTassetID, nout);
       nftutxoids.push(nftutxo.getUTXOID());
       const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
       ops.push(xferop);

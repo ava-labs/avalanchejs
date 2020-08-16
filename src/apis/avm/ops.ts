@@ -381,6 +381,9 @@ export class NFTTransferOperation extends Operation {
   }
 }
 
+/**
+ * CKC - Make generic, use everywhere.
+ */
 
 /**
  * Class for representing a UTXOID used in [[TransferableOp]] types
