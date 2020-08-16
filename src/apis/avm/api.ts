@@ -746,7 +746,7 @@ class AVMAPI extends JRPCAPI {
     buildImportTx = async (
       utxoset:UTXOSet, 
       ownerAddresses:Array<string>, 
-      sourceChain:Buffer | string = platformChainID,
+      sourceChain:Buffer | string = undefined,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow(), 
     ):Promise<UnsignedTx> => {
@@ -761,9 +761,7 @@ class AVMAPI extends JRPCAPI {
         memo = memo.getPayload();
       }
 
-      if(typeof sourceChain === "undefined") {
-        sourceChain = bintools.cb58Decode(platformChainID);
-      } else if (typeof sourceChain === "string") {
+      if (typeof sourceChain === "string") {
         sourceChain = bintools.cb58Decode(platformChainID);
       } else if(!(sourceChain instanceof Buffer)) {
         throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
@@ -838,7 +836,7 @@ class AVMAPI extends JRPCAPI {
       toAddresses:Array<string>, 
       fromAddresses:Array<string>,
       changeAddresses:Array<string> = undefined,
-      destinationChain:Buffer | string = platformChainID,
+      destinationChain:Buffer | string = undefined,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow(),
       locktime:BN = new BN(0), 
@@ -854,9 +852,7 @@ class AVMAPI extends JRPCAPI {
 
       const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
-      if(typeof destinationChain === "undefined") {
-        destinationChain = bintools.cb58Decode(platformChainID);
-      } else if (typeof destinationChain === "string") {
+      if (typeof destinationChain === "string") {
         destinationChain = bintools.cb58Decode(platformChainID);
       } else if(!(destinationChain instanceof Buffer)) {
         throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );

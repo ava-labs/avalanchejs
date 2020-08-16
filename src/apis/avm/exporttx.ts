@@ -21,7 +21,7 @@ const bintools = BinTools.getInstance();
  * Class representing an unsigned Export transaction.
  */
 export class ExportTx extends BaseTx {
-    protected destinationChain:Buffer = Buffer.alloc(32);
+    protected destinationChain:Buffer = undefined;
     protected numOuts:Buffer = Buffer.alloc(4);
     protected exportOuts:Array<TransferableOutput> = [];
   
@@ -30,6 +30,20 @@ export class ExportTx extends BaseTx {
        */
     getTxType = ():number => {
       return AVMConstants.EXPORTTX;
+    }
+
+    /**
+     * Returns the exported outputs as an array of [[TransferableOutput]]
+     */
+    getExportOuts = ():Array<TransferableOutput> => {
+      return this.exportOuts;
+    }
+
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} for the destination chainid.
+     */
+    getDestinationChain = ():Buffer => {
+      return this.destinationChain;
     }
   
     /**
@@ -60,13 +74,16 @@ export class ExportTx extends BaseTx {
        * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
        */
     toBuffer():Buffer {
-        this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
-        let barr:Array<Buffer> = [super.toBuffer(), this.destinationChain, this.numOuts];
-        this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
-        for(let i = 0; i < this.exportOuts.length; i++) {
-            barr.push(this.exportOuts[i].toBuffer());
-        }
-        return Buffer.concat(barr);
+      if(typeof this.destinationChain === "undefined") {
+        throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
+      }
+      this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
+      let barr:Array<Buffer> = [super.toBuffer(), this.destinationChain, this.numOuts];
+      this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
+      for(let i = 0; i < this.exportOuts.length; i++) {
+          barr.push(this.exportOuts[i].toBuffer());
+      }
+      return Buffer.concat(barr);
     }
     /**
        * Returns an array of [[TransferableOutput]]s in this transaction.
@@ -91,9 +108,7 @@ export class ExportTx extends BaseTx {
       memo:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
-      if(typeof destinationChain === "undefined"){
-        this.destinationChain = bintools.cb58Decode(platformChainID);
-      }
+      this.destinationChain = destinationChain; //no correction, if they don't pass a chainid here, it will BOMB on toBuffer
       if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
         for (let i = 0; i < exportOuts.length; i++) {
           if (!(exportOuts[i] instanceof TransferableOutput)) {

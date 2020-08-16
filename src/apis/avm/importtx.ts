@@ -34,6 +34,20 @@ export class ImportTx extends BaseTx {
     getTxType = ():number => {
       return AVMConstants.IMPORTTX;
     }
+
+    /**
+     * Returns the exported outputs as an array of [[TransferableInput]]
+     */
+    getExportOuts = ():Array<TransferableInput> => {
+      return this.importIns;
+    }
+
+    /**
+     * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
+     */
+    getSourceChain = ():Buffer => {
+      return this.sourceChain;
+    }
   
     /**
        * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, populates the class, and returns the length of the [[ImportTx]] in bytes.
@@ -44,8 +58,10 @@ export class ImportTx extends BaseTx {
        *
        * @remarks assume not-checksummed
        */
-    fromBuffer(bytes:Buffer, offset:number = 0, codecid:number = AVMConstants.LATESTCODEC):number {
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
       offset = super.fromBuffer(bytes, offset);
+      this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32);
+      offset += 32;
       this.numIns = bintools.copyFrom(bytes, offset, offset + 4);
       offset += 4;
       const numIns:number = this.numIns.readUInt32BE(0);
@@ -61,13 +77,16 @@ export class ImportTx extends BaseTx {
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
      */
     toBuffer():Buffer {
-        this.numIns.writeUInt32BE(this.importIns.length, 0);
-        let barr:Array<Buffer> = [super.toBuffer(), this.numIns];
-        this.importIns = this.importIns.sort(TransferableInput.comparator());
-        for(let i = 0; i < this.importIns.length; i++) {
-            barr.push(this.importIns[i].toBuffer());
-        }
-        return Buffer.concat(barr);
+      if(typeof this.sourceChain === "undefined") {
+        throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
+      }
+      this.numIns.writeUInt32BE(this.importIns.length, 0);
+      let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
+      this.importIns = this.importIns.sort(TransferableInput.comparator());
+      for(let i = 0; i < this.importIns.length; i++) {
+          barr.push(this.importIns[i].toBuffer());
+      }
+      return Buffer.concat(barr);
     }
     /**
        * Returns an array of [[TransferableInput]]s in this transaction.
@@ -118,9 +137,7 @@ export class ImportTx extends BaseTx {
       memo:Buffer = undefined, importIns:Array<TransferableInput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
-      if(typeof sourceChain === "undefined"){
-        this.sourceChain = bintools.cb58Decode(platformChainID);
-      }
+      this.sourceChain = sourceChain; // do no correct, if it's wrong it'll bomb on toBuffer
       if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
         for (let i = 0; i < importIns.length; i++) {
           if (!(importIns[i] instanceof TransferableInput)) {
