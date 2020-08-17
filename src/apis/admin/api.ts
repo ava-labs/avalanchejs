@@ -16,7 +16,7 @@ import { RequestResponseData } from '../../common/apibase';
  * Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
 
-export default class AdminAPI extends JRPCAPI {
+export class AdminAPI extends JRPCAPI {
 
   /**
      * Assign an API an alias, a different endpoint for the API. The original endpoint will still

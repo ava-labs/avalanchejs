@@ -13,7 +13,7 @@ import { RequestResponseData } from '../../common/apibase';
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-export default class InfoAPI extends JRPCAPI {
+export class InfoAPI extends JRPCAPI {
   /**
      * Fetches the blockchainID from the node for a given alias.
      *

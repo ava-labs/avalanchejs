@@ -15,7 +15,7 @@ import { RequestResponseData } from '../../common/apibase';
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-export default class KeystoreAPI extends JRPCAPI {
+export class KeystoreAPI extends JRPCAPI {
   /**
      * Creates a user in the node's database.
      *

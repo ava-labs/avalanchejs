@@ -14,7 +14,7 @@ import { RequestResponseData } from '../../common/apibase';
  *
  * @remarks This extends the [[RESTAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-export default class MetricsAPI extends RESTAPI {
+export class MetricsAPI extends RESTAPI {
   /**
      *
      * @returns Promise for an object containing the metrics response

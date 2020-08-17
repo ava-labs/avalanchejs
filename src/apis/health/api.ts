@@ -14,7 +14,7 @@ import { RequestResponseData } from '../../common/apibase';
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-class HealthAPI extends JRPCAPI {
+export class HealthAPI extends JRPCAPI {
   /**
      *
      * @returns Promise for an object containing the health check response
@@ -31,4 +31,3 @@ class HealthAPI extends JRPCAPI {
   constructor(core:AvalancheCore, baseurl:string = '/ext/health') { super(core, baseurl); }
 }
 
-export default HealthAPI;
