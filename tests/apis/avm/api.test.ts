@@ -153,22 +153,29 @@ describe('AVMAPI', () => {
 
   test('getBalance', async () => {
     const balance = new BN('100', 10);
+    const respobj = {
+      balance,
+      utxoIDs: [
+        {
+          "txID":"LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
+        "outputIndex":0
+        }
+      ]
+    };
 
-    const result:Promise<BN> = api.getBalance(addrA, 'ATH');
+    const result:Promise<object> = api.getBalance(addrA, 'ATH');
     const payload:object = {
-      result: {
-        balance,
-      },
+      result: respobj,
     };
     const responseObj = {
       data: payload,
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:BN = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(balance);
+    expect(JSON.stringify(response)).toBe(JSON.stringify(respobj));
   });
 
   test('exportKey', async () => {

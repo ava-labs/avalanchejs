@@ -1,14 +1,14 @@
-import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
+import { UTXOSet, UTXO } from 'src/apis/platformvm/utxos';
+import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
+import { SecpInput, TransferableInput } from 'src/apis/platformvm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import {
   SecpOutput, AmountOutput, TransferableOutput,
-} from 'src/apis/avm/outputs';
-import { AVMConstants } from 'src/apis/avm/constants';
+} from 'src/apis/platformvm/outputs';
+import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { Input } from 'src/common/input';
 import { Output } from 'src/common/output';
 
@@ -18,8 +18,8 @@ import { Output } from 'src/common/output';
 const bintools = BinTools.getInstance();
 describe('Inputs', () => {
   let set:UTXOSet;
-  let keymgr1:AVMKeyChain;
-  let keymgr2:AVMKeyChain;
+  let keymgr1:PlatformVMKeyChain;
+  let keymgr2:PlatformVMKeyChain;
   let addrs1:Array<Buffer>;
   let addrs2:Array<Buffer>;
   let utxos:Array<UTXO>;
@@ -27,8 +27,8 @@ describe('Inputs', () => {
   const amnt:number = 10000;
   beforeEach(() => {
     set = new UTXOSet();
-    keymgr1 = new AVMKeyChain(hrp, 'X');
-    keymgr2 = new AVMKeyChain(hrp, 'X');
+    keymgr1 = new PlatformVMKeyChain(hrp, 'X');
+    keymgr2 = new PlatformVMKeyChain(hrp, 'X');
     addrs1 = [];
     addrs2 = [];
     utxos = [];
@@ -47,7 +47,7 @@ describe('Inputs', () => {
       const assetID:Buffer = Buffer.from(createHash('sha256').update(txid).digest());
       const out:Output = new SecpOutput(amount.add(new BN(i)), addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
-      const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
+      const u:UTXO = new UTXO(PlatformVMConstants.LATESTCODEC, txid, txidx, assetID, out);
       u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
       utxos.push(u);
     }
@@ -69,7 +69,7 @@ describe('Inputs', () => {
     input = new SecpInput(amount);
     xferinput = new TransferableInput(txid, txidx, asset, input);
     expect(xferinput.getUTXOID()).toBe(u.getUTXOID());
-    expect(input.getInputID()).toBe(AVMConstants.SECPINPUTID);
+    expect(input.getInputID()).toBe(PlatformVMConstants.SECPINPUTID);
 
     input.addSignatureIdx(0, addrs2[0]);
     input.addSignatureIdx(1, addrs2[1]);

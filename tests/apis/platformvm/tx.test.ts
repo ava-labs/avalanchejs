@@ -42,7 +42,7 @@ describe('Transactions', () => {
   const amnt:number = 10000;
   const netid:number = 12345;
   const memo:Buffer = bintools.stringToBuffer("Avalanche.js");
-  const blockchainID:Buffer = Buffer.from(createHash('sha256').update('Foot on the pedal, never ever false metal, engine running hotter than a boiling kettle.').digest());
+  const blockchainID:Buffer = bintools.cb58Decode(PlatformChainID);
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
   const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
@@ -58,13 +58,14 @@ describe('Transactions', () => {
   const port = 8080;
   const protocol = 'http';
   let avalanche:Avalanche;
-  const blockchainid:string = '6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF';
+  const blockchainid:string = PlatformChainID;
   const name:string = 'Mortycoin is the dumb as a sack of hammers.';
   const symbol:string = 'morT';
   const denomination:number = 8;
   let avaxAssetID:Buffer;
 
   beforeAll(async () => {
+    
     avalanche = new Avalanche(ip, port, protocol, 12345, undefined, null, true);
     api = new PlatformVMAPI(avalanche, '/ext/bc/P');
 
@@ -145,7 +146,7 @@ describe('Transactions', () => {
   test('Create small BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
@@ -167,8 +168,7 @@ describe('Transactions', () => {
   test('confirm inputTotal, outputTotal and fee are correct', async () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    // local network P Chain ID
     // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outs:TransferableOutput[] = [];
@@ -199,7 +199,6 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("267");
@@ -221,8 +220,7 @@ describe('Transactions', () => {
   test('Create large BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    // local network P Chain ID
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("609555500000");
@@ -244,8 +242,7 @@ describe('Transactions', () => {
   test("Create large BaseTx that isn't Goose Egg Tx", async () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    // local network P Chain ID
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("44995609555500000");

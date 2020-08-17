@@ -11,7 +11,7 @@ import BinTools from '../../utils/bintools';
 import { PlatformVMKeyChain } from './keychain';
 import { Defaults, PlatformChainID } from '../../common/constants';
 import { PlatformVMConstants } from './constants';
-import { UnsignedTx } from './tx';
+import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../common/payload';
 import { UnixNow } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
@@ -245,61 +245,58 @@ class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-   * The P-Chain uses an account model. This method creates a P-Chain account on an existing user in the Keystore.
+   * Create an address in the node's keystore.
    *
    * @param username The username of the Keystore user that controls the new account
    * @param password The password of the Keystore user that controls the new account
-   * @param privateKey The private key that controls the account. If omitted, a new private key is generated
    *
    * @returns Promise for a string of the newly created account address.
    */
-  createAccount = async (username: string,
-    password:string,
-    privateKey:Buffer | string = undefined)
+  createAddress = async (username: string,
+    password:string
+  )
   :Promise<string> => {
     const params:any = {
       username,
       password,
     };
-    if (typeof privateKey === 'string') {
-      params.privateKey = privateKey;
-    } else if (typeof privateKey !== 'undefined') {
-      params.privateKey = bintools.cb58Encode(privateKey);
-    }
-    return this.callMethod('platform.createAccount', params)
+    return this.callMethod('platform.createAddress', params)
       .then((response:RequestResponseData) => response.data.result.address);
   };
 
   /**
-   * The P-Chain uses an account model. An account is identified by an address. This method returns the account with the given address.
+   * Gets the balance of a particular asset.
    *
-   * @param address The address of the account
+   * @param address The address to pull the asset balance from
    *
-   * @returns Promise for an object containing the address, the nonce, and the balance.
+   * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
-  getAccount = async (address: string):Promise<object> => {
+  getBalance = async (address:string):Promise<object> => {
+    if (typeof this.parseAddress(address) === 'undefined') {
+      /* istanbul ignore next */
+      throw new Error(`Error - PlatformVMAPI.getBalance: Invalid address format ${address}`);
+    }
     const params:any = {
-      address,
+      address
     };
-    return this.callMethod('platform.getAccount', params)
-      .then((response:RequestResponseData) => response.data.result);
+    return  this.callMethod('platform.getBalance', params).then((response:RequestResponseData) => response.data.result);
   };
-
+  
   /**
-   * List the accounts controlled by the user in the Keystore.
+   * List the addresses controlled by the user.
    *
    * @param username The username of the Keystore user
    * @param password The password of the Keystore user
    *
-   * @returns Promise for an array of accounts.
+   * @returns Promise for an array of addresses.
    */
-  listAccounts = async (username: string, password:string):Promise<Array<object>> => {
+  listAddresses = async (username: string, password:string):Promise<Array<string>> => {
     const params:any = {
       username,
       password,
     };
-    return this.callMethod('platform.listAccounts', params)
-      .then((response:RequestResponseData) => response.data.result.accounts);
+    return this.callMethod('platform.listAddresses', params)
+      .then((response:RequestResponseData) => response.data.result.addresses);
   };
 
   /**
@@ -559,22 +556,23 @@ class PlatformVMAPI extends JRPCAPI {
    * transaction fee. After issuing this transaction, you must call the X-Chain’s importAVAX
    * method to complete the transfer.
    *
+   * @param username The Keystore user that controls the account specified in `to`
+   * @param password The password of the Keystore user
    * @param to The address on the X-Chain to send the AVAX to. Do not include X- in the address
    * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param payerNonce The next unused nonce of the account paying the tx fee and providing
-   * the sent AVAX
    *
    * @returns Promise for an unsigned transaction to be signed by the account the the AVAX is
    * sent from and pays the transaction fee.
    */
-  exportAVAX = async (amount:BN, to:string, payerNonce:number):Promise<string> => {
+  exportAVAX = async (username: string, password:string, amount:BN, to:string):Promise<string> => {
     const params:any = {
+      username,
+      password,
       to,
-      amount: amount.toString(10),
-      payerNonce,
+      amount: amount.toString(10)
     };
     return this.callMethod('platform.exportAVAX', params)
-      .then((response:RequestResponseData) => response.data.result.unsignedTx);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -587,21 +585,19 @@ class PlatformVMAPI extends JRPCAPI {
    * @param password The password of the Keystore user
    * @param to The ID of the account the AVAX is sent to. This must be the same as the to
    * argument in the corresponding call to the X-Chain’s exportAVAX
-   * @param payerNonce The next unused nonce of the account specified in `to`
    *
    * @returns Promise for a string for the transaction, which should be sent to the network
    * by calling issueTx.
    */
-  importAVAX = async (username: string, password:string, to:string, payerNonce:number)
+  importAVAX = async (username: string, password:string, to:string)
   :Promise<string> => {
     const params:any = {
       to,
-      payerNonce,
       username,
       password,
     };
     return this.callMethod('platform.importAVAX', params)
-      .then((response:RequestResponseData) => response.data.result.tx);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -631,18 +627,30 @@ class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-   * Issue a transaction to the Platform Chain.
+   * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
    *
-   * @param tx The base 58 (with checksum) representation of a transaction
+   * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
    *
-   * @returns Promise for an string of the transaction after being signed.
+   * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
-  issueTx = async (tx:string):Promise<string> => {
+  issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
+    let Transaction = '';
+    if (typeof tx === 'string') {
+      Transaction = tx;
+    } else if (tx instanceof Buffer) {
+      const txobj:Tx = new Tx();
+      txobj.fromBuffer(tx);
+      Transaction = txobj.toString();
+    } else if (tx instanceof Tx) {
+      Transaction = tx.toString();
+    } else {
+      /* istanbul ignore next */
+      throw new Error('Error - platform.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+    }
     const params:any = {
-      tx,
+      tx: Transaction.toString(),
     };
-    return this.callMethod('platform.issueTx', params)
-      .then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod('platform.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -755,7 +763,6 @@ class PlatformVMAPI extends JRPCAPI {
   buildBaseTx = async (
     utxoset:UTXOSet, 
     amount:BN, 
-    assetID:Buffer | string = undefined, 
     toAddresses:Array<string>, 
     fromAddresses:Array<string>,
     changeAddresses:Array<string>, 
@@ -768,9 +775,7 @@ class PlatformVMAPI extends JRPCAPI {
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
-    if (typeof assetID === 'string') {
-      assetID = bintools.cb58Decode(assetID);
-    }
+    const assetID = await this.getAVAXAssetID();
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
