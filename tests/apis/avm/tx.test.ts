@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import AVMAPI from 'src/apis/avm/api';
+import { AVMAPI } from 'src/apis/avm/api';
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
 import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';

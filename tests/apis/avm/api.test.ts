@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from "src";
-import AVMAPI from "src/apis/avm/api";
+import { AVMAPI } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";

@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 import { Avalanche } from 'src';
-import AdminAPI from 'src/apis/admin/api';
+import { AdminAPI } from 'src/apis/admin/api';
 
 describe('Admin', () => {
   const ip = '127.0.0.1';

@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { UTXOSet, UTXO } from 'src/apis/platformvm/utxos';
-import PlatformVMAPI from 'src/apis/platformvm/api';
+import { PlatformVMAPI } from 'src/apis/platformvm/api';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
 import { SecpInput, TransferableInput } from 'src/apis/platformvm/inputs';

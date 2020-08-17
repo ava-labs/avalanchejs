@@ -3,13 +3,13 @@
  * @module Avalanche
  */
 import AvalancheCore from './avalanche';
-import AdminAPI from './apis/admin/api';
-import AVMAPI from './apis/avm/api';
-import HealthAPI from './apis/health/api';
-import InfoAPI from './apis/info/api';
-import KeystoreAPI from './apis/keystore/api';
-import MetricsAPI from './apis/metrics/api';
-import PlatformVMAPI from './apis/platformvm/api';
+import { AdminAPI } from './apis/admin/api';
+import { AVMAPI } from './apis/avm/api';
+import { HealthAPI } from './apis/health/api';
+import { InfoAPI } from './apis/info/api';
+import { KeystoreAPI } from './apis/keystore/api';
+import { MetricsAPI } from './apis/metrics/api';
+import { PlatformVMAPI } from './apis/platformvm/api';
 import { DefaultNetworkID, Defaults } from './utils/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';

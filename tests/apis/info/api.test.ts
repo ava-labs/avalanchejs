@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from 'src';
-import InfoAPI from 'src/apis/info/api';
+import { InfoAPI } from 'src/apis/info/api';
 
 describe('Info', () => {
   const ip:string = '127.0.0.1';
