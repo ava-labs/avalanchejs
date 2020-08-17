@@ -11,6 +11,11 @@ import { Output } from '../../common/output';
 import { UnixNow } from '../../utils/helperfunctions';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
 import { PlatformVMConstants } from './constants';
+import { BaseTx } from './basetx';
+import { UnsignedTx } from './tx';
+import { ExportTx } from '../platformvm/exporttx';
+import { PlatformChainID } from '../../common/constants';
+import { ImportTx } from '../platformvm/importtx';
 
 /**
  * @ignore
@@ -328,5 +333,218 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     return undefined;
   }
+
+  /**
+   * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
+   * [[UnsignedTx]] wrapping a [[BaseTx]] manually (with their corresponding [[TransferableInput]]s and [[TransferableOutput]]s).
+   *
+   * @param networkid The number representing NetworkID of the node
+   * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+   * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
+   * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
+   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned. Default: assetID
+   * @param memo Optional. Contains arbitrary data, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * 
+   * @returns An unsigned transaction created from the passed in parameters.
+   *
+   */
+  buildBaseTx = (
+    networkid:number,
+    blockchainid:Buffer,
+    amount:BN,
+    assetID:Buffer,
+    toAddresses:Array<Buffer>,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer> = undefined,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined,
+    memo:Buffer = undefined,
+    asOf:BN = UnixNow(),
+    locktime:BN = new BN(0),
+    threshold:number = 1
+  ):UnsignedTx => {
+  
+  if(threshold > toAddresses.length) {
+    /* istanbul ignore next */
+    throw new Error(`Error - UTXOSet.buildBaseTx: threshold is greater than number of addresses`);
+  }
+
+  if(typeof changeAddresses === "undefined") {
+    changeAddresses = toAddresses;
+  }
+
+  if(typeof feeAssetID === "undefined") {
+    feeAssetID = assetID;
+  }
+
+  const zero:BN = new BN(0);
+  
+  if (amount.eq(zero)) {
+    return undefined;
+  }
+
+  const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+  if(assetID.toString("hex") === feeAssetID.toString("hex")){
+    aad.addAssetAmount(assetID, amount, fee);
+  } else {
+    aad.addAssetAmount(assetID, amount, zero);
+    aad.addAssetAmount(feeAssetID, zero, fee);
+  }
+
+  let ins:Array<TransferableInput> = [];
+  let outs:Array<TransferableOutput> = [];
+  
+  const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+  if(typeof success === "undefined") {
+    ins = aad.getInputs();
+    outs = aad.getAllOutputs();
+  } else {
+    throw success;
+  }
+
+  const baseTx:BaseTx = new BaseTx(networkid, blockchainid, outs, ins, memo);
+  return new UnsignedTx(baseTx);
+
+  };
+
+  /**
+    * Creates an unsigned ImportTx transaction.
+    *
+    * @param networkid The number representing NetworkID of the node
+    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+    * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+    * @param importIns An array of [[TransferableInput]]s being imported
+    * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * @returns An unsigned transaction created from the passed in parameters.
+    *
+    */
+   buildImportTx = (
+    networkid:number, 
+    blockchainid:Buffer,
+    fromAddresses:Array<Buffer>,
+    importIns:Array<TransferableInput>,
+    destinationChain:Buffer = undefined, 
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+  ):UnsignedTx => {
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    // Not implemented: Fees can be paid from importIns
+    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
+      }
+    }
+
+    if(typeof destinationChain === "undefined") {
+      destinationChain = bintools.cb58Decode(PlatformChainID);
+    }
+
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid, destinationChain, outs, ins, memo, importIns);
+    return new UnsignedTx(importTx);
+  };
+
+  /**
+    * Creates an unsigned ExportTx transaction. 
+    *
+    * @param networkid The number representing NetworkID of the node
+    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
+    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
+    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover of the AVAX
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param destinationChain Optional. A {@link https://github.com/feross/buffer|Buffer} for the chainid where to send the asset.
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param locktime Optional. The locktime field created in the resulting outputs
+    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+    * @returns An unsigned transaction created from the passed in parameters.
+    *
+    */
+   buildExportTx = (
+    networkid:number, 
+    blockchainid:Buffer,
+    amount:BN,
+    avaxAssetID:Buffer,
+    toAddresses:Array<Buffer>,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer> = undefined,
+    destinationChain:Buffer = undefined,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), 
+    threshold:number = 1,
+  ):UnsignedTx => {
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    let exportouts:Array<TransferableOutput> = [];
+    
+    if(typeof changeAddresses === "undefined") {
+      changeAddresses = toAddresses;
+    }
+
+    const zero:BN = new BN(0);
+    
+    if (amount.eq(zero)) {
+      return undefined;
+    }
+
+    if(typeof feeAssetID === "undefined") {
+      feeAssetID = avaxAssetID;
+    } else if (feeAssetID.toString("hex") !== avaxAssetID.toString("hex")) {
+      /* istanbul ignore next */
+      throw new Error('Error - UTXOSet.buildExportTx: '
+      + `feeAssetID must match avaxAssetID`);
+    }
+
+    if(typeof destinationChain === "undefined") {
+      destinationChain = bintools.cb58Decode(PlatformChainID);
+    }
+
+    const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
+      aad.addAssetAmount(avaxAssetID, amount, fee);
+    } else {
+      aad.addAssetAmount(avaxAssetID, amount, zero);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+    }
+    const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    if(typeof success === "undefined") {
+      ins = aad.getInputs();
+      outs = aad.getChangeOutputs();
+      exportouts = aad.getOutputs();
+    } else {
+      throw success;
+    }
+
+    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, destinationChain, outs, ins, memo, exportouts);
+    return new UnsignedTx(exportTx);
+  };
 
 }

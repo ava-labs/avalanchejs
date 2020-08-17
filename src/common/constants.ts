@@ -3,6 +3,8 @@
  * @module Common-Constants
  */
 
+export const PrimaryAssetAlias:string = "AVAX";
+
 export const NetworkIDToHRP:object = {
     1: "avax",
     2: "cascade",
@@ -23,16 +25,16 @@ export const FallbackHRP:string = "custom";
 
 export const DefaultNetworkID:number = 3;
 
-
-// TODO: UPDATE FOR MAINNET
-
-export const platformChainID:string = "11111111111111111111111111111111LpoYY";
+export const PlatformChainID:string = "11111111111111111111111111111111LpoYY";
+export const DefaultSubnetID:string = "11111111111111111111111111111111LpoYY";
 export const XChainAlias:string = "X";
 export const CChainAlias:string = "C";
 export const PChainAlias:string = "P";
 export const XChainVMName:string = "avm";
 export const CChainVMName:string = "evm";
 export const PChainVMName:string = "platformvm";
+
+// TODO: UPDATE FOR MAINNET
 
 const n1X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
@@ -42,7 +44,7 @@ const n1X:object = {
 };
 
 const n1P:object = {
-  blockchainID: platformChainID,
+  blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
   fee: 0
@@ -65,7 +67,7 @@ const n2X:object = {
 };
 
 const n2P:object = {
-  blockchainID: platformChainID,
+  blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
   fee: 0
@@ -108,7 +110,7 @@ const n4X:object = {
 };
 
 const n4P:object = {
-  blockchainID: platformChainID,
+  blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
   fee: 0
@@ -126,7 +128,7 @@ const n4C:object = {
 const n12345X:any = { ...n2X };
 n12345X.blockchainID = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
 const n12345P:any = { ...n2P };
-n12345P.blockchainID = platformChainID;
+n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n2C };
 n12345C.blockchainID = 'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq';
 

@@ -6,6 +6,7 @@ export * from './jrpcapi';
 export * from './nbytes';
 export * from './output';
 export * from './payload';
+export * from './persistenceoptions';
 export * from './restapi';
 export * from './tx';
 export * from './utxos';

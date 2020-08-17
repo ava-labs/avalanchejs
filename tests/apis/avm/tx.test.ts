@@ -20,7 +20,7 @@ import { CreateAssetTx } from 'src/apis/avm/createassettx';
 import { OperationTx } from 'src/apis/avm/operationtx';
 import { ImportTx } from 'src/apis/avm/importtx';
 import { ExportTx } from 'src/apis/avm/exporttx';
-import { platformChainID } from '../../../src/common/constants';
+import { PlatformChainID } from 'src/common/constants';
 
 
 /**
@@ -397,7 +397,7 @@ describe('Transactions', () => {
     }).toThrow();
 
     const importtx:ImportTx = new ImportTx(
-      netid, blockchainID, bintools.cb58Decode(platformChainID), outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
+      netid, blockchainID, bintools.cb58Decode(PlatformChainID), outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
     );
     const txunew:ImportTx = new ImportTx();
     const importbuff:Buffer = importtx.toBuffer();
@@ -418,7 +418,7 @@ describe('Transactions', () => {
     }).toThrow();
 
     const exporttx:ExportTx = new ExportTx(
-      netid, blockchainID, bintools.cb58Decode(platformChainID), outputs, inputs, undefined, exportOuts
+      netid, blockchainID, bintools.cb58Decode(PlatformChainID), outputs, inputs, undefined, exportOuts
     );
     const txunew:ExportTx = new ExportTx();
     const exportbuff:Buffer = exporttx.toBuffer();
@@ -469,7 +469,7 @@ describe('Transactions', () => {
 
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
-      netid, blockchainID, addrs1, importIns, bintools.cb58Decode(platformChainID), new BN(90), assetID,
+      netid, blockchainID, addrs1, importIns, bintools.cb58Decode(PlatformChainID), new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
     const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
@@ -480,7 +480,7 @@ describe('Transactions', () => {
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
       netid, blockchainID, new BN(90), avaxAssetID,
-      addrs3, addrs1, addrs2, bintools.cb58Decode(platformChainID), 
+      addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID), 
       undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
     const tx:Tx = txu.sign(keymgr1);

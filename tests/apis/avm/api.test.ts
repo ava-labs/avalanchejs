@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from "src";
-import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
+import AVMAPI from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
@@ -20,7 +20,8 @@ import { UnixNow } from 'src/utils/helperfunctions';
 import { OutputOwners } from 'src/common/output';
 import { MinterSet } from 'src/apis/avm/minterset';
 import { ImportTx } from 'src/apis/avm/importtx';
-import { platformChainID } from '../../../src/common/constants';
+import { PlatformChainID } from 'src/common/constants';
+import { PersistanceOptions } from 'src/common/persistenceoptions';
 
 /**
  * @ignore
@@ -872,7 +873,7 @@ describe('AVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
       const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
       const result:Promise<UnsignedTx> = avm.buildImportTx(
-        set, addrs1, platformChainID, new UTF8Payload("hello world"), UnixNow()
+        set, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
       );
       const payload:object = {
         result: {
@@ -912,7 +913,7 @@ describe('AVMAPI', () => {
         addrs3, 
         addrs1, 
         addrs2,
-        platformChainID, 
+        PlatformChainID, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -923,7 +924,7 @@ describe('AVMAPI', () => {
         addrbuff3, 
         addrbuff1, 
         addrbuff2, 
-        bintools.cb58Decode(platformChainID), 
+        bintools.cb58Decode(PlatformChainID), 
         avm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -933,7 +934,7 @@ describe('AVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
       const txu3:UnsignedTx = await avm.buildExportTx(
-        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(platformChainID),
+        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID),
         new UTF8Payload("hello world"), UnixNow()
       );
 

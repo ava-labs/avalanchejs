@@ -17,64 +17,15 @@ import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import { Defaults, platformChainID } from '../../common/constants';
+import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../common/constants';
 import { MinterSet } from './minterset';
-import { MergeRule } from '../../common/utxos';
-import { type } from 'os';
+import { PersistanceOptions } from '../../common/persistenceoptions';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
 
-/**
- * A class for defining the persistance behavior of this an API call.
- *
- */
-export class PersistanceOptions {
-  protected name:string = undefined;
-
-  protected overwrite:boolean = false;
-
-  protected mergeRule:MergeRule = 'union';
-
-  /**
-     * Returns the namespace of the instance
-     */
-  getName = ():string => this.name;
-
-  /**
-     * Returns the overwrite rule of the instance
-     */
-  getOverwrite = ():boolean => this.overwrite;
-
-  /**
-     * Returns the [[MergeRule]] of the instance
-     */
-  getMergeRule = ():MergeRule => this.mergeRule;
-
-  /**
-     *
-     * @param name The namespace of the database the data
-     * @param overwrite True if the data should be completey overwritten
-     * @param MergeRule The type of process used to merge with existing data: "intersection", "differenceSelf", "differenceNew", "symDifference", "union", "unionMinusNew", "unionMinusSelf"
-     *
-     * @remarks
-     * The merge rules are as follows:
-     *   * "intersection" - the intersection of the set
-     *   * "differenceSelf" - the difference between the existing data and new set
-     *   * "differenceNew" - the difference between the new data and the existing set
-     *   * "symDifference" - the union of the differences between both sets of data
-     *   * "union" - the unique set of all elements contained in both sets
-     *   * "unionMinusNew" - the unique set of all elements contained in both sets, excluding values only found in the new set
-     *   * "unionMinusSelf" - the unique set of all elements contained in both sets, excluding values only found in the existing set
-     */
-  constructor(name:string, overwrite:boolean = false, mergeRule:MergeRule) {
-    this.name = name;
-    this.overwrite = overwrite;
-    this.mergeRule = mergeRule;
-  }
-}
 
 /**
  * Class for interacting with a node endpoint that is using the AVM.
@@ -154,7 +105,7 @@ class AVMAPI extends JRPCAPI {
   /**
    * Fetches the AVAX AssetID and returns it in a Promise.
    *
-   * @returns The the provided string representing the blockchainID
+   * @returns The the provided string representing the AVAX AssetID
    */
   getAVAXAssetID = async ():Promise<Buffer> => {
     if (typeof this.AVAXAssetID === 'undefined') {
@@ -163,8 +114,7 @@ class AVMAPI extends JRPCAPI {
         symbol: string;
         assetID: Buffer;
         denomination: number;
-      } = await this.getAssetDescription('AVAX');
-      // TODO - Remove hardcoded 'AVAX'
+      } = await this.getAssetDescription(PrimaryAssetAlias);
       this.AVAXAssetID = asset.assetID;
     }
     return this.AVAXAssetID;
@@ -280,31 +230,31 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Create a new fixed-cap, fungible asset. A quantity of it is created at initialization and there no more is ever created.
-     *
-     * @param username The user paying the transaction fee (in $AVAX) for asset creation
-     * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
-     * @param name The human-readable name for the asset
-     * @param symbol Optional. The shorthand symbol for the asset. Between 0 and 4 characters
-     * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
-     * @param initialHolders An array of objects containing the field "address" and "amount" to establish the genesis values for the new asset
-     *
-     * ```js
-     * Example initialHolders:
-     * [
-     *     {
-     *         "address": "X-7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
-     *         "amount": 10000
-     *     },
-     *     {
-     *         "address": "X-7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
-     *         "amount": 50000
-     *     }
-     * ]
-     * ```
-     *
-     * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
-     */
+   * Create a new fixed-cap, fungible asset. A quantity of it is created at initialization and there no more is ever created.
+   *
+   * @param username The user paying the transaction fee (in $AVAX) for asset creation
+   * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
+   * @param name The human-readable name for the asset
+   * @param symbol Optional. The shorthand symbol for the asset. Between 0 and 4 characters
+   * @param denomination Optional. Determines how balances of this asset are displayed by user interfaces. Default is 0
+   * @param initialHolders An array of objects containing the field "address" and "amount" to establish the genesis values for the new asset
+   *
+   * ```js
+   * Example initialHolders:
+   * [
+   *     {
+   *         "address": "X-7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+   *         "amount": 10000
+   *     },
+   *     {
+   *         "address": "X-7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+   *         "amount": 50000
+   *     }
+   * ]
+   * ```
+   *
+   * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
+   */
   createFixedCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, initialHolders:Array<object>):Promise<string> => {
     const params:any = {
       name,
@@ -537,26 +487,26 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
-     *
-     * @param txid The string representation of the transaction ID
-     *
-     * @returns Returns a Promise<string> containing the bytes retrieved from the node
-     */
-    getTx = async (txid:string):Promise<string> => {
-      const params:any = {
-        txID: txid,
-      };
-      return this.callMethod('avm.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
+   * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
+   *
+   * @param txid The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   */
+  getTx = async (txid:string):Promise<string> => {
+    const params:any = {
+      txID: txid,
     };
+    return this.callMethod('avm.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
+  };
 
   /**
-     * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
-     *
-     * @param txid The string representation of the transaction ID
-     *
-     * @returns Returns a Promise<string> containing the status retrieved from the node
-     */
+   * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
+   *
+   * @param txid The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the status retrieved from the node
+   */
   getTxStatus = async (txid:string):Promise<string> => {
     const params:any = {
       txID: txid,
@@ -565,15 +515,15 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
-     *
-     * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
-     * @param persistOpts Options available to persist these UTXOs in local storage
-     *
-     * @remarks
-     * persistOpts is optional and must be of type [[PersistanceOptions]]
-     *
-     */
+   * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
+   *
+   * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param persistOpts Options available to persist these UTXOs in local storage
+   *
+   * @remarks
+   * persistOpts is optional and must be of type [[PersistanceOptions]]
+   *
+   */
   getUTXOs = async (addresses:Array<string> | Array<Buffer>, persistOpts:PersistanceOptions = undefined):Promise<UTXOSet> => {
     const addrs:Array<string> = this._cleanAddressArray(addresses, 'getUTXOs');
 
@@ -728,90 +678,90 @@ class AVMAPI extends JRPCAPI {
     return builtUnsignedTx;
   };
 
-    /**
-     * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
-     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-     *
-     * @param utxoset  A set of UTXOs that the transaction is built on
-     * @param ownerAddresses The addresses being used to import
-     * @param sourceChain The chainid for where the import is coming from. Default, platform chainid. 
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     *
-     * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
-     *
-     * @remarks
-     * This helper exists because the endpoint API should be the primary point of entry for most functionality.
-     */
-    buildImportTx = async (
-      utxoset:UTXOSet, 
-      ownerAddresses:Array<string>, 
-      sourceChain:Buffer | string = undefined,
-      memo:PayloadBase|Buffer = undefined, 
-      asOf:BN = UnixNow(), 
-    ):Promise<UnsignedTx> => {
-      const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+/**
+ * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
+ * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+ *
+ * @param utxoset  A set of UTXOs that the transaction is built on
+ * @param ownerAddresses The addresses being used to import
+ * @param sourceChain The chainid for where the import is coming from. Default, platform chainid. 
+ * @param memo Optional contains arbitrary bytes, up to 256 bytes
+ * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+ *
+ * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
+ *
+ * @remarks
+ * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+ */
+buildImportTx = async (
+  utxoset:UTXOSet, 
+  ownerAddresses:Array<string>, 
+  sourceChain:Buffer | string = undefined,
+  memo:PayloadBase|Buffer = undefined, 
+  asOf:BN = UnixNow(), 
+):Promise<UnsignedTx> => {
+  const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
 
-      const atomicUTXOs:UTXOSet = await this.getUTXOs(owners);
-      const avaxAssetID:Buffer = await this.getAVAXAssetID();
-      const avaxAssetIDStr:string = avaxAssetID.toString("hex");
+  const atomicUTXOs:UTXOSet = await this.getUTXOs(owners);
+  const avaxAssetID:Buffer = await this.getAVAXAssetID();
+  const avaxAssetIDStr:string = avaxAssetID.toString("hex");
 
 
-      if( memo instanceof PayloadBase) {
-        memo = memo.getPayload();
-      }
+  if( memo instanceof PayloadBase) {
+    memo = memo.getPayload();
+  }
 
-      if (typeof sourceChain === "string") {
-        sourceChain = bintools.cb58Decode(platformChainID);
-      } else if(!(sourceChain instanceof Buffer)) {
-        throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
-      }
-      
-      const atomics = atomicUTXOs.getAllUTXOs();
-      const importIns:Array<TransferableInput> = [];
-      for(let i:number = 0; i < atomics.length; i++) {
-        const utxo:UTXO = atomics[i];
-        const assetID:Buffer = utxo.getAssetID();
-        if(assetID.toString("hex") === avaxAssetIDStr) {
-          const output:AmountOutput = utxo.getOutput() as AmountOutput;
-          const amt:BN = output.getAmount().clone();
-          const txid:Buffer = utxo.getTxID();
-          const outputidx:Buffer = utxo.getOutputIdx();
-          const input:SecpInput = new SecpInput(amt);
-          const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
-          const fromAddresses:Array<Buffer> = output.getAddresses(); // Verify correct approach
-          const spenders:Array<Buffer> = output.getSpenders(fromAddresses, asOf);
-          for (let j = 0; j < spenders.length; j++) {
-            const idx:number = output.getAddressIdx(spenders[j]);
-            if (idx === -1) {
-              /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.buildImportTx: no such '
-              + `address in output: ${spenders[j]}`);
-            }
-            xferin.getInput().addSignatureIdx(idx, spenders[j]);
-          }
-          importIns.push(xferin);
+  if (typeof sourceChain === "string") {
+    sourceChain = bintools.cb58Decode(PlatformChainID);
+  } else if(!(sourceChain instanceof Buffer)) {
+    throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
+  }
+  
+  const atomics = atomicUTXOs.getAllUTXOs();
+  const importIns:Array<TransferableInput> = [];
+  for(let i:number = 0; i < atomics.length; i++) {
+    const utxo:UTXO = atomics[i];
+    const assetID:Buffer = utxo.getAssetID();
+    if(assetID.toString("hex") === avaxAssetIDStr) {
+      const output:AmountOutput = utxo.getOutput() as AmountOutput;
+      const amt:BN = output.getAmount().clone();
+      const txid:Buffer = utxo.getTxID();
+      const outputidx:Buffer = utxo.getOutputIdx();
+      const input:SecpInput = new SecpInput(amt);
+      const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
+      const fromAddresses:Array<Buffer> = output.getAddresses(); // Verify correct approach
+      const spenders:Array<Buffer> = output.getSpenders(fromAddresses, asOf);
+      for (let j = 0; j < spenders.length; j++) {
+        const idx:number = output.getAddressIdx(spenders[j]);
+        if (idx === -1) {
+          /* istanbul ignore next */
+          throw new Error('Error - UTXOSet.buildImportTx: no such '
+          + `address in output: ${spenders[j]}`);
         }
+        xferin.getInput().addSignatureIdx(idx, spenders[j]);
       }
+      importIns.push(xferin);
+    }
+  }
   
-      const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
-        this.core.getNetworkID(), 
-        bintools.cb58Decode(this.blockchainID), 
-        owners,
-        importIns, 
-        sourceChain,
-        this.getFee(), 
-        avaxAssetID, 
-        memo, asOf
-      );
-  
-      if(! await this.checkGooseEgg(builtUnsignedTx)) {
-        /* istanbul ignore next */
-        throw new Error("Failed Goose Egg Check");
-      }
-  
-      return builtUnsignedTx;
-    };
+  const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
+    this.core.getNetworkID(), 
+    bintools.cb58Decode(this.blockchainID), 
+    owners,
+    importIns, 
+    sourceChain,
+    this.getFee(), 
+    avaxAssetID, 
+    memo, asOf
+  );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  };
 
   /**
    * Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
@@ -830,72 +780,72 @@ class AVMAPI extends JRPCAPI {
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
    */
-    buildExportTx = async (
-      utxoset:UTXOSet, 
-      amount:BN,
-      toAddresses:Array<string>, 
-      fromAddresses:Array<string>,
-      changeAddresses:Array<string> = undefined,
-      destinationChain:Buffer | string = undefined,
-      memo:PayloadBase|Buffer = undefined, 
-      asOf:BN = UnixNow(),
-      locktime:BN = new BN(0), 
-      threshold:number = 1
-    ):Promise<UnsignedTx> => {
-      const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-      const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-      const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-  
-      if( memo instanceof PayloadBase) {
-        memo = memo.getPayload();
-      }
+  buildExportTx = async (
+    utxoset:UTXOSet, 
+    amount:BN,
+    toAddresses:Array<string>, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string> = undefined,
+    destinationChain:Buffer | string = undefined,
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), 
+    threshold:number = 1
+  ):Promise<UnsignedTx> => {
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
-      const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
 
-      if (typeof destinationChain === "string") {
-        destinationChain = bintools.cb58Decode(platformChainID);
-      } else if(!(destinationChain instanceof Buffer)) {
-        throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
-      }
-  
-      const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
-        this.core.getNetworkID(), 
-        bintools.cb58Decode(this.blockchainID), 
-        amount,
-        avaxAssetID, 
-        to,
-        from,
-        change,
-        destinationChain,
-        this.getFee(), 
-        avaxAssetID,
-        memo, asOf, locktime, threshold
-      );
-  
-      if(! await this.checkGooseEgg(builtUnsignedTx)) {
-        /* istanbul ignore next */
-        throw new Error("Failed Goose Egg Check");
-      }
-  
-      return builtUnsignedTx;
-    };
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+
+    if (typeof destinationChain === "string") {
+      destinationChain = bintools.cb58Decode(PlatformChainID);
+    } else if(!(destinationChain instanceof Buffer)) {
+      throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
+    }
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      amount,
+      avaxAssetID, 
+      to,
+      from,
+      change,
+      destinationChain,
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf, locktime, threshold
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  };
 
   /**
-     * Creates an unsigned transaction. For more granular control, you may create your own
-     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-     *
-     * @param utxoset A set of UTXOs that the transaction is built on
-     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
-     * @param initialState The [[InitialStates]] that represent the intial state of a created asset
-     * @param name String for the descriptive name of the asset
-     * @param symbol String for the ticker symbol of the asset
-     * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     *
-     * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
-     * 
-     */
+   * Creates an unsigned transaction. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param initialState The [[InitialStates]] that represent the intial state of a created asset
+   * @param name String for the descriptive name of the asset
+   * @param symbol String for the ticker symbol of the asset
+   * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
+   * 
+   */
   buildCreateAssetTx = async (
       utxoset:UTXOSet, 
       fromAddresses:Array<string> | Array<Buffer>, 
@@ -906,89 +856,89 @@ class AVMAPI extends JRPCAPI {
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
-      let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
+    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
 
-      if( memo instanceof PayloadBase) {
-        memo = memo.getPayload();
-      }
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
 
-      /* istanbul ignore next */
-      if(symbol.length > AVMConstants.SYMBOLMAXLEN){
-          /* istanbul ignore next */
-          throw new Error("Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
-      }
-      /* istanbul ignore next */
-      if(name.length > AVMConstants.ASSETNAMELEN) {
+    /* istanbul ignore next */
+    if(symbol.length > AVMConstants.SYMBOLMAXLEN){
         /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
-      }
+        throw new Error("Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+    }
+    /* istanbul ignore next */
+    if(name.length > AVMConstants.ASSETNAMELEN) {
+      /* istanbul ignore next */
+      throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+    }
 
-      const avaxAssetID:Buffer = await this.getAVAXAssetID();
-      const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
-        this.core.getNetworkID(), 
-        bintools.cb58Decode(this.blockchainID), 
-        from,
-        initialStates,
-        name, 
-        symbol, 
-        denomination, 
-        this.getFee(), 
-        avaxAssetID,
-        memo, asOf
-      );
-  
-      if(! await this.checkGooseEgg(builtUnsignedTx)) {
-        /* istanbul ignore next */
-        throw new Error("Failed Goose Egg Check");
-      }
-  
-      return builtUnsignedTx;
-    };
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateAssetTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      from,
+      initialStates,
+      name, 
+      symbol, 
+      denomination, 
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  };
 
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
-    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-    * 
-    * @param utxoset A set of UTXOs that the transaction is built on
-    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
-    * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
-    * @param name String for the descriptive name of the asset
-    * @param symbol String for the ticker symbol of the asset
-    * @param memo Optional contains arbitrary bytes, up to 256 bytes
-    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-    * @param locktime Optional. The locktime field created in the resulting mint output
-    * 
-    * ```js
-    * Example minterSets:
-    * [
-    *      {
-    *          "minters":[
-    *              "X-4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
-    *          ],
-    *          "threshold": 1
-    *      },
-    *      {
-    *          "minters": [
-    *              "X-dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
-    *              "X-2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
-    *              "X-7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
-    *          ],
-    *          "threshold": 2
-    *      }
-    * ]
-    * ```
-    * 
-    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
-    * 
-    */
-   buildCreateNFTAssetTx = async (
+  * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+  * 
+  * @param utxoset A set of UTXOs that the transaction is built on
+  * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+  * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
+  * @param name String for the descriptive name of the asset
+  * @param symbol String for the ticker symbol of the asset
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param locktime Optional. The locktime field created in the resulting mint output
+  * 
+  * ```js
+  * Example minterSets:
+  * [
+  *      {
+  *          "minters":[
+  *              "X-4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+  *          ],
+  *          "threshold": 1
+  *      },
+  *      {
+  *          "minters": [
+  *              "X-dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
+  *              "X-2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
+  *              "X-7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+  *          ],
+  *          "threshold": 2
+  *      }
+  * ]
+  * ```
+  * 
+  * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
+  * 
+  */
+  buildCreateNFTAssetTx = async (
     utxoset:UTXOSet, 
     fromAddresses:Array<string> | Array<Buffer>, 
     minterSets:MinterSet[], 
     name:string, 
     symbol:string, 
     memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0)
-   ): Promise<UnsignedTx> => {
+  ): Promise<UnsignedTx> => {
     let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
@@ -1023,85 +973,85 @@ class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * Creates an unsigned transaction. For more granular control, you may create your own
-    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-    * 
-    * @param utxoset  A set of UTXOs that the transaction is built on
-    * @param toAddresses The addresses to send the nft output
-    * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
-    * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
-    * @param groupID Optional. The group this NFT is issued to.
-    * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
-    * @param memo Optional contains arbitrary bytes, up to 256 bytes
-    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-    * @param locktime Optional. The locktime field created in the resulting mint output
-    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-    * 
-    * 
-    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
-    * 
-    */
+  * Creates an unsigned transaction. For more granular control, you may create your own
+  * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+  * 
+  * @param utxoset  A set of UTXOs that the transaction is built on
+  * @param toAddresses The addresses to send the nft output
+  * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
+  * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
+  * @param groupID Optional. The group this NFT is issued to.
+  * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param locktime Optional. The locktime field created in the resulting mint output
+  * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+  * 
+  * 
+  * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
+  * 
+  */
   buildCreateNFTMintTx = async (
-      utxoset:UTXOSet,  
-      toAddresses:Array<string>|Array<Buffer>, 
-      fromAddresses:Array<string>|Array<Buffer>, 
-      utxoid:string|Array<string>,
-      groupID:number = 0, 
-      payload:PayloadBase|Buffer = undefined, 
-      memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
+    utxoset:UTXOSet,  
+    toAddresses:Array<string>|Array<Buffer>, 
+    fromAddresses:Array<string>|Array<Buffer>, 
+    utxoid:string|Array<string>,
+    groupID:number = 0, 
+    payload:PayloadBase|Buffer = undefined, 
+    memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
   ): Promise<any> => {
-      let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-      let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-     
-      if( memo instanceof PayloadBase) {
-        memo = memo.getPayload();
-      }
+    let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+    
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
 
-      if(payload instanceof PayloadBase){
-        payload = payload.getPayload();
-      }
+    if(payload instanceof PayloadBase){
+      payload = payload.getPayload();
+    }
 
-      if(typeof utxoid === 'string') {
-          utxoid = [utxoid];
-      }
+    if(typeof utxoid === 'string') {
+        utxoid = [utxoid];
+    }
 
-      let avaxAssetID:Buffer = await this.getAVAXAssetID();
+    let avaxAssetID:Buffer = await this.getAVAXAssetID();
 
-      const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
-          this.core.getNetworkID(),
-          bintools.cb58Decode(this.blockchainID),
-          to,
-          from,
-          utxoid,
-          groupID,
-          payload,
-          this.getFee(),
-          avaxAssetID,
-          memo, asOf, locktime, threshold
-      );
-      if(! await this.checkGooseEgg(builtUnsignedTx)) {
-        /* istanbul ignore next */
-        throw new Error("Failed Goose Egg Check");
-      }
-      return builtUnsignedTx;
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
+        this.core.getNetworkID(),
+        bintools.cb58Decode(this.blockchainID),
+        to,
+        from,
+        utxoid,
+        groupID,
+        payload,
+        this.getFee(),
+        avaxAssetID,
+        memo, asOf, locktime, threshold
+    );
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+    return builtUnsignedTx;
   }
 
   /**
    * Helper function which takes an unsigned transaction and signs it, returning the resulting [[Tx]].
-    *
-    * @param utx The unsigned transaction of type [[UnsignedTx]]
-    *
-    * @returns A signed transaction of type [[Tx]]
-    */
+  *
+  * @param utx The unsigned transaction of type [[UnsignedTx]]
+  *
+  * @returns A signed transaction of type [[Tx]]
+  */
   signTx = (utx:UnsignedTx):Tx => utx.sign(this.keychain);
 
   /**
-     * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
-     *
-     * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
-     *
-     * @returns A Promise<string> representing the transaction ID of the posted transaction.
-     */
+   * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
+   *
+   * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
+   *
+   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   */
   issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
     let Transaction = '';
     if (typeof tx === 'string') {
@@ -1123,17 +1073,17 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Sends an amount of assetID to the specified address from a list of owned of addresses.
-     *
-     * @param username The user that owns the private keys associated with the `from` addresses
-     * @param password The password unlocking the user
-     * @param assetID The assetID of the asset to send
-     * @param amount The amount of the asset to be sent
-     * @param to The address of the recipient
-     * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-     *
-     * @returns Promise for the string representing the transaction's ID.
-     */
+   * Sends an amount of assetID to the specified address from a list of owned of addresses.
+   *
+   * @param username The user that owns the private keys associated with the `from` addresses
+   * @param password The password unlocking the user
+   * @param assetID The assetID of the asset to send
+   * @param amount The amount of the asset to be sent
+   * @param to The address of the recipient
+   * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   *
+   * @returns Promise for the string representing the transaction's ID.
+   */
   send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>):Promise<string> => {
     let asset:string;
     let amnt:BN;
@@ -1168,12 +1118,12 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Given a JSON representation of this Virtual Machine’s genesis state, create the byte representation of that state.
-     *
-     * @param genesisData The blockchain's genesis data object
-     *
-     * @returns Promise of a string of bytes
-     */
+   * Given a JSON representation of this Virtual Machine’s genesis state, create the byte representation of that state.
+   *
+   * @param genesisData The blockchain's genesis data object
+   *
+   * @returns Promise of a string of bytes
+   */
   buildGenesis = async (genesisData:object):Promise<string> => {
     const params:any = {
       genesisData,
@@ -1185,8 +1135,8 @@ class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * @ignore
-     */
+   * @ignore
+   */
   protected _cleanAddressArray(addresses:Array<string> | Array<Buffer>, caller:string):Array<string> {
     const addrs:Array<string> = [];
     const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
@@ -1207,12 +1157,12 @@ class AVMAPI extends JRPCAPI {
   }
 
   /**
-     * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
-     *
-     * @param core A reference to the Avalanche class
-     * @param baseurl Defaults to the string "/ext/bc/avm" as the path to blockchain's baseurl
-     */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/bc/avm', blockchainID:string = '') {
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
+   *
+   * @param core A reference to the Avalanche class
+   * @param baseurl Defaults to the string "/ext/bc/X" as the path to blockchain's baseurl
+   */
+  constructor(core:AvalancheCore, baseurl:string = '/ext/bc/X', blockchainID:string = '') {
     super(core, baseurl);
     this.blockchainID = blockchainID;
     const netid:number = core.getNetworkID();

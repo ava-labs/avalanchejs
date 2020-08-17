@@ -20,7 +20,7 @@ import { OperationTx } from './operationtx';
 import { BaseTx } from './basetx';
 import { ExportTx } from './exporttx';
 import { ImportTx } from './importtx';
-import { platformChainID } from '../../common/constants';
+import { PlatformChainID } from '../../common/constants';
 
 /**
  * @ignore
@@ -378,7 +378,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     if(threshold > toAddresses.length) {
       /* istanbul ignore next */
-      throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
+      throw new Error(`Error - UTXOSet.buildBaseTx: threshold is greater than number of addresses`);
     }
 
     if(typeof changeAddresses === "undefined") {
@@ -692,7 +692,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     return new UnsignedTx(OpTx);
   };
 
-    /**
+  /**
     * Creates an unsigned ImportTx transaction.
     *
     * @param networkid The number representing NetworkID of the node
@@ -736,7 +736,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     if(typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(platformChainID);
+      destinationChain = bintools.cb58Decode(PlatformChainID);
     }
 
     const importTx:ImportTx = new ImportTx(networkid, blockchainid, destinationChain, outs, ins, memo, importIns);
@@ -802,7 +802,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     if(typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(platformChainID);
+      destinationChain = bintools.cb58Decode(PlatformChainID);
     }
 
     const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);

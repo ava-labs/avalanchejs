@@ -8,7 +8,7 @@ import {  AVMConstants } from './constants';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';
-import { platformChainID } from '../../common/constants';
+import { PlatformChainID } from '../../common/constants';
 
 
 /**

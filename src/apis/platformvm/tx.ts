@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module API-AVM-Transactions
+ * @module API-PlatformVM-Transactions
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
