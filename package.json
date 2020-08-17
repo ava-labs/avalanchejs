@@ -2,8 +2,8 @@
   "name": "avalanche",
   "version": "2.3.0",
   "description": "Avalanche Platform JS Library",
-  "main": "typings/src/index.js",
-  "types": "typings/src/index.d.ts",
+  "main": "dist/index.js",
+  "browser": "dist/lib/avalanche.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "rm -rf typings/ && npx tsc -b",
