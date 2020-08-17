@@ -32,7 +32,7 @@ const bintools:BinTools = BinTools.getInstance();
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-class PlatformVMAPI extends JRPCAPI {
+export default class PlatformVMAPI extends JRPCAPI {
 
   /**
    * @ignore
@@ -986,4 +986,3 @@ class PlatformVMAPI extends JRPCAPI {
   constructor(core:AvalancheCore, baseurl:string = '/ext/bc/P') { super(core, baseurl); }
 }
 
-export default PlatformVMAPI;
