@@ -3,7 +3,7 @@
  * @module Utils-HelperFunctions
  */
 
-import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP } from '../common/constants';
+import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP } from './constants';
 import BN from 'bn.js';
 
 

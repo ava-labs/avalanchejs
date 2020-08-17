@@ -4,7 +4,7 @@
  */
 import { Buffer } from "buffer/";
 import BinTools from '../../utils/bintools';
-import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../keychains/secp256k1';
+import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
 
 /**
  * @ignore

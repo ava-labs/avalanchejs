@@ -6,9 +6,9 @@ import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from 'src/utils/bintools';
 import * as bech32 from 'bech32';
-import { Defaults, PlatformChainID } from 'src/common/constants';
+import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
-import { PersistanceOptions } from 'src/common/persistenceoptions';
+import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
 import { SecpOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
 import { TransferableInput, SecpInput } from 'src/apis/platformvm/inputs';
@@ -16,7 +16,7 @@ import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { UnixNow } from 'src/utils/helperfunctions';
-import { UTF8Payload } from 'src/common/payload';
+import { UTF8Payload } from 'src/utils/payload';
 import { ImportTx } from 'src/apis/platformvm/importtx';
 
 /**

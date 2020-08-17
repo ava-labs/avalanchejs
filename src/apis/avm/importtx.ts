@@ -11,7 +11,7 @@ import { BaseTx } from './basetx';
 import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
-import { PlatformChainID } from '../../common/constants';
+import { PlatformChainID } from '../../utils/constants';
 
 /**
  * @ignore

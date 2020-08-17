@@ -4,7 +4,7 @@
  */
 
 import { Buffer } from "buffer/";
-import BinTools  from '../utils/bintools';
+import BinTools  from './bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
 

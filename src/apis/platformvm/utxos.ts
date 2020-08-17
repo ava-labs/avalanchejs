@@ -14,7 +14,7 @@ import { PlatformVMConstants } from './constants';
 import { BaseTx } from './basetx';
 import { UnsignedTx } from './tx';
 import { ExportTx } from '../platformvm/exporttx';
-import { PlatformChainID } from '../../common/constants';
+import { PlatformChainID } from '../../utils/constants';
 import { ImportTx } from '../platformvm/importtx';
 
 /**

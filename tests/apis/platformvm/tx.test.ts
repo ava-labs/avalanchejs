@@ -11,12 +11,12 @@ import { Buffer } from 'buffer/';
 import { SecpOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { Avalanche } from 'src/index';
-import { UTF8Payload } from 'src/common/payload';
+import { UTF8Payload } from 'src/utils/payload';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { BaseTx } from 'src/apis/platformvm/basetx';
 import { ImportTx } from 'src/apis/platformvm/importtx';
 import { ExportTx } from 'src/apis/platformvm/exporttx';
-import { PlatformChainID } from 'src/common/constants';
+import { PlatformChainID } from 'src/utils/constants';
 
 
 /**

@@ -13,15 +13,15 @@ import { AVMConstants } from 'src/apis/avm/constants';
 import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput } from 'src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from 'src/apis/avm/ops';
 import * as bech32 from 'bech32';
-import { UTF8Payload } from 'src/common/payload';
+import { UTF8Payload } from 'src/utils/payload';
 import { InitialStates } from 'src/apis/avm/initialstates';
-import { Defaults } from 'src/common/constants';
+import { Defaults } from 'src/utils/constants';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { OutputOwners } from 'src/common/output';
 import { MinterSet } from 'src/apis/avm/minterset';
 import { ImportTx } from 'src/apis/avm/importtx';
-import { PlatformChainID } from 'src/common/constants';
-import { PersistanceOptions } from 'src/common/persistenceoptions';
+import { PlatformChainID } from 'src/utils/constants';
+import { PersistanceOptions } from 'src/utils/persistenceoptions';
 
 /**
  * @ignore
@@ -30,7 +30,7 @@ const bintools = BinTools.getInstance();
 
 describe('AVMAPI', () => {
   const networkid:number = 12345;
-  const blockchainid:string = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
+  const blockchainid:string = Defaults.network[networkid].X.blockchainID;
   const ip:string = '127.0.0.1';
   const port:number = 9650;
   const protocol:string = 'https';
@@ -41,6 +41,7 @@ describe('AVMAPI', () => {
   const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, true);
   let api:AVMAPI;
   let alias:string;
+
 
   const addrA:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")));
   const addrB:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")));

@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Credential } from './credentials';
 import BN from 'bn.js';
-import { KeyChain, KeyPair } from '../keychains/keychain';
+import { KeyChain, KeyPair } from './keychain';
 import { StandardAmountInput, StandardTransferableInput } from './input';
 import { StandardAmountOutput, StandardTransferableOutput } from './output';
 

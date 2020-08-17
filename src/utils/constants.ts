@@ -126,18 +126,18 @@ const n4C:object = {
 // END TODO
 
 const n12345X:any = { ...n2X };
-n12345X.blockchainID = '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH';
+n12345X.blockchainID = '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD';
 const n12345P:any = { ...n2P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n2C };
-n12345C.blockchainID = 'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq';
+n12345C.blockchainID = 'f5DjTrC9YJPagt9ogKgKPYpp7KMaCBKsv7AeqfonpTiw6rBec';
 
 export class Defaults {
   static network = {
     1: { // update before mainnet
       hrp: NetworkIDToHRP[1],
       X: n1X,
-      '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM': n1X,
+      '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD': n1X,
       P: n1P,
       '11111111111111111111111111111111LpoYY': n1P,
       C: n1C,
@@ -173,11 +173,23 @@ export class Defaults {
     12345: {
       hrp: NetworkIDToHRP[12345],
       X: n12345X,
-      '4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH': n12345X,
+      '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD': n12345X,
       P: n12345P,
       '11111111111111111111111111111111LpoYY': n12345P,
       C: n12345C,
-      'jvYyfQTxGMJLuGWa55kdP2p2zSUYsQ5Raupu4TW34ZAUBAbtq': n12345C,
+      'f5DjTrC9YJPagt9ogKgKPYpp7KMaCBKsv7AeqfonpTiw6rBec': n12345C,
     },
   };
 }
+
+/**
+ * Rules used when merging sets
+ */
+export type MergeRule = 'intersection' // Self INTERSECT New
+| 'differenceSelf' // Self MINUS New
+| 'differenceNew' // New MINUS Self
+| 'symDifference' // differenceSelf UNION differenceNew
+| 'union' // Self UNION New
+| 'unionMinusNew' // union MINUS differenceNew
+| 'unionMinusSelf' // union MINUS differenceSelf
+| 'ERROR'; // generate error for testing

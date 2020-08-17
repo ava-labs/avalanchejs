@@ -10,7 +10,7 @@ import InfoAPI from './apis/info/api';
 import KeystoreAPI from './apis/keystore/api';
 import MetricsAPI from './apis/metrics/api';
 import PlatformVMAPI from './apis/platformvm/api';
-import { DefaultNetworkID, Defaults } from './common/constants';
+import { DefaultNetworkID, Defaults } from './utils/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
@@ -122,7 +122,6 @@ export { AvalancheCore };
 
 export * as utils from './utils';
 export * as common from './common';
-export * as keychains from './keychains';
 export * as admin from './apis/admin';
 export * as avm from './apis/avm';
 export * as health from './apis/health';

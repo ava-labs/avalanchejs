@@ -20,7 +20,7 @@ import { OperationTx } from './operationtx';
 import { BaseTx } from './basetx';
 import { ExportTx } from './exporttx';
 import { ImportTx } from './importtx';
-import { PlatformChainID } from '../../common/constants';
+import { PlatformChainID } from '../../utils/constants';
 
 /**
  * @ignore

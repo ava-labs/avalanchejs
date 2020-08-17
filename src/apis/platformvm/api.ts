@@ -9,16 +9,16 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 import { PlatformVMKeyChain } from './keychain';
-import { Defaults, PlatformChainID } from '../../common/constants';
+import { Defaults, PlatformChainID } from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
-import { PayloadBase } from '../../common/payload';
+import { PayloadBase } from '../../utils/payload';
 import { UnixNow } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { TransferableInput, SecpInput } from '../platformvm/inputs';
 import { UTXO } from '../platformvm/utxos';
 import { AmountOutput } from '../platformvm/outputs';
-import { PersistanceOptions } from '../../common/persistenceoptions';
+import { PersistanceOptions } from '../../utils/persistenceoptions';
 
 /**
  * @ignore

@@ -10,16 +10,16 @@ import { UTXOSet, UTXO } from './utxos';
 import { AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
-import { PayloadBase } from '../../common/payload';
+import { PayloadBase } from '../../utils/payload';
 import { TransferableInput, SecpInput } from './inputs';
 import { AmountOutput } from './outputs';
 import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../common/constants';
+import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/constants';
 import { MinterSet } from './minterset';
-import { PersistanceOptions } from '../../common/persistenceoptions';
+import { PersistanceOptions } from '../../utils/persistenceoptions';
 
 /**
  * @ignore

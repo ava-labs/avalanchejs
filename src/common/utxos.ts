@@ -7,23 +7,12 @@ import BinTools from '../utils/bintools';
 import BN from "bn.js";
 import { Output, StandardAmountOutput } from './output';
 import { UnixNow } from '../utils/helperfunctions';
+import { MergeRule } from '../utils/constants';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
-
-/**
- * Rules used when merging sets
- */
-export type MergeRule = 'intersection' // Self INTERSECT New
-| 'differenceSelf' // Self MINUS New
-| 'differenceNew' // New MINUS Self
-| 'symDifference' // differenceSelf UNION differenceNew
-| 'union' // Self UNION New
-| 'unionMinusNew' // union MINUS differenceNew
-| 'unionMinusSelf' // union MINUS differenceSelf
-| 'ERROR'; // generate error for testing
 
 
 /**

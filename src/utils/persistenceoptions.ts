@@ -1,4 +1,4 @@
-import { MergeRule } from './utxos';
+import { MergeRule } from './constants';
 /**
  * A class for defining the persistance behavior of this an API call.
  *
