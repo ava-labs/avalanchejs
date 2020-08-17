@@ -153,7 +153,7 @@ describe('Transactions', () => {
   test('Create small BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    const blockchainID:Buffer = bintools.cb58Decode("2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
@@ -176,7 +176,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    const blockchainID:Buffer = bintools.cb58Decode("2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD");
     // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outs:TransferableOutput[] = [];
@@ -207,7 +207,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    const blockchainID:Buffer = bintools.cb58Decode("2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("267");
@@ -230,7 +230,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    const blockchainID:Buffer = bintools.cb58Decode("2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("609555500000");
@@ -253,7 +253,7 @@ describe('Transactions', () => {
     const bintools: BinTools = BinTools.getInstance();
     const networkID: number = 12345;
     // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH");
+    const blockchainID:Buffer = bintools.cb58Decode("2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("44995609555500000");

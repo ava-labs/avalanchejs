@@ -70,7 +70,7 @@ export default class Avalanche extends AvalancheCore {
      * ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default 3
      * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect,
-     * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
+     * otherwise default "2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD"
      * @param skipinit Skips creating the APIs
      */
   constructor(ip:string,
