@@ -19,6 +19,7 @@ import { TransferableInput, SecpInput } from '../platformvm/inputs';
 import { UTXO } from '../platformvm/utxos';
 import { AmountOutput } from '../platformvm/outputs';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { platform } from 'os';
 
 /**
  * @ignore
@@ -587,7 +588,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an unsigned transaction to be signed by the account the the AVAX is
    * sent from and pays the transaction fee.
    */
-  exportAVAX = async (username: string, password:string, amount:BN, to:string):Promise<string> => {
+  exportAVAX = async (username: string, password:string, amount:BN, to:string,):Promise<string> => {
     const params:any = {
       username,
       password,
@@ -608,14 +609,16 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param password The password of the Keystore user
    * @param to The ID of the account the AVAX is sent to. This must be the same as the to
    * argument in the corresponding call to the X-Chain’s exportAVAX
+   * @param sourceChain The chainID where the funds are coming from.
    *
    * @returns Promise for a string for the transaction, which should be sent to the network
    * by calling issueTx.
    */
-  importAVAX = async (username: string, password:string, to:string)
+  importAVAX = async (username: string, password:string, to:string, sourceChain:string)
   :Promise<string> => {
     const params:any = {
       to,
+      sourceChain,
       username,
       password,
     };

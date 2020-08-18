@@ -411,16 +411,17 @@ export class AVMAPI extends JRPCAPI {
      * Finalize a transfer of AVAX from the P-Chain to the X-Chain.
      *
      * Before this method is called, you must call the P-Chain’s `exportAVAX` method to initiate the transfer.
-     *
-     * @param to The address the AVAX is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVAX, except that the prepended X- should be included in this argument
      * @param username The Keystore user that controls the address specified in `to`
      * @param password The password of the Keystore user
+     * @param to The address the AVAX is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVAX, except that the prepended X- should be included in this argument
+     * @param sourceChain Chain the funds are coming from.
      *
      * @returns String representing the transaction id
      */
-  importAVAX = async (username:string, password:string, to:string):Promise<string> => {
+  importAVAX = async (username:string, password:string, to:string, sourceChain:string):Promise<string> => {
     const params:any = {
       to,
+      sourceChain,
       username,
       password,
     };

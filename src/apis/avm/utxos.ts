@@ -267,6 +267,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     return newset as this;
   }
 
+  _feeCheck(fee:BN, feeAssetID:Buffer):boolean {
+    return (typeof fee !== "undefined" && 
+    typeof feeAssetID !== "undefined" &&
+    fee.gt(new BN(0)) && feeAssetID instanceof Buffer);
+  }
+
   getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
     const utxoArray:Array<UTXO> = this.getAllUTXOs();
     const outids:object = {};
@@ -337,26 +343,26 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   }
 
   /**
-     * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
-     * [[UnsignedTx]] wrapping a [[BaseTx]] manually (with their corresponding [[TransferableInput]]s and [[TransferableOutput]]s).
-     *
-     * @param networkid The number representing NetworkID of the node
-     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
-     * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
-     * @param toAddresses The addresses to send the funds
-     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
-     * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
-     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
-     * @param feeAssetID Optional. The assetID of the fees being burned. Default: assetID
-     * @param memo Optional. Contains arbitrary data, up to 256 bytes
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
-     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-     * 
-     * @returns An unsigned transaction created from the passed in parameters.
-     *
-     */
+   * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
+   * [[UnsignedTx]] wrapping a [[BaseTx]] manually (with their corresponding [[TransferableInput]]s and [[TransferableOutput]]s).
+   *
+   * @param networkid The number representing NetworkID of the node
+   * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+   * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
+   * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
+   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned. Default: assetID
+   * @param memo Optional. Contains arbitrary data, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * 
+   * @returns An unsigned transaction created from the passed in parameters.
+   *
+   */
   buildBaseTx = (
     networkid:number,
     blockchainid:Buffer,
@@ -397,7 +403,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       aad.addAssetAmount(assetID, amount, fee);
     } else {
       aad.addAssetAmount(assetID, amount, zero);
-      aad.addAssetAmount(feeAssetID, zero, fee);
+      if(this._feeCheck(fee, feeAssetID)) {
+        aad.addAssetAmount(feeAssetID, zero, fee);
+      }
     }
 
     let ins:Array<TransferableInput> = [];
@@ -452,7 +460,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let ins:Array<TransferableInput> = [];
     let outs:Array<TransferableOutput> = [];
     
-    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined"){
+    if(this._feeCheck(fee, feeAssetID)){
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
@@ -503,7 +511,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let ins:Array<TransferableInput> = [];
     let outs:Array<TransferableOutput> = [];
     
-    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+    if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
@@ -570,7 +578,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let ins:Array<TransferableInput> = [];
     let outs:Array<TransferableOutput> = [];
     
-    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+    if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
@@ -647,7 +655,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let ins:Array<TransferableInput> = [];
     let outs:Array<TransferableOutput> = [];
     
-    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+    if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
@@ -720,7 +728,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let outs:Array<TransferableOutput> = [];
     
     // Not implemented: Fees can be paid from importIns
-    if(typeof fee !== "undefined" && typeof feeAssetID !== "undefined") {
+    if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
@@ -807,7 +815,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       aad.addAssetAmount(avaxAssetID, amount, fee);
     } else {
       aad.addAssetAmount(avaxAssetID, amount, zero);
-      aad.addAssetAmount(feeAssetID, zero, fee);
+      if(this._feeCheck(fee, feeAssetID)){
+        aad.addAssetAmount(feeAssetID, zero, fee);
+      }
     }
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if(typeof success === "undefined") {
