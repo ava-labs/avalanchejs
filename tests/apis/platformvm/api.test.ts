@@ -358,7 +358,7 @@ describe('PlatformVMAPI', () => {
     let username = "Robert";
     let password = "Paulson";
     let txID = "valid";
-    let result:Promise<string> = api.importAVAX(username, password, to);
+    let result:Promise<string> = api.importAVAX(username, password, to, blockchainid);
     let payload:object = {
         "result": {
             "txID": txID
