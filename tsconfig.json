@@ -19,14 +19,13 @@
       "strictFunctionTypes": true,
       "esModuleInterop": true,
       "typeRoots": [
-        "./typings/**",
+        "./dist/**",
         "./node_modules/@types"
       ]
     },
     "include": ["src"],
     "exclude": [
       "node_modules",
-      "typings"
     ],
     "typeAcquisition": {
       "enable": true,

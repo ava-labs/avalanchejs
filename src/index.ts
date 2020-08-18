@@ -14,6 +14,7 @@ import { DefaultNetworkID, Defaults } from './utils/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
+import BN from "bn.js";
 
 /**
  * Avalanche.js is middleware for interacting with Avalanche node RPC APIs.
@@ -119,6 +120,7 @@ export { Avalanche };
 export { BinTools };
 export { DB };
 export { AvalancheCore };
+export { BN };
 
 export * as utils from './utils';
 export * as common from './common';
