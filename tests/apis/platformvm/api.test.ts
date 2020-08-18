@@ -592,6 +592,47 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(resp);
   });
 
+  test('getTx', async () => {
+    const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+
+    const result:Promise<string> = api.getTx(txid);
+    const payload:object = {
+      result: {
+        tx: 'sometx',
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:string = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe('sometx');
+  });
+
+
+  test('getTxStatus', async () => {
+    const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+
+    const result:Promise<string> = api.getTxStatus(txid);
+    const payload:object = {
+      result: {
+        status: 'accepted',
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:string = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe('accepted');
+  });
+
   test('getUTXOs', async () => {
     // Payment
     const OPUTXOstr1:string = bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex'));

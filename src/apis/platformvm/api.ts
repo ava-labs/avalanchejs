@@ -709,6 +709,34 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
+   * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
+   *
+   * @param txid The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   */
+  getTx = async (txid:string):Promise<string> => {
+    const params:any = {
+      txID: txid,
+    };
+    return this.callMethod('platform.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
+  };
+
+  /**
+   * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
+   *
+   * @param txid The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the status retrieved from the node
+   */
+  getTxStatus = async (txid:string):Promise<string> => {
+    const params:any = {
+      txID: txid,
+    };
+    return this.callMethod('platform.getTxStatus', params).then((response:RequestResponseData) => response.data.result.status);
+  };
+
+  /**
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
    * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
