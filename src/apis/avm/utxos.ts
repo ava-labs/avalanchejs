@@ -135,13 +135,8 @@ export class AssetAmount {
     if(!this.finished) {
       let total:BN = this.amount.add(this.burn);
       this.spent = this.spent.add(amt);
-      if(this.spent.gte(this.amount)){
-        if(this.spent.gte(total)){
-          this.change = this.change.add(this.spent.sub(total));
-        } else {
-          this.change = new BN(0);
-        }
-        this.spent = total;
+      if(this.spent.gte(total)) {
+        this.change = this.spent.sub(total)
         this.finished = true;
       }
     }
@@ -324,11 +319,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     for(let i = 0; i < amounts.length; i++) {
       const assetKey:string = amounts[i].getAssetIDString();
       const amount:BN = amounts[i].getAmount();
+      if (amount.gt(zero)) {
+        const spendout:AmountOutput = SelectOutputClass(outids[assetKey],
+          amount, aad.getDestinations(), locktime, threshold) as AmountOutput;
+        const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+        aad.addOutput(xferout);
+      }
       const change:BN = amounts[i].getChange();
-      const spendout:AmountOutput = SelectOutputClass(outids[assetKey],
-        amount, aad.getDestinations(), locktime, threshold) as AmountOutput;
-      const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
-      aad.addOutput(xferout);
       if (change.gt(zero)) {
         const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
           change, aad.getChangeAddresses()) as AmountOutput;
