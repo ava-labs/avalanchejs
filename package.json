@@ -6,7 +6,7 @@
   "browser": "dist/lib/avalanche.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "rm -rf dist/ && npx tsc -b && cp typings/src ./dist -r",
+    "build": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",
     "prebundle": "npm run build",
     "bundle": "webpack --mode production",
     "postbundle": "mkdir -p dist/lib && cp web/avalanche.js dist/lib/avalanche.js",
