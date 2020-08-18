@@ -4,6 +4,7 @@
  */
 
 import BN from 'bn.js';
+import { ImportTx } from '../avm/importtx';
 
 export class PlatformVMConstants {
   static LATESTCODEC:number = 0;
@@ -20,33 +21,31 @@ export class PlatformVMConstants {
 
   static SECPFXID:number = 0;
 
-  static NFTFXID:number = 1;
-
   static SECPOUTPUTID:number = 7;
-
-  static NFTXFEROUTPUTID:number = 11;
-
-  static NFTMINTOUTPUTID:number = 10;
 
   static SECPINPUTID:number = 5;
 
-  static NFTMINTOPID:number = 12;
-
-  static NFTXFEROP:number = 13;
-
   static BASETX:number = 0;
 
-  static CREATEASSETTX:number = 1;
+  static ADDDEFAULTSUBNETVALIDATORTX:number = 12;
 
-  static OPERATIONTX:number = 2;
+  static ADDNONDEFAULTSUBNETVALIDATORTX:number = 13;
 
-  static IMPORTTX:number = 3;
+  static ADDDEFAULTSUBNETDELEGATORTX:number = 14;
 
-  static EXPORTTX:number = 4;
+  static CREATECHAINTX:number = 15;
+
+  static CREATESUBNETTX:number = 16;
+
+  static IMPORTTX:number = 17;
+
+  static EXPORTTX:number = 18;
+
+  static ADVANCETIMETX:number = 19;
+
+  static REWARDVALIDATORTX:number = 20;
 
   static SECPCREDENTIAL:number = 9;
-
-  static NFTCREDENTIAL:number = 14;
 
   static ASSETIDLEN:number = 32;
 

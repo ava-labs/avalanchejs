@@ -200,24 +200,32 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Creates a new blockchain.
    *
-   * @param vmID The ID of the Virtual Machine the blockchain runs. Can also be an alias of the Virtual Machine.
-   * @param name A human-readable name for the new blockchain
-   * @param payerNonce The next unused nonce of the account paying the transaction fee
-   * @param genesis The base 58 (with checksum) representation of the genesis state of the new blockchain. Virtual Machines should have a static API method named buildGenesis that can be used to generate genesisData.
+   * @param username The username of the Keystore user that controls the new account
+   * @param password The password of the Keystore user that controls the new account
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an cb58 serialized string for the SubnetID or its alias.
+   * @param vmID The ID of the Virtual Machine the blockchain runs. Can also be an alias of the Virtual Machine.
+   * @param FXIDs The ids of the FXs the VM is running.
+   * @param name A human-readable name for the new blockchain
+   * @param genesis The base 58 (with checksum) representation of the genesis state of the new blockchain. Virtual Machines should have a static API method named buildGenesis that can be used to generate genesisData.
    *
    * @returns Promise for the unsigned transaction to create this blockchain. Must be signed by a sufficient number of the Subnet’s control keys and by the account paying the transaction fee.
    */
-  createBlockchain = async (vmID:string,
+  createBlockchain = async (
+    username: string,
+    password:string,
+    subnetID:Buffer | string = undefined,
+    vmID:string,
+    fxIDs: Array<number>,
     name:string,
-    payerNonce: number,
     genesis:string,
-    subnetID:Buffer | string = undefined)
+    )
   :Promise<string> => {
     const params:any = {
+      username, 
+      password,
+      fxIDs,
       vmID,
       name,
-      payerNonce,
       genesisData: genesis,
     };
     if (typeof subnetID === 'string') {
@@ -226,11 +234,11 @@ export class PlatformVMAPI extends JRPCAPI {
       params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.createBlockchain', params)
-      .then((response:RequestResponseData) => response.data.result.blockchainID);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
-   * Creates a new blockchain.
+   * Gets the status of a blockchain.
    *
    * @param blockchainID The blockchainID requesting a status update
    *
@@ -252,7 +260,8 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for a string of the newly created account address.
    */
-  createAddress = async (username: string,
+  createAddress = async (
+    username: string,
     password:string
   )
   :Promise<string> => {
@@ -367,75 +376,79 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Add a validator to the Default Subnet.
    *
-   * @param id The node ID of the validator
+   * @param username The username of the Keystore user
+   * @param password The password of the Keystore user
+   * @param nodeID The node ID of the validator
    * @param startTime Javascript Date object for the start time to validate
    * @param endTime Javascript Date object for the end time to validate
    * @param stakeAmount The amount of nAVAX the validator is staking as
    * a {@link https://github.com/indutny/bn.js/|BN}
-   * @param payerNonce The next unused nonce of the account that is providing the staked
-   * AVAX and paying the transaction fee
-   * @param destination The P-Chain address of the account that the staked AVAX will be returned
-   * to, as well as a validation reward if the validator is sufficiently responsive and correct
-   * while it validated
-   * @param delegationFeeRate Optional. The percent fee this validator charges when others
-   * delegate stake to them, multiplied by 10,000 as
-   * a {@link https://github.com/indutny/bn.js/|BN}. For example, suppose a validator has
-   * delegationFeeRate 300,000 and someone delegates to that validator. When the delegation
-   * period is over, if the delegator is entitled to a reward, 30% of the reward
-   * (300,000 / 10,000) goes to the validator and 70% goes to the delegator
-   * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or
-   * an cb58 serialized string for the SubnetID or its alias.
+   * @param rewardAddress The address the validator reward will go to, if there is one.
+   * @param delegationFeeRate Optional. A {@link https://github.com/indutny/bn.js/|BN} for the percent fee this validator 
+   * charges when others delegate stake to them. Up to 4 decimal places allowed; additional decimal places are ignored. 
+   * Must be between 0 and 100, inclusive. For example, if delegationFeeRate is 1.2345 and someone delegates to this 
+   * validator, then when the delegation period is over, 1.2345% of the reward goes to the validator and the rest goes 
+   * to the delegator.
    *
    * @returns Promise for a base58 string of the unsigned transaction.
    */
-  addDefaultSubnetValidator = async (id:string,
+  addDefaultSubnetValidator = async (
+    username:string,
+    password:string,
+    nodeID:string,
     startTime:Date,
     endTime:Date,
     stakeAmount:BN,
-    payerNonce:number,
-    destination:string,
-    delegationFeeRate:BN = undefined)
+    rewardAddress:string,
+    delegationFeeRate:BN = undefined
+  )
   :Promise<string> => {
     const params:any = {
-      id,
+      username,
+      password,
+      nodeID,
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
       stakeAmount: stakeAmount.toString(10),
-      payerNonce: Math.floor(payerNonce),
-      destination,
+      rewardAddress,
     };
     if (typeof delegationFeeRate !== 'undefined') {
       params.delegationFeeRate = delegationFeeRate.toString(10);
     }
     return this.callMethod('platform.addDefaultSubnetValidator', params)
-      .then((response:RequestResponseData) => response.data.result.unsignedTx);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
    * Add a validator to a Subnet other than the Default Subnet. The validator must validate the Default Subnet for the entire duration they validate this Subnet.
    *
-   * @param id The node ID of the validator
+   * @param username The username of the Keystore user
+   * @param password The password of the Keystore user
+   * @param nodeID The node ID of the validator
    * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58 serialized string for the SubnetID or its alias.
    * @param startTime Javascript Date object for the start time to validate
    * @param endTime Javascript Date object for the end time to validate
    * @param weight The validator’s weight used for sampling
-   * @param payerNonce The next unused nonce of the account that is providing the staked AVAX and paying the transaction fee
    *
    * @returns Promise for the unsigned transaction. It must be signed (using sign) by the proper number of the Subnet’s control keys and by the key of the account paying the transaction fee before it can be issued.
    */
-  addNonDefaultSubnetValidator = async (id:string,
+  addNonDefaultSubnetValidator = async (
+    username:string,
+    password:string,
+    nodeID:string,
     subnetID:Buffer | string,
     startTime:Date,
     endTime:Date,
-    weight:number,
-    payerNonce:number)
+    weight:number
+    )
   :Promise<string> => {
     const params:any = {
-      id,
+      username,
+      password,
+      nodeID,
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
-      weight,
-      payerNonce: Math.floor(payerNonce),
+      weight
     };
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
@@ -443,63 +456,73 @@ export class PlatformVMAPI extends JRPCAPI {
       params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.addNonDefaultSubnetValidator', params)
-      .then((response:RequestResponseData) => response.data.result.unsignedTx);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
    * Add a delegator to the Default Subnet.
    *
-   * @param id The node ID of the delegatee
+   * @param username The username of the Keystore user
+   * @param password The password of the Keystore user
+   * @param nodeID The node ID of the delegatee
    * @param startTime Javascript Date object for when the delegator starts delegating
    * @param endTime Javascript Date object for when the delegator starts delegating
    * @param stakeAmount The amount of nAVAX the delegator is staking as
    * a {@link https://github.com/indutny/bn.js/|BN}
-   * @param payerNonce The next unused nonce of the account that will provide the staked
-   * AVAX and pay the transaction fee
-   * @param destination The address of the account the staked AVAX and validation reward
+   * @param rewardAddress The address of the account the staked AVAX and validation reward
    * (if applicable) are sent to at endTime
    *
    * @returns Promise for an array of validator's stakingIDs.
    */
-  addDefaultSubnetDelegator = async (id:string,
+  addDefaultSubnetDelegator = async (
+    username:string,
+    password:string,
+    nodeID:string,
     startTime:Date,
     endTime:Date,
     stakeAmount:BN,
-    payerNonce:number,
-    destination:string)
+    rewardAddress:string)
   :Promise<string> => {
     const params:any = {
-      id,
+      username,
+      password,
+      nodeID,
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
       stakeAmount: stakeAmount.toString(10),
-      payerNonce: Math.floor(payerNonce),
-      destination,
+      rewardAddress,
     };
     return this.callMethod('platform.addDefaultSubnetDelegator', params)
-      .then((response:RequestResponseData) => response.data.result.unsignedTx);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
    * Create an unsigned transaction to create a new Subnet. The unsigned transaction must be
    * signed with the key of the account paying the transaction fee. The Subnet’s ID is the ID of the transaction that creates it (ie the response from issueTx when issuing the signed transaction).
    *
+   * @param username The username of the Keystore user
+   * @param password The password of the Keystore user
    * @param controlKeys Array of platform addresses as strings
    * @param threshold To add a validator to this Subnet, a transaction must have threshold
    * signatures, where each signature is from a key whose address is an element of `controlKeys`
-   * @param payerNonce The next unused nonce of the account providing the transaction fee
    *
    * @returns Promise for a string with the unsigned transaction encoded as base58.
    */
-  createSubnet = async (controlKeys:Array<string>, threshold:number, payerNonce:number)
+  createSubnet = async (
+    username: string, 
+    password:string,
+    controlKeys:Array<string>, 
+    threshold:number
+  )
   :Promise<string> => {
     const params:any = {
+      username,
+      password,
       controlKeys,
-      threshold,
-      payerNonce,
+      threshold
     };
     return this.callMethod('platform.createSubnet', params)
-      .then((response:RequestResponseData) => response.data.result.unsignedTx);
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -601,32 +624,6 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-   * Sign an unsigned or partially signed transaction.
-   *
-   * Transactions to add non-default Subnets require signatures from control keys and
-   * from the account paying the transaction fee. If `signer` is a control key and the
-   * transaction needs more signatures from control keys, `sign` will provide a control
-   * signature. Otherwise, `signer` will sign to pay the transaction fee.
-   *
-   * @param username The Keystore user that controls the key signing `tx`
-   * @param password The password of the Keystore user
-   * @param tx The unsigned/partially signed transaction
-   * @param signer The address of the key signing `tx`
-   *
-   * @returns Promise for an string of the transaction after being signed.
-   */
-  sign = async (username: string, password:string, tx:string, signer:string):Promise<string> => {
-    const params:any = {
-      tx,
-      signer,
-      username,
-      password,
-    };
-    return this.callMethod('platform.sign', params)
-      .then((response:RequestResponseData) => response.data.result.tx);
-  };
-
-  /**
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
@@ -656,11 +653,16 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Get all the subnets that exist.
    *
+   * @param ids IDs of the subnets to retrieve information about. If omitted, gets all subnets
+   * 
    * @returns Promise for an array of objects containing fields "id",
    * "controlKeys", and "threshold".
    */
-  getSubnets = async ():Promise<Array<object>> => {
+  getSubnets = async (ids:Array<string> = undefined):Promise<Array<object>> => {
     const params:any = {};
+    if(typeof ids !== undefined){
+      params.ids = ids;
+    }
     return this.callMethod('platform.getSubnets', params)
       .then((response:RequestResponseData) => response.data.result.subnets);
   };
@@ -707,18 +709,31 @@ export class PlatformVMAPI extends JRPCAPI {
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
    * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
+   * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
+   * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
+   * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
    * persistOpts is optional and must be of type [[PersistanceOptions]]
    *
    */
-  getUTXOs = async (addresses:Array<string> | Array<Buffer>, persistOpts:PersistanceOptions = undefined):Promise<UTXOSet> => {
+  getUTXOs = async (
+    addresses:Array<string> | Array<Buffer>,
+    limit:number = 0,
+    startIndex:number = undefined,
+    persistOpts:PersistanceOptions = undefined
+  ):Promise<UTXOSet> => {
     const addrs:Array<string> = this._cleanAddressArray(addresses, 'getUTXOs');
 
     const params:any = {
       addresses: addrs,
+      limit
     };
+    if(typeof startIndex !== "undefined"){
+      params.startIndex = startIndex;
+    }
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;

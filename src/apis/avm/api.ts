@@ -518,18 +518,31 @@ export class AVMAPI extends JRPCAPI {
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
    * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
+   * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
+   * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
+   * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
    * persistOpts is optional and must be of type [[PersistanceOptions]]
    *
    */
-  getUTXOs = async (addresses:Array<string> | Array<Buffer>, persistOpts:PersistanceOptions = undefined):Promise<UTXOSet> => {
+  getUTXOs = async (
+    addresses:Array<string> | Array<Buffer>,
+    limit:number = 0,
+    startIndex:number = undefined,
+    persistOpts:PersistanceOptions = undefined
+  ):Promise<UTXOSet> => {
     const addrs:Array<string> = this._cleanAddressArray(addresses, 'getUTXOs');
 
     const params:any = {
       addresses: addrs,
+      limit,
     };
+    if(typeof startIndex !== "undefined"){
+      params.startIndex = startIndex;
+    }
     return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;

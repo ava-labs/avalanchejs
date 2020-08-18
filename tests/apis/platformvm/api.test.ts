@@ -134,17 +134,16 @@ describe('PlatformVMAPI', () => {
   });
 
   test('addNonDefaultSubnetValidator 1', async () => {
-    const id = 'abcdef';
-    let subnetID = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH";
+    const nodeID = 'abcdef';
+    const subnetID = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH";
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
     const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
     const weight = 13;
-    const payerNonce = 3;
     const utx = 'valid';
-    const result:Promise<string> = api.addNonDefaultSubnetValidator(id, subnetID, startTime, endTime, weight, payerNonce);
+    const result:Promise<string> = api.addNonDefaultSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight);
     const payload:object = {
       result: {
-        unsignedTx: utx,
+        txID: utx,
       },
     };
     const responseObj = {
@@ -158,69 +157,17 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx);
   });
 
-  test('addDefaultSubnetValidator 1', async () => {
-    const id = 'abcdef';
-    const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
-    const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
-    const stakeAmount = new BN(13);
-    const payerNonce = 3;
-    const destination = 'fedcba';
-    const delegationFeeRate = new BN(2);
-    const utx = 'valid';
-    const result:Promise<string> = api.addDefaultSubnetValidator(id, startTime, endTime, stakeAmount, payerNonce, destination, delegationFeeRate);
-    const payload:object = {
-      result: {
-        unsignedTx: utx,
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(utx);
-  });
-
-  test('addNonDefaultSubnetValidator 2', async () => {
-    const id = 'abcdef';
-    const subnetID = 'abcdef';
-    const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
-    const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
-    const weight = 13;
-    const payerNonce = 3;
-    const utx = 'valid';
-    const result:Promise<string> = api.addNonDefaultSubnetValidator(id, subnetID, startTime, endTime, weight, payerNonce);
-    const payload:object = {
-      result: {
-        unsignedTx: utx,
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(utx);
-  });
-
-  test('addNonDefaultSubnetValidator 3', async () => {
-    const id = 'abcdef';
+  test('addNonDefaultSubnetValidator', async () => {
+    const nodeID = 'abcdef';
     const subnetID = Buffer.from('abcdef', 'hex');
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
     const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
     const weight = 13;
-    const payerNonce = 3;
     const utx = 'valid';
-    const result:Promise<string> = api.addNonDefaultSubnetValidator(id, subnetID, startTime, endTime, weight, payerNonce);
+    const result:Promise<string> = api.addNonDefaultSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight);
     const payload:object = {
       result: {
-        unsignedTx: utx,
+        txID: utx,
       },
     };
     const responseObj = {
@@ -235,17 +182,16 @@ describe('PlatformVMAPI', () => {
   });
 
   test('addDefaultSubnetDelegator 1', async () => {
-    const id = 'abcdef';
+    const nodeID = 'abcdef';
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
     const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
     const stakeAmount = new BN(13);
-    const payerNonce = 3;
-    const destination = 'fedcba';
+    const rewardAddress = 'fedcba';
     const utx = 'valid';
-    const result:Promise<string> = api.addDefaultSubnetDelegator(id, startTime, endTime, stakeAmount, payerNonce, destination);
+    const result:Promise<string> = api.addDefaultSubnetDelegator(username, password, nodeID, startTime, endTime, stakeAmount, rewardAddress);
     const payload:object = {
       result: {
-        unsignedTx: utx,
+        txID: utx,
       },
     };
     const responseObj = {
@@ -429,61 +375,16 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(txID);
   });
 
-  test('createBlockchain 1', async () => {
-    const blockchainID:string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh';
-    const vmID:string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh';
-    const name:string = 'Some Blockchain';
-    const genesis:string = '{ruh:"roh"}';
-    const result:Promise<string> = api.createBlockchain(vmID, name, 1, genesis);
-    const payload:object = {
-      result: {
-        blockchainID,
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(blockchainID);
-  });
-
-  test('createBlockchain 2', async () => {
-    const blockchainID:string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh';
-    const vmID:string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh';
-    const name:string = 'Some Blockchain';
-    const genesis:string = '{ruh:"roh"}';
-    const subnetID:string = 'abcdefg';
-    const result:Promise<string> = api.createBlockchain(vmID, name, 1, genesis, subnetID);
-    const payload:object = {
-      result: {
-        blockchainID,
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(blockchainID);
-  });
-
-  test('createBlockchain 3', async () => {
+  test('createBlockchain', async () => {
     const blockchainID:string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh';
     const vmID:string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh';
     const name:string = 'Some Blockchain';
     const genesis:string = '{ruh:"roh"}';
     const subnetID:Buffer = Buffer.from('abcdef', 'hex');
-    const result:Promise<string> = api.createBlockchain(vmID, name, 1, genesis, subnetID);
+    const result:Promise<string> = api.createBlockchain(username, password, subnetID, vmID, [1,2,3], name, genesis);
     const payload:object = {
       result: {
-        blockchainID,
+        txID: blockchainID,
       },
     };
     const responseObj = {
@@ -539,12 +440,11 @@ describe('PlatformVMAPI', () => {
   test('createSubnet 1', async () => {
     const controlKeys = ['abcdef'];
     const threshold = 13;
-    const payerNonce = 3;
     const utx = 'valid';
-    const result:Promise<string> = api.createSubnet(controlKeys, threshold, payerNonce);
+    const result:Promise<string> = api.createSubnet(username, password, controlKeys, threshold);
     const payload:object = {
       result: {
-        unsignedTx: utx,
+        txID: utx,
       },
     };
     const responseObj = {
@@ -705,7 +605,7 @@ describe('PlatformVMAPI', () => {
     const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
     expect(persistOpts.getMergeRule()).toBe('union');
     let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:Promise<UTXOSet> = api.getUTXOs(addresses, persistOpts);
+    let result:Promise<UTXOSet> = api.getUTXOs(addresses, 0, 1, persistOpts);
     const payload:object = {
       result: {
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
@@ -722,7 +622,7 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, persistOpts);
+    result = api.getUTXOs(addresses, 0, 0, persistOpts);
 
     mockAxios.mockResponse(responseObj);
     response = await result;

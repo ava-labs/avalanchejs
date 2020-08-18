@@ -24,9 +24,6 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
   if (credid === PlatformVMConstants.SECPCREDENTIAL) {
     const secpcred:SecpCredential = new SecpCredential(...args);
     return secpcred;
-  } if (credid === PlatformVMConstants.NFTCREDENTIAL) {
-    const nftcred:NFTCredential = new NFTCredential(...args);
-    return nftcred;
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
@@ -38,8 +35,3 @@ export class SecpCredential extends Credential {
   }
 }
 
-export class NFTCredential extends Credential {
-  getCredentialID():number {
-    return PlatformVMConstants.NFTCREDENTIAL;
-  }
-}
