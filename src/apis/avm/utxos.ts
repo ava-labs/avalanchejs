@@ -267,7 +267,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     return newset as this;
   }
 
-  protected getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
+  getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
     const utxoArray:Array<UTXO> = this.getAllUTXOs();
     const outids:object = {};
     for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
