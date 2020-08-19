@@ -102,9 +102,9 @@ describe('Transactions', () => {
     fungutxos = [];
     exportUTXOIDS = [];
     for (let i:number = 0; i < 3; i++) {
-      addrs1.push(keymgr1.makeKey());
-      addrs2.push(keymgr2.makeKey());
-      addrs3.push(keymgr3.makeKey());
+      addrs1.push(keymgr1.makeKey().getAddress());
+      addrs2.push(keymgr2.makeKey().getAddress());
+      addrs3.push(keymgr3.makeKey().getAddress());
     }
     amount = new BN(amnt);
     addresses = keymgr1.getAddresses();

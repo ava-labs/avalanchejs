@@ -85,12 +85,12 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
     /**
      * Makes a new key pair, returns the address.
      * 
-     * @returns Address of the new key pair
+     * @returns The new key pair
      */
-    makeKey = ():Buffer => {
+    makeKey = ():AVMKeyPair => {
         let keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
         this.addKey(keypair);
-        return keypair.getAddress();
+        return keypair
     }
 
     addKey = (newKey:AVMKeyPair) => {
@@ -103,9 +103,9 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
      * 
      * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
      * 
-     * @returns Address of the new key pair
+     * @returns The new key pair
      */
-    importKey = (privk:Buffer | string):Buffer => {
+    importKey = (privk:Buffer | string):AVMKeyPair => {
         let keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
@@ -117,7 +117,7 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
         if(!(keypair.getAddress().toString("hex") in this.keys)){
             this.addKey(keypair);
         }
-        return keypair.getAddress();
+        return keypair;
     }
 
     /**

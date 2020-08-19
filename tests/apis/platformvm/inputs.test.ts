@@ -33,8 +33,8 @@ describe('Inputs', () => {
     addrs2 = [];
     utxos = [];
     for (let i:number = 0; i < 3; i++) {
-      addrs1.push(keymgr1.makeKey());
-      addrs2.push(keymgr2.makeKey());
+      addrs1.push(keymgr1.makeKey().getAddress());
+      addrs2.push(keymgr2.makeKey().getAddress());
     }
     const amount:BN = new BN(amnt);
     const addresses:Array<Buffer> = keymgr1.getAddresses();

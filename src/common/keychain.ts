@@ -121,16 +121,16 @@ export class KeyPair {
        *
        * @returns Address of the new [[KeyPair]]
        */
-    makeKey:() => Buffer;
+    makeKey:() => KPClass;
   
     /**
        * Given a private key, makes a new [[KeyPair]], returns the address.
        *
        * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key
        *
-       * @returns Address of the new [[KeyPair]]
+       * @returns A new [[KeyPair]]
        */
-    importKey:(privk:Buffer) => Buffer;
+    importKey:(privk:Buffer) => KPClass;
   
     /**
        * Gets an array of addresses stored in the [[KeyChain]].

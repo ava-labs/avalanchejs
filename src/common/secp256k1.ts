@@ -203,7 +203,7 @@ export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> ex
      * 
      * @returns Address of the new key pair
      */
-    makeKey:() => Buffer; 
+    makeKey:() => SECPKPClass; 
 
     addKey(newKey:SECPKPClass) {
         super.addKey(newKey);
@@ -216,7 +216,7 @@ export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> ex
      * 
      * @returns Address of the new key pair
      */
-    importKey:(privk:Buffer | string) => Buffer;
+    importKey:(privk:Buffer | string) => SECPKPClass;
 
     /**
      * Returns instance of SECP256k1KeyChain.

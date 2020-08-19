@@ -594,9 +594,9 @@ describe('AVMAPI', () => {
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
 
       for (let i:number = 0; i < 3; i++) {
-        addrs1.push(avm.addressFromBuffer(avm.keyChain().makeKey()));
-        addrs2.push(avm.addressFromBuffer(keymgr2.makeKey()));
-        addrs3.push(avm.addressFromBuffer(keymgr3.makeKey()));
+        addrs1.push(avm.addressFromBuffer(avm.keyChain().makeKey().getAddress()));
+        addrs2.push(avm.addressFromBuffer(keymgr2.makeKey().getAddress()));
+        addrs3.push(avm.addressFromBuffer(keymgr3.makeKey().getAddress()));
       }
       const amount:BN = new BN(amnt);
       addressbuffs = avm.keyChain().getAddresses();

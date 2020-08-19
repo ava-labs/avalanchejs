@@ -85,12 +85,12 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
     /**
      * Makes a new key pair, returns the address.
      * 
-     * @returns Address of the new key pair
+     * @returns The new key pair
      */
-    makeKey = ():Buffer => {
+    makeKey = ():PlatformVMKeyPair => {
         let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
         this.addKey(keypair);
-        return keypair.getAddress();
+        return keypair;
     }
 
     addKey = (newKey:PlatformVMKeyPair) => {
@@ -103,9 +103,9 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
      * 
      * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
      * 
-     * @returns Address of the new key pair
+     * @returns The new key pair
      */
-    importKey = (privk:Buffer | string):Buffer => {
+    importKey = (privk:Buffer | string):PlatformVMKeyPair => {
         let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
@@ -117,7 +117,7 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
         if(!(keypair.getAddress().toString("hex") in this.keys)){
             this.addKey(keypair);
         }
-        return keypair.getAddress();
+        return keypair;
     }
 
     /**
