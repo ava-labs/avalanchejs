@@ -769,60 +769,8 @@ describe('PlatformVMAPI', () => {
 
     });
 
-    test('buildBaseTx1', async () => {
-      const assetID = await avm.getAVAXAssetID();
-      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, new UTF8Payload("hello world").getContent());
-      let memobuf:Buffer = Buffer.from("hello world");
-      const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
-        addrs3.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        avm.getFee(), assetID,
-         memobuf, UnixNow(), new BN(0), 1,
-      );
-      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
-      expect(txu2.toString()).toBe(txu1.toString());
-    });
-
-    test('buildBaseTx2', async () => {
-      const assetID = await avm.getAVAXAssetID();
-      const txu1:UnsignedTx = await avm.buildBaseTx(
-        set, new BN(amnt).sub(new BN(100)),
-        addrs3, addrs1, addrs2, 
-        new UTF8Payload("hello world"));
-      const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt).sub(new BN(100)), assetID,
-        addrs3.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        addrs2.map((a) => avm.parseAddress(a)),
-        avm.getFee(), assetID,
-        new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
-      );
-
-      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
-      expect(txu2.toString()).toBe(txu1.toString());
-
-      const outies = txu1.getTransaction().getOuts().sort(TransferableOutput.comparator()) as Array<TransferableOutput>;
-
-      expect(outies.length).toBe(2);
-      const outaddr0 = outies[0].getOutput().getAddresses().map((a) => avm.addressFromBuffer(a));
-      const outaddr1 = outies[1].getOutput().getAddresses().map((a) => avm.addressFromBuffer(a));
-
-      const testaddr2 = JSON.stringify(addrs2.sort());
-      const testaddr3 = JSON.stringify(addrs3.sort());
-
-      const testout0 = JSON.stringify(outaddr0.sort());
-      const testout1 = JSON.stringify(outaddr1.sort());
-      expect(
-        (testaddr2 == testout0 && testaddr3 == testout1)
-                || (testaddr3 == testout0 && testaddr2 == testout1),
-      ).toBe(true);
-    });
-
     test('signTx', async () => {
       const assetID = await avm.getAVAXAssetID();
-      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1);
       const txu2:UnsignedTx = set.buildBaseTx(
         networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
@@ -832,75 +780,12 @@ describe('PlatformVMAPI', () => {
         undefined, UnixNow(), new BN(0), 1,
       );
 
-      const tx1:Tx = txu1.sign(avm.keyChain());
       const tx2:Tx = txu2.sign(avm.keyChain());
-
-      expect(tx2.toBuffer().toString('hex')).toBe(tx1.toBuffer().toString('hex'));
-      expect(tx2.toString()).toBe(tx1.toString());
     });
 
-    test('issueTx Serialized', async () => {
-      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1);
-      const tx = txu.sign(avm.keyChain());
-      const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
-      const result:Promise<string> = avm.issueTx(tx.toString());
-      const payload:object = {
-        result: {
-          txID: txid,
-        },
-      };
-      const responseObj = {
-        data: payload,
-      };
-      mockAxios.mockResponse(responseObj);
-        let response:string = await result;
 
-        expect(response).toBe(txid);
-    });
 
-      test('issueTx Buffer', async () => {
-        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1);
-        const tx = txu.sign(avm.keyChain());
-  
-        const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-        const result:Promise<string> = avm.issueTx(tx.toBuffer());
-        const payload:object = {
-          result: {
-            txID: txid,
-          },
-        };
-        const responseObj = {
-          data: payload,
-        };
-  
-        mockAxios.mockResponse(responseObj);
-        const response:string = await result;
-  
-        expect(response).toBe(txid);
-      });
-
-      test('issueTx Class Tx', async () => {
-        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1);
-        const tx = txu.sign(avm.keyChain());
-  
-        const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-  
-        const result:Promise<string> = avm.issueTx(tx);
-        const payload:object = {
-          result: {
-            txID: txid,
-          },
-        };
-        const responseObj = {
-          data: payload,
-        };
-  
-        mockAxios.mockResponse(responseObj);
-        const response:string = await result;
-  
-        expect(response).toBe(txid);
-      });
 
 
     test('buildImportTx', async () => {

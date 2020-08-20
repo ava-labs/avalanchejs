@@ -15,6 +15,7 @@ import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
 import BN from "bn.js";
+import { Buffer } from 'buffer/';
 
 /**
  * Avalanche.js is middleware for interacting with Avalanche node RPC APIs.
@@ -121,6 +122,7 @@ export { BinTools };
 export { DB };
 export { AvalancheCore };
 export { BN };
+export { Buffer };
 
 export * as utils from './utils';
 export * as common from './common';
