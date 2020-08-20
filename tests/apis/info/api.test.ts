@@ -1,6 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from 'src';
 import { InfoAPI } from 'src/apis/info/api';
+import BN from "bn.js";
 
 describe('Info', () => {
   const ip:string = '127.0.0.1';
@@ -52,6 +53,24 @@ describe('Info', () => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(12345);
+  });
+
+  test('getTxFee', async () => {
+    const result:Promise<BN> = info.getTxFee();
+    const payload:object = {
+      result: {
+        txFee: "1000000",
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:BN = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.eq(new BN('1000000'))).toBe(true);
   });
 
   test('getNetworkName', async () => {
