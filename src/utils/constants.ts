@@ -103,24 +103,24 @@ const n3C:object = {
 
 // TODO: UPDATE FOR EVEREST
 const n4X:object = {
-  blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
+  blockchainID: 'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 0
+  fee: 1000000
 };
 
 const n4P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 0
+  fee: 1000000
 };
 
 const n4C:object = {
-  blockchainID: 'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9',
+  blockchainID: 'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 0
+  fee: 1000000
 };
 
 // END TODO
@@ -164,11 +164,11 @@ export class Defaults {
     4: { // update before everest
       hrp: NetworkIDToHRP[4],
       X: n4X,
-      'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L': n4X,
+      'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC': n4X,
       P: n4P,
       '11111111111111111111111111111111LpoYY': n4P,
       C: n4C,
-      'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9': n4C,
+      'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK': n4C,
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
