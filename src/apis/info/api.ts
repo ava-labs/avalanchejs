@@ -5,6 +5,7 @@
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
+import BN from "bn.js";
 
 /**
  * Class for interacting with a node's InfoAPI.
@@ -45,9 +46,9 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<number> of the transaction fee in nAVAX.
    */
-  getTxFee = async ():Promise<number> => {
+  getTxFee = async ():Promise<BN> => {
     return this.callMethod('info.getTxFee')
-        .then((response:RequestResponseData) => response.data.result.txFee);
+        .then((response:RequestResponseData) => new BN(response.data.result.txFee));
   };
 
   /**
