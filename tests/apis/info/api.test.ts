@@ -54,6 +54,24 @@ describe('Info', () => {
     expect(response).toBe(12345);
   });
 
+  test('getTxFee', async () => {
+    const result:Promise<number> = info.getTxFee();
+    const payload:object = {
+      result: {
+        txFee: "1000000",
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:number = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe('1000000');
+  });
+
   test('getNetworkName', async () => {
     const result:Promise<string> = info.getNetworkName();
     const payload:object = {

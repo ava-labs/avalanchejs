@@ -41,6 +41,16 @@ export class InfoAPI extends JRPCAPI {
   };
 
   /**
+   * Fetches the transaction fee from the node.
+   *
+   * @returns Returns a Promise<number> of the transaction fee in nAVAX.
+   */
+  getTxFee = async ():Promise<number> => {
+    return this.callMethod('info.getTxFee')
+        .then((response:RequestResponseData) => response.data.result.txFee);
+  };
+
+  /**
      * Fetches the network name this node is running on
      *
      * @returns Returns a Promise<string> containing the network name.
