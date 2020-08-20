@@ -129,9 +129,13 @@ export default class BinTools {
      * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert
      * to a {@link https://github.com/indutny/bn.js/|BN}
      */
-  fromBufferToBN = (buff:Buffer):BN => new BN(buff.toString('hex'), 16, 'be');
-
-  /**
+  fromBufferToBN = (buff:Buffer):BN => {
+    if(typeof buff === "undefined") {
+      return undefined;
+    }
+    return new BN(buff.toString('hex'), 16, 'be')
+  };
+    /**
      * Takes a {@link https://github.com/indutny/bn.js/|BN} and converts it
      * to a {@link https://github.com/feross/buffer|Buffer}.
      *
@@ -140,6 +144,9 @@ export default class BinTools {
      * @param length The zero-padded length of the {@link https://github.com/feross/buffer|Buffer}
      */
   fromBNToBuffer = (bn:BN, length?:number):Buffer => {
+    if(typeof bn === "undefined") {
+      return undefined;
+    }
     const newarr = bn.toArray('be');
     /**
      * CKC: Still unsure why bn.toArray with a "be" and a length do not work right. Bug?

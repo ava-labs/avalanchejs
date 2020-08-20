@@ -786,67 +786,6 @@ export class PlatformVMAPI extends JRPCAPI {
     });
   };
 
-  /**
-   * Helper function which creates an unsigned transaction. For more granular control, you may create your own
-   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-   *
-   * @param utxoset A set of UTXOs that the transaction is built on
-   * @param amount The amount of AssetID to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
-   * @param assetID The assetID of the value being sent
-   * @param toAddresses The addresses to send the funds
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
-   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-   *
-   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[BaseTx]].
-   *
-   * @remarks
-   * This helper exists because the endpoint API should be the primary point of entry for most functionality.
-   */
-  buildBaseTx = async (
-    utxoset:UTXOSet, 
-    amount:BN, 
-    toAddresses:Array<string>, 
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string>, 
-    memo:PayloadBase|Buffer = undefined, 
-    asOf:BN = UnixNow(),
-    locktime:BN = new BN(0), 
-    threshold:number = 1
-  ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-
-    const assetID = await this.getAVAXAssetID();
-
-    if( memo instanceof PayloadBase) {
-      memo = memo.getPayload();
-    }
-
-    const builtUnsignedTx:UnsignedTx = utxoset.buildBaseTx(
-      this.core.getNetworkID(), 
-      bintools.cb58Decode(this.blockchainID),
-      amount, 
-      assetID, 
-      to, 
-      from, 
-      change, 
-      this.getFee(), 
-      await this.getAVAXAssetID(),
-      memo, asOf, locktime, threshold,
-    );
-
-    if(! await this.checkGooseEgg(builtUnsignedTx)) {
-      /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
-    }
-
-    return builtUnsignedTx;
-  };
 
 /**
  * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own

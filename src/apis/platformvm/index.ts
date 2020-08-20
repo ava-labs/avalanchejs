@@ -9,3 +9,4 @@ export * from './keychain';
 export * from './outputs';
 export * from './tx';
 export * from './utxos';
+export * from './validationtx';
