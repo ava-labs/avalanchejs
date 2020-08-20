@@ -6,127 +6,7 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import * as bech32 from 'bech32';
-
-/**
- * A Base58 class that uses the cross-platform Buffer module. Built so that Typescript
- * will accept the code.
- *
- * ```js
- * let b58:Base58 = new Base58();
- * let str:string = b58.encode(somebuffer);
- * let buff:Buffer = b58.decode(somestring);
- * ```
- */
-export class Base58 {
-  protected b58alphabet:string = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-
-  protected alphabetIdx0 = '1';
-
-  protected b58 = [
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 0, 1, 2, 3, 4, 5, 6,
-    7, 8, 255, 255, 255, 255, 255, 255,
-    255, 9, 10, 11, 12, 13, 14, 15,
-    16, 255, 17, 18, 19, 20, 21, 255,
-    22, 23, 24, 25, 26, 27, 28, 29,
-    30, 31, 32, 255, 255, 255, 255, 255,
-    255, 33, 34, 35, 36, 37, 38, 39,
-    40, 41, 42, 43, 255, 44, 45, 46,
-    47, 48, 49, 50, 51, 52, 53, 54,
-    55, 56, 57, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-    255, 255, 255, 255, 255, 255, 255, 255,
-  ];
-
-  protected big58Radix:BN = new BN(58);
-
-  protected bigZero:BN = new BN(0);
-
-  /**
-     * Encodes a {@link https://github.com/feross/buffer|Buffer} as a base-58 string
-     *
-     * @param buff A {@link https://github.com/feross/buffer|Buffer} to encode
-     *
-     * @returns A base-58 string.
-     */
-  encode = (buff:Buffer):string => {
-    let x:BN = new BN(buff.toString('hex'), 'hex', 'be');
-    let answer:string = '';// = Buffer.alloc(buff.length*136/100, 0);
-    while (x.cmp(this.bigZero) > 0) {
-      const mod:BN = x.mod(this.big58Radix);
-      x = x.div(this.big58Radix);
-      answer += this.b58alphabet[mod.toNumber()];
-    }
-
-    for (let i:number = 0; i < buff.length; i++) {
-      if (buff.readUInt8(i) !== 0) {
-        break;
-      }
-      answer += this.alphabetIdx0;
-    }
-    return answer.split('').reverse().join('');
-  };
-
-  /**
-     * Decodes a base-58 into a {@link https://github.com/feross/buffer|Buffer}
-     *
-     * @param b A base-58 string to decode
-     *
-     * @returns A {@link https://github.com/feross/buffer|Buffer} from the decoded string.
-     */
-  decode = (b:string):Buffer => {
-    const answer:BN = new BN(0);
-    const j:BN = new BN(1);
-
-    for (let i:number = b.length - 1; i >= 0; i--) {
-      const tmp:number = this.b58[b.charCodeAt(i)];
-      if (tmp === 255) {
-        throw new Error('Error - Base58.decode: not a valid base58 string');
-      }
-      const scratch:BN = new BN(tmp);
-      scratch.imul(j);
-      answer.iadd(scratch);
-      j.imul(this.big58Radix);
-    }
-
-    /* EGS: why are we converting to hex and back from hex? */
-    let anshex = answer.toString('hex');
-    anshex = anshex.length % 2 ? `0${anshex}` : anshex;
-
-    /* EGS: what's the point of counting these zeroes? */
-    const tmpval:Buffer = Buffer.from(anshex, 'hex');
-    let numZeros:number;
-    for (numZeros = 0; numZeros < b.length; numZeros++) {
-      if (b[numZeros] !== this.alphabetIdx0) {
-        break;
-      }
-    }
-    const xlen:number = numZeros + tmpval.length;
-    const result:Buffer = Buffer.alloc(xlen, 0);
-    tmpval.copy(result, numZeros);
-
-    return result;
-  };
-}
+import { Base58 } from './base58';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using
@@ -192,12 +72,10 @@ export default class BinTools {
      * @param end The index to end the copy
      */
   copyFrom = (buff:Buffer, start:number = 0, end:number = undefined):Buffer => {
-    /* EGS: why introduce theEnd as a new variable? */
-    let theEnd = end;
     if (end === undefined) {
-      theEnd = buff.length;
+      end = buff.length;
     }
-    return Buffer.from(Uint8Array.prototype.slice.call(buff.slice(start, theEnd)));
+    return Buffer.from(Uint8Array.prototype.slice.call(buff.slice(start, end)));
   };
 
   /**
@@ -223,7 +101,6 @@ export default class BinTools {
      * convert to an ArrayBuffer
      */
   fromBufferToArrayBuffer = (buff:Buffer):ArrayBuffer => {
-	/* EGS: isn't there a more efficient buffer/array concat operator we could use? */
     const ab = new ArrayBuffer(buff.length);
     const view = new Uint8Array(ab);
     for (let i = 0; i < buff.length; ++i) {
@@ -238,7 +115,6 @@ export default class BinTools {
      * @param ab The ArrayBuffer to convert to a {@link https://github.com/feross/buffer|Buffer}
      */
   fromArrayBufferToBuffer = (ab:ArrayBuffer):Buffer => {
-	/* EGS: isn't there a more efficient buffer/array concat operator we could use? */
     const buf = Buffer.alloc(ab.byteLength);
     for (let i = 0; i < ab.byteLength; ++i) {
       buf[i] = ab[i];
@@ -253,9 +129,13 @@ export default class BinTools {
      * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert
      * to a {@link https://github.com/indutny/bn.js/|BN}
      */
-  fromBufferToBN = (buff:Buffer):BN => new BN(buff.toString('hex'), 16, 'be');
-
-  /**
+  fromBufferToBN = (buff:Buffer):BN => {
+    if(typeof buff === "undefined") {
+      return undefined;
+    }
+    return new BN(buff.toString('hex'), 16, 'be')
+  };
+    /**
      * Takes a {@link https://github.com/indutny/bn.js/|BN} and converts it
      * to a {@link https://github.com/feross/buffer|Buffer}.
      *
@@ -264,8 +144,13 @@ export default class BinTools {
      * @param length The zero-padded length of the {@link https://github.com/feross/buffer|Buffer}
      */
   fromBNToBuffer = (bn:BN, length?:number):Buffer => {
+    if(typeof bn === "undefined") {
+      return undefined;
+    }
     const newarr = bn.toArray('be');
-      /* EGS: sounds weird that toArray with the length param doesn't work */
+    /**
+     * CKC: Still unsure why bn.toArray with a "be" and a length do not work right. Bug?
+     */
     if (length) { // bn toArray with the length parameter doesn't work correctly, need this.
       const x = length - newarr.length;
       for (let i:number = 0; i < x; i++) {
@@ -342,7 +227,10 @@ export default class BinTools {
    * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer}
    * representation if valid. A more strict version of stringToAddress.
    *
-   * EGS: need to document the alias argument and the function it serves
+   * @param addr A string representation of the address
+   * @param blockchainID A cb58 encoded string representation of the blockchainID
+   * @param alias A chainID alias, if any, that the address can also parse from.
+   * @param addrlen VMs can use any addressing scheme that they like, so this is the appropriate number of address bytes. Default 20.
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
    * undefined if not valid.
@@ -351,7 +239,6 @@ export default class BinTools {
     blockchainID:string,
     alias:string = undefined,
     addrlen:number = 20):Buffer => {
-	/* EGS: is addrlen necessary? are we guaranteed that all addresses will be this exact number of bytes? */
     const abc:Array<string> = addr.split('-');
     if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
         const addrbuff = this.stringToAddress(addr);

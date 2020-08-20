@@ -1,6 +1,6 @@
 import mockAxios from 'jest-mock-axios';
-import { Avalanche, MinterSet } from "src";
-import AVMAPI, { PersistanceOptions } from "src/apis/avm/api";
+import { Avalanche } from "src";
+import { AVMAPI } from "src/apis/avm/api";
 import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
@@ -8,13 +8,20 @@ import BinTools from 'src/utils/bintools';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
-import { ImportTx, UnsignedTx, Tx } from 'src/apis/avm/tx';
-import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
-import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput, OutputOwners } from 'src/apis/avm/outputs';
+import { UnsignedTx, Tx } from 'src/apis/avm/tx';
+import { AVMConstants } from 'src/apis/avm/constants';
+import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput } from 'src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from 'src/apis/avm/ops';
-import { Defaults } from 'src/utils/types';
 import * as bech32 from 'bech32';
 import { UTF8Payload } from 'src/utils/payload';
+import { InitialStates } from 'src/apis/avm/initialstates';
+import { Defaults } from 'src/utils/constants';
+import { UnixNow } from 'src/utils/helperfunctions';
+import { OutputOwners } from 'src/common/output';
+import { MinterSet } from 'src/apis/avm/minterset';
+import { ImportTx } from 'src/apis/avm/importtx';
+import { PlatformChainID } from 'src/utils/constants';
+import { PersistanceOptions } from 'src/utils/persistenceoptions';
 
 /**
  * @ignore
@@ -23,7 +30,7 @@ const bintools = BinTools.getInstance();
 
 describe('AVMAPI', () => {
   const networkid:number = 12345;
-  const blockchainid:string = '2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD';
+  const blockchainid:string = Defaults.network[networkid].X.blockchainID;
   const ip:string = '127.0.0.1';
   const port:number = 9650;
   const protocol:string = 'https';
@@ -34,6 +41,7 @@ describe('AVMAPI', () => {
   const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, true);
   let api:AVMAPI;
   let alias:string;
+
 
   const addrA:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")));
   const addrB:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")));
@@ -146,22 +154,29 @@ describe('AVMAPI', () => {
 
   test('getBalance', async () => {
     const balance = new BN('100', 10);
+    const respobj = {
+      balance,
+      utxoIDs: [
+        {
+          "txID":"LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
+        "outputIndex":0
+        }
+      ]
+    };
 
-    const result:Promise<BN> = api.getBalance(addrA, 'ATH');
+    const result:Promise<object> = api.getBalance(addrA, 'ATH');
     const payload:object = {
-      result: {
-        balance,
-      },
+      result: respobj,
     };
     const responseObj = {
       data: payload,
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:BN = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(balance);
+    expect(JSON.stringify(response)).toBe(JSON.stringify(respobj));
   });
 
   test('exportKey', async () => {
@@ -212,7 +227,7 @@ describe('AVMAPI', () => {
     let username = "Robert";
     let password = "Paulson";
     let txID = "valid";
-    let result:Promise<string> = api.importAVAX(username, password, to);
+    let result:Promise<string> = api.importAVAX(username, password, to, blockchainid);
     let payload:object = {
         "result": {
             "txID": txID
@@ -323,7 +338,9 @@ describe('AVMAPI', () => {
     expect(response).toBe(assetid);
   });
 
-  test('createMintTx 1', async () => {
+  test('mint 1', async () => {
+    const username:string = 'Collin';
+    const password:string = 'Cusce';
     const amount:number = 2;
     const assetID:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
@@ -332,10 +349,10 @@ describe('AVMAPI', () => {
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ];
-    const result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+    const result:Promise<string> = api.mint(username, password, amount, assetID, to, minters);
     const payload:object = {
       result: {
-        tx: 'sometx',
+        txID: 'sometx',
       },
     };
     const responseObj = {
@@ -349,7 +366,9 @@ describe('AVMAPI', () => {
     expect(response).toBe('sometx');
   });
 
-  test('createMintTx 2', async () => {
+  test('mint 2', async () => {
+    const username:string = 'Collin';
+    const password:string = 'Cusce';
     const amount:BN = new BN(1);
     const assetID:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
@@ -358,54 +377,10 @@ describe('AVMAPI', () => {
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ];
-    const result:Promise<string> = api.createMintTx(amount, assetID, to, minters);
+    const result:Promise<string> = api.mint(username, password, amount, assetID, to, minters);
     const payload:object = {
       result: {
-        tx: 'sometx',
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('sometx');
-  });
-
-  test('signMintTx 1', async () => {
-    const username:string = 'Collin';
-    const password:string = 'Cusce';
-    const tx:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-    const minter:string = addrA;
-    const result:Promise<string> = api.signMintTx(username, password, tx, minter);
-    const payload:object = {
-      result: {
-        tx: 'sometx',
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('sometx');
-  });
-
-  test('signMintTx 2', async () => {
-    const username:string = 'Collin';
-    const password:string = 'Cusce';
-    const tx:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
-    const minter:string = addrA;
-    const result:Promise<string> = api.signMintTx(username, password, tx, minter);
-    const payload:object = {
-      result: {
-        tx: 'sometx',
+        txID: 'sometx',
       },
     };
     const responseObj = {
@@ -527,7 +502,7 @@ describe('AVMAPI', () => {
     const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
     expect(persistOpts.getMergeRule()).toBe('union');
     let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:Promise<UTXOSet> = api.getUTXOs(addresses, persistOpts);
+    let result:Promise<UTXOSet> = api.getUTXOs(addresses, 0, 1, persistOpts);
     const payload:object = {
       result: {
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
@@ -544,46 +519,7 @@ describe('AVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, persistOpts);
-
-    mockAxios.mockResponse(responseObj);
-    response = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(2);
-    expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
-  });
-
-  test('getAtomicUTXOs', async () => {
-    // Payment
-    const OPUTXOstr1:string = bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex'));
-    const OPUTXOstr2:string = bintools.cb58Encode(Buffer.from('0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
-    const OPUTXOstr3:string = bintools.cb58Encode(Buffer.from('0000f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
-
-    const set:UTXOSet = new UTXOSet();
-    set.add(OPUTXOstr1);
-    set.addArray([OPUTXOstr2, OPUTXOstr3]);
-
-    const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
-    expect(persistOpts.getMergeRule()).toBe('union');
-    let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:Promise<UTXOSet> = api.getAtomicUTXOs(addresses, persistOpts);
-    const payload:object = {
-      result: {
-        utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
-      },
-    };
-    const responseObj = {
-      data: payload,
-    };
-
-    mockAxios.mockResponse(responseObj);
-    let response:UTXOSet = await result;
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
-
-    addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, persistOpts);
+    result = api.getUTXOs(addresses,0, 1, persistOpts);
 
     mockAxios.mockResponse(responseObj);
     response = await result;
@@ -658,20 +594,20 @@ describe('AVMAPI', () => {
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
 
       for (let i:number = 0; i < 3; i++) {
-        addrs1.push(avm.addressFromBuffer(avm.keyChain().makeKey()));
-        addrs2.push(avm.addressFromBuffer(keymgr2.makeKey()));
-        addrs3.push(avm.addressFromBuffer(keymgr3.makeKey()));
+        addrs1.push(avm.addressFromBuffer(avm.keyChain().makeKey().getAddress()));
+        addrs2.push(avm.addressFromBuffer(keymgr2.makeKey().getAddress()));
+        addrs3.push(avm.addressFromBuffer(keymgr3.makeKey().getAddress()));
       }
       const amount:BN = new BN(amnt);
       addressbuffs = avm.keyChain().getAddresses();
       addresses = addressbuffs.map((a) => avm.addressFromBuffer(a));
       const locktime:BN = new BN(54321);
       const threshold:number = 3;
-
       for (let i:number = 0; i < 5; i++) {
         let txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
+        
         const out:SecpOutput = new SecpOutput(amount, addressbuffs, locktime, threshold);
         const xferout:TransferableOutput = new TransferableOutput(assetID, out);
         outputs.push(xferout);
@@ -718,27 +654,32 @@ describe('AVMAPI', () => {
     });
 
     test('buildBaseTx1', async () => {
-      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID), new UTF8Payload("hello world").getContent());
+      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1, new UTF8Payload("hello world").getContent());
       let memobuf:Buffer = Buffer.from("hello world");
       const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt),
+        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
-        assetID, memobuf, UnixNow(), new BN(0), 1,
+        avm.getFee(), assetID,
+         memobuf, UnixNow(), new BN(0), 1,
       );
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
     });
 
     test('buildBaseTx2', async () => {
-      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt).sub(new BN(100)), addrs3, addrs1, addrs2, bintools.cb58Encode(assetID), new UTF8Payload("hello world"));
+      const txu1:UnsignedTx = await avm.buildBaseTx(
+        set, new BN(amnt).sub(new BN(100)), bintools.cb58Encode(assetID), 
+        addrs3, addrs1, addrs2, 
+        new UTF8Payload("hello world"));
       const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt).sub(new BN(100)),
+        networkid, bintools.cb58Decode(blockchainid), new BN(amnt).sub(new BN(100)), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
         addrs2.map((a) => avm.parseAddress(a)),
-        assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
+        avm.getFee(), assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
       );
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
@@ -762,13 +703,14 @@ describe('AVMAPI', () => {
     });
 
     test('signTx', async () => {
-      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
+      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
       const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt),
+        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
-        assetID, undefined, UnixNow(), new BN(0), 1,
+        avm.getFee(), assetID,
+        undefined, UnixNow(), new BN(0), 1,
       );
 
       const tx1:Tx = avm.signTx(txu1);
@@ -779,7 +721,7 @@ describe('AVMAPI', () => {
     });
 
     test('issueTx Serialized', async () => {
-      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
+      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
       const tx = avm.signTx(txu);
       const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
@@ -799,7 +741,7 @@ describe('AVMAPI', () => {
       });
 
       test('issueTx Buffer', async () => {
-        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
+        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
         const tx = avm.signTx(txu);
   
         const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
@@ -819,7 +761,7 @@ describe('AVMAPI', () => {
         expect(response).toBe(txid);
       });
       test('issueTx Class Tx', async () => {
-        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), addrs3, addrs1, addrs1, bintools.cb58Encode(assetID));
+        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
         const tx = avm.signTx(txu);
   
         const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
@@ -841,27 +783,46 @@ describe('AVMAPI', () => {
       });
 
       test('buildCreateAssetTx', async () => {
-        const txu1:UnsignedTx = await avm.buildCreateAssetTx(set, new BN(fee), addrs1, initialState, name, symbol, denomination);
+        avm.setFee(new BN(fee));
+        const txu1:UnsignedTx = await avm.buildCreateAssetTx(
+          set, 
+          addrs1, 
+          initialState, 
+          name, 
+          symbol, 
+          denomination
+        );
   
-        const txu2:UnsignedTx = set.buildCreateAssetTx(avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), assetID, new BN(fee), addrs1.map((a) => avm.parseAddress(a)), initialState, name, symbol, denomination);
+        const txu2:UnsignedTx = set.buildCreateAssetTx(
+          avalanche.getNetworkID(), 
+          bintools.cb58Decode(avm.getBlockchainID()), 
+          addrs1.map((a) => avm.parseAddress(a)), 
+          initialState, 
+          name, 
+          symbol, 
+          denomination,
+          avm.getFee(),
+          assetID
+        );
   
         expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
         expect(txu2.toString()).toBe(txu1.toString());
       });
 
-      test('buildCreateNFTAssetTx', async () => {
+    test('buildCreateNFTAssetTx', async () => {
+        avm.setFee(new BN(fee));
         let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
         let locktime:BN = new BN(0);
 
         let txu1:UnsignedTx = await avm.buildCreateNFTAssetTx(
-            set, new BN(fee), addrs1, 
-            name, symbol, minterSets, new UTF8Payload("hello world"), UnixNow(), locktime
+            set, addrs1,  minterSets,
+            name, symbol, new UTF8Payload("hello world"), UnixNow(), locktime
         );
         
         let txu2:UnsignedTx = set.buildCreateNFTAssetTx(
             avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
-            assetID, new BN(fee), addrs1.map(a => avm.parseAddress(a)), minterSets, 
-            name, symbol, new UTF8Payload("hello world").getPayload(), UnixNow(), locktime
+            addrs1.map(a => avm.parseAddress(a)), minterSets, 
+            name, symbol, avm.getFee(), assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), locktime
         );
 
         expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -869,7 +830,7 @@ describe('AVMAPI', () => {
     }); 
 
     test('buildCreateNFTMintTx', async () => {
-      let fee:number = 0;
+      avm.setFee(new BN(fee));
       let groupID:number = 0;
       let locktime:BN = new BN(0);
       let threshold:number = 1;
@@ -878,16 +839,16 @@ describe('AVMAPI', () => {
       let addrbuff3: Buffer[] = addrs3.map(a => avm.parseAddress(a));
       let outputOwners:Array<OutputOwners> = [];
       outputOwners.push(new OutputOwners(addrbuff3, locktime, threshold));
-
+      
       let txu1:UnsignedTx = await avm.buildCreateNFTMintTx(
-          set, nftutxoids, addrs3, addrs3, new BN(fee), addrs1, groupID, payload,
+          set, addrs3, addrs1, nftutxoids,  groupID, payload, 
           undefined, UnixNow(), locktime, threshold, 
       );
 
       let txu2:UnsignedTx = set.buildCreateNFTMintTx(
           avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
-          assetID, new BN(fee), addrbuff1, addrbuff3, addrbuff3, nftutxoids,
-          groupID, payload, undefined, UnixNow(), locktime, threshold
+          addrbuff3, addrbuff1, nftutxoids, groupID, payload, 
+          avm.getFee(), assetID, undefined, UnixNow(), locktime, threshold
       );
 
       expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
@@ -895,20 +856,19 @@ describe('AVMAPI', () => {
   });
 
     test('buildNFTTransferTx', async () => {
+      avm.setFee(new BN(fee));
       const pload:Buffer = Buffer.alloc(1024);
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => avm.parseAddress(a));
-      const fee:BN = new BN(90);
       const txu1:UnsignedTx = await avm.buildNFTTransferTx(
-        set, nftutxoids[1], addrs3, addrs3, fee, addrs1,
+        set, addrs3, addrs1, nftutxoids[1],
         new UTF8Payload("hello world"), UnixNow(), new BN(0), 1,
       );
 
       const txu2:UnsignedTx = set.buildNFTTransferTx(
-        networkid, bintools.cb58Decode(blockchainid), assetID,
-        fee, addrbuff1, addrbuff3, addrbuff3,
-        [nftutxoids[1]], new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
+        networkid, bintools.cb58Decode(blockchainid), addrbuff3, addrbuff1, 
+        [nftutxoids[1]], avm.getFee(), assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
       );
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
@@ -917,11 +877,11 @@ describe('AVMAPI', () => {
     });
 
     test('buildImportTx', async () => {
+      avm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
-      const fee:BN = new BN(90);
       const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
       const result:Promise<UnsignedTx> = avm.buildImportTx(
-        set, addrs3, fee, addrs1, new UTF8Payload("hello world"), UnixNow()
+        set, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
       );
       const payload:object = {
         result: {
@@ -940,7 +900,7 @@ describe('AVMAPI', () => {
 
       const txu2:UnsignedTx = set.buildImportTx(
         networkid, bintools.cb58Decode(blockchainid), 
-        assetID, fee, addrbuff1, importIns, 
+        addrbuff1, importIns, undefined, avm.getFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
@@ -950,17 +910,31 @@ describe('AVMAPI', () => {
     });
 
     test('buildExportTx', async () => {
+      avm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => avm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => avm.parseAddress(a));
-      const fee:BN = new BN(90);
+      const amount:BN = new BN(90);
       const txu1:UnsignedTx = await avm.buildExportTx(
-        set, fungutxoids[1], fee, addrs1, 
+        set, 
+        amount, 
+        addrs3, 
+        addrs1, 
+        addrs2,
+        PlatformChainID, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
       const txu2:UnsignedTx = set.buildExportTx(
-      networkid, bintools.cb58Decode(blockchainid), assetID,
-        fee, addrbuff1, [fungutxoids[1]], 
+        networkid, bintools.cb58Decode(blockchainid),
+        amount,
+        assetID, 
+        addrbuff3, 
+        addrbuff1, 
+        addrbuff2, 
+        bintools.cb58Decode(PlatformChainID), 
+        avm.getFee(), 
+        assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
@@ -968,13 +942,13 @@ describe('AVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
       const txu3:UnsignedTx = await avm.buildExportTx(
-        set, fungutxoids, fee, addrs1, 
+        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID),
         new UTF8Payload("hello world"), UnixNow()
       );
 
       const txu4:UnsignedTx = set.buildExportTx(
-      networkid, bintools.cb58Decode(blockchainid), assetID,
-        fee, addrbuff1, fungutxoids, 
+        networkid, bintools.cb58Decode(blockchainid), amount,
+        assetID, addrbuff3, addrbuff1, addrbuff2, undefined, avm.getFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 

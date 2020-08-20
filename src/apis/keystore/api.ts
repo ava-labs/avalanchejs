@@ -1,9 +1,10 @@
 /**
  * @packageDocumentation
- * @module KeystoreAPI
+ * @module API-Keystore
  */
 import AvalancheCore from '../../avalanche';
-import { JRPCAPI, RequestResponseData } from '../../utils/types';
+import { JRPCAPI } from '../../common/jrpcapi';
+import { RequestResponseData } from '../../common/apibase';
 
 /**
  * Class for interacting with a node API that is using the node's KeystoreAPI.
@@ -14,7 +15,7 @@ import { JRPCAPI, RequestResponseData } from '../../utils/types';
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-class KeystoreAPI extends JRPCAPI {
+export class KeystoreAPI extends JRPCAPI {
   /**
      * Creates a user in the node's database.
      *
@@ -101,5 +102,3 @@ class KeystoreAPI extends JRPCAPI {
      */
   constructor(core:AvalancheCore, baseurl:string = '/ext/keystore') { super(core, baseurl); }
 }
-
-export default KeystoreAPI;

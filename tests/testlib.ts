@@ -1,6 +1,7 @@
-import { APIBase, RequestResponseData } from 'src/utils/types';
+
 import AvalancheCore from 'src/avalanche';
 import { AxiosRequestConfig } from 'axios';
+import { APIBase, RequestResponseData } from '../src/common/apibase';
 
 export class TestAPI extends APIBase {
   TestGET = async (input:string, path:string = '', axiosConfig:AxiosRequestConfig = undefined):Promise<object> => this._TestMethod('get', path, { input }, axiosConfig);

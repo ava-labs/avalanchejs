@@ -1,5 +1,5 @@
 import { Buffer } from "buffer/";
-import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, cb58EncodedPayload, TXIDPayload, JSONPayload } from '../../src/utils/payload';
+import { PayloadTypes, BINPayload, PayloadBase, UTF8Payload, HEXSTRPayload, B58STRPayload, B64STRPayload, BIGNUMPayload, XCHAINADDRPayload, PCHAINADDRPayload, CCHAINADDRPayload, TXIDPayload, JSONPayload } from 'src/utils/payload';
 import BinTools from 'src/utils/bintools';
 import BN from "bn.js";
 import * as bech32 from 'bech32';
@@ -73,7 +73,6 @@ describe("Payload", () => {
         ["SVG", svgstr, bintools.bufferToB58(Buffer.from(svgstr))], 
         ["CSV", csvstr, bintools.bufferToB58(Buffer.from(csvstr))], 
         ["JSON", JSON.stringify(jsonobj), bintools.bufferToB58(Buffer.from(JSON.stringify(jsonobj)))], 
-        ["PROTOBUF", binstr, binstr], 
         ["YAML", yamlstr, bintools.bufferToB58(Buffer.from(yamlstr))], 
         ["EMAIL", emailstr, bintools.bufferToB58(Buffer.from(emailstr))], 
         ["URL", urlstr, bintools.bufferToB58(Buffer.from(urlstr))], 

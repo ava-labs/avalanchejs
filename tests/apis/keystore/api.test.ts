@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 
 import { Avalanche } from 'src';
-import KeystoreAPI from 'src/apis/keystore/api';
+import { KeystoreAPI } from 'src/apis/keystore/api';
 
 describe('Keystore', () => {
   const ip = '127.0.0.1';

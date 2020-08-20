@@ -1,9 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import AVMAPI from 'src/apis/avm/api';
-import {
-  BaseTx, CreateAssetTx, OperationTx, UnsignedTx, Tx, ImportTx, ExportTx 
-} from 'src/apis/avm/tx';
+import { AVMAPI } from 'src/apis/avm/api';
+import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
 import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
@@ -11,10 +9,20 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/outputs';
-import { UnixNow, AVMConstants, InitialStates } from 'src/apis/avm/types';
+import { AVMConstants } from 'src/apis/avm/constants';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 import { Avalanche } from 'src/index';
 import { UTF8Payload } from 'src/utils/payload';
+import { InitialStates } from 'src/apis/avm/initialstates';
+import { UnixNow } from 'src/utils/helperfunctions';
+import { BaseTx } from 'src/apis/avm/basetx';
+import { CreateAssetTx } from 'src/apis/avm/createassettx';
+import { OperationTx } from 'src/apis/avm/operationtx';
+import { ImportTx } from 'src/apis/avm/importtx';
+import { ExportTx } from 'src/apis/avm/exporttx';
+import { PlatformChainID } from 'src/utils/constants';
+import { Defaults } from 'src/utils/constants';
+
 
 /**
  * @ignore
@@ -40,7 +48,7 @@ describe('Transactions', () => {
   const amnt:number = 10000;
   const netid:number = 12345;
   const memo:Buffer = bintools.stringToBuffer("Avalanche.js");
-  const blockchainID:Buffer = Buffer.from(createHash('sha256').update('Foot on the pedal, never ever false metal, engine running hotter than a boiling kettle.').digest());
+  const blockchainid:string = Defaults.network[netid].X.blockchainID;
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
   const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
@@ -56,14 +64,14 @@ describe('Transactions', () => {
   const port = 8080;
   const protocol = 'http';
   let avalanche:Avalanche;
-  const blockchainid:string = '6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF';
+  const blockchainID:Buffer = bintools.cb58Decode(blockchainid);
   const name:string = 'Mortycoin is the dumb as a sack of hammers.';
   const symbol:string = 'morT';
   const denomination:number = 8;
   let avaxAssetID:Buffer;
 
   beforeAll(async () => {
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, null, true);
+    avalanche = new Avalanche(ip, port, protocol, netid, undefined, null, true);
     api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
 
     const result:Promise<Buffer> = api.getAVAXAssetID();
@@ -100,9 +108,9 @@ describe('Transactions', () => {
     exportUTXOIDS = [];
     ops = [];
     for (let i:number = 0; i < 3; i++) {
-      addrs1.push(keymgr1.makeKey());
-      addrs2.push(keymgr2.makeKey());
-      addrs3.push(keymgr3.makeKey());
+      addrs1.push(keymgr1.makeKey().getAddress());
+      addrs2.push(keymgr2.makeKey().getAddress());
+      addrs3.push(keymgr3.makeKey().getAddress());
     }
     amount = new BN(amnt);
     addresses = keymgr1.getAddresses();
@@ -136,7 +144,7 @@ describe('Transactions', () => {
       const nout:NFTTransferOutput = new NFTTransferOutput(1000 + i, payload, addresses, locktime, threshold);
       const op:NFTTransferOperation = new NFTTransferOperation(nout);
       const nfttxid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1000 + i), 32)).digest());
-      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC,nfttxid, 1000 + i, NFTassetID, nout);
+      const nftutxo:UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, 1000 + i, NFTassetID, nout);
       nftutxoids.push(nftutxo.getUTXOID());
       const xferop:TransferableOperation = new TransferableOperation(NFTassetID, [nftutxo.getUTXOID()], op);
       ops.push(xferop);
@@ -152,8 +160,6 @@ describe('Transactions', () => {
 
   test('Create small BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
-    const networkID: number = 12345;
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
@@ -167,16 +173,13 @@ describe('Transactions', () => {
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
     const transferableInput:TransferableInput = new TransferableInput(txid, outputIndex, avaxAssetID, input);
     ins.push(transferableInput);
-    const baseTx:BaseTx = new BaseTx(networkID, blockchainID, outs, ins);
+    const baseTx:BaseTx = new BaseTx(netid, blockchainID, outs, ins);
     const unsignedTx:UnsignedTx = new UnsignedTx(baseTx);
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true);
   });
 
   test('confirm inputTotal, outputTotal and fee are correct', async () => {
     const bintools: BinTools = BinTools.getInstance();
-    const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
     // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outs:TransferableOutput[] = [];
@@ -192,7 +195,7 @@ describe('Transactions', () => {
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
     const transferableInput:TransferableInput = new TransferableInput(txid, outputIndex, assetID, input);
     ins.push(transferableInput);
-    const baseTx:BaseTx = new BaseTx(networkID, blockchainID, outs, ins);
+    const baseTx:BaseTx = new BaseTx(netid, blockchainID, outs, ins);
     const unsignedTx:UnsignedTx = new UnsignedTx(baseTx);
     const inputTotal:BN = unsignedTx.getInputTotal(assetID);
     const outputTotal:BN = unsignedTx.getOutputTotal(assetID);
@@ -205,9 +208,6 @@ describe('Transactions', () => {
 
   test("Create small BaseTx that isn't Goose Egg Tx", async () => {
     const bintools: BinTools = BinTools.getInstance();
-    const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("267");
@@ -221,16 +221,13 @@ describe('Transactions', () => {
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
     const transferableInput:TransferableInput = new TransferableInput(txid, outputIndex, avaxAssetID, input);
     ins.push(transferableInput);
-    const baseTx:BaseTx = new BaseTx(networkID, blockchainID, outs, ins);
+    const baseTx:BaseTx = new BaseTx(netid, blockchainID, outs, ins);
     const unsignedTx:UnsignedTx = new UnsignedTx(baseTx);
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true);
   });
 
   test('Create large BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
-    const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("609555500000");
@@ -244,16 +241,13 @@ describe('Transactions', () => {
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
     const transferableInput:TransferableInput = new TransferableInput(txid, outputIndex, avaxAssetID, input);
     ins.push(transferableInput);
-    const baseTx:BaseTx = new BaseTx(networkID, blockchainID, outs, ins);
+    const baseTx:BaseTx = new BaseTx(netid, blockchainID, outs, ins);
     const unsignedTx:UnsignedTx = new UnsignedTx(baseTx);
     expect(await api.checkGooseEgg(unsignedTx)).toBe(false);
   });
 
   test("Create large BaseTx that isn't Goose Egg Tx", async () => {
     const bintools: BinTools = BinTools.getInstance();
-    const networkID: number = 12345;
-    // local network X Chain ID
-    const blockchainID:Buffer = bintools.cb58Decode("2oALd6xoUMp3oSHMiJYVqMcbaWxGQWYosrfiT7AaFKKNG5dmKD");
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("44995609555500000");
@@ -267,7 +261,7 @@ describe('Transactions', () => {
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
     const transferableInput:TransferableInput = new TransferableInput(txid, outputIndex, avaxAssetID, input);
     ins.push(transferableInput);
-    const baseTx:BaseTx = new BaseTx(networkID, blockchainID, outs, ins);
+    const baseTx:BaseTx = new BaseTx(netid, blockchainID, outs, ins);
     const unsignedTx:UnsignedTx = new UnsignedTx(baseTx);
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true);
   });
@@ -311,8 +305,8 @@ describe('Transactions', () => {
     expect(() => {
       set.buildBaseTx(
         netid, blockchainID,
-        new BN(amnt * 1000),
-        addrs3, addrs1, addrs1, assetID,
+        new BN(amnt * 1000), assetID,
+        addrs3, addrs1, addrs1, 
       );
     }).toThrow();
   });
@@ -381,8 +375,16 @@ describe('Transactions', () => {
   });
 
   test('Creation ImportTx', () => {
+    const bombtx:ImportTx = new ImportTx(
+      netid, blockchainID, undefined, outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
+    );
+
+    expect(() => {
+      bombtx.toBuffer();
+    }).toThrow();
+
     const importtx:ImportTx = new ImportTx(
-      netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
+      netid, blockchainID, bintools.cb58Decode(PlatformChainID), outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
     );
     const txunew:ImportTx = new ImportTx();
     const importbuff:Buffer = importtx.toBuffer();
@@ -394,8 +396,16 @@ describe('Transactions', () => {
   });
 
   test('Creation ExportTx', () => {
+    const bombtx:ExportTx = new ExportTx(
+      netid, blockchainID, undefined, outputs, inputs, undefined, exportOuts
+    );
+
+    expect(() => {
+      bombtx.toBuffer();
+    }).toThrow();
+
     const exporttx:ExportTx = new ExportTx(
-      netid, blockchainID, outputs, inputs, undefined, exportOuts
+      netid, blockchainID, bintools.cb58Decode(PlatformChainID), outputs, inputs, undefined, exportOuts
     );
     const txunew:ExportTx = new ExportTx();
     const exportbuff:Buffer = exporttx.toBuffer();
@@ -409,10 +419,10 @@ describe('Transactions', () => {
   test('Creation Tx1 with asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000), addrs3, addrs1, addrs1, assetID, undefined,
+      new BN(9000), assetID, addrs3, addrs1, addrs1, undefined, undefined, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
 
     const tx2:Tx = new Tx();
     tx2.fromString(tx.toString());
@@ -422,10 +432,10 @@ describe('Transactions', () => {
   test('Creation Tx2 without asof, locktime, threshold', () => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
-      new BN(9000),
-      addrs3, addrs1, addrs1, assetID, undefined
+      new BN(9000), assetID,
+      addrs3, addrs1, addrs1
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -434,11 +444,11 @@ describe('Transactions', () => {
 
   test('Creation Tx3 using OperationTx', () => {
     const txu:UnsignedTx = set.buildNFTTransferTx(
-      netid, blockchainID, avaxAssetID, new BN(90),
-      addrs1, addrs3, addrs1, nftutxoids, undefined,
+      netid, blockchainID, 
+      addrs3, addrs1, nftutxoids, new BN(90), avaxAssetID, undefined,
       UnixNow(), UnixNow().add(new BN(50)), 1,
     );
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -446,10 +456,9 @@ describe('Transactions', () => {
 
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
-      netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, importIns,
+      netid, blockchainID, addrs1, importIns, bintools.cb58Decode(PlatformChainID), new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
@@ -457,10 +466,11 @@ describe('Transactions', () => {
 
   test('Creation Tx5 using ExportTx', () => {
     const txu:UnsignedTx = set.buildExportTx(
-      netid, blockchainID, avaxAssetID, new BN(90), 
-      addrs1, exportUTXOIDS, new UTF8Payload("hello world").getPayload(), UnixNow()
+      netid, blockchainID, new BN(90), avaxAssetID,
+      addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID), 
+      undefined, undefined, new UTF8Payload("hello world").getPayload(), UnixNow()
     )
-    const tx:Tx = keymgr1.signTx(txu);
+    const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();
     tx2.fromBuffer(tx.toBuffer());
     expect(tx.toBuffer().toString('hex')).toBe(tx2.toBuffer().toString('hex'));

@@ -1,9 +1,11 @@
 /**
  * @packageDocumentation
- * @module HealthAPI
+ * @module API-Health
  */
 import AvalancheCore from '../../avalanche';
-import { JRPCAPI, RequestResponseData } from '../../utils/types';
+import { JRPCAPI } from '../../common/jrpcapi';
+import { RequestResponseData } from '../../common/apibase';
+
 
 /**
  * Class for interacting with a node API that is using the node's HealthApi.
@@ -12,7 +14,7 @@ import { JRPCAPI, RequestResponseData } from '../../utils/types';
  *
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-class HealthAPI extends JRPCAPI {
+export class HealthAPI extends JRPCAPI {
   /**
      *
      * @returns Promise for an object containing the health check response
@@ -29,4 +31,3 @@ class HealthAPI extends JRPCAPI {
   constructor(core:AvalancheCore, baseurl:string = '/ext/health') { super(core, baseurl); }
 }
 
-export default HealthAPI;

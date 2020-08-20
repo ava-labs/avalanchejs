@@ -1,9 +1,9 @@
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
-import { UnixNow } from 'src/apis/avm/types';
 import { UTXO, UTXOSet } from 'src/apis/avm/utxos';
 import { AmountOutput } from 'src/apis/avm/outputs';
+import { UnixNow } from 'src/utils/helperfunctions';
 
 const bintools = BinTools.getInstance();
 

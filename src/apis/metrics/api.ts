@@ -1,9 +1,11 @@
 /**
  * @packageDocumentation
- * @module MetricsAPI
+ * @module API-Metrics
  */
 import AvalancheCore from '../../avalanche';
-import { RESTAPI, RequestResponseData } from '../../utils/types';
+import { RESTAPI } from '../../common/restapi';
+import { RequestResponseData } from '../../common/apibase';
+
 
 /**
  * Class for interacting with a node API that is using the node's MetricsApi.
@@ -12,7 +14,7 @@ import { RESTAPI, RequestResponseData } from '../../utils/types';
  *
  * @remarks This extends the [[RESTAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
-class MetricsAPI extends RESTAPI {
+export class MetricsAPI extends RESTAPI {
   /**
      *
      * @returns Promise for an object containing the metrics response
@@ -29,4 +31,3 @@ class MetricsAPI extends RESTAPI {
   constructor(core:AvalancheCore, baseurl:string = '/ext/metrics') { super(core, baseurl); }
 }
 
-export default MetricsAPI;

@@ -1,8 +1,13 @@
 import {
-  SigIdx, Signature, Address, UnixNow,
-} from 'src/apis/avm/types';
+    
+} from 'src/apis/avm/constants';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
+import { SigIdx, Signature } from 'src/common/credentials';
+import { Address } from 'src/common/output';
+import { UnixNow } from 'src/utils/helperfunctions';
+
+
 
 const bintools:BinTools = BinTools.getInstance();
 

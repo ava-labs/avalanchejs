@@ -1,13 +1,12 @@
 /**
  * @packageDocumentation
- * @module Payload
+ * @module Common-Payload
  */
 
 import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
-import { AVMConstants } from '../apis/avm/types';
 
 /**
  * @ignore
@@ -65,7 +64,6 @@ export class PayloadTypes {
     /**
      * Given a TypeID returns the proper [[PayloadBase]].
      */
-    /* EGS: wouldn't it make more sense to look up the right constructor in an array and invoke that? */
     select(typeid:number, ...args:Array<any>):PayloadBase {
         switch(typeid) {
             case 0:
@@ -115,25 +113,20 @@ export class PayloadTypes {
             case 22:
                 return new SVGPayload(...args);
             case 23:
-	    /* EGS do we need this? */
                 return new CSVPayload(...args);
             case 24:
                 return new JSONPayload(...args);
             case 25:
-	    /* EGS do we need this? */
-                return new PROTOBUFPayload(...args);
-            case 26:
                 return new YAMLPayload(...args);
-            case 27:
-	    /* EGS do we need this? */
+            case 26:
                 return new EMAILPayload(...args);
-            case 28:
+            case 27:
                 return new URLPayload(...args);
-            case 29:
+            case 28:
                 return new IPFSPayload(...args);
-            case 30:
+            case 29:
                 return new ONIONPayload(...args);
-            case 31:
+            case 30:
                 return new MAGNETPayload(...args);
         }
         throw new Error("Error - PayloadTypes.select: unknown typeid " + typeid);
@@ -161,7 +154,7 @@ export class PayloadTypes {
         this.types = [
             "BIN", "UTF8", "HEXSTR", "B58STR", "B64STR", "BIGNUM", "XCHAINADDR", "PCHAINADDR", "CCHAINADDR", "TXID", 
             "ASSETID", "UTXOID",  "NFTID", "SUBNETID", "CHAINID", "NODEID", "SECPSIG", "SECPENC", "JPEG", "PNG", 
-            "BMP", "ICO", "SVG", "CSV", "JSON", "PROTOBUF", "YAML", "EMAIL", "URL", "IPFS", "ONION", "MAGNET"
+            "BMP", "ICO", "SVG", "CSV", "JSON", "YAML", "EMAIL", "URL", "IPFS", "ONION", "MAGNET"
         ];
     }
 }
@@ -214,11 +207,8 @@ export abstract class PayloadBase {
         this.typeid = bintools.copyFrom(bytes, offset, offset + 1).readUInt8(0);
         offset += 1
         this.payload = bintools.copyFrom(bytes, offset, offset + size - 1);
-	/* EGS shouldn't we do:
-	   offset += size-1
-	   return offset
-	   less can go wrong this way. */
-        return offset + this.payload.length - 1;
+        offset += size-1
+        return offset;
     }
 
     /**
@@ -311,9 +301,10 @@ export class HEXSTRPayload extends PayloadBase {
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(typeof payload === "string") {
-	    /* EGS do we always require that the payload arrive with a "0x" in front of it? 
-	       If so, we should check the arg and reject if it doesn't have "0x" */
-            this.payload = Buffer.from(payload.replace("0x", ""), "hex");
+            if(payload.startsWith("0x") ||!payload.match(/^[0-9A-Fa-f]+$/) ){
+                throw new Error("HEXSTRPayload.constructor -- hex string may not start with 0x and must be in /^[0-9A-Fa-f]+$/: " + payload);
+            }
+            this.payload = Buffer.from(payload, "hex");
         }
     }
 }
@@ -617,50 +608,43 @@ export class JSONPayload extends PayloadBase {
 }
 
 /**
- * Class for payloads representing protobuf definitions.
- */
-export class PROTOBUFPayload extends BINPayload {
-    protected typeid = 25;
-}
-
-/**
  * Class for payloads representing YAML definitions.
  */
 export class YAMLPayload extends UTF8Payload {
-    protected typeid = 26;
+    protected typeid = 25;
 }
 
 /**
  * Class for payloads representing email addresses.
  */
 export class EMAILPayload extends UTF8Payload {
-    protected typeid = 27;
+    protected typeid = 26;
 }
 
 /**
  * Class for payloads representing URL strings.
  */
 export class URLPayload extends UTF8Payload {
-    protected typeid = 28;
+    protected typeid = 27;
 }
 
 /**
  * Class for payloads representing IPFS addresses.
  */
 export class IPFSPayload extends B58STRPayload {
-    protected typeid = 29;
+    protected typeid = 28;
 }
 
 /**
  * Class for payloads representing onion URLs.
  */
 export class ONIONPayload extends UTF8Payload {
-    protected typeid = 30;
+    protected typeid = 29;
 }
 
 /**
  * Class for payloads representing torrent magnet links.
  */
 export class MAGNETPayload extends UTF8Payload {
-    protected typeid = 31;
+    protected typeid = 30;
 }

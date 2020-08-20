@@ -1,14 +1,16 @@
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { Input, SecpInput, TransferableInput } from 'src/apis/avm/inputs';
+import { SecpInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import {
-  Output, SecpOutput, AmountOutput, TransferableOutput,
+  SecpOutput, AmountOutput, TransferableOutput,
 } from 'src/apis/avm/outputs';
-import { AVMConstants } from 'src/apis/avm/types';
+import { AVMConstants } from 'src/apis/avm/constants';
+import { Input } from 'src/common/input';
+import { Output } from 'src/common/output';
 
 /**
  * @ignore
@@ -31,8 +33,8 @@ describe('Inputs', () => {
     addrs2 = [];
     utxos = [];
     for (let i:number = 0; i < 3; i++) {
-      addrs1.push(keymgr1.makeKey());
-      addrs2.push(keymgr2.makeKey());
+      addrs1.push(keymgr1.makeKey().getAddress());
+      addrs2.push(keymgr2.makeKey().getAddress());
     }
     const amount:BN = new BN(amnt);
     const addresses:Array<Buffer> = keymgr1.getAddresses();
