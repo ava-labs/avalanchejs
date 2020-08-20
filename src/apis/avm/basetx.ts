@@ -11,6 +11,7 @@ import { SelectCredentialClass } from './credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
 import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
+import { DefaultNetworkID } from '../../utils/constants';
 
 /**
  * @ignore
@@ -96,13 +97,13 @@ export class BaseTx  extends StandardBaseTx<AVMKeyPair, AVMKeyChain>{
     /**
      * Class representing a BaseTx which is the foundation for all transactions.
      *
-     * @param networkid Optional networkid, default 3
+     * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
      */
-    constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, memo:Buffer = undefined) {
+    constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, memo:Buffer = undefined) {
       super(networkid, blockchainid, outs, ins, memo);
     }
   }

@@ -9,6 +9,7 @@ import BN from 'bn.js';
 import { KeyChain, KeyPair } from './keychain';
 import { StandardAmountInput, StandardTransferableInput } from './input';
 import { StandardAmountOutput, StandardTransferableOutput } from './output';
+import { DefaultNetworkID } from '../utils/constants';
 
 /**
  * @ignore
@@ -109,13 +110,13 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
   /**
      * Class representing a StandardBaseTx which is the foundation for all transactions.
      *
-     * @param networkid Optional networkid, default 3
+     * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
      */
-  constructor(networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
+  constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
     if(typeof memo === "undefined"){
