@@ -247,7 +247,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     // force a copy
     if (typeof utxo === 'string') {
       utxovar.fromBuffer(bintools.cb58Decode(utxo));
-    } else if (utxo instanceof StandardUTXO) {
+    } else if (utxo instanceof UTXO) {
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     } else {
       /* istanbul ignore next */
