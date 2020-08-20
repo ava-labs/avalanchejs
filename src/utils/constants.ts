@@ -23,7 +23,7 @@ export const HRPToNetworkID:object = {
 
 export const FallbackHRP:string = "custom";
 
-export const DefaultNetworkID:number = 3;
+export const DefaultNetworkID:number = 4;
 
 export const PlatformChainID:string = "11111111111111111111111111111111LpoYY";
 export const DefaultSubnetID:string = "11111111111111111111111111111111LpoYY";

@@ -11,6 +11,7 @@ import { PlatformVMKeyChain, PlatformVMKeyPair } from './keychain';
 import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
+import { DefaultNetworkID } from '../../utils/constants';
 
 /**
  * @ignore
@@ -107,7 +108,7 @@ export class ImportTx extends BaseTx {
   /**
    * Class representing an unsigned Import transaction.
    *
-   * @param networkid Optional networkid, default 3
+   * @param networkid Optional networkid, [[DefaultNetworkID]]
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
    * @param sourceChain Optiona chainid for the source inputs to import. Default platform chainid.
    * @param outs Optional array of the [[TransferableOutput]]s
@@ -116,7 +117,7 @@ export class ImportTx extends BaseTx {
    * @param importIns Array of [[TransferableInput]]s used in the transaction
    */
   constructor(
-    networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), sourceChain:Buffer = undefined,
+    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), sourceChain:Buffer = undefined,
     outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
     memo:Buffer = undefined, importIns:Array<TransferableInput> = undefined
   ) {

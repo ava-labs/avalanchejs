@@ -243,11 +243,11 @@ export class AVMAPI extends JRPCAPI {
    * Example initialHolders:
    * [
    *     {
-   *         "address": "X-7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+   *         "address": "X-avax1kj06lhgx84h39snsljcey3tpc046ze68mek3g5",
    *         "amount": 10000
    *     },
    *     {
-   *         "address": "X-7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
+   *         "address": "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr",
    *         "amount": 50000
    *     }
    * ]
@@ -282,15 +282,15 @@ export class AVMAPI extends JRPCAPI {
      * [
      *      {
      *          "minters":[
-     *              "X-4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+     *              "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr"
      *          ],
      *          "threshold": 1
      *      },
      *      {
      *          "minters": [
-     *              "X-dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
-     *              "X-2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
-     *              "X-7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+     *              "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr",
+     *              "X-avax1kj06lhgx84h39snsljcey3tpc046ze68mek3g5",
+     *              "X-avax1yell3e4nln0m39cfpdhgqprsd87jkh4qnakklx"
      *          ],
      *          "threshold": 2
      *      }
@@ -927,15 +927,15 @@ buildImportTx = async (
   * [
   *      {
   *          "minters":[
-  *              "X-4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"
+  *              "X-avax1ghstjukrtw8935lryqtnh643xe9a94u3tc75c7"
   *          ],
   *          "threshold": 1
   *      },
   *      {
   *          "minters": [
-  *              "X-dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
-  *              "X-2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
-  *              "X-7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
+  *              "X-avax1yell3e4nln0m39cfpdhgqprsd87jkh4qnakklx",
+  *              "X-avax1k4nr26c80jaquzm9369j5a4shmwcjn0vmemcjz",
+  *              "X-avax1ztkzsrjnkn0cek5ryvhqswdtcg23nhge3nnr5e"
   *          ],
   *          "threshold": 2
   *      }

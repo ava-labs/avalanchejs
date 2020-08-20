@@ -10,6 +10,7 @@ import { TransferableOutput } from '../platformvm/outputs';
 import { TransferableInput } from '../platformvm/inputs';
 import { Buffer } from 'buffer/';
 import { PlatformVMConstants } from './constants';
+import { DefaultNetworkID } from '../../utils/constants';
 
 /**
  * @ignore
@@ -137,7 +138,7 @@ export class AddDefaultSubnetDelegatorTx extends ValidatorTx {
     /**
      * Class representing an unsigned Import transaction.
      *
-     * @param networkid Optional networkid, default 3
+     * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param sourceChain Optiona chainid for the source inputs to import. Default platform chainid.
      * @param outs Optional array of the [[TransferableOutput]]s
@@ -146,7 +147,7 @@ export class AddDefaultSubnetDelegatorTx extends ValidatorTx {
      * @param importIns Array of [[TransferableInput]]s used in the transaction
      */
     constructor(
-        networkid:number = 1, 
+        networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
         outs:Array<TransferableOutput> = undefined, 
         ins:Array<TransferableInput> = undefined, 

@@ -8,6 +8,7 @@ import {  PlatformVMConstants } from './constants';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';
+import { DefaultNetworkID } from '../../utils/constants';
 
 /**
  * @ignore
@@ -78,7 +79,7 @@ export class ExportTx extends BaseTx {
   /**
      * Class representing an unsigned Export transaction.
      *
-     * @param networkid Optional networkid, default 3
+     * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param destinationChain Optional chainid which identifies where the funds will send to.
      * @param outs Optional array of the [[TransferableOutput]]s
@@ -86,7 +87,7 @@ export class ExportTx extends BaseTx {
      * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
      */
   constructor(
-    networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16), destinationChain:Buffer = undefined,
+    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), destinationChain:Buffer = undefined,
     outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
     memo:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
   ) {

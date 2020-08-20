@@ -12,6 +12,7 @@ import { SelectCredentialClass } from './credentials';
 import { AVMKeyChain, AVMKeyPair } from './keychain';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
+import { DefaultNetworkID } from '../../utils/constants';
 
 /**
  * @ignore
@@ -101,7 +102,7 @@ export class OperationTx extends BaseTx {
     /**
      * Class representing an unsigned Operation transaction.
      *
-     * @param networkid Optional networkid, default 3
+     * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
@@ -109,7 +110,7 @@ export class OperationTx extends BaseTx {
      * @param ops Array of [[Operation]]s used in the transaction
      */
     constructor(
-      networkid:number = 3, blockchainid:Buffer = Buffer.alloc(32, 16),
+      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16),
       outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
       memo:Buffer = undefined, ops:Array<TransferableOperation> = undefined
     ) {
