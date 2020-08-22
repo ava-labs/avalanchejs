@@ -21,7 +21,26 @@ export const HRPToNetworkID:object = {
   "local": 12345
 };
 
+export const NetworkIDToNetworkNames:object = {
+  1: ["Avalanche","Mainnet"],
+  2: ["Cascade"],
+  3: ["Denali"],
+  4: ["Everest", "Testnet"],
+  12345: ["Local Network"]
+};
+
+export const NetworkNameToNetworkID:object = {
+"Avalanche": 1,
+"Mainnet": 1,
+"Cascade": 2,
+"Denali": 3,
+"Everest": 4,
+"Testnet": 4,
+"Local Network": 12345
+};
+
 export const FallbackHRP:string = "custom";
+export const FallbackNetworkName:string = "Custom Network";
 
 export const DefaultNetworkID:number = 4;
 
