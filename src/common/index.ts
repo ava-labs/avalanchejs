@@ -1,4 +1,5 @@
 export * from './apibase';
+export * from './assetamount';
 export * from './credentials';
 export * from './input';
 export * from './jrpcapi';
