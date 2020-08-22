@@ -394,7 +394,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
 
   abstract clone():this;
 
-  abstract create():this;
+  abstract create(...args:any[]):this;
 
   /**
      * Returns a new set with copy of UTXOs in this and set parameter.

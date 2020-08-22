@@ -108,7 +108,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     return utxovar
   }
 
-  create():this{
+  create(...args:any[]):this{
     return new UTXOSet() as this;
   }
 

@@ -5,6 +5,7 @@
 import { Buffer } from "buffer/";
 import BinTools from '../../utils/bintools';
 import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
+import { AVMKeyPair } from '../avm/keychain';
 
 /**
  * @ignore
@@ -63,6 +64,19 @@ export class PlatformVMKeyPair extends SECP256k1KeyPair {
       this.hrp = hrp;
     };
 
+    clone():this {
+        let newkp:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
+        newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
+        return newkp as this;
+    }
+
+    create(...args:any[]):this {
+        if(args.length == 2){
+            return new PlatformVMKeyPair(args[0], args[1]) as this;
+        }
+        return new PlatformVMKeyPair(this.hrp, this.chainid) as this;
+    }
+
     constructor(hrp:string, chainid:string) {
         super();
         this.chainid = chainid;
@@ -118,6 +132,29 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
             this.addKey(keypair);
         }
         return keypair;
+    }
+
+    create(...args:any[]):this {
+        if(args.length == 2){
+            return new PlatformVMKeyChain(args[0], args[1]) as this;
+        }
+        return new PlatformVMKeyChain(this.hrp, this.chainid) as this;
+    };
+
+    clone():this {
+        const newkc:PlatformVMKeyChain = new PlatformVMKeyChain(this.hrp, this.chainid);
+        for(let k in this.keys){
+            newkc.addKey(this.keys[k].clone());
+        }
+        return newkc as this;
+    };
+
+    union(kc:this):this {
+        let newkc:PlatformVMKeyChain = kc.clone();
+        for(let k in this.keys){
+            newkc.addKey(this.keys[k].clone());
+        }
+        return newkc as this;
     }
 
     /**

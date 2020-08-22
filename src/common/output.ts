@@ -14,7 +14,6 @@ import { UnixNow } from '../utils/helperfunctions';
  */
 const bintools:BinTools = BinTools.getInstance();
 
-
 /**
  * Class for representing an address used in [[Output]] types
  */
@@ -57,6 +56,17 @@ export class Address extends NBytes {
       }
       return this.getSize();
     }
+
+    clone():this {
+      let newbase:Address = new Address();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+  
+    create(...args:any[]):this {
+      return new Address() as this;
+    }
+
   
     /**
        * Class for representing an address used in [[Output]] types
@@ -68,6 +78,9 @@ export class Address extends NBytes {
     }
   }
 
+  /**
+   * Defines the most basic values for output ownership. Mostly inherited from, but can be used in population of NFT Owner data.
+   */
 export class OutputOwners {
     protected locktime:Buffer = Buffer.alloc(8);
     protected threshold:Buffer = Buffer.alloc(4);
@@ -263,6 +276,12 @@ export abstract class Output extends OutputOwners {
      * Returns the outputID for the output which tells parsers what type it is
      */
     abstract getOutputID():number;
+
+    abstract clone():this;
+
+    abstract create(...args:any[]):this;
+
+    abstract select(id:number, ...args:any[]):Output;
 
     /**
      * 

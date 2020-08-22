@@ -107,6 +107,12 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
      */
   abstract sign(msg:Buffer, kc:KeyChain<KPClass>):Array<Credential>;
 
+  abstract clone():this;
+
+  abstract create(...args:any[]):this;
+
+  abstract select(id:number, ...args:any[]):this;
+
   /**
      * Class representing a StandardBaseTx which is the foundation for all transactions.
      *

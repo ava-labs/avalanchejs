@@ -50,6 +50,11 @@ export abstract class AmountOutput extends StandardAmountOutput {
     makeTransferable(assetID:Buffer):TransferableOutput {
         return new TransferableOutput(assetID, this);
     }
+
+    select(id:number, ...args: any[]):Output {
+        return SelectOutputClass(id, ...args);
+    }
+
 }
 
 export abstract class NFTOutput extends BaseNFTOutput {
@@ -59,6 +64,10 @@ export abstract class NFTOutput extends BaseNFTOutput {
      */
     makeTransferable(assetID:Buffer):TransferableOutput {
         return new TransferableOutput(assetID, this);
+    }
+
+    select(id:number, ...args: any[]):Output {
+        return SelectOutputClass(id, ...args);
     }
 }
 
@@ -72,6 +81,18 @@ export class SecpOutput extends AmountOutput {
   getOutputID():number {
     return AVMConstants.SECPOUTPUTID;
   }
+
+  create(...args:any[]):this{
+    return new SecpOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SecpOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
+
 }
 
 /**
@@ -102,6 +123,16 @@ export class NFTMintOutput extends NFTOutput {
         let bsize:number = this.groupID.length + superbuff.length;
         let barr:Array<Buffer> = [this.groupID, superbuff];
         return Buffer.concat(barr,bsize);
+    }
+
+    create(...args:any[]):this{
+        return new NFTMintOutput(...args) as this;
+    }
+
+    clone():this {
+        const newout:NFTMintOutput = this.create()
+        newout.fromBuffer(this.toBuffer());
+        return newout as this;
     }
 
     /**
@@ -162,6 +193,16 @@ export class NFTTransferOutput extends NFTOutput {
     this.sizePayload.writeUInt32BE(this.payload.length, 0);
     const barr:Array<Buffer> = [this.groupID, this.sizePayload, this.payload, superbuff];
     return Buffer.concat(barr, bsize);
+  }
+
+  create(...args:any[]):this{
+    return new NFTTransferOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:NFTTransferOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
   }
 
   /**

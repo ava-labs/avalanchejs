@@ -12,6 +12,7 @@ import { PlatformVMKeyChain, PlatformVMKeyPair } from './keychain';
 import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
+import { SelectTxClass } from '../platformvm/tx';
 
 /**
  * @ignore
@@ -93,6 +94,21 @@ export class BaseTx  extends StandardBaseTx<PlatformVMKeyPair, PlatformVMKeyChai
       }
       return sigs;
     }
+
+  clone():this {
+    let newbase:BaseTx = new BaseTx();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new BaseTx(...args) as this;
+  }
+
+  select(id:number, ...args:any[]):this {
+    let newbasetx:BaseTx = SelectTxClass(id, ...args);
+    return newbasetx as this;
+  }
 
   /**
    * Class representing a BaseTx which is the foundation for all transactions.

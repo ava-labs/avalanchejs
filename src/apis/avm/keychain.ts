@@ -63,6 +63,19 @@ export class AVMKeyPair extends SECP256k1KeyPair {
       this.hrp = hrp;
     };
 
+    clone():this {
+        let newkp:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
+        newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
+        return newkp as this;
+    }
+
+    create(...args:any[]):this {
+        if(args.length == 2){
+            return new AVMKeyPair(args[0], args[1]) as this;
+        }
+        return new AVMKeyPair(this.hrp, this.chainid) as this;
+    }
+
     constructor(hrp:string, chainid:string) {
         super();
         this.chainid = chainid;
@@ -118,6 +131,29 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
             this.addKey(keypair);
         }
         return keypair;
+    }
+
+    create(...args:any[]):this {
+        if(args.length == 2){
+            return new AVMKeyChain(args[0], args[1]) as this;
+        }
+        return new AVMKeyChain(this.hrp, this.chainid) as this;
+    };
+
+    clone():this {
+        const newkc:AVMKeyChain = new AVMKeyChain(this.hrp, this.chainid);
+        for(let k in this.keys){
+            newkc.addKey(this.keys[k].clone());
+        }
+        return newkc as this;
+    };
+
+    union(kc:this):this {
+        let newkc:AVMKeyChain = kc.clone();
+        for(let k in this.keys){
+            newkc.addKey(this.keys[k].clone());
+        }
+        return newkc as this;
     }
 
     /**

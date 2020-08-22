@@ -37,7 +37,7 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on the Platform Chain. 
  */
-export class SECP256k1KeyPair extends KeyPair {
+export abstract class SECP256k1KeyPair extends KeyPair {
     protected keypair:elliptic.ec.KeyPair
 
     /**

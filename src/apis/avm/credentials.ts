@@ -36,10 +36,42 @@ export class SecpCredential extends Credential {
   getCredentialID():number {
     return AVMConstants.SECPCREDENTIAL;
   }
+
+  clone():this {
+    let newbase:SecpCredential = new SecpCredential();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new SecpCredential(...args) as this;
+  }
+
+  select(id:number, ...args:any[]):this {
+    let newbasetx:SecpCredential = SelectCredentialClass(id, ...args);
+    return newbasetx as this;
+  }
+
 }
 
 export class NFTCredential extends Credential {
   getCredentialID():number {
     return AVMConstants.NFTCREDENTIAL;
   }
+
+  clone():this {
+    let newbase:NFTCredential = new NFTCredential();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new NFTCredential(...args) as this;
+  }
+
+  select(id:number, ...args:any[]):this {
+    let newbasetx:NFTCredential = SelectCredentialClass(id, ...args);
+    return newbasetx as this;
+  }
+
 }

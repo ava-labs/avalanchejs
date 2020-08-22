@@ -30,6 +30,17 @@ export class SigIdx extends NBytes {
      */
     getSource = ():Buffer => this.source;
 
+    clone():this {
+      let newbase:SigIdx = new SigIdx();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+  
+    create(...args:any[]):this {
+      return new SigIdx() as this;
+    }
+
+
     /**
      * Type representing a [[Signature]] index used in [[Input]]
      */
@@ -44,6 +55,17 @@ export class SigIdx extends NBytes {
  * Signature for a [[Tx]]
  */
 export class Signature extends NBytes {
+
+  clone():this {
+    let newbase:Signature = new Signature();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new Signature() as this;
+  }
+
     /**
      * Signature for a [[Tx]]
      */
@@ -92,6 +114,12 @@ export abstract class Credential {
       return Buffer.concat(barr, bsize);
     }
   
+    abstract clone():this;
+
+    abstract create(...args:any[]):this;
+
+    abstract select(id:number, ...args:any[]):Credential;
+
     constructor(sigarray:Array<Signature> = undefined) {
       if (typeof sigarray !== 'undefined') {
         /* istanbul ignore next */

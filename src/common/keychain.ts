@@ -9,7 +9,7 @@ import { Buffer } from "buffer/";
  * Class for representing a private and public keypair in Avalanche. 
  * All APIs that need key pairs should extend on this class.
  */
-export class KeyPair {
+export abstract class KeyPair {
     protected pubk:Buffer;
   
     protected privk:Buffer;
@@ -103,6 +103,10 @@ export class KeyPair {
      * @returns A string representation of the address
      */
     getAddressString:() => string
+
+    abstract create(...args:any[]):this;
+
+    abstract clone():this;
   
     constructor() {}
   }
@@ -113,7 +117,7 @@ export class KeyPair {
    *
    * @typeparam KPClass extending [[KeyPair]] which is used as the key in [[KeyChain]]
    */
-  export class KeyChain<KPClass extends KeyPair> {
+  export abstract class KeyChain<KPClass extends KeyPair> {
     protected keys:{[address: string]: KPClass} = {};
   
     /**
@@ -197,6 +201,12 @@ export class KeyPair {
        * @returns A reference to the [[KeyPair]] in the keys database
        */
     getKey = (address:Buffer): KPClass => this.keys[address.toString('hex')];
+
+    abstract create(...args:any[]):this;
+
+    abstract clone():this;
+
+    abstract union(kc:this):this;
   
     /**
        * Returns instance of [[KeyChain]].

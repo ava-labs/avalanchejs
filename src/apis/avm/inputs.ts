@@ -52,9 +52,14 @@ export class TransferableInput extends StandardTransferableInput {
   
 }
 
-export abstract class AmountInput extends StandardAmountInput {}
+export abstract class AmountInput extends StandardAmountInput {
 
-export class SecpInput extends StandardAmountInput {
+  select(id:number, ...args: any[]):Input {
+    return SelectInputClass(id, ...args);
+  }
+}
+
+export class SecpInput extends AmountInput {
   /**
      * Returns the inputID for this input
      */
@@ -63,4 +68,14 @@ export class SecpInput extends StandardAmountInput {
   }
 
   getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
+
+  create(...args:any[]):this{
+    return new SecpInput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SecpInput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
 }

@@ -105,6 +105,16 @@ export class ImportTx extends BaseTx {
     return sigs;
   }
 
+  clone():this {
+    let newbase:ImportTx = new ImportTx();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new ImportTx(...args) as this;
+  }
+
   /**
    * Class representing an unsigned Import transaction.
    *

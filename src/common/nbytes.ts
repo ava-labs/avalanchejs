@@ -83,6 +83,10 @@ export abstract class NBytes {
     toString():string {
       return bintools.bufferToB58(this.toBuffer());
     }
+
+    abstract clone():this;
+
+    abstract create(...args:any[]):this;
   
     /**
        * Returns instance of [[NBytes]].

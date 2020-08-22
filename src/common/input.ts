@@ -90,6 +90,12 @@ export abstract class Input {
       const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
       return Buffer.compare(asort, bsort) as (1|-1|0);
     };
+
+    abstract clone():this;
+
+    abstract create(...args:any[]):this;
+
+    abstract select(id:number, ...args:any[]):Input;
   
     constructor() {}
   }

@@ -41,7 +41,11 @@ export abstract class AmountOutput extends StandardAmountOutput {
      * @param assetID An assetID which is wrapped around the Buffer of the Output
      */
     makeTransferable(assetID:Buffer):TransferableOutput {
-        return new TransferableOutput(assetID, this);
+      return new TransferableOutput(assetID, this);
+    }
+
+    select(id:number, ...args: any[]):Output {
+      return SelectOutputClass(id, ...args);
     }
 }
 
@@ -54,6 +58,16 @@ export class SecpOutput extends AmountOutput {
      */
   getOutputID():number {
     return PlatformVMConstants.SECPOUTPUTID;
+  }
+
+  create(...args:any[]):this{
+    return new SecpOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SecpOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
   }
 }
 

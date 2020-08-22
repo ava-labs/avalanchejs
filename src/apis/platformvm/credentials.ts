@@ -33,5 +33,20 @@ export class SecpCredential extends Credential {
   getCredentialID():number {
     return PlatformVMConstants.SECPCREDENTIAL;
   }
+
+  clone():this {
+    let newbase:SecpCredential = new SecpCredential();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new SecpCredential(...args) as this;
+  }
+
+  select(id:number, ...args:any[]):this {
+    let newbasetx:SecpCredential = SelectCredentialClass(id, ...args);
+    return newbasetx as this;
+  }
 }
 
