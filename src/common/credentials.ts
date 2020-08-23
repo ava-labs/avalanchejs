@@ -2,10 +2,10 @@
  * @packageDocumentation
  * @module Common-Signature
  */
-
+import { NBytes } from './nbytes';
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
-import { NBytes } from './nbytes';
+
 
 /**
  * @ignore

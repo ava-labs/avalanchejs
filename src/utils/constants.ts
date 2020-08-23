@@ -3,15 +3,19 @@
  * @module Common-Constants
  */
 
+export const PrivateKeyPrefix:string = "PrivateKey-";
+
+export const NodeIDPrefix:string = "NodeID-";
+
 export const PrimaryAssetAlias:string = "AVAX";
 
 export const NetworkIDToHRP:object = {
-    1: "avax",
-    2: "cascade",
-    3: "denali",
-    4: "everest",
-    12345: "local"
-  };
+  1: "avax",
+  2: "cascade",
+  3: "denali",
+  4: "everest",
+  12345: "local"
+};
   
 export const HRPToNetworkID:object = {
   "avax": 1,
@@ -30,13 +34,13 @@ export const NetworkIDToNetworkNames:object = {
 };
 
 export const NetworkNameToNetworkID:object = {
-"Avalanche": 1,
-"Mainnet": 1,
-"Cascade": 2,
-"Denali": 3,
-"Everest": 4,
-"Testnet": 4,
-"Local Network": 12345
+  "Avalanche": 1,
+  "Mainnet": 1,
+  "Cascade": 2,
+  "Denali": 3,
+  "Everest": 4,
+  "Testnet": 4,
+  "Local Network": 12345
 };
 
 export const FallbackHRP:string = "custom";
