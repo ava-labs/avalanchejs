@@ -65,7 +65,7 @@ export function bufferToNodeIDString(pk:Buffer):string {
  * 
  * @param pk A string for the nodeID.
  */
-export function privateNodeIDToBuffer(pk:string):Buffer {
+export function NodeIDStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("NodeID-")) {
     throw new Error("privateNodeIDToBuffer -- nodeID must start with 'NodeID-'");
   }

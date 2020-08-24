@@ -13,7 +13,7 @@ import { Defaults, PlatformChainID } from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
-import { UnixNow } from '../../utils/helperfunctions';
+import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { TransferableInput, SecpInput } from '../platformvm/inputs';
 import { UTXO } from '../platformvm/utxos';
@@ -938,6 +938,204 @@ export class PlatformVMAPI extends JRPCAPI {
 
     return builtUnsignedTx;
   };
+
+  /**
+  * Helper function which creates an unsigned [[AddSubnetValidatorTx]]. For more granular control, you may create your own
+  * [[UnsignedTx]] manually and import the [[AddSubnetValidatorTx]] class directly.
+  *
+  * @param utxoset A set of UTXOs that the transaction is built on.
+  * @param weight The amount of weight for this subnet validator.
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+  * @param nodeID The node ID of the validator being added.
+  * @param startTime The Unix time when the validator starts validating the Default Subnet.
+  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  *  
+  * @returns An unsigned transaction created from the passed in parameters.
+  */
+  buildAddSubnetValidatorTx = async (
+    utxoset:UTXOSet, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
+    nodeID:string, 
+    startTime:BN, 
+    endTime:BN,
+    weight:BN,
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow()
+  ):Promise<UnsignedTx> => {
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddSubnetValidatorTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddSubnetValidatorTx').map((a) => bintools.stringToAddress(a));
+
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
+
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    
+    const now:BN = UnixNow();
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new Error("PlatformVMAPI.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime");
+    }
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildAddSubnetValidatorTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      from,
+      change,
+      NodeIDStringToBuffer(nodeID),
+      startTime, endTime,
+      weight, 
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  }
+
+  /**
+  * Helper function which creates an unsigned [[AddPrimaryDelegatorTx]]. For more granular control, you may create your own
+  * [[UnsignedTx]] manually and import the [[AddPrimaryDelegatorTx]] class directly.
+  *
+  * @param utxoset A set of UTXOs that the transaction is built on
+  * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+  * @param nodeID The node ID of the validator being added.
+  * @param startTime The Unix time when the validator starts validating the Default Subnet.
+  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  *  
+  * @returns An unsigned transaction created from the passed in parameters.
+  */
+  buildAddPrimaryDelegatorTx = async (
+    utxoset:UTXOSet, 
+    stakeAmount:BN,
+    rewardAddress:string,
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
+    nodeID:string, 
+    startTime:BN, 
+    endTime:BN,
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow()
+  ):Promise<UnsignedTx> => {
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddPrimaryDelegatorTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddPrimaryDelegatorTx').map((a) => bintools.stringToAddress(a));
+
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
+
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    
+    const now:BN = UnixNow();
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new Error("PlatformVMAPI.buildAddPrimaryDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+    }
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildAddPrimaryDelegatorTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      avaxAssetID,
+      bintools.stringToAddress(rewardAddress),
+      from,
+      change,
+      NodeIDStringToBuffer(nodeID),
+      startTime, endTime,
+      stakeAmount,
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  }
+
+
+  /**
+  * Helper function which creates an unsigned [[AddPrimaryValidatorTx]]. For more granular control, you may create your own
+  * [[UnsignedTx]] manually and import the [[AddPrimaryValidatorTx]] class directly.
+  *
+  * @param utxoset A set of UTXOs that the transaction is built on
+  * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+  * @param nodeID The node ID of the validator being added.
+  * @param startTime The Unix time when the validator starts validating the Default Subnet.
+  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  *  
+  * @returns An unsigned transaction created from the passed in parameters.
+  */
+  buildAddPrimaryValidatorTx = async (
+    utxoset:UTXOSet, 
+    stakeAmount:BN,
+    rewardAddress:string,
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
+    nodeID:string, 
+    startTime:BN, 
+    endTime:BN,
+    delegationFee:number,
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow()
+  ):Promise<UnsignedTx> => {
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddPrimaryValidatorTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddPrimaryValidatorTx').map((a) => bintools.stringToAddress(a));
+
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
+
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    
+    const now:BN = UnixNow();
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new Error("PlatformVMAPI.buildAddPrimaryValidatorTx -- startTime must be in the future and endTime must come after startTime");
+    }
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildAddPrimaryValidatorTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      avaxAssetID,
+      bintools.stringToAddress(rewardAddress),
+      from,
+      change,
+      NodeIDStringToBuffer(nodeID),
+      startTime, endTime,
+      stakeAmount,
+      delegationFee,
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  }
 
   /**
    * @ignore
