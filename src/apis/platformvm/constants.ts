@@ -4,7 +4,6 @@
  */
 
 import BN from 'bn.js';
-import { ImportTx } from '../avm/importtx';
 
 export class PlatformVMConstants {
   static LATESTCODEC:number = 0;
@@ -19,6 +18,8 @@ export class PlatformVMConstants {
 
   static MICROAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(1000000));
 
+  static MINSTAKE:BN = PlatformVMConstants.ONEAVAX.mul(new BN(2000));
+
   static SECPFXID:number = 0;
 
   static SECPOUTPUTID:number = 7;
@@ -27,11 +28,11 @@ export class PlatformVMConstants {
 
   static BASETX:number = 0;
 
-  static ADDDEFAULTSUBNETVALIDATORTX:number = 12;
+  static ADDPRIMARYVALIDATORTX:number = 12;
 
-  static ADDNONDEFAULTSUBNETVALIDATORTX:number = 13;
+  static ADDSUBNETVALIDATORTX:number = 13;
 
-  static ADDDEFAULTSUBNETDELEGATORTX:number = 14;
+  static ADDPRIMARYDELEGATORTX:number = 14;
 
   static CREATECHAINTX:number = 15;
 

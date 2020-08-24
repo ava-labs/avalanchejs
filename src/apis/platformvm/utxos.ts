@@ -12,11 +12,12 @@ import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx } from './tx';
 import { ExportTx } from '../platformvm/exporttx';
-import { PlatformChainID } from '../../utils/constants';
+import { PlatformChainID, DefaultNetworkID } from '../../utils/constants';
 import { ImportTx } from '../platformvm/importtx';
 import { BaseTx } from '../platformvm/basetx';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
 import { Output } from '../../common/output';
+import { AddPrimaryDelegatorTx, AddSubnetValidatorTx, AddPrimaryValidatorTx } from './validationtx';
 
 /**
  * @ignore
@@ -338,13 +339,14 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
     * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
     * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover of the AVAX
-    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param destinationChain Optional. A {@link https://github.com/feross/buffer|Buffer} for the chainid where to send the asset.
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * @param locktime Optional. The locktime field created in the resulting outputs
     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+    * 
     * @returns An unsigned transaction created from the passed in parameters.
     *
     */
@@ -399,6 +401,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         aad.addAssetAmount(feeAssetID, zero, fee);
       }
     }
+
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
@@ -411,5 +414,216 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const exportTx:ExportTx = new ExportTx(networkid, blockchainid, destinationChain, outs, ins, memo, exportouts);
     return new UnsignedTx(exportTx);
   };
+
+
+  /**
+  * Class representing an unsigned [[AddNonDefaultSubnetDelegatorTx]] transaction.
+  *
+  * @param networkid Networkid, [[DefaultNetworkID]]
+  * @param blockchainid Blockchainid, default undefined
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+  * @param nodeID The node ID of the validator being added.
+  * @param startTime The Unix time when the validator starts validating the Default Subnet.
+  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param weight The amount of weight for this subnet validator.
+  * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+  * @param feeAssetID Optional. The assetID of the fees being burned. 
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param locktime Optional. The locktime field created in the resulting outputs
+  * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+  * 
+  * @returns An unsigned transaction created from the passed in parameters.
+  */
+  buildAddNonDefaultSubnetDelegatorTx = (
+    networkid:number = DefaultNetworkID, 
+    blockchainid:Buffer,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer>,
+    nodeID:Buffer, 
+    startTime:BN, 
+    endTime:BN,
+    weight:BN,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow()
+  ):UnsignedTx => {
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    //let stakeOuts:Array<TransferableOutput> = [];
+    
+    const zero:BN = new BN(0);
+    const now:BN = UnixNow();
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new Error("UTXOSet.buildAddNonDefaultSubnetDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+    }
+
+    // Not implemented: Fees can be paid from importIns
+    if(this._feeCheck(fee, feeAssetID)) {
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
+      }
+    }
+
+    const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, weight);
+    return new UnsignedTx(UTx);
+  }
+
+  /**
+  * Class representing an unsigned [[AddPrimaryDelegatorTx]] transaction.
+  *
+  * @param networkid Networkid, [[DefaultNetworkID]]
+  * @param blockchainid Blockchainid, default undefined
+  * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
+  * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
+  * @param rewardAddress The address the validator reward goes.
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
+  * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
+  * @param nodeID The node ID of the validator being added.
+  * @param startTime The Unix time when the validator starts validating the Default Subnet.
+  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+  * @param feeAssetID Optional. The assetID of the fees being burned. 
+  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+  * 
+  * @returns An unsigned transaction created from the passed in parameters.
+  */
+  buildAddPrimaryDelegatorTx = (
+    networkid:number = DefaultNetworkID, 
+    blockchainid:Buffer,
+    stakeAmount:BN,
+    avaxAssetID:Buffer,
+    rewardAddress:Buffer,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer>,
+    nodeID:Buffer, 
+    startTime:BN,
+    endTime:BN,
+
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+  ):UnsignedTx => {
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    let stakeOuts:Array<TransferableOutput> = [];
+    
+    const zero:BN = new BN(0);
+    const now:BN = UnixNow();
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new Error("UTXOSet.buildAddPrimaryDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+    }
+
+    const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
+    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
+      aad.addAssetAmount(avaxAssetID, stakeAmount, fee);
+    } else {
+      aad.addAssetAmount(avaxAssetID, stakeAmount, zero);
+      if(this._feeCheck(fee, feeAssetID)) {
+        aad.addAssetAmount(feeAssetID, zero, fee);
+      }
+    }
+    
+    const success:Error = this.getMinimumSpendable(aad, asOf);
+    if(typeof success === "undefined") {
+      ins = aad.getInputs();
+      outs = aad.getChangeOutputs();
+      stakeOuts = aad.getOutputs();
+    } else {
+      throw success;
+    }
+
+    const UTx:AddPrimaryDelegatorTx = new AddPrimaryDelegatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, rewardAddress);
+    return new UnsignedTx(UTx);
+  }
+
+  /**
+    * Class representing an unsigned [[buildAddPrimaryValidatorTx]] transaction.
+    *
+    * @param networkid Networkid, [[DefaultNetworkID]]
+    * @param blockchainid Blockchainid, default undefined
+    * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
+    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
+    * @param rewardAddress The address the validator reward goes.
+    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
+    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
+    * @param nodeID The node ID of the validator being added.
+    * @param startTime The Unix time when the validator starts validating the Default Subnet.
+    * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+    * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned. 
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * 
+    * @returns An unsigned transaction created from the passed in parameters.
+    */
+  buildAddPrimaryValidatorTx = (
+    networkid:number = DefaultNetworkID, 
+    blockchainid:Buffer,
+    stakeAmount:BN,
+    avaxAssetID:Buffer,
+    rewardAddress:Buffer,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer>,
+    nodeID:Buffer, 
+    startTime:BN,
+    endTime:BN,
+    delegationFee:number,
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+  ):UnsignedTx => {
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    let stakeOuts:Array<TransferableOutput> = [];
+    
+    const zero:BN = new BN(0);
+    const now:BN = UnixNow();
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new Error("UTXOSet.buildAddPrimaryValidatorTx -- startTime must be in the future and endTime must come after startTime");
+    }
+
+    if(stakeAmount.lt(PlatformVMConstants.MINSTAKE)) {
+      throw new Error("UTXOSet.buildAddPrimaryValidatorTx -- stake amount must be at least " + PlatformVMConstants.MINSTAKE);
+    }
+
+    if(delegationFee > 100 || delegationFee < 0){
+      throw new Error("UTXOSet.buildAddPrimaryValidatorTx -- startTime must be in the range of 0 to 100, inclusively");
+    }
+
+    const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
+    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
+      aad.addAssetAmount(avaxAssetID, stakeAmount, fee);
+    } else {
+      aad.addAssetAmount(avaxAssetID, stakeAmount, zero);
+      if(this._feeCheck(fee, feeAssetID)) {
+        aad.addAssetAmount(feeAssetID, zero, fee);
+      }
+    }
+    
+    const success:Error = this.getMinimumSpendable(aad, asOf);
+    if(typeof success === "undefined") {
+      ins = aad.getInputs();
+      outs = aad.getChangeOutputs();
+      stakeOuts = aad.getOutputs();
+    } else {
+      throw success;
+    }
+
+    const UTx:AddPrimaryValidatorTx = new AddPrimaryValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, rewardAddress, delegationFee);
+    return new UnsignedTx(UTx);
+  }
 
 }

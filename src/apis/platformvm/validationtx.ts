@@ -11,7 +11,6 @@ import { TransferableInput } from '../platformvm/inputs';
 import { Buffer } from 'buffer/';
 import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
-import { AVMConstants } from '../avm/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
 
 /**
@@ -98,14 +97,14 @@ export abstract class ValidatorTx extends BaseTx {
 }
 
 
-export class AddNonDefaultSubnetDelegatorTx extends ValidatorTx {
+export class AddSubnetValidatorTx extends ValidatorTx {
     protected weight:Buffer = Buffer.alloc(8);
 
     /**
-     * Returns the id of the [[AddNonDefaultSubnetDelegatorTx]]
+     * Returns the id of the [[AddSubnetValidatorTx]]
      */
     getTxType = ():number => {
-    return PlatformVMConstants.ADDNONDEFAULTSUBNETVALIDATORTX;
+    return PlatformVMConstants.ADDSUBNETVALIDATORTX;
     }
 
     /**
@@ -130,26 +129,25 @@ export class AddNonDefaultSubnetDelegatorTx extends ValidatorTx {
     }
 
     /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[AddNonDefaultSubnetDelegatorTx]].
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[AddSubnetValidatorTx]].
      */
     toBuffer():Buffer {
         const superbuff:Buffer = super.toBuffer();
         return Buffer.concat([superbuff, this.weight]);
     }
 
-        /**
-     * Class representing an unsigned Import transaction.
+    /**
+     * Class representing an unsigned AddSubnetValidatorTx transaction.
      *
      * @param networkid Optional. Networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
-     * @param sourceChain Optional. Chainid for the source inputs to import. Default platform chainid.
      * @param outs Optional. Array of the [[TransferableOutput]]s
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
      * @param nodeID Optional. The node ID of the validator being added.
      * @param startTime Optional. The Unix time when the validator starts validating the Default Subnet.
      * @param endTime Optional. The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
-     * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
+     * @param weight Optional. The amount of nAVAX the validator is staking.
      */
     constructor(
         networkid:number = DefaultNetworkID, 
@@ -172,18 +170,18 @@ export class AddNonDefaultSubnetDelegatorTx extends ValidatorTx {
 
 
 /**
- * Class representing an unsigned AddDefaultSubnetDelegator transaction.
+ * Class representing an unsigned AddPrimaryDelegatorTx transaction.
  */
-export class AddDefaultSubnetDelegatorTx extends AddNonDefaultSubnetDelegatorTx {
+export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
     
     protected stakeOuts:Array<TransferableOutput> = [];
     protected rewardAddress:Buffer = Buffer.alloc(20);
   
     /**
-       * Returns the id of the [[AddDefaultSubnetDelegatorTx]]
+       * Returns the id of the [[AddPrimaryDelegatorTx]]
        */
     getTxType = ():number => {
-      return PlatformVMConstants.ADDDEFAULTSUBNETDELEGATORTX;
+      return PlatformVMConstants.ADDPRIMARYDELEGATORTX;
     }
 
     /**
@@ -225,13 +223,13 @@ export class AddDefaultSubnetDelegatorTx extends AddNonDefaultSubnetDelegatorTx 
             offset = xferout.fromBuffer(bytes, offset);
             this.outs.push(xferout);
         }
-        this.rewardAddress = bintools.copyFrom(bytes, offset, offset + AVMConstants.ADDRESSLENGTH);
-        offset += AVMConstants.ADDRESSLENGTH;
+        this.rewardAddress = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ADDRESSLENGTH);
+        offset += PlatformVMConstants.ADDRESSLENGTH;
         return offset;
     }
 
     /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[AddPrimaryDelegatorTx]].
      */
     toBuffer():Buffer {
         const superbuff:Buffer = super.toBuffer();
@@ -251,11 +249,10 @@ export class AddDefaultSubnetDelegatorTx extends AddNonDefaultSubnetDelegatorTx 
       }
   
     /**
-     * Class representing an unsigned Import transaction.
+     * Class representing an unsigned AddPrimaryDelegatorTx transaction.
      *
      * @param networkid Optional. Networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
-     * @param sourceChain Optional. Chainid for the source inputs to import. Default platform chainid.
      * @param outs Optional. Array of the [[TransferableOutput]]s
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -287,7 +284,7 @@ export class AddDefaultSubnetDelegatorTx extends AddNonDefaultSubnetDelegatorTx 
     }
   }
 
-export class AddDefaultSubnetValidatorTx extends AddDefaultSubnetDelegatorTx {
+export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
 
@@ -295,7 +292,7 @@ export class AddDefaultSubnetValidatorTx extends AddDefaultSubnetDelegatorTx {
        * Returns the id of the [[AddDefaultSubnetDelegatorTx]]
        */
     getTxType = ():number => {
-    return PlatformVMConstants.ADDDEFAULTSUBNETVALIDATORTX;
+    return PlatformVMConstants.ADDPRIMARYVALIDATORTX;
     }
 
     /**
@@ -310,7 +307,7 @@ export class AddDefaultSubnetValidatorTx extends AddDefaultSubnetDelegatorTx {
      */
     getDelegationFeeBuffer():Buffer {
         let dBuff:Buffer = Buffer.alloc(4);
-        let buffnum:number = parseFloat(this.delegationFee.toFixed(4)) * AddDefaultSubnetValidatorTx.delegatorMultiplier;
+        let buffnum:number = parseFloat(this.delegationFee.toFixed(4)) * AddPrimaryValidatorTx.delegatorMultiplier;
         dBuff.writeUInt32BE(buffnum, 0);
         return dBuff;
     }
@@ -319,7 +316,7 @@ export class AddDefaultSubnetValidatorTx extends AddDefaultSubnetDelegatorTx {
         offset = super.fromBuffer(bytes, offset);
         let dbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
-        this.delegationFee = dbuff.readUInt32BE(0) / AddDefaultSubnetValidatorTx.delegatorMultiplier;
+        this.delegationFee = dbuff.readUInt32BE(0) / AddPrimaryValidatorTx.delegatorMultiplier;
         return offset;
     }
 
@@ -330,11 +327,10 @@ export class AddDefaultSubnetValidatorTx extends AddDefaultSubnetDelegatorTx {
     }
 
     /**
-     * Class representing an unsigned Import transaction.
+     * Class representing an unsigned AddPrimaryValidatorTx transaction.
      *
      * @param networkid Optional. Networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
-     * @param sourceChain Optional. Chainid for the source inputs to import. Default platform chainid.
      * @param outs Optional. Array of the [[TransferableOutput]]s
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -379,7 +375,7 @@ export class AddDefaultSubnetValidatorTx extends AddDefaultSubnetDelegatorTx {
             if(delegationFee >= 0 && delegationFee <= 100) {
                 this.delegationFee = parseFloat(delegationFee.toFixed(4));
             } else {
-                throw new Error("AddDefaultSubnetValidatorTx.constructor -- delegationFee must be in the range of 0 and 100, inclusively.");
+                throw new Error("AddPrimaryValidatorTx.constructor -- delegationFee must be in the range of 0 and 100, inclusively.");
             }
         }
     }
