@@ -18,6 +18,9 @@ import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
 import { ImportTx } from 'src/apis/platformvm/importtx';
+import { PlatformVMConstants } from 'src/apis/platformvm/constants';
+import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
+import { platform } from 'os';
 
 /**
  * @ignore
@@ -30,6 +33,10 @@ describe('PlatformVMAPI', () => {
   const ip:string = '127.0.0.1';
   const port:number = 9650;
   const protocol:string = 'https';
+
+  const nodeID:string = "NodeID-B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW";
+  const startTime:BN = UnixNow().add(new BN(60 * 5));
+  const endTime:BN = startTime.add(new BN(1209600));
 
   const username:string = 'AvaLabs';
   const password:string = 'password';
@@ -692,15 +699,15 @@ describe('PlatformVMAPI', () => {
     let secpbase2:SecpOutput;
     let secpbase3:SecpOutput;
     let fungutxoids:Array<string> = [];
-    let avm:PlatformVMAPI;
+    let platformvm:PlatformVMAPI;
     const fee:number = 10;
     const name:string = 'Mortycoin is the dumb as a sack of hammers.';
     const symbol:string = 'morT';
     const denomination:number = 8;
 
     beforeEach(async () => {
-      avm = new PlatformVMAPI(avalanche, "/ext/bc/P");
-      const result:Promise<Buffer> = avm.getAVAXAssetID();
+      platformvm = new PlatformVMAPI(avalanche, "/ext/bc/P");
+      const result:Promise<Buffer> = platformvm.getAVAXAssetID();
       const payload:object = {
         result: {
           name,
@@ -716,7 +723,7 @@ describe('PlatformVMAPI', () => {
       mockAxios.mockResponse(responseObj);
       await result;
       set = new UTXOSet();
-      avm.newKeyChain();
+      platformvm.newKeyChain();
       keymgr2 = new PlatformVMKeyChain(avalanche.getHRP(), alias);
       keymgr3 = new PlatformVMKeyChain(avalanche.getHRP(), alias);
       addrs1 = [];
@@ -730,13 +737,13 @@ describe('PlatformVMAPI', () => {
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
 
       for (let i:number = 0; i < 3; i++) {
-        addrs1.push(avm.addressFromBuffer(avm.keyChain().makeKey().getAddress()));
-        addrs2.push(avm.addressFromBuffer(keymgr2.makeKey().getAddress()));
-        addrs3.push(avm.addressFromBuffer(keymgr3.makeKey().getAddress()));
+        addrs1.push(platformvm.addressFromBuffer(platformvm.keyChain().makeKey().getAddress()));
+        addrs2.push(platformvm.addressFromBuffer(keymgr2.makeKey().getAddress()));
+        addrs3.push(platformvm.addressFromBuffer(keymgr3.makeKey().getAddress()));
       }
-      const amount:BN = new BN(amnt);
-      addressbuffs = avm.keyChain().getAddresses();
-      addresses = addressbuffs.map((a) => avm.addressFromBuffer(a));
+      const amount:BN = PlatformVMConstants.ONEAVAX.mul(new BN(amnt));
+      addressbuffs = platformvm.keyChain().getAddresses();
+      addresses = addressbuffs.map((a) => platformvm.addressFromBuffer(a));
       const locktime:BN = new BN(54321);
       const threshold:number = 3;
       for (let i:number = 0; i < 5; i++) {
@@ -763,36 +770,31 @@ describe('PlatformVMAPI', () => {
       }
       set.addArray(utxos);
 
-      secpbase1 = new SecpOutput(new BN(777), addrs3.map((a) => avm.parseAddress(a)), UnixNow(), 1);
-      secpbase2 = new SecpOutput(new BN(888), addrs2.map((a) => avm.parseAddress(a)), UnixNow(), 1);
-      secpbase3 = new SecpOutput(new BN(999), addrs2.map((a) => avm.parseAddress(a)), UnixNow(), 1);
+      secpbase1 = new SecpOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase2 = new SecpOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase3 = new SecpOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
 
     });
 
     test('signTx', async () => {
-      const assetID = await avm.getAVAXAssetID();
+      const assetID = await platformvm.getAVAXAssetID();
       const txu2:UnsignedTx = set.buildBaseTx(
         networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
-        addrs3.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        avm.getFee(), assetID,
+        addrs3.map((a) => platformvm.parseAddress(a)),
+        addrs1.map((a) => platformvm.parseAddress(a)),
+        addrs1.map((a) => platformvm.parseAddress(a)),
+        platformvm.getFee(), assetID,
         undefined, UnixNow(), new BN(0), 1,
       );
 
-      const tx2:Tx = txu2.sign(avm.keyChain());
+      const tx2:Tx = txu2.sign(platformvm.keyChain());
     });
 
-
-
-
-
-
     test('buildImportTx', async () => {
-      avm.setFee(new BN(fee));
-      const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
-      const result:Promise<UnsignedTx> = avm.buildImportTx(
+      const result:Promise<UnsignedTx> = platformvm.buildImportTx(
         set, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
       );
       const payload:object = {
@@ -812,7 +814,7 @@ describe('PlatformVMAPI', () => {
 
       const txu2:UnsignedTx = set.buildImportTx(
         networkid, bintools.cb58Decode(blockchainid), 
-        addrbuff1, importIns, undefined, avm.getFee(), assetID, 
+        addrbuff1, importIns, undefined, platformvm.getFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
@@ -822,12 +824,12 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildExportTx', async () => {
-      avm.setFee(new BN(fee));
-      const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
-      const addrbuff2 = addrs2.map((a) => avm.parseAddress(a));
-      const addrbuff3 = addrs3.map((a) => avm.parseAddress(a));
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = new BN(90);
-      const txu1:UnsignedTx = await avm.buildExportTx(
+      const txu1:UnsignedTx = await platformvm.buildExportTx(
         set, 
         amount, 
         addrs3, 
@@ -845,7 +847,7 @@ describe('PlatformVMAPI', () => {
         addrbuff1, 
         addrbuff2, 
         bintools.cb58Decode(PlatformChainID), 
-        avm.getFee(), 
+        platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
@@ -853,19 +855,132 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
 
-      const txu3:UnsignedTx = await avm.buildExportTx(
+      const txu3:UnsignedTx = await platformvm.buildExportTx(
         set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID),
         new UTF8Payload("hello world"), UnixNow()
       );
 
       const txu4:UnsignedTx = set.buildExportTx(
         networkid, bintools.cb58Decode(blockchainid), amount,
-        assetID, addrbuff3, addrbuff1, addrbuff2, undefined, avm.getFee(), assetID, 
+        assetID, addrbuff3, addrbuff1, addrbuff2, undefined, platformvm.getFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
       expect(txu4.toBuffer().toString('hex')).toBe(txu3.toBuffer().toString('hex'));
       expect(txu4.toString()).toBe(txu3.toString());
+
+    });
+
+    test('buildAddSubnetValidatorTx', async () => {
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = new BN(90);
+
+      const txu1:UnsignedTx = await platformvm.buildAddSubnetValidatorTx(
+        set,  
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        PlatformVMConstants.MINSTAKE,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        addrbuff1,         
+        addrbuff2, 
+        NodeIDStringToBuffer(nodeID), 
+        startTime,
+        endTime,
+        PlatformVMConstants.MINSTAKE,
+        platformvm.getFee(), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+    });
+
+    test('buildAddPrimaryDelegatorTx', async () => {
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = PlatformVMConstants.MINSTAKE;
+
+      const txu1:UnsignedTx = await platformvm.buildAddPrimaryDelegatorTx(
+        set, 
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        amount,
+        addrs3[0], 
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = set.buildAddPrimaryDelegatorTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        assetID,
+        addrbuff1,         
+        addrbuff2, 
+        NodeIDStringToBuffer(nodeID), 
+        startTime,
+        endTime,
+        amount,
+        bintools.stringToAddress(addrs3[0]),
+        platformvm.getFee(), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+    });
+
+    test('buildAddPrimaryValidatorTx', async () => {
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = PlatformVMConstants.MINSTAKE;
+
+      const txu1:UnsignedTx = await platformvm.buildAddPrimaryValidatorTx(
+        set, 
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        amount,
+        addrs3[0], 
+        0.1334556,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = set.buildAddPrimaryValidatorTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        assetID,
+        addrbuff1,         
+        addrbuff2, 
+        NodeIDStringToBuffer(nodeID), 
+        startTime,
+        endTime,
+        amount,
+        bintools.stringToAddress(addrs3[0]),
+        0.1335,
+        platformvm.getFee(), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
 
     });
 

@@ -425,6 +425,17 @@ export class UTXOID extends NBytes {
       throw new Error('Error - UTXOID.fromString: invalid address');
     }
     return this.getSize();
+    
+  }
+
+  clone():this {
+    let newbase:UTXOID = new UTXOID();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new UTXOID() as this;
   }
 
   /**

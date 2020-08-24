@@ -5,10 +5,11 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import {  AVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
+import { TransferableOutput, AmountOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';
-import { PlatformChainID, DefaultNetworkID } from '../../utils/constants';
+import { DefaultNetworkID } from '../../utils/constants';
+import BN from 'bn.js';
 
 
 /**
@@ -33,10 +34,21 @@ export class ExportTx extends BaseTx {
     }
 
     /**
-     * Returns the exported outputs as an array of [[TransferableOutput]]
+     * Returns an array of [[TransferableOutput]]s in this transaction.
      */
-    getExportOuts = ():Array<TransferableOutput> => {
+    getExportOutputs():Array<TransferableOutput> {
       return this.exportOuts;
+    }
+
+    /**
+     * Returns the totall exported amount as a {@link https://github.com/indutny/bn.js/|BN}.
+     */
+    getExportTotal():BN {
+      let val:BN = new BN(0);
+      for(let i = 0; i < this.exportOuts.length; i++){
+        val = val.add((this.exportOuts[i].getOutput() as AmountOutput).getAmount());
+      }
+      return val;
     }
 
     /**
@@ -84,12 +96,6 @@ export class ExportTx extends BaseTx {
           barr.push(this.exportOuts[i].toBuffer());
       }
       return Buffer.concat(barr);
-    }
-    /**
-       * Returns an array of [[TransferableOutput]]s in this transaction.
-       */
-    getExportOutputs():Array<TransferableOutput> {
-      return this.exportOuts;
     }
   
     /**

@@ -9,6 +9,8 @@ import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
+import BN from 'bn.js';
+import { AmountOutput } from '../platformvm/outputs';
 
 /**
  * @ignore
@@ -24,21 +26,39 @@ export class ExportTx extends BaseTx {
   protected exportOuts:Array<TransferableOutput> = [];
 
   /**
-     * Returns the id of the [[ExportTx]]
-     */
+   * Returns the id of the [[ExportTx]]
+   */
   getTxType = ():number => {
     return PlatformVMConstants.EXPORTTX;
   }
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.
-     *
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ExportTx]]
-     *
-     * @returns The length of the raw [[ExportTx]]
-     *
-     * @remarks assume not-checksummed
-     */
+   * Returns an array of [[TransferableOutput]]s in this transaction.
+   */
+  getExportOutputs():Array<TransferableOutput> {
+    return this.exportOuts;
+  }
+
+  /**
+   * Returns the totall exported amount as a {@link https://github.com/indutny/bn.js/|BN}.
+   */
+  getExportTotal():BN {
+    let val:BN = new BN(0);
+    for(let i = 0; i < this.exportOuts.length; i++){
+      val = val.add((this.exportOuts[i].getOutput() as AmountOutput).getAmount());
+    }
+    return val;
+  }
+
+  /**
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ExportTx]]
+   *
+   * @returns The length of the raw [[ExportTx]]
+   *
+   * @remarks assume not-checksummed
+   */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     offset = super.fromBuffer(bytes, offset);
     this.destinationChain = bintools.copyFrom(bytes, offset, offset + 32);
@@ -55,8 +75,8 @@ export class ExportTx extends BaseTx {
   }
 
   /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
-     */
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
+   */
   toBuffer():Buffer {
     if(typeof this.destinationChain === "undefined") {
       throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
@@ -69,23 +89,17 @@ export class ExportTx extends BaseTx {
     }
     return Buffer.concat(barr);
   }
-  /**
-     * Returns an array of [[TransferableOutput]]s in this transaction.
-     */
-  getExportOutputs():Array<TransferableOutput> {
-    return this.exportOuts;
-  }
 
   /**
-     * Class representing an unsigned Export transaction.
-     *
-     * @param networkid Optional networkid, [[DefaultNetworkID]]
-     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-     * @param destinationChain Optional chainid which identifies where the funds will send to.
-     * @param outs Optional array of the [[TransferableOutput]]s
-     * @param ins Optional array of the [[TransferableInput]]s
-     * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
-     */
+   * Class representing an unsigned Export transaction.
+   *
+   * @param networkid Optional networkid, [[DefaultNetworkID]]
+   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param destinationChain Optional chainid which identifies where the funds will send to.
+   * @param outs Optional array of the [[TransferableOutput]]s
+   * @param ins Optional array of the [[TransferableInput]]s
+   * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
+   */
   constructor(
     networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), destinationChain:Buffer = undefined,
     outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,

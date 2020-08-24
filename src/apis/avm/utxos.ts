@@ -193,7 +193,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
           change, aad.getChangeAddresses()) as AmountOutput;
         const chgxferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
-        aad.addOutput(chgxferout);
+        aad.addChange(chgxferout);
       }
     }
     return undefined;

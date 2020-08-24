@@ -19,7 +19,8 @@ import { TransferableInput, SecpInput } from '../platformvm/inputs';
 import { UTXO } from '../platformvm/utxos';
 import { AmountOutput } from '../platformvm/outputs';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { platform } from 'os';
+import { ExportTx } from './exporttx';
+import { AddPrimaryValidatorTx, AddPrimaryDelegatorTx } from './validationtx';
 
 /**
  * @ignore
@@ -178,9 +179,8 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
-    const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    let outputTotal:BN = utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
-
     if(fee.lte(PlatformVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
     } else {
@@ -944,12 +944,12 @@ export class PlatformVMAPI extends JRPCAPI {
   * [[UnsignedTx]] manually and import the [[AddSubnetValidatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on.
-  * @param weight The amount of weight for this subnet validator.
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Default Subnet.
   * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param weight The amount of weight for this subnet validator.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   *  
@@ -1006,13 +1006,13 @@ export class PlatformVMAPI extends JRPCAPI {
   * [[UnsignedTx]] manually and import the [[AddPrimaryDelegatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
-  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Default Subnet.
   * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   *  
@@ -1020,13 +1020,13 @@ export class PlatformVMAPI extends JRPCAPI {
   */
   buildAddPrimaryDelegatorTx = async (
     utxoset:UTXOSet, 
-    stakeAmount:BN,
-    rewardAddress:string,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     nodeID:string, 
     startTime:BN, 
     endTime:BN,
+    stakeAmount:BN,
+    rewardAddress:string,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
@@ -1048,18 +1048,18 @@ export class PlatformVMAPI extends JRPCAPI {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
-      bintools.stringToAddress(rewardAddress),
       from,
       change,
       NodeIDStringToBuffer(nodeID),
       startTime, endTime,
       stakeAmount,
+      bintools.stringToAddress(rewardAddress),
       this.getFee(), 
       avaxAssetID,
       memo, asOf
     );
 
-    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+    if(!await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }
@@ -1073,13 +1073,13 @@ export class PlatformVMAPI extends JRPCAPI {
   * [[UnsignedTx]] manually and import the [[AddPrimaryValidatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
-  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Default Subnet.
   * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
   * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
@@ -1088,13 +1088,13 @@ export class PlatformVMAPI extends JRPCAPI {
   */
   buildAddPrimaryValidatorTx = async (
     utxoset:UTXOSet, 
-    stakeAmount:BN,
-    rewardAddress:string,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     nodeID:string, 
     startTime:BN, 
     endTime:BN,
+    stakeAmount:BN,
+    rewardAddress:string,
     delegationFee:number,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
@@ -1117,12 +1117,12 @@ export class PlatformVMAPI extends JRPCAPI {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
-      bintools.stringToAddress(rewardAddress),
       from,
       change,
       NodeIDStringToBuffer(nodeID),
       startTime, endTime,
       stakeAmount,
+      bintools.stringToAddress(rewardAddress),
       delegationFee,
       this.getFee(), 
       avaxAssetID,

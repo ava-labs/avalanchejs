@@ -20,6 +20,7 @@ import { RequestResponseData } from '../../common/apibase';
 import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/constants';
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { ExportTx } from './exporttx';
 
 /**
  * @ignore
@@ -183,9 +184,8 @@ export class AVMAPI extends JRPCAPI {
    */
   checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
-    const outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    let outputTotal:BN = utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
-
     if(fee.lte(AVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
     } else {

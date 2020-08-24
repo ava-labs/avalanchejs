@@ -12,6 +12,7 @@ import { Buffer } from 'buffer/';
 import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
+import { AmountOutput } from './outputs';
 
 /**
  * @ignore
@@ -203,6 +204,17 @@ export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
      */
     getStakeOuts():Array<TransferableOutput> {
         return this.stakeOuts;
+    }
+
+    /**
+     * Should match stakeAmount. Used in sanity checking.
+     */
+    getStakeOutsTotal():BN {
+        let val:BN = new BN(0);
+        for(let i = 0; i < this.stakeOuts.length; i++){
+          val = val.add((this.stakeOuts[i].getOutput() as AmountOutput).getAmount());
+        }
+        return val;
     }
     
     /**

@@ -189,7 +189,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
           change, aad.getChangeAddresses()) as AmountOutput;
         const chgxferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
-        aad.addOutput(chgxferout);
+        aad.addChange(chgxferout);
       }
     }
     return undefined;
@@ -483,13 +483,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   * @param networkid Networkid, [[DefaultNetworkID]]
   * @param blockchainid Blockchainid, default undefined
   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-  * @param rewardAddress The address the validator reward goes.
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Default Subnet.
   * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
   * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
+  * @param rewardAddress The address the validator reward goes.
   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
   * @param feeAssetID Optional. The assetID of the fees being burned. 
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -501,13 +501,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer,
     avaxAssetID:Buffer,
-    rewardAddress:Buffer,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
     nodeID:Buffer, 
     startTime:BN,
     endTime:BN,
     stakeAmount:BN,
+    rewardAddress:Buffer,
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
     memo:Buffer = undefined, 
@@ -532,7 +532,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         aad.addAssetAmount(feeAssetID, zero, fee);
       }
     }
-    
+
     const success:Error = this.getMinimumSpendable(aad, asOf);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
@@ -552,13 +552,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param networkid Networkid, [[DefaultNetworkID]]
     * @param blockchainid Blockchainid, default undefined
     * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-    * @param rewardAddress The address the validator reward goes.
     * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
     * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
     * @param nodeID The node ID of the validator being added.
     * @param startTime The Unix time when the validator starts validating the Default Subnet.
-    * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
     * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+    * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
+    * @param rewardAddress The address the validator reward goes.
     * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned. 
@@ -571,13 +571,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer,
     avaxAssetID:Buffer,
-    rewardAddress:Buffer,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
     nodeID:Buffer, 
     startTime:BN,
     endTime:BN,
     stakeAmount:BN,
+    rewardAddress:Buffer,
     delegationFee:number,
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
