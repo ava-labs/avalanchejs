@@ -20,7 +20,6 @@ import { RequestResponseData } from '../../common/apibase';
 import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/constants';
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { ExportTx } from './exporttx';
 
 /**
  * @ignore
