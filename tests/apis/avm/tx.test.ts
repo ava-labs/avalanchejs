@@ -112,7 +112,7 @@ describe('Transactions', () => {
       addrs2.push(keymgr2.makeKey().getAddress());
       addrs3.push(keymgr3.makeKey().getAddress());
     }
-    amount = new BN(amnt);
+    amount = AVMConstants.ONEAVAX.mul(new BN(amnt));
     addresses = keymgr1.getAddresses();
     fallAddresses = keymgr2.getAddresses();
     locktime = new BN(54321);
@@ -305,7 +305,7 @@ describe('Transactions', () => {
     expect(() => {
       set.buildBaseTx(
         netid, blockchainID,
-        new BN(amnt * 1000), assetID,
+        AVMConstants.ONEAVAX.mul(new BN(amnt * 10000)), assetID,
         addrs3, addrs1, addrs1, 
       );
     }).toThrow();
