@@ -149,11 +149,11 @@ const n4C:object = {
 // END TODO
 
 const n12345X:any = { ...n2X };
-n12345X.blockchainID = '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD';
+n12345X.blockchainID = 'v4hFSZTNNVdyomeMoXa77dAz4CdxU3cziSb45TB7mfXUmy7C7';
 const n12345P:any = { ...n2P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n2C };
-n12345C.blockchainID = 'f5DjTrC9YJPagt9ogKgKPYpp7KMaCBKsv7AeqfonpTiw6rBec';
+n12345C.blockchainID = '2m6aMgMBJWsmT4Hv448n6sNAwGMFfugBvdU6PdY5oxZge4qb1W';
 
 export class Defaults {
   static network = {
@@ -196,11 +196,11 @@ export class Defaults {
     12345: {
       hrp: NetworkIDToHRP[12345],
       X: n12345X,
-      '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD': n12345X,
+      'v4hFSZTNNVdyomeMoXa77dAz4CdxU3cziSb45TB7mfXUmy7C7': n12345X,
       P: n12345P,
       '11111111111111111111111111111111LpoYY': n12345P,
       C: n12345C,
-      'f5DjTrC9YJPagt9ogKgKPYpp7KMaCBKsv7AeqfonpTiw6rBec': n12345C,
+      '2m6aMgMBJWsmT4Hv448n6sNAwGMFfugBvdU6PdY5oxZge4qb1W': n12345C,
     },
   };
 }
