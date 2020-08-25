@@ -148,11 +148,11 @@ const n4C:object = {
 
 // END TODO
 
-const n12345X:any = { ...n2X };
+const n12345X:any = { ...n4X };
 n12345X.blockchainID = 'v4hFSZTNNVdyomeMoXa77dAz4CdxU3cziSb45TB7mfXUmy7C7';
-const n12345P:any = { ...n2P };
+const n12345P:any = { ...n4P };
 n12345P.blockchainID = PlatformChainID;
-const n12345C:any = { ...n2C };
+const n12345C:any = { ...n4C };
 n12345C.blockchainID = '2m6aMgMBJWsmT4Hv448n6sNAwGMFfugBvdU6PdY5oxZge4qb1W';
 
 export class Defaults {
