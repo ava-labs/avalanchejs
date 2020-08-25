@@ -49,7 +49,7 @@ export const FallbackNetworkName:string = "Custom Network";
 export const DefaultNetworkID:number = 4;
 
 export const PlatformChainID:string = "11111111111111111111111111111111LpoYY";
-export const DefaultSubnetID:string = "11111111111111111111111111111111LpoYY";
+export const PrimaryNetworkID:string = "11111111111111111111111111111111LpoYY";
 export const XChainAlias:string = "X";
 export const CChainAlias:string = "C";
 export const PChainAlias:string = "P";

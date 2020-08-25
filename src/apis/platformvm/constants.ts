@@ -28,11 +28,11 @@ export class PlatformVMConstants {
 
   static BASETX:number = 0;
 
-  static ADDPRIMARYVALIDATORTX:number = 12;
+  static ADDVALIDATORTX:number = 12;
 
   static ADDSUBNETVALIDATORTX:number = 13;
 
-  static ADDPRIMARYDELEGATORTX:number = 14;
+  static ADDDELEGATORTX:number = 14;
 
   static CREATECHAINTX:number = 15;
 

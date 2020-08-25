@@ -20,7 +20,7 @@ import { UTXO } from '../platformvm/utxos';
 import { AmountOutput } from '../platformvm/outputs';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { ExportTx } from './exporttx';
-import { AddPrimaryValidatorTx, AddPrimaryDelegatorTx } from './validationtx';
+import { AddValidatorTx, AddDelegatorTx } from './validationtx';
 
 /**
  * @ignore
@@ -375,7 +375,7 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-   * Add a validator to the Default Subnet.
+   * Add a validator to the Primary Network.
    *
    * @param username The username of the Keystore user
    * @param password The password of the Keystore user
@@ -393,7 +393,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for a base58 string of the unsigned transaction.
    */
-  addDefaultSubnetValidator = async (
+  addValidator = async (
     username:string,
     password:string,
     nodeID:string,
@@ -416,12 +416,12 @@ export class PlatformVMAPI extends JRPCAPI {
     if (typeof delegationFeeRate !== 'undefined') {
       params.delegationFeeRate = delegationFeeRate.toString(10);
     }
-    return this.callMethod('platform.addDefaultSubnetValidator', params)
+    return this.callMethod('platform.addValidator', params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
-   * Add a validator to a Subnet other than the Default Subnet. The validator must validate the Default Subnet for the entire duration they validate this Subnet.
+   * Add a validator to a Subnet other than the Primary Network. The validator must validate the Primary Network for the entire duration they validate this Subnet.
    *
    * @param username The username of the Keystore user
    * @param password The password of the Keystore user
@@ -433,7 +433,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for the unsigned transaction. It must be signed (using sign) by the proper number of the Subnet’s control keys and by the key of the account paying the transaction fee before it can be issued.
    */
-  addNonDefaultSubnetValidator = async (
+  addSubnetValidator = async (
     username:string,
     password:string,
     nodeID:string,
@@ -456,12 +456,12 @@ export class PlatformVMAPI extends JRPCAPI {
     } else if (typeof subnetID !== 'undefined') {
       params.subnetID = bintools.cb58Encode(subnetID);
     }
-    return this.callMethod('platform.addNonDefaultSubnetValidator', params)
+    return this.callMethod('platform.addSubnetValidator', params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
-   * Add a delegator to the Default Subnet.
+   * Add a delegator to the Primary Network.
    *
    * @param username The username of the Keystore user
    * @param password The password of the Keystore user
@@ -475,7 +475,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of validator's stakingIDs.
    */
-  addDefaultSubnetDelegator = async (
+  addDelegator = async (
     username:string,
     password:string,
     nodeID:string,
@@ -493,7 +493,7 @@ export class PlatformVMAPI extends JRPCAPI {
       stakeAmount: stakeAmount.toString(10),
       rewardAddress,
     };
-    return this.callMethod('platform.addDefaultSubnetDelegator', params)
+    return this.callMethod('platform.addDelegator', params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
 
@@ -947,8 +947,8 @@ export class PlatformVMAPI extends JRPCAPI {
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
-  * @param startTime The Unix time when the validator starts validating the Default Subnet.
-  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param startTime The Unix time when the validator starts validating the Primary Network.
+  * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param weight The amount of weight for this subnet validator.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
@@ -1002,15 +1002,15 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-  * Helper function which creates an unsigned [[AddPrimaryDelegatorTx]]. For more granular control, you may create your own
-  * [[UnsignedTx]] manually and import the [[AddPrimaryDelegatorTx]] class directly.
+  * Helper function which creates an unsigned [[AddDelegatorTx]]. For more granular control, you may create your own
+  * [[UnsignedTx]] manually and import the [[AddDelegatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
-  * @param startTime The Unix time when the validator starts validating the Default Subnet.
-  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param startTime The Unix time when the validator starts validating the Primary Network.
+  * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
   * @param rewardAddress The address which will recieve the rewards from the delegated stake.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -1018,7 +1018,7 @@ export class PlatformVMAPI extends JRPCAPI {
   *  
   * @returns An unsigned transaction created from the passed in parameters.
   */
-  buildAddPrimaryDelegatorTx = async (
+  buildAddDelegatorTx = async (
     utxoset:UTXOSet, 
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
@@ -1030,8 +1030,8 @@ export class PlatformVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddPrimaryDelegatorTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddPrimaryDelegatorTx').map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1041,10 +1041,10 @@ export class PlatformVMAPI extends JRPCAPI {
     
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("PlatformVMAPI.buildAddPrimaryDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new Error("PlatformVMAPI.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
-    const builtUnsignedTx:UnsignedTx = utxoset.buildAddPrimaryDelegatorTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildAddDelegatorTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
@@ -1069,15 +1069,15 @@ export class PlatformVMAPI extends JRPCAPI {
 
 
   /**
-  * Helper function which creates an unsigned [[AddPrimaryValidatorTx]]. For more granular control, you may create your own
-  * [[UnsignedTx]] manually and import the [[AddPrimaryValidatorTx]] class directly.
+  * Helper function which creates an unsigned [[AddValidatorTx]]. For more granular control, you may create your own
+  * [[UnsignedTx]] manually and import the [[AddValidatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
-  * @param startTime The Unix time when the validator starts validating the Default Subnet.
-  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param startTime The Unix time when the validator starts validating the Primary Network.
+  * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
   * @param rewardAddress The address which will recieve the rewards from the delegated stake.
   * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
@@ -1086,7 +1086,7 @@ export class PlatformVMAPI extends JRPCAPI {
   *  
   * @returns An unsigned transaction created from the passed in parameters.
   */
-  buildAddPrimaryValidatorTx = async (
+  buildAddValidatorTx = async (
     utxoset:UTXOSet, 
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
@@ -1099,8 +1099,8 @@ export class PlatformVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddPrimaryValidatorTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddPrimaryValidatorTx').map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1110,10 +1110,10 @@ export class PlatformVMAPI extends JRPCAPI {
     
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("PlatformVMAPI.buildAddPrimaryValidatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new Error("PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
-    const builtUnsignedTx:UnsignedTx = utxoset.buildAddPrimaryValidatorTx(
+    const builtUnsignedTx:UnsignedTx = utxoset.buildAddValidatorTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,

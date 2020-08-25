@@ -140,14 +140,14 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj));
   });
 
-  test('addNonDefaultSubnetValidator 1', async () => {
+  test('addSubnetValidator 1', async () => {
     const nodeID = 'abcdef';
     const subnetID = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH";
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
     const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
     const weight = 13;
     const utx = 'valid';
-    const result:Promise<string> = api.addNonDefaultSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight);
+    const result:Promise<string> = api.addSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight);
     const payload:object = {
       result: {
         txID: utx,
@@ -164,14 +164,14 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx);
   });
 
-  test('addNonDefaultSubnetValidator', async () => {
+  test('addSubnetValidator', async () => {
     const nodeID = 'abcdef';
     const subnetID = Buffer.from('abcdef', 'hex');
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
     const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
     const weight = 13;
     const utx = 'valid';
-    const result:Promise<string> = api.addNonDefaultSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight);
+    const result:Promise<string> = api.addSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight);
     const payload:object = {
       result: {
         txID: utx,
@@ -188,14 +188,14 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx);
   });
 
-  test('addDefaultSubnetDelegator 1', async () => {
+  test('addDelegator 1', async () => {
     const nodeID = 'abcdef';
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9);
     const endTime = new Date(1982, 3, 1, 12, 58, 33, 7);
     const stakeAmount = new BN(13);
     const rewardAddress = 'fedcba';
     const utx = 'valid';
-    const result:Promise<string> = api.addDefaultSubnetDelegator(username, password, nodeID, startTime, endTime, stakeAmount, rewardAddress);
+    const result:Promise<string> = api.addDelegator(username, password, nodeID, startTime, endTime, stakeAmount, rewardAddress);
     const payload:object = {
       result: {
         txID: utx,
@@ -906,14 +906,14 @@ describe('PlatformVMAPI', () => {
 
     });
 
-    test('buildAddPrimaryDelegatorTx', async () => {
+    test('buildAddDelegatorTx', async () => {
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
 
-      const txu1:UnsignedTx = await platformvm.buildAddPrimaryDelegatorTx(
+      const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
         set, 
         addrs1, 
         addrs2, 
@@ -925,7 +925,7 @@ describe('PlatformVMAPI', () => {
         new UTF8Payload("hello world"), UnixNow()
       );
 
-      const txu2:UnsignedTx = set.buildAddPrimaryDelegatorTx(
+      const txu2:UnsignedTx = set.buildAddDelegatorTx(
         networkid, bintools.cb58Decode(blockchainid), 
         assetID,
         addrbuff1,         
@@ -944,14 +944,14 @@ describe('PlatformVMAPI', () => {
 
     });
 
-    test('buildAddPrimaryValidatorTx', async () => {
+    test('buildAddValidatorTx', async () => {
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
 
-      const txu1:UnsignedTx = await platformvm.buildAddPrimaryValidatorTx(
+      const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         set, 
         addrs1, 
         addrs2, 
@@ -964,7 +964,7 @@ describe('PlatformVMAPI', () => {
         new UTF8Payload("hello world"), UnixNow()
       );
 
-      const txu2:UnsignedTx = set.buildAddPrimaryValidatorTx(
+      const txu2:UnsignedTx = set.buildAddValidatorTx(
         networkid, bintools.cb58Decode(blockchainid), 
         assetID,
         addrbuff1,         

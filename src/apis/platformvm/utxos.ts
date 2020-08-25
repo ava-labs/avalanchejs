@@ -17,7 +17,7 @@ import { ImportTx } from '../platformvm/importtx';
 import { BaseTx } from '../platformvm/basetx';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
 import { Output } from '../../common/output';
-import { AddPrimaryDelegatorTx, AddSubnetValidatorTx, AddPrimaryValidatorTx } from './validationtx';
+import { AddDelegatorTx, AddSubnetValidatorTx, AddValidatorTx } from './validationtx';
 
 /**
  * @ignore
@@ -424,8 +424,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
-  * @param startTime The Unix time when the validator starts validating the Default Subnet.
-  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param startTime The Unix time when the validator starts validating the Primary Network.
+  * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param weight The amount of weight for this subnet validator.
   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
   * @param feeAssetID Optional. The assetID of the fees being burned. 
@@ -478,7 +478,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   }
 
   /**
-  * Class representing an unsigned [[AddPrimaryDelegatorTx]] transaction.
+  * Class representing an unsigned [[AddDelegatorTx]] transaction.
   *
   * @param networkid Networkid, [[DefaultNetworkID]]
   * @param blockchainid Blockchainid, default undefined
@@ -486,8 +486,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
   * @param nodeID The node ID of the validator being added.
-  * @param startTime The Unix time when the validator starts validating the Default Subnet.
-  * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+  * @param startTime The Unix time when the validator starts validating the Primary Network.
+  * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
   * @param rewardAddress The address the validator reward goes.
   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
@@ -497,7 +497,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   * 
   * @returns An unsigned transaction created from the passed in parameters.
   */
-  buildAddPrimaryDelegatorTx = (
+  buildAddDelegatorTx = (
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer,
     avaxAssetID:Buffer,
@@ -520,7 +520,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const zero:BN = new BN(0);
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("UTXOSet.buildAddPrimaryDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new Error("UTXOSet.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
@@ -542,12 +542,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const UTx:AddPrimaryDelegatorTx = new AddPrimaryDelegatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, rewardAddress);
+    const UTx:AddDelegatorTx = new AddDelegatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, rewardAddress);
     return new UnsignedTx(UTx);
   }
 
   /**
-    * Class representing an unsigned [[AddPrimaryValidatorTx]] transaction.
+    * Class representing an unsigned [[AddValidatorTx]] transaction.
     *
     * @param networkid Networkid, [[DefaultNetworkID]]
     * @param blockchainid Blockchainid, default undefined
@@ -555,8 +555,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
     * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
     * @param nodeID The node ID of the validator being added.
-    * @param startTime The Unix time when the validator starts validating the Default Subnet.
-    * @param endTime The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+    * @param startTime The Unix time when the validator starts validating the Primary Network.
+    * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
     * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
     * @param rewardAddress The address the validator reward goes.
     * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
@@ -567,7 +567,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * 
     * @returns An unsigned transaction created from the passed in parameters.
     */
-  buildAddPrimaryValidatorTx = (
+  buildAddValidatorTx = (
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer,
     avaxAssetID:Buffer,
@@ -591,15 +591,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const zero:BN = new BN(0);
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("UTXOSet.buildAddPrimaryValidatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new Error("UTXOSet.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     if(stakeAmount.lt(PlatformVMConstants.MINSTAKE)) {
-      throw new Error("UTXOSet.buildAddPrimaryValidatorTx -- stake amount must be at least " + PlatformVMConstants.MINSTAKE);
+      throw new Error("UTXOSet.buildAddValidatorTx -- stake amount must be at least " + PlatformVMConstants.MINSTAKE);
     }
 
     if(delegationFee > 100 || delegationFee < 0){
-      throw new Error("UTXOSet.buildAddPrimaryValidatorTx -- startTime must be in the range of 0 to 100, inclusively");
+      throw new Error("UTXOSet.buildAddValidatorTx -- startTime must be in the range of 0 to 100, inclusively");
     }
 
     const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
@@ -621,7 +621,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const UTx:AddPrimaryValidatorTx = new AddPrimaryValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, rewardAddress, delegationFee);
+    const UTx:AddValidatorTx = new AddValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, rewardAddress, delegationFee);
     return new UnsignedTx(UTx);
   }
 

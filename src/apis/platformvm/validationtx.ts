@@ -146,8 +146,8 @@ export class AddSubnetValidatorTx extends ValidatorTx {
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
      * @param nodeID Optional. The node ID of the validator being added.
-     * @param startTime Optional. The Unix time when the validator starts validating the Default Subnet.
-     * @param endTime Optional. The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+     * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
+     * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param weight Optional. The amount of nAVAX the validator is staking.
      */
     constructor(
@@ -171,18 +171,18 @@ export class AddSubnetValidatorTx extends ValidatorTx {
 
 
 /**
- * Class representing an unsigned AddPrimaryDelegatorTx transaction.
+ * Class representing an unsigned AddDelegatorTx transaction.
  */
-export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
+export class AddDelegatorTx extends AddSubnetValidatorTx {
     
     protected stakeOuts:Array<TransferableOutput> = [];
     protected rewardAddress:Buffer = Buffer.alloc(20);
   
     /**
-       * Returns the id of the [[AddPrimaryDelegatorTx]]
+       * Returns the id of the [[AddDelegatorTx]]
        */
     getTxType = ():number => {
-      return PlatformVMConstants.ADDPRIMARYDELEGATORTX;
+      return PlatformVMConstants.ADDDELEGATORTX;
     }
 
     /**
@@ -241,7 +241,7 @@ export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
     }
 
     /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[AddPrimaryDelegatorTx]].
+     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[AddDelegatorTx]].
      */
     toBuffer():Buffer {
         const superbuff:Buffer = super.toBuffer();
@@ -261,7 +261,7 @@ export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
       }
   
     /**
-     * Class representing an unsigned AddPrimaryDelegatorTx transaction.
+     * Class representing an unsigned AddDelegatorTx transaction.
      *
      * @param networkid Optional. Networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
@@ -269,8 +269,8 @@ export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
      * @param nodeID Optional. The node ID of the validator being added.
-     * @param startTime Optional. The Unix time when the validator starts validating the Default Subnet.
-     * @param endTime Optional. The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+     * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
+     * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
      * @param stakeOuts Optional. The outputs used in paying the stake.
      * @param rewardAddress Optional. The address the validator reward goes.
@@ -296,15 +296,15 @@ export class AddPrimaryDelegatorTx extends AddSubnetValidatorTx {
     }
   }
 
-export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
+export class AddValidatorTx extends AddDelegatorTx {
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
 
     /**
-       * Returns the id of the [[AddDefaultSubnetDelegatorTx]]
+       * Returns the id of the [[AddDelegatorTx]]
        */
     getTxType = ():number => {
-    return PlatformVMConstants.ADDPRIMARYVALIDATORTX;
+    return PlatformVMConstants.ADDVALIDATORTX;
     }
 
     /**
@@ -319,7 +319,7 @@ export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
      */
     getDelegationFeeBuffer():Buffer {
         let dBuff:Buffer = Buffer.alloc(4);
-        let buffnum:number = parseFloat(this.delegationFee.toFixed(4)) * AddPrimaryValidatorTx.delegatorMultiplier;
+        let buffnum:number = parseFloat(this.delegationFee.toFixed(4)) * AddValidatorTx.delegatorMultiplier;
         dBuff.writeUInt32BE(buffnum, 0);
         return dBuff;
     }
@@ -328,7 +328,7 @@ export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
         offset = super.fromBuffer(bytes, offset);
         let dbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
-        this.delegationFee = dbuff.readUInt32BE(0) / AddPrimaryValidatorTx.delegatorMultiplier;
+        this.delegationFee = dbuff.readUInt32BE(0) / AddValidatorTx.delegatorMultiplier;
         return offset;
     }
 
@@ -339,7 +339,7 @@ export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
     }
 
     /**
-     * Class representing an unsigned AddPrimaryValidatorTx transaction.
+     * Class representing an unsigned AddValidatorTx transaction.
      *
      * @param networkid Optional. Networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
@@ -347,8 +347,8 @@ export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
      * @param nodeID Optional. The node ID of the validator being added.
-     * @param startTime Optional. The Unix time when the validator starts validating the Default Subnet.
-     * @param endTime Optional. The Unix time when the validator stops validating the Default Subnet (and staked AVAX is returned).
+     * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
+     * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
      * @param rewardAddress Optional. The address the validator reward goes to.
      * @param delegationFee Optional. The percent fee this validator charges when others delegate stake to them. 
@@ -387,7 +387,7 @@ export class AddPrimaryValidatorTx extends AddPrimaryDelegatorTx {
             if(delegationFee >= 0 && delegationFee <= 100) {
                 this.delegationFee = parseFloat(delegationFee.toFixed(4));
             } else {
-                throw new Error("AddPrimaryValidatorTx.constructor -- delegationFee must be in the range of 0 and 100, inclusively.");
+                throw new Error("AddValidatorTx.constructor -- delegationFee must be in the range of 0 and 100, inclusively.");
             }
         }
     }
