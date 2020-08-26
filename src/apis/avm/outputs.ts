@@ -92,6 +92,41 @@ export class SecpOutput extends AmountOutput {
     return newout as this;
   }
 
+}
+
+/**
+ * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
+ */
+export class SecpMintOutput extends Output {
+
+  /**
+   * Returns the outputID for this output
+   */
+  getOutputID():number {
+    return AVMConstants.SECPMINTOUTPUTID;
+  }
+
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+    return new TransferableOutput(assetID, this);
+  }
+
+  create(...args:any[]):this{
+    return new SecpMintOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SecpMintOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
+  select(id:number, ...args: any[]):Output {
+    return SelectOutputClass(id, ...args);
+  }
 
 }
 
