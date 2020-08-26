@@ -28,7 +28,7 @@ export class AVMConstants {
 
   static NFTFXID:number = 1;
 
-  static SECPMINTOUTPUTID:number = 666;
+  static SECPMINTOUTPUTID:number = 6;
 
   static SECPOUTPUTID:number = 7;
 
