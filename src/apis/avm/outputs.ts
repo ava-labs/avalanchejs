@@ -21,6 +21,9 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
     if(outputid == AVMConstants.SECPOUTPUTID){
         let secpout:SecpOutput = new SecpOutput( ...args);
         return secpout;
+    } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
+        let secpmintout:SecpMintOutput = new SecpMintOutput( ...args);
+        return secpmintout;
     } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
         let nftout:NFTMintOutput = new NFTMintOutput(...args);
         return nftout;

@@ -3,6 +3,7 @@ import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
 import { SecpOutput, SelectOutputClass, NFTMintOutput } from 'src/apis/avm/outputs';
 import { Output } from 'src/common/output';
+import { SecpMintOutput } from '../../../src/apis/avm/outputs';
 
 const bintools = BinTools.getInstance();
 
@@ -133,5 +134,35 @@ describe('Outputs', () => {
           let m4:boolean = out.meetsThreshold(addrs, locktime.add(new BN(100)));
           expect(m4).toBe(true);
       });
+
+      test('SecpMintOutput', () => {
+        let out:SecpMintOutput = new SecpMintOutput(addrs, locktime, 3);
+        expect(out.getOutputID()).toBe(6);
+        expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
+
+        expect(out.getThreshold()).toBe(3);
+        expect(out.getLocktime().toNumber()).toBe(locktime.toNumber());
+
+        let r = out.getAddressIdx(addrs[2]);
+        expect(out.getAddress(r)).toStrictEqual(addrs[2]);
+        expect(() => {
+            out.getAddress(400)
+        }).toThrow();
+
+        let b:Buffer = out.toBuffer();
+        expect(out.toString()).toBe(bintools.bufferToB58(b));
+
+        let s:Array<Buffer> = out.getSpenders(addrs);
+        expect(JSON.stringify(s.sort())).toBe(JSON.stringify(addrs.sort()));
+
+        let m1:boolean = out.meetsThreshold([addrs[0]]);
+        expect(m1).toBe(false);
+        let m2:boolean = out.meetsThreshold(addrs, new BN(100));
+        expect(m2).toBe(false);
+        let m3:boolean = out.meetsThreshold(addrs);
+        expect(m3).toBe(true);
+        let m4:boolean = out.meetsThreshold(addrs, locktime.add(new BN(100)));
+        expect(m4).toBe(true);
+    });
     });
 });
