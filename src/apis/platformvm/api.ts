@@ -793,7 +793,7 @@ export class PlatformVMAPI extends JRPCAPI {
  *
  * @param utxoset  A set of UTXOs that the transaction is built on
  * @param ownerAddresses The addresses being used to import
- * @param sourceChain The chainid for where the import is coming from. Default, platform chainid. 
+ * @param sourceChain The chainid for where the import is coming from.
  * @param memo Optional contains arbitrary bytes, up to 256 bytes
  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
  *
@@ -880,7 +880,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param utxoset A set of UTXOs that the transaction is built on
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param destinationChain The chainid for where the assets will be sent. Default platform chainid.
+   * @param destinationChain The chainid for where the assets will be sent.
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
