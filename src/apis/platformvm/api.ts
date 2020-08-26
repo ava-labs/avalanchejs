@@ -1166,6 +1166,16 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/P" as the path to blockchain's baseurl
    */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/bc/P') { super(core, baseurl); }
+  constructor(core:AvalancheCore, baseurl:string = '/ext/bc/P') { 
+    super(core, baseurl); 
+    this.blockchainID = PlatformChainID;
+    const netid:number = core.getNetworkID();
+    if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
+      const { alias } = Defaults.network[netid][blockchainID];
+      this.keychain = new AVMKeyChain(this.core.getHRP(), alias);
+    } else {
+      this.keychain = new AVMKeyChain(this.core.getHRP(), blockchainID);
+    }
+  }
 }
 
