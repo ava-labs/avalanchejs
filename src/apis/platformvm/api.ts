@@ -1170,11 +1170,11 @@ export class PlatformVMAPI extends JRPCAPI {
     super(core, baseurl); 
     this.blockchainID = PlatformChainID;
     const netid:number = core.getNetworkID();
-    if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
-      const { alias } = Defaults.network[netid][blockchainID];
-      this.keychain = new AVMKeyChain(this.core.getHRP(), alias);
+    if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
+      const { alias } = Defaults.network[netid][this.blockchainID];
+      this.keychain = new PlatformVMKeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new AVMKeyChain(this.core.getHRP(), blockchainID);
+      this.keychain = new PlatformVMKeyChain(this.core.getHRP(), this.blockchainID);
     }
   }
 }
