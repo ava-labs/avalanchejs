@@ -815,7 +815,6 @@ export class PlatformVMAPI extends JRPCAPI {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     const avaxAssetIDStr:string = avaxAssetID.toString("hex");
 
-
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
     }
@@ -823,7 +822,7 @@ export class PlatformVMAPI extends JRPCAPI {
     if(typeof sourceChain === "undefined") {
       throw new Error("Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined.");
     } else if (typeof sourceChain === "string") {
-      sourceChain = bintools.cb58Decode(PlatformChainID);
+      sourceChain = bintools.cb58Decode(sourceChain);
     } else if(!(sourceChain instanceof Buffer)) {
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
