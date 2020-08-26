@@ -12,7 +12,7 @@ import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx } from './tx';
 import { ExportTx } from '../platformvm/exporttx';
-import { PlatformChainID, DefaultNetworkID } from '../../utils/constants';
+import { PlatformChainID, DefaultNetworkID, Defaults } from '../../utils/constants';
 import { ImportTx } from '../platformvm/importtx';
 import { BaseTx } from '../platformvm/basetx';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
@@ -389,7 +389,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     if(typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(PlatformChainID);
+      destinationChain = bintools.cb58Decode(Defaults.network[networkid].X["blockchainID"]);
     }
 
     const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);

@@ -20,7 +20,6 @@ import { UTF8Payload } from 'src/utils/payload';
 import { ImportTx } from 'src/apis/platformvm/importtx';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
-import { platform } from 'os';
 
 /**
  * @ignore
@@ -831,11 +830,11 @@ describe('PlatformVMAPI', () => {
       const amount:BN = new BN(90);
       const txu1:UnsignedTx = await platformvm.buildExportTx(
         set, 
-        amount, 
-        addrs3, 
+        amount,
+        bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]),
+        addrbuff3.map((a) => bintools.addressToString(avalanche.getHRP(), "P", a)), 
         addrs1, 
         addrs2,
-        PlatformChainID, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -846,7 +845,7 @@ describe('PlatformVMAPI', () => {
         addrbuff3, 
         addrbuff1, 
         addrbuff2, 
-        bintools.cb58Decode(PlatformChainID), 
+        bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]), 
         platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -856,7 +855,8 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
       const txu3:UnsignedTx = await platformvm.buildExportTx(
-        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID),
+        set, amount, bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]), 
+        addrs3, addrs1, addrs2, 
         new UTF8Payload("hello world"), UnixNow()
       );
 

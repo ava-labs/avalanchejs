@@ -709,7 +709,7 @@ export class AVMAPI extends JRPCAPI {
 buildImportTx = async (
   utxoset:UTXOSet, 
   ownerAddresses:Array<string>, 
-  sourceChain:Buffer | string = undefined,
+  sourceChain:Buffer | string,
   memo:PayloadBase|Buffer = undefined, 
   asOf:BN = UnixNow(), 
 ):Promise<UnsignedTx> => {
@@ -724,7 +724,9 @@ buildImportTx = async (
     memo = memo.getPayload();
   }
 
-  if (typeof sourceChain === "string") {
+  if(typeof sourceChain === "undefined") {
+    throw new Error("Error - AVMAPI.buildImportTx: Source ChainID is undefined.");
+  } else if (typeof sourceChain === "string") {
     sourceChain = bintools.cb58Decode(PlatformChainID);
   } else if(!(sourceChain instanceof Buffer)) {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
@@ -782,10 +784,10 @@ buildImportTx = async (
    *
    * @param utxoset A set of UTXOs that the transaction is built on
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param destinationChain The chainid for where the assets will be sent. Default platform chainid.
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param destinationChain The chainid for where the assets will be sent. Default platform chainid.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
@@ -796,30 +798,53 @@ buildImportTx = async (
   buildExportTx = async (
     utxoset:UTXOSet, 
     amount:BN,
+    destinationChain:Buffer | string,
     toAddresses:Array<string>, 
     fromAddresses:Array<string>,
     changeAddresses:Array<string> = undefined,
-    destinationChain:Buffer | string = undefined,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0), 
     threshold:number = 1
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    
+    let prefixes:object = {};
+    toAddresses.map((a) => {
+      prefixes[a.split("-")[0]] = true;
+    });
+    if(Object.keys(prefixes).length !== 1){
+      throw new Error("Error - AVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
+    }
+    
+    if(typeof destinationChain === "undefined") {
+      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID is undefined.");
+    } else if (typeof destinationChain === "string") {
+      destinationChain = bintools.cb58Decode(destinationChain); //
+    } else if(!(destinationChain instanceof Buffer)) {
+      throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
+    }
+    if(destinationChain.length !== 32) {
+      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
+    }
+
+    if(bintools.cb58Encode(destinationChain) !== PlatformChainID) {
+      console.log('avm', bintools.cb58Encode(destinationChain), PlatformChainID);
+      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must PlatformChainID in the current version of Avalanche.js.");
+    }
+
+    let to:Array<Buffer> = [];
+    toAddresses.map((a) => {
+      to.push(bintools.stringToAddress(a));
+    });
+
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
-
-    if (typeof destinationChain === "string") {
-      destinationChain = bintools.cb58Decode(PlatformChainID);
-    } else if(!(destinationChain instanceof Buffer)) {
-      throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
-    }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
       this.core.getNetworkID(), 

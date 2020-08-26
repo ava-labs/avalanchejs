@@ -918,10 +918,10 @@ describe('AVMAPI', () => {
       const txu1:UnsignedTx = await avm.buildExportTx(
         set, 
         amount, 
-        addrs3, 
+        bintools.cb58Decode(PlatformChainID),
+        addrbuff3.map((a) => bintools.addressToString(avalanche.getHRP(), "P", a)), 
         addrs1, 
         addrs2,
-        PlatformChainID, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -942,7 +942,8 @@ describe('AVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
       const txu3:UnsignedTx = await avm.buildExportTx(
-        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID),
+        set, amount, PlatformChainID, 
+        addrs3, addrs1, addrs2, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
