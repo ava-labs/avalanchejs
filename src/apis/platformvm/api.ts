@@ -809,7 +809,7 @@ export class PlatformVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(), 
   ):Promise<UnsignedTx> => {
-    const owners:Array<Buffer> = this._cleanAddressArray(ownerAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const owners:Array<Buffer> = ownerAddresses.map((a) => bintools.stringToAddress(a));
 
     const atomicUTXOs:UTXOSet = await this.getUTXOs(owners);
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
