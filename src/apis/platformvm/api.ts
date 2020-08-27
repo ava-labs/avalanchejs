@@ -751,7 +751,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    */
   getUTXOs = async (
-    addresses:Array<string> | Array<Buffer>,
+    addresses:Array<string> | string,
     limit:number = 0,
     startIndex:number = undefined,
     persistOpts:PersistanceOptions = undefined
@@ -814,7 +814,7 @@ export class PlatformVMAPI extends JRPCAPI {
   ):Promise<UnsignedTx> => {
     const owners:Array<Buffer> = ownerAddresses.map((a) => bintools.stringToAddress(a));
 
-    const atomicUTXOs:UTXOSet = await this.getUTXOs(owners);
+    const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses);
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     const avaxAssetIDStr:string = avaxAssetID.toString("hex");
 
