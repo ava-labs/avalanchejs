@@ -756,10 +756,13 @@ export class PlatformVMAPI extends JRPCAPI {
     startIndex:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
-    const addrs:Array<string> = this._cleanAddressArray(addresses, 'getUTXOs');
+    
+    if(typeof addresses === "string") {
+      addresses = [addresses];
+    }
 
     const params:any = {
-      addresses: addrs,
+      addresses: addresses,
       limit
     };
     if(typeof startIndex !== "undefined"){
