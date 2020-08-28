@@ -741,7 +741,7 @@ buildImportTx = async (
   const importIns:Array<TransferableInput> = [];
   for(let i:number = 0; i < atomics.length; i++) {
     const utxo:UTXO = atomics[i];
-    const assetID:Buffer = utxo.getAssetID();
+    const assetID:Buffer = utxo.getAssetID(); 
     if(assetID.toString("hex") === avaxAssetIDStr) {
       const output:AmountOutput = utxo.getOutput() as AmountOutput;
       const amt:BN = output.getAmount().clone();
@@ -749,7 +749,7 @@ buildImportTx = async (
       const outputidx:Buffer = utxo.getOutputIdx();
       const input:SecpInput = new SecpInput(amt);
       const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
-      const fromAddresses:Array<Buffer> = output.getAddresses(); // Verify correct approach
+      const fromAddresses:Array<Buffer> = output.getAddresses(); 
       const spenders:Array<Buffer> = output.getSpenders(fromAddresses, asOf);
       for (let j = 0; j < spenders.length; j++) {
         const idx:number = output.getAddressIdx(spenders[j]);
