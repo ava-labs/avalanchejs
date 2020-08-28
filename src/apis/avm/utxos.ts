@@ -613,12 +613,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         assetStr === feeAssetStr
       ) 
       {
-        feepaid.add(infeeamount);
+        feepaid = feepaid.add(infeeamount);
         if(feepaid.gt(fee)) {
           infeeamount = feepaid.sub(fee);
           feepaid = fee.clone();
         } else {
-          feepaid = feepaid.add(infeeamount);
           infeeamount =  zero.clone();
         }
       }

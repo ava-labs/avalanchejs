@@ -327,9 +327,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const assetID:Buffer = utxo.getAssetID(); 
       const output:AmountOutput = utxo.getOutput() as AmountOutput;
       let amt:BN = output.getAmount().clone();
-      let assetStr:string = assetID.toString("hex");
-      let infeeamount = amt.clone();
       
+      let infeeamount = amt.clone();
+      console.log("a", infeeamount.toString(10));
+      let assetStr:string = assetID.toString("hex");
       if(
         typeof feeAssetID !== "undefined" && 
         fee.gt(zero) && 
@@ -337,13 +338,14 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         assetStr === feeAssetStr
       ) 
       {
-        feepaid.add(infeeamount);
-        if(feepaid.gt(fee)) {
+        feepaid = feepaid.add(infeeamount);
+        if(feepaid.gte(fee)) {
           infeeamount = feepaid.sub(fee);
+          console.log("b", infeeamount.toString(10));
           feepaid = fee.clone();
         } else {
-          feepaid = feepaid.add(infeeamount);
           infeeamount =  zero.clone();
+          console.log("c", infeeamount.toString(10));
         }
       }
 
@@ -363,7 +365,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         xferin.getInput().addSignatureIdx(idx, spenders[j]);
       }
       importIns.push(xferin);
-
+      console.log("d", infeeamount.toString(10));
       //add extra outputs for each amount (calculated from the imported inputs), minus fees
       if(infeeamount.gt(zero)) {
         const spendout:AmountOutput = SelectOutputClass(output.getOutputID(),
@@ -375,6 +377,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     
     // get remaining fees from the provided addresses
     let feeRemaining:BN = fee.sub(feepaid);
+    console.log("e", feeRemaining.toString(10));
     if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, feeRemaining);
