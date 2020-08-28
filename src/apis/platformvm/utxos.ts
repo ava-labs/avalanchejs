@@ -283,36 +283,102 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     *
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param fromAddresses An array for {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+    * @param toAddresses The addresses to send the funds
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+    * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
     * @param importIns An array of [[TransferableInput]]s being imported
     * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
-    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}. Fee will come from the inputs first, if they can.
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param locktime Optional. The locktime field created in the resulting outputs
+    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
     * @returns An unsigned transaction created from the passed in parameters.
     *
     */
    buildImportTx = (
     networkid:number, 
     blockchainid:Buffer,
+    toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
-    importIns:Array<TransferableInput>,
-    destinationChain:Buffer = undefined, 
+    changeAddresses:Array<Buffer>,
+    atomics:Array<UTXO>,
+    sourceChain:Buffer = undefined, 
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
     memo:Buffer = undefined, 
     asOf:BN = UnixNow(),
+    locktime:BN = new BN(0), 
+    threshold:number = 1
   ):UnsignedTx => {
     const zero:BN = new BN(0);
     let ins:Array<TransferableInput> = [];
     let outs:Array<TransferableOutput> = [];
+    if(typeof fee === "undefined") {
+      fee = zero.clone();
+    }
+
+    const importIns:Array<TransferableInput> = [];
+    let feepaid:BN = new BN(0);
+    let feeAssetStr:string = feeAssetID.toString("hex");
+    for(let i:number = 0; i < atomics.length; i++) {
+      const utxo:UTXO = atomics[i];
+      const assetID:Buffer = utxo.getAssetID(); 
+      const output:AmountOutput = utxo.getOutput() as AmountOutput;
+      let amt:BN = output.getAmount().clone();
+      let assetStr:string = assetID.toString("hex");
+      let infeeamount = amt.clone();
+      
+      if(
+        typeof feeAssetID !== "undefined" && 
+        fee.gt(zero) && 
+        feepaid.lt(fee) && 
+        assetStr === feeAssetStr
+      ) 
+      {
+        feepaid.add(infeeamount);
+        if(feepaid.gt(fee)) {
+          infeeamount = feepaid.sub(fee);
+          feepaid = fee.clone();
+        } else {
+          feepaid = feepaid.add(infeeamount);
+          infeeamount =  zero.clone();
+        }
+      }
+
+      const txid:Buffer = utxo.getTxID();
+      const outputidx:Buffer = utxo.getOutputIdx();
+      const input:SecpInput = new SecpInput(amt);
+      const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
+      const from:Array<Buffer> = output.getAddresses(); 
+      const spenders:Array<Buffer> = output.getSpenders(from, asOf);
+      for (let j = 0; j < spenders.length; j++) {
+        const idx:number = output.getAddressIdx(spenders[j]);
+        if (idx === -1) {
+          /* istanbul ignore next */
+          throw new Error('Error - UTXOSet.buildImportTx: no such '
+          + `address in output: ${spenders[j]}`);
+        }
+        xferin.getInput().addSignatureIdx(idx, spenders[j]);
+      }
+      importIns.push(xferin);
+
+      //add extra outputs for each amount (calculated from the imported inputs), minus fees
+      if(infeeamount.gt(zero)) {
+        const spendout:AmountOutput = SelectOutputClass(output.getOutputID(),
+          infeeamount, toAddresses, locktime, threshold) as AmountOutput;
+        const xferout:TransferableOutput = new TransferableOutput(assetID, spendout);
+        outs.push(xferout);
+      }
+    }
     
-    // Not implemented: Fees can be paid from importIns
-    if(this._feeCheck(fee, feeAssetID)) {
-      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
-      aad.addAssetAmount(feeAssetID, zero, fee);
-      const success:Error = this.getMinimumSpendable(aad, asOf);
+    // get remaining fees from the provided addresses
+    let feeRemaining:BN = fee.sub(feepaid);
+    if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
+      const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+      aad.addAssetAmount(feeAssetID, zero, feeRemaining);
+      const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
         outs = aad.getAllOutputs();
@@ -321,11 +387,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    if(typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(PlatformChainID);
-    }
-
-    const importTx:ImportTx = new ImportTx(networkid, blockchainid, destinationChain, outs, ins, memo, importIns);
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid, sourceChain, outs, ins, memo, importIns);
     return new UnsignedTx(importTx);
   };
 

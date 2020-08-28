@@ -41,6 +41,7 @@ describe('Transactions', () => {
   let outputs:Array<TransferableOutput>;
   let ops:Array<TransferableOperation>;
   let importIns:Array<TransferableInput>;
+  let importUTXOs:Array<UTXO>;
   let exportOuts:Array<TransferableOutput>;
   let fungutxos:Array<UTXO>;
   let exportUTXOIDS:Array<string>;
@@ -103,6 +104,7 @@ describe('Transactions', () => {
     inputs = [];
     outputs = [];
     importIns = [];
+    importUTXOs = [];
     exportOuts = [];
     fungutxos = [];
     exportUTXOIDS = [];
@@ -133,6 +135,7 @@ describe('Transactions', () => {
       const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
       utxos.push(u);
       fungutxos.push(u);
+      importUTXOs.push(u);
 
       txid = u.getTxID();
       txidx = u.getOutputIdx();
@@ -456,7 +459,7 @@ describe('Transactions', () => {
 
   test('Creation Tx4 using ImportTx', () => {
     const txu:UnsignedTx = set.buildImportTx(
-      netid, blockchainID, addrs1, importIns, bintools.cb58Decode(PlatformChainID), new BN(90), assetID,
+      netid, blockchainID, addrs3, addrs1, addrs2, importUTXOs, bintools.cb58Decode(PlatformChainID), new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
     const tx:Tx = txu.sign(keymgr1);
     const tx2:Tx = new Tx();

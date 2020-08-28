@@ -17,7 +17,6 @@ import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
-import { ImportTx } from 'src/apis/platformvm/importtx';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 
@@ -790,15 +789,21 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildImportTx', async () => {
+      let locktime:BN = new BN(0);
+      let threshold:number = 1;
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
-      const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const fungutxo:UTXO = set.getUTXO(fungutxoids[1]);
+      const fungutxostr:string = fungutxo.toString();
+
       const result:Promise<UnsignedTx> = platformvm.buildImportTx(
-        set,addrs1, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
+        set,addrs1, PlatformChainID, addrs3, addrs1, addrs2, new UTF8Payload("hello world"), UnixNow(), locktime, threshold
       );
       const payload:object = {
         result: {
-          utxos:[fungutxo]
+          utxos:[fungutxostr]
         },
       };
       const responseObj = {
@@ -808,13 +813,10 @@ describe('PlatformVMAPI', () => {
       mockAxios.mockResponse(responseObj);
       const txu1:UnsignedTx = await result;
 
-      const txin:ImportTx = txu1.getTransaction() as ImportTx;
-      const importIns:Array<TransferableInput> = txin.getImportInputs();
-
       const txu2:UnsignedTx = set.buildImportTx(
         networkid, bintools.cb58Decode(blockchainid), 
-        addrbuff1, importIns, undefined, platformvm.getFee(), assetID, 
-        new UTF8Payload("hello world").getPayload(), UnixNow()
+        addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), platformvm.getFee(), await platformvm.getAVAXAssetID(), 
+        new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
       );
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
