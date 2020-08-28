@@ -794,7 +794,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
       const result:Promise<UnsignedTx> = platformvm.buildImportTx(
-        set, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
+        set,addrs1, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
       );
       const payload:object = {
         result: {

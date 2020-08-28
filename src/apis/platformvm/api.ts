@@ -795,6 +795,7 @@ export class PlatformVMAPI extends JRPCAPI {
  * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
  *
  * @param utxoset  A set of UTXOs that the transaction is built on
+ * @param feePayerAddresses The addresses being used to pay the transaction fees
  * @param ownerAddresses The addresses being used to import
  * @param sourceChain The chainid for where the import is coming from.
  * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -807,12 +808,13 @@ export class PlatformVMAPI extends JRPCAPI {
  */
   buildImportTx = async (
     utxoset:UTXOSet, 
+    feePayerAddresses:Array<string>,
     ownerAddresses:Array<string>, 
     sourceChain:Buffer | string,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(), 
   ):Promise<UnsignedTx> => {
-    const owners:Array<Buffer> = ownerAddresses.map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(feePayerAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
 
     const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses);
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
@@ -860,7 +862,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
-      owners,
+      from,
       importIns, 
       sourceChain,
       this.getFee(), 
