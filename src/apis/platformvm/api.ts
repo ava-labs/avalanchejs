@@ -15,12 +15,8 @@ import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
-import { TransferableInput, SecpInput } from '../platformvm/inputs';
-import { UTXO } from '../platformvm/utxos';
-import { AmountOutput } from '../platformvm/outputs';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { ExportTx } from './exporttx';
-import { AddValidatorTx, AddDelegatorTx } from './validationtx';
+import axios from 'axios';
 
 /**
  * @ignore
@@ -740,6 +736,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
    * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param sourceChain A string for the chain to look for the UTXO's. Default is to use this chain, but if exported UTXOs exist from other chains, this can used to pull them instead.
    * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
@@ -752,6 +749,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getUTXOs = async (
     addresses:Array<string> | string,
+    sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
     persistOpts:PersistanceOptions = undefined
@@ -765,11 +763,21 @@ export class PlatformVMAPI extends JRPCAPI {
       addresses: addresses,
       limit
     };
-    if(typeof startIndex !== "undefined"){
+    if(typeof startIndex !== "undefined") {
       params.startIndex = startIndex;
     }
+
+    if(typeof sourceChain !== "undefined") {
+      params.sourceChain = sourceChain;
+    }
+console.log("getUTXOs params", params);
+axios.interceptors.request.use(request => {
+  console.log('Starting Request', request)
+  return request
+})
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
+      console.log("getUTXOs response:", JSON.stringify(response.data.result));
       let data = response.data.result.utxos;
       if (persistOpts && typeof persistOpts === 'object') {
         if (this.db.has(persistOpts.getName())) {
@@ -826,20 +834,27 @@ export class PlatformVMAPI extends JRPCAPI {
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
-    const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses);
+    let srcChain:string = undefined;
+
+    if(typeof sourceChain === "undefined") {
+      throw new Error("Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined.");
+    } else if (typeof sourceChain === "string") {
+      srcChain = sourceChain;
+      sourceChain = bintools.cb58Decode(sourceChain);
+    } else if(!(sourceChain instanceof Buffer)) {
+      srcChain = bintools.cb58Encode(sourceChain);
+      throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
+    }
+console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
+    const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
     }
 
-    if(typeof sourceChain === "undefined") {
-      throw new Error("Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined.");
-    } else if (typeof sourceChain === "string") {
-      sourceChain = bintools.cb58Decode(sourceChain);
-    } else if(!(sourceChain instanceof Buffer)) {
-      throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
-    }
+    console.log("atomic balance", atomicUTXOs.getBalance(to, avaxAssetID).toString(10), atomicUTXOs.getBalance(ownerAddresses.map((a) => bintools.stringToAddress(a)), avaxAssetID).toString(10));
+
     
     const atomics = atomicUTXOs.getAllUTXOs();
 

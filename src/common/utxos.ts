@@ -39,7 +39,7 @@ export abstract class StandardUTXO {
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
     */
-   getCodecIDBuffer = ():Buffer => this.codecid;
+  getCodecIDBuffer = ():Buffer => this.codecid;
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.

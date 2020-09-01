@@ -518,6 +518,7 @@ export class AVMAPI extends JRPCAPI {
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
    * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param sourceChain A string for the chain to look for the UTXO's. Default is to use this chain, but if exported UTXOs exist from other chains, this can used to pull them instead.
    * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
@@ -530,6 +531,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getUTXOs = async (
     addresses:Array<string> | string,
+    sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
     persistOpts:PersistanceOptions = undefined
@@ -543,9 +545,16 @@ export class AVMAPI extends JRPCAPI {
       addresses: addresses,
       limit,
     };
+
     if(typeof startIndex !== "undefined"){
       params.startIndex = startIndex;
     }
+
+
+    if(typeof sourceChain !== "undefined"){
+      params.sourceChain = sourceChain;
+    }
+
     return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
@@ -730,23 +739,28 @@ buildImportTx = async (
   const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
   const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
-  const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses);
-  const avaxAssetID:Buffer = await this.getAVAXAssetID();
-
-
-  if( memo instanceof PayloadBase) {
-    memo = memo.getPayload();
-  }
+  let srcChain:string = undefined;
 
   if(typeof sourceChain === "undefined") {
     throw new Error("Error - AVMAPI.buildImportTx: Source ChainID is undefined.");
   } else if (typeof sourceChain === "string") {
-    sourceChain = bintools.cb58Decode(PlatformChainID);
+    srcChain = sourceChain;
+    sourceChain = bintools.cb58Decode(sourceChain);
   } else if(!(sourceChain instanceof Buffer)) {
+    srcChain = bintools.cb58Encode(sourceChain);
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
+  
+
+  const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+  const avaxAssetID:Buffer = await this.getAVAXAssetID();
+
   const atomics = atomicUTXOs.getAllUTXOs();
+
+  if( memo instanceof PayloadBase) {
+    memo = memo.getPayload();
+  }
 
   const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
     this.core.getNetworkID(), 

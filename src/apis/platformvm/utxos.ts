@@ -373,6 +373,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     
     // get remaining fees from the provided addresses
     let feeRemaining:BN = fee.sub(feepaid);
+    console.log("feeRemaining", feeRemaining.toString(10));
     if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, feeRemaining);
