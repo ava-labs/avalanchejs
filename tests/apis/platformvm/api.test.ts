@@ -872,7 +872,7 @@ describe('PlatformVMAPI', () => {
       expect(txu4.toString()).toBe(txu3.toString());
 
     });
-
+/*
     test('buildAddSubnetValidatorTx', async () => {
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
@@ -907,13 +907,16 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
     });
-
+*/
     test('buildAddDelegatorTx', async () => {
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
+
+      const lockime:BN = new BN(54321);
+      const threshold:number = 2;
 
       const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
         set, 
@@ -923,7 +926,9 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        addrs3[0], 
+        addrs3, 
+        lockime,
+        threshold,
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -936,7 +941,9 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        bintools.stringToAddress(addrs3[0]),
+        lockime,
+        threshold,
+        addrbuff3,
         platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -953,6 +960,9 @@ describe('PlatformVMAPI', () => {
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
 
+      const lockime:BN = new BN(54321);
+      const threshold:number = 2;
+
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         set, 
         addrs1, 
@@ -961,8 +971,10 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        addrs3[0], 
+        addrs3, 
         0.1334556,
+        lockime,
+        threshold,
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -975,7 +987,9 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        bintools.stringToAddress(addrs3[0]),
+        lockime,
+        threshold,
+        addrbuff3,
         0.1335,
         platformvm.getFee(), 
         assetID,

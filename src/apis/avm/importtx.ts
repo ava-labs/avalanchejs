@@ -36,13 +36,6 @@ export class ImportTx extends BaseTx {
     }
 
     /**
-     * Returns the exported outputs as an array of [[TransferableInput]]
-     */
-    getExportOuts = ():Array<TransferableInput> => {
-      return this.importIns;
-    }
-
-    /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
      */
     getSourceChain = ():Buffer => {

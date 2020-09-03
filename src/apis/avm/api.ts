@@ -833,7 +833,6 @@ buildImportTx = async (
     }
 
     if(bintools.cb58Encode(destinationChain) !== PlatformChainID) {
-      console.log('avm', bintools.cb58Encode(destinationChain), PlatformChainID);
       throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must PlatformChainID in the current version of Avalanche.js.");
     }
 

@@ -44,14 +44,19 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
   getBlockchainID = ():Buffer => this.blockchainid;
 
   /**
-   * Returns the array of [[TransferableInput]]s
+   * Returns the array of [[StandardTransferableInput]]s
    */
   getIns = ():Array<StandardTransferableInput> => this.ins;
 
   /**
-   * Returns the array of [[TransferableOutput]]s
+   * Returns the array of [[StandardTransferableOutput]]s
    */
   getOuts = ():Array<StandardTransferableOutput> => this.outs;
+
+  /**
+   * Returns the array of combined total [[StandardTransferableOutput]]s
+   */
+  abstract getTotalOuts():Array<StandardTransferableOutput>;
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo 
@@ -193,7 +198,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
    * Returns the outputTotal as a BN
    */
   getOutputTotal = (assetID:Buffer):BN => {
-    const outs:Array<StandardTransferableOutput> = this.getTransaction().getOuts();
+    const outs:Array<StandardTransferableOutput> = this.getTransaction().getTotalOuts();
     const aIDHex:string = assetID.toString('hex');
     let total:BN = new BN(0);
 

@@ -292,22 +292,18 @@ export abstract class Output extends OutputOwners {
     abstract makeTransferable(assetID:Buffer):StandardTransferableOutput;
 }
 
-export abstract class StandardTransferableOutput {
-    protected assetID:Buffer = undefined;
-  
-    protected output:Output;
-  
+export abstract class StandardParseableOutput {
+  protected output:Output;
+
     /**
-       * Returns a function used to sort an array of [[StandardTransferableOutput]]s
-       */
-    static comparator = ():(a:StandardTransferableOutput, b:StandardTransferableOutput) => (1|-1|0) => (a:StandardTransferableOutput, b:StandardTransferableOutput):(1|-1|0) => {
+     * Returns a function used to sort an array of [[ParseableOutput]]s
+     */
+    static comparator = ():(a:StandardParseableOutput, b:StandardParseableOutput) => (1|-1|0) => (a:StandardParseableOutput, b:StandardParseableOutput):(1|-1|0) => {
       const sorta = a.toBuffer();
       const sortb = b.toBuffer();
       return Buffer.compare(sorta, sortb) as (1|-1|0);
     };
-  
-    getAssetID = ():Buffer => this.assetID;
-  
+
     getOutput = ():Output => this.output;
 
     // must be implemented to select output types for the VM in question
@@ -317,20 +313,48 @@ export abstract class StandardTransferableOutput {
       const outbuff:Buffer = this.output.toBuffer();
       const outid:Buffer = Buffer.alloc(4);
       outid.writeUInt32BE(this.output.getOutputID(), 0);
-      const barr:Array<Buffer> = [this.assetID, outid, outbuff];
-      return Buffer.concat(barr, this.assetID.length + outid.length + outbuff.length);
+      const barr:Array<Buffer> = [outid, outbuff];
+      return Buffer.concat(barr, outid.length + outbuff.length);
+    }
+
+    /**
+     * Class representing an [[ParseableOutput]] for a transaction.
+     * 
+     * @param output A number representing the InputID of the [[ParseableOutput]]
+     */
+    constructor(output:Output = undefined) {
+      if (output instanceof Output) {
+        this.output = output;
+      }
+    }
+}
+
+export abstract class StandardTransferableOutput extends StandardParseableOutput {
+    protected assetID:Buffer = undefined;
+  
+    protected output:Output;
+  
+    getAssetID = ():Buffer => this.assetID;
+
+    // must be implemented to select output types for the VM in question
+    abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+  
+    toBuffer():Buffer {
+      const parseeableBuff:Buffer = super.toBuffer();
+      const barr:Array<Buffer> = [this.assetID, parseeableBuff];
+      return Buffer.concat(barr, this.assetID.length + parseeableBuff.length);
     }
   
     /**
-       * Class representing an [[StandardTransferableOutput]] for a transaction.
-       *
-       * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Output]]
-       * @param output A number representing the InputID of the [[StandardTransferableOutput]]
-       */
+     * Class representing an [[StandardTransferableOutput]] for a transaction.
+     *
+     * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Output]]
+     * @param output A number representing the InputID of the [[StandardTransferableOutput]]
+     */
     constructor(assetID:Buffer = undefined, output:Output = undefined) {
-      if (typeof assetID !== 'undefined' && output instanceof Output) {
+      super(output);
+      if (typeof assetID !== 'undefined') {
         this.assetID = assetID;
-        this.output = output;
       }
     }
   }
