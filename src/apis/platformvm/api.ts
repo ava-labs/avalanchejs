@@ -799,12 +799,12 @@ axios.interceptors.request.use(request => {
  * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
  * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
  *
- * @param utxoset  A set of UTXOs that the transaction is built on
+ * @param utxoset A set of UTXOs that the transaction is built on
  * @param ownerAddresses The addresses being used to import
+ * @param sourceChain The chainid for where the import is coming from.
  * @param toAddresses The addresses to send the funds
  * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
  * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
- * @param sourceChain The chainid for where the import is coming from.
  * @param memo Optional contains arbitrary bytes, up to 256 bytes
  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
  * @param locktime Optional. The locktime field created in the resulting outputs
