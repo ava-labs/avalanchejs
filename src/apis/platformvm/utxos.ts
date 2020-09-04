@@ -629,7 +629,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
     * @param rewardLocktime The locktime field created in the resulting reward outputs
     * @param rewardThreshold The number of signatures required to spend the funds in the resultant reward UTXO
-    * @param rewardAddress The address the validator reward goes.
+    * @param rewardAddresses The addresses the validator reward goes.
     * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned. 
