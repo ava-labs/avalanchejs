@@ -20,6 +20,7 @@ import { RequestResponseData } from '../../common/apibase';
 import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/constants';
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { OutputOwners } from '../../common/output';
 
 /**
  * @ignore
@@ -1026,8 +1027,6 @@ buildImportTx = async (
   * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-  * @param locktime Optional. The locktime field created in the resulting mint output
-  * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
   * 
   * 
   * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
@@ -1035,14 +1034,13 @@ buildImportTx = async (
   */
   buildCreateNFTMintTx = async (
     utxoset:UTXOSet,  
-    toAddresses:Array<string>|Array<Buffer>, 
+    owners:Array<OutputOwners>|OutputOwners, 
     fromAddresses:Array<string>|Array<Buffer>, 
     utxoid:string|Array<string>,
     groupID:number = 0, 
     payload:PayloadBase|Buffer = undefined, 
-    memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1
+    memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
   ): Promise<any> => {
-    let to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
     let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
@@ -1059,17 +1057,21 @@ buildImportTx = async (
 
     let avaxAssetID:Buffer = await this.getAVAXAssetID();
 
+    if(owners instanceof OutputOwners) {
+      owners = [owners];
+    }
+
     const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTMintTx(
         this.core.getNetworkID(),
         bintools.cb58Decode(this.blockchainID),
-        to,
+        owners,
         from,
         utxoid,
         groupID,
         payload,
         this.getFee(),
         avaxAssetID,
-        memo, asOf, locktime, threshold
+        memo, asOf
     );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
