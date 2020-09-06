@@ -770,14 +770,11 @@ export class PlatformVMAPI extends JRPCAPI {
     if(typeof sourceChain !== "undefined") {
       params.sourceChain = sourceChain;
     }
-console.log("getUTXOs params", params);
 axios.interceptors.request.use(request => {
-  console.log('Starting Request', request)
   return request
 })
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
-      console.log("getUTXOs response:", JSON.stringify(response.data.result));
       let data = response.data.result.utxos;
       if (persistOpts && typeof persistOpts === 'object') {
         if (this.db.has(persistOpts.getName())) {
@@ -802,12 +799,12 @@ axios.interceptors.request.use(request => {
  * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
  * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
  *
- * @param utxoset  A set of UTXOs that the transaction is built on
+ * @param utxoset A set of UTXOs that the transaction is built on
  * @param ownerAddresses The addresses being used to import
+ * @param sourceChain The chainid for where the import is coming from.
  * @param toAddresses The addresses to send the funds
  * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
  * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
- * @param sourceChain The chainid for where the import is coming from.
  * @param memo Optional contains arbitrary bytes, up to 256 bytes
  * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
  * @param locktime Optional. The locktime field created in the resulting outputs
@@ -845,7 +842,6 @@ axios.interceptors.request.use(request => {
       srcChain = bintools.cb58Encode(sourceChain);
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
-console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
     const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
@@ -853,9 +849,6 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
       memo = memo.getPayload();
     }
 
-    console.log("atomic balance", atomicUTXOs.getBalance(to, avaxAssetID).toString(10), atomicUTXOs.getBalance(ownerAddresses.map((a) => bintools.stringToAddress(a)), avaxAssetID).toString(10));
-
-    
     const atomics = atomicUTXOs.getAllUTXOs();
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
@@ -929,7 +922,6 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
     }
 
     if(bintools.cb58Encode(destinationChain) !== Defaults.network[this.core.getNetworkID()].X["blockchainID"]) {
-      console.log('avm', bintools.cb58Encode(destinationChain), Defaults.network[this.core.getNetworkID()].X["blockchainID"]);
       throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must The X-Chain ID in the current version of Avalanche.js.");
     }
 
@@ -984,6 +976,8 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
   *  
   * @returns An unsigned transaction created from the passed in parameters.
   */
+
+  /* Re-implement when subnetValidator signing process is clearer
   buildAddSubnetValidatorTx = async (
     utxoset:UTXOSet, 
     fromAddresses:Array<string>,
@@ -1023,12 +1017,14 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
     );
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
-      /* istanbul ignore next */
+      /* istanbul ignore next *//*
       throw new Error("Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
   }
+
+  */
 
   /**
   * Helper function which creates an unsigned [[AddDelegatorTx]]. For more granular control, you may create your own
@@ -1041,7 +1037,9 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
   * @param startTime The Unix time when the validator starts validating the Primary Network.
   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
-  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
+  * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+  * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs
+  * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   *  
@@ -1055,12 +1053,15 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
     startTime:BN, 
     endTime:BN,
     stakeAmount:BN,
-    rewardAddress:string,
+    rewardAddresses:Array<string>,
+    rewardLocktime:BN = new BN(0),
+    rewardThreshold:number = 1,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
+    const rewards:Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1082,7 +1083,9 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
       NodeIDStringToBuffer(nodeID),
       startTime, endTime,
       stakeAmount,
-      bintools.stringToAddress(rewardAddress),
+      rewardLocktime,
+      rewardThreshold,
+      rewards,
       this.getFee(), 
       avaxAssetID,
       memo, asOf
@@ -1108,8 +1111,10 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
   * @param startTime The Unix time when the validator starts validating the Primary Network.
   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
-  * @param rewardAddress The address which will recieve the rewards from the delegated stake.
+  * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
   * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
+  * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs
+  * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   *  
@@ -1123,13 +1128,16 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
     startTime:BN, 
     endTime:BN,
     stakeAmount:BN,
-    rewardAddress:string,
+    rewardAddresses:Array<string>,
     delegationFee:number,
+    rewardLocktime:BN = new BN(0),
+    rewardThreshold:number = 1,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
+    const rewards:Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1151,7 +1159,9 @@ console.log("owneraddresses", ownerAddresses, "srcChain", srcChain);
       NodeIDStringToBuffer(nodeID),
       startTime, endTime,
       stakeAmount,
-      bintools.stringToAddress(rewardAddress),
+      rewardLocktime,
+      rewardThreshold,
+      rewards,
       delegationFee,
       this.getFee(), 
       avaxAssetID,

@@ -51,6 +51,10 @@ export class ExportTx extends BaseTx {
       return val;
     }
 
+    getTotalOuts():Array<TransferableOutput> {
+      return [...this.getOuts(), ...this.getExportOutputs()];
+    }
+
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} for the destination chainid.
      */

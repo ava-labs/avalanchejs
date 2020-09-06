@@ -24,6 +24,8 @@ export class PlatformVMConstants {
 
   static SECPOUTPUTID:number = 7;
 
+  static SECPOWNEROUTPUTID:number = 11;
+
   static SECPINPUTID:number = 5;
 
   static BASETX:number = 0;
