@@ -409,8 +409,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-    * @param locktime Optional. The locktime field created in the resulting mint output
-    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
     * 
     * @returns An unsigned transaction created from the passed in parameters.
     * 

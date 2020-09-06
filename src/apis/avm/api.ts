@@ -1020,14 +1020,13 @@ buildImportTx = async (
   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
   * 
   * @param utxoset  A set of UTXOs that the transaction is built on
-  * @param toAddresses The addresses to send the nft output
+  * @param owners The either a single or an array of [[OutputOwners]] to send the nft output
   * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
   * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
   * @param groupID Optional. The group this NFT is issued to.
   * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-  * 
   * 
   * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
   * 
