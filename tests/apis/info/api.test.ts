@@ -20,7 +20,7 @@ describe('Info', () => {
   });
 
   test('getBlockchainID', async () => {
-    const result:Promise<string> = info.getBlockchainID('avm');
+    const result:Promise<string> = info.getBlockchainID('X');
     const payload:object = {
       result: {
         blockchainID: avalanche.XChain().getBlockchainID(),
@@ -125,6 +125,42 @@ describe('Info', () => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe('avalanche/0.5.5');
+  });
+
+  test('isBootstrapped false', async () => {
+    const result:Promise<boolean> = info.isBootstrapped('X');
+    const payload:object = {
+      result: {
+        isBootstrapped: false,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:boolean = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(false);
+  });
+
+  test('isBootstrapped true', async () => {
+    const result:Promise<boolean> = info.isBootstrapped('P');
+    const payload:object = {
+      result: {
+        isBootstrapped: true,
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:boolean = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(true);
   });
 
   test('peers', async () => {

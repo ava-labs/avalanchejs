@@ -400,7 +400,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * 
     * @param networkid The number representing NetworkID of the node
     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-    * @param toAddresses The addresses to send the funds
+    * @param owners An array of [[OutputOwners]] who will be given the NFTs.
     * @param fromAddresses The addresses being used to send the funds from the UTXOs
     * @param utxoids An array of strings for the NFTs being transferred
     * @param groupID Optional. The group this NFT is issued to.
@@ -409,8 +409,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-    * @param locktime Optional. The locktime field created in the resulting mint output
-    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
     * 
     * @returns An unsigned transaction created from the passed in parameters.
     * 
@@ -418,7 +416,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   buildCreateNFTMintTx = (
     networkid:number, 
     blockchainid:Buffer, 
-    toAddresses:Array<Buffer>, 
+    owners:Array<OutputOwners>,
     fromAddresses:Array<Buffer>, 
     utxoids:Array<string>, 
     groupID:number = 0, 
@@ -426,9 +424,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     fee:BN = undefined,
     feeAssetID:Buffer = undefined,  
     memo:Buffer = undefined,
-    asOf:BN = UnixNow(), 
-    locktime:BN, 
-    threshold:number = 1 
+    asOf:BN = UnixNow()
   ):UnsignedTx => {
 
     const zero:BN = new BN(0);
@@ -436,7 +432,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let outs:Array<TransferableOutput> = [];
     
     if(this._feeCheck(fee, feeAssetID)) {
-      const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, fromAddresses);
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, fromAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
       const success:Error = this.getMinimumSpendable(aad, asOf);
       if(typeof success === "undefined") {
@@ -448,11 +444,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     let ops:TransferableOperation[] = [];
 
-    if(threshold > toAddresses.length) {
-        /* istanbul ignore next */
-        throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: threshold is greater than number of addresses`);
-    }
-    let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, [new OutputOwners(toAddresses, locktime, threshold)]);
+    let nftMintOperation: NFTMintOperation = new NFTMintOperation(groupID, payload, owners);
 
     for(let i:number = 0; i < utxoids.length; i++) {
         let utxo:UTXO = this.getUTXO(utxoids[i]);
