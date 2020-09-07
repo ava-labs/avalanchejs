@@ -710,10 +710,10 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param utxoset  A set of UTXOs that the transaction is built on
    * @param ownerAddresses The addresses being used to import
+   * @param sourceChain The chainid for where the import is coming from
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param sourceChain The chainid for where the import is coming from.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
@@ -736,9 +736,9 @@ export class AVMAPI extends JRPCAPI {
     locktime:BN = new BN(0), 
     threshold:number = 1
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
 
     let srcChain:string = undefined;
 
@@ -1020,7 +1020,7 @@ export class AVMAPI extends JRPCAPI {
   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
   * 
   * @param utxoset  A set of UTXOs that the transaction is built on
-  * @param owners The either a single or an array of [[OutputOwners]] to send the nft output
+  * @param owners Either a single or an array of [[OutputOwners]] to send the nft output
   * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
   * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
   * @param groupID Optional. The group this NFT is issued to.
