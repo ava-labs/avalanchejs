@@ -1,14 +1,14 @@
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
-import { SecpOutput, SelectOutputClass } from 'src/apis/platformvm/outputs';
+import { SecpTransferOutput, SelectOutputClass } from 'src/apis/platformvm/outputs';
 import { Output } from 'src/common/output';
 
 const bintools = BinTools.getInstance();
 
 describe('Outputs', () => {
 
-    describe('SecpOutput', () => {
+    describe('SecpTransferOutput', () => {
       let addrs:Array<Buffer> = [
           bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
           bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
@@ -20,18 +20,18 @@ describe('Outputs', () => {
       let fallLocktime:BN = locktime.add(new BN(50));
 
       test('SelectOutputClass', () => {
-          let goodout:SecpOutput = new SecpOutput(new BN(2600), addrpay, fallLocktime, 1);
+          let goodout:SecpTransferOutput = new SecpTransferOutput(new BN(2600), addrpay, fallLocktime, 1);
           let outpayment:Output = SelectOutputClass(goodout.getOutputID());
-          expect(outpayment).toBeInstanceOf(SecpOutput);
+          expect(outpayment).toBeInstanceOf(SecpTransferOutput);
           expect(() => {
               SelectOutputClass(99);
           }).toThrow("Error - SelectOutputClass: unknown outputid");
       });
 
       test('comparator', () => {
-          let outpayment1:Output = new SecpOutput(new BN(10000), addrs, locktime, 3);
-          let outpayment2:Output = new SecpOutput(new BN(10001), addrs, locktime, 3);
-          let outpayment3:Output = new SecpOutput(new BN(9999), addrs, locktime, 3);
+          let outpayment1:Output = new SecpTransferOutput(new BN(10000), addrs, locktime, 3);
+          let outpayment2:Output = new SecpTransferOutput(new BN(10001), addrs, locktime, 3);
+          let outpayment3:Output = new SecpTransferOutput(new BN(9999), addrs, locktime, 3);
           let cmp = Output.comparator();
           expect(cmp(outpayment1, outpayment1)).toBe(0);
           expect(cmp(outpayment2, outpayment2)).toBe(0);
@@ -40,8 +40,8 @@ describe('Outputs', () => {
           expect(cmp(outpayment1, outpayment3)).toBe(1);
       });
 
-      test('SecpOutput', () => {
-          let out:SecpOutput = new SecpOutput(new BN(10000), addrs, locktime, 3);
+      test('SecpTransferOutput', () => {
+          let out:SecpTransferOutput = new SecpTransferOutput(new BN(10000), addrs, locktime, 3);
           expect(out.getOutputID()).toBe(7);
           expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 

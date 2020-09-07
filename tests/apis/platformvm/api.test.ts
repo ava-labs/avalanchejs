@@ -10,7 +10,7 @@ import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
-import { SecpOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
+import { SecpTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
 import { TransferableInput, SecpInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
@@ -693,9 +693,9 @@ describe('PlatformVMAPI', () => {
     const amnt:number = 10000;
     const assetID:Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest());
     const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
-    let secpbase1:SecpOutput;
-    let secpbase2:SecpOutput;
-    let secpbase3:SecpOutput;
+    let secpbase1:SecpTransferOutput;
+    let secpbase2:SecpTransferOutput;
+    let secpbase3:SecpTransferOutput;
     let fungutxoids:Array<string> = [];
     let platformvm:PlatformVMAPI;
     const fee:number = 10;
@@ -749,7 +749,7 @@ describe('PlatformVMAPI', () => {
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
         
-        const out:SecpOutput = new SecpOutput(amount, addressbuffs, locktime, threshold);
+        const out:SecpTransferOutput = new SecpTransferOutput(amount, addressbuffs, locktime, threshold);
         const xferout:TransferableOutput = new TransferableOutput(assetID, out);
         outputs.push(xferout);
 
@@ -768,9 +768,9 @@ describe('PlatformVMAPI', () => {
       }
       set.addArray(utxos);
 
-      secpbase1 = new SecpOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
-      secpbase2 = new SecpOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
-      secpbase3 = new SecpOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase1 = new SecpTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase2 = new SecpTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase3 = new SecpTransferOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
 
     });
 

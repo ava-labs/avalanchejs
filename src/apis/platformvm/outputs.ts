@@ -17,8 +17,8 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == PlatformVMConstants.SECPOUTPUTID){
-        return new SecpOutput( ...args);
+    if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
+        return new SecpTransferOutput( ...args);
     } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
       return new SecpOwnerOutput(...args);
     }
@@ -62,20 +62,20 @@ export abstract class AmountOutput extends StandardAmountOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpOutput extends AmountOutput {
+export class SecpTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return PlatformVMConstants.SECPOUTPUTID;
+    return PlatformVMConstants.SECPXFEROUTPUTID;
   }
 
   create(...args:any[]):this{
-    return new SecpOutput(...args) as this;
+    return new SecpTransferOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpOutput = this.create()
+    const newout:SecpTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }

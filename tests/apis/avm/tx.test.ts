@@ -8,7 +8,7 @@ import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
-import { SecpOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/outputs';
+import { SecpTransferOutput, NFTTransferOutput, TransferableOutput } from 'src/apis/avm/outputs';
 import { AVMConstants } from 'src/apis/avm/constants';
 import { TransferableOperation, NFTTransferOperation } from 'src/apis/avm/ops';
 import { Avalanche } from 'src/index';
@@ -128,7 +128,7 @@ describe('Transactions', () => {
     for (let i:number = 0; i < 5; i++) {
       let txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
       let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
-      const out:SecpOutput = new SecpOutput(amount, addresses, locktime, threshold);
+      const out:SecpTransferOutput = new SecpTransferOutput(amount, addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
       outputs.push(xferout);
 
@@ -166,7 +166,7 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
-    const output:SecpOutput = new SecpOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
@@ -188,7 +188,7 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
-    const output:SecpOutput = new SecpOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(assetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
@@ -214,7 +214,7 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("267");
-    const output:SecpOutput = new SecpOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
@@ -234,7 +234,7 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("609555500000");
-    const output:SecpOutput = new SecpOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("45000000000000000");
@@ -254,7 +254,7 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("44995609555500000");
-    const output:SecpOutput = new SecpOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("45000000000000000");
@@ -315,9 +315,9 @@ describe('Transactions', () => {
   });
 
   test('CreateAssetTX', () => {
-    const secpbase1:SecpOutput = new SecpOutput(new BN(777), addrs3, locktime, 1);
-    const secpbase2:SecpOutput = new SecpOutput(new BN(888), addrs2, locktime, 1);
-    const secpbase3:SecpOutput = new SecpOutput(new BN(999), addrs2, locktime, 1);
+    const secpbase1:SecpTransferOutput = new SecpTransferOutput(new BN(777), addrs3, locktime, 1);
+    const secpbase2:SecpTransferOutput = new SecpTransferOutput(new BN(888), addrs2, locktime, 1);
+    const secpbase3:SecpTransferOutput = new SecpTransferOutput(new BN(999), addrs2, locktime, 1);
     const initialState:InitialStates = new InitialStates();
     initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
     initialState.addOutput(secpbase2, AVMConstants.SECPFXID);

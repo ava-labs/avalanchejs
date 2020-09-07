@@ -30,7 +30,7 @@ export class AVMConstants {
 
   static SECPMINTOUTPUTID:number = 6;
 
-  static SECPOUTPUTID:number = 7;
+  static SECPXFEROUTPUTID:number = 7;
 
   static NFTXFEROUTPUTID:number = 11;
 

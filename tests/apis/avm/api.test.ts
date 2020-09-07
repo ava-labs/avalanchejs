@@ -10,7 +10,7 @@ import { TransferableInput, SecpInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMConstants } from 'src/apis/avm/constants';
-import { TransferableOutput, SecpOutput, NFTMintOutput, NFTTransferOutput } from 'src/apis/avm/outputs';
+import { TransferableOutput, SecpTransferOutput, NFTMintOutput, NFTTransferOutput } from 'src/apis/avm/outputs';
 import { NFTTransferOperation, TransferableOperation } from 'src/apis/avm/ops';
 import * as bech32 from 'bech32';
 import { UTF8Payload } from 'src/utils/payload';
@@ -543,9 +543,9 @@ describe('AVMAPI', () => {
     const amnt:number = 10000;
     const assetID:Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest());
     const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
-    let secpbase1:SecpOutput;
-    let secpbase2:SecpOutput;
-    let secpbase3:SecpOutput;
+    let secpbase1:SecpTransferOutput;
+    let secpbase2:SecpTransferOutput;
+    let secpbase3:SecpTransferOutput;
     let initialState:InitialStates;
     let nftpbase1:NFTMintOutput;
     let nftpbase2:NFTMintOutput;
@@ -607,7 +607,7 @@ describe('AVMAPI', () => {
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
         
-        const out:SecpOutput = new SecpOutput(amount, addressbuffs, locktime, threshold);
+        const out:SecpTransferOutput = new SecpTransferOutput(amount, addressbuffs, locktime, threshold);
         const xferout:TransferableOutput = new TransferableOutput(assetID, out);
         outputs.push(xferout);
 
@@ -635,9 +635,9 @@ describe('AVMAPI', () => {
       }
       set.addArray(utxos);
 
-      secpbase1 = new SecpOutput(new BN(777), addrs3.map((a) => avm.parseAddress(a)), UnixNow(), 1);
-      secpbase2 = new SecpOutput(new BN(888), addrs2.map((a) => avm.parseAddress(a)), UnixNow(), 1);
-      secpbase3 = new SecpOutput(new BN(999), addrs2.map((a) => avm.parseAddress(a)), UnixNow(), 1);
+      secpbase1 = new SecpTransferOutput(new BN(777), addrs3.map((a) => avm.parseAddress(a)), UnixNow(), 1);
+      secpbase2 = new SecpTransferOutput(new BN(888), addrs2.map((a) => avm.parseAddress(a)), UnixNow(), 1);
+      secpbase3 = new SecpTransferOutput(new BN(999), addrs2.map((a) => avm.parseAddress(a)), UnixNow(), 1);
       initialState = new InitialStates();
       initialState.addOutput(secpbase1, AVMConstants.SECPFXID);
       initialState.addOutput(secpbase2, AVMConstants.SECPFXID);
