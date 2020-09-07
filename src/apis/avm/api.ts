@@ -704,50 +704,50 @@ export class AVMAPI extends JRPCAPI {
     return builtUnsignedTx;
   };
 
-/**
- * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
- * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
- *
- * @param utxoset  A set of UTXOs that the transaction is built on
- * @param ownerAddresses The addresses being used to import
- * @param toAddresses The addresses to send the funds
- * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
- * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
- * @param sourceChain The chainid for where the import is coming from.
- * @param memo Optional contains arbitrary bytes, up to 256 bytes
- * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
- * @param locktime Optional. The locktime field created in the resulting outputs
- * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
- *
- * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
- *
- * @remarks
- * This helper exists because the endpoint API should be the primary point of entry for most functionality.
- */
-buildImportTx = async (
-  utxoset:UTXOSet, 
-  ownerAddresses:Array<string>,
-  sourceChain:Buffer | string,
-  toAddresses:Array<string>, 
-  fromAddresses:Array<string>,
-  changeAddresses:Array<string> = undefined,
-  memo:PayloadBase|Buffer = undefined, 
-  asOf:BN = UnixNow(), 
-  locktime:BN = new BN(0), 
-  threshold:number = 1
-):Promise<UnsignedTx> => {
-  const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-  const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-  const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+  /**
+   * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset  A set of UTXOs that the transaction is built on
+   * @param ownerAddresses The addresses being used to import
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param sourceChain The chainid for where the import is coming from.
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
+   *
+   * @remarks
+   * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+   */
+  buildImportTx = async (
+    utxoset:UTXOSet, 
+    ownerAddresses:Array<string>,
+    sourceChain:Buffer | string,
+    toAddresses:Array<string>, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string> = undefined,
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow(), 
+    locktime:BN = new BN(0), 
+    threshold:number = 1
+  ):Promise<UnsignedTx> => {
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
-  let srcChain:string = undefined;
+    let srcChain:string = undefined;
 
-  if(typeof sourceChain === "undefined") {
-    throw new Error("Error - AVMAPI.buildImportTx: Source ChainID is undefined.");
-  } else if (typeof sourceChain === "string") {
-    srcChain = sourceChain;
-    sourceChain = bintools.cb58Decode(sourceChain);
-  } else if(!(sourceChain instanceof Buffer)) {
+    if(typeof sourceChain === "undefined") {
+      throw new Error("Error - AVMAPI.buildImportTx: Source ChainID is undefined.");
+    } else if (typeof sourceChain === "string") {
+      srcChain = sourceChain;
+      sourceChain = bintools.cb58Decode(sourceChain);
+    } else if(!(sourceChain instanceof Buffer)) {
     srcChain = bintools.cb58Encode(sourceChain);
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }

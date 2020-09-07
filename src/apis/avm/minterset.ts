@@ -35,13 +35,13 @@ export class MinterSet {
         return this.minters;
     }
 
-   protected  _cleanAddresses = (addresses:Array<string|Buffer>):Array<Buffer> => {
+    protected  _cleanAddresses = (addresses:Array<string|Buffer>):Array<Buffer> => {
         let addrs:Array<Buffer> = [];
         for(let i:number = 0; i < addresses.length; i++) {
-            if(!Buffer.isBuffer(addresses[i])) {
-                addrs.push(bintools.stringToBuffer(addresses[i] as string))
-            } else {
-                addrs.push(addresses[i] as Buffer)
+            if(typeof addresses[i] === "string") {
+                addrs.push(bintools.stringToAddress(addresses[i] as string));
+            } else if(addresses[i] instanceof Buffer) {
+                addrs.push(addresses[i] as Buffer);
             }
         }
         return addrs;
