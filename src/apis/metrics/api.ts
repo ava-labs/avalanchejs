@@ -23,22 +23,7 @@ export class MetricsAPI extends RESTAPI {
     };
 
   }
-  post = async (method:string, params?:Array<object> | object, baseurl?:string,
-    contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
-    const ep:string = baseurl || this.baseurl;
-    const rpc:any = {};
-    rpc.method = method;
 
-    // Set parameters if exists
-    if (params) {
-      rpc.params = params;
-    }
-
-    const headers:object = this.prepHeaders(contentType, acceptType);
-
-    return this.core.post(ep, {}, JSON.stringify(rpc), headers, this.axConf())
-      .then((resp:RequestResponseData) => resp);
-  };
   /**
      *
      * @returns Promise for an object containing the metrics response
