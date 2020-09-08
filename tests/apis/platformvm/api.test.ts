@@ -11,7 +11,7 @@ import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
 import { SECPTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
-import { TransferableInput, SECPInput } from 'src/apis/platformvm/inputs';
+import { TransferableInput, SECPTransferInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
@@ -762,7 +762,7 @@ describe('PlatformVMAPI', () => {
         txidx = u.getOutputIdx();
         const asset = u.getAssetID();
 
-        const input:SECPInput = new SECPInput(amount);
+        const input:SECPTransferInput = new SECPTransferInput(amount);
         const xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
         inputs.push(xferinput);
       }

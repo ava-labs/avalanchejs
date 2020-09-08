@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput } from './outputs';
-import { SECPInput, TransferableInput } from './inputs';
+import { SECPTransferInput, TransferableInput } from './inputs';
 import { UnixNow } from '../../utils/helperfunctions';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
 import { PlatformVMConstants } from './constants';
@@ -142,7 +142,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           am.spendAmount(amount);
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
-          const input:SECPInput = new SECPInput(amount);
+          const input:SECPTransferInput = new SECPTransferInput(amount);
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
           const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
           for (let j = 0; j < spenders.length; j++) {
@@ -348,7 +348,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       const txid:Buffer = utxo.getTxID();
       const outputidx:Buffer = utxo.getOutputIdx();
-      const input:SECPInput = new SECPInput(amt);
+      const input:SECPTransferInput = new SECPTransferInput(amt);
       const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
       const from:Array<Buffer> = output.getAddresses(); 
       const spenders:Array<Buffer> = output.getSpenders(from, asOf);
