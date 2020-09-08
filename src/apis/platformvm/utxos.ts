@@ -5,8 +5,8 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { AmountOutput, SelectOutputClass, TransferableOutput, SecpOwnerOutput, ParseableOutput } from './outputs';
-import { SecpInput, TransferableInput } from './inputs';
+import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput } from './outputs';
+import { SECPInput, TransferableInput } from './inputs';
 import { UnixNow } from '../../utils/helperfunctions';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
 import { PlatformVMConstants } from './constants';
@@ -142,7 +142,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           am.spendAmount(amount);
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
-          const input:SecpInput = new SecpInput(amount);
+          const input:SECPInput = new SECPInput(amount);
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
           const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
           for (let j = 0; j < spenders.length; j++) {
@@ -348,7 +348,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       const txid:Buffer = utxo.getTxID();
       const outputidx:Buffer = utxo.getOutputIdx();
-      const input:SecpInput = new SecpInput(amt);
+      const input:SECPInput = new SECPInput(amt);
       const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
       const from:Array<Buffer> = output.getAddresses(); 
       const spenders:Array<Buffer> = output.getSpenders(from, asOf);
@@ -609,7 +609,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const rewardOutputOwners:SecpOwnerOutput = new SecpOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
+    const rewardOutputOwners:SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
 
     const UTx:AddDelegatorTx = new AddDelegatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners));
     return new UnsignedTx(UTx);
@@ -694,7 +694,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const rewardOutputOwners:SecpOwnerOutput = new SecpOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
+    const rewardOutputOwners:SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
 
     const UTx:AddValidatorTx = new AddValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners), delegationFee);
     return new UnsignedTx(UTx);

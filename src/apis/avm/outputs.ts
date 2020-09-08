@@ -19,10 +19,10 @@ const bintools = BinTools.getInstance();
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
     if(outputid == AVMConstants.SECPXFEROUTPUTID){
-        let secpout:SecpTransferOutput = new SecpTransferOutput( ...args);
+        let secpout:SECPTransferOutput = new SECPTransferOutput( ...args);
         return secpout;
     } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
-        let secpmintout:SecpMintOutput = new SecpMintOutput( ...args);
+        let secpmintout:SECPMintOutput = new SECPMintOutput( ...args);
         return secpmintout;
     } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
         let nftout:NFTMintOutput = new NFTMintOutput(...args);
@@ -77,7 +77,7 @@ export abstract class NFTOutput extends BaseNFTOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpTransferOutput extends AmountOutput {
+export class SECPTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
@@ -86,11 +86,11 @@ export class SecpTransferOutput extends AmountOutput {
   }
 
   create(...args:any[]):this{
-    return new SecpTransferOutput(...args) as this;
+    return new SECPTransferOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpTransferOutput = this.create()
+    const newout:SECPTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
@@ -100,7 +100,7 @@ export class SecpTransferOutput extends AmountOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpMintOutput extends Output {
+export class SECPMintOutput extends Output {
 
   /**
    * Returns the outputID for this output
@@ -118,11 +118,11 @@ export class SecpMintOutput extends Output {
   }
 
   create(...args:any[]):this{
-    return new SecpMintOutput(...args) as this;
+    return new SECPMintOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpMintOutput = this.create()
+    const newout:SECPMintOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }

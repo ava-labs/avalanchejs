@@ -18,9 +18,9 @@ const bintools = BinTools.getInstance();
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
     if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
-        return new SecpTransferOutput( ...args);
+        return new SECPTransferOutput( ...args);
     } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
-      return new SecpOwnerOutput(...args);
+      return new SECPOwnerOutput(...args);
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }
@@ -62,7 +62,7 @@ export abstract class AmountOutput extends StandardAmountOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpTransferOutput extends AmountOutput {
+export class SECPTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
@@ -71,11 +71,11 @@ export class SecpTransferOutput extends AmountOutput {
   }
 
   create(...args:any[]):this{
-    return new SecpTransferOutput(...args) as this;
+    return new SECPTransferOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpTransferOutput = this.create()
+    const newout:SECPTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
@@ -84,7 +84,7 @@ export class SecpTransferOutput extends AmountOutput {
 /**
  * An [[Output]] class which only specifies an Output ownership and uses secp256k1 signature scheme.
  */
-export class SecpOwnerOutput extends Output {
+export class SECPOwnerOutput extends Output {
   /**
      * Returns the outputID for this output
      */
@@ -101,11 +101,11 @@ export class SecpOwnerOutput extends Output {
   }
 
   create(...args:any[]):this{
-    return new SecpOwnerOutput(...args) as this;
+    return new SECPOwnerOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpOwnerOutput = this.create()
+    const newout:SECPOwnerOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }

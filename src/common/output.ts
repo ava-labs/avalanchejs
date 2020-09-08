@@ -252,7 +252,7 @@ export class OutputOwners {
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
      */
   constructor(addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
-    if (addresses) {
+    if(typeof addresses !== "undefined" && addresses.length) {
       const addrs:Array<Address> = [];
       for (let i = 0; i < addresses.length; i++) {
         addrs[i] = new Address();
@@ -261,11 +261,11 @@ export class OutputOwners {
       this.addresses = addrs;
       this.addresses.sort(Address.comparator());
       this.numaddrs.writeUInt32BE(this.addresses.length, 0);
+    }
+    if(typeof threshold !== undefined) {
       this.threshold.writeUInt32BE((threshold || 1), 0);
-      if (!(locktime)) {
-        /* istanbul ignore next */
-        locktime = new BN(0);
-      }
+    }
+    if (typeof locktime !== "undefined") {
       this.locktime = bintools.fromBNToBuffer(locktime, 8);
     }
   }

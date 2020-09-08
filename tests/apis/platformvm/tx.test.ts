@@ -3,12 +3,12 @@ import { UTXOSet, UTXO } from 'src/apis/platformvm/utxos';
 import { PlatformVMAPI } from 'src/apis/platformvm/api';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
-import { SecpInput, TransferableInput } from 'src/apis/platformvm/inputs';
+import { SECPInput, TransferableInput } from 'src/apis/platformvm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
-import { SecpTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
+import { SECPTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { Avalanche } from 'src/index';
 import { UTF8Payload } from 'src/utils/payload';
@@ -122,7 +122,7 @@ describe('Transactions', () => {
     for (let i:number = 0; i < 5; i++) {
       let txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
       let txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
-      const out:SecpTransferOutput = new SecpTransferOutput(amount, addresses, locktime, threshold);
+      const out:SECPTransferOutput = new SECPTransferOutput(amount, addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
       outputs.push(xferout);
 
@@ -134,7 +134,7 @@ describe('Transactions', () => {
       txid = u.getTxID();
       txidx = u.getOutputIdx();
 
-      const input:SecpInput = new SecpInput(amount);
+      const input:SECPInput = new SECPInput(amount);
       const xferin:TransferableInput = new TransferableInput(txid, txidx, assetID, input);
       inputs.push(xferin);
     }
@@ -153,11 +153,11 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
-    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SECPTransferOutput = new SECPTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
-    const input:SecpInput = new SecpInput(inputAmt);
+    const input:SECPInput = new SECPInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -177,11 +177,11 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("266");
-    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SECPTransferOutput = new SECPTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(assetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
-    const input:SecpInput = new SecpInput(inputAmt);
+    const input:SECPInput = new SECPInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -205,11 +205,11 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("267");
-    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SECPTransferOutput = new SECPTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
-    const input:SecpInput = new SecpInput(inputAmt);
+    const input:SECPInput = new SECPInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -227,11 +227,11 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("609555500000");
-    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SECPTransferOutput = new SECPTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("45000000000000000");
-    const input:SecpInput = new SecpInput(inputAmt);
+    const input:SECPInput = new SECPInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -249,11 +249,11 @@ describe('Transactions', () => {
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
     const outputAmt:BN = new BN("44995609555500000");
-    const output:SecpTransferOutput = new SecpTransferOutput(outputAmt, addrs1, new BN(0), 1);
+    const output:SECPTransferOutput = new SECPTransferOutput(outputAmt, addrs1, new BN(0), 1);
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("45000000000000000");
-    const input:SecpInput = new SecpInput(inputAmt);
+    const input:SECPInput = new SECPInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));

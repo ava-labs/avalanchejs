@@ -11,8 +11,8 @@ import { AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../utils/payload';
-import { TransferableInput, SecpInput } from './inputs';
-import { AmountOutput } from './outputs';
+import { TransferableInput, SECPInput } from './inputs';
+import { AmountOutput, SECPMintOutput } from './outputs';
 import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
@@ -21,6 +21,7 @@ import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/consta
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
+import { SECPTransferOutput } from '../platformvm/outputs';
 
 /**
  * @ignore
@@ -578,25 +579,25 @@ export class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Helper function which creates an unsigned transaction. For more granular control, you may create your own
-     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-     *
-     * @param utxoset A set of UTXOs that the transaction is built on
-     * @param amount The amount of AssetID to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
-     * @param assetID The assetID of the value being sent
-     * @param toAddresses The addresses to send the funds
-     * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
-     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
-     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-     *
-     * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[BaseTx]].
-     *
-     * @remarks
-     * This helper exists because the endpoint API should be the primary point of entry for most functionality.
-     */
+   * Helper function which creates an unsigned transaction. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param amount The amount of AssetID to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
+   * @param assetID The assetID of the value being sent
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[BaseTx]].
+   *
+   * @remarks
+   * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+   */
   buildBaseTx = async (
     utxoset:UTXOSet, 
     amount:BN, 
@@ -643,27 +644,29 @@ export class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Helper function which creates an unsigned NFT Transfer. For more granular control, you may create your own
-     * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
-     *
-     * @param utxoset  A set of UTXOs that the transaction is built on
-     * @param toAddresses The addresses to send the NFT
-     * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
-     * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
-     * @param memo Optional contains arbitrary bytes, up to 256 bytes
-     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-     * @param locktime Optional. The locktime field created in the resulting outputs
-     * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-     *
-     * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[NFTTransferTx]].
-     *
-     * @remarks
-     * This helper exists because the endpoint API should be the primary point of entry for most functionality.
-     */
+   * Helper function which creates an unsigned NFT Transfer. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset  A set of UTXOs that the transaction is built on
+   * @param toAddresses The addresses to send the NFT
+   * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[NFTTransferTx]].
+   *
+   * @remarks
+   * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+   */
   buildNFTTransferTx = async (
     utxoset:UTXOSet, 
     toAddresses:Array<string>, 
     fromAddresses:Array<string>, 
+    changeAddresses:Array<string>, 
     utxoid:string | Array<string>, 
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(), 
@@ -672,6 +675,7 @@ export class AVMAPI extends JRPCAPI {
   ):Promise<UnsignedTx> => {
     const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -689,7 +693,8 @@ export class AVMAPI extends JRPCAPI {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       to, 
-      from, 
+      from,
+      change,
       utxoidArray, 
       this.getFee(),
       avaxAssetID, 
@@ -879,6 +884,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param utxoset A set of UTXOs that the transaction is built on
    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
    * @param initialState The [[InitialStates]] that represent the intial state of a created asset
    * @param name String for the descriptive name of the asset
    * @param symbol String for the ticker symbol of the asset
@@ -891,7 +897,8 @@ export class AVMAPI extends JRPCAPI {
    */
   buildCreateAssetTx = async (
       utxoset:UTXOSet, 
-      fromAddresses:Array<string> | Array<Buffer>, 
+      fromAddresses:Array<string>, 
+      changeAddresses:Array<string> ,
       initialStates:InitialStates, 
       name:string, 
       symbol:string, 
@@ -900,6 +907,7 @@ export class AVMAPI extends JRPCAPI {
       asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
     let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
+    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -921,6 +929,7 @@ export class AVMAPI extends JRPCAPI {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       from,
+      change,
       initialStates,
       name, 
       symbol, 
@@ -938,12 +947,50 @@ export class AVMAPI extends JRPCAPI {
     return builtUnsignedTx;
   };
 
+  buildSECPMintTx = async (
+    utxoset:UTXOSet,  
+    mintOwner:SECPMintOutput,
+    transferOwners:Array<SECPTransferOutput>,
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
+    mintUTXOID:string,
+    memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
+  ): Promise<any> => {
+    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildSECPMintTx").map(a => bintools.stringToAddress(a));
+    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildSECPMintTx").map(a => bintools.stringToAddress(a));
+    
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
+
+    let avaxAssetID:Buffer = await this.getAVAXAssetID();
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildSECPMintTx(
+        this.core.getNetworkID(),
+        bintools.cb58Decode(this.blockchainID),
+        mintOwner,
+        transferOwners,
+        from,
+        change,
+        mintUTXOID,
+        this.getFee(),
+        avaxAssetID,
+        memo, asOf
+    );
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+    return builtUnsignedTx;
+  }
+
   /**
-   * Creates an unsigned transaction. For more granular control, you may create your own
+  * Creates an unsigned transaction. For more granular control, you may create your own
   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
   * 
   * @param utxoset A set of UTXOs that the transaction is built on
   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+  * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
   * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
   * @param name String for the descriptive name of the asset
   * @param symbol String for the ticker symbol of the asset
@@ -976,13 +1023,15 @@ export class AVMAPI extends JRPCAPI {
   */
   buildCreateNFTAssetTx = async (
     utxoset:UTXOSet, 
-    fromAddresses:Array<string> | Array<Buffer>, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
     minterSets:MinterSet[], 
     name:string, 
     symbol:string, 
     memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0)
   ): Promise<UnsignedTx> => {
     let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1001,6 +1050,7 @@ export class AVMAPI extends JRPCAPI {
         this.core.getNetworkID(), 
         bintools.cb58Decode(this.blockchainID),
         from,
+        change,
         minterSets,
         name, 
         symbol,
@@ -1022,6 +1072,7 @@ export class AVMAPI extends JRPCAPI {
   * @param utxoset  A set of UTXOs that the transaction is built on
   * @param owners Either a single or an array of [[OutputOwners]] to send the nft output
   * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
+  * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
   * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
   * @param groupID Optional. The group this NFT is issued to.
   * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
@@ -1034,13 +1085,15 @@ export class AVMAPI extends JRPCAPI {
   buildCreateNFTMintTx = async (
     utxoset:UTXOSet,  
     owners:Array<OutputOwners>|OutputOwners, 
-    fromAddresses:Array<string>|Array<Buffer>, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
     utxoid:string|Array<string>,
     groupID:number = 0, 
     payload:PayloadBase|Buffer = undefined, 
     memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
   ): Promise<any> => {
     let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1065,6 +1118,7 @@ export class AVMAPI extends JRPCAPI {
         bintools.cb58Decode(this.blockchainID),
         owners,
         from,
+        change,
         utxoid,
         groupID,
         payload,
