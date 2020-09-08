@@ -11,7 +11,7 @@ import { AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../utils/payload';
-import { TransferableInput, SECPInput } from './inputs';
+import { TransferableInput, SECPTransferInput } from './inputs';
 import { AmountOutput, SECPMintOutput } from './outputs';
 import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
@@ -888,8 +888,9 @@ export class AVMAPI extends JRPCAPI {
    * @param initialState The [[InitialStates]] that represent the intial state of a created asset
    * @param name String for the descriptive name of the asset
    * @param symbol String for the ticker symbol of the asset
-   * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param denomination Number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
+   * @param mintOutputs Optional. Array of [[SECPMintOutput]]s to be included in the transaction. These outputs can be spent to mint more tokens.
+   * @param memo Optional. Contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
@@ -903,6 +904,7 @@ export class AVMAPI extends JRPCAPI {
       name:string, 
       symbol:string, 
       denomination:number, 
+      mintOutputs:Array<SECPMintOutput> = undefined,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
@@ -934,6 +936,7 @@ export class AVMAPI extends JRPCAPI {
       name, 
       symbol, 
       denomination, 
+      mintOutputs,
       this.getFee(), 
       avaxAssetID,
       memo, asOf

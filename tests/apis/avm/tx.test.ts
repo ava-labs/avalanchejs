@@ -3,7 +3,7 @@ import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { AVMAPI } from 'src/apis/avm/api';
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { SECPInput, TransferableInput } from 'src/apis/avm/inputs';
+import { SECPTransferInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
@@ -140,7 +140,7 @@ describe('Transactions', () => {
       txid = u.getTxID();
       txidx = u.getOutputIdx();
 
-      const input:SECPInput = new SECPInput(amount);
+      const input:SECPTransferInput = new SECPTransferInput(amount);
       const xferin:TransferableInput = new TransferableInput(txid, txidx, assetID, input);
       inputs.push(xferin);
 
@@ -170,7 +170,7 @@ describe('Transactions', () => {
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
-    const input:SECPInput = new SECPInput(inputAmt);
+    const input:SECPTransferInput = new SECPTransferInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -192,7 +192,7 @@ describe('Transactions', () => {
     const transferableOutput:TransferableOutput = new TransferableOutput(assetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
-    const input:SECPInput = new SECPInput(inputAmt);
+    const input:SECPTransferInput = new SECPTransferInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -218,7 +218,7 @@ describe('Transactions', () => {
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("400");
-    const input:SECPInput = new SECPInput(inputAmt);
+    const input:SECPTransferInput = new SECPTransferInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -238,7 +238,7 @@ describe('Transactions', () => {
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("45000000000000000");
-    const input:SECPInput = new SECPInput(inputAmt);
+    const input:SECPTransferInput = new SECPTransferInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));
@@ -258,7 +258,7 @@ describe('Transactions', () => {
     const transferableOutput:TransferableOutput = new TransferableOutput(avaxAssetID, output);
     outs.push(transferableOutput);
     const inputAmt:BN = new BN("45000000000000000");
-    const input:SECPInput = new SECPInput(inputAmt);
+    const input:SECPTransferInput = new SECPTransferInput(inputAmt);
     input.addSignatureIdx(0, addrs1[0]);
     const txid:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
     const outputIndex:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(0), 4));

@@ -8,7 +8,7 @@ import BN from "bn.js";
 import { AmountOutput, SelectOutputClass, TransferableOutput, NFTTransferOutput, NFTMintOutput, SECPMintOutput, SECPTransferOutput } from './outputs';
 import { AVMConstants } from './constants';
 import { UnsignedTx } from './tx';
-import { SECPInput, TransferableInput } from './inputs';
+import { SECPTransferInput, TransferableInput } from './inputs';
 import { NFTTransferOperation, TransferableOperation, NFTMintOperation, SECPMintOperation } from './ops';
 import { Output, OutputOwners } from '../../common/output';
 import { UnixNow } from '../../utils/helperfunctions';
@@ -146,7 +146,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           am.spendAmount(amount);
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
-          const input:SECPInput = new SECPInput(amount);
+          const input:SECPTransferInput = new SECPTransferInput(amount);
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
           const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
           for (let j = 0; j < spenders.length; j++) {
@@ -293,6 +293,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
    * @param name String for the descriptive name of the asset
    * @param symbol String for the ticker symbol of the asset
    * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
+   * @param mintOutputs Optional. Array of [[SECPMintOutput]]s to be included in the transaction. These outputs can be spent to mint more tokens.
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
    * @param feeAssetID Optional. The assetID of the fees being burned.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -310,6 +311,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       name:string, 
       symbol:string, 
       denomination:number, 
+      mintOutputs:Array<SECPMintOutput> = undefined,
       fee:BN = undefined,
       feeAssetID:Buffer = undefined, 
       memo:Buffer = undefined, 
@@ -330,6 +332,16 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         throw success;
       }
     }
+    if(typeof mintOutputs !== "undefined"){
+      for(let i = 0; i < mintOutputs.length; i++){
+        if(mintOutputs[i] instanceof SECPMintOutput){
+          initialState.addOutput(mintOutputs[i]);
+        } else {
+          throw new Error("Error - UTXOSet.buildCreateAssetTx: A submitted mintOutput was not of type SECPMintOutput");
+        }
+      }
+    }
+
     let CAtx:CreateAssetTx = new CreateAssetTx(networkid, blockchainid, outs, ins, memo, name, symbol, denomination, initialState);
     return new UnsignedTx(CAtx);
   }
@@ -699,7 +711,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       const txid:Buffer = utxo.getTxID();
       const outputidx:Buffer = utxo.getOutputIdx();
-      const input:SECPInput = new SECPInput(amt);
+      const input:SECPTransferInput = new SECPTransferInput(amt);
       const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
       const from:Array<Buffer> = output.getAddresses(); 
       const spenders:Array<Buffer> = output.getSpenders(from, asOf);

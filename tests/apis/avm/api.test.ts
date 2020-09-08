@@ -6,7 +6,7 @@ import {Buffer} from "buffer/";
 import BN from "bn.js";
 import BinTools from 'src/utils/bintools';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
-import { TransferableInput, SECPInput } from 'src/apis/avm/inputs';
+import { TransferableInput, SECPTransferInput } from 'src/apis/avm/inputs';
 import createHash from "create-hash";
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
 import { AVMConstants } from 'src/apis/avm/constants';
@@ -559,7 +559,8 @@ describe('AVMAPI', () => {
     const symbol:string = 'morT';
     const denomination:number = 8;
 
-    let secpMintOut:SECPMintOutput;
+    let secpMintOut1:SECPMintOutput;
+    let secpMintOut2:SECPMintOutput;
     let secpMintTXID:Buffer;
     let secpMintUTXO:UTXO;
     let secpMintXferOut1:SECPTransferOutput;
@@ -629,7 +630,7 @@ describe('AVMAPI', () => {
         txidx = u.getOutputIdx();
         const asset = u.getAssetID();
 
-        const input:SECPInput = new SECPInput(amount);
+        const input:SECPTransferInput = new SECPTransferInput(amount);
         const xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
         inputs.push(xferinput);
 
@@ -660,12 +661,13 @@ describe('AVMAPI', () => {
       nftInitialState.addOutput(nftpbase2, AVMConstants.NFTFXID);
       nftInitialState.addOutput(nftpbase3, AVMConstants.NFTFXID);
 
-      secpMintOut = new SECPMintOutput(addressbuffs, new BN(0), 1);
+      secpMintOut1 = new SECPMintOutput(addressbuffs, new BN(0), 1);
+      secpMintOut2 = new SECPMintOutput(addressbuffs, new BN(0), 1);
       secpMintTXID = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(1337), 32)).digest());
-      secpMintUTXO = new UTXO(AVMConstants.LATESTCODEC, secpMintTXID, 0, assetID, secpMintOut);
+      secpMintUTXO = new UTXO(AVMConstants.LATESTCODEC, secpMintTXID, 0, assetID, secpMintOut1);
       secpMintXferOut1 = new SECPTransferOutput(new BN(123), addrs3.map((a) => avm.parseAddress(a)), UnixNow(), 2);
       secpMintXferOut2 = new SECPTransferOutput(new BN(456), [avm.parseAddress(addrs2[0])], UnixNow(), 1);
-      secpMintOp = new SECPMintOperation(secpMintOut, [secpMintXferOut1, secpMintXferOut2]);
+      secpMintOp = new SECPMintOperation(secpMintOut1, [secpMintXferOut1, secpMintXferOut2]);
 
       set.add(secpMintUTXO);
 
@@ -802,7 +804,7 @@ describe('AVMAPI', () => {
         expect(response).toBe(txid);
       });
 
-    test('buildCreateAssetTx', async () => {
+    test('buildCreateAssetTx - Fixed Cap', async () => {
       avm.setFee(new BN(fee));
       const txu1:UnsignedTx = await avm.buildCreateAssetTx(
         set, 
@@ -823,6 +825,39 @@ describe('AVMAPI', () => {
         name, 
         symbol, 
         denomination,
+        undefined,
+        avm.getFee(),
+        assetID
+      );
+
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+    });
+
+    test('buildCreateAssetTx - Variable Cap', async () => {
+      avm.setFee(new BN(fee));
+      let mintOutputs:Array<SECPMintOutput>  = [secpMintOut1, secpMintOut2];
+      const txu1:UnsignedTx = await avm.buildCreateAssetTx(
+        set, 
+        addrs1, 
+        addrs2,
+        initialState, 
+        name, 
+        symbol, 
+        denomination,
+        mintOutputs
+      );
+  
+      const txu2:UnsignedTx = set.buildCreateAssetTx(
+        avalanche.getNetworkID(), 
+        bintools.cb58Decode(avm.getBlockchainID()), 
+        addrs1.map((a) => avm.parseAddress(a)), 
+        addrs2.map((a) => avm.parseAddress(a)), 
+        initialState, 
+        name, 
+        symbol, 
+        denomination,
+        mintOutputs,
         avm.getFee(),
         assetID
       );

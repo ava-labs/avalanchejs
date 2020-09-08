@@ -22,7 +22,7 @@ const bintools = BinTools.getInstance();
  */
 export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
   if (inputid === AVMConstants.SECPINPUTID) {
-    const secpin:SECPInput = new SECPInput(...args);
+    const secpin:SECPTransferInput = new SECPTransferInput(...args);
     return secpin;
   }
   /* istanbul ignore next */
@@ -59,7 +59,7 @@ export abstract class AmountInput extends StandardAmountInput {
   }
 }
 
-export class SECPInput extends AmountInput {
+export class SECPTransferInput extends AmountInput {
   /**
      * Returns the inputID for this input
      */
@@ -70,11 +70,11 @@ export class SECPInput extends AmountInput {
   getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
 
   create(...args:any[]):this{
-    return new SECPInput(...args) as this;
+    return new SECPTransferInput(...args) as this;
   }
 
   clone():this {
-    const newout:SECPInput = this.create()
+    const newout:SECPTransferInput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }

@@ -1,6 +1,6 @@
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { AVMKeyChain } from 'src/apis/avm/keychain';
-import { SECPInput, TransferableInput } from 'src/apis/avm/inputs';
+import { SECPTransferInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
@@ -58,7 +58,7 @@ describe('Inputs', () => {
     let txid:Buffer;
     let txidx:Buffer;
     const amount:BN = new BN(amnt);
-    let input:SECPInput;
+    let input:SECPTransferInput;
     let xferinput:TransferableInput;
 
     u = utxos[0];
@@ -66,7 +66,7 @@ describe('Inputs', () => {
     txidx = u.getOutputIdx();
     const asset = u.getAssetID();
 
-    input = new SECPInput(amount);
+    input = new SECPTransferInput(amount);
     xferinput = new TransferableInput(txid, txidx, asset, input);
     expect(xferinput.getUTXOID()).toBe(u.getUTXOID());
     expect(input.getInputID()).toBe(AVMConstants.SECPINPUTID);
@@ -74,18 +74,18 @@ describe('Inputs', () => {
     input.addSignatureIdx(0, addrs2[0]);
     input.addSignatureIdx(1, addrs2[1]);
 
-    const newin:SECPInput = new SECPInput();
+    const newin:SECPTransferInput = new SECPTransferInput();
     newin.fromBuffer(bintools.b58ToBuffer(input.toString()));
     expect(newin.toBuffer().toString('hex')).toBe(input.toBuffer().toString('hex'));
     expect(newin.getSigIdxs().toString()).toBe(input.getSigIdxs().toString());
   });
 
   test('Input comparator', () => {
-    const inpt1:SECPInput = new SECPInput((utxos[0].getOutput() as AmountOutput).getAmount());
+    const inpt1:SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
 
-    const inpt2:SECPInput = new SECPInput((utxos[1].getOutput() as AmountOutput).getAmount());
+    const inpt2:SECPTransferInput = new SECPTransferInput((utxos[1].getOutput() as AmountOutput).getAmount());
 
-    const inpt3:SECPInput = new SECPInput((utxos[2].getOutput() as AmountOutput).getAmount());
+    const inpt3:SECPTransferInput = new SECPTransferInput((utxos[2].getOutput() as AmountOutput).getAmount());
 
     const cmp = Input.comparator();
     expect(cmp(inpt1, inpt2)).toBe(-1);
@@ -96,13 +96,13 @@ describe('Inputs', () => {
   });
 
   test('TransferableInput comparator', () => {
-    const inpt1:SECPInput = new SECPInput((utxos[0].getOutput() as AmountOutput).getAmount());
+    const inpt1:SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
     const in1:TransferableInput = new TransferableInput(utxos[0].getTxID(), utxos[0].getOutputIdx(), utxos[0].getAssetID(), inpt1);
 
-    const inpt2:SECPInput = new SECPInput((utxos[1].getOutput() as AmountOutput).getAmount());
+    const inpt2:SECPTransferInput = new SECPTransferInput((utxos[1].getOutput() as AmountOutput).getAmount());
     const in2:TransferableInput = new TransferableInput(utxos[1].getTxID(), utxos[1].getOutputIdx(), utxos[1].getAssetID(), inpt2);
 
-    const inpt3:SECPInput = new SECPInput((utxos[2].getOutput() as AmountOutput).getAmount());
+    const inpt3:SECPTransferInput = new SECPTransferInput((utxos[2].getOutput() as AmountOutput).getAmount());
     const in3:TransferableInput = new TransferableInput(utxos[2].getTxID(), utxos[2].getOutputIdx(), utxos[2].getAssetID(), inpt3);
 
     const cmp = TransferableInput.comparator();
