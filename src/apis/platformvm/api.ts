@@ -14,7 +14,7 @@ import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXOSet } from '../platformvm/utxos';
+import { UTXOSet, UTXO } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import axios from 'axios';
 
@@ -754,8 +754,6 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
-    assetID:Buffer|string = undefined,
-    typeID:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
     
@@ -774,12 +772,7 @@ export class PlatformVMAPI extends JRPCAPI {
     if(typeof sourceChain !== "undefined") {
       params.sourceChain = sourceChain;
     }
-    let asset:Buffer;
-    if(typeof assetID === "string") {
-      asset = bintools.cb58Decode(assetID);
-    } else {
-      asset = assetID;
-    }
+
 axios.interceptors.request.use(request => {
   return request
 })
@@ -800,7 +793,7 @@ axios.interceptors.request.use(request => {
         }
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data, false, asset, typeID);
+      utxos.addArray(data, false);
       return utxos;
     });
   };

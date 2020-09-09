@@ -11,8 +11,7 @@ import { AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../utils/payload';
-import { TransferableInput, SECPTransferInput } from './inputs';
-import { AmountOutput, SECPMintOutput } from './outputs';
+import { SECPMintOutput } from './outputs';
 import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
@@ -538,8 +537,6 @@ export class AVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
-    assetID:Buffer|string = undefined,
-    typeID:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
 
@@ -561,13 +558,6 @@ export class AVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    let asset:Buffer;
-    if(typeof assetID === "string") {
-      asset = bintools.cb58Decode(assetID);
-    } else {
-      asset = assetID;
-    }
-
     return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
@@ -584,7 +574,7 @@ export class AVMAPI extends JRPCAPI {
         }
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data, false, asset, typeID);
+      utxos.addArray(data, false);
       return utxos;
     });
   };
