@@ -314,7 +314,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
    *
    */
-  getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
+  getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<object> => {
     const params:any = {};
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
@@ -322,7 +322,7 @@ export class PlatformVMAPI extends JRPCAPI {
       params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.getCurrentValidators', params)
-      .then((response:RequestResponseData) => response.data.result.validators);
+      .then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -334,7 +334,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
    *
    */
-  getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
+  getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<object> => {
     const params:any = {};
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
@@ -343,7 +343,7 @@ export class PlatformVMAPI extends JRPCAPI {
     }
 
     return this.callMethod('platform.getPendingValidators', params)
-      .then((response:RequestResponseData) => response.data.result.validators);
+      .then((response:RequestResponseData) => response.data.result);
   };
 
   /**
