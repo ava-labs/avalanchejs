@@ -563,7 +563,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
   /**
   * Creates an unsigned NFT transfer transaction. For more granular control, you may create your own
-  * [[NFTTransferOperation]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+  * [[OperationTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
   *
   * @param networkid The number representing NetworkID of the node
   * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
