@@ -525,6 +525,7 @@ export class AVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
+   * @param assetID An assetID to filter on the recieved UTXOs
    * @param typeID A number of the typeID to filter on the recieved UTXOs
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
@@ -537,6 +538,7 @@ export class AVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
+    assetID:Buffer|string = undefined,
     typeID:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
@@ -559,6 +561,13 @@ export class AVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
+    let asset:Buffer;
+    if(typeof assetID === "string") {
+      asset = bintools.cb58Decode(assetID);
+    } else {
+      asset = assetID;
+    }
+
     return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
@@ -575,7 +584,7 @@ export class AVMAPI extends JRPCAPI {
         }
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data, false, typeID);
+      utxos.addArray(data, false, asset, typeID);
       return utxos;
     });
   };
