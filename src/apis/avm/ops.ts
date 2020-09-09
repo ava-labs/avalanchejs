@@ -283,7 +283,7 @@ export class SECPMintOperation extends Operation {
   }
 
   /**
-   * An [[Operation]] class which contains an NFT on an assetID.
+   * An [[Operation]] class which mints new tokens on an assetID.
    * 
    * @param mintOutput The [[SECPMintOutput]] that will be produced by this transaction.
    * @param transferOutputs An array of [[SECPTransferOutput]]s that will be produced from this minting operation.
