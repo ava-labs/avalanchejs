@@ -223,7 +223,7 @@ export class SECPMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.NFTMINTOPID;
+    return AVMConstants.SECPMINTOPID;
   }
 
   /**
