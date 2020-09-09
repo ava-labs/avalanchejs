@@ -216,12 +216,30 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
      *
      * @returns An array of StandardUTXOs which were added.
      */
-  addArray(utxos:Array<string | UTXOClass>, overwrite:boolean = false):Array<StandardUTXO> {
+  addArray(utxos:Array<string | UTXOClass>, overwrite:boolean = false, assetID:Buffer = undefined, typeID:number = undefined):Array<StandardUTXO> {
     const added:Array<UTXOClass> = [];
     for (let i = 0; i < utxos.length; i++) {
-      const result:UTXOClass = this.add(utxos[i], overwrite);
+      let result:UTXOClass = this.add(utxos[i], overwrite);
       if (typeof result !== 'undefined') {
-        added.push(result);
+        if( (
+              typeof typeID === "number" 
+              && 
+              result.getOutput().getOutputID() !== typeID
+            )
+          || 
+            (
+              typeof assetID !== "undefined" 
+              && 
+              assetID instanceof Buffer 
+              && 
+              assetID.toString("hex") !== result.getAssetID().toString("hex")
+            )
+        ){
+          this.remove(result);
+        } else {
+          added.push(result);
+        }
+        
       }
     }
     return added;

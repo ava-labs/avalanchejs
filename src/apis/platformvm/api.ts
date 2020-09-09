@@ -741,6 +741,8 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
+   * @param assetID An assetID to filter on the recieved UTXOs
+   * @param typeID A number of the typeID to filter on the recieved UTXOs
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -752,6 +754,8 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
+    assetID:Buffer|string = undefined,
+    typeID:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
     
@@ -770,10 +774,17 @@ export class PlatformVMAPI extends JRPCAPI {
     if(typeof sourceChain !== "undefined") {
       params.sourceChain = sourceChain;
     }
+    let asset:Buffer;
+    if(typeof assetID === "string") {
+      asset = bintools.cb58Decode(assetID);
+    } else {
+      asset = assetID;
+    }
 axios.interceptors.request.use(request => {
   return request
 })
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
+
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
       if (persistOpts && typeof persistOpts === 'object') {
@@ -789,7 +800,7 @@ axios.interceptors.request.use(request => {
         }
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data);
+      utxos.addArray(data, false, asset, typeID);
       return utxos;
     });
   };

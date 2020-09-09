@@ -10,8 +10,8 @@ import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
-import { SecpTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
-import { TransferableInput, SecpInput } from 'src/apis/platformvm/inputs';
+import { SECPTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
+import { TransferableInput, SECPTransferInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
@@ -651,7 +651,7 @@ describe('PlatformVMAPI', () => {
     const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
     expect(persistOpts.getMergeRule()).toBe('union');
     let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:Promise<UTXOSet> = api.getUTXOs(addresses, api.getBlockchainID(), 0, 1, persistOpts);
+    let result:Promise<UTXOSet> = api.getUTXOs(addresses, api.getBlockchainID(), 0, 1, undefined, undefined, persistOpts);
     const payload:object = {
       result: {
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
@@ -668,7 +668,7 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, api.getBlockchainID(), 0, 0, persistOpts);
+    result = api.getUTXOs(addresses, api.getBlockchainID(), 0, 0, undefined, undefined, persistOpts);
 
     mockAxios.mockResponse(responseObj);
     response = await result;
@@ -693,9 +693,9 @@ describe('PlatformVMAPI', () => {
     const amnt:number = 10000;
     const assetID:Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest());
     const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
-    let secpbase1:SecpTransferOutput;
-    let secpbase2:SecpTransferOutput;
-    let secpbase3:SecpTransferOutput;
+    let secpbase1:SECPTransferOutput;
+    let secpbase2:SECPTransferOutput;
+    let secpbase3:SECPTransferOutput;
     let fungutxoids:Array<string> = [];
     let platformvm:PlatformVMAPI;
     const fee:number = 10;
@@ -749,7 +749,7 @@ describe('PlatformVMAPI', () => {
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
         
-        const out:SecpTransferOutput = new SecpTransferOutput(amount, addressbuffs, locktime, threshold);
+        const out:SECPTransferOutput = new SECPTransferOutput(amount, addressbuffs, locktime, threshold);
         const xferout:TransferableOutput = new TransferableOutput(assetID, out);
         outputs.push(xferout);
 
@@ -762,15 +762,15 @@ describe('PlatformVMAPI', () => {
         txidx = u.getOutputIdx();
         const asset = u.getAssetID();
 
-        const input:SecpInput = new SecpInput(amount);
+        const input:SECPTransferInput = new SECPTransferInput(amount);
         const xferinput:TransferableInput = new TransferableInput(txid, txidx, asset, input);
         inputs.push(xferinput);
       }
       set.addArray(utxos);
 
-      secpbase1 = new SecpTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
-      secpbase2 = new SecpTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
-      secpbase3 = new SecpTransferOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase1 = new SECPTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase2 = new SECPTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase3 = new SECPTransferOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
 
     });
 

@@ -38,9 +38,11 @@ export class AVMConstants {
 
   static SECPINPUTID:number = 5;
 
+  static SECPMINTOPID:number = 8;
+
   static NFTMINTOPID:number = 12;
 
-  static NFTXFEROP:number = 13;
+  static NFTXFEROPID:number = 13;
 
   static BASETX:number = 0;
 

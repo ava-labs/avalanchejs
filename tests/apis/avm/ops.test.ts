@@ -96,7 +96,7 @@ describe('Operations', () => {
             let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1);
             let op:NFTTransferOperation = new NFTTransferOperation(nout);
         
-            expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROP);
+            expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROPID);
             expect(op.getOutput().toString()).toBe(nout.toString());
         
             let opcopy:NFTTransferOperation = new NFTTransferOperation();
