@@ -17,6 +17,7 @@ import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet, UTXO } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import axios from 'axios';
+import { SECPOwnerOutput } from './outputs';
 
 /**
  * @ignore
@@ -1179,6 +1180,61 @@ axios.interceptors.request.use(request => {
       rewardThreshold,
       rewards,
       delegationFee,
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  }
+
+  /**
+    * Class representing an unsigned [[CreateSubnetTx]] transaction.
+    *
+    * @param utxoset A set of UTXOs that the transaction is built on
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+    * @param subnetOwnerAddresses An array of addresses for owners of the new subnet
+    * @param subnetOwnerLocktime A {@link https://github.com/indutny/bn.js/|BN} representing when the subnet owners can change the subnet
+    * @param subnetOwnerThreshold A number for how many subnet owners are required to sign for a change
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * 
+    * @returns An unsigned transaction created from the passed in parameters.
+    */
+  buildCreateSubnetTx = async (
+    utxoset:UTXOSet, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
+    subnetOwnerAddresses:Array<string>,
+    subnetOwnerLocktime:BN = new BN(0),
+    subnetOwnerThreshold:number = 1,
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow()
+  ):Promise<UnsignedTx> => {
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
+    const owners:Array<Buffer> = this._cleanAddressArray(subnetOwnerAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
+
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
+
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateSubnetTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      from,
+      change,
+      new SECPOwnerOutput(owners, subnetOwnerLocktime, subnetOwnerThreshold),
       this.getFee(), 
       avaxAssetID,
       memo, asOf
