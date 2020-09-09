@@ -47,7 +47,10 @@ export abstract class Operation {
      */
   getSigIdxs = ():Array<SigIdx> => this.sigIdxs;
 
-  getCredentialID = ():number => AVMConstants.NFTCREDENTIAL;
+  /**
+   * Returns the credential ID.
+   */
+  abstract getCredentialID():number;
 
   /**
      * Creates and adds a [[SigIdx]] to the [[Operation]].
@@ -175,18 +178,18 @@ export class TransferableOperation {
   }
 
   /**
-     * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
-     */
+   * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
+   */
   getAssetID = ():Buffer => this.assetid;
 
   /**
-     * Returns an array of UTXOIDs in this operation.
-     */
+   * Returns an array of UTXOIDs in this operation.
+   */
   getUTXOIDs = ():Array<UTXOID> => this.utxoIDs;
 
   /**
-     * Returns the operation
-     */
+   * Returns the operation
+   */
   getOperation = ():Operation => this.operation;
 
   constructor(assetid:Buffer = undefined, utxoids:Array<UTXOID|string|Buffer> = undefined, operation:Operation = undefined) {
@@ -224,6 +227,13 @@ export class SECPMintOperation extends Operation {
    */
   getOperationID():number {
     return AVMConstants.SECPMINTOPID;
+  }
+
+  /**
+   * Returns the credential ID.
+   */
+  getCredentialID():number {
+    return AVMConstants.SECPCREDENTIAL;
   }
 
   /**
@@ -313,6 +323,13 @@ export class NFTMintOperation extends Operation {
    */
   getOperationID():number {
     return AVMConstants.NFTMINTOPID;
+  }
+
+  /**
+   * Returns the credential ID.
+   */
+  getCredentialID():number {
+    return AVMConstants.NFTCREDENTIAL;
   }
 
   /**
@@ -417,10 +434,17 @@ export class NFTTransferOperation extends Operation {
   protected output:NFTTransferOutput;
 
   /**
-     * Returns the operation ID.
-     */
+   * Returns the operation ID.
+   */
   getOperationID():number {
     return AVMConstants.NFTXFEROPID;
+  }
+
+  /**
+   * Returns the credential ID.
+   */
+  getCredentialID():number {
+    return AVMConstants.NFTCREDENTIAL;
   }
 
   getOutput = ():NFTTransferOutput => this.output;
