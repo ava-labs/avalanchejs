@@ -18,9 +18,12 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == AVMConstants.SECPOUTPUTID){
-        let secpout:SecpOutput = new SecpOutput( ...args);
+    if(outputid == AVMConstants.SECPXFEROUTPUTID){
+        let secpout:SecpTransferOutput = new SecpTransferOutput( ...args);
         return secpout;
+    } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
+        let secpmintout:SecpMintOutput = new SecpMintOutput( ...args);
+        return secpmintout;
     } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
         let nftout:NFTMintOutput = new NFTMintOutput(...args);
         return nftout;
@@ -74,24 +77,59 @@ export abstract class NFTOutput extends BaseNFTOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpOutput extends AmountOutput {
+export class SecpTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return AVMConstants.SECPOUTPUTID;
+    return AVMConstants.SECPXFEROUTPUTID;
   }
 
   create(...args:any[]):this{
-    return new SecpOutput(...args) as this;
+    return new SecpTransferOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpOutput = this.create()
+    const newout:SecpTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
 
+}
+
+/**
+ * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
+ */
+export class SecpMintOutput extends Output {
+
+  /**
+   * Returns the outputID for this output
+   */
+  getOutputID():number {
+    return AVMConstants.SECPMINTOUTPUTID;
+  }
+
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+    return new TransferableOutput(assetID, this);
+  }
+
+  create(...args:any[]):this{
+    return new SecpMintOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SecpMintOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
+  select(id:number, ...args: any[]):Output {
+    return SelectOutputClass(id, ...args);
+  }
 
 }
 

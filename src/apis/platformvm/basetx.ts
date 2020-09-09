@@ -70,6 +70,10 @@ export class BaseTx  extends StandardBaseTx<PlatformVMKeyPair, PlatformVMKeyChai
     return offset;
   }
 
+  getTotalOuts():Array<TransferableOutput> {
+    return this.getOuts();
+  }
+
   /**
    * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
    *

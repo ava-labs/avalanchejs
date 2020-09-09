@@ -10,17 +10,15 @@ import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
-import { SecpOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
+import { SecpTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
 import { TransferableInput, SecpInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
-import { ImportTx } from 'src/apis/platformvm/importtx';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
-import { platform } from 'os';
 
 /**
  * @ignore
@@ -653,7 +651,7 @@ describe('PlatformVMAPI', () => {
     const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
     expect(persistOpts.getMergeRule()).toBe('union');
     let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:Promise<UTXOSet> = api.getUTXOs(addresses, 0, 1, persistOpts);
+    let result:Promise<UTXOSet> = api.getUTXOs(addresses, api.getBlockchainID(), 0, 1, persistOpts);
     const payload:object = {
       result: {
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
@@ -670,7 +668,7 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, 0, 0, persistOpts);
+    result = api.getUTXOs(addresses, api.getBlockchainID(), 0, 0, persistOpts);
 
     mockAxios.mockResponse(responseObj);
     response = await result;
@@ -695,9 +693,9 @@ describe('PlatformVMAPI', () => {
     const amnt:number = 10000;
     const assetID:Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest());
     const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
-    let secpbase1:SecpOutput;
-    let secpbase2:SecpOutput;
-    let secpbase3:SecpOutput;
+    let secpbase1:SecpTransferOutput;
+    let secpbase2:SecpTransferOutput;
+    let secpbase3:SecpTransferOutput;
     let fungutxoids:Array<string> = [];
     let platformvm:PlatformVMAPI;
     const fee:number = 10;
@@ -751,7 +749,7 @@ describe('PlatformVMAPI', () => {
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
         
-        const out:SecpOutput = new SecpOutput(amount, addressbuffs, locktime, threshold);
+        const out:SecpTransferOutput = new SecpTransferOutput(amount, addressbuffs, locktime, threshold);
         const xferout:TransferableOutput = new TransferableOutput(assetID, out);
         outputs.push(xferout);
 
@@ -770,9 +768,9 @@ describe('PlatformVMAPI', () => {
       }
       set.addArray(utxos);
 
-      secpbase1 = new SecpOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
-      secpbase2 = new SecpOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
-      secpbase3 = new SecpOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase1 = new SecpTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase2 = new SecpTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
+      secpbase3 = new SecpTransferOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
 
     });
 
@@ -791,15 +789,21 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildImportTx', async () => {
+      let locktime:BN = new BN(0);
+      let threshold:number = 1;
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
-      const fungutxo:string = set.getUTXO(fungutxoids[1]).toString();
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const fungutxo:UTXO = set.getUTXO(fungutxoids[1]);
+      const fungutxostr:string = fungutxo.toString();
+
       const result:Promise<UnsignedTx> = platformvm.buildImportTx(
-        set, addrs1, PlatformChainID, new UTF8Payload("hello world"), UnixNow()
+        set,addrs1, PlatformChainID, addrs3, addrs1, addrs2, new UTF8Payload("hello world"), UnixNow(), locktime, threshold
       );
       const payload:object = {
         result: {
-          utxos:[fungutxo]
+          utxos:[fungutxostr]
         },
       };
       const responseObj = {
@@ -809,13 +813,10 @@ describe('PlatformVMAPI', () => {
       mockAxios.mockResponse(responseObj);
       const txu1:UnsignedTx = await result;
 
-      const txin:ImportTx = txu1.getTransaction() as ImportTx;
-      const importIns:Array<TransferableInput> = txin.getImportInputs();
-
       const txu2:UnsignedTx = set.buildImportTx(
         networkid, bintools.cb58Decode(blockchainid), 
-        addrbuff1, importIns, undefined, platformvm.getFee(), assetID, 
-        new UTF8Payload("hello world").getPayload(), UnixNow()
+        addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), platformvm.getFee(), await platformvm.getAVAXAssetID(), 
+        new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
       );
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
@@ -831,11 +832,11 @@ describe('PlatformVMAPI', () => {
       const amount:BN = new BN(90);
       const txu1:UnsignedTx = await platformvm.buildExportTx(
         set, 
-        amount, 
-        addrs3, 
+        amount,
+        bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]),
+        addrbuff3.map((a) => bintools.addressToString(avalanche.getHRP(), "P", a)), 
         addrs1, 
         addrs2,
-        PlatformChainID, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -846,7 +847,7 @@ describe('PlatformVMAPI', () => {
         addrbuff3, 
         addrbuff1, 
         addrbuff2, 
-        bintools.cb58Decode(PlatformChainID), 
+        bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]), 
         platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -856,7 +857,8 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
       const txu3:UnsignedTx = await platformvm.buildExportTx(
-        set, amount, addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID),
+        set, amount, bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]), 
+        addrs3, addrs1, addrs2, 
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -870,7 +872,7 @@ describe('PlatformVMAPI', () => {
       expect(txu4.toString()).toBe(txu3.toString());
 
     });
-
+/*
     test('buildAddSubnetValidatorTx', async () => {
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
@@ -905,13 +907,16 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toString()).toBe(txu1.toString());
 
     });
-
+*/
     test('buildAddDelegatorTx', async () => {
       platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
+
+      const lockime:BN = new BN(54321);
+      const threshold:number = 2;
 
       const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
         set, 
@@ -921,7 +926,9 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        addrs3[0], 
+        addrs3, 
+        lockime,
+        threshold,
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -934,7 +941,9 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        bintools.stringToAddress(addrs3[0]),
+        lockime,
+        threshold,
+        addrbuff3,
         platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -951,6 +960,9 @@ describe('PlatformVMAPI', () => {
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
 
+      const lockime:BN = new BN(54321);
+      const threshold:number = 2;
+
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         set, 
         addrs1, 
@@ -959,8 +971,10 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        addrs3[0], 
+        addrs3, 
         0.1334556,
+        lockime,
+        threshold,
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -973,7 +987,9 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        bintools.stringToAddress(addrs3[0]),
+        lockime,
+        threshold,
+        addrbuff3,
         0.1335,
         platformvm.getFee(), 
         assetID,

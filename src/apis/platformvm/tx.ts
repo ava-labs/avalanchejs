@@ -13,6 +13,7 @@ import createHash from 'create-hash';
 import { BaseTx } from './basetx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
+import BN from 'bn.js';
 
 /**
  * @ignore
@@ -30,7 +31,7 @@ export class UnsignedTx extends StandardUnsignedTx<PlatformVMKeyPair, PlatformVM
     this.transaction = SelectTxClass(txtype);
     return this.transaction.fromBuffer(bytes, offset);
   }
-  
+
   /**
    * Signs this [[UnsignedTx]] and returns signed [[StandardTx]]
    *

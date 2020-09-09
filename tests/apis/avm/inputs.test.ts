@@ -6,7 +6,7 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import {
-  SecpOutput, AmountOutput, TransferableOutput,
+  SecpTransferOutput, AmountOutput, TransferableOutput,
 } from 'src/apis/avm/outputs';
 import { AVMConstants } from 'src/apis/avm/constants';
 import { Input } from 'src/common/input';
@@ -45,7 +45,7 @@ describe('Inputs', () => {
       const txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
       const txidx:Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(i), 4));
       const assetID:Buffer = Buffer.from(createHash('sha256').update(txid).digest());
-      const out:Output = new SecpOutput(amount.add(new BN(i)), addresses, locktime, threshold);
+      const out:Output = new SecpTransferOutput(amount.add(new BN(i)), addresses, locktime, threshold);
       const xferout:TransferableOutput = new TransferableOutput(assetID, out);
       const u:UTXO = new UTXO(AVMConstants.LATESTCODEC, txid, txidx, assetID, out);
       u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));

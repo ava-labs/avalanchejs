@@ -55,7 +55,7 @@ export class CreateAssetTx extends BaseTx {
     getDenominationBuffer = ():Buffer => {
         return this.denomination;
     }
-  
+
     /**
      * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[CreateAssetTx]], parses it, populates the class, and returns the length of the [[CreateAssetTx]] in bytes.
      *

@@ -22,7 +22,9 @@ export class PlatformVMConstants {
 
   static SECPFXID:number = 0;
 
-  static SECPOUTPUTID:number = 7;
+  static SECPXFEROUTPUTID:number = 7;
+
+  static SECPOWNEROUTPUTID:number = 11;
 
   static SECPINPUTID:number = 5;
 

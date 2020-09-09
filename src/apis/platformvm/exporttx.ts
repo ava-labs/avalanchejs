@@ -40,7 +40,7 @@ export class ExportTx extends BaseTx {
   }
 
   /**
-   * Returns the totall exported amount as a {@link https://github.com/indutny/bn.js/|BN}.
+   * Returns the total exported amount as a {@link https://github.com/indutny/bn.js/|BN}.
    */
   getExportTotal():BN {
     let val:BN = new BN(0);
@@ -48,6 +48,10 @@ export class ExportTx extends BaseTx {
       val = val.add((this.exportOuts[i].getOutput() as AmountOutput).getAmount());
     }
     return val;
+  }
+
+  getTotalOuts():Array<TransferableOutput> {
+    return [...this.getOuts(), ...this.getExportOutputs()];
   }
 
   /**

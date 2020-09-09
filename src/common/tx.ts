@@ -29,29 +29,34 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
   protected memo:Buffer = Buffer.alloc(4);
 
   /**
-     * Returns the id of the [[StandardBaseTx]]
-     */
+   * Returns the id of the [[StandardBaseTx]]
+   */
   abstract getTxType:() => number;
 
   /**
-     * Returns the NetworkID as a number
-     */
+   * Returns the NetworkID as a number
+   */
   getNetworkID = ():number => this.networkid.readUInt32BE(0);
 
   /**
-     * Returns the Buffer representation of the BlockchainID
-     */
+   * Returns the Buffer representation of the BlockchainID
+   */
   getBlockchainID = ():Buffer => this.blockchainid;
 
   /**
-     * Returns the array of [[TransferableInput]]s
-     */
+   * Returns the array of [[StandardTransferableInput]]s
+   */
   getIns = ():Array<StandardTransferableInput> => this.ins;
 
   /**
-     * Returns the array of [[TransferableOutput]]s
-     */
+   * Returns the array of [[StandardTransferableOutput]]s
+   */
   getOuts = ():Array<StandardTransferableOutput> => this.outs;
+
+  /**
+   * Returns the array of combined total [[StandardTransferableOutput]]s
+   */
+  abstract getTotalOuts():Array<StandardTransferableOutput>;
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo 
@@ -59,8 +64,8 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
   getMemo = ():Buffer => this.memo;
 
   /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
-     */
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
+   */
   toBuffer():Buffer {
     this.outs.sort(StandardTransferableOutput.comparator());
     this.ins.sort(StandardTransferableInput.comparator());
@@ -91,20 +96,20 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
   }
 
   /**
-     * Returns a base-58 representation of the [[StandardBaseTx]].
-     */
+   * Returns a base-58 representation of the [[StandardBaseTx]].
+   */
   toString():string {
     return bintools.bufferToB58(this.toBuffer());
   }
 
   /**
-     * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
-     *
-     * @param msg A Buffer for the [[UnsignedTx]]
-     * @param kc An [[KeyChain]] used in signing
-     *
-     * @returns An array of [[Credential]]s
-     */
+   * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+   *
+   * @param msg A Buffer for the [[UnsignedTx]]
+   * @param kc An [[KeyChain]] used in signing
+   *
+   * @returns An array of [[Credential]]s
+   */
   abstract sign(msg:Buffer, kc:KeyChain<KPClass>):Array<Credential>;
 
   abstract clone():this;
@@ -114,14 +119,14 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
   abstract select(id:number, ...args:any[]):this;
 
   /**
-     * Class representing a StandardBaseTx which is the foundation for all transactions.
-     *
-     * @param networkid Optional networkid, [[DefaultNetworkID]]
-     * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-     * @param outs Optional array of the [[TransferableOutput]]s
-     * @param ins Optional array of the [[TransferableInput]]s
-     * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
-     */
+   * Class representing a StandardBaseTx which is the foundation for all transactions.
+   *
+   * @param networkid Optional networkid, [[DefaultNetworkID]]
+   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param outs Optional array of the [[TransferableOutput]]s
+   * @param ins Optional array of the [[TransferableInput]]s
+   * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+   */
   constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
@@ -156,22 +161,22 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   protected transaction:SBTx;
 
   /**
-     * Returns the CodecID as a number
-     */
-    getCodecID = ():number => this.codecid;
-
-    /**
-     * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
-      */
-     getCodecIDBuffer = ():Buffer => {
-       let codecBuf:Buffer = Buffer.alloc(2);
-       codecBuf.writeUInt16BE(this.codecid, 0);
-       return codecBuf;
-     } 
+   * Returns the CodecID as a number
+   */
+  getCodecID = ():number => this.codecid;
 
   /**
-     * Returns the inputTotal as a BN 
-     */
+  * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
+  */
+  getCodecIDBuffer = ():Buffer => {
+    let codecBuf:Buffer = Buffer.alloc(2);
+    codecBuf.writeUInt16BE(this.codecid, 0);
+    return codecBuf;
+  } 
+
+  /**
+   * Returns the inputTotal as a BN 
+   */
   getInputTotal = (assetID:Buffer):BN=> {
     const ins:Array<StandardTransferableInput> = this.getTransaction().getIns();
     const aIDHex:string = assetID.toString('hex');
@@ -190,10 +195,10 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   }
 
   /**
-     * Returns the outputTotal as a BN
-     */
+   * Returns the outputTotal as a BN
+   */
   getOutputTotal = (assetID:Buffer):BN => {
-    const outs:Array<StandardTransferableOutput> = this.getTransaction().getOuts();
+    const outs:Array<StandardTransferableOutput> = this.getTransaction().getTotalOuts();
     const aIDHex:string = assetID.toString('hex');
     let total:BN = new BN(0);
 
@@ -209,15 +214,15 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   }
 
   /**
-     * Returns the number of burned tokens as a BN
-     */
+   * Returns the number of burned tokens as a BN
+   */
   getBurn = (assetID:Buffer):BN => {
     return this.getInputTotal(assetID).sub(this.getOutputTotal(assetID));
   }
 
   /**
-     * Returns the Transaction
-     */
+   * Returns the Transaction
+   */
   getTransaction = ():SBTx => this.transaction;
 
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
@@ -231,12 +236,12 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   }
 
   /**
-     * Signs this [[UnsignedTx]] and returns signed [[StandardTx]]
-     *
-     * @param kc An [[KeyChain]] used in signing
-     *
-     * @returns A signed [[StandardTx]]
-     */
+   * Signs this [[UnsignedTx]] and returns signed [[StandardTx]]
+   *
+   * @param kc An [[KeyChain]] used in signing
+   *
+   * @returns A signed [[StandardTx]]
+   */
   abstract sign(kc:KCClass):StandardTx<
     KPClass, 
     KCClass, 
@@ -263,8 +268,8 @@ export abstract class StandardTx<
   protected credentials:Array<Credential> = [];
 
   /**
-     * Returns the [[StandardUnsignedTx]]
-     */
+   * Returns the [[StandardUnsignedTx]]
+   */
   getUnsignedTx = ():SUBTx => {
     return this.unsignedTx;
   }
@@ -272,8 +277,8 @@ export abstract class StandardTx<
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
   /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
-     */
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
+   */
   toBuffer():Buffer {
     const txbuff:Buffer = this.unsignedTx.toBuffer();
     let bsize:number = txbuff.length;
@@ -295,35 +300,35 @@ export abstract class StandardTx<
   }
 
   /**
-     * Takes a base-58 string containing an [[StandardTx]], parses it, populates the class, and returns the length of the Tx in bytes.
-     *
-     * @param serialized A base-58 string containing a raw [[StandardTx]]
-     *
-     * @returns The length of the raw [[StandardTx]]
-     *
-     * @remarks
-     * unlike most fromStrings, it expects the string to be serialized in cb58 format
-     */
+   * Takes a base-58 string containing an [[StandardTx]], parses it, populates the class, and returns the length of the Tx in bytes.
+   *
+   * @param serialized A base-58 string containing a raw [[StandardTx]]
+   *
+   * @returns The length of the raw [[StandardTx]]
+   *
+   * @remarks
+   * unlike most fromStrings, it expects the string to be serialized in cb58 format
+   */
   fromString(serialized:string):number {
     return this.fromBuffer(bintools.cb58Decode(serialized));
   }
 
   /**
-     * Returns a cb58 representation of the [[StandardTx]].
-     *
-     * @remarks
-     * unlike most toStrings, this returns in cb58 serialization format
-     */
+   * Returns a cb58 representation of the [[StandardTx]].
+   *
+   * @remarks
+   * unlike most toStrings, this returns in cb58 serialization format
+   */
   toString():string {
     return bintools.cb58Encode(this.toBuffer());
   }
 
   /**
-     * Class representing a signed transaction.
-     *
-     * @param unsignedTx Optional [[StandardUnsignedTx]]
-     * @param signatures Optional array of [[Credential]]s
-     */
+   * Class representing a signed transaction.
+   *
+   * @param unsignedTx Optional [[StandardUnsignedTx]]
+   * @param signatures Optional array of [[Credential]]s
+   */
   constructor(unsignedTx:SUBTx = undefined, credentials:Array<Credential> = undefined) {
     if (typeof unsignedTx !== 'undefined') {
       this.unsignedTx = unsignedTx;
