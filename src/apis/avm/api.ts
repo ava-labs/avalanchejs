@@ -525,6 +525,7 @@ export class AVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
+   * @param typeID A number of the typeID to filter on the recieved UTXOs
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -536,6 +537,7 @@ export class AVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
+    typeID:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
 
@@ -573,7 +575,7 @@ export class AVMAPI extends JRPCAPI {
         }
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data);
+      utxos.addArray(data, false, typeID);
       return utxos;
     });
   };
