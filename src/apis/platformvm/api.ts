@@ -649,6 +649,18 @@ export class PlatformVMAPI extends JRPCAPI {
     return this.callMethod('platform.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
+  getHeight = async ():Promise<BN> => {
+    const params:any = {};
+    return this.callMethod('platform.getHeight', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.minStake, 10));
+  }
+
+  getMinStake = async ():Promise<BN> => {
+    const params:any = {};
+    return this.callMethod('platform.getMinStake', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.minStake, 10));
+  }
+
   /**
    * Get all the subnets that exist.
    *

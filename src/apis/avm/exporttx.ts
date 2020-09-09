@@ -101,6 +101,16 @@ export class ExportTx extends BaseTx {
       }
       return Buffer.concat(barr);
     }
+
+    clone():this {
+      let newbase:ExportTx = new ExportTx();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new ExportTx(...args) as this;
+    }
   
     /**
        * Class representing an unsigned Export transaction.

@@ -6,7 +6,7 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
-import { UTXOSet, UTXO } from './utxos';
+import { UTXOSet } from './utxos';
 import { AVMConstants } from './constants';
 import { AVMKeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
@@ -20,7 +20,7 @@ import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/consta
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
-import { SECPTransferOutput } from '../platformvm/outputs';
+import { SECPTransferOutput } from './outputs';
 
 /**
  * @ignore

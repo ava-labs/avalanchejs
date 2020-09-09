@@ -87,6 +87,16 @@ export class ImportTx extends BaseTx {
     getImportInputs():Array<TransferableInput> {
       return this.importIns;
     }
+
+    clone():this {
+      let newbase:ImportTx = new ImportTx();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new ImportTx(...args) as this;
+    }
   
     /**
        * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s

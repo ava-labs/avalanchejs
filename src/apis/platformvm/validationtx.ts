@@ -12,8 +12,7 @@ import { Buffer } from 'buffer/';
 import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
-import { AmountOutput, SECPOwnerOutput, ParseableOutput } from './outputs';
-import { OutputOwners, StandardParseableOutput } from '../../common/output';
+import { AmountOutput, ParseableOutput } from './outputs';
 
 /**
  * @ignore
@@ -369,8 +368,19 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         barr.push(ro);
         bsize += ro.length;
         return Buffer.concat(barr, bsize);
-      }
+    }
   
+    clone():this {
+        let newbase:AddDelegatorTx = new AddDelegatorTx();
+        newbase.fromBuffer(this.toBuffer());
+        return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new AddDelegatorTx(...args) as this;
+    }
+
+
     /**
      * Class representing an unsigned AddDelegatorTx transaction.
      *
@@ -462,7 +472,7 @@ export class AddValidatorTx extends AddDelegatorTx {
      * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
      * @param stakeOuts Optional. The outputs used in paying the stake.
-     * @param rewardOwners Optional. The [[ParseableOutput]] containing the [[SecpOwnerOutput]] for the rewards.
+     * @param rewardOwners Optional. The [[ParseableOutput]] containing the [[SECPOwnerOutput]] for the rewards.
      * @param delegationFee Optional. The percent fee this validator charges when others delegate stake to them. 
      * Up to 4 decimal places allowed; additional decimal places are ignored. Must be between 0 and 100, inclusive. 
      * For example, if delegationFeeRate is 1.2345 and someone delegates to this validator, then when the delegation 
