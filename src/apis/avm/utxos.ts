@@ -282,7 +282,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   };
 
   /**
-   * Creates an unsigned transaction. For more granular control, you may create your own
+   * Creates an unsigned Create Asset transaction. For more granular control, you may create your own
    * [[CreateAssetTX]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
    * 
    * @param networkid The number representing NetworkID of the node
@@ -347,8 +347,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   }
 
   /**
-   * Creates an unsigned NFT mint transaction. For more granular control, you may create your own
-   * [[SECPMintTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   * Creates an unsigned Secp mint transaction. For more granular control, you may create your own
+   * [[OperationTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
    * 
    * @param networkid The number representing NetworkID of the node
    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
@@ -421,7 +421,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   }
 
   /**
-  * Creates an unsigned transaction. For more granular control, you may create your own
+  * Creates an unsigned Create Asset transaction. For more granular control, you may create your own
   * [[CreateAssetTX]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
   * 
   * @param networkid The number representing NetworkID of the node
@@ -486,7 +486,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
   /**
   * Creates an unsigned NFT mint transaction. For more granular control, you may create your own
-  * [[NFTMintTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+  * [[OperationTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
   * 
   * @param networkid The number representing NetworkID of the node
   * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
