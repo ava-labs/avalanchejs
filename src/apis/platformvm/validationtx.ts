@@ -461,7 +461,8 @@ export class AddValidatorTx extends AddDelegatorTx {
      * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
      * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
-     * @param rewardOwners Optional. The [[ParseableOutput]] containing the [[SECPOwnerOutput]] for the rewards.
+     * @param stakeOuts Optional. The outputs used in paying the stake.
+     * @param rewardOwners Optional. The [[ParseableOutput]] containing the [[SecpOwnerOutput]] for the rewards.
      * @param delegationFee Optional. The percent fee this validator charges when others delegate stake to them. 
      * Up to 4 decimal places allowed; additional decimal places are ignored. Must be between 0 and 100, inclusive. 
      * For example, if delegationFeeRate is 1.2345 and someone delegates to this validator, then when the delegation 
