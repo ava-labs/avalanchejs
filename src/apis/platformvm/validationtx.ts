@@ -161,7 +161,7 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     }
 
 }
-/* Must implement later, the signing process isn't friendly to Avalanche.js
+/* Must implement later, the signing process isn't friendly to AvalancheJS
 
 export class AddSubnetValidatorTx extends WeightedValidatorTx {
     protected subnetID:Buffer = Buffer.alloc(32);

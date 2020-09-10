@@ -840,7 +840,7 @@ export class AVMAPI extends JRPCAPI {
     }
 
     if(bintools.cb58Encode(destinationChain) !== PlatformChainID) {
-      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must PlatformChainID in the current version of Avalanche.js.");
+      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must PlatformChainID in the current version of AvalancheJS.");
     }
 
     let to:Array<Buffer> = [];

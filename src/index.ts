@@ -19,7 +19,7 @@ import BN from "bn.js";
 import { Buffer } from 'buffer/';
 
 /**
- * Avalanche.js is middleware for interacting with Avalanche node RPC APIs.
+ * AvalancheJS is middleware for interacting with Avalanche node RPC APIs.
  *
  * Example usage:
  * ```js

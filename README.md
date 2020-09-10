@@ -1,8 +1,8 @@
-# Avalanche.js - The Avalanche Platform JavaScript Library
+# AvalancheJS - The Avalanche Platform JavaScript Library
 
 ## Overview 
 
-Avalanche.js is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The Avalanche.js library allows one to issue commands to the Avalanche node APIs. 
+AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The AvalancheJS library allows one to issue commands to the Avalanche node APIs. 
 
 The APIs currently supported by default are:
 
@@ -14,9 +14,9 @@ The APIs currently supported by default are:
   * Metrics API
   * PlatformVM API
 
-We built Avalanche.js with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network). 
+We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network). 
 
-  Using Avalanche.js, developers can:
+  Using AvalancheJS, developers can:
 
   * Locally manage private keys
   * Retrieve balances on addresses
@@ -29,7 +29,7 @@ We built Avalanche.js with ease of use in mind. With this library, any Javascrip
 
 ### Requirements
 
-Avalanche.js requires Node.js LTS version 12.13.1 or higher to compile. 
+AvalancheJS requires Node.js LTS version 12.13.1 or higher to compile. 
 
 ### Installation
 
@@ -41,9 +41,9 @@ You can also pull the repo down directly and build it from scratch:
 
 `npm run build`
 
-This will generate a pure javascript library and place it in a folder named "dist" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.
+This will generate a pure Javascript library and place it in a folder named "web" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.
 
-The Avalanche.js library can be imported into your existing Node.js project as follows:
+The AvalancheJS library can be imported into your existing Node.js project as follows:
 
 ```js
 const avalanche = require("avalanche");
@@ -70,13 +70,13 @@ let bintools = BinTools.getInstance();
 The above lines import the libraries used in the tutorials. The libraries include:
   
   * avalanche: Our javascript module.
-  * bn.js: A bignumber module use by Avalanche.js.
+  * bn.js: A bignumber module use by AvalancheJS.
   * buffer: A Buffer library.
-  * BinTools: A singleton built into Avalanche.js that is used for dealing with binary data.
+  * BinTools: A singleton built into AvalancheJS that is used for dealing with binary data.
 
 ## Example 1 &mdash; Managing X-Chain Keys
 
-Avalanche.js comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of Avalanche.js connected to our Avalanche Platform endpoint of choice.
+AvalancheJS comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
 
 ```js
 import {
@@ -91,7 +91,7 @@ let bintools = BinTools.getInstance();
 let myNetworkID = 12345; //default is 3, we want to override that for our local network
 let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The XChain blockchainID on this network
 let ava = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = ava.XChain(); //returns a reference to the XChain used by Avalanche.js
+let xchain = ava.XChain(); //returns a reference to the XChain used by AvalancheJS
 ```
 
 ### Accessing the keychain
@@ -166,7 +166,7 @@ let isValid = keypair.verify(message, signature); //returns a boolean
 
 ## Example 2 &mdash; Creating An Asset
 
-This example creates an asset in the X-Chain and publishes it to the Avalanche Platform. The first step in this process is to create an instance of Avalanche.js connected to our Avalanche Platform endpoint of choice.
+This example creates an asset in the X-Chain and publishes it to the Avalanche Platform. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
 
 ```js
 
@@ -184,12 +184,12 @@ import {
 let myNetworkID = 12345; //default is 3, we want to override that for our local network
 let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The XChain blockchainID on this network
 let avax = new Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = avax.XChain(); //returns a reference to the XChain used by Avalanche.js
+let xchain = avax.XChain(); //returns a reference to the XChain used by AvalancheJS
 ```
 
 ### Describe the new asset
 
-The first steps in creating a new asset using Avalanche.js is to determine the qualities of the asset. We will give the asset a name, a ticker symbol, as well as a denomination. 
+The first steps in creating a new asset using AvalancheJS is to determine the qualities of the asset. We will give the asset a name, a ticker symbol, as well as a denomination. 
 
 ```js
 // Name our new coin and give it a symbol
@@ -240,7 +240,7 @@ let signed = xchain.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it! 
 
-Using the Avalanche.js AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the AvalancheJS AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
@@ -294,7 +294,7 @@ import {
 let myNetworkID = 1; //default is 3, we want to override that for our local network
 let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The XChain blockchainID on this network
 let avax = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = avax.XChain(); //returns a reference to the XChain used by Avalanche.js
+let xchain = avax.XChain(); //returns a reference to the XChain used by AvalancheJS
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
