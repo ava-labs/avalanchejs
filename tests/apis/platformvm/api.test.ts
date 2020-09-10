@@ -19,7 +19,6 @@ import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
-import { SECPOwnerOutput } from '../../../src/apis/platformvm/outputs';
 
 /**
  * @ignore
@@ -138,6 +137,64 @@ describe('PlatformVMAPI', () => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj));
   });
+
+  test('getHeight', async () => {
+    const height = new BN('100', 10);
+    const result:Promise<object> = api.getHeight();
+    const payload:object = {
+      result: {
+        height
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:object = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(response)).toBe(JSON.stringify(height));
+  });
+
+  test('getMinStake', async () => {
+    const minStake = new BN('100', 10);
+    const result:Promise<object> = api.getMinStake();
+    const payload:object = {
+      result: {
+        minStake
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:object = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(response)).toBe(JSON.stringify(minStake));
+  });
+
+  test('getStake', async () => {
+    const staked = new BN('100', 10);
+    const result:Promise<object> = api.getStake([addrA]);
+    const payload:object = {
+      result: {
+        staked
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:object = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(JSON.stringify(response)).toBe(JSON.stringify(staked));
+  });
+
 
   test('addSubnetValidator 1', async () => {
     const nodeID = 'abcdef';
