@@ -127,7 +127,7 @@ export default class AvalancheCore {
    *
    * @typeparam GA Class of the API being added
    * @param apiName A label for referencing the API in the future
-   * @param constructorFN A reference to the class which instantiates the API
+   * @param ConstructorFN A reference to the class which instantiates the API
    * @param baseurl Path to resolve to reach the API
    *
    */

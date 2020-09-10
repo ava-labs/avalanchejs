@@ -123,9 +123,9 @@ export class ExportTx extends BaseTx {
        * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
        */
     constructor(
-      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), destinationChain:Buffer = undefined,
+      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
       outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-      memo:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
+      memo:Buffer = undefined, destinationChain:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
       this.destinationChain = destinationChain; //no correction, if they don't pass a chainid here, it will BOMB on toBuffer

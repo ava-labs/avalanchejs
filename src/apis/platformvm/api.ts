@@ -650,16 +650,33 @@ export class PlatformVMAPI extends JRPCAPI {
     return this.callMethod('platform.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
+  /**
+   * Returns the height of the platform chain.
+   */
   getHeight = async ():Promise<BN> => {
     const params:any = {};
     return this.callMethod('platform.getHeight', params)
-      .then((response:RequestResponseData) => new BN(response.data.result.minStake, 10));
+      .then((response:RequestResponseData) => new BN(response.data.result.height, 10));
   }
 
+  /**
+   * Gets the minimum staking amount.
+   */
   getMinStake = async ():Promise<BN> => {
     const params:any = {};
     return this.callMethod('platform.getMinStake', params)
       .then((response:RequestResponseData) => new BN(response.data.result.minStake, 10));
+  }
+
+  /**
+   * Gets the total amount staked for an array of addresses.
+   */
+  getStake = async (addresses:Array<string>):Promise<BN> => {
+    const params:any = {
+      addresses
+    };
+    return this.callMethod('platform.getStake', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.staked, 10));
   }
 
   /**

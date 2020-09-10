@@ -38,7 +38,7 @@ export class AuthAPI extends JRPCAPI {
      * @param password This node's authorization token password, set through the CLI when the node was launched.
      * @param token An authorization token whose access should be revoked.
      *
-     * @returns Returns a Promise<bool> indicating if a token was successfully revoked.
+     * @returns Returns a Promise<boolean> indicating if a token was successfully revoked.
      */
     revokeToken = async (password:string, token:string):Promise<boolean> => {
         const params:any = {
@@ -55,7 +55,7 @@ export class AuthAPI extends JRPCAPI {
      * @param oldPassword This node's authorization token password, set through the CLI when the node was launched.
      * @param newPassword A new password for this node's authorization token issuance.
      *
-     * @returns Returns a Promise<bool> indicating if the password was successfully changed.
+     * @returns Returns a Promise<boolean> indicating if the password was successfully changed.
      */
     changePassword = async (oldPassword:string, newPassword:string):Promise<boolean> => {
         const params:any = {

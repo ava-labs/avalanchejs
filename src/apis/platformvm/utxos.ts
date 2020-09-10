@@ -386,7 +386,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const importTx:ImportTx = new ImportTx(networkid, blockchainid, sourceChain, outs, ins, memo, importIns);
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid,  outs, ins, memo, sourceChain, importIns);
     return new UnsignedTx(importTx);
   };
 
@@ -472,7 +472,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, destinationChain, outs, ins, memo, exportouts);
+    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, destinationChain, exportouts);
     return new UnsignedTx(exportTx);
   };
 

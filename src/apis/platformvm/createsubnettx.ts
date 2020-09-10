@@ -49,21 +49,21 @@ export class CreateSubnetTx extends BaseTx {
      */
     toBuffer():Buffer {
         if(typeof this.subnetOwners === "undefined" || !(this.subnetOwners instanceof SECPOwnerOutput)) {
-            throw new Error("CreateSubnetTx.toBuffer -- this.sourceChain is not a SECPOwnerOutput");
+            throw new Error("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
         }
         let barr:Array<Buffer> = [super.toBuffer(), this.subnetOwners.toBuffer()];
         return Buffer.concat(barr);
     }
 
     /**
-     * Class representing an unsigned Import transaction.
+     * Class representing an unsigned Create Subnet transaction.
      *
      * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-     * @param subnetOwners Optional [[SECPOwnerOutput]] class for specifying who owns the subnet.
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+     * @param subnetOwners Optional [[SECPOwnerOutput]] class for specifying who owns the subnet.
     */
   constructor(
     networkid:number = DefaultNetworkID, 

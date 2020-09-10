@@ -34,7 +34,7 @@ export default class Avalanche extends AvalancheCore {
   Admin = () => this.apis.admin as AdminAPI;
 
   /**
-     * Returns a reference to the Admin RPC.
+     * Returns a reference to the Auth RPC.
      */
   Auth = () => this.apis.auth as AuthAPI;
 
