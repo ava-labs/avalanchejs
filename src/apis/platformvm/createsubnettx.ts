@@ -52,7 +52,7 @@ export class CreateSubnetTx extends BaseTx {
             throw new Error("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
         }
         let typeID:Buffer = Buffer.alloc(4);
-        typeID.readUInt32BE(this.subnetOwners.getOutputID());
+        typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0);
         let barr:Array<Buffer> = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
         return Buffer.concat(barr);
     }
