@@ -1006,18 +1006,13 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = PlatformVMConstants.MINSTAKE;
-
-      const locktime:BN = new BN(54321);
-      const threshold:number = 2;
 
       const txu1:UnsignedTx = await platformvm.buildCreateSubnetTx(
         set, 
         addrs1, 
         addrs2, 
         addrs3, 
-        locktime,
-        threshold,
+        1,
         new UTF8Payload("hello world"), UnixNow()
       );
 
@@ -1025,7 +1020,8 @@ describe('PlatformVMAPI', () => {
         networkid, bintools.cb58Decode(blockchainid), 
         addrbuff1,         
         addrbuff2, 
-        new SECPOwnerOutput(addrbuff3, locktime, threshold),
+        addrbuff3,
+        1,
         platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()

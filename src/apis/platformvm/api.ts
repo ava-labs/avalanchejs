@@ -1200,8 +1200,7 @@ axios.interceptors.request.use(request => {
     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
     * @param subnetOwnerAddresses An array of addresses for owners of the new subnet
-    * @param subnetOwnerLocktime A {@link https://github.com/indutny/bn.js/|BN} representing when the subnet owners can change the subnet
-    * @param subnetOwnerThreshold A number for how many subnet owners are required to sign for a change
+    * @param subnetOwnerThreshold A number indicating the amount of signatures required to add validators to a subnet
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -1214,8 +1213,7 @@ axios.interceptors.request.use(request => {
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     subnetOwnerAddresses:Array<string>,
-    subnetOwnerLocktime:BN = new BN(0),
-    subnetOwnerThreshold:number = 1,
+    subnetOwnerThreshold:number, 
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
@@ -1234,7 +1232,8 @@ axios.interceptors.request.use(request => {
       bintools.cb58Decode(this.blockchainID), 
       from,
       change,
-      new SECPOwnerOutput(owners, subnetOwnerLocktime, subnetOwnerThreshold),
+      owners,
+      subnetOwnerThreshold,
       this.getFee(), 
       avaxAssetID,
       memo, asOf

@@ -709,7 +709,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param blockchainid Blockchainid, default undefined
     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
-    * @param subnetOwners Optional [[SECPOwnerOutput]] class for specifying who owns the subnet.
+    * @param subnetOwnerAddresses An array of {@link https://github.com/feross/buffer|Buffer} for the addresses to add to a subnet
+    * @param subnetOwnerThreshold The number of owners's signatures required to add a validator to the network
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -722,7 +723,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     blockchainid:Buffer,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
-    subnetOwners:SECPOwnerOutput = undefined,
+    subnetOwnerAddresses:Array<Buffer>,
+    subnetOwnerThreshold:number, 
     fee:BN = undefined,
     feeAssetID:Buffer = undefined, 
     memo:Buffer = undefined, 
@@ -744,7 +746,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, subnetOwners, outs, ins, memo);
+    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, new SECPOwnerOutput(subnetOwnerAddresses, new BN(0), subnetOwnerThreshold), outs, ins, memo);
     return new UnsignedTx(UTx);
   }
 
