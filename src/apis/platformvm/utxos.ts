@@ -746,7 +746,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, outs, ins, memo, new SECPOwnerOutput(subnetOwnerAddresses));
+    const locktime: BN = new BN(0)
+    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, outs, ins, memo, new SECPOwnerOutput(subnetOwnerAddresses, locktime, subnetOwnerThreshold));
     return new UnsignedTx(UTx);
   }
 
