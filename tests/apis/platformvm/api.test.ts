@@ -19,6 +19,7 @@ import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
+import { SECPOwnerOutput } from '../../../src/apis/platformvm/outputs';
 
 /**
  * @ignore
@@ -258,7 +259,7 @@ describe('PlatformVMAPI', () => {
 
   test('getCurrentValidators 1', async () => {
     const validators = ['val1', 'val2'];
-    const result:Promise<Array<object>> = api.getCurrentValidators();
+    const result:Promise<object> = api.getCurrentValidators();
     const payload:object = {
       result: {
         validators,
@@ -269,16 +270,16 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:Array<object> = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(validators);
+    expect(response).toStrictEqual({validators});
   });
 
   test('getCurrentValidators 2', async () => {
     const subnetID:string = 'abcdef';
     const validators = ['val1', 'val2'];
-    const result:Promise<Array<object>> = api.getCurrentValidators(subnetID);
+    const result:Promise<object> = api.getCurrentValidators(subnetID);
     const payload:object = {
       result: {
         validators,
@@ -289,16 +290,16 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:Array<object> = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(validators);
+    expect(response).toStrictEqual({validators});
   });
 
   test('getCurrentValidators 3', async () => {
     const subnetID:Buffer = Buffer.from('abcdef', 'hex');
     const validators = ['val1', 'val2'];
-    const result:Promise<Array<object>> = api.getCurrentValidators(subnetID);
+    const result:Promise<object> = api.getCurrentValidators(subnetID);
     const payload:object = {
       result: {
         validators,
@@ -309,10 +310,10 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:Array<object> = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(validators);
+    expect(response).toStrictEqual({validators});
   });
 
   test('exportKey', async () => {
@@ -915,7 +916,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
 
-      const lockime:BN = new BN(54321);
+      const locktime:BN = new BN(54321);
       const threshold:number = 2;
 
       const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
@@ -927,7 +928,7 @@ describe('PlatformVMAPI', () => {
         endTime,
         amount,
         addrs3, 
-        lockime,
+        locktime,
         threshold,
         new UTF8Payload("hello world"), UnixNow()
       );
@@ -941,7 +942,7 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        lockime,
+        locktime,
         threshold,
         addrbuff3,
         platformvm.getFee(), 
@@ -960,7 +961,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
       const amount:BN = PlatformVMConstants.MINSTAKE;
 
-      const lockime:BN = new BN(54321);
+      const locktime:BN = new BN(54321);
       const threshold:number = 2;
 
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
@@ -973,7 +974,7 @@ describe('PlatformVMAPI', () => {
         amount,
         addrs3, 
         0.1334556,
-        lockime,
+        locktime,
         threshold,
         new UTF8Payload("hello world"), UnixNow()
       );
@@ -987,10 +988,44 @@ describe('PlatformVMAPI', () => {
         startTime,
         endTime,
         amount,
-        lockime,
+        locktime,
         threshold,
         addrbuff3,
         0.1335,
+        platformvm.getFee(), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+    });
+
+    test('buildCreateSubnetTx', async () => {
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = PlatformVMConstants.MINSTAKE;
+
+      const locktime:BN = new BN(54321);
+      const threshold:number = 2;
+
+      const txu1:UnsignedTx = await platformvm.buildCreateSubnetTx(
+        set, 
+        addrs1, 
+        addrs2, 
+        addrs3, 
+        locktime,
+        threshold,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = set.buildCreateSubnetTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        addrbuff1,         
+        addrbuff2, 
+        new SECPOwnerOutput(addrbuff3, locktime, threshold),
         platformvm.getFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
