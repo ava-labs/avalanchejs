@@ -203,10 +203,17 @@ export class NFTTransferOutput extends NFTOutput {
         return AVMConstants.NFTXFEROUTPUTID;
     }
 
-  /**
-     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer}
+    /**
+     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with content only.
      */
-  getPayload = ():Buffer => Buffer.concat([bintools.copyFrom(this.sizePayload), bintools.copyFrom(this.payload)]);
+    getPayload = ():Buffer =>  bintools.copyFrom(this.payload);
+
+
+    /**
+     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with length of payload prepended.
+     */
+    getPayloadBuffer = ():Buffer => Buffer.concat([bintools.copyFrom(this.sizePayload), bintools.copyFrom(this.payload)]);
+
 
     /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOutput]] and returns the size of the output.

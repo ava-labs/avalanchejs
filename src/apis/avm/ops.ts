@@ -336,6 +336,13 @@ export class NFTMintOperation extends Operation {
    * Returns the payload.
    */
   getPayload = ():Buffer => {
+    return bintools.copyFrom(this.payload, 0);
+  }
+
+  /**
+   * Returns the payload's raw {@link https://github.com/feross/buffer|Buffer} with length prepended, for use with 
+   */
+  getPayloadBuffer = ():Buffer => {
     let payloadlen:Buffer = Buffer.alloc(4);
     payloadlen.writeUInt32BE(this.payload.length, 0);
     return Buffer.concat([payloadlen, bintools.copyFrom(this.payload, 0)]);
