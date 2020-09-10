@@ -336,7 +336,9 @@ export class NFTMintOperation extends Operation {
    * Returns the payload.
    */
   getPayload = ():Buffer => {
-    return this.payload;
+    let payloadlen:Buffer = Buffer.alloc(4);
+    payloadlen.writeUInt32BE(this.payload.length, 0);
+    return Buffer.concat([payloadlen, bintools.copyFrom(this.payload, 0)]);
   }
 
   /**
