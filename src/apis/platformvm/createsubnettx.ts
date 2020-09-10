@@ -51,7 +51,9 @@ export class CreateSubnetTx extends BaseTx {
         if(typeof this.subnetOwners === "undefined" || !(this.subnetOwners instanceof SECPOwnerOutput)) {
             throw new Error("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
         }
-        let barr:Array<Buffer> = [super.toBuffer(), this.subnetOwners.toBuffer()];
+        let typeID:Buffer = Buffer.alloc(4);
+        typeID.readUInt32BE(this.subnetOwners.getOutputID());
+        let barr:Array<Buffer> = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
         return Buffer.concat(barr);
     }
 
