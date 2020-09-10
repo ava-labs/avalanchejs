@@ -3,7 +3,6 @@
   "version": "2.4.3",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
-  "browser": "dist/lib/avalanche.js",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",

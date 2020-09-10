@@ -28,6 +28,8 @@ export default class AvalancheCore {
 
   protected url:string;
 
+  protected auth:string = undefined;
+
   protected apis:{ [k: string]: APIBase } = {};
 
   /**
@@ -95,24 +97,40 @@ export default class AvalancheCore {
   };
 
   /**
-     * Adds an API to the middleware. The API resolves to a registered blockchain's RPC.
-     *
-     * In TypeScript:
-     * ```js
-     * avalanche.addAPI<MyVMClass>("mychain", MyVMClass, "/ext/bc/mychain");
-     * ```
-     *
-     * In Javascript:
-     * ```js
-     * avalanche.addAPI("mychain", MyVMClass, "/ext/bc/mychain");
-     * ```
-     *
-     * @typeparam GA Class of the API being added
-     * @param apiName A label for referencing the API in the future
-     * @param constructorFN A reference to the class which instantiates the API
-     * @param baseurl Path to resolve to reach the API
-     *
-     */
+   * Sets the temporary auth token used for communicating with the node.
+   * 
+   * @param auth A temporary token provided by the node enabling access to the endpoints on the node.
+   */
+  setAuthToken = (auth:string):void => {
+    this.auth = auth;
+  }
+
+  protected _setHeaders = (headers:object):object => {
+    if(typeof this.auth === "string"){
+      headers["Authorization"] = "Bearer " + this.auth;
+    }
+    return headers;
+  }
+
+  /**
+   * Adds an API to the middleware. The API resolves to a registered blockchain's RPC.
+   *
+   * In TypeScript:
+   * ```js
+   * avalanche.addAPI<MyVMClass>("mychain", MyVMClass, "/ext/bc/mychain");
+   * ```
+   *
+   * In Javascript:
+   * ```js
+   * avalanche.addAPI("mychain", MyVMClass, "/ext/bc/mychain");
+   * ```
+   *
+   * @typeparam GA Class of the API being added
+   * @param apiName A label for referencing the API in the future
+   * @param ConstructorFN A reference to the class which instantiates the API
+   * @param baseurl Path to resolve to reach the API
+   *
+   */
   addAPI = <GA extends APIBase>(apiName:string,
     ConstructorFN: new(avax:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA,
     baseurl:string = undefined,
@@ -125,15 +143,15 @@ export default class AvalancheCore {
   };
 
   /**
-     * Retrieves a reference to an API by its apiName label.
-     *
-     * @param apiName Name of the API to return
-     */
+   * Retrieves a reference to an API by its apiName label.
+   *
+   * @param apiName Name of the API to return
+   */
   api = <GA extends APIBase>(apiName:string): GA => this.apis[apiName] as GA;
 
   /**
-     * @ignore
-     */
+   * @ignore
+   */
   protected _request = async (xhrmethod:Method,
     baseurl:string,
     getdata:object,
@@ -167,40 +185,40 @@ export default class AvalancheCore {
   };
 
   /**
-     * Makes a GET call to an API.
-     *
-     * @param baseurl Path to the api
-     * @param getdata Object containing the key value pairs sent in GET
-     * @param parameters Object containing the parameters of the API call
-     * @param headers An array HTTP Request Headers
-     * @param axiosConfig Configuration for the axios javascript library that will be the
-     * foundation for the rest of the parameters
-     *
-     * @returns A promise for [[RequestResponseData]]
-     */
+   * Makes a GET call to an API.
+   *
+   * @param baseurl Path to the api
+   * @param getdata Object containing the key value pairs sent in GET
+   * @param parameters Object containing the parameters of the API call
+   * @param headers An array HTTP Request Headers
+   * @param axiosConfig Configuration for the axios javascript library that will be the
+   * foundation for the rest of the parameters
+   *
+   * @returns A promise for [[RequestResponseData]]
+   */
   get = (baseurl:string,
     getdata:object,
     headers:object = {},
     axiosConfig:AxiosRequestConfig = undefined)
-  : Promise<RequestResponseData> => this._request('GET',
-    baseurl,
-    getdata,
-    {},
-    headers,
-    axiosConfig);
+  : Promise<RequestResponseData> =>  this._request('GET',
+      baseurl,
+      getdata,
+      {},
+      this._setHeaders(headers),
+      axiosConfig);
 
   /**
-     * Makes a DELETE call to an API.
-     *
-     * @param baseurl Path to the API
-     * @param getdata Object containing the key value pairs sent in DELETE
-     * @param parameters Object containing the parameters of the API call
-     * @param headers An array HTTP Request Headers
-     * @param axiosConfig Configuration for the axios javascript library that will be the
-     * foundation for the rest of the parameters
-     *
-     * @returns A promise for [[RequestResponseData]]
-     */
+   * Makes a DELETE call to an API.
+   *
+   * @param baseurl Path to the API
+   * @param getdata Object containing the key value pairs sent in DELETE
+   * @param parameters Object containing the parameters of the API call
+   * @param headers An array HTTP Request Headers
+   * @param axiosConfig Configuration for the axios javascript library that will be the
+   * foundation for the rest of the parameters
+   *
+   * @returns A promise for [[RequestResponseData]]
+   */
   delete = (baseurl:string,
     getdata:object,
     headers:object = {},
@@ -209,22 +227,22 @@ export default class AvalancheCore {
     baseurl,
     getdata,
     {},
-    headers,
+    this._setHeaders(headers),
     axiosConfig);
 
   /**
-     * Makes a POST call to an API.
-     *
-     * @param baseurl Path to the API
-     * @param getdata Object containing the key value pairs sent in POST
-     * @param postdata Object containing the key value pairs sent in POST
-     * @param parameters Object containing the parameters of the API call
-     * @param headers An array HTTP Request Headers
-     * @param axiosConfig Configuration for the axios javascript library that will be the
-     * foundation for the rest of the parameters
-     *
-     * @returns A promise for [[RequestResponseData]]
-     */
+   * Makes a POST call to an API.
+   *
+   * @param baseurl Path to the API
+   * @param getdata Object containing the key value pairs sent in POST
+   * @param postdata Object containing the key value pairs sent in POST
+   * @param parameters Object containing the parameters of the API call
+   * @param headers An array HTTP Request Headers
+   * @param axiosConfig Configuration for the axios javascript library that will be the
+   * foundation for the rest of the parameters
+   *
+   * @returns A promise for [[RequestResponseData]]
+   */
   post = (baseurl:string,
     getdata:object,
     postdata:string | object | ArrayBuffer | ArrayBufferView,
@@ -234,22 +252,22 @@ export default class AvalancheCore {
     baseurl,
     getdata,
     postdata,
-    headers,
+    this._setHeaders(headers),
     axiosConfig);
 
   /**
-     * Makes a PUT call to an API.
-     *
-     * @param baseurl Path to the baseurl
-     * @param getdata Object containing the key value pairs sent in PUT
-     * @param postdata Object containing the key value pairs sent in PUT
-     * @param parameters Object containing the parameters of the API call
-     * @param headers An array HTTP Request Headers
-     * @param axiosConfig Configuration for the axios javascript library that will be the
-     * foundation for the rest of the parameters
-     *
-     * @returns A promise for [[RequestResponseData]]
-     */
+   * Makes a PUT call to an API.
+   *
+   * @param baseurl Path to the baseurl
+   * @param getdata Object containing the key value pairs sent in PUT
+   * @param postdata Object containing the key value pairs sent in PUT
+   * @param parameters Object containing the parameters of the API call
+   * @param headers An array HTTP Request Headers
+   * @param axiosConfig Configuration for the axios javascript library that will be the
+   * foundation for the rest of the parameters
+   *
+   * @returns A promise for [[RequestResponseData]]
+   */
   put = (baseurl:string,
     getdata:object,
     postdata:string | object | ArrayBuffer | ArrayBufferView,
@@ -259,22 +277,22 @@ export default class AvalancheCore {
     baseurl,
     getdata,
     postdata,
-    headers,
+    this._setHeaders(headers),
     axiosConfig);
 
   /**
-     * Makes a PATCH call to an API.
-     *
-     * @param baseurl Path to the baseurl
-     * @param getdata Object containing the key value pairs sent in PATCH
-     * @param postdata Object containing the key value pairs sent in PATCH
-     * @param parameters Object containing the parameters of the API call
-     * @param headers An array HTTP Request Headers
-     * @param axiosConfig Configuration for the axios javascript library that will be the
-     * foundation for the rest of the parameters
-     *
-     * @returns A promise for [[RequestResponseData]]
-     */
+   * Makes a PATCH call to an API.
+   *
+   * @param baseurl Path to the baseurl
+   * @param getdata Object containing the key value pairs sent in PATCH
+   * @param postdata Object containing the key value pairs sent in PATCH
+   * @param parameters Object containing the parameters of the API call
+   * @param headers An array HTTP Request Headers
+   * @param axiosConfig Configuration for the axios javascript library that will be the
+   * foundation for the rest of the parameters
+   *
+   * @returns A promise for [[RequestResponseData]]
+   */
   patch = (baseurl:string,
     getdata:object,
     postdata:string | object | ArrayBuffer | ArrayBufferView,
@@ -284,16 +302,16 @@ export default class AvalancheCore {
     baseurl,
     getdata,
     postdata,
-    headers,
+    this._setHeaders(headers),
     axiosConfig);
 
   /**
-     * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
-     *
-     * @param ip The hostname to resolve to reach the Avalanche Client APIs
-     * @param port The port to resolve to reach the Avalanche Client APIs
-     * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
-     */
+   * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
+   *
+   * @param ip The hostname to resolve to reach the Avalanche Client APIs
+   * @param port The port to resolve to reach the Avalanche Client APIs
+   * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
+   */
   constructor(ip:string, port:number, protocol:string = 'http') {
     this.setAddress(ip, port, protocol);
   }

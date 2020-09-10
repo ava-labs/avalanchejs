@@ -4,6 +4,7 @@
  */
 import AvalancheCore from './avalanche';
 import { AdminAPI } from './apis/admin/api';
+import { AuthAPI } from './apis/auth/api';
 import { AVMAPI } from './apis/avm/api';
 import { HealthAPI } from './apis/health/api';
 import { InfoAPI } from './apis/info/api';
@@ -31,6 +32,11 @@ export default class Avalanche extends AvalancheCore {
      * Returns a reference to the Admin RPC.
      */
   Admin = () => this.apis.admin as AdminAPI;
+
+  /**
+     * Returns a reference to the Auth RPC.
+     */
+  Auth = () => this.apis.auth as AuthAPI;
 
   /**
      * Returns a reference to the AVM RPC pointed at the X-Chain.
@@ -107,6 +113,7 @@ export default class Avalanche extends AvalancheCore {
     
     if (!skipinit) {
       this.addAPI('admin', AdminAPI);
+      this.addAPI('auth', AuthAPI);
       this.addAPI('xchain', AVMAPI, '/ext/bc/X', chainid);
       this.addAPI('health', HealthAPI);
       this.addAPI('info', InfoAPI);
@@ -127,6 +134,7 @@ export { Buffer };
 export * as utils from './utils';
 export * as common from './common';
 export * as admin from './apis/admin';
+export * as auth from './apis/auth';
 export * as avm from './apis/avm';
 export * as health from './apis/health';
 export * as info from './apis/info';

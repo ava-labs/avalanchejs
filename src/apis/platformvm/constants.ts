@@ -23,6 +23,8 @@ export class PlatformVMConstants {
   static SECPFXID:number = 0;
 
   static SECPXFEROUTPUTID:number = 7;
+  
+  static SUBNETAUTHID:number = 10;
 
   static SECPOWNEROUTPUTID:number = 11;
 

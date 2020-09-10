@@ -16,8 +16,9 @@ import { DefaultNetworkID, Defaults } from '../../utils/constants';
 import { ImportTx } from '../platformvm/importtx';
 import { BaseTx } from '../platformvm/basetx';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
-import { Output, OutputOwners } from '../../common/output';
+import { Output } from '../../common/output';
 import { AddDelegatorTx, AddValidatorTx } from './validationtx';
+import { CreateSubnetTx } from './createsubnettx';
 
 /**
  * @ignore
@@ -385,7 +386,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const importTx:ImportTx = new ImportTx(networkid, blockchainid, sourceChain, outs, ins, memo, importIns);
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid, outs, ins, memo, sourceChain, importIns);
     return new UnsignedTx(importTx);
   };
 
@@ -471,7 +472,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw success;
     }
 
-    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, destinationChain, outs, ins, memo, exportouts);
+    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, destinationChain, exportouts);
     return new UnsignedTx(exportTx);
   };
 
@@ -697,6 +698,56 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const rewardOutputOwners:SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
 
     const UTx:AddValidatorTx = new AddValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners), delegationFee);
+    return new UnsignedTx(UTx);
+  }
+
+
+  /**
+    * Class representing an unsigned [[CreateSubnetTx]] transaction.
+    *
+    * @param networkid Networkid, [[DefaultNetworkID]]
+    * @param blockchainid Blockchainid, default undefined
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+    * @param subnetOwnerAddresses An array of {@link https://github.com/feross/buffer|Buffer} for the addresses to add to a subnet
+    * @param subnetOwnerThreshold The number of owners's signatures required to add a validator to the network
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * 
+    * @returns An unsigned transaction created from the passed in parameters.
+    */
+   buildCreateSubnetTx = (
+    networkid:number = DefaultNetworkID, 
+    blockchainid:Buffer,
+    fromAddresses:Array<Buffer>,
+    changeAddresses:Array<Buffer>,
+    subnetOwnerAddresses:Array<Buffer>,
+    subnetOwnerThreshold:number, 
+    fee:BN = undefined,
+    feeAssetID:Buffer = undefined, 
+    memo:Buffer = undefined, 
+    asOf:BN = UnixNow(),
+  ):UnsignedTx => {
+    const zero:BN = new BN(0);
+    let ins:Array<TransferableInput> = [];
+    let outs:Array<TransferableOutput> = [];
+    
+    if(this._feeCheck(fee, feeAssetID)) {
+      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
+      aad.addAssetAmount(feeAssetID, zero, fee);
+      const success:Error = this.getMinimumSpendable(aad, asOf);
+      if(typeof success === "undefined") {
+        ins = aad.getInputs();
+        outs = aad.getAllOutputs();
+      } else {
+        throw success;
+      }
+    }
+
+    const locktime: BN = new BN(0)
+    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, outs, ins, memo, new SECPOwnerOutput(subnetOwnerAddresses, locktime, subnetOwnerThreshold));
     return new UnsignedTx(UTx);
   }
 

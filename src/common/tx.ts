@@ -134,8 +134,6 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
       this.memo = Buffer.alloc(4);
       this.memo.writeUInt32BE(0,0);
     } else {
-      let memolen = Buffer.alloc(4)
-      memolen.writeUInt32BE(memo.length, 0);
       this.memo = memo;
     }
     

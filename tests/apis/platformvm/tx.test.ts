@@ -311,7 +311,7 @@ describe('Transactions', () => {
 
   test('Creation ImportTx', () => {
     const bombtx:ImportTx = new ImportTx(
-      netid, blockchainID, undefined, outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
+      netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), undefined, importIns
     );
 
     expect(() => {
@@ -319,7 +319,7 @@ describe('Transactions', () => {
     }).toThrow();
 
     const importtx:ImportTx = new ImportTx(
-      netid, blockchainID, bintools.cb58Decode(PlatformChainID), outputs, inputs, new UTF8Payload("hello world").getPayload(), importIns
+      netid, blockchainID,  outputs, inputs, new UTF8Payload("hello world").getPayload(), bintools.cb58Decode(PlatformChainID), importIns
     );
     const txunew:ImportTx = new ImportTx();
     const importbuff:Buffer = importtx.toBuffer();
@@ -332,7 +332,7 @@ describe('Transactions', () => {
 
   test('Creation ExportTx', () => {
     const bombtx:ExportTx = new ExportTx(
-      netid, blockchainID, undefined, outputs, inputs, undefined, exportOuts
+      netid, blockchainID, outputs, inputs, undefined, undefined, exportOuts
     );
 
     expect(() => {
@@ -340,7 +340,7 @@ describe('Transactions', () => {
     }).toThrow();
 
     const exporttx:ExportTx = new ExportTx(
-      netid, blockchainID, bintools.cb58Decode(PlatformChainID), outputs, inputs, undefined, exportOuts
+      netid, blockchainID, outputs, inputs, undefined, bintools.cb58Decode(PlatformChainID), exportOuts
     );
     const txunew:ExportTx = new ExportTx();
     const exportbuff:Buffer = exporttx.toBuffer();

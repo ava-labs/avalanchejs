@@ -110,6 +110,16 @@ export class CreateAssetTx extends BaseTx {
       return Buffer.concat(barr, bsize);
     }
   
+    clone():this {
+      let newbase:CreateAssetTx = new CreateAssetTx();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new CreateAssetTx(...args) as this;
+    }
+
     /**
      * Class representing an unsigned Create Asset transaction.
      *

@@ -98,6 +98,16 @@ export class OperationTx extends BaseTx {
       }
       return sigs;
     }
+
+    clone():this {
+        let newbase:OperationTx = new OperationTx();
+        newbase.fromBuffer(this.toBuffer());
+        return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new OperationTx(...args) as this;
+    }
   
     /**
      * Class representing an unsigned Operation transaction.

@@ -14,9 +14,10 @@ import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXOSet } from '../platformvm/utxos';
+import { UTXOSet, UTXO } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import axios from 'axios';
+import { SECPOwnerOutput } from './outputs';
 
 /**
  * @ignore
@@ -314,7 +315,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
    *
    */
-  getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
+  getCurrentValidators = async (subnetID:Buffer | string = undefined):Promise<object> => {
     const params:any = {};
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
@@ -322,7 +323,7 @@ export class PlatformVMAPI extends JRPCAPI {
       params.subnetID = bintools.cb58Encode(subnetID);
     }
     return this.callMethod('platform.getCurrentValidators', params)
-      .then((response:RequestResponseData) => response.data.result.validators);
+      .then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -334,7 +335,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
    *
    */
-  getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<Array<object>> => {
+  getPendingValidators = async (subnetID:Buffer | string = undefined):Promise<object> => {
     const params:any = {};
     if (typeof subnetID === 'string') {
       params.subnetID = subnetID;
@@ -343,7 +344,7 @@ export class PlatformVMAPI extends JRPCAPI {
     }
 
     return this.callMethod('platform.getPendingValidators', params)
-      .then((response:RequestResponseData) => response.data.result.validators);
+      .then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -650,6 +651,35 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
+   * Returns the height of the platform chain.
+   */
+  getHeight = async ():Promise<BN> => {
+    const params:any = {};
+    return this.callMethod('platform.getHeight', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.height, 10));
+  }
+
+  /**
+   * Gets the minimum staking amount.
+   */
+  getMinStake = async ():Promise<BN> => {
+    const params:any = {};
+    return this.callMethod('platform.getMinStake', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.minStake, 10));
+  }
+
+  /**
+   * Gets the total amount staked for an array of addresses.
+   */
+  getStake = async (addresses:Array<string>):Promise<BN> => {
+    const params:any = {
+      addresses
+    };
+    return this.callMethod('platform.getStake', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.staked, 10));
+  }
+
+  /**
    * Get all the subnets that exist.
    *
    * @param ids IDs of the subnets to retrieve information about. If omitted, gets all subnets
@@ -754,8 +784,6 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:number = undefined,
-    assetID:Buffer|string = undefined,
-    typeID:number = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<UTXOSet> => {
     
@@ -774,12 +802,7 @@ export class PlatformVMAPI extends JRPCAPI {
     if(typeof sourceChain !== "undefined") {
       params.sourceChain = sourceChain;
     }
-    let asset:Buffer;
-    if(typeof assetID === "string") {
-      asset = bintools.cb58Decode(assetID);
-    } else {
-      asset = assetID;
-    }
+
 axios.interceptors.request.use(request => {
   return request
 })
@@ -800,7 +823,7 @@ axios.interceptors.request.use(request => {
         }
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data, false, asset, typeID);
+      utxos.addArray(data, false);
       return utxos;
     });
   };
@@ -1174,6 +1197,60 @@ axios.interceptors.request.use(request => {
       rewardThreshold,
       rewards,
       delegationFee,
+      this.getFee(), 
+      avaxAssetID,
+      memo, asOf
+    );
+
+    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check");
+    }
+
+    return builtUnsignedTx;
+  }
+
+  /**
+    * Class representing an unsigned [[CreateSubnetTx]] transaction.
+    *
+    * @param utxoset A set of UTXOs that the transaction is built on
+    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+    * @param subnetOwnerAddresses An array of addresses for owners of the new subnet
+    * @param subnetOwnerThreshold A number indicating the amount of signatures required to add validators to a subnet
+    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+    * @param feeAssetID Optional. The assetID of the fees being burned
+    * @param memo Optional contains arbitrary bytes, up to 256 bytes
+    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+    * 
+    * @returns An unsigned transaction created from the passed in parameters.
+    */
+  buildCreateSubnetTx = async (
+    utxoset:UTXOSet, 
+    fromAddresses:Array<string>,
+    changeAddresses:Array<string>,
+    subnetOwnerAddresses:Array<string>,
+    subnetOwnerThreshold:number, 
+    memo:PayloadBase|Buffer = undefined, 
+    asOf:BN = UnixNow()
+  ):Promise<UnsignedTx> => {
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildCreateSubnetTx').map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildCreateSubnetTx').map((a) => bintools.stringToAddress(a));
+    const owners:Array<Buffer> = this._cleanAddressArray(subnetOwnerAddresses, 'buildCreateSubnetTx').map((a) => bintools.stringToAddress(a));
+
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
+
+    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+
+    const builtUnsignedTx:UnsignedTx = utxoset.buildCreateSubnetTx(
+      this.core.getNetworkID(), 
+      bintools.cb58Decode(this.blockchainID), 
+      from,
+      change,
+      owners,
+      subnetOwnerThreshold,
       this.getFee(), 
       avaxAssetID,
       memo, asOf

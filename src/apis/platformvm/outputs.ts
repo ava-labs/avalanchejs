@@ -100,6 +100,8 @@ export class SECPOwnerOutput extends Output {
     return new TransferableOutput(assetID, this);
   }
 
+  
+
   create(...args:any[]):this{
     return new SECPOwnerOutput(...args) as this;
   }

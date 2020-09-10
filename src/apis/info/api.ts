@@ -75,7 +75,7 @@ export class InfoAPI extends JRPCAPI {
    */
   getTxFee = async ():Promise<BN> => {
     return this.callMethod('info.getTxFee')
-        .then((response:RequestResponseData) => new BN(response.data.result.txFee));
+        .then((response:RequestResponseData) => new BN(response.data.result.txFee, 10));
   };
 
   /**
