@@ -340,7 +340,7 @@ export class NFTMintOperation extends Operation {
   }
 
   /**
-   * Returns the payload's raw {@link https://github.com/feross/buffer|Buffer} with length prepended, for use with 
+   * Returns the payload's raw {@link https://github.com/feross/buffer|Buffer} with length prepended, for use with [[PayloadBase]]'s fromBuffer
    */
   getPayloadBuffer = ():Buffer => {
     let payloadlen:Buffer = Buffer.alloc(4);
