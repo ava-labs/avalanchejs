@@ -386,7 +386,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const importTx:ImportTx = new ImportTx(networkid, blockchainid,  outs, ins, memo, sourceChain, importIns);
+    const importTx:ImportTx = new ImportTx(networkid, blockchainid, outs, ins, memo, sourceChain, importIns);
     return new UnsignedTx(importTx);
   };
 
@@ -746,7 +746,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, new SECPOwnerOutput(subnetOwnerAddresses, new BN(0), subnetOwnerThreshold), outs, ins, memo);
+    const UTx:CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, outs, ins, memo, new SECPOwnerOutput(subnetOwnerAddresses));
     return new UnsignedTx(UTx);
   }
 

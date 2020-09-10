@@ -111,6 +111,7 @@ export class ExportTx extends BaseTx {
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
+   * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    * @param destinationChain Optional chainid which identifies where the funds will send to.
    * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
    */

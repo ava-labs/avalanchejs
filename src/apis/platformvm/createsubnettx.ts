@@ -70,10 +70,10 @@ export class CreateSubnetTx extends BaseTx {
   constructor(
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer = Buffer.alloc(32, 16), 
-    subnetOwners:SECPOwnerOutput = undefined,
     outs:Array<TransferableOutput> = undefined, 
     ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined
+    memo:Buffer = undefined,
+    subnetOwners:SECPOwnerOutput = undefined
   ) {
     super(networkid, blockchainid, outs, ins, memo);
     this.subnetOwners = subnetOwners;

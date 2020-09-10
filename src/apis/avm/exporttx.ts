@@ -117,9 +117,10 @@ export class ExportTx extends BaseTx {
        *
        * @param networkid Optional networkid, [[DefaultNetworkID]]
        * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-       * @param destinationChain Optional chainid which identifies where the funds will send to.
        * @param outs Optional array of the [[TransferableOutput]]s
        * @param ins Optional array of the [[TransferableInput]]s
+       * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+       * @param destinationChain Optional chainid which identifies where the funds will sent to
        * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
        */
     constructor(
@@ -128,9 +129,9 @@ export class ExportTx extends BaseTx {
       memo:Buffer = undefined, destinationChain:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
-      this.destinationChain = destinationChain; //no correction, if they don't pass a chainid here, it will BOMB on toBuffer
+      this.destinationChain = destinationChain; // no correction, if they don't pass a chainid here, it will BOMB on toBuffer
       if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
-        for (let i = 0; i < exportOuts.length; i++) {
+        for (let i:number = 0; i < exportOuts.length; i++) {
           if (!(exportOuts[i] instanceof TransferableOutput)) {
             throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
           }

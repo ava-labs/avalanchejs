@@ -131,7 +131,7 @@ export class ImportTx extends BaseTx {
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
-     * @param sourceChain Optiona chainid for the source inputs to import. Default platform chainid.
+     * @param sourceChain Optional chainid for the source inputs to import. Default platform chainid.
      * @param importIns Array of [[TransferableInput]]s used in the transaction
      */
     constructor(
@@ -140,7 +140,7 @@ export class ImportTx extends BaseTx {
       memo:Buffer = undefined, sourceChain:Buffer = undefined, importIns:Array<TransferableInput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
-      this.sourceChain = sourceChain; // do no correct, if it's wrong it'll bomb on toBuffer
+      this.sourceChain = sourceChain; // do not correct, if it's wrong it'll bomb on toBuffer
       if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
         for (let i = 0; i < importIns.length; i++) {
           if (!(importIns[i] instanceof TransferableInput)) {
