@@ -206,7 +206,7 @@ export class NFTTransferOutput extends NFTOutput {
   /**
      * Returns the payload as a {@link https://github.com/feross/buffer|Buffer}
      */
-  getPayload = ():Buffer => bintools.copyFrom(this.payload);
+  getPayload = ():Buffer => Buffer.concat([bintools.copyFrom(this.sizePayload), bintools.copyFrom(this.payload)]);
 
     /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOutput]] and returns the size of the output.
