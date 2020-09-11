@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Common-Payload
+ * @module Utils-Payload
  */
 
 import { Buffer } from "buffer/";
@@ -192,8 +192,8 @@ export abstract class PayloadBase {
      * Returns the payload (with typeID).
      */
     getPayload():Buffer {
-        let typeid:Buffer = Buffer.alloc(4);
-        typeid.writeUInt32BE(this.typeid, 0);
+        let typeid:Buffer = Buffer.alloc(1);
+        typeid.writeUInt8(this.typeid, 0);
         const pl: Buffer = Buffer.concat([typeid, bintools.copyFrom(this.payload)]);
         return pl; 
     }

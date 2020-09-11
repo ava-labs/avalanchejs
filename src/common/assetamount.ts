@@ -1,3 +1,8 @@
+/**
+ * @packageDocumentation
+ * @module Common-AssetAmount
+ */
+
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import { StandardTransferableOutput } from './output';

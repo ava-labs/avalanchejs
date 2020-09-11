@@ -51,6 +51,10 @@ export class ExportTx extends BaseTx {
       return val;
     }
 
+    getTotalOuts():Array<TransferableOutput> {
+      return [...this.getOuts(), ...this.getExportOutputs()];
+    }
+
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} for the destination chainid.
      */
@@ -97,26 +101,37 @@ export class ExportTx extends BaseTx {
       }
       return Buffer.concat(barr);
     }
+
+    clone():this {
+      let newbase:ExportTx = new ExportTx();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new ExportTx(...args) as this;
+    }
   
     /**
        * Class representing an unsigned Export transaction.
        *
        * @param networkid Optional networkid, [[DefaultNetworkID]]
        * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-       * @param destinationChain Optional chainid which identifies where the funds will send to.
        * @param outs Optional array of the [[TransferableOutput]]s
        * @param ins Optional array of the [[TransferableInput]]s
+       * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+       * @param destinationChain Optional chainid which identifies where the funds will sent to
        * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
        */
     constructor(
-      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), destinationChain:Buffer = undefined,
+      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
       outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-      memo:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
+      memo:Buffer = undefined, destinationChain:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
-      this.destinationChain = destinationChain; //no correction, if they don't pass a chainid here, it will BOMB on toBuffer
+      this.destinationChain = destinationChain; // no correction, if they don't pass a chainid here, it will BOMB on toBuffer
       if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
-        for (let i = 0; i < exportOuts.length; i++) {
+        for (let i:number = 0; i < exportOuts.length; i++) {
           if (!(exportOuts[i] instanceof TransferableOutput)) {
             throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
           }

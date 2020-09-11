@@ -39,7 +39,7 @@ export abstract class StandardUTXO {
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
     */
-   getCodecIDBuffer = ():Buffer => this.codecid;
+  getCodecIDBuffer = ():Buffer => this.codecid;
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -154,8 +154,19 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
    * @param utxo Either a [[StandardUTXO]] a cb58 serialized string representing a StandardUTXO
    */
   includes = (utxo:UTXOClass | string):boolean => {
-    const utxoX:UTXOClass = this.parseUTXO(utxo);
-    const utxoid:string = utxoX.getUTXOID();
+    let utxoX:UTXOClass = undefined;
+    let utxoid:string = undefined;
+    try {
+      utxoX = this.parseUTXO(utxo);
+      utxoid = utxoX.getUTXOID();
+    } catch(e) {
+      if(e instanceof Error){
+        console.log(e.message);
+      } else{ 
+        console.log(e);
+      }
+      return false;
+    }
     return (utxoid in this.utxos);
   };
 
@@ -168,7 +179,17 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
      * @returns A [[StandardUTXO]] if one was added and undefined if nothing was added.
      */
   add(utxo:UTXOClass | string, overwrite:boolean = false):UTXOClass {
-    const utxovar:UTXOClass = this.parseUTXO(utxo);
+    let utxovar:UTXOClass = undefined;
+    try {
+      utxovar = this.parseUTXO(utxo);
+    } catch(e) {
+      if(e instanceof Error){
+        console.log(e.message);
+      } else{ 
+        console.log(e);
+      }
+      return undefined; 
+    }
 
     const utxoid:string = utxovar.getUTXOID();
     if (!(utxoid in this.utxos) || overwrite === true) {
@@ -198,9 +219,9 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
   addArray(utxos:Array<string | UTXOClass>, overwrite:boolean = false):Array<StandardUTXO> {
     const added:Array<UTXOClass> = [];
     for (let i = 0; i < utxos.length; i++) {
-      const result:UTXOClass = this.add(utxos[i], overwrite);
+      let result:UTXOClass = this.add(utxos[i], overwrite);
       if (typeof result !== 'undefined') {
-        added.push(result);
+          added.push(result);
       }
     }
     return added;
@@ -214,7 +235,17 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
      * @returns A [[StandardUTXO]] if it was removed and undefined if nothing was removed.
      */
   remove = (utxo:UTXOClass | string):UTXOClass => {
-    const utxovar:UTXOClass = this.parseUTXO(utxo);
+    let utxovar:UTXOClass = undefined;
+    try {
+      utxovar = this.parseUTXO(utxo);
+    } catch(e) {
+      if(e instanceof Error){
+        console.log(e.message);
+      } else{ 
+        console.log(e);
+      }
+      return undefined; 
+    }
 
     const utxoid:string = utxovar.getUTXOID();
     if (!(utxoid in this.utxos)) {
@@ -395,6 +426,17 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
   abstract clone():this;
 
   abstract create(...args:any[]):this;
+
+  filter(args:any[], lambda:(utxo:UTXOClass, ...largs:any[]) => boolean):this {
+    let newset:this = this.clone();
+    let utxos:Array<UTXOClass> = this.getAllUTXOs();
+    for(let i = 0; i < utxos.length; i++){
+      if(lambda(utxos[i], ...args) === false) {
+        newset.remove(utxos[i]);
+      }
+    }
+    return newset;
+  }
 
   /**
      * Returns a new set with copy of UTXOs in this and set parameter.

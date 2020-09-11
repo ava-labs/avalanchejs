@@ -15,7 +15,7 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on an AVM Chain. 
  */
-export class AVMKeyPair extends SECP256k1KeyPair {
+export class KeyPair extends SECP256k1KeyPair {
 
     protected chainid:string = '';
     protected hrp:string = '';
@@ -64,16 +64,16 @@ export class AVMKeyPair extends SECP256k1KeyPair {
     };
 
     clone():this {
-        let newkp:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
+        let newkp:KeyPair = new KeyPair(this.hrp, this.chainid);
         newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
         return newkp as this;
     }
 
     create(...args:any[]):this {
         if(args.length == 2){
-            return new AVMKeyPair(args[0], args[1]) as this;
+            return new KeyPair(args[0], args[1]) as this;
         }
-        return new AVMKeyPair(this.hrp, this.chainid) as this;
+        return new KeyPair(this.hrp, this.chainid) as this;
     }
 
     constructor(hrp:string, chainid:string) {
@@ -88,9 +88,9 @@ export class AVMKeyPair extends SECP256k1KeyPair {
 /**
  * Class for representing a key chain in Avalanche. 
  * 
- * @typeparam AVMKeyPair Class extending [[KeyPair]] which is used as the key in [[AVMKeyChain]]
+ * @typeparam KeyPair Class extending [[SECP256k1KeyChain]] which is used as the key in [[KeyChain]]
  */
-export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
+export class KeyChain extends SECP256k1KeyChain<KeyPair> {
 
     hrp:string = '';
     chainid:string = '';
@@ -100,13 +100,13 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
      * 
      * @returns The new key pair
      */
-    makeKey = ():AVMKeyPair => {
-        let keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
+    makeKey = ():KeyPair => {
+        let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
         this.addKey(keypair);
         return keypair
     }
 
-    addKey = (newKey:AVMKeyPair) => {
+    addKey = (newKey:KeyPair) => {
         newKey.setChainID(this.chainid);
         super.addKey(newKey);
     }
@@ -118,8 +118,8 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
      * 
      * @returns The new key pair
      */
-    importKey = (privk:Buffer | string):AVMKeyPair => {
-        let keypair:AVMKeyPair = new AVMKeyPair(this.hrp, this.chainid);
+    importKey = (privk:Buffer | string):KeyPair => {
+        let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
             pk = bintools.cb58Decode(privk.split('-')[1]);
@@ -135,13 +135,13 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
 
     create(...args:any[]):this {
         if(args.length == 2){
-            return new AVMKeyChain(args[0], args[1]) as this;
+            return new KeyChain(args[0], args[1]) as this;
         }
-        return new AVMKeyChain(this.hrp, this.chainid) as this;
+        return new KeyChain(this.hrp, this.chainid) as this;
     };
 
     clone():this {
-        const newkc:AVMKeyChain = new AVMKeyChain(this.hrp, this.chainid);
+        const newkc:KeyChain = new KeyChain(this.hrp, this.chainid);
         for(let k in this.keys){
             newkc.addKey(this.keys[k].clone());
         }
@@ -149,7 +149,7 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
     };
 
     union(kc:this):this {
-        let newkc:AVMKeyChain = kc.clone();
+        let newkc:KeyChain = kc.clone();
         for(let k in this.keys){
             newkc.addKey(this.keys[k].clone());
         }
@@ -157,7 +157,7 @@ export class AVMKeyChain extends SECP256k1KeyChain<AVMKeyPair> {
     }
 
     /**
-     * Returns instance of AVMKeyChain.
+     * Returns instance of KeyChain.
      */
     constructor(hrp:string, chainid:string){
         super();

@@ -9,7 +9,7 @@ import { Buffer } from "buffer/";
  * Class for representing a private and public keypair in Avalanche. 
  * All APIs that need key pairs should extend on this class.
  */
-export abstract class KeyPair {
+export abstract class StandardKeyPair {
     protected pubk:Buffer;
   
     protected privk:Buffer;
@@ -115,29 +115,29 @@ export abstract class KeyPair {
    * Class for representing a key chain in Avalanche.
    * All endpoints that need key chains should extend on this class.
    *
-   * @typeparam KPClass extending [[KeyPair]] which is used as the key in [[KeyChain]]
+   * @typeparam KPClass extending [[StandardKeyPair]] which is used as the key in [[StandardKeyChain]]
    */
-  export abstract class KeyChain<KPClass extends KeyPair> {
+  export abstract class StandardKeyChain<KPClass extends StandardKeyPair> {
     protected keys:{[address: string]: KPClass} = {};
   
     /**
-       * Makes a new [[KeyPair]], returns the address.
+       * Makes a new [[StandardKeyPair]], returns the address.
        *
-       * @returns Address of the new [[KeyPair]]
+       * @returns Address of the new [[StandardKeyPair]]
        */
     makeKey:() => KPClass;
   
     /**
-       * Given a private key, makes a new [[KeyPair]], returns the address.
+       * Given a private key, makes a new [[StandardKeyPair]], returns the address.
        *
        * @param privk A {@link https://github.com/feross/buffer|Buffer} representing the private key
        *
-       * @returns A new [[KeyPair]]
+       * @returns A new [[StandardKeyPair]]
        */
     importKey:(privk:Buffer) => KPClass;
   
     /**
-       * Gets an array of addresses stored in the [[KeyChain]].
+       * Gets an array of addresses stored in the [[StandardKeyChain]].
        *
        * @returns An array of {@link https://github.com/feross/buffer|Buffer}  representations
        * of the addresses
@@ -145,7 +145,7 @@ export abstract class KeyPair {
     getAddresses = ():Array<Buffer> => Object.values(this.keys).map((kp) => kp.getAddress());
   
     /**
-       * Gets an array of addresses stored in the [[KeyChain]].
+       * Gets an array of addresses stored in the [[StandardKeyChain]].
        *
        * @returns An array of string representations of the addresses
        */
@@ -153,16 +153,16 @@ export abstract class KeyPair {
       .map((kp) => kp.getAddressString());
   
     /**
-       * Adds the key pair to the list of the keys managed in the [[KeyChain]].
+       * Adds the key pair to the list of the keys managed in the [[StandardKeyChain]].
        *
-       * @param newKey A key pair of the appropriate class to be added to the [[KeyChain]]
+       * @param newKey A key pair of the appropriate class to be added to the [[StandardKeyChain]]
        */
     addKey(newKey:KPClass) {
       this.keys[newKey.getAddress().toString('hex')] = newKey;
     };
   
     /**
-       * Removes the key pair from the list of they keys managed in the [[KeyChain]].
+       * Removes the key pair from the list of they keys managed in the [[StandardKeyChain]].
        *
        * @param key A {@link https://github.com/feross/buffer|Buffer} for the address or
        * KPClass to remove
@@ -193,12 +193,12 @@ export abstract class KeyPair {
     hasKey = (address:Buffer):boolean => (address.toString('hex') in this.keys);
   
     /**
-       * Returns the [[KeyPair]] listed under the provided address
+       * Returns the [[StandardKeyPair]] listed under the provided address
        *
        * @param address The {@link https://github.com/feross/buffer|Buffer} of the address to
        * retrieve from the keys database
        *
-       * @returns A reference to the [[KeyPair]] in the keys database
+       * @returns A reference to the [[StandardKeyPair]] in the keys database
        */
     getKey = (address:Buffer): KPClass => this.keys[address.toString('hex')];
 
@@ -209,7 +209,7 @@ export abstract class KeyPair {
     abstract union(kc:this):this;
   
     /**
-       * Returns instance of [[KeyChain]].
+       * Returns instance of [[StandardKeyChain]].
        * 
        */
     constructor() {}

@@ -10,7 +10,7 @@ import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';
 import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { AVMKeyChain, AVMKeyPair } from './keychain';
+import { KeyChain, KeyPair } from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
 
 /**
@@ -33,13 +33,6 @@ export class ImportTx extends BaseTx {
        */
     getTxType = ():number => {
       return AVMConstants.IMPORTTX;
-    }
-
-    /**
-     * Returns the exported outputs as an array of [[TransferableInput]]
-     */
-    getExportOuts = ():Array<TransferableInput> => {
-      return this.importIns;
     }
 
     /**
@@ -94,22 +87,32 @@ export class ImportTx extends BaseTx {
     getImportInputs():Array<TransferableInput> {
       return this.importIns;
     }
+
+    clone():this {
+      let newbase:ImportTx = new ImportTx();
+      newbase.fromBuffer(this.toBuffer());
+      return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new ImportTx(...args) as this;
+    }
   
     /**
        * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
        *
        * @param msg A Buffer for the [[UnsignedTx]]
-       * @param kc An [[AVMKeyChain]] used in signing
+       * @param kc An [[KeyChain]] used in signing
        *
        * @returns An array of [[Credential]]s
        */
-    sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
+    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
       const sigs:Array<Credential> = super.sign(msg, kc);
       for (let i = 0; i < this.importIns.length; i++) {
         const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
         const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
         for (let j = 0; j < sigidxs.length; j++) {
-          const keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
+          const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
           const signval:Buffer = keypair.sign(msg);
           const sig:Signature = new Signature();
           sig.fromBuffer(signval);
@@ -125,19 +128,19 @@ export class ImportTx extends BaseTx {
      *
      * @param networkid Optional networkid, [[DefaultNetworkID]]
      * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-     * @param sourceChain Optiona chainid for the source inputs to import. Default platform chainid.
      * @param outs Optional array of the [[TransferableOutput]]s
      * @param ins Optional array of the [[TransferableInput]]s
      * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+     * @param sourceChain Optional chainid for the source inputs to import. Default platform chainid.
      * @param importIns Array of [[TransferableInput]]s used in the transaction
      */
     constructor(
-      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), sourceChain:Buffer = undefined,
+      networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
       outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-      memo:Buffer = undefined, importIns:Array<TransferableInput> = undefined
+      memo:Buffer = undefined, sourceChain:Buffer = undefined, importIns:Array<TransferableInput> = undefined
     ) {
       super(networkid, blockchainid, outs, ins, memo);
-      this.sourceChain = sourceChain; // do no correct, if it's wrong it'll bomb on toBuffer
+      this.sourceChain = sourceChain; // do not correct, if it's wrong it'll bomb on toBuffer
       if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
         for (let i = 0; i < importIns.length; i++) {
           if (!(importIns[i] instanceof TransferableInput)) {

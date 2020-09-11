@@ -16,12 +16,12 @@ import BN from "bn.js";
  */
 export class InfoAPI extends JRPCAPI {
   /**
-     * Fetches the blockchainID from the node for a given alias.
-     *
-     * @param alias The blockchain alias to get the blockchainID
-     *
-     * @returns Returns a Promise<string> containing the base 58 string representation of the blockchainID.
-     */
+   * Fetches the blockchainID from the node for a given alias.
+   *
+   * @param alias The blockchain alias to get the blockchainID
+   *
+   * @returns Returns a Promise<string> containing the base 58 string representation of the blockchainID.
+   */
   getBlockchainID = async (alias:string):Promise<string> => {
     const params:any = {
       alias,
@@ -31,10 +31,10 @@ export class InfoAPI extends JRPCAPI {
   };
 
   /**
-     * Fetches the networkID from the node.
-     *
-     * @returns Returns a Promise<number> of the networkID.
-     */
+   * Fetches the networkID from the node.
+   *
+   * @returns Returns a Promise<number> of the networkID.
+   */
   getNetworkID = async ():Promise<number> => {
     const params:any = {};
     return this.callMethod('info.getNetworkID', params)
@@ -42,28 +42,18 @@ export class InfoAPI extends JRPCAPI {
   };
 
   /**
-   * Fetches the transaction fee from the node.
+   * Fetches the network name this node is running on
    *
-   * @returns Returns a Promise<number> of the transaction fee in nAVAX.
+   * @returns Returns a Promise<string> containing the network name.
    */
-  getTxFee = async ():Promise<BN> => {
-    return this.callMethod('info.getTxFee')
-        .then((response:RequestResponseData) => new BN(response.data.result.txFee));
-  };
-
-  /**
-     * Fetches the network name this node is running on
-     *
-     * @returns Returns a Promise<string> containing the network name.
-     */
   getNetworkName = async ():Promise<string> => this.callMethod('info.getNetworkName')
     .then((response:RequestResponseData) => response.data.result.networkName);
 
   /**
-     * Fetches the nodeID from the node.
-     *
-     * @returns Returns a Promise<string> of the nodeID.
-     */
+   * Fetches the nodeID from the node.
+   *
+   * @returns Returns a Promise<string> of the nodeID.
+   */
   getNodeID = async ():Promise<string> => {
     const params:any = {};
     return this.callMethod('info.getNodeID', params)
@@ -71,18 +61,42 @@ export class InfoAPI extends JRPCAPI {
   };
 
   /**
-     * Fetches the version of Gecko this node is running
-     *
-     * @returns Returns a Promise<string> containing the version of Gecko.
-     */
+   * Fetches the version of Gecko this node is running
+   *
+   * @returns Returns a Promise<string> containing the version of Gecko.
+   */
   getNodeVersion = async ():Promise<string> => this.callMethod('info.getNodeVersion')
     .then((response:RequestResponseData) => response.data.result.version);
 
   /**
-     * Returns the peers connected to the node.
-     *
-     * @returns Promise for the list of connected peers in <ip>:<port> format.
-     */
+   * Fetches the transaction fee from the node.
+   *
+   * @returns Returns a Promise<BN> of the transaction fee in nAVAX.
+   */
+  getTxFee = async ():Promise<BN> => {
+    return this.callMethod('info.getTxFee')
+        .then((response:RequestResponseData) => new BN(response.data.result.txFee, 10));
+  };
+
+  /**
+   * Check whether a given chain is done bootstrapping
+   * @param chain The ID or alias of a chain.
+   *
+   * @returns Returns a Promise<boolean> of whether the chain has completed bootstrapping.
+   */
+  isBootstrapped = async (chain:string):Promise<boolean> => {
+    const params:any = {
+      chain
+    };
+    return this.callMethod('info.isBootstraped', params)
+        .then((response:RequestResponseData) => response.data.result.isBootstrapped);
+  };
+
+  /**
+   * Returns the peers connected to the node.
+   *
+   * @returns Promise for the list of connected peers in <ip>:<port> format.
+   */
   peers = async ():Promise<Array<string>> => this.callMethod('info.peers')
     .then((response:RequestResponseData) => response.data.result.peers);
 

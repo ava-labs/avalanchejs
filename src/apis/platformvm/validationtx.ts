@@ -12,7 +12,7 @@ import { Buffer } from 'buffer/';
 import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
-import { AmountOutput } from './outputs';
+import { AmountOutput, ParseableOutput } from './outputs';
 
 /**
  * @ignore
@@ -98,15 +98,8 @@ export abstract class ValidatorTx extends BaseTx {
 }
 
 
-export class AddSubnetValidatorTx extends ValidatorTx {
+export abstract class WeightedValidatorTx extends ValidatorTx {
     protected weight:Buffer = Buffer.alloc(8);
-
-    /**
-     * Returns the id of the [[AddSubnetValidatorTx]]
-     */
-    getTxType = ():number => {
-    return PlatformVMConstants.ADDSUBNETVALIDATORTX;
-    }
 
     /**
      * Returns a {@link https://github.com/indutny/bn.js/|BN} for the stake amount.
@@ -168,15 +161,125 @@ export class AddSubnetValidatorTx extends ValidatorTx {
     }
 
 }
+/* Must implement later, the signing process isn't friendly to AvalancheJS
 
+export class AddSubnetValidatorTx extends WeightedValidatorTx {
+    protected subnetID:Buffer = Buffer.alloc(32);
+    protected subnetAddrs:Array<Buffer> = [];
+    protected subnetAuthIdxs:Array<Buffer> = [];
+
+
+    getTxType = ():number => {
+        return PlatformVMConstants.ADDSUBNETVALIDATORTX;
+    }
+
+
+    getSubnetID = ():Buffer => {
+        return this.subnetID;
+    }
+
+
+    getSubnetIDString = ():string => {
+        return bintools.cb58Encode(this.subnetID);
+    }
+
+
+    getSubnetAuthAddresses = ():Array<Buffer> => {
+        return this.subnetAddrs;
+    }
+
+
+    setSubnetAuthAddresses = (addrs:Array<Buffer>):void => {
+        this.subnetAddrs = addrs;
+    }
+
+    calcSubnetAuthIdxs = (addrs:Array<Buffer>):Array<Buffer> => {
+        let idxs:Array<Buffer> = [];
+        addrs = addrs.sort();
+        for(let i = 0; i < addrs.length; i++){
+            let idx:Buffer = Buffer.alloc(4);
+            idx.writeUInt32BE(i,0);
+            idxs.push(idx);
+        }
+    }
+
+
+    getSubnetAuthIdxs = ():Array<Buffer> => {
+        return this.subnetAddrs;
+    }
+
+    fromBuffer(bytes:Buffer, offset:number = 0):number {
+        offset = super.fromBuffer(bytes, offset);
+        this.subnetID = bintools.copyFrom(bytes, offset, offset + 32);
+        offset += 32;
+        let sublenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
+        offset += 4;
+        let sublen:number = sublenbuff.readUInt32BE(0);
+        for(let i = 0; i < sublen; i++){
+
+        }
+        offset = this.subnetAuth.fromBuffer(bytes, offset);
+        return offset;
+    }
+
+
+    toBuffer():Buffer {
+        const superbuff:Buffer = super.toBuffer();
+
+        return Buffer.concat([superbuff, this.subnetID, subAuth], superbuff.length + this.subnetID.length + subAuth.length);
+    }
+
+
+    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
+        let creds:Array<SECPCredential> = super.sign(msg, kc);
+        const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
+        for(let i = 0; i  < this.subnetAuth.length ; i++) {
+            if(!kc.hasKey(this.subnetAuth[i])) {
+                throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.");
+            }
+            
+            let kp:KeyPair = kc.getKey(this.subnetAuth[i]);
+            const signval:Buffer = kp.sign(msg);
+            const sig:Signature = new Signature();
+            sig.fromBuffer(signval);
+            cred.addSignature(sig);
+        }
+        creds.push(cred);
+        return creds;
+    }
+
+
+    constructor(
+        networkid:number = DefaultNetworkID, 
+        blockchainid:Buffer = Buffer.alloc(32, 16), 
+        outs:Array<TransferableOutput> = undefined, 
+        ins:Array<TransferableInput> = undefined, 
+        memo:Buffer = undefined, 
+        nodeID:Buffer = undefined, 
+        startTime:BN = undefined, 
+        endTime:BN = undefined,
+        weight:BN = undefined,
+        subnetID:Buffer = undefined,
+        subnetAuth:Array<Buffer> = undefined
+    ) {
+        super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, weight);
+        if(typeof subnetID !== undefined){
+            this.subnetID = subnetID;
+        }
+        if(typeof subnetAuth !== undefined) {
+            this.subnetAuth = subnetAuth;
+        }
+    }
+
+}
+*/
 
 /**
  * Class representing an unsigned AddDelegatorTx transaction.
  */
-export class AddDelegatorTx extends AddSubnetValidatorTx {
-    
+export class AddDelegatorTx extends WeightedValidatorTx {
     protected stakeOuts:Array<TransferableOutput> = [];
-    protected rewardAddress:Buffer = Buffer.alloc(20);
+    protected rewardOwners:ParseableOutput = undefined;
   
     /**
        * Returns the id of the [[AddDelegatorTx]]
@@ -220,10 +323,14 @@ export class AddDelegatorTx extends AddSubnetValidatorTx {
     /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} for the reward address.
      */
-    getRewardAddress():Buffer {
-        return this.rewardAddress;
+    getRewardOwners():ParseableOutput {
+        return this.rewardOwners;
     }
     
+    getTotalOuts():Array<TransferableOutput> {
+        return [...this.getOuts(), ...this.getStakeOuts()];
+    }
+
     fromBuffer(bytes:Buffer, offset:number = 0):number {
         offset = super.fromBuffer(bytes, offset);
         const numstakeouts = bintools.copyFrom(bytes, offset, offset + 4);
@@ -235,7 +342,8 @@ export class AddDelegatorTx extends AddSubnetValidatorTx {
             offset = xferout.fromBuffer(bytes, offset);
             this.outs.push(xferout);
         }
-        this.rewardAddress = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ADDRESSLENGTH);
+        this.rewardOwners = new ParseableOutput();
+        offset = this.rewardOwners.fromBuffer(bytes, offset);
         offset += PlatformVMConstants.ADDRESSLENGTH;
         return offset;
     }
@@ -248,18 +356,31 @@ export class AddDelegatorTx extends AddSubnetValidatorTx {
         let bsize:number = superbuff.length;
         const numouts:Buffer = Buffer.alloc(4);
         numouts.writeUInt32BE(this.stakeOuts.length, 0);
-        let barr:Array<Buffer> = [super.toBuffer(), this.weight, numouts];
+        let barr:Array<Buffer> = [super.toBuffer(), numouts];
+        bsize += numouts.length;
         this.stakeOuts = this.stakeOuts.sort(TransferableOutput.comparator());
         for(let i = 0; i < this.stakeOuts.length; i++) {
             let out:Buffer = this.stakeOuts[i].toBuffer();
             barr.push(out);
             bsize += out.length;
         }
-        barr.push(this.rewardAddress);
-        bsize += this.rewardAddress.length;
+        let ro:Buffer = this.rewardOwners.toBuffer();
+        barr.push(ro);
+        bsize += ro.length;
         return Buffer.concat(barr, bsize);
-      }
+    }
   
+    clone():this {
+        let newbase:AddDelegatorTx = new AddDelegatorTx();
+        newbase.fromBuffer(this.toBuffer());
+        return newbase as this;
+    }
+
+    create(...args:any[]):this {
+        return new AddDelegatorTx(...args) as this;
+    }
+
+
     /**
      * Class representing an unsigned AddDelegatorTx transaction.
      *
@@ -273,7 +394,7 @@ export class AddDelegatorTx extends AddSubnetValidatorTx {
      * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
      * @param stakeOuts Optional. The outputs used in paying the stake.
-     * @param rewardAddress Optional. The address the validator reward goes.
+     * @param rewardOwners Optional. The [[ParseableOutput]] containing a [[SECPOwnerOutput]] for the rewards.
      */
     constructor(
         networkid:number = DefaultNetworkID, 
@@ -286,13 +407,13 @@ export class AddDelegatorTx extends AddSubnetValidatorTx {
         endTime:BN = undefined,
         stakeAmount:BN = undefined,
         stakeOuts:Array<TransferableOutput> = undefined,
-        rewardAddress:Buffer = undefined
+        rewardOwners:ParseableOutput = undefined
     ) {
         super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount);
         if(typeof stakeOuts !== undefined){
             this.stakeOuts = stakeOuts
         }
-        this.rewardAddress = rewardAddress;
+        this.rewardOwners = rewardOwners;
     }
   }
 
@@ -350,7 +471,8 @@ export class AddValidatorTx extends AddDelegatorTx {
      * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
      * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
-     * @param rewardAddress Optional. The address the validator reward goes to.
+     * @param stakeOuts Optional. The outputs used in paying the stake.
+     * @param rewardOwners Optional. The [[ParseableOutput]] containing the [[SECPOwnerOutput]] for the rewards.
      * @param delegationFee Optional. The percent fee this validator charges when others delegate stake to them. 
      * Up to 4 decimal places allowed; additional decimal places are ignored. Must be between 0 and 100, inclusive. 
      * For example, if delegationFeeRate is 1.2345 and someone delegates to this validator, then when the delegation 
@@ -367,7 +489,7 @@ export class AddValidatorTx extends AddDelegatorTx {
         endTime:BN = undefined,
         stakeAmount:BN = undefined,
         stakeOuts:Array<TransferableOutput> = undefined,
-        rewardAddress:Buffer = undefined,
+        rewardOwners:ParseableOutput = undefined,
         delegationFee:number = undefined
     ) {
         super(
@@ -381,7 +503,7 @@ export class AddValidatorTx extends AddDelegatorTx {
             endTime,
             stakeAmount,
             stakeOuts,
-            rewardAddress
+            rewardOwners
         );
         if(typeof delegationFee === "number") {
             if(delegationFee >= 0 && delegationFee <= 100) {

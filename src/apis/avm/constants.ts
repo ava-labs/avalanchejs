@@ -1,34 +1,18 @@
 /**
  * @packageDocumentation
- * @module API-AVM-Types
+ * @module API-AVM-Constants
  */
-
-import BN from 'bn.js';
-import BinTools from '../../utils/bintools';
-
-/**
- * @ignore
- */
-const bintools:BinTools = BinTools.getInstance();
 
 export class AVMConstants {
   static LATESTCODEC:number = 0;
-
-  static ONEAVAX:BN = new BN(1000000000);
-
-  static DECIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(10));
-
-  static CENTIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(100));
-
-  static MILLIAVAX:BN = AVMConstants.ONEAVAX.div(new BN(1000));
-
-  static MICROAVAX:BN = AVMConstants.ONEAVAX.div(new BN(1000000));
 
   static SECPFXID:number = 0;
 
   static NFTFXID:number = 1;
 
-  static SECPOUTPUTID:number = 7;
+  static SECPMINTOUTPUTID:number = 6;
+
+  static SECPXFEROUTPUTID:number = 7;
 
   static NFTXFEROUTPUTID:number = 11;
 
@@ -36,9 +20,11 @@ export class AVMConstants {
 
   static SECPINPUTID:number = 5;
 
+  static SECPMINTOPID:number = 8;
+
   static NFTMINTOPID:number = 12;
 
-  static NFTXFEROP:number = 13;
+  static NFTXFEROPID:number = 13;
 
   static BASETX:number = 0;
 

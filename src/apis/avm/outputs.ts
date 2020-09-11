@@ -18,9 +18,12 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == AVMConstants.SECPOUTPUTID){
-        let secpout:SecpOutput = new SecpOutput( ...args);
+    if(outputid == AVMConstants.SECPXFEROUTPUTID){
+        let secpout:SECPTransferOutput = new SECPTransferOutput( ...args);
         return secpout;
+    } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
+        let secpmintout:SECPMintOutput = new SECPMintOutput( ...args);
+        return secpmintout;
     } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
         let nftout:NFTMintOutput = new NFTMintOutput(...args);
         return nftout;
@@ -74,24 +77,59 @@ export abstract class NFTOutput extends BaseNFTOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpOutput extends AmountOutput {
+export class SECPTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return AVMConstants.SECPOUTPUTID;
+    return AVMConstants.SECPXFEROUTPUTID;
   }
 
   create(...args:any[]):this{
-    return new SecpOutput(...args) as this;
+    return new SECPTransferOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpOutput = this.create()
+    const newout:SECPTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
 
+}
+
+/**
+ * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
+ */
+export class SECPMintOutput extends Output {
+
+  /**
+   * Returns the outputID for this output
+   */
+  getOutputID():number {
+    return AVMConstants.SECPMINTOUTPUTID;
+  }
+
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+    return new TransferableOutput(assetID, this);
+  }
+
+  create(...args:any[]):this{
+    return new SECPMintOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SECPMintOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
+  select(id:number, ...args: any[]):Output {
+    return SelectOutputClass(id, ...args);
+  }
 
 }
 
@@ -165,10 +203,17 @@ export class NFTTransferOutput extends NFTOutput {
         return AVMConstants.NFTXFEROUTPUTID;
     }
 
-  /**
-     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer}
+    /**
+     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with content only.
      */
-  getPayload = ():Buffer => bintools.copyFrom(this.payload);
+    getPayload = ():Buffer =>  bintools.copyFrom(this.payload);
+
+
+    /**
+     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with length of payload prepended.
+     */
+    getPayloadBuffer = ():Buffer => Buffer.concat([bintools.copyFrom(this.sizePayload), bintools.copyFrom(this.payload)]);
+
 
     /**
      * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOutput]] and returns the size of the output.

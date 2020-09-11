@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
-import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
+import { Output, StandardAmountOutput, StandardTransferableOutput, OutputOwners, StandardParseableOutput } from '../../common/output';
 
 const bintools = BinTools.getInstance();
 
@@ -17,10 +17,11 @@ const bintools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == PlatformVMConstants.SECPOUTPUTID){
-        let secpout:SecpOutput = new SecpOutput( ...args);
-        return secpout;
-    } 
+    if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
+        return new SECPTransferOutput( ...args);
+    } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
+      return new SECPOwnerOutput(...args);
+    }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }
 
@@ -33,6 +34,15 @@ export class TransferableOutput extends StandardTransferableOutput{
         this.output = SelectOutputClass(outputid);
         return this.output.fromBuffer(bytes, offset);
       }
+}
+
+export class ParseableOutput extends StandardParseableOutput{
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+      const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+      offset += 4;
+      this.output = SelectOutputClass(outputid);
+      return this.output.fromBuffer(bytes, offset);
+    }
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
@@ -52,22 +62,57 @@ export abstract class AmountOutput extends StandardAmountOutput {
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
-export class SecpOutput extends AmountOutput {
+export class SECPTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return PlatformVMConstants.SECPOUTPUTID;
+    return PlatformVMConstants.SECPXFEROUTPUTID;
   }
 
   create(...args:any[]):this{
-    return new SecpOutput(...args) as this;
+    return new SECPTransferOutput(...args) as this;
   }
 
   clone():this {
-    const newout:SecpOutput = this.create()
+    const newout:SECPTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
 }
 
+/**
+ * An [[Output]] class which only specifies an Output ownership and uses secp256k1 signature scheme.
+ */
+export class SECPOwnerOutput extends Output {
+  /**
+     * Returns the outputID for this output
+     */
+  getOutputID():number {
+    return PlatformVMConstants.SECPOWNEROUTPUTID;
+  }
+
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+    return new TransferableOutput(assetID, this);
+  }
+
+  
+
+  create(...args:any[]):this{
+    return new SECPOwnerOutput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SECPOwnerOutput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
+  select(id:number, ...args: any[]):Output {
+    return SelectOutputClass(id, ...args);
+  }
+}

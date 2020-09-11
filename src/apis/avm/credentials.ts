@@ -22,7 +22,7 @@ const bintools:BinTools = BinTools.getInstance();
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
   if (credid === AVMConstants.SECPCREDENTIAL) {
-    const secpcred:SecpCredential = new SecpCredential(...args);
+    const secpcred:SECPCredential = new SECPCredential(...args);
     return secpcred;
   } if (credid === AVMConstants.NFTCREDENTIAL) {
     const nftcred:NFTCredential = new NFTCredential(...args);
@@ -32,23 +32,23 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
   throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
 };
 
-export class SecpCredential extends Credential {
+export class SECPCredential extends Credential {
   getCredentialID():number {
     return AVMConstants.SECPCREDENTIAL;
   }
 
   clone():this {
-    let newbase:SecpCredential = new SecpCredential();
+    let newbase:SECPCredential = new SECPCredential();
     newbase.fromBuffer(this.toBuffer());
     return newbase as this;
   }
 
   create(...args:any[]):this {
-    return new SecpCredential(...args) as this;
+    return new SECPCredential(...args) as this;
   }
 
   select(id:number, ...args:any[]):this {
-    let newbasetx:SecpCredential = SelectCredentialClass(id, ...args);
+    let newbasetx:SECPCredential = SelectCredentialClass(id, ...args);
     return newbasetx as this;
   }
 

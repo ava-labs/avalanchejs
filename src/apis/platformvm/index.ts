@@ -1,6 +1,7 @@
 export * from './api';
 export * from './basetx';
 export * from './constants';
+export * from './createsubnettx';
 export * from './credentials';
 export * from './exporttx';
 export * from './importtx';

@@ -40,7 +40,7 @@ export class ExportTx extends BaseTx {
   }
 
   /**
-   * Returns the totall exported amount as a {@link https://github.com/indutny/bn.js/|BN}.
+   * Returns the total exported amount as a {@link https://github.com/indutny/bn.js/|BN}.
    */
   getExportTotal():BN {
     let val:BN = new BN(0);
@@ -48,6 +48,10 @@ export class ExportTx extends BaseTx {
       val = val.add((this.exportOuts[i].getOutput() as AmountOutput).getAmount());
     }
     return val;
+  }
+
+  getTotalOuts():Array<TransferableOutput> {
+    return [...this.getOuts(), ...this.getExportOutputs()];
   }
 
   /**
@@ -90,20 +94,31 @@ export class ExportTx extends BaseTx {
     return Buffer.concat(barr);
   }
 
+  clone():this {
+    let newbase:ExportTx = new ExportTx();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new ExportTx(...args) as this;
+  }
+
   /**
    * Class representing an unsigned Export transaction.
    *
    * @param networkid Optional networkid, [[DefaultNetworkID]]
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-   * @param destinationChain Optional chainid which identifies where the funds will send to.
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
+   * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+   * @param destinationChain Optional chainid which identifies where the funds will send to.
    * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
    */
   constructor(
-    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), destinationChain:Buffer = undefined,
+    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
     outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
+    memo:Buffer = undefined, destinationChain:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
   ) {
     super(networkid, blockchainid, outs, ins, memo);
     this.destinationChain = destinationChain; //do not correct, it should bomb on toBuffer if not provided
