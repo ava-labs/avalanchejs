@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Common-Payload
+ * @module Utils-Payload
  */
 
 import { Buffer } from "buffer/";

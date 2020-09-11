@@ -1,6 +1,3 @@
-import {
-    
-} from 'src/apis/avm/constants';
 import { Buffer } from 'buffer/';
 import BinTools from 'src/utils/bintools';
 import { SigIdx, Signature } from 'src/common/credentials';

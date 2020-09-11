@@ -3,8 +3,6 @@
  * @module API-PlatformVM-Constants
  */
 
-import BN from 'bn.js';
-
 export class PlatformVMConstants {
   static LATESTCODEC:number = 0;
 

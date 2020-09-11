@@ -2,7 +2,7 @@ import mockAxios from 'jest-mock-axios';
 import { UTXOSet, UTXO } from 'src/apis/avm/utxos';
 import { AVMAPI } from 'src/apis/avm/api';
 import { UnsignedTx, Tx } from 'src/apis/avm/tx';
-import { AVMKeyChain } from 'src/apis/avm/keychain';
+import { KeyChain } from 'src/apis/avm/keychain';
 import { SECPTransferInput, TransferableInput } from 'src/apis/avm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
@@ -31,9 +31,9 @@ import { ONEAVAX } from '../../../src/utils/constants';
 const bintools = BinTools.getInstance();
 describe('Transactions', () => {
   let set:UTXOSet;
-  let keymgr1:AVMKeyChain;
-  let keymgr2:AVMKeyChain;
-  let keymgr3:AVMKeyChain;
+  let keymgr1:KeyChain;
+  let keymgr2:KeyChain;
+  let keymgr3:KeyChain;
   let addrs1:Array<Buffer>;
   let addrs2:Array<Buffer>;
   let addrs3:Array<Buffer>;
@@ -95,9 +95,9 @@ describe('Transactions', () => {
 
   beforeEach(() => {
     set = new UTXOSet();
-    keymgr1 = new AVMKeyChain(avalanche.getHRP(), alias);
-    keymgr2 = new AVMKeyChain(avalanche.getHRP(), alias);
-    keymgr3 = new AVMKeyChain(avalanche.getHRP(), alias);
+    keymgr1 = new KeyChain(avalanche.getHRP(), alias);
+    keymgr2 = new KeyChain(avalanche.getHRP(), alias);
+    keymgr3 = new KeyChain(avalanche.getHRP(), alias);
     addrs1 = [];
     addrs2 = [];
     addrs3 = [];

@@ -5,7 +5,6 @@
 import { Buffer } from "buffer/";
 import BinTools from '../../utils/bintools';
 import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
-import { AVMKeyPair } from '../avm/keychain';
 
 /**
  * @ignore
@@ -16,7 +15,7 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on the Platform Chain. 
  */
-export class PlatformVMKeyPair extends SECP256k1KeyPair {
+export class KeyPair extends SECP256k1KeyPair {
 
     protected chainid:string = '';
     protected hrp:string = '';
@@ -65,16 +64,16 @@ export class PlatformVMKeyPair extends SECP256k1KeyPair {
     };
 
     clone():this {
-        let newkp:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
+        let newkp:KeyPair = new KeyPair(this.hrp, this.chainid);
         newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
         return newkp as this;
     }
 
     create(...args:any[]):this {
         if(args.length == 2){
-            return new PlatformVMKeyPair(args[0], args[1]) as this;
+            return new KeyPair(args[0], args[1]) as this;
         }
-        return new PlatformVMKeyPair(this.hrp, this.chainid) as this;
+        return new KeyPair(this.hrp, this.chainid) as this;
     }
 
     constructor(hrp:string, chainid:string) {
@@ -89,9 +88,9 @@ export class PlatformVMKeyPair extends SECP256k1KeyPair {
 /**
  * Class for representing a key chain in Avalanche. 
  * 
- * @typeparam PlatformVMKeyPair Class extending [[KeyPair]] which is used as the key in [[PlatformVMKeyChain]]
+ * @typeparam KeyPair Class extending [[KeyPair]] which is used as the key in [[KeyChain]]
  */
-export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
+export class KeyChain extends SECP256k1KeyChain<KeyPair> {
 
     hrp:string = '';
     chainid:string = '';
@@ -101,13 +100,13 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
      * 
      * @returns The new key pair
      */
-    makeKey = ():PlatformVMKeyPair => {
-        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
+    makeKey = ():KeyPair => {
+        let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
         this.addKey(keypair);
         return keypair;
     }
 
-    addKey = (newKey:PlatformVMKeyPair) => {
+    addKey = (newKey:KeyPair) => {
         newKey.setChainID(this.chainid);
         super.addKey(newKey);
     }
@@ -119,8 +118,8 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
      * 
      * @returns The new key pair
      */
-    importKey = (privk:Buffer | string):PlatformVMKeyPair => {
-        let keypair:PlatformVMKeyPair = new PlatformVMKeyPair(this.hrp, this.chainid);
+    importKey = (privk:Buffer | string):KeyPair => {
+        let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
         let pk:Buffer;
         if(typeof privk === 'string'){
             pk = bintools.cb58Decode(privk.split('-')[1]);
@@ -136,13 +135,13 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
 
     create(...args:any[]):this {
         if(args.length == 2){
-            return new PlatformVMKeyChain(args[0], args[1]) as this;
+            return new KeyChain(args[0], args[1]) as this;
         }
-        return new PlatformVMKeyChain(this.hrp, this.chainid) as this;
+        return new KeyChain(this.hrp, this.chainid) as this;
     };
 
     clone():this {
-        const newkc:PlatformVMKeyChain = new PlatformVMKeyChain(this.hrp, this.chainid);
+        const newkc:KeyChain = new KeyChain(this.hrp, this.chainid);
         for(let k in this.keys){
             newkc.addKey(this.keys[k].clone());
         }
@@ -150,7 +149,7 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
     };
 
     union(kc:this):this {
-        let newkc:PlatformVMKeyChain = kc.clone();
+        let newkc:KeyChain = kc.clone();
         for(let k in this.keys){
             newkc.addKey(this.keys[k].clone());
         }
@@ -158,7 +157,7 @@ export class PlatformVMKeyChain extends SECP256k1KeyChain<PlatformVMKeyPair> {
     }
 
     /**
-     * Returns instance of PlatformVMKeyChain.
+     * Returns instance of KeyChain.
      */
     constructor(hrp:string, chainid:string){
         super();

@@ -1,15 +1,7 @@
 /**
  * @packageDocumentation
- * @module API-AVM-Types
+ * @module API-AVM-Constants
  */
-
-import BN from 'bn.js';
-import BinTools from '../../utils/bintools';
-
-/**
- * @ignore
- */
-const bintools:BinTools = BinTools.getInstance();
 
 export class AVMConstants {
   static LATESTCODEC:number = 0;

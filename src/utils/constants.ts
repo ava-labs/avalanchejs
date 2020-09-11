@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Common-Constants
+ * @module Utils-Constants
  */
 
 import BN from "bn.js";
@@ -102,7 +102,7 @@ const n1C:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 470000000000000
+  fee: GWEI.mul(new BN(470))
 };
 
 // END TODO
@@ -183,7 +183,7 @@ const n4C:object = {
   blockchainID: 'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 470000000000000
+  fee: GWEI.mul(new BN(470))
 };
 
 // END TODO

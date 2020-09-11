@@ -4,11 +4,11 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import {  AVMConstants } from './constants';
+import { AVMConstants } from './constants';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { SelectCredentialClass } from './credentials';
-import { AVMKeyChain, AVMKeyPair } from './keychain';
+import { KeyChain, KeyPair } from './keychain';
 import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
@@ -22,7 +22,7 @@ const bintools = BinTools.getInstance();
 /**
  * Class representing a base for all transactions.
  */
-export class BaseTx  extends StandardBaseTx<AVMKeyPair, AVMKeyChain>{
+export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     /**
      * Returns the id of the [[BaseTx]]
      */
@@ -82,13 +82,13 @@ export class BaseTx  extends StandardBaseTx<AVMKeyPair, AVMKeyChain>{
      *
      * @returns An array of [[Credential]]s
      */
-      sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
+      sign(msg:Buffer, kc:KeyChain):Array<Credential> {
         const sigs:Array<Credential> = [];
         for (let i = 0; i < this.ins.length; i++) {
           const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
           const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
           for (let j = 0; j < sigidxs.length; j++) {
-            const keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
+            const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
             const signval:Buffer = keypair.sign(msg);
             const sig:Signature = new Signature();
             sig.fromBuffer(signval);

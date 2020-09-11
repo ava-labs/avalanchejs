@@ -8,7 +8,7 @@ import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
 import { UTXOSet } from './utxos';
 import { AVMConstants } from './constants';
-import { AVMKeyChain } from './keychain';
+import { KeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { SECPMintOutput } from './outputs';
@@ -39,7 +39,7 @@ export class AVMAPI extends JRPCAPI {
   /**
    * @ignore
    */
-  protected keychain:AVMKeyChain = new AVMKeyChain('', '');
+  protected keychain:KeyChain = new KeyChain('', '');
 
   protected blockchainID:string = '';
 
@@ -154,20 +154,20 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Gets a reference to the keychain for this class.
    *
-   * @returns The instance of [[AVMKeyChain]] for this class
+   * @returns The instance of [[KeyChain]] for this class
    */
-  keyChain = ():AVMKeyChain => this.keychain;
+  keyChain = ():KeyChain => this.keychain;
 
   /**
    * @ignore
    */
-  newKeyChain = ():AVMKeyChain => {
+  newKeyChain = ():KeyChain => {
     // warning, overwrites the old keychain
     const alias = this.getBlockchainAlias();
     if (alias) {
-      this.keychain = new AVMKeyChain(this.core.getHRP(), alias);
+      this.keychain = new KeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new AVMKeyChain(this.core.getHRP(), this.blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
     }
     return this.keychain;
   };
@@ -1269,9 +1269,9 @@ export class AVMAPI extends JRPCAPI {
     const netid:number = core.getNetworkID();
     if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
       const { alias } = Defaults.network[netid][blockchainID];
-      this.keychain = new AVMKeyChain(this.core.getHRP(), alias);
+      this.keychain = new KeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new AVMKeyChain(this.core.getHRP(), blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), blockchainID);
     }
   }
 }

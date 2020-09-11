@@ -1,7 +1,7 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from "src";
 import { AVMAPI } from "src/apis/avm/api";
-import { AVMKeyPair, AVMKeyChain } from 'src/apis/avm/keychain';
+import { KeyPair, KeyChain } from 'src/apis/avm/keychain';
 import {Buffer} from "buffer/";
 import BN from "bn.js";
 import BinTools from 'src/utils/bintools';
@@ -265,7 +265,7 @@ describe('AVMAPI', () => {
   });
 
   test('createFixedCapAsset', async () => {
-    const kp:AVMKeyPair = new AVMKeyPair(avalanche.getHRP(), alias);
+    const kp:KeyPair = new KeyPair(avalanche.getHRP(), alias);
     kp.importKey(Buffer.from('ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676', 'hex'));
 
     const denomination:number = 0;
@@ -299,7 +299,7 @@ describe('AVMAPI', () => {
   });
 
   test('createVariableCapAsset', async () => {
-    const kp:AVMKeyPair = new AVMKeyPair(avalanche.getHRP(), alias);
+    const kp:KeyPair = new KeyPair(avalanche.getHRP(), alias);
     kp.importKey(Buffer.from('ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676', 'hex'));
 
     const denomination:number = 0;
@@ -530,8 +530,8 @@ describe('AVMAPI', () => {
 
   describe('Transactions', () => {
     let set:UTXOSet;
-    let keymgr2:AVMKeyChain;
-    let keymgr3:AVMKeyChain;
+    let keymgr2:KeyChain;
+    let keymgr3:KeyChain;
     let addrs1:Array<string>;
     let addrs2:Array<string>;
     let addrs3:Array<string>;
@@ -589,8 +589,8 @@ describe('AVMAPI', () => {
       await result;
       set = new UTXOSet();
       avm.newKeyChain();
-      keymgr2 = new AVMKeyChain(avalanche.getHRP(), alias);
-      keymgr3 = new AVMKeyChain(avalanche.getHRP(), alias);
+      keymgr2 = new KeyChain(avalanche.getHRP(), alias);
+      keymgr3 = new KeyChain(avalanche.getHRP(), alias);
       addrs1 = [];
       addrs2 = [];
       addrs3 = [];
