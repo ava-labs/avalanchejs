@@ -138,9 +138,28 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj));
   });
 
+  test('getCurrentSupply', async () => {
+    const supply = new BN('1000000000000', 10);
+    const result:Promise<BN> = api.getCurrentSupply();
+    const payload:object = {
+      result: {
+        supply
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:BN = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response.toString(10)).toBe(supply.toString(10));
+  });
+
   test('getHeight', async () => {
     const height = new BN('100', 10);
-    const result:Promise<object> = api.getHeight();
+    const result:Promise<BN> = api.getHeight();
     const payload:object = {
       result: {
         height
@@ -151,15 +170,15 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:object = await result;
+    const response:BN = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(JSON.stringify(response)).toBe(JSON.stringify(height));
+    expect(response.toString(10)).toBe(height.toString(10));
   });
 
   test('getMinStake', async () => {
     const minStake = new BN('100', 10);
-    const result:Promise<object> = api.getMinStake();
+    const result:Promise<BN> = api.getMinStake();
     const payload:object = {
       result: {
         minStake
@@ -170,10 +189,10 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:object = await result;
+    const response:BN = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(JSON.stringify(response)).toBe(JSON.stringify(minStake));
+    expect(response.toString(10)).toBe(minStake.toString(10));
   });
 
   test('getStake', async () => {

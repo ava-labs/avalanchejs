@@ -29,7 +29,7 @@ We built AvalancheJS with ease of use in mind. With this library, any Javascript
 
 ### Requirements
 
-AvalancheJS requires Node.js LTS version 12.18.3 or higher to compile.
+AvalancheJS requires Node.js LTS version 12.14.1 or higher to compile.
 
 ### Installation
 
