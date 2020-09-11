@@ -76,7 +76,7 @@ The above lines import the libraries used in the tutorials. The libraries includ
 
 ## Example 1 &mdash; Managing X-Chain Keys
 
-AvalancheJS comes with its own AVM Keychain. This keychain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
+AvalancheJS comes with its own AVM Keychain. This KeyChain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
 
 ```js
 import {
@@ -89,30 +89,30 @@ import {
 let bintools = BinTools.getInstance();
 
 let myNetworkID = 12345; //default is 3, we want to override that for our local network
-let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The XChain blockchainID on this network
+let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
 let ava = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = ava.XChain(); //returns a reference to the XChain used by AvalancheJS
+let xchain = ava.XChain(); //returns a reference to the X-Chain used by AvalancheJS
 ```
 
-### Accessing the keychain
+### Accessing the KeyChain
 
-The keychain is accessed through the XChain and can be referenced directly or through a reference variable.
+The KeyChain is accessed through the X-Chain and can be referenced directly or through a reference variable.
 
 ```js
 let myKeychain = xchain.keyChain();
 ```
 
-This exposes the instance of the class AVMKeyChain which is created when the XChain API is created. At present, this supports secp256k1 curve for ECDSA key pairs.
+This exposes the instance of the class AVMKeyChain which is created when the X-Chain API is created. At present, this supports secp256k1 curve for ECDSA key pairs.
 
 ### Creating X-Chain key pairs
 
-The keychain has the ability to create new keypairs for you and return the address assocated with the key pair.
+The KeyChain has the ability to create new KeyPairs for you and return the address assocated with the key pair.
 
 ```js
 let newAddress1 = myKeychain.makeKey(); //returns a Buffer for the address
 ```
 
-You may also import your exsting private key into the keychain using either a Buffer...
+You may also import your exsting private key into the KeyChain using either a Buffer...
 
 ```js
 let mypk = bintools.avaDeserialize("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
@@ -126,33 +126,33 @@ let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
 let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
 ```
 
-### Working with keychains
+### Working with KeyChains
 
-The AVMKeyChain extends the global KeyChain class, which has standardized key management capabilities. The following functions are available on any keychain that implements this interface.
+The X-Chains's KeyChain has standardized key management capabilities. The following functions are available on any KeyChain that implements this interface.
 
 ```js
 let addresses = myKeychain.getAddresses(); //returns an array of Buffers for the addresses
 let addressStrings = myKeychain.getAddressStrings(); //returns an array of strings for the addresses
 let exists = myKeychain.hasKey(newAddress1); //returns true if the address is managed
-let keypair = myKeychain.getKey(newAddress1); //returns the keypair class
+let keypair = myKeychain.getKey(newAddress1); //returns the KeyPair class
 ```
 
 
-### Working with keypairs
+### Working with KeyPairs
 
-The AVMKeyPair class implements the global KeyPair class, which has standardized keypair functionality. The following operations are available on any keypair that implements this interface.
+The X-Chain's KeyPair has standardized KeyPair functionality. The following operations are available on any KeyPair that implements this interface.
 
 ```js
 let address = keypair.getAddress(); //returns Buffer
 let addressString = keypair.getAddressString(); //returns string
 
 let pubk = keypair.getPublicKey(); //returns Buffer
-let pubkstr = keypair.getPublicKeyString(); //returns a cb58 encoded string
+let pubkstr = keypair.getPublicKeyString(); //returns a CB58 encoded string
 
 let privk = keypair.getPrivateKey(); //returns Buffer
-let privkstr = keypair.getPrivateKeyString(); //returns a cb58 encoded string
+let privkstr = keypair.getPrivateKeyString(); //returns a CB58 encoded string
 
-keypair.generateKey(); //creates a new random keypair
+keypair.generateKey(); //creates a new random KeyPair
 
 let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
 let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
@@ -178,13 +178,13 @@ import {
   } from "avalanche" 
 import {
     InitialStates,
-    SecpOutput
+    SECPTransferOutput
   } from "avalanche/dist/apis/avm"
 
 let myNetworkID = 12345; //default is 3, we want to override that for our local network
-let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The XChain blockchainID on this network
+let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
 let avax = new Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = avax.XChain(); //returns a reference to the XChain used by AvalancheJS
+let xchain = avax.XChain(); //returns a reference to the X-Chain used by AvalancheJS
 ```
 
 ### Describe the new asset
@@ -205,15 +205,15 @@ let denomination = 9;
 
 We want to mint an asset with 400 coins to all of our managed keys, 500 to the second address we know of, and 600 to the second and third address. This sets up the state that will result from the Create Asset transaction. 
 
-*Note: This example assumes we have the keys already managed in our AVM Keychain.*
+*Note: This example assumes we have the keys already managed in our X-Chain's Keychain.*
 
 ```js
 let addresses = xchain.keyChain().getAddresses();
 
 // Create outputs for the asset's initial state
-let secpOutput1 = new SecpOutput(new BN(400), new BN(400), 1, addresses);
-let secpOutput2 = new SecpOutput(new BN(500), new BN(400), 1, [addresses[1]]);
-let secpOutput3 = new SecpOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
+let secpOutput1 = new SECPTransferOutput(new BN(400), new BN(400), 1, addresses);
+let secpOutput2 = new SECPTransferOutput(new BN(500), new BN(400), 1, [addresses[1]]);
+let secpOutput3 = new SECPTransferOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
 
 // Populate the initialStates with the outputs
 let initialState = new InitialStates();
@@ -231,7 +231,15 @@ Now that we know what we want an asset to look like, we create an output to send
 let utxos = await xchain.getUTXOs(addresses);
 
 // Make an unsigned Create Asset transaction from the data compiled earlier
-let unsigned = await xchain.buildCreateAssetTx(utxos, addresses, initialState, name, symbol, denomination);
+let unsigned = await xchain.buildCreateAssetTx(
+  utxos, // the UTXOSet containing the UTXOs we're going to spend
+  addresses, // the addresses which will pay the fees
+  addresses, // the addresses which recieve the change from the spent UTXOs
+  initialState, // the initial state to be created for this new asset 
+  name, // the full name of the asset
+  symbol, // a short ticker symbol for the asset
+  denomination // the asse's denomination 
+);
 
 let signed = xchain.keyChain().signTx(unsigned); //returns a Tx class
 ```
@@ -240,21 +248,21 @@ let signed = xchain.keyChain().signTx(unsigned); //returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it! 
 
-Using the AvalancheJS AVM API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the AvalancheJS X-Chain API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
-let txid = await xchain.issueTx(signed); //returns an Avalanche serialized string for the TxID
+let txid = await xchain.issueTx(signed); //returns a CB58 serialized string for the TxID
 ```
 
 ```js
 // using the base-58 representation
-let txid = await xchain.issueTx(signed.toString()); //returns an Avalanche serialized string for the TxID
+let txid = await xchain.issueTx(signed.toString()); //returns a CB58 serialized string for the TxID
 ```
 
 ```js
 // using the transaction Buffer
-let txid = await xchain.issueTx(signed.toBuffer()); //returns an Avalanche serialized string for the TxID
+let txid = await xchain.issueTx(signed.toBuffer()); //returns a CB58 serialized string for the TxID
 ```
 
 We assume ONE of those methods are used to issue the transaction.
@@ -292,9 +300,9 @@ import {
   } from "avalanche" 
 
 let myNetworkID = 1; //default is 3, we want to override that for our local network
-let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The XChain blockchainID on this network
+let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
 let avax = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = avax.XChain(); //returns a reference to the XChain used by AvalancheJS
+let xchain = avax.XChain(); //returns a reference to the X-Chain used by AvalancheJS
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
@@ -308,8 +316,8 @@ For the case of this example, we're going to create a simple transaction that sp
 However, we do need to get the UTXO Set for the addresses we're managing. 
 
 ```js
-let myAddresses = xchain.keyChain().getAddresses(); //returns an array of addresses the keychain manages
-let addressStrings = xchain.keyChain().getAddressStrings(); //returns an array of addresses the keychain manages as strings
+let myAddresses = xchain.keyChain().getAddresses(); //returns an array of addresses the KeyChain manages
+let addressStrings = xchain.keyChain().getAddressStrings(); //returns an array of addresses the KeyChain manages as strings
 let utxos = await xchain.getUTXOs(myAddresses);
 ```
 
