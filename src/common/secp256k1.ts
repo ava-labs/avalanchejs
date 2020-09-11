@@ -1,12 +1,12 @@
 /**
  * @packageDocumentation
- * @module PlatformVMAPI-KeyChain
+ * @module Common-SECP256k1KeyChain
  */
 import { Buffer } from "buffer/";
 import * as elliptic from "elliptic";
 import createHash from "create-hash";
 import BinTools from '../utils/bintools';
-import { KeyPair, KeyChain } from './keychain';
+import { StandardKeyPair, StandardKeyChain } from './keychain';
 
 /**
  * @ignore
@@ -37,7 +37,7 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Class for representing a private and public keypair on the Platform Chain. 
  */
-export abstract class SECP256k1KeyPair extends KeyPair {
+export abstract class SECP256k1KeyPair extends StandardKeyPair {
     protected keypair:elliptic.ec.KeyPair
 
     /**
@@ -194,9 +194,9 @@ export abstract class SECP256k1KeyPair extends KeyPair {
 /**
  * Class for representing a key chain in Avalanche. 
  * 
- * @typeparam SECP256k1KeyPair Class extending [[KeyPair]] which is used as the key in [[SECP256k1KeyChain]]
+ * @typeparam SECP256k1KeyPair Class extending [[StandardKeyPair]] which is used as the key in [[SECP256k1KeyChain]]
  */
-export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> extends KeyChain<SECPKPClass> {
+export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> extends StandardKeyChain<SECPKPClass> {
 
     /**
      * Makes a new key pair, returns the address.

@@ -8,7 +8,7 @@ import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
-import { PlatformVMKeyChain } from './keychain';
+import { KeyChain } from './keychain';
 import { Defaults, PlatformChainID, ONEAVAX } from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
@@ -35,7 +35,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * @ignore
    */
-  protected keychain:PlatformVMKeyChain = new PlatformVMKeyChain('', '');
+  protected keychain:KeyChain = new KeyChain('', '');
 
   protected blockchainID:string = PlatformChainID;
 
@@ -147,20 +147,20 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets a reference to the keychain for this class.
    *
-   * @returns The instance of [[PlatformVMKeyChain]] for this class
+   * @returns The instance of [[]] for this class
    */
-  keyChain = ():PlatformVMKeyChain => this.keychain;
+  keyChain = ():KeyChain => this.keychain;
 
   /**
    * @ignore
    */
-  newKeyChain = ():PlatformVMKeyChain => {
+  newKeyChain = ():KeyChain => {
     // warning, overwrites the old keychain
     const alias = this.getBlockchainAlias();
     if (alias) {
-      this.keychain = new PlatformVMKeyChain(this.core.getHRP(), alias);
+      this.keychain = new KeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new PlatformVMKeyChain(this.core.getHRP(), this.blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
     }
     return this.keychain;
   };
@@ -1325,9 +1325,9 @@ axios.interceptors.request.use(request => {
     const netid:number = core.getNetworkID();
     if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
       const { alias } = Defaults.network[netid][this.blockchainID];
-      this.keychain = new PlatformVMKeyChain(this.core.getHRP(), alias);
+      this.keychain = new KeyChain(this.core.getHRP(), alias);
     } else {
-      this.keychain = new PlatformVMKeyChain(this.core.getHRP(), this.blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
     }
   }
 }

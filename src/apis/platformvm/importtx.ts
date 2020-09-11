@@ -7,7 +7,7 @@ import BinTools from '../../utils/bintools';
 import {  PlatformVMConstants } from './constants';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
-import { PlatformVMKeyChain, PlatformVMKeyPair } from './keychain';
+import { KeyChain, KeyPair } from './keychain';
 import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
@@ -84,17 +84,17 @@ export class ImportTx extends BaseTx {
      * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
      *
      * @param msg A Buffer for the [[UnsignedTx]]
-     * @param kc An [[PlatformVMKeyChain]] used in signing
+     * @param kc An [[KeyChain]] used in signing
      *
      * @returns An array of [[Credential]]s
      */
-  sign(msg:Buffer, kc:PlatformVMKeyChain):Array<Credential> {
+  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
     const sigs:Array<Credential> = super.sign(msg, kc);
     for (let i = 0; i < this.importIns.length; i++) {
       const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
       const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
       for (let j = 0; j < sigidxs.length; j++) {
-        const keypair:PlatformVMKeyPair = kc.getKey(sigidxs[j].getSource());
+        const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
         const sig:Signature = new Signature();
         sig.fromBuffer(signval);

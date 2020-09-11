@@ -10,7 +10,7 @@ import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';
 import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { AVMKeyChain, AVMKeyPair } from './keychain';
+import { KeyChain, KeyPair } from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
 
 /**
@@ -102,17 +102,17 @@ export class ImportTx extends BaseTx {
        * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
        *
        * @param msg A Buffer for the [[UnsignedTx]]
-       * @param kc An [[AVMKeyChain]] used in signing
+       * @param kc An [[KeyChain]] used in signing
        *
        * @returns An array of [[Credential]]s
        */
-    sign(msg:Buffer, kc:AVMKeyChain):Array<Credential> {
+    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
       const sigs:Array<Credential> = super.sign(msg, kc);
       for (let i = 0; i < this.importIns.length; i++) {
         const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
         const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
         for (let j = 0; j < sigidxs.length; j++) {
-          const keypair:AVMKeyPair = kc.getKey(sigidxs[j].getSource());
+          const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
           const signval:Buffer = keypair.sign(msg);
           const sig:Signature = new Signature();
           sig.fromBuffer(signval);

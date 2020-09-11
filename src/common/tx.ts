@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Credential } from './credentials';
 import BN from 'bn.js';
-import { KeyChain, KeyPair } from './keychain';
+import { StandardKeyChain, StandardKeyPair } from './keychain';
 import { StandardAmountInput, StandardTransferableInput } from './input';
 import { StandardAmountOutput, StandardTransferableOutput } from './output';
 import { DefaultNetworkID } from '../utils/constants';
@@ -19,7 +19,7 @@ const bintools = BinTools.getInstance();
 /**
  * Class representing a base for all transactions.
  */
-export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends KeyChain<KPClass>> {
+export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass extends StandardKeyChain<KPClass>> {
   protected networkid:Buffer = Buffer.alloc(4);
   protected blockchainid:Buffer = Buffer.alloc(32);
   protected numouts:Buffer = Buffer.alloc(4);
@@ -110,7 +110,7 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
    *
    * @returns An array of [[Credential]]s
    */
-  abstract sign(msg:Buffer, kc:KeyChain<KPClass>):Array<Credential>;
+  abstract sign(msg:Buffer, kc:StandardKeyChain<KPClass>):Array<Credential>;
 
   abstract clone():this;
 
@@ -151,8 +151,8 @@ export abstract class StandardBaseTx<KPClass extends KeyPair, KCClass extends Ke
 /**
  * Class representing an unsigned transaction.
  */
-export abstract class StandardUnsignedTx<KPClass extends KeyPair, 
-KCClass extends KeyChain<KPClass>, 
+export abstract class StandardUnsignedTx<KPClass extends StandardKeyPair, 
+KCClass extends StandardKeyChain<KPClass>, 
 SBTx extends StandardBaseTx<KPClass, KCClass>
 > {
   protected codecid:number = 0;
@@ -255,8 +255,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
  * Class representing a signed transaction.
  */
 export abstract class StandardTx<
-    KPClass extends KeyPair, 
-    KCClass extends KeyChain<KPClass>, 
+    KPClass extends StandardKeyPair, 
+    KCClass extends StandardKeyChain<KPClass>, 
     SUBTx extends StandardUnsignedTx<
         KPClass, 
         KCClass, 

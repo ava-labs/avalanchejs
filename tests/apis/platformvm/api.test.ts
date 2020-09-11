@@ -9,7 +9,7 @@ import * as bech32 from 'bech32';
 import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
-import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
+import { KeyChain } from 'src/apis/platformvm/keychain';
 import { SECPTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
 import { TransferableInput, SECPTransferInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
@@ -17,7 +17,6 @@ import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
-import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from '../../../src/utils/constants';
 
@@ -739,8 +738,8 @@ describe('PlatformVMAPI', () => {
 
   describe('Transactions', () => {
     let set:UTXOSet;
-    let keymgr2:PlatformVMKeyChain;
-    let keymgr3:PlatformVMKeyChain;
+    let keymgr2:KeyChain;
+    let keymgr3:KeyChain;
     let addrs1:Array<string>;
     let addrs2:Array<string>;
     let addrs3:Array<string>;
@@ -781,8 +780,8 @@ describe('PlatformVMAPI', () => {
       await result;
       set = new UTXOSet();
       platformvm.newKeyChain();
-      keymgr2 = new PlatformVMKeyChain(avalanche.getHRP(), alias);
-      keymgr3 = new PlatformVMKeyChain(avalanche.getHRP(), alias);
+      keymgr2 = new KeyChain(avalanche.getHRP(), alias);
+      keymgr3 = new KeyChain(avalanche.getHRP(), alias);
       addrs1 = [];
       addrs2 = [];
       addrs3 = [];

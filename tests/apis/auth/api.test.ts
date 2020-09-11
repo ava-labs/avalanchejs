@@ -1,7 +1,6 @@
 import mockAxios from 'jest-mock-axios';
 import { Avalanche } from 'src';
 import { AuthAPI } from 'src/apis/auth/api';
-import BN from "bn.js";
 
 describe('Auth', () => {
   const ip:string = '127.0.0.1';

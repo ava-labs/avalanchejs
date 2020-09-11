@@ -161,7 +161,7 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     }
 
 }
-/* Must implement later, the signing process isn't friendly to AvalancheJS
+/* Must implement later, the signing process isn't friendly to Avalanche.js
 
 export class AddSubnetValidatorTx extends WeightedValidatorTx {
     protected subnetID:Buffer = Buffer.alloc(32);
@@ -230,7 +230,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    sign(msg:Buffer, kc:PlatformVMKeyChain):Array<Credential> {
+    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
         let creds:Array<SECPCredential> = super.sign(msg, kc);
         const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
         for(let i = 0; i  < this.subnetAuth.length ; i++) {
@@ -238,7 +238,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
                 throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.");
             }
             
-            let kp:PlatformVMKeyPair = kc.getKey(this.subnetAuth[i]);
+            let kp:KeyPair = kc.getKey(this.subnetAuth[i]);
             const signval:Buffer = kp.sign(msg);
             const sig:Signature = new Signature();
             sig.fromBuffer(signval);

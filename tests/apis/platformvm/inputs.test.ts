@@ -1,5 +1,5 @@
 import { UTXOSet, UTXO } from 'src/apis/platformvm/utxos';
-import { PlatformVMKeyChain } from 'src/apis/platformvm/keychain';
+import { KeyChain } from 'src/apis/platformvm/keychain';
 import { SECPTransferInput, TransferableInput } from 'src/apis/platformvm/inputs';
 import createHash from 'create-hash';
 import BinTools from 'src/utils/bintools';
@@ -18,8 +18,8 @@ import { Output } from 'src/common/output';
 const bintools = BinTools.getInstance();
 describe('Inputs', () => {
   let set:UTXOSet;
-  let keymgr1:PlatformVMKeyChain;
-  let keymgr2:PlatformVMKeyChain;
+  let keymgr1:KeyChain;
+  let keymgr2:KeyChain;
   let addrs1:Array<Buffer>;
   let addrs2:Array<Buffer>;
   let utxos:Array<UTXO>;
@@ -27,8 +27,8 @@ describe('Inputs', () => {
   const amnt:number = 10000;
   beforeEach(() => {
     set = new UTXOSet();
-    keymgr1 = new PlatformVMKeyChain(hrp, 'X');
-    keymgr2 = new PlatformVMKeyChain(hrp, 'X');
+    keymgr1 = new KeyChain(hrp, 'X');
+    keymgr2 = new KeyChain(hrp, 'X');
     addrs1 = [];
     addrs2 = [];
     utxos = [];

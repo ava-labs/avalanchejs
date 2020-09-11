@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Common-Constants
+ * @module Utils-Constants
  */
 
 import BN from "bn.js";
