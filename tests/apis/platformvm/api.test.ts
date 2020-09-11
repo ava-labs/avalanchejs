@@ -971,7 +971,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = Defaults.network[networkid]["P"].minStake;
+      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
 
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
