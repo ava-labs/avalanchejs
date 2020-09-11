@@ -1177,6 +1177,10 @@ axios.interceptors.request.use(request => {
       memo = memo.getPayload();
     }
 
+    if(typeof delegationFee !== "number" || delegationFee > 100 || delegationFee < 0){
+      throw new Error("PlatformVMAPI.buildAddValidatorTx -- delegationFee must be a number between 0 and 100");
+    }
+
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     
     const now:BN = UnixNow();
