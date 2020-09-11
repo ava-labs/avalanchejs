@@ -3,6 +3,8 @@
  * @module Common-Constants
  */
 
+import BN from "bn.js";
+
 export const PrivateKeyPrefix:string = "PrivateKey-";
 
 export const NodeIDPrefix:string = "NodeID-";
@@ -57,27 +59,50 @@ export const XChainVMName:string = "avm";
 export const CChainVMName:string = "evm";
 export const PChainVMName:string = "platformvm";
 
+export const ONEAVAX:BN = new BN(1000000000);
+
+export const DECIAVAX:BN = ONEAVAX.div(new BN(10));
+
+export const CENTIAVAX:BN = ONEAVAX.div(new BN(100));
+
+export const MILLIAVAX:BN = ONEAVAX.div(new BN(1000));
+
+export const MICROAVAX:BN = ONEAVAX.div(new BN(1000000));
+
+export const NANOAVAX:BN = ONEAVAX.div(new BN(1000000000));
+
+export const WEI:BN = new BN(1);
+
+export const GWEI:BN = WEI.mul(new BN(1000000000));
+
+export const AVAXGWEI:BN = NANOAVAX.clone();
+
 // TODO: UPDATE FOR MAINNET
 
 const n1X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 0
+  fee: 1000000
 };
 
 const n1P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 0
+  fee: 1000000,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(720000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000))
 };
 
 const n1C:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 0
+  fee: 470000000000000
 };
 
 // END TODO
@@ -93,7 +118,12 @@ const n2P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 0
+  fee: 0,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(720000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000))
 };
 
 const n2C:object = {
@@ -114,7 +144,12 @@ const n3P:object = {
   blockchainID: '',
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 0
+  fee: 0,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(720000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000))
 };
 
 const n3C:object = {
@@ -136,14 +171,19 @@ const n4P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 1000000
+  fee: 1000000,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(720000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000))
 };
 
 const n4C:object = {
   blockchainID: 'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 1000000
+  fee: 470000000000000
 };
 
 // END TODO

@@ -632,6 +632,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param rewardThreshold The number of signatures required to spend the funds in the resultant reward UTXO
     * @param rewardAddresses The addresses the validator reward goes.
     * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
+    * @param minStake A {@link https://github.com/indutny/bn.js/|BN} representing the minimum stake required to validate on this network.
     * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
     * @param feeAssetID Optional. The assetID of the fees being burned. 
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -666,10 +667,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new Error("UTXOSet.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
-    }
-
-    if(stakeAmount.lt(PlatformVMConstants.MINSTAKE)) {
-      throw new Error("UTXOSet.buildAddValidatorTx -- stake amount must be at least " + PlatformVMConstants.MINSTAKE);
     }
 
     if(delegationFee > 100 || delegationFee < 0){

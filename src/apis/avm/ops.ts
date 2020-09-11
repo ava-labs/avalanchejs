@@ -6,7 +6,6 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { NFTTransferOutput, SECPMintOutput, SECPTransferOutput } from './outputs';
-import BN from "bn.js";
 import { NBytes } from '../../common/nbytes';
 import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';

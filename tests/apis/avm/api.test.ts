@@ -21,6 +21,7 @@ import { OutputOwners } from 'src/common/output';
 import { MinterSet } from 'src/apis/avm/minterset';
 import { PlatformChainID } from 'src/utils/constants';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
+import { ONEAVAX } from '../../../src/utils/constants';
 
 /**
  * @ignore
@@ -607,7 +608,7 @@ describe('AVMAPI', () => {
         addrs2.push(avm.addressFromBuffer(keymgr2.makeKey().getAddress()));
         addrs3.push(avm.addressFromBuffer(keymgr3.makeKey().getAddress()));
       }
-      const amount:BN = AVMConstants.ONEAVAX.mul(new BN(amnt));
+      const amount:BN = ONEAVAX.mul(new BN(amnt));
       addressbuffs = avm.keyChain().getAddresses();
       addresses = addressbuffs.map((a) => avm.addressFromBuffer(a));
       const locktime:BN = new BN(54321);

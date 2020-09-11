@@ -22,6 +22,7 @@ import { ImportTx } from 'src/apis/avm/importtx';
 import { ExportTx } from 'src/apis/avm/exporttx';
 import { PlatformChainID } from 'src/utils/constants';
 import { Defaults } from 'src/utils/constants';
+import { ONEAVAX } from '../../../src/utils/constants';
 
 
 /**
@@ -114,7 +115,7 @@ describe('Transactions', () => {
       addrs2.push(keymgr2.makeKey().getAddress());
       addrs3.push(keymgr3.makeKey().getAddress());
     }
-    amount = AVMConstants.ONEAVAX.mul(new BN(amnt));
+    amount = ONEAVAX.mul(new BN(amnt));
     addresses = keymgr1.getAddresses();
     fallAddresses = keymgr2.getAddresses();
     locktime = new BN(54321);
@@ -308,7 +309,7 @@ describe('Transactions', () => {
     expect(() => {
       set.buildBaseTx(
         netid, blockchainID,
-        AVMConstants.ONEAVAX.mul(new BN(amnt * 10000)), assetID,
+        ONEAVAX.mul(new BN(amnt * 10000)), assetID,
         addrs3, addrs1, addrs1, 
       );
     }).toThrow();

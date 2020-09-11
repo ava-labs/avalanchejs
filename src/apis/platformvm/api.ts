@@ -9,15 +9,14 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 import { PlatformVMKeyChain } from './keychain';
-import { Defaults, PlatformChainID } from '../../utils/constants';
+import { Defaults, PlatformChainID, ONEAVAX } from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXOSet, UTXO } from '../platformvm/utxos';
+import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import axios from 'axios';
-import { SECPOwnerOutput } from './outputs';
 
 /**
  * @ignore
@@ -43,6 +42,8 @@ export class PlatformVMAPI extends JRPCAPI {
   protected AVAXAssetID:Buffer = undefined;
 
   protected fee:BN = undefined;
+
+  protected minStake:BN = undefined;
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -178,7 +179,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     let outputTotal:BN = utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
-    if(fee.lte(PlatformVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
+    if(fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
     } else {
       return false;
@@ -660,12 +661,28 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * Gets the minimum staking amount.
+   * Sets the minimum stake cached in this class.
+   * @param minStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
    */
-  getMinStake = async ():Promise<BN> => {
+  setMinStake = (minStake:BN):void => {
+    this.minStake = minStake;
+  }
+
+  /**
+   * Gets the minimum staking amount.
+   * 
+   * @param refresh A boolean to bypass the local cached value of Minimum Stake Amount, polling the node instead.
+   */
+  getMinStake = async (refresh:boolean = undefined):Promise<BN> => {
+    if(typeof this.minStake !== "undefined" && refresh !== false) {
+      return this.minStake;
+    }
     const params:any = {};
     return this.callMethod('platform.getMinStake', params)
-      .then((response:RequestResponseData) => new BN(response.data.result.minStake, 10));
+      .then((response:RequestResponseData) => {
+        this.minStake = new BN(response.data.result.minStake, 10);
+        return this.minStake;
+      });
   }
 
   /**
@@ -1175,6 +1192,11 @@ axios.interceptors.request.use(request => {
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
+    }
+
+    const minStake:BN = await this.getMinStake();
+    if(stakeAmount.lt(minStake)) {
+      throw new Error("PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " + minStake.toString(10));
     }
 
     if(typeof delegationFee !== "number" || delegationFee > 100 || delegationFee < 0){

@@ -19,6 +19,7 @@ import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
 import { PlatformVMConstants } from 'src/apis/platformvm/constants';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
+import { ONEAVAX } from '../../../src/utils/constants';
 
 /**
  * @ignore
@@ -797,7 +798,7 @@ describe('PlatformVMAPI', () => {
         addrs2.push(platformvm.addressFromBuffer(keymgr2.makeKey().getAddress()));
         addrs3.push(platformvm.addressFromBuffer(keymgr3.makeKey().getAddress()));
       }
-      const amount:BN = PlatformVMConstants.ONEAVAX.mul(new BN(amnt));
+      const amount:BN = ONEAVAX.mul(new BN(amnt));
       addressbuffs = platformvm.keyChain().getAddresses();
       addresses = addressbuffs.map((a) => platformvm.addressFromBuffer(a));
       const locktime:BN = new BN(54321);
@@ -971,7 +972,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = PlatformVMConstants.MINSTAKE;
+      const amount:BN = Defaults.network[networkid]["P"].minStake;
 
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
@@ -1016,10 +1017,12 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = PlatformVMConstants.MINSTAKE;
+      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
 
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
+
+      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake);
 
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         set, 

@@ -16,7 +16,7 @@ import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import { Defaults, PlatformChainID, PrimaryAssetAlias } from '../../utils/constants';
+import { Defaults, PlatformChainID, PrimaryAssetAlias, ONEAVAX } from '../../utils/constants';
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
@@ -186,7 +186,7 @@ export class AVMAPI extends JRPCAPI {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     let outputTotal:BN = utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
-    if(fee.lte(AVMConstants.ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
+    if(fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
     } else {
       return false;

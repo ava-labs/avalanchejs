@@ -8,18 +8,6 @@ import BN from 'bn.js';
 export class PlatformVMConstants {
   static LATESTCODEC:number = 0;
 
-  static ONEAVAX:BN = new BN(1000000000);
-
-  static DECIAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(10));
-
-  static CENTIAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(100));
-
-  static MILLIAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(1000));
-
-  static MICROAVAX:BN = PlatformVMConstants.ONEAVAX.div(new BN(1000000));
-
-  static MINSTAKE:BN = PlatformVMConstants.ONEAVAX.mul(new BN(2000));
-
   static SECPFXID:number = 0;
 
   static SECPXFEROUTPUTID:number = 7;
