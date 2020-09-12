@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module API-PlatformVM-ExportTx
+ * @module API-PlatformVM-ImportTx
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
