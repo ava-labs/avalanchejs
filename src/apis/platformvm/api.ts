@@ -652,6 +652,15 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
+   * Returns an upper bound on the amount of tokens that exist. Not monotonically increasing because this number can go down if a staker's reward is denied.
+   */
+  getCurrentSupply = async ():Promise<BN> => {
+    const params:any = {};
+    return this.callMethod('platform.getCurrentSupply', params)
+      .then((response:RequestResponseData) => new BN(response.data.result.supply, 10));
+  }
+
+  /**
    * Returns the height of the platform chain.
    */
   getHeight = async ():Promise<BN> => {
