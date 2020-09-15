@@ -27,6 +27,19 @@ export class ImportTx extends BaseTx {
   protected type = "ImportTx";
   protected typeID = AVMConstants.IMPORTTX;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
   protected importIns:Array<TransferableInput> = [];
@@ -90,19 +103,6 @@ export class ImportTx extends BaseTx {
   getImportInputs():Array<TransferableInput> {
     return this.importIns;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:ImportTx = new ImportTx();

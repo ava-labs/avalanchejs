@@ -21,6 +21,19 @@ export class InitialStates extends Serializable{
   protected type = "AmountInput";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   protected fxs:{[fxid:number]:Array<Output>} = {};
 
   /**
@@ -85,17 +98,5 @@ export class InitialStates extends Serializable{
     return Buffer.concat(buff);
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 }
   

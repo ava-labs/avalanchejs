@@ -8,7 +8,7 @@ import BN from 'bn.js';
 import BinTools from '../utils/bintools';
 import { NBytes } from './nbytes';
 import { UnixNow } from '../utils/helperfunctions';
-import { Serializable } from '../utils/serialization';
+import { Serializable, SerializedEncoding } from '../utils/serialization';
 
 /**
  * @ignore
@@ -21,6 +21,20 @@ const bintools:BinTools = BinTools.getInstance();
 export class Address extends NBytes {
     protected type = "Address";
     protected typeID = undefined;
+
+    getFields(encoding:SerializedEncoding = "hex"):object {};
+    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+  
+    };
+  
+    serialize(encoding:SerializedEncoding = "hex"):string {
+  
+    };
+
     /**
      * Returns a function used to sort an array of [[Address]]es
      */
@@ -69,19 +83,6 @@ export class Address extends NBytes {
     create(...args:any[]):this {
       return new Address() as this;
     }
-
-    getFields(encoding:string = "hex"):object {};
-    setFields(fields:object, encoding:string = "hex") {
-  
-    }
-  
-    deserialize(obj:object, encoding:string = "hex"):this {
-  
-    };
-  
-    serialize(encoding:string = "hex"):string {
-  
-    };
   
     /**
        * Class for representing an address used in [[Output]] types
@@ -99,6 +100,19 @@ export class Address extends NBytes {
 export class OutputOwners extends Serializable {
   protected type = "OutputOwners";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   protected locktime:Buffer = Buffer.alloc(8);
   protected threshold:Buffer = Buffer.alloc(4);
@@ -250,19 +264,6 @@ export class OutputOwners extends Serializable {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
-
   static comparator = ():(a:Output, b:Output) => (1|-1|0) => (a:Output, b:Output):(1|-1|0) => {
     const aoutid:Buffer = Buffer.alloc(4);
     aoutid.writeUInt32BE(a.getOutputID(), 0);
@@ -313,8 +314,8 @@ export abstract class Output extends OutputOwners {
    */
   abstract getOutputID():number;
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -336,6 +337,11 @@ export abstract class Output extends OutputOwners {
 export abstract class StandardParseableOutput extends Serializable {
   protected type = "StandardParseableOutput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
   
   protected output:Output;
 
@@ -360,11 +366,6 @@ export abstract class StandardParseableOutput extends Serializable {
     const barr:Array<Buffer> = [outid, outbuff];
     return Buffer.concat(barr, outid.length + outbuff.length);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
   
   /**
    * Class representing an [[ParseableOutput]] for a transaction.
@@ -383,10 +384,13 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
   protected type = "StandardTransferableOutput";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
   protected assetID:Buffer = undefined;
   protected output:Output;
-
-  
 
   getAssetID = ():Buffer => this.assetID;
 
@@ -397,11 +401,6 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
     const parseeableBuff:Buffer = super.toBuffer();
     const barr:Array<Buffer> = [this.assetID, parseeableBuff];
     return Buffer.concat(barr, this.assetID.length + parseeableBuff.length);
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   /**
@@ -424,6 +423,11 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
 export abstract class StandardAmountOutput extends Output {
   protected type = "StandardAmountOutput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
 
   protected amount:Buffer = Buffer.alloc(8);
   protected amountValue:BN = new BN(0);
@@ -454,11 +458,6 @@ export abstract class StandardAmountOutput extends Output {
     return Buffer.concat(barr, bsize);
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
   /**
    * A [[BaseAmountOutput]] class which issues a payment on an assetID.
    *
@@ -483,12 +482,12 @@ export abstract class BaseNFTOutput extends Output {
   protected type = "BaseNFTOutput";
   protected typeID = undefined;
 
-  protected groupID:Buffer = Buffer.alloc(4);
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
+
+  protected groupID:Buffer = Buffer.alloc(4);
 
   /**
    * Returns the groupID as a number.

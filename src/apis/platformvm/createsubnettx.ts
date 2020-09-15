@@ -14,6 +14,19 @@ export class CreateSubnetTx extends BaseTx {
   protected type = "SECPCredential";
   protected typeID = PlatformVMConstants.CREATESUBNETTX;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   protected subnetOwners:SECPOwnerOutput = undefined;
 
   /**
@@ -59,19 +72,6 @@ export class CreateSubnetTx extends BaseTx {
       let barr:Array<Buffer> = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
       return Buffer.concat(barr);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   /**
    * Class representing an unsigned Create Subnet transaction.

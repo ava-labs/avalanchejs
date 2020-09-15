@@ -29,6 +29,19 @@ export class TransferableOutput extends StandardTransferableOutput{
   protected type = "TransferableOutput";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
     offset += PlatformVMConstants.ASSETIDLEN;
@@ -38,23 +51,24 @@ export class TransferableOutput extends StandardTransferableOutput{
     return this.output.fromBuffer(bytes, offset);
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 }
 
 export class ParseableOutput extends StandardParseableOutput{
   protected type = "ParseableOutput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
@@ -62,23 +76,16 @@ export class ParseableOutput extends StandardParseableOutput{
     this.output = SelectOutputClass(outputid);
     return this.output.fromBuffer(bytes, offset);
   }
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
   protected type = "AmountOutput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
 
   /**
    * 
@@ -86,11 +93,6 @@ export abstract class AmountOutput extends StandardAmountOutput {
    */
   makeTransferable(assetID:Buffer):TransferableOutput {
     return new TransferableOutput(assetID, this);
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   select(id:number, ...args: any[]):Output {
@@ -105,25 +107,25 @@ export class SECPTransferOutput extends AmountOutput {
   protected type = "SECPTransferOutput";
   protected typeID = PlatformVMConstants.SECPXFEROUTPUTID;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
     return this.typeID;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new SECPTransferOutput(...args) as this;
@@ -143,6 +145,19 @@ export class SECPOwnerOutput extends Output {
   protected type = "SECPOwnerOutput";
   protected typeID = PlatformVMConstants.SECPOWNEROUTPUTID;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
      * Returns the outputID for this output
      */
@@ -157,19 +172,6 @@ export class SECPOwnerOutput extends Output {
   makeTransferable(assetID:Buffer):TransferableOutput {
     return new TransferableOutput(assetID, this);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new SECPOwnerOutput(...args) as this;

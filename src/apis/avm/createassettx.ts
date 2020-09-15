@@ -20,6 +20,19 @@ export class CreateAssetTx extends BaseTx {
   protected type = "CreateAssetTx";
   protected typeID = AVMConstants.CREATEASSETTX;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   protected name:string = '';
   protected symbol:string = '';
   protected denomination:Buffer = Buffer.alloc(1);
@@ -112,19 +125,6 @@ export class CreateAssetTx extends BaseTx {
     const barr:Array<Buffer> = [superbuff, namesize, namebuff, symsize, symbuff, this.denomination, initstatebuff];
     return Buffer.concat(barr, bsize);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:CreateAssetTx = new CreateAssetTx();

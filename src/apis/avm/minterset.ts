@@ -22,6 +22,19 @@ export class MinterSet extends Serializable{
     protected type = "MinterSet";
     protected typeID = undefined;
 
+    getFields(encoding:SerializedEncoding = "hex"):object {};
+    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+  
+    };
+  
+    serialize(encoding:SerializedEncoding = "hex"):string {
+  
+    };
+
     protected threshold:number;
     protected minters:Array<Buffer> = [];
 
@@ -50,19 +63,6 @@ export class MinterSet extends Serializable{
         }
         return addrs;
     }
-
-    getFields(encoding:string = "hex"):object {};
-    setFields(fields:object, encoding:string = "hex") {
-  
-    }
-  
-    deserialize(obj:object, encoding:string = "hex"):this {
-  
-    };
-  
-    serialize(encoding:string = "hex"):string {
-  
-    };
 
     /**
      * 

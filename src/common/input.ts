@@ -18,6 +18,11 @@ export abstract class Input extends Serializable {
   protected type = "Input";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
   protected sigCount:Buffer = Buffer.alloc(4);
   protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
 
@@ -94,11 +99,6 @@ export abstract class Input extends Serializable {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
   abstract clone():this;
 
   abstract create(...args:any[]):this;
@@ -110,6 +110,11 @@ export abstract class Input extends Serializable {
 export abstract class StandardTransferableInput extends Serializable{
   protected type = "StandardTransferableInput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
 
   protected txid:Buffer = Buffer.alloc(32);
   protected outputidx:Buffer = Buffer.alloc(4);
@@ -178,11 +183,6 @@ export abstract class StandardTransferableInput extends Serializable{
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
   /**
    * Class representing an [[StandardTransferableInput]] for a transaction.
    *
@@ -208,6 +208,11 @@ export abstract class StandardTransferableInput extends Serializable{
 export abstract class StandardAmountInput extends Input {
   protected type = "StandardAmountInput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
 
   protected amount:Buffer = Buffer.alloc(8);
   protected amountValue:BN = new BN(0);
@@ -235,11 +240,6 @@ export abstract class StandardAmountInput extends Input {
     const bsize:number = this.amount.length + superbuff.length;
     const barr:Array<Buffer> = [this.amount, superbuff];
     return Buffer.concat(barr, bsize);
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   /**

@@ -26,6 +26,19 @@ export class OperationTx extends BaseTx {
   protected type = "OperationTx";
   protected typeID = AVMConstants.OPERATIONTX;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   protected numOps:Buffer = Buffer.alloc(4);
   protected ops:Array<TransferableOperation> = [];
 
@@ -102,19 +115,6 @@ export class OperationTx extends BaseTx {
     }
     return sigs;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
       let newbase:OperationTx = new OperationTx();

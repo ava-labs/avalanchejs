@@ -8,7 +8,7 @@ import BN from "bn.js";
 import { Output, StandardAmountOutput } from './output';
 import { UnixNow } from '../utils/helperfunctions';
 import { MergeRule } from '../utils/constants';
-import { Serializable, Serialization } from '../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
 
 /**
  * @ignore
@@ -23,17 +23,21 @@ export abstract class StandardUTXO extends Serializable{
   protected type = "StandardUTXO";
   protected typeID = undefined;
 
-  getFields(encoding:string = "hex"):object {
+  getFields(encoding:SerializedEncoding = "hex"):object {
     let obj:object = {
-      "codecid": serializer.encoder(this.codecid, encoding, "number"),
-      "txid": this.txid,
-      "outputidx": this.outputidx,
-      "assetid": this.assetid,
-      "output": this.output.serialize();
+      "codecid": serializer.encoder(this.codecid, encoding, "Buffer", "number"),
+      "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
+      "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "number"),
+      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "output": this.output.serialize()
     }
+    return obj;
   };
-  setFields(fields:object, encoding:string = "hex") {
-
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+    this.codecid = serializer.decoder(fields["codecid"], encoding, "number", "Buffer", 2);
+    this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
+    this.outputidx = serializer.decoder(fields["outputidx"], encoding, "number", "Buffer", 4);
+    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
   }
 
   protected codecid:Buffer = Buffer.alloc(2);
@@ -159,8 +163,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
   protected type = "StandardUTXOSet";
   protected typeID = undefined;
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 

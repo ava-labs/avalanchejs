@@ -26,6 +26,11 @@ export abstract class ValidatorTx extends BaseTx {
     protected type = "ValidatorTx";
     protected typeID = undefined;
 
+    getFields(encoding:SerializedEncoding = "hex"):object {};
+    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+    }
+
     protected nodeID:Buffer = Buffer.alloc(20);
     protected startTime:Buffer = Buffer.alloc(8);
     protected endTime:Buffer = Buffer.alloc(8);
@@ -80,11 +85,6 @@ export abstract class ValidatorTx extends BaseTx {
             this.startTime,
             this.endTime
         ], bsize);
-      }
-
-    getFields(encoding:string = "hex"):object {};
-    setFields(fields:object, encoding:string = "hex") {
-
     }
     
     constructor(
@@ -109,6 +109,11 @@ export abstract class ValidatorTx extends BaseTx {
 export abstract class WeightedValidatorTx extends ValidatorTx {
     protected type = "WeightedValidatorTx";
     protected typeID = undefined;
+
+    getFields(encoding:SerializedEncoding = "hex"):object {};
+    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+    }
 
     protected weight:Buffer = Buffer.alloc(8);
 
@@ -292,6 +297,19 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     protected type = "AddDelegatorTx";
     protected typeID = PlatformVMConstants.ADDDELEGATORTX;
 
+    getFields(encoding:SerializedEncoding = "hex"):object {};
+    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+  
+    };
+  
+    serialize(encoding:SerializedEncoding = "hex"):string {
+  
+    };
+
     protected stakeOuts:Array<TransferableOutput> = [];
     protected rewardOwners:ParseableOutput = undefined;
   
@@ -383,19 +401,6 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         bsize += ro.length;
         return Buffer.concat(barr, bsize);
     }
-  
-    getFields(encoding:string = "hex"):object {};
-    setFields(fields:object, encoding:string = "hex") {
-  
-    }
-  
-    deserialize(obj:object, encoding:string = "hex"):this {
-  
-    };
-  
-    serialize(encoding:string = "hex"):string {
-  
-    };
 
     clone():this {
         let newbase:AddDelegatorTx = new AddDelegatorTx();
@@ -406,7 +411,6 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     create(...args:any[]):this {
         return new AddDelegatorTx(...args) as this;
     }
-
 
     /**
      * Class representing an unsigned AddDelegatorTx transaction.
@@ -448,6 +452,19 @@ export class AddValidatorTx extends AddDelegatorTx {
     protected type = "AddValidatorTx";
     protected typeID = PlatformVMConstants.ADDVALIDATORTX;
 
+    getFields(encoding:SerializedEncoding = "hex"):object {};
+    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+  
+    };
+  
+    serialize(encoding:SerializedEncoding = "hex"):string {
+  
+    };
+
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
 
@@ -488,19 +505,6 @@ export class AddValidatorTx extends AddDelegatorTx {
         let feeBuff:Buffer = this.getDelegationFeeBuffer();
         return Buffer.concat([superBuff, feeBuff]);
     }
-
-    getFields(encoding:string = "hex"):object {};
-    setFields(fields:object, encoding:string = "hex") {
-  
-    }
-  
-    deserialize(obj:object, encoding:string = "hex"):this {
-  
-    };
-  
-    serialize(encoding:string = "hex"):string {
-  
-    };
 
     /**
      * Class representing an unsigned AddValidatorTx transaction.

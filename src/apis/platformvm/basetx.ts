@@ -23,6 +23,22 @@ const bintools = BinTools.getInstance();
  * Class representing a base for all transactions.
  */
 export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
+  protected type = "BaseTx";
+  protected typeID = PlatformVMConstants.CREATESUBNETTX;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
    * Returns the id of the [[BaseTx]]
    */
@@ -82,22 +98,22 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
    *
    * @returns An array of [[Credential]]s
    */
-    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-      const sigs:Array<Credential> = [];
-      for (let i = 0; i < this.ins.length; i++) {
-        const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
-        const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
-        for (let j = 0; j < sigidxs.length; j++) {
-          const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
-          const signval:Buffer = keypair.sign(msg);
-          const sig:Signature = new Signature();
-          sig.fromBuffer(signval);
-          cred.addSignature(sig);
-        }
-        sigs.push(cred);
+  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
+    const sigs:Array<Credential> = [];
+    for (let i = 0; i < this.ins.length; i++) {
+      const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
+      const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
+      for (let j = 0; j < sigidxs.length; j++) {
+        const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
+        const signval:Buffer = keypair.sign(msg);
+        const sig:Signature = new Signature();
+        sig.fromBuffer(signval);
+        cred.addSignature(sig);
       }
-      return sigs;
+      sigs.push(cred);
     }
+    return sigs;
+  }
 
   clone():this {
     let newbase:BaseTx = new BaseTx();

@@ -26,6 +26,19 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
   protected type = "BaseTx";
   protected typeID = AVMConstants.BASETX;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
    * Returns the id of the [[BaseTx]]
    */
@@ -101,19 +114,6 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     }
     return sigs;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:BaseTx = new BaseTx();

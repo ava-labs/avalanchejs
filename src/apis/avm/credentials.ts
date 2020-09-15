@@ -36,22 +36,22 @@ export class SECPCredential extends Credential {
   protected type = "SECPCredential";
   protected typeID = AVMConstants.SECPCREDENTIAL;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   getCredentialID():number {
     return this.typeID;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:SECPCredential = new SECPCredential();
@@ -74,22 +74,22 @@ export class NFTCredential extends Credential {
   protected type = "NFTCredential";
   protected typeID = AVMConstants.NFTCREDENTIAL;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   getCredentialID():number {
     return this.typeID;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:NFTCredential = new NFTCredential();

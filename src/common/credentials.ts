@@ -20,6 +20,19 @@ export class SigIdx extends NBytes {
   protected type = "SigIdx";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   source:Buffer;
 
   /**
@@ -33,19 +46,6 @@ export class SigIdx extends NBytes {
    * Retrieves the source address for the signature
    */
   getSource = ():Buffer => this.source;
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:SigIdx = new SigIdx();
@@ -75,6 +75,18 @@ export class Signature extends NBytes {
   protected type = "Signature";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   clone():this {
     let newbase:Signature = new Signature();
@@ -85,19 +97,6 @@ export class Signature extends NBytes {
   create(...args:any[]):this {
     return new Signature() as this;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   /**
    * Signature for a [[Tx]]
@@ -112,6 +111,11 @@ export class Signature extends NBytes {
 export abstract class Credential extends Serializable{
   protected type = "Credential";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
 
   protected sigArray:Array<Signature> = [];
 
@@ -148,11 +152,6 @@ export abstract class Credential extends Serializable{
       barr.push(sigbuff);
     }
     return Buffer.concat(barr, bsize);
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   abstract clone():this;

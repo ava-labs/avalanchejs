@@ -39,6 +39,11 @@ export abstract class Operation extends Serializable{
   protected type = "Operation";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
   protected sigCount:Buffer = Buffer.alloc(4);
   protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
 
@@ -118,11 +123,6 @@ export abstract class Operation extends Serializable{
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
 }
 
 /**
@@ -132,6 +132,19 @@ export abstract class Operation extends Serializable{
 export class TransferableOperation extends Serializable {
   protected type = "TransferableOperation";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   protected assetid:Buffer = Buffer.alloc(32);
   protected utxoIDs:Array<UTXOID> = [];
@@ -198,19 +211,6 @@ export class TransferableOperation extends Serializable {
     return Buffer.concat(barr, bsize);
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
-
   constructor(assetid:Buffer = undefined, utxoids:Array<UTXOID|string|Buffer> = undefined, operation:Operation = undefined) {
     super();
     if (
@@ -241,6 +241,19 @@ export class TransferableOperation extends Serializable {
 export class SECPMintOperation extends Operation {
   protected type = "SECPMintOperation";
   protected typeID = AVMConstants.SECPMINTOPID;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   protected mintOutput:SECPMintOutput = undefined;
   protected transferOutputs:Array<SECPTransferOutput> = [];
@@ -315,19 +328,6 @@ export class SECPMintOperation extends Operation {
     return Buffer.concat(barr,bsize);
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
-
   /**
    * An [[Operation]] class which mints new tokens on an assetID.
    * 
@@ -352,6 +352,19 @@ export class SECPMintOperation extends Operation {
 export class NFTMintOperation extends Operation {
   protected type = "NFTMintOperation";
   protected typeID = AVMConstants.NFTMINTOPID;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   protected groupID:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
@@ -458,19 +471,6 @@ export class NFTMintOperation extends Operation {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
-
   /**
    * An [[Operation]] class which contains an NFT on an assetID.
    * 
@@ -494,6 +494,19 @@ export class NFTMintOperation extends Operation {
 export class NFTTransferOperation extends Operation {
   protected type = "NFTTransferOperation";
   protected typeID = AVMConstants.NFTXFEROPID;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   protected output:NFTTransferOutput;
 
@@ -540,19 +553,6 @@ export class NFTTransferOperation extends Operation {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
-
   /**
      * An [[Operation]] class which contains an NFT on an assetID.
      *
@@ -576,6 +576,19 @@ export class NFTTransferOperation extends Operation {
 export class UTXOID extends NBytes {
   protected type = "UTXOID";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   /**
      * Returns a function used to sort an array of [[UTXOID]]s
@@ -615,19 +628,6 @@ export class UTXOID extends NBytes {
     return this.getSize();
     
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:UTXOID = new UTXOID();

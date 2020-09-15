@@ -25,6 +25,19 @@ export class ExportTx extends BaseTx {
   protected type = "ExportTx";
   protected typeID = AVMConstants.EXPORTTX;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   protected destinationChain:Buffer = undefined;
   protected numOuts:Buffer = Buffer.alloc(4);
   protected exportOuts:Array<TransferableOutput> = [];
@@ -104,19 +117,6 @@ export class ExportTx extends BaseTx {
     }
     return Buffer.concat(barr);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:ExportTx = new ExportTx();

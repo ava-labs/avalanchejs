@@ -19,16 +19,21 @@ export type SerializedType =
 | 'utf8'
 ;
 
+export type SerializedEncoding = 
+  'hex'
+| 'display'
+;
+
 export abstract class Serializable {
     protected type:string = undefined;
     protected typeID:number = undefined;
 
     //sometimes the parent class manages the fields
     //these are so you can say super.getFields(); 
-    abstract getFields(encoding?:string):object; 
-    abstract setFields(fields:object, encoding:string);
+    abstract getFields(encoding?:SerializedEncoding):object; 
+    abstract setFields(fields:object, encoding?:SerializedEncoding);
 
-    abstract deserialize(obj:object, encoding?:string):this;
+    abstract deserialize(obj:object, encoding?:SerializedEncoding):this;
 
     abstract serialize(encoding?:string):string;
 }
@@ -51,64 +56,13 @@ export class Serialization {
         return Serialization.instance;
     }
 
-    stringToHex(v:string):string {
-        let out:string = undefined;
-        if(this.bintools.isPrimaryBechAddress(v)){
-            out = this.bintools.stringToAddress(v).toString("hex");
-        } else if(this.bintools.isHex(v)){
-            out = v;
-        } else if(this.bintools.isBase58(v)){
-            let vbuff:Buffer = this.bintools.b58ToBuffer(v);
-            if(this.bintools.validateChecksum(vbuff)){
-                out = this.bintools.cb58Decode(vbuff).toString("hex")
-            } else {
-                out = vbuff.toString("hex");
-            }
-        } else if(this.bintools.isBase64(v)){
-            out = atob(v);
-        } else if(this.bintools.isDecimal(v)) {
-            out = new BN(v, 10).toString("hex");
-        } else {
-            const buff:Buffer = Buffer.alloc(v.length);
-            buff.write(v, 0, v.length, 'utf8');
-            out = buff.toString("hex");
-        }
-        return out.startsWith("0x") ? out.slice(2) : out;
-    }
-
-    encoder(v:any, enc:"hex"|"native", type:SerializedType,  hrp?:string, chainid?:string):string {
-        if(enc === "hex") {
-            if(v instanceof BN) {
-                return v.toString("hex");
-            } else if(v instanceof Buffer) {
-                return v.toString("hex");
-            } else if(typeof v === "string") {
-                return this.stringToHex(v);
-            } else if(typeof v === "number") {
-                let x = v.toString(16);
-                return x.startsWith("0x") ? x.slice(2) : x
-            }
-        } else if(enc === "native") {
-            if(v instanceof BN) {
-                return v.toString(10);
-            } else if(v instanceof Buffer) {
-                return this.bufferToType(v, type, hrp, chainid) as string;
-            } else if(typeof v === "string") {
-               return v;
-            } else if(typeof v === "number") {
-                return v.toString();
-            }
-        }
-        return undefined;
-    }
-
-    bufferToType(vb:Buffer, type:SerializedType, hrp?:string, chainid?:string):any {
+    bufferToType(vb:Buffer, type:SerializedType, ...args:Array<any>):any {
         if(type === "BN") {
             return new BN(vb.toString("hex"), "hex");
         } else if(type === "Buffer") {
             return vb;
         } else if(type === "Bech32") {
-            return this.bintools.addressToString(hrp, chainid, vb);
+            return this.bintools.addressToString(args[0], args[1], vb);
         } else if(type === "cb58") {
             return this.bintools.cb58Encode(vb);
         } else if(type === "base58") {
@@ -127,45 +81,80 @@ export class Serialization {
         return undefined;
     }
 
-    decoder(v:string, enc:"hex"|"native", type:SerializedType,  hrp?:string, chainid?:string):any {
-        if(enc === "hex") {
-            let vb:Buffer = Buffer.from(v, "hex");
-            return this.bufferToType(vb, enc, hrp, chainid);
-        } else if(enc === "native") {
-            if(type === "BN") {
-                return new BN(v, 10);
-            } else if(
-                type === "Buffer" ||
-                type === "Bech32" ||
-                type === "cb58" ||
-                type === "base58" ||
-                type === "base64" ||
-                type === "hex" ) 
-            {
-                return this.bufferToType(Buffer.from(this.stringToHex(v), "hex"), type, hrp, chainid);
-            } else if(
-                type === "decimalString" ||
-                type === "utf8" ) 
-            {
-                return v;
-            } else if(type === "number") {
-                return new BN(v, 10).toNumber();
-            } else if(type === "utf8") {
-                return v;
+    typeToBuffer(v:any, type:SerializedType, ...args:Array<any>):any {
+        if(type === "BN") {
+            let str:string = (v as BN).toString("hex");
+            if(args.length > 0 && typeof args[0] === "number"){
+               return Buffer.from(str.padStart(args[0], '0'), 'hex'); 
             }
+            return Buffer.from(str, 'hex'); 
+        } else if(type === "Buffer") {
+            return v;
+        } else if(type === "Bech32") {
+            return this.bintools.stringToAddress(v);
+        } else if(type === "cb58") {
+            return this.bintools.cb58Decode(v);
+        } else if(type === "base58") {
+            return this.bintools.b58ToBuffer(v);
+        } else if(type === "base64") {
+            return Buffer.from(v as string, "base64");
+        } else if(type === "hex") {
+            return Buffer.from(v as string, "hex");
+        } else if(type === "decimalString") {
+            let str:string = new BN(v as string, 10).toString("hex");
+            if(args.length > 0 && typeof args[0] === "number"){
+                return Buffer.from(str.padStart(args[0], '0'), 'hex');
+            }
+            return Buffer.from(str, 'hex');
+        } else if(type === "number") {
+            let str:string = new BN(v).toString("hex");
+            if(args.length > 0 && typeof args[0] === "number"){
+                return Buffer.from(str.padStart(args[0], '0'), 'hex');
+            }
+            return Buffer.from(str, 'hex');
+        } else if(type === "utf8") {
+            if(args.length > 0 && typeof args[0] === "number"){
+                let b:Buffer = Buffer.alloc(args[0]);
+                return b.copy(Buffer.from(v, 'utf8'), 0);
+            }
+            return Buffer.from(v, 'utf8');
         }
         return undefined;
     }
 
-    format(type:string, fields:object, typeid:number = undefined):object {
-        let obj:object = {
-            "type": type,
-            "fields": fields
+    encoder(value:any, enc:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):string {
+        if(enc === "hex"){
+            outtype = "hex";
         }
-        if(typeof typeid === "number") {
-            obj["typeID"] = typeid;
+        let vb:Buffer = this.typeToBuffer(value, intype, ...args);
+        return this.bufferToType(vb, outtype, ...args);
+    }
+
+
+    decoder(value:string, enc:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
+        if(enc === "hex") {
+            intype = "hex";
+        } 
+        let vb:Buffer = this.typeToBuffer(value, intype, ...args);
+        return this.bufferToType(vb, outtype, ...args);
+    }
+
+    format(type:string, fields:object, typeID:number = undefined):object {
+        let obj:object = {
+            type,
+            fields
+        }
+        if(typeof typeID === "number") {
+            obj["typeID"] = typeID;
         }
         return obj;
     }
 
+    wrapSpecification(fields:object, vm:string, encoding:SerializedEncoding):object {
+        return {
+            vm,
+            encoding,
+            fields
+        }
+    }
 }

@@ -38,6 +38,19 @@ export class TransferableOutput extends StandardTransferableOutput{
   protected type = "TransferableOutput";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
     offset += AVMConstants.ASSETIDLEN;
@@ -46,24 +59,17 @@ export class TransferableOutput extends StandardTransferableOutput{
     this.output = SelectOutputClass(outputid);
     return this.output.fromBuffer(bytes, offset);
   }
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
   protected type = "AmountOutput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
   
   /**
    * 
@@ -71,11 +77,6 @@ export abstract class AmountOutput extends StandardAmountOutput {
    */
   makeTransferable(assetID:Buffer):TransferableOutput {
       return new TransferableOutput(assetID, this);
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   select(id:number, ...args: any[]):Output {
@@ -87,17 +88,18 @@ export abstract class AmountOutput extends StandardAmountOutput {
 export abstract class NFTOutput extends BaseNFTOutput {
   protected type = "NFTOutput";
   protected typeID = undefined;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
   /**
    * 
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */
   makeTransferable(assetID:Buffer):TransferableOutput {
       return new TransferableOutput(assetID, this);
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   select(id:number, ...args: any[]):Output {
@@ -111,25 +113,26 @@ export abstract class NFTOutput extends BaseNFTOutput {
 export class SECPTransferOutput extends AmountOutput {
   protected type = "SECPTransferOutput";
   protected typeID = AVMConstants.SECPXFEROUTPUTID;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
     return this.typeID;
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new SECPTransferOutput(...args) as this;
@@ -150,6 +153,19 @@ export class SECPMintOutput extends Output {
   protected type = "SECPMintOutput";
   protected typeID = AVMConstants.SECPMINTOUTPUTID;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
    * Returns the outputID for this output
    */
@@ -164,19 +180,6 @@ export class SECPMintOutput extends Output {
   makeTransferable(assetID:Buffer):TransferableOutput {
     return new TransferableOutput(assetID, this);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new SECPMintOutput(...args) as this;
@@ -200,6 +203,20 @@ export class SECPMintOutput extends Output {
 export class NFTMintOutput extends NFTOutput {
   protected type = "NFTMintOutput";
   protected typeID = AVMConstants.NFTMINTOUTPUTID;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   /**
    * Returns the outputID for this output
    */
@@ -225,19 +242,6 @@ export class NFTMintOutput extends NFTOutput {
       let barr:Array<Buffer> = [this.groupID, superbuff];
       return Buffer.concat(barr,bsize);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
       return new NFTMintOutput(...args) as this;
@@ -271,6 +275,19 @@ export class NFTMintOutput extends NFTOutput {
 export class NFTTransferOutput extends NFTOutput {
   protected type = "NFTTransferOutput";
   protected typeID = AVMConstants.NFTXFEROUTPUTID;
+
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   protected sizePayload:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
@@ -318,19 +335,6 @@ export class NFTTransferOutput extends NFTOutput {
     const barr:Array<Buffer> = [this.groupID, this.sizePayload, this.payload, superbuff];
     return Buffer.concat(barr, bsize);
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new NFTTransferOutput(...args) as this;

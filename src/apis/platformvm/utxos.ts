@@ -30,6 +30,19 @@ const bintools = BinTools.getInstance();
  */
 export class UTXO extends StandardUTXO {
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
+
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
     offset += 2;
@@ -71,19 +84,6 @@ export class UTXO extends StandardUTXO {
     return bintools.cb58Encode(this.toBuffer());
   }
 
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
-
   clone():this {
     const utxo:UTXO = new UTXO();
     utxo.fromBuffer(this.toBuffer());
@@ -111,6 +111,18 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   protected type = "UTXOSet";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
+
+  };
+
+  serialize(encoding:SerializedEncoding = "hex"):string {
+
+  };
 
   parseUTXO(utxo:UTXO | string):UTXO {
     const utxovar:UTXO = new UTXO();
@@ -125,19 +137,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     return utxovar
   }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:string = "hex"):this {
-
-  };
-
-  serialize(encoding:string = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new UTXOSet() as this;
@@ -306,7 +305,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     return new UnsignedTx(baseTx);
 
   };
-
 
   /**
     * Creates an unsigned ImportTx transaction.
@@ -726,7 +724,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const UTx:AddValidatorTx = new AddValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners), delegationFee);
     return new UnsignedTx(UTx);
   }
-
 
   /**
     * Class representing an unsigned [[CreateSubnetTx]] transaction.

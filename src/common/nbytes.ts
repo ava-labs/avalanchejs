@@ -24,6 +24,11 @@ export abstract class NBytes extends Serializable {
   protected type = "NBytes";
   protected typeID = undefined;
 
+  getFields(encoding:SerializedEncoding = "hex"):object {};
+  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+
+  }
+
   protected bytes:Buffer;
   protected bsize:number;
 
@@ -85,11 +90,6 @@ export abstract class NBytes extends Serializable {
    */
   toString():string {
     return bintools.bufferToB58(this.toBuffer());
-  }
-
-  getFields(encoding:string = "hex"):object {};
-  setFields(fields:object, encoding:string = "hex") {
-
   }
 
   abstract clone():this;
