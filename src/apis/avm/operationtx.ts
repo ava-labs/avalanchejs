@@ -13,11 +13,13 @@ import { KeyChain, KeyPair } from './keychain';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing an unsigned Operation transaction.
@@ -26,18 +28,10 @@ export class OperationTx extends BaseTx {
   protected type = "OperationTx";
   protected typeID = AVMConstants.OPERATIONTX;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected numOps:Buffer = Buffer.alloc(4);
   protected ops:Array<TransferableOperation> = [];

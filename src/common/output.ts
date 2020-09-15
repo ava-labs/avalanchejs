@@ -8,12 +8,13 @@ import BN from 'bn.js';
 import BinTools from '../utils/bintools';
 import { NBytes } from './nbytes';
 import { UnixNow } from '../utils/helperfunctions';
-import { Serializable, SerializedEncoding } from '../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools:BinTools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class for representing an address used in [[Output]] types
@@ -22,18 +23,10 @@ export class Address extends NBytes {
     protected type = "Address";
     protected typeID = undefined;
 
-    getFields(encoding:SerializedEncoding = "hex"):object {};
-    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+    serialize(encoding:SerializedEncoding = "hex"):object {};
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
   
     }
-  
-    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-  
-    };
-  
-    serialize(encoding:SerializedEncoding = "hex"):string {
-  
-    };
 
     /**
      * Returns a function used to sort an array of [[Address]]es
@@ -101,18 +94,12 @@ export class OutputOwners extends Serializable {
   protected type = "OutputOwners";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected locktime:Buffer = Buffer.alloc(8);
   protected threshold:Buffer = Buffer.alloc(4);
@@ -314,8 +301,8 @@ export abstract class Output extends OutputOwners {
    */
   abstract getOutputID():number;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -338,8 +325,8 @@ export abstract class StandardParseableOutput extends Serializable {
   protected type = "StandardParseableOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
   
@@ -384,8 +371,8 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
   protected type = "StandardTransferableOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -424,8 +411,8 @@ export abstract class StandardAmountOutput extends Output {
   protected type = "StandardAmountOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -482,8 +469,8 @@ export abstract class BaseNFTOutput extends Output {
   protected type = "BaseNFTOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 

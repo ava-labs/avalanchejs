@@ -13,11 +13,13 @@ import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
 import { SelectTxClass } from './tx';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
@@ -26,18 +28,10 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
   protected type = "BaseTx";
   protected typeID = AVMConstants.BASETX;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
    * Returns the id of the [[BaseTx]]

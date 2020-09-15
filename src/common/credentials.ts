@@ -5,13 +5,14 @@
 import { NBytes } from './nbytes';
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
-import { Serializable } from '../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
 
 
 /**
  * @ignore
  */
 const bintools:BinTools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Type representing a [[Signature]] index used in [[Input]]
@@ -20,18 +21,12 @@ export class SigIdx extends NBytes {
   protected type = "SigIdx";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   source:Buffer;
 
@@ -75,18 +70,12 @@ export class Signature extends NBytes {
   protected type = "Signature";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   clone():this {
     let newbase:Signature = new Signature();
@@ -112,8 +101,8 @@ export abstract class Credential extends Serializable{
   protected type = "Credential";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 

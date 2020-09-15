@@ -10,12 +10,13 @@ import { StandardKeyChain, StandardKeyPair } from './keychain';
 import { StandardAmountInput, StandardTransferableInput } from './input';
 import { StandardAmountOutput, StandardTransferableOutput } from './output';
 import { DefaultNetworkID } from '../utils/constants';
-import { Serializable, SerializedEncoding } from '../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
@@ -24,8 +25,8 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   protected type = "StandardBaseTx";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -166,8 +167,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   protected type = "StandardUnsignedTx";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -282,8 +283,8 @@ export abstract class StandardTx<
   protected type = "StandardTx";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 

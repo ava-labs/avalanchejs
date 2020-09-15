@@ -11,11 +11,13 @@ import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
 import BN from 'bn.js';
 import { AmountOutput } from '../platformvm/outputs';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing an unsigned Export transaction.
@@ -24,18 +26,10 @@ export class ExportTx extends BaseTx {
   protected type = "ExportTx";
   protected typeID = PlatformVMConstants.EXPORTTX;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected destinationChain:Buffer = Buffer.alloc(32);
   protected numOuts:Buffer = Buffer.alloc(4);

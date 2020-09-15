@@ -22,11 +22,13 @@ import { ExportTx } from './exporttx';
 import { ImportTx } from './importtx';
 import { PlatformChainID } from '../../utils/constants';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class for representing a single UTXO.
@@ -34,19 +36,6 @@ const bintools = BinTools.getInstance();
 export class UTXO extends StandardUTXO {
   protected type = "UTXO";
   protected typeID = undefined;
-
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
@@ -114,6 +103,23 @@ export class AssetAmountDestination extends StandardAssetAmountDestination<Trans
  */
 export class UTXOSet extends StandardUTXOSet<UTXO>{
 
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    let utxos = {}
+    for(let utxoid in fields["utxos"]){
+      utxos[utxoid] = new UTXO().deserialize(fields["utxos"][utxoid], encoding);
+    }
+    let addressUTXOs = {};
+    for(let address in fields["addressUTXOs"]){
+      let utxobalance = {};
+      for(let utxoid in fields["addressUTXOs"]){
+        utxobalance[utxoid] = serializer.decoder(fields["addressUTXOs"][utxoid], encoding, "decimalString", "BN");
+      }
+      addressUTXOs[address] = utxobalance;
+    }
+    this.utxos = utxos;
+    this.addressUTXOs = addressUTXOs;
+  }
+
   parseUTXO(utxo:UTXO | string):UTXO {
     const utxovar:UTXO = new UTXO();
     // force a copy
@@ -127,19 +133,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     return utxovar
   }
-
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   create(...args:any[]):this{
     return new UTXOSet() as this;

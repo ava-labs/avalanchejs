@@ -8,11 +8,12 @@ import BinTools  from '../../utils/bintools';
 import { Output } from '../../common/output';
 import { SelectOutputClass } from './outputs';
 import { AVMConstants } from './constants';
-import { Serializable } from '../../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class for creating initial output states used in asset creation
@@ -21,18 +22,10 @@ export class InitialStates extends Serializable{
   protected type = "AmountInput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected fxs:{[fxid:number]:Array<Output>} = {};
 

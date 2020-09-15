@@ -8,24 +8,18 @@ import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
 import { TransferableOutput, SECPOwnerOutput} from './outputs';
 import { TransferableInput } from './inputs';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
+const serializer = Serialization.getInstance();
 
 export class CreateSubnetTx extends BaseTx {
   protected type = "SECPCredential";
   protected typeID = PlatformVMConstants.CREATESUBNETTX;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected subnetOwners:SECPOwnerOutput = undefined;
 

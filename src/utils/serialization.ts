@@ -6,6 +6,8 @@ import BinTools from '../utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 
+export const SERIALIZATIONVERSION = 1;
+
 export type SerializedType = 
   'hex' 
 | 'BN' 
@@ -20,7 +22,13 @@ export type SerializedType =
 ;
 
 export type SerializedEncoding = 
-  'hex'
+  'hex' 
+| 'cb58' 
+| 'base58' 
+| 'base64' 
+| 'decimalString'
+| 'number'
+| 'utf8'
 | 'display'
 ;
 
@@ -29,13 +37,9 @@ export abstract class Serializable {
     protected typeID:number = undefined;
 
     //sometimes the parent class manages the fields
-    //these are so you can say super.getFields(); 
-    abstract getFields(encoding?:SerializedEncoding):object; 
-    abstract setFields(fields:object, encoding?:SerializedEncoding);
-
-    abstract deserialize(obj:object, encoding?:SerializedEncoding):this;
-
-    abstract serialize(encoding?:string):string;
+    //these are so you can say super.serialize(); 
+    abstract serialize(encoding?:SerializedEncoding):object; 
+    abstract deserialize(fields:object, encoding?:SerializedEncoding);
 }
 
 export class Serialization {
@@ -122,38 +126,36 @@ export class Serialization {
         return undefined;
     }
 
-    encoder(value:any, enc:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):string {
-        if(enc === "hex"){
-            outtype = "hex";
+    encoder(value:any, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):string {
+        if(encoding !== "display"){
+            outtype = encoding;
         }
         let vb:Buffer = this.typeToBuffer(value, intype, ...args);
         return this.bufferToType(vb, outtype, ...args);
     }
 
 
-    decoder(value:string, enc:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
-        if(enc === "hex") {
-            intype = "hex";
+    decoder(value:string, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
+        if(encoding !== "display") {
+            intype = encoding;
         } 
         let vb:Buffer = this.typeToBuffer(value, intype, ...args);
         return this.bufferToType(vb, outtype, ...args);
     }
 
-    format(type:string, fields:object, typeID:number = undefined):object {
-        let obj:object = {
-            type,
-            fields
-        }
+    format(fields:object, type:string, typeID:number = undefined):object {
+        fields["type"] = type;
         if(typeof typeID === "number") {
-            obj["typeID"] = typeID;
+            fields["typeID"] = typeID;
         }
-        return obj;
+        return fields;
     }
 
-    wrapSpecification(fields:object, vm:string, encoding:SerializedEncoding):object {
+    addSpecification(fields:object, vm:string, encoding:SerializedEncoding):object {
         return {
             vm,
             encoding,
+            version: SERIALIZATIONVERSION,
             fields
         }
     }

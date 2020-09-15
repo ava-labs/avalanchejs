@@ -7,8 +7,10 @@ import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -38,18 +40,10 @@ export class TransferableOutput extends StandardTransferableOutput{
   protected type = "TransferableOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
@@ -66,8 +60,8 @@ export abstract class AmountOutput extends StandardAmountOutput {
   protected type = "AmountOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
   
@@ -89,8 +83,8 @@ export abstract class NFTOutput extends BaseNFTOutput {
   protected type = "NFTOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -114,18 +108,12 @@ export class SECPTransferOutput extends AmountOutput {
   protected type = "SECPTransferOutput";
   protected typeID = AVMConstants.SECPXFEROUTPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
      * Returns the outputID for this output
@@ -153,18 +141,12 @@ export class SECPMintOutput extends Output {
   protected type = "SECPMintOutput";
   protected typeID = AVMConstants.SECPMINTOUTPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
    * Returns the outputID for this output
@@ -204,18 +186,12 @@ export class NFTMintOutput extends NFTOutput {
   protected type = "NFTMintOutput";
   protected typeID = AVMConstants.NFTMINTOUTPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
    * Returns the outputID for this output
@@ -276,18 +252,12 @@ export class NFTTransferOutput extends NFTOutput {
   protected type = "NFTTransferOutput";
   protected typeID = AVMConstants.NFTXFEROUTPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected sizePayload:Buffer = Buffer.alloc(4);
   protected payload:Buffer;

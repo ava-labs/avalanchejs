@@ -23,17 +23,16 @@ export abstract class StandardUTXO extends Serializable{
   protected type = "StandardUTXO";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {
-    let obj:object = {
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    return {
       "codecid": serializer.encoder(this.codecid, encoding, "Buffer", "number"),
       "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
       "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "number"),
       "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
       "output": this.output.serialize()
     }
-    return obj;
   };
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     this.codecid = serializer.decoder(fields["codecid"], encoding, "number", "Buffer", 2);
     this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
     this.outputidx = serializer.decoder(fields["outputidx"], encoding, "number", "Buffer", 4);
@@ -163,10 +162,24 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
   protected type = "StandardUTXOSet";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let utxos = {};
+    for(let utxoid in this.utxos) {
+      utxos[utxoid] = this.utxos[utxoid].serialize();
+    }
+    let addressUTXOs = {};
+    for(let address in this.addressUTXOs) {
+      let utxobalance = {};
+      for(let utxoid in this.addressUTXOs){
+        utxobalance[utxoid] = serializer.encoder(this.addressUTXOs[utxoid], encoding, "BN", "decimalString");
+      }
+      addressUTXOs[address] = utxobalance;
+    }
+    return {
+      utxos,
+      addressUTXOs
+    }
+  };
 
   protected utxos:{[utxoid: string]: UTXOClass } = {};
   protected addressUTXOs:{[address: string]: {[utxoid: string]: BN}} = {}; // maps address to utxoids:locktime

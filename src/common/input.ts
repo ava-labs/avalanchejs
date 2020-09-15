@@ -6,20 +6,20 @@ import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import BN from 'bn.js';
 import { SigIdx } from './credentials';
-import { Serializable } from '../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
-
+const serializer = Serialization.getInstance();
 
 export abstract class Input extends Serializable {
   protected type = "Input";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -111,8 +111,8 @@ export abstract class StandardTransferableInput extends Serializable{
   protected type = "StandardTransferableInput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -209,8 +209,8 @@ export abstract class StandardAmountInput extends Input {
   protected type = "StandardAmountInput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 

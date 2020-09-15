@@ -13,11 +13,13 @@ import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
 import { AmountOutput, ParseableOutput } from './outputs';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Abstract class representing an transactions with validation information.
@@ -26,8 +28,8 @@ export abstract class ValidatorTx extends BaseTx {
     protected type = "ValidatorTx";
     protected typeID = undefined;
 
-    getFields(encoding:SerializedEncoding = "hex"):object {};
-    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+    serialize(encoding:SerializedEncoding = "hex"):object {};
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
     }
 
@@ -110,8 +112,8 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     protected type = "WeightedValidatorTx";
     protected typeID = undefined;
 
-    getFields(encoding:SerializedEncoding = "hex"):object {};
-    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+    serialize(encoding:SerializedEncoding = "hex"):object {};
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
     }
 
@@ -297,18 +299,12 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     protected type = "AddDelegatorTx";
     protected typeID = PlatformVMConstants.ADDDELEGATORTX;
 
-    getFields(encoding:SerializedEncoding = "hex"):object {};
-    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+    serialize(encoding:SerializedEncoding = "hex"):object {};
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
   
     }
   
-    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-  
-    };
-  
-    serialize(encoding:SerializedEncoding = "hex"):string {
-  
-    };
+
 
     protected stakeOuts:Array<TransferableOutput> = [];
     protected rewardOwners:ParseableOutput = undefined;
@@ -452,18 +448,12 @@ export class AddValidatorTx extends AddDelegatorTx {
     protected type = "AddValidatorTx";
     protected typeID = PlatformVMConstants.ADDVALIDATORTX;
 
-    getFields(encoding:SerializedEncoding = "hex"):object {};
-    setFields(fields:object, encoding:SerializedEncoding = "hex") {
+    serialize(encoding:SerializedEncoding = "hex"):object {};
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
   
     }
   
-    deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-  
-    };
-  
-    serialize(encoding:SerializedEncoding = "hex"):string {
-  
-    };
+
 
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;

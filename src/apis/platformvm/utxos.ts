@@ -19,29 +19,20 @@ import { StandardAssetAmountDestination, AssetAmount } from '../../common/asseta
 import { Output } from '../../common/output';
 import { AddDelegatorTx, AddValidatorTx } from './validationtx';
 import { CreateSubnetTx } from './createsubnettx';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class for representing a single UTXO.
  */
 export class UTXO extends StandardUTXO {
-
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
+  protected type = "UTXO";
+  protected typeID = undefined;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
@@ -111,18 +102,22 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   protected type = "UTXOSet";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
-
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    let utxos = {}
+    for(let utxoid in fields["utxos"]){
+      utxos[utxoid] = new UTXO().deserialize(fields["utxos"][utxoid], encoding);
+    }
+    let addressUTXOs = {};
+    for(let address in fields["addressUTXOs"]){
+      let utxobalance = {};
+      for(let utxoid in fields["addressUTXOs"]){
+        utxobalance[utxoid] = serializer.decoder(fields["addressUTXOs"][utxoid], encoding, "decimalString", "BN");
+      }
+      addressUTXOs[address] = utxobalance;
+    }
+    this.utxos = utxos;
+    this.addressUTXOs = addressUTXOs;
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   parseUTXO(utxo:UTXO | string):UTXO {
     const utxovar:UTXO = new UTXO();

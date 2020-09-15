@@ -5,9 +5,11 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
-import { Output, StandardAmountOutput, StandardTransferableOutput, OutputOwners, StandardParseableOutput } from '../../common/output';
+import { Output, StandardAmountOutput, StandardTransferableOutput, StandardParseableOutput } from '../../common/output';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -29,18 +31,12 @@ export class TransferableOutput extends StandardTransferableOutput{
   protected type = "TransferableOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
@@ -57,18 +53,12 @@ export class ParseableOutput extends StandardParseableOutput{
   protected type = "ParseableOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
@@ -82,8 +72,8 @@ export abstract class AmountOutput extends StandardAmountOutput {
   protected type = "AmountOutput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -107,18 +97,12 @@ export class SECPTransferOutput extends AmountOutput {
   protected type = "SECPTransferOutput";
   protected typeID = PlatformVMConstants.SECPXFEROUTPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
      * Returns the outputID for this output
@@ -145,18 +129,10 @@ export class SECPOwnerOutput extends Output {
   protected type = "SECPOwnerOutput";
   protected typeID = PlatformVMConstants.SECPOWNEROUTPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
      * Returns the outputID for this output

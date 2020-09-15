@@ -9,9 +9,10 @@ import { NFTTransferOutput, SECPMintOutput, SECPTransferOutput } from './outputs
 import { NBytes } from '../../common/nbytes';
 import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';
-import { Serializable } from '../../utils/serialization';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Operation]] instance.
@@ -39,8 +40,8 @@ export abstract class Operation extends Serializable{
   protected type = "Operation";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -133,18 +134,12 @@ export class TransferableOperation extends Serializable {
   protected type = "TransferableOperation";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected assetid:Buffer = Buffer.alloc(32);
   protected utxoIDs:Array<UTXOID> = [];
@@ -242,18 +237,12 @@ export class SECPMintOperation extends Operation {
   protected type = "SECPMintOperation";
   protected typeID = AVMConstants.SECPMINTOPID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected mintOutput:SECPMintOutput = undefined;
   protected transferOutputs:Array<SECPTransferOutput> = [];
@@ -353,18 +342,12 @@ export class NFTMintOperation extends Operation {
   protected type = "NFTMintOperation";
   protected typeID = AVMConstants.NFTMINTOPID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected groupID:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
@@ -495,18 +478,12 @@ export class NFTTransferOperation extends Operation {
   protected type = "NFTTransferOperation";
   protected typeID = AVMConstants.NFTXFEROPID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected output:NFTTransferOutput;
 
@@ -577,18 +554,12 @@ export class UTXOID extends NBytes {
   protected type = "UTXOID";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
      * Returns a function used to sort an array of [[UTXOID]]s

@@ -6,12 +6,13 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
-
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
@@ -33,18 +34,12 @@ export class TransferableInput extends StandardTransferableInput {
   protected type = "TransferableInput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
 
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[TransferableInput]], parses it, populates the class, and returns the length of the [[TransferableInput]] in bytes.
@@ -72,8 +67,8 @@ export abstract class AmountInput extends StandardAmountInput {
   protected type = "AmountInput";
   protected typeID = undefined;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
 
@@ -86,18 +81,10 @@ export class SECPTransferInput extends AmountInput {
   protected type = "SECPTransferInput";
   protected typeID = AVMConstants.SECPINPUTID;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-  
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   /**
      * Returns the inputID for this input

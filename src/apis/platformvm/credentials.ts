@@ -5,13 +5,14 @@
 import BinTools from '../../utils/bintools';
 
 import { PlatformVMConstants } from './constants';
-import { Signature, Credential } from '../../common/credentials';
-Signature
+import { Credential } from '../../common/credentials';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools:BinTools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.
@@ -33,18 +34,10 @@ export class SECPCredential extends Credential {
   protected type = "SECPCredential";
   protected typeID = PlatformVMConstants.SECPCREDENTIAL;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   getCredentialID():number {
     return this.typeID;

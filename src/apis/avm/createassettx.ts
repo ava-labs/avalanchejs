@@ -10,28 +10,22 @@ import { TransferableInput } from './inputs';
 import { InitialStates } from './initialstates';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 export class CreateAssetTx extends BaseTx {
   protected type = "CreateAssetTx";
   protected typeID = AVMConstants.CREATEASSETTX;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected name:string = '';
   protected symbol:string = '';

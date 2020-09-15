@@ -12,11 +12,13 @@ import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 
 /**
@@ -26,18 +28,10 @@ export class ImportTx extends BaseTx {
   protected type = "ImportTx";
   protected typeID = PlatformVMConstants.IMPORTTX;
 
-  getFields(encoding:SerializedEncoding = "hex"):object {};
-  setFields(fields:object, encoding:SerializedEncoding = "hex") {
+  serialize(encoding:SerializedEncoding = "hex"):object {};
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
 
   }
-
-  deserialize(obj:object, encoding:SerializedEncoding = "hex"):this {
-
-  };
-
-  serialize(encoding:SerializedEncoding = "hex"):string {
-
-  };
 
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
