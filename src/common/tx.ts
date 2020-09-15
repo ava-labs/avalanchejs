@@ -10,6 +10,7 @@ import { StandardKeyChain, StandardKeyPair } from './keychain';
 import { StandardAmountInput, StandardTransferableInput } from './input';
 import { StandardAmountOutput, StandardTransferableOutput } from './output';
 import { DefaultNetworkID } from '../utils/constants';
+import { Serializable } from '../utils/serialization';
 
 /**
  * @ignore
@@ -19,7 +20,10 @@ const bintools = BinTools.getInstance();
 /**
  * Class representing a base for all transactions.
  */
-export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass extends StandardKeyChain<KPClass>> {
+export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass extends StandardKeyChain<KPClass>> extends Serializable{
+  protected type = "StandardBaseTx";
+  protected typeID = undefined;
+
   protected networkid:Buffer = Buffer.alloc(4);
   protected blockchainid:Buffer = Buffer.alloc(32);
   protected numouts:Buffer = Buffer.alloc(4);
@@ -128,6 +132,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
   constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
+    super();
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
     if(typeof memo === "undefined"){
@@ -146,15 +151,16 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   }
 }
 
-
-
 /**
  * Class representing an unsigned transaction.
  */
 export abstract class StandardUnsignedTx<KPClass extends StandardKeyPair, 
 KCClass extends StandardKeyChain<KPClass>, 
 SBTx extends StandardBaseTx<KPClass, KCClass>
-> {
+> extends Serializable{
+  protected type = "StandardUnsignedTx";
+  protected typeID = undefined;
+
   protected codecid:number = 0;
   protected transaction:SBTx;
 
@@ -247,6 +253,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   >;
 
   constructor(transaction:SBTx = undefined, codecid:number = 0) {
+    super();
     this.transaction = transaction;
   }
 }
@@ -261,7 +268,10 @@ export abstract class StandardTx<
         KPClass, 
         KCClass, 
         StandardBaseTx<KPClass, KCClass>>
-    > {
+    > extends Serializable {
+  protected type = "StandardTx";
+  protected typeID = undefined;
+
   protected unsignedTx:SUBTx = undefined;
   protected credentials:Array<Credential> = [];
 
@@ -328,6 +338,7 @@ export abstract class StandardTx<
    * @param signatures Optional array of [[Credential]]s
    */
   constructor(unsignedTx:SUBTx = undefined, credentials:Array<Credential> = undefined) {
+    super();
     if (typeof unsignedTx !== 'undefined') {
       this.unsignedTx = unsignedTx;
       if (typeof credentials !== 'undefined') {

@@ -32,6 +32,8 @@ const bintools = BinTools.getInstance();
  * Class for representing a single UTXO.
  */
 export class UTXO extends StandardUTXO {
+  protected type = "UTXO";
+  protected typeID = undefined;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
@@ -74,6 +76,19 @@ export class UTXO extends StandardUTXO {
     return bintools.cb58Encode(this.toBuffer());
   }
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
   clone():this {
     const utxo:UTXO = new UTXO();
     utxo.fromBuffer(this.toBuffer());
@@ -112,6 +127,19 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     return utxovar
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 
   create(...args:any[]):this{
     return new UTXOSet() as this;

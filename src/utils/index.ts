@@ -5,3 +5,4 @@ export * from './db';
 export * from './helperfunctions';
 export * from './payload';
 export * from './persistenceoptions';
+export * from './serialization';

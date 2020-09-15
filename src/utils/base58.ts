@@ -16,6 +16,21 @@ import { Buffer } from 'buffer/';
  * ```
  */
 export class Base58 {
+
+  private static instance:Base58;
+  
+  private constructor() {}
+
+  /**
+   * Retrieves the Base58 singleton.
+   */
+  static getInstance(): Base58 {
+      if (!Base58.instance) {
+        Base58.instance = new Base58();
+      }
+      return Base58.instance;
+  }
+
   protected b58alphabet:string = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
   protected alphabetIdx0 = '1';

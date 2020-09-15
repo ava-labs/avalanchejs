@@ -8,6 +8,7 @@ import BN from 'bn.js';
 import BinTools from '../utils/bintools';
 import { NBytes } from './nbytes';
 import { UnixNow } from '../utils/helperfunctions';
+import { Serializable } from '../utils/serialization';
 
 /**
  * @ignore
@@ -18,6 +19,8 @@ const bintools:BinTools = BinTools.getInstance();
  * Class for representing an address used in [[Output]] types
  */
 export class Address extends NBytes {
+    protected type = "Address";
+    protected typeID = undefined;
     /**
      * Returns a function used to sort an array of [[Address]]es
      */
@@ -67,6 +70,18 @@ export class Address extends NBytes {
       return new Address() as this;
     }
 
+    getFields(encoding:string = "hex"):object {};
+    setFields(fields:object, encoding:string = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:string = "hex"):this {
+  
+    };
+  
+    serialize(encoding:string = "hex"):string {
+  
+    };
   
     /**
        * Class for representing an address used in [[Output]] types
@@ -81,11 +96,16 @@ export class Address extends NBytes {
   /**
    * Defines the most basic values for output ownership. Mostly inherited from, but can be used in population of NFT Owner data.
    */
-export class OutputOwners {
-    protected locktime:Buffer = Buffer.alloc(8);
-    protected threshold:Buffer = Buffer.alloc(4);
-    protected numaddrs:Buffer = Buffer.alloc(4);
-    protected addresses:Array<Address> = [];
+export class OutputOwners extends Serializable {
+  protected type = "OutputOwners";
+  protected typeID = undefined;
+
+  protected locktime:Buffer = Buffer.alloc(8);
+  protected threshold:Buffer = Buffer.alloc(4);
+  protected numaddrs:Buffer = Buffer.alloc(4);
+  protected addresses:Array<Address> = [];
+
+    
 
     /**
      * Returns the threshold of signers required to spend this output.
@@ -230,6 +250,19 @@ export class OutputOwners {
     return bintools.bufferToB58(this.toBuffer());
   }
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
   static comparator = ():(a:Output, b:Output) => (1|-1|0) => (a:Output, b:Output):(1|-1|0) => {
     const aoutid:Buffer = Buffer.alloc(4);
     aoutid.writeUInt32BE(a.getOutputID(), 0);
@@ -245,13 +278,14 @@ export class OutputOwners {
   };
 
   /**
-     * An [[Output]] class which contains addresses, locktimes, and thresholds.
-     *
-     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing output owner's addresses
-     * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-     * @param threshold A number representing the the threshold number of signers required to sign the transaction
-     */
+   * An [[Output]] class which contains addresses, locktimes, and thresholds.
+   *
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing output owner's addresses
+   * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
+   * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   */
   constructor(addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
+    super();
     if(typeof addresses !== "undefined" && addresses.length) {
       const addrs:Array<Address> = [];
       for (let i = 0; i < addresses.length; i++) {
@@ -272,155 +306,194 @@ export class OutputOwners {
 }
 
 export abstract class Output extends OutputOwners {
-    /**
-     * Returns the outputID for the output which tells parsers what type it is
-     */
-    abstract getOutputID():number;
+  protected type = "Output";
+  protected typeID = undefined;
+  /**
+   * Returns the outputID for the output which tells parsers what type it is
+   */
+  abstract getOutputID():number;
 
-    abstract clone():this;
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
 
-    abstract create(...args:any[]):this;
+  }
 
-    abstract select(id:number, ...args:any[]):Output;
+  abstract clone():this;
 
-    /**
-     * 
-     * @param assetID An assetID which is wrapped around the Buffer of the Output
-     * 
-     * Must be implemented to use the appropriate TransferableOutput for the VM.
-     */
-    abstract makeTransferable(assetID:Buffer):StandardTransferableOutput;
+  abstract create(...args:any[]):this;
+
+  abstract select(id:number, ...args:any[]):Output;
+
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   * 
+   * Must be implemented to use the appropriate TransferableOutput for the VM.
+   */
+  abstract makeTransferable(assetID:Buffer):StandardTransferableOutput;
 }
 
-export abstract class StandardParseableOutput {
+export abstract class StandardParseableOutput extends Serializable {
+  protected type = "StandardParseableOutput";
+  protected typeID = undefined;
+  
   protected output:Output;
 
-    /**
-     * Returns a function used to sort an array of [[ParseableOutput]]s
-     */
-    static comparator = ():(a:StandardParseableOutput, b:StandardParseableOutput) => (1|-1|0) => (a:StandardParseableOutput, b:StandardParseableOutput):(1|-1|0) => {
-      const sorta = a.toBuffer();
-      const sortb = b.toBuffer();
-      return Buffer.compare(sorta, sortb) as (1|-1|0);
-    };
+  /**
+   * Returns a function used to sort an array of [[ParseableOutput]]s
+   */
+  static comparator = ():(a:StandardParseableOutput, b:StandardParseableOutput) => (1|-1|0) => (a:StandardParseableOutput, b:StandardParseableOutput):(1|-1|0) => {
+    const sorta = a.toBuffer();
+    const sortb = b.toBuffer();
+    return Buffer.compare(sorta, sortb) as (1|-1|0);
+  };
 
-    getOutput = ():Output => this.output;
+  getOutput = ():Output => this.output;
 
-    // must be implemented to select output types for the VM in question
-    abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+  // must be implemented to select output types for the VM in question
+  abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+
+  toBuffer():Buffer {
+    const outbuff:Buffer = this.output.toBuffer();
+    const outid:Buffer = Buffer.alloc(4);
+    outid.writeUInt32BE(this.output.getOutputID(), 0);
+    const barr:Array<Buffer> = [outid, outbuff];
+    return Buffer.concat(barr, outid.length + outbuff.length);
+  }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
   
-    toBuffer():Buffer {
-      const outbuff:Buffer = this.output.toBuffer();
-      const outid:Buffer = Buffer.alloc(4);
-      outid.writeUInt32BE(this.output.getOutputID(), 0);
-      const barr:Array<Buffer> = [outid, outbuff];
-      return Buffer.concat(barr, outid.length + outbuff.length);
+  /**
+   * Class representing an [[ParseableOutput]] for a transaction.
+   * 
+   * @param output A number representing the InputID of the [[ParseableOutput]]
+   */
+  constructor(output:Output = undefined) {
+    super();
+    if (output instanceof Output) {
+      this.output = output;
     }
-
-    /**
-     * Class representing an [[ParseableOutput]] for a transaction.
-     * 
-     * @param output A number representing the InputID of the [[ParseableOutput]]
-     */
-    constructor(output:Output = undefined) {
-      if (output instanceof Output) {
-        this.output = output;
-      }
-    }
+  }
 }
 
 export abstract class StandardTransferableOutput extends StandardParseableOutput {
-    protected assetID:Buffer = undefined;
-  
-    protected output:Output;
-  
-    getAssetID = ():Buffer => this.assetID;
+  protected type = "StandardTransferableOutput";
+  protected typeID = undefined;
 
-    // must be implemented to select output types for the VM in question
-    abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+  protected assetID:Buffer = undefined;
+  protected output:Output;
+
   
-    toBuffer():Buffer {
-      const parseeableBuff:Buffer = super.toBuffer();
-      const barr:Array<Buffer> = [this.assetID, parseeableBuff];
-      return Buffer.concat(barr, this.assetID.length + parseeableBuff.length);
-    }
-  
-    /**
-     * Class representing an [[StandardTransferableOutput]] for a transaction.
-     *
-     * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Output]]
-     * @param output A number representing the InputID of the [[StandardTransferableOutput]]
-     */
-    constructor(assetID:Buffer = undefined, output:Output = undefined) {
-      super(output);
-      if (typeof assetID !== 'undefined') {
-        this.assetID = assetID;
-      }
-    }
+
+  getAssetID = ():Buffer => this.assetID;
+
+  // must be implemented to select output types for the VM in question
+  abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+
+  toBuffer():Buffer {
+    const parseeableBuff:Buffer = super.toBuffer();
+    const barr:Array<Buffer> = [this.assetID, parseeableBuff];
+    return Buffer.concat(barr, this.assetID.length + parseeableBuff.length);
+  }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
   }
 
   /**
+   * Class representing an [[StandardTransferableOutput]] for a transaction.
+   *
+   * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Output]]
+   * @param output A number representing the InputID of the [[StandardTransferableOutput]]
+   */
+  constructor(assetID:Buffer = undefined, output:Output = undefined) {
+    super(output);
+    if (typeof assetID !== 'undefined') {
+      this.assetID = assetID;
+    }
+  }
+}
+
+/**
  * An [[Output]] class which specifies a token amount .
  */
 export abstract class StandardAmountOutput extends Output {
-    protected amount:Buffer = Buffer.alloc(8);
-  
-    protected amountValue:BN = new BN(0);
-  
-    /**
-       * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
-       */
-    getAmount = ():BN => this.amountValue.clone();
-  
-    /**
-       * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StandardAmountOutput]] and returns the size of the output.
-       */
-    fromBuffer(outbuff:Buffer, offset:number = 0):number {
-      this.amount = bintools.copyFrom(outbuff, offset, offset + 8);
-      this.amountValue = bintools.fromBufferToBN(this.amount);
-      offset += 8;
-      return super.fromBuffer(outbuff, offset);
-    }
-  
-    /**
-       * Returns the buffer representing the [[StandardAmountOutput]] instance.
-       */
-    toBuffer():Buffer {
-      const superbuff:Buffer = super.toBuffer();
-      const bsize:number = this.amount.length + superbuff.length;
-      this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-      const barr:Array<Buffer> = [this.amount, superbuff];
-      return Buffer.concat(barr, bsize);
-    }
-  
-    /**
-       * A [[BaseAmountOutput]] class which issues a payment on an assetID.
-       *
-       * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
-       * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
-       * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-       * @param threshold A number representing the the threshold number of signers required to sign the transaction
-  
-       */
-    constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
-      super(addresses, locktime, threshold);
-      if (amount) {
-        this.amountValue = amount.clone();
-        this.amount = bintools.fromBNToBuffer(amount, 8);
-      }
+  protected type = "StandardAmountOutput";
+  protected typeID = undefined;
+
+  protected amount:Buffer = Buffer.alloc(8);
+  protected amountValue:BN = new BN(0);
+
+  /**
+   * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
+   */
+  getAmount = ():BN => this.amountValue.clone();
+
+  /**
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StandardAmountOutput]] and returns the size of the output.
+   */
+  fromBuffer(outbuff:Buffer, offset:number = 0):number {
+    this.amount = bintools.copyFrom(outbuff, offset, offset + 8);
+    this.amountValue = bintools.fromBufferToBN(this.amount);
+    offset += 8;
+    return super.fromBuffer(outbuff, offset);
+  }
+
+  /**
+   * Returns the buffer representing the [[StandardAmountOutput]] instance.
+   */
+  toBuffer():Buffer {
+    const superbuff:Buffer = super.toBuffer();
+    const bsize:number = this.amount.length + superbuff.length;
+    this.numaddrs.writeUInt32BE(this.addresses.length, 0);
+    const barr:Array<Buffer> = [this.amount, superbuff];
+    return Buffer.concat(barr, bsize);
+  }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  /**
+   * A [[BaseAmountOutput]] class which issues a payment on an assetID.
+   *
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+   * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
+   * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   */
+  constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
+    super(addresses, locktime, threshold);
+    if (amount) {
+      this.amountValue = amount.clone();
+      this.amount = bintools.fromBNToBuffer(amount, 8);
     }
   }
+}
 
 /**
  * An [[Output]] class which specifies an NFT.
  */
 export abstract class BaseNFTOutput extends Output {
-    protected groupID:Buffer = Buffer.alloc(4);
+  protected type = "BaseNFTOutput";
+  protected typeID = undefined;
+
+  protected groupID:Buffer = Buffer.alloc(4);
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
 
   /**
-     * Returns the groupID as a number.
-     */
-    getGroupID = ():number => {
-        return this.groupID.readUInt32BE(0);
-    }
+   * Returns the groupID as a number.
+   */
+  getGroupID = ():number => {
+      return this.groupID.readUInt32BE(0);
+  }
 }

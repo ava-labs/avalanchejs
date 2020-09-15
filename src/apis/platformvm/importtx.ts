@@ -23,6 +23,9 @@ const bintools = BinTools.getInstance();
  * Class representing an unsigned Import transaction.
  */
 export class ImportTx extends BaseTx {
+  protected type = "ImportTx";
+  protected typeID = PlatformVMConstants.IMPORTTX;
+
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
   protected importIns:Array<TransferableInput> = [];
@@ -31,7 +34,7 @@ export class ImportTx extends BaseTx {
      * Returns the id of the [[ImportTx]]
      */
   getTxType = ():number => {
-    return PlatformVMConstants.IMPORTTX;
+    return this.typeID;
   }
   
   /**
@@ -104,6 +107,19 @@ export class ImportTx extends BaseTx {
     }
     return sigs;
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 
   clone():this {
     let newbase:ImportTx = new ImportTx();

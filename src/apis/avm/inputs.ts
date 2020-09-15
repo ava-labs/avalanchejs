@@ -30,6 +30,9 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
 };
 
 export class TransferableInput extends StandardTransferableInput {
+  protected type = "TransferableInput";
+  protected typeID = undefined;
+
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[TransferableInput]], parses it, populates the class, and returns the length of the [[TransferableInput]] in bytes.
    *
@@ -49,10 +52,30 @@ export class TransferableInput extends StandardTransferableInput {
     this.input = SelectInputClass(inputid);
     return this.input.fromBuffer(bytes, offset);
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
   
 }
 
 export abstract class AmountInput extends StandardAmountInput {
+  protected type = "AmountInput";
+  protected typeID = undefined;
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
 
   select(id:number, ...args: any[]):Input {
     return SelectInputClass(id, ...args);
@@ -60,6 +83,9 @@ export abstract class AmountInput extends StandardAmountInput {
 }
 
 export class SECPTransferInput extends AmountInput {
+  protected type = "SECPTransferInput";
+  protected typeID = AVMConstants.SECPINPUTID;
+
   /**
      * Returns the inputID for this input
      */
@@ -68,6 +94,20 @@ export class SECPTransferInput extends AmountInput {
   }
 
   getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+  
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
 
   create(...args:any[]):this{
     return new SECPTransferInput(...args) as this;

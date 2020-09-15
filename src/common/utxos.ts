@@ -8,25 +8,38 @@ import BN from "bn.js";
 import { Output, StandardAmountOutput } from './output';
 import { UnixNow } from '../utils/helperfunctions';
 import { MergeRule } from '../utils/constants';
+import { Serializable, Serialization } from '../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
-
+const serializer = Serialization.getInstance();
 
 /**
  * Class for representing a single StandardUTXO.
  */
-export abstract class StandardUTXO {
+export abstract class StandardUTXO extends Serializable{
+  protected type = "StandardUTXO";
+  protected typeID = undefined;
+
+  getFields(encoding:string = "hex"):object {
+    let obj:object = {
+      "codecid": serializer.encoder(this.codecid, encoding, "number"),
+      "txid": this.txid,
+      "outputidx": this.outputidx,
+      "assetid": this.assetid,
+      "output": this.output.serialize();
+    }
+  };
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
   protected codecid:Buffer = Buffer.alloc(2);
-
   protected txid:Buffer = Buffer.alloc(32);
-
   protected outputidx:Buffer = Buffer.alloc(4);
-
   protected assetid:Buffer = Buffer.alloc(32);
-
   protected output:Output = undefined;
 
   /**
@@ -117,6 +130,7 @@ export abstract class StandardUTXO {
     outputidx:Buffer | number = undefined,
     assetid:Buffer = undefined,
     output:Output = undefined){
+    super();
     if (typeof codecID !== 'undefined') {
       this.codecid .writeUInt8(codecID, 0);
     }
@@ -141,9 +155,16 @@ export abstract class StandardUTXO {
 /**
  * Class representing a set of [[StandardUTXO]]s.
  */
-export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> {
-  protected utxos:{[utxoid: string]: UTXOClass } = {};
+export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Serializable{
+  protected type = "StandardUTXOSet";
+  protected typeID = undefined;
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  protected utxos:{[utxoid: string]: UTXOClass } = {};
   protected addressUTXOs:{[address: string]: {[utxoid: string]: BN}} = {}; // maps address to utxoids:locktime
 
   abstract parseUTXO(utxo:UTXOClass | string):UTXOClass;

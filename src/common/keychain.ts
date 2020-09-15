@@ -11,7 +11,6 @@ import { Buffer } from "buffer/";
  */
 export abstract class StandardKeyPair {
     protected pubk:Buffer;
-  
     protected privk:Buffer;
   
     /**
@@ -108,7 +107,6 @@ export abstract class StandardKeyPair {
 
     abstract clone():this;
   
-    constructor() {}
   }
   
   /**
@@ -207,10 +205,5 @@ export abstract class StandardKeyPair {
     abstract clone():this;
 
     abstract union(kc:this):this;
-  
-    /**
-       * Returns instance of [[StandardKeyChain]].
-       * 
-       */
-    constructor() {}
+    
   }

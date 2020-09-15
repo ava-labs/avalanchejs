@@ -22,6 +22,8 @@ import { ExportTx } from './exporttx';
 const bintools = BinTools.getInstance();
 
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
+  protected type = "UnsigndTx";
+  protected typeID = undefined;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
@@ -45,9 +47,24 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 }
 
 export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
+  protected type = "Tx";
+  protected typeID = undefined;
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.
    *
@@ -71,6 +88,19 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     }
     return offset;
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 }
 
 /**

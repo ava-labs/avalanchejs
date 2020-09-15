@@ -9,6 +9,7 @@ import { NFTTransferOutput, SECPMintOutput, SECPTransferOutput } from './outputs
 import { NBytes } from '../../common/nbytes';
 import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';
+import { Serializable } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
 
@@ -34,10 +35,26 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
 /**
  * A class representing an operation. All operation types must extend on this class.
  */
-export abstract class Operation {
-  protected sigCount:Buffer = Buffer.alloc(4);
+export abstract class Operation extends Serializable{
+  protected type = "Operation";
+  protected typeID = undefined;
 
+  protected sigCount:Buffer = Buffer.alloc(4);
   protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
+
+  static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => (a:Operation, b:Operation):(1|-1|0) => {
+    const aoutid:Buffer = Buffer.alloc(4);
+    aoutid.writeUInt32BE(a.getOperationID(), 0);
+    const abuff:Buffer = a.toBuffer();
+
+    const boutid:Buffer = Buffer.alloc(4);
+    boutid.writeUInt32BE(b.getOperationID(), 0);
+    const bbuff:Buffer = b.toBuffer();
+
+    const asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+    const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+    return Buffer.compare(asort, bsort) as (1|-1|0);
+  };
 
   abstract getOperationID():number;
 
@@ -101,42 +118,47 @@ export abstract class Operation {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => (a:Operation, b:Operation):(1|-1|0) => {
-    const aoutid:Buffer = Buffer.alloc(4);
-    aoutid.writeUInt32BE(a.getOperationID(), 0);
-    const abuff:Buffer = a.toBuffer();
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
 
-    const boutid:Buffer = Buffer.alloc(4);
-    boutid.writeUInt32BE(b.getOperationID(), 0);
-    const bbuff:Buffer = b.toBuffer();
+  }
 
-    const asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
-    const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
-    return Buffer.compare(asort, bsort) as (1|-1|0);
-  };
-
-  constructor() {}
 }
 
 /**
  * A class which contains an [[Operation]] for transfers.
  *
  */
-export class TransferableOperation {
+export class TransferableOperation extends Serializable {
+  protected type = "TransferableOperation";
+  protected typeID = undefined;
+
   protected assetid:Buffer = Buffer.alloc(32);
-
   protected utxoIDs:Array<UTXOID> = [];
-
   protected operation:Operation;
 
-    /**
-     * Returns a function used to sort an array of [[TransferableOperation]]s
-     */
-    static comparator = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
-        return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
-            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
-        }
-    }
+  /**
+   * Returns a function used to sort an array of [[TransferableOperation]]s
+   */
+  static comparator = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
+      return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
+          return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+      }
+  }
+  /**
+   * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
+   */
+  getAssetID = ():Buffer => this.assetid;
+
+  /**
+   * Returns an array of UTXOIDs in this operation.
+   */
+  getUTXOIDs = ():Array<UTXOID> => this.utxoIDs;
+
+  /**
+   * Returns the operation
+   */
+  getOperation = ():Operation => this.operation;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -176,22 +198,21 @@ export class TransferableOperation {
     return Buffer.concat(barr, bsize);
   }
 
-  /**
-   * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
-   */
-  getAssetID = ():Buffer => this.assetid;
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
 
-  /**
-   * Returns an array of UTXOIDs in this operation.
-   */
-  getUTXOIDs = ():Array<UTXOID> => this.utxoIDs;
+  }
 
-  /**
-   * Returns the operation
-   */
-  getOperation = ():Operation => this.operation;
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 
   constructor(assetid:Buffer = undefined, utxoids:Array<UTXOID|string|Buffer> = undefined, operation:Operation = undefined) {
+    super();
     if (
       typeof assetid !== 'undefined' && assetid.length === AVMConstants.ASSETIDLEN
             && operation instanceof Operation && typeof utxoids !== 'undefined'
@@ -218,6 +239,9 @@ export class TransferableOperation {
  * An [[Operation]] class which specifies a SECP256k1 Mint Op.
  */
 export class SECPMintOperation extends Operation {
+  protected type = "SECPMintOperation";
+  protected typeID = AVMConstants.SECPMINTOPID;
+
   protected mintOutput:SECPMintOutput = undefined;
   protected transferOutputs:Array<SECPTransferOutput> = [];
 
@@ -225,7 +249,7 @@ export class SECPMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.SECPMINTOPID;
+    return this.typeID;
   }
 
   /**
@@ -291,6 +315,19 @@ export class SECPMintOperation extends Operation {
     return Buffer.concat(barr,bsize);
   }
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
   /**
    * An [[Operation]] class which mints new tokens on an assetID.
    * 
@@ -313,6 +350,9 @@ export class SECPMintOperation extends Operation {
  * An [[Operation]] class which specifies a NFT Mint Op.
  */
 export class NFTMintOperation extends Operation {
+  protected type = "NFTMintOperation";
+  protected typeID = AVMConstants.NFTMINTOPID;
+
   protected groupID:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
   protected outputOwners:Array<OutputOwners> = [];
@@ -321,7 +361,7 @@ export class NFTMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.NFTMINTOPID;
+    return this.typeID;
   }
 
   /**
@@ -418,6 +458,19 @@ export class NFTMintOperation extends Operation {
     return bintools.bufferToB58(this.toBuffer());
   }
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
   /**
    * An [[Operation]] class which contains an NFT on an assetID.
    * 
@@ -439,13 +492,16 @@ export class NFTMintOperation extends Operation {
  * A [[Operation]] class which specifies a NFT Transfer Op.
  */
 export class NFTTransferOperation extends Operation {
+  protected type = "NFTTransferOperation";
+  protected typeID = AVMConstants.NFTXFEROPID;
+
   protected output:NFTTransferOutput;
 
   /**
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.NFTXFEROPID;
+    return this.typeID;
   }
 
   /**
@@ -484,6 +540,19 @@ export class NFTTransferOperation extends Operation {
     return bintools.bufferToB58(this.toBuffer());
   }
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
   /**
      * An [[Operation]] class which contains an NFT on an assetID.
      *
@@ -505,6 +574,9 @@ export class NFTTransferOperation extends Operation {
  * Class for representing a UTXOID used in [[TransferableOp]] types
  */
 export class UTXOID extends NBytes {
+  protected type = "UTXOID";
+  protected typeID = undefined;
+
   /**
      * Returns a function used to sort an array of [[UTXOID]]s
      */
@@ -543,6 +615,19 @@ export class UTXOID extends NBytes {
     return this.getSize();
     
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 
   clone():this {
     let newbase:UTXOID = new UTXOID();

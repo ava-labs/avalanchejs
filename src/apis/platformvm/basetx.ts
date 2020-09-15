@@ -22,7 +22,7 @@ const bintools = BinTools.getInstance();
 /**
  * Class representing a base for all transactions.
  */
-export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
+export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
   /**
    * Returns the id of the [[BaseTx]]
    */

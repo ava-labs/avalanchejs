@@ -23,6 +23,9 @@ const bintools = BinTools.getInstance();
  * Abstract class representing an transactions with validation information.
  */
 export abstract class ValidatorTx extends BaseTx {
+    protected type = "ValidatorTx";
+    protected typeID = undefined;
+
     protected nodeID:Buffer = Buffer.alloc(20);
     protected startTime:Buffer = Buffer.alloc(8);
     protected endTime:Buffer = Buffer.alloc(8);
@@ -79,6 +82,11 @@ export abstract class ValidatorTx extends BaseTx {
         ], bsize);
       }
 
+    getFields(encoding:string = "hex"):object {};
+    setFields(fields:object, encoding:string = "hex") {
+
+    }
+    
     constructor(
         networkid:number, 
         blockchainid:Buffer, 
@@ -99,6 +107,9 @@ export abstract class ValidatorTx extends BaseTx {
 
 
 export abstract class WeightedValidatorTx extends ValidatorTx {
+    protected type = "WeightedValidatorTx";
+    protected typeID = undefined;
+
     protected weight:Buffer = Buffer.alloc(8);
 
     /**
@@ -278,6 +289,9 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
  * Class representing an unsigned AddDelegatorTx transaction.
  */
 export class AddDelegatorTx extends WeightedValidatorTx {
+    protected type = "AddDelegatorTx";
+    protected typeID = PlatformVMConstants.ADDDELEGATORTX;
+
     protected stakeOuts:Array<TransferableOutput> = [];
     protected rewardOwners:ParseableOutput = undefined;
   
@@ -285,7 +299,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
        * Returns the id of the [[AddDelegatorTx]]
        */
     getTxType = ():number => {
-      return PlatformVMConstants.ADDDELEGATORTX;
+      return this.typeID;
     }
 
     /**
@@ -370,6 +384,19 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         return Buffer.concat(barr, bsize);
     }
   
+    getFields(encoding:string = "hex"):object {};
+    setFields(fields:object, encoding:string = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:string = "hex"):this {
+  
+    };
+  
+    serialize(encoding:string = "hex"):string {
+  
+    };
+
     clone():this {
         let newbase:AddDelegatorTx = new AddDelegatorTx();
         newbase.fromBuffer(this.toBuffer());
@@ -418,14 +445,17 @@ export class AddDelegatorTx extends WeightedValidatorTx {
   }
 
 export class AddValidatorTx extends AddDelegatorTx {
+    protected type = "AddValidatorTx";
+    protected typeID = PlatformVMConstants.ADDVALIDATORTX;
+
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
 
     /**
-       * Returns the id of the [[AddDelegatorTx]]
+       * Returns the id of the [[AddValidatorTx]]
        */
     getTxType = ():number => {
-    return PlatformVMConstants.ADDVALIDATORTX;
+    return this.typeID;
     }
 
     /**
@@ -458,6 +488,19 @@ export class AddValidatorTx extends AddDelegatorTx {
         let feeBuff:Buffer = this.getDelegationFeeBuffer();
         return Buffer.concat([superBuff, feeBuff]);
     }
+
+    getFields(encoding:string = "hex"):object {};
+    setFields(fields:object, encoding:string = "hex") {
+  
+    }
+  
+    deserialize(obj:object, encoding:string = "hex"):this {
+  
+    };
+  
+    serialize(encoding:string = "hex"):string {
+  
+    };
 
     /**
      * Class representing an unsigned AddValidatorTx transaction.
@@ -513,4 +556,4 @@ export class AddValidatorTx extends AddDelegatorTx {
             }
         }
     }
-  }
+}

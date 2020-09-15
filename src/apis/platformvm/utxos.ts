@@ -71,6 +71,19 @@ export class UTXO extends StandardUTXO {
     return bintools.cb58Encode(this.toBuffer());
   }
 
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
+
   clone():this {
     const utxo:UTXO = new UTXO();
     utxo.fromBuffer(this.toBuffer());
@@ -95,6 +108,9 @@ export class AssetAmountDestination extends StandardAssetAmountDestination<Trans
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet extends StandardUTXOSet<UTXO>{
+  protected type = "UTXOSet";
+  protected typeID = undefined;
+
 
   parseUTXO(utxo:UTXO | string):UTXO {
     const utxovar:UTXO = new UTXO();
@@ -109,6 +125,19 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     return utxovar
   }
+
+  getFields(encoding:string = "hex"):object {};
+  setFields(fields:object, encoding:string = "hex") {
+
+  }
+
+  deserialize(obj:object, encoding:string = "hex"):this {
+
+  };
+
+  serialize(encoding:string = "hex"):string {
+
+  };
 
   create(...args:any[]):this{
     return new UTXOSet() as this;

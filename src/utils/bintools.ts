@@ -7,6 +7,7 @@ import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import * as bech32 from 'bech32';
 import { Base58 } from './base58';
+import { Defaults } from './constants';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using
@@ -28,14 +29,14 @@ export default class BinTools {
   private static instance:BinTools;
 
   private constructor() {
-    this.b58 = new Base58();
+    this.b58 = Base58.getInstance();
   }
 
   private b58:Base58;
 
   /**
-     * Retrieves the BinTools singleton.
-     */
+   * Retrieves the BinTools singleton.
+   */
   static getInstance(): BinTools {
     if (!BinTools.instance) {
       BinTools.instance = new BinTools();
@@ -44,15 +45,82 @@ export default class BinTools {
   }
 
   /**
+   * Returns true if base64, otherwise false
+   * @param str the string to verify is Base64
+   */
+  isBase64(str:string) {
+    if (str ==='' || str.trim() ===''){ return false; }
+    try {
+        let b64:Buffer = Buffer.from(str, "base64");
+        return b64.toString("base64") === str;
+    } catch (err) {
+        return false;
+    }
+  }
+
+  /**
+   * Returns true if base58, otherwise false
+   * @param str the string to verify is base58
+   */
+  isBase58(str:string) {
+    if (str ==='' || str.trim() ===''){ return false; }
+    try {
+        return this.b58.encode(this.b58.decode(str)) === str;
+    } catch (err) {
+        return false;
+    }
+  }
+
+  /**
+   * Returns true if hexidecimal, otherwise false
+   * @param str the string to verify is hexidecimal
+   */
+  isHex(str:string) {
+    if (str ==='' || str.trim() ===''){ return false; }
+    return (str.startsWith("0x") && str.slice(2).match(/^[0-9A-Fa-f]/g) || str.match(/^[0-9A-Fa-f]/g));
+  }
+
+  /**
+   * Returns true if decimal, otherwise false
+   * @param str the string to verify is hexidecimal
+   */
+  isDecimal(str:string) {
+    if (str ==='' || str.trim() ===''){ return false; }
+    try {
+      return new BN(str, 10).toString(10) === str.trim();
+    } catch (err) {
+        return false;
+    }
+  }
+
+  /**
+   * Returns true if meets requirements to parse as an address as Bech32 on X-Chain or P-Chain, otherwise false
+   * @param address the string to verify is address
+   */
+  isPrimaryBechAddress = (address:string):boolean => {
+    const parts:Array<string> = address.trim().split('-');
+    if(parts.length !== 2) {
+      return false;
+    }
+    try {
+      bech32.fromWords(bech32.decode(parts[1]).words);
+    } catch(err) {
+      return false
+    }
+    return true;
+  };
+
+
+  /**
      * Produces a string from a {@link https://github.com/feross/buffer|Buffer}
-     * representing a string.
+     * representing a string. ONLY USED IN TRANSACTION FORMATTING, ASSUMED LENGTH IS PREPENDED.
      *
      * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to a string
      */
   bufferToString = (buff:Buffer):string => this.copyFrom(buff, 2).toString('utf8');
 
   /**
-     * Produces a {@link https://github.com/feross/buffer|Buffer} from a string.
+     * Produces a {@link https://github.com/feross/buffer|Buffer} from a string. ONLY USED IN TRANSACTION FORMATTING, LENGTH IS PREPENDED.
      *
      * @param str The string to convert to a {@link https://github.com/feross/buffer|Buffer}
      */
