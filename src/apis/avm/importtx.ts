@@ -12,7 +12,7 @@ import { SelectCredentialClass } from './credentials';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -24,12 +24,27 @@ const serializer = Serialization.getInstance();
  * Class representing an unsigned Import transaction.
  */
 export class ImportTx extends BaseTx {
-  protected type = "ImportTx";
-  protected typeID = AVMConstants.IMPORTTX;
+  public _typeName = "ImportTx";
+  public _typeID = AVMConstants.IMPORTTX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "sourceChain": serializer.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
+      "importIns": this.importIns.map((i) => i.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.sourceChain = serializer.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
+    this.importIns = fields["importIns"].map((i:object) => {
+      let ii:TransferableInput = new TransferableInput();
+      ii.deserialize(i, encoding);
+      return ii;
+    });
+    this.numIns = Buffer.alloc(4);
+    this.numIns.writeUInt32BE(this.importIns.length, 0);
   }
 
   protected sourceChain:Buffer = Buffer.alloc(32);
@@ -40,7 +55,7 @@ export class ImportTx extends BaseTx {
      * Returns the id of the [[ImportTx]]
      */
   getTxType = ():number => {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**

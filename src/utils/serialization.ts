@@ -5,14 +5,17 @@
 import BinTools from '../utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
+import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from './helperfunctions';
 
-export const SERIALIZATIONVERSION = 1;
+export const SERIALIZATIONVERSION = 0;
 
 export type SerializedType = 
   'hex' 
 | 'BN' 
 | 'Buffer' 
-| 'Bech32' 
+| 'bech32' 
+| 'nodeID'
+| 'privateKey'
 | 'cb58' 
 | 'base58' 
 | 'base64' 
@@ -33,13 +36,47 @@ export type SerializedEncoding =
 ;
 
 export abstract class Serializable {
-    protected type:string = undefined;
-    protected typeID:number = undefined;
+    public _typeName:string = undefined;
+    public _typeID:number = undefined;
+
+    /**
+     * Used in serialization. TypeName is a string name for the type of object being output.
+     */
+    getTypeName():string {
+        return this._typeName;
+    }
+
+    /**
+     * Used in serialization. Optional. TypeID is a number for the typeID of object being output.
+     */
+    getTypeID():number {
+        return this._typeID
+    }
 
     //sometimes the parent class manages the fields
-    //these are so you can say super.serialize(); 
-    abstract serialize(encoding?:SerializedEncoding):object; 
-    abstract deserialize(fields:object, encoding?:SerializedEncoding);
+    //these are so you can say super.serialize(encoding); 
+    serialize(encoding?:SerializedEncoding):object {
+        return {
+            "_typeName": this._typeName,
+            "_typeID": (typeof this._typeID === "undefined" ? null : this._typeID)
+        }
+    }; 
+    deserialize(fields:object, encoding?:SerializedEncoding) {
+        if(typeof fields["_typeName"] !== "string") {
+            throw new Error("Error - Serializable.deserialize: _typeName must be a string, found: " + typeof fields["_typeName"]);
+        }
+        if(fields["_typeName"] !== this._typeName) {
+            throw new Error("Error - Serializable.deserialize: _typeName mismatch -- expected: " + this._typeName + " -- recieved: " + fields["_typeName"]);
+        }
+        if(typeof fields["_typeID"] !== "undefined" && fields["_typeID"] !== null) {
+            if(typeof fields["_typeID"] !== "number") {
+                throw new Error("Error - Serializable.deserialize: _typeID must be a number, found: " + typeof fields["_typeID"]);
+            }
+            if(fields["_typeID"] !== this._typeID) {
+                throw new Error("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- recieved: " + fields["_typeID"]);
+            }
+        }
+    };
 }
 
 export class Serialization {
@@ -65,8 +102,12 @@ export class Serialization {
             return new BN(vb.toString("hex"), "hex");
         } else if(type === "Buffer") {
             return vb;
-        } else if(type === "Bech32") {
+        } else if(type === "bech32") {
             return this.bintools.addressToString(args[0], args[1], vb);
+        } else if(type === "nodeID") {
+            return bufferToNodeIDString(vb);
+        } else if(type === "privateKey") {
+            return bufferToPrivateKeyString(vb);
         } else if(type === "cb58") {
             return this.bintools.cb58Encode(vb);
         } else if(type === "base58") {
@@ -94,8 +135,12 @@ export class Serialization {
             return Buffer.from(str, 'hex'); 
         } else if(type === "Buffer") {
             return v;
-        } else if(type === "Bech32") {
+        } else if(type === "bech32") {
             return this.bintools.stringToAddress(v);
+        } else if(type === "nodeID") {
+            return NodeIDStringToBuffer(v);
+        } else if(type === "privateKey") {
+            return privateKeyStringToBuffer(v);
         } else if(type === "cb58") {
             return this.bintools.cb58Decode(v);
         } else if(type === "base58") {
@@ -103,6 +148,9 @@ export class Serialization {
         } else if(type === "base64") {
             return Buffer.from(v as string, "base64");
         } else if(type === "hex") {
+            if((v as string).startsWith("0x")){
+                v = (v as string).slice(2);
+            }
             return Buffer.from(v as string, "hex");
         } else if(type === "decimalString") {
             let str:string = new BN(v as string, 10).toString("hex");
@@ -143,20 +191,18 @@ export class Serialization {
         return this.bufferToType(vb, outtype, ...args);
     }
 
-    format(fields:object, type:string, typeID:number = undefined):object {
-        fields["type"] = type;
-        if(typeof typeID === "number") {
-            fields["typeID"] = typeID;
-        }
-        return fields;
-    }
-
-    addSpecification(fields:object, vm:string, encoding:SerializedEncoding):object {
+    serialize(serialize:Serializable, vm:string, encoding:SerializedEncoding = "display", type:string, typeID:number = undefined):object {
         return {
             vm,
             encoding,
             version: SERIALIZATIONVERSION,
-            fields
+            type,
+            typeID: typeof typeID === "undefined" ? null : typeID,
+            fields: serialize.serialize(encoding)
         }
+    }
+
+    deserialize(input:object, output:Serializable) {
+        output.deserialize(input["fields"], input["encoding"]);
     }
 }

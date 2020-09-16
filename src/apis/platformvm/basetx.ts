@@ -4,7 +4,7 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import {  PlatformVMConstants } from './constants';
+import { PlatformVMConstants } from './constants';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { SelectCredentialClass } from './credentials';
@@ -13,7 +13,7 @@ import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
 import { SelectTxClass } from '../platformvm/tx';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -25,12 +25,23 @@ const serializer = Serialization.getInstance();
  * Class representing a base for all transactions.
  */
 export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
-  protected type = "BaseTx";
-  protected typeID = PlatformVMConstants.CREATESUBNETTX;
+  public _typeName = "BaseTx";
+  public _typeID = PlatformVMConstants.CREATESUBNETTX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.outs = fields["outs"].map((o:TransferableOutput) => {
+      let newOut:TransferableOutput = new TransferableOutput();
+      newOut.deserialize(o, encoding);
+      return newOut;
+    });
+    this.ins = fields["ins"].map((i:TransferableInput) => {
+      let newIn:TransferableInput = new TransferableInput();
+      newIn.deserialize(i, encoding);
+      return newIn;
+    });
+    this.numouts = serializer.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4);
+    this.numins = serializer.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
   }
 
   /**

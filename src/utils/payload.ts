@@ -7,6 +7,7 @@ import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
+import { Serializable } from './serialization';
 
 /**
  * @ignore
@@ -162,7 +163,7 @@ export class PayloadTypes {
 /**
  * Base class for payloads.
  */
-export abstract class PayloadBase {
+export abstract class PayloadBase  {
     protected payload:Buffer = Buffer.alloc(0);
     protected typeid:number = undefined;
     

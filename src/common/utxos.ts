@@ -20,19 +20,22 @@ const serializer = Serialization.getInstance();
  * Class for representing a single StandardUTXO.
  */
 export abstract class StandardUTXO extends Serializable{
-  protected type = "StandardUTXO";
-  protected typeID = undefined;
+  public _typeName = "StandardUTXO";
+  public _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
     return {
+      ...fields,
       "codecid": serializer.encoder(this.codecid, encoding, "Buffer", "number"),
       "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
       "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "number"),
       "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
-      "output": this.output.serialize()
+      "output": this.output.serialize(encoding)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
     this.codecid = serializer.decoder(fields["codecid"], encoding, "number", "Buffer", 2);
     this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
     this.outputidx = serializer.decoder(fields["outputidx"], encoding, "number", "Buffer", 4);
@@ -159,13 +162,14 @@ export abstract class StandardUTXO extends Serializable{
  * Class representing a set of [[StandardUTXO]]s.
  */
 export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Serializable{
-  protected type = "StandardUTXOSet";
-  protected typeID = undefined;
+  public _typeName = "StandardUTXOSet";
+  public _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
     let utxos = {};
     for(let utxoid in this.utxos) {
-      utxos[utxoid] = this.utxos[utxoid].serialize();
+      utxos[utxoid] = this.utxos[utxoid].serialize(encoding);
     }
     let addressUTXOs = {};
     for(let address in this.addressUTXOs) {
@@ -176,6 +180,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
       addressUTXOs[address] = utxobalance;
     }
     return {
+      ...fields,
       utxos,
       addressUTXOs
     }

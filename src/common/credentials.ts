@@ -18,15 +18,20 @@ const serializer = Serialization.getInstance();
  * Type representing a [[Signature]] index used in [[Input]]
  */
 export class SigIdx extends NBytes {
-  protected type = "SigIdx";
-  protected typeID = undefined;
+  public _typeName = "SigIdx";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "source": serializer.encoder(this.source, encoding, "Buffer", "hex")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.source = serializer.decoder(fields["source"], encoding, "hex", "Buffer");
   }
-
-
 
   source:Buffer;
 
@@ -67,15 +72,10 @@ export class SigIdx extends NBytes {
  * Signature for a [[Tx]]
  */
 export class Signature extends NBytes {
-  protected type = "Signature";
-  protected typeID = undefined;
+  public _typeName = "Signature";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   clone():this {
     let newbase:Signature = new Signature();
@@ -98,13 +98,10 @@ export class Signature extends NBytes {
 }
 
 export abstract class Credential extends Serializable{
-  protected type = "Credential";
-  protected typeID = undefined;
+  public _typeName = "Credential";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   protected sigArray:Array<Signature> = [];
 

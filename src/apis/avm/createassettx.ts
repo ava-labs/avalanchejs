@@ -10,7 +10,7 @@ import { TransferableInput } from './inputs';
 import { InitialStates } from './initialstates';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -19,12 +19,26 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export class CreateAssetTx extends BaseTx {
-  protected type = "CreateAssetTx";
-  protected typeID = AVMConstants.CREATEASSETTX;
+  public _typeName = "CreateAssetTx";
+  public _typeID = AVMConstants.CREATEASSETTX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "name": serializer.encoder(this.name, encoding, "utf8", "utf8"),
+      "symbol": serializer.encoder(this.name, encoding, "utf8", "utf8"),
+      "denomination": serializer.encoder(this.denomination, encoding, "Buffer", "decimalString"),
+      "initialstate": this.initialstate.serialize(encoding)
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.name = serializer.decoder(fields["name"], encoding, "utf8", "utf8");
+    this.symbol = serializer.decoder(fields["symbol"], encoding, "utf8", "utf8");
+    this.denomination = serializer.decoder(fields["denomination"], encoding, "decimalString", "Buffer");
+    this.initialstate = new InitialStates();
+    this.initialstate.deserialize(fields["initialstate"], encoding);
   }
 
   protected name:string = '';
@@ -36,7 +50,7 @@ export class CreateAssetTx extends BaseTx {
    * Returns the id of the [[CreateAssetTx]]
    */
   getTxType = ():number => {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**

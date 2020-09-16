@@ -19,12 +19,21 @@ const serializer = Serialization.getInstance();
  * @typeparam MinterSet including a threshold and array of addresses
  */
 export class MinterSet extends Serializable{
-    protected type = "MinterSet";
-    protected typeID = undefined;
+    public _typeName = "MinterSet";
+    public _typeID = undefined;
 
-    serialize(encoding:SerializedEncoding = "hex"):object {};
+    serialize(encoding:SerializedEncoding = "hex"):object {
+        let fields:object = super.serialize(encoding);
+        return {
+            ...fields,
+            "threshold": serializer.encoder(this.threshold, encoding, "number", "decimalString"),
+            "minters": this.minters.map((m) => serializer.encoder(m, encoding, "Buffer", "cb58"))
+        }
+    };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-  
+        super.deserialize(fields, encoding);
+        this.threshold = serializer.decoder(fields["threshold"], encoding, "decimalString", "number");
+        this.minters = fields["minters"].map((m:string) => serializer.decoder(m, encoding, "cb58", "Buffer"));
     }
   
     protected threshold:number;

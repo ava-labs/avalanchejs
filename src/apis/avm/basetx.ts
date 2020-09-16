@@ -13,7 +13,7 @@ import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
 import { SelectTxClass } from './tx';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -25,19 +25,32 @@ const serializer = Serialization.getInstance();
  * Class representing a base for all transactions.
  */
 export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
-  protected type = "BaseTx";
-  protected typeID = AVMConstants.BASETX;
+  public _typeName = "BaseTx";
+  public _typeID = AVMConstants.BASETX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  //serialize is inherited
+
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.outs = fields["outs"].map((o:TransferableOutput) => {
+      let newOut:TransferableOutput = new TransferableOutput();
+      newOut.deserialize(o, encoding);
+      return newOut;
+    });
+    this.ins = fields["ins"].map((i:TransferableInput) => {
+      let newIn:TransferableInput = new TransferableInput();
+      newIn.deserialize(i, encoding);
+      return newIn;
+    });
+    this.numouts = serializer.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4);
+    this.numins = serializer.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
   }
 
   /**
    * Returns the id of the [[BaseTx]]
    */
   getTxType = ():number => {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**

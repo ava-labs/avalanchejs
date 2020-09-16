@@ -20,107 +20,116 @@ const serializer = Serialization.getInstance();
  * Class for representing an address used in [[Output]] types
  */
 export class Address extends NBytes {
-    protected type = "Address";
-    protected typeID = undefined;
+  public _typeName = "Address";
+  public _typeID = undefined;
 
-    serialize(encoding:SerializedEncoding = "hex"):object {};
-    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-  
-    }
+  //serialize and deserialize both are inherited
 
-    /**
-     * Returns a function used to sort an array of [[Address]]es
+  /**
+   * Returns a function used to sort an array of [[Address]]es
+   */
+  static comparator = ()
+      :(a:Address, b:Address) => (1|-1|0) => (a:Address, b:Address)
+      :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+
+  /**
+     * Returns a base-58 representation of the [[Address]].
      */
-    static comparator = ()
-        :(a:Address, b:Address) => (1|-1|0) => (a:Address, b:Address)
-        :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
-  
-    /**
-       * Returns a base-58 representation of the [[Address]].
-       */
-    toString():string {
-      return bintools.cb58Encode(this.toBuffer());
-    }
-  
-    /**
-       * Takes a base-58 string containing an [[Address]], parses it, populates the class, and returns the length of the Address in bytes.
-       *
-       * @param bytes A base-58 string containing a raw [[Address]]
-       *
-       * @returns The length of the raw [[Address]]
-       */
-    fromString(addr:string):number {
-      const addrbuff:Buffer = bintools.b58ToBuffer(addr);
-      if (addrbuff.length === 24 && bintools.validateChecksum(addrbuff)) {
-        const newbuff:Buffer = bintools.copyFrom(addrbuff, 0, addrbuff.length - 4);
-        if (newbuff.length === 20) {
-          this.bytes = newbuff;
-        }
-      } else if (addrbuff.length === 24) {
-        throw new Error('Error - Address.fromString: invalid checksum on address');
-      } else if (addrbuff.length === 20) {
-        this.bytes = addrbuff;
-      } else {
-        /* istanbul ignore next */
-        throw new Error('Error - Address.fromString: invalid address');
-      }
-      return this.getSize();
-    }
-
-    clone():this {
-      let newbase:Address = new Address();
-      newbase.fromBuffer(this.toBuffer());
-      return newbase as this;
-    }
-  
-    create(...args:any[]):this {
-      return new Address() as this;
-    }
-  
-    /**
-       * Class for representing an address used in [[Output]] types
-       */
-    constructor() {
-      super();
-      this.bytes = Buffer.alloc(20);
-      this.bsize = 20;
-    }
+  toString():string {
+    return bintools.cb58Encode(this.toBuffer());
   }
+
+  /**
+     * Takes a base-58 string containing an [[Address]], parses it, populates the class, and returns the length of the Address in bytes.
+     *
+     * @param bytes A base-58 string containing a raw [[Address]]
+     *
+     * @returns The length of the raw [[Address]]
+     */
+  fromString(addr:string):number {
+    const addrbuff:Buffer = bintools.b58ToBuffer(addr);
+    if (addrbuff.length === 24 && bintools.validateChecksum(addrbuff)) {
+      const newbuff:Buffer = bintools.copyFrom(addrbuff, 0, addrbuff.length - 4);
+      if (newbuff.length === 20) {
+        this.bytes = newbuff;
+      }
+    } else if (addrbuff.length === 24) {
+      throw new Error('Error - Address.fromString: invalid checksum on address');
+    } else if (addrbuff.length === 20) {
+      this.bytes = addrbuff;
+    } else {
+      /* istanbul ignore next */
+      throw new Error('Error - Address.fromString: invalid address');
+    }
+    return this.getSize();
+  }
+
+  clone():this {
+    let newbase:Address = new Address();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+    return new Address() as this;
+  }
+
+  /**
+     * Class for representing an address used in [[Output]] types
+     */
+  constructor() {
+    super();
+    this.bytes = Buffer.alloc(20);
+    this.bsize = 20;
+  }
+}
 
   /**
    * Defines the most basic values for output ownership. Mostly inherited from, but can be used in population of NFT Owner data.
    */
 export class OutputOwners extends Serializable {
-  protected type = "OutputOwners";
-  protected typeID = undefined;
+  public _typeName = "OutputOwners";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "locktime": serializer.encoder(this.locktime, encoding, "Buffer", "decimalString"),
+      "threshold": serializer.encoder(this.threshold, encoding, "Buffer", "decimalString"),
+      "addresses": this.addresses.map((a) => a.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.locktime = serializer.decoder(fields["locktime"], encoding, "decimalString", "Buffer", 4);
+    this.threshold = serializer.decoder(fields["threshold"], encoding, "decimalString", "Buffer", 4);
+    this.numaddrs = serializer.decoder(fields["addresses"].length.toString(), "display", "number", "Buffer", 4);
+    this.addresses = fields["addresses"].map((a:object) => {
+      let addr:Address = new Address();
+      addr.deserialize(a, encoding);
+      return addr;
+    });
   }
-
-
 
   protected locktime:Buffer = Buffer.alloc(8);
   protected threshold:Buffer = Buffer.alloc(4);
   protected numaddrs:Buffer = Buffer.alloc(4);
   protected addresses:Array<Address> = [];
 
-    
-
-    /**
-     * Returns the threshold of signers required to spend this output.
-     */
+  /**
+   * Returns the threshold of signers required to spend this output.
+   */
   getThreshold = ():number => this.threshold.readUInt32BE(0);
 
   /**
-     * Returns the a {@link https://github.com/indutny/bn.js/|BN} repersenting the UNIX Timestamp when the lock is made available.
-     */
+   * Returns the a {@link https://github.com/indutny/bn.js/|BN} repersenting the UNIX Timestamp when the lock is made available.
+   */
   getLocktime = ():BN => bintools.fromBufferToBN(this.locktime);
 
   /**
-     * Returns an array of {@link https://github.com/feross/buffer|Buffer}s for the addresses.
-     */
+   * Returns an array of {@link https://github.com/feross/buffer|Buffer}s for the addresses.
+   */
   getAddresses = ():Array<Buffer> => {
     const result:Array<Buffer> = [];
     for (let i = 0; i < this.addresses.length; i++) {
@@ -130,12 +139,12 @@ export class OutputOwners extends Serializable {
   };
 
   /**
-     * Returns the index of the address.
-     *
-     * @param address A {@link https://github.com/feross/buffer|Buffer} of the address to look up to return its index.
-     *
-     * @returns The index of the address.
-     */
+   * Returns the index of the address.
+   *
+   * @param address A {@link https://github.com/feross/buffer|Buffer} of the address to look up to return its index.
+   *
+   * @returns The index of the address.
+   */
   getAddressIdx = (address:Buffer):number => {
     for (let i = 0; i < this.addresses.length; i++) {
       if (this.addresses[i].toBuffer().toString('hex') === address.toString('hex')) {
@@ -147,12 +156,12 @@ export class OutputOwners extends Serializable {
   };
 
   /**
-     * Returns the address from the index provided.
-     *
-     * @param idx The index of the address.
-     *
-     * @returns Returns the string representing the address.
-     */
+   * Returns the address from the index provided.
+   *
+   * @param idx The index of the address.
+   *
+   * @returns Returns the string representing the address.
+   */
   getAddress = (idx:number):Buffer => {
     if (idx < this.addresses.length) {
       return this.addresses[idx].toBuffer();
@@ -161,8 +170,8 @@ export class OutputOwners extends Serializable {
   };
 
   /**
-     * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
-     */
+   * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
+   */
   meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
     let now:BN;
     if (typeof asOf === 'undefined') {
@@ -180,8 +189,8 @@ export class OutputOwners extends Serializable {
   };
 
   /**
-     * Given an array of addresses and an optional timestamp, select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
-     */
+   * Given an array of addresses and an optional timestamp, select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
+   */
   getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
     const qualified:Array<Buffer> = [];
     let now:BN;
@@ -208,8 +217,8 @@ export class OutputOwners extends Serializable {
   };
 
   /**
-     * Returns a base-58 string representing the [[Output]].
-     */
+   * Returns a base-58 string representing the [[Output]].
+   */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.locktime = bintools.copyFrom(bytes, offset, offset + 8);
     offset += 8;
@@ -229,8 +238,8 @@ export class OutputOwners extends Serializable {
   }
 
   /**
-     * Returns the buffer representing the [[Output]] instance.
-     */
+   * Returns the buffer representing the [[Output]] instance.
+   */
   toBuffer():Buffer {
     this.addresses.sort(Address.comparator());
     this.numaddrs.writeUInt32BE(this.addresses.length, 0);
@@ -245,8 +254,8 @@ export class OutputOwners extends Serializable {
   }
 
   /**
-     * Returns a base-58 string representing the [[Output]].
-     */
+   * Returns a base-58 string representing the [[Output]].
+   */
   toString():string {
     return bintools.bufferToB58(this.toBuffer());
   }
@@ -294,17 +303,15 @@ export class OutputOwners extends Serializable {
 }
 
 export abstract class Output extends OutputOwners {
-  protected type = "Output";
-  protected typeID = undefined;
+  public _typeName = "Output";
+  public _typeID = undefined;
+  
+  //serialize and deserialize both are inherited
+
   /**
    * Returns the outputID for the output which tells parsers what type it is
    */
   abstract getOutputID():number;
-
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
 
   abstract clone():this;
 
@@ -322,13 +329,16 @@ export abstract class Output extends OutputOwners {
 }
 
 export abstract class StandardParseableOutput extends Serializable {
-  protected type = "StandardParseableOutput";
-  protected typeID = undefined;
+  public _typeName = "StandardParseableOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "output": this.output.serialize(encoding)
+    }
+  };
   
   protected output:Output;
 
@@ -368,16 +378,22 @@ export abstract class StandardParseableOutput extends Serializable {
 }
 
 export abstract class StandardTransferableOutput extends StandardParseableOutput {
-  protected type = "StandardTransferableOutput";
-  protected typeID = undefined;
+  public _typeName = "StandardTransferableOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "assetID": serializer.encoder(this.assetID, encoding, "Buffer", "cb58")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.assetID = serializer.decoder(fields["assetID"], encoding, "cb58", "Buffer", 32);
   }
 
   protected assetID:Buffer = undefined;
-  protected output:Output;
 
   getAssetID = ():Buffer => this.assetID;
 
@@ -408,12 +424,20 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
  * An [[Output]] class which specifies a token amount .
  */
 export abstract class StandardAmountOutput extends Output {
-  protected type = "StandardAmountOutput";
-  protected typeID = undefined;
+  public _typeName = "StandardAmountOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "amount": serializer.encoder(this.amountValue, encoding, "BN", "decimalString")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.amountValue = serializer.decoder(fields["amountValue"], encoding, "decimalString", "BN");
+    this.amount = bintools.fromBNToBuffer(this.amountValue, 8);
   }
 
   protected amount:Buffer = Buffer.alloc(8);
@@ -466,12 +490,19 @@ export abstract class StandardAmountOutput extends Output {
  * An [[Output]] class which specifies an NFT.
  */
 export abstract class BaseNFTOutput extends Output {
-  protected type = "BaseNFTOutput";
-  protected typeID = undefined;
+  public _typeName = "BaseNFTOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer");
   }
 
   protected groupID:Buffer = Buffer.alloc(4);

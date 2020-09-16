@@ -22,12 +22,21 @@ const serializer = Serialization.getInstance();
  * the correct length.
  */
 export abstract class NBytes extends Serializable {
-  protected type = "NBytes";
-  protected typeID = undefined;
+  public _typeName = "NBytes";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "bytes": serializer.encoder(this.bytes, encoding, "Buffer", "hex", this.bsize),
+      "bsize": serializer.encoder(this.bsize, encoding, "number", "decimalString")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.bytes = serializer.decoder(fields["bytes"], encoding, "hex", "Buffer");
+    this.bsize = serializer.decoder(fields["bytes"], encoding, "decimalString", "number");
   }
 
   protected bytes:Buffer;

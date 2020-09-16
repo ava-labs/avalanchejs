@@ -19,12 +19,31 @@ const serializer = Serialization.getInstance();
  * Class for creating initial output states used in asset creation
  */
 export class InitialStates extends Serializable{
-  protected type = "AmountInput";
-  protected typeID = undefined;
+  public _typeName = "AmountInput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    let flatfxs:object = {}
+    for(let fxid in this.fxs){
+      flatfxs[fxid] = this.fxs[fxid].map((o) => o.serialize(encoding));
+    }
+    return {
+      ...fields,
+      "fxs": flatfxs
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    let unflat:{[fxid:number]:Array<Output>} = {};
+    for(let fxid in fields["fxs"]){
+      unflat[fxid] = fields["fxs"][fxid].map((o:object) => {
+        let out:Output = SelectOutputClass(o["_typeID"], encoding);
+        out.deserialize(o, encoding);
+        return out;
+      });
+    }
+    this.fxs = unflat;
   }
 
   protected fxs:{[fxid:number]:Array<Output>} = {};

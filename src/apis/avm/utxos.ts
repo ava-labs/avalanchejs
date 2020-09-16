@@ -34,8 +34,10 @@ const serializer = Serialization.getInstance();
  * Class for representing a single UTXO.
  */
 export class UTXO extends StandardUTXO {
-  protected type = "UTXO";
-  protected typeID = undefined;
+  public _typeName = "UTXO";
+  public _typeID = undefined;
+
+  //serialize and deserialize both are inherited
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
@@ -102,6 +104,10 @@ export class AssetAmountDestination extends StandardAssetAmountDestination<Trans
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet extends StandardUTXOSet<UTXO>{
+  public _typeName = "UTXOSet";
+  public _typeID = undefined;
+  
+  //serialize is inherited
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     let utxos = {}

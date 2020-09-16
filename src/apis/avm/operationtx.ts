@@ -13,7 +13,7 @@ import { KeyChain, KeyPair } from './keychain';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -25,12 +25,25 @@ const serializer = Serialization.getInstance();
  * Class representing an unsigned Operation transaction.
  */
 export class OperationTx extends BaseTx {
-  protected type = "OperationTx";
-  protected typeID = AVMConstants.OPERATIONTX;
+  public _typeName = "OperationTx";
+  public _typeID = AVMConstants.OPERATIONTX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "ops": this.ops.map((o) => o.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.ops = fields["ops"].map((o:object) => {
+      let op:TransferableOperation = new TransferableOperation();
+      op.deserialize(o, encoding);
+      return op;
+    });
+    this.numOps = Buffer.alloc(4);
+    this.numOps.writeUInt32BE(this.ops.length,0);
   }
 
   protected numOps:Buffer = Buffer.alloc(4);
@@ -40,7 +53,7 @@ export class OperationTx extends BaseTx {
    * Returns the id of the [[OperationTx]]
    */
   getTxType = ():number => {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**

@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -31,15 +31,16 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
 };
 
 export class TransferableInput extends StandardTransferableInput {
-  protected type = "TransferableInput";
-  protected typeID = undefined;
+  public _typeName = "TransferableInput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  //serialize is inherited
+
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.input = SelectInputClass(fields["input"]["_typeID"]);
+    this.input.deserialize(fields["input"], encoding);
   }
-
-
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[TransferableInput]], parses it, populates the class, and returns the length of the [[TransferableInput]] in bytes.
@@ -64,13 +65,10 @@ export class TransferableInput extends StandardTransferableInput {
 }
 
 export abstract class AmountInput extends StandardAmountInput {
-  protected type = "AmountInput";
-  protected typeID = undefined;
+  public _typeName = "AmountInput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   select(id:number, ...args: any[]):Input {
     return SelectInputClass(id, ...args);
@@ -78,19 +76,16 @@ export abstract class AmountInput extends StandardAmountInput {
 }
 
 export class SECPTransferInput extends AmountInput {
-  protected type = "SECPTransferInput";
-  protected typeID = PlatformVMConstants.SECPINPUTID;
+  public _typeName = "SECPTransferInput";
+  public _typeID = PlatformVMConstants.SECPINPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   /**
-     * Returns the inputID for this input
-     */
+   * Returns the inputID for this input
+   */
   getInputID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   getCredentialID = ():number => PlatformVMConstants.SECPCREDENTIAL;

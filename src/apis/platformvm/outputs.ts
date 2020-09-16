@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, StandardParseableOutput } from '../../common/output';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
@@ -28,15 +28,10 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
-  protected type = "TransferableOutput";
-  protected typeID = undefined;
+  public _typeName = "TransferableOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
@@ -50,15 +45,15 @@ export class TransferableOutput extends StandardTransferableOutput{
 }
 
 export class ParseableOutput extends StandardParseableOutput{
-  protected type = "ParseableOutput";
-  protected typeID = undefined;
+  public _typeName = "ParseableOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  //serialize is inherited
+
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    this.output = SelectOutputClass(fields["output"]["_typeID"]);
+    this.output.deserialize(fields["output"], encoding);
   }
-
-
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
@@ -69,16 +64,12 @@ export class ParseableOutput extends StandardParseableOutput{
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
-  protected type = "AmountOutput";
-  protected typeID = undefined;
+  public _typeName = "AmountOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   /**
-   * 
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */
   makeTransferable(assetID:Buffer):TransferableOutput {
@@ -94,21 +85,16 @@ export abstract class AmountOutput extends StandardAmountOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPTransferOutput extends AmountOutput {
-  protected type = "SECPTransferOutput";
-  protected typeID = PlatformVMConstants.SECPXFEROUTPUTID;
+  public _typeName = "SECPTransferOutput";
+  public _typeID = PlatformVMConstants.SECPXFEROUTPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   /**
-     * Returns the outputID for this output
-     */
+   * Returns the outputID for this output
+   */
   getOutputID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   create(...args:any[]):this{
@@ -126,19 +112,16 @@ export class SECPTransferOutput extends AmountOutput {
  * An [[Output]] class which only specifies an Output ownership and uses secp256k1 signature scheme.
  */
 export class SECPOwnerOutput extends Output {
-  protected type = "SECPOwnerOutput";
-  protected typeID = PlatformVMConstants.SECPOWNEROUTPUTID;
+  public _typeName = "SECPOwnerOutput";
+  public _typeID = PlatformVMConstants.SECPOWNEROUTPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   /**
-     * Returns the outputID for this output
-     */
+   * Returns the outputID for this output
+   */
   getOutputID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**

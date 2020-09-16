@@ -6,7 +6,7 @@ import BinTools from '../../utils/bintools';
 
 import { AVMConstants } from './constants';
 import {  Credential } from '../../common/credentials';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -34,18 +34,13 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 };
 
 export class SECPCredential extends Credential {
-  protected type = "SECPCredential";
-  protected typeID = AVMConstants.SECPCREDENTIAL;
+  public _typeName = "SECPCredential";
+  public _typeID = AVMConstants.SECPCREDENTIAL;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   getCredentialID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   clone():this {
@@ -66,16 +61,13 @@ export class SECPCredential extends Credential {
 }
 
 export class NFTCredential extends Credential {
-  protected type = "NFTCredential";
-  protected typeID = AVMConstants.NFTCREDENTIAL;
+  public _typeName = "NFTCredential";
+  public _typeID = AVMConstants.NFTCREDENTIAL;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   getCredentialID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   clone():this {

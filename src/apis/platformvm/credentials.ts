@@ -6,7 +6,7 @@ import BinTools from '../../utils/bintools';
 
 import { PlatformVMConstants } from './constants';
 import { Credential } from '../../common/credentials';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -31,16 +31,13 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 };
 
 export class SECPCredential extends Credential {
-  protected type = "SECPCredential";
-  protected typeID = PlatformVMConstants.SECPCREDENTIAL;
+  public _typeName = "SECPCredential";
+  public _typeID = PlatformVMConstants.SECPCREDENTIAL;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   getCredentialID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
 

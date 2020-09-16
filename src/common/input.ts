@@ -15,12 +15,24 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export abstract class Input extends Serializable {
-  protected type = "Input";
-  protected typeID = undefined;
+  public _typeName = "Input";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "sigIdxs": this.sigIdxs.map((s) => s.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.sigIdxs = fields["sigIdxs"].map((s:object) => {
+      let sidx:SigIdx = new SigIdx();
+      sidx.deserialize(s, encoding);
+      return sidx;
+    });
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
   }
 
   protected sigCount:Buffer = Buffer.alloc(4);
@@ -108,12 +120,25 @@ export abstract class Input extends Serializable {
 }
 
 export abstract class StandardTransferableInput extends Serializable{
-  protected type = "StandardTransferableInput";
-  protected typeID = undefined;
+  public _typeName = "StandardTransferableInput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
+      "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
+      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "input": this.input.serialize(encoding)
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
+    this.outputidx = serializer.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4);
+    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    //input deserialization must be implmented in child classes
   }
 
   protected txid:Buffer = Buffer.alloc(32);
@@ -206,12 +231,20 @@ export abstract class StandardTransferableInput extends Serializable{
  * An [[Input]] class which specifies a token amount .
  */
 export abstract class StandardAmountInput extends Input {
-  protected type = "StandardAmountInput";
-  protected typeID = undefined;
+  public _typeName = "StandardAmountInput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "amount": serializer.encoder(this.amountValue, encoding, "BN", "decimalString")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.amountValue = serializer.decoder(fields["amountValue"], encoding, "decimalString", "BN");
+    this.amount = bintools.fromBNToBuffer(this.amountValue, 8);
   }
 
   protected amount:Buffer = Buffer.alloc(8);

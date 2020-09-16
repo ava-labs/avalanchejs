@@ -37,12 +37,24 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
  * A class representing an operation. All operation types must extend on this class.
  */
 export abstract class Operation extends Serializable{
-  protected type = "Operation";
-  protected typeID = undefined;
+  public _typeName = "Operation";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "sigIdxs": this.sigIdxs.map((s) => s.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.sigIdxs = fields["sigIdxs"].map((s:object) => {
+      let sidx:SigIdx = new SigIdx();
+      sidx.deserialize(s, encoding);
+      return sidx;
+    });
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
   }
 
   protected sigCount:Buffer = Buffer.alloc(4);
@@ -131,15 +143,29 @@ export abstract class Operation extends Serializable{
  *
  */
 export class TransferableOperation extends Serializable {
-  protected type = "TransferableOperation";
-  protected typeID = undefined;
+  public _typeName = "TransferableOperation";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "utxoIDs": this.utxoIDs.map((u) => u.serialize(encoding)),
+      "operation": this.operation.serialize(encoding)
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.utxoIDs = fields["utxoIDs"].map((u:object) => {
+      let utxoid:UTXOID = new UTXOID();
+      utxoid.deserialize(u, encoding);
+      return utxoid;
+    });
+    this.operation = SelectOperationClass(fields["operation"]["_typeID"]);
+    this.operation.deserialize(fields["operation"]);
   }
-
-
 
   protected assetid:Buffer = Buffer.alloc(32);
   protected utxoIDs:Array<UTXOID> = [];
@@ -234,15 +260,27 @@ export class TransferableOperation extends Serializable {
  * An [[Operation]] class which specifies a SECP256k1 Mint Op.
  */
 export class SECPMintOperation extends Operation {
-  protected type = "SECPMintOperation";
-  protected typeID = AVMConstants.SECPMINTOPID;
+  public _typeName = "SECPMintOperation";
+  public _typeID = AVMConstants.SECPMINTOPID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "mintOutput": this.mintOutput.serialize(encoding),
+      "transferOutputs": this.transferOutputs.map((t) => t.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields);
+    this.mintOutput = new SECPMintOutput();
+    this.mintOutput.deserialize(fields["mintOutput"]);
+    this.transferOutputs = fields["transferOutputs"].map((t:object) => {
+      let xferout:SECPTransferOutput = new SECPTransferOutput();
+      xferout.deserialize(fields, encoding);
+      return xferout;
+    });
   }
-
-
 
   protected mintOutput:SECPMintOutput = undefined;
   protected transferOutputs:Array<SECPTransferOutput> = [];
@@ -251,7 +289,7 @@ export class SECPMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**
@@ -339,12 +377,27 @@ export class SECPMintOperation extends Operation {
  * An [[Operation]] class which specifies a NFT Mint Op.
  */
 export class NFTMintOperation extends Operation {
-  protected type = "NFTMintOperation";
-  protected typeID = AVMConstants.NFTMINTOPID;
+  public _typeName = "NFTMintOperation";
+  public _typeID = AVMConstants.NFTMINTOPID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString"),
+      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex"),
+      "outputOwners": this.outputOwners.map((o) => o.serialize(encoding))
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer");
+    this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
+    this.outputOwners = fields["outputOwners"].map((o:object) => {
+      let oo:OutputOwners = new OutputOwners();
+      oo.deserialize(o, encoding);
+      return oo;
+    });
   }
 
 
@@ -357,7 +410,7 @@ export class NFTMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**
@@ -475,15 +528,21 @@ export class NFTMintOperation extends Operation {
  * A [[Operation]] class which specifies a NFT Transfer Op.
  */
 export class NFTTransferOperation extends Operation {
-  protected type = "NFTTransferOperation";
-  protected typeID = AVMConstants.NFTXFEROPID;
+  public _typeName = "NFTTransferOperation";
+  public _typeID = AVMConstants.NFTXFEROPID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "output": this.output.serialize(encoding)
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.output = new NFTTransferOutput();
+    this.output.deserialize(fields["output"], encoding);
   }
-
-
 
   protected output:NFTTransferOutput;
 
@@ -491,7 +550,7 @@ export class NFTTransferOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**
@@ -551,15 +610,10 @@ export class NFTTransferOperation extends Operation {
  * Class for representing a UTXOID used in [[TransferableOp]] types
  */
 export class UTXOID extends NBytes {
-  protected type = "UTXOID";
-  protected typeID = undefined;
+  public _typeName = "UTXOID";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   /**
      * Returns a function used to sort an array of [[UTXOID]]s

@@ -7,7 +7,7 @@ import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
@@ -37,13 +37,10 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
-  protected type = "TransferableOutput";
-  protected typeID = undefined;
+  public _typeName = "TransferableOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
@@ -57,13 +54,10 @@ export class TransferableOutput extends StandardTransferableOutput{
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
-  protected type = "AmountOutput";
-  protected typeID = undefined;
+  public _typeName = "AmountOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
   
   /**
    * 
@@ -80,13 +74,10 @@ export abstract class AmountOutput extends StandardAmountOutput {
 }
 
 export abstract class NFTOutput extends BaseNFTOutput {
-  protected type = "NFTOutput";
-  protected typeID = undefined;
+  public _typeName = "NFTOutput";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
+  //serialize and deserialize both are inherited
 
   /**
    * 
@@ -105,21 +96,16 @@ export abstract class NFTOutput extends BaseNFTOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPTransferOutput extends AmountOutput {
-  protected type = "SECPTransferOutput";
-  protected typeID = AVMConstants.SECPXFEROUTPUTID;
+  public _typeName = "SECPTransferOutput";
+  public _typeID = AVMConstants.SECPXFEROUTPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   create(...args:any[]):this{
@@ -138,21 +124,16 @@ export class SECPTransferOutput extends AmountOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPMintOutput extends Output {
-  protected type = "SECPMintOutput";
-  protected typeID = AVMConstants.SECPMINTOUTPUTID;
+  public _typeName = "SECPMintOutput";
+  public _typeID = AVMConstants.SECPMINTOUTPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   /**
    * Returns the outputID for this output
    */
   getOutputID():number {
-    return this.typeID;
+    return this._typeID;
   }
 
   /**
@@ -183,21 +164,16 @@ export class SECPMintOutput extends Output {
  * An [[Output]] class which specifies an Output that carries an NFT Mint and uses secp256k1 signature scheme.
  */
 export class NFTMintOutput extends NFTOutput {
-  protected type = "NFTMintOutput";
-  protected typeID = AVMConstants.NFTMINTOUTPUTID;
+  public _typeName = "NFTMintOutput";
+  public _typeID = AVMConstants.NFTMINTOUTPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
-  }
-
-
+  //serialize and deserialize both are inherited
 
   /**
    * Returns the outputID for this output
    */
   getOutputID():number {
-      return this.typeID;
+      return this._typeID;
   }
 
   /**
@@ -249,15 +225,22 @@ export class NFTMintOutput extends NFTOutput {
  * An [[Output]] class which specifies an Output that carries an NFT and uses secp256k1 signature scheme.
  */
 export class NFTTransferOutput extends NFTOutput {
-  protected type = "NFTTransferOutput";
-  protected typeID = AVMConstants.NFTXFEROUTPUTID;
+  public _typeName = "NFTTransferOutput";
+  public _typeID = AVMConstants.NFTXFEROUTPUTID;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex")
+    }
+  };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
+    this.sizePayload = Buffer.alloc(4);
+    this.sizePayload.writeUInt32BE(this.payload.length, 0);
   }
-
-
 
   protected sizePayload:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
@@ -266,7 +249,7 @@ export class NFTTransferOutput extends NFTOutput {
    * Returns the outputID for this output
    */
   getOutputID():number {
-      return this.typeID;
+      return this._typeID;
   }
 
   /**

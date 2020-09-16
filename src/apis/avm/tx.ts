@@ -15,7 +15,7 @@ import { CreateAssetTx } from './createassettx';
 import { OperationTx } from './operationtx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
@@ -24,15 +24,16 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
-  protected type = "UnsigndTx";
-  protected typeID = undefined;
+  public _typeName = "UnsigndTx";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  //serialize is inherited
+
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.transaction = SelectTxClass(fields["transaction"]["_typeID"]);
+    this.transaction.deserialize(fields["transacion"], encoding);
   }
-
-
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
@@ -60,12 +61,21 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
 }
 
 export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
-  protected type = "Tx";
-  protected typeID = undefined;
+  public _typeName = "Tx";
+  public _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {};
+  //serialize is inherited
+
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-
+    super.deserialize(fields, encoding);
+    this.unsignedTx = new UnsignedTx();
+    this.unsignedTx.deserialize(fields["unsignedTx"]);
+    this.credentials = [];
+    for(let i = 0; i < fields["credentials"].length; i++){
+      const cred:Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
+      cred.deserialize(fields["credentials"][i]);
+      this.credentials.push(cred);
+    }
   }
 
   /**

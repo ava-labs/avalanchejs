@@ -16,6 +16,7 @@ export const NetworkIDToHRP:object = {
   2: "cascade",
   3: "denali",
   4: "everest",
+  5: "fuji",
   12345: "local"
 };
   
@@ -24,6 +25,7 @@ export const HRPToNetworkID:object = {
   "cascade": 2,
   "denali": 3,
   "everest": 4,
+  "fuji": 5,
   "local": 12345
 };
 
@@ -31,7 +33,8 @@ export const NetworkIDToNetworkNames:object = {
   1: ["Avalanche","Mainnet"],
   2: ["Cascade"],
   3: ["Denali"],
-  4: ["Everest", "Testnet"],
+  4: ["Everest"],
+  5: ["Fuji", "Testnet"],
   12345: ["Local Network"]
 };
 
@@ -41,14 +44,15 @@ export const NetworkNameToNetworkID:object = {
   "Cascade": 2,
   "Denali": 3,
   "Everest": 4,
-  "Testnet": 4,
+  "Fuji": 5,
+  "Testnet": 5,
   "Local Network": 12345
 };
 
 export const FallbackHRP:string = "custom";
 export const FallbackNetworkName:string = "Custom Network";
 
-export const DefaultNetworkID:number = 4;
+export const DefaultNetworkID:number = 5;
 
 export const PlatformChainID:string = "11111111111111111111111111111111LpoYY";
 export const PrimaryNetworkID:string = "11111111111111111111111111111111LpoYY";
@@ -95,7 +99,8 @@ const n1P:object = {
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
-  minStake: ONEAVAX.mul(new BN(2000))
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minDelegation: ONEAVAX.mul(new BN(25))
 };
 
 const n1C:object = {
@@ -123,7 +128,8 @@ const n2P:object = {
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
-  minStake: ONEAVAX.mul(new BN(2000))
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minDelegation: ONEAVAX.mul(new BN(25))
 };
 
 const n2C:object = {
@@ -149,7 +155,8 @@ const n3P:object = {
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
-  minStake: ONEAVAX.mul(new BN(2000))
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minDelegation: ONEAVAX.mul(new BN(25))
 };
 
 const n3C:object = {
@@ -159,7 +166,6 @@ const n3C:object = {
   fee: 0
 };
 
-// TODO: UPDATE FOR EVEREST
 const n4X:object = {
   blockchainID: 'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC',
   alias: XChainAlias,
@@ -176,11 +182,40 @@ const n4P:object = {
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
-  minStake: ONEAVAX.mul(new BN(2000))
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minDelegation: ONEAVAX.mul(new BN(25))
 };
 
 const n4C:object = {
   blockchainID: 'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK',
+  alias: CChainAlias,
+  vm: CChainVMName,
+  fee: GWEI.mul(new BN(470))
+};
+
+// TODO: UPDATE FOR FUJI
+const n5X:object = {
+  blockchainID: '',
+  alias: XChainAlias,
+  vm: XChainVMName,
+  fee: 1000000
+};
+
+const n5P:object = {
+  blockchainID: PlatformChainID,
+  alias: PChainAlias,
+  vm: PChainVMName,
+  fee: 1000000,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(720000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minDelegation: ONEAVAX.mul(new BN(25))
+};
+
+const n5C:object = {
+  blockchainID: '',
   alias: CChainAlias,
   vm: CChainVMName,
   fee: GWEI.mul(new BN(470))
@@ -224,7 +259,7 @@ export class Defaults {
       C: n3C,
       'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9': n3C,
     },
-    4: { // update before everest
+    4: { 
       hrp: NetworkIDToHRP[4],
       X: n4X,
       'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC': n4X,
@@ -232,6 +267,15 @@ export class Defaults {
       '11111111111111111111111111111111LpoYY': n4P,
       C: n4C,
       'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK': n4C,
+    },
+    5: { // update before fuji
+      hrp: NetworkIDToHRP[5],
+      X: n5X,
+      'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC': n5X,
+      P: n5P,
+      '11111111111111111111111111111111LpoYY': n5P,
+      C: n5C,
+      'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK': n5C,
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
