@@ -572,7 +572,7 @@ describe('AVMAPI', () => {
 
     beforeEach(async () => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainid);
-      const result:Promise<Buffer> = avm.getAVAXAssetID();
+      const result:Promise<Buffer> = avm.getAVAXAssetID(true);
       const payload:object = {
         result: {
           name,

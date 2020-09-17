@@ -111,7 +111,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns The the provided string representing the AVAX AssetID
    */
   getAVAXAssetID = async (refresh:boolean = false):Promise<Buffer> => {
-    if (typeof this.AVAXAssetID === 'undefined') {
+    if (typeof this.AVAXAssetID === 'undefined' || refresh) {
       const asset:{
         name: string;
         symbol: string;
@@ -136,6 +136,7 @@ export class AVMAPI extends JRPCAPI {
     }
     this.AVAXAssetID = avaxAssetID;
   }
+
   /**
    * Gets the default fee for this chain.
    *
