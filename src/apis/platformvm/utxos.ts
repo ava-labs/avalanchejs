@@ -34,7 +34,13 @@ export class UTXO extends StandardUTXO {
   public _typeName = "UTXO";
   public _typeID = undefined;
 
-  //serialize and deserialize both are inherited
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.output = SelectOutputClass(fields["output"]["_typeID"]);
+    this.output.deserialize(fields["output"], encoding);
+  }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
@@ -107,17 +113,22 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   //serialize is inherited
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
     let utxos = {};
     for(let utxoid in fields["utxos"]){
-      utxos[utxoid] = new UTXO().deserialize(fields["utxos"][utxoid], encoding);
+      let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+      utxos[utxoidCleaned] = new UTXO();
+      utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding);
     }
     let addressUTXOs = {};
     for(let address in fields["addressUTXOs"]){
+      let addressCleaned:string = serializer.decoder(address, encoding, "cb58", "hex");
       let utxobalance = {};
-      for(let utxoid in fields["addressUTXOs"]){
-        utxobalance[utxoid] = serializer.decoder(fields["addressUTXOs"][utxoid], encoding, "decimalString", "BN");
+      for(let utxoid in fields["addressUTXOs"][address]){
+        let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+        utxobalance[utxoidCleaned] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
       }
-      addressUTXOs[address] = utxobalance;
+      addressUTXOs[addressCleaned] = utxobalance;
     }
     this.utxos = utxos;
     this.addressUTXOs = addressUTXOs;

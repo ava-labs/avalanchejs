@@ -102,14 +102,15 @@ export class OutputOwners extends Serializable {
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.locktime = serializer.decoder(fields["locktime"], encoding, "decimalString", "Buffer", 4);
+    this.locktime = serializer.decoder(fields["locktime"], encoding, "decimalString", "Buffer", 8);
     this.threshold = serializer.decoder(fields["threshold"], encoding, "decimalString", "Buffer", 4);
-    this.numaddrs = serializer.decoder(fields["addresses"].length.toString(), "display", "number", "Buffer", 4);
     this.addresses = fields["addresses"].map((a:object) => {
       let addr:Address = new Address();
       addr.deserialize(a, encoding);
       return addr;
     });
+    this.numaddrs = Buffer.alloc(4);
+    this.numaddrs.writeUInt32BE(this.addresses.length, 0);
   }
 
   protected locktime:Buffer = Buffer.alloc(8);
@@ -436,7 +437,7 @@ export abstract class StandardAmountOutput extends Output {
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.amountValue = serializer.decoder(fields["amountValue"], encoding, "decimalString", "BN");
+    this.amountValue = serializer.decoder(fields["amount"], encoding, "decimalString", "BN");
     this.amount = bintools.fromBNToBuffer(this.amountValue, 8);
   }
 

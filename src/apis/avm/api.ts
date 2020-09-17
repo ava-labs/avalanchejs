@@ -106,9 +106,11 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Fetches the AVAX AssetID and returns it in a Promise.
    *
+   * @param refresh This function caches the response. Refresh = true will bust the cache.
+   * 
    * @returns The the provided string representing the AVAX AssetID
    */
-  getAVAXAssetID = async ():Promise<Buffer> => {
+  getAVAXAssetID = async (refresh:boolean = false):Promise<Buffer> => {
     if (typeof this.AVAXAssetID === 'undefined') {
       const asset:{
         name: string;

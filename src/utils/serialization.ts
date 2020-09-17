@@ -101,6 +101,9 @@ export class Serialization {
         if(type === "BN") {
             return new BN(vb.toString("hex"), "hex");
         } else if(type === "Buffer") {
+            if(args.length == 1 && typeof args[0] === "number"){
+                vb = Buffer.from(vb.toString("hex").padStart(args[0] * 2, '0'), "hex")
+            }
             return vb;
         } else if(type === "bech32") {
             return this.bintools.addressToString(args[0], args[1], vb);
@@ -126,11 +129,11 @@ export class Serialization {
         return undefined;
     }
 
-    typeToBuffer(v:any, type:SerializedType, ...args:Array<any>):any {
+    typeToBuffer(v:any, type:SerializedType, ...args:Array<any>):Buffer {
         if(type === "BN") {
             let str:string = (v as BN).toString("hex");
-            if(args.length > 0 && typeof args[0] === "number"){
-               return Buffer.from(str.padStart(args[0], '0'), 'hex'); 
+            if(args.length == 1 && typeof args[0] === "number"){
+               return Buffer.from(str.padStart(args[0] * 2, '0'), 'hex'); 
             }
             return Buffer.from(str, 'hex'); 
         } else if(type === "Buffer") {
@@ -154,20 +157,21 @@ export class Serialization {
             return Buffer.from(v as string, "hex");
         } else if(type === "decimalString") {
             let str:string = new BN(v as string, 10).toString("hex");
-            if(args.length > 0 && typeof args[0] === "number"){
+            if(args.length == 1 && typeof args[0] === "number"){
                 return Buffer.from(str.padStart(args[0], '0'), 'hex');
             }
             return Buffer.from(str, 'hex');
         } else if(type === "number") {
             let str:string = new BN(v).toString("hex");
-            if(args.length > 0 && typeof args[0] === "number"){
+            if(args.length == 1 && typeof args[0] === "number"){
                 return Buffer.from(str.padStart(args[0], '0'), 'hex');
             }
             return Buffer.from(str, 'hex');
         } else if(type === "utf8") {
-            if(args.length > 0 && typeof args[0] === "number"){
+            if(args.length == 1 && typeof args[0] === "number"){
                 let b:Buffer = Buffer.alloc(args[0]);
-                return b.copy(Buffer.from(v, 'utf8'), 0);
+                b.write(v)
+                return b;
             }
             return Buffer.from(v, 'utf8');
         }
@@ -191,13 +195,11 @@ export class Serialization {
         return this.bufferToType(vb, outtype, ...args);
     }
 
-    serialize(serialize:Serializable, vm:string, encoding:SerializedEncoding = "display", type:string, typeID:number = undefined):object {
+    serialize(serialize:Serializable, vm:string, encoding:SerializedEncoding = "display"):object {
         return {
             vm,
             encoding,
             version: SERIALIZATIONVERSION,
-            type,
-            typeID: typeof typeID === "undefined" ? null : typeID,
             fields: serialize.serialize(encoding)
         }
     }

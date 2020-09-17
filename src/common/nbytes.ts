@@ -35,8 +35,8 @@ export abstract class NBytes extends Serializable {
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.bytes = serializer.decoder(fields["bytes"], encoding, "hex", "Buffer");
-    this.bsize = serializer.decoder(fields["bytes"], encoding, "decimalString", "number");
+    this.bsize = serializer.decoder(fields["bsize"], encoding, "decimalString", "number");
+    this.bytes = serializer.decoder(fields["bytes"], encoding, "hex", "Buffer", this.bsize);
   }
 
   protected bytes:Buffer;
