@@ -17,7 +17,7 @@ export function getPreferredHRP(networkID:number = undefined) {
     if (networkID in NetworkIDToHRP) {
       return NetworkIDToHRP[networkID];
     } else if(typeof networkID === "undefined") {
-      return DefaultNetworkID;
+      return NetworkIDToHRP[DefaultNetworkID];
     }
     return FallbackHRP;
 }
