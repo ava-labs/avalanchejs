@@ -28,8 +28,8 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
-  public _typeName = "TransferableOutput";
-  public _typeID = undefined;
+  protected _typeName = "TransferableOutput";
+  protected _typeID = undefined;
 
   //serialize is inherited
 
@@ -51,8 +51,8 @@ export class TransferableOutput extends StandardTransferableOutput{
 }
 
 export class ParseableOutput extends StandardParseableOutput{
-  public _typeName = "ParseableOutput";
-  public _typeID = undefined;
+  protected _typeName = "ParseableOutput";
+  protected _typeID = undefined;
 
   //serialize is inherited
 
@@ -71,8 +71,8 @@ export class ParseableOutput extends StandardParseableOutput{
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
-  public _typeName = "AmountOutput";
-  public _typeID = undefined;
+  protected _typeName = "AmountOutput";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
 
@@ -92,8 +92,8 @@ export abstract class AmountOutput extends StandardAmountOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPTransferOutput extends AmountOutput {
-  public _typeName = "SECPTransferOutput";
-  public _typeID = PlatformVMConstants.SECPXFEROUTPUTID;
+  protected _typeName = "SECPTransferOutput";
+  protected _typeID = PlatformVMConstants.SECPXFEROUTPUTID;
 
   //serialize and deserialize both are inherited
 
@@ -119,8 +119,8 @@ export class SECPTransferOutput extends AmountOutput {
  * An [[Output]] class which only specifies an Output ownership and uses secp256k1 signature scheme.
  */
 export class SECPOwnerOutput extends Output {
-  public _typeName = "SECPOwnerOutput";
-  public _typeID = PlatformVMConstants.SECPOWNEROUTPUTID;
+  protected _typeName = "SECPOwnerOutput";
+  protected _typeID = PlatformVMConstants.SECPOWNEROUTPUTID;
 
   //serialize and deserialize both are inherited
 

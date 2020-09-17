@@ -37,8 +37,8 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
  * A class representing an operation. All operation types must extend on this class.
  */
 export abstract class Operation extends Serializable{
-  public _typeName = "Operation";
-  public _typeID = undefined;
+  protected _typeName = "Operation";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -143,8 +143,8 @@ export abstract class Operation extends Serializable{
  *
  */
 export class TransferableOperation extends Serializable {
-  public _typeName = "TransferableOperation";
-  public _typeID = undefined;
+  protected _typeName = "TransferableOperation";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -260,8 +260,8 @@ export class TransferableOperation extends Serializable {
  * An [[Operation]] class which specifies a SECP256k1 Mint Op.
  */
 export class SECPMintOperation extends Operation {
-  public _typeName = "SECPMintOperation";
-  public _typeID = AVMConstants.SECPMINTOPID;
+  protected _typeName = "SECPMintOperation";
+  protected _typeID = AVMConstants.SECPMINTOPID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -377,8 +377,8 @@ export class SECPMintOperation extends Operation {
  * An [[Operation]] class which specifies a NFT Mint Op.
  */
 export class NFTMintOperation extends Operation {
-  public _typeName = "NFTMintOperation";
-  public _typeID = AVMConstants.NFTMINTOPID;
+  protected _typeName = "NFTMintOperation";
+  protected _typeID = AVMConstants.NFTMINTOPID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -528,8 +528,8 @@ export class NFTMintOperation extends Operation {
  * A [[Operation]] class which specifies a NFT Transfer Op.
  */
 export class NFTTransferOperation extends Operation {
-  public _typeName = "NFTTransferOperation";
-  public _typeID = AVMConstants.NFTXFEROPID;
+  protected _typeName = "NFTTransferOperation";
+  protected _typeID = AVMConstants.NFTXFEROPID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -610,8 +610,8 @@ export class NFTTransferOperation extends Operation {
  * Class for representing a UTXOID used in [[TransferableOp]] types
  */
 export class UTXOID extends NBytes {
-  public _typeName = "UTXOID";
-  public _typeID = undefined;
+  protected _typeName = "UTXOID";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
 

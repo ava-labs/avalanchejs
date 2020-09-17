@@ -15,8 +15,8 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export abstract class Input extends Serializable {
-  public _typeName = "Input";
-  public _typeID = undefined;
+  protected _typeName = "Input";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -120,8 +120,8 @@ export abstract class Input extends Serializable {
 }
 
 export abstract class StandardTransferableInput extends Serializable{
-  public _typeName = "StandardTransferableInput";
-  public _typeID = undefined;
+  protected _typeName = "StandardTransferableInput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -231,8 +231,8 @@ export abstract class StandardTransferableInput extends Serializable{
  * An [[Input]] class which specifies a token amount .
  */
 export abstract class StandardAmountInput extends Input {
-  public _typeName = "StandardAmountInput";
-  public _typeID = undefined;
+  protected _typeName = "StandardAmountInput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

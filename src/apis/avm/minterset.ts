@@ -19,8 +19,8 @@ const serializer = Serialization.getInstance();
  * @typeparam MinterSet including a threshold and array of addresses
  */
 export class MinterSet extends Serializable{
-    public _typeName = "MinterSet";
-    public _typeID = undefined;
+    protected _typeName = "MinterSet";
+    protected _typeID = undefined;
 
     serialize(encoding:SerializedEncoding = "hex"):object {
         let fields:object = super.serialize(encoding);

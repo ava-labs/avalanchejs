@@ -22,8 +22,8 @@ const serializer = Serialization.getInstance();
  * the correct length.
  */
 export abstract class NBytes extends Serializable {
-  public _typeName = "NBytes";
-  public _typeID = undefined;
+  protected _typeName = "NBytes";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

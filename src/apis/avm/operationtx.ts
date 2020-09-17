@@ -25,8 +25,8 @@ const serializer = Serialization.getInstance();
  * Class representing an unsigned Operation transaction.
  */
 export class OperationTx extends BaseTx {
-  public _typeName = "OperationTx";
-  public _typeID = AVMConstants.OPERATIONTX;
+  protected _typeName = "OperationTx";
+  protected _typeID = AVMConstants.OPERATIONTX;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

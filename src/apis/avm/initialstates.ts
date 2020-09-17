@@ -19,8 +19,8 @@ const serializer = Serialization.getInstance();
  * Class for creating initial output states used in asset creation
  */
 export class InitialStates extends Serializable{
-  public _typeName = "AmountInput";
-  public _typeID = undefined;
+  protected _typeName = "AmountInput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

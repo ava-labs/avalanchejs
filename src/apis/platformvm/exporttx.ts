@@ -23,8 +23,8 @@ const serializer = Serialization.getInstance();
  * Class representing an unsigned Export transaction.
  */
 export class ExportTx extends BaseTx {
-  public _typeName = "ExportTx";
-  public _typeID = PlatformVMConstants.EXPORTTX;
+  protected _typeName = "ExportTx";
+  protected _typeID = PlatformVMConstants.EXPORTTX;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -76,7 +76,7 @@ export class ExportTx extends BaseTx {
   }
 
   getTotalOuts():Array<TransferableOutput> {
-    return [...this.getOuts(), ...this.getExportOutputs()];
+    return [...this.getOuts() as Array<TransferableOutput>, ...this.getExportOutputs()];
   }
 
   /**

@@ -34,8 +34,8 @@ const serializer = Serialization.getInstance();
  * Class for representing a single UTXO.
  */
 export class UTXO extends StandardUTXO {
-  public _typeName = "UTXO";
-  public _typeID = undefined;
+  protected _typeName = "UTXO";
+  protected _typeID = undefined;
 
   //serialize is inherited
 
@@ -110,8 +110,8 @@ export class AssetAmountDestination extends StandardAssetAmountDestination<Trans
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet extends StandardUTXOSet<UTXO>{
-  public _typeName = "UTXOSet";
-  public _typeID = undefined;
+  protected _typeName = "UTXOSet";
+  protected _typeID = undefined;
   
   //serialize is inherited
 

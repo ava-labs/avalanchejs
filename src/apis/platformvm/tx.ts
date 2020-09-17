@@ -22,8 +22,8 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
-  public _typeName = "UnsignedTx";
-  public _typeID = undefined;
+  protected _typeName = "UnsignedTx";
+  protected _typeID = undefined;
 
   //serialize is inherited
 
@@ -32,6 +32,10 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
     this.transaction = SelectTxClass(fields["transaction"]["_typeID"]);
     this.transaction.deserialize(fields["transaction"], encoding);
   }
+
+  getTransaction():BaseTx{
+    return this.transaction as BaseTx;
+  } 
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
@@ -49,7 +53,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    *
    * @returns A signed [[StandardTx]]
    */
-  sign(kc:KeyChain):StandardTx<KeyPair, KeyChain, UnsignedTx> {
+  sign(kc:KeyChain):Tx {
     const txbuff = this.toBuffer();
     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
@@ -58,8 +62,8 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
 }
 
 export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
-  public _typeName = "Tx";
-  public _typeID = undefined;
+  protected _typeName = "Tx";
+  protected _typeID = undefined;
 
   //serialize is inherited
 

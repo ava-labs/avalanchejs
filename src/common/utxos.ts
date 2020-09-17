@@ -20,8 +20,8 @@ const serializer = Serialization.getInstance();
  * Class for representing a single StandardUTXO.
  */
 export abstract class StandardUTXO extends Serializable{
-  public _typeName = "StandardUTXO";
-  public _typeID = undefined;
+  protected _typeName = "StandardUTXO";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -162,8 +162,8 @@ export abstract class StandardUTXO extends Serializable{
  * Class representing a set of [[StandardUTXO]]s.
  */
 export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Serializable{
-  public _typeName = "StandardUTXOSet";
-  public _typeID = undefined;
+  protected _typeName = "StandardUTXOSet";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

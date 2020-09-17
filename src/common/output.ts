@@ -20,8 +20,8 @@ const serializer = Serialization.getInstance();
  * Class for representing an address used in [[Output]] types
  */
 export class Address extends NBytes {
-  public _typeName = "Address";
-  public _typeID = undefined;
+  protected _typeName = "Address";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
 
@@ -88,8 +88,8 @@ export class Address extends NBytes {
    * Defines the most basic values for output ownership. Mostly inherited from, but can be used in population of NFT Owner data.
    */
 export class OutputOwners extends Serializable {
-  public _typeName = "OutputOwners";
-  public _typeID = undefined;
+  protected _typeName = "OutputOwners";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -304,8 +304,8 @@ export class OutputOwners extends Serializable {
 }
 
 export abstract class Output extends OutputOwners {
-  public _typeName = "Output";
-  public _typeID = undefined;
+  protected _typeName = "Output";
+  protected _typeID = undefined;
   
   //serialize and deserialize both are inherited
 
@@ -330,8 +330,8 @@ export abstract class Output extends OutputOwners {
 }
 
 export abstract class StandardParseableOutput extends Serializable {
-  public _typeName = "StandardParseableOutput";
-  public _typeID = undefined;
+  protected _typeName = "StandardParseableOutput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -379,8 +379,8 @@ export abstract class StandardParseableOutput extends Serializable {
 }
 
 export abstract class StandardTransferableOutput extends StandardParseableOutput {
-  public _typeName = "StandardTransferableOutput";
-  public _typeID = undefined;
+  protected _typeName = "StandardTransferableOutput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -425,8 +425,8 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
  * An [[Output]] class which specifies a token amount .
  */
 export abstract class StandardAmountOutput extends Output {
-  public _typeName = "StandardAmountOutput";
-  public _typeID = undefined;
+  protected _typeName = "StandardAmountOutput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -491,8 +491,8 @@ export abstract class StandardAmountOutput extends Output {
  * An [[Output]] class which specifies an NFT.
  */
 export abstract class BaseNFTOutput extends Output {
-  public _typeName = "BaseNFTOutput";
-  public _typeID = undefined;
+  protected _typeName = "BaseNFTOutput";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

@@ -37,8 +37,8 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
-  public _typeName = "TransferableOutput";
-  public _typeID = undefined;
+  protected _typeName = "TransferableOutput";
+  protected _typeID = undefined;
 
   //serialize is inherited
 
@@ -60,8 +60,8 @@ export class TransferableOutput extends StandardTransferableOutput{
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
-  public _typeName = "AmountOutput";
-  public _typeID = undefined;
+  protected _typeName = "AmountOutput";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
   
@@ -80,8 +80,8 @@ export abstract class AmountOutput extends StandardAmountOutput {
 }
 
 export abstract class NFTOutput extends BaseNFTOutput {
-  public _typeName = "NFTOutput";
-  public _typeID = undefined;
+  protected _typeName = "NFTOutput";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
 
@@ -102,8 +102,8 @@ export abstract class NFTOutput extends BaseNFTOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPTransferOutput extends AmountOutput {
-  public _typeName = "SECPTransferOutput";
-  public _typeID = AVMConstants.SECPXFEROUTPUTID;
+  protected _typeName = "SECPTransferOutput";
+  protected _typeID = AVMConstants.SECPXFEROUTPUTID;
 
   //serialize and deserialize both are inherited
 
@@ -130,8 +130,8 @@ export class SECPTransferOutput extends AmountOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPMintOutput extends Output {
-  public _typeName = "SECPMintOutput";
-  public _typeID = AVMConstants.SECPMINTOUTPUTID;
+  protected _typeName = "SECPMintOutput";
+  protected _typeID = AVMConstants.SECPMINTOUTPUTID;
 
   //serialize and deserialize both are inherited
 
@@ -170,8 +170,8 @@ export class SECPMintOutput extends Output {
  * An [[Output]] class which specifies an Output that carries an NFT Mint and uses secp256k1 signature scheme.
  */
 export class NFTMintOutput extends NFTOutput {
-  public _typeName = "NFTMintOutput";
-  public _typeID = AVMConstants.NFTMINTOUTPUTID;
+  protected _typeName = "NFTMintOutput";
+  protected _typeID = AVMConstants.NFTMINTOUTPUTID;
 
   //serialize and deserialize both are inherited
 
@@ -231,8 +231,8 @@ export class NFTMintOutput extends NFTOutput {
  * An [[Output]] class which specifies an Output that carries an NFT and uses secp256k1 signature scheme.
  */
 export class NFTTransferOutput extends NFTOutput {
-  public _typeName = "NFTTransferOutput";
-  public _typeID = AVMConstants.NFTXFEROUTPUTID;
+  protected _typeName = "NFTTransferOutput";
+  protected _typeID = AVMConstants.NFTXFEROUTPUTID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

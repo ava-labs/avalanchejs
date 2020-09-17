@@ -25,8 +25,8 @@ const serializer = Serialization.getInstance();
  * Class representing an unsigned Import transaction.
  */
 export class ImportTx extends BaseTx {
-  public _typeName = "ImportTx";
-  public _typeID = PlatformVMConstants.IMPORTTX;
+  protected _typeName = "ImportTx";
+  protected _typeID = PlatformVMConstants.IMPORTTX;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

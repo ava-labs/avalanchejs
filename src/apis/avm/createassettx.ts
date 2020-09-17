@@ -19,8 +19,8 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export class CreateAssetTx extends BaseTx {
-  public _typeName = "CreateAssetTx";
-  public _typeID = AVMConstants.CREATEASSETTX;
+  protected _typeName = "CreateAssetTx";
+  protected _typeID = AVMConstants.CREATEASSETTX;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

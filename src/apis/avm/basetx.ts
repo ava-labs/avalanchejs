@@ -25,8 +25,8 @@ const serializer = Serialization.getInstance();
  * Class representing a base for all transactions.
  */
 export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
-  public _typeName = "BaseTx";
-  public _typeID = AVMConstants.BASETX;
+  protected _typeName = "BaseTx";
+  protected _typeID = AVMConstants.BASETX;
 
   //serialize is inherited
 
@@ -44,6 +44,18 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     });
     this.numouts = serializer.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4);
     this.numins = serializer.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
+  }
+
+  getOuts():Array<TransferableOutput> {
+    return this.outs as Array<TransferableOutput>;
+  }
+
+  getIns():Array<TransferableInput> {
+    return this.ins as Array<TransferableInput>;
+  }
+
+  getTotalOuts():Array<TransferableOutput> {
+    return this.getOuts() as Array<TransferableOutput>;
   }
 
   /**
@@ -91,10 +103,6 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     this.memo = bintools.copyFrom(bytes, offset, offset + memolen);
     offset += memolen;
     return offset;
-  }
-
-  getTotalOuts():Array<TransferableOutput> {
-    return this.getOuts();
   }
 
   /**

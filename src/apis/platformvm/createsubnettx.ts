@@ -13,8 +13,8 @@ import { Serialization, SerializedEncoding } from '../../utils/serialization';
 const serializer = Serialization.getInstance();
 
 export class CreateSubnetTx extends BaseTx {
-  public _typeName = "SECPCredential";
-  public _typeID = PlatformVMConstants.CREATESUBNETTX;
+  protected _typeName = "SECPCredential";
+  protected _typeID = PlatformVMConstants.CREATESUBNETTX;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

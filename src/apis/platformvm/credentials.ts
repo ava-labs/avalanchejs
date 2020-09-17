@@ -31,8 +31,8 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 };
 
 export class SECPCredential extends Credential {
-  public _typeName = "SECPCredential";
-  public _typeID = PlatformVMConstants.SECPCREDENTIAL;
+  protected _typeName = "SECPCredential";
+  protected _typeID = PlatformVMConstants.SECPCREDENTIAL;
 
   //serialize and deserialize both are inherited
 
@@ -51,9 +51,9 @@ export class SECPCredential extends Credential {
     return new SECPCredential(...args) as this;
   }
 
-  select(id:number, ...args:any[]):this {
-    let newbasetx:SECPCredential = SelectCredentialClass(id, ...args);
-    return newbasetx as this;
+  select(id:number, ...args:any[]):Credential {
+    let newbasetx:Credential = SelectCredentialClass(id, ...args);
+    return newbasetx;
   }
 }
 

@@ -36,8 +36,8 @@ export type SerializedEncoding =
 ;
 
 export abstract class Serializable {
-    public _typeName:string = undefined;
-    public _typeID:number = undefined;
+    protected _typeName:string = undefined;
+    protected _typeID:number = undefined;
 
     /**
      * Used in serialization. TypeName is a string name for the type of object being output.

@@ -18,8 +18,8 @@ const serializer = Serialization.getInstance();
  * Type representing a [[Signature]] index used in [[Input]]
  */
 export class SigIdx extends NBytes {
-  public _typeName = "SigIdx";
-  public _typeID = undefined;
+  protected _typeName = "SigIdx";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -72,8 +72,8 @@ export class SigIdx extends NBytes {
  * Signature for a [[Tx]]
  */
 export class Signature extends NBytes {
-  public _typeName = "Signature";
-  public _typeID = undefined;
+  protected _typeName = "Signature";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
 
@@ -98,8 +98,8 @@ export class Signature extends NBytes {
 }
 
 export abstract class Credential extends Serializable{
-  public _typeName = "Credential";
-  public _typeID = undefined;
+  protected _typeName = "Credential";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

@@ -31,8 +31,8 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
 };
 
 export class TransferableInput extends StandardTransferableInput {
-  public _typeName = "TransferableInput";
-  public _typeID = undefined;
+  protected _typeName = "TransferableInput";
+  protected _typeID = undefined;
 
   //serialize is inherited
 
@@ -65,8 +65,8 @@ export class TransferableInput extends StandardTransferableInput {
 }
 
 export abstract class AmountInput extends StandardAmountInput {
-  public _typeName = "AmountInput";
-  public _typeID = undefined;
+  protected _typeName = "AmountInput";
+  protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
 
@@ -76,8 +76,8 @@ export abstract class AmountInput extends StandardAmountInput {
 }
 
 export class SECPTransferInput extends AmountInput {
-  public _typeName = "SECPTransferInput";
-  public _typeID = AVMConstants.SECPINPUTID;
+  protected _typeName = "SECPTransferInput";
+  protected _typeID = AVMConstants.SECPINPUTID;
 
   //serialize and deserialize both are inherited
 

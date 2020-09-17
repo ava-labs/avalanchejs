@@ -22,8 +22,8 @@ const serializer = Serialization.getInstance();
  * Class representing a base for all transactions.
  */
 export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass extends StandardKeyChain<KPClass>> extends Serializable{
-  public _typeName = "StandardBaseTx";
-  public _typeID = undefined;
+  protected _typeName = "StandardBaseTx";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -71,12 +71,12 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Returns the array of [[StandardTransferableInput]]s
    */
-  getIns = ():Array<StandardTransferableInput> => this.ins;
+  abstract getIns():Array<StandardTransferableInput>;
 
   /**
    * Returns the array of [[StandardTransferableOutput]]s
    */
-  getOuts = ():Array<StandardTransferableOutput> => this.outs;
+  abstract getOuts():Array<StandardTransferableOutput>;
 
   /**
    * Returns the array of combined total [[StandardTransferableOutput]]s
@@ -179,8 +179,8 @@ export abstract class StandardUnsignedTx<KPClass extends StandardKeyPair,
 KCClass extends StandardKeyChain<KPClass>, 
 SBTx extends StandardBaseTx<KPClass, KCClass>
 > extends Serializable{
-  public _typeName = "StandardUnsignedTx";
-  public _typeID = undefined;
+  protected _typeName = "StandardUnsignedTx";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -262,7 +262,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   /**
    * Returns the Transaction
    */
-  getTransaction = ():SBTx => this.transaction;
+  abstract getTransaction():SBTx;
 
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
@@ -304,8 +304,8 @@ export abstract class StandardTx<
         KCClass, 
         StandardBaseTx<KPClass, KCClass>>
     > extends Serializable {
-  public _typeName = "StandardTx";
-  public _typeID = undefined;
+  protected _typeName = "StandardTx";
+  protected _typeID = undefined;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

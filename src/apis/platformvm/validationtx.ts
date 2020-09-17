@@ -25,8 +25,8 @@ const serializer = Serialization.getInstance();
  * Abstract class representing an transactions with validation information.
  */
 export abstract class ValidatorTx extends BaseTx {
-    public _typeName = "ValidatorTx";
-    public _typeID = undefined;
+    protected _typeName = "ValidatorTx";
+    protected _typeID = undefined;
 
     serialize(encoding:SerializedEncoding = "hex"):object {
         let fields:object = super.serialize(encoding);
@@ -119,8 +119,8 @@ export abstract class ValidatorTx extends BaseTx {
 }
 
 export abstract class WeightedValidatorTx extends ValidatorTx {
-    public _typeName = "WeightedValidatorTx";
-    public _typeID = undefined;
+    protected _typeName = "WeightedValidatorTx";
+    protected _typeID = undefined;
 
     serialize(encoding:SerializedEncoding = "hex"):object {
         let fields:object = super.serialize(encoding);
@@ -313,8 +313,8 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
  * Class representing an unsigned AddDelegatorTx transaction.
  */
 export class AddDelegatorTx extends WeightedValidatorTx {
-    public _typeName = "AddDelegatorTx";
-    public _typeID = PlatformVMConstants.ADDDELEGATORTX;
+    protected _typeName = "AddDelegatorTx";
+    protected _typeID = PlatformVMConstants.ADDDELEGATORTX;
 
     serialize(encoding:SerializedEncoding = "hex"):object {
         let fields:object = super.serialize(encoding);
@@ -384,7 +384,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     }
     
     getTotalOuts():Array<TransferableOutput> {
-        return [...this.getOuts(), ...this.getStakeOuts()];
+        return [...this.getOuts() as Array<TransferableOutput>, ...this.getStakeOuts()];
     }
 
     fromBuffer(bytes:Buffer, offset:number = 0):number {
@@ -473,8 +473,8 @@ export class AddDelegatorTx extends WeightedValidatorTx {
   }
 
 export class AddValidatorTx extends AddDelegatorTx {
-    public _typeName = "AddValidatorTx";
-    public _typeID = PlatformVMConstants.ADDVALIDATORTX;
+    protected _typeName = "AddValidatorTx";
+    protected _typeID = PlatformVMConstants.ADDVALIDATORTX;
 
     serialize(encoding:SerializedEncoding = "hex"):object {
         let fields:object = super.serialize(encoding);
