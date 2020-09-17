@@ -33,7 +33,9 @@ export class SigIdx extends NBytes {
     this.source = serializer.decoder(fields["source"], encoding, "hex", "Buffer");
   }
 
-  source:Buffer;
+  protected source:Buffer = Buffer.alloc(20);
+  protected bytes = Buffer.alloc(4);
+  protected bsize = 4;
 
   /**
    * Sets the source address for the signature
@@ -63,8 +65,6 @@ export class SigIdx extends NBytes {
    */
   constructor() {
       super();
-      this.bytes = Buffer.alloc(4);
-      this.bsize = 4;
   }
 }
 
@@ -76,6 +76,9 @@ export class Signature extends NBytes {
   protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
+
+  protected bytes = Buffer.alloc(65);
+  protected bsize = 65;
 
   clone():this {
     let newbase:Signature = new Signature();
@@ -92,8 +95,6 @@ export class Signature extends NBytes {
    */
   constructor() {
       super();
-      this.bytes = Buffer.alloc(65);
-      this.bsize = 65;
   }
 }
 

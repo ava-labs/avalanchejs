@@ -29,13 +29,13 @@ export abstract class NBytes extends Serializable {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "bytes": serializer.encoder(this.bytes, encoding, "Buffer", "hex", this.bsize),
-      "bsize": serializer.encoder(this.bsize, encoding, "number", "decimalString")
+      "bsize": serializer.encoder(this.bsize, "display", "number", "decimalString", 4),
+      "bytes": serializer.encoder(this.bytes, encoding, "Buffer", "hex", this.bsize)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.bsize = serializer.decoder(fields["bsize"], encoding, "decimalString", "number");
+    this.bsize = serializer.decoder(fields["bsize"], "display", "decimalString", "number", 4);
     this.bytes = serializer.decoder(fields["bytes"], encoding, "hex", "Buffer", this.bsize);
   }
 
@@ -75,7 +75,7 @@ export abstract class NBytes extends Serializable {
     try {
       if (buff.length - offset < this.bsize) {
         /* istanbul ignore next */
-        throw new Error(`Buffer length must be at least ${this.bsize} bytes.`);
+        throw new Error(`Buffer length must be ${this.bsize} bytes. Only have ${buff.length - offset} remaining in buffer.`);
       }
 
       this.bytes = bintools.copyFrom(buff, offset, offset + this.bsize);

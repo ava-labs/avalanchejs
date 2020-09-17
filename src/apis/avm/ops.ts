@@ -615,6 +615,9 @@ export class UTXOID extends NBytes {
 
   //serialize and deserialize both are inherited
 
+  protected bytes = Buffer.alloc(36);
+  protected bsize = 36;
+
   /**
      * Returns a function used to sort an array of [[UTXOID]]s
      */
@@ -669,7 +672,5 @@ export class UTXOID extends NBytes {
      */
   constructor() {
     super();
-    this.bytes = Buffer.alloc(36);
-    this.bsize = 36;
   }
 }

@@ -158,13 +158,13 @@ export class Serialization {
         } else if(type === "decimalString") {
             let str:string = new BN(v as string, 10).toString("hex");
             if(args.length == 1 && typeof args[0] === "number"){
-                return Buffer.from(str.padStart(args[0], '0'), 'hex');
+                return Buffer.from(str.padStart(args[0] * 2, '0'), 'hex');
             }
             return Buffer.from(str, 'hex');
         } else if(type === "number") {
-            let str:string = new BN(v).toString("hex");
+            let str:string = new BN(v, 10).toString("hex");
             if(args.length == 1 && typeof args[0] === "number"){
-                return Buffer.from(str.padStart(args[0], '0'), 'hex');
+                return Buffer.from(str.padStart(args[0] * 2, '0'), 'hex');
             }
             return Buffer.from(str, 'hex');
         } else if(type === "utf8") {

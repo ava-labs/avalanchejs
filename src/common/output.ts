@@ -25,6 +25,9 @@ export class Address extends NBytes {
 
   //serialize and deserialize both are inherited
 
+  protected bytes = Buffer.alloc(20);
+  protected bsize = 20;
+
   /**
    * Returns a function used to sort an array of [[Address]]es
    */
@@ -75,12 +78,10 @@ export class Address extends NBytes {
   }
 
   /**
-     * Class for representing an address used in [[Output]] types
-     */
+   * Class for representing an address used in [[Output]] types
+   */
   constructor() {
     super();
-    this.bytes = Buffer.alloc(20);
-    this.bsize = 20;
   }
 }
 
