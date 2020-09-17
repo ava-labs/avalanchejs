@@ -340,7 +340,7 @@ export abstract class StandardParseableOutput extends Serializable {
       "output": this.output.serialize(encoding)
     }
   };
-  
+
   protected output:Output;
 
   /**
@@ -432,13 +432,13 @@ export abstract class StandardAmountOutput extends Output {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "amount": serializer.encoder(this.amountValue, encoding, "BN", "decimalString")
+      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString")
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.amountValue = serializer.decoder(fields["amount"], encoding, "decimalString", "BN");
-    this.amount = bintools.fromBNToBuffer(this.amountValue, 8);
+    this.amount = serializer.decoder(fields["amount"], encoding, "decimalString", "Buffer", 8);
+    this.amountValue = bintools.fromBufferToBN(this.amount);
   }
 
   protected amount:Buffer = Buffer.alloc(8);

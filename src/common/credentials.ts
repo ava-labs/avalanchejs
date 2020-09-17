@@ -101,7 +101,21 @@ export abstract class Credential extends Serializable{
   public _typeName = "Credential";
   public _typeID = undefined;
 
-  //serialize and deserialize both are inherited
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "sigArray": this.sigArray.map((s) => s.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.sigArray = fields["sigArray"].map((s:object) => {
+      let sig:Signature = new Signature();
+      sig.deserialize(s, encoding);
+      return sig;
+    });
+  }
 
   protected sigArray:Array<Signature> = [];
 

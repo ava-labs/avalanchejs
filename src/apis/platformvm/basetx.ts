@@ -40,8 +40,10 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
       newIn.deserialize(i, encoding);
       return newIn;
     });
-    this.numouts = serializer.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4);
-    this.numins = serializer.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
+    this.numouts = Buffer.alloc(4);
+    this.numouts.writeUInt32BE(this.outs.length, 0);
+    this.numins = Buffer.alloc(4);
+    this.numins.writeUInt32BE(this.ins.length, 0);
   }
 
   /**

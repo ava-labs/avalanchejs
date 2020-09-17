@@ -119,15 +119,19 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     super.deserialize(fields, encoding);
     let utxos = {};
     for(let utxoid in fields["utxos"]){
-      utxos[utxoid] = new UTXO().deserialize(fields["utxos"][utxoid], encoding);
+      let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+      utxos[utxoidCleaned] = new UTXO();
+      utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding);
     }
     let addressUTXOs = {};
     for(let address in fields["addressUTXOs"]){
+      let addressCleaned:string = serializer.decoder(address, encoding, "cb58", "hex");
       let utxobalance = {};
       for(let utxoid in fields["addressUTXOs"][address]){
-        utxobalance[utxoid] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
+        let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+        utxobalance[utxoidCleaned] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
       }
-      addressUTXOs[address] = utxobalance;
+      addressUTXOs[addressCleaned] = utxobalance;
     }
     this.utxos = utxos;
     this.addressUTXOs = addressUTXOs;

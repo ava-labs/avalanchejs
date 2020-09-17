@@ -29,17 +29,19 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "networkid": serializer.encoder(this.networkid, encoding, "Buffer", "number"),
+      "networkid": serializer.encoder(this.networkid, encoding, "Buffer", "decimalString"),
       "blockchainid": serializer.encoder(this.blockchainid, encoding, "Buffer", "cb58"),
       "outs": this.outs.map((o) => o.serialize(encoding)),
-      "ins": this.outs.map((i) => i.serialize(encoding)),
+      "ins": this.ins.map((i) => i.serialize(encoding)),
       "memo": serializer.encoder(this.memo, encoding, "Buffer", "hex")
     }
   };
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-    this.networkid = serializer.decoder(fields["networkid"], encoding, "number", "Buffer");
-    this.blockchainid = serializer.decoder(fields["blockchainid"], encoding, "cb58", "Buffer");
+    super.deserialize(fields, encoding);
+    this.networkid = serializer.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4);
+    this.blockchainid = serializer.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32);
+    this.memo = serializer.decoder(fields["memo"], encoding, "hex", "Buffer");
   }
 
 

@@ -899,6 +899,25 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
 
+      let tx:Tx = txu1.sign(platformvm.keyChain());
+      let txobj:object = tx.serialize("hex");
+      let txstr:string = JSON.stringify(txobj);
+      
+      console.log("-----Test1 JSON-----");
+      console.log(txstr);
+      console.log("-----Test1 ENDN-----");
+      
+      let tx2newobj:object = JSON.parse(txstr);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(tx.toBuffer().toString("hex"));
     });
 
     test('buildExportTx', async () => {

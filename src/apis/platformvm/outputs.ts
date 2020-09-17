@@ -31,7 +31,13 @@ export class TransferableOutput extends StandardTransferableOutput{
   public _typeName = "TransferableOutput";
   public _typeID = undefined;
 
-  //serialize and deserialize both are inherited
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.output = SelectOutputClass(fields["output"]["_typeID"]);
+    this.output.deserialize(fields["output"], encoding);
+  }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
@@ -51,6 +57,7 @@ export class ParseableOutput extends StandardParseableOutput{
   //serialize is inherited
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
     this.output = SelectOutputClass(fields["output"]["_typeID"]);
     this.output.deserialize(fields["output"], encoding);
   }

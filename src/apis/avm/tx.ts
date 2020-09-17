@@ -69,11 +69,11 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.unsignedTx = new UnsignedTx();
-    this.unsignedTx.deserialize(fields["unsignedTx"]);
+    this.unsignedTx.deserialize(fields["unsignedTx"], encoding);
     this.credentials = [];
     for(let i = 0; i < fields["credentials"].length; i++){
       const cred:Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
-      cred.deserialize(fields["credentials"][i]);
+      cred.deserialize(fields["credentials"][i], encoding);
       this.credentials.push(cred);
     }
   }
