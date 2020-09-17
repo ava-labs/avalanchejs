@@ -238,7 +238,7 @@ export class NFTTransferOutput extends NFTOutput {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex")
+      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex", this.payload.length)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {

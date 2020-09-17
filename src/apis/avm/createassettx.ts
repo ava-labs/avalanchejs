@@ -27,8 +27,8 @@ export class CreateAssetTx extends BaseTx {
     return {
       ...fields,
       "name": serializer.encoder(this.name, encoding, "utf8", "utf8"),
-      "symbol": serializer.encoder(this.name, encoding, "utf8", "utf8"),
-      "denomination": serializer.encoder(this.denomination, encoding, "Buffer", "decimalString"),
+      "symbol": serializer.encoder(this.symbol, encoding, "utf8", "utf8"),
+      "denomination": serializer.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
       "initialstate": this.initialstate.serialize(encoding)
     }
   };
@@ -36,7 +36,7 @@ export class CreateAssetTx extends BaseTx {
     super.deserialize(fields, encoding);
     this.name = serializer.decoder(fields["name"], encoding, "utf8", "utf8");
     this.symbol = serializer.decoder(fields["symbol"], encoding, "utf8", "utf8");
-    this.denomination = serializer.decoder(fields["denomination"], encoding, "decimalString", "Buffer");
+    this.denomination = serializer.decoder(fields["denomination"], encoding, "decimalString", "Buffer", 1);
     this.initialstate = new InitialStates();
     this.initialstate.deserialize(fields["initialstate"], encoding);
   }

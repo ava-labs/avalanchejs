@@ -179,6 +179,9 @@ export class Serialization {
     }
 
     encoder(value:any, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):string {
+        if(typeof value === "undefined"){
+            throw new Error("Error - Serializable.encoder: value passed is undefined");
+        }
         if(encoding !== "display"){
             outtype = encoding;
         }
@@ -188,6 +191,9 @@ export class Serialization {
 
 
     decoder(value:string, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
+        if(typeof value === "undefined"){
+            throw new Error("Error - Serializable.decoder: value passed is undefined");
+        }
         if(encoding !== "display") {
             intype = encoding;
         } 
@@ -195,11 +201,15 @@ export class Serialization {
         return this.bufferToType(vb, outtype, ...args);
     }
 
-    serialize(serialize:Serializable, vm:string, encoding:SerializedEncoding = "display"):object {
+    serialize(serialize:Serializable, vm:string, encoding:SerializedEncoding = "display", notes:string = undefined):object {
+        if(typeof notes === "undefined"){
+            notes = serialize.getTypeName();
+        }
         return {
             vm,
             encoding,
             version: SERIALIZATIONVERSION,
+            notes,
             fields: serialize.serialize(encoding)
         }
     }

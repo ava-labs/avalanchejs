@@ -150,7 +150,7 @@ export class TransferableOperation extends Serializable {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58", 32),
       "utxoIDs": this.utxoIDs.map((u) => u.serialize(encoding)),
       "operation": this.operation.serialize(encoding)
     }
@@ -164,7 +164,7 @@ export class TransferableOperation extends Serializable {
       return utxoid;
     });
     this.operation = SelectOperationClass(fields["operation"]["_typeID"]);
-    this.operation.deserialize(fields["operation"]);
+    this.operation.deserialize(fields["operation"], encoding);
   }
 
   protected assetid:Buffer = Buffer.alloc(32);
@@ -272,12 +272,12 @@ export class SECPMintOperation extends Operation {
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-    super.deserialize(fields);
+    super.deserialize(fields, encoding);
     this.mintOutput = new SECPMintOutput();
-    this.mintOutput.deserialize(fields["mintOutput"]);
+    this.mintOutput.deserialize(fields["mintOutput"], encoding);
     this.transferOutputs = fields["transferOutputs"].map((t:object) => {
       let xferout:SECPTransferOutput = new SECPTransferOutput();
-      xferout.deserialize(fields, encoding);
+      xferout.deserialize(t, encoding);
       return xferout;
     });
   }
@@ -384,14 +384,14 @@ export class NFTMintOperation extends Operation {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString"),
+      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString", 4),
       "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex"),
       "outputOwners": this.outputOwners.map((o) => o.serialize(encoding))
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer");
+    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4);
     this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
     this.outputOwners = fields["outputOwners"].map((o:object) => {
       let oo:OutputOwners = new OutputOwners();

@@ -32,9 +32,9 @@ export abstract class ValidatorTx extends BaseTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "nodeID":serializer.encoder(fields["nodeID"], encoding, "Buffer", "nodeID"),
-            "startTime":serializer.encoder(fields["startTime"], encoding, "Buffer", "decimalString"),
-            "endTime":serializer.encoder(fields["endTime"], encoding, "Buffer", "decimalString")
+            "nodeID":serializer.encoder(this.nodeID, encoding, "Buffer", "nodeID"),
+            "startTime":serializer.encoder(this.startTime, encoding, "Buffer", "decimalString"),
+            "endTime":serializer.encoder(this.endTime, encoding, "Buffer", "decimalString")
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
@@ -325,13 +325,14 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+        super.deserialize(fields, encoding);
         this.stakeOuts = fields["stakeOuts"].map((s:object) => {
             let xferout:TransferableOutput = new TransferableOutput();
             xferout.deserialize(s, encoding);
             return xferout;
         });
         this.rewardOwners = new ParseableOutput();
-        this.rewardOwners.deserialize(fields, encoding);
+        this.rewardOwners.deserialize(fields["rewardOwners"], encoding);
     }
     
     protected stakeOuts:Array<TransferableOutput> = [];
@@ -480,12 +481,13 @@ export class AddValidatorTx extends AddDelegatorTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "delegationFee": serializer.encoder(this.delegationFee.toString(), encoding, "utf8", "utf8")
+            "delegationFee": serializer.encoder(this.getDelegationFeeBuffer(), encoding, "Buffer", "decimalString", 4)
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        this.delegationFee = parseFloat(serializer.decoder(fields["delegationFee"], encoding, "utf8", "utf8") as string);
+        let dbuff:Buffer = serializer.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
+        this.delegationFee = dbuff.readUInt32BE(0) / AddValidatorTx.delegatorMultiplier;
     }
   
 

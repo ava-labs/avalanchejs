@@ -14,6 +14,8 @@ import { BaseTx } from './basetx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { AddDelegatorTx, AddValidatorTx } from './validationtx';
+import { CreateSubnetTx } from './createsubnettx';
 
 /**
  * @ignore
@@ -122,7 +124,16 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
   } else if (txtype === PlatformVMConstants.EXPORTTX) {
     const tx:ExportTx = new ExportTx(...args);
     return tx;
-  }
+  } else if (txtype === PlatformVMConstants.ADDDELEGATORTX) {
+    const tx:AddDelegatorTx = new AddDelegatorTx(...args);
+    return tx;
+  } else if (txtype === PlatformVMConstants.ADDVALIDATORTX) {
+    const tx:AddValidatorTx = new AddValidatorTx(...args);
+    return tx;
+  } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
+    const tx:CreateSubnetTx = new CreateSubnetTx(...args);
+    return tx;
+  } 
   /* istanbul ignore next */
   throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
 };

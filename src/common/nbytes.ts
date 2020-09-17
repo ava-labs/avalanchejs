@@ -29,13 +29,13 @@ export abstract class NBytes extends Serializable {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "bsize": serializer.encoder(this.bsize, "display", "number", "decimalString", 4),
+      "bsize": serializer.encoder(this.bsize, encoding, "number", "decimalString", 4),
       "bytes": serializer.encoder(this.bytes, encoding, "Buffer", "hex", this.bsize)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.bsize = serializer.decoder(fields["bsize"], "display", "decimalString", "number", 4);
+    this.bsize = serializer.decoder(fields["bsize"], encoding, "decimalString", "number", 4);
     this.bytes = serializer.decoder(fields["bytes"], encoding, "hex", "Buffer", this.bsize);
   }
 

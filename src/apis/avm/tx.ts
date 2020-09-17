@@ -32,7 +32,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.transaction = SelectTxClass(fields["transaction"]["_typeID"]);
-    this.transaction.deserialize(fields["transacion"], encoding);
+    this.transaction.deserialize(fields["transaction"], encoding);
   }
 
   getTransaction():BaseTx{

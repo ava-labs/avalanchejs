@@ -186,7 +186,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "codecid": serializer.encoder(this.codecid, encoding, "number", "decimalString"),
+      "codecid": serializer.encoder(this.codecid, encoding, "number", "decimalString", 2),
       "transaction": this.transaction.serialize(encoding)
     };
   };
@@ -289,6 +289,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
 
   constructor(transaction:SBTx = undefined, codecid:number = 0) {
     super();
+    this.codecid = codecid;
     this.transaction = transaction;
   }
 }

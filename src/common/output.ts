@@ -96,8 +96,8 @@ export class OutputOwners extends Serializable {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "locktime": serializer.encoder(this.locktime, encoding, "Buffer", "decimalString"),
-      "threshold": serializer.encoder(this.threshold, encoding, "Buffer", "decimalString"),
+      "locktime": serializer.encoder(this.locktime, encoding, "Buffer", "decimalString", 8),
+      "threshold": serializer.encoder(this.threshold, encoding, "Buffer", "decimalString", 4),
       "addresses": this.addresses.map((a) => a.serialize(encoding))
     }
   };
@@ -433,7 +433,7 @@ export abstract class StandardAmountOutput extends Output {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString")
+      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString", 8)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
@@ -499,12 +499,12 @@ export abstract class BaseNFTOutput extends Output {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString")
+      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString", 4)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer");
+    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4);
   }
 
   protected groupID:Buffer = Buffer.alloc(4);

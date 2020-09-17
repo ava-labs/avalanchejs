@@ -38,7 +38,7 @@ export class InitialStates extends Serializable{
     let unflat:{[fxid:number]:Array<Output>} = {};
     for(let fxid in fields["fxs"]){
       unflat[fxid] = fields["fxs"][fxid].map((o:object) => {
-        let out:Output = SelectOutputClass(o["_typeID"], encoding);
+        let out:Output = SelectOutputClass(o["_typeID"]);
         out.deserialize(o, encoding);
         return out;
       });

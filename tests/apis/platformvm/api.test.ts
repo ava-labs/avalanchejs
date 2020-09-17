@@ -18,12 +18,24 @@ import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
 import { UnixNow } from 'src/utils/helperfunctions';
 import { UTF8Payload } from 'src/utils/payload';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
-import { ONEAVAX } from '../../../src/utils/constants';
+import { ONEAVAX } from 'src/utils/constants';
+import { Serializable, Serialization } from 'src/utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
+
+
+const dumpSerailization:boolean = false;
+
+function serialzeit(aThing:Serializable, name:string){
+  if(dumpSerailization){
+    console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "hex", name + " -- Hex Encoded")));
+    console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "display", name + " -- Human-Readable")));
+  }
+}
 
 describe('PlatformVMAPI', () => {
   const networkid:number = 12345;
@@ -904,7 +916,8 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*console.log("-----Test1 JSON-----");
+      /*
+      console.log("-----Test1 JSON-----");
       console.log(tx1str);
       console.log("-----Test1 ENDN-----");
       */
@@ -946,6 +959,8 @@ describe('PlatformVMAPI', () => {
       */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "ImportTx");
     });
 
     test('buildExportTx', async () => {
@@ -1003,6 +1018,7 @@ describe('PlatformVMAPI', () => {
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
+
       /*
       console.log("-----Test1 JSON-----");
       console.log(tx1str);
@@ -1012,6 +1028,7 @@ describe('PlatformVMAPI', () => {
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
+
       /*
       let tx2obj:object = tx2.serialize("hex");
       let tx2str:string = JSON.stringify(tx2obj);
@@ -1019,11 +1036,13 @@ describe('PlatformVMAPI', () => {
       console.log(tx2str);
       console.log("-----Test2 ENDN-----");
       */
-     expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
+
       /*
       console.log("-----Test3 JSON-----");
       console.log(tx3str);
@@ -1033,6 +1052,7 @@ describe('PlatformVMAPI', () => {
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
+
       /*
       let tx4obj:object = tx4.serialize("display");
       let tx4str:string = JSON.stringify(tx4obj);
@@ -1040,7 +1060,10 @@ describe('PlatformVMAPI', () => {
       console.log(tx4str);
       console.log("-----Test4 ENDN-----");
       */
-     expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "ExportTx");
 
     });
 /*
@@ -1122,6 +1145,57 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
 
+      let tx1:Tx = txu1.sign(platformvm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(platformvm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "AddDelegatorTx");
+
     });
 
     test('buildAddValidatorTx', async () => {
@@ -1171,6 +1245,57 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
 
+      let tx1:Tx = txu1.sign(platformvm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(platformvm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "AddValidatorTx");
+
     });
 
     test('buildCreateSubnetTx', async () => {
@@ -1200,6 +1325,57 @@ describe('PlatformVMAPI', () => {
       );
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(platformvm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(platformvm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "CreateSubnetTx");
 
     });
 

@@ -238,7 +238,7 @@ export abstract class StandardAmountInput extends Input {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString")
+      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString", 8)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
