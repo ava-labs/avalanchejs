@@ -24,8 +24,9 @@ const serializer = Serialization.getInstance();
  */
 export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
   if (inputid === PlatformVMConstants.SECPINPUTID) {
-    const secpin:SECPTransferInput = new SECPTransferInput(...args);
-    return secpin;
+    return new SECPTransferInput(...args);
+  } else if (inputid === PlatformVMConstants.STAKEABLELOCKINID) {
+    return new StakeableLockIn(...args);
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);

@@ -23,8 +23,7 @@ const serializer = Serialization.getInstance();
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
   if (credid === PlatformVMConstants.SECPCREDENTIAL) {
-    const secpcred:SECPCredential = new SECPCredential(...args);
-    return secpcred;
+    return new SECPCredential(...args);
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);

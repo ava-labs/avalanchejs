@@ -21,17 +21,13 @@ const serializer = Serialization.getInstance();
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
     if(outputid == AVMConstants.SECPXFEROUTPUTID){
-        let secpout:SECPTransferOutput = new SECPTransferOutput( ...args);
-        return secpout;
+        return new SECPTransferOutput( ...args);
     } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
-        let secpmintout:SECPMintOutput = new SECPMintOutput( ...args);
-        return secpmintout;
+        return new SECPMintOutput( ...args);
     } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
-        let nftout:NFTMintOutput = new NFTMintOutput(...args);
-        return nftout;
+        return new NFTMintOutput(...args);
     } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
-        let nftout:NFTTransferOutput = new NFTTransferOutput(...args);
-        return nftout;
+        return new NFTTransferOutput(...args);
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }

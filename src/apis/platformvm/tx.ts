@@ -23,6 +23,31 @@ import { CreateSubnetTx } from './createsubnettx';
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
+/**
+ * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
+ *
+ * @param txtype The id of the transaction type
+ *
+ * @returns An instance of an [[BaseTx]]-extended class.
+ */
+export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
+  if (txtype === PlatformVMConstants.BASETX) {
+    return new BaseTx(...args);
+  } else if (txtype === PlatformVMConstants.IMPORTTX) {
+    return new ImportTx(...args);
+  } else if (txtype === PlatformVMConstants.EXPORTTX) {
+    return new ExportTx(...args);
+  } else if (txtype === PlatformVMConstants.ADDDELEGATORTX) {
+    return new AddDelegatorTx(...args);
+  } else if (txtype === PlatformVMConstants.ADDVALIDATORTX) {
+    return new AddValidatorTx(...args);
+  } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
+    return new CreateSubnetTx(...args);
+  } 
+  /* istanbul ignore next */
+  throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
+};
+
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   protected _typeName = "UnsignedTx";
   protected _typeID = undefined;
@@ -106,34 +131,3 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
   }
 
 }
-
-/**
- * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
- *
- * @param txtype The id of the transaction type
- *
- * @returns An instance of an [[BaseTx]]-extended class.
- */
-export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
-  if (txtype === PlatformVMConstants.BASETX) {
-    const tx:BaseTx = new BaseTx(...args);
-    return tx;
-  } else if (txtype === PlatformVMConstants.IMPORTTX) {
-    const tx:ImportTx = new ImportTx(...args);
-    return tx;
-  } else if (txtype === PlatformVMConstants.EXPORTTX) {
-    const tx:ExportTx = new ExportTx(...args);
-    return tx;
-  } else if (txtype === PlatformVMConstants.ADDDELEGATORTX) {
-    const tx:AddDelegatorTx = new AddDelegatorTx(...args);
-    return tx;
-  } else if (txtype === PlatformVMConstants.ADDVALIDATORTX) {
-    const tx:AddValidatorTx = new AddValidatorTx(...args);
-    return tx;
-  } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
-    const tx:CreateSubnetTx = new CreateSubnetTx(...args);
-    return tx;
-  } 
-  /* istanbul ignore next */
-  throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
-};

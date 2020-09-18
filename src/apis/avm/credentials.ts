@@ -23,11 +23,9 @@ const serializer = Serialization.getInstance();
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
   if (credid === AVMConstants.SECPCREDENTIAL) {
-    const secpcred:SECPCredential = new SECPCredential(...args);
-    return secpcred;
+    return new SECPCredential(...args);
   } if (credid === AVMConstants.NFTCREDENTIAL) {
-    const nftcred:NFTCredential = new NFTCredential(...args);
-    return nftcred;
+    return new NFTCredential(...args);
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);

@@ -21,9 +21,11 @@ const serializer = Serialization.getInstance();
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
     if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
-        return new SECPTransferOutput( ...args);
+      return new SECPTransferOutput( ...args);
     } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
       return new SECPOwnerOutput(...args);
+    } else if(outputid == PlatformVMConstants.STAKEABLELOCKOUTID) {
+      return new StakeableLockOut(...args);
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }

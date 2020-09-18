@@ -23,8 +23,7 @@ const serializer = Serialization.getInstance();
  */
 export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
   if (inputid === AVMConstants.SECPINPUTID) {
-    const secpin:SECPTransferInput = new SECPTransferInput(...args);
-    return secpin;
+    return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
