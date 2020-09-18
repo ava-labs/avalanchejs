@@ -169,7 +169,7 @@ export class StakeableLockOut extends Output {
       return addr;
     });
     this.numaddrs = Buffer.alloc(4);
-    this.numaddrs.writeUInt32BE(this.addresses.length, 4);
+    this.numaddrs.writeUInt32BE(this.addresses.length, 0);
     this.locktime = bintools.fromBNToBuffer(output.getLocktime(), 8);
     this.threshold = Buffer.alloc(4);
     this.threshold.writeUInt32BE(output.getThreshold(), 0);
