@@ -24,7 +24,7 @@ const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
-  protected _typeName = "UnsigndTx";
+  protected _typeName = "UnsignedTx";
   protected _typeID = undefined;
 
   //serialize is inherited

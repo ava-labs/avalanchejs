@@ -472,7 +472,7 @@ export abstract class StandardAmountOutput extends Output {
   }
 
   /**
-   * A [[BaseAmountOutput]] class which issues a payment on an assetID.
+   * A [[StandardAmountOutput]] class which issues a payment on an assetID.
    *
    * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
    * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
@@ -481,7 +481,7 @@ export abstract class StandardAmountOutput extends Output {
    */
   constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
     super(addresses, locktime, threshold);
-    if (amount) {
+    if (typeof amount !== "undefined") {
       this.amountValue = amount.clone();
       this.amount = bintools.fromBNToBuffer(amount, 8);
     }

@@ -7,6 +7,7 @@ import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import BN from 'bn.js';
 
 /**
  * @ignore
@@ -98,5 +99,81 @@ export class SECPTransferInput extends AmountInput {
     const newout:SECPTransferInput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
+  }
+
+}
+
+/**
+ * An [[Input]] class which specifies an input that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
+ */
+export class StakeableLockIn extends SECPTransferInput {
+  protected _typeName = "StakeableLockIn";
+  protected _typeID = PlatformVMConstants.STAKEABLELOCKINID;
+
+  //serialize and deserialize both are inherited
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8)
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+  }
+
+  protected stakeableLocktime:Buffer;
+
+  /**
+   * Returns the inputID for this input
+   */
+  getInputID():number {
+    return this._typeID;
+  }
+
+  getCredentialID = ():number => PlatformVMConstants.SECPCREDENTIAL;
+
+  /**
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockIn]] and returns the size of the output.
+   */
+  fromBuffer(inbuff:Buffer, offset:number = 0):number {
+    this.stakeableLocktime = bintools.copyFrom(inbuff, offset, offset + 8);
+    offset += 8;
+    return super.fromBuffer(inbuff, offset);
+  }
+
+  /**
+   * Returns the buffer representing the [[StakeableLockIn]] instance.
+   */
+  toBuffer():Buffer {
+    const superbuff:Buffer = super.toBuffer();
+    const bsize:number = this.stakeableLocktime.length + superbuff.length;
+    const barr:Array<Buffer> = [this.stakeableLocktime, superbuff];
+    return Buffer.concat(barr, bsize);
+  }
+  
+  create(...args:any[]):this{
+    return new SECPTransferInput(...args) as this;
+  }
+
+  clone():this {
+    const newout:SECPTransferInput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
+  /**
+   * A [[StandardAmountInput]] class which specifies an [[Input]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
+   *
+   * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
+   */
+  constructor(stakeableLocktime:BN = undefined, amount:BN = undefined) {
+    super(amount);
+    if (typeof stakeableLocktime !== undefined) {
+      this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);
+    }
   }
 }
