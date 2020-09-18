@@ -228,12 +228,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         if(outs[assetKey].getOutputID() == PlatformVMConstants.STAKEABLELOCKOUTID){
           let stakeableLocktime:BN = (outs[assetKey] as StakeableLockOut).getStakeableLocktime();
           let pout:ParseableOutput = (outs[assetKey] as StakeableLockOut).getTransferableOutput();
-          let same1:string = aad.getDestinations().map(d => d.toString("hex")).sort().join('');
+          /*let same1:string = aad.getDestinations().map(d => d.toString("hex")).sort().join('');
           let same2:string = pout.getOutput().getAddresses().map(d => d.toString("hex")).sort().join('');
           if(stakeableLocktime.gt(asOf) && same1 !== same2){
             return new Error('Error - UTXOSet.getMinimumSpendable: destination addresses must match the source addresses in  '
             + 'StakeableLockOuts that are below their lock time.');
-          }
+          }*/
           let newout:AmountOutput = SelectOutputClass(pout.getOutput().getOutputID(), amount, pout.getOutput().getAddresses(), locktime, threshold) as AmountOutput;
           spendout = SelectOutputClass(outs[assetKey].getOutputID(),
             amount, aad.getDestinations(), locktime, threshold, stakeableLocktime, new ParseableOutput(newout)) as StakeableLockOut;
@@ -251,12 +251,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         if(outs[assetKey].getOutputID() == PlatformVMConstants.STAKEABLELOCKOUTID){
           let stakeableLocktime:BN = (outs[assetKey] as StakeableLockOut).getStakeableLocktime();
           let pout:ParseableOutput = (outs[assetKey] as StakeableLockOut).getTransferableOutput();
-          let same1:string = aad.getChangeAddresses().map(d => d.toString("hex")).sort().join('');
+          /*let same1:string = aad.getChangeAddresses().map(d => d.toString("hex")).sort().join('');
           let same2:string = pout.getOutput().getAddresses().map(d => d.toString("hex")).sort().join('');
           if(stakeableLocktime.gt(asOf) && same1 !== same2){
             return new Error('Error - UTXOSet.getMinimumSpendable: destination addresses must match the source addresses in  '
             + 'StakeableLockOuts that are below their lock time.');
-          }
+          }*/
           let newout:AmountOutput = SelectOutputClass(pout.getOutput().getOutputID(), change, pout.getOutput().getAddresses(), locktime, threshold) as AmountOutput;
           changeout = SelectOutputClass(outs[assetKey].getOutputID(),
             change, aad.getChangeAddresses(), undefined, undefined, stakeableLocktime, new ParseableOutput(newout)) as StakeableLockOut;
@@ -621,7 +621,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   * @param networkid Networkid, [[DefaultNetworkID]]
   * @param blockchainid Blockchainid, default undefined
   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -641,6 +642,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer,
     avaxAssetID:Buffer,
+    toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
     nodeID:Buffer, 
@@ -665,7 +667,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw new Error("UTXOSet.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
-    const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
+    const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
       aad.addAssetAmount(avaxAssetID, stakeAmount, fee);
     } else {
@@ -696,7 +698,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @param networkid Networkid, [[DefaultNetworkID]]
     * @param blockchainid Blockchainid, default undefined
     * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake in AVAX
+    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
+    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
     * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
     * @param nodeID The node ID of the validator being added.
     * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -718,6 +721,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer,
     avaxAssetID:Buffer,
+    toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
     nodeID:Buffer, 
@@ -747,7 +751,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw new Error("UTXOSet.buildAddValidatorTx -- startTime must be in the range of 0 to 100, inclusively");
     }
 
-    const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
+    const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
       aad.addAssetAmount(avaxAssetID, stakeAmount, fee);
     } else {

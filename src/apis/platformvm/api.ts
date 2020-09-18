@@ -1087,7 +1087,8 @@ export class PlatformVMAPI extends JRPCAPI {
   * [[UnsignedTx]] manually and import the [[AddDelegatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieved the staked tokens at the end of the staking period
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -1103,6 +1104,7 @@ export class PlatformVMAPI extends JRPCAPI {
   */
   buildAddDelegatorTx = async (
     utxoset:UTXOSet, 
+    toAddresses:Array<string>,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     nodeID:string, 
@@ -1115,6 +1117,7 @@ export class PlatformVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const rewards:Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
@@ -1134,6 +1137,7 @@ export class PlatformVMAPI extends JRPCAPI {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
+      to,
       from,
       change,
       NodeIDStringToBuffer(nodeID),
@@ -1161,7 +1165,8 @@ export class PlatformVMAPI extends JRPCAPI {
   * [[UnsignedTx]] manually and import the [[AddValidatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieved the staked tokens at the end of the staking period
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -1178,6 +1183,7 @@ export class PlatformVMAPI extends JRPCAPI {
   */
   buildAddValidatorTx = async (
     utxoset:UTXOSet, 
+    toAddresses:Array<string>,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     nodeID:string, 
@@ -1191,6 +1197,7 @@ export class PlatformVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const rewards:Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
@@ -1219,6 +1226,7 @@ export class PlatformVMAPI extends JRPCAPI {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
+      to,
       from,
       change,
       NodeIDStringToBuffer(nodeID),

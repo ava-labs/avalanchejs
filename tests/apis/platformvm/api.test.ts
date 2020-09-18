@@ -1113,6 +1113,7 @@ describe('PlatformVMAPI', () => {
 
       const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
         set, 
+        addrs3,
         addrs1, 
         addrs2, 
         nodeID, 
@@ -1128,6 +1129,7 @@ describe('PlatformVMAPI', () => {
       const txu2:UnsignedTx = set.buildAddDelegatorTx(
         networkid, bintools.cb58Decode(blockchainid), 
         assetID,
+        addrbuff3,
         addrbuff1,         
         addrbuff2, 
         NodeIDStringToBuffer(nodeID), 
@@ -1210,6 +1212,7 @@ describe('PlatformVMAPI', () => {
 
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         set, 
+        addrs3,
         addrs1, 
         addrs2, 
         nodeID, 
@@ -1226,6 +1229,7 @@ describe('PlatformVMAPI', () => {
       const txu2:UnsignedTx = set.buildAddValidatorTx(
         networkid, bintools.cb58Decode(blockchainid), 
         assetID,
+        addrbuff3,
         addrbuff1,         
         addrbuff2, 
         NodeIDStringToBuffer(nodeID), 
