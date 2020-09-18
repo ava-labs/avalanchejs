@@ -403,9 +403,9 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
   toBuffer():Buffer {
-    const parseeableBuff:Buffer = super.toBuffer();
-    const barr:Array<Buffer> = [this.assetID, parseeableBuff];
-    return Buffer.concat(barr, this.assetID.length + parseeableBuff.length);
+    const parseableBuff:Buffer = super.toBuffer();
+    const barr:Array<Buffer> = [this.assetID, parseableBuff];
+    return Buffer.concat(barr, this.assetID.length + parseableBuff.length);
   }
 
   /**
