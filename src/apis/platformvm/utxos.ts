@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput } from './outputs';
+import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput, StakeableLockOut } from './outputs';
 import { SECPTransferInput, TransferableInput } from './inputs';
 import { UnixNow } from '../../utils/helperfunctions';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
@@ -166,7 +166,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   }
 
   getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
-    const utxoArray:Array<UTXO> = this.getAllUTXOs();
+    const utxoArray:Array<UTXO> = this.getAllUTXOs().filter((u) => {
+      if(u.getOutput() instanceof StakeableLockOut && (u.getOutput() as StakeableLockOut).getStakeableLocktime().gt(asOf)){
+        return false;
+      };
+      return true;
+    });
     const outids:object = {};
     for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
       const u:UTXO = utxoArray[i];
@@ -770,7 +775,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
-      const success:Error = this.getMinimumSpendable(aad, asOf);
+      const success:Error = this.getMinimumSpendable(aad, asOf, undefined, undefined);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
         outs = aad.getAllOutputs();

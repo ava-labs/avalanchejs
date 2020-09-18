@@ -167,6 +167,13 @@ export class StakeableLockIn extends AmountInput {
     this.amountValue = input.getAmount();
   }
 
+  getStakeableLocktime():BN {
+    return bintools.fromBufferToBN(this.stakeableLocktime);
+  }
+
+  getTransferableOutput():ParseableInput {
+    return this.transferableInput;
+  }
   /**
    * Returns the inputID for this input
    */

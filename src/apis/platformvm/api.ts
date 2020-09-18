@@ -16,7 +16,6 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import axios from 'axios';
 
 /**
  * @ignore
@@ -829,9 +828,6 @@ export class PlatformVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-axios.interceptors.request.use(request => {
-  return request
-})
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
 
       const utxos:UTXOSet = new UTXOSet();

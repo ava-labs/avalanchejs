@@ -154,6 +154,31 @@ export class StakeableLockOut extends AmountOutput {
   protected stakeableLocktime:Buffer;
   protected transferableOutput:ParseableOutput;
 
+    //call this every time you load in data
+    private synchronize(){
+      let output:AmountOutput = this.transferableOutput.getOutput() as AmountOutput;
+      this.addresses = output.getAddresses().map((a) => {
+        let addr:Address = new Address();
+        addr.fromBuffer(a);
+        return addr;
+      });
+      this.numaddrs = Buffer.alloc(4);
+      this.numaddrs.writeUInt32BE(this.addresses.length, 0);
+      this.locktime = bintools.fromBNToBuffer(output.getLocktime(), 8);
+      this.threshold = Buffer.alloc(4);
+      this.threshold.writeUInt32BE(output.getThreshold(), 0);
+      this.amount = bintools.fromBNToBuffer(output.getAmount(), 8);
+      this.amountValue = output.getAmount();
+    }
+
+  getStakeableLocktime():BN {
+    return bintools.fromBufferToBN(this.stakeableLocktime);
+  }
+
+  getTransferableOutput():ParseableOutput {
+    return this.transferableOutput;
+  }
+
   /**
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */
@@ -165,22 +190,7 @@ export class StakeableLockOut extends AmountOutput {
     return SelectOutputClass(id, ...args);
   }
 
-  //call this every time you load in data
-  private synchronize(){
-    let output:AmountOutput = this.transferableOutput.getOutput() as AmountOutput;
-    this.addresses = output.getAddresses().map((a) => {
-      let addr:Address = new Address();
-      addr.fromBuffer(a);
-      return addr;
-    });
-    this.numaddrs = Buffer.alloc(4);
-    this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-    this.locktime = bintools.fromBNToBuffer(output.getLocktime(), 8);
-    this.threshold = Buffer.alloc(4);
-    this.threshold.writeUInt32BE(output.getThreshold(), 0);
-    this.amount = bintools.fromBNToBuffer(output.getAmount(), 8);
-    this.amountValue = output.getAmount();
-  }
+
 
   /**
    * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockOut]] and returns the size of the output.
