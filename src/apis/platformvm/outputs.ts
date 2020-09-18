@@ -133,7 +133,7 @@ export class StakeableLockOut extends Output {
       ...fields, //included anywayyyy... not ideal
       "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
       "transferableOutput": this.transferableOutput.serialize(encoding)
-    }
+    };
     delete outobj["addresses"];
     delete outobj["locktime"];
     delete outobj["threshold"];
