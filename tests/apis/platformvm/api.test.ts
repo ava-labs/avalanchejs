@@ -1103,7 +1103,6 @@ describe('PlatformVMAPI', () => {
     });
 */
     test('buildAddDelegatorTx', async () => {
-      platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -1138,7 +1137,7 @@ describe('PlatformVMAPI', () => {
         locktime,
         threshold,
         addrbuff3,
-        platformvm.getFee(), 
+        new BN(0), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
@@ -1199,7 +1198,6 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildAddValidatorTx', async () => {
-      platformvm.setFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -1238,7 +1236,7 @@ describe('PlatformVMAPI', () => {
         threshold,
         addrbuff3,
         0.1335,
-        platformvm.getFee(), 
+        new BN(0),
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );

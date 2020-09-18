@@ -1146,7 +1146,7 @@ axios.interceptors.request.use(request => {
       rewardLocktime,
       rewardThreshold,
       rewards,
-      this.getFee(), 
+      new BN(0), 
       avaxAssetID,
       memo, asOf
     );
@@ -1232,7 +1232,7 @@ axios.interceptors.request.use(request => {
       rewardThreshold,
       rewards,
       delegationFee,
-      this.getFee(), 
+      new BN(0), 
       avaxAssetID,
       memo, asOf
     );
