@@ -161,8 +161,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
   _feeCheck(fee:BN, feeAssetID:Buffer):boolean {
     return (typeof fee !== "undefined" && 
-    typeof feeAssetID !== "undefined" &&
-    fee.gt(new BN(0)) && feeAssetID instanceof Buffer);
+      typeof feeAssetID !== "undefined" &&
+      fee.gt(new BN(0)) && feeAssetID instanceof Buffer
+    );
   }
 
   getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1, stakeable:boolean = false):Error => {
@@ -172,7 +173,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       };
       return true;
     });
-    const outids:object = {};
+    const outs:object = {};
     for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
       const u:UTXO = utxoArray[i];
       const assetKey:string = u.getAssetID().toString("hex");
@@ -181,7 +182,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const am:AssetAmount = aad.getAssetAmount(assetKey);
         if(!am.isFinished()){
           const uout:AmountOutput = u.getOutput() as AmountOutput;
-          outids[assetKey] = uout.getOutputID();
+          outs[assetKey] = uout;
           const amount = uout.getAmount();
           am.spendAmount(amount);
           const txid:Buffer = u.getTxID();
@@ -223,15 +224,46 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const assetKey:string = amounts[i].getAssetIDString();
       const amount:BN = amounts[i].getAmount();
       if (amount.gt(zero)) {
-        const spendout:AmountOutput = SelectOutputClass(outids[assetKey],
-          amount, aad.getDestinations(), locktime, threshold) as AmountOutput;
+        let spendout:AmountOutput;
+        if(outs[assetKey].getOutputID() == PlatformVMConstants.STAKEABLELOCKOUTID){
+          let stakeableLocktime:BN = (outs[assetKey] as StakeableLockOut).getStakeableLocktime();
+          let pout:ParseableOutput = (outs[assetKey] as StakeableLockOut).getTransferableOutput();
+          let same1:string = aad.getDestinations().map(d => d.toString("hex")).sort().join('');
+          let same2:string = pout.getOutput().getAddresses().map(d => d.toString("hex")).sort().join('');
+          if(stakeableLocktime.gt(asOf) && same1 !== same2){
+            return new Error('Error - UTXOSet.getMinimumSpendable: destination addresses must match the source addresses in  '
+            + 'StakeableLockOuts that are below their lock time.');
+          }
+          let newout:AmountOutput = SelectOutputClass(pout.getOutput().getOutputID(), amount, pout.getOutput().getAddresses(), locktime, threshold) as AmountOutput;
+          spendout = SelectOutputClass(outs[assetKey].getOutputID(),
+            amount, aad.getDestinations(), locktime, threshold, stakeableLocktime, new ParseableOutput(newout)) as StakeableLockOut;
+        } else {
+          spendout = SelectOutputClass(outs[assetKey].getOutputID(),
+            amount, aad.getDestinations(), locktime, threshold) as AmountOutput;
+          
+        }
         const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
         aad.addOutput(xferout);
       }
       const change:BN = amounts[i].getChange();
       if (change.gt(zero)) {
-        const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
-          change, aad.getChangeAddresses()) as AmountOutput;
+        let changeout:AmountOutput;
+        if(outs[assetKey].getOutputID() == PlatformVMConstants.STAKEABLELOCKOUTID){
+          let stakeableLocktime:BN = (outs[assetKey] as StakeableLockOut).getStakeableLocktime();
+          let pout:ParseableOutput = (outs[assetKey] as StakeableLockOut).getTransferableOutput();
+          let same1:string = aad.getChangeAddresses().map(d => d.toString("hex")).sort().join('');
+          let same2:string = pout.getOutput().getAddresses().map(d => d.toString("hex")).sort().join('');
+          if(stakeableLocktime.gt(asOf) && same1 !== same2){
+            return new Error('Error - UTXOSet.getMinimumSpendable: destination addresses must match the source addresses in  '
+            + 'StakeableLockOuts that are below their lock time.');
+          }
+          let newout:AmountOutput = SelectOutputClass(pout.getOutput().getOutputID(), change, pout.getOutput().getAddresses(), locktime, threshold) as AmountOutput;
+          changeout = SelectOutputClass(outs[assetKey].getOutputID(),
+            change, aad.getChangeAddresses(), undefined, undefined, stakeableLocktime, new ParseableOutput(newout)) as StakeableLockOut;
+        } else {
+          changeout = SelectOutputClass(outs[assetKey].getOutputID(), change, aad.getChangeAddresses()) as AmountOutput;
+        }
+        
         const chgxferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
         aad.addChange(chgxferout);
       }

@@ -190,8 +190,6 @@ export class StakeableLockOut extends AmountOutput {
     return SelectOutputClass(id, ...args);
   }
 
-
-
   /**
    * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockOut]] and returns the size of the output.
    */

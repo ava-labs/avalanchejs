@@ -20,6 +20,8 @@ export class PlatformVMConstants {
 
   static STAKEABLELOCKINID:number = 21;
 
+  static LOCKEDSTAKEABLES:Array<number> = [PlatformVMConstants.STAKEABLELOCKINID, PlatformVMConstants.STAKEABLELOCKOUTID];
+
   static BASETX:number = 0;
 
   static ADDVALIDATORTX:number = 12;
