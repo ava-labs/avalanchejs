@@ -481,7 +481,7 @@ export abstract class StandardAmountOutput extends Output {
    */
   constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
     super(addresses, locktime, threshold);
-    if (typeof amount !== undefined) {
+    if (typeof amount !== "undefined") {
       this.amountValue = amount.clone();
       this.amount = bintools.fromBNToBuffer(amount, 8);
     }
