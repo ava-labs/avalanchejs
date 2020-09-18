@@ -141,6 +141,10 @@ export class StakeableLockOut extends AmountOutput {
     return outobj;
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    fields["addresses"] = [];
+    fields["locktime"] = "0";
+    fields["threshold"] =  "1";
+    fields["amount"] = "99";
     super.deserialize(fields, encoding);
     this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
     this.transferableOutput.deserialize(fields["transferableOutput"], encoding);
@@ -175,6 +179,7 @@ export class StakeableLockOut extends AmountOutput {
     this.threshold = Buffer.alloc(4);
     this.threshold.writeUInt32BE(output.getThreshold(), 0);
     this.amount = bintools.fromBNToBuffer(output.getAmount(), 8);
+    this.amountValue = output.getAmount();
   }
 
   /**

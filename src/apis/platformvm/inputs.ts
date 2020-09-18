@@ -146,6 +146,9 @@ export class StakeableLockIn extends AmountInput {
     return outobj;
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    fields["sigIdxs"] = [];
+    fields["sigCount"] = "0";
+    fields["amount"] = "98";
     super.deserialize(fields, encoding);
     this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
     this.transferableInput.deserialize(fields["transferableInput"], encoding);
