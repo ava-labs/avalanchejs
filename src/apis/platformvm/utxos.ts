@@ -165,9 +165,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     fee.gt(new BN(0)) && feeAssetID instanceof Buffer);
   }
 
-  getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
+  getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1, stakeable:boolean = false):Error => {
     const utxoArray:Array<UTXO> = this.getAllUTXOs().filter((u) => {
-      if(u.getOutput() instanceof StakeableLockOut && (u.getOutput() as StakeableLockOut).getStakeableLocktime().gt(asOf)){
+      if(!stakeable && u.getOutput() instanceof StakeableLockOut && (u.getOutput() as StakeableLockOut).getStakeableLocktime().gt(asOf)){
         return false;
       };
       return true;
@@ -643,7 +643,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const success:Error = this.getMinimumSpendable(aad, asOf);
+    const success:Error = this.getMinimumSpendable(aad, asOf, undefined, undefined, true);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
       outs = aad.getChangeOutputs();
@@ -725,7 +725,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
     
-    const success:Error = this.getMinimumSpendable(aad, asOf);
+    const success:Error = this.getMinimumSpendable(aad, asOf, undefined, undefined, true);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
       outs = aad.getChangeOutputs();
