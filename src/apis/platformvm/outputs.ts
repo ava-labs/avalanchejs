@@ -224,11 +224,15 @@ export class StakeableLockOut extends AmountOutput {
   /**
    * A [[Output]] class which specifies a [[ParseableOutput]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
    *
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+   * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
+   * @param threshold A number representing the the threshold number of signers required to sign the transaction
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
    * @param transferableOutput A [[ParseableOutput]] which is embedded into this output.
    */
-  constructor(stakeableLocktime:BN = undefined, transferableOutput:ParseableOutput = undefined) {
-    super();
+  constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined, stakeableLocktime:BN = undefined, transferableOutput:ParseableOutput = undefined) {
+    super(amount, addresses, locktime, threshold);
     if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);
     }

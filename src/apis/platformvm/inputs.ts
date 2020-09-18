@@ -212,11 +212,12 @@ export class StakeableLockIn extends AmountInput {
   /**
    * A [[Output]] class which specifies an [[Input]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
    *
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the input
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
    * @param transferableInput A [[ParseableInput]] which is embedded into this input.
    */
-  constructor(stakeableLocktime:BN = undefined, transferableInput:ParseableInput = undefined) {
-    super();
+  constructor(amount:BN = undefined, stakeableLocktime:BN = undefined, transferableInput:ParseableInput = undefined) {
+    super(amount);
     if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);
     }
