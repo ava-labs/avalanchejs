@@ -127,7 +127,7 @@ export class SECPTransferInput extends AmountInput {
 /**
  * An [[Input]] class which specifies an input that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
  */
-export class StakeableLockIn extends Input {
+export class StakeableLockIn extends AmountInput {
   protected _typeName = "StakeableLockIn";
   protected _typeID = PlatformVMConstants.STAKEABLELOCKINID;
 
@@ -142,6 +142,7 @@ export class StakeableLockIn extends Input {
     };
     delete outobj["sigIdxs"];
     delete outobj["sigCount"];
+    delete outobj["amount"];
     return outobj;
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
@@ -155,10 +156,12 @@ export class StakeableLockIn extends Input {
   protected transferableInput:ParseableInput;
 
   private synchronize(){
-    let input:Input = this.transferableInput.getInput();
+    let input:AmountInput = this.transferableInput.getInput() as AmountInput;
     this.sigIdxs = input.getSigIdxs();
     this.sigCount = Buffer.alloc(4);
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 4);
+    this.amount = bintools.fromBNToBuffer(input.getAmount(), 8);
+    this.amountValue = input.getAmount();
   }
 
   /**

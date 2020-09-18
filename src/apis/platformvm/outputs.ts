@@ -121,7 +121,7 @@ export class SECPTransferOutput extends AmountOutput {
 /**
  * An [[Output]] class which specifies an input that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
  */
-export class StakeableLockOut extends Output {
+export class StakeableLockOut extends AmountOutput {
   protected _typeName = "StakeableLockOut";
   protected _typeID = PlatformVMConstants.STAKEABLELOCKOUTID;
 
@@ -137,6 +137,7 @@ export class StakeableLockOut extends Output {
     delete outobj["addresses"];
     delete outobj["locktime"];
     delete outobj["threshold"];
+    delete outobj["amount"];
     return outobj;
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
@@ -162,7 +163,7 @@ export class StakeableLockOut extends Output {
 
   //call this every time you load in data
   private synchronize(){
-    let output:Output = this.transferableOutput.getOutput();
+    let output:AmountOutput = this.transferableOutput.getOutput() as AmountOutput;
     this.addresses = output.getAddresses().map((a) => {
       let addr:Address = new Address();
       addr.fromBuffer(a);
@@ -173,6 +174,7 @@ export class StakeableLockOut extends Output {
     this.locktime = bintools.fromBNToBuffer(output.getLocktime(), 8);
     this.threshold = Buffer.alloc(4);
     this.threshold.writeUInt32BE(output.getThreshold(), 0);
+    this.amount = bintools.fromBNToBuffer(output.getAmount(), 8);
   }
 
   /**
