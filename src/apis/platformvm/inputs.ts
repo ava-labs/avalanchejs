@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
-import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
+import { Input, StandardTransferableInput, StandardAmountInput, StandardParseableInput } from '../../common/input';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import BN from 'bn.js';
 
@@ -31,6 +31,26 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
   /* istanbul ignore next */
   throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
 };
+
+export class ParseableInput extends StandardParseableInput{
+  protected _typeName = "ParseableInput";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.input = SelectInputClass(fields["input"]["_typeID"]);
+    this.input.deserialize(fields["input"], encoding);
+  }
+
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    offset += 4;
+    this.input = SelectInputClass(inputid);
+    return this.input.fromBuffer(bytes, offset);
+  }
+}
 
 export class TransferableInput extends StandardTransferableInput {
   protected _typeName = "TransferableInput";
@@ -107,7 +127,7 @@ export class SECPTransferInput extends AmountInput {
 /**
  * An [[Input]] class which specifies an input that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
  */
-export class StakeableLockIn extends SECPTransferInput {
+export class StakeableLockIn extends Input {
   protected _typeName = "StakeableLockIn";
   protected _typeID = PlatformVMConstants.STAKEABLELOCKINID;
 
@@ -115,17 +135,31 @@ export class StakeableLockIn extends SECPTransferInput {
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
-    return {
+    let outobj:object = {
       ...fields,
-      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8)
-    }
+      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
+      "transferableInput": this.transferableInput.serialize(encoding)
+    };
+    delete outobj["sigIdxs"];
+    delete outobj["sigCount"];
+    return outobj;
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.transferableInput.deserialize(fields["transferableInput"], encoding);
+    this.synchronize();
   }
 
   protected stakeableLocktime:Buffer;
+  protected transferableInput:ParseableInput;
+
+  private synchronize(){
+    let input:Input = this.transferableInput.getInput();
+    this.sigIdxs = input.getSigIdxs();
+    this.sigCount = Buffer.alloc(4);
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 4);
+  }
 
   /**
    * Returns the inputID for this input
@@ -156,25 +190,33 @@ export class StakeableLockIn extends SECPTransferInput {
   }
   
   create(...args:any[]):this{
-    return new SECPTransferInput(...args) as this;
+    return new StakeableLockIn(...args) as this;
   }
 
   clone():this {
-    const newout:SECPTransferInput = this.create()
+    const newout:StakeableLockIn = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
 
+  select(id:number, ...args: any[]):Input {
+    return SelectInputClass(id, ...args);
+  }
+
   /**
-   * A [[StandardAmountInput]] class which specifies an [[Input]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
+   * A [[Output]] class which specifies an [[Input]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
    *
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
-   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
+   * @param transferableInput A [[ParseableInput]] which is embedded into this input.
    */
-  constructor(stakeableLocktime:BN = undefined, amount:BN = undefined) {
-    super(amount);
-    if (typeof stakeableLocktime !== undefined) {
+  constructor(stakeableLocktime:BN = undefined, transferableInput:ParseableInput = undefined) {
+    super();
+    if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);
+    }
+    if (typeof transferableInput !== "undefined") {
+      this.transferableInput = transferableInput;
+      this.synchronize();
     }
   }
 }

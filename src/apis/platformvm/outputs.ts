@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { PlatformVMConstants } from './constants';
-import { Output, StandardAmountOutput, StandardTransferableOutput, StandardParseableOutput } from '../../common/output';
+import { Output, StandardAmountOutput, StandardTransferableOutput, StandardParseableOutput, Address } from '../../common/output';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import BN from 'bn.js';
 
@@ -121,7 +121,7 @@ export class SECPTransferOutput extends AmountOutput {
 /**
  * An [[Output]] class which specifies an input that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
  */
-export class StakeableLockOut extends SECPTransferOutput {
+export class StakeableLockOut extends Output {
   protected _typeName = "StakeableLockOut";
   protected _typeID = PlatformVMConstants.STAKEABLELOCKOUTID;
 
@@ -129,33 +129,71 @@ export class StakeableLockOut extends SECPTransferOutput {
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
-    return {
-      ...fields,
-      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8)
+    let outobj:object = {
+      ...fields, //included anywayyyy... not ideal
+      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
+      "transferableOutput": this.transferableOutput.serialize(encoding)
     }
+    delete outobj["addresses"];
+    delete outobj["locktime"];
+    delete outobj["threshold"];
+    return outobj;
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.transferableOutput.deserialize(fields["transferableOutput"], encoding);
+    this.synchronize();
   }
 
   protected stakeableLocktime:Buffer;
+  protected transferableOutput:ParseableOutput;
+
+  /**
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+    return new TransferableOutput(assetID, this);
+  }
+
+  select(id:number, ...args: any[]):Output {
+    return SelectOutputClass(id, ...args);
+  }
+
+  //call this every time you load in data
+  private synchronize(){
+    let output:Output = this.transferableOutput.getOutput();
+    this.addresses = output.getAddresses().map((a) => {
+      let addr:Address = new Address();
+      addr.fromBuffer(a);
+      return addr;
+    });
+    this.numaddrs = Buffer.alloc(4);
+    this.numaddrs.writeUInt32BE(this.addresses.length, 4);
+    this.locktime = bintools.fromBNToBuffer(output.getLocktime(), 8);
+    this.threshold = Buffer.alloc(4);
+    this.threshold.writeUInt32BE(output.getThreshold(), 0);
+  }
+
   /**
    * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockOut]] and returns the size of the output.
    */
   fromBuffer(outbuff:Buffer, offset:number = 0):number {
     this.stakeableLocktime = bintools.copyFrom(outbuff, offset, offset + 8);
     offset += 8;
-    return super.fromBuffer(outbuff, offset);
+    this.transferableOutput = new ParseableOutput();
+    offset = this.transferableOutput.fromBuffer(outbuff, offset);
+    this.synchronize();
+    return offset;
   }
 
   /**
    * Returns the buffer representing the [[StakeableLockOut]] instance.
    */
   toBuffer():Buffer {
-    const superbuff:Buffer = super.toBuffer();
-    const bsize:number = this.stakeableLocktime.length + superbuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, superbuff];
+    let xferoutBuff:Buffer = this.transferableOutput.toBuffer();
+    const bsize:number = this.stakeableLocktime.length + xferoutBuff.length;
+    const barr:Array<Buffer> = [this.stakeableLocktime, xferoutBuff];
     return Buffer.concat(barr, bsize);
   }
 
@@ -167,28 +205,29 @@ export class StakeableLockOut extends SECPTransferOutput {
   }
 
   create(...args:any[]):this{
-    return new SECPTransferOutput(...args) as this;
+    return new StakeableLockOut(...args) as this;
   }
 
   clone():this {
-    const newout:SECPTransferOutput = this.create()
+    const newout:StakeableLockOut = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
 
   /**
-   * A [[StandardAmountOutput]] class which specifies an [[Output]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
+   * A [[Output]] class which specifies a [[ParseableOutput]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
    *
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
-   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the output
-   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
-   * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-   * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   * @param transferableOutput A [[ParseableOutput]] which is embedded into this output.
    */
-  constructor(stakeableLocktime:BN = undefined, amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
-    super(amount, addresses, locktime, threshold);
-    if (typeof stakeableLocktime !== undefined) {
+  constructor(stakeableLocktime:BN = undefined, transferableOutput:ParseableOutput = undefined) {
+    super();
+    if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);
+    }
+    if (typeof transferableOutput !== "undefined") {
+      this.transferableOutput = transferableOutput;
+      this.synchronize();
     }
   }
 }

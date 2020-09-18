@@ -119,7 +119,56 @@ export abstract class Input extends Serializable {
   
 }
 
-export abstract class StandardTransferableInput extends Serializable{
+export abstract class StandardParseableInput extends Serializable {
+  protected _typeName = "StandardParseableInput";
+  protected _typeID = undefined;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "input": this.input.serialize(encoding)
+    }
+  };
+
+  protected input:Input;
+
+  /**
+   * Returns a function used to sort an array of [[StandardParseableInput]]s
+   */
+  static comparator = ():(a:StandardParseableInput, b:StandardParseableInput) => (1|-1|0) => (a:StandardParseableInput, b:StandardParseableInput):(1|-1|0) => {
+    const sorta = a.toBuffer();
+    const sortb = b.toBuffer();
+    return Buffer.compare(sorta, sortb) as (1|-1|0);
+  };
+
+  getInput = ():Input => this.input;
+
+  // must be implemented to select input types for the VM in question
+  abstract fromBuffer(bytes:Buffer, offset?:number):number; 
+
+  toBuffer():Buffer {
+    const inbuff:Buffer = this.input.toBuffer();
+    const inid:Buffer = Buffer.alloc(4);
+    inid.writeUInt32BE(this.input.getInputID(), 0);
+    const barr:Array<Buffer> = [inid, inbuff];
+    return Buffer.concat(barr, inid.length + inbuff.length);
+  }
+  
+  /**
+   * Class representing an [[StandardParseableInput]] for a transaction.
+   * 
+   * @param input A number representing the InputID of the [[StandardParseableInput]]
+   */
+  constructor(input:Input = undefined) {
+    super();
+    if (Input instanceof Input) {
+      this.input = input;
+    }
+  }
+}
+
+export abstract class StandardTransferableInput extends StandardParseableInput{
   protected _typeName = "StandardTransferableInput";
   protected _typeID = undefined;
 
@@ -130,7 +179,6 @@ export abstract class StandardTransferableInput extends Serializable{
       "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
       "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
       "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
-      "input": this.input.serialize(encoding)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
@@ -144,16 +192,6 @@ export abstract class StandardTransferableInput extends Serializable{
   protected txid:Buffer = Buffer.alloc(32);
   protected outputidx:Buffer = Buffer.alloc(4);
   protected assetid:Buffer = Buffer.alloc(32);
-  protected input:Input;
-
-  /**
-   * Returns a function used to sort an array of [[StandardTransferableInput]]s
-   */
-  static comparator = ():(a:StandardTransferableInput, b:StandardTransferableInput) => (1|-1|0) => (a:StandardTransferableInput, b:StandardTransferableInput):(1|-1|0) => {
-    const sorta = Buffer.concat([a.getTxID(), a.getOutputIdx()]);
-    const sortb = Buffer.concat([b.getTxID(), b.getOutputIdx()]);
-    return Buffer.compare(sorta, sortb) as (1|-1|0);
-  };
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -184,18 +222,15 @@ export abstract class StandardTransferableInput extends Serializable{
    */
   getAssetID = ():Buffer => this.assetid;
 
-  // must be implemented to select output types for the VM in question
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTransferableInput]].
    */
   toBuffer():Buffer {
-    const inbuff:Buffer = this.input.toBuffer();
-    const inputid:Buffer = Buffer.alloc(4);
-    inputid.writeInt32BE(this.input.getInputID(), 0);
-    const bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + inputid.length + inbuff.length;
-    const barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, inputid, inbuff];
+    const parseableBuff:Buffer = super.toBuffer();
+    const bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + parseableBuff.length;
+    const barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, parseableBuff];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -256,7 +291,7 @@ export abstract class StandardAmountInput extends Input {
   getAmount = ():BN => this.amountValue.clone();
 
   /**
-   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[AmountInput]] and returns the size of the output.
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[AmountInput]] and returns the size of the input.
    */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.amount = bintools.copyFrom(bytes, offset, offset + 8);
