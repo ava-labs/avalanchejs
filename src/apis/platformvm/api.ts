@@ -401,8 +401,7 @@ export class PlatformVMAPI extends JRPCAPI {
     stakeAmount:BN,
     rewardAddress:string,
     delegationFeeRate:BN = undefined
-  )
-  :Promise<string> => {
+  ):Promise<string> => {
     const params:any = {
       username,
       password,

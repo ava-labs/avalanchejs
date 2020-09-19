@@ -56,7 +56,7 @@ export const NetworkNameToNetworkID:object = {
 export const FallbackHRP:string = "custom";
 export const FallbackNetworkName:string = "Custom Network";
 
-export const DefaultNetworkID:number = 5;
+export const DefaultNetworkID:number = 1;
 
 export const PlatformChainID:string = "11111111111111111111111111111111LpoYY";
 export const PrimaryNetworkID:string = "11111111111111111111111111111111LpoYY";
@@ -85,8 +85,10 @@ export const GWEI:BN = WEI.mul(new BN(1000000000));
 
 export const AVAXGWEI:BN = NANOAVAX.clone();
 
+export const AVAXSTAKECAP:BN = ONEAVAX.mul(new BN(3000000));
+
 const n0X:object = {
-  blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
+  blockchainID: '2G6XnaMqqFj6tkYPw8i3eHFoHnQqfo2yaS5BAtNEL2Knayq6qP',
   alias: XChainAlias,
   vm: XChainVMName,
   fee: 1000000
@@ -102,14 +104,16 @@ const n0P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegationStake: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
 };
 
 const n0C:object = {
-  blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
+  blockchainID: '2LcZK7Cp7LQNbvEbPfFvpr5qJqUjodghDndbWDZ7e6KYGMQ4jG',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: GWEI.mul(new BN(470))
+  gasPrice: GWEI.mul(new BN(470)), //equivalent to gas price
+  chainID: 43114
 };
 
 // TODO: UPDATE FOR MAINNET
@@ -131,14 +135,16 @@ const n1P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegationStake: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
 };
 
 const n1C:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: GWEI.mul(new BN(470))
+  gasPrice: GWEI.mul(new BN(470)), 
+  chainID: 43113
 };
 
 // END TODO
@@ -160,14 +166,15 @@ const n2P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegationStake: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
 };
 
 const n2C:object = {
   blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 0
+  gasPrice: 0
 };
 
 const n3X:object = {
@@ -187,14 +194,15 @@ const n3P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegationStake: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
 };
 
 const n3C:object = {
   blockchainID: 'zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: 0
+  gasPrice: 0
 };
 
 const n4X:object = {
@@ -214,14 +222,16 @@ const n4P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegationStake: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
 };
 
 const n4C:object = {
   blockchainID: 'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: GWEI.mul(new BN(470))
+  gasPrice: GWEI.mul(new BN(470)),
+  chainID: 43110
 };
 
 // TODO: UPDATE FOR FUJI
@@ -242,14 +252,16 @@ const n5P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegationStake: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
 };
 
 const n5C:object = {
   blockchainID: '',
   alias: CChainAlias,
   vm: CChainVMName,
-  fee: GWEI.mul(new BN(470))
+  gasPrice: GWEI.mul(new BN(470)), 
+  chainID: 43112
 };
 
 // END TODO
@@ -260,17 +272,18 @@ const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
 n12345C.blockchainID = '2m6aMgMBJWsmT4Hv448n6sNAwGMFfugBvdU6PdY5oxZge4qb1W';
+n12345C.chainID = 43111;
 
 export class Defaults {
   static network = {
     0: { 
       hrp: NetworkIDToHRP[0],
       X: n0X,
-      '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD': n0X,
+      '2G6XnaMqqFj6tkYPw8i3eHFoHnQqfo2yaS5BAtNEL2Knayq6qP': n0X,
       P: n0P,
       '11111111111111111111111111111111LpoYY': n0P,
       C: n0C,
-      '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n0C,
+      '2LcZK7Cp7LQNbvEbPfFvpr5qJqUjodghDndbWDZ7e6KYGMQ4jG': n0C,
     }, 
     1: { // update before mainnet
       hrp: NetworkIDToHRP[1],
