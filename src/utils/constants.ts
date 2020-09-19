@@ -12,6 +12,7 @@ export const NodeIDPrefix:string = "NodeID-";
 export const PrimaryAssetAlias:string = "AVAX";
 
 export const NetworkIDToHRP:object = {
+  0: "custom",
   1: "avax",
   2: "cascade",
   3: "denali",
@@ -21,6 +22,7 @@ export const NetworkIDToHRP:object = {
 };
   
 export const HRPToNetworkID:object = {
+  "custom": 0,
   "avax": 1,
   "cascade": 2,
   "denali": 3,
@@ -30,6 +32,7 @@ export const HRPToNetworkID:object = {
 };
 
 export const NetworkIDToNetworkNames:object = {
+  0: ["Manhattan"],
   1: ["Avalanche","Mainnet"],
   2: ["Cascade"],
   3: ["Denali"],
@@ -39,6 +42,7 @@ export const NetworkIDToNetworkNames:object = {
 };
 
 export const NetworkNameToNetworkID:object = {
+  "Manhattan": 0,
   "Avalanche": 1,
   "Mainnet": 1,
   "Cascade": 2,
@@ -80,6 +84,33 @@ export const WEI:BN = new BN(1);
 export const GWEI:BN = WEI.mul(new BN(1000000000));
 
 export const AVAXGWEI:BN = NANOAVAX.clone();
+
+const n0X:object = {
+  blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
+  alias: XChainAlias,
+  vm: XChainVMName,
+  fee: 1000000
+};
+
+const n0P:object = {
+  blockchainID: PlatformChainID,
+  alias: PChainAlias,
+  vm: PChainVMName,
+  fee: 1000000,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(720000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minDelegationStake: ONEAVAX.mul(new BN(25))
+};
+
+const n0C:object = {
+  blockchainID: '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i',
+  alias: CChainAlias,
+  vm: CChainVMName,
+  fee: GWEI.mul(new BN(470))
+};
 
 // TODO: UPDATE FOR MAINNET
 
@@ -232,6 +263,15 @@ n12345C.blockchainID = '2m6aMgMBJWsmT4Hv448n6sNAwGMFfugBvdU6PdY5oxZge4qb1W';
 
 export class Defaults {
   static network = {
+    0: { 
+      hrp: NetworkIDToHRP[0],
+      X: n0X,
+      '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD': n0X,
+      P: n0P,
+      '11111111111111111111111111111111LpoYY': n0P,
+      C: n0C,
+      '2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i': n0C,
+    }, 
     1: { // update before mainnet
       hrp: NetworkIDToHRP[1],
       X: n1X,
