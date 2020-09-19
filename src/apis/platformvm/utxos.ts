@@ -188,7 +188,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
           let input:AmountInput;
-
           if(uout instanceof StakeableLockOut){
             let stakeout:StakeableLockOut = uout as StakeableLockOut;
             let pinput:ParseableInput = new ParseableInput(new SECPTransferInput(amount));
