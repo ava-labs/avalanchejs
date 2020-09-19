@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput, StakeableLockOut } from './outputs';
-import { SECPTransferInput, TransferableInput } from './inputs';
+import { AmountInput, SECPTransferInput, StakeableLockIn, TransferableInput, ParseableInput } from './inputs';
 import { UnixNow } from '../../utils/helperfunctions';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
 import { PlatformVMConstants } from './constants';
@@ -187,7 +187,16 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           am.spendAmount(amount);
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
-          const input:SECPTransferInput = new SECPTransferInput(amount);
+          let input:AmountInput;
+
+          if(uout instanceof StakeableLockOut){
+            let stakeout:StakeableLockOut = uout as StakeableLockOut;
+            let pinput:ParseableInput = new ParseableInput(new SECPTransferInput(amount));
+            input = new StakeableLockIn(amount, stakeout.getStakeableLocktime(), pinput);
+          } else {
+            input = new SECPTransferInput(amount);
+          }
+
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
           const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
           for (let j = 0; j < spenders.length; j++) {
