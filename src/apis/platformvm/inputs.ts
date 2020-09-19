@@ -162,7 +162,7 @@ export class StakeableLockIn extends AmountInput {
     let input:AmountInput = this.transferableInput.getInput() as AmountInput;
     this.sigIdxs = input.getSigIdxs();
     this.sigCount = Buffer.alloc(4);
-    this.sigCount.writeUInt32BE(this.sigIdxs.length, 4);
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     this.amount = bintools.fromBNToBuffer(input.getAmount(), 8);
     this.amountValue = input.getAmount();
   }
