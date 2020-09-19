@@ -675,7 +675,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * 
    * @param refresh A boolean to bypass the local cached value of Minimum Stake Amount, polling the node instead.
    */
-  getMinStake = async (refresh:boolean = undefined):Promise<object> => {
+  getMinStake = async (refresh:boolean = undefined):Promise<{minValidatorStake:BN, minDelegatorStake:BN}> => {
     if(refresh !== false && typeof this.minValidatorStake !== "undefined" && typeof this.minDelegatorStake !== "undefined") {
       return {
         minValidatorStake: this.minValidatorStake,
