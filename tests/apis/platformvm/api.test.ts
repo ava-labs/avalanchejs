@@ -189,11 +189,13 @@ describe('PlatformVMAPI', () => {
   });
 
   test('getMinStake', async () => {
-    const minStake = new BN('100', 10);
-    const result:Promise<BN> = api.getMinStake();
+    const minStake = new BN("2000000000000", 10);
+    const minDelegate = new BN("25000000000", 10);
+    const result:Promise<object> = api.getMinStake();
     const payload:object = {
       result: {
-        minStake
+        minValidatorStake: "2000000000000",
+        minDelegatorStake: "25000000000"
       },
     };
     const responseObj = {
@@ -201,10 +203,11 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:BN = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response.toString(10)).toBe(minStake.toString(10));
+    expect(response["minValidatorStake"].toString(10)).toBe(minStake.toString(10));
+    expect(response["minDelegatorStake"].toString(10)).toBe(minDelegate.toString(10));
   });
 
   test('getStake', async () => {
@@ -1111,6 +1114,8 @@ describe('PlatformVMAPI', () => {
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
 
+      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake);
+
       const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
         set, 
         addrs3,
@@ -1208,7 +1213,7 @@ describe('PlatformVMAPI', () => {
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake);
+      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake);
 
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         set, 

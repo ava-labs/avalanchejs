@@ -100,7 +100,7 @@ const n1P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegation: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25))
 };
 
 const n1C:object = {
@@ -129,7 +129,7 @@ const n2P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegation: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25))
 };
 
 const n2C:object = {
@@ -156,7 +156,7 @@ const n3P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegation: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25))
 };
 
 const n3C:object = {
@@ -183,7 +183,7 @@ const n4P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegation: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25))
 };
 
 const n4C:object = {
@@ -211,7 +211,7 @@ const n5P:object = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(720000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minDelegation: ONEAVAX.mul(new BN(25))
+  minDelegationStake: ONEAVAX.mul(new BN(25))
 };
 
 const n5C:object = {

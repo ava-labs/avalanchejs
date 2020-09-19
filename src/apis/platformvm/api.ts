@@ -42,7 +42,9 @@ export class PlatformVMAPI extends JRPCAPI {
 
   protected fee:BN = undefined;
 
-  protected minStake:BN = undefined;
+  protected minValidatorStake:BN = undefined;
+
+  protected minDelegatorStake:BN = undefined;
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -669,28 +671,41 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * Sets the minimum stake cached in this class.
-   * @param minStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
-   */
-  setMinStake = (minStake:BN):void => {
-    this.minStake = minStake;
-  }
-
-  /**
    * Gets the minimum staking amount.
    * 
    * @param refresh A boolean to bypass the local cached value of Minimum Stake Amount, polling the node instead.
    */
-  getMinStake = async (refresh:boolean = undefined):Promise<BN> => {
-    if(typeof this.minStake !== "undefined" && refresh !== false) {
-      return this.minStake;
+  getMinStake = async (refresh:boolean = undefined):Promise<object> => {
+    if(refresh !== false && typeof this.minValidatorStake !== "undefined" && typeof this.minDelegatorStake !== "undefined") {
+      return {
+        minValidatorStake: this.minValidatorStake,
+        minDelegatorStake: this.minDelegatorStake
+      };
     }
     const params:any = {};
     return this.callMethod('platform.getMinStake', params)
       .then((response:RequestResponseData) => {
-        this.minStake = new BN(response.data.result.minStake, 10);
-        return this.minStake;
+        this.minValidatorStake = new BN(response.data.result.minValidatorStake, 10);
+        this.minDelegatorStake = new BN(response.data.result.minDelegatorStake, 10);
+        return {
+          minValidatorStake: this.minValidatorStake,
+          minDelegatorStake: this.minDelegatorStake
+        };
       });
+  }
+
+  /**
+   * Sets the minimum stake cached in this class.
+   * @param minValidatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
+   * @param minDelegatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum delegation amount cached in this class.
+   */
+  setMinStake = (minValidatorStake:BN = undefined, minDelegatorStake:BN = undefined):void => {
+    if(typeof minValidatorStake !== "undefined") {
+      this.minValidatorStake = minValidatorStake;
+    }
+    if(typeof minDelegatorStake !== "undefined") {
+      this.minDelegatorStake = minDelegatorStake;
+    }
   }
 
   /**
@@ -1126,6 +1141,11 @@ export class PlatformVMAPI extends JRPCAPI {
       memo = memo.getPayload();
     }
 
+    const minStake:BN = (await this.getMinStake())["minDelegatorStake"];
+    if(stakeAmount.lt(minStake)) {
+      throw new Error("PlatformVMAPI.buildAddDelegatorTx -- stake amount must be at least " + minStake.toString(10));
+    }
+
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     
     const now:BN = UnixNow();
@@ -1206,7 +1226,7 @@ export class PlatformVMAPI extends JRPCAPI {
       memo = memo.getPayload();
     }
 
-    const minStake:BN = await this.getMinStake();
+    const minStake:BN = (await this.getMinStake())["minValidatorStake"];
     if(stakeAmount.lt(minStake)) {
       throw new Error("PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " + minStake.toString(10));
     }
