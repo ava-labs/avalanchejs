@@ -86,7 +86,7 @@ export const GWEI:BN = WEI.mul(new BN(1000000000));
 export const AVAXGWEI:BN = NANOAVAX.clone();
 
 const n0X:object = {
-  blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
+  blockchainID: '2G6XnaMqqFj6tkYPw8i3eHFoHnQqfo2yaS5BAtNEL2Knayq6qP',
   alias: XChainAlias,
   vm: XChainVMName,
   fee: 1000000
@@ -266,7 +266,7 @@ export class Defaults {
     0: { 
       hrp: NetworkIDToHRP[0],
       X: n0X,
-      '2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD': n0X,
+      '2G6XnaMqqFj6tkYPw8i3eHFoHnQqfo2yaS5BAtNEL2Knayq6qP': n0X,
       P: n0P,
       '11111111111111111111111111111111LpoYY': n0P,
       C: n0C,
