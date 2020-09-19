@@ -196,9 +196,9 @@ export class StakeableLockIn extends AmountInput {
    * Returns the buffer representing the [[StakeableLockIn]] instance.
    */
   toBuffer():Buffer {
-    const superbuff:Buffer = super.toBuffer();
-    const bsize:number = this.stakeableLocktime.length + superbuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, superbuff];
+    const xferinBuff:Buffer = this.transferableInput.toBuffer();
+    const bsize:number = this.stakeableLocktime.length + xferinBuff.length;
+    const barr:Array<Buffer> = [this.stakeableLocktime, xferinBuff];
     return Buffer.concat(barr, bsize);
   }
   
