@@ -11,16 +11,41 @@ import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
 import BN from 'bn.js';
 import { AmountOutput } from '../platformvm/outputs';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing an unsigned Export transaction.
  */
 export class ExportTx extends BaseTx {
+  protected _typeName = "ExportTx";
+  protected _typeID = PlatformVMConstants.EXPORTTX;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "destinationChain": serializer.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
+      "exportOuts": this.exportOuts.map((e) => e.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.destinationChain = serializer.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
+    this.exportOuts = fields["exportOuts"].map((e:object) => {
+      let eo:TransferableOutput = new TransferableOutput();
+      eo.deserialize(e, encoding);
+      return eo;
+    });
+    this.numOuts = Buffer.alloc(4);
+    this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
+  }
+
   protected destinationChain:Buffer = Buffer.alloc(32);
   protected numOuts:Buffer = Buffer.alloc(4);
   protected exportOuts:Array<TransferableOutput> = [];
@@ -51,7 +76,7 @@ export class ExportTx extends BaseTx {
   }
 
   getTotalOuts():Array<TransferableOutput> {
-    return [...this.getOuts(), ...this.getExportOutputs()];
+    return [...this.getOuts() as Array<TransferableOutput>, ...this.getExportOutputs()];
   }
 
   /**

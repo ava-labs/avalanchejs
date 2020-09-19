@@ -14,7 +14,13 @@ export class PlatformVMConstants {
 
   static SECPOWNEROUTPUTID:number = 11;
 
+  static STAKEABLELOCKOUTID:number = 22;
+
   static SECPINPUTID:number = 5;
+
+  static STAKEABLELOCKINID:number = 21;
+
+  static LOCKEDSTAKEABLES:Array<number> = [PlatformVMConstants.STAKEABLELOCKINID, PlatformVMConstants.STAKEABLELOCKOUTID];
 
   static BASETX:number = 0;
 

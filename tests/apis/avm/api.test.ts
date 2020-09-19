@@ -21,12 +21,23 @@ import { OutputOwners } from 'src/common/output';
 import { MinterSet } from 'src/apis/avm/minterset';
 import { PlatformChainID } from 'src/utils/constants';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
-import { ONEAVAX } from '../../../src/utils/constants';
+import { ONEAVAX } from 'src/utils/constants';
+import { Serializable, Serialization } from 'src/utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
+
+const dumpSerailization:boolean = false;
+
+function serialzeit(aThing:Serializable, name:string){
+  if(dumpSerailization){
+    console.log(JSON.stringify(serializer.serialize(aThing, "avm", "hex", name + " -- Hex Encoded")));
+    console.log(JSON.stringify(serializer.serialize(aThing, "avm", "display", name + " -- Human-Readable")));
+  }
+}
 
 describe('AVMAPI', () => {
   const networkid:number = 12345;
@@ -572,7 +583,7 @@ describe('AVMAPI', () => {
 
     beforeEach(async () => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainid);
-      const result:Promise<Buffer> = avm.getAVAXAssetID();
+      const result:Promise<Buffer> = avm.getAVAXAssetID(true);
       const payload:object = {
         result: {
           name,
@@ -676,6 +687,24 @@ describe('AVMAPI', () => {
 
     });
 
+    test('signTx', async () => {
+      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
+      const txu2:UnsignedTx = set.buildBaseTx(
+        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
+        addrs3.map((a) => avm.parseAddress(a)),
+        addrs1.map((a) => avm.parseAddress(a)),
+        addrs1.map((a) => avm.parseAddress(a)),
+        avm.getFee(), assetID,
+        undefined, UnixNow(), new BN(0), 1,
+      );
+
+      const tx1:Tx = avm.signTx(txu1);
+      const tx2:Tx = avm.signTx(txu2);
+
+      expect(tx2.toBuffer().toString('hex')).toBe(tx1.toBuffer().toString('hex'));
+      expect(tx2.toString()).toBe(tx1.toString());
+    });
+
     test('buildBaseTx1', async () => {
       const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1, new UTF8Payload("hello world").getContent());
       let memobuf:Buffer = Buffer.from("hello world");
@@ -689,6 +718,55 @@ describe('AVMAPI', () => {
       );
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
     });
 
     test('buildBaseTx2', async () => {
@@ -723,24 +801,57 @@ describe('AVMAPI', () => {
         (testaddr2 == testout0 && testaddr3 == testout1)
                 || (testaddr3 == testout0 && testaddr2 == testout1),
       ).toBe(true);
-    });
 
-    test('signTx', async () => {
-      const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
-      const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
-        addrs3.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        addrs1.map((a) => avm.parseAddress(a)),
-        avm.getFee(), assetID,
-        undefined, UnixNow(), new BN(0), 1,
-      );
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
-      const tx1:Tx = avm.signTx(txu1);
-      const tx2:Tx = avm.signTx(txu2);
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
-      expect(tx2.toBuffer().toString('hex')).toBe(tx1.toBuffer().toString('hex'));
-      expect(tx2.toString()).toBe(tx1.toString());
+      serialzeit(tx1, "BaseTx");
     });
 
     test('issueTx Serialized', async () => {
@@ -763,47 +874,47 @@ describe('AVMAPI', () => {
         expect(response).toBe(txid);
       });
 
-      test('issueTx Buffer', async () => {
-        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
-        const tx = avm.signTx(txu);
-  
-        const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-        const result:Promise<string> = avm.issueTx(tx.toBuffer());
-        const payload:object = {
-          result: {
-            txID: txid,
-          },
-        };
-        const responseObj = {
-          data: payload,
-        };
-  
-        mockAxios.mockResponse(responseObj);
-        const response:string = await result;
-  
-        expect(response).toBe(txid);
-      });
-      test('issueTx Class Tx', async () => {
-        const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
-        const tx = avm.signTx(txu);
-  
-        const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
-  
-        const result:Promise<string> = avm.issueTx(tx);
-        const payload:object = {
-          result: {
-            txID: txid,
-          },
-        };
-        const responseObj = {
-          data: payload,
-        };
-  
-        mockAxios.mockResponse(responseObj);
-        const response:string = await result;
-  
-        expect(response).toBe(txid);
-      });
+    test('issueTx Buffer', async () => {
+      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
+      const tx = avm.signTx(txu);
+
+      const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+      const result:Promise<string> = avm.issueTx(tx.toBuffer());
+      const payload:object = {
+        result: {
+          txID: txid,
+        },
+      };
+      const responseObj = {
+        data: payload,
+      };
+
+      mockAxios.mockResponse(responseObj);
+      const response:string = await result;
+
+      expect(response).toBe(txid);
+    });
+    test('issueTx Class Tx', async () => {
+      const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
+      const tx = avm.signTx(txu);
+
+      const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
+
+      const result:Promise<string> = avm.issueTx(tx);
+      const payload:object = {
+        result: {
+          txID: txid,
+        },
+      };
+      const responseObj = {
+        data: payload,
+      };
+
+      mockAxios.mockResponse(responseObj);
+      const response:string = await result;
+
+      expect(response).toBe(txid);
+    });
 
     test('buildCreateAssetTx - Fixed Cap', async () => {
       avm.setFee(new BN(fee));
@@ -833,6 +944,57 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "CreateAssetTx");
     });
 
     test('buildCreateAssetTx - Variable Cap', async () => {
@@ -865,6 +1027,55 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
     });
 
     test('buildSECPMintTx', async () => {
@@ -892,6 +1103,57 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "SECPMintTx");
     });
 
     test('buildCreateNFTAssetTx', async () => {
@@ -912,6 +1174,57 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "CreateNFTAssetTx");
     }); 
 
     test('buildCreateNFTMintTx', async () => {
@@ -958,6 +1271,57 @@ describe('AVMAPI', () => {
     expect(txu4.toBuffer().toString("hex")).toBe(txu3.toBuffer().toString("hex"));
     expect(txu4.toString()).toBe(txu3.toString());
 
+    let tx1:Tx = txu1.sign(avm.keyChain());
+    let checkTx:string = tx1.toBuffer().toString("hex");
+    let tx1obj:object = tx1.serialize("hex");
+    let tx1str:string = JSON.stringify(tx1obj);
+    
+    /*
+    console.log("-----Test1 JSON-----");
+    console.log(tx1str);
+    console.log("-----Test1 ENDN-----");
+    */
+    
+    let tx2newobj:object = JSON.parse(tx1str);
+    let tx2:Tx = new Tx();
+    tx2.deserialize(tx2newobj, "hex");
+    
+    /*
+    let tx2obj:object = tx2.serialize("hex");
+    let tx2str:string = JSON.stringify(tx2obj);
+    console.log("-----Test2 JSON-----");
+    console.log(tx2str);
+    console.log("-----Test2 ENDN-----");
+    */
+    
+    expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+    let tx3:Tx = txu1.sign(avm.keyChain());
+    let tx3obj:object = tx3.serialize("display");
+    let tx3str:string = JSON.stringify(tx3obj);
+    
+    /*
+    console.log("-----Test3 JSON-----");
+    console.log(tx3str);
+    console.log("-----Test3 ENDN-----");
+    */
+    
+    let tx4newobj:object = JSON.parse(tx3str);
+    let tx4:Tx = new Tx();
+    tx4.deserialize(tx4newobj, "display");
+    
+    /*
+    let tx4obj:object = tx4.serialize("display");
+    let tx4str:string = JSON.stringify(tx4obj);
+    console.log("-----Test4 JSON-----");
+    console.log(tx4str);
+    console.log("-----Test4 ENDN-----");
+    */
+    
+    expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+    serialzeit(tx1, "CreateNFTMintTx");
+
   });
 
     test('buildNFTTransferTx', async () => {
@@ -979,6 +1343,57 @@ describe('AVMAPI', () => {
 
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+  
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "NFTTransferTx");
 
     });
 
@@ -1016,6 +1431,56 @@ describe('AVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
 
+      let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+  
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "ImportTx");
     });
 
     test('buildExportTx', async () => {
@@ -1064,6 +1529,57 @@ describe('AVMAPI', () => {
 
       expect(txu4.toBuffer().toString('hex')).toBe(txu3.toBuffer().toString('hex'));
       expect(txu4.toString()).toBe(txu3.toString());
+
+            let tx1:Tx = txu1.sign(avm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+  
+      let tx3:Tx = txu1.sign(avm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "ExportTx");
 
     });
 

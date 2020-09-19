@@ -16,7 +16,6 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import axios from 'axios';
 
 /**
  * @ignore
@@ -43,7 +42,9 @@ export class PlatformVMAPI extends JRPCAPI {
 
   protected fee:BN = undefined;
 
-  protected minStake:BN = undefined;
+  protected minValidatorStake:BN = undefined;
+
+  protected minDelegatorStake:BN = undefined;
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -670,28 +671,41 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * Sets the minimum stake cached in this class.
-   * @param minStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
-   */
-  setMinStake = (minStake:BN):void => {
-    this.minStake = minStake;
-  }
-
-  /**
    * Gets the minimum staking amount.
    * 
    * @param refresh A boolean to bypass the local cached value of Minimum Stake Amount, polling the node instead.
    */
-  getMinStake = async (refresh:boolean = undefined):Promise<BN> => {
-    if(typeof this.minStake !== "undefined" && refresh !== false) {
-      return this.minStake;
+  getMinStake = async (refresh:boolean = undefined):Promise<{minValidatorStake:BN, minDelegatorStake:BN}> => {
+    if(refresh !== false && typeof this.minValidatorStake !== "undefined" && typeof this.minDelegatorStake !== "undefined") {
+      return {
+        minValidatorStake: this.minValidatorStake,
+        minDelegatorStake: this.minDelegatorStake
+      };
     }
     const params:any = {};
     return this.callMethod('platform.getMinStake', params)
       .then((response:RequestResponseData) => {
-        this.minStake = new BN(response.data.result.minStake, 10);
-        return this.minStake;
+        this.minValidatorStake = new BN(response.data.result.minValidatorStake, 10);
+        this.minDelegatorStake = new BN(response.data.result.minDelegatorStake, 10);
+        return {
+          minValidatorStake: this.minValidatorStake,
+          minDelegatorStake: this.minDelegatorStake
+        };
       });
+  }
+
+  /**
+   * Sets the minimum stake cached in this class.
+   * @param minValidatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
+   * @param minDelegatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum delegation amount cached in this class.
+   */
+  setMinStake = (minValidatorStake:BN = undefined, minDelegatorStake:BN = undefined):void => {
+    if(typeof minValidatorStake !== "undefined") {
+      this.minValidatorStake = minValidatorStake;
+    }
+    if(typeof minDelegatorStake !== "undefined") {
+      this.minDelegatorStake = minDelegatorStake;
+    }
   }
 
   /**
@@ -829,9 +843,6 @@ export class PlatformVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-axios.interceptors.request.use(request => {
-  return request
-})
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
 
       const utxos:UTXOSet = new UTXOSet();
@@ -1091,7 +1102,8 @@ axios.interceptors.request.use(request => {
   * [[UnsignedTx]] manually and import the [[AddDelegatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieved the staked tokens at the end of the staking period
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -1107,6 +1119,7 @@ axios.interceptors.request.use(request => {
   */
   buildAddDelegatorTx = async (
     utxoset:UTXOSet, 
+    toAddresses:Array<string>,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     nodeID:string, 
@@ -1119,12 +1132,18 @@ axios.interceptors.request.use(request => {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a));
     const rewards:Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
+    }
+
+    const minStake:BN = (await this.getMinStake())["minDelegatorStake"];
+    if(stakeAmount.lt(minStake)) {
+      throw new Error("PlatformVMAPI.buildAddDelegatorTx -- stake amount must be at least " + minStake.toString(10));
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
@@ -1138,6 +1157,7 @@ axios.interceptors.request.use(request => {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
+      to,
       from,
       change,
       NodeIDStringToBuffer(nodeID),
@@ -1146,7 +1166,7 @@ axios.interceptors.request.use(request => {
       rewardLocktime,
       rewardThreshold,
       rewards,
-      this.getFee(), 
+      new BN(0), 
       avaxAssetID,
       memo, asOf
     );
@@ -1165,7 +1185,8 @@ axios.interceptors.request.use(request => {
   * [[UnsignedTx]] manually and import the [[AddValidatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieved the staked tokens at the end of the staking period
+  * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
   * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -1182,6 +1203,7 @@ axios.interceptors.request.use(request => {
   */
   buildAddValidatorTx = async (
     utxoset:UTXOSet, 
+    toAddresses:Array<string>,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     nodeID:string, 
@@ -1195,6 +1217,7 @@ axios.interceptors.request.use(request => {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
     const rewards:Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a));
@@ -1203,7 +1226,7 @@ axios.interceptors.request.use(request => {
       memo = memo.getPayload();
     }
 
-    const minStake:BN = await this.getMinStake();
+    const minStake:BN = (await this.getMinStake())["minValidatorStake"];
     if(stakeAmount.lt(minStake)) {
       throw new Error("PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " + minStake.toString(10));
     }
@@ -1223,6 +1246,7 @@ axios.interceptors.request.use(request => {
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       avaxAssetID,
+      to,
       from,
       change,
       NodeIDStringToBuffer(nodeID),
@@ -1232,7 +1256,7 @@ axios.interceptors.request.use(request => {
       rewardThreshold,
       rewards,
       delegationFee,
-      this.getFee(), 
+      new BN(0), 
       avaxAssetID,
       memo, asOf
     );

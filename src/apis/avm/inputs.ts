@@ -6,12 +6,13 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
-
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
@@ -22,14 +23,24 @@ const bintools = BinTools.getInstance();
  */
 export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
   if (inputid === AVMConstants.SECPINPUTID) {
-    const secpin:SECPTransferInput = new SECPTransferInput(...args);
-    return secpin;
+    return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
 };
 
 export class TransferableInput extends StandardTransferableInput {
+  protected _typeName = "TransferableInput";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.input = SelectInputClass(fields["input"]["_typeID"]);
+    this.input.deserialize(fields["input"], encoding);
+  }
+
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[TransferableInput]], parses it, populates the class, and returns the length of the [[TransferableInput]] in bytes.
    *
@@ -53,6 +64,10 @@ export class TransferableInput extends StandardTransferableInput {
 }
 
 export abstract class AmountInput extends StandardAmountInput {
+  protected _typeName = "AmountInput";
+  protected _typeID = undefined;
+
+  //serialize and deserialize both are inherited
 
   select(id:number, ...args: any[]):Input {
     return SelectInputClass(id, ...args);
@@ -60,6 +75,11 @@ export abstract class AmountInput extends StandardAmountInput {
 }
 
 export class SECPTransferInput extends AmountInput {
+  protected _typeName = "SECPTransferInput";
+  protected _typeID = AVMConstants.SECPINPUTID;
+
+  //serialize and deserialize both are inherited
+
   /**
      * Returns the inputID for this input
      */

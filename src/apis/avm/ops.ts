@@ -9,8 +9,10 @@ import { NFTTransferOutput, SECPMintOutput, SECPTransferOutput } from './outputs
 import { NBytes } from '../../common/nbytes';
 import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';
+import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Operation]] instance.
@@ -34,10 +36,43 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
 /**
  * A class representing an operation. All operation types must extend on this class.
  */
-export abstract class Operation {
-  protected sigCount:Buffer = Buffer.alloc(4);
+export abstract class Operation extends Serializable{
+  protected _typeName = "Operation";
+  protected _typeID = undefined;
 
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "sigIdxs": this.sigIdxs.map((s) => s.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.sigIdxs = fields["sigIdxs"].map((s:object) => {
+      let sidx:SigIdx = new SigIdx();
+      sidx.deserialize(s, encoding);
+      return sidx;
+    });
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
+  }
+
+  protected sigCount:Buffer = Buffer.alloc(4);
   protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
+
+  static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => (a:Operation, b:Operation):(1|-1|0) => {
+    const aoutid:Buffer = Buffer.alloc(4);
+    aoutid.writeUInt32BE(a.getOperationID(), 0);
+    const abuff:Buffer = a.toBuffer();
+
+    const boutid:Buffer = Buffer.alloc(4);
+    boutid.writeUInt32BE(b.getOperationID(), 0);
+    const bbuff:Buffer = b.toBuffer();
+
+    const asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+    const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+    return Buffer.compare(asort, bsort) as (1|-1|0);
+  };
 
   abstract getOperationID():number;
 
@@ -101,42 +136,63 @@ export abstract class Operation {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => (a:Operation, b:Operation):(1|-1|0) => {
-    const aoutid:Buffer = Buffer.alloc(4);
-    aoutid.writeUInt32BE(a.getOperationID(), 0);
-    const abuff:Buffer = a.toBuffer();
-
-    const boutid:Buffer = Buffer.alloc(4);
-    boutid.writeUInt32BE(b.getOperationID(), 0);
-    const bbuff:Buffer = b.toBuffer();
-
-    const asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
-    const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
-    return Buffer.compare(asort, bsort) as (1|-1|0);
-  };
-
-  constructor() {}
 }
 
 /**
  * A class which contains an [[Operation]] for transfers.
  *
  */
-export class TransferableOperation {
+export class TransferableOperation extends Serializable {
+  protected _typeName = "TransferableOperation";
+  protected _typeID = undefined;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58", 32),
+      "utxoIDs": this.utxoIDs.map((u) => u.serialize(encoding)),
+      "operation": this.operation.serialize(encoding)
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.utxoIDs = fields["utxoIDs"].map((u:object) => {
+      let utxoid:UTXOID = new UTXOID();
+      utxoid.deserialize(u, encoding);
+      return utxoid;
+    });
+    this.operation = SelectOperationClass(fields["operation"]["_typeID"]);
+    this.operation.deserialize(fields["operation"], encoding);
+  }
+
   protected assetid:Buffer = Buffer.alloc(32);
-
   protected utxoIDs:Array<UTXOID> = [];
-
   protected operation:Operation;
 
-    /**
-     * Returns a function used to sort an array of [[TransferableOperation]]s
-     */
-    static comparator = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
-        return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
-            return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
-        }
-    }
+  /**
+   * Returns a function used to sort an array of [[TransferableOperation]]s
+   */
+  static comparator = ():(a:TransferableOperation, b:TransferableOperation) => (1|-1|0) => {
+      return function(a:TransferableOperation, b:TransferableOperation):(1|-1|0) { 
+          return Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
+      }
+  }
+  /**
+   * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
+   */
+  getAssetID = ():Buffer => this.assetid;
+
+  /**
+   * Returns an array of UTXOIDs in this operation.
+   */
+  getUTXOIDs = ():Array<UTXOID> => this.utxoIDs;
+
+  /**
+   * Returns the operation
+   */
+  getOperation = ():Operation => this.operation;
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -176,22 +232,8 @@ export class TransferableOperation {
     return Buffer.concat(barr, bsize);
   }
 
-  /**
-   * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
-   */
-  getAssetID = ():Buffer => this.assetid;
-
-  /**
-   * Returns an array of UTXOIDs in this operation.
-   */
-  getUTXOIDs = ():Array<UTXOID> => this.utxoIDs;
-
-  /**
-   * Returns the operation
-   */
-  getOperation = ():Operation => this.operation;
-
   constructor(assetid:Buffer = undefined, utxoids:Array<UTXOID|string|Buffer> = undefined, operation:Operation = undefined) {
+    super();
     if (
       typeof assetid !== 'undefined' && assetid.length === AVMConstants.ASSETIDLEN
             && operation instanceof Operation && typeof utxoids !== 'undefined'
@@ -218,6 +260,28 @@ export class TransferableOperation {
  * An [[Operation]] class which specifies a SECP256k1 Mint Op.
  */
 export class SECPMintOperation extends Operation {
+  protected _typeName = "SECPMintOperation";
+  protected _typeID = AVMConstants.SECPMINTOPID;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "mintOutput": this.mintOutput.serialize(encoding),
+      "transferOutputs": this.transferOutputs.map((t) => t.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.mintOutput = new SECPMintOutput();
+    this.mintOutput.deserialize(fields["mintOutput"], encoding);
+    this.transferOutputs = fields["transferOutputs"].map((t:object) => {
+      let xferout:SECPTransferOutput = new SECPTransferOutput();
+      xferout.deserialize(t, encoding);
+      return xferout;
+    });
+  }
+
   protected mintOutput:SECPMintOutput = undefined;
   protected transferOutputs:Array<SECPTransferOutput> = [];
 
@@ -225,7 +289,7 @@ export class SECPMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.SECPMINTOPID;
+    return this._typeID;
   }
 
   /**
@@ -313,6 +377,31 @@ export class SECPMintOperation extends Operation {
  * An [[Operation]] class which specifies a NFT Mint Op.
  */
 export class NFTMintOperation extends Operation {
+  protected _typeName = "NFTMintOperation";
+  protected _typeID = AVMConstants.NFTMINTOPID;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString", 4),
+      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex"),
+      "outputOwners": this.outputOwners.map((o) => o.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4);
+    this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
+    this.outputOwners = fields["outputOwners"].map((o:object) => {
+      let oo:OutputOwners = new OutputOwners();
+      oo.deserialize(o, encoding);
+      return oo;
+    });
+  }
+
+
+
   protected groupID:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
   protected outputOwners:Array<OutputOwners> = [];
@@ -321,7 +410,7 @@ export class NFTMintOperation extends Operation {
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.NFTMINTOPID;
+    return this._typeID;
   }
 
   /**
@@ -439,13 +528,29 @@ export class NFTMintOperation extends Operation {
  * A [[Operation]] class which specifies a NFT Transfer Op.
  */
 export class NFTTransferOperation extends Operation {
+  protected _typeName = "NFTTransferOperation";
+  protected _typeID = AVMConstants.NFTXFEROPID;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "output": this.output.serialize(encoding)
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.output = new NFTTransferOutput();
+    this.output.deserialize(fields["output"], encoding);
+  }
+
   protected output:NFTTransferOutput;
 
   /**
    * Returns the operation ID.
    */
   getOperationID():number {
-    return AVMConstants.NFTXFEROPID;
+    return this._typeID;
   }
 
   /**
@@ -505,6 +610,14 @@ export class NFTTransferOperation extends Operation {
  * Class for representing a UTXOID used in [[TransferableOp]] types
  */
 export class UTXOID extends NBytes {
+  protected _typeName = "UTXOID";
+  protected _typeID = undefined;
+
+  //serialize and deserialize both are inherited
+
+  protected bytes = Buffer.alloc(36);
+  protected bsize = 36;
+
   /**
      * Returns a function used to sort an array of [[UTXOID]]s
      */
@@ -559,7 +672,5 @@ export class UTXOID extends NBytes {
      */
   constructor() {
     super();
-    this.bytes = Buffer.alloc(36);
-    this.bsize = 36;
   }
 }

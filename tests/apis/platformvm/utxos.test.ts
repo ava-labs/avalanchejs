@@ -107,6 +107,31 @@ describe('UTXOSet', () => {
     utxo.fromString(utxostrs[0]);
     const setArray:Array<UTXO> = set.getAllUTXOs();
     expect(utxo.toString()).toBe(setArray[0].toString());
+
+  });
+
+  test('Serialization', () => {
+    const set:UTXOSet = new UTXOSet();
+    set.addArray([...utxostrs]);
+    let setobj:object = set.serialize("cb58");
+    let setstr:string = JSON.stringify(setobj);
+    /*
+    console.log("-----SET1 JSON-----");
+    console.log(setstr);
+    console.log("-----SET1 ENDN-----");
+    */
+    let set2newobj:object = JSON.parse(setstr);
+    let set2:UTXOSet = new UTXOSet();
+    set2.deserialize(set2newobj, "cb58");
+    let set2obj:object = set2.serialize("cb58");
+    let set2str:string = JSON.stringify(set2obj);
+    /*
+    console.log("-----SET2 JSON-----");
+    console.log(set2str);
+    console.log("-----SET2 ENDN-----");
+    */
+
+    expect(set2.getAllUTXOStrings().sort().join(',')).toBe(set.getAllUTXOStrings().sort().join(','));
   });
 
   test('Mutliple add', () => {

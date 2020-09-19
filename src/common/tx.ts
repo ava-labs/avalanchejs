@@ -10,16 +10,41 @@ import { StandardKeyChain, StandardKeyPair } from './keychain';
 import { StandardAmountInput, StandardTransferableInput } from './input';
 import { StandardAmountOutput, StandardTransferableOutput } from './output';
 import { DefaultNetworkID } from '../utils/constants';
+import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
  */
-export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass extends StandardKeyChain<KPClass>> {
+export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass extends StandardKeyChain<KPClass>> extends Serializable{
+  protected _typeName = "StandardBaseTx";
+  protected _typeID = undefined;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "networkid": serializer.encoder(this.networkid, encoding, "Buffer", "decimalString"),
+      "blockchainid": serializer.encoder(this.blockchainid, encoding, "Buffer", "cb58"),
+      "outs": this.outs.map((o) => o.serialize(encoding)),
+      "ins": this.ins.map((i) => i.serialize(encoding)),
+      "memo": serializer.encoder(this.memo, encoding, "Buffer", "hex")
+    }
+  };
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.networkid = serializer.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4);
+    this.blockchainid = serializer.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32);
+    this.memo = serializer.decoder(fields["memo"], encoding, "hex", "Buffer");
+  }
+
+
   protected networkid:Buffer = Buffer.alloc(4);
   protected blockchainid:Buffer = Buffer.alloc(32);
   protected numouts:Buffer = Buffer.alloc(4);
@@ -46,12 +71,12 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Returns the array of [[StandardTransferableInput]]s
    */
-  getIns = ():Array<StandardTransferableInput> => this.ins;
+  abstract getIns():Array<StandardTransferableInput>;
 
   /**
    * Returns the array of [[StandardTransferableOutput]]s
    */
-  getOuts = ():Array<StandardTransferableOutput> => this.outs;
+  abstract getOuts():Array<StandardTransferableOutput>;
 
   /**
    * Returns the array of combined total [[StandardTransferableOutput]]s
@@ -128,6 +153,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
   constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
+    super();
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
     if(typeof memo === "undefined"){
@@ -146,15 +172,30 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   }
 }
 
-
-
 /**
  * Class representing an unsigned transaction.
  */
 export abstract class StandardUnsignedTx<KPClass extends StandardKeyPair, 
 KCClass extends StandardKeyChain<KPClass>, 
 SBTx extends StandardBaseTx<KPClass, KCClass>
-> {
+> extends Serializable{
+  protected _typeName = "StandardUnsignedTx";
+  protected _typeID = undefined;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "codecid": serializer.encoder(this.codecid, encoding, "number", "decimalString", 2),
+      "transaction": this.transaction.serialize(encoding)
+    };
+  };
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "number");
+  }
+
   protected codecid:number = 0;
   protected transaction:SBTx;
 
@@ -221,7 +262,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   /**
    * Returns the Transaction
    */
-  getTransaction = ():SBTx => this.transaction;
+  abstract getTransaction():SBTx;
 
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
@@ -247,6 +288,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   >;
 
   constructor(transaction:SBTx = undefined, codecid:number = 0) {
+    super();
+    this.codecid = codecid;
     this.transaction = transaction;
   }
 }
@@ -261,7 +304,19 @@ export abstract class StandardTx<
         KPClass, 
         KCClass, 
         StandardBaseTx<KPClass, KCClass>>
-    > {
+    > extends Serializable {
+  protected _typeName = "StandardTx";
+  protected _typeID = undefined;
+
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "unsignedTx": this.unsignedTx.serialize(encoding),
+      "credentials": this.credentials.map((c) => c.serialize(encoding))
+    }
+  };
+
   protected unsignedTx:SUBTx = undefined;
   protected credentials:Array<Credential> = [];
 
@@ -328,6 +383,7 @@ export abstract class StandardTx<
    * @param signatures Optional array of [[Credential]]s
    */
   constructor(unsignedTx:SUBTx = undefined, credentials:Array<Credential> = undefined) {
+    super();
     if (typeof unsignedTx !== 'undefined') {
       this.unsignedTx = unsignedTx;
       if (typeof credentials !== 'undefined') {

@@ -22,16 +22,28 @@ import { ExportTx } from './exporttx';
 import { ImportTx } from './importtx';
 import { PlatformChainID } from '../../utils/constants';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class for representing a single UTXO.
  */
 export class UTXO extends StandardUTXO {
+  protected _typeName = "UTXO";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.output = SelectOutputClass(fields["output"]["_typeID"]);
+    this.output.deserialize(fields["output"], encoding);
+  }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
@@ -98,6 +110,32 @@ export class AssetAmountDestination extends StandardAssetAmountDestination<Trans
  * Class representing a set of [[UTXO]]s.
  */
 export class UTXOSet extends StandardUTXOSet<UTXO>{
+  protected _typeName = "UTXOSet";
+  protected _typeID = undefined;
+  
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    let utxos = {};
+    for(let utxoid in fields["utxos"]){
+      let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+      utxos[utxoidCleaned] = new UTXO();
+      utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding);
+    }
+    let addressUTXOs = {};
+    for(let address in fields["addressUTXOs"]){
+      let addressCleaned:string = serializer.decoder(address, encoding, "cb58", "hex");
+      let utxobalance = {};
+      for(let utxoid in fields["addressUTXOs"][address]){
+        let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+        utxobalance[utxoidCleaned] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
+      }
+      addressUTXOs[addressCleaned] = utxobalance;
+    }
+    this.utxos = utxos;
+    this.addressUTXOs = addressUTXOs;
+  }
 
   parseUTXO(utxo:UTXO | string):UTXO {
     const utxovar:UTXO = new UTXO();

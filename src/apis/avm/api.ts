@@ -106,10 +106,12 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Fetches the AVAX AssetID and returns it in a Promise.
    *
+   * @param refresh This function caches the response. Refresh = true will bust the cache.
+   * 
    * @returns The the provided string representing the AVAX AssetID
    */
-  getAVAXAssetID = async ():Promise<Buffer> => {
-    if (typeof this.AVAXAssetID === 'undefined') {
+  getAVAXAssetID = async (refresh:boolean = false):Promise<Buffer> => {
+    if (typeof this.AVAXAssetID === 'undefined' || refresh) {
       const asset:{
         name: string;
         symbol: string;
@@ -120,6 +122,20 @@ export class AVMAPI extends JRPCAPI {
     }
     return this.AVAXAssetID;
   };
+  
+  /**
+   * Overrides the defaults and sets the cache to a specific AVAX AssetID
+   * 
+   * @param avaxAssetID A cb58 string or Buffer representing the AVAX AssetID
+   * 
+   * @returns The the provided string representing the AVAX AssetID
+   */
+  setAVAXAssetID = (avaxAssetID:string | Buffer) => {
+    if(typeof avaxAssetID === "string") {
+      avaxAssetID = bintools.cb58Decode(avaxAssetID);
+    }
+    this.AVAXAssetID = avaxAssetID;
+  }
 
   /**
    * Gets the default fee for this chain.

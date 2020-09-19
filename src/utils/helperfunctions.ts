@@ -17,7 +17,7 @@ export function getPreferredHRP(networkID:number = undefined) {
     if (networkID in NetworkIDToHRP) {
       return NetworkIDToHRP[networkID];
     } else if(typeof networkID === "undefined") {
-      return DefaultNetworkID;
+      return NetworkIDToHRP[DefaultNetworkID];
     }
     return FallbackHRP;
 }
@@ -45,7 +45,7 @@ export function bufferToPrivateKeyString(pk:Buffer):string {
  */
 export function privateKeyStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("PrivateKey-")) {
-    throw new Error("privateKeyStringToBuffer -- private keys must start with 'PrivateKey-'");
+    throw new Error("Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'");
   }
   let pksplit:Array<string> = pk.split("-");
   return bintools.cb58Decode(pksplit[pksplit.length - 1]);
@@ -67,7 +67,7 @@ export function bufferToNodeIDString(pk:Buffer):string {
  */
 export function NodeIDStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("NodeID-")) {
-    throw new Error("privateNodeIDToBuffer -- nodeID must start with 'NodeID-'");
+    throw new Error("Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'");
   }
   let pksplit:Array<string> = pk.split("-");
   return bintools.cb58Decode(pksplit[pksplit.length - 1]);

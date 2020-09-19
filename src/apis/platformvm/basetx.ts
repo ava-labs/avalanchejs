@@ -4,7 +4,7 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import {  PlatformVMConstants } from './constants';
+import { PlatformVMConstants } from './constants';
 import { TransferableOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { SelectCredentialClass } from './credentials';
@@ -13,16 +13,52 @@ import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
 import { SelectTxClass } from '../platformvm/tx';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
  */
-export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
+export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
+  protected _typeName = "BaseTx";
+  protected _typeID = PlatformVMConstants.CREATESUBNETTX;
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.outs = fields["outs"].map((o:TransferableOutput) => {
+      let newOut:TransferableOutput = new TransferableOutput();
+      newOut.deserialize(o, encoding);
+      return newOut;
+    });
+    this.ins = fields["ins"].map((i:TransferableInput) => {
+      let newIn:TransferableInput = new TransferableInput();
+      newIn.deserialize(i, encoding);
+      return newIn;
+    });
+    this.numouts = Buffer.alloc(4);
+    this.numouts.writeUInt32BE(this.outs.length, 0);
+    this.numins = Buffer.alloc(4);
+    this.numins.writeUInt32BE(this.ins.length, 0);
+  }
+
+  getOuts():Array<TransferableOutput> {
+    return this.outs as Array<TransferableOutput>;
+  }
+
+  getIns():Array<TransferableInput> {
+    return this.ins as Array<TransferableInput>;
+  }
+
+
+  getTotalOuts():Array<TransferableOutput> {
+    return this.getOuts() as Array<TransferableOutput>;
+  }
+
   /**
    * Returns the id of the [[BaseTx]]
    */
@@ -70,10 +106,6 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     return offset;
   }
 
-  getTotalOuts():Array<TransferableOutput> {
-    return this.getOuts();
-  }
-
   /**
    * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
    *
@@ -82,22 +114,22 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
    *
    * @returns An array of [[Credential]]s
    */
-    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-      const sigs:Array<Credential> = [];
-      for (let i = 0; i < this.ins.length; i++) {
-        const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
-        const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
-        for (let j = 0; j < sigidxs.length; j++) {
-          const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
-          const signval:Buffer = keypair.sign(msg);
-          const sig:Signature = new Signature();
-          sig.fromBuffer(signval);
-          cred.addSignature(sig);
-        }
-        sigs.push(cred);
+  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
+    const sigs:Array<Credential> = [];
+    for (let i = 0; i < this.ins.length; i++) {
+      const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
+      const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
+      for (let j = 0; j < sigidxs.length; j++) {
+        const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
+        const signval:Buffer = keypair.sign(msg);
+        const sig:Signature = new Signature();
+        sig.fromBuffer(signval);
+        cred.addSignature(sig);
       }
-      return sigs;
+      sigs.push(cred);
     }
+    return sigs;
+  }
 
   clone():this {
     let newbase:BaseTx = new BaseTx();

@@ -186,7 +186,6 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
      */
     constructor() {
         super();
-        this.generateKey();
     }
     
 }
@@ -218,10 +217,4 @@ export abstract class SECP256k1KeyChain<SECPKPClass extends SECP256k1KeyPair> ex
      */
     importKey:(privk:Buffer | string) => SECPKPClass;
 
-    /**
-     * Returns instance of SECP256k1KeyChain.
-     */
-    constructor(){
-        super();
-    }
 }

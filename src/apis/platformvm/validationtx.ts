@@ -13,16 +13,37 @@ import { PlatformVMConstants } from './constants';
 import { DefaultNetworkID } from '../../utils/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
 import { AmountOutput, ParseableOutput } from './outputs';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Abstract class representing an transactions with validation information.
  */
 export abstract class ValidatorTx extends BaseTx {
+    protected _typeName = "ValidatorTx";
+    protected _typeID = undefined;
+
+    serialize(encoding:SerializedEncoding = "hex"):object {
+        let fields:object = super.serialize(encoding);
+        return {
+            ...fields,
+            "nodeID":serializer.encoder(this.nodeID, encoding, "Buffer", "nodeID"),
+            "startTime":serializer.encoder(this.startTime, encoding, "Buffer", "decimalString"),
+            "endTime":serializer.encoder(this.endTime, encoding, "Buffer", "decimalString")
+        }
+    };
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+        super.deserialize(fields, encoding);
+        this.nodeID = serializer.decoder(fields["nodeID"], encoding, "nodeID", "Buffer", 20);
+        this.startTime = serializer.decoder(fields["startTime"], encoding, "decimalString", "Buffer", 8);
+        this.endTime = serializer.decoder(fields["endTime"], encoding, "decimalString", "Buffer", 8);
+    }
+
     protected nodeID:Buffer = Buffer.alloc(20);
     protected startTime:Buffer = Buffer.alloc(8);
     protected endTime:Buffer = Buffer.alloc(8);
@@ -77,8 +98,8 @@ export abstract class ValidatorTx extends BaseTx {
             this.startTime,
             this.endTime
         ], bsize);
-      }
-
+    }
+    
     constructor(
         networkid:number, 
         blockchainid:Buffer, 
@@ -97,8 +118,22 @@ export abstract class ValidatorTx extends BaseTx {
 
 }
 
-
 export abstract class WeightedValidatorTx extends ValidatorTx {
+    protected _typeName = "WeightedValidatorTx";
+    protected _typeID = undefined;
+
+    serialize(encoding:SerializedEncoding = "hex"):object {
+        let fields:object = super.serialize(encoding);
+        return {
+            ...fields,
+            "weight": serializer.encoder(this.weight, encoding, "Buffer", "decimalString")
+        }
+    };
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+        super.deserialize(fields, encoding);
+        this.weight = serializer.decoder(fields["weight"], encoding, "decimalString", "Buffer", 8);
+    }
+
     protected weight:Buffer = Buffer.alloc(8);
 
     /**
@@ -278,6 +313,28 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
  * Class representing an unsigned AddDelegatorTx transaction.
  */
 export class AddDelegatorTx extends WeightedValidatorTx {
+    protected _typeName = "AddDelegatorTx";
+    protected _typeID = PlatformVMConstants.ADDDELEGATORTX;
+
+    serialize(encoding:SerializedEncoding = "hex"):object {
+        let fields:object = super.serialize(encoding);
+        return  {
+            ...fields,
+            "stakeOuts": this.stakeOuts.map((s) => s.serialize(encoding)),
+            "rewardOwners": this.rewardOwners.serialize(encoding)
+        }
+    };
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+        super.deserialize(fields, encoding);
+        this.stakeOuts = fields["stakeOuts"].map((s:object) => {
+            let xferout:TransferableOutput = new TransferableOutput();
+            xferout.deserialize(s, encoding);
+            return xferout;
+        });
+        this.rewardOwners = new ParseableOutput();
+        this.rewardOwners.deserialize(fields["rewardOwners"], encoding);
+    }
+    
     protected stakeOuts:Array<TransferableOutput> = [];
     protected rewardOwners:ParseableOutput = undefined;
   
@@ -285,7 +342,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
        * Returns the id of the [[AddDelegatorTx]]
        */
     getTxType = ():number => {
-      return PlatformVMConstants.ADDDELEGATORTX;
+      return this._typeID;
     }
 
     /**
@@ -328,7 +385,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     }
     
     getTotalOuts():Array<TransferableOutput> {
-        return [...this.getOuts(), ...this.getStakeOuts()];
+        return [...this.getOuts() as Array<TransferableOutput>, ...this.getStakeOuts()];
     }
 
     fromBuffer(bytes:Buffer, offset:number = 0):number {
@@ -369,7 +426,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         bsize += ro.length;
         return Buffer.concat(barr, bsize);
     }
-  
+
     clone():this {
         let newbase:AddDelegatorTx = new AddDelegatorTx();
         newbase.fromBuffer(this.toBuffer());
@@ -379,7 +436,6 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     create(...args:any[]):this {
         return new AddDelegatorTx(...args) as this;
     }
-
 
     /**
      * Class representing an unsigned AddDelegatorTx transaction.
@@ -418,14 +474,32 @@ export class AddDelegatorTx extends WeightedValidatorTx {
   }
 
 export class AddValidatorTx extends AddDelegatorTx {
+    protected _typeName = "AddValidatorTx";
+    protected _typeID = PlatformVMConstants.ADDVALIDATORTX;
+
+    serialize(encoding:SerializedEncoding = "hex"):object {
+        let fields:object = super.serialize(encoding);
+        return {
+            ...fields,
+            "delegationFee": serializer.encoder(this.getDelegationFeeBuffer(), encoding, "Buffer", "decimalString", 4)
+        }
+    };
+    deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+        super.deserialize(fields, encoding);
+        let dbuff:Buffer = serializer.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
+        this.delegationFee = dbuff.readUInt32BE(0) / AddValidatorTx.delegatorMultiplier;
+    }
+  
+
+
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
 
     /**
-       * Returns the id of the [[AddDelegatorTx]]
+       * Returns the id of the [[AddValidatorTx]]
        */
     getTxType = ():number => {
-    return PlatformVMConstants.ADDVALIDATORTX;
+    return this._typeID;
     }
 
     /**
@@ -513,4 +587,4 @@ export class AddValidatorTx extends AddDelegatorTx {
             }
         }
     }
-  }
+}

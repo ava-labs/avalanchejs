@@ -15,13 +15,53 @@ import { CreateAssetTx } from './createassettx';
 import { OperationTx } from './operationtx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
+
+/**
+ * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
+ *
+ * @param txtype The id of the transaction type
+ *
+ * @returns An instance of an [[BaseTx]]-extended class.
+ */
+export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
+  if (txtype === AVMConstants.BASETX) {
+    return new BaseTx(...args);
+  } else if (txtype === AVMConstants.CREATEASSETTX) {
+    return new CreateAssetTx(...args);
+  } else if (txtype === AVMConstants.OPERATIONTX) {
+    return new OperationTx(...args);
+  } else if (txtype === AVMConstants.IMPORTTX) {
+    return new ImportTx(...args);
+  } else if (txtype === AVMConstants.EXPORTTX) {
+    return new ExportTx(...args);
+  }
+  /* istanbul ignore next */
+  throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
+};
+
 
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
+  protected _typeName = "UnsignedTx";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.transaction = SelectTxClass(fields["transaction"]["_typeID"]);
+    this.transaction.deserialize(fields["transaction"], encoding);
+  }
+
+  getTransaction():BaseTx{
+    return this.transaction as BaseTx;
+  }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
@@ -39,15 +79,33 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    *
    * @returns A signed [[StandardTx]]
    */
-  sign(kc:KeyChain):StandardTx<KeyPair, KeyChain, UnsignedTx> {
+  sign(kc:KeyChain):Tx {
     const txbuff = this.toBuffer();
     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
+
 }
 
 export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
+  protected _typeName = "Tx";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.unsignedTx = new UnsignedTx();
+    this.unsignedTx.deserialize(fields["unsignedTx"], encoding);
+    this.credentials = [];
+    for(let i = 0; i < fields["credentials"].length; i++){
+      const cred:Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
+      cred.deserialize(fields["credentials"][i], encoding);
+      this.credentials.push(cred);
+    }
+  }
+
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.
    *
@@ -71,32 +129,5 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     }
     return offset;
   }
-}
 
-/**
- * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
- *
- * @param txtype The id of the transaction type
- *
- * @returns An instance of an [[BaseTx]]-extended class.
- */
-export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
-  if (txtype === AVMConstants.BASETX) {
-    const tx:BaseTx = new BaseTx(...args);
-    return tx;
-  } else if (txtype === AVMConstants.CREATEASSETTX) {
-    const tx:CreateAssetTx = new CreateAssetTx(...args);
-    return tx;
-  } else if (txtype === AVMConstants.OPERATIONTX) {
-    const tx:OperationTx = new OperationTx(...args);
-    return tx;
-  } else if (txtype === AVMConstants.IMPORTTX) {
-    const tx:ImportTx = new ImportTx(...args);
-    return tx;
-  } else if (txtype === AVMConstants.EXPORTTX) {
-    const tx:ExportTx = new ExportTx(...args);
-    return tx;
-  }
-  /* istanbul ignore next */
-  throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
-};
+}

@@ -7,8 +7,10 @@ import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -19,70 +21,93 @@ const bintools = BinTools.getInstance();
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
     if(outputid == AVMConstants.SECPXFEROUTPUTID){
-        let secpout:SECPTransferOutput = new SECPTransferOutput( ...args);
-        return secpout;
+        return new SECPTransferOutput( ...args);
     } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
-        let secpmintout:SECPMintOutput = new SECPMintOutput( ...args);
-        return secpmintout;
+        return new SECPMintOutput( ...args);
     } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
-        let nftout:NFTMintOutput = new NFTMintOutput(...args);
-        return nftout;
+        return new NFTMintOutput(...args);
     } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
-        let nftout:NFTTransferOutput = new NFTTransferOutput(...args);
-        return nftout;
+        return new NFTTransferOutput(...args);
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
-    fromBuffer(bytes:Buffer, offset:number = 0):number {
-        this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
-        offset += AVMConstants.ASSETIDLEN;
-        const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-        offset += 4;
-        this.output = SelectOutputClass(outputid);
-        return this.output.fromBuffer(bytes, offset);
-      }
+  protected _typeName = "TransferableOutput";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.output = SelectOutputClass(fields["output"]["_typeID"]);
+    this.output.deserialize(fields["output"], encoding);
+  }
+
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
+    offset += AVMConstants.ASSETIDLEN;
+    const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    offset += 4;
+    this.output = SelectOutputClass(outputid);
+    return this.output.fromBuffer(bytes, offset);
+  }
+
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
-    /**
-     * 
-     * @param assetID An assetID which is wrapped around the Buffer of the Output
-     */
-    makeTransferable(assetID:Buffer):TransferableOutput {
-        return new TransferableOutput(assetID, this);
-    }
+  protected _typeName = "AmountOutput";
+  protected _typeID = undefined;
 
-    select(id:number, ...args: any[]):Output {
-        return SelectOutputClass(id, ...args);
-    }
+  //serialize and deserialize both are inherited
+  
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+      return new TransferableOutput(assetID, this);
+  }
+
+  select(id:number, ...args: any[]):Output {
+      return SelectOutputClass(id, ...args);
+  }
 
 }
 
 export abstract class NFTOutput extends BaseNFTOutput {
-    /**
-     * 
-     * @param assetID An assetID which is wrapped around the Buffer of the Output
-     */
-    makeTransferable(assetID:Buffer):TransferableOutput {
-        return new TransferableOutput(assetID, this);
-    }
+  protected _typeName = "NFTOutput";
+  protected _typeID = undefined;
 
-    select(id:number, ...args: any[]):Output {
-        return SelectOutputClass(id, ...args);
-    }
+  //serialize and deserialize both are inherited
+
+  /**
+   * 
+   * @param assetID An assetID which is wrapped around the Buffer of the Output
+   */
+  makeTransferable(assetID:Buffer):TransferableOutput {
+      return new TransferableOutput(assetID, this);
+  }
+
+  select(id:number, ...args: any[]):Output {
+      return SelectOutputClass(id, ...args);
+  }
 }
 
 /**
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPTransferOutput extends AmountOutput {
+  protected _typeName = "SECPTransferOutput";
+  protected _typeID = AVMConstants.SECPXFEROUTPUTID;
+
+  //serialize and deserialize both are inherited
+
   /**
      * Returns the outputID for this output
      */
   getOutputID():number {
-    return AVMConstants.SECPXFEROUTPUTID;
+    return this._typeID;
   }
 
   create(...args:any[]):this{
@@ -101,12 +126,16 @@ export class SECPTransferOutput extends AmountOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPMintOutput extends Output {
+  protected _typeName = "SECPMintOutput";
+  protected _typeID = AVMConstants.SECPMINTOUTPUTID;
+
+  //serialize and deserialize both are inherited
 
   /**
    * Returns the outputID for this output
    */
   getOutputID():number {
-    return AVMConstants.SECPMINTOUTPUTID;
+    return this._typeID;
   }
 
   /**
@@ -137,97 +166,119 @@ export class SECPMintOutput extends Output {
  * An [[Output]] class which specifies an Output that carries an NFT Mint and uses secp256k1 signature scheme.
  */
 export class NFTMintOutput extends NFTOutput {
-    /**
-     * Returns the outputID for this output
-     */
-    getOutputID():number {
-        return AVMConstants.NFTMINTOUTPUTID;
-    }
+  protected _typeName = "NFTMintOutput";
+  protected _typeID = AVMConstants.NFTMINTOUTPUTID;
 
-    /**
-     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOutput]] and returns the size of the output.
-     */
-    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
-        this.groupID = bintools.copyFrom(utxobuff, offset, offset + 4);
-        offset += 4;
-        return super.fromBuffer(utxobuff, offset);
-    }
+  //serialize and deserialize both are inherited
 
-    /**
-     * Returns the buffer representing the [[NFTMintOutput]] instance.
-     */
-    toBuffer():Buffer {
-        let superbuff:Buffer = super.toBuffer();
-        let bsize:number = this.groupID.length + superbuff.length;
-        let barr:Array<Buffer> = [this.groupID, superbuff];
-        return Buffer.concat(barr,bsize);
-    }
+  /**
+   * Returns the outputID for this output
+   */
+  getOutputID():number {
+      return this._typeID;
+  }
 
-    create(...args:any[]):this{
-        return new NFTMintOutput(...args) as this;
-    }
+  /**
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOutput]] and returns the size of the output.
+   */
+  fromBuffer(utxobuff:Buffer, offset:number = 0):number {
+      this.groupID = bintools.copyFrom(utxobuff, offset, offset + 4);
+      offset += 4;
+      return super.fromBuffer(utxobuff, offset);
+  }
 
-    clone():this {
-        const newout:NFTMintOutput = this.create()
-        newout.fromBuffer(this.toBuffer());
-        return newout as this;
-    }
+  /**
+   * Returns the buffer representing the [[NFTMintOutput]] instance.
+   */
+  toBuffer():Buffer {
+      let superbuff:Buffer = super.toBuffer();
+      let bsize:number = this.groupID.length + superbuff.length;
+      let barr:Array<Buffer> = [this.groupID, superbuff];
+      return Buffer.concat(barr,bsize);
+  }
 
-    /**
-     * An [[Output]] class which contains an NFT mint for an assetID.
-     * 
-     * @param groupID A number specifies the group this NFT is issued to
-     * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-     * @param threshold A number representing the the threshold number of signers required to sign the transaction
-     * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
-     */
-    constructor(groupID:number = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined){
-        super(addresses, locktime, threshold);
-        if(typeof groupID !== 'undefined') {
-            this.groupID.writeUInt32BE(groupID, 0);
-        }
-    }
+  create(...args:any[]):this{
+      return new NFTMintOutput(...args) as this;
+  }
+
+  clone():this {
+      const newout:NFTMintOutput = this.create()
+      newout.fromBuffer(this.toBuffer());
+      return newout as this;
+  }
+
+  /**
+   * An [[Output]] class which contains an NFT mint for an assetID.
+   * 
+   * @param groupID A number specifies the group this NFT is issued to
+   * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
+   * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+   */
+  constructor(groupID:number = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined){
+      super(addresses, locktime, threshold);
+      if(typeof groupID !== 'undefined') {
+          this.groupID.writeUInt32BE(groupID, 0);
+      }
+  }
 }
 
 /**
  * An [[Output]] class which specifies an Output that carries an NFT and uses secp256k1 signature scheme.
  */
 export class NFTTransferOutput extends NFTOutput {
-    protected sizePayload:Buffer = Buffer.alloc(4);
-    protected payload:Buffer;
+  protected _typeName = "NFTTransferOutput";
+  protected _typeID = AVMConstants.NFTXFEROUTPUTID;
 
-    /**
-     * Returns the outputID for this output
-     */
-    getOutputID():number {
-        return AVMConstants.NFTXFEROUTPUTID;
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex", this.payload.length)
     }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
+    this.sizePayload = Buffer.alloc(4);
+    this.sizePayload.writeUInt32BE(this.payload.length, 0);
+  }
 
-    /**
-     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with content only.
-     */
-    getPayload = ():Buffer =>  bintools.copyFrom(this.payload);
+  protected sizePayload:Buffer = Buffer.alloc(4);
+  protected payload:Buffer;
+
+  /**
+   * Returns the outputID for this output
+   */
+  getOutputID():number {
+      return this._typeID;
+  }
+
+  /**
+   * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with content only.
+   */
+  getPayload = ():Buffer =>  bintools.copyFrom(this.payload);
 
 
-    /**
-     * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with length of payload prepended.
-     */
-    getPayloadBuffer = ():Buffer => Buffer.concat([bintools.copyFrom(this.sizePayload), bintools.copyFrom(this.payload)]);
+  /**
+   * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with length of payload prepended.
+   */
+  getPayloadBuffer = ():Buffer => Buffer.concat([bintools.copyFrom(this.sizePayload), bintools.copyFrom(this.payload)]);
 
 
-    /**
-     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOutput]] and returns the size of the output.
-     */
-    fromBuffer(utxobuff:Buffer, offset:number = 0):number {
-        this.groupID = bintools.copyFrom(utxobuff, offset, offset + 4);
-        offset += 4;
-        this.sizePayload = bintools.copyFrom(utxobuff, offset, offset + 4);
-        let psize:number = this.sizePayload.readUInt32BE(0);
-        offset += 4;
-        this.payload = bintools.copyFrom(utxobuff, offset, offset + psize);
-        offset = offset + psize;
-        return super.fromBuffer(utxobuff, offset);
-    }
+  /**
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOutput]] and returns the size of the output.
+   */
+  fromBuffer(utxobuff:Buffer, offset:number = 0):number {
+      this.groupID = bintools.copyFrom(utxobuff, offset, offset + 4);
+      offset += 4;
+      this.sizePayload = bintools.copyFrom(utxobuff, offset, offset + 4);
+      let psize:number = this.sizePayload.readUInt32BE(0);
+      offset += 4;
+      this.payload = bintools.copyFrom(utxobuff, offset, offset + psize);
+      offset = offset + psize;
+      return super.fromBuffer(utxobuff, offset);
+  }
 
     /**
      * Returns the buffer representing the [[NFTTransferOutput]] instance.

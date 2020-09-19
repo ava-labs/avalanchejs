@@ -5,13 +5,14 @@
 import BinTools from '../../utils/bintools';
 
 import { PlatformVMConstants } from './constants';
-import { Signature, Credential } from '../../common/credentials';
-Signature
+import { Credential } from '../../common/credentials';
+import { Serialization } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools:BinTools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.
@@ -22,17 +23,22 @@ const bintools:BinTools = BinTools.getInstance();
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
   if (credid === PlatformVMConstants.SECPCREDENTIAL) {
-    const secpcred:SECPCredential = new SECPCredential(...args);
-    return secpcred;
+    return new SECPCredential(...args);
   }
   /* istanbul ignore next */
   throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
 };
 
 export class SECPCredential extends Credential {
+  protected _typeName = "SECPCredential";
+  protected _typeID = PlatformVMConstants.SECPCREDENTIAL;
+
+  //serialize and deserialize both are inherited
+
   getCredentialID():number {
-    return PlatformVMConstants.SECPCREDENTIAL;
+    return this._typeID;
   }
+
 
   clone():this {
     let newbase:SECPCredential = new SECPCredential();
@@ -44,9 +50,9 @@ export class SECPCredential extends Credential {
     return new SECPCredential(...args) as this;
   }
 
-  select(id:number, ...args:any[]):this {
-    let newbasetx:SECPCredential = SelectCredentialClass(id, ...args);
-    return newbasetx as this;
+  select(id:number, ...args:any[]):Credential {
+    let newbasetx:Credential = SelectCredentialClass(id, ...args);
+    return newbasetx;
   }
 }
 
