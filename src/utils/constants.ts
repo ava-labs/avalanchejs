@@ -68,6 +68,8 @@ export const XChainVMName:string = "avm";
 export const CChainVMName:string = "evm";
 export const PChainVMName:string = "platformvm";
 
+export const DefaultLocalGenesisPrivateKey = "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN";
+
 export const ONEAVAX:BN = new BN(1000000000);
 
 export const DECIAVAX:BN = ONEAVAX.div(new BN(10));
@@ -92,7 +94,8 @@ const n0X:object = {
   blockchainID: '2G6XnaMqqFj6tkYPw8i3eHFoHnQqfo2yaS5BAtNEL2Knayq6qP',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 1000000
+  fee: 1000000,
+  creationTxFee: 10000000
 };
 
 const n0P:object = {
@@ -100,6 +103,7 @@ const n0P:object = {
   alias: PChainAlias,
   vm: PChainVMName,
   fee: 1000000,
+  creationTxFee: 10000000,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -123,14 +127,16 @@ const n1X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 1000000
+  txFee: 1000000,
+  creationTxFee: 10000000
 };
 
 const n1P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 1000000,
+  txFee: 1000000,
+  creationTxFee: 10000000,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -154,14 +160,16 @@ const n2X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 0
+  txFee: 0,
+  creationTxFee: 0
 };
 
 const n2P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 0,
+  txFee: 0,
+  creationTxFee: 0,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -182,14 +190,16 @@ const n3X:object = {
   blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 0
+  txFee: 0,
+  creationTxFee: 0
 };
 
 const n3P:object = {
   blockchainID: '',
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 0,
+  txFee: 0,
+  creationTxFee: 0,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -210,14 +220,16 @@ const n4X:object = {
   blockchainID: 'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 1000000
+  txFee: 1000000,
+  creationTxFee: 10000000
 };
 
 const n4P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 1000000,
+  txFee: 1000000,
+  creationTxFee: 10000000,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -240,14 +252,16 @@ const n5X:object = {
   blockchainID: '',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 1000000
+  txFee: 1000000,
+  creationTxFee: 10000000
 };
 
 const n5P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 1000000,
+  txFee: 1000000,
+  creationTxFee: 10000000,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),

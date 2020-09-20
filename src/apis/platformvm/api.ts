@@ -40,7 +40,9 @@ export class PlatformVMAPI extends JRPCAPI {
 
   protected AVAXAssetID:Buffer = undefined;
 
-  protected fee:BN = undefined;
+  protected txFee:BN = undefined;
+
+  protected creationTxFee:BN = undefined;
 
   protected minValidatorStake:BN = undefined;
 
@@ -116,33 +118,64 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-   * Gets the default fee for this chain.
+   * Gets the default tx fee for this chain.
    *
-   * @returns The default fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getDefaultFee =  ():BN => {
-    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["fee"]) : new BN(0);
+  getDefaultTxFee =  ():BN => {
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["txFee"]) : new BN(0);
   }
 
   /**
-   * Gets the fee for this chain.
+   * Gets the tx fee for this chain.
    *
-   * @returns The fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getFee = ():BN => {
-    if(typeof this.fee === "undefined") {
-      this.fee = this.getDefaultFee();
+  getTxFee = ():BN => {
+    if(typeof this.txFee === "undefined") {
+      this.txFee = this.getDefaultTxFee();
     }
-    return this.fee;
+    return this.txFee;
   }
 
   /**
-   * Sets the fee for this chain.
+   * Sets the tx fee for this chain.
    *
-   * @param fee The fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
-  setFee = (fee:BN) => {
-    this.fee = fee;
+  setTxFee = (fee:BN) => {
+    this.txFee = fee;
+  }
+
+
+  /**
+   * Gets the default creation fee for this chain.
+   *
+   * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getDefaultCreationTxFee =  ():BN => {
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["creationTxFee"]) : new BN(0);
+  }
+
+  /**
+   * Gets the creation fee for this chain.
+   *
+   * @returns The creation fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreationTxFee = ():BN => {
+    if(typeof this.creationTxFee === "undefined") {
+      this.creationTxFee = this.getDefaultCreationTxFee();
+    }
+    return this.creationTxFee;
+  }
+
+  /**
+   * Sets the creation fee for this chain.
+   *
+   * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   */
+  setCreationTxFee = (fee:BN) => {
+    this.creationTxFee = fee;
   }
 
   /**
@@ -929,7 +962,7 @@ export class PlatformVMAPI extends JRPCAPI {
       change,
       atomics, 
       sourceChain,
-      this.getFee(), 
+      this.getTxFee(), 
       avaxAssetID, 
       memo, asOf, locktime, threshold
     );
@@ -1017,7 +1050,7 @@ export class PlatformVMAPI extends JRPCAPI {
       from,
       change,
       destinationChain,
-      this.getFee(), 
+      this.getTxFee(), 
       avaxAssetID,
       memo, asOf, locktime, threshold
     );
@@ -1309,7 +1342,7 @@ export class PlatformVMAPI extends JRPCAPI {
       change,
       owners,
       subnetOwnerThreshold,
-      this.getFee(), 
+      this.getCreationTxFee(), 
       avaxAssetID,
       memo, asOf
     );

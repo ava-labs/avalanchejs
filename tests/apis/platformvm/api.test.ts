@@ -873,7 +873,7 @@ describe('PlatformVMAPI', () => {
         addrs3.map((a) => platformvm.parseAddress(a)),
         addrs1.map((a) => platformvm.parseAddress(a)),
         addrs1.map((a) => platformvm.parseAddress(a)),
-        platformvm.getFee(), assetID,
+        platformvm.getTxFee(), assetID,
         undefined, UnixNow(), new BN(0), 1,
       );
 
@@ -883,7 +883,7 @@ describe('PlatformVMAPI', () => {
     test('buildImportTx', async () => {
       let locktime:BN = new BN(0);
       let threshold:number = 1;
-      platformvm.setFee(new BN(fee));
+      platformvm.setTxFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -907,7 +907,7 @@ describe('PlatformVMAPI', () => {
 
       const txu2:UnsignedTx = set.buildImportTx(
         networkid, bintools.cb58Decode(blockchainid), 
-        addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), platformvm.getFee(), await platformvm.getAVAXAssetID(), 
+        addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), platformvm.getTxFee(), await platformvm.getAVAXAssetID(), 
         new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
       );
 
@@ -967,7 +967,7 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildExportTx', async () => {
-      platformvm.setFee(new BN(fee));
+      platformvm.setTxFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -990,7 +990,7 @@ describe('PlatformVMAPI', () => {
         addrbuff1, 
         addrbuff2, 
         bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]), 
-        platformvm.getFee(), 
+        platformvm.getTxFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
@@ -1006,7 +1006,7 @@ describe('PlatformVMAPI', () => {
 
       const txu4:UnsignedTx = set.buildExportTx(
         networkid, bintools.cb58Decode(blockchainid), amount,
-        assetID, addrbuff3, addrbuff1, addrbuff2, undefined, platformvm.getFee(), assetID, 
+        assetID, addrbuff3, addrbuff1, addrbuff2, undefined, platformvm.getTxFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
 
@@ -1306,7 +1306,7 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildCreateSubnetTx', async () => {
-      platformvm.setFee(new BN(fee));
+      platformvm.setCreationTxFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -1326,7 +1326,7 @@ describe('PlatformVMAPI', () => {
         addrbuff2, 
         addrbuff3,
         1,
-        platformvm.getFee(), 
+        platformvm.getCreationTxFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
