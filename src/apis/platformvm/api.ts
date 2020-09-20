@@ -1042,10 +1042,10 @@ export class PlatformVMAPI extends JRPCAPI {
     if(destinationChain.length !== 32) {
       throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
-
+    /*
     if(bintools.cb58Encode(destinationChain) !== Defaults.network[this.core.getNetworkID()].X["blockchainID"]) {
       throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must The X-Chain ID in the current version of AvalancheJS.");
-    }
+    }*/
 
     let to:Array<Buffer> = [];
     toAddresses.map((a) => {
