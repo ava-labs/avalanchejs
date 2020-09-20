@@ -55,6 +55,7 @@ export const NetworkNameToNetworkID:object = {
 
 export const FallbackHRP:string = "custom";
 export const FallbackNetworkName:string = "Custom Network";
+export const FallbackEVMChainID:number = 43112;
 
 export const DefaultNetworkID:number = 1;
 
@@ -113,7 +114,7 @@ const n0C:object = {
   alias: CChainAlias,
   vm: CChainVMName,
   gasPrice: GWEI.mul(new BN(470)), //equivalent to gas price
-  chainID: 43114
+  chainID: 43112
 };
 
 // TODO: UPDATE FOR MAINNET
@@ -144,7 +145,7 @@ const n1C:object = {
   alias: CChainAlias,
   vm: CChainVMName,
   gasPrice: GWEI.mul(new BN(470)), 
-  chainID: 43113
+  chainID: 43114
 };
 
 // END TODO
@@ -261,7 +262,7 @@ const n5C:object = {
   alias: CChainAlias,
   vm: CChainVMName,
   gasPrice: GWEI.mul(new BN(470)), 
-  chainID: 43112
+  chainID: 43113
 };
 
 // END TODO
