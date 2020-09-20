@@ -123,7 +123,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultTxFee =  ():BN => {
-    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["txFee"]) : new BN(0);
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["txFee"]) : new BN(0);
   }
 
   /**
@@ -154,7 +154,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultCreationTxFee =  ():BN => {
-    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["creationTxFee"]) : new BN(0);
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["creationTxFee"]) : new BN(0);
   }
 
   /**
