@@ -43,6 +43,8 @@ export class AVMAPI extends JRPCAPI {
 
   protected blockchainID:string = '';
 
+  protected blockchainAlias:string = '';
+
   protected AVAXAssetID:Buffer = undefined;
 
   protected txFee:BN = undefined;
@@ -50,33 +52,48 @@ export class AVMAPI extends JRPCAPI {
   protected creationTxFee:BN = undefined;
 
   /**
-     * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
-     *
-     * @returns The alias for the blockchainID
-     */
+   * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
+   *
+   * @returns The alias for the blockchainID
+   */
   getBlockchainAlias = ():string => {
-    const netid:number = this.core.getNetworkID();
-    if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
-      return Defaults.network[netid][this.blockchainID].alias;
+    if(this.blockchainAlias == ''){
+      const netid:number = this.core.getNetworkID();
+      if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
+        return Defaults.network[netid][this.blockchainID].alias;
+      }
+      /* istanbul ignore next */
+      return undefined;
     }
+    return this.blockchainAlias;
+  };
+
+  /**
+   * Sets the alias for the blockchainID.
+   * 
+   * @param alias The alias for the blockchainID.
+   * 
+   */
+  setBlockchainAlias = (alias:string):string => {
+    this.blockchainAlias = alias;
     /* istanbul ignore next */
     return undefined;
   };
 
   /**
-     * Gets the blockchainID and returns it.
-     *
-     * @returns The blockchainID
-     */
+   * Gets the blockchainID and returns it.
+   *
+   * @returns The blockchainID
+   */
   getBlockchainID = ():string => this.blockchainID;
 
   /**
-     * Refresh blockchainID, and if a blockchainID is passed in, use that.
-     *
-     * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
-     *
-     * @returns The blockchainID
-     */
+   * Refresh blockchainID, and if a blockchainID is passed in, use that.
+   *
+   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
+   *
+   * @returns The blockchainID
+   */
   refreshBlockchainID = (blockchainID:string = undefined):boolean => {
     const netid:number = this.core.getNetworkID();
     if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
@@ -90,10 +107,10 @@ export class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
-     *
-     * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
-     */
+   * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
+   *
+   * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
+   */
   parseAddress = (addr:string):Buffer => {
     const alias:string = this.getBlockchainAlias();
     const blockchainID:string = this.getBlockchainID();
