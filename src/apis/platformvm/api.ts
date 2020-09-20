@@ -38,7 +38,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
   protected blockchainID:string = PlatformChainID;
 
-  protected blockchainAlias:string = '';
+  protected blockchainAlias:string = undefined;
 
   protected AVAXAssetID:Buffer = undefined;
 
@@ -56,13 +56,15 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The alias for the blockchainID
    */
   getBlockchainAlias = ():string => {
-    if(this.blockchainAlias == ''){
+    if(typeof this.blockchainAlias === undefined){
       const netid:number = this.core.getNetworkID();
       if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
-        return Defaults.network[netid][this.blockchainID].alias;
+        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
+        return this.blockchainAlias;
+      } else {
+        /* istanbul ignore next */
+        return undefined;
       }
-      /* istanbul ignore next */
-      return undefined;
     } 
     return this.blockchainAlias;
   };
