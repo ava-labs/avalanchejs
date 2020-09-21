@@ -834,7 +834,7 @@ export class AVMAPI extends JRPCAPI {
   const atomics = atomicUTXOs.getAllUTXOs();
 
   if(atomics.length === 0){
-    throw new Error("Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " + (typeof sourceChain) + " using addresses: " + ownerAddresses.join(", ") );
+    throw new Error("Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " + srcChain + " using addresses: " + ownerAddresses.join(", ") );
   }
 
   if( memo instanceof PayloadBase) {
