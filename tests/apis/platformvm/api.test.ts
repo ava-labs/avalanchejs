@@ -743,10 +743,16 @@ describe('PlatformVMAPI', () => {
     const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
     expect(persistOpts.getMergeRule()).toBe('union');
     let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    let result:UTXOSet = (await api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, undefined, persistOpts)).utxos;
+    let result:Promise<{
+      numFetched:number,
+      utxos:UTXOSet,
+      stopIndex:{address:string, utxo:string}
+    }> = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, undefined, persistOpts);
     const payload:object = {
       result: {
+        numFetched:3,
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
+        stopIndex: {address: "a", utxo: "b"}
       },
     };
     const responseObj = {
@@ -754,16 +760,16 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    let response:UTXOSet = await result;
+    let response:UTXOSet = (await result).utxos;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = (await api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, undefined, persistOpts)).utxos;
+    result =  api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, undefined, persistOpts);
 
     mockAxios.mockResponse(responseObj);
-    response = await result;
+    response = (await result).utxos;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
