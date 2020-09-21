@@ -632,7 +632,7 @@ export class AVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
+    return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
 
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
