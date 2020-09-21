@@ -16,6 +16,7 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { numberToHex } from 'web3-utils';
 
 /**
  * @ignore
@@ -862,8 +863,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
-   * @param assetID An assetID to filter on the recieved UTXOs
-   * @param typeID A number of the typeID to filter on the recieved UTXOs
+   * @param startIndex Optional. Defined where to stop fetching UTXOs.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -874,9 +874,14 @@ export class PlatformVMAPI extends JRPCAPI {
     addresses:Array<string> | string,
     sourceChain:string = undefined,
     limit:number = 0,
-    startIndex:number = undefined,
+    startIndex:{address:string, utxo:string} = undefined,
+    stopIndex:{address:string, utxo:string} = undefined,
     persistOpts:PersistanceOptions = undefined
-  ):Promise<UTXOSet> => {
+  ):Promise<{
+    numFetched:number,
+    utxos:UTXOSet,
+    stopIndex:{address:string, utxo:string}
+  }> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
@@ -886,8 +891,12 @@ export class PlatformVMAPI extends JRPCAPI {
       addresses: addresses,
       limit
     };
-    if(typeof startIndex !== "undefined") {
+    if(typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex;
+    }
+
+    if(typeof stopIndex !== "undefined" && stopIndex) {
+      params.stopIndex = stopIndex;
     }
 
     if(typeof sourceChain !== "undefined") {
@@ -912,7 +921,8 @@ export class PlatformVMAPI extends JRPCAPI {
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
       utxos.addArray(data, false);
-      return utxos;
+      response.data.result.utxos = utxos;
+      return response.data.result;
     });
   };
 
@@ -964,7 +974,7 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = bintools.cb58Encode(sourceChain);
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
-    const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+    const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
     if( memo instanceof PayloadBase) {

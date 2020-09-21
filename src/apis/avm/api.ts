@@ -592,8 +592,7 @@ export class AVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
-   * @param assetID An assetID to filter on the recieved UTXOs
-   * @param typeID A number of the typeID to filter on the recieved UTXOs
+   * @param startIndex Optional. Defined where to stop fetching UTXOs.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -604,29 +603,37 @@ export class AVMAPI extends JRPCAPI {
     addresses:Array<string> | string,
     sourceChain:string = undefined,
     limit:number = 0,
-    startIndex:number = undefined,
+    startIndex:{address:string, utxo:string} = undefined,
+    stopIndex:{address:string, utxo:string} = undefined,
     persistOpts:PersistanceOptions = undefined
-  ):Promise<UTXOSet> => {
-
+  ):Promise<{
+    numFetched:number,
+    utxos:UTXOSet,
+    stopIndex:{address:string, utxo:string}
+  }> => {
+    
     if(typeof addresses === "string") {
       addresses = [addresses];
     }
 
     const params:any = {
       addresses: addresses,
-      limit,
+      limit
     };
-
-    if(typeof startIndex !== "undefined"){
+    if(typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex;
     }
 
+    if(typeof stopIndex !== "undefined" && stopIndex) {
+      params.stopIndex = stopIndex;
+    }
 
-    if(typeof sourceChain !== "undefined"){
+    if(typeof sourceChain !== "undefined") {
       params.sourceChain = sourceChain;
     }
 
-    return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
+    return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
+
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
       if (persistOpts && typeof persistOpts === 'object') {
@@ -643,7 +650,8 @@ export class AVMAPI extends JRPCAPI {
         this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
       utxos.addArray(data, false);
-      return utxos;
+      response.data.result.utxos = utxos;
+      return response.data.result;
     });
   };
 
@@ -826,7 +834,7 @@ export class AVMAPI extends JRPCAPI {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
-  const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+  const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
   const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
   const atomics = atomicUTXOs.getAllUTXOs();
