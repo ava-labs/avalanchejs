@@ -20,7 +20,6 @@ import { UTF8Payload } from 'src/utils/payload';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
-import { createLessThan } from 'typescript';
 import { ParseableOutput, StakeableLockOut } from '../../../src/apis/platformvm/outputs';
 
 /**
@@ -865,16 +864,15 @@ describe('PlatformVMAPI', () => {
         inputs.push(xferinput);
       }
       set.addArray(utxos);
-      lset = set.clone();
-
+      lset.addArray(set.getAllUTXOs().slice(2,4));
       for (let i:number = 0; i < 5; i++) {
         let txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
         
-        const out:SECPTransferOutput = new SECPTransferOutput(amount, addressbuffs, locktime, threshold);
+        const out:SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(5)), addressbuffs, locktime, 1);
         const pout:ParseableOutput = new ParseableOutput(out);
-        const lockout:StakeableLockOut = new StakeableLockOut(amount, addressbuffs, locktime, threshold, locktime.add(new BN(86400)), pout);
+        const lockout:StakeableLockOut = new StakeableLockOut(ONEAVAX.mul(new BN(5)), addressbuffs, locktime, 1, locktime.add(new BN(86400)), pout);
         const xferout:TransferableOutput = new TransferableOutput(assetID, lockout);
 
         const u:UTXO = new UTXO();
@@ -883,6 +881,7 @@ describe('PlatformVMAPI', () => {
       }
 
       lset.addArray(lutxos);
+      
 
       secpbase1 = new SECPTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
       secpbase2 = new SECPTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
@@ -1133,7 +1132,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
+      const amount:BN = Defaults.network[networkid]["P"].minDelegationStake;
 
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
@@ -1333,7 +1332,7 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
+      const amount:BN = Defaults.network[networkid]["P"].minDelegationStake;
 
       const locktime:BN = new BN(54321);
       const threshold:number = 2;

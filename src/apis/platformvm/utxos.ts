@@ -246,7 +246,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const change:BN = amounts[i].getChange();
       const isStakeableLockChange = amounts[i].getStakeableLockChange();
       if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
-
         if(stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))){
           let ls:Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
           let sspent:BN = new BN(zero);
@@ -255,9 +254,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             let stakeableLocktime:BN = ls[j].getStakeableLocktime();
             let pout:ParseableOutput = ls[j].getTransferableOutput();
             let o:AmountOutput = pout.getOutput() as AmountOutput;
-
             let spendme:BN = o.getAmount();
-
             // FYI - You can always guarantee that the last element of the ls array is the one who gives change (if any)
             if(j == ls.length - 1 && schange.gt(zero)) { 
               spendme = spendme.sub(change);
