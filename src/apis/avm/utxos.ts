@@ -775,9 +775,18 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     
     // get remaining fees from the provided addresses
     let feeRemaining:BN = fee.sub(feepaid);
+    console.log("feeRemaining", feeRemaining.toString(10), 
+    "feepaid", feepaid.toString(10), 
+    "fee", fee.toString(10), 
+    "feeAssetID", bintools.cb58Encode(feeAssetID),
+    "_feeCheck", this._feeCheck(feeRemaining, feeAssetID),
+    "feeRemaining.gt(zero)", feeRemaining.gt(zero)
+    );
     if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
+      //console.log(toAddresses, fromAddresses, changeAddresses);
       const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, feeRemaining);
+      console.log("asOf", asOf, "locktime", locktime, "threshold", threshold);
       const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
