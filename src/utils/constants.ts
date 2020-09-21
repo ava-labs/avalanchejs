@@ -279,7 +279,7 @@ const n5P:object = {
   minStake: ONEAVAX,
   minStakeDuration: 24 * 60 * 60, //one day
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
-  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationStake: ONEAVAX,
   minDelegationFee: new BN(2)
 };
 
