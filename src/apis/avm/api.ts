@@ -43,38 +43,59 @@ export class AVMAPI extends JRPCAPI {
 
   protected blockchainID:string = '';
 
+  protected blockchainAlias:string = undefined;
+
   protected AVAXAssetID:Buffer = undefined;
 
-  protected fee:BN = undefined;
+  protected txFee:BN = undefined;
+
+  protected creationTxFee:BN = undefined;
 
   /**
-     * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
-     *
-     * @returns The alias for the blockchainID
-     */
+   * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
+   *
+   * @returns The alias for the blockchainID
+   */
   getBlockchainAlias = ():string => {
-    const netid:number = this.core.getNetworkID();
-    if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
-      return Defaults.network[netid][this.blockchainID].alias;
-    }
+    if(typeof this.blockchainAlias === "undefined"){
+      const netid:number = this.core.getNetworkID();
+      if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
+        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
+        return this.blockchainAlias;
+      } else {
+        /* istanbul ignore next */
+        return undefined;
+      }
+    } 
+    return this.blockchainAlias;
+  };
+
+  /**
+   * Sets the alias for the blockchainID.
+   * 
+   * @param alias The alias for the blockchainID.
+   * 
+   */
+  setBlockchainAlias = (alias:string):string => {
+    this.blockchainAlias = alias;
     /* istanbul ignore next */
     return undefined;
   };
 
   /**
-     * Gets the blockchainID and returns it.
-     *
-     * @returns The blockchainID
-     */
+   * Gets the blockchainID and returns it.
+   *
+   * @returns The blockchainID
+   */
   getBlockchainID = ():string => this.blockchainID;
 
   /**
-     * Refresh blockchainID, and if a blockchainID is passed in, use that.
-     *
-     * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
-     *
-     * @returns The blockchainID
-     */
+   * Refresh blockchainID, and if a blockchainID is passed in, use that.
+   *
+   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
+   *
+   * @returns The blockchainID
+   */
   refreshBlockchainID = (blockchainID:string = undefined):boolean => {
     const netid:number = this.core.getNetworkID();
     if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
@@ -88,10 +109,10 @@ export class AVMAPI extends JRPCAPI {
   };
 
   /**
-     * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
-     *
-     * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
-     */
+   * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
+   *
+   * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
+   */
   parseAddress = (addr:string):Buffer => {
     const alias:string = this.getBlockchainAlias();
     const blockchainID:string = this.getBlockchainID();
@@ -138,33 +159,64 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * Gets the default fee for this chain.
+   * Gets the default tx fee for this chain.
    *
-   * @returns The default fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getDefaultFee =  ():BN => {
-    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["fee"]) : new BN(0);
+  getDefaultTxFee =  ():BN => {
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["txFee"]) : new BN(0);
   }
 
   /**
-   * Gets the fee for this chain.
+   * Gets the tx fee for this chain.
    *
-   * @returns The fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getFee = ():BN => {
-    if(typeof this.fee === "undefined") {
-      this.fee = this.getDefaultFee();
+  getTxFee = ():BN => {
+    if(typeof this.txFee === "undefined") {
+      this.txFee = this.getDefaultTxFee();
     }
-    return this.fee;
+    return this.txFee;
   }
 
   /**
-   * Sets the fee for this chain.
+   * Sets the tx fee for this chain.
    *
-   * @param fee The fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
-  setFee = (fee:BN) => {
-    this.fee = fee;
+  setTxFee = (fee:BN) => {
+    this.txFee = fee;
+  }
+
+
+  /**
+   * Gets the default creation fee for this chain.
+   *
+   * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getDefaultCreationTxFee =  ():BN => {
+    return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["creationTxFee"]) : new BN(0);
+  }
+
+  /**
+   * Gets the creation fee for this chain.
+   *
+   * @returns The creation fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreationTxFee = ():BN => {
+    if(typeof this.creationTxFee === "undefined") {
+      this.creationTxFee = this.getDefaultCreationTxFee();
+    }
+    return this.creationTxFee;
+  }
+
+  /**
+   * Sets the creation fee for this chain.
+   *
+   * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   */
+  setCreationTxFee = (fee:BN) => {
+    this.creationTxFee = fee;
   }
 
   /**
@@ -198,9 +250,9 @@ export class AVMAPI extends JRPCAPI {
    * @remarks
    * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
    */
-  checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
+  checkGooseEgg = async (utx:UnsignedTx, outTotal:BN = new BN(0)): Promise<boolean> => {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
-    let outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    let outputTotal:BN = outTotal.gt(new BN(0)) ? outTotal : utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
     if(fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
@@ -647,7 +699,7 @@ export class AVMAPI extends JRPCAPI {
       to, 
       from, 
       change, 
-      this.getFee(), 
+      this.getTxFee(), 
       await this.getAVAXAssetID(),
       memo, asOf, locktime, threshold,
     );
@@ -713,7 +765,7 @@ export class AVMAPI extends JRPCAPI {
       from,
       change,
       utxoidArray, 
-      this.getFee(),
+      this.getTxFee(),
       avaxAssetID, 
       memo, asOf, locktime, threshold,
     );
@@ -774,12 +826,14 @@ export class AVMAPI extends JRPCAPI {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
-  
-
   const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
   const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
   const atomics = atomicUTXOs.getAllUTXOs();
+
+  if(atomics.length === 0){
+    throw new Error("Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " + srcChain + " using addresses: " + ownerAddresses.join(", ") );
+  }
 
   if( memo instanceof PayloadBase) {
     memo = memo.getPayload();
@@ -793,7 +847,7 @@ export class AVMAPI extends JRPCAPI {
     change,
     atomics, 
     sourceChain,
-    this.getFee(), 
+    this.getTxFee(), 
     avaxAssetID, 
     memo, asOf, locktime, threshold
   );
@@ -882,7 +936,7 @@ export class AVMAPI extends JRPCAPI {
       from,
       change,
       destinationChain,
-      this.getFee(), 
+      this.getTxFee(), 
       avaxAssetID,
       memo, asOf, locktime, threshold
     );
@@ -954,12 +1008,12 @@ export class AVMAPI extends JRPCAPI {
       symbol, 
       denomination, 
       mintOutputs,
-      this.getFee(), 
+      this.getCreationTxFee(), 
       avaxAssetID,
       memo, asOf
     );
 
-    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+    if(! await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee())) {
       /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }
@@ -993,7 +1047,7 @@ export class AVMAPI extends JRPCAPI {
         from,
         change,
         mintUTXOID,
-        this.getFee(),
+        this.getTxFee(),
         avaxAssetID,
         memo, asOf
     );
@@ -1074,11 +1128,11 @@ export class AVMAPI extends JRPCAPI {
         minterSets,
         name, 
         symbol,
-        this.getFee(), 
+        this.getCreationTxFee(), 
         avaxAssetID,
         memo, asOf, locktime
     );
-    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+    if(! await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee())) {
       /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }
@@ -1142,7 +1196,7 @@ export class AVMAPI extends JRPCAPI {
         utxoid,
         groupID,
         payload,
-        this.getFee(),
+        this.getTxFee(),
         avaxAssetID,
         memo, asOf
     );
@@ -1207,7 +1261,7 @@ export class AVMAPI extends JRPCAPI {
 
     if (typeof this.parseAddress(to) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.sen: Invalid address format ${to}`);
+      throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
     }
 
     from = this._cleanAddressArray(from, 'send');

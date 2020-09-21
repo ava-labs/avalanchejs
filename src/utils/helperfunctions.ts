@@ -22,6 +22,10 @@ export function getPreferredHRP(networkID:number = undefined) {
     return FallbackHRP;
 }
 
+export function MaxWeightFormula(staked:BN, cap:BN):BN{
+  return BN.min(staked.mul(new BN(5)), cap);
+}
+
 /**
  * Function providing the current UNIX time using a {@link https://github.com/indutny/bn.js/|BN}.
  */

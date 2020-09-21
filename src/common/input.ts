@@ -162,7 +162,7 @@ export abstract class StandardParseableInput extends Serializable {
    */
   constructor(input:Input = undefined) {
     super();
-    if (Input instanceof Input) {
+    if (input instanceof Input) {
       this.input = input;
     }
   }

@@ -56,10 +56,11 @@ describe('Info', () => {
   });
 
   test('getTxFee', async () => {
-    const result:Promise<BN> = info.getTxFee();
+    const result:Promise<{txFee:BN, creationTxFee:BN}> = info.getTxFee();
     const payload:object = {
       result: {
         txFee: "1000000",
+        creationTxFee: "10000000"
       },
     };
     const responseObj = {
@@ -67,10 +68,11 @@ describe('Info', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:BN = await result;
+    const response:{txFee:BN, creationTxFee:BN} = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response.eq(new BN('1000000'))).toBe(true);
+    expect(response.txFee.eq(new BN('1000000'))).toBe(true);
+    expect(response.creationTxFee.eq(new BN('10000000'))).toBe(true);
   });
 
   test('getNetworkName', async () => {

@@ -172,6 +172,12 @@ describe('UTXOSet', () => {
       const veriutxo:UTXO = set.getUTXO(utxo.getUTXOID()) as UTXO;
       expect(veriutxo.toString()).toBe(utxostrs[i]);
     }
+    let o:object = set.serialize("hex");
+    let s:UTXOSet = new UTXOSet();
+    s.deserialize(o);
+    let t:object = set.serialize("display");
+    let r:UTXOSet = new UTXOSet();
+    r.deserialize(t);
   });
 
   test('overwriting UTXO', () => {

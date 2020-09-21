@@ -151,6 +151,7 @@ export class StakeableLockIn extends AmountInput {
     fields["amount"] = "98";
     super.deserialize(fields, encoding);
     this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.transferableInput = new ParseableInput();
     this.transferableInput.deserialize(fields["transferableInput"], encoding);
     this.synchronize();
   }
@@ -162,7 +163,7 @@ export class StakeableLockIn extends AmountInput {
     let input:AmountInput = this.transferableInput.getInput() as AmountInput;
     this.sigIdxs = input.getSigIdxs();
     this.sigCount = Buffer.alloc(4);
-    this.sigCount.writeUInt32BE(this.sigIdxs.length, 4);
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     this.amount = bintools.fromBNToBuffer(input.getAmount(), 8);
     this.amountValue = input.getAmount();
   }
@@ -196,9 +197,9 @@ export class StakeableLockIn extends AmountInput {
    * Returns the buffer representing the [[StakeableLockIn]] instance.
    */
   toBuffer():Buffer {
-    const superbuff:Buffer = super.toBuffer();
-    const bsize:number = this.stakeableLocktime.length + superbuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, superbuff];
+    const xferinBuff:Buffer = this.transferableInput.toBuffer();
+    const bsize:number = this.stakeableLocktime.length + xferinBuff.length;
+    const barr:Array<Buffer> = [this.stakeableLocktime, xferinBuff];
     return Buffer.concat(barr, bsize);
   }
   

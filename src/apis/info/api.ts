@@ -71,11 +71,16 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Fetches the transaction fee from the node.
    *
-   * @returns Returns a Promise<BN> of the transaction fee in nAVAX.
+   * @returns Returns a Promise<object> of the transaction fee in nAVAX.
    */
-  getTxFee = async ():Promise<BN> => {
+  getTxFee = async ():Promise<{txFee:BN, creationTxFee:BN}> => {
     return this.callMethod('info.getTxFee')
-        .then((response:RequestResponseData) => new BN(response.data.result.txFee, 10));
+        .then((response:RequestResponseData) => {
+          return {
+            txFee: new BN(response.data.result.txFee, 10),
+            creationTxFee: new BN(response.data.result.creationTxFee, 10)
+          }
+        });
   };
 
   /**

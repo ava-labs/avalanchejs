@@ -17,6 +17,8 @@ export class AssetAmount {
     protected burn:BN = new BN(0);
     protected spent:BN = new BN(0);
     protected change:BN = new BN(0);
+    protected stakeableLockSpent:BN  = new BN(0);
+    protected stakeableLockChange:boolean = false;
     protected finished:boolean = false;
   
     getAssetID = ():Buffer => {
@@ -42,18 +44,31 @@ export class AssetAmount {
     getChange = ():BN => {
       return this.change;
     }
+
+    getStakeableLockSpent = ():BN => {
+      return this.stakeableLockSpent;
+    }
+
+    getStakeableLockChange = ():boolean => {
+      return this.stakeableLockChange;
+    }
   
     isFinished = ():boolean => {
       return this.finished;
     }
   
-    spendAmount = (amt:BN):boolean => {
-      
+    spendAmount = (amt:BN, stakeableLocked:boolean = false):boolean => {
       if(!this.finished) {
         let total:BN = this.amount.add(this.burn);
         this.spent = this.spent.add(amt);
+        if(stakeableLocked){
+          this.stakeableLockSpent = this.stakeableLockSpent.add(amt);
+        }
         if(this.spent.gte(total)) {
-          this.change = this.spent.sub(total)
+          this.change = this.spent.sub(total);
+          if(stakeableLocked){
+            this.stakeableLockChange = true;
+          }
           this.finished = true;
         }
       }
@@ -65,6 +80,8 @@ export class AssetAmount {
       this.amount = typeof amount === "undefined" ? new BN(0) : amount;
       this.burn = typeof burn === "undefined" ? new BN(0) : burn;
       this.spent = new BN(0);
+      this.stakeableLockSpent = new BN(0);
+      this.stakeableLockChange = false;
     }
   }
   
