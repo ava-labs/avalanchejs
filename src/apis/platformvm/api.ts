@@ -726,8 +726,8 @@ export class PlatformVMAPI extends JRPCAPI {
    * 
    * @param refresh A boolean to bypass the local cached value of Minimum Stake Amount, polling the node instead.
    */
-  getMinStake = async (refresh:boolean = undefined):Promise<{minValidatorStake:BN, minDelegatorStake:BN}> => {
-    if(refresh !== false && typeof this.minValidatorStake !== "undefined" && typeof this.minDelegatorStake !== "undefined") {
+  getMinStake = async (refresh:boolean = false):Promise<{minValidatorStake:BN, minDelegatorStake:BN}> => {
+    if(refresh !== true && typeof this.minValidatorStake !== "undefined" && typeof this.minDelegatorStake !== "undefined") {
       return {
         minValidatorStake: this.minValidatorStake,
         minDelegatorStake: this.minDelegatorStake
@@ -850,7 +850,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const params:any = {
       txID: txid,
     };
-    return this.callMethod('platform.getTxStatus', params).then((response:RequestResponseData) => response.data.result.status);
+    return this.callMethod('platform.getTxStatus', params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**

@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput, StakeableLockOut } from './outputs';
+import { AmountOutput, SelectOutputClass, TransferableOutput, SECPOwnerOutput, ParseableOutput, StakeableLockOut, SECPTransferOutput } from './outputs';
 import { AmountInput, SECPTransferInput, StakeableLockIn, TransferableInput, ParseableInput } from './inputs';
 import { UnixNow } from '../../utils/helperfunctions';
 import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
@@ -301,36 +301,26 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         }
 
         if(unlockedAmount.gt(zero) || (!isStakeableLockChange && change.gt(zero))) {
-          let ls:Array<AmountOutput> = outs[assetKey].unlocked;
-          let spent:BN = new BN(0);
-          for(let j = 0; j < ls.length && spent.lt(unlockedAmount.add(change)); j++) {
-            let spendme:BN = ls[j].getAmount();
-            let uchange:BN = !isStakeableLockChange ? change : new BN(zero);
-
-            // FYI - You can always guarantee that the last element of the ls array is the one who gives change (if any)
-            if(j == ls.length - 1 && ! isStakeableLockChange) { 
-              spendme = spendme.sub(change);
-              let schangeOut:AmountOutput = SelectOutputClass(
-                ls[j].getOutputID(),
-                uchange, 
-                aad.getDestinations(), 
-                locktime, 
-                threshold
-              ) as AmountOutput;
-              const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), schangeOut);
-              aad.addChange(xferout);
-            }
-            let spendout:AmountOutput;
-            spendout = SelectOutputClass(
-              ls[j].getOutputID(),
-              spendme, 
-              aad.getChangeAddresses(), 
+          let uchange:BN = !isStakeableLockChange ? change : new BN(zero);
+          if(uchange.gt(zero)) { 
+            let schangeOut:AmountOutput = new SECPTransferOutput(
+              uchange, 
+              aad.getDestinations(), 
               locktime, 
               threshold
             ) as AmountOutput;
-            const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
-            aad.addOutput(xferout);
+            const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), schangeOut);
+            aad.addChange(xferout);
           }
+          let spendout:AmountOutput;
+          spendout = new SECPTransferOutput(
+            unlockedAmount, 
+            aad.getChangeAddresses(), 
+            locktime, 
+            threshold
+          ) as AmountOutput;
+          const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+          aad.addOutput(xferout);
         }
       }
     }

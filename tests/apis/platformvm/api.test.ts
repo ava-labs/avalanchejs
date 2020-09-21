@@ -716,9 +716,7 @@ describe('PlatformVMAPI', () => {
 
     const result:Promise<string> = api.getTxStatus(txid);
     const payload:object = {
-      result: {
-        status: 'accepted',
-      },
+      result:  'accepted'
     };
     const responseObj = {
       data: payload,
@@ -864,8 +862,7 @@ describe('PlatformVMAPI', () => {
         inputs.push(xferinput);
       }
       set.addArray(utxos);
-      lset.addArray(set.getAllUTXOs().slice(2,4));
-      for (let i:number = 0; i < 5; i++) {
+      for (let i:number = 0; i < 4; i++) {
         let txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
         let txidx:Buffer = Buffer.alloc(4);
         txidx.writeUInt32BE(i, 0);
@@ -881,6 +878,7 @@ describe('PlatformVMAPI', () => {
       }
 
       lset.addArray(lutxos);
+      lset.addArray(set.getAllUTXOs());
       
 
       secpbase1 = new SECPTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
@@ -1431,12 +1429,12 @@ describe('PlatformVMAPI', () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
+      const amount:BN = ONEAVAX.mul(new BN(25));
 
       const locktime:BN = new BN(54321);
       const threshold:number = 2;
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake);
+      platformvm.setMinStake(ONEAVAX.mul(new BN(25)), ONEAVAX.mul(new BN(25)));
 
       const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
         lset, 

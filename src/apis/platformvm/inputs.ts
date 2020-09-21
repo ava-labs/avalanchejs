@@ -151,6 +151,7 @@ export class StakeableLockIn extends AmountInput {
     fields["amount"] = "98";
     super.deserialize(fields, encoding);
     this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.transferableInput = new ParseableInput();
     this.transferableInput.deserialize(fields["transferableInput"], encoding);
     this.synchronize();
   }
