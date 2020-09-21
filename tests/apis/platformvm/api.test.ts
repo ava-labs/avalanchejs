@@ -21,6 +21,7 @@ import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
 import { ParseableOutput, StakeableLockOut } from '../../../src/apis/platformvm/outputs';
+import { ExportTx } from 'src/apis/platformvm/exporttx';
 
 /**
  * @ignore
@@ -988,6 +989,7 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildExportTx', async () => {
+
       platformvm.setTxFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
