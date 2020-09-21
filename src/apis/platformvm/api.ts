@@ -863,7 +863,6 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
-   * @param startIndex Optional. Defined where to stop fetching UTXOs.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -875,12 +874,11 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:{address:string, utxo:string} = undefined,
-    stopIndex:{address:string, utxo:string} = undefined,
     persistOpts:PersistanceOptions = undefined
   ):Promise<{
     numFetched:number,
     utxos:UTXOSet,
-    stopIndex:{address:string, utxo:string}
+    endIndex:{address:string, utxo:string}
   }> => {
     
     if(typeof addresses === "string") {
@@ -893,10 +891,6 @@ export class PlatformVMAPI extends JRPCAPI {
     };
     if(typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex;
-    }
-
-    if(typeof stopIndex !== "undefined" && stopIndex) {
-      params.stopIndex = stopIndex;
     }
 
     if(typeof sourceChain !== "undefined") {

@@ -746,8 +746,8 @@ describe('PlatformVMAPI', () => {
     let result:Promise<{
       numFetched:number,
       utxos:UTXOSet,
-      stopIndex:{address:string, utxo:string}
-    }> = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, undefined, persistOpts);
+      endIndex:{address:string, utxo:string}
+    }> = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, persistOpts);
     const payload:object = {
       result: {
         numFetched:3,
@@ -766,7 +766,7 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result =  api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, undefined, persistOpts);
+    result =  api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, persistOpts);
 
     mockAxios.mockResponse(responseObj);
     response = (await result).utxos;
