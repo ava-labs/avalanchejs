@@ -826,8 +826,6 @@ export class AVMAPI extends JRPCAPI {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
-  
-
   const atomicUTXOs:UTXOSet = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
   const avaxAssetID:Buffer = await this.getAVAXAssetID();
 

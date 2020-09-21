@@ -174,7 +174,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       return true;
     });
     const outs:object = {};
-    let g = 0;
     for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
       const u:UTXO = utxoArray[i];
       const assetKey:string = u.getAssetID().toString("hex");
@@ -237,7 +236,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     const amounts:Array<AssetAmount> = aad.getAmounts();
     const zero:BN = new BN(0);
-    let k = 0;
     for(let i = 0; i < amounts.length; i++) {
       const assetKey:string = amounts[i].getAssetIDString();
       const amount:BN = amounts[i].getAmount();
@@ -305,7 +303,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           if(uchange.gt(zero)) { 
             let schangeOut:AmountOutput = new SECPTransferOutput(
               uchange, 
-              aad.getDestinations(), 
+              aad.getChangeAddresses(),
               locktime, 
               threshold
             ) as AmountOutput;
@@ -315,7 +313,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           let spendout:AmountOutput;
           spendout = new SECPTransferOutput(
             unlockedAmount, 
-            aad.getChangeAddresses(), 
+            aad.getDestinations(),
             locktime, 
             threshold
           ) as AmountOutput;
