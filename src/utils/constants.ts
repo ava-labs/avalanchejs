@@ -94,16 +94,16 @@ const n0X:object = {
   blockchainID: '2G6XnaMqqFj6tkYPw8i3eHFoHnQqfo2yaS5BAtNEL2Knayq6qP',
   alias: XChainAlias,
   vm: XChainVMName,
-  fee: 1000000,
-  creationTxFee: 10000000
+  fee: MILLIAVAX,
+  creationTxFee: CENTIAVAX
 };
 
 const n0P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  fee: 1000000,
-  creationTxFee: 10000000,
+  fee: MILLIAVAX,
+  creationTxFee: CENTIAVAX,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -127,16 +127,16 @@ const n1X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: XChainAlias,
   vm: XChainVMName,
-  txFee: 1000000,
-  creationTxFee: 10000000
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX
 };
 
 const n1P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  txFee: 1000000,
-  creationTxFee: 10000000,
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -220,16 +220,16 @@ const n4X:object = {
   blockchainID: 'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC',
   alias: XChainAlias,
   vm: XChainVMName,
-  txFee: 1000000,
-  creationTxFee: 10000000
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX
 };
 
 const n4P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  txFee: 1000000,
-  creationTxFee: 10000000,
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),
@@ -252,16 +252,16 @@ const n5X:object = {
   blockchainID: '',
   alias: XChainAlias,
   vm: XChainVMName,
-  txFee: 1000000,
-  creationTxFee: 10000000
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX
 };
 
 const n5P:object = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
-  txFee: 1000000,
-  creationTxFee: 10000000,
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX,
   minConsumption: 0.1,
   maxConsumption: 0.12,
   maxStakingDuration: new BN(31536000),

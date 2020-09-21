@@ -20,6 +20,8 @@ import { UTF8Payload } from 'src/utils/payload';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
+import { createLessThan } from 'typescript';
+import { ParseableOutput, StakeableLockOut } from '../../../src/apis/platformvm/outputs';
 
 /**
  * @ignore
@@ -131,7 +133,7 @@ describe('PlatformVMAPI', () => {
       utxoIDs: [
         {
           "txID":"LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
-        "outputIndex":0
+          "outputIndex":0
         }
       ]
     }
@@ -772,6 +774,7 @@ describe('PlatformVMAPI', () => {
 
   describe('Transactions', () => {
     let set:UTXOSet;
+    let lset:UTXOSet;
     let keymgr2:KeyChain;
     let keymgr3:KeyChain;
     let addrs1:Array<string>;
@@ -780,6 +783,7 @@ describe('PlatformVMAPI', () => {
     let addressbuffs:Array<Buffer> = [];
     let addresses:Array<string> = [];
     let utxos:Array<UTXO>;
+    let lutxos:Array<UTXO>;
     let inputs:Array<TransferableInput>;
     let outputs:Array<TransferableOutput>;
     const amnt:number = 10000;
@@ -813,6 +817,7 @@ describe('PlatformVMAPI', () => {
       mockAxios.mockResponse(responseObj);
       await result;
       set = new UTXOSet();
+      lset = new UTXOSet;
       platformvm.newKeyChain();
       keymgr2 = new KeyChain(avalanche.getHRP(), alias);
       keymgr3 = new KeyChain(avalanche.getHRP(), alias);
@@ -820,6 +825,7 @@ describe('PlatformVMAPI', () => {
       addrs2 = [];
       addrs3 = [];
       utxos = [];
+      lutxos = [];
       inputs = [];
       outputs = [];
       fungutxoids = [];
@@ -859,6 +865,24 @@ describe('PlatformVMAPI', () => {
         inputs.push(xferinput);
       }
       set.addArray(utxos);
+      lset = set.clone();
+
+      for (let i:number = 0; i < 5; i++) {
+        let txid:Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest());
+        let txidx:Buffer = Buffer.alloc(4);
+        txidx.writeUInt32BE(i, 0);
+        
+        const out:SECPTransferOutput = new SECPTransferOutput(amount, addressbuffs, locktime, threshold);
+        const pout:ParseableOutput = new ParseableOutput(out);
+        const lockout:StakeableLockOut = new StakeableLockOut(amount, addressbuffs, locktime, threshold, locktime.add(new BN(86400)), pout);
+        const xferout:TransferableOutput = new TransferableOutput(assetID, lockout);
+
+        const u:UTXO = new UTXO();
+        u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
+        lutxos.push(u);
+      }
+
+      lset.addArray(lutxos);
 
       secpbase1 = new SECPTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
       secpbase2 = new SECPTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1);
@@ -1105,7 +1129,7 @@ describe('PlatformVMAPI', () => {
 
     });
 */
-    test('buildAddDelegatorTx', async () => {
+    test('buildAddDelegatorTx 1', async () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -1204,7 +1228,7 @@ describe('PlatformVMAPI', () => {
 
     });
 
-    test('buildAddValidatorTx', async () => {
+    test('buildAddValidatorTx 1', async () => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -1305,8 +1329,208 @@ describe('PlatformVMAPI', () => {
 
     });
 
-    test('buildCreateSubnetTx', async () => {
-      platformvm.setCreationTxFee(new BN(fee));
+    test('buildAddDelegatorTx 2', async () => {
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
+
+      const locktime:BN = new BN(54321);
+      const threshold:number = 2;
+
+      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake);
+
+      const txu1:UnsignedTx = await platformvm.buildAddDelegatorTx(
+        lset, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        amount,
+        addrs3, 
+        locktime,
+        threshold,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = lset.buildAddDelegatorTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        assetID,
+        addrbuff3,
+        addrbuff1,         
+        addrbuff2, 
+        NodeIDStringToBuffer(nodeID), 
+        startTime,
+        endTime,
+        amount,
+        locktime,
+        threshold,
+        addrbuff3,
+        new BN(0), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(platformvm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+      
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+      
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+      
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(platformvm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+      
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+      
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+      
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "AddDelegatorTx");
+
+    });
+
+    test('buildAddValidatorTx 2', async () => {
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee));
+
+      const locktime:BN = new BN(54321);
+      const threshold:number = 2;
+
+      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake);
+
+      const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
+        lset, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        amount,
+        addrs3, 
+        0.1334556,
+        locktime,
+        threshold,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = lset.buildAddValidatorTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        assetID,
+        addrbuff3,
+        addrbuff1,         
+        addrbuff2, 
+        NodeIDStringToBuffer(nodeID), 
+        startTime,
+        endTime,
+        amount,
+        locktime,
+        threshold,
+        addrbuff3,
+        0.1335,
+        new BN(0),
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(platformvm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(platformvm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "AddValidatorTx");
+
+    });
+
+    test('buildCreateSubnetTx1', async () => {
+      platformvm.setCreationTxFee(new BN(10));
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
@@ -1385,6 +1609,37 @@ describe('PlatformVMAPI', () => {
       serialzeit(tx1, "CreateSubnetTx");
 
     });
+
+    test('buildCreateSubnetTx 2', async () => {
+      platformvm.setCreationTxFee(new BN(10));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+
+      const txu1:UnsignedTx = await platformvm.buildCreateSubnetTx(
+        lset, 
+        addrs1, 
+        addrs2, 
+        addrs3, 
+        1,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = lset.buildCreateSubnetTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        addrbuff1,         
+        addrbuff2, 
+        addrbuff3,
+        1,
+        platformvm.getCreationTxFee(), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+    });
+
 
   });
 });

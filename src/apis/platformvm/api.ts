@@ -56,7 +56,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The alias for the blockchainID
    */
   getBlockchainAlias = ():string => {
-    if(typeof this.blockchainAlias === undefined){
+    if(typeof this.blockchainAlias === "undefined"){
       const netid:number = this.core.getNetworkID();
       if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
         this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
@@ -228,9 +228,9 @@ export class PlatformVMAPI extends JRPCAPI {
    * @remarks
    * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
    */
-  checkGooseEgg = async (utx:UnsignedTx): Promise<boolean> => {
+  checkGooseEgg = async (utx:UnsignedTx, outTotal:BN = new BN(0)): Promise<boolean> => {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
-    let outputTotal:BN = utx.getOutputTotal(avaxAssetID);
+    let outputTotal:BN = outTotal.gt(new BN(0)) ? outTotal : utx.getOutputTotal(avaxAssetID);
     const fee:BN = utx.getBurn(avaxAssetID);
     if(fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
@@ -1366,7 +1366,7 @@ export class PlatformVMAPI extends JRPCAPI {
       memo, asOf
     );
 
-    if(! await this.checkGooseEgg(builtUnsignedTx)) {
+    if(! await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee())) {
       /* istanbul ignore next */
       throw new Error("Failed Goose Egg Check");
     }

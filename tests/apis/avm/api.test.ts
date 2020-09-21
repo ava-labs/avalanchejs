@@ -998,7 +998,7 @@ describe('AVMAPI', () => {
     });
 
     test('buildCreateAssetTx - Variable Cap', async () => {
-      avm.setCreationTxFee(new BN(fee));
+      avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]));
       let mintOutputs:Array<SECPMintOutput>  = [secpMintOut1, secpMintOut2];
       const txu1:UnsignedTx = await avm.buildCreateAssetTx(
         set, 
@@ -1157,7 +1157,7 @@ describe('AVMAPI', () => {
     });
 
     test('buildCreateNFTAssetTx', async () => {
-      avm.setCreationTxFee(new BN(fee));
+      avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]));
       let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
       let locktime:BN = new BN(0);
 
