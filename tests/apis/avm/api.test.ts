@@ -68,8 +68,9 @@ describe('AVMAPI', () => {
   });
 
   test('can Send 1', async () => {
-    const txId = 'asdfhvl234';
-    const result:Promise<string> = api.send(username, password, 'assetId', 10, addrA, [addrB]);
+    const txId:string = 'asdfhvl234';
+    const memobuf:Buffer = Buffer.from("hello world");
+    const result:Promise<string> = api.send(username, password, 'assetId', 10, addrA, [addrB], memobuf);
     const payload:object = {
       result: {
         txID: txId,
@@ -87,9 +88,9 @@ describe('AVMAPI', () => {
   });
 
   test('can Send 2', async () => {
-    const txId = 'asdfhvl234';
-
-    const result:Promise<string> = api.send(username, password, bintools.b58ToBuffer('6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF'), new BN(10), addrA, [addrB]);
+    const txId:string = 'asdfhvl234';
+    const memobuf:Buffer = Buffer.from("hello world");
+    const result:Promise<string> = api.send(username, password, bintools.b58ToBuffer('6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF'), new BN(10), addrA, [addrB], memobuf);
     const payload:object = {
       result: {
         txID: txId,

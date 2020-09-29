@@ -1254,10 +1254,11 @@ export class AVMAPI extends JRPCAPI {
    * @param amount The amount of the asset to be sent
    * @param to The address of the recipient
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>):Promise<string> => {
+  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, memo:PayloadBase|Buffer = undefined):Promise<string> => {
     let asset:string;
     let amnt:BN;
 
@@ -1278,6 +1279,9 @@ export class AVMAPI extends JRPCAPI {
     } else {
       amnt = amount;
     }
+    if( memo instanceof PayloadBase) {
+      memo = memo.getPayload();
+    }
 
     const params:any = {
       username,
@@ -1286,6 +1290,7 @@ export class AVMAPI extends JRPCAPI {
       amount: amnt.toString(10),
       to,
       from,
+      memo
     };
     return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result.txID);
   };
