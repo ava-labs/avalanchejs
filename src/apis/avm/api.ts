@@ -1310,7 +1310,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param username The user that owns the private keys associated with the `from` addresses
    * @param password The password unlocking the user
-   * @param sendOutputs The array of SendOutput. A SendOutput is an object literal which contains an assetID, amount and to.
+   * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount and to.
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
    * @param changeAddr An address to send the change
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
