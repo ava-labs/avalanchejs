@@ -6,7 +6,7 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
-import { UTXOSet } from './utxos';
+import { UTXOSet, UTXO } from './utxos';
 import { AVMConstants } from './constants';
 import { KeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
@@ -16,16 +16,18 @@ import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import { Defaults, PlatformChainID, PrimaryAssetAlias, ONEAVAX } from '../../utils/constants';
+import { Defaults, PlatformChainID, PrimaryAssetAlias, ONEAVAX, RPCENCODINGS } from '../../utils/constants';
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
 import { SECPTransferOutput } from './outputs';
+import { Serialization } from '../../utils';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer:Serialization = Serialization.getInstance();
 
 
 /**
@@ -559,12 +561,14 @@ export class AVMAPI extends JRPCAPI {
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
    *
    * @param txid The string representation of the transaction ID
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the output types of the RPC call.
    *
    * @returns Returns a Promise<string> containing the bytes retrieved from the node
    */
-  getTx = async (txid:string):Promise<string> => {
+  getTx = async (txid:string, encoding:RPCENCODINGS = "hex"):Promise<string> => {
     const params:any = {
       txID: txid,
+      encoding
     };
     return this.callMethod('avm.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
   };
@@ -592,6 +596,7 @@ export class AVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the output types of the UTXOs call.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -603,6 +608,7 @@ export class AVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:{address:string, utxo:string} = undefined,
+    encoding:RPCENCODINGS = "hex",
     persistOpts:PersistanceOptions = undefined
   ):Promise<{
     numFetched:number,
@@ -616,8 +622,10 @@ export class AVMAPI extends JRPCAPI {
 
     const params:any = {
       addresses: addresses,
-      limit
+      limit, 
+      encoding
     };
+
     if(typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex;
     }
@@ -627,9 +635,19 @@ export class AVMAPI extends JRPCAPI {
     }
 
     return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
-
       const utxos:UTXOSet = new UTXOSet();
-      let data = response.data.result.utxos;
+
+      let resp:Array<string> = response.data.result.utxos;
+      let buffs:Array<Buffer> = resp.map((u) => {
+        return serializer.decoder(u, "display", encoding, "Buffer") as Buffer;
+      });
+      
+      let data:Array<UTXO> = buffs.map((u) => {
+        let utxo:UTXO = new UTXO();
+        utxo.fromBuffer(u);
+        return utxo;
+      });
+
       if (persistOpts && typeof persistOpts === 'object') {
         if (this.db.has(persistOpts.getName())) {
           const selfArray:Array<string> = this.db.get(persistOpts.getName());
@@ -638,10 +656,10 @@ export class AVMAPI extends JRPCAPI {
             const self:UTXOSet = new UTXOSet();
             self.addArray(selfArray);
             self.mergeByRule(utxos, persistOpts.getMergeRule());
-            data = self.getAllUTXOStrings();
+            data = self.getAllUTXOs();
           }
         }
-        this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
+        this.db.set(persistOpts.getName(), resp, persistOpts.getOverwrite());
       }
       utxos.addArray(data, false);
       response.data.result.utxos = utxos;
@@ -828,7 +846,7 @@ export class AVMAPI extends JRPCAPI {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
-  const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
+  const atomicUTXOs:UTXOSet = (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
   const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
   const atomics = atomicUTXOs.getAllUTXOs();
@@ -1222,26 +1240,24 @@ export class AVMAPI extends JRPCAPI {
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the input and output types of the RPC call.
    *
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
-  issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
-    let Transaction = '';
+  issueTx = async (tx:string | Buffer | Tx, encoding:RPCENCODINGS = "hex"):Promise<string> => {
+    const params:any = {
+      encoding
+    };
     if (typeof tx === 'string') {
-      Transaction = tx;
+      params["tx"] = serializer.encoder(tx, "display", encoding, encoding);
     } else if (tx instanceof Buffer) {
-      const txobj:Tx = new Tx();
-      txobj.fromBuffer(tx);
-      Transaction = txobj.toString();
+      params["tx"] = serializer.encoder(tx, "display", "Buffer", encoding);
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString();
+      params["tx"] = serializer.encoder(tx.toBuffer(), "display", "Buffer", encoding);
     } else {
       /* istanbul ignore next */
       throw new Error('Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
-    const params:any = {
-      tx: Transaction.toString(),
-    };
     return this.callMethod('avm.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
@@ -1294,16 +1310,17 @@ export class AVMAPI extends JRPCAPI {
    * Given a JSON representation of this Virtual Machine’s genesis state, create the byte representation of that state.
    *
    * @param genesisData The blockchain's genesis data object
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the output type of the genesis bytes.
    *
    * @returns Promise of a string of bytes
    */
-  buildGenesis = async (genesisData:object):Promise<string> => {
+  buildGenesis = async (genesisData:object, encoding:RPCENCODINGS = "hex"):Promise<string> => {
     const params:any = {
       genesisData,
+      encoding
     };
     return this.callMethod('avm.buildGenesis', params).then((response:RequestResponseData) => {
-      const r = response.data.result.bytes;
-      return r;
+      return response.data.result.bytes;
     });
   };
 

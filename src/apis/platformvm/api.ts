@@ -9,19 +9,22 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 import { KeyChain } from './keychain';
-import { Defaults, PlatformChainID, ONEAVAX } from '../../utils/constants';
+import { Defaults, PlatformChainID, ONEAVAX, RPCENCODINGS } from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXOSet } from '../platformvm/utxos';
+import { UTXOSet, UTXO} from './utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { numberToHex } from 'web3-utils';
+import { Serialization } from '../../utils';
+
+
 
 /**
  * @ignore
  */
 const bintools:BinTools = BinTools.getInstance();
+const serializer:Serialization = Serialization.getInstance();
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -697,26 +700,24 @@ export class PlatformVMAPI extends JRPCAPI {
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the input and output types of the RPC call.
    *
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
-  issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
-    let Transaction = '';
+  issueTx = async (tx:string | Buffer | Tx, encoding:RPCENCODINGS = "hex"):Promise<string> => {
+    const params:any = {
+      encoding
+    };
     if (typeof tx === 'string') {
-      Transaction = tx;
+      params["tx"] = tx;
     } else if (tx instanceof Buffer) {
-      const txobj:Tx = new Tx();
-      txobj.fromBuffer(tx);
-      Transaction = txobj.toString();
+      params["tx"] = serializer.encoder(tx, "display", "Buffer", encoding);
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString();
+      params["tx"] = serializer.encoder(tx.toBuffer(), "display", "Buffer", encoding);
     } else {
       /* istanbul ignore next */
       throw new Error('Error - platform.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
-    const params:any = {
-      tx: Transaction.toString(),
-    };
     return this.callMethod('platform.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
@@ -846,14 +847,16 @@ export class PlatformVMAPI extends JRPCAPI {
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
    *
    * @param txid The string representation of the transaction ID
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the output types of the RPC call.
    *
    * @returns Returns a Promise<string> containing the bytes retrieved from the node
    */
-  getTx = async (txid:string):Promise<string> => {
+  getTx = async (txid:string, encoding:RPCENCODINGS = "hex"):Promise<string> => {
     const params:any = {
       txID: txid,
+      encoding
     };
-    return this.callMethod('platform.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
+    return this.callMethod('avm.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
   };
 
   /**
@@ -879,6 +882,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
+   * @param encoding A string of type [[RPCENCODINGS]] which indicates the output types of the UTXOs call.
    * @param persistOpts Options available to persist these UTXOs in local storage
    *
    * @remarks
@@ -890,6 +894,7 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:{address:string, utxo:string} = undefined,
+    encoding:RPCENCODINGS = "hex",
     persistOpts:PersistanceOptions = undefined
   ):Promise<{
     numFetched:number,
@@ -916,7 +921,16 @@ export class PlatformVMAPI extends JRPCAPI {
     return this.callMethod('platform.getUTXOs', params).then((response:RequestResponseData) => {
 
       const utxos:UTXOSet = new UTXOSet();
-      let data = response.data.result.utxos;
+      let resp:Array<string> = response.data.result.utxos;
+      let buffs:Array<Buffer> = resp.map((u) => {
+        return serializer.decoder(u, "display", encoding, "Buffer") as Buffer;
+      });
+      
+      let data:Array<UTXO> = buffs.map((u) => {
+        let utxo:UTXO = new UTXO();
+        utxo.fromBuffer(u);
+        return utxo;
+      });
       if (persistOpts && typeof persistOpts === 'object') {
         if (this.db.has(persistOpts.getName())) {
           const selfArray:Array<string> = this.db.get(persistOpts.getName());
@@ -925,14 +939,15 @@ export class PlatformVMAPI extends JRPCAPI {
             const self:UTXOSet = new UTXOSet();
             self.addArray(selfArray);
             self.mergeByRule(utxos, persistOpts.getMergeRule());
-            data = self.getAllUTXOStrings();
+            data = self.getAllUTXOs();
           }
         }
-        this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
+        this.db.set(persistOpts.getName(), resp, persistOpts.getOverwrite());
       }
       utxos.addArray(data, false);
-      response.data.result.utxos = utxos;
-      return response.data.result;
+      let result = Object.assign({}, response.data.result);
+      result["utxos"] = utxos;
+      return result;
     });
   };
 
@@ -984,7 +999,7 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = bintools.cb58Encode(sourceChain);
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
-    const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
+    const atomicUTXOs:UTXOSet = (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
     if( memo instanceof PayloadBase) {

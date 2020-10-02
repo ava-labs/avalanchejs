@@ -517,15 +517,15 @@ describe('AVMAPI', () => {
       numFetched:number,
       utxos:UTXOSet,
       endIndex:{address:string, utxo:string}
-    }> = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, persistOpts);
-    const payload:object = {
+    }> = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, "cb58", persistOpts);
+    let payload:object = {
       result: {
         numFetched:3,
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
         stopIndex: {address: "a", utxo: "b"}
       },
     };
-    const responseObj = {
+    let responseObj = {
       data: payload,
     };
 
@@ -536,13 +536,26 @@ describe('AVMAPI', () => {
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
 
     addresses = set.getAddresses().map((a) => api.addressFromBuffer(a));
-    result = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, persistOpts);
+    result = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, "cb58", persistOpts);
+
+    /* resetting payload */
+    payload = {
+      result: {
+        numFetched:3,
+        utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
+        stopIndex: {address: "a", utxo: "b"}
+      },
+    };
+    responseObj = {
+      data: payload,
+    };
 
     mockAxios.mockResponse(responseObj);
     response = (await result).utxos;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(2);
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
+
   });
 
   describe('Transactions', () => {
@@ -1411,7 +1424,7 @@ describe('AVMAPI', () => {
       const addrbuff2 = addrs2.map((a) => avm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => avm.parseAddress(a));
       const fungutxo:UTXO = set.getUTXO(fungutxoids[1]);
-      const fungutxostr:string = fungutxo.toString();
+      const fungutxostr:string = serializer.decoder(fungutxo.toString(), "display", "cb58", "hex");
       
       const result:Promise<UnsignedTx> = avm.buildImportTx(
         set, addrs1, PlatformChainID, addrs3, addrs1, addrs2, new UTF8Payload("hello world"), UnixNow(), locktime, threshold

@@ -5,6 +5,8 @@
 
 import BN from "bn.js";
 
+export type RPCENCODINGS = "hex"|"cb58"; 
+
 export const PrivateKeyPrefix:string = "PrivateKey-";
 
 export const NodeIDPrefix:string = "NodeID-";
