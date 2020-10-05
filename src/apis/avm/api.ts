@@ -1259,7 +1259,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string = undefined):Promise<string> => {
+  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
     let m:string;
@@ -1307,7 +1307,7 @@ export class AVMAPI extends JRPCAPI {
       changeAddr: changeAddr,
       memo: m
     };
-    return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -1322,7 +1322,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string = undefined):Promise<string> => {
+  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
     let m:string;
@@ -1367,7 +1367,7 @@ export class AVMAPI extends JRPCAPI {
       changeAddr: changeAddr,
       memo: m
     };
-    return this.callMethod('avm.sendMultiple', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod('avm.sendMultiple', params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
