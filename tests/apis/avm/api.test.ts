@@ -68,11 +68,14 @@ describe('AVMAPI', () => {
   });
 
   test('can Send 1', async () => {
-    const txId = 'asdfhvl234';
-    const result:Promise<string> = api.send(username, password, 'assetId', 10, addrA, [addrB]);
+    const txId:string = 'asdfhvl234';
+    const memo:string = "hello world";
+    const changeAddr:string = "X-local1"
+    const result:Promise<object> = api.send(username, password, 'assetId', 10, addrA, [addrB], addrA, memo);
     const payload:object = {
       result: {
         txID: txId,
+        changeAddr: changeAddr
       },
     };
     const responseObj = {
@@ -80,19 +83,22 @@ describe('AVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(txId);
+    expect(response['txID']).toBe(txId);
+    expect(response['changeAddr']).toBe(changeAddr);
   });
 
   test('can Send 2', async () => {
-    const txId = 'asdfhvl234';
-
-    const result:Promise<string> = api.send(username, password, bintools.b58ToBuffer('6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF'), new BN(10), addrA, [addrB]);
+    const txId:string = 'asdfhvl234';
+    const memo:Buffer = bintools.stringToBuffer("hello world")
+    const changeAddr:string = "X-local1"
+    const result:Promise<object> = api.send(username, password, bintools.b58ToBuffer('6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF'), new BN(10), addrA, [addrB], addrA, memo);
     const payload:object = {
       result: {
         txID: txId,
+        changeAddr: changeAddr
       },
     };
     const responseObj = {
@@ -100,10 +106,34 @@ describe('AVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(txId);
+    expect(response['txID']).toBe(txId);
+    expect(response['changeAddr']).toBe(changeAddr);
+  });
+
+  test('can Send Multiple', async () => {
+    const txId:string = 'asdfhvl234';
+    const memo:string = "hello world";
+    const changeAddr:string = "X-local1"
+    const result:Promise<object> = api.sendMultiple(username, password, [{assetID: 'assetId', amount: 10, to: addrA}], [addrB], addrA, memo);
+    const payload:object = {
+      result: {
+        txID: txId,
+        changeAddr: changeAddr
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:object = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response['txID']).toBe(txId);
+    expect(response['changeAddr']).toBe(changeAddr);
   });
 
   test('refreshBlockchainID', async () => {
@@ -170,7 +200,7 @@ describe('AVMAPI', () => {
       utxoIDs: [
         {
           "txID":"LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
-        "outputIndex":0
+          "outputIndex":0
         }
       ]
     };

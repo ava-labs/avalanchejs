@@ -659,7 +659,7 @@ export class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -723,7 +723,7 @@ export class AVMAPI extends JRPCAPI {
    * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
    * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -790,7 +790,7 @@ export class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -872,7 +872,7 @@ export class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -963,7 +963,7 @@ export class AVMAPI extends JRPCAPI {
    * @param symbol String for the ticker symbol of the asset
    * @param denomination Number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
    * @param mintOutputs Optional. Array of [[SECPMintOutput]]s to be included in the transaction. These outputs can be spent to mint more tokens.
-   * @param memo Optional. Contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
@@ -1070,7 +1070,7 @@ export class AVMAPI extends JRPCAPI {
   * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
   * @param name String for the descriptive name of the asset
   * @param symbol String for the ticker symbol of the asset
-  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   * @param locktime Optional. The locktime field created in the resulting mint output
   * 
@@ -1152,7 +1152,7 @@ export class AVMAPI extends JRPCAPI {
   * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
   * @param groupID Optional. The group this NFT is issued to.
   * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
-  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   * 
   * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
@@ -1253,11 +1253,13 @@ export class AVMAPI extends JRPCAPI {
    * @param assetID The assetID of the asset to send
    * @param amount The amount of the asset to be sent
    * @param to The address of the recipient
-   * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   * @param changeAddr Optional. An address to send the change
+   * @param memo Optional. CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>):Promise<string> => {
+  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer> = undefined, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
 
@@ -1265,8 +1267,6 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
     }
-
-    from = this._cleanAddressArray(from, 'send');
 
     if (typeof assetID !== 'string') {
       asset = bintools.cb58Encode(assetID);
@@ -1280,14 +1280,105 @@ export class AVMAPI extends JRPCAPI {
     }
 
     const params:any = {
-      username,
-      password,
+      username: username,
+      password: password,
       assetID: asset,
       amount: amnt.toString(10),
-      to,
-      from,
+      to: to
     };
-    return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result.txID);
+
+    from = this._cleanAddressArray(from, 'send');
+    if(typeof from !== "undefined"){
+      params["from"] = from;
+    }
+
+    if (typeof changeAddr !== 'undefined') {
+      if(typeof this.parseAddress(changeAddr) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+      }
+      params["changeAddr"] = changeAddr;
+    } 
+
+    if(typeof memo !== "undefined") {
+      if(typeof memo !== 'string') {
+        params["memo"] = bintools.cb58Encode(memo);
+      } else {
+        params["memo"] = memo;
+      }
+    }
+    
+    return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result);
+  };
+
+  /**
+   * Sends an amount of assetID to an array of specified addresses from a list of owned of addresses.
+   *
+   * @param username The user that owns the private keys associated with the `from` addresses
+   * @param password The password unlocking the user
+   * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount, and to.
+   * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   * @param changeAddr Optional. An address to send the change
+   * @param memo Optional. CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
+   *
+   * @returns Promise for the string representing the transaction's ID.
+   */
+  sendMultiple = async (username:string, password:string, 
+      sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, 
+      from:Array<string> | Array<Buffer> = undefined, 
+      changeAddr:string = undefined, 
+      memo:string | Buffer = undefined
+    ):Promise<{txID: string, changeAddr: string}> => {
+    let asset:string;
+    let amnt:BN;
+    let sOutputs:Array<{assetID:string, amount:string, to:string}> = [];
+
+    sendOutputs.forEach((output) => {
+      if (typeof this.parseAddress(output.to) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.sendMultiple: Invalid address format ${output.to}`);
+      }
+      if (typeof output.assetID !== 'string') {
+        asset = bintools.cb58Encode(output.assetID);
+      } else {
+        asset = output.assetID;
+      }
+      if (typeof output.amount === 'number') {
+        amnt = new BN(output.amount);
+      } else {
+        amnt = output.amount;
+      }
+      sOutputs.push({to: output.to, assetID: asset, amount: amnt.toString(10)})
+    });
+
+    const params:any = {
+      username: username,
+      password: password,
+      outputs: sOutputs,
+    };
+
+    from = this._cleanAddressArray(from, 'send');
+    if(typeof from !== "undefined"){
+      params["from"] = from;
+    }
+
+    if (typeof changeAddr !== 'undefined') {
+      if(typeof this.parseAddress(changeAddr) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+      }
+      params["changeAddr"] = changeAddr;
+    } 
+
+    if(typeof memo !== "undefined") {
+      if(typeof memo !== 'string') {
+        params["memo"] = bintools.cb58Encode(memo);
+      } else {
+        params["memo"] = memo;
+      }
+    }
+    
+    return this.callMethod('avm.sendMultiple', params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
