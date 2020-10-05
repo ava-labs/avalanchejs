@@ -1254,7 +1254,7 @@ export class AVMAPI extends JRPCAPI {
    * @param amount The amount of the asset to be sent
    * @param to The address of the recipient
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-   * @param changeAddr An address to send the change
+   * @param changeAddr Optional An address to send the change
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
@@ -1315,7 +1315,7 @@ export class AVMAPI extends JRPCAPI {
    * @param password The password unlocking the user
    * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount, and to.
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-   * @param changeAddr An address to send the change
+   * @param changeAddr Optional An address to send the change
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
