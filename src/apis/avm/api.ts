@@ -1353,7 +1353,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== 'undefined') {
       if (typeof this.parseAddress(changeAddr) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+        throw new Error(`Error - AVMAPI.sendMultiple: Invalid address format ${changeAddr}`);
       }
     }
     if (typeof memo !== 'undefined') {
