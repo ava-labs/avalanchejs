@@ -1259,7 +1259,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string = undefined):Promise<{txID: string, changeAddr: string}> => {
+  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
     let m:string;
@@ -1322,7 +1322,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string = undefined):Promise<{txID: string, changeAddr: string}> => {
+  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
     let m:string;
