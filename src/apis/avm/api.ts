@@ -1253,23 +1253,20 @@ export class AVMAPI extends JRPCAPI {
    * @param assetID The assetID of the asset to send
    * @param amount The amount of the asset to be sent
    * @param to The address of the recipient
-   * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-   * @param changeAddr Optional An address to send the change
-   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
+   * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   * @param changeAddr Optional. An address to send the change
+   * @param memo Optional. CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
+  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer> = undefined, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
-    let m:string = undefined;
 
     if (typeof this.parseAddress(to) === 'undefined') {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
     }
-
-    from = this._cleanAddressArray(from, 'send');
 
     if (typeof assetID !== 'string') {
       asset = bintools.cb58Encode(assetID);
@@ -1281,30 +1278,36 @@ export class AVMAPI extends JRPCAPI {
     } else {
       amnt = amount;
     }
-    if (typeof changeAddr !== 'undefined') {
-      if (typeof this.parseAddress(changeAddr) === 'undefined') {
-        /* istanbul ignore next */
-        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
-      }
-    }
-    if (typeof memo !== 'undefined') {
-      if(typeof memo !== 'string') {
-        m = bintools.cb58Encode(memo);
-      } else {
-        m = memo;
-      }
-    }
 
     const params:any = {
       username: username,
       password: password,
       assetID: asset,
       amount: amnt.toString(10),
-      to: to,
-      from: from,
-      changeAddr: changeAddr,
-      memo: m
+      to: to
     };
+
+    from = this._cleanAddressArray(from, 'send');
+    if(typeof from !== "undefined"){
+      params["from"] = from;
+    }
+
+    if (typeof changeAddr !== 'undefined') {
+      if(typeof this.parseAddress(changeAddr) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+      }
+      params["changeAddr"] = changeAddr;
+    } 
+
+    if(typeof memo !== "undefined") {
+      if(typeof memo !== 'string') {
+        params["memo"] = bintools.cb58Encode(memo);
+      } else {
+        params["memo"] = memo;
+      }
+    }
+    
     return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result);
   };
 
@@ -1314,24 +1317,21 @@ export class AVMAPI extends JRPCAPI {
    * @param username The user that owns the private keys associated with the `from` addresses
    * @param password The password unlocking the user
    * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount, and to.
-   * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-   * @param changeAddr Optional An address to send the change
-   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
+   * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
+   * @param changeAddr Optional. An address to send the change
+   * @param memo Optional. CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
+  sendMultiple = async (username:string, password:string, 
+      sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, 
+      from:Array<string> | Array<Buffer> = undefined, 
+      changeAddr:string = undefined, 
+      memo:string | Buffer = undefined
+    ):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
-    let m:string = undefined;
     let sOutputs:Array<{assetID:string, amount:string, to:string}> = [];
-
-    if (typeof this.parseAddress(changeAddr) === 'undefined') {
-      /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.sendMultiple: Invalid address format ${changeAddr}`);
-    }
-
-    from = this._cleanAddressArray(from, 'sendMultiple');
 
     sendOutputs.forEach((output) => {
       if (typeof this.parseAddress(output.to) === 'undefined') {
@@ -1349,28 +1349,35 @@ export class AVMAPI extends JRPCAPI {
         amnt = output.amount;
       }
       sOutputs.push({to: output.to, assetID: asset, amount: amnt.toString(10)})
-    })
-    if (typeof changeAddr !== 'undefined') {
-      if (typeof this.parseAddress(changeAddr) === 'undefined') {
-        /* istanbul ignore next */
-        throw new Error(`Error - AVMAPI.sendMultiple: Invalid address format ${changeAddr}`);
-      }
-    }
-    if (typeof memo !== 'undefined') {
-      if(typeof memo !== 'string') {
-        m = bintools.cb58Encode(memo);
-      } else {
-        m = memo;
-      }
-    }
+    });
+
     const params:any = {
       username: username,
       password: password,
       outputs: sOutputs,
-      from: from,
-      changeAddr: changeAddr,
-      memo: m
     };
+
+    from = this._cleanAddressArray(from, 'send');
+    if(typeof from !== "undefined"){
+      params["from"] = from;
+    }
+
+    if (typeof changeAddr !== 'undefined') {
+      if(typeof this.parseAddress(changeAddr) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+      }
+      params["changeAddr"] = changeAddr;
+    } 
+
+    if(typeof memo !== "undefined") {
+      if(typeof memo !== 'string') {
+        params["memo"] = bintools.cb58Encode(memo);
+      } else {
+        params["memo"] = memo;
+      }
+    }
+    
     return this.callMethod('avm.sendMultiple', params).then((response:RequestResponseData) => response.data.result);
   };
 
