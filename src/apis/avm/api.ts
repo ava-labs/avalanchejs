@@ -659,7 +659,7 @@ export class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -723,7 +723,7 @@ export class AVMAPI extends JRPCAPI {
    * @param fromAddresses The addresses being used to send the NFT from the utxoID provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
    * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nfts this transaction is sending
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -790,7 +790,7 @@ export class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -872,7 +872,7 @@ export class AVMAPI extends JRPCAPI {
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
@@ -963,7 +963,7 @@ export class AVMAPI extends JRPCAPI {
    * @param symbol String for the ticker symbol of the asset
    * @param denomination Number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
    * @param mintOutputs Optional. Array of [[SECPMintOutput]]s to be included in the transaction. These outputs can be spent to mint more tokens.
-   * @param memo Optional. Contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
@@ -1070,7 +1070,7 @@ export class AVMAPI extends JRPCAPI {
   * @param minterSets is a list where each element specifies that threshold of the addresses in minters may together mint more of the asset by signing a minting transaction
   * @param name String for the descriptive name of the asset
   * @param symbol String for the ticker symbol of the asset
-  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   * @param locktime Optional. The locktime field created in the resulting mint output
   * 
@@ -1152,7 +1152,7 @@ export class AVMAPI extends JRPCAPI {
   * @param utxoid A base58 utxoID or an array of base58 utxoIDs for the nft mint output this transaction is sending
   * @param groupID Optional. The group this NFT is issued to.
   * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
-  * @param memo Optional contains arbitrary bytes, up to 256 bytes
+  * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
   * 
   * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
@@ -1318,7 +1318,7 @@ export class AVMAPI extends JRPCAPI {
    * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount, and to.
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
    * @param changeAddr An address to send the change
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
    */
