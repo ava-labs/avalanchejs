@@ -1259,27 +1259,17 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
+  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer>, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
-    let m:string;
+    let m:string = undefined;
 
     if (typeof this.parseAddress(to) === 'undefined') {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
     }
 
-    if (typeof this.parseAddress(changeAddr) === 'undefined') {
-      /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
-    }
-
     from = this._cleanAddressArray(from, 'send');
-
-    if (typeof this.parseAddress(changeAddr) === 'undefined') {
-      /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
-    }
 
     if (typeof assetID !== 'string') {
       asset = bintools.cb58Encode(assetID);
@@ -1291,10 +1281,18 @@ export class AVMAPI extends JRPCAPI {
     } else {
       amnt = amount;
     }
-    if(typeof memo !== 'string') {
-      m = bintools.cb58Encode(memo);
-    } else {
-      m = memo;
+    if (typeof changeAddr !== 'undefined') {
+      if (typeof this.parseAddress(changeAddr) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+      }
+    }
+    if (typeof memo !== 'undefined') {
+      if(typeof memo !== 'string') {
+        m = bintools.cb58Encode(memo);
+      } else {
+        m = memo;
+      }
     }
 
     const params:any = {
@@ -1322,10 +1320,10 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
+  sendMultiple = async (username:string, password:string, sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, from:Array<string> | Array<Buffer>, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
-    let m:string;
+    let m:string = undefined;
     let sOutputs:Array<{assetID:string, amount:string, to:string}> = [];
 
     if (typeof this.parseAddress(changeAddr) === 'undefined') {
@@ -1352,13 +1350,19 @@ export class AVMAPI extends JRPCAPI {
       }
       sOutputs.push({to: output.to, assetID: asset, amount: amnt.toString(10)})
     })
-
-    if(typeof memo !== 'string') {
-      m = bintools.cb58Encode(memo);
-    } else {
-      m = memo;
+    if (typeof changeAddr !== 'undefined') {
+      if (typeof this.parseAddress(changeAddr) === 'undefined') {
+        /* istanbul ignore next */
+        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+      }
     }
-
+    if (typeof memo !== 'undefined') {
+      if(typeof memo !== 'string') {
+        m = bintools.cb58Encode(memo);
+      } else {
+        m = memo;
+      }
+    }
     const params:any = {
       username: username,
       password: password,
