@@ -1255,7 +1255,7 @@ export class AVMAPI extends JRPCAPI {
    * @param to The address of the recipient
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
    * @param changeAddr An address to send the change
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    *
    * @returns Promise for the string representing the transaction's ID.
    */
@@ -1267,6 +1267,11 @@ export class AVMAPI extends JRPCAPI {
     if (typeof this.parseAddress(to) === 'undefined') {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
+    }
+
+    if (typeof this.parseAddress(changeAddr) === 'undefined') {
+      /* istanbul ignore next */
+      throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
     }
 
     from = this._cleanAddressArray(from, 'send');
@@ -1295,7 +1300,7 @@ export class AVMAPI extends JRPCAPI {
     const params:any = {
       username: username,
       password: password,
-      assetID: assetID,
+      assetID: asset,
       amount: amnt.toString(10),
       to: to,
       from: from,
@@ -1310,7 +1315,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param username The user that owns the private keys associated with the `from` addresses
    * @param password The password unlocking the user
-   * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount and to.
+   * @param sendOutputs The array of SendOutputs. A SendOutput is an object literal which contains an assetID, amount, and to.
    * @param from An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
    * @param changeAddr An address to send the change
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
