@@ -86,7 +86,8 @@ describe('AVMAPI', () => {
     const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(txId);
+    expect(response['txID']).toBe(txId);
+    expect(response['changeAddr']).toBe(changeAddr);
   });
 
   test('can Send 2', async () => {
@@ -108,7 +109,8 @@ describe('AVMAPI', () => {
     const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(txId);
+    expect(response['txID']).toBe(txId);
+    expect(response['changeAddr']).toBe(changeAddr);
   });
 
   test('can Send Multiple', async () => {
@@ -130,7 +132,8 @@ describe('AVMAPI', () => {
     const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(txId);
+    expect(response['txID']).toBe(txId);
+    expect(response['changeAddr']).toBe(changeAddr);
   });
 
   test('refreshBlockchainID', async () => {
