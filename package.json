@@ -30,7 +30,7 @@
   "homepage": "https://github.com/ava-labs/avalanchejs#readme",
   "devDependencies": {
     "@types/bech32": "^1.1.2",
-    "@types/bn.js": "^4.11.6",
+    "@types/bn.js": "4.11.6",
     "@types/create-hash": "^1.2.2",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.62",

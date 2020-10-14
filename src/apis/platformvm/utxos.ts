@@ -180,9 +180,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const fromAddresses:Array<Buffer> = aad.getSenders();
       if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(fromAddresses, asOf)) {
         const am:AssetAmount = aad.getAssetAmount(assetKey);
-        if(!am.isFinished()){
+        if(!am.isFinished()) {
           const uout:AmountOutput = u.getOutput() as AmountOutput;
-          if(!(assetKey in outs)){
+          if(!(assetKey in outs)) {
             outs[assetKey] = {
               lockedStakeable:[],
               unlocked:[]
@@ -192,7 +192,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
           let input:AmountInput;
-          if(uout instanceof StakeableLockOut){
+          if(uout instanceof StakeableLockOut) {
             let stakeout:StakeableLockOut = uout as StakeableLockOut;
             let pinput:ParseableInput = new ParseableInput(new SECPTransferInput(amount));
             input = new StakeableLockIn(amount, stakeout.getStakeableLocktime(), pinput);
@@ -210,13 +210,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             const idx:number = uout.getAddressIdx(spenders[j]);
             if (idx === -1) {
               /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.buildBaseTx: no such '
+              throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
               + `address in output: ${spenders[j]}`);
             }
             xferin.getInput().addSignatureIdx(idx, spenders[j]);
           }
           aad.addInput(xferin);
-        } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)){
+        } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)) {
           /**
            * Leaving the below lines, not simply for posterity, but for clarification.
            * AssetIDs may have mixed OutputTypes. 
@@ -244,7 +244,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const change:BN = amounts[i].getChange();
       const isStakeableLockChange = amounts[i].getStakeableLockChange();
       if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
-        if(stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))){
+        if(stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))) {
           let ls:Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
           let sspent:BN = new BN(zero);
           let schange:BN = isStakeableLockChange ? change : new BN(zero);

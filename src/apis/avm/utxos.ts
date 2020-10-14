@@ -191,7 +191,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             const idx:number = uout.getAddressIdx(spenders[j]);
             if (idx === -1) {
               /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.buildBaseTx: no such '
+              throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
               + `address in output: ${spenders[j]}`);
             }
             xferin.getInput().addSignatureIdx(idx, spenders[j]);
