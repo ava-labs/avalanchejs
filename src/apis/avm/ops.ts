@@ -10,6 +10,7 @@ import { NBytes } from '../../common/nbytes';
 import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';
 import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
+import { off } from 'process';
 
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
@@ -268,22 +269,19 @@ export class SECPMintOperation extends Operation {
     return {
       ...fields,
       "mintOutput": this.mintOutput.serialize(encoding),
-      "transferOutputs": this.transferOutputs.map((t) => t.serialize(encoding))
+      "transferOutputs": this.transferOutput.serialize(encoding)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.mintOutput = new SECPMintOutput();
     this.mintOutput.deserialize(fields["mintOutput"], encoding);
-    this.transferOutputs = fields["transferOutputs"].map((t:object) => {
-      let xferout:SECPTransferOutput = new SECPTransferOutput();
-      xferout.deserialize(t, encoding);
-      return xferout;
-    });
+    this.transferOutput = new SECPTransferOutput();
+    this.transferOutput.deserialize(fields["transferOutputs"], encoding);
   }
 
   protected mintOutput:SECPMintOutput = undefined;
-  protected transferOutputs:Array<SECPTransferOutput> = [];
+  protected transferOutput:SECPTransferOutput = undefined;
 
   /**
    * Returns the operation ID.
@@ -307,10 +305,10 @@ export class SECPMintOperation extends Operation {
   }
 
   /**
-   * Returns the array of [[SECPTransferOutput]]s to be produced by this operation.
+   * Returns [[SECPTransferOutput]] to be produced by this operation.
    */
-  getTransferOutputs():Array<SECPTransferOutput> {
-    return this.transferOutputs;
+  getTransferOutput():SECPTransferOutput {
+    return this.transferOutput;
   }
 
   /**
@@ -320,14 +318,8 @@ export class SECPMintOperation extends Operation {
     offset = super.fromBuffer(bytes, offset);
     this.mintOutput = new SECPMintOutput();
     offset = this.mintOutput.fromBuffer(bytes, offset);
-    let numoutputs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-    offset += 4;
-    this.transferOutputs = [];
-    for(let i:number = 0; i < numoutputs; i++) {
-      let transferOut:SECPTransferOutput = new SECPTransferOutput();
-      offset = transferOut.fromBuffer(bytes, offset);
-      this.transferOutputs.push(transferOut);
-    }
+    this.transferOutput = new SECPTransferOutput();
+    offset = this.transferOutput.fromBuffer(bytes, offset);
     return offset;
   }
 
@@ -337,20 +329,17 @@ export class SECPMintOperation extends Operation {
   toBuffer():Buffer {
     let superbuff:Buffer = super.toBuffer();
     let mintoutBuff:Buffer = this.mintOutput.toBuffer();
+    let transferOutBuff:Buffer = this.transferOutput.toBuffer();
     let bsize:number = 
       superbuff.length + 
-      mintoutBuff.length; 
+      mintoutBuff.length + 
+      transferOutBuff.length; 
 
     let barr:Array<Buffer> = [
       superbuff, 
-      mintoutBuff
+      mintoutBuff,
+      transferOutBuff
     ];
-
-    for(let i = 0; i < this.transferOutputs.length; i++) {
-      let b:Buffer = this.transferOutputs[i].toBuffer();
-      barr.push(b);
-      bsize += b.length;
-    }
 
     return Buffer.concat(barr,bsize);
   }
@@ -359,15 +348,15 @@ export class SECPMintOperation extends Operation {
    * An [[Operation]] class which mints new tokens on an assetID.
    * 
    * @param mintOutput The [[SECPMintOutput]] that will be produced by this transaction.
-   * @param transferOutputs An array of [[SECPTransferOutput]]s that will be produced from this minting operation.
+   * @param transferOutput A [[SECPTransferOutput]] that will be produced from this minting operation.
    */
-  constructor(mintOutput:SECPMintOutput = undefined, transferOutputs:Array<SECPTransferOutput> = undefined){
+  constructor(mintOutput:SECPMintOutput = undefined, transferOutput:SECPTransferOutput = undefined){
     super();
     if(typeof mintOutput !== 'undefined') {
       this.mintOutput = mintOutput;
     } 
-    if(typeof transferOutputs !== 'undefined' && transferOutputs.length) {
-        this.transferOutputs = transferOutputs;
+    if(typeof transferOutput !== 'undefined') {
+        this.transferOutput = transferOutput;
     }
   }
 

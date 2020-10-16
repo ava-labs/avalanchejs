@@ -715,7 +715,7 @@ describe('AVMAPI', () => {
       secpMintUTXO = new UTXO(AVMConstants.LATESTCODEC, secpMintTXID, 0, assetID, secpMintOut1);
       secpMintXferOut1 = new SECPTransferOutput(new BN(123), addrs3.map((a) => avm.parseAddress(a)), UnixNow(), 2);
       secpMintXferOut2 = new SECPTransferOutput(new BN(456), [avm.parseAddress(addrs2[0])], UnixNow(), 1);
-      secpMintOp = new SECPMintOperation(secpMintOut1, [secpMintXferOut1, secpMintXferOut2]);
+      secpMintOp = new SECPMintOperation(secpMintOut1, secpMintXferOut1);
 
       set.add(secpMintUTXO);
 
@@ -1120,7 +1120,7 @@ describe('AVMAPI', () => {
       const txu1:UnsignedTx = await avm.buildSECPMintTx(
         set, 
         newMinter,
-        [secpMintXferOut1, secpMintXferOut2],
+        secpMintXferOut1,
         addrs1,
         addrs2,
         secpMintUTXO.getUTXOID()
@@ -1130,7 +1130,7 @@ describe('AVMAPI', () => {
         avalanche.getNetworkID(), 
         bintools.cb58Decode(avm.getBlockchainID()),
         newMinter,
-        [secpMintXferOut1, secpMintXferOut2],
+        secpMintXferOut1,
         addrs1.map((a) => avm.parseAddress(a)), 
         addrs2.map((a) => avm.parseAddress(a)), 
         secpMintUTXO.getUTXOID(),

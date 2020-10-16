@@ -391,7 +391,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
    * @param networkid The number representing NetworkID of the node
    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
    * @param mintOwner A [[SECPMintOutput]] which specifies the new set of minters
-   * @param transferOwners An array of [[SECPTransferOutput]]s which specifies where the minted tokens will go
+   * @param transferOwner A [[SECPTransferOutput]] which specifies where the minted tokens will go
    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
    * @param mintUTXOID The UTXOID for the [[SCPMintOutput]] being spent to produce more tokens
@@ -404,7 +404,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     networkid:number, 
     blockchainid:Buffer,
     mintOwner:SECPMintOutput,
-    transferOwners:Array<SECPTransferOutput>,
+    transferOwner:SECPTransferOutput,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer>,
     mintUTXOID:string,
@@ -430,7 +430,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     let ops:Array<TransferableOperation> = [];
-    let mintOp:SECPMintOperation =  new SECPMintOperation(mintOwner, transferOwners);
+    let mintOp:SECPMintOperation =  new SECPMintOperation(mintOwner, transferOwner);
     
     let utxo:UTXO = this.getUTXO(mintUTXOID);
     if(typeof utxo === "undefined") {

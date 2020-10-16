@@ -393,15 +393,14 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         const numstakeouts = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         const outcount:number = numstakeouts.readUInt32BE(0);
-        this.outs = [];
+        this.stakeOuts = [];
         for(let i = 0; i < outcount; i++) {
             const xferout:TransferableOutput = new TransferableOutput();
             offset = xferout.fromBuffer(bytes, offset);
-            this.outs.push(xferout);
+            this.stakeOuts.push(xferout);
         }
         this.rewardOwners = new ParseableOutput();
         offset = this.rewardOwners.fromBuffer(bytes, offset);
-        offset += PlatformVMConstants.ADDRESSLENGTH;
         return offset;
     }
 
