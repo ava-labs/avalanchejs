@@ -1635,7 +1635,7 @@ describe('PlatformVMAPI', () => {
         addrbuff1,         
         addrbuff2, 
         addrbuff3,
-        1,
+        1, 
         platformvm.getCreationTxFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
