@@ -10,8 +10,8 @@ import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { KeyChain } from 'src/apis/platformvm/keychain';
-import { SECPTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
-import { TransferableInput, SECPTransferInput } from 'src/apis/platformvm/inputs';
+import { SECPTransferOutput, TransferableOutput, AmountOutput, ParseableOutput, StakeableLockOut } from 'src/apis/platformvm/outputs';
+import { TransferableInput, SECPTransferInput, AmountInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
@@ -20,7 +20,7 @@ import { UTF8Payload } from 'src/utils/payload';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
-import { ParseableOutput, StakeableLockOut } from '../../../src/apis/platformvm/outputs';
+import { AddValidatorTx } from 'src/apis/platformvm/validationtx';
 
 /**
  * @ignore
@@ -1548,22 +1548,21 @@ describe('PlatformVMAPI', () => {
 
       let dummySet:UTXOSet = new UTXOSet();
 
-      let lockedBaseOut:SECPTransferOutput = new SECPTransferOutput(new BN(2), addrbuff1, locktime, 1);
+      let lockedBaseOut:SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1);
       let lockedBaseXOut:ParseableOutput = new ParseableOutput(lockedBaseOut);
-      let lockedOut:StakeableLockOut = new StakeableLockOut(new BN(2), addrbuff1, locktime, 1, locktime, lockedBaseXOut)
-      let lockedXOut:TransferableOutput = new TransferableOutput(assetID, lockedOut);
+      let lockedOut:StakeableLockOut = new StakeableLockOut(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1, locktime, lockedBaseXOut)
       
       let txidLocked:Buffer = Buffer.alloc(32);
-      txidLocked.fill(2);
+      txidLocked.fill(1);
       let txidxLocked:Buffer = Buffer.alloc(4);
-      txidxLocked.writeUInt32BE(2, 0);
+      txidxLocked.writeUInt32BE(1, 0);
       const lu:UTXO = new UTXO(0, txidLocked, txidxLocked, assetID, lockedOut);
       
       let txidUnlocked:Buffer = Buffer.alloc(32);
-      txidUnlocked.fill(1);
+      txidUnlocked.fill(2);
       let txidxUnlocked:Buffer = Buffer.alloc(4);
-      txidxUnlocked.writeUInt32BE(1, 0);
-      let unlockedOut:SECPTransferOutput = new SECPTransferOutput(amount, addrbuff1, locktime, 1);
+      txidxUnlocked.writeUInt32BE(2, 0);
+      let unlockedOut:SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1);
       const ulu:UTXO = new UTXO(0, txidUnlocked, txidxUnlocked, assetID, unlockedOut);
 
       dummySet.add(ulu);
@@ -1585,77 +1584,41 @@ describe('PlatformVMAPI', () => {
         new UTF8Payload("hello world"), UnixNow()
       );
 
-      const txu2:UnsignedTx = dummySet.buildAddValidatorTx(
-        networkid, bintools.cb58Decode(blockchainid), 
-        assetID,
-        addrbuff3,
-        addrbuff1,         
-        addrbuff2, 
-        NodeIDStringToBuffer(nodeID), 
-        startTime,
-        endTime,
-        amount,
-        locktime,
-        threshold,
-        addrbuff3,
-        0.1335,
-        new BN(0), 
-        assetID,
-        new UTF8Payload("hello world").getPayload(), UnixNow()
-      );
-      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
-      expect(txu2.toString()).toBe(txu1.toString());
+      let txu1Ins = (txu1.getTransaction() as AddValidatorTx).getIns();
+      let txu1Outs = (txu1.getTransaction() as AddValidatorTx).getOuts();
+      let txu1Stake = (txu1.getTransaction() as AddValidatorTx).getStakeOuts();
+      let txu1Total = (txu1.getTransaction() as AddValidatorTx).getTotalOuts();
 
-      let tx1:Tx = txu1.sign(platformvm.keyChain());
-      let checkTx:string = tx1.toBuffer().toString("hex");
-      let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
+      let intotal:BN = new BN(0);
 
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
-      let tx2newobj:object = JSON.parse(tx1str);
-      let tx2:Tx = new Tx();
-      tx2.deserialize(tx2newobj, "hex");
+      for(let i = 0; i < txu1Ins.length; i++) {
+        intotal = intotal.add((txu1Ins[i].getInput() as AmountInput).getAmount());
+      }
 
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
+      let outtotal:BN = new BN(0);
 
-      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+      for(let i = 0; i < txu1Outs.length; i++) {
+        outtotal = outtotal.add((txu1Outs[i].getOutput() as AmountOutput).getAmount());
+      }
 
-      let tx3:Tx = txu1.sign(platformvm.keyChain());
-      let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
+      let staketotal:BN = new BN(0);
 
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
-      let tx4newobj:object = JSON.parse(tx3str);
-      let tx4:Tx = new Tx();
-      tx4.deserialize(tx4newobj, "display");
+      for(let i = 0; i < txu1Stake.length; i++) {
+        staketotal = staketotal.add((txu1Stake[i].getOutput() as AmountOutput).getAmount());
+      }
 
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
+      let totaltotal:BN = new BN(0);
 
-      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+      for(let i = 0; i < txu1Total.length; i++) {
+        totaltotal = totaltotal.add((txu1Total[i].getOutput() as AmountOutput).getAmount());
+      }
 
-      serialzeit(tx1, "AddValidatorTx");
+      console.log(intotal.toString(10), outtotal.toString(10), staketotal.toString(10), totaltotal.toString(10));
+
+      expect(intotal.toString(10)).toBe("4000000000");
+      expect(outtotal.toString(10)).toBe("1000000000");
+      expect(staketotal.toString(10)).toBe("3000000000");
+      expect(totaltotal.toString(10)).toBe("4000000000");
 
     });
 
