@@ -21,7 +21,6 @@ import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
 import { ParseableOutput, StakeableLockOut } from '../../../src/apis/platformvm/outputs';
-import { ExportTx } from 'src/apis/platformvm/exporttx';
 
 /**
  * @ignore
@@ -1461,6 +1460,132 @@ describe('PlatformVMAPI', () => {
       );
 
       const txu2:UnsignedTx = lset.buildAddValidatorTx(
+        networkid, bintools.cb58Decode(blockchainid), 
+        assetID,
+        addrbuff3,
+        addrbuff1,         
+        addrbuff2, 
+        NodeIDStringToBuffer(nodeID), 
+        startTime,
+        endTime,
+        amount,
+        locktime,
+        threshold,
+        addrbuff3,
+        0.1335,
+        new BN(0), 
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+
+      let tx1:Tx = txu1.sign(platformvm.keyChain());
+      let checkTx:string = tx1.toBuffer().toString("hex");
+      let tx1obj:object = tx1.serialize("hex");
+      let tx1str:string = JSON.stringify(tx1obj);
+
+      /*
+      console.log("-----Test1 JSON-----");
+      console.log(tx1str);
+      console.log("-----Test1 ENDN-----");
+      */
+      
+      let tx2newobj:object = JSON.parse(tx1str);
+      let tx2:Tx = new Tx();
+      tx2.deserialize(tx2newobj, "hex");
+
+      /*
+      let tx2obj:object = tx2.serialize("hex");
+      let tx2str:string = JSON.stringify(tx2obj);
+      console.log("-----Test2 JSON-----");
+      console.log(tx2str);
+      console.log("-----Test2 ENDN-----");
+      */
+
+      expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
+
+      let tx3:Tx = txu1.sign(platformvm.keyChain());
+      let tx3obj:object = tx3.serialize("display");
+      let tx3str:string = JSON.stringify(tx3obj);
+
+      /*
+      console.log("-----Test3 JSON-----");
+      console.log(tx3str);
+      console.log("-----Test3 ENDN-----");
+      */
+      
+      let tx4newobj:object = JSON.parse(tx3str);
+      let tx4:Tx = new Tx();
+      tx4.deserialize(tx4newobj, "display");
+
+      /*
+      let tx4obj:object = tx4.serialize("display");
+      let tx4str:string = JSON.stringify(tx4obj);
+      console.log("-----Test4 JSON-----");
+      console.log(tx4str);
+      console.log("-----Test4 ENDN-----");
+      */
+
+      expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
+
+      serialzeit(tx1, "AddValidatorTx");
+
+    });
+
+    test('buildAddValidatorTx 3', async () => {
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = ONEAVAX.mul(new BN(3));
+
+      const locktime:BN = new BN(54321);
+      const threshold:number = 2;
+
+      platformvm.setMinStake(ONEAVAX.mul(new BN(3)), ONEAVAX.mul(new BN(3)));
+
+      //2 utxos; one lockedstakeable; other unlocked; both utxos have 2 avax; stake 3 AVAX
+
+      let dummySet:UTXOSet = new UTXOSet();
+
+      let lockedBaseOut:SECPTransferOutput = new SECPTransferOutput(new BN(2), addrbuff1, locktime, 1);
+      let lockedBaseXOut:ParseableOutput = new ParseableOutput(lockedBaseOut);
+      let lockedOut:StakeableLockOut = new StakeableLockOut(new BN(2), addrbuff1, locktime, 1, locktime, lockedBaseXOut)
+      let lockedXOut:TransferableOutput = new TransferableOutput(assetID, lockedOut);
+      
+      let txidLocked:Buffer = Buffer.alloc(32);
+      txidLocked.fill(2);
+      let txidxLocked:Buffer = Buffer.alloc(4);
+      txidxLocked.writeUInt32BE(2, 0);
+      const lu:UTXO = new UTXO(0, txidLocked, txidxLocked, assetID, lockedOut);
+      
+      let txidUnlocked:Buffer = Buffer.alloc(32);
+      txidUnlocked.fill(1);
+      let txidxUnlocked:Buffer = Buffer.alloc(4);
+      txidxUnlocked.writeUInt32BE(1, 0);
+      let unlockedOut:SECPTransferOutput = new SECPTransferOutput(amount, addrbuff1, locktime, 1);
+      const ulu:UTXO = new UTXO(0, txidUnlocked, txidxUnlocked, assetID, unlockedOut);
+
+      dummySet.add(ulu);
+      dummySet.add(lu);
+
+      const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
+        dummySet, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        amount,
+        addrs3, 
+        0.1334556,
+        locktime,
+        threshold,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      const txu2:UnsignedTx = dummySet.buildAddValidatorTx(
         networkid, bintools.cb58Decode(blockchainid), 
         assetID,
         addrbuff3,
