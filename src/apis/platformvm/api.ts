@@ -16,7 +16,6 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { numberToHex } from 'web3-utils';
 
 /**
  * @ignore
