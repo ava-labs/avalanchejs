@@ -172,7 +172,7 @@ export class StakeableLockIn extends AmountInput {
     return bintools.fromBufferToBN(this.stakeableLocktime);
   }
 
-  getTransferableOutput():ParseableInput {
+  getTransferablInput():ParseableInput {
     return this.transferableInput;
   }
   /**
@@ -187,10 +187,13 @@ export class StakeableLockIn extends AmountInput {
   /**
    * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockIn]] and returns the size of the output.
    */
-  fromBuffer(inbuff:Buffer, offset:number = 0):number {
-    this.stakeableLocktime = bintools.copyFrom(inbuff, offset, offset + 8);
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.stakeableLocktime = bintools.copyFrom(bytes, offset, offset + 8);
     offset += 8;
-    return super.fromBuffer(inbuff, offset);
+    this.transferableInput = new ParseableInput();
+    offset = this.transferableInput.fromBuffer(bytes, offset);
+    this.synchronize();
+    return offset;
   }
 
   /**

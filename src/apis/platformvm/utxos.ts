@@ -180,9 +180,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const fromAddresses:Array<Buffer> = aad.getSenders();
       if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(fromAddresses, asOf)) {
         const am:AssetAmount = aad.getAssetAmount(assetKey);
-        if(!am.isFinished()){
+        if(!am.isFinished()) {
           const uout:AmountOutput = u.getOutput() as AmountOutput;
-          if(!(assetKey in outs)){
+          if(!(assetKey in outs)) {
             outs[assetKey] = {
               lockedStakeable:[],
               unlocked:[]
@@ -192,7 +192,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           const txid:Buffer = u.getTxID();
           const outputidx:Buffer = u.getOutputIdx();
           let input:AmountInput;
-          if(uout instanceof StakeableLockOut){
+          if(uout instanceof StakeableLockOut) {
             let stakeout:StakeableLockOut = uout as StakeableLockOut;
             let pinput:ParseableInput = new ParseableInput(new SECPTransferInput(amount));
             input = new StakeableLockIn(amount, stakeout.getStakeableLocktime(), pinput);
@@ -210,13 +210,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             const idx:number = uout.getAddressIdx(spenders[j]);
             if (idx === -1) {
               /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.buildBaseTx: no such '
+              throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
               + `address in output: ${spenders[j]}`);
             }
             xferin.getInput().addSignatureIdx(idx, spenders[j]);
           }
           aad.addInput(xferin);
-        } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)){
+        } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)) {
           /**
            * Leaving the below lines, not simply for posterity, but for clarification.
            * AssetIDs may have mixed OutputTypes. 
@@ -238,17 +238,16 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const zero:BN = new BN(0);
     for(let i = 0; i < amounts.length; i++) {
       const assetKey:string = amounts[i].getAssetIDString();
-      const amount:BN = amounts[i].getAmount();
-      const stakeableLockedAmount:BN = amounts[i].getStakeableLockSpent();
-      const unlockedAmount:BN = amount.sub(stakeableLockedAmount);
       const change:BN = amounts[i].getChange();
+      const stakeableLockedAmount:BN = amounts[i].getStakeableLockSpent();
       const isStakeableLockChange = amounts[i].getStakeableLockChange();
+      const unlockedAmount:BN = amounts[i].getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
+      
       if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
-        if(stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))){
+        if(stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))) {
           let ls:Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
-          let sspent:BN = new BN(zero);
-          let schange:BN = isStakeableLockChange ? change : new BN(zero);
-          for(let j = 0; j < ls.length && sspent.lt(stakeableLockedAmount.add(schange)); j++) {
+          let schange:BN = isStakeableLockChange ? change : zero.clone();
+          for(let j = 0; j < ls.length; j++) {
             let stakeableLocktime:BN = ls[j].getStakeableLocktime();
             let pout:ParseableOutput = ls[j].getTransferableOutput();
             let o:AmountOutput = pout.getOutput() as AmountOutput;
@@ -264,7 +263,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
                   o.getThreshold()
               ) as AmountOutput;
               let schangeOut:StakeableLockOut = SelectOutputClass(
-                  ls[i].getOutputID(),
+                  ls[j].getOutputID(),
                   schange,  
                   o.getAddresses(), 
                   o.getLocktime(), 
@@ -275,32 +274,30 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
               const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), schangeOut);
               aad.addChange(xferout);
             }
-            if(spendme.gt(zero)){
-              let newout:AmountOutput = SelectOutputClass(
-                o.getOutputID(), 
-                spendme, 
-                o.getAddresses(), 
-                o.getLocktime(), 
-                o.getThreshold()
-              ) as AmountOutput;
-              let spendout:StakeableLockOut = SelectOutputClass(
-                ls[i].getOutputID(),
-                spendme,  
-                o.getAddresses(), 
-                o.getLocktime(), 
-                o.getThreshold(), 
-                stakeableLocktime, 
-                new ParseableOutput(newout)
-              ) as StakeableLockOut;
-              const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
-              aad.addOutput(xferout);
-            }
+            let newout:AmountOutput = SelectOutputClass(
+              o.getOutputID(), 
+              spendme, 
+              o.getAddresses(), 
+              o.getLocktime(), 
+              o.getThreshold()
+            ) as AmountOutput;
+            let spendout:StakeableLockOut = SelectOutputClass(
+              ls[j].getOutputID(),
+              spendme,  
+              o.getAddresses(), 
+              o.getLocktime(), 
+              o.getThreshold(), 
+              stakeableLocktime, 
+              new ParseableOutput(newout)
+            ) as StakeableLockOut;
+            const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+            aad.addOutput(xferout);
           }
         }
 
-        if(unlockedAmount.gt(zero) || (!isStakeableLockChange && change.gt(zero))) {
-          let uchange:BN = !isStakeableLockChange ? change : new BN(zero);
-          if(uchange.gt(zero)) { 
+        if(unlockedAmount.gt(zero)) {
+          let uchange:BN = isStakeableLockChange ? zero.clone() : change;
+          if(uchange.gt(zero)) {
             let schangeOut:AmountOutput = new SECPTransferOutput(
               uchange, 
               aad.getChangeAddresses(),

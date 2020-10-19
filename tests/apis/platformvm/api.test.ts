@@ -10,8 +10,8 @@ import { Defaults, PlatformChainID } from 'src/utils/constants';
 import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { KeyChain } from 'src/apis/platformvm/keychain';
-import { SECPTransferOutput, TransferableOutput } from 'src/apis/platformvm/outputs';
-import { TransferableInput, SECPTransferInput } from 'src/apis/platformvm/inputs';
+import { SECPTransferOutput, TransferableOutput, AmountOutput, ParseableOutput, StakeableLockOut } from 'src/apis/platformvm/outputs';
+import { TransferableInput, SECPTransferInput, AmountInput } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
@@ -20,8 +20,7 @@ import { UTF8Payload } from 'src/utils/payload';
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
-import { ParseableOutput, StakeableLockOut } from '../../../src/apis/platformvm/outputs';
-import { ExportTx } from 'src/apis/platformvm/exporttx';
+import { AddValidatorTx } from 'src/apis/platformvm/validationtx';
 
 /**
  * @ignore
@@ -899,7 +898,7 @@ describe('PlatformVMAPI', () => {
         u.fromBuffer(Buffer.concat([u.getCodecIDBuffer(), txid, txidx, xferout.toBuffer()]));
         lutxos.push(u);
       }
-
+      
       lset.addArray(lutxos);
       lset.addArray(set.getAllUTXOs());
       
@@ -1490,7 +1489,7 @@ describe('PlatformVMAPI', () => {
         threshold,
         addrbuff3,
         0.1335,
-        new BN(0),
+        new BN(0), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       );
@@ -1547,6 +1546,95 @@ describe('PlatformVMAPI', () => {
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
       serialzeit(tx1, "AddValidatorTx");
+
+    });
+
+    test('buildAddValidatorTx 3', async () => {
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = ONEAVAX.mul(new BN(3));
+
+      const locktime:BN = new BN(54321);
+      const threshold:number = 2;
+
+      platformvm.setMinStake(ONEAVAX.mul(new BN(3)), ONEAVAX.mul(new BN(3)));
+
+      //2 utxos; one lockedstakeable; other unlocked; both utxos have 2 avax; stake 3 AVAX
+
+      let dummySet:UTXOSet = new UTXOSet();
+
+      let lockedBaseOut:SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1);
+      let lockedBaseXOut:ParseableOutput = new ParseableOutput(lockedBaseOut);
+      let lockedOut:StakeableLockOut = new StakeableLockOut(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1, locktime, lockedBaseXOut)
+      
+      let txidLocked:Buffer = Buffer.alloc(32);
+      txidLocked.fill(1);
+      let txidxLocked:Buffer = Buffer.alloc(4);
+      txidxLocked.writeUInt32BE(1, 0);
+      const lu:UTXO = new UTXO(0, txidLocked, txidxLocked, assetID, lockedOut);
+      
+      let txidUnlocked:Buffer = Buffer.alloc(32);
+      txidUnlocked.fill(2);
+      let txidxUnlocked:Buffer = Buffer.alloc(4);
+      txidxUnlocked.writeUInt32BE(2, 0);
+      let unlockedOut:SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1);
+      const ulu:UTXO = new UTXO(0, txidUnlocked, txidxUnlocked, assetID, unlockedOut);
+
+      dummySet.add(ulu);
+      dummySet.add(lu);
+
+      const txu1:UnsignedTx = await platformvm.buildAddValidatorTx(
+        dummySet, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        amount,
+        addrs3, 
+        0.1334556,
+        locktime,
+        threshold,
+        new UTF8Payload("hello world"), UnixNow()
+      );
+
+      let txu1Ins = (txu1.getTransaction() as AddValidatorTx).getIns();
+      let txu1Outs = (txu1.getTransaction() as AddValidatorTx).getOuts();
+      let txu1Stake = (txu1.getTransaction() as AddValidatorTx).getStakeOuts();
+      let txu1Total = (txu1.getTransaction() as AddValidatorTx).getTotalOuts();
+
+      let intotal:BN = new BN(0);
+
+      for(let i = 0; i < txu1Ins.length; i++) {
+        intotal = intotal.add((txu1Ins[i].getInput() as AmountInput).getAmount());
+      }
+
+      let outtotal:BN = new BN(0);
+
+      for(let i = 0; i < txu1Outs.length; i++) {
+        outtotal = outtotal.add((txu1Outs[i].getOutput() as AmountOutput).getAmount());
+      }
+
+      let staketotal:BN = new BN(0);
+
+      for(let i = 0; i < txu1Stake.length; i++) {
+        staketotal = staketotal.add((txu1Stake[i].getOutput() as AmountOutput).getAmount());
+      }
+
+      let totaltotal:BN = new BN(0);
+
+      for(let i = 0; i < txu1Total.length; i++) {
+        totaltotal = totaltotal.add((txu1Total[i].getOutput() as AmountOutput).getAmount());
+      }
+
+      console.log(intotal.toString(10), outtotal.toString(10), staketotal.toString(10), totaltotal.toString(10));
+
+      expect(intotal.toString(10)).toBe("4000000000");
+      expect(outtotal.toString(10)).toBe("1000000000");
+      expect(staketotal.toString(10)).toBe("3000000000");
+      expect(totaltotal.toString(10)).toBe("4000000000");
 
     });
 
@@ -1651,7 +1739,7 @@ describe('PlatformVMAPI', () => {
         addrbuff1,         
         addrbuff2, 
         addrbuff3,
-        1,
+        1, 
         platformvm.getCreationTxFee(), 
         assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()

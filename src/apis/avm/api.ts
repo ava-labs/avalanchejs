@@ -1044,7 +1044,7 @@ export class AVMAPI extends JRPCAPI {
   buildSECPMintTx = async (
     utxoset:UTXOSet,  
     mintOwner:SECPMintOutput,
-    transferOwners:Array<SECPTransferOutput>,
+    transferOwner:SECPTransferOutput,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
     mintUTXOID:string,
@@ -1063,7 +1063,7 @@ export class AVMAPI extends JRPCAPI {
         this.core.getNetworkID(),
         bintools.cb58Decode(this.blockchainID),
         mintOwner,
-        transferOwners,
+        transferOwner,
         from,
         change,
         mintUTXOID,
