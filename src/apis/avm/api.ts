@@ -1249,7 +1249,7 @@ export class AVMAPI extends JRPCAPI {
       encoding
     };
     if (typeof tx === 'string') {
-      params["tx"] = serializer.encoder(tx, "display", encoding, encoding);
+      params["tx"] = tx;
     } else if (tx instanceof Buffer) {
       params["tx"] = serializer.encoder(tx, "display", "Buffer", encoding);
     } else if (tx instanceof Tx) {
