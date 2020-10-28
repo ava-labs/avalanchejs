@@ -714,7 +714,7 @@ describe('PlatformVMAPI', () => {
   test('getTxStatus', async () => {
     const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
-    const result:Promise<string> = api.getTxStatus(txid);
+    const result:Promise<object> = api.getTxStatus(txid);
     const payload:object = {
       result:  'accepted'
     };
@@ -723,7 +723,7 @@ describe('PlatformVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+    const response:object = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe('accepted');
