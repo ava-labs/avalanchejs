@@ -93,7 +93,7 @@ export class InfoAPI extends JRPCAPI {
     const params:any = {
       chain
     };
-    return this.callMethod('info.isBootstraped', params)
+    return this.callMethod('info.isBootstrapped', params)
         .then((response:RequestResponseData) => response.data.result.isBootstrapped);
   };
 
