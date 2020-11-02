@@ -863,7 +863,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the status retrieved from the node and the reason a tx was dropped, if applicable.
    */
-  getTxStatus = async (txid:string, includeReason:boolean = true):Promise<object> => {
+  getTxStatus = async (txid:string, includeReason:boolean = true):Promise<string|{status:string, reason:string}> => {
     const params:any = {
       txID: txid,
       includeReason: includeReason
