@@ -859,12 +859,14 @@ export class PlatformVMAPI extends JRPCAPI {
    * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
    *
    * @param txid The string representation of the transaction ID
+   * @param includeReason Return the reason tx was dropped, if applicable. Defaults to true
    *
-   * @returns Returns a Promise<string> containing the status retrieved from the node
+   * @returns Returns a Promise<string> containing the status retrieved from the node and the reason a tx was dropped, if applicable.
    */
-  getTxStatus = async (txid:string):Promise<string> => {
+  getTxStatus = async (txid:string, includeReason:boolean = true):Promise<string|{status:string, reason:string}> => {
     const params:any = {
       txID: txid,
+      includeReason: includeReason
     };
     return this.callMethod('platform.getTxStatus', params).then((response:RequestResponseData) => response.data.result);
   };
