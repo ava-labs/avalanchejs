@@ -240,8 +240,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const assetKey:string = amounts[i].getAssetIDString();
       const change:BN = amounts[i].getChange();
       const stakeableLockedAmount:BN = amounts[i].getStakeableLockSpent();
-      const isStakeableLockChange = amounts[i].getStakeableLockChange();
-      const unlockedAmount:BN = amounts[i].getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
+      const isStakeableLockChange: boolean = amounts[i].getStakeableLockChange();
+      const unlockedAmount:BN = amounts[i].getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change)).sub(new BN(1000000));
       
       if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
         if(stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))) {
