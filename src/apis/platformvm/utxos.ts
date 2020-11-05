@@ -203,23 +203,22 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     // We only need to iterate over UTXOs until we have spent sufficient funds
     // to met the requested amounts.
-    for (let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
-      const utxo: UTXO = utxoArray[i];
+    utxoArray.forEach((utxo: UTXO, index: number) => {
       const assetID: Buffer = utxo.getAssetID();
       const assetKey: string = assetID.toString("hex");
-      const fromAddresses: Array<Buffer> = aad.getSenders();
+      const fromAddresses: Buffer[] = aad.getSenders();
       const output: Output = utxo.getOutput();
       if (!(output instanceof AmountOutput) || !aad.assetExists(assetKey) || !output.meetsThreshold(fromAddresses, asOf)) {
         // We should only try to spend fungible assets.
         // We should only spend {{ assetKey }}.
         // We need to be able to spend the output.
-        continue;
+        return;
       }
 
       const assetAmount: AssetAmount = aad.getAssetAmount(assetKey);
       if (assetAmount.isFinished()) {
         // We've already spent the needed UTXOs for this assetID.
-        continue;
+        return;
       }
 
       if (!(assetKey in outs)) {
@@ -287,7 +286,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         input,
       );
       aad.addInput(transferInput);
-    }
+    });
+
     if (!aad.canComplete()) {
       // After running through all the UTXOs, we still weren't able to get all
       // the necessary funds, so this transaction can't be made.
@@ -303,12 +303,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     // assetAmounts is an array of asset descriptions and how much is left to
     // spend for them.
     const assetAmounts: Array<AssetAmount> = aad.getAmounts();
-    assetAmounts.forEach((assetAmount) => {
+    assetAmounts.forEach((assetAmount: AssetAmount) => {
       const assetID: Buffer = assetAmount.getAssetID();
       const assetKey: string = assetAmount.getAssetIDString();
       const change: BN = assetAmount.getChange();
       const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
-      const isStakeableLockChange = assetAmount.getStakeableLockChange();
+      const isStakeableLockChange: boolean = assetAmount.getStakeableLockChange();
       const unlockedAmount: BN = assetAmount.getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
 
       if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
@@ -459,12 +459,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     let ins: Array<TransferableInput> = [];
     let outs: Array<TransferableOutput> = [];
 
-    const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-    if (typeof success === "undefined") {
+    const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs();
       outs = aad.getAllOutputs();
     } else {
-      throw success;
+      throw minSpendableErr;
     }
 
     const baseTx: BaseTx = new BaseTx(networkid, blockchainid, outs, ins, memo);
@@ -569,12 +569,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if (feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, feeRemaining);
-      const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-      if (typeof success === "undefined") {
+      const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+      if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs();
         outs = aad.getAllOutputs();
       } else {
-        throw success;
+        throw minSpendableErr;
       }
     }
 
@@ -645,6 +645,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       destinationChain = bintools.cb58Decode(Defaults.network[networkid].X["blockchainID"]);
     }
 
+
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if (avaxAssetID.toString("hex") === feeAssetID.toString("hex")) {
       aad.addAssetAmount(avaxAssetID, amount, fee);
@@ -655,13 +656,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-    if (typeof success === "undefined") {
+    const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs();
       outs = aad.getChangeOutputs();
       exportouts = aad.getOutputs();
     } else {
-      throw success;
+      throw minSpendableErr;
     }
 
     const exportTx: ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, destinationChain, exportouts);
@@ -796,13 +797,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const success: Error = this.getMinimumSpendable(aad, asOf, undefined, undefined, true);
-    if (typeof success === "undefined") {
+    const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, undefined, undefined, true);
+    if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs();
       outs = aad.getChangeOutputs();
       stakeOuts = aad.getOutputs();
     } else {
-      throw success;
+      throw minSpendableErr;
     }
 
     const rewardOutputOwners: SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
@@ -880,13 +881,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const success: Error = this.getMinimumSpendable(aad, asOf, undefined, undefined, true);
-    if (typeof success === "undefined") {
+    const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, undefined, undefined, true);
+    if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs();
       outs = aad.getChangeOutputs();
       stakeOuts = aad.getOutputs();
     } else {
-      throw success;
+      throw minSpendableErr;
     }
 
     const rewardOutputOwners: SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
@@ -930,12 +931,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, fee);
-      const success: Error = this.getMinimumSpendable(aad, asOf, undefined, undefined);
-      if (typeof success === "undefined") {
+      const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, undefined, undefined);
+      if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs();
         outs = aad.getAllOutputs();
       } else {
-        throw success;
+        throw minSpendableErr;
       }
     }
 
