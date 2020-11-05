@@ -165,8 +165,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     );
   }
 
-  getMinimumSpendable = (aad: AssetAmountDestination, asOf: BN = UnixNow(), locktime: BN = new BN(0), threshold: number = 1, stakeable: boolean = false): Error => {
-    const utxoArray: Array<UTXO> = this.getAllUTXOs().filter((utxo) => {
+  getConsumableUXTO = (asOf: BN = UnixNow(), stakeable: boolean = false): Array<UTXO> => {
+    return this.getAllUTXOs().filter((utxo: UTXO) => {
       if (stakeable) {
         // stakeable transactions can consume any UTXO.
         return true;
@@ -186,6 +186,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       // transaction.
       return false;
     });
+  }
+
+  getMinimumSpendable = (aad: AssetAmountDestination, asOf: BN = UnixNow(), locktime: BN = new BN(0), threshold: number = 1, stakeable: boolean = false): Error => {
+    const utxoArray: Array<UTXO> = this.getConsumableUXTO(asOf, stakeable);
 
     // outs is a map from assetID to a tuple of (lockedStakeable, unlocked)
     // which are arrays of outputs.
