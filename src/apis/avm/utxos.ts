@@ -776,10 +776,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     // get remaining fees from the provided addresses
     let feeRemaining:BN = fee.sub(feepaid);
     if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
-      //console.log(toAddresses, fromAddresses, changeAddresses);
       const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
       aad.addAssetAmount(feeAssetID, zero, feeRemaining);
-      console.log("asOf", asOf, "locktime", locktime, "threshold", threshold);
       const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
       if(typeof success === "undefined") {
         ins = aad.getInputs();
@@ -864,6 +862,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         aad.addAssetAmount(feeAssetID, zero, fee);
       }
     }
+
     const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if(typeof success === "undefined") {
       ins = aad.getInputs();
