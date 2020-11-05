@@ -306,85 +306,97 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     assetAmounts.forEach((assetAmount: AssetAmount) => {
       const assetID: Buffer = assetAmount.getAssetID();
       const assetKey: string = assetAmount.getAssetIDString();
+      // change is the amount that should be returned back to the source of the
+      // funds.
       const change: BN = assetAmount.getChange();
-      const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
+      // isStakeableLockChange is if the change is locked or not.
       const isStakeableLockChange: boolean = assetAmount.getStakeableLockChange();
+
+      // stakeableLockedAmount is the total amount of locked tokens consumed.
+      const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
+      // unlockedAmount is ???????
       const unlockedAmount: BN = assetAmount.getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
 
-      if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
-        if (stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))) {
-          let ls: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
-          let schange: BN = isStakeableLockChange ? change : zero.clone();
-          for (let j = 0; j < ls.length; j++) {
-            let stakeableLocktime: BN = ls[j].getStakeableLocktime();
-            let pout: ParseableOutput = ls[j].getTransferableOutput();
-            let o: AmountOutput = pout.getOutput() as AmountOutput;
-            let spendme: BN = o.getAmount();
-            // FYI - You can always guarantee that the last element of the ls array is the one who gives change (if any)
-            if (j == ls.length - 1 && schange.gt(zero)) {
-              spendme = spendme.sub(change);
-              let schangeNewOut: AmountOutput = SelectOutputClass(
-                o.getOutputID(),
-                schange,
-                o.getAddresses(),
-                o.getLocktime(),
-                o.getThreshold()
-              ) as AmountOutput;
-              let schangeOut: StakeableLockOut = SelectOutputClass(
-                ls[j].getOutputID(),
-                schange,
-                o.getAddresses(),
-                o.getLocktime(),
-                o.getThreshold(),
-                stakeableLocktime,
-                new ParseableOutput(schangeNewOut)
-              ) as StakeableLockOut;
-              const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
-              aad.addChange(xferout);
-            }
-            let newout: AmountOutput = SelectOutputClass(
-              o.getOutputID(),
-              spendme,
-              o.getAddresses(),
-              o.getLocktime(),
-              o.getThreshold()
-            ) as AmountOutput;
-            let spendout: StakeableLockOut = SelectOutputClass(
-              ls[j].getOutputID(),
-              spendme,
-              o.getAddresses(),
-              o.getLocktime(),
-              o.getThreshold(),
-              stakeableLocktime,
-              new ParseableOutput(newout)
-            ) as StakeableLockOut;
-            const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
-            aad.addOutput(xferout);
-          }
-        }
+      if (unlockedAmount.eq(zero) && stakeableLockedAmount.eq(zero) && change.eq(zero)) {
+        return; // move to the next loop iteration.
+      }
+      if (stakeableLockedAmount.gt(zero)) {
+        const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
+        const lockedChange: BN = isStakeableLockChange ? change : zero.clone();
+        for (let i = 0; i < lockedOutputs.length; i++) {
+          const lockedOutput: StakeableLockOut = lockedOutputs[i];
+          const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
+          const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();
 
-        if (unlockedAmount.gt(zero)) {
-          let uchange: BN = isStakeableLockChange ? zero.clone() : change;
-          if (uchange.gt(zero)) {
-            let schangeOut: AmountOutput = new SECPTransferOutput(
-              uchange,
-              aad.getChangeAddresses(),
-              locktime,
-              threshold
+          // We know that parseableOutput contains an AmountOutput because the
+          // first loop filters for fungible assets.
+          const output: AmountOutput = parseableOutput.getOutput() as AmountOutput;
+
+          let outputAmountRemaining: BN = output.getAmount();
+          // FYI - You can always guarantee that the last element of the ls array is the one who gives change (if any)
+          if (i == lockedOutputs.length - 1 && lockedChange.gt(zero)) {
+            outputAmountRemaining = outputAmountRemaining.sub(lockedChange);
+            let schangeNewOut: AmountOutput = SelectOutputClass(
+              output.getOutputID(),
+              lockedChange,
+              output.getAddresses(),
+              output.getLocktime(),
+              output.getThreshold()
             ) as AmountOutput;
+            let schangeOut: StakeableLockOut = SelectOutputClass(
+              lockedOutput.getOutputID(),
+              lockedChange,
+              output.getAddresses(),
+              output.getLocktime(),
+              output.getThreshold(),
+              stakeableLocktime,
+              new ParseableOutput(schangeNewOut)
+            ) as StakeableLockOut;
             const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
             aad.addChange(xferout);
           }
-          let spendout: AmountOutput;
-          spendout = new SECPTransferOutput(
-            unlockedAmount,
-            aad.getDestinations(),
-            locktime,
-            threshold
+          let newout: AmountOutput = SelectOutputClass(
+            output.getOutputID(),
+            outputAmountRemaining,
+            output.getAddresses(),
+            output.getLocktime(),
+            output.getThreshold()
           ) as AmountOutput;
+          let spendout: StakeableLockOut = SelectOutputClass(
+            lockedOutput.getOutputID(),
+            outputAmountRemaining,
+            output.getAddresses(),
+            output.getLocktime(),
+            output.getThreshold(),
+            stakeableLocktime,
+            new ParseableOutput(newout)
+          ) as StakeableLockOut;
           const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
           aad.addOutput(xferout);
         }
+      }
+
+      if (unlockedAmount.gt(zero)) {
+        let uchange: BN = isStakeableLockChange ? zero.clone() : change;
+        if (uchange.gt(zero)) {
+          let schangeOut: AmountOutput = new SECPTransferOutput(
+            uchange,
+            aad.getChangeAddresses(),
+            locktime,
+            threshold
+          ) as AmountOutput;
+          const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
+          aad.addChange(xferout);
+        }
+        let spendout: AmountOutput;
+        spendout = new SECPTransferOutput(
+          unlockedAmount,
+          aad.getDestinations(),
+          locktime,
+          threshold
+        ) as AmountOutput;
+        const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
+        aad.addOutput(xferout);
       }
     })
     return undefined;
@@ -716,7 +728,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new Error("UTXOSet.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
-  
+   
     // Not implemented: Fees can be paid from importIns
     if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
@@ -729,7 +741,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         throw success;
       }
     }
-  
+   
     const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, weight);
     return new UnsignedTx(UTx);
   }
