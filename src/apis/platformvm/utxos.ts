@@ -188,7 +188,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     });
   }
 
-  getMinimumSpendable = (aad: AssetAmountDestination, asOf: BN = UnixNow(), locktime: BN = new BN(0), threshold: number = 1, stakeable: boolean = false): Error => {
+  getMinimumSpendable = (
+    aad: AssetAmountDestination,
+    asOf: BN = UnixNow(),
+    locktime: BN = new BN(0),
+    threshold: number = 1,
+    stakeable: boolean = false,
+  ): Error => {
     const utxoArray: Array<UTXO> = this.getConsumableUXTO(asOf, stakeable);
 
     // outs is a map from assetID to a tuple of (lockedStakeable, unlocked)
@@ -251,10 +257,20 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         outs[assetKey].unlocked.push(amountOutput);
       }
 
+      // Get the indices of the outputs that should be used to authorize the
+      // spending of this input.
+
+      // TODO: getSpenders should return an array of indices rather than an
+      // array of addresses.
       const spenders: Array<Buffer> = amountOutput.getSpenders(fromAddresses, asOf);
       spenders.forEach((spender) => {
         const idx: number = amountOutput.getAddressIdx(spender);
         if (idx === -1) {
+          // This should never happen, which is why the error is thrown rather
+          // than being returned. If this were to ever happen this would be an
+          // error in the internal logic rather having called this function with
+          // invalid arguments.
+
           /* istanbul ignore next */
           throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
             + `address in output: ${spender}`);
@@ -264,21 +280,36 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       const txID: Buffer = utxo.getTxID();
       const outputIdx: Buffer = utxo.getOutputIdx();
-      const transferInput: TransferableInput = new TransferableInput(txID, outputIdx, assetID, input);
+      const transferInput: TransferableInput = new TransferableInput(
+        txID,
+        outputIdx,
+        assetID,
+        input,
+      );
       aad.addInput(transferInput);
     }
     if (!aad.canComplete()) {
+      // After running through all the UTXOs, we still weren't able to get all
+      // the necessary funds, so this transaction can't be made.
       return new Error('Error - UTXOSet.getMinimumSpendable: insufficient '
         + 'funds to create the transaction');
     }
-    const amounts: Array<AssetAmount> = aad.getAmounts();
+
+    // TODO: We should separate the above functionality into a single function
+    // that just selects the UTXOs to consume.
+
     const zero: BN = new BN(0);
-    for (let i = 0; i < amounts.length; i++) {
-      const assetKey: string = amounts[i].getAssetIDString();
-      const change: BN = amounts[i].getChange();
-      const stakeableLockedAmount: BN = amounts[i].getStakeableLockSpent();
-      const isStakeableLockChange = amounts[i].getStakeableLockChange();
-      const unlockedAmount: BN = amounts[i].getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
+
+    // assetAmounts is an array of asset descriptions and how much is left to
+    // spend for them.
+    const assetAmounts: Array<AssetAmount> = aad.getAmounts();
+    assetAmounts.forEach((assetAmount) => {
+      const assetID: Buffer = assetAmount.getAssetID();
+      const assetKey: string = assetAmount.getAssetIDString();
+      const change: BN = assetAmount.getChange();
+      const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
+      const isStakeableLockChange = assetAmount.getStakeableLockChange();
+      const unlockedAmount: BN = assetAmount.getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
 
       if (unlockedAmount.gt(zero) || stakeableLockedAmount.gt(zero) || change.gt(zero)) {
         if (stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))) {
@@ -308,7 +339,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
                 stakeableLocktime,
                 new ParseableOutput(schangeNewOut)
               ) as StakeableLockOut;
-              const xferout: TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), schangeOut);
+              const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
               aad.addChange(xferout);
             }
             let newout: AmountOutput = SelectOutputClass(
@@ -327,7 +358,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
               stakeableLocktime,
               new ParseableOutput(newout)
             ) as StakeableLockOut;
-            const xferout: TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+            const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
             aad.addOutput(xferout);
           }
         }
@@ -341,7 +372,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
               locktime,
               threshold
             ) as AmountOutput;
-            const xferout: TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), schangeOut);
+            const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
             aad.addChange(xferout);
           }
           let spendout: AmountOutput;
@@ -351,11 +382,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             locktime,
             threshold
           ) as AmountOutput;
-          const xferout: TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+          const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
           aad.addOutput(xferout);
         }
       }
-    }
+    })
     return undefined;
   }
 
