@@ -242,7 +242,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const stakeableOutput: StakeableLockOut = amountOutput as StakeableLockOut;
         const stakeableLocktime: BN = stakeableOutput.getStakeableLocktime();
 
-        if (stakeableLocktime.lt(asOf)) {
+        if (stakeableLocktime.gt(asOf)) {
           // Add a new input and mark it as being locked.
           input = new StakeableLockIn(
             amount,
