@@ -233,26 +233,34 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const amountOutput: AmountOutput = output as AmountOutput;
       // amount is the amount of funds available from this UTXO.
       const amount = amountOutput.getAmount();
-      let input: AmountInput;
-      if (amountOutput instanceof StakeableLockOut) {
-        // TODO: The output should only be treated as being locked if the
-        //       stakeableLocktime is in the future.
 
+      // Set up the SECP input with the same amount as the output.
+      let input: AmountInput = new SECPTransferInput(amount);
+
+      let locked: boolean = false;
+      if (amountOutput instanceof StakeableLockOut) {
         const stakeableOutput: StakeableLockOut = amountOutput as StakeableLockOut;
         const stakeableLocktime: BN = stakeableOutput.getStakeableLocktime();
 
-        // Add a new input and mark it as being locked.
-        input = new StakeableLockIn(
-          amount,
-          stakeableLocktime,
-          new ParseableInput(new SECPTransferInput(amount))
-        );
-        assetAmount.spendAmount(amount, true);
+        if (stakeableLocktime.lt(asOf)) {
+          // Add a new input and mark it as being locked.
+          input = new StakeableLockIn(
+            amount,
+            stakeableLocktime,
+            new ParseableInput(input),
+          );
+
+          // Mark this UTXO as having been re-locked.
+          locked = true;
+        }
+      }
+
+      assetAmount.spendAmount(amount, locked);
+      if (locked) {
+        // Track the UTXO as locked.
         outs[assetKey].lockedStakeable.push(amountOutput);
       } else {
-        // Add a new input and mark it as being unlocked.
-        input = new SECPTransferInput(amount);
-        assetAmount.spendAmount(amount, false);
+        // Track the UTXO as unlocked.
         outs[assetKey].unlocked.push(amountOutput);
       }
 
