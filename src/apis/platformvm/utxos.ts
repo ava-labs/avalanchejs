@@ -398,8 +398,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
       // totalUnlockedSpent is the total amount of unlocked tokens consumed.
       const totalUnlockedSpent: BN = totalAmountSpent.sub(stakeableLockedAmount);
+      // amountBurnt is the amount of unlocked tokens that must be burn.
+      const amountBurnt: BN = assetAmount.getBurn();
+      // totalUnlockedAvailable is the total amount of unlocked tokens available
+      // to be produced.
+      const totalUnlockedAvailable: BN = totalUnlockedSpent.sub(amountBurnt);
       // unlockedAmount is the amount of unlocked tokens that should be sent.
-      const unlockedAmount: BN = totalUnlockedSpent.sub(unlockedChange);
+      const unlockedAmount: BN = totalUnlockedAvailable.sub(unlockedChange);
       if (unlockedAmount.gt(zero)) {
         const newOutput: AmountOutput = new SECPTransferOutput(
           unlockedAmount,
