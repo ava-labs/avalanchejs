@@ -165,7 +165,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     );
   }
 
-  getConsumableUXTO = (asOf: BN = UnixNow(), stakeable: boolean = false): Array<UTXO> => {
+  getConsumableUXTO = (asOf: BN = UnixNow(), stakeable: boolean = false): UTXO[] => {
     return this.getAllUTXOs().filter((utxo: UTXO) => {
       if (stakeable) {
         // stakeable transactions can consume any UTXO.
@@ -315,14 +315,14 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         if (stakeableLockedAmount.gt(zero) || (isStakeableLockChange && change.gt(zero))) {
           let ls: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
           let schange: BN = isStakeableLockChange ? change : zero.clone();
-          for (let j = 0; j < ls.length; j++) {
+          ls.forEach((lockedStakeable: StakeableLockOut, j: number) => {
             let stakeableLocktime: BN = ls[j].getStakeableLocktime();
             let pout: ParseableOutput = ls[j].getTransferableOutput();
             let o: AmountOutput = pout.getOutput() as AmountOutput;
             let spendme: BN = o.getAmount();
             // FYI - You can always guarantee that the last element of the ls array is the one who gives change (if any)
             if (j == ls.length - 1 && schange.gt(zero)) {
-              spendme = spendme.sub(change);
+              spendme = spendme.sub(schange);
               let schangeNewOut: AmountOutput = SelectOutputClass(
                 o.getOutputID(),
                 schange,
@@ -360,7 +360,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             ) as StakeableLockOut;
             const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
             aad.addOutput(xferout);
-          }
+
+          });
         }
 
         if (unlockedAmount.gt(zero)) {
@@ -644,7 +645,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if (typeof destinationChain === "undefined") {
       destinationChain = bintools.cb58Decode(Defaults.network[networkid].X["blockchainID"]);
     }
-
 
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
     if (avaxAssetID.toString("hex") === feeAssetID.toString("hex")) {
