@@ -320,60 +320,69 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       if (unlockedAmount.eq(zero) && stakeableLockedAmount.eq(zero) && change.eq(zero)) {
         return; // move to the next loop iteration.
       }
-      if (stakeableLockedAmount.gt(zero)) {
-        const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
-        const lockedChange: BN = isStakeableLockChange ? change : zero.clone();
-        for (let i = 0; i < lockedOutputs.length; i++) {
-          const lockedOutput: StakeableLockOut = lockedOutputs[i];
-          const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
-          const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();
+      const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
+      const lockedChange: BN = isStakeableLockChange ? change : zero.clone();
+      for (let i = 0; i < lockedOutputs.length; i++) {
+        const lockedOutput: StakeableLockOut = lockedOutputs[i];
+        const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
+        const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();
 
-          // We know that parseableOutput contains an AmountOutput because the
-          // first loop filters for fungible assets.
-          const output: AmountOutput = parseableOutput.getOutput() as AmountOutput;
+        // We know that parseableOutput contains an AmountOutput because the
+        // first loop filters for fungible assets.
+        const output: AmountOutput = parseableOutput.getOutput() as AmountOutput;
 
-          let outputAmountRemaining: BN = output.getAmount();
-          // FYI - You can always guarantee that the last element of the ls array is the one who gives change (if any)
-          if (i == lockedOutputs.length - 1 && lockedChange.gt(zero)) {
-            outputAmountRemaining = outputAmountRemaining.sub(lockedChange);
-            let schangeNewOut: AmountOutput = SelectOutputClass(
-              output.getOutputID(),
-              lockedChange,
-              output.getAddresses(),
-              output.getLocktime(),
-              output.getThreshold()
-            ) as AmountOutput;
-            let schangeOut: StakeableLockOut = SelectOutputClass(
-              lockedOutput.getOutputID(),
-              lockedChange,
-              output.getAddresses(),
-              output.getLocktime(),
-              output.getThreshold(),
-              stakeableLocktime,
-              new ParseableOutput(schangeNewOut)
-            ) as StakeableLockOut;
-            const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
-            aad.addChange(xferout);
-          }
-          let newout: AmountOutput = SelectOutputClass(
+        let outputAmountRemaining: BN = output.getAmount();
+        // The only output that could generate change is the last output.
+        // Otherwise, any further UTXOs wouldn't have needed to be spent.
+        if (i == lockedOutputs.length - 1 && lockedChange.gt(zero)) {
+          // update outputAmountRemaining to no longer hold the change that we
+          // are returning.
+          outputAmountRemaining = outputAmountRemaining.sub(lockedChange);
+          // Create the inner output.
+          const newChangeOutput: AmountOutput = SelectOutputClass(
             output.getOutputID(),
-            outputAmountRemaining,
+            lockedChange,
             output.getAddresses(),
             output.getLocktime(),
             output.getThreshold()
           ) as AmountOutput;
-          let spendout: StakeableLockOut = SelectOutputClass(
+          // Wrap the inner output in the StakeableLockOut wrapper.
+          let newLockedChangeOutput: StakeableLockOut = SelectOutputClass(
             lockedOutput.getOutputID(),
-            outputAmountRemaining,
+            lockedChange,
             output.getAddresses(),
             output.getLocktime(),
             output.getThreshold(),
             stakeableLocktime,
-            new ParseableOutput(newout)
+            new ParseableOutput(newChangeOutput)
           ) as StakeableLockOut;
-          const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
-          aad.addOutput(xferout);
+          const transferOutput: TransferableOutput = new TransferableOutput(assetID, newLockedChangeOutput);
+          aad.addChange(transferOutput);
         }
+
+        // We know that outputAmountRemaining > 0. Otherwise, we would never
+        // have consumed this UTXO, as it would be only change.
+
+        // Create the inner output.
+        const newOutput: AmountOutput = SelectOutputClass(
+          output.getOutputID(),
+          outputAmountRemaining,
+          output.getAddresses(),
+          output.getLocktime(),
+          output.getThreshold()
+        ) as AmountOutput;
+        // Wrap the inner output in the StakeableLockOut wrapper.
+        const newLockedOutput: StakeableLockOut = SelectOutputClass(
+          lockedOutput.getOutputID(),
+          outputAmountRemaining,
+          output.getAddresses(),
+          output.getLocktime(),
+          output.getThreshold(),
+          stakeableLocktime,
+          new ParseableOutput(newOutput)
+        ) as StakeableLockOut;
+        const transferOutput: TransferableOutput = new TransferableOutput(assetID, newLockedOutput);
+        aad.addOutput(transferOutput);
       }
 
       if (unlockedAmount.gt(zero)) {
