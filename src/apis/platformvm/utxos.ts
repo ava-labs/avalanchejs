@@ -304,24 +304,18 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     // spend for them.
     const assetAmounts: Array<AssetAmount> = aad.getAmounts();
     assetAmounts.forEach((assetAmount: AssetAmount) => {
-      const assetID: Buffer = assetAmount.getAssetID();
-      const assetKey: string = assetAmount.getAssetIDString();
       // change is the amount that should be returned back to the source of the
       // funds.
       const change: BN = assetAmount.getChange();
       // isStakeableLockChange is if the change is locked or not.
       const isStakeableLockChange: boolean = assetAmount.getStakeableLockChange();
-
-      // stakeableLockedAmount is the total amount of locked tokens consumed.
-      const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
-      // unlockedAmount is ???????
-      const unlockedAmount: BN = assetAmount.getSpent().sub(isStakeableLockChange ? stakeableLockedAmount : stakeableLockedAmount.add(change));
-
-      if (unlockedAmount.eq(zero) && stakeableLockedAmount.eq(zero) && change.eq(zero)) {
-        return; // move to the next loop iteration.
-      }
-      const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
+      // lockedChange is the amount of locked change that should be returned to
+      // the sender
       const lockedChange: BN = isStakeableLockChange ? change : zero.clone();
+
+      const assetID: Buffer = assetAmount.getAssetID();
+      const assetKey: string = assetAmount.getAssetIDString();
+      const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
       lockedOutputs.forEach((lockedOutput: StakeableLockOut, i: number) => {
         const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
         const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();
@@ -343,7 +337,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             lockedChange,
             output.getAddresses(),
             output.getLocktime(),
-            output.getThreshold()
+            output.getThreshold(),
           ) as AmountOutput;
           // Wrap the inner output in the StakeableLockOut wrapper.
           let newLockedChangeOutput: StakeableLockOut = SelectOutputClass(
@@ -353,7 +347,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             output.getLocktime(),
             output.getThreshold(),
             stakeableLocktime,
-            new ParseableOutput(newChangeOutput)
+            new ParseableOutput(newChangeOutput),
           ) as StakeableLockOut;
           const transferOutput: TransferableOutput = new TransferableOutput(assetID, newLockedChangeOutput);
           aad.addChange(transferOutput);
@@ -368,7 +362,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           outputAmountRemaining,
           output.getAddresses(),
           output.getLocktime(),
-          output.getThreshold()
+          output.getThreshold(),
         ) as AmountOutput;
         // Wrap the inner output in the StakeableLockOut wrapper.
         const newLockedOutput: StakeableLockOut = SelectOutputClass(
@@ -378,34 +372,43 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           output.getLocktime(),
           output.getThreshold(),
           stakeableLocktime,
-          new ParseableOutput(newOutput)
+          new ParseableOutput(newOutput),
         ) as StakeableLockOut;
         const transferOutput: TransferableOutput = new TransferableOutput(assetID, newLockedOutput);
         aad.addOutput(transferOutput);
-
       });
 
+      // unlockedChange is the amount of unlocked change that should be returned
+      // to the sender
+      const unlockedChange: BN = isStakeableLockChange ? zero.clone() : change;
+      if (unlockedChange.gt(zero)) {
+        const newChangeOutput: AmountOutput = new SECPTransferOutput(
+          unlockedChange,
+          aad.getChangeAddresses(),
+          zero.clone(), // make sure that we don't lock the change output.
+          1, // only require one of the changes addresses to spend this output.
+        ) as AmountOutput;
+        const transferOutput: TransferableOutput = new TransferableOutput(assetID, newChangeOutput);
+        aad.addChange(transferOutput);
+      }
+
+      // totalAmountSpent is the total amount of tokens consumed.
+      const totalAmountSpent: BN = assetAmount.getSpent();
+      // stakeableLockedAmount is the total amount of locked tokens consumed.
+      const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent();
+      // totalUnlockedSpent is the total amount of unlocked tokens consumed.
+      const totalUnlockedSpent: BN = totalAmountSpent.sub(stakeableLockedAmount);
+      // unlockedAmount is the amount of unlocked tokens that should be sent.
+      const unlockedAmount: BN = totalUnlockedSpent.sub(unlockedChange);
       if (unlockedAmount.gt(zero)) {
-        const unlockedChange: BN = isStakeableLockChange ? zero.clone() : change;
-        if (unlockedChange.gt(zero)) {
-          let schangeOut: AmountOutput = new SECPTransferOutput(
-            unlockedChange,
-            aad.getChangeAddresses(),
-            locktime,
-            threshold
-          ) as AmountOutput;
-          const xferout: TransferableOutput = new TransferableOutput(assetID, schangeOut);
-          aad.addChange(xferout);
-        }
-        let spendout: AmountOutput;
-        spendout = new SECPTransferOutput(
+        const newOutput: AmountOutput = new SECPTransferOutput(
           unlockedAmount,
           aad.getDestinations(),
           locktime,
-          threshold
+          threshold,
         ) as AmountOutput;
-        const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
-        aad.addOutput(xferout);
+        const transferOutput: TransferableOutput = new TransferableOutput(assetID, newOutput);
+        aad.addOutput(transferOutput);
       }
     })
     return undefined;
