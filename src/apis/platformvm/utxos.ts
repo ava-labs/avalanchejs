@@ -386,10 +386,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       });
 
       if (unlockedAmount.gt(zero)) {
-        let uchange: BN = isStakeableLockChange ? zero.clone() : change;
-        if (uchange.gt(zero)) {
+        const unlockedChange: BN = isStakeableLockChange ? zero.clone() : change;
+        if (unlockedChange.gt(zero)) {
           let schangeOut: AmountOutput = new SECPTransferOutput(
-            uchange,
+            unlockedChange,
             aad.getChangeAddresses(),
             locktime,
             threshold
