@@ -195,7 +195,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     threshold: number = 1,
     stakeable: boolean = false,
   ): Error => {
-    const utxoArray: Array<UTXO> = this.getConsumableUXTO(asOf, stakeable);
+    const utxoArray: UTXO[] = this.getConsumableUXTO(asOf, stakeable);
 
     // outs is a map from assetID to a tuple of (lockedStakeable, unlocked)
     // which are arrays of outputs.
@@ -262,7 +262,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       // TODO: getSpenders should return an array of indices rather than an
       // array of addresses.
       const spenders: Array<Buffer> = amountOutput.getSpenders(fromAddresses, asOf);
-      spenders.forEach((spender) => {
+      spenders.forEach((spender: Buffer) => {
         const idx: number = amountOutput.getAddressIdx(spender);
         if (idx === -1) {
           // This should never happen, which is why the error is thrown rather
@@ -322,8 +322,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
       const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
       const lockedChange: BN = isStakeableLockChange ? change : zero.clone();
-      for (let i = 0; i < lockedOutputs.length; i++) {
-        const lockedOutput: StakeableLockOut = lockedOutputs[i];
+      lockedOutputs.forEach((lockedOutput: StakeableLockOut, i: number) => {
         const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
         const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();
 
@@ -383,7 +382,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         ) as StakeableLockOut;
         const transferOutput: TransferableOutput = new TransferableOutput(assetID, newLockedOutput);
         aad.addOutput(transferOutput);
-      }
+
+      });
 
       if (unlockedAmount.gt(zero)) {
         let uchange: BN = isStakeableLockChange ? zero.clone() : change;
