@@ -1349,8 +1349,6 @@ export class PlatformVMAPI extends JRPCAPI {
     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
     * @param subnetOwnerAddresses An array of addresses for owners of the new subnet
     * @param subnetOwnerThreshold A number indicating the amount of signatures required to add validators to a subnet
-    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
-    * @param feeAssetID Optional. The assetID of the fees being burned
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
     * 
