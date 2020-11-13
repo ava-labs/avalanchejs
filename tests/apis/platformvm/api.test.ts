@@ -1613,8 +1613,6 @@ describe('PlatformVMAPI', () => {
         totaltotal = totaltotal.add((txu1Total[i].getOutput() as AmountOutput).getAmount());
       }
 
-      console.log(intotal.toString(10), outtotal.toString(10), staketotal.toString(10), totaltotal.toString(10));
-
       expect(intotal.toString(10)).toBe("4000000000");
       expect(outtotal.toString(10)).toBe("1000000000");
       expect(staketotal.toString(10)).toBe("3000000000");
