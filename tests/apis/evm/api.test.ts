@@ -102,12 +102,11 @@ describe('EVMAPI', () => {
   test("export", async ()=>{
     let amount = new BN(100);
     let to = "abcdef";
-    let blockchainID = "X"
     let assetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
     let username = "Robert";
     let password = "Paulson";
     let txID = "valid";
-    let result:Promise<string> = api.export(username, password, to, amount, blockchainID, assetID);
+    let result:Promise<string> = api.export(username, password, to, amount, assetID);
     let payload:object = {
         "result": {
             "txID": txID

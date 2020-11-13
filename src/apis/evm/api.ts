@@ -33,18 +33,16 @@ export class EVMAPI extends JRPCAPI {
     * @param password The password of the Keystore user
     * @param to The account on the X-Chain to send the AVAX to. 
     * @param amount Amount of asset to export as a {@link https://github.com/indutny/bn.js/|BN}
-    * @param destinationChain The chain where the funds are being sent. Ex: "X"
     * @param assetID The asset id which is being sent
     *
     * @returns String representing the transaction id
     */
-  export = async (username: string, password: string, to: string, amount: BN, destinationChain: string, assetID: string):Promise<string> => {
+  export = async (username: string, password: string, to: string, amount: BN, assetID: string):Promise<string> => {
     const params: any = {
       to,
       amount: amount.toString(10),
       username,
       password,
-      destinationChain,
       assetID
     };
     return this.callMethod('avax.export', params).then((response: RequestResponseData) => response.data.result.txID);
@@ -57,7 +55,7 @@ export class EVMAPI extends JRPCAPI {
     *
     * @param username The Keystore user that controls the X-Chain account specified in `to`
     * @param password The password of the Keystore user
-    * @param to The account on the X-Chain to send the AVAX to. Do not include X- in the address
+    * @param to The account on the X-Chain to send the AVAX to.
     * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
     *
     * @returns String representing the transaction id
