@@ -454,13 +454,13 @@ export class AVMAPI extends JRPCAPI {
   };
 
   /**
-   * Send ANT (Avalanche Native Token) assets including AVAX from the X-Chain to an account on the P-Chain or C-Chain.
+    * Send ANT (Avalanche Native Token) assets including AVAX from the X-Chain to an account on the P-Chain or C-Chain.
     *
-    * After calling this method, you must call the C-Chain’s importAVAX method to complete the transfer.
+    * After calling this method, you must call the P-Chain's `importAVAX` or the C-Chain’s `import` method to complete the transfer.
     *
-    * @param username The Keystore user that controls the C-Chain account specified in `to`
+    * @param username The Keystore user that controls the P-Chain or C-Chain account specified in `to`
     * @param password The password of the Keystore user
-    * @param to The account on the X-Chain to send the AVAX to. 
+    * @param to The account on the P-Chain or C-Chain to send the asset to. 
     * @param amount Amount of asset to export as a {@link https://github.com/indutny/bn.js/|BN}
     * @param assetID The asset id which is being sent
     *
