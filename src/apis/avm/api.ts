@@ -454,6 +454,30 @@ export class AVMAPI extends JRPCAPI {
   };
 
   /**
+   * Send mulitcoin assets including AVAX from the X-Chain to an account on the C-Chain.
+    *
+    * After calling this method, you must call the C-Chain’s importAVAX method to complete the transfer.
+    *
+    * @param username The Keystore user that controls the C-Chain account specified in `to`
+    * @param password The password of the Keystore user
+    * @param to The account on the X-Chain to send the AVAX to. 
+    * @param amount Amount of asset to export as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param assetID The asset id which is being sent
+    *
+    * @returns String representing the transaction id
+    */
+  export = async (username: string, password: string, to: string, amount: BN, assetID: string):Promise<string> => {
+    const params: any = {
+      to,
+      amount: amount.toString(10),
+      username,
+      password,
+      assetID
+    };
+    return this.callMethod('avm.export', params).then((response: RequestResponseData) => response.data.result.txID);
+  };
+
+  /**
      * Send AVAX from the X-Chain to an account on the P-Chain.
      *
      * After calling this method, you must call the P-Chain’s importAVAX method to complete the transfer.
@@ -473,6 +497,31 @@ export class AVMAPI extends JRPCAPI {
       password,
     };
     return this.callMethod('avm.exportAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
+  };
+
+  /**
+   * Send multicoin assets including AVAX from an account on the C-Chain to an address on the X-Chain. This transaction
+   * must be signed with the key of the account that the asset is sent from and which pays
+   * the transaction fee.
+   *
+   * @param username The Keystore user that controls the account specified in `to`
+   * @param password The password of the Keystore user
+   * @param to The ID of the account the AVAX is sent to.
+   * @param sourceChain The chainID where the funds are coming from. Ex: "C"
+   *
+   * @returns Promise for a string for the transaction, which should be sent to the network
+   * by calling issueTx.
+   */
+  import = async (username: string, password:string, to:string, sourceChain:string)
+  :Promise<string> => {
+    const params:any = {
+      to,
+      sourceChain,
+      username,
+      password,
+    };
+    return this.callMethod('avm.import', params)
+      .then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**

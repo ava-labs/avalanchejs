@@ -240,6 +240,30 @@ describe('AVMAPI', () => {
     expect(response).toBe(key);
   });
 
+  test("export", async ()=>{
+    let amount = new BN(100);
+    let to = "abcdef";
+    let assetID = "AVAX"
+    let username = "Robert";
+    let password = "Paulson";
+    let txID = "valid";
+    let result:Promise<string> = api.export(username, password, to, amount, assetID);
+    let payload:object = {
+        "result": {
+            "txID": txID
+        }
+    };
+    let responseObj = {
+        data: payload
+    };
+
+    mockAxios.mockResponse(responseObj);
+    let response:string = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(response).toBe(txID);
+  });
+
   test("exportAVAX", async ()=>{
     let amount = new BN(100);
     let to = "abcdef";
@@ -261,6 +285,28 @@ describe('AVMAPI', () => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(txID);
+});
+
+test("import", async ()=>{
+  let to = "abcdef";
+  let username = "Robert";
+  let password = "Paulson";
+  let txID = "valid";
+  let result:Promise<string> = api.import(username, password, to, blockchainid);
+  let payload:object = {
+      "result": {
+          "txID": txID
+      }
+  };
+  let responseObj = {
+      data: payload
+  };
+
+  mockAxios.mockResponse(responseObj);
+  let response:string = await result;
+
+  expect(mockAxios.request).toHaveBeenCalledTimes(1);
+  expect(response).toBe(txID);
 });
 
   test("importAVAX", async ()=>{

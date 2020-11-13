@@ -27,13 +27,13 @@ export class EVMAPI extends JRPCAPI {
   /**
    * Send mulitcoin assets including AVAX from the C-Chain to an account on the X-Chain.
     *
-    * After calling this method, you must call the X-Chain’s importAVAX method to complete the transfer.
+    * After calling this method, you must call the X-Chain’s import method to complete the transfer.
     *
     * @param username The Keystore user that controls the X-Chain account specified in `to`
     * @param password The password of the Keystore user
     * @param to The account on the X-Chain to send the AVAX to. 
-    * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
-    * @param destinationChain The chain id where the funds are being sent
+    * @param amount Amount of asset to export as a {@link https://github.com/indutny/bn.js/|BN}
+    * @param destinationChain The chain where the funds are being sent. Ex: "X"
     * @param assetID The asset id which is being sent
     *
     * @returns String representing the transaction id
@@ -74,14 +74,13 @@ export class EVMAPI extends JRPCAPI {
 
   /**
    * Send multicoin assets including AVAX from an account on the X-Chain to an address on the C-Chain. This transaction
-   * must be signed with the key of the account that the AVAX is sent from and which pays
+   * must be signed with the key of the account that the asset is sent from and which pays
    * the transaction fee.
    *
    * @param username The Keystore user that controls the account specified in `to`
    * @param password The password of the Keystore user
-   * @param to The ID of the account the AVAX is sent to. This must be the same as the to
-   * argument in the corresponding call to the X-Chain’s exportAVAX
-   * @param sourceChain The chainID where the funds are coming from.
+   * @param to The ID of the account the asset is sent to. 
+   * @param sourceChain The chainID where the funds are coming from. Ex: "X"
    *
    * @returns Promise for a string for the transaction, which should be sent to the network
    * by calling issueTx.
@@ -94,7 +93,7 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('avax.importAVAX', params)
+    return this.callMethod('avax.import', params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
 
