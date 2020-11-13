@@ -506,7 +506,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param username The Keystore user that controls the account specified in `to`
    * @param password The password of the Keystore user
-   * @param to The ID of the account the AVAX is sent to.
+   * @param to The ID of the account the asset is sent to.
    * @param sourceChain The chainID where the funds are coming from. Ex: "C"
    *
    * @returns Promise for a string for the transaction, which should be sent to the network
