@@ -25,7 +25,7 @@ export class EVMAPI extends JRPCAPI {
   protected blockchainID:string = '';
 
   /**
-   * Send mulitcoin assets including AVAX from the C-Chain to an account on the X-Chain.
+   * Send ANT (Avalanche Native Token) assets including AVAX from the C-Chain to an account on the X-Chain.
     *
     * After calling this method, you must call the X-Chain’s import method to complete the transfer.
     *
@@ -73,7 +73,7 @@ export class EVMAPI extends JRPCAPI {
   };
 
   /**
-   * Send multicoin assets including AVAX from an account on the X-Chain to an address on the C-Chain. This transaction
+   * Send ANT (Avalanche Native Token) assets including AVAX from an account on the X-Chain to an address on the C-Chain. This transaction
    * must be signed with the key of the account that the asset is sent from and which pays
    * the transaction fee.
    *
