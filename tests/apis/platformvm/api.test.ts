@@ -52,7 +52,7 @@ describe('PlatformVMAPI', () => {
   const username:string = 'AvaLabs';
   const password:string = 'password';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, true);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true);
   let api:PlatformVMAPI;
   let alias:string;
 
@@ -1612,8 +1612,6 @@ describe('PlatformVMAPI', () => {
       for(let i = 0; i < txu1Total.length; i++) {
         totaltotal = totaltotal.add((txu1Total[i].getOutput() as AmountOutput).getAmount());
       }
-
-      console.log(intotal.toString(10), outtotal.toString(10), staketotal.toString(10), totaltotal.toString(10));
 
       expect(intotal.toString(10)).toBe("4000000000");
       expect(outtotal.toString(10)).toBe("1000000000");

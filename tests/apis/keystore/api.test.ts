@@ -11,7 +11,7 @@ describe('Keystore', () => {
   const username = 'AvaLabs';
   const password = 'password';
 
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
   let keystore:KeystoreAPI;
 
   beforeAll(() => {

@@ -6,6 +6,7 @@ import AvalancheCore from './avalanche';
 import { AdminAPI } from './apis/admin/api';
 import { AuthAPI } from './apis/auth/api';
 import { AVMAPI } from './apis/avm/api';
+import { EVMAPI } from './apis/evm/api';
 import { HealthAPI } from './apis/health/api';
 import { InfoAPI } from './apis/info/api';
 import { KeystoreAPI } from './apis/keystore/api';
@@ -37,6 +38,11 @@ export default class Avalanche extends AvalancheCore {
      * Returns a reference to the Auth RPC.
      */
   Auth = () => this.apis.auth as AuthAPI;
+
+  /**
+   * Returns a reference to the EVMAPI RPC pointed at the C-Chain.
+   */
+  CChain = () => this.apis.cchain as EVMAPI;
 
   /**
      * Returns a reference to the AVM RPC pointed at the X-Chain.
@@ -77,27 +83,42 @@ export default class Avalanche extends AvalancheCore {
      * @param protocol The protocol string to use before a "://" in a request,
      * ex: "http", "https", "git", "ws", etc ...
      * @param networkid Sets the NetworkID of the class. Default [[DefaultNetworkID]]
-     * @param avmChainID Sets the blockchainID for the AVM. Will try to auto-detect,
+     * @param XChainID Sets the blockchainID for the AVM. Will try to auto-detect,
      * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
+     * @param CChainID Sets the blockchainID for the EVM. Will try to auto-detect,
+     * otherwise default "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5"
+     * @param hrp The human-readable part of the bech32 addresses
      * @param skipinit Skips creating the APIs
      */
-  constructor(ip:string,
+  constructor(
+    ip:string,
     port:number,
     protocol:string = 'http',
     networkID:number = DefaultNetworkID,
     XChainID:string = undefined,
+    CChainID:string = undefined,
     hrp:string = undefined,
     skipinit:boolean = false) {
     super(ip, port, protocol);
-    let chainid = XChainID;
+    let xchainid = XChainID;
+    let cchainid = CChainID;
 
     if (typeof XChainID === 'undefined'
     || !XChainID
     || XChainID.toLowerCase() === 'x') {
       if (networkID.toString() in Defaults.network) {
-        chainid = Defaults.network[networkID].X.blockchainID;
+        xchainid = Defaults.network[networkID].X.blockchainID;
       } else {
-        chainid = Defaults.network[12345].X.blockchainID;
+        xchainid = Defaults.network[12345].X.blockchainID;
+      }
+    }
+    if (typeof CChainID === 'undefined'
+    || !CChainID
+    || CChainID.toLowerCase() === 'c') {
+      if (networkID.toString() in Defaults.network) {
+        cchainid = Defaults.network[networkID].C.blockchainID;
+      } else {
+        cchainid = Defaults.network[12345].C.blockchainID;
       }
     }
     if (typeof networkID === 'number' && networkID >= 0) {
@@ -114,7 +135,8 @@ export default class Avalanche extends AvalancheCore {
     if (!skipinit) {
       this.addAPI('admin', AdminAPI);
       this.addAPI('auth', AuthAPI);
-      this.addAPI('xchain', AVMAPI, '/ext/bc/X', chainid);
+      this.addAPI('xchain', AVMAPI, '/ext/bc/X', xchainid);
+      this.addAPI('cchain', EVMAPI, '/ext/bc/C/avax', cchainid);
       this.addAPI('health', HealthAPI);
       this.addAPI('info', InfoAPI);
       this.addAPI('keystore', KeystoreAPI);
@@ -136,6 +158,7 @@ export * as common from './common';
 export * as admin from './apis/admin';
 export * as auth from './apis/auth';
 export * as avm from './apis/avm';
+export * as evm from './apis/evm';
 export * as health from './apis/health';
 export * as info from './apis/info';
 export * as keystore from './apis/keystore';
