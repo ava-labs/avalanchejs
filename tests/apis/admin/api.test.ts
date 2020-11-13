@@ -11,7 +11,7 @@ describe('Admin', () => {
   const username = 'AvaLabs';
   const password = 'password';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, false);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, undefined, false);
   let admin:AdminAPI;
 
   beforeAll(() => {

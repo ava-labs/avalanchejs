@@ -7,7 +7,7 @@ describe('Metrics', () => {
   const port = 9650;
   const protocol = 'https';
 
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, true);
+  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
   let metrics:MetricsAPI;
 
   beforeAll(() => {

@@ -8,7 +8,7 @@ describe('Info', () => {
   const port:number = 9650;
   const protocol:string = 'https';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, false);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, undefined, false);
   let info:InfoAPI;
 
   beforeAll(() => {
