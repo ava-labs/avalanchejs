@@ -13,7 +13,7 @@ describe('AVMKeyPair', () => {
   const ip:string = '127.0.0.1';
   const port:number = 9650;
   const protocol:string = 'https';
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, true);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true);
 
   test('human readable part', () => {
     let hrp:string = avalanche.getHRP();

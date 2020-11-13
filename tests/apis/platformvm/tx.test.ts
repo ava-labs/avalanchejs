@@ -67,7 +67,7 @@ describe('Transactions', () => {
 
   beforeAll(async () => {
     
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, null, true);
+    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, null, true);
     api = new PlatformVMAPI(avalanche, '/ext/bc/P');
 
     const result:Promise<Buffer> = api.getAVAXAssetID();

@@ -42,7 +42,7 @@ export abstract class APIBase {
   /**
      * Sets the path of the APIs baseurl.
      *
-     * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
+     * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/X"
      */
   setBaseURL = (baseurl:string) => {
     if (this.db && this.baseurl !== baseurl) {
@@ -70,7 +70,7 @@ export abstract class APIBase {
   /**
      *
      * @param core Reference to the Avalanche instance using this baseurl
-     * @param baseurl Path to the baseurl - ex: "/ext/bc/avm"
+     * @param baseurl Path to the baseurl - ex: "/ext/bc/X"
      */
   constructor(core:AvalancheCore, baseurl:string) {
     this.core = core;

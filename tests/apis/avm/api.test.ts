@@ -49,7 +49,7 @@ describe('AVMAPI', () => {
   const username:string = 'AvaLabs';
   const password:string = 'password';
 
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, true);
+  const avalanche:Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true);
   let api:AVMAPI;
   let alias:string;
 
@@ -59,7 +59,7 @@ describe('AVMAPI', () => {
   const addrC:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")));
 
   beforeAll(() => {
-    api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
+    api = new AVMAPI(avalanche, '/ext/bc/X', blockchainid);
     alias = api.getBlockchainAlias();
   });
 

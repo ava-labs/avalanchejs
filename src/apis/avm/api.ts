@@ -1425,6 +1425,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/bc/X" as the path to blockchain's baseurl
+   * @param blockchainID The Blockchain's ID. Defaults to an empty string: ''
    */
   constructor(core:AvalancheCore, baseurl:string = '/ext/bc/X', blockchainID:string = '') {
     super(core, baseurl);
