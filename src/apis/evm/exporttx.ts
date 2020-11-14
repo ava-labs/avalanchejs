@@ -1,5 +1,8 @@
+/**
+ * @packageDocumentation
+ * @module API-EVM-ExportTx
+ */
 import { Buffer } from 'buffer/';
-import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { EVMOutput } from './outputs';
 import { EVMInput } from './inputs';

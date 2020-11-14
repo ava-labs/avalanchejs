@@ -1,9 +1,9 @@
 /**
  * @packageDocumentation
- * @module API-PlatformVM-Credentials
+ * @module API-EVM-Credentials
  */
 
-import { PlatformVMConstants } from './constants';
+import { EVMConstants } from './constants';
 import { Credential } from '../../common/credentials';
 
 /**
@@ -14,7 +14,7 @@ import { Credential } from '../../common/credentials';
  * @returns An instance of an [[Credential]]-extended class.
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
-  if (credid === PlatformVMConstants.SECPCREDENTIAL) {
+  if (credid === EVMConstants.SECPCREDENTIAL) {
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
@@ -23,7 +23,7 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 
 export class SECPCredential extends Credential {
   protected _typeName = "SECPCredential";
-  protected _typeID = PlatformVMConstants.SECPCREDENTIAL;
+  protected _typeID = EVMConstants.SECPCREDENTIAL;
 
   //serialize and deserialize both are inherited
 

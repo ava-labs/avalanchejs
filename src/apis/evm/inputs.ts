@@ -1,3 +1,8 @@
+/**
+ * @packageDocumentation
+ * @module API-EVM-Inputs
+ */
+
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
