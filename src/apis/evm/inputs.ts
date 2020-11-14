@@ -16,7 +16,7 @@ export class EVMInput {
   protected nonceValue: BN = new BN(0);
 
   /**
-   * Returns the assetID of the input as {@link https://github.com/feross/buffer|Buffer}
+   * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
    */
   getAddress = (): Buffer => this.address;
 
@@ -26,7 +26,7 @@ export class EVMInput {
   getAmount = (): BN => this.amountValue.clone();
 
   /**
-   * Returns the assetID of the input as {@link https://github.com/feross/buffer|Buffer}
+   * Returns the assetid of the input as {@link https://github.com/feross/buffer|Buffer}
    */ 
   getAssetID = (): Buffer => this.assetid;
 
@@ -61,7 +61,7 @@ export class EVMInput {
   }
 
   /**
-   * Returns a base-58 representation of the [[Input]].
+   * Returns a base-58 representation of the [[EVMInput]].
    */
   toString():string {
     return bintools.bufferToB58(this.toBuffer());

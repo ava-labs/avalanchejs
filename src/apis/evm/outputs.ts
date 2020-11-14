@@ -14,7 +14,7 @@ export class EVMOutput {
   protected assetid: Buffer = Buffer.alloc(32);
 
   /**
-   * Returns the assetID of the input as {@link https://github.com/feross/buffer|Buffer}
+   * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
    */
   getAddress = (): Buffer => this.address;
 
@@ -24,7 +24,7 @@ export class EVMOutput {
   getAmount = (): BN => this.amountValue.clone();
 
   /**
-   * Returns the assetID of the input as {@link https://github.com/feross/buffer|Buffer}
+   * Returns the assetid of the input as {@link https://github.com/feross/buffer|Buffer}
    */ 
   getAssetID = (): Buffer => this.assetid;
  
@@ -52,7 +52,7 @@ export class EVMOutput {
   }
 
   /**
-   * Returns a base-58 representation of the [[Input]].
+   * Returns a base-58 representation of the [[EVMOutput]].
    */
   toString():string {
     return bintools.bufferToB58(this.toBuffer());
