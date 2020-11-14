@@ -42,15 +42,15 @@ export class ImportTx {
   /**
    * Returns the importedIns as an array of [[EVMInputs]]
    */ 
-  getImportedIns= (): EVMInput[] => this.importedInputs;
+  getImportedIns = (): EVMInput[] => this.importedInputs;
 
   /**
    * Returns the outs as an array of [[EVMOutputs]]
    */ 
-  getOuts= (): EVMOutput[] => this.outs;
+  getOuts = (): EVMOutput[] => this.outs;
  
   /**
-   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[InputTx]].
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
    */
   toBuffer():Buffer {
     const bsize: number = this.typeid.length + this.networkid.length + this.blockchainid.length + this.sourceChain.length + this.importedInputs.length + this.outs.length;
@@ -60,7 +60,7 @@ export class ImportTx {
   }
 
   /**
-   * Decodes the [[InputTx]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
+   * Decodes the [[ImportTx]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.typeid = bintools.copyFrom(bytes, offset, offset + 4);
@@ -75,14 +75,14 @@ export class ImportTx {
   }
 
   /**
-   * Returns a base-58 representation of the [[InputTx]].
+   * Returns a base-58 representation of the [[ImportTx]].
    */
   toString():string {
     return bintools.bufferToB58(this.toBuffer());
   }
 
   /**
-   * Class representing a InputTx.
+   * Class representing a ImportTx.
    *
    * @param networkid Optional networkid
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
@@ -90,7 +90,7 @@ export class ImportTx {
    * @param importedIns Optional array of the [[EVMInputs]]s
    * @param outs Optional array of the [[EVMOutputs]]s
    */
-  constructor(networkid: number = undefined, blockchainid:Buffer = Buffer.alloc(32, 16), sourceChain:Buffer = Buffer.alloc(32, 16), importedIns: EVMInput[] = undefined, outs:EVMOutput[] = undefined) {
+  constructor(networkid: number = undefined, blockchainid: Buffer = Buffer.alloc(32, 16), sourceChain: Buffer = Buffer.alloc(32, 16), importedIns: EVMInput[] = undefined, outs: EVMOutput[] = undefined) {
     this.typeid.writeUInt32BE(0, 0);
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
