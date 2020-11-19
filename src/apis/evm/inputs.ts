@@ -43,6 +43,9 @@ export class EVMInput extends EVMOutput {
 
   /**
    * Decodes the [[EVMInput]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
+   *
+   * @param bytes The bytes as a {@link https://github.com/feross/buffer|Buffer}.
+   * @param offset An offset as a number.
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.address = bintools.copyFrom(bytes, offset, offset + 20);

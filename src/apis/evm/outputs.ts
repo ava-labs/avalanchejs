@@ -6,6 +6,7 @@
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
+// import { getPreferredHRP } from 'src/utils';
 
 /**
  * @ignore
@@ -33,6 +34,12 @@ export class EVMOutput {
    * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
    */
   getAddress = (): Buffer => this.address;
+
+  /**
+   * Returns the address as a bech32 encoded string.
+   */
+  // TODO - Get getAddressString to work. Why is `getPreferredHRP(networkID)` failing?
+  // getAddressString = (networkID: number = 1, blockchainID: string = "X"): string => {return bintools.addressToString(getPreferredHRP(networkID), blockchainID, this.address)}
 
   /**
    * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
