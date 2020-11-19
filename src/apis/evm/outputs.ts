@@ -17,8 +17,10 @@ const bintools = BinTools.getInstance();
  *
  * @returns An instance of an [[EVMOutput]] class.
  */
-export const SelectOutputClass = (...args: any[]): EVMOutput => {
-  return new EVMOutput( ...args);
+export const SelectOutputClass = (outputClass: string = 'EVMOutput', ...args: any[]): EVMOutput => {
+  if(outputClass === 'EVMOutput') {
+    return new EVMOutput(...args);
+  }
 }
 
 export class EVMOutput {
@@ -72,19 +74,29 @@ export class EVMOutput {
     return bintools.bufferToB58(this.toBuffer());
   }
 
+  create(...args: any[]): this{
+    return new EVMOutput(...args) as this;
+  }
+
+  clone(): this {
+    const newout: EVMOutput = this.create();
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
+  }
+
   /**
    * An [[EVMOutput]] class which contains address, amount, and assetID.
    *
    * @param address The address recieving the asset as a {@link https://github.com/feross/buffer|Buffer} or a string.
-   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount.
-   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer}
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} or number representing the amount.
+   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer} or a string.
    */
   constructor(
     address: Buffer | string = undefined, 
     amount: BN | number = undefined, 
     assetid: Buffer | string = undefined
   ) {
-    if (typeof address !== undefined && typeof amount !== undefined && typeof assetid !== undefined) {
+    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
       // convert string address to Buffer
       if(!(address instanceof Buffer)) {
         address = bintools.stringToAddress(address);

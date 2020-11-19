@@ -202,7 +202,7 @@ export class NFTMintOutput extends NFTOutput {
   }
 
   clone():this {
-      const newout:NFTMintOutput = this.create()
+      const newout:NFTMintOutput = this.create();
       newout.fromBuffer(this.toBuffer());
       return newout as this;
   }

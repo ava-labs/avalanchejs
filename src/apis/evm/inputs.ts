@@ -66,21 +66,30 @@ export class EVMInput extends EVMOutput {
   /**
    * An [[EVMInput]] class which contains address, amount, and assetID.
    *
-   * @param address The address recieving the asset as a {@link https://github.com/feross/buffer|Buffer}
-   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer}
-   * @param nonce A {@link https://github.com/indutny/bn.js/|BN} representing the nonce 
+   * @param address The address recieving the asset as a {@link https://github.com/feross/buffer|Buffer} or as a string.
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} or a number representing the locktime.
+   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer} or as a string.
+   * @param nonce A {@link https://github.com/indutny/bn.js/|BN} or a number representing the nonce.
    */
   constructor(
-    address: Buffer = undefined, 
-    amount: BN = undefined, 
-    assetid: Buffer = undefined, 
-    nonce: BN = undefined
+    address: Buffer | string = undefined, 
+    amount: BN | number = undefined, 
+    assetid: Buffer | string = undefined,
+    nonce: BN | number = undefined
   ) {
     super(address, amount, assetid);
     if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined' && typeof nonce !== 'undefined') {
-      this.nonceValue = nonce.clone();
-      this.nonce = bintools.fromBNToBuffer(nonce, 8);
+
+      // convert number nonce to BN
+      let n:BN;
+      if (typeof nonce === 'number') {
+        n = new BN(nonce);
+      } else {
+        n = nonce;
+      }
+
+      this.nonceValue = n.clone();
+      this.nonce = bintools.fromBNToBuffer(n, 8);
     }
   }
 }  
