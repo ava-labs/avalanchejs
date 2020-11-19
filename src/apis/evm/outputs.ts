@@ -70,7 +70,11 @@ export class EVMOutput {
    * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
    * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer}
    */
-  constructor(address: Buffer = undefined, amount: BN = undefined, assetid: Buffer = undefined) {
+  constructor(
+    address: Buffer = undefined, 
+    amount: BN = undefined, 
+    assetid: Buffer = undefined
+  ) {
     if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
       this.address = address;
       this.amountValue = amount.clone();

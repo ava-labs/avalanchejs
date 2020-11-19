@@ -80,7 +80,12 @@ export class EVMInput {
    * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer}
    * @param nonce A {@link https://github.com/indutny/bn.js/|BN} representing the nonce 
    */
-  constructor(address: Buffer = undefined, amount: BN = undefined, assetid: Buffer = undefined, nonce: BN = undefined) {
+  constructor(
+    address: Buffer = undefined, 
+    amount: BN = undefined, 
+    assetid: Buffer = undefined, 
+    nonce: BN = undefined
+  ) {
     if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined' && typeof nonce !== 'undefined') {
       this.address = address;
       this.amountValue = amount.clone();

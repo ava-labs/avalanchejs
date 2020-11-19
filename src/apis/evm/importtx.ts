@@ -7,36 +7,20 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { EVMOutput } from './outputs';
 import { EVMInput } from './inputs';
+import { Tx } from './tx';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
 
-export class ImportTx {
-  protected typeid: Buffer = Buffer.alloc(4); 
-  protected networkid: Buffer = Buffer.alloc(4); 
-  protected blockchainid: Buffer = Buffer.alloc(32);
+export class ImportTx extends Tx {
   protected sourceChain: Buffer = Buffer.alloc(32);
   protected numImportedInputs: Buffer = Buffer.alloc(4);
   protected importedInputs: EVMInput[];
   protected numouts: Buffer = Buffer.alloc(4);
   protected outs: EVMOutput[];
 
-  /**
-   * Returns the typeid of the input as {@link https://github.com/feross/buffer|Buffer}
-   */
-  getTypeID = (): Buffer => this.typeid;
-
-  /**
-   * Returns the networkid as a {@link https://github.com/feross/buffer|Buffer}.
-   */
-  getNetworkID = (): Buffer => this.networkid;
-
-  /**
-   * Returns the blockchainid of the input as {@link https://github.com/feross/buffer|Buffer}
-   */ 
-  getBlockchainID = (): Buffer => this.blockchainid;
 
   /**
    * Returns the sourceChain of the input as {@link https://github.com/feross/buffer|Buffer}
@@ -94,10 +78,15 @@ export class ImportTx {
    * @param importedIns Optional array of the [[EVMInputs]]s
    * @param outs Optional array of the [[EVMOutputs]]s
    */
-  constructor(networkid: number = undefined, blockchainid: Buffer = Buffer.alloc(32, 16), sourceChain: Buffer = Buffer.alloc(32, 16), importedIns: EVMInput[] = undefined, outs: EVMOutput[] = undefined) {
+  constructor(
+    networkid: number = undefined, 
+    blockchainid: Buffer = Buffer.alloc(32, 16), 
+    sourceChain: Buffer = Buffer.alloc(32, 16), 
+    importedIns: EVMInput[] = undefined, 
+    outs: EVMOutput[] = undefined
+  ) {
+    super(networkid, blockchainid);
     this.typeid.writeUInt32BE(0, 0);
-    this.networkid.writeUInt32BE(networkid, 0);
-    this.blockchainid = blockchainid;
     this.sourceChain = sourceChain;
     
     if (typeof importedIns !== 'undefined' && typeof outs !== 'undefined') {

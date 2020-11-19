@@ -4,7 +4,7 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import {  AVMConstants } from './constants';
+import { AVMConstants } from './constants';
 import { SelectCredentialClass } from './credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { Credential } from '../../common/credentials';

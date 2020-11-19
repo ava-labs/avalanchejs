@@ -4,7 +4,7 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import {  AVMConstants } from './constants';
+import { AVMConstants } from './constants';
 import { TransferableOutput, AmountOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { BaseTx } from './basetx';

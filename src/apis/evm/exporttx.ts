@@ -2,40 +2,24 @@
  * @packageDocumentation
  * @module API-EVM-ExportTx
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { EVMOutput } from './outputs';
 import { EVMInput } from './inputs';
+import { Tx } from './tx';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
 
-export class ExportTx {
-  protected typeid: Buffer = Buffer.alloc(4); 
-  protected networkid: Buffer = Buffer.alloc(4); 
-  protected blockchainid: Buffer = Buffer.alloc(32);
+export class ExportTx extends Tx {
   protected destinationChain: Buffer = Buffer.alloc(32);
   protected numInputs: Buffer = Buffer.alloc(4);
   protected inputs: EVMInput[];
   protected numExportedOutputs: Buffer = Buffer.alloc(4);
   protected exportedOutputs: EVMOutput[];
-
-  /**
-   * Returns the typeid of the input as {@link https://github.com/feross/buffer|Buffer}
-   */
-  getTypeID = (): Buffer => this.typeid;
-
-  /**
-   * Returns the networkid as a {@link https://github.com/feross/buffer|Buffer}.
-   */
-  getNetworkID = (): Buffer => this.networkid;
-
-  /**
-   * Returns the blockchainid of the input as {@link https://github.com/feross/buffer|Buffer}
-   */ 
-  getBlockchainID = (): Buffer => this.blockchainid;
 
   /**
    * Returns the destinationChain of the input as {@link https://github.com/feross/buffer|Buffer}
@@ -93,10 +77,15 @@ export class ExportTx {
    * @param inputs Optional array of the [[EVMInputs]]s
    * @param exportedOutputs Optional array of the [[EVMOutputs]]s
    */
-  constructor(networkid: number = undefined, blockchainid: Buffer = Buffer.alloc(32, 16), destinationChain: Buffer = Buffer.alloc(32, 16), inputs: EVMInput[] = undefined, exportedOutputs: EVMOutput[] = undefined) {
+  constructor(
+    networkid: number = undefined, 
+    blockchainid: Buffer = Buffer.alloc(32, 16), 
+    destinationChain: Buffer = Buffer.alloc(32, 16), 
+    inputs: EVMInput[] = undefined, 
+    exportedOutputs: EVMOutput[] = undefined
+  ) {
+    super(networkid, blockchainid);
     this.typeid.writeUInt32BE(1, 0);
-    this.networkid.writeUInt32BE(networkid, 0);
-    this.blockchainid = blockchainid;
     this.destinationChain = destinationChain;
     
     if (typeof inputs !== 'undefined' && typeof exportedOutputs !== 'undefined') {
