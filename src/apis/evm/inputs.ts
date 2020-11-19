@@ -6,34 +6,25 @@
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
+import { EVMOutput } from './outputs';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
 
-export class EVMInput {
-  protected address: Buffer = Buffer.alloc(20); 
-  protected amount: Buffer = Buffer.alloc(8);
-  protected amountValue: BN = new BN(0);
-  protected assetid: Buffer = Buffer.alloc(32);
+/**
+ * Takes a buffer representing the input and returns the proper Input instance.
+ *
+ * @returns An instance of an [[EVMInput]] class.
+ */
+export const SelectInputClass = (...args: any[]): EVMInput => {
+  return new EVMInput(...args);
+}
+
+export class EVMInput extends EVMOutput {
   protected nonce: Buffer = Buffer.alloc(8);
   protected nonceValue: BN = new BN(0);
-
-  /**
-   * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
-   */
-  getAddress = (): Buffer => this.address;
-
-  /**
-   * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
-   */
-  getAmount = (): BN => this.amountValue.clone();
-
-  /**
-   * Returns the assetid of the input as {@link https://github.com/feross/buffer|Buffer}
-   */ 
-  getAssetID = (): Buffer => this.assetid;
 
   /**
    * Returns the nonce as a {@link https://github.com/indutny/bn.js/|BN}.
@@ -86,11 +77,8 @@ export class EVMInput {
     assetid: Buffer = undefined, 
     nonce: BN = undefined
   ) {
+    super(address, amount, assetid);
     if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined' && typeof nonce !== 'undefined') {
-      this.address = address;
-      this.amountValue = amount.clone();
-      this.amount = bintools.fromBNToBuffer(amount, 8);
-      this.assetid = assetid;
       this.nonceValue = nonce.clone();
       this.nonce = bintools.fromBNToBuffer(nonce, 8);
     }
