@@ -18,8 +18,10 @@ const bintools = BinTools.getInstance();
  *
  * @returns An instance of an [[EVMInput]] class.
  */
-export const SelectInputClass = (...args: any[]): EVMInput => {
-  return new EVMInput(...args);
+export const SelectInputClass = (inputClass: string = 'EVMInput', ...args: any[]): EVMInput => {
+  if(inputClass === 'EVMInput') {
+    return new EVMInput(...args);
+  }
 }
 
 export class EVMInput extends EVMOutput {
@@ -34,11 +36,11 @@ export class EVMInput extends EVMOutput {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[EVMOutput]].
    */
-  toBuffer():Buffer {
-    const bsize: number = this.address.length + this.amount.length + this.assetid.length + this.nonce.length;
-    const barr: Buffer[] = [this.address, this.amount, this.assetid, this.nonce];
-    const buff: Buffer = Buffer.concat(barr, bsize);
-    return buff;
+  toBuffer(): Buffer {
+    let superbuff: Buffer = super.toBuffer();
+    let bsize: number = superbuff.length + this.nonce.length;
+    let barr: Buffer[] = [superbuff, this.nonce];
+    return Buffer.concat(barr,bsize);
   }
 
   /**
@@ -48,12 +50,7 @@ export class EVMInput extends EVMOutput {
    * @param offset An offset as a number.
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.address = bintools.copyFrom(bytes, offset, offset + 20);
-    offset += 20;
-    this.amount = bintools.copyFrom(bytes, offset, offset + 8);
-    offset += 8;
-    this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
-    offset += 32;
+    offset = super.fromBuffer(bytes, offset);
     this.nonce = bintools.copyFrom(bytes, offset, offset + 8);
     offset += 8;
     return offset;
@@ -66,8 +63,18 @@ export class EVMInput extends EVMOutput {
     return bintools.bufferToB58(this.toBuffer());
   }
 
+  create(...args: any[]): this{
+    return new EVMInput(...args) as this;
+  }
+
+  clone(): this {
+    const newin: EVMInput = this.create();
+    newin.fromBuffer(this.toBuffer());
+    return newin as this;
+  }
+
   /**
-   * An [[EVMInput]] class which contains address, amount, and assetID.
+   * An [[EVMInput]] class which contains address, amount, assetID, nonce.
    *
    * @param address The address recieving the asset as a {@link https://github.com/feross/buffer|Buffer} or as a string.
    * @param amount A {@link https://github.com/indutny/bn.js/|BN} or a number representing the locktime.
