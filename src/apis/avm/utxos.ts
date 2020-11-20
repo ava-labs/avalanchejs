@@ -1,7 +1,7 @@
 /**
  * @packageDocumentation
  * @module API-AVM-UTXOs
- */
+  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";

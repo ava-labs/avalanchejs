@@ -8,6 +8,11 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 
+interface Index {
+  address: string,
+  utxo: string
+}
+
 /**
  * @ignore
  */
@@ -69,6 +74,51 @@ export class EVMAPI extends JRPCAPI {
     };
     return this.callMethod('avax.exportAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
   };
+
+  /**
+   * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
+   *
+   * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param sourceChain A string for the chain to look for the UTXO's. Default is to use this chain, but if exported UTXOs exist from other chains, this can used to pull them instead.
+   * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
+   * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
+   * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
+   * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
+   */
+  getUTXOs = async (
+    addresses: string[] | string,
+    sourceChain: string = undefined,
+    limit: number = 0,
+    startIndex: Index = undefined
+  ):Promise<{
+    numFetched:number,
+    utxos,
+    endIndex: Index
+  }> => {
+    if(typeof addresses === "string") {
+      addresses = [addresses];
+    }
+
+    const params:any = {
+      addresses: addresses,
+      limit
+    };
+    if(typeof startIndex !== "undefined" && startIndex) {
+      params.startIndex = startIndex;
+    }
+
+    if(typeof sourceChain !== "undefined" && sourceChain) {
+      params.sourceChain = sourceChain;
+      return this.callMethod('avax.getUTXOs', params).then((response: RequestResponseData) => {
+        // const utxos: UTXOSet = new UTXOSet();
+        // let data = response.data.result.utxos;
+        // utxos.aRRArray(data, false);
+        // response.data.result.utxos = utxos;
+        return response.data.result;
+      });
+    };
+  }
+
 
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from an account on the X-Chain to an address on the C-Chain. This transaction
