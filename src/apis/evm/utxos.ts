@@ -6,6 +6,7 @@ import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
 import { off } from 'process';
+import { EVMOutput } from './outputs';
 
 /**
  * @ignore
@@ -20,7 +21,7 @@ export class EVMUTXO {
   protected txid: Buffer = Buffer.alloc(32);
   protected outputidx: Buffer = Buffer.alloc(4);
   protected assetid: Buffer = Buffer.alloc(32);
-//   protected output: Output = undefined;
+  protected output: EVMOutput = undefined;
 
   /**
    * Takes a base-58 string containing a [[UTXO]], parses it, populates the class, and returns the length of the UTXO in bytes.
@@ -70,7 +71,7 @@ export class EVMUTXO {
   toBuffer(): Buffer {
     const outbuff: Buffer = this.output.toBuffer();
     const outputidbuffer: Buffer = Buffer.alloc(4);
-    outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
+    // outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
     const barr: Buffer[] = [this.codecid, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
     return Buffer.concat(barr, 
       this.codecid.length + this.txid.length 
@@ -78,15 +79,3 @@ export class EVMUTXO {
       + outputidbuffer.length + outbuff.length);
   }
 }
-
-// * codec id: 00 00
-// * txid: 09 b1 44 1f d8 1f b5 6e 11 ff f8 92 3b 9b ae e5 cb a4 9d 51 07 b6 bb 77 8c 5c 38 16 2d fc a4 f3
-// * output index: 00 00 00 01
-// * asset id: db cf 89 0f 77 f4 9b 96 85 76 48 b7 2b 77 f9 f8 29 37 f2 8a 68 70 4a f0 5d a0 dc 12 ba 53 f2 db
-// * Output:
-// * type id: 00 00 00 07
-// * amount: 00 00 03 a3 52 a3 82 40
-// * locktime: 00 00 00 00 00 00 00 00
-// * threshold: 00 00 00 01
-// * num addrs: 00 00 00 01
-// * addrs[0]: 3c b7 d3 84 2e 8c ee 6a 0e bd 09 f1 fe 88 4f 68 61 e1 b2 9c
