@@ -115,7 +115,7 @@ let newAddress1 = myKeychain.makeKey(); //returns a Buffer for the address
 You may also import your exsting private key into the KeyChain using either a Buffer...
 
 ```js
-let mypk = bintools.avaDeserialize("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
+let mypk = bintools.cb58Decode("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
 let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
 ```
 
