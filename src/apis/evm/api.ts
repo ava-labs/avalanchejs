@@ -8,6 +8,8 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 import { UTXOSet } from './utxos';
+import { KeyChain } from './keychain';
+import { Defaults } from '../../utils/constants';
 
 interface Index {
   address: string,
@@ -27,8 +29,12 @@ const bintools:BinTools = BinTools.getInstance();
  * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
 export class EVMAPI extends JRPCAPI {
+  /**
+   * @ignore
+   */
+  protected keychain: KeyChain = new KeyChain('', '');
 
-  protected blockchainID:string = '';
+  protected blockchainID: string = '';
 
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from the C-Chain to an account on the X-Chain.
@@ -212,6 +218,13 @@ export class EVMAPI extends JRPCAPI {
   };
 
   /**
+   * Gets a reference to the keychain for this class.
+   *
+   * @returns The instance of [[KeyChain]] for this class
+   */
+  keyChain = (): KeyChain => this.keychain;
+
+  /**
    * This class should not be instantiated directly.
    * Instead use the [[Avalanche.addAPI]] method.
    *
@@ -222,5 +235,12 @@ export class EVMAPI extends JRPCAPI {
   constructor(core:AvalancheCore, baseurl:string = '/ext/bc/C/avax', blockchainID:string = '') { 
     super(core, baseurl); 
     this.blockchainID = blockchainID;
+    const netid: number = core.getNetworkID();
+    if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
+      const { alias } = Defaults.network[netid][blockchainID];
+      this.keychain = new KeyChain(this.core.getHRP(), alias);
+    } else {
+      this.keychain = new KeyChain(this.core.getHRP(), blockchainID);
+    }
   }
 }
