@@ -7,6 +7,7 @@ import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
+import { UTXOSet } from './utxos';
 
 interface Index {
   address: string,
@@ -107,16 +108,17 @@ export class EVMAPI extends JRPCAPI {
       params.startIndex = startIndex;
     }
 
-    if(typeof sourceChain !== "undefined" && sourceChain) {
+    if(typeof sourceChain !== "undefined") {
       params.sourceChain = sourceChain;
-      return this.callMethod('avax.getUTXOs', params).then((response: RequestResponseData) => {
-        // const utxos: UTXOSet = new UTXOSet();
-        // let data = response.data.result.utxos;
-        // utxos.aRRArray(data, false);
-        // response.data.result.utxos = utxos;
-        return response.data.result;
-      });
-    };
+    }
+
+    return this.callMethod('avax.getUTXOs', params).then((response: RequestResponseData) => {
+      const utxos: UTXOSet = new UTXOSet();
+      let data = response.data.result.utxos;
+      utxos.addArray(data, false);
+      response.data.result.utxos = utxos;
+      return response.data.result;
+    });
   }
 
 
