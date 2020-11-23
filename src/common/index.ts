@@ -1,6 +1,7 @@
 export * from './apibase';
 export * from './assetamount';
 export * from './credentials';
+export * from './evmtx';
 export * from './input';
 export * from './jrpcapi';
 export * from './keychain';

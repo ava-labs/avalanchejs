@@ -2,104 +2,100 @@
  * @packageDocumentation
  * @module API-EVM-Inputs
  */
-
 import { Buffer } from 'buffer/';
-import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
-import { EVMOutput } from './outputs';
+import { EVMConstants } from './constants';
+import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
 /**
- * Takes a buffer representing the input and returns the proper Input instance.
+ * Takes a buffer representing the output and returns the proper [[Input]] instance.
  *
- * @returns An instance of an [[EVMInput]] class.
+ * @param inputid A number representing the inputID parsed prior to the bytes passed in
+ *
+ * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputClass: string = 'EVMInput', ...args: any[]): EVMInput => {
-  if(inputClass === 'EVMInput') {
-    return new EVMInput(...args);
+export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
+  if (inputid === EVMConstants.SECPINPUTID) {
+    return new SECPTransferInput(...args);
+  }
+  /* istanbul ignore next */
+  throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
+};
+
+export class TransferableInput extends StandardTransferableInput {
+  protected _typeName = "TransferableInput";
+  protected _typeID = undefined;
+
+  //serialize is inherited
+
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.input = SelectInputClass(fields["input"]["_typeID"]);
+    this.input.deserialize(fields["input"], encoding);
+  }
+
+  /**
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[TransferableInput]], parses it, populates the class, and returns the length of the [[TransferableInput]] in bytes.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[TransferableInput]]
+   *
+   * @returns The length of the raw [[TransferableInput]]
+   */
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    this.txid = bintools.copyFrom(bytes, offset, offset + 32);
+    offset += 32;
+    this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    this.assetid = bintools.copyFrom(bytes, offset, offset + EVMConstants.ASSETIDLEN);
+    offset += 32;
+    const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    offset += 4;
+    this.input = SelectInputClass(inputid);
+    return this.input.fromBuffer(bytes, offset);
+  }
+  
+}
+
+export abstract class AmountInput extends StandardAmountInput {
+  protected _typeName = "AmountInput";
+  protected _typeID = undefined;
+
+  //serialize and deserialize both are inherited
+
+  select(id:number, ...args: any[]):Input {
+    return SelectInputClass(id, ...args);
   }
 }
 
-export class EVMInput extends EVMOutput {
-  protected nonce: Buffer = Buffer.alloc(8);
-  protected nonceValue: BN = new BN(0);
+export class SECPTransferInput extends AmountInput {
+  protected _typeName = "SECPTransferInput";
+  protected _typeID = EVMConstants.SECPINPUTID;
+
+  //serialize and deserialize both are inherited
 
   /**
-   * Returns the nonce as a {@link https://github.com/indutny/bn.js/|BN}.
-   */
-  getNonce = (): BN => this.nonceValue.clone();
- 
-  /**
-   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[EVMOutput]].
-   */
-  toBuffer(): Buffer {
-    let superbuff: Buffer = super.toBuffer();
-    let bsize: number = superbuff.length + this.nonce.length;
-    let barr: Buffer[] = [superbuff, this.nonce];
-    return Buffer.concat(barr,bsize);
+     * Returns the inputID for this input
+     */
+  getInputID():number {
+    return EVMConstants.SECPINPUTID;
   }
 
-  /**
-   * Decodes the [[EVMInput]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
-   *
-   * @param bytes The bytes as a {@link https://github.com/feross/buffer|Buffer}.
-   * @param offset An offset as a number.
-   */
-  fromBuffer(bytes: Buffer, offset: number = 0): number {
-    offset = super.fromBuffer(bytes, offset);
-    this.nonce = bintools.copyFrom(bytes, offset, offset + 8);
-    offset += 8;
-    return offset;
+  getCredentialID = ():number => EVMConstants.SECPCREDENTIAL;
+
+  create(...args:any[]):this{
+    return new SECPTransferInput(...args) as this;
   }
 
-  /**
-   * Returns a base-58 representation of the [[EVMInput]].
-   */
-  toString():string {
-    return bintools.bufferToB58(this.toBuffer());
+  clone():this {
+    const newout:SECPTransferInput = this.create()
+    newout.fromBuffer(this.toBuffer());
+    return newout as this;
   }
-
-  create(...args: any[]): this{
-    return new EVMInput(...args) as this;
-  }
-
-  clone(): this {
-    const newin: EVMInput = this.create();
-    newin.fromBuffer(this.toBuffer());
-    return newin as this;
-  }
-
-  /**
-   * An [[EVMInput]] class which contains address, amount, assetID, nonce.
-   *
-   * @param address The address recieving the asset as a {@link https://github.com/feross/buffer|Buffer} or as a string.
-   * @param amount A {@link https://github.com/indutny/bn.js/|BN} or a number representing the locktime.
-   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer} or as a string.
-   * @param nonce A {@link https://github.com/indutny/bn.js/|BN} or a number representing the nonce.
-   */
-  constructor(
-    address: Buffer | string = undefined, 
-    amount: BN | number = undefined, 
-    assetid: Buffer | string = undefined,
-    nonce: BN | number = undefined
-  ) {
-    super(address, amount, assetid);
-    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined' && typeof nonce !== 'undefined') {
-
-      // convert number nonce to BN
-      let n:BN;
-      if (typeof nonce === 'number') {
-        n = new BN(nonce);
-      } else {
-        n = nonce;
-      }
-
-      this.nonceValue = n.clone();
-      this.nonce = bintools.fromBNToBuffer(n, 8);
-    }
-  }
-}  
+}

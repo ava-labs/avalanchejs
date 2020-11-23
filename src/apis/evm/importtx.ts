@@ -2,100 +2,174 @@
  * @packageDocumentation
  * @module API-EVM-ImportTx
  */
-
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { EVMOutput } from './outputs';
-import { EVMInput } from './inputs';
-import { Tx } from './tx';
+import { EVMConstants } from './constants';
+import { EVMOutput, TransferableOutput } from './outputs';
+import { TransferableInput } from './inputs';
+import { EVMBaseTx } from './basetx';
+import { SelectCredentialClass } from './credentials';
+import { Signature, SigIdx, Credential } from '../../common/credentials';
+import { KeyChain, KeyPair } from './keychain';
+import { DefaultNetworkID } from '../../utils/constants';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
-export class ImportTx extends Tx {
-  protected sourceChain: Buffer = Buffer.alloc(32);
-  protected numImportedInputs: Buffer = Buffer.alloc(4);
-  protected importedInputs: EVMInput[];
-  protected numouts: Buffer = Buffer.alloc(4);
-  protected outs: EVMOutput[];
+/**
+ * Class representing an unsigned Import transaction.
+ */
+export class ImportTx extends EVMBaseTx {
+  protected _typeName = "ImportTx";
+  protected _typeID = EVMConstants.IMPORTTX;
 
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "sourceChain": serializer.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
+      "importIns": this.importIns.map((i) => i.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.sourceChain = serializer.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
+    this.importIns = fields["importIns"].map((i:object) => {
+      let ii:TransferableInput = new TransferableInput();
+      ii.deserialize(i, encoding);
+      return ii;
+    });
+    this.numIns = Buffer.alloc(4);
+    this.numIns.writeUInt32BE(this.importIns.length, 0);
+  }
+
+  protected sourceChain:Buffer = Buffer.alloc(32);
+  protected numIns:Buffer = Buffer.alloc(4);
+  protected importIns:Array<TransferableInput> = [];
 
   /**
-   * Returns the sourceChain of the input as {@link https://github.com/feross/buffer|Buffer}
-   */ 
-  getSourceChain = (): Buffer => this.sourceChain;
-
-  /**
-   * Returns the importedIns as an array of [[EVMInputs]]
-   */ 
-  getImportedIns = (): EVMInput[] => this.importedInputs;
-
-  /**
-   * Returns the outs as an array of [[EVMOutputs]]
-   */ 
-  getOuts = (): EVMOutput[] => this.outs;
- 
-  /**
-   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
-   */
-  toBuffer():Buffer {
-    const bsize: number = this.typeid.length + this.networkid.length + this.blockchainid.length + this.sourceChain.length + this.importedInputs.length + this.outs.length;
-    const barr: Buffer[] = [this.typeid, this.networkid, this.blockchainid, this.sourceChain];
-    const buff: Buffer = Buffer.concat(barr, bsize);
-    return buff;
+     * Returns the id of the [[ImportTx]]
+     */
+  getTxType = ():number => {
+    return this._typeID;
   }
 
   /**
-   * Decodes the [[ImportTx]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
+   * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
    */
-  fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.typeid = bintools.copyFrom(bytes, offset, offset + 4);
-    offset += 4;
-    this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
-    offset += 4;
-    this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
-    offset += 32;
+  getSourceChain = ():Buffer => {
+    return this.sourceChain;
+  }
+
+  /**
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, populates the class, and returns the length of the [[ImportTx]] in bytes.
+     *
+     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ImportTx]]
+     *
+     * @returns The length of the raw [[ImportTx]]
+     *
+     * @remarks assume not-checksummed
+     */
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
+    offset = super.fromBuffer(bytes, offset);
     this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
+    this.numIns = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    const numIns:number = this.numIns.readUInt32BE(0);
+    for (let i:number = 0; i < numIns; i++) {
+      const anIn:TransferableInput = new TransferableInput();
+      offset = anIn.fromBuffer(bytes, offset);
+      this.importIns.push(anIn);
+    }
     return offset;
   }
 
   /**
-   * Returns a base-58 representation of the [[ImportTx]].
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
    */
-  toString():string {
-    return bintools.bufferToB58(this.toBuffer());
+  toBuffer():Buffer {
+    if(typeof this.sourceChain === "undefined") {
+      throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
+    }
+    this.numIns.writeUInt32BE(this.importIns.length, 0);
+    let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
+    this.importIns = this.importIns.sort(TransferableInput.comparator());
+    for(let i = 0; i < this.importIns.length; i++) {
+        barr.push(this.importIns[i].toBuffer());
+    }
+    return Buffer.concat(barr);
+  }
+  /**
+     * Returns an array of [[TransferableInput]]s in this transaction.
+     */
+  getImportInputs():Array<TransferableInput> {
+    return this.importIns;
+  }
+
+  clone():this {
+    let newbase:ImportTx = new ImportTx();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
+  }
+
+  create(...args:any[]):this {
+      return new ImportTx(...args) as this;
   }
 
   /**
-   * Class representing a ImportTx.
+     * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+     *
+     * @param msg A Buffer for the [[UnsignedTx]]
+     * @param kc An [[KeyChain]] used in signing
+     *
+     * @returns An array of [[Credential]]s
+     */
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    // const sigs:Array<Credential> = super.sign(msg, kc);
+    const sigs: Credential[] = [];
+    for (let i: number = 0; i < this.importIns.length; i++) {
+      const cred: Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
+      const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs();
+      for (let j = 0; j < sigidxs.length; j++) {
+        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource());
+        const signval: Buffer = keypair.sign(msg);
+        const sig: Signature = new Signature();
+        sig.fromBuffer(signval);
+        cred.addSignature(sig);
+      }
+      sigs.push(cred);
+    }
+    return sigs;
+  }
+
+  /**
+   * Class representing an unsigned Import transaction.
    *
-   * @param networkid Optional networkid
+   * @param networkid Optional networkid, [[DefaultNetworkID]]
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-   * @param sourceChain Optional sourceChain, default Buffer.alloc(32, 16)
-   * @param importedIns Optional array of the [[EVMInputs]]s
-   * @param outs Optional array of the [[EVMOutputs]]s
+   * @param sourceChainid Optional chainid for the source inputs to import. Default platform chainid.
+   * @param importIns Array of [[TransferableInput]]s used in the transaction
+   * @param outs Optional array of the [[TransferableOutput]]s
    */
   constructor(
-    networkid: number = undefined, 
-    blockchainid: Buffer = Buffer.alloc(32, 16), 
-    sourceChain: Buffer = Buffer.alloc(32, 16), 
-    importedIns: EVMInput[] = undefined, 
-    outs: EVMOutput[] = undefined
+    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
+    sourceChainid:Buffer = Buffer.alloc(32, 16), importIns:Array<TransferableInput> = undefined,
+    outs:Array<EVMOutput> = undefined
   ) {
     super(networkid, blockchainid);
-    this.typeid.writeUInt32BE(0, 0);
-    this.sourceChain = sourceChain;
-    
-    if (typeof importedIns !== 'undefined' && typeof outs !== 'undefined') {
-      this.numouts.writeUInt32BE(outs.length, 0);
-    //   this.outs = outs.sort(StandardTransferableOutput.comparator());
-      this.outs = outs;
-      this.numImportedInputs.writeUInt32BE(importedIns.length, 0);
-      this.importedInputs = importedIns;
-    //   this.ins = ins.sort(StandardTransferableInput.comparator());
+    this.sourceChain = sourceChainid;
+    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+      for (let i = 0; i < importIns.length; i++) {
+        if (!(importIns[i] instanceof TransferableInput)) {
+          throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
+        }
+      }
+      this.importIns = importIns;
     }
   }
-}  
+}
