@@ -49,7 +49,8 @@ export class ImportTx extends EVMBaseTx {
 
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
-  protected importIns:Array<TransferableInput> = [];
+  protected importIns: TransferableInput[] = [];
+  protected outs: EVMOutput[] = [];
 
   /**
      * Returns the id of the [[ImportTx]]
@@ -104,11 +105,19 @@ export class ImportTx extends EVMBaseTx {
     }
     return Buffer.concat(barr);
   }
+
   /**
      * Returns an array of [[TransferableInput]]s in this transaction.
      */
-  getImportInputs():Array<TransferableInput> {
+  getImportInputs(): TransferableInput[] {
     return this.importIns;
+  }
+
+  /**
+     * Returns an array of [[EVMOutput]]s in this transaction.
+     */
+  getOuts(): EVMOutput[] {
+    return this.outs;
   }
 
   clone():this {
@@ -154,12 +163,12 @@ export class ImportTx extends EVMBaseTx {
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
    * @param sourceChainid Optional chainid for the source inputs to import. Default platform chainid.
    * @param importIns Array of [[TransferableInput]]s used in the transaction
-   * @param outs Optional array of the [[TransferableOutput]]s
+   * @param outs Optional array of the [[EVMOutput]]s
    */
   constructor(
-    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
-    sourceChainid:Buffer = Buffer.alloc(32, 16), importIns:Array<TransferableInput> = undefined,
-    outs:Array<EVMOutput> = undefined
+    networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), 
+    sourceChainid: Buffer = Buffer.alloc(32, 16), importIns: TransferableInput[] = undefined,
+    outs: EVMOutput[] = undefined
   ) {
     super(networkid, blockchainid);
     this.sourceChain = sourceChainid;
@@ -170,6 +179,14 @@ export class ImportTx extends EVMBaseTx {
         }
       }
       this.importIns = importIns;
+    }
+    if (typeof outs !== 'undefined' && Array.isArray(outs)) {
+      for (let i = 0; i < outs.length; i++) {
+        if (!(outs[i] instanceof EVMOutput)) {
+          throw new Error("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
+        }
+      }
+      this.outs = outs;
     }
   }
 }

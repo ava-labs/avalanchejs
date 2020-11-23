@@ -403,8 +403,9 @@ export class EVMOutput {
     if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
       // convert string address to Buffer
       if(!(address instanceof Buffer)) {
-        address = bintools.stringToAddress(address);
+        address = Buffer.from(address, 'hex');
       }
+
 
       // convert number amount to BN
       let amnt:BN;
