@@ -2,6 +2,7 @@
  * @packageDocumentation
  * @module API-EVM
  */
+import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
@@ -10,6 +11,7 @@ import BinTools from '../../utils/bintools';
 import { UTXOSet } from './utxos';
 import { KeyChain } from './keychain';
 import { Defaults } from '../../utils/constants';
+import { Tx } from './tx';
 
 interface Index {
   address: string,
@@ -127,7 +129,6 @@ export class EVMAPI extends JRPCAPI {
     });
   }
 
-
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from an account on the X-Chain to an address on the C-Chain. This transaction
    * must be signed with the key of the account that the asset is sent from and which pays
@@ -196,6 +197,34 @@ export class EVMAPI extends JRPCAPI {
     };
     return this.callMethod('avax.importKey', params)
       .then((response:RequestResponseData) => response.data.result.address);
+  };
+
+
+  /**
+   * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
+   *
+   * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
+   *
+   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   */
+  issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
+    let Transaction = '';
+    if (typeof tx === 'string') {
+      Transaction = tx;
+    } else if (tx instanceof Buffer) {
+      const txobj:Tx = new Tx();
+      txobj.fromBuffer(tx);
+      Transaction = txobj.toString();
+    } else if (tx instanceof Tx) {
+      Transaction = tx.toString();
+    } else {
+      /* istanbul ignore next */
+      throw new Error('Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+    }
+    const params:any = {
+      tx: Transaction.toString(),
+    };
+    return this.callMethod('avax.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
