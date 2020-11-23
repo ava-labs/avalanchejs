@@ -50,6 +50,7 @@ export class ImportTx extends EVMBaseTx {
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
   protected importIns: TransferableInput[] = [];
+  protected numOuts:Buffer = Buffer.alloc(4);
   protected outs: EVMOutput[] = [];
 
   /**
@@ -98,11 +99,20 @@ export class ImportTx extends EVMBaseTx {
       throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
+    this.numOuts.writeUInt32BE(this.outs.length, 0);
+    let barr: Buffer[] = [super.toBuffer(), this.sourceChain, this.numIns];
+    let bsize: number = super.toBuffer().length + this.sourceChain.length + this.numIns.length;
     this.importIns = this.importIns.sort(TransferableInput.comparator());
-    for(let i = 0; i < this.importIns.length; i++) {
-        barr.push(this.importIns[i].toBuffer());
-    }
+    this.importIns.forEach((importIn: TransferableInput) => {
+      bsize += importIn.toBuffer().length;
+      barr.push(importIn.toBuffer());
+    });
+    bsize += this.numOuts.length;
+    barr.push(this.numOuts);
+    this.outs.forEach((out: EVMOutput) => {
+      bsize += out.toBuffer().length;
+      barr.push(out.toBuffer());
+    });
     return Buffer.concat(barr);
   }
 
