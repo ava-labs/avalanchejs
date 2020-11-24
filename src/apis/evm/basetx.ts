@@ -4,9 +4,6 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { EVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
 import { KeyChain, KeyPair } from './keychain';
 import { EVMStandardBaseTx } from '../../common/evmtx';
 import { Credential } from '../../common/credentials';
@@ -25,7 +22,7 @@ const serializer = Serialization.getInstance();
  */
 export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
   protected _typeName = "BaseTx";
-  protected _typeID = EVMConstants.BASETX;
+  protected _typeID = undefined;
 
   //serialize is inherited
 
