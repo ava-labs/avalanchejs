@@ -47,23 +47,23 @@ export class ImportTx extends EVMBaseTx {
     this.numIns.writeUInt32BE(this.importIns.length, 0);
   }
 
-  protected sourceChain:Buffer = Buffer.alloc(32);
-  protected numIns:Buffer = Buffer.alloc(4);
+  protected sourceChain: Buffer = Buffer.alloc(32);
+  protected numIns: Buffer = Buffer.alloc(4);
   protected importIns: TransferableInput[] = [];
-  protected numOuts:Buffer = Buffer.alloc(4);
+  protected numOuts: Buffer = Buffer.alloc(4);
   protected outs: EVMOutput[] = [];
 
   /**
      * Returns the id of the [[ImportTx]]
      */
-  getTxType = ():number => {
+  getTxType = (): number => {
     return this._typeID;
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
    */
-  getSourceChain = ():Buffer => {
+  getSourceChain = (): Buffer => {
     return this.sourceChain;
   }
 
@@ -76,7 +76,7 @@ export class ImportTx extends EVMBaseTx {
      *
      * @remarks assume not-checksummed
      */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset);
     this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
@@ -102,7 +102,7 @@ export class ImportTx extends EVMBaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
    */
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     if(typeof this.sourceChain === "undefined") {
       throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
@@ -139,12 +139,12 @@ export class ImportTx extends EVMBaseTx {
   }
 
   clone():this {
-    let newbase:ImportTx = new ImportTx();
-    newbase.fromBuffer(this.toBuffer());
-    return newbase as this;
+    let newImportTx: ImportTx = new ImportTx();
+    newImportTx.fromBuffer(this.toBuffer());
+    return newImportTx as this;
   }
 
-  create(...args:any[]):this {
+  create(...args: any[]): this {
       return new ImportTx(...args) as this;
   }
 

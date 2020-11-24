@@ -24,7 +24,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
+export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
   if (inputid === EVMConstants.SECPINPUTID) {
     return new SECPTransferInput(...args);
   }
@@ -38,7 +38,7 @@ export class TransferableInput extends StandardTransferableInput {
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.input = SelectInputClass(fields["input"]["_typeID"]);
     this.input.deserialize(fields["input"], encoding);
@@ -51,7 +51,7 @@ export class TransferableInput extends StandardTransferableInput {
    *
    * @returns The length of the raw [[TransferableInput]]
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
@@ -72,7 +72,7 @@ export abstract class AmountInput extends StandardAmountInput {
 
   //serialize and deserialize both are inherited
 
-  select(id:number, ...args: any[]):Input {
+  select(id: number, ...args: any[]): Input {
     return SelectInputClass(id, ...args);
   }
 }
@@ -86,18 +86,18 @@ export class SECPTransferInput extends AmountInput {
   /**
      * Returns the inputID for this input
      */
-  getInputID():number {
+  getInputID(): number {
     return EVMConstants.SECPINPUTID;
   }
 
-  getCredentialID = ():number => EVMConstants.SECPCREDENTIAL;
+  getCredentialID = (): number => EVMConstants.SECPCREDENTIAL;
 
-  create(...args:any[]):this{
+  create(...args: any[]): this{
     return new SECPTransferInput(...args) as this;
   }
 
-  clone():this {
-    const newout:SECPTransferInput = this.create()
+  clone(): this {
+    const newout: SECPTransferInput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
@@ -106,7 +106,7 @@ export class SECPTransferInput extends AmountInput {
 export class EVMInput extends EVMOutput {
   protected nonce: Buffer = Buffer.alloc(8);
   protected nonceValue: BN = new BN(0);
-  protected sigCount:Buffer = Buffer.alloc(4);
+  protected sigCount: Buffer = Buffer.alloc(4);
   protected sigIdxs: SigIdx[] = []; // idxs of signers from utxo
 
   /**
@@ -120,9 +120,9 @@ export class EVMInput extends EVMOutput {
    * @param addressIdx The index of the address to reference in the signatures
    * @param address The address of the source of the signature
    */
-  addSignatureIdx = (addressIdx:number, address:Buffer) => {
-    const sigidx:SigIdx = new SigIdx();
-    const b:Buffer = Buffer.alloc(4);
+  addSignatureIdx = (addressIdx: number, address: Buffer) => {
+    const sigidx: SigIdx = new SigIdx();
+    const b: Buffer = Buffer.alloc(4);
     b.writeUInt32BE(addressIdx, 0);
     sigidx.fromBuffer(b);
     sigidx.setSource(address);
@@ -146,7 +146,7 @@ export class EVMInput extends EVMOutput {
     return Buffer.concat(barr,bsize);
   }
 
-  getCredentialID = ():number => EVMConstants.SECPCREDENTIAL;
+  getCredentialID = (): number => EVMConstants.SECPCREDENTIAL;
 
   /**
    * Decodes the [[EVMInput]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
@@ -164,7 +164,7 @@ export class EVMInput extends EVMOutput {
   /**
    * Returns a base-58 representation of the [[EVMInput]].
    */
-  toString():string {
+  toString(): string {
     return bintools.bufferToB58(this.toBuffer());
   }
 
