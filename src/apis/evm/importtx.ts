@@ -77,17 +77,24 @@ export class ImportTx extends EVMBaseTx {
      * @remarks assume not-checksummed
      */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
-    // TODO - update fromBuffer
     offset = super.fromBuffer(bytes, offset);
     this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     this.numIns = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    const numIns:number = this.numIns.readUInt32BE(0);
-    for (let i:number = 0; i < numIns; i++) {
-      const anIn:TransferableInput = new TransferableInput();
+    const numIns: number = this.numIns.readUInt32BE(0);
+    for (let i: number = 0; i < numIns; i++) {
+      const anIn: TransferableInput = new TransferableInput();
       offset = anIn.fromBuffer(bytes, offset);
       this.importIns.push(anIn);
+    }
+    this.numOuts = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    const numOuts: number = this.numOuts.readUInt32BE(0);
+    for (let i: number = 0; i < numOuts; i++) {
+      const anOut: EVMOutput = new EVMOutput();
+      offset = anOut.fromBuffer(bytes, offset);
+      this.outs.push(anOut);
     }
     return offset;
   }
