@@ -26,14 +26,14 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
   }
 
   /**
    * Returns the id of the [[BaseTx]]
    */
-  getTxType = ():number => {
+  getTxType = (): number => {
     return this._typeID;
   }
 
@@ -46,7 +46,7 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
     this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -62,8 +62,8 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = [];
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = [];
     // for (let i = 0; i < this.ins.length; i++) {
     //   const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
     //   const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
@@ -79,18 +79,18 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
     return sigs;
   }
 
-  clone():this {
-    let newbase:EVMBaseTx = new EVMBaseTx();
+  clone(): this {
+    let newbase: EVMBaseTx = new EVMBaseTx();
     newbase.fromBuffer(this.toBuffer());
     return newbase as this;
   }
 
-  create(...args:any[]):this {
+  create(...args: any[]): this {
     return new EVMBaseTx(...args) as this;
   }
 
-  select(id:number, ...args:any[]):this {
-    let newbasetx:EVMBaseTx = SelectTxClass(id, ...args);
+  select(id: number, ...args: any[]): this {
+    let newbasetx: EVMBaseTx = SelectTxClass(id, ...args);
     return newbasetx as this;
   }
 
@@ -100,7 +100,7 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
    * @param networkid Optional networkid, [[DefaultNetworkID]]
    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
    */
-  constructor( networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16)) {
+  constructor( networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16)) {
     super(networkid, blockchainid);
   }
 }
