@@ -5,96 +5,172 @@
 
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-// import { EVMOutput } from './outputs';
-// import { EVMInput } from './inputs';
-// import { Tx } from './tx';
+import { EVMConstants } from './constants';
+import { KeyChain, KeyPair } from './keychain';
+import { EVMBaseTx } from './basetx';
+import { SelectCredentialClass } from './credentials';
+import { Signature, SigIdx, Credential } from '../../common/credentials';
+import { EVMInput } from './inputs';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { TransferableOutput } from './outputs';
 
-// /**
-//  * @ignore
-//  */
-// const bintools = BinTools.getInstance();
+/**
+ * @ignore
+ */
+const bintools = BinTools.getInstance();
+const serializer = Serialization.getInstance();
 
-// export class ExportTx extends Tx {
-//   protected destinationChain: Buffer = Buffer.alloc(32);
-//   protected numInputs: Buffer = Buffer.alloc(4);
-//   protected inputs: EVMInput[];
-//   protected numExportedOutputs: Buffer = Buffer.alloc(4);
-//   protected exportedOutputs: EVMOutput[];
+export class ExportTx extends EVMBaseTx {
+  protected _typeName = "ExportTx";
+  protected _typeID = EVMConstants.EXPORTTX
 
-//   /**
-//    * Returns the destinationChain of the input as {@link https://github.com/feross/buffer|Buffer}
-//    */ 
-//   getDestinationChain = (): Buffer => this.destinationChain;
+  serialize(encoding:SerializedEncoding = "hex"):object {
+    let fields:object = super.serialize(encoding);
+    return {
+      ...fields,
+      "destinationChain": serializer.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
+      "exportedOutputs": this.exportedOutputs.map((i) => i.serialize(encoding))
+    }
+  };
+  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding);
+    this.destinationChain = serializer.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
+    this.exportedOutputs = fields["exportedOutputs"].map((i:object) => {
+      let eo:TransferableOutput = new TransferableOutput();
+      eo.deserialize(i, encoding);
+      return eo;
+    });
+    this.numExportedOutputs = Buffer.alloc(4);
+    this.numExportedOutputs.writeUInt32BE(this.exportedOutputs.length, 0);
+  }
 
-//   /**
-//    * Returns the inputs as an array of [[EVMInputs]]
-//    */ 
-//   getInputs = (): EVMInput[] => this.inputs;
+  protected destinationChain: Buffer = Buffer.alloc(32);
+  protected numInputs: Buffer = Buffer.alloc(4);
+  protected inputs: EVMInput[];
+  protected numExportedOutputs: Buffer = Buffer.alloc(4);
+  protected exportedOutputs: TransferableOutput[];
 
-//   /**
-//    * Returns the outs as an array of [[EVMOutputs]]
-//    */ 
-//   getExportedOutputs = (): EVMOutput[] => this.exportedOutputs;
+  /**
+   * Returns the destinationChain of the input as {@link https://github.com/feross/buffer|Buffer}
+   */ 
+  getDestinationChain = (): Buffer => this.destinationChain;
+
+  /**
+   * Returns the inputs as an array of [[EVMInputs]]
+   */ 
+  getInputs = (): EVMInput[] => this.inputs;
+
+  /**
+   * Returns the outs as an array of [[EVMOutputs]]
+   */ 
+  getExportedOutputs = (): TransferableOutput[] => this.exportedOutputs;
  
-//   /**
-//    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
-//    */
-//   toBuffer():Buffer {
-//     const bsize: number = this.typeid.length + this.networkid.length + this.blockchainid.length + this.destinationChain.length + this.inputs.length + this.exportedOutputs.length;
-//     const barr: Buffer[] = [this.typeid, this.networkid, this.blockchainid, this.destinationChain];
-//     const buff: Buffer = Buffer.concat(barr, bsize);
-//     return buff;
-//   }
+  /**
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
+   */
+  toBuffer():Buffer {
+    if(typeof this.destinationChain === "undefined") {
+      throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
+    }
+    this.numInputs.writeUInt32BE(this.inputs.length, 0);
+    this.numExportedOutputs.writeUInt32BE(this.exportedOutputs.length, 0);
+    let barr: Buffer[] = [super.toBuffer(), this.destinationChain, this.numInputs];
+    let bsize: number = super.toBuffer().length + this.destinationChain.length + this.numInputs.length;
+    // this.importIns = this.importIns.sort(TransferableInput.comparator());
+    this.inputs.forEach((importIn: EVMInput) => {
+      bsize += importIn.toBuffer().length;
+      barr.push(importIn.toBuffer());
+    });
+    bsize += this.numExportedOutputs.length;
+    barr.push(this.numExportedOutputs);
+    this.exportedOutputs.forEach((out:TransferableOutput) => {
+      bsize += out.toBuffer().length;
+      barr.push(out.toBuffer());
+    });
+    return Buffer.concat(barr, bsize);
+  }
 
-//   /**
-//    * Decodes the [[ExportTx]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
-//    */
-//   fromBuffer(bytes: Buffer, offset: number = 0): number {
-//     this.typeid = bintools.copyFrom(bytes, offset, offset + 4);
-//     offset += 4;
-//     this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
-//     offset += 4;
-//     this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
-//     offset += 32;
-//     this.destinationChain = bintools.copyFrom(bytes, offset, offset + 32);
-//     offset += 32;
-//     return offset;
-//   }
+  /**
+   * Decodes the [[ExportTx]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
+   */
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    // this.typeid = bintools.copyFrom(bytes, offset, offset + 4);
+    // offset += 4;
+    // this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
+    // offset += 4;
+    // this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
+    // offset += 32;
+    // this.destinationChain = bintools.copyFrom(bytes, offset, offset + 32);
+    // offset += 32;
+    return offset;
+  }
 
-//   /**
-//    * Returns a base-58 representation of the [[ExportTx]].
-//    */
-//   toString():string {
-//     return bintools.bufferToB58(this.toBuffer());
-//   }
+  /**
+   * Returns a base-58 representation of the [[ExportTx]].
+   */
+  toString():string {
+    return bintools.bufferToB58(this.toBuffer());
+  }
 
-//   /**
-//    * Class representing a ExportTx.
-//    *
-//    * @param networkid Optional networkid
-//    * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-//    * @param destinationChain Optional destinationChain, default Buffer.alloc(32, 16)
-//    * @param inputs Optional array of the [[EVMInputs]]s
-//    * @param exportedOutputs Optional array of the [[EVMOutputs]]s
-//    */
-//   constructor(
-//     networkid: number = undefined, 
-//     blockchainid: Buffer = Buffer.alloc(32, 16), 
-//     destinationChain: Buffer = Buffer.alloc(32, 16), 
-//     inputs: EVMInput[] = undefined, 
-//     exportedOutputs: EVMOutput[] = undefined
-//   ) {
-//     super(networkid, blockchainid);
-//     this.typeid.writeUInt32BE(1, 0);
-//     this.destinationChain = destinationChain;
-    
-//     if (typeof inputs !== 'undefined' && typeof exportedOutputs !== 'undefined') {
-//       this.numExportedOutputs.writeUInt32BE(exportedOutputs.length, 0);
-//     //   this.outs = outs.sort(StandardTransferableOutput.comparator());
-//       this.exportedOutputs = exportedOutputs;
-//       this.numInputs.writeUInt32BE(inputs.length, 0);
-//       this.inputs = inputs;
-//     //   this.ins = ins.sort(StandardTransferableInput.comparator());
-//     }
-//   }
-// }  
+  /**
+   * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+      *
+      * @param msg A Buffer for the [[UnsignedTx]]
+      * @param kc An [[KeyChain]] used in signing
+      *
+      * @returns An array of [[Credential]]s
+      */
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+      // const sigs:Array<Credential> = super.sign(msg, kc);
+      const sigs: Credential[] = [];
+      this.inputs.forEach((input: EVMInput) => {
+        const cred: Credential = SelectCredentialClass(input.getCredentialID());
+        const sigidxs: SigIdx[] = input.getSigIdxs();
+        sigidxs.forEach((sigidx: SigIdx) => {
+          const keypair: KeyPair = kc.getKey(sigidx.getSource());
+          const signval: Buffer = keypair.sign(msg);
+          const sig: Signature = new Signature();
+          sig.fromBuffer(signval);
+          cred.addSignature(sig);
+        });
+        sigs.push(cred);
+      });
+      return sigs;
+    }
+
+  /**
+   * Class representing a ExportTx.
+   *
+   * @param networkid Optional networkid
+   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param destinationChain Optional destinationChain, default Buffer.alloc(32, 16)
+   * @param inputs Optional array of the [[EVMInputs]]s
+   * @param exportedOutputs Optional array of the [[EVMOutputs]]s
+   */
+  constructor(
+    networkid: number = undefined, 
+    blockchainid: Buffer = Buffer.alloc(32, 16), 
+    destinationChain: Buffer = Buffer.alloc(32, 16), 
+    inputs: EVMInput[] = undefined, 
+    exportedOutputs: TransferableOutput[] = undefined
+  ) {
+    super(networkid, blockchainid);
+    this.destinationChain = destinationChain;
+    if (typeof inputs !== 'undefined' && Array.isArray(inputs)) {
+      inputs.forEach((input: EVMInput) => {
+        if (!(input instanceof EVMInput)) {
+          throw new Error("Error - ExportTx.constructor: invalid EVMInput in array parameter 'inputs'");
+        }
+      });
+      this.inputs = inputs;
+    }
+    if (typeof exportedOutputs !== 'undefined' && Array.isArray(exportedOutputs)) {
+        exportedOutputs.forEach((exportedOutput: TransferableOutput) => {
+        if (!(exportedOutput instanceof TransferableOutput)) {
+          throw new Error("Error - ExportTx.constructor: TransferableOutput EVMInput in array parameter 'exportedOutputs'");
+        }
+      });
+      this.exportedOutputs = exportedOutputs;
+    }
+  }
+}  

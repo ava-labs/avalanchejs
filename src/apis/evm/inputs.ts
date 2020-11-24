@@ -7,6 +7,9 @@ import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { EVMOutput } from './outputs';
+import BN from 'bn.js';
+import { SigIdx } from '../../common/credentials';
 
 /**
  * @ignore
@@ -99,3 +102,109 @@ export class SECPTransferInput extends AmountInput {
     return newout as this;
   }
 }
+
+export class EVMInput extends EVMOutput {
+  protected nonce: Buffer = Buffer.alloc(8);
+  protected nonceValue: BN = new BN(0);
+  protected sigCount:Buffer = Buffer.alloc(4);
+  protected sigIdxs: SigIdx[] = []; // idxs of signers from utxo
+
+  /**
+   * Returns the array of [[SigIdx]] for this [[Input]]
+   */
+  getSigIdxs = (): SigIdx[] => this.sigIdxs;
+
+  /**
+   * Creates and adds a [[SigIdx]] to the [[Input]].
+   *
+   * @param addressIdx The index of the address to reference in the signatures
+   * @param address The address of the source of the signature
+   */
+  addSignatureIdx = (addressIdx:number, address:Buffer) => {
+    const sigidx:SigIdx = new SigIdx();
+    const b:Buffer = Buffer.alloc(4);
+    b.writeUInt32BE(addressIdx, 0);
+    sigidx.fromBuffer(b);
+    sigidx.setSource(address);
+    this.sigIdxs.push(sigidx);
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
+  };
+
+
+  /**
+   * Returns the nonce as a {@link https://github.com/indutny/bn.js/|BN}.
+   */
+  getNonce = (): BN => this.nonceValue.clone();
+ 
+  /**
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[EVMOutput]].
+   */
+  toBuffer(): Buffer {
+    let superbuff: Buffer = super.toBuffer();
+    let bsize: number = superbuff.length + this.nonce.length;
+    let barr: Buffer[] = [superbuff, this.nonce];
+    return Buffer.concat(barr,bsize);
+  }
+
+  getCredentialID = ():number => EVMConstants.SECPCREDENTIAL;
+
+  /**
+   * Decodes the [[EVMInput]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
+   *
+   * @param bytes The bytes as a {@link https://github.com/feross/buffer|Buffer}.
+   * @param offset An offset as a number.
+   */
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    offset = super.fromBuffer(bytes, offset);
+    this.nonce = bintools.copyFrom(bytes, offset, offset + 8);
+    offset += 8;
+    return offset;
+  }
+
+  /**
+   * Returns a base-58 representation of the [[EVMInput]].
+   */
+  toString():string {
+    return bintools.bufferToB58(this.toBuffer());
+  }
+
+  create(...args: any[]): this{
+    return new EVMInput(...args) as this;
+  }
+
+  clone(): this {
+    const newin: EVMInput = this.create();
+    newin.fromBuffer(this.toBuffer());
+    return newin as this;
+  }
+
+  /**
+   * An [[EVMInput]] class which contains address, amount, assetID, nonce.
+   *
+   * @param address is the EVM address from which to transfer funds.
+   * @param amount is the amount of the asset to be transferred (specified in nAVAX for AVAX and the smallest denomination for all other assets).
+   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer} or as a string.
+   * @param nonce A {@link https://github.com/indutny/bn.js/|BN} or a number representing the nonce.
+   */
+  constructor(
+    address: Buffer | string = undefined, 
+    amount: BN | number = undefined, 
+    assetid: Buffer | string = undefined,
+    nonce: BN | number = undefined
+  ) {
+    super(address, amount, assetid);
+
+    if (typeof nonce !== 'undefined') {
+      // convert number nonce to BN
+      let n:BN;
+      if (typeof nonce === 'number') {
+        n = new BN(nonce);
+      } else {
+        n = nonce;
+      }
+
+      this.nonceValue = n.clone();
+      this.nonce = bintools.fromBNToBuffer(n, 8);
+    }
+  }
+}  

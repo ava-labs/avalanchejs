@@ -400,13 +400,14 @@ export class EVMOutput {
     amount: BN | number = undefined, 
     assetid: Buffer | string = undefined
   ) {
-    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
+    if(address instanceof String) {
       // convert string address to Buffer
-      if(!(address instanceof Buffer)) {
-        address = Buffer.from(address, 'hex');
-      }
+      address = bintools.stringToAddress(address as string)
+    } else if(!(address instanceof Buffer)) { 
+      address = Buffer.from(address, 'hex');
+    }
 
-
+    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
       // convert number amount to BN
       let amnt:BN;
       if (typeof amount === 'number') {

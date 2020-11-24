@@ -5,7 +5,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
-import { EVMOutput, TransferableOutput } from './outputs';
+import { EVMOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { EVMBaseTx } from './basetx';
 import { SelectCredentialClass } from './credentials';
@@ -77,6 +77,7 @@ export class ImportTx extends EVMBaseTx {
      * @remarks assume not-checksummed
      */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
+    // TODO - update fromBuffer
     offset = super.fromBuffer(bytes, offset);
     this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
@@ -113,7 +114,7 @@ export class ImportTx extends EVMBaseTx {
       bsize += out.toBuffer().length;
       barr.push(out.toBuffer());
     });
-    return Buffer.concat(barr);
+    return Buffer.concat(barr, bsize);
   }
 
   /**
@@ -151,18 +152,18 @@ export class ImportTx extends EVMBaseTx {
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     // const sigs:Array<Credential> = super.sign(msg, kc);
     const sigs: Credential[] = [];
-    for (let i: number = 0; i < this.importIns.length; i++) {
-      const cred: Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
-      const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource());
+    this.importIns.forEach((importIn: TransferableInput) => {
+      const cred: Credential = SelectCredentialClass(importIn.getInput().getCredentialID());
+      const sigidxs: SigIdx[] = importIn.getInput().getSigIdxs();
+      sigidxs.forEach((sigidx: SigIdx) => {
+        const keypair: KeyPair = kc.getKey(sigidx.getSource());
         const signval: Buffer = keypair.sign(msg);
         const sig: Signature = new Signature();
         sig.fromBuffer(signval);
         cred.addSignature(sig);
-      }
+      });
       sigs.push(cred);
-    }
+    });
     return sigs;
   }
 
