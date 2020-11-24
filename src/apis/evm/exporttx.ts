@@ -46,9 +46,9 @@ export class ExportTx extends EVMBaseTx {
 
   protected destinationChain: Buffer = Buffer.alloc(32);
   protected numInputs: Buffer = Buffer.alloc(4);
-  protected inputs: EVMInput[];
+  protected inputs: EVMInput[] = [];
   protected numExportedOutputs: Buffer = Buffer.alloc(4);
-  protected exportedOutputs: TransferableOutput[];
+  protected exportedOutputs: TransferableOutput[] = [];
 
   /**
    * Returns the destinationChain of the input as {@link https://github.com/feross/buffer|Buffer}
@@ -94,14 +94,25 @@ export class ExportTx extends EVMBaseTx {
    * Decodes the [[ExportTx]] as a {@link https://github.com/feross/buffer|Buffer} and returns the size.
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    // this.typeid = bintools.copyFrom(bytes, offset, offset + 4);
-    // offset += 4;
-    // this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
-    // offset += 4;
-    // this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
-    // offset += 32;
-    // this.destinationChain = bintools.copyFrom(bytes, offset, offset + 32);
-    // offset += 32;
+    offset = super.fromBuffer(bytes, offset);
+    this.destinationChain = bintools.copyFrom(bytes, offset, offset + 32);
+    offset += 32;
+    this.numInputs = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    const numInputs: number = this.numInputs.readUInt32BE(0);
+    for (let i: number = 0; i < numInputs; i++) {
+      const anIn: EVMInput = new EVMInput();
+      offset = anIn.fromBuffer(bytes, offset);
+      this.inputs.push(anIn);
+    }
+    this.numExportedOutputs = bintools.copyFrom(bytes, offset, offset + 4);
+    offset += 4;
+    const numExportedOutputs: number = this.numExportedOutputs.readUInt32BE(0);
+    for (let i: number = 0; i < numExportedOutputs; i++) {
+      const anOut: TransferableOutput = new TransferableOutput();
+      offset = anOut.fromBuffer(bytes, offset);
+      this.exportedOutputs.push(anOut);
+    }
     return offset;
   }
 

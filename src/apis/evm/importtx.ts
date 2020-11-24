@@ -184,26 +184,28 @@ export class ImportTx extends EVMBaseTx {
    * @param outs Optional array of the [[EVMOutput]]s
    */
   constructor(
-    networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), 
-    sourceChainid: Buffer = Buffer.alloc(32, 16), importIns: TransferableInput[] = undefined,
+    networkid: number = DefaultNetworkID, 
+    blockchainid: Buffer = Buffer.alloc(32, 16), 
+    sourceChainid: Buffer = Buffer.alloc(32, 16), 
+    importIns: TransferableInput[] = undefined,
     outs: EVMOutput[] = undefined
   ) {
     super(networkid, blockchainid);
     this.sourceChain = sourceChainid;
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
-      for (let i = 0; i < importIns.length; i++) {
-        if (!(importIns[i] instanceof TransferableInput)) {
+      importIns.forEach((importIn: TransferableInput) => {
+        if (!(importIn instanceof TransferableInput)) {
           throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
-      }
+      });
       this.importIns = importIns;
     }
     if (typeof outs !== 'undefined' && Array.isArray(outs)) {
-      for (let i = 0; i < outs.length; i++) {
-        if (!(outs[i] instanceof EVMOutput)) {
+      outs.forEach((out: EVMOutput) => {
+        if (!(out instanceof EVMOutput)) {
           throw new Error("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
         }
-      }
+      });
       this.outs = outs;
     }
   }
