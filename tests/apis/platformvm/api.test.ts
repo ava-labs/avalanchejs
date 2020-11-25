@@ -1457,8 +1457,8 @@ describe('PlatformVMAPI', () => {
       // The 2nd has a lesser stakeablelocktime and a greater amount of AVAX. 
       // The 3rd has a greater stakeablelocktime and a lesser amount of AVAX.
       // 
-      // this time we're staking a greater amount than is available in the 2nd UTXO.
-      // We expect this test to consume the full 2nd UTXO and a fraction of the 1st UTXO and not to consume the SecpTransferableOutput
+      // this time we're staking a greater amount than is available in the 3rd UTXO.
+      // We expect this test to consume the full 3rd UTXO and a fraction of the 2nd UTXO and not to consume the SecpTransferableOutput
       const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a));
       const amount1: BN = new BN('20000000000000000');
       const amount2: BN = new BN('10000000000000000');
