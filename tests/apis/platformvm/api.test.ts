@@ -1235,11 +1235,11 @@ describe('PlatformVMAPI', () => {
     });
 
     test('buildAddValidatorTx sort StakeableLockOuts 1', async () => {
-      // two UTXO. The first has a lesser stakeablelocktime and a greater amount of AVAX. The second has a greater stakeablelocktime and a lesser amount of AVAX.
+      // two UTXO. The 1st has a lesser stakeablelocktime and a greater amount of AVAX. The 2nd has a greater stakeablelocktime and a lesser amount of AVAX.
       // We expect this test to only consume the 2nd UTXO since it has the greater locktime.
       const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a));
-      const amount1: BN = new BN('3000000000');
-      const amount2: BN = new BN('2000000000');
+      const amount1: BN = new BN('20000000000000000');
+      const amount2: BN = new BN('10000000000000000');
       const locktime1: BN = new BN(0);
       const threshold: number = 1;
       
@@ -1317,6 +1317,8 @@ describe('PlatformVMAPI', () => {
       // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time but lesser amount 
       expect(slo.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut1.getStakeableLocktime().toString());
 
+      // confirm tx nodeID matches nodeID
+      expect(tx.getNodeIDString()).toEqual(nodeID);
       // confirm tx starttime matches starttime
       expect(tx.getStartTime().toString()).toEqual(startTime.toString());
       // confirm tx endtime matches endtime 
@@ -1337,6 +1339,115 @@ describe('PlatformVMAPI', () => {
       slo2.getAmount()
       // confirm stakeOut stake amount matches stakeAmount
       expect(slo2.getAmount().toString()).toEqual(stakeAmount.toString());
+    });
+
+    test('buildAddValidatorTx sort StakeableLockOuts 2', async () => {
+      // two UTXO. The 1st has a lesser stakeablelocktime and a greater amount of AVAX. The 2nd has a greater stakeablelocktime and a lesser amount of AVAX.
+      // this time we're staking a greater amount than is available in the 2nd UTXO.
+      // We expect this test to consume the full 2nd UTXO and a fraction of the 1st UTXO..
+      const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a));
+      const amount1: BN = new BN('20000000000000000');
+      const amount2: BN = new BN('10000000000000000');
+      const locktime1: BN = new BN(0);
+      const threshold: number = 1;
+      
+      const stakeableLockTime1: BN = new BN(1633824000);
+      const secpTransferOutput1: SECPTransferOutput = new SECPTransferOutput(amount1, addrbuff1, locktime1, threshold);
+      const parseableOutput1: ParseableOutput = new ParseableOutput(secpTransferOutput1);
+      const stakeableLockOut1: StakeableLockOut = new StakeableLockOut(amount1, addrbuff1, locktime1, threshold, stakeableLockTime1, parseableOutput1);
+      const stakeableLockTime2: BN = new BN(1733824000);
+      const secpTransferOutput2: SECPTransferOutput = new SECPTransferOutput(amount2, addrbuff1, locktime1, threshold);
+      const parseableOutput2: ParseableOutput = new ParseableOutput(secpTransferOutput2);
+      const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2);
+      const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1";
+      const stakeAmount: BN = new BN('10000003000000000');
+      // console.log(stakeAmount.toString())
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake);
+      const delegationFeeRate: number = new BN(2).toNumber();
+      const codecID: number = 0;
+      const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib');
+      const txid2: Buffer = bintools.cb58Decode('2JwDfm3C7p88rJQ1Y1xWLkWNMA1nqPzqnaC2Hi4PDNKiPnXgGv'); 
+      const outputidx0: number = 0;
+      const outputidx1: number = 0;
+      const assetID = await platformvm.getAVAXAssetID();
+      const assetID2 = await platformvm.getAVAXAssetID();
+      const utxo1: UTXO = new UTXO(codecID, txid, outputidx0, assetID, stakeableLockOut1);
+      const utxo2: UTXO = new UTXO(codecID, txid2, outputidx1, assetID2, stakeableLockOut2);
+      const utxoSet: UTXOSet =  new UTXOSet();
+      utxoSet.add(utxo1);
+      utxoSet.add(utxo2);
+      const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
+        utxoSet, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        stakeAmount,
+        addrs3, 
+        delegationFeeRate
+      );
+      let tx = txu1.getTransaction() as AddValidatorTx;
+      let ins: TransferableInput[] = tx.getIns();
+      // start test inputs
+      // confirm only 1 input
+      expect(ins.length).toBe(2);
+      let input1: TransferableInput = ins[0];
+      // console.log(input1)
+      let input2: TransferableInput = ins[1];
+      // console.log(input2)
+      let ai1 = input1.getInput() as AmountInput;
+      let ai2 = input2.getInput() as AmountInput;
+      let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput;
+      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput;
+      // confirm each input amount matches the corresponding output 
+      expect(ai2.getAmount().toString()).toEqual(ao1.getAmount().toString())
+      expect(ai1.getAmount().toString()).toEqual(ao2.getAmount().toString())
+
+      let sli1 = input1.getInput() as StakeableLockIn;
+      let sli2 = input2.getInput() as StakeableLockIn;
+      // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
+      expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+      // // stop test inputs
+
+      // // start test outputs
+      let outs: TransferableOutput[] = tx.getOuts();
+      // console.log(outs)
+      // confirm only 1 output
+      expect(outs.length).toBe(1);
+      let output: TransferableOutput = outs[0];
+      let ao3 = output.getOutput() as AmountOutput;
+      // confirm output amount matches the output amount sans the 2nd utxo amount and the stake amount
+      expect(ao3.getAmount().toString()).toEqual(ao2.getAmount().sub(stakeAmount.sub(ao1.getAmount())).toString())
+
+      let slo = output.getOutput() as StakeableLockOut;
+      // confirm output stakeablelock time matches the output w/ the lesser stakeablelock since the other was consumed
+      expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time  
+      expect(slo.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+
+      // confirm tx nodeID matches nodeID
+      expect(tx.getNodeIDString()).toEqual(nodeID);
+      // confirm tx starttime matches starttime
+      expect(tx.getStartTime().toString()).toEqual(startTime.toString());
+      // confirm tx endtime matches endtime 
+      expect(tx.getEndTime().toString()).toEqual(endTime.toString());
+      // confirm tx stake amount matches stakeAmount
+      expect(tx.getStakeAmount().toString()).toEqual(stakeAmount.toString());
+
+      let stakeOuts: TransferableOutput[] = tx.getStakeOuts();
+      // confirm 2 stakeOuts
+      expect(stakeOuts.length).toBe(2);
+
+      let stakeOut1: TransferableOutput = stakeOuts[0];
+      let stakeOut2: TransferableOutput = stakeOuts[1];
+      let slo2 = stakeOut1.getOutput() as StakeableLockOut;
+      let slo3 = stakeOut2.getOutput() as StakeableLockOut;
+      // confirm both stakeOut strakeablelock times matche the corresponding output  
+      expect(slo3.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
     });
 
     test('buildAddValidatorTx 1', async () => {
@@ -1841,4 +1952,5 @@ describe('PlatformVMAPI', () => {
 
   });
 });
+
 
