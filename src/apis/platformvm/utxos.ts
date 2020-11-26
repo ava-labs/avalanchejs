@@ -195,7 +195,33 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     threshold: number = 1,
     stakeable: boolean = false,
   ): Error => {
-    const utxoArray: UTXO[] = this.getConsumableUXTO(asOf, stakeable);
+    let utxoArray: UTXO[] = this.getConsumableUXTO(asOf, stakeable);
+    let tmpUTXOArray: UTXO[] = [];
+    if(stakeable) {
+      // If this is a stakeable transaction then have StakeableLockOut come before SECPTransferOutput
+      // so that users first stake locked tokens before staking unlocked tokens
+      utxoArray.forEach((utxo: UTXO) => {
+        // StakeableLockOuts
+        if(utxo.getOutput().getTypeID() === 22) {
+          tmpUTXOArray.push(utxo);
+        }
+      })
+
+      // Sort the StakeableLockOuts by StakeableLocktime so that the greatest StakeableLocktime are spent first
+      tmpUTXOArray.sort((a: UTXO, b: UTXO) => {
+        let stakeableLockOut1 = a.getOutput() as StakeableLockOut;
+        let stakeableLockOut2 = b.getOutput() as StakeableLockOut;
+        return stakeableLockOut2.getStakeableLocktime().toNumber() - stakeableLockOut1.getStakeableLocktime().toNumber()
+      })
+
+      utxoArray.forEach((utxo: UTXO) => {
+        // SECPTransferOutputs
+        if(utxo.getOutput().getTypeID() === 7) {
+          tmpUTXOArray.push(utxo);
+        }
+      })
+      utxoArray = tmpUTXOArray;
+    }
 
     // outs is a map from assetID to a tuple of (lockedStakeable, unlocked)
     // which are arrays of outputs.

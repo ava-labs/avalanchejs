@@ -1,5 +1,4 @@
 import mockAxios from 'jest-mock-axios';
-
 import { Avalanche } from 'src';
 import { PlatformVMAPI } from 'src/apis/platformvm/api';
 import { Buffer } from 'buffer/';
@@ -11,7 +10,7 @@ import { UTXOSet } from 'src/apis/platformvm/utxos';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { KeyChain } from 'src/apis/platformvm/keychain';
 import { SECPTransferOutput, TransferableOutput, AmountOutput, ParseableOutput, StakeableLockOut } from 'src/apis/platformvm/outputs';
-import { TransferableInput, SECPTransferInput, AmountInput } from 'src/apis/platformvm/inputs';
+import { TransferableInput, SECPTransferInput, AmountInput, StakeableLockIn } from 'src/apis/platformvm/inputs';
 import { UTXO } from 'src/apis/platformvm/utxos';
 import createHash from 'create-hash';
 import { UnsignedTx, Tx } from 'src/apis/platformvm/tx';
@@ -28,11 +27,10 @@ import { AddValidatorTx } from 'src/apis/platformvm/validationtx';
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
-
-const dumpSerailization:boolean = false;
+const dumpSerialization:boolean = false;
 
 function serialzeit(aThing:Serializable, name:string){
-  if(dumpSerailization){
+  if(dumpSerialization){
     console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "hex", name + " -- Hex Encoded")));
     console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "display", name + " -- Human-Readable")));
   }
@@ -946,23 +944,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -970,23 +954,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1050,47 +1020,19 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
 
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
-
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
       
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1184,23 +1126,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1208,28 +1136,340 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
       serialzeit(tx1, "AddDelegatorTx");
 
+    });
+
+    test('buildAddValidatorTx sort StakeableLockOuts 1', async () => {
+      // two UTXO. The 1st has a lesser stakeablelocktime and a greater amount of AVAX. The 2nd has a greater stakeablelocktime and a lesser amount of AVAX.
+      // We expect this test to only consume the 2nd UTXO since it has the greater locktime.
+      const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a));
+      const amount1: BN = new BN('20000000000000000');
+      const amount2: BN = new BN('10000000000000000');
+      const locktime1: BN = new BN(0);
+      const threshold: number = 1;
+      
+      const stakeableLockTime1: BN = new BN(1633824000);
+      const secpTransferOutput1: SECPTransferOutput = new SECPTransferOutput(amount1, addrbuff1, locktime1, threshold);
+      const parseableOutput1: ParseableOutput = new ParseableOutput(secpTransferOutput1);
+      const stakeableLockOut1: StakeableLockOut = new StakeableLockOut(amount1, addrbuff1, locktime1, threshold, stakeableLockTime1, parseableOutput1);
+      const stakeableLockTime2: BN = new BN(1733824000);
+      const secpTransferOutput2: SECPTransferOutput = new SECPTransferOutput(amount2, addrbuff1, locktime1, threshold);
+      const parseableOutput2: ParseableOutput = new ParseableOutput(secpTransferOutput2);
+      const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2);
+      const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1";
+      const stakeAmount: BN = Defaults.network[networkid]["P"].minStake;
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake);
+      const delegationFeeRate: number = new BN(2).toNumber();
+      const codecID: number = 0;
+      const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib');
+      const txid2: Buffer = bintools.cb58Decode('2JwDfm3C7p88rJQ1Y1xWLkWNMA1nqPzqnaC2Hi4PDNKiPnXgGv'); 
+      const outputidx0: number = 0;
+      const outputidx1: number = 0;
+      const assetID = await platformvm.getAVAXAssetID();
+      const assetID2 = await platformvm.getAVAXAssetID();
+      const utxo1: UTXO = new UTXO(codecID, txid, outputidx0, assetID, stakeableLockOut1);
+      const utxo2: UTXO = new UTXO(codecID, txid2, outputidx1, assetID2, stakeableLockOut2);
+      const utxoSet: UTXOSet =  new UTXOSet();
+      utxoSet.add(utxo1);
+      utxoSet.add(utxo2);
+      const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
+        utxoSet, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        stakeAmount,
+        addrs3, 
+        delegationFeeRate
+      );
+      let tx = txu1.getTransaction() as AddValidatorTx;
+      let ins: TransferableInput[] = tx.getIns();
+      // start test inputs
+      // confirm only 1 input
+      expect(ins.length).toBe(1);
+      let input: TransferableInput = ins[0];
+      let ai = input.getInput() as AmountInput;
+      let ao = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput;
+      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput;
+      // confirm input amount matches the output w/ the greater staekablelock time but lesser amount
+      expect(ai.getAmount().toString()).toEqual(ao.getAmount().toString())
+      // confirm input amount doesn't match the output w/ the lesser staekablelock time but greater amount
+      expect(ai.getAmount().toString()).not.toEqual(ao2.getAmount().toString())
+
+      let sli = input.getInput() as StakeableLockIn;
+      // confirm input stakeablelock time matches the output w/ the greater stakeablelock time but lesser amount 
+      expect(sli.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+      // confirm input stakeablelock time doesn't match the output w/ the lesser stakeablelock time but greater amount
+      expect(sli.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      // stop test inputs
+
+      // start test outputs
+      let outs: TransferableOutput[] = tx.getOuts();
+      // confirm only 1 output
+      expect(outs.length).toBe(1);
+      let output: TransferableOutput = outs[0];
+      let ao3 = output.getOutput() as AmountOutput;
+      // confirm output amount matches the output w/ the greater stakeablelock time but lesser amount sans the stake amount
+      expect(ao3.getAmount().toString()).toEqual(ao.getAmount().sub(stakeAmount).toString())
+      // confirm output amount doesn't match the output w/ the lesser stakeablelock time but greater amount
+      expect(ao3.getAmount().toString()).not.toEqual(ao2.getAmount().toString())
+
+      let slo = output.getOutput() as StakeableLockOut;
+      // confirm output stakeablelock time matches the output w/ the greater stakeablelock time but lesser amount 
+      expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+      // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time but lesser amount 
+      expect(slo.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+
+      // confirm tx nodeID matches nodeID
+      expect(tx.getNodeIDString()).toEqual(nodeID);
+      // confirm tx starttime matches starttime
+      expect(tx.getStartTime().toString()).toEqual(startTime.toString());
+      // confirm tx endtime matches endtime 
+      expect(tx.getEndTime().toString()).toEqual(endTime.toString());
+      // confirm tx stake amount matches stakeAmount
+      expect(tx.getStakeAmount().toString()).toEqual(stakeAmount.toString());
+
+      let stakeOuts: TransferableOutput[] = tx.getStakeOuts();
+      // confirm only 1 stakeOut
+      expect(stakeOuts.length).toBe(1);
+
+      let stakeOut: TransferableOutput = stakeOuts[0];
+      let slo2 = stakeOut.getOutput() as StakeableLockOut;
+      // confirm stakeOut stakeablelock time matches the output w/ the greater stakeablelock time but lesser amount 
+      expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+      // confirm stakeOut stakeablelock time doesn't match the output w/ the greater stakeablelock time but lesser amount 
+      expect(slo2.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      slo2.getAmount()
+      // confirm stakeOut stake amount matches stakeAmount
+      expect(slo2.getAmount().toString()).toEqual(stakeAmount.toString());
+    });
+
+    test('buildAddValidatorTx sort StakeableLockOuts 2', async () => {
+
+      // two UTXO. The 1st has a lesser stakeablelocktime and a greater amount of AVAX. The 2nd has a greater stakeablelocktime and a lesser amount of AVAX.
+      // this time we're staking a greater amount than is available in the 2nd UTXO.
+      // We expect this test to consume the full 2nd UTXO and a fraction of the 1st UTXO..
+      const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a));
+      const amount1: BN = new BN('20000000000000000');
+      const amount2: BN = new BN('10000000000000000');
+      const locktime1: BN = new BN(0);
+      const threshold: number = 1;
+      
+      const stakeableLockTime1: BN = new BN(1633824000);
+      const secpTransferOutput1: SECPTransferOutput = new SECPTransferOutput(amount1, addrbuff1, locktime1, threshold);
+      const parseableOutput1: ParseableOutput = new ParseableOutput(secpTransferOutput1);
+      const stakeableLockOut1: StakeableLockOut = new StakeableLockOut(amount1, addrbuff1, locktime1, threshold, stakeableLockTime1, parseableOutput1);
+      const stakeableLockTime2: BN = new BN(1733824000);
+      const secpTransferOutput2: SECPTransferOutput = new SECPTransferOutput(amount2, addrbuff1, locktime1, threshold);
+      const parseableOutput2: ParseableOutput = new ParseableOutput(secpTransferOutput2);
+      const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2);
+      const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1";
+      const stakeAmount: BN = new BN('10000003000000000');
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake);
+      const delegationFeeRate: number = new BN(2).toNumber();
+      const codecID: number = 0;
+      const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib');
+      const txid2: Buffer = bintools.cb58Decode('2JwDfm3C7p88rJQ1Y1xWLkWNMA1nqPzqnaC2Hi4PDNKiPnXgGv'); 
+      const outputidx0: number = 0;
+      const outputidx1: number = 0;
+      const assetID = await platformvm.getAVAXAssetID();
+      const assetID2 = await platformvm.getAVAXAssetID();
+      const utxo1: UTXO = new UTXO(codecID, txid, outputidx0, assetID, stakeableLockOut1);
+      const utxo2: UTXO = new UTXO(codecID, txid2, outputidx1, assetID2, stakeableLockOut2);
+      const utxoSet: UTXOSet =  new UTXOSet();
+      utxoSet.add(utxo1);
+      utxoSet.add(utxo2);
+      const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
+        utxoSet, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        stakeAmount,
+        addrs3, 
+        delegationFeeRate
+      );
+      let tx = txu1.getTransaction() as AddValidatorTx;
+      let ins: TransferableInput[] = tx.getIns();
+      // start test inputs
+      // confirm only 1 input
+      expect(ins.length).toBe(2);
+      let input1: TransferableInput = ins[0];
+      let input2: TransferableInput = ins[1];
+      let ai1 = input1.getInput() as AmountInput;
+      let ai2 = input2.getInput() as AmountInput;
+      let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput;
+      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput;
+      // confirm each input amount matches the corresponding output 
+      expect(ai2.getAmount().toString()).toEqual(ao1.getAmount().toString())
+      expect(ai1.getAmount().toString()).toEqual(ao2.getAmount().toString())
+
+      let sli1 = input1.getInput() as StakeableLockIn;
+      let sli2 = input2.getInput() as StakeableLockIn;
+      // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
+      expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+      // stop test inputs
+
+      // start test outputs
+      let outs: TransferableOutput[] = tx.getOuts();
+      // confirm only 1 output
+      expect(outs.length).toBe(1);
+      let output: TransferableOutput = outs[0];
+      let ao3 = output.getOutput() as AmountOutput;
+      // confirm output amount matches the output amount sans the 2nd utxo amount and the stake amount
+      expect(ao3.getAmount().toString()).toEqual(ao2.getAmount().sub(stakeAmount.sub(ao1.getAmount())).toString())
+
+      let slo = output.getOutput() as StakeableLockOut;
+      // confirm output stakeablelock time matches the output w/ the lesser stakeablelock since the other was consumed
+      expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time  
+      expect(slo.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+
+      // confirm tx nodeID matches nodeID
+      expect(tx.getNodeIDString()).toEqual(nodeID);
+      // confirm tx starttime matches starttime
+      expect(tx.getStartTime().toString()).toEqual(startTime.toString());
+      // confirm tx endtime matches endtime 
+      expect(tx.getEndTime().toString()).toEqual(endTime.toString());
+      // confirm tx stake amount matches stakeAmount
+      expect(tx.getStakeAmount().toString()).toEqual(stakeAmount.toString());
+
+      let stakeOuts: TransferableOutput[] = tx.getStakeOuts();
+      // confirm 2 stakeOuts
+      expect(stakeOuts.length).toBe(2);
+
+      let stakeOut1: TransferableOutput = stakeOuts[0];
+      let stakeOut2: TransferableOutput = stakeOuts[1];
+      let slo2 = stakeOut1.getOutput() as StakeableLockOut;
+      let slo3 = stakeOut2.getOutput() as StakeableLockOut;
+      // confirm both stakeOut strakeablelock times matche the corresponding output  
+      expect(slo3.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+    });
+
+    test('buildAddValidatorTx sort StakeableLockOuts 3', async () => {
+      // three UTXO. 
+      // The 1st is a SecpTransferableOutput. 
+      // The 2nd has a lesser stakeablelocktime and a greater amount of AVAX. 
+      // The 3rd has a greater stakeablelocktime and a lesser amount of AVAX.
+      // 
+      // this time we're staking a greater amount than is available in the 3rd UTXO.
+      // We expect this test to consume the full 3rd UTXO and a fraction of the 2nd UTXO and not to consume the SecpTransferableOutput
+      const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a));
+      const amount1: BN = new BN('20000000000000000');
+      const amount2: BN = new BN('10000000000000000');
+      const locktime1: BN = new BN(0);
+      const threshold: number = 1;
+      
+      const stakeableLockTime1: BN = new BN(1633824000);
+      const secpTransferOutput0: SECPTransferOutput = new SECPTransferOutput(amount1, addrbuff1, locktime1, threshold);
+      const secpTransferOutput1: SECPTransferOutput = new SECPTransferOutput(amount1, addrbuff1, locktime1, threshold);
+      const parseableOutput1: ParseableOutput = new ParseableOutput(secpTransferOutput1);
+      const stakeableLockOut1: StakeableLockOut = new StakeableLockOut(amount1, addrbuff1, locktime1, threshold, stakeableLockTime1, parseableOutput1);
+      const stakeableLockTime2: BN = new BN(1733824000);
+      const secpTransferOutput2: SECPTransferOutput = new SECPTransferOutput(amount2, addrbuff1, locktime1, threshold);
+      const parseableOutput2: ParseableOutput = new ParseableOutput(secpTransferOutput2);
+      const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2);
+      const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1";
+      const stakeAmount: BN = new BN('10000003000000000');
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake);
+      const delegationFeeRate: number = new BN(2).toNumber();
+      const codecID: number = 0;
+      const txid0: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib');
+      const txid1: Buffer = bintools.cb58Decode('2jhyJit8kWA6SwkRwKxXepFnfhs971CEqaGkjJmiADM8H4g2LR');
+      const txid2: Buffer = bintools.cb58Decode('2JwDfm3C7p88rJQ1Y1xWLkWNMA1nqPzqnaC2Hi4PDNKiPnXgGv'); 
+      const outputidx0: number = 0;
+      const outputidx1: number = 0;
+      const assetID = await platformvm.getAVAXAssetID();
+      const assetID2 = await platformvm.getAVAXAssetID();
+      const utxo0: UTXO = new UTXO(codecID, txid0, outputidx0, assetID, secpTransferOutput0);
+      const utxo1: UTXO = new UTXO(codecID, txid1, outputidx0, assetID, stakeableLockOut1);
+      const utxo2: UTXO = new UTXO(codecID, txid2, outputidx1, assetID2, stakeableLockOut2);
+      const utxoSet: UTXOSet =  new UTXOSet();
+      utxoSet.add(utxo0);
+      utxoSet.add(utxo1);
+      utxoSet.add(utxo2);
+      const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
+        utxoSet, 
+        addrs3,
+        addrs1, 
+        addrs2, 
+        nodeID, 
+        startTime,
+        endTime,
+        stakeAmount,
+        addrs3, 
+        delegationFeeRate
+      );
+      let tx = txu1.getTransaction() as AddValidatorTx;
+      let ins: TransferableInput[] = tx.getIns();
+      // start test inputs
+      // confirm only 1 input
+      expect(ins.length).toBe(2);
+      let input1: TransferableInput = ins[0];
+      let input2: TransferableInput = ins[1];
+      let ai1 = input1.getInput() as AmountInput;
+      let ai2 = input2.getInput() as AmountInput;
+      let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput;
+      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput;
+      // confirm each input amount matches the corresponding output 
+      expect(ai2.getAmount().toString()).toEqual(ao2.getAmount().toString())
+      expect(ai1.getAmount().toString()).toEqual(ao1.getAmount().toString())
+
+      let sli1 = input1.getInput() as StakeableLockIn;
+      let sli2 = input2.getInput() as StakeableLockIn;
+      // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
+      expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+      expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      // stop test inputs
+
+      // start test outputs
+      let outs: TransferableOutput[] = tx.getOuts();
+      // confirm only 1 output
+      expect(outs.length).toBe(1);
+      let output: TransferableOutput = outs[0];
+      let ao3 = output.getOutput() as AmountOutput;
+      // confirm output amount matches the output amount sans the 2nd utxo amount and the stake amount
+      expect(ao3.getAmount().toString()).toEqual(ao2.getAmount().sub(stakeAmount.sub(ao1.getAmount())).toString())
+
+      let slo = output.getOutput() as StakeableLockOut;
+      // confirm output stakeablelock time matches the output w/ the lesser stakeablelock since the other was consumed
+      expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time  
+      expect(slo.getStakeableLocktime().toString()).not.toEqual(stakeableLockOut2.getStakeableLocktime().toString());
+
+      // confirm tx nodeID matches nodeID
+      expect(tx.getNodeIDString()).toEqual(nodeID);
+      // confirm tx starttime matches starttime
+      expect(tx.getStartTime().toString()).toEqual(startTime.toString());
+      // confirm tx endtime matches endtime 
+      expect(tx.getEndTime().toString()).toEqual(endTime.toString());
+      // confirm tx stake amount matches stakeAmount
+      expect(tx.getStakeAmount().toString()).toEqual(stakeAmount.toString());
+
+      let stakeOuts: TransferableOutput[] = tx.getStakeOuts();
+      // confirm 2 stakeOuts
+      expect(stakeOuts.length).toBe(2);
+
+      let stakeOut1: TransferableOutput = stakeOuts[0];
+      let stakeOut2: TransferableOutput = stakeOuts[1];
+      let slo2 = stakeOut1.getOutput() as StakeableLockOut;
+      let slo3 = stakeOut2.getOutput() as StakeableLockOut;
+      // confirm both stakeOut strakeablelock times matche the corresponding output  
+      expect(slo3.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
     });
 
     test('buildAddValidatorTx 1', async () => {
@@ -1284,48 +1524,20 @@ describe('PlatformVMAPI', () => {
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
-
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
       
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
-
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
       
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1384,23 +1596,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1408,23 +1606,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1484,48 +1668,20 @@ describe('PlatformVMAPI', () => {
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
-
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
       
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
-
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
       
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1653,23 +1809,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1677,23 +1819,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
