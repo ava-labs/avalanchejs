@@ -1,5 +1,4 @@
 import mockAxios from 'jest-mock-axios';
-
 import { Avalanche } from 'src';
 import { PlatformVMAPI } from 'src/apis/platformvm/api';
 import { Buffer } from 'buffer/';
@@ -21,8 +20,6 @@ import { NodeIDStringToBuffer } from 'src/utils/helperfunctions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
 import { AddValidatorTx } from 'src/apis/platformvm/validationtx';
-import { BaseTx } from 'src/apis/platformvm';
-import { OutputOwners } from 'src/common';
 
 /**
  * @ignore
@@ -30,11 +27,10 @@ import { OutputOwners } from 'src/common';
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
 
-
-const dumpSerailization:boolean = false;
+const dumpSerialization:boolean = false;
 
 function serialzeit(aThing:Serializable, name:string){
-  if(dumpSerailization){
+  if(dumpSerialization){
     console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "hex", name + " -- Hex Encoded")));
     console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "display", name + " -- Human-Readable")));
   }
@@ -948,23 +944,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -972,23 +954,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1052,47 +1020,19 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
 
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
-
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
       
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1186,23 +1126,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1210,23 +1136,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1362,7 +1274,6 @@ describe('PlatformVMAPI', () => {
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2);
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1";
       const stakeAmount: BN = new BN('10000003000000000');
-      // console.log(stakeAmount.toString())
       platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake);
       const delegationFeeRate: number = new BN(2).toNumber();
       const codecID: number = 0;
@@ -1395,9 +1306,7 @@ describe('PlatformVMAPI', () => {
       // confirm only 1 input
       expect(ins.length).toBe(2);
       let input1: TransferableInput = ins[0];
-      // console.log(input1)
       let input2: TransferableInput = ins[1];
-      // console.log(input2)
       let ai1 = input1.getInput() as AmountInput;
       let ai2 = input2.getInput() as AmountInput;
       let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput;
@@ -1411,11 +1320,10 @@ describe('PlatformVMAPI', () => {
       // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
       expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
       expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
-      // // stop test inputs
+      // stop test inputs
 
-      // // start test outputs
+      // start test outputs
       let outs: TransferableOutput[] = tx.getOuts();
-      // console.log(outs)
       // confirm only 1 output
       expect(outs.length).toBe(1);
       let output: TransferableOutput = outs[0];
@@ -1476,7 +1384,6 @@ describe('PlatformVMAPI', () => {
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2);
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1";
       const stakeAmount: BN = new BN('10000003000000000');
-      // console.log(stakeAmount.toString())
       platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake);
       const delegationFeeRate: number = new BN(2).toNumber();
       const codecID: number = 0;
@@ -1506,16 +1413,13 @@ describe('PlatformVMAPI', () => {
         addrs3, 
         delegationFeeRate
       );
-      console.log(txu1.toBuffer().toString('hex'))
       let tx = txu1.getTransaction() as AddValidatorTx;
       let ins: TransferableInput[] = tx.getIns();
       // start test inputs
       // confirm only 1 input
       expect(ins.length).toBe(2);
       let input1: TransferableInput = ins[0];
-      // console.log(input1)
       let input2: TransferableInput = ins[1];
-      // console.log(input2)
       let ai1 = input1.getInput() as AmountInput;
       let ai2 = input2.getInput() as AmountInput;
       let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput;
@@ -1529,11 +1433,10 @@ describe('PlatformVMAPI', () => {
       // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
       expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
       expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
-      // // stop test inputs
+      // stop test inputs
 
-      // // start test outputs
+      // start test outputs
       let outs: TransferableOutput[] = tx.getOuts();
-      // console.log(outs)
       // confirm only 1 output
       expect(outs.length).toBe(1);
       let output: TransferableOutput = outs[0];
@@ -1565,8 +1468,8 @@ describe('PlatformVMAPI', () => {
       let slo2 = stakeOut1.getOutput() as StakeableLockOut;
       let slo3 = stakeOut2.getOutput() as StakeableLockOut;
       // confirm both stakeOut strakeablelock times matche the corresponding output  
-      expect(slo3.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
-      expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(slo3.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString());
+      expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString());
     });
 
     test('buildAddValidatorTx 1', async () => {
@@ -1621,48 +1524,20 @@ describe('PlatformVMAPI', () => {
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
-
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
       
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
-
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
       
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1721,23 +1596,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1745,23 +1606,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1821,48 +1668,20 @@ describe('PlatformVMAPI', () => {
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
-
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
       
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
       let tx3:Tx = txu1.sign(platformvm.keyChain());
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
-
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
       
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -1990,23 +1809,9 @@ describe('PlatformVMAPI', () => {
       let tx1obj:object = tx1.serialize("hex");
       let tx1str:string = JSON.stringify(tx1obj);
       
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
-      
-      /*
-      let tx2obj:object = tx2.serialize("hex");
-      let tx2str:string = JSON.stringify(tx2obj);
-      console.log("-----Test2 JSON-----");
-      console.log(tx2str);
-      console.log("-----Test2 ENDN-----");
-      */
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx);
 
@@ -2014,23 +1819,9 @@ describe('PlatformVMAPI', () => {
       let tx3obj:object = tx3.serialize("display");
       let tx3str:string = JSON.stringify(tx3obj);
       
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
-      
-      /*
-      let tx4obj:object = tx4.serialize("display");
-      let tx4str:string = JSON.stringify(tx4obj);
-      console.log("-----Test4 JSON-----");
-      console.log(tx4str);
-      console.log("-----Test4 ENDN-----");
-      */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
 
