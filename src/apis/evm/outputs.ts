@@ -175,12 +175,15 @@ export class EVMOutput {
     assetid: Buffer | string = undefined
   ) {
     if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
-      if(address instanceof String) {
-        // convert string address to Buffer
-        address = bintools.stringToAddress(address as string)
-      } else if(!(address instanceof Buffer)) { 
+      if(typeof address === 'string') {
+        // if present then remove `0x` prefix
+        let prefix: string = address.substring(0, 2);
+        if(prefix === '0x') {
+          address = address.split('x')[1];
+        }
         address = Buffer.from(address, 'hex');
       }
+
       // convert number amount to BN
       let amnt:BN;
       if (typeof amount === 'number') {
