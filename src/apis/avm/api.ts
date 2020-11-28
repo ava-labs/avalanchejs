@@ -960,10 +960,6 @@ export class AVMAPI extends JRPCAPI {
       throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
 
-    if(bintools.cb58Encode(destinationChain) !== PlatformChainID) {
-      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must PlatformChainID in the current version of AvalancheJS.");
-    }
-
     let to:Array<Buffer> = [];
     toAddresses.map((a) => {
       to.push(bintools.stringToAddress(a));
