@@ -14,8 +14,8 @@ import { SigIdx } from '../../common/credentials';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.

@@ -9,8 +9,8 @@ import { EVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -19,7 +19,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid: number, ...args: any[]):Output => {
+export const SelectOutputClass = (outputid: number, ...args: any[]): Output => {
   if(outputid == EVMConstants.SECPXFEROUTPUTID){
     return new SECPTransferOutput( ...args);
   }
@@ -32,13 +32,13 @@ export class TransferableOutput extends StandardTransferableOutput{
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.output = SelectOutputClass(fields["output"]["_typeID"]);
     this.output.deserialize(fields["output"], encoding);
   }
 
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + EVMConstants.ASSETIDLEN);
     offset += EVMConstants.ASSETIDLEN;
     const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
@@ -59,11 +59,11 @@ export abstract class AmountOutput extends StandardAmountOutput {
    * 
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */
-  makeTransferable(assetID:Buffer):TransferableOutput {
+  makeTransferable(assetID: Buffer): TransferableOutput {
       return new TransferableOutput(assetID, this);
   }
 
-  select(id:number, ...args: any[]):Output {
+  select(id:number, ...args: any[]): Output {
       return SelectOutputClass(id, ...args);
   }
 }

@@ -13,12 +13,13 @@ import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Serializer } from 'v8';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Class representing an unsigned Import transaction.
@@ -27,15 +28,15 @@ export class ImportTx extends EVMBaseTx {
   protected _typeName = "ImportTx";
   protected _typeID = EVMConstants.IMPORTTX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields:object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding);
     return {
       ...fields,
       "sourceChain": serializer.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
       "importIns": this.importIns.map((i) => i.serialize(encoding))
     }
   };
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.sourceChain = serializer.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
     this.importIns = fields["importIns"].map((i:object) => {
@@ -138,7 +139,7 @@ export class ImportTx extends EVMBaseTx {
     return this.outs;
   }
 
-  clone():this {
+  clone(): this {
     let newImportTx: ImportTx = new ImportTx();
     newImportTx.fromBuffer(this.toBuffer());
     return newImportTx as this;

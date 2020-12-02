@@ -17,22 +17,22 @@ import { TransferableOutput } from './outputs';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 export class ExportTx extends EVMBaseTx {
   protected _typeName = "ExportTx";
   protected _typeID = EVMConstants.EXPORTTX
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields:object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding);
     return {
       ...fields,
       "destinationChain": serializer.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
       "exportedOutputs": this.exportedOutputs.map((i) => i.serialize(encoding))
     }
   };
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.destinationChain = serializer.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
     this.exportedOutputs = fields["exportedOutputs"].map((i:object) => {
@@ -68,7 +68,7 @@ export class ExportTx extends EVMBaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
    */
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     if(typeof this.destinationChain === "undefined") {
       throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
@@ -83,7 +83,7 @@ export class ExportTx extends EVMBaseTx {
     });
     bsize += this.numExportedOutputs.length;
     barr.push(this.numExportedOutputs);
-    this.exportedOutputs.forEach((out:TransferableOutput) => {
+    this.exportedOutputs.forEach((out: TransferableOutput) => {
       bsize += out.toBuffer().length;
       barr.push(out.toBuffer());
     });
@@ -119,7 +119,7 @@ export class ExportTx extends EVMBaseTx {
   /**
    * Returns a base-58 representation of the [[ExportTx]].
    */
-  toString():string {
+  toString(): string {
     return bintools.bufferToB58(this.toBuffer());
   }
 

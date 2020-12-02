@@ -207,7 +207,7 @@ export class EVMAPI extends JRPCAPI {
    *
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
-  issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
+  issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
     let Transaction = '';
     if (typeof tx === 'string') {
       Transaction = tx;
@@ -221,10 +221,10 @@ export class EVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new Error('Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
-    const params:any = {
+    const params: any = {
       tx: Transaction.toString(),
     };
-    return this.callMethod('avax.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod('avax.issueTx', params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -236,14 +236,14 @@ export class EVMAPI extends JRPCAPI {
    *
    * @returns Promise with the decrypted private key as store in the database
    */
-  exportKey = async (username:string, password:string, address:string):Promise<string> => {
+  exportKey = async (username: string, password: string, address: string): Promise<string> => {
     const params:any = {
       username,
       password,
       address,
     };
     return this.callMethod('avax.exportKey', params)
-      .then((response:RequestResponseData) => response.data.result.privateKey);
+      .then((response: RequestResponseData) => response.data.result.privateKey);
   };
 
   /**
@@ -261,7 +261,7 @@ export class EVMAPI extends JRPCAPI {
    * @param baseurl Defaults to the string "/ext/bc/C/avax" as the path to blockchain's baseurl
    * @param blockchainID The Blockchain's ID. Defaults to an empty string: ''
    */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/bc/C/avax', blockchainID:string = '') { 
+  constructor(core: AvalancheCore, baseurl: string = '/ext/bc/C/avax', blockchainID: string = '') { 
     super(core, baseurl); 
     this.blockchainID = blockchainID;
     const netid: number = core.getNetworkID();
