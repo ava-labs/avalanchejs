@@ -12,6 +12,7 @@ import { UTXOSet } from './utxos';
 import { KeyChain } from './keychain';
 import { Defaults } from '../../utils/constants';
 import { Tx } from './tx';
+import { EVMConstants } from './constants';
 
 interface Index {
   address: string,
@@ -37,6 +38,123 @@ export class EVMAPI extends JRPCAPI {
   protected keychain: KeyChain = new KeyChain('', '');
 
   protected blockchainID: string = '';
+
+  protected blockchainAlias: string = undefined;
+
+  protected AVAXAssetID:Buffer = undefined;
+
+  /**
+   * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
+   *
+   * @returns The alias for the blockchainID
+   */
+  getBlockchainAlias = (): string => {
+    if(typeof this.blockchainAlias === "undefined"){
+      const netid: number = this.core.getNetworkID();
+      if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
+        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
+        return this.blockchainAlias;
+      } else {
+        /* istanbul ignore next */
+        return undefined;
+      }
+    } 
+    return this.blockchainAlias;
+  };
+
+  /**
+   * Sets the alias for the blockchainID.
+   * 
+   * @param alias The alias for the blockchainID.
+   * 
+   */
+  setBlockchainAlias = (alias: string): string => {
+    this.blockchainAlias = alias;
+    /* istanbul ignore next */
+    return undefined;
+  };
+
+
+  /**
+   * Gets the blockchainID and returns it.
+   *
+   * @returns The blockchainID
+   */
+  getBlockchainID = (): string => this.blockchainID;
+
+  /**
+   * Refresh blockchainID, and if a blockchainID is passed in, use that.
+   *
+   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
+   *
+   * @returns The blockchainID
+   */
+  refreshBlockchainID = (blockchainID: string = undefined): boolean => {
+    const netid: number = this.core.getNetworkID();
+    if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
+      this.blockchainID = Defaults.network[netid].C.blockchainID; //default to C-Chain
+      return true;
+    } if (typeof blockchainID === 'string') {
+      this.blockchainID = blockchainID;
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
+   *
+   * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
+   */
+  parseAddress = (addr: string): Buffer => {
+    const alias: string = this.getBlockchainAlias();
+    const blockchainID: string = this.getBlockchainID();
+    return bintools.parseAddress(addr, blockchainID, alias, EVMConstants.ADDRESSLENGTH);
+  };
+
+  addressFromBuffer = (address: Buffer): string => {
+    const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
+    return bintools.addressToString(this.core.getHRP(), chainid, address);
+  };
+  
+  /**
+   * Fetches the AVAX AssetID and returns it in a Promise.
+   *
+   * @param refresh This function caches the response. Refresh = true will bust the cache.
+   * 
+   * @returns The the provided string representing the AVAX AssetID
+   */
+  getAVAXAssetID = async (refresh:boolean = false):Promise<Buffer> => {
+    if (typeof this.AVAXAssetID === 'undefined' || refresh) {
+      const assetID:string = await this.getStakingAssetID();
+      this.AVAXAssetID = bintools.cb58Decode(assetID);
+    }
+    return this.AVAXAssetID;
+  };
+  
+  /**
+   * Overrides the defaults and sets the cache to a specific AVAX AssetID
+   * 
+   * @param avaxAssetID A cb58 string or Buffer representing the AVAX AssetID
+   * 
+   * @returns The the provided string representing the AVAX AssetID
+   */
+  setAVAXAssetID = (avaxAssetID: string | Buffer) => {
+    if(typeof avaxAssetID === "string") {
+      avaxAssetID = bintools.cb58Decode(avaxAssetID);
+    }
+    this.AVAXAssetID = avaxAssetID;
+  }
+
+  /**
+   * Retrieves an assetID for a subnet's staking assset.
+   *
+   * @returns Returns a Promise<string> with cb58 encoded value of the assetID.
+   */
+  getStakingAssetID = async (): Promise<string> => {
+    const params:any = {};
+    return this.callMethod('platform.getStakingAssetID', params).then((response: RequestResponseData) => (response.data.result.assetID));
+  };
 
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from the C-Chain to an account on the X-Chain.
@@ -246,12 +364,118 @@ export class EVMAPI extends JRPCAPI {
       .then((response: RequestResponseData) => response.data.result.privateKey);
   };
 
+
+  /**
+   * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
+   *
+   * @param utxoset  A set of UTXOs that the transaction is built on
+   * @param ownerAddresses The addresses being used to import
+   * @param sourceChain The chainid for where the import is coming from
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
+   *
+   * @remarks
+   * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+   */
+  buildImportTx = async (
+    utxoset: UTXOSet, 
+    toAddress:string,
+    // ownerAddresses:string[],
+    sourceChain: Buffer | string,
+    // toAddresses: string[], 
+    fromAddresses: string[],
+    // changeAddresses: string[] = undefined,
+    // asOf: BN = UnixNow(), 
+    // locktime: BN = new BN(0), 
+    // threshold: number = 1
+  // ):Promise<UnsignedTx> => {
+  ):Promise<boolean> => {
+    // const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    // const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+
+    let srcChain: string = undefined;
+
+    if(typeof sourceChain === "undefined") {
+      throw new Error("Error - EVMAPI.buildImportTx: sourceChain is undefined.");
+    } else if (typeof sourceChain === "string") {
+      srcChain = sourceChain;
+      sourceChain = bintools.cb58Decode(sourceChain);
+    } else if(!(sourceChain instanceof Buffer)) {
+      srcChain = bintools.cb58Encode(sourceChain);
+      throw new Error("Error - EVMAPI.buildImportTx: Invalid sourceChain type: " + (typeof sourceChain) );
+    }
+  
+    const atomicUTXOs: UTXOSet = await (await this.getUTXOs(fromAddresses, srcChain, 0, undefined)).utxos;
+    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+
+    // const atomics = atomicutxos.getallutxos();
+
+    // if(atomics.length === 0){
+    //   throw new error("error - avmapi.buildimporttx: no atomic utxos to import from " + srcchain + " using addresses: " + owneraddresses.join(", ") );
+    // }
+
+    // const builtunsignedtx: unsignedtx = utxoset.buildimporttx(
+    //   this.core.getnetworkid(), 
+    //   bintools.cb58Decode(this.blockchainID), 
+    //   to,
+    //   from,
+    //   change,
+    //   atomics, 
+    //   sourceChain,
+    //   this.getTxFee(), 
+    //   avaxAssetID, 
+    //   memo, asOf, locktime, threshold
+    // );
+
+    // if(! await this.checkGooseEgg(builtUnsignedTx)) {
+    //   /* istanbul ignore next */
+    //   throw new Error("Failed Goose Egg Check");
+    // }
+
+    // return builtUnsignedTx;
+    return false;
+  };
+
   /**
    * Gets a reference to the keychain for this class.
    *
    * @returns The instance of [[KeyChain]] for this class
    */
   keyChain = (): KeyChain => this.keychain;
+
+  /**
+   * @ignore
+   */
+  protected _cleanAddressArray(addresses: string[] | Buffer[], caller: string): string[] {
+    const addrs: string[] = [];
+    console.log("===++++++")
+    console.log(addresses)
+    const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
+    console.log(chainid)
+    if (addresses && addresses.length > 0) {
+      addresses.forEach((address: string | Buffer) => {
+        if (typeof address === 'string') {
+          if (typeof this.parseAddress(address as string) === 'undefined') {
+            /* istanbul ignore next */
+            throw new Error(`Error - EVMAPI.${caller}: Invalid address format ${address}`);
+          }
+          addrs.push(address as string);
+        } else {
+          addrs.push(bintools.addressToString(this.core.getHRP(), chainid, address as Buffer));
+        }
+      });
+    }
+    return addrs;
+  }
 
   /**
    * This class should not be instantiated directly.

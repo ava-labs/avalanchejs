@@ -17,4 +17,6 @@ export class EVMConstants {
   static SECPXFEROUTPUTID: number = 7;
 
   static LATESTCODEC: number = 0;
+
+  static ADDRESSLENGTH:number = 20;
 }
