@@ -22,6 +22,7 @@ import {
   Index, 
   UTXOResponse 
 } from './../../common/interfaces'
+import { Input } from 'src/common';
 
 /**
  * @ignore
@@ -220,6 +221,7 @@ export class EVMAPI extends JRPCAPI {
       password,
       assetID
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.export', params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
@@ -242,6 +244,7 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.exportAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
@@ -281,6 +284,7 @@ export class EVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.getUTXOs', params).then((response: RequestResponseData) => {
       const utxos: UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
@@ -311,6 +315,7 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.import', params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
@@ -337,6 +342,7 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.importAVAX', params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
@@ -356,6 +362,7 @@ export class EVMAPI extends JRPCAPI {
       password,
       privateKey,
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.importKey', params)
       .then((response:RequestResponseData) => response.data.result.address);
   };
@@ -380,11 +387,12 @@ export class EVMAPI extends JRPCAPI {
       Transaction = tx.toString();
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+      throw new Error('Error - avax.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
     const params: any = {
       tx: Transaction.toString(),
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.issueTx', params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
@@ -403,6 +411,7 @@ export class EVMAPI extends JRPCAPI {
       password,
       address,
     };
+    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.exportKey', params)
       .then((response: RequestResponseData) => response.data.result.privateKey);
   };
@@ -412,15 +421,13 @@ export class EVMAPI extends JRPCAPI {
    * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
    *
-   * @param utxoset  A set of UTXOs that the transaction is built on
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param toAddress The address to send the funds
    * @param ownerAddresses The addresses being used to import
    * @param sourceChain The chainid for where the import is coming from
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
    *
@@ -432,16 +439,9 @@ export class EVMAPI extends JRPCAPI {
     toAddress: string,
     ownerAddresses: string[],
     sourceChain: Buffer | string,
-    fromAddresses: string[],
-    changeAddresses: string[] = undefined,
-    asOf: BN = UnixNow(), 
-    locktime: BN = new BN(0), 
-    threshold: number = 1
-  ):Promise<UnsignedTx> => {
-    // const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    fromAddresses: string[]
+  ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-
     let srcChain: string = undefined;
 
     if(typeof sourceChain === "string") {
@@ -465,16 +465,12 @@ export class EVMAPI extends JRPCAPI {
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID), 
-      [Buffer.from(toAddress)],
+      [toAddress],
       from,
-      change,
       atomics,
       sourceChain,
       this.getTxFee(),
-      avaxAssetId,
-      asOf, 
-      locktime, 
-      threshold
+      avaxAssetId
     );
 
     // TODO goose egg check

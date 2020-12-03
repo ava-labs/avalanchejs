@@ -240,7 +240,6 @@ import { ImportTx } from './importtx';
      * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
-     * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs.
      * @param importIns An array of [[TransferableInput]]s being imported
      * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
      * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}. Fee will come from the inputs first, if they can.
@@ -255,36 +254,31 @@ import { ImportTx } from './importtx';
     buildImportTx = (
      networkid: number, 
      blockchainid: Buffer,
-     toAddresses: Buffer[],
+     toAddresses: string[],
      fromAddresses: Buffer[],
-     changeAddresses: Buffer[],
      atomics: UTXO[],
      sourceChain: Buffer = undefined, 
      fee: BN = undefined,
-     feeAssetID: Buffer = undefined, 
-     asOf: BN = UnixNow(),
-     locktime: BN = new BN(0), 
-     threshold: number = 1
+     feeAssetID: Buffer = undefined
    ): UnsignedTx => {
+
      const zero: BN = new BN(0);
-     let ins: TransferableInput[] = [];
-     let outs: TransferableOutput[] = [];
+     const ins: TransferableInput[] = [];
+     const outs: EVMOutput[] = [];
 
      if(typeof fee === "undefined") {
        fee = zero.clone();
      }
  
-    //  const importIns: TransferableInput[] = [];
      let feepaid: BN = new BN(0);
-     let feeAssetStr: string = feeAssetID.toString("hex");
-     atomics.forEach((atomic: UTXO, index: number) => {
-       const utxo: UTXO = atomic;
-       const assetID: Buffer = utxo.getAssetID(); 
-       const output: AmountOutput = utxo.getOutput() as AmountOutput;
-       let amt: BN = output.getAmount().clone();
+     const feeAssetStr: string = feeAssetID.toString("hex");
+     atomics.forEach((atomic: UTXO) => {
+       const assetID: Buffer = atomic.getAssetID(); 
+       const output: AmountOutput = atomic.getOutput() as AmountOutput;
+       const amt: BN = output.getAmount().clone();
  
-       let infeeamount = amt.clone();
-       let assetStr: string = assetID.toString("hex");
+       let infeeamount: BN = amt.clone();
+       const assetStr: string = assetID.toString("hex");
        if(
          typeof feeAssetID !== "undefined" && 
          fee.gt(zero) && 
@@ -301,12 +295,12 @@ import { ImportTx } from './importtx';
          }
        }
  
-       const txid: Buffer = utxo.getTxID();
-       const outputidx: Buffer = utxo.getOutputIdx();
+       const txid: Buffer = atomic.getTxID();
+       const outputidx: Buffer = atomic.getOutputIdx();
        const input: SECPTransferInput = new SECPTransferInput(amt);
        const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
        const from: Buffer[] = output.getAddresses(); 
-       const spenders: Buffer[] = output.getSpenders(from, asOf);
+       const spenders: Buffer[] = output.getSpenders(from);
        spenders.forEach((spender: Buffer) => {
          const idx: number = output.getAddressIdx(spender);
          if (idx === -1) {
@@ -316,37 +310,33 @@ import { ImportTx } from './importtx';
          xferin.getInput().addSignatureIdx(idx, spender);
        });
        ins.push(xferin);
- 
        //add extra outputs for each amount (calculated from the imported inputs), minus fees
        if(infeeamount.gt(zero)) {
-         const spendout: AmountOutput = SelectOutputClass(
-           output.getOutputID(),
-           infeeamount, 
-           toAddresses, 
-           locktime, 
-           threshold
-         ) as AmountOutput;
-         const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
-         outs.push(xferout);
+         const evmOutput: EVMOutput = new EVMOutput(
+           toAddresses[0],
+           amt,
+           assetID
+         );
+         outs.push(evmOutput);
        }
      });
      
+     // TODO - review commented out code to confirm that we don't need it.
      // get remaining fees from the provided addresses
-     let feeRemaining: BN = fee.sub(feepaid);
-     if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
-       const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
-       aad.addAssetAmount(feeAssetID, zero, feeRemaining);
-       const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-       if(typeof success === "undefined") {
-         ins = aad.getInputs();
-         outs = aad.getAllOutputs();
-       } else {
-         throw success;
-       }
-     }
- 
-    //  const importTx: ImportTx = new ImportTx(networkid, blockchainid, sourceChain, ins, outs);
-     const importTx: ImportTx = new ImportTx(networkid, blockchainid, sourceChain, ins);
+    //  let feeRemaining: BN = fee.sub(feepaid);
+    //  if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
+    //    const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+    //    aad.addAssetAmount(feeAssetID, zero, feeRemaining);
+    //    const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    //    if(typeof success === "undefined") {
+    //      ins = aad.getInputs();
+    //      outs = aad.getAllOutputs();
+    //    } else {
+    //      throw success;
+    //    }
+    //  }
+
+     const importTx: ImportTx = new ImportTx(networkid, blockchainid, sourceChain, ins, outs);
      return new UnsignedTx(importTx);
    };
  
