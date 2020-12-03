@@ -8,7 +8,7 @@
  import { AmountOutput, SelectOutputClass, TransferableOutput, SECPTransferOutput, EVMOutput } from './outputs';
  import { EVMConstants } from './constants';
 //  import { UnsignedTx } from './tx';
- import { SECPTransferInput, TransferableInput } from './inputs';
+ import { EVMInput, SECPTransferInput, TransferableInput } from './inputs';
  import { Output, OutputOwners } from '../../common/output';
  import { UnixNow } from '../../utils/helperfunctions';
  import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
@@ -19,6 +19,7 @@
  import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import { UnsignedTx } from './tx';
 import { ImportTx } from './importtx';
+import { ExportTx } from './exporttx';
  
  /**
   * @ignore
@@ -340,88 +341,85 @@ import { ImportTx } from './importtx';
      return new UnsignedTx(importTx);
    };
  
-  //    /**
-  //    * Creates an unsigned ExportTx transaction. 
-  //    *
-  //    * @param networkid The number representing NetworkID of the node
-  //    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-  //    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
-  //    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-  //    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
-  //    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
-  //    * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs.
-  //    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
-  //    * @param destinationChain Optional. A {@link https://github.com/feross/buffer|Buffer} for the chainid where to send the asset.
-  //    * @param feeAssetID Optional. The assetID of the fees being burned. 
-  //    * @param memo Optional contains arbitrary bytes, up to 256 bytes
-  //    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-  //    * @param locktime Optional. The locktime field created in the resulting outputs
-  //    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
-  //    * @returns An unsigned transaction created from the passed in parameters.
-  //    *
-  //    */
-  //   buildExportTx = (
-  //    networkid:number, 
-  //    blockchainid:Buffer,
-  //    amount:BN,
-  //    avaxAssetID:Buffer,
-  //    toAddresses:Array<Buffer>,
-  //    fromAddresses:Array<Buffer>,
-  //    changeAddresses:Array<Buffer> = undefined,
-  //    destinationChain:Buffer = undefined,
-  //    fee:BN = undefined,
-  //    feeAssetID:Buffer = undefined, 
-  //    memo:Buffer = undefined, 
-  //    asOf:BN = UnixNow(),
-  //    locktime:BN = new BN(0), 
-  //    threshold:number = 1
-  //  ):UnsignedTx => {
-  //    let ins:Array<TransferableInput> = [];
-  //    let outs:Array<TransferableOutput> = [];
-  //    let exportouts:Array<TransferableOutput> = [];
-     
-  //    if(typeof changeAddresses === "undefined") {
-  //      changeAddresses = toAddresses;
-  //    }
- 
-  //    const zero:BN = new BN(0);
-     
-  //    if (amount.eq(zero)) {
-  //      return undefined;
-  //    }
- 
-  //    if(typeof feeAssetID === "undefined") {
-  //      feeAssetID = avaxAssetID;
-  //    } else if (feeAssetID.toString("hex") !== avaxAssetID.toString("hex")) {
-  //      /* istanbul ignore next */
-  //      throw new Error('Error - UTXOSet.buildExportTx: '
-  //      + `feeAssetID must match avaxAssetID`);
-  //    }
- 
-  //    if(typeof destinationChain === "undefined") {
-  //      destinationChain = bintools.cb58Decode(PlatformChainID);
-  //    }
- 
-  //    const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
-  //    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
-  //      aad.addAssetAmount(avaxAssetID, amount, fee);
-  //    } else {
-  //      aad.addAssetAmount(avaxAssetID, amount, zero);
-  //      if(this._feeCheck(fee, feeAssetID)){
-  //        aad.addAssetAmount(feeAssetID, zero, fee);
-  //      }
-  //    }
-  //    const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-  //    if(typeof success === "undefined") {
-  //      ins = aad.getInputs();
-  //      outs = aad.getChangeOutputs();
-  //      exportouts = aad.getOutputs();
-  //    } else {
-  //      throw success;
-  //    }
- 
-  //    const exportTx:ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, destinationChain, exportouts);
-  //    return new UnsignedTx(exportTx);
-  //  };
+   /**
+   * Creates an unsigned ExportTx transaction. 
+   *
+   * @param networkId The number representing NetworkID of the node
+   * @param blockchainId The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+   * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
+   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
+   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+   * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs.
+   * @param destinationChain Optional. A {@link https://github.com/feross/buffer|Buffer} for the chainid where to send the asset.
+   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned. 
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @returns An unsigned transaction created from the passed in parameters.
+   *
+   */
+   buildExportTx = (
+    networkId: number, 
+    blockchainId: Buffer,
+    amount: BN,
+    avaxAssetId: Buffer,
+    toAddresses: Buffer[],
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[] = undefined,
+    destinationChain: Buffer = undefined,
+    fee: BN = undefined,
+    feeAssetId: Buffer = undefined, 
+    asOf: BN = UnixNow(),
+    locktime: BN = new BN(0), 
+    threshold: number = 1
+  ): UnsignedTx => {
+    let ins: EVMInput[] = [];
+    let outs: TransferableOutput[] = [];
+    let exportouts: TransferableOutput[] = [];
+    
+    if(typeof changeAddresses === "undefined") {
+      changeAddresses = toAddresses;
+    }
+
+    const zero: BN = new BN(0);
+    
+    if (amount.eq(zero)) {
+      return undefined;
+    }
+
+    if(typeof feeAssetId === 'undefined') {
+      feeAssetId = avaxAssetId;
+    } else if (feeAssetId.toString('hex') !== avaxAssetId.toString('hex')) {
+      /* istanbul ignore next */
+      throw new Error('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
+    }
+
+    if(typeof destinationChain === 'undefined') {
+      destinationChain = bintools.cb58Decode(PlatformChainID);
+    }
+
+    const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
+    if(avaxAssetId.toString('hex') === feeAssetId.toString('hex')){
+      aad.addAssetAmount(avaxAssetId, amount, fee);
+    } else {
+      aad.addAssetAmount(avaxAssetId, amount, zero);
+      if(this._feeCheck(fee, feeAssetId)){
+        aad.addAssetAmount(feeAssetId, zero, fee);
+      }
+    }
+    const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
+    if(typeof success === 'undefined') {
+      // ins = aad.getInputs();
+      outs = aad.getChangeOutputs();
+      exportouts = aad.getOutputs();
+    } else {
+      throw success;
+    }
+
+    const exportTx: ExportTx = new ExportTx(networkId, blockchainId, destinationChain, ins, exportouts);
+    return new UnsignedTx(exportTx);
+  };
  }
  
