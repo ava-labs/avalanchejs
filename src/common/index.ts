@@ -3,6 +3,7 @@ export * from './assetamount';
 export * from './credentials';
 export * from './evmtx';
 export * from './input';
+export * from './interfaces';
 export * from './jrpcapi';
 export * from './keychain';
 export * from './nbytes';

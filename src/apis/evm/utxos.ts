@@ -5,7 +5,7 @@
  import { Buffer } from 'buffer/';
  import BinTools from '../../utils/bintools';
  import BN from "bn.js";
- import { AmountOutput, SelectOutputClass, TransferableOutput, SECPTransferOutput } from './outputs';
+ import { AmountOutput, SelectOutputClass, TransferableOutput, SECPTransferOutput, EVMOutput } from './outputs';
  import { EVMConstants } from './constants';
 //  import { UnsignedTx } from './tx';
  import { SECPTransferInput, TransferableInput } from './inputs';
@@ -269,14 +269,15 @@ import { ImportTx } from './importtx';
      const zero: BN = new BN(0);
      let ins: TransferableInput[] = [];
      let outs: TransferableOutput[] = [];
+
      if(typeof fee === "undefined") {
        fee = zero.clone();
      }
  
-     const importIns:  TransferableInput[] = [];
+    //  const importIns: TransferableInput[] = [];
      let feepaid: BN = new BN(0);
      let feeAssetStr: string = feeAssetID.toString("hex");
-     atomics.forEach((atomic: UTXO) => {
+     atomics.forEach((atomic: UTXO, index: number) => {
        const utxo: UTXO = atomic;
        const assetID: Buffer = utxo.getAssetID(); 
        const output: AmountOutput = utxo.getOutput() as AmountOutput;
@@ -306,20 +307,25 @@ import { ImportTx } from './importtx';
        const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
        const from: Buffer[] = output.getAddresses(); 
        const spenders: Buffer[] = output.getSpenders(from, asOf);
-       for (let j = 0; j < spenders.length; j++) {
-         const idx: number = output.getAddressIdx(spenders[j]);
+       spenders.forEach((spender: Buffer) => {
+         const idx: number = output.getAddressIdx(spender);
          if (idx === -1) {
            /* istanbul ignore next */
-           throw new Error(`Error - UTXOSet.buildImportTx: no such address in output: ${spenders[j]}`);
+           throw new Error(`Error - UTXOSet.buildImportTx: no such address in output: ${spender}`);
          }
-         xferin.getInput().addSignatureIdx(idx, spenders[j]);
-       }
-       importIns.push(xferin);
+         xferin.getInput().addSignatureIdx(idx, spender);
+       });
+       ins.push(xferin);
  
        //add extra outputs for each amount (calculated from the imported inputs), minus fees
        if(infeeamount.gt(zero)) {
-         const spendout: AmountOutput = SelectOutputClass(output.getOutputID(),
-           infeeamount, toAddresses, locktime, threshold) as AmountOutput;
+         const spendout: AmountOutput = SelectOutputClass(
+           output.getOutputID(),
+           infeeamount, 
+           toAddresses, 
+           locktime, 
+           threshold
+         ) as AmountOutput;
          const xferout: TransferableOutput = new TransferableOutput(assetID, spendout);
          outs.push(xferout);
        }
@@ -328,10 +334,8 @@ import { ImportTx } from './importtx';
      // get remaining fees from the provided addresses
      let feeRemaining: BN = fee.sub(feepaid);
      if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
-       //console.log(toAddresses, fromAddresses, changeAddresses);
        const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
        aad.addAssetAmount(feeAssetID, zero, feeRemaining);
-       console.log("asOf", asOf, "locktime", locktime, "threshold", threshold);
        const success:Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
        if(typeof success === "undefined") {
          ins = aad.getInputs();
