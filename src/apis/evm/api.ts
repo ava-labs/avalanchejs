@@ -481,8 +481,8 @@ export class EVMAPI extends JRPCAPI {
    * Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
    *
-   * @param utxoset A set of UTXOs that the transaction is built on
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param assetID The asset id which is being sent
    * @param destinationChain The chainid for where the assets will be sent.
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
