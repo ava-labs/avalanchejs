@@ -23,6 +23,9 @@ import {
   UTXOResponse 
 } from './../../common/interfaces'
 import { Input } from 'src/common';
+import { EVMInput } from './inputs';
+import { SECPTransferOutput, TransferableOutput } from './outputs';
+import { ExportTx } from './exporttx';
 
 /**
  * @ignore
@@ -491,66 +494,37 @@ export class EVMAPI extends JRPCAPI {
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
    */
   buildExportTx = async (
-    utxoset: UTXOSet, 
     amount: BN,
+    assetID: Buffer | string,
     destinationChain: Buffer | string,
-    toAddresses: string[], 
-    fromAddresses: string[],
-    changeAddresses: string[] = undefined,
-    asOf: BN = UnixNow(),
+    fromAddressHex: string, 
+    fromAddressBech: string, 
+    toAddresses: string[],
     locktime: BN = new BN(0), 
-    threshold: number = 1
-  ): Promise<UnsignedTx> => {
-    
-    let prefixes: object = {};
-    toAddresses.map((a: string) => {
-      prefixes[a.split('-')[0]] = true;
-    });
-    if(Object.keys(prefixes).length !== 1){
-      throw new Error('Error - EVMAPI.buildExportTx: To addresses must have the same chainID prefix.');
-    }
-    
-    if(typeof destinationChain === "undefined") {
-      throw new Error('Error - EVMAPI.buildExportTx: Destination ChainID is undefined.');
-    } else if (typeof destinationChain === "string") {
-      destinationChain = bintools.cb58Decode(destinationChain); //
-    } else if(!(destinationChain instanceof Buffer)) {
-      throw new Error(`Error - EVMAPI.buildExportTx: Invalid destinationChain type: ${typeof destinationChain}`);
-    }
-    if(destinationChain.length !== 32) {
-      throw new Error('Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.');
-    }
+    threshold: number = 1,
+    nonce: number = 0
+  ): Promise<UnsignedTx> => { 
+    const fee: BN = new BN(1000000);
+    const inputs: EVMInput[] = [];
+    const input: EVMInput = new EVMInput(fromAddressHex, amount, assetID, nonce);
+    input.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
+    inputs.push(input);
 
-    let to: Buffer[] = [];
-    toAddresses.map((a: string) => {
-      to.push(bintools.stringToAddress(a));
-    });
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
+    const exportedOuts: TransferableOutput[] = [];
+    const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amount.sub(fee), to, locktime, threshold);
+    const transferableOutput: TransferableOutput = new TransferableOutput(bintools.cb58Decode(assetID), secpTransferOutput);
+    exportedOuts.push(transferableOutput);
 
-    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
-    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
-
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
-
-    const builtUnsignedTx: UnsignedTx = utxoset.buildExportTx(
+    const exportTx: ExportTx = new ExportTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
-      amount,
-      avaxAssetID, 
-      to,
-      from,
-      change,
-      destinationChain,
-      this.getTxFee(), 
-      avaxAssetID,
-      asOf, locktime, threshold
+      bintools.cb58Decode(destinationChain),
+      inputs,
+      exportedOuts
     );
-
-    // if(! await this.checkGooseEgg(builtUnsignedTx)) {
-    //   /* istanbul ignore next */
-    //   throw new Error("Failed Goose Egg Check");
-    // }
-
-    return builtUnsignedTx;
+    const unsignedTx: UnsignedTx = new UnsignedTx(exportTx);
+    return unsignedTx;
   };
 
   /**
