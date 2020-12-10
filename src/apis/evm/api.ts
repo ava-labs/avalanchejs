@@ -523,13 +523,26 @@ export class EVMAPI extends JRPCAPI {
     if(destinationChain.length !== 32) {
       throw new Error("Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
-    // TODO - fetch fee
-    const fee: BN = new BN(1000000);
+    const fee: BN = this.getTxFee();
 
+    const assetDescription: any = await this.getAssetDescription("AVAX");
     const evmInputs: EVMInput[] = [];
-    const evmInput: EVMInput = new EVMInput(fromAddressHex, amount.add(fee), assetID, nonce);
-    evmInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
-    evmInputs.push(evmInput);
+    if(bintools.cb58Encode(assetDescription.assetID) === assetID) {
+      const evmInput: EVMInput = new EVMInput(fromAddressHex, amount.add(fee), assetID, nonce);
+      evmInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
+      evmInputs.push(evmInput);
+    } else {
+      // if asset id isn't AVAX asset id then create 2 inputs
+      // first input will be AVAX and will be for the amount of the fee
+      // second input will be the ANT
+      const evmAVAXInput: EVMInput = new EVMInput(fromAddressHex, fee, assetDescription.assetID, nonce);
+      evmAVAXInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
+      evmInputs.push(evmAVAXInput);
+
+      const evmANTInput: EVMInput = new EVMInput(fromAddressHex, amount, assetID, nonce);
+      evmANTInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
+      evmInputs.push(evmANTInput);
+    }
 
     const to: Buffer[] = [];
     toAddresses.map((address: string) => {
