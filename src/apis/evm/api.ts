@@ -500,29 +500,55 @@ export class EVMAPI extends JRPCAPI {
     fromAddressHex: string, 
     fromAddressBech: string, 
     toAddresses: string[],
+    nonce: number = 0,
     locktime: BN = new BN(0), 
-    threshold: number = 1,
-    nonce: number = 0
+    threshold: number = 1
   ): Promise<UnsignedTx> => { 
-    const fee: BN = new BN(1000000);
-    const inputs: EVMInput[] = [];
-    const input: EVMInput = new EVMInput(fromAddressHex, amount, assetID, nonce);
-    input.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
-    inputs.push(input);
 
-    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
+    let prefixes: object = {};
+    toAddresses.map((address: string) => {
+      prefixes[address.split("-")[0]] = true;
+    });
+    if(Object.keys(prefixes).length !== 1){
+      throw new Error("Error - EVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
+    }
+    
+    if(typeof destinationChain === "undefined") {
+      throw new Error("Error - EVMAPI.buildExportTx: Destination ChainID is undefined.");
+    } else if (typeof destinationChain === "string") {
+      destinationChain = bintools.cb58Decode(destinationChain); 
+    } else if(!(destinationChain instanceof Buffer)) {
+      throw new Error(`Error - EVMAPI.buildExportTx: Invalid destinationChain type: ${typeof destinationChain}`);
+    }
+    if(destinationChain.length !== 32) {
+      throw new Error("Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
+    }
+    // TODO - fetch fee
+    const fee: BN = new BN(1000000);
+
+    const evmInputs: EVMInput[] = [];
+    const evmInput: EVMInput = new EVMInput(fromAddressHex, amount.add(fee), assetID, nonce);
+    evmInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech));
+    evmInputs.push(evmInput);
+
+    const to: Buffer[] = [];
+    toAddresses.map((address: string) => {
+      to.push(bintools.stringToAddress(address));
+    });
+
     const exportedOuts: TransferableOutput[] = [];
-    const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amount.sub(fee), to, locktime, threshold);
+    const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amount, to, locktime, threshold);
     const transferableOutput: TransferableOutput = new TransferableOutput(bintools.cb58Decode(assetID), secpTransferOutput);
     exportedOuts.push(transferableOutput);
 
     const exportTx: ExportTx = new ExportTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
-      bintools.cb58Decode(destinationChain),
-      inputs,
+      destinationChain,
+      evmInputs,
       exportedOuts
     );
+
     const unsignedTx: UnsignedTx = new UnsignedTx(exportTx);
     return unsignedTx;
   };
