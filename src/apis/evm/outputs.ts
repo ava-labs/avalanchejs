@@ -6,11 +6,10 @@ import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
-import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
+import { SerializedEncoding } from '../../utils/serialization';
 
 const bintools: BinTools = BinTools.getInstance();
-const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -80,16 +79,16 @@ export class SECPTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
-  getOutputID():number {
+  getOutputID(): number {
     return this._typeID;
   }
 
-  create(...args:any[]):this{
+  create(...args: any[]): this{
     return new SECPTransferOutput(...args) as this;
   }
 
-  clone():this {
-    const newout:SECPTransferOutput = this.create()
+  clone(): this {
+    const newout: SECPTransferOutput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
@@ -148,7 +147,7 @@ export class EVMOutput {
   /**
    * Returns a base-58 representation of the [[EVMOutput]].
    */
-  toString():string {
+  toString(): string {
     return bintools.bufferToB58(this.toBuffer());
   }
 
@@ -185,7 +184,7 @@ export class EVMOutput {
       }
 
       // convert number amount to BN
-      let amnt:BN;
+      let amnt: BN;
       if (typeof amount === 'number') {
         amnt = new BN(amount);
       } else {

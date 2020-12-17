@@ -12,14 +12,12 @@ import { EVMStandardTx, EVMStandardUnsignedTx } from '../../common/evmtx';
 import createHash from 'create-hash';
 import { EVMBaseTx } from './basetx';
 import { ImportTx } from './importtx';
-// import { ExportTx } from './exporttx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
@@ -28,7 +26,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[BaseTx]]-extended class.
  */
-export const SelectTxClass = (txtype:number, ...args:Array<any>):EVMBaseTx => {
+export const SelectTxClass = (txtype: number, ...args: any[]): EVMBaseTx => {
   // if (txtype === EVMConstants.BASETX) {
   //   return new BaseTx(...args);
   if (txtype === EVMConstants.IMPORTTX) {
@@ -47,20 +45,20 @@ export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBase
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.transaction = SelectTxClass(fields["transaction"]["_typeID"]);
     this.transaction.deserialize(fields["transaction"], encoding);
   }
 
-  getTransaction():EVMBaseTx{
+  getTransaction(): EVMBaseTx{
     return this.transaction as EVMBaseTx;
   }
 
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
-    const txtype:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    const txtype: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.transaction = SelectTxClass(txtype);
     return this.transaction.fromBuffer(bytes, offset);
@@ -73,10 +71,10 @@ export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBase
    *
    * @returns A signed [[StandardTx]]
    */
-  sign(kc:KeyChain):Tx {
+  sign(kc: KeyChain): Tx {
     const txbuff = this.toBuffer();
-    const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
-    const sigs:Array<Credential> = this.transaction.sign(msg, kc);
+    const msg: Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
+    const sigs: Credential[] = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
 
@@ -88,13 +86,13 @@ export class Tx extends EVMStandardTx<KeyPair, KeyChain, UnsignedTx> {
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.unsignedTx = new UnsignedTx();
     this.unsignedTx.deserialize(fields["unsignedTx"], encoding);
     this.credentials = [];
-    for(let i = 0; i < fields["credentials"].length; i++){
-      const cred:Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
+    for(let i: number = 0; i < fields["credentials"].length; i++){
+      const cred: Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
       cred.deserialize(fields["credentials"][i], encoding);
       this.credentials.push(cred);
     }
@@ -108,16 +106,16 @@ export class Tx extends EVMStandardTx<KeyPair, KeyChain, UnsignedTx> {
    *
    * @returns The length of the raw [[Tx]]
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.unsignedTx = new UnsignedTx();
     offset = this.unsignedTx.fromBuffer(bytes, offset);
     const numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.credentials = [];
-    for (let i = 0; i < numcreds; i++) {
-      const credid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    for (let i: number = 0; i < numcreds; i++) {
+      const credid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
       offset += 4;
-      const cred:Credential = SelectCredentialClass(credid);
+      const cred: Credential = SelectCredentialClass(credid);
       offset = cred.fromBuffer(bytes, offset);
       this.credentials.push(cred);
     }

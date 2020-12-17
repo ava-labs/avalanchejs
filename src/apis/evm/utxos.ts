@@ -1,22 +1,19 @@
 /**
  * @packageDocumentation
  * @module API-EVM-UTXOs
-  */
- import { Buffer } from 'buffer/';
- import BinTools from '../../utils/bintools';
- import BN from "bn.js";
- import { AmountOutput, SelectOutputClass, TransferableOutput, SECPTransferOutput, EVMOutput } from './outputs';
- import { EVMConstants } from './constants';
-//  import { UnsignedTx } from './tx';
- import { EVMInput, SECPTransferInput, TransferableInput } from './inputs';
- import { Output, OutputOwners } from '../../common/output';
- import { UnixNow } from '../../utils/helperfunctions';
- import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
-//  import { ExportTx } from './exporttx';
-//  import { ImportTx } from './importtx';
- import { PlatformChainID } from '../../utils/constants';
- import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
- import { Serialization, SerializedEncoding } from '../../utils/serialization';
+ */
+import { Buffer } from 'buffer/';
+import BinTools from '../../utils/bintools';
+import BN from "bn.js";
+import { AmountOutput, SelectOutputClass, TransferableOutput, EVMOutput } from './outputs';
+import { EVMConstants } from './constants';
+import { EVMInput, SECPTransferInput, TransferableInput } from './inputs';
+import { Output } from '../../common/output';
+import { UnixNow } from '../../utils/helperfunctions';
+import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
+import { PlatformChainID } from '../../utils/constants';
+import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
+import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import { UnsignedTx } from './tx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
@@ -24,8 +21,8 @@ import { ExportTx } from './exporttx';
  /**
   * @ignore
   */
- const bintools = BinTools.getInstance();
- const serializer = Serialization.getInstance();
+ const bintools: BinTools = BinTools.getInstance();
+ const serializer: Serialization = Serialization.getInstance();
  
  /**
   * Class for representing a single UTXO.

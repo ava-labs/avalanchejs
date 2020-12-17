@@ -8,7 +8,6 @@ import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
-import { UnixNow } from '../../utils/helperfunctions';
 import { 
   UTXOSet,
   UTXO 
@@ -22,7 +21,6 @@ import {
   Index, 
   UTXOResponse 
 } from './../../common/interfaces'
-import { Input } from 'src/common';
 import { EVMInput } from './inputs';
 import { SECPTransferOutput, TransferableOutput } from './outputs';
 import { ExportTx } from './exporttx';

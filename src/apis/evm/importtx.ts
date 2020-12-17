@@ -13,7 +13,6 @@ import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
-import { Serializer } from 'v8';
 
 /**
  * @ignore

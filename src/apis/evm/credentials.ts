@@ -22,8 +22,8 @@ export const SelectCredentialClass = (credid: number, ...args: any[]): Credentia
 };
 
 export class SECPCredential extends Credential {
-  protected _typeName = "SECPCredential";
-  protected _typeID = EVMConstants.SECPCREDENTIAL;
+  protected _typeName: string = "SECPCredential";
+  protected _typeID: number = EVMConstants.SECPCREDENTIAL;
 
   //serialize and deserialize both are inherited
 
@@ -37,7 +37,7 @@ export class SECPCredential extends Credential {
     return newbase as this;
   }
 
-  create(...args: any[]):this {
+  create(...args: any[]): this {
     return new SECPCredential(...args) as this;
   }
 
