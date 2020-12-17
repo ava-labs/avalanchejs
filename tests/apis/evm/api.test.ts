@@ -168,18 +168,20 @@ describe('EVMAPI', () => {
   });
 
   test('refreshBlockchainID', async () => {
-    let n5bcID: string = Defaults.network[5].C["blockchainID"];
-    let n12345bcID: string = Defaults.network[12345].C["blockchainID"];
-    let testAPI: EVMAPI = new EVMAPI(avalanche, '/ext/bc/C/avax', n5bcID);
-    let bc1: string = testAPI.getBlockchainID();
+    const n5bcID: string = Defaults.network[5].C["blockchainID"];
+    const n12345bcID: string = Defaults.network[12345].C["blockchainID"];
+    const testAPI: EVMAPI = new EVMAPI(avalanche, '/ext/bc/C/avax', n5bcID);
+    const bc1: string = testAPI.getBlockchainID();
     expect(bc1).toBe(n5bcID);
 
-    testAPI.refreshBlockchainID();
-    let bc2: string = testAPI.getBlockchainID();
+    let res: boolean = testAPI.refreshBlockchainID();
+    expect(res).toBeTruthy();
+    const bc2: string = testAPI.getBlockchainID();
     expect(bc2).toBe(n12345bcID);
 
-    testAPI.refreshBlockchainID(n5bcID);
-    let bc3: string = testAPI.getBlockchainID();
+    res = testAPI.refreshBlockchainID(n5bcID);
+    expect(res).toBeTruthy();
+    const bc3: string = testAPI.getBlockchainID();
     expect(bc3).toBe(n5bcID);
 
   });

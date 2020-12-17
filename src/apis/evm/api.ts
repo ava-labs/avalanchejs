@@ -97,18 +97,20 @@ export class EVMAPI extends JRPCAPI {
    *
    * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
    *
-   * @returns The blockchainID
+   * @returns A boolean if the blockchainID was successfully refreshed.
    */
   refreshBlockchainID = (blockchainID: string = undefined): boolean => {
     const netID: number = this.core.getNetworkID();
     if (typeof blockchainID === 'undefined' && typeof Defaults.network[netID] !== "undefined") {
-      // TODO - confirm `blockchainID` is working instead of `blockchainID`
       this.blockchainID = Defaults.network[netID].C.blockchainID; //default to C-Chain
       return true;
-    } if (typeof blockchainID === 'string') {
+    } 
+    
+    if (typeof blockchainID === 'string') {
       this.blockchainID = blockchainID;
       return true;
     }
+
     return false;
   };
 
@@ -257,7 +259,8 @@ export class EVMAPI extends JRPCAPI {
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
    * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
-   * @param sourceChain A string for the chain to look for the UTXO's. Default is to use this chain, but if exported UTXOs exist from other chains, this can used to pull them instead.
+   * @param sourceChain A string for the chain to look for the UTXO's. Default is to use this chain, but if exported UTXOs exist 
+   * from other chains, this can used to pull them instead.
    * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
