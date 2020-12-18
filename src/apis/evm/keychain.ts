@@ -2,9 +2,13 @@
  * @packageDocumentation
  * @module API-EVM-KeyChain
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
+import { 
+  SECP256k1KeyChain, 
+  SECP256k1KeyPair 
+} from '../../common/secp256k1';
 
 /**
  * @ignore
@@ -15,7 +19,7 @@ const bintools: BinTools = BinTools.getInstance();
  * Class for representing a private and public keypair on an AVM Chain. 
  */
 export class KeyPair extends SECP256k1KeyPair {
-  protected chainid: string = '';
+  protected chainID: string = '';
   protected hrp: string = '';
 
   /**
@@ -25,7 +29,7 @@ export class KeyPair extends SECP256k1KeyPair {
     */
   getAddressString = (): string => {
     const addr: Buffer = this.addressFromPublicKey(this.pubk);
-    return bintools.addressToString(this.hrp, this.chainid, addr);
+    return bintools.addressToString(this.hrp, this.chainID, addr);
   }
 
   /**
@@ -33,15 +37,15 @@ export class KeyPair extends SECP256k1KeyPair {
     *
     * @returns The [[KeyPair]]'s chainID
     */
-  getChainID = (): string => this.chainid;
+  getChainID = (): string => this.chainID;
 
   /**
     * Sets the the chainID associated with this key.
     *
-    * @param chainid String for the chainID
+    * @param chainID String for the chainID
     */
-  setChainID = (chainid: string): void => {
-    this.chainid = chainid;
+  setChainID = (chainID: string): void => {
+    this.chainID = chainID;
   };
 
   /**
@@ -61,7 +65,7 @@ export class KeyPair extends SECP256k1KeyPair {
   };
 
   clone(): this {
-    let newkp: KeyPair = new KeyPair(this.hrp, this.chainid);
+    let newkp: KeyPair = new KeyPair(this.hrp, this.chainID);
     newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
     return newkp as this;
   }
@@ -70,12 +74,12 @@ export class KeyPair extends SECP256k1KeyPair {
     if(args.length == 2){
       return new KeyPair(args[0], args[1]) as this;
     }
-    return new KeyPair(this.hrp, this.chainid) as this;
+    return new KeyPair(this.hrp, this.chainID) as this;
   }
 
   constructor(hrp: string, chainid: string) {
     super();
-    this.chainid = chainid;
+    this.chainID = chainid;
     this.hrp = hrp;
     this.generateKey();
   }
@@ -88,7 +92,7 @@ export class KeyPair extends SECP256k1KeyPair {
   */
 export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   hrp: string = '';
-  chainid: string = '';
+  chainID: string = '';
 
   /**
     * Makes a new key pair, returns the address.
@@ -96,25 +100,26 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
     * @returns The new key pair
     */
   makeKey = (): KeyPair => {
-    let keypair: KeyPair = new KeyPair(this.hrp, this.chainid);
+    let keypair: KeyPair = new KeyPair(this.hrp, this.chainID);
     this.addKey(keypair);
     return keypair
   }
 
   addKey = (newKey: KeyPair) => {
-    newKey.setChainID(this.chainid);
+    newKey.setChainID(this.chainID);
     super.addKey(newKey);
   }
 
   /**
     * Given a private key, makes a new key pair, returns the address.
     * 
-    * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
+    * @param privk A {@link https://github.com/feross/buffer|Buffer} 
+    * or cb58 serialized string representing the private key 
     * 
     * @returns The new key pair
     */
   importKey = (privk: Buffer | string): KeyPair => {
-    let keypair: KeyPair = new KeyPair(this.hrp, this.chainid);
+    let keypair: KeyPair = new KeyPair(this.hrp, this.chainID);
     let pk: Buffer;
     if(typeof privk === 'string'){
       pk = bintools.cb58Decode(privk.split('-')[1]);
@@ -132,11 +137,11 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
     if(args.length == 2){
       return new KeyChain(args[0], args[1]) as this;
     }
-    return new KeyChain(this.hrp, this.chainid) as this;
+    return new KeyChain(this.hrp, this.chainID) as this;
   };
 
   clone(): this {
-    const newkc: KeyChain = new KeyChain(this.hrp, this.chainid);
+    const newkc: KeyChain = new KeyChain(this.hrp, this.chainID);
     for(let k in this.keys){
       newkc.addKey(this.keys[k].clone());
     }
@@ -154,9 +159,9 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   /**
     * Returns instance of KeyChain.
     */
-  constructor(hrp: string, chainid: string){
+  constructor(hrp: string, chainID: string){
     super();
     this.hrp = hrp;
-    this.chainid = chainid;
+    this.chainID = chainID;
   }
 }

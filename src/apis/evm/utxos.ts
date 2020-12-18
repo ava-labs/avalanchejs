@@ -132,16 +132,16 @@ import { ExportTx } from './exporttx';
      super.deserialize(fields, encoding);
      let utxos = {};
      for(let utxoid in fields["utxos"]){
-       let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+       let utxoidCleaned: string = serializer.decoder(utxoid, encoding, "base58", "base58");
        utxos[utxoidCleaned] = new UTXO();
        utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding);
      }
      let addressUTXOs = {};
      for(let address in fields["addressUTXOs"]){
-       let addressCleaned:string = serializer.decoder(address, encoding, "cb58", "hex");
+       let addressCleaned: string = serializer.decoder(address, encoding, "cb58", "hex");
        let utxobalance = {};
        for(let utxoid in fields["addressUTXOs"][address]){
-         let utxoidCleaned:string = serializer.decoder(utxoid, encoding, "base58", "base58");
+         let utxoidCleaned: string = serializer.decoder(utxoid, encoding, "base58", "base58");
          utxobalance[utxoidCleaned] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
        }
        addressUTXOs[addressCleaned] = utxobalance;
@@ -182,33 +182,32 @@ import { ExportTx } from './exporttx';
    }
  
    getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
-     const utxoArray:Array<UTXO> = this.getAllUTXOs();
-     const outids:object = {};
-     for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
-       const u:UTXO = utxoArray[i];
-       const assetKey:string = u.getAssetID().toString("hex");
-       const fromAddresses:Array<Buffer> = aad.getSenders();
+     const utxoArray:UTXO[] = this.getAllUTXOs();
+     const outids: object = {};
+     for(let i: number = 0; i < utxoArray.length && !aad.canComplete(); i++) {
+       const u: UTXO = utxoArray[i];
+       const assetKey: string = u.getAssetID().toString("hex");
+       const fromAddresses: Buffer[] = aad.getSenders();
        if(u.getOutput() instanceof AmountOutput && aad.assetExists(assetKey) && u.getOutput().meetsThreshold(fromAddresses, asOf)) {
-         const am:AssetAmount = aad.getAssetAmount(assetKey);
+         const am: AssetAmount = aad.getAssetAmount(assetKey);
          if(!am.isFinished()){
-           const uout:AmountOutput = u.getOutput() as AmountOutput;
+           const uout: AmountOutput = u.getOutput() as AmountOutput;
            outids[assetKey] = uout.getOutputID();
            const amount = uout.getAmount();
            am.spendAmount(amount);
-           const txid:Buffer = u.getTxID();
-           const outputidx:Buffer = u.getOutputIdx();
-           const input:SECPTransferInput = new SECPTransferInput(amount);
-           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
-           const spenders:Array<Buffer> = uout.getSpenders(fromAddresses, asOf);
-           for (let j = 0; j < spenders.length; j++) {
-             const idx:number = uout.getAddressIdx(spenders[j]);
+           const txid: Buffer = u.getTxID();
+           const outputidx: Buffer = u.getOutputIdx();
+           const input: SECPTransferInput = new SECPTransferInput(amount);
+           const xferin: TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
+           const spenders: Buffer[] = uout.getSpenders(fromAddresses, asOf);
+           spenders.forEach((spender: Buffer) => {
+             const idx: number = uout.getAddressIdx(spender);
              if (idx === -1) {
                /* istanbul ignore next */
-               throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
-               + `address in output: ${spenders[j]}`);
+               throw new Error(`Error - UTXOSet.getMinimumSpendable: no such address in output: ${spender}`);
              }
-             xferin.getInput().addSignatureIdx(idx, spenders[j]);
-           }
+             xferin.getInput().addSignatureIdx(idx, spender);
+           });
            aad.addInput(xferin);
          } else if(aad.assetExists(assetKey) && !(u.getOutput() instanceof AmountOutput)){
            /**
@@ -225,25 +224,24 @@ import { ExportTx } from './exporttx';
        }
      }
      if(!aad.canComplete()) {
-       return new Error('Error - UTXOSet.getMinimumSpendable: insufficient '
-       + 'funds to create the transaction');
+       return new Error(`Error - UTXOSet.getMinimumSpendable: insufficient funds to create the transaction`);
      }
-     const amounts:Array<AssetAmount> = aad.getAmounts();
-     const zero:BN = new BN(0);
-     for(let i = 0; i < amounts.length; i++) {
-       const assetKey:string = amounts[i].getAssetIDString();
-       const amount:BN = amounts[i].getAmount();
+     const amounts: AssetAmount[] = aad.getAmounts();
+     const zero: BN = new BN(0);
+     for(let i: number = 0; i < amounts.length; i++) {
+       const assetKey: string = amounts[i].getAssetIDString();
+       const amount: BN = amounts[i].getAmount();
        if (amount.gt(zero)) {
-         const spendout:AmountOutput = SelectOutputClass(outids[assetKey],
+         const spendout: AmountOutput = SelectOutputClass(outids[assetKey],
            amount, aad.getDestinations(), locktime, threshold) as AmountOutput;
-         const xferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
+         const xferout: TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), spendout);
          aad.addOutput(xferout);
        }
-       const change:BN = amounts[i].getChange();
+       const change: BN = amounts[i].getChange();
        if (change.gt(zero)) {
-         const changeout:AmountOutput = SelectOutputClass(outids[assetKey],
+         const changeout: AmountOutput = SelectOutputClass(outids[assetKey],
            change, aad.getChangeAddresses()) as AmountOutput;
-         const chgxferout:TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
+         const chgxferout: TransferableOutput = new TransferableOutput(amounts[i].getAssetID(), changeout);
          aad.addChange(chgxferout);
        }
      }

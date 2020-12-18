@@ -45,7 +45,6 @@ export class TransferableOutput extends StandardTransferableOutput{
     this.output = SelectOutputClass(outputid);
     return this.output.fromBuffer(bytes, offset);
   }
-
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
@@ -59,11 +58,11 @@ export abstract class AmountOutput extends StandardAmountOutput {
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */
   makeTransferable(assetID: Buffer): TransferableOutput {
-      return new TransferableOutput(assetID, this);
+    return new TransferableOutput(assetID, this);
   }
 
-  select(id:number, ...args: any[]): Output {
-      return SelectOutputClass(id, ...args);
+  select(id: number, ...args: any[]): Output {
+    return SelectOutputClass(id, ...args);
   }
 }
 
@@ -165,14 +164,14 @@ export class EVMOutput {
    *
    * @param address The address recieving the asset as a {@link https://github.com/feross/buffer|Buffer} or a string.
    * @param amount A {@link https://github.com/indutny/bn.js/|BN} or number representing the amount.
-   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer} or a string.
+   * @param assetID The assetID which is being sent as a {@link https://github.com/feross/buffer|Buffer} or a string.
    */
   constructor(
     address: Buffer | string = undefined, 
     amount: BN | number = undefined, 
-    assetid: Buffer | string = undefined
+    assetID: Buffer | string = undefined
   ) {
-    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetid !== 'undefined') {
+    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetID !== 'undefined') {
       if(typeof address === 'string') {
         // if present then remove `0x` prefix
         let prefix: string = address.substring(0, 2);
@@ -190,15 +189,15 @@ export class EVMOutput {
         amnt = amount;
       }
 
-      // convert string assetid to Buffer
-      if(!(assetid instanceof Buffer)) {
-        assetid = bintools.cb58Decode(assetid);
+      // convert string assetID to Buffer
+      if(!(assetID instanceof Buffer)) {
+        assetID = bintools.cb58Decode(assetID);
       }
 
       this.address = address;
       this.amountValue = amnt.clone();
       this.amount = bintools.fromBNToBuffer(amnt, 8);
-      this.assetID = assetid;
+      this.assetID = assetID;
     }
   }
 }  

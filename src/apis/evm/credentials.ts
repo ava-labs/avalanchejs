@@ -42,8 +42,8 @@ export class SECPCredential extends Credential {
   }
 
   select(id: number, ...args: any[]): Credential {
-    let newbasetx: Credential = SelectCredentialClass(id, ...args);
-    return newbasetx;
+    let credential: Credential = SelectCredentialClass(id, ...args);
+    return credential;
   }
 }
 

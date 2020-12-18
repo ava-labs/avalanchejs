@@ -5,8 +5,12 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
-import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { 
+  Input, 
+  StandardTransferableInput, 
+  StandardAmountInput 
+} from '../../common/input';
+import { SerializedEncoding } from '../../utils/serialization';
 import { EVMOutput } from './outputs';
 import BN from 'bn.js';
 import { SigIdx } from '../../common/credentials';
@@ -19,16 +23,16 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
  *
- * @param inputid A number representing the inputID parsed prior to the bytes passed in
+ * @param inputID A number representing the inputID parsed prior to the bytes passed in
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
-  if (inputid === EVMConstants.SECPINPUTID) {
+export const SelectInputClass = (inputID: number, ...args: any[]): Input => {
+  if (inputID === EVMConstants.SECPINPUTID) {
     return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
+  throw new Error(`Error - SelectInputClass: unknown inputID ${inputID}`);
 };
 
 export class TransferableInput extends StandardTransferableInput {
@@ -172,9 +176,9 @@ export class EVMInput extends EVMOutput {
   }
 
   clone(): this {
-    const newin: EVMInput = this.create();
-    newin.fromBuffer(this.toBuffer());
-    return newin as this;
+    const newEVMInput: EVMInput = this.create();
+    newEVMInput.fromBuffer(this.toBuffer());
+    return newEVMInput as this;
   }
 
   /**
@@ -182,16 +186,16 @@ export class EVMInput extends EVMOutput {
    *
    * @param address is the EVM address from which to transfer funds.
    * @param amount is the amount of the asset to be transferred (specified in nAVAX for AVAX and the smallest denomination for all other assets).
-   * @param assetid The asset id which is being sent as a {@link https://github.com/feross/buffer|Buffer} or as a string.
+   * @param assetID The assetID which is being sent as a {@link https://github.com/feross/buffer|Buffer} or as a string.
    * @param nonce A {@link https://github.com/indutny/bn.js/|BN} or a number representing the nonce.
    */
   constructor(
     address: Buffer | string = undefined, 
     amount: BN | number = undefined, 
-    assetid: Buffer | string = undefined,
+    assetID: Buffer | string = undefined,
     nonce: BN | number = undefined
   ) {
-    super(address, amount, assetid);
+    super(address, amount, assetID);
 
     if (typeof nonce !== 'undefined') {
       // convert number nonce to BN

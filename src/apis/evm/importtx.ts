@@ -10,10 +10,20 @@ import { EVMOutput } from './outputs';
 import { TransferableInput } from './inputs';
 import { EVMBaseTx } from './basetx';
 import { SelectCredentialClass } from './credentials';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { KeyChain, KeyPair } from './keychain';
+import { 
+  Signature, 
+  SigIdx, 
+  Credential 
+} from '../../common/credentials';
+import { 
+  KeyChain, 
+  KeyPair 
+} from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { 
+  Serialization, 
+  SerializedEncoding 
+} from '../../utils/serialization';
 
 /**
  * @ignore
@@ -40,7 +50,7 @@ export class ImportTx extends EVMBaseTx {
     super.deserialize(fields, encoding);
     this.sourceChain = serializer.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
     this.importIns = fields["importIns"].map((i:object) => {
-      let ii:TransferableInput = new TransferableInput();
+      let ii: TransferableInput = new TransferableInput();
       ii.deserialize(i, encoding);
       return ii;
     });
@@ -73,6 +83,7 @@ export class ImportTx extends EVMBaseTx {
      * populates the class, and returns the length of the [[ImportTx]] in bytes.
      *
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ImportTx]]
+     * @param offset A number representing the byte offset. Defaults to 0.
      *
      * @returns The length of the raw [[ImportTx]]
      *
