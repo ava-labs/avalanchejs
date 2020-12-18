@@ -14,15 +14,15 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
  *
- * @param outputid A number representing the inputID parsed prior to the bytes passed in
+ * @param outputID A number representing the outputID parsed prior to the bytes passed in
  *
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid: number, ...args: any[]): Output => {
-  if(outputid == EVMConstants.SECPXFEROUTPUTID){
+export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
+  if(outputID == EVMConstants.SECPXFEROUTPUTID){
     return new SECPTransferOutput( ...args);
   }
-  throw new Error(`Error - SelectOutputClass: unknown outputid ${outputid}`);
+  throw new Error(`Error - SelectOutputClass: unknown outputID ${outputID}`);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
@@ -98,7 +98,7 @@ export class EVMOutput {
   protected address: Buffer = Buffer.alloc(20); 
   protected amount: Buffer = Buffer.alloc(8);
   protected amountValue: BN = new BN(0);
-  protected assetid: Buffer = Buffer.alloc(32);
+  protected assetID: Buffer = Buffer.alloc(32);
 
   /**
    * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
@@ -108,8 +108,7 @@ export class EVMOutput {
   /**
    * Returns the address as a bech32 encoded string.
    */
-  // TODO - Get getAddressString to work. Why is `getPreferredHRP(networkID)` failing?
-  // getAddressString = (networkID: number = 1, blockchainID: string = "X"): string => {return bintools.addressToString(getPreferredHRP(networkID), blockchainID, this.address)}
+  getAddressString = (): string => this.address.toString('hex');
 
   /**
    * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
@@ -119,14 +118,14 @@ export class EVMOutput {
   /**
    * Returns the assetid of the input as {@link https://github.com/feross/buffer|Buffer}
    */ 
-  getAssetID = (): Buffer => this.assetid;
+  getAssetID = (): Buffer => this.assetID;
  
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[EVMOutput]].
    */
   toBuffer():Buffer {
-    const bsize: number = this.address.length + this.amount.length + this.assetid.length;
-    const barr: Buffer[] = [this.address, this.amount, this.assetid];
+    const bsize: number = this.address.length + this.amount.length + this.assetID.length;
+    const barr: Buffer[] = [this.address, this.amount, this.assetID];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -139,7 +138,7 @@ export class EVMOutput {
     offset += 20;
     this.amount = bintools.copyFrom(bytes, offset, offset + 8);
     offset += 8;
-    this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
+    this.assetID = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     return offset;
   }
@@ -156,9 +155,9 @@ export class EVMOutput {
   }
 
   clone(): this {
-    const newout: EVMOutput = this.create();
-    newout.fromBuffer(this.toBuffer());
-    return newout as this;
+    const newEVMOutput: EVMOutput = this.create();
+    newEVMOutput.fromBuffer(this.toBuffer());
+    return newEVMOutput as this;
   }
 
   /**
@@ -199,7 +198,7 @@ export class EVMOutput {
       this.address = address;
       this.amountValue = amnt.clone();
       this.amount = bintools.fromBNToBuffer(amnt, 8);
-      this.assetid = assetid;
+      this.assetID = assetid;
     }
   }
 }  

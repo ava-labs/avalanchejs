@@ -2,6 +2,7 @@
  * @packageDocumentation
  * @module API-EVM-ImportTx
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
@@ -68,7 +69,8 @@ export class ImportTx extends EVMBaseTx {
   }
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, populates the class, and returns the length of the [[ImportTx]] in bytes.
+     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, 
+     * populates the class, and returns the length of the [[ImportTx]] in bytes.
      *
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ImportTx]]
      *

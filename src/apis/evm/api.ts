@@ -2,6 +2,7 @@
  * @packageDocumentation
  * @module API-EVM
  */
+
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import AvalancheCore from '../../avalanche';
@@ -13,7 +14,10 @@ import {
   UTXO 
 } from './utxos';
 import { KeyChain } from './keychain';
-import { Defaults, PrimaryAssetAlias } from '../../utils/constants';
+import { 
+  Defaults, 
+  PrimaryAssetAlias 
+} from '../../utils/constants';
 import { Tx, UnsignedTx } from './tx';
 import { EVMConstants } from './constants';
 import { 
@@ -22,13 +26,16 @@ import {
   UTXOResponse 
 } from './../../common/interfaces'
 import { EVMInput } from './inputs';
-import { SECPTransferOutput, TransferableOutput } from './outputs';
+import { 
+  SECPTransferOutput, 
+  TransferableOutput 
+} from './outputs';
 import { ExportTx } from './exporttx';
 
 /**
  * @ignore
  */
-const bintools:BinTools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Class for interacting with a node's EVMAPI 

@@ -9,9 +9,16 @@ import { EVMConstants } from './constants';
 import { KeyChain, KeyPair } from './keychain';
 import { EVMBaseTx } from './basetx';
 import { SelectCredentialClass } from './credentials';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
+import { 
+  Signature, 
+  SigIdx, 
+  Credential 
+} from '../../common/credentials';
 import { EVMInput } from './inputs';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { 
+  Serialization, 
+  SerializedEncoding 
+} from '../../utils/serialization';
 import { TransferableOutput } from './outputs';
 
 /**
@@ -76,7 +83,6 @@ export class ExportTx extends EVMBaseTx {
     this.numExportedOutputs.writeUInt32BE(this.exportedOutputs.length, 0);
     let barr: Buffer[] = [super.toBuffer(), this.destinationChain, this.numInputs];
     let bsize: number = super.toBuffer().length + this.destinationChain.length + this.numInputs.length;
-    // this.importIns = this.importIns.sort(TransferableInput.comparator());
     this.inputs.forEach((importIn: EVMInput) => {
       bsize += importIn.toBuffer().length;
       barr.push(importIn.toBuffer());

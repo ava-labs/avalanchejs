@@ -36,27 +36,26 @@ export class KeyPair extends SECP256k1KeyPair {
   getChainID = (): string => this.chainid;
 
   /**
-   * Sets the the chainID associated with this key.
-      *
-      * @param chainid String for the chainID
-      */
+    * Sets the the chainID associated with this key.
+    *
+    * @param chainid String for the chainID
+    */
   setChainID = (chainid: string): void => {
     this.chainid = chainid;
   };
-    
 
   /**
-   * Returns the Human-Readable-Part of the network associated with this key.
-      *
-      * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
-      */
+    * Returns the Human-Readable-Part of the network associated with this key.
+    *
+    * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
+    */
   getHRP = (): string => this.hrp;
   
   /**
-   * Sets the the Human-Readable-Part of the network associated with this key.
-      *
-      * @param hrp String for the Human-Readable-Part of Bech32 addresses
-      */
+    * Sets the the Human-Readable-Part of the network associated with this key.
+    *
+    * @param hrp String for the Human-Readable-Part of Bech32 addresses
+    */
   setHRP = (hrp: string): void => {
     this.hrp = hrp;
   };
@@ -83,16 +82,16 @@ export class KeyPair extends SECP256k1KeyPair {
 }
 
 /**
- * Class for representing a key chain in Avalanche. 
- * 
- * @typeparam KeyPair Class extending [[SECP256k1KeyChain]] which is used as the key in [[KeyChain]]
- */
+  * Class for representing a key chain in Avalanche. 
+  * 
+  * @typeparam KeyPair Class extending [[SECP256k1KeyChain]] which is used as the key in [[KeyChain]]
+  */
 export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   hrp: string = '';
   chainid: string = '';
 
   /**
-   * Makes a new key pair, returns the address.
+    * Makes a new key pair, returns the address.
     * 
     * @returns The new key pair
     */
@@ -108,7 +107,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   }
 
   /**
-   * Given a private key, makes a new key pair, returns the address.
+    * Given a private key, makes a new key pair, returns the address.
     * 
     * @param privk A {@link https://github.com/feross/buffer|Buffer} or cb58 serialized string representing the private key 
     * 

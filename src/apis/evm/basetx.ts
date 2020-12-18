@@ -2,25 +2,28 @@
  * @packageDocumentation
  * @module API-EVM-BaseTx
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { KeyChain, KeyPair } from './keychain';
+import { 
+  KeyChain, 
+  KeyPair 
+} from './keychain';
 import { EVMStandardBaseTx } from '../../common/evmtx';
 import { Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
 import { SelectTxClass } from './tx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Class representing a base for all transactions.
  */
-export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
+export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
   protected _typeName = "BaseTx";
   protected _typeID = undefined;
 
@@ -80,9 +83,9 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
   }
 
   clone(): this {
-    let newbase: EVMBaseTx = new EVMBaseTx();
-    newbase.fromBuffer(this.toBuffer());
-    return newbase as this;
+    const newEVMBaseTx: EVMBaseTx = new EVMBaseTx();
+    newEVMBaseTx.fromBuffer(this.toBuffer());
+    return newEVMBaseTx as this;
   }
 
   create(...args: any[]): this {
@@ -90,17 +93,17 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain>{
   }
 
   select(id: number, ...args: any[]): this {
-    let newbasetx: EVMBaseTx = SelectTxClass(id, ...args);
-    return newbasetx as this;
+    const newEVMBaseTx: EVMBaseTx = SelectTxClass(id, ...args);
+    return newEVMBaseTx as this;
   }
 
   /**
-   * Class representing an EVMBaseTx which is the foundation for all transactions.
+   * Class representing an EVMBaseTx which is the foundation for all EVM transactions.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    */
-  constructor( networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16)) {
-    super(networkid, blockchainid);
+  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16)) {
+    super(networkID, blockchainID);
   }
 }
