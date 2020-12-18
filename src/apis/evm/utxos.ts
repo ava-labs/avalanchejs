@@ -340,21 +340,6 @@ import { ExportTx } from './exporttx';
          outs.push(evmOutput);
        }
      });
-     
-     // TODO - review commented out code to confirm that we don't need it.
-     // get remaining fees from the provided addresses
-    //  let feeRemaining: BN = fee.sub(feepaid);
-    //  if(feeRemaining.gt(zero) && this._feeCheck(feeRemaining, feeAssetID)) {
-    //    const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
-    //    aad.addAssetAmount(feeAssetID, zero, feeRemaining);
-    //    const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-    //    if(typeof success === "undefined") {
-    //      ins = aad.getInputs();
-    //      outs = aad.getAllOutputs();
-    //    } else {
-    //      throw success;
-    //    }
-    //  }
 
      const importTx: ImportTx = new ImportTx(networkID, blockchainID, sourceChain, ins, outs);
      return new UnsignedTx(importTx);
