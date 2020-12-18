@@ -1,9 +1,9 @@
 /**
  * @packageDocumentation
- * @module API-PlatformVM-Credentials
+ * @module API-EVM-Credentials
  */
 
-import { PlatformVMConstants } from './constants';
+import { EVMConstants } from './constants';
 import { Credential } from '../../common/credentials';
 
 /**
@@ -13,8 +13,8 @@ import { Credential } from '../../common/credentials';
  *
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
-  if (credid === PlatformVMConstants.SECPCREDENTIAL) {
+export const SelectCredentialClass = (credid: number, ...args: any[]): Credential => {
+  if (credid === EVMConstants.SECPCREDENTIAL) {
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
@@ -22,29 +22,28 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 };
 
 export class SECPCredential extends Credential {
-  protected _typeName = "SECPCredential";
-  protected _typeID = PlatformVMConstants.SECPCREDENTIAL;
+  protected _typeName: string = "SECPCredential";
+  protected _typeID: number = EVMConstants.SECPCREDENTIAL;
 
   //serialize and deserialize both are inherited
 
-  getCredentialID():number {
+  getCredentialID(): number {
     return this._typeID;
   }
 
-
-  clone():this {
-    let newbase:SECPCredential = new SECPCredential();
+  clone(): this {
+    let newbase: SECPCredential = new SECPCredential();
     newbase.fromBuffer(this.toBuffer());
     return newbase as this;
   }
 
-  create(...args:any[]):this {
+  create(...args: any[]): this {
     return new SECPCredential(...args) as this;
   }
 
-  select(id:number, ...args:any[]):Credential {
-    let newbasetx:Credential = SelectCredentialClass(id, ...args);
-    return newbasetx;
+  select(id: number, ...args: any[]): Credential {
+    let credential: Credential = SelectCredentialClass(id, ...args);
+    return credential;
   }
 }
 

@@ -4,7 +4,7 @@
  */
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import {  PlatformVMConstants } from './constants';
+import { PlatformVMConstants } from './constants';
 import { SelectCredentialClass } from './credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { StandardTx, StandardUnsignedTx } from '../../common/tx';
