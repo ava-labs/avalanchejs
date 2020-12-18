@@ -16,6 +16,7 @@ import {
 import createHash from 'create-hash';
 import { EVMBaseTx } from './basetx';
 import { ImportTx } from './importtx';
+import { ExportTx } from './exporttx';
 import { SerializedEncoding } from '../../utils/serialization';
 
 /**
@@ -26,22 +27,19 @@ const bintools: BinTools = BinTools.getInstance();
 /**
  * Takes a buffer representing the output and returns the proper [[EVMBaseTx]] instance.
  *
- * @param txtype The id of the transaction type
+ * @param txTypeID The id of the transaction type
  *
  * @returns An instance of an [[EVMBaseTx]]-extended class.
  */
-export const SelectTxClass = (txtype: number, ...args: any[]): EVMBaseTx => {
-  // if (txtype === EVMConstants.BASETX) {
-  //   return new BaseTx(...args);
-  if (txtype === EVMConstants.IMPORTTX) {
+export const SelectTxClass = (txTypeID: number, ...args: any[]): EVMBaseTx => {
+  if (txTypeID === EVMConstants.IMPORTTX) {
     return new ImportTx(...args);
-  // } else if (txtype === EVMConstants.EXPORTTX) {
-  //   return new ExportTx(...args);
+  } else if (txTypeID === EVMConstants.EXPORTTX) {
+    return new ExportTx(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
+  throw new Error(`Error - SelectTxClass: unknown txType ${txTypeID}`);
 };
-
 
 export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBaseTx> {
   protected _typeName = "UnsignedTx";

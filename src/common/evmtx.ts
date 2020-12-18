@@ -59,21 +59,6 @@ export abstract class EVMStandardBaseTx<KPClass extends StandardKeyPair, KCClass
    */
   getBlockchainID = (): Buffer => this.blockchainid;
 
-//   /**
-//    * Returns the array of [[StandardTransferableInput]]s
-//    */
-//   abstract getIns():Array<StandardTransferableInput>;
-
-//   /**
-//    * Returns the array of [[StandardTransferableOutput]]s
-//    */
-//   abstract getOuts():Array<StandardTransferableOutput>;
-
-//   /**
-//    * Returns the array of combined total [[StandardTransferableOutput]]s
-//    */
-//   abstract getTotalOuts():Array<StandardTransferableOutput>;
-
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
    */
