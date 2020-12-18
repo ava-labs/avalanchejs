@@ -143,22 +143,33 @@ export class EVMAPI extends JRPCAPI {
      * @returns Returns a Promise<Asset> with keys "name", "symbol", "assetID" and "denomination".
      */
   getAssetDescription = async (assetID: Buffer | string): Promise<any> => {
-    let asset:string;
+    let asset: string;
     if (typeof assetID !== 'string') {
       asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
     }
-    const params:any = {
+
+    const params: {
+      assetID: Buffer | string
+    } = {
       assetID: asset,
     };
+
+    const tmpBaseURL: string = this.getBaseURL();
+
+    // set base url to get asset description
     this.setBaseURL("/ext/bc/X");
-    return this.callMethod('avm.getAssetDescription', params).then((response: RequestResponseData) => ({
+    const response: RequestResponseData = await this.callMethod('avm.getAssetDescription', params);
+
+    // set base url back what it originally was
+    this.setBaseURL(tmpBaseURL);
+    return {
       name: response.data.result.name,
       symbol: response.data.result.symbol,
       assetID: bintools.cb58Decode(response.data.result.assetID),
       denomination: parseInt(response.data.result.denomination, 10),
-    }));
+    }
   };
   
   /**
@@ -224,16 +235,26 @@ export class EVMAPI extends JRPCAPI {
     *
     * @returns String representing the transaction id
     */
-  export = async (username: string, password: string, to: string, amount: BN, assetID: string):Promise<string> => {
-    const params: any = {
+  export = async (
+    username: string, 
+    password: string, 
+    to: string, 
+    amount: BN, 
+    assetID: string
+  ):Promise<string> => {
+    const params: {
+      username: string, 
+      password: string, 
+      to: string, 
+      amount: string, 
+      assetID: string
+    } = {
       to,
       amount: amount.toString(10),
       username,
       password,
       assetID
     };
-    // TODO - confirm calling `this.setBaseURL` isn't causing any unwanted side effects
-    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.export', params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
@@ -249,14 +270,23 @@ export class EVMAPI extends JRPCAPI {
     *
     * @returns String representing the transaction id
     */
-  exportAVAX = async (username: string, password: string, to: string, amount: BN): Promise<string> => {
-    const params: any = {
+  exportAVAX = async (
+    username: string, 
+    password: string, 
+    to: string, 
+    amount: BN
+  ): Promise<string> => {
+    const params: {
+      username: string, 
+      password: string, 
+      to: string, 
+      amount: string
+    } = {
       to,
       amount: amount.toString(10),
       username,
       password,
     };
-    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.exportAVAX', params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
@@ -285,7 +315,7 @@ export class EVMAPI extends JRPCAPI {
       addresses = [addresses];
     }
 
-    const params:any = {
+    const params: any = {
       addresses: addresses,
       limit
     };
@@ -297,10 +327,9 @@ export class EVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.getUTXOs', params).then((response: RequestResponseData) => {
       const utxos: UTXOSet = new UTXOSet();
-      let data = response.data.result.utxos;
+      let data: any = response.data.result.utxos;
       utxos.addArray(data, false);
       response.data.result.utxos = utxos;
       return response.data.result;
@@ -320,15 +349,24 @@ export class EVMAPI extends JRPCAPI {
    * @returns Promise for a string for the transaction, which should be sent to the network
    * by calling issueTx.
    */
-  import = async (username: string, password: string, to: string, sourceChain: string)
+  import = async (
+    username: string, 
+    password: string, 
+    to: string, 
+    sourceChain: string
+  )
   : Promise<string> => {
-    const params: any = {
+    const params: {
+      username: string, 
+      password: string, 
+      to: string, 
+      sourceChain: string
+    } = {
       to,
       sourceChain,
       username,
       password,
     };
-    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.import', params)
       .then((response: RequestResponseData) => response.data.result.txID);
   };
@@ -347,15 +385,23 @@ export class EVMAPI extends JRPCAPI {
    * @returns Promise for a string for the transaction, which should be sent to the network
    * by calling issueTx.
    */
-  importAVAX = async (username: string, password: string, to: string, sourceChain: string)
-  : Promise<string> => {
-    const params: any = {
+  importAVAX = async (
+    username: string, 
+    password: string, 
+    to: string, 
+    sourceChain: string) : 
+  Promise<string> => {
+    const params: {
+      username: string, 
+      password: string, 
+      to: string, 
+      sourceChain: string
+    } = {
       to,
       sourceChain,
       username,
       password,
     };
-    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.importAVAX', params)
       .then((response: RequestResponseData) => response.data.result.txID);
   };
@@ -369,15 +415,21 @@ export class EVMAPI extends JRPCAPI {
    *
    * @returns The address for the imported private key.
    */
-  importKey = async (username: string, password: string, privateKey: string): Promise<string> => {
-    const params: any = {
+  importKey = async (
+    username: string, 
+    password: string, 
+    privateKey: string
+  ): Promise<string> => {
+    const params: {
+      username: string, 
+      password: string, 
+      privateKey: string
+    } = {
       username,
       password,
       privateKey,
     };
-    this.setBaseURL("/ext/bc/C/avax");
-    return this.callMethod('avax.importKey', params)
-      .then((response: RequestResponseData) => response.data.result.address);
+    return this.callMethod('avax.importKey', params).then((response: RequestResponseData) => response.data.result.address);
   };
 
   /**
@@ -401,10 +453,11 @@ export class EVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new Error('Error - avax.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
-    const params: any = {
+    const params: {
+      tx: string
+    } = {
       tx: Transaction.toString(),
     };
-    this.setBaseURL("/ext/bc/C/avax");
     return this.callMethod('avax.issueTx', params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
@@ -417,15 +470,21 @@ export class EVMAPI extends JRPCAPI {
    *
    * @returns Promise with the decrypted private key as store in the database
    */
-  exportKey = async (username: string, password: string, address: string): Promise<string> => {
-    const params: any = {
+  exportKey = async (
+    username: string, 
+    password: string, 
+    address: string
+  ): Promise<string> => {
+    const params: {
+      username: string, 
+      password: string, 
+      address: string
+    } = {
       username,
       password,
       address,
     };
-    this.setBaseURL("/ext/bc/C/avax");
-    return this.callMethod('avax.exportKey', params)
-      .then((response: RequestResponseData) => response.data.result.privateKey);
+    return this.callMethod('avax.exportKey', params).then((response: RequestResponseData) => response.data.result.privateKey);
   };
 
   /**
