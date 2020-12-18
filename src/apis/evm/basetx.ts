@@ -67,18 +67,6 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = [];
-    // for (let i = 0; i < this.ins.length; i++) {
-    //   const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
-    //   const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
-    //   for (let j = 0; j < sigidxs.length; j++) {
-    //     const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
-    //     const signval:Buffer = keypair.sign(msg);
-    //     const sig:Signature = new Signature();
-    //     sig.fromBuffer(signval);
-    //     cred.addSignature(sig);
-    //   }
-    //   sigs.push(cred);
-    // }
     return sigs;
   }
 

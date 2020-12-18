@@ -138,22 +138,21 @@ export class ExportTx extends EVMBaseTx {
       * @returns An array of [[Credential]]s
       */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-      // const sigs:Array<Credential> = super.sign(msg, kc);
-      const sigs: Credential[] = [];
-      this.inputs.forEach((input: EVMInput) => {
-        const cred: Credential = SelectCredentialClass(input.getCredentialID());
-        const sigidxs: SigIdx[] = input.getSigIdxs();
-        sigidxs.forEach((sigidx: SigIdx) => {
-          const keypair: KeyPair = kc.getKey(sigidx.getSource());
-          const signval: Buffer = keypair.sign(msg);
-          const sig: Signature = new Signature();
-          sig.fromBuffer(signval);
-          cred.addSignature(sig);
-        });
-        sigs.push(cred);
+    const sigs: Credential[] = super.sign(msg, kc);
+    this.inputs.forEach((input: EVMInput) => {
+      const cred: Credential = SelectCredentialClass(input.getCredentialID());
+      const sigidxs: SigIdx[] = input.getSigIdxs();
+      sigidxs.forEach((sigidx: SigIdx) => {
+        const keypair: KeyPair = kc.getKey(sigidx.getSource());
+        const signval: Buffer = keypair.sign(msg);
+        const sig: Signature = new Signature();
+        sig.fromBuffer(signval);
+        cred.addSignature(sig);
       });
-      return sigs;
-    }
+      sigs.push(cred);
+    });
+    return sigs;
+  }
 
   /**
    * Class representing a ExportTx.

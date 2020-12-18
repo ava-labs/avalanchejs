@@ -170,7 +170,7 @@ export class ImportTx extends EVMBaseTx {
      * @returns An array of [[Credential]]s
      */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = [];
+    const sigs: Credential[] = super.sign(msg, kc);
     this.importIns.forEach((importIn: TransferableInput) => {
       const cred: Credential = SelectCredentialClass(importIn.getInput().getCredentialID());
       const sigidxs: SigIdx[] = importIn.getInput().getSigIdxs();
