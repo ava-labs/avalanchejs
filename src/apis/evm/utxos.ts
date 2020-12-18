@@ -2,18 +2,37 @@
  * @packageDocumentation
  * @module API-EVM-UTXOs
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import BN from "bn.js";
-import { AmountOutput, SelectOutputClass, TransferableOutput, EVMOutput } from './outputs';
+import { 
+  AmountOutput, 
+  SelectOutputClass, 
+  TransferableOutput, 
+  EVMOutput 
+} from './outputs';
 import { EVMConstants } from './constants';
-import { EVMInput, SECPTransferInput, TransferableInput } from './inputs';
+import { 
+  EVMInput, 
+  SECPTransferInput, 
+  TransferableInput 
+} from './inputs';
 import { Output } from '../../common/output';
 import { UnixNow } from '../../utils/helperfunctions';
-import { StandardUTXO, StandardUTXOSet } from '../../common/utxos';
+import { 
+  StandardUTXO, 
+  StandardUTXOSet 
+} from '../../common/utxos';
 import { PlatformChainID } from '../../utils/constants';
-import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { 
+  StandardAssetAmountDestination, 
+  AssetAmount 
+} from '../../common/assetamount';
+import { 
+  Serialization, 
+  SerializedEncoding 
+} from '../../utils/serialization';
 import { UnsignedTx } from './tx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
@@ -33,13 +52,13 @@ import { ExportTx } from './exporttx';
  
    //serialize is inherited
  
-   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
      super.deserialize(fields, encoding);
      this.output = SelectOutputClass(fields["output"]["_typeID"]);
      this.output.deserialize(fields["output"], encoding);
    }
  
-   fromBuffer(bytes:Buffer, offset:number = 0):number {
+   fromBuffer(bytes: Buffer, offset: number = 0):number {
      this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
      offset += 2;
      this.txid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -48,7 +67,7 @@ import { ExportTx } from './exporttx';
      offset += 4;
      this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
      offset += 32;
-     const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+     const outputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
      offset += 4;
      this.output = SelectOutputClass(outputid);
      return this.output.fromBuffer(bytes, offset);
@@ -64,7 +83,7 @@ import { ExportTx } from './exporttx';
     * @remarks
     * unlike most fromStrings, it expects the string to be serialized in cb58 format
     */
-   fromString(serialized:string):number {
+   fromString(serialized: string): number {
        /* istanbul ignore next */
        return this.fromBuffer(bintools.cb58Decode(serialized));
    }
@@ -75,23 +94,23 @@ import { ExportTx } from './exporttx';
     * @remarks
     * unlike most toStrings, this returns in cb58 serialization format
     */
-   toString():string {
+   toString(): string {
      /* istanbul ignore next */
      return bintools.cb58Encode(this.toBuffer());
    }
  
-   clone():this {
-     const utxo:UTXO = new UTXO();
+   clone(): this {
+     const utxo: UTXO = new UTXO();
      utxo.fromBuffer(this.toBuffer());
      return utxo as this;
    }
  
    create(
-     codecID:number = EVMConstants.LATESTCODEC, 
-     txid:Buffer = undefined,
-     outputidx:Buffer | number = undefined,
-     assetid:Buffer = undefined,
-     output:Output = undefined):this 
+     codecID: number = EVMConstants.LATESTCODEC, 
+     txid: Buffer = undefined,
+     outputidx: Buffer | number = undefined,
+     assetid: Buffer = undefined,
+     output: Output = undefined):this 
    {
      return new UTXO(codecID, txid, outputidx, assetid, output) as this;
    }
@@ -109,7 +128,7 @@ import { ExportTx } from './exporttx';
    
    //serialize is inherited
  
-   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
      super.deserialize(fields, encoding);
      let utxos = {};
      for(let utxoid in fields["utxos"]){
@@ -131,8 +150,8 @@ import { ExportTx } from './exporttx';
      this.addressUTXOs = addressUTXOs;
    }
  
-   parseUTXO(utxo:UTXO | string):UTXO {
-     const utxovar:UTXO = new UTXO();
+   parseUTXO(utxo: UTXO | string): UTXO {
+     const utxovar: UTXO = new UTXO();
      // force a copy
      if (typeof utxo === 'string') {
        utxovar.fromBuffer(bintools.cb58Decode(utxo));
@@ -145,18 +164,18 @@ import { ExportTx } from './exporttx';
      return utxovar
    }
  
-   create(...args:any[]):this{
+   create(...args: any[]): this{
      return new UTXOSet() as this;
    }
  
-   clone():this {
-     const newset:UTXOSet = this.create();
-     const allUTXOs:Array<UTXO> = this.getAllUTXOs();
+   clone(): this {
+     const newset: UTXOSet = this.create();
+     const allUTXOs: UTXO[] = this.getAllUTXOs();
      newset.addArray(allUTXOs)
      return newset as this;
    }
  
-   _feeCheck(fee:BN, feeAssetID:Buffer):boolean {
+   _feeCheck(fee: BN, feeAssetID: Buffer): boolean {
      return (typeof fee !== "undefined" && 
      typeof feeAssetID !== "undefined" &&
      fee.gt(new BN(0)) && feeAssetID instanceof Buffer);

@@ -2,13 +2,17 @@
  * @packageDocumentation
  * @module API-EVM-Transactions
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
 import { SelectCredentialClass } from './credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { Credential } from '../../common/credentials';
-import { EVMStandardTx, EVMStandardUnsignedTx } from '../../common/evmtx';
+import { 
+  EVMStandardTx, 
+  EVMStandardUnsignedTx 
+} from '../../common/evmtx';
 import createHash from 'create-hash';
 import { EVMBaseTx } from './basetx';
 import { ImportTx } from './importtx';
@@ -17,14 +21,14 @@ import { SerializedEncoding } from '../../utils/serialization';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
- * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
+ * Takes a buffer representing the output and returns the proper [[EVMBaseTx]] instance.
  *
  * @param txtype The id of the transaction type
  *
- * @returns An instance of an [[BaseTx]]-extended class.
+ * @returns An instance of an [[EVMBaseTx]]-extended class.
  */
 export const SelectTxClass = (txtype: number, ...args: any[]): EVMBaseTx => {
   // if (txtype === EVMConstants.BASETX) {
@@ -72,12 +76,11 @@ export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBase
    * @returns A signed [[StandardTx]]
    */
   sign(kc: KeyChain): Tx {
-    const txbuff = this.toBuffer();
+    const txbuff: Buffer = this.toBuffer();
     const msg: Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
     const sigs: Credential[] = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
-
 }
 
 export class Tx extends EVMStandardTx<KeyPair, KeyChain, UnsignedTx> {
@@ -99,7 +102,8 @@ export class Tx extends EVMStandardTx<KeyPair, KeyChain, UnsignedTx> {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, populates the class, and returns the length of the Tx in bytes.
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Tx]], parses it, 
+   * populates the class, and returns the length of the Tx in bytes.
    *
    * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Tx]]
    * @param offset A number representing the starting point of the bytes to begin parsing
@@ -109,7 +113,7 @@ export class Tx extends EVMStandardTx<KeyPair, KeyChain, UnsignedTx> {
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.unsignedTx = new UnsignedTx();
     offset = this.unsignedTx.fromBuffer(bytes, offset);
-    const numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    const numcreds: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.credentials = [];
     for (let i: number = 0; i < numcreds; i++) {

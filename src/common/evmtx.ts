@@ -2,6 +2,7 @@
  * @packageDocumentation
  * @module Common-Transactions
  */
+
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Credential } from './credentials';
@@ -39,7 +40,6 @@ export abstract class EVMStandardBaseTx<KPClass extends StandardKeyPair, KCClass
     this.networkid = serializer.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4);
     this.blockchainid = serializer.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32);
   }
-
 
   protected networkid: Buffer = Buffer.alloc(4);
   protected blockchainid: Buffer = Buffer.alloc(32);
