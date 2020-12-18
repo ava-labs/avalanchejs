@@ -186,8 +186,8 @@ import { ExportTx } from './exporttx';
      asOf:BN = UnixNow(), 
      locktime:BN = new BN(0), 
      threshold:number = 1
-   ):Error => {
-     const utxoArray:UTXO[] = this.getAllUTXOs();
+    ):Error => {
+     const utxoArray: UTXO[] = this.getAllUTXOs();
      const outids: object = {};
      for(let i: number = 0; i < utxoArray.length && !aad.canComplete(); i++) {
        const u: UTXO = utxoArray[i];
@@ -364,7 +364,7 @@ import { ExportTx } from './exporttx';
    * Creates an unsigned ExportTx transaction. 
    *
    * @param networkID The number representing NetworkID of the node
-   * @param blockchainId The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+   * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the AssetID for AVAX
    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
