@@ -107,12 +107,12 @@ import { ExportTx } from './exporttx';
  
    create(
      codecID: number = EVMConstants.LATESTCODEC, 
-     txid: Buffer = undefined,
+     txID: Buffer = undefined,
      outputidx: Buffer | number = undefined,
-     assetid: Buffer = undefined,
+     assetID: Buffer = undefined,
      output: Output = undefined):this 
    {
-     return new UTXO(codecID, txid, outputidx, assetid, output) as this;
+     return new UTXO(codecID, txID, outputidx, assetID, output) as this;
    }
  
  }
@@ -181,7 +181,12 @@ import { ExportTx } from './exporttx';
      fee.gt(new BN(0)) && feeAssetID instanceof Buffer);
    }
  
-   getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
+   getMinimumSpendable = (
+     aad:AssetAmountDestination, 
+     asOf:BN = UnixNow(), 
+     locktime:BN = new BN(0), 
+     threshold:number = 1
+   ):Error => {
      const utxoArray:UTXO[] = this.getAllUTXOs();
      const outids: object = {};
      for(let i: number = 0; i < utxoArray.length && !aad.canComplete(); i++) {
@@ -251,8 +256,8 @@ import { ExportTx } from './exporttx';
    /**
      * Creates an unsigned ImportTx transaction.
      *
-     * @param networkid The number representing NetworkID of the node
-     * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+     * @param networkID The number representing NetworkID of the node
+     * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
      * @param toAddresses The addresses to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param importIns An array of [[TransferableInput]]s being imported
@@ -267,8 +272,8 @@ import { ExportTx } from './exporttx';
      *
      */
     buildImportTx = (
-     networkid: number, 
-     blockchainid: Buffer,
+     networkID: number, 
+     blockchainID: Buffer,
      toAddresses: string[],
      fromAddresses: Buffer[],
      atomics: UTXO[],
@@ -325,7 +330,7 @@ import { ExportTx } from './exporttx';
          xferin.getInput().addSignatureIdx(idx, spender);
        });
        ins.push(xferin);
-       //add extra outputs for each amount (calculated from the imported inputs), minus fees
+       // add extra outputs for each amount (calculated from the imported inputs), minus fees
        if(infeeamount.gt(zero)) {
          const evmOutput: EVMOutput = new EVMOutput(
            toAddresses[0],
@@ -351,17 +356,17 @@ import { ExportTx } from './exporttx';
     //    }
     //  }
 
-     const importTx: ImportTx = new ImportTx(networkid, blockchainid, sourceChain, ins, outs);
+     const importTx: ImportTx = new ImportTx(networkID, blockchainID, sourceChain, ins, outs);
      return new UnsignedTx(importTx);
    };
  
    /**
    * Creates an unsigned ExportTx transaction. 
    *
-   * @param networkId The number representing NetworkID of the node
+   * @param networkID The number representing NetworkID of the node
    * @param blockchainId The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
+   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the AssetID for AVAX
    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
    * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
    * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs.
@@ -375,16 +380,16 @@ import { ExportTx } from './exporttx';
    *
    */
    buildExportTx = (
-    networkId: number, 
-    blockchainId: Buffer,
+    networkID: number, 
+    blockchainID: Buffer,
     amount: BN,
-    avaxAssetId: Buffer,
+    avaxAssetID: Buffer,
     toAddresses: Buffer[],
     fromAddresses: Buffer[],
     changeAddresses: Buffer[] = undefined,
     destinationChain: Buffer = undefined,
     fee: BN = undefined,
-    feeAssetId: Buffer = undefined, 
+    feeAssetID: Buffer = undefined, 
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0), 
     threshold: number = 1
@@ -403,9 +408,9 @@ import { ExportTx } from './exporttx';
       return undefined;
     }
 
-    if(typeof feeAssetId === 'undefined') {
-      feeAssetId = avaxAssetId;
-    } else if (feeAssetId.toString('hex') !== avaxAssetId.toString('hex')) {
+    if(typeof feeAssetID === 'undefined') {
+      feeAssetID = avaxAssetID;
+    } else if (feeAssetID.toString('hex') !== avaxAssetID.toString('hex')) {
       /* istanbul ignore next */
       throw new Error('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
     }
@@ -415,24 +420,23 @@ import { ExportTx } from './exporttx';
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
-    if(avaxAssetId.toString('hex') === feeAssetId.toString('hex')){
-      aad.addAssetAmount(avaxAssetId, amount, fee);
+    if(avaxAssetID.toString('hex') === feeAssetID.toString('hex')){
+      aad.addAssetAmount(avaxAssetID, amount, fee);
     } else {
-      aad.addAssetAmount(avaxAssetId, amount, zero);
-      if(this._feeCheck(fee, feeAssetId)){
-        aad.addAssetAmount(feeAssetId, zero, fee);
+      aad.addAssetAmount(avaxAssetID, amount, zero);
+      if(this._feeCheck(fee, feeAssetID)){
+        aad.addAssetAmount(feeAssetID, zero, fee);
       }
     }
     const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if(typeof success === 'undefined') {
-      // ins = aad.getInputs();
       outs = aad.getChangeOutputs();
       exportouts = aad.getOutputs();
     } else {
       throw success;
     }
 
-    const exportTx: ExportTx = new ExportTx(networkId, blockchainId, destinationChain, ins, exportouts);
+    const exportTx: ExportTx = new ExportTx(networkID, blockchainID, destinationChain, ins, exportouts);
     return new UnsignedTx(exportTx);
   };
  }
