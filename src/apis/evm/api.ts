@@ -616,10 +616,13 @@ export class EVMAPI extends JRPCAPI {
       to.push(bintools.stringToAddress(address));
     });
 
-    const exportedOuts: TransferableOutput[] = [];
+    let exportedOuts: TransferableOutput[] = [];
     const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amount, to, locktime, threshold);
     const transferableOutput: TransferableOutput = new TransferableOutput(bintools.cb58Decode(assetID), secpTransferOutput);
     exportedOuts.push(transferableOutput);
+
+    // lexicographically sort array
+    exportedOuts = exportedOuts.sort(TransferableOutput.comparator());
 
     const exportTx: ExportTx = new ExportTx(
       this.core.getNetworkID(), 
