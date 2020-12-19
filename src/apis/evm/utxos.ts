@@ -283,7 +283,7 @@ import { ExportTx } from './exporttx';
    ): UnsignedTx => {
 
      const zero: BN = new BN(0);
-     const ins: TransferableInput[] = [];
+     let ins: TransferableInput[] = [];
      const outs: EVMOutput[] = [];
 
      if(typeof fee === "undefined") {
@@ -330,6 +330,10 @@ import { ExportTx } from './exporttx';
          xferin.getInput().addSignatureIdx(idx, spender);
        });
        ins.push(xferin);
+
+       // lexicographically sort array
+       ins = ins.sort(TransferableInput.comparator());
+
        // add extra outputs for each amount (calculated from the imported inputs), minus fees
        if(infeeamount.gt(zero)) {
          const evmOutput: EVMOutput = new EVMOutput(
