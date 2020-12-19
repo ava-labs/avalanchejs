@@ -2,17 +2,9 @@
  * @packageDocumentation
  * @module API-AVM-Credentials
  */
-import BinTools from '../../utils/bintools';
 
 import { AVMConstants } from './constants';
-import {  Credential } from '../../common/credentials';
-import { Serialization } from '../../utils/serialization';
-
-/**
- * @ignore
- */
-const bintools:BinTools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+import { Credential } from '../../common/credentials';
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.

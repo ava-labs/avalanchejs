@@ -119,6 +119,7 @@ const n0C:object = {
   blockchainID: '2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb',
   alias: CChainAlias,
   vm: CChainVMName,
+  fee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(470)), //equivalent to gas price
   chainID: 43111
 };
@@ -154,6 +155,7 @@ const n1C:object = {
   blockchainID: '2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5',
   alias: CChainAlias,
   vm: CChainVMName,
+  txFee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(470)), 
   chainID: 43114
 };
@@ -287,6 +289,7 @@ const n5C:object = {
   blockchainID: 'yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp',
   alias: CChainAlias,
   vm: CChainVMName,
+  txFee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(470)), 
   chainID: 43113
 };
