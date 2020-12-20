@@ -1,9 +1,11 @@
+import { Buffer } from 'buffer/';
 import mockAxios from 'jest-mock-axios';
 import { Avalanche, BN } from "src";
 import { EVMAPI } from "src/apis/evm/api";
 import BinTools from 'src/utils/bintools';
 import * as bech32 from 'bech32';
-import { Defaults } from 'src/utils/constants';
+import { DefaultLocalGenesisPrivateKey, Defaults, PrivateKeyPrefix } from 'src/utils/constants';
+import { KeyChain } from 'src/apis/evm';
 
 /**
  * @ignore
@@ -34,6 +36,49 @@ describe('EVMAPI', () => {
 
   afterEach(() => {
     mockAxios.reset();
+  });
+
+  test('getBlockchainAlias', async () => {
+    const blockchainAliasC: string = "C";
+    const blockchainAlias: string = api.getBlockchainAlias();
+    expect(blockchainAlias).toBe(blockchainAliasC);
+  });
+
+  test('setBlockchainAlias', async () => {
+    const blockchainAliasC: string = "C";
+    const blockchainAliasX: string = "X";
+    let blockchainAlias: string = api.getBlockchainAlias();
+    // defaults to C
+    expect(blockchainAlias).toBe(blockchainAliasC);
+    // set to X
+    api.setBlockchainAlias(blockchainAliasX);
+    // confirm it's X
+    blockchainAlias = api.getBlockchainAlias();
+    expect(blockchainAlias).toBe(blockchainAliasX);
+  });
+
+  test('getBlockchainID', async () => {
+    const blockchainIDC: string = "26sSDdFXoKeShAqVfvugUiUQKhMZtHYDLeBqmBfNfcdjziTrZA";
+    const blockchainID: string = api.getBlockchainID();
+    expect(blockchainID).toBe(blockchainIDC);
+  });
+
+  test('refreshBlockchainID', async () => {
+    const n5bcID: string = Defaults.network[5].C["blockchainID"];
+    const n12345bcID: string = Defaults.network[12345].C["blockchainID"];
+    const testAPI: EVMAPI = new EVMAPI(avalanche, '/ext/bc/C/avax', n5bcID);
+    const bc1: string = testAPI.getBlockchainID();
+    expect(bc1).toBe(n5bcID);
+
+    let res: boolean = testAPI.refreshBlockchainID();
+    expect(res).toBeTruthy();
+    const bc2: string = testAPI.getBlockchainID();
+    expect(bc2).toBe(n12345bcID);
+
+    res = testAPI.refreshBlockchainID(n5bcID);
+    expect(res).toBeTruthy();
+    const bc3: string = testAPI.getBlockchainID();
+    expect(bc3).toBe(n5bcID);
   });
 
   test('importKey', async () => {
@@ -165,24 +210,5 @@ describe('EVMAPI', () => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(txID);
-  });
-
-  test('refreshBlockchainID', async () => {
-    const n5bcID: string = Defaults.network[5].C["blockchainID"];
-    const n12345bcID: string = Defaults.network[12345].C["blockchainID"];
-    const testAPI: EVMAPI = new EVMAPI(avalanche, '/ext/bc/C/avax', n5bcID);
-    const bc1: string = testAPI.getBlockchainID();
-    expect(bc1).toBe(n5bcID);
-
-    let res: boolean = testAPI.refreshBlockchainID();
-    expect(res).toBeTruthy();
-    const bc2: string = testAPI.getBlockchainID();
-    expect(bc2).toBe(n12345bcID);
-
-    res = testAPI.refreshBlockchainID(n5bcID);
-    expect(res).toBeTruthy();
-    const bc3: string = testAPI.getBlockchainID();
-    expect(bc3).toBe(n5bcID);
-
   });
 });
