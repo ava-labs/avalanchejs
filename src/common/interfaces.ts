@@ -22,3 +22,11 @@ export interface Asset {
   assetID: Buffer
   denomination: number
 }
+export interface Payload {
+  result: {
+    name: string,
+    symbol: string,
+    assetID: string,
+    denomination: number
+  }
+}

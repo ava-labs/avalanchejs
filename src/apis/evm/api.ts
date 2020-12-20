@@ -18,7 +18,10 @@ import {
   Defaults, 
   PrimaryAssetAlias 
 } from '../../utils/constants';
-import { Tx, UnsignedTx } from './tx';
+import { 
+  Tx, 
+  UnsignedTx 
+} from './tx';
 import { EVMConstants } from './constants';
 import { 
   Asset,
@@ -54,9 +57,9 @@ export class EVMAPI extends JRPCAPI {
 
   protected blockchainAlias: string = undefined;
 
-  protected AVAXAssetID:Buffer = undefined;
+  protected AVAXAssetID: Buffer = undefined;
 
-  protected txFee:BN = undefined;
+  protected txFee: BN = undefined;
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -191,8 +194,6 @@ export class EVMAPI extends JRPCAPI {
    * Overrides the defaults and sets the cache to a specific AVAX AssetID
    * 
    * @param avaxAssetID A cb58 string or Buffer representing the AVAX AssetID
-   * 
-   * @returns The the provided string representing the AVAX AssetID
    */
   setAVAXAssetID = (avaxAssetID: string | Buffer) => {
     if(typeof avaxAssetID === "string") {
