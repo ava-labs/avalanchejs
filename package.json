@@ -64,6 +64,9 @@
     "node": ">=12.14.1",
     "npm": ">=6.14.6"
   },
+  "browser": {
+    "buffer": "./node_modules/buffer"
+  },
   "dependencies": {
     "axios": "0.19.2",
     "bech32": "1.1.4",
