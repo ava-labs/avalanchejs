@@ -238,7 +238,7 @@ let unsigned = await xchain.buildCreateAssetTx(
   initialState, // the initial state to be created for this new asset 
   name, // the full name of the asset
   symbol, // a short ticker symbol for the asset
-  denomination // the asse's denomination 
+  denomination // the asset's denomination 
 );
 
 let signed = xchain.keyChain().signTx(unsigned); //returns a Tx class
