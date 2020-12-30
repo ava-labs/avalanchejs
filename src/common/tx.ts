@@ -196,8 +196,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "number");
   }
 
-  protected codecid:number = 0;
-  protected transaction:SBTx;
+  protected codecid: number;
+  protected transaction: SBTx;
 
   /**
    * Returns the CodecID as a number

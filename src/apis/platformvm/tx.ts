@@ -51,6 +51,7 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   protected _typeName = "UnsignedTx";
   protected _typeID = undefined;
+  protected codecid: number = PlatformVMConstants.LATESTCODEC;
 
   //serialize is inherited
 

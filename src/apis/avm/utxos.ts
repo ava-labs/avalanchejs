@@ -45,7 +45,7 @@ export class UTXO extends StandardUTXO {
     this.output.deserialize(fields["output"], encoding);
   }
 
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
     offset += 2;
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
@@ -54,8 +54,11 @@ export class UTXO extends StandardUTXO {
     offset += 4;
     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
-    const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-    offset += 4;
+    // TODO - where do I add the `groupid` property?
+    const groupid: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
+    const outputid: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
     this.output = SelectOutputClass(outputid);
     return this.output.fromBuffer(bytes, offset);
   }

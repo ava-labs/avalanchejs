@@ -648,22 +648,23 @@ export class AVMAPI extends JRPCAPI {
    *
    */
   getUTXOs = async (
-    addresses:Array<string> | string,
-    sourceChain:string = undefined,
-    limit:number = 0,
-    startIndex:{address:string, utxo:string} = undefined,
-    persistOpts:PersistanceOptions = undefined
-  ):Promise<{
-    numFetched:number,
-    utxos:UTXOSet,
-    endIndex:{address:string, utxo:string}
+    addresses: string[] | string,
+    sourceChain: string = undefined,
+    limit: number = 0,
+    startIndex: {address: string, utxo: string} = undefined,
+    persistOpts: PersistanceOptions = undefined
+  ): Promise<{
+    numFetched: number,
+    encoding: string,
+    utxos: UTXOSet,
+    endIndex: {address: string, utxo: string}
   }> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
     }
 
-    const params:any = {
+    const params: any = {
       addresses: addresses,
       limit
     };
