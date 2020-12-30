@@ -55,9 +55,12 @@ export class TransferableInput extends StandardTransferableInput {
     offset += 4;
     this.assetid = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
     offset += 32;
-    const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-    offset += 4;
-    this.input = SelectInputClass(inputid);
+    // TODO - where do I add the `groupid` property?
+    const groupID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
+    const typeID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
+    this.input = SelectInputClass(typeID);
     return this.input.fromBuffer(bytes, offset);
   }
   

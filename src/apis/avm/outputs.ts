@@ -47,9 +47,12 @@ export class TransferableOutput extends StandardTransferableOutput{
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
     offset += AVMConstants.ASSETIDLEN;
-    const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
-    offset += 4;
-    this.output = SelectOutputClass(outputid);
+    // TODO - where do I add the `groupid` property?
+    const groupID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
+    const typeID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    offset += 2;
+    this.output = SelectOutputClass(typeID);
     return this.output.fromBuffer(bytes, offset);
   }
 
