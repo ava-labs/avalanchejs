@@ -24,39 +24,67 @@ export class AVMConstants {
 
   static PROPERTYFXID: number = 2;
 
-  static SECPINPUTID: number = 0;
+  // start CODECZERO constants
 
-  static SECPMINTOUTPUTID: number = 1;
+  static SECPMINTOUTPUTID_CODECZERO: number = 6;
 
-  static SECPXFEROUTPUTID: number = 2;
+  static SECPXFEROUTPUTID_CODECZERO: number = 7;
 
-  static SECPMINTOPID: number = 3;
+  static NFTXFEROUTPUTID_CODECZERO:number = 11;
 
-  static SECPCREDENTIAL: number = 4;
+  static NFTMINTOUTPUTID_CODECZERO: number = 10;
 
-  static SECPMANAGEDASSETSTATUSOUTPUTID: number = 5;
+  static SECPINPUTID_CODECZERO: number = 5;
 
-  static SECPUPDATEMANAGEDASSETOPID: number = 6;
+  static SECPMINTOPID_CODECZERO: number = 8;
 
-  static NFTMINTOUTPUTID: number = 0;
+  static NFTMINTOPID_CODECZERO: number = 12;
 
-  static NFTXFEROUTPUTID: number = 1;
+  static NFTXFEROPID_CODECZERO: number = 13;
 
-  static NFTMINTOPID: number = 2;
+  static SECPCREDENTIAL_CODECZERO: number = 9;
 
-  static NFTXFEROPID: number = 3;
+  static NFTCREDENTIAL_CODECZERO: number = 14;
 
-  static NFTCREDENTIAL: number = 4;
+  // end CODECZERO constants
 
-  static PROPERTYMINTOUTPUTID: number = 0;
+  // start CODECONE constants
 
-  static PROPERTYOWNEDOUTPUTID: number = 1;
+  static SECPINPUTID_CODECONE: number = 0;
 
-  static PROPERTYMINTOPID: number = 2;
+  static SECPMINTOUTPUTID_CODECONE: number = 1;
 
-  static PROPERTYBURNOPID: number = 3;
+  static SECPXFEROUTPUTID_CODECONE: number = 2;
 
-  static PROPERTYCREDENTIAL: number = 4;
+  static SECPMINTOPID_CODECONE: number = 3;
+
+  static SECPCREDENTIAL_CODECONE: number = 4;
+
+  static SECPMANAGEDASSETSTATUSOUTPUTID_CODECONE: number = 5;
+
+  static SECPUPDATEMANAGEDASSETOPID_CODECONE: number = 6;
+
+  static NFTMINTOUTPUTID_CODECONE: number = 0;
+
+  static NFTXFEROUTPUTID_CODECONE: number = 1;
+
+  static NFTMINTOPID_CODECONE: number = 2;
+
+  static NFTXFEROPID_CODECONE: number = 3;
+
+  static NFTCREDENTIAL_CODECONE: number = 4;
+
+  static PROPERTYMINTOUTPUTID_CODECONE: number = 0;
+
+  static PROPERTYOWNEDOUTPUTID_CODECONE: number = 1;
+
+  static PROPERTYMINTOPID_CODECONE: number = 2;
+
+  static PROPERTYBURNOPID_CODECONE: number = 3;
+
+  static PROPERTYCREDENTIAL_CODECONE: number = 4;
+
+  // end CODECONE constants
 
   static BASETX: number = 0;
 

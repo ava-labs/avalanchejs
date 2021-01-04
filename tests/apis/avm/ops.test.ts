@@ -59,7 +59,7 @@ describe('Operations', () => {
             outputOwners.push(new OutputOwners(addrs, locktime, 1));
             let op:NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
         
-            expect(op.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
+            expect(op.getOperationID()).toBe(AVMConstants.NFTMINTOPID_CODECONE);
             expect(op.getOutputOwners().toString()).toBe(outputOwners.toString());
         
             let opcopy:NFTMintOperation = new NFTMintOperation();
@@ -96,7 +96,7 @@ describe('Operations', () => {
             let nout:NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1);
             let op:NFTTransferOperation = new NFTTransferOperation(nout);
         
-            expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROPID);
+            expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROPID_CODECONE);
             expect(op.getOutput().toString()).toBe(nout.toString());
         
             let opcopy:NFTTransferOperation = new NFTTransferOperation();

@@ -54,12 +54,13 @@ export class UTXO extends StandardUTXO {
     offset += 4;
     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
-    // TODO - where do I add the `groupid` property?
-    const groupid: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    const groupID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    // console.log(groupID)
     offset += 2;
-    const outputid: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    const typeID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    // console.log(typeID)
     offset += 2;
-    this.output = SelectOutputClass(outputid);
+    this.output = SelectOutputClass(typeID);
     return this.output.fromBuffer(bytes, offset);
   }
 
@@ -439,7 +440,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if(typeof utxo === "undefined") {
       throw new Error("Error - UTXOSet.buildSECPMintTx: UTXOID not found");
     }
-    if(utxo.getOutput().getOutputID() !== AVMConstants.SECPMINTOUTPUTID) {
+    if(utxo.getOutput().getOutputID() !== AVMConstants.SECPMINTOUTPUTID_CODECONE) {
       throw new Error("Error - UTXOSet.buildSECPMintTx: UTXO is not a SECPMINTOUTPUTID");
     }
     let out:SECPMintOutput = utxo.getOutput() as SECPMintOutput;

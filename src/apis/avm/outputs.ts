@@ -20,13 +20,13 @@ const serializer = Serialization.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == AVMConstants.SECPXFEROUTPUTID){
+    if(outputid == AVMConstants.SECPXFEROUTPUTID_CODECONE){
         return new SECPTransferOutput( ...args);
-    } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
+    } else if(outputid == AVMConstants.SECPMINTOUTPUTID_CODECONE){
         return new SECPMintOutput( ...args);
-    } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
+    } else if(outputid == AVMConstants.NFTMINTOUTPUTID_CODECONE){
         return new NFTMintOutput(...args);
-    } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
+    } else if(outputid == AVMConstants.NFTXFEROUTPUTID_CODECONE){
         return new NFTTransferOutput(...args);
     }
     throw new Error(`Error - SelectOutputClass: unknown outputid ${outputid}`);
@@ -102,7 +102,7 @@ export abstract class NFTOutput extends BaseNFTOutput {
  */
 export class SECPTransferOutput extends AmountOutput {
   protected _typeName = "SECPTransferOutput";
-  protected _typeID = AVMConstants.SECPXFEROUTPUTID;
+  protected _typeID = AVMConstants.SECPXFEROUTPUTID_CODECONE;
   protected _groupID = AVMConstants.GROUPONE;
 
   //serialize and deserialize both are inherited
@@ -138,7 +138,7 @@ export class SECPTransferOutput extends AmountOutput {
  */
 export class SECPMintOutput extends Output {
   protected _typeName = "SECPMintOutput";
-  protected _typeID = AVMConstants.SECPMINTOUTPUTID;
+  protected _typeID = AVMConstants.SECPMINTOUTPUTID_CODECONE;
 
   //serialize and deserialize both are inherited
 
@@ -178,7 +178,7 @@ export class SECPMintOutput extends Output {
  */
 export class NFTMintOutput extends NFTOutput {
   protected _typeName = "NFTMintOutput";
-  protected _typeID = AVMConstants.NFTMINTOUTPUTID;
+  protected _typeID = AVMConstants.NFTMINTOUTPUTID_CODECONE;
 
   //serialize and deserialize both are inherited
 
@@ -239,7 +239,7 @@ export class NFTMintOutput extends NFTOutput {
  */
 export class NFTTransferOutput extends NFTOutput {
   protected _typeName = "NFTTransferOutput";
-  protected _typeID = AVMConstants.NFTXFEROUTPUTID;
+  protected _typeID = AVMConstants.NFTXFEROUTPUTID_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

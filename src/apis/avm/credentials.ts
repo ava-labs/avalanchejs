@@ -14,9 +14,9 @@ import { Credential } from '../../common/credentials';
  * @returns An instance of an [[Credential]]-extended class.
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
-  if (credid === AVMConstants.SECPCREDENTIAL) {
+  if (credid === AVMConstants.SECPCREDENTIAL_CODECONE) {
     return new SECPCredential(...args);
-  } if (credid === AVMConstants.NFTCREDENTIAL) {
+  } if (credid === AVMConstants.NFTCREDENTIAL_CODECONE) {
     return new NFTCredential(...args);
   }
   /* istanbul ignore next */
@@ -25,7 +25,7 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 
 export class SECPCredential extends Credential {
   protected _typeName = "SECPCredential";
-  protected _typeID = AVMConstants.SECPCREDENTIAL;
+  protected _typeID = AVMConstants.SECPCREDENTIAL_CODECONE;
 
   //serialize and deserialize both are inherited
 
@@ -52,7 +52,7 @@ export class SECPCredential extends Credential {
 
 export class NFTCredential extends Credential {
   protected _typeName = "NFTCredential";
-  protected _typeID = AVMConstants.NFTCREDENTIAL;
+  protected _typeID = AVMConstants.NFTCREDENTIAL_CODECONE;
 
   //serialize and deserialize both are inherited
 
