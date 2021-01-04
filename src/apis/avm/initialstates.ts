@@ -85,14 +85,14 @@ export class InitialStates extends Serializable{
     return offset;
   }
 
-  toBuffer():Buffer {
-    const buff:Array<Buffer> = [];
-    const keys:Array<number> = Object.keys(this.fxs).map((k) => parseInt(k, 10)).sort();
-    const klen:Buffer = Buffer.alloc(4);
+  toBuffer(): Buffer {
+    const buff: Buffer[] = [];
+    const keys: number[] = Object.keys(this.fxs).map((k) => parseInt(k, 10)).sort();
+    const klen: Buffer = Buffer.alloc(4);
     klen.writeUInt32BE(keys.length, 0);
     buff.push(klen);
-    for (let i = 0; i < keys.length; i++) {
-      const fxid:number = keys[i];
+    keys.forEach((key: number) => {
+      const fxid: number = key;
       const fxidbuff:Buffer = Buffer.alloc(4);
       fxidbuff.writeUInt32BE(fxid, 0);
       buff.push(fxidbuff);
@@ -100,13 +100,16 @@ export class InitialStates extends Serializable{
       const statelen:Buffer = Buffer.alloc(4);
       statelen.writeUInt32BE(initialState.length, 0);
       buff.push(statelen);
-      for (let j = 0; j < initialState.length; j++) {
-        const outputid:Buffer = Buffer.alloc(4);
-        outputid.writeInt32BE(initialState[j].getOutputID(), 0);
-        buff.push(outputid);
-        buff.push(initialState[j].toBuffer());
-      }
-    }
+      initialState.forEach((iState: Output) => {
+        const groupID: Buffer = Buffer.alloc(2);
+        groupID.writeInt16BE(iState.getGroupID(), 0);
+        buff.push(groupID);
+        const outputID: Buffer = Buffer.alloc(2);
+        outputID.writeInt16BE(iState.getOutputID(), 0);
+        buff.push(outputID);
+        buff.push(iState.toBuffer());
+      })
+    })
     return Buffer.concat(buff);
   }
 

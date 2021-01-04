@@ -21,6 +21,7 @@ const serializer = Serialization.getInstance();
 export class CreateAssetTx extends BaseTx {
   protected _typeName = "CreateAssetTx";
   protected _typeID = AVMConstants.CREATEASSETTX;
+  protected _groupID = AVMConstants.GROUPZERO;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

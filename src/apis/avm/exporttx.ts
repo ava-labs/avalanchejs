@@ -25,6 +25,7 @@ const serializer = Serialization.getInstance();
 export class ExportTx extends BaseTx {
   protected _typeName = "ExportTx";
   protected _typeID = AVMConstants.EXPORTTX;
+  protected _groupID = AVMConstants.GROUPZERO;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
