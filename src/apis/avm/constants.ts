@@ -4,19 +4,19 @@
  */
 
 export class AVMConstants {
-  static GROUP_ZERO: number = 0;
+  static GROUPZERO: number = 0;
 
-  static GROUP_ONE: number = 1;
+  static GROUPONE: number = 1;
 
-  static GROUP_TWO: number = 2;
+  static GROUPTWO: number = 2;
 
-  static GROUP_THREE: number = 3;
+  static GROUPTHREE: number = 3;
 
-  static CODEC_ZERO: number = 0;
+  static CODECZERO: number = 0;
 
-  static CODEC_ONE: number = 1;
+  static CODECONE: number = 1;
 
-  static LATESTCODEC: number = AVMConstants.CODEC_ONE;
+  static LATESTCODEC: number = AVMConstants.CODECONE;
 
   static SECPFXID: number = 0;
 

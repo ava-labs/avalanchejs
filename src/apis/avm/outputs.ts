@@ -29,7 +29,7 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
     } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
         return new NFTTransferOutput(...args);
     }
-    throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
+    throw new Error(`Error - SelectOutputClass: unknown outputid ${outputid}`);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
@@ -103,13 +103,21 @@ export abstract class NFTOutput extends BaseNFTOutput {
 export class SECPTransferOutput extends AmountOutput {
   protected _typeName = "SECPTransferOutput";
   protected _typeID = AVMConstants.SECPXFEROUTPUTID;
+  protected _groupID = AVMConstants.GROUPONE;
 
   //serialize and deserialize both are inherited
 
   /**
+     * Returns the groupID for this output
+     */
+  getGroupID(): number {
+    return this._groupID;
+  }
+
+  /**
      * Returns the outputID for this output
      */
-  getOutputID():number {
+  getOutputID(): number {
     return this._typeID;
   }
 
