@@ -6,7 +6,7 @@ import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import AvalancheCore from '../../avalanche';
 import BinTools from '../../utils/bintools';
-import { UTXOSet } from './utxos';
+import { UTXO, UTXOSet } from './utxos';
 import { AVMConstants } from './constants';
 import { KeyChain } from './keychain';
 import { Tx, UnsignedTx } from './tx';
@@ -16,11 +16,12 @@ import { InitialStates } from './initialstates';
 import { UnixNow } from '../../utils/helperfunctions';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import { Defaults, PlatformChainID, PrimaryAssetAlias, ONEAVAX } from '../../utils/constants';
+import { Defaults, PrimaryAssetAlias, ONEAVAX } from '../../utils/constants';
 import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
 import { SECPTransferOutput } from './outputs';
+import { Index, AVMUTXOResponse } from 'src/common';
 
 /**
  * @ignore
@@ -650,15 +651,10 @@ export class AVMAPI extends JRPCAPI {
   getUTXOs = async (
     addresses: string[] | string,
     sourceChain: string = undefined,
-    limit: number = 0,
-    startIndex: {address: string, utxo: string} = undefined,
+    limit:number = 0,
+    startIndex: Index = undefined,
     persistOpts: PersistanceOptions = undefined
-  ): Promise<{
-    numFetched: number,
-    encoding: string,
-    utxos: UTXOSet,
-    endIndex: {address: string, utxo: string}
-  }> => {
+  ):Promise<AVMUTXOResponse> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
@@ -878,10 +874,10 @@ export class AVMAPI extends JRPCAPI {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
-  const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
-  const avaxAssetID:Buffer = await this.getAVAXAssetID();
-
-  const atomics = atomicUTXOs.getAllUTXOs();
+  const avmUTXOResponse: AVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)
+  const atomicUTXOs: UTXOSet = await avmUTXOResponse.utxos;
+  const avaxAssetID: Buffer = await this.getAVAXAssetID();
+  const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
 
   if(atomics.length === 0){
     throw new Error("Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " + srcChain + " using addresses: " + ownerAddresses.join(", ") );
