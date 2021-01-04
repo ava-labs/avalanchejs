@@ -2,12 +2,12 @@
  * @packageDocumentation
  * @module Utils-BinTools
  */
+
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import createHash from 'create-hash';
 import * as bech32 from 'bech32';
 import { Base58 } from './base58';
-import { Defaults } from './constants';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using
@@ -303,16 +303,17 @@ export default class BinTools {
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
    * undefined if not valid.
    */
-  parseAddress = (addr:string,
-    blockchainID:string,
-    alias:string = undefined,
-    addrlen:number = 20):Buffer => {
-    const abc:Array<string> = addr.split('-');
+  parseAddress = (
+    addr: string,
+    blockchainID: string,
+    alias: string = undefined,
+    addrlen: number = 20): Buffer => {
+    const abc: string[] = addr.split('-');
     if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
-        const addrbuff = this.stringToAddress(addr);
-        if ((addrlen && addrbuff.length === addrlen) || !(addrlen)) {
-          return addrbuff;
-        }
+      const addrbuff = this.stringToAddress(addr);
+      if ((addrlen && addrbuff.length === addrlen) || !(addrlen)) {
+        return addrbuff;
+      }
     }
     return undefined;
   };
