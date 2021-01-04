@@ -266,12 +266,14 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
 
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
-  toBuffer():Buffer {
-    const codecid:Buffer = this.getCodecIDBuffer();
-    const txtype:Buffer = Buffer.alloc(4);
-    txtype.writeUInt32BE(this.transaction.getTxType(), 0);
+  toBuffer(): Buffer {
+    const codecID: Buffer = this.getCodecIDBuffer();
+    const groupID: Buffer = Buffer.alloc(2);
+    groupID.writeUInt16BE(this.transaction.getGroupID(), 0);
+    const typeID: Buffer = Buffer.alloc(2);
+    typeID.writeUInt16BE(this.transaction.getTxType(), 0);
     const basebuff = this.transaction.toBuffer();
-    return Buffer.concat([codecid, txtype, basebuff], codecid.length + txtype.length + basebuff.length);
+    return Buffer.concat([codecID, groupID, typeID, basebuff], codecID.length + groupID.length + typeID.length + basebuff.length);
   }
 
   /**
@@ -332,18 +334,22 @@ export abstract class StandardTx<
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
    */
-  toBuffer():Buffer {
-    const txbuff:Buffer = this.unsignedTx.toBuffer();
+  toBuffer(): Buffer {
+    const txbuff: Buffer = this.unsignedTx.toBuffer();
     let bsize:number = txbuff.length;
-    const credlen:Buffer = Buffer.alloc(4);
+    const credlen: Buffer = Buffer.alloc(4);
     credlen.writeUInt32BE(this.credentials.length, 0);
-    const barr:Array<Buffer> = [txbuff, credlen];
+    const barr: Buffer[] = [txbuff, credlen];
     bsize += credlen.length;
-    for (let i = 0; i < this.credentials.length; i++) {
-      const credid:Buffer = Buffer.alloc(4);
-      credid.writeUInt32BE(this.credentials[i].getCredentialID(), 0);
-      barr.push(credid);
-      bsize += credid.length;
+    for (let i: number = 0; i < this.credentials.length; i++) {
+      const groupdID: Buffer = Buffer.alloc(2);
+      groupdID.writeUInt16BE(this.credentials[i].getGroupID(), 0);
+      barr.push(groupdID);
+      bsize += groupdID.length;
+      const credID: Buffer = Buffer.alloc(2);
+      credID.writeUInt16BE(this.credentials[i].getCredentialID(), 0);
+      barr.push(credID);
+      bsize += credID.length;
       const credbuff:Buffer = this.credentials[i].toBuffer();
       bsize += credbuff.length;
       barr.push(credbuff);

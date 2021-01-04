@@ -360,10 +360,12 @@ export abstract class StandardParseableOutput extends Serializable {
 
   toBuffer():Buffer {
     const outbuff:Buffer = this.output.toBuffer();
-    const outid:Buffer = Buffer.alloc(4);
-    outid.writeUInt32BE(this.output.getOutputID(), 0);
-    const barr:Array<Buffer> = [outid, outbuff];
-    return Buffer.concat(barr, outid.length + outbuff.length);
+    const groupID:Buffer = Buffer.alloc(2);
+    groupID.writeUInt16BE(this.output.getGroupID(), 0);
+    const typeID:Buffer = Buffer.alloc(2);
+    typeID.writeUInt16BE(this.output.getOutputID(), 0);
+    const barr: Buffer[] = [groupID, typeID, outbuff];
+    return Buffer.concat(barr, groupID.length + typeID.length + outbuff.length);
   }
   
   /**

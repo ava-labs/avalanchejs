@@ -47,7 +47,6 @@ export class TransferableOutput extends StandardTransferableOutput{
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN);
     offset += AVMConstants.ASSETIDLEN;
-    // TODO - where do I add the `groupid` property?
     const groupID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
     const typeID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
@@ -108,13 +107,6 @@ export class SECPTransferOutput extends AmountOutput {
   //serialize and deserialize both are inherited
 
   /**
-     * Returns the groupID for this output
-     */
-  getGroupID(): number {
-    return this._groupID;
-  }
-
-  /**
      * Returns the outputID for this output
      */
   getOutputID(): number {
@@ -139,6 +131,7 @@ export class SECPTransferOutput extends AmountOutput {
 export class SECPMintOutput extends Output {
   protected _typeName = "SECPMintOutput";
   protected _typeID = AVMConstants.SECPMINTOUTPUTID_CODECONE;
+  protected _groupID = AVMConstants.GROUPONE;
 
   //serialize and deserialize both are inherited
 
@@ -179,6 +172,7 @@ export class SECPMintOutput extends Output {
 export class NFTMintOutput extends NFTOutput {
   protected _typeName = "NFTMintOutput";
   protected _typeID = AVMConstants.NFTMINTOUTPUTID_CODECONE;
+  protected _groupID = AVMConstants.GROUPONE;
 
   //serialize and deserialize both are inherited
 
@@ -240,6 +234,7 @@ export class NFTMintOutput extends NFTOutput {
 export class NFTTransferOutput extends NFTOutput {
   protected _typeName = "NFTTransferOutput";
   protected _typeID = AVMConstants.NFTXFEROUTPUTID_CODECONE;
+  protected _groupID = AVMConstants.GROUPONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -315,7 +310,7 @@ export class NFTTransferOutput extends NFTOutput {
   /**
      * An [[Output]] class which contains an NFT on an assetID.
      *
-     * @param groupID A number representing the amount in the output
+     * @param groupID A number representing the groupID
      * @param payload A {@link https://github.com/feross/buffer|Buffer} of max length 1024 
      * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime

@@ -21,7 +21,7 @@ import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
 import { SECPTransferOutput } from './outputs';
-import { Index, AVMUTXOResponse } from 'src/common';
+import { Index, AVMUTXOResponse, AVMGetUTXOS } from 'src/common';
 
 /**
  * @ignore
@@ -651,19 +651,20 @@ export class AVMAPI extends JRPCAPI {
   getUTXOs = async (
     addresses: string[] | string,
     sourceChain: string = undefined,
-    limit:number = 0,
+    limit: number = 0,
     startIndex: Index = undefined,
     persistOpts: PersistanceOptions = undefined
-  ):Promise<AVMUTXOResponse> => {
+  ): Promise<AVMUTXOResponse> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
     }
 
-    const params: any = {
+    const params: AVMGetUTXOS = {
       addresses: addresses,
       limit
     };
+
     if(typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex;
     }
@@ -672,16 +673,16 @@ export class AVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
+    return this.callMethod("avm.getUTXOs", params).then((response:RequestResponseData) => {
 
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
-      if (persistOpts && typeof persistOpts === 'object') {
+      if (persistOpts && typeof persistOpts === "object") {
         if (this.db.has(persistOpts.getName())) {
           const selfArray:Array<string> = this.db.get(persistOpts.getName());
           if (Array.isArray(selfArray)) {
             utxos.addArray(data);
-            const self:UTXOSet = new UTXOSet();
+            const self: UTXOSet = new UTXOSet();
             self.addArray(selfArray);
             self.mergeByRule(utxos, persistOpts.getMergeRule());
             data = self.getAllUTXOStrings();

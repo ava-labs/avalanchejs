@@ -27,6 +27,7 @@ const serializer = Serialization.getInstance();
 export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
   protected _typeName = "BaseTx";
   protected _typeID = AVMConstants.BASETX;
+  protected _groupID = AVMConstants.GROUPZERO;
 
   //serialize is inherited
 

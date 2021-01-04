@@ -80,6 +80,7 @@ export abstract class AmountInput extends StandardAmountInput {
 export class SECPTransferInput extends AmountInput {
   protected _typeName = "SECPTransferInput";
   protected _typeID = AVMConstants.SECPINPUTID_CODECONE;
+  protected _groupID = AVMConstants.GROUPONE;
 
   //serialize and deserialize both are inherited
 

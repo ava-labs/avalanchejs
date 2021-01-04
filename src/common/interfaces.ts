@@ -13,6 +13,13 @@ export interface Index {
   utxo: string
 }
 
+export interface AVMGetUTXOS {
+  addresses: string[] | string,
+  limit: number,
+  startIndex?: Index,
+  sourceChain?: string
+}
+
 export interface UTXOResponse {
   numFetched: number
   encoding: string

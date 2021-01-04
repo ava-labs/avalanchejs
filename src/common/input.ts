@@ -147,12 +147,14 @@ export abstract class StandardParseableInput extends Serializable {
   // must be implemented to select input types for the VM in question
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
-  toBuffer():Buffer {
-    const inbuff:Buffer = this.input.toBuffer();
-    const inid:Buffer = Buffer.alloc(4);
-    inid.writeUInt32BE(this.input.getInputID(), 0);
-    const barr:Array<Buffer> = [inid, inbuff];
-    return Buffer.concat(barr, inid.length + inbuff.length);
+  toBuffer(): Buffer {
+    const inbuff: Buffer = this.input.toBuffer();
+    const groupID: Buffer = Buffer.alloc(2);
+    groupID.writeUInt16BE(this.input.getGroupID(), 0);
+    const inID: Buffer = Buffer.alloc(2);
+    inID.writeUInt16BE(this.input.getInputID(), 0);
+    const barr:Array<Buffer> = [groupID, inID, inbuff];
+    return Buffer.concat(barr, groupID.length + inID.length + inbuff.length);
   }
   
   /**

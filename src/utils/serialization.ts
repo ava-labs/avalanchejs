@@ -38,6 +38,7 @@ export type SerializedEncoding =
 export abstract class Serializable {
     protected _typeName:string = undefined;
     protected _typeID:number = undefined;
+    protected _groupID:number = undefined;
 
     /**
      * Used in serialization. TypeName is a string name for the type of object being output.
@@ -51,6 +52,10 @@ export abstract class Serializable {
      */
     getTypeID():number {
         return this._typeID
+    }
+
+    getGroupID():number {
+        return this._groupID
     }
 
     //sometimes the parent class manages the fields

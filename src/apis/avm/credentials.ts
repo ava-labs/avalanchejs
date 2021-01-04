@@ -26,6 +26,7 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 export class SECPCredential extends Credential {
   protected _typeName = "SECPCredential";
   protected _typeID = AVMConstants.SECPCREDENTIAL_CODECONE;
+  protected _groupID = AVMConstants.GROUPONE;
 
   //serialize and deserialize both are inherited
 
