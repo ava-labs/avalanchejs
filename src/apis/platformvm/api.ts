@@ -14,8 +14,9 @@ import { PlatformVMConstants } from './constants';
 import { UnsignedTx, Tx } from './tx';
 import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXOSet } from '../platformvm/utxos';
+import { UTXO, UTXOSet } from './utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { Index, PlatformVMUTXOResponse } from 'src/common';
 
 /**
  * @ignore
@@ -887,16 +888,12 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    */
   getUTXOs = async (
-    addresses:Array<string> | string,
-    sourceChain:string = undefined,
-    limit:number = 0,
-    startIndex:{address:string, utxo:string} = undefined,
-    persistOpts:PersistanceOptions = undefined
-  ):Promise<{
-    numFetched:number,
-    utxos:UTXOSet,
-    endIndex:{address:string, utxo:string}
-  }> => {
+    addresses: string[] | string,
+    sourceChain: string = undefined,
+    limit: number = 0,
+    startIndex: Index = undefined,
+    persistOpts: PersistanceOptions = undefined
+  ): Promise<PlatformVMUTXOResponse> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
@@ -985,14 +982,15 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = bintools.cb58Encode(sourceChain);
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
-    const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
-    const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    const platformVMUTXOResponse: PlatformVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+    const atomicUTXOs: UTXOSet = platformVMUTXOResponse.utxos;
+    const avaxAssetID: Buffer = await this.getAVAXAssetID();
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
     }
 
-    const atomics = atomicUTXOs.getAllUTXOs();
+    const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildImportTx(
       this.core.getNetworkID(), 
