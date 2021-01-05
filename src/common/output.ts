@@ -263,16 +263,16 @@ export class OutputOwners extends Serializable {
   }
 
   static comparator = ():(a:Output, b:Output) => (1|-1|0) => (a:Output, b:Output):(1|-1|0) => {
-    const aoutid:Buffer = Buffer.alloc(4);
-    aoutid.writeUInt32BE(a.getOutputID(), 0);
-    const abuff:Buffer = a.toBuffer();
+    const aoutid: Buffer = Buffer.alloc(2);
+    aoutid.writeUInt16BE(a.getOutputID(), 0);
+    const abuff: Buffer = a.toBuffer();
 
-    const boutid:Buffer = Buffer.alloc(4);
-    boutid.writeUInt32BE(b.getOutputID(), 0);
-    const bbuff:Buffer = b.toBuffer();
+    const boutid: Buffer = Buffer.alloc(2);
+    boutid.writeUInt16BE(b.getOutputID(), 0);
+    const bbuff: Buffer = b.toBuffer();
 
-    const asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
-    const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+    const asort: Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+    const bsort: Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
