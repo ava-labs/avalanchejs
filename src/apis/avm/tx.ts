@@ -50,7 +50,7 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   protected _typeName = "UnsignedTx";
   protected _typeID = undefined;
-  protected codecid:number = AVMConstants.LATESTCODEC;
+  protected codecid: number = AVMConstants.LATESTCODEC;
 
   //serialize is inherited
 
@@ -67,7 +67,6 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   fromBuffer(bytes:Buffer, offset:number = 0):number {
     this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
-    // TODO - where do I add the `groupID` property?
     const groupID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
     const typeID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);

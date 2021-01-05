@@ -42,7 +42,7 @@ describe('Outputs', () => {
 
       test('Functionality', () => {
           let out:NFTMintOutput = new NFTMintOutput(0, addrs, fallLocktime, 3);
-          expect(out.getOutputID()).toBe(10);
+          expect(out.getOutputID()).toBe(0);
           expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
           expect(out.getThreshold()).toBe(3);
@@ -105,7 +105,7 @@ describe('Outputs', () => {
 
       test('SECPTransferOutput', () => {
           let out:SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
-          expect(out.getOutputID()).toBe(7);
+          expect(out.getOutputID()).toBe(2);
           expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
           expect(out.getThreshold()).toBe(3);
@@ -137,7 +137,7 @@ describe('Outputs', () => {
 
       test('SECPMintOutput', () => {
         let out:SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
-        expect(out.getOutputID()).toBe(6);
+        expect(out.getOutputID()).toBe(1);
         expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));
 
         expect(out.getThreshold()).toBe(3);
