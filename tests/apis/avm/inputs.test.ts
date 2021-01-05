@@ -69,7 +69,7 @@ describe('Inputs', () => {
     input = new SECPTransferInput(amount);
     xferinput = new TransferableInput(txid, txidx, asset, input);
     expect(xferinput.getUTXOID()).toBe(u.getUTXOID());
-    expect(input.getInputID()).toBe(AVMConstants.SECPINPUTID);
+    expect(input.getInputID()).toBe(AVMConstants.SECPXFERINPUTID);
 
     input.addSignatureIdx(0, addrs2[0]);
     input.addSignatureIdx(1, addrs2[1]);

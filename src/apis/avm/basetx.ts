@@ -61,9 +61,14 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
   /**
    * Returns the id of the [[BaseTx]]
    */
-  getTxType = ():number => {
-    return this._typeID;
-  }
+  getTxType = (codecID: number = 1): number => {
+    if(codecID === 0) {
+      return this._typeID;
+
+    } else if(codecID === 1)  {
+      return this._typeID;
+    }
+  } 
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[BaseTx]], parses it, populates the class, and returns the length of the BaseTx in bytes.

@@ -20,13 +20,13 @@ const serializer = Serialization.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == AVMConstants.SECPXFEROUTPUTID){
+    if(outputid === AVMConstants.SECPXFEROUTPUTID || outputid === AVMConstants.SECPXFEROUTPUTID_CODECONE){
         return new SECPTransferOutput( ...args);
-    } else if(outputid == AVMConstants.SECPMINTOUTPUTID){
+    } else if(outputid === AVMConstants.SECPMINTOUTPUTID || outputid === AVMConstants.SECPMINTOUTPUTID_CODECONE){
         return new SECPMintOutput( ...args);
-    } else if(outputid == AVMConstants.NFTMINTOUTPUTID){
+    } else if(outputid === AVMConstants.NFTMINTOUTPUTID){
         return new NFTMintOutput(...args);
-    } else if(outputid == AVMConstants.NFTXFEROUTPUTID){
+    } else if(outputid === AVMConstants.NFTXFEROUTPUTID){
         return new NFTTransferOutput(...args);
     }
     throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
@@ -110,6 +110,14 @@ export class SECPTransferOutput extends AmountOutput {
     return this._typeID;
   }
 
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.SECPXFEROUTPUTID;
+    } else if (codecID === 1) {
+      return AVMConstants.SECPXFEROUTPUTID_CODECONE;
+    }
+  }
+
   create(...args:any[]):this{
     return new SECPTransferOutput(...args) as this;
   }
@@ -136,6 +144,14 @@ export class SECPMintOutput extends Output {
    */
   getOutputID():number {
     return this._typeID;
+  }
+
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.SECPMINTOUTPUTID;
+    } else if (codecID === 1) {
+      return AVMConstants.SECPMINTOUTPUTID_CODECONE;
+    }
   }
 
   /**

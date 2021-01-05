@@ -12,15 +12,23 @@ export class AVMConstants {
 
   static SECPMINTOUTPUTID:number = 6;
 
+  static SECPMINTOUTPUTID_CODECONE:number = 65537;
+
   static SECPXFEROUTPUTID:number = 7;
+
+  static SECPXFEROUTPUTID_CODECONE:number = 65538;
 
   static NFTXFEROUTPUTID:number = 11;
 
   static NFTMINTOUTPUTID:number = 10;
 
-  static SECPINPUTID:number = 5;
+  static SECPXFERINPUTID:number = 5;
+
+  static SECPXFERINPUTID_CODECONE:number = 65536;
 
   static SECPMINTOPID:number = 8;
+
+  static SECPMINTOPID_CODECONE:number = 65539;
 
   static NFTMINTOPID:number = 12;
 
@@ -37,6 +45,8 @@ export class AVMConstants {
   static EXPORTTX:number = 4;
 
   static SECPCREDENTIAL:number = 9;
+  
+  static SECPCREDENTIAL_CODECONE:number = 65540;
 
   static NFTCREDENTIAL:number = 14;
 

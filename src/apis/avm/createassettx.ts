@@ -49,9 +49,14 @@ export class CreateAssetTx extends BaseTx {
   /**
    * Returns the id of the [[CreateAssetTx]]
    */
-  getTxType = ():number => {
-    return this._typeID;
-  }
+  getTxType = (codecID: number = 1): number => {
+    if(codecID === 0) {
+      return this._typeID;
+
+    } else if(codecID === 1)  {
+      return this._typeID;
+    }
+  } 
 
   /**
    * Returns the array of array of [[Output]]s for the initial state

@@ -7,6 +7,7 @@ import BinTools from '../utils/bintools';
 import BN from 'bn.js';
 import { SigIdx } from './credentials';
 import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { AVMConstants } from '../../src/apis/avm/constants';
 
 /**
  * @ignore
@@ -17,6 +18,7 @@ const serializer = Serialization.getInstance();
 export abstract class Input extends Serializable {
   protected _typeName = "Input";
   protected _typeID = undefined;
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number | void {};
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -147,10 +149,10 @@ export abstract class StandardParseableInput extends Serializable {
   // must be implemented to select input types for the VM in question
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     const inbuff:Buffer = this.input.toBuffer();
     const inid:Buffer = Buffer.alloc(4);
-    inid.writeUInt32BE(this.input.getInputID(), 0);
+    inid.writeUInt32BE(this.input.getEncodingID(codecID) as number, 0);
     const barr:Array<Buffer> = [inid, inbuff];
     return Buffer.concat(barr, inid.length + inbuff.length);
   }
@@ -227,8 +229,8 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTransferableInput]].
    */
-  toBuffer():Buffer {
-    const parseableBuff:Buffer = super.toBuffer();
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
+    const parseableBuff:Buffer = super.toBuffer(codecID);
     const bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + parseableBuff.length;
     const barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, parseableBuff];
     const buff: Buffer = Buffer.concat(barr, bsize);

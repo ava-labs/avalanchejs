@@ -9,6 +9,7 @@ import BinTools from '../utils/bintools';
 import { NBytes } from './nbytes';
 import { UnixNow } from '../utils/helperfunctions';
 import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { AVMConstants } from '../../src/apis/avm/constants';
 
 /**
  * @ignore
@@ -307,6 +308,7 @@ export class OutputOwners extends Serializable {
 export abstract class Output extends OutputOwners {
   protected _typeName = "Output";
   protected _typeID = undefined;
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number | void {};
   
   //serialize and deserialize both are inherited
 
@@ -314,7 +316,7 @@ export abstract class Output extends OutputOwners {
    * Returns the outputID for the output which tells parsers what type it is
    */
   abstract getOutputID():number;
-
+ 
   abstract clone():this;
 
   abstract create(...args:any[]):this;
@@ -358,10 +360,10 @@ export abstract class StandardParseableOutput extends Serializable {
   // must be implemented to select output types for the VM in question
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     const outbuff:Buffer = this.output.toBuffer();
     const outid:Buffer = Buffer.alloc(4);
-    outid.writeUInt32BE(this.output.getOutputID(), 0);
+    outid.writeUInt32BE(this.output.getEncodingID(codecID) as number, 0);
     const barr:Array<Buffer> = [outid, outbuff];
     return Buffer.concat(barr, outid.length + outbuff.length);
   }
@@ -402,8 +404,8 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
   // must be implemented to select output types for the VM in question
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
-  toBuffer():Buffer {
-    const parseableBuff:Buffer = super.toBuffer();
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
+    const parseableBuff:Buffer = super.toBuffer(codecID);
     const barr:Array<Buffer> = [this.assetID, parseableBuff];
     return Buffer.concat(barr, this.assetID.length + parseableBuff.length);
   }
