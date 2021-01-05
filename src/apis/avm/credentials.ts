@@ -14,9 +14,9 @@ import { Credential } from '../../common/credentials';
  * @returns An instance of an [[Credential]]-extended class.
  */
 export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
-  if (credid === AVMConstants.SECPCREDENTIAL) {
+  if (credid === AVMConstants.SECPCREDENTIAL || credid === AVMConstants.SECPCREDENTIAL_CODECONE) {
     return new SECPCredential(...args);
-  } if (credid === AVMConstants.NFTCREDENTIAL) {
+  } if (credid === AVMConstants.NFTCREDENTIAL || credid === AVMConstants.NFTCREDENTIAL_CODECONE) {
     return new NFTCredential(...args);
   }
   /* istanbul ignore next */

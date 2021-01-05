@@ -92,15 +92,15 @@ export class ImportTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
    */
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     if(typeof this.sourceChain === "undefined") {
       throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
+    let barr:Array<Buffer> = [super.toBuffer(codecID), this.sourceChain, this.numIns];
     this.importIns = this.importIns.sort(TransferableInput.comparator());
     for(let i = 0; i < this.importIns.length; i++) {
-        barr.push(this.importIns[i].toBuffer());
+        barr.push(this.importIns[i].toBuffer(codecID));
     }
     return Buffer.concat(barr);
   }

@@ -81,12 +81,12 @@ export class OperationTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
    */
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
       this.numOps.writeUInt32BE(this.ops.length, 0);
-      let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
+      let barr:Array<Buffer> = [super.toBuffer(codecID), this.numOps];
       this.ops = this.ops.sort(TransferableOperation.comparator());
       for(let i = 0; i < this.ops.length; i++) {
-          barr.push(this.ops[i].toBuffer());
+          barr.push(this.ops[i].toBuffer(codecID));
       }
       return Buffer.concat(barr);
   }

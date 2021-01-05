@@ -194,6 +194,14 @@ export class NFTMintOutput extends NFTOutput {
       return this._typeID;
   }
 
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.NFTMINTOUTPUTID;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTMINTOUTPUTID_CODECONE;
+    }
+  }
+
   /**
    * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOutput]] and returns the size of the output.
    */
@@ -270,11 +278,18 @@ export class NFTTransferOutput extends NFTOutput {
       return this._typeID;
   }
 
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.NFTXFEROUTPUTID;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTXFEROUTPUTID_CODECONE;
+    }
+  }
+
   /**
    * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with content only.
    */
   getPayload = ():Buffer =>  bintools.copyFrom(this.payload);
-
 
   /**
    * Returns the payload as a {@link https://github.com/feross/buffer|Buffer} with length of payload prepended.

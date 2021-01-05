@@ -23,11 +23,11 @@ const serializer = Serialization.getInstance();
  * @returns An instance of an [[Operation]]-extended class.
  */
 export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation => {
-    if(opid == AVMConstants.SECPMINTOPID) {
+    if(opid === AVMConstants.SECPMINTOPID || opid === AVMConstants.SECPMINTOPID_CODECONE) {
       return new SECPMintOperation(...args);
-    } else if(opid == AVMConstants.NFTMINTOPID){
+    } else if(opid === AVMConstants.NFTMINTOPID || opid === AVMConstants.NFTMINTOPID_CODECONE){
       return new NFTMintOperation(...args);
-    } else if(opid == AVMConstants.NFTXFEROPID){
+    } else if(opid === AVMConstants.NFTXFEROPID || opid === AVMConstants.NFTXFEROPID_CODECONE){
       return new NFTTransferOperation(...args);
     }
     /* istanbul ignore next */
@@ -40,6 +40,7 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
 export abstract class Operation extends Serializable{
   protected _typeName = "Operation";
   protected _typeID = undefined;
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number | void {};
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -212,7 +213,7 @@ export class TransferableOperation extends Serializable {
     return this.operation.fromBuffer(bytes, offset);
   }
 
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     const numutxoIDs = Buffer.alloc(4);
     numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
     let bsize:number = this.assetid.length + numutxoIDs.length;
@@ -224,7 +225,7 @@ export class TransferableOperation extends Serializable {
       bsize += b.length;
     }
     const opid:Buffer = Buffer.alloc(4);
-    opid.writeUInt32BE(this.operation.getOperationID(), 0);
+    opid.writeUInt32BE(this.operation.getEncodingID(codecID) as number, 0);
     barr.push(opid);
     bsize += opid.length;
     const b:Buffer = this.operation.toBuffer();
@@ -288,6 +289,14 @@ export class SECPMintOperation extends Operation {
    */
   getOperationID():number {
     return this._typeID;
+  }
+
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.SECPMINTOPID;
+    } else if (codecID === 1) {
+      return AVMConstants.SECPMINTOPID_CODECONE;
+    }
   }
 
   /**
@@ -389,8 +398,6 @@ export class NFTMintOperation extends Operation {
     });
   }
 
-
-
   protected groupID:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
   protected outputOwners:Array<OutputOwners> = [];
@@ -400,6 +407,14 @@ export class NFTMintOperation extends Operation {
    */
   getOperationID():number {
     return this._typeID;
+  }
+
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.NFTMINTOPID;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTMINTOPID_CODECONE;
+    }
   }
 
   /**
@@ -540,6 +555,14 @@ export class NFTTransferOperation extends Operation {
    */
   getOperationID():number {
     return this._typeID;
+  }
+
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.NFTXFEROPID;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTXFEROPID_CODECONE;
+    }
   }
 
   /**

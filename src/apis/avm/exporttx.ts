@@ -113,12 +113,12 @@ export class ExportTx extends BaseTx {
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
      */
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     if(typeof this.destinationChain === "undefined") {
       throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
     this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(), this.destinationChain, this.numOuts];
+    let barr:Array<Buffer> = [super.toBuffer(codecID), this.destinationChain, this.numOuts];
     this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
     for(let i = 0; i < this.exportOuts.length; i++) {
         barr.push(this.exportOuts[i].toBuffer());

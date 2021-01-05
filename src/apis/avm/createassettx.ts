@@ -120,9 +120,9 @@ export class CreateAssetTx extends BaseTx {
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateAssetTx]].
      */
-  toBuffer():Buffer {
-    const superbuff:Buffer = super.toBuffer();
-    const initstatebuff:Buffer = this.initialstate.toBuffer();
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
+    const superbuff:Buffer = super.toBuffer(codecID);
+    const initstatebuff:Buffer = this.initialstate.toBuffer(codecID);
 
     const namebuff:Buffer = Buffer.alloc(this.name.length);
     namebuff.write(this.name, 0, this.name.length, 'utf8');
