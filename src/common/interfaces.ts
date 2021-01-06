@@ -19,10 +19,6 @@ export interface UTXOResponse {
   endIndex: Index
 }
 
-export interface AVMUTXOResponse extends UTXOResponse {
-  utxos: AVMUTXOSet
-}
-
 export interface PlatformVMUTXOResponse extends UTXOResponse {
   utxos: PlatformVMUTXOSet
 }

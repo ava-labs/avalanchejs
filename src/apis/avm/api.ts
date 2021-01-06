@@ -21,7 +21,8 @@ import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
 import { SECPTransferOutput } from './outputs';
-import { Index, AVMUTXOResponse } from 'src/common';
+import { Index } from '../../../src/common';
+import { iAVMUTXOResponse, iGetBalanceParams, iGetBalanceResponse } from './interfaces';
 
 /**
  * @ignore
@@ -270,12 +271,13 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Promise with the balance of the assetID as a {@link https://github.com/indutny/bn.js/|BN} on the provided address for the blockchain.
      */
-  getBalance = async (address:string, assetID:string):Promise<object> => {
+
+  getBalance = async (address:string, assetID:string):Promise<iGetBalanceResponse> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.getBalance: Invalid address format ${address}`);
     }
-    const params:any = {
+    const params:iGetBalanceParams = {
       address,
       assetID,
     };
@@ -654,7 +656,7 @@ export class AVMAPI extends JRPCAPI {
     limit:number = 0,
     startIndex: Index = undefined,
     persistOpts: PersistanceOptions = undefined
-  ):Promise<AVMUTXOResponse> => {
+  ):Promise<iAVMUTXOResponse> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
@@ -874,8 +876,8 @@ export class AVMAPI extends JRPCAPI {
     throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
-  const avmUTXOResponse: AVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)
-  const atomicUTXOs: UTXOSet = await avmUTXOResponse.utxos;
+  const avmUTXOResponse: iAVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)
+  const atomicUTXOs: UTXOSet = avmUTXOResponse.utxos;
   const avaxAssetID: Buffer = await this.getAVAXAssetID();
   const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
 
