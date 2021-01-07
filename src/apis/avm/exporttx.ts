@@ -121,7 +121,7 @@ export class ExportTx extends BaseTx {
     let barr:Array<Buffer> = [super.toBuffer(codecID), this.destinationChain, this.numOuts];
     this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
     for(let i = 0; i < this.exportOuts.length; i++) {
-        barr.push(this.exportOuts[i].toBuffer());
+        barr.push(this.exportOuts[i].toBuffer(codecID));
     }
     return Buffer.concat(barr);
   }

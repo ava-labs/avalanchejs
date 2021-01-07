@@ -24,12 +24,12 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
         return new SECPTransferOutput( ...args);
     } else if(outputid === AVMConstants.SECPMINTOUTPUTID || outputid === AVMConstants.SECPMINTOUTPUTID_CODECONE){
         return new SECPMintOutput( ...args);
-    } else if(outputid === AVMConstants.NFTMINTOUTPUTID){
+    } else if(outputid === AVMConstants.NFTMINTOUTPUTID || outputid === AVMConstants.NFTMINTOUTPUTID_CODECONE){
         return new NFTMintOutput(...args);
-    } else if(outputid === AVMConstants.NFTXFEROUTPUTID){
+    } else if(outputid === AVMConstants.NFTXFEROUTPUTID || outputid === AVMConstants.NFTXFEROUTPUTID_CODECONE){
         return new NFTTransferOutput(...args);
     }
-    throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
+    throw new Error(`Error - SelectOutputClass: unknown outputid ${outputid}`);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
