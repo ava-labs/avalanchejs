@@ -269,7 +269,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
 
   toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     const codecBuf:Buffer = Buffer.alloc(2);
-    codecBuf.writeUInt16BE(this.codecid, 0)
+    codecBuf.writeUInt16BE(codecID, 0)
+    this.codecid = codecID;
     const txtype:Buffer = Buffer.alloc(4);
     if(codecID === 0) {
       // in this case the final result is the same for all tx types in both codec 0 and 1
@@ -277,7 +278,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     } else if (codecID === 1) {
       txtype.writeUInt32BE(this.transaction.getTxType(), 0);
     }
-    const basebuff = this.transaction.toBuffer();
+    const basebuff = this.transaction.toBuffer(codecID);
     return Buffer.concat([codecBuf, txtype, basebuff], codecBuf.length + txtype.length + basebuff.length);
   }
 
@@ -348,7 +349,7 @@ export abstract class StandardTx<
     bsize += credlen.length;
     for (let i = 0; i < this.credentials.length; i++) {
       const credid:Buffer = Buffer.alloc(4);
-      credid.writeUInt32BE(this.credentials[i].getCredentialID(), 0);
+      credid.writeUInt32BE(this.credentials[i].getEncodingID(codecID) as number, 0);
       barr.push(credid);
       bsize += credid.length;
       const credbuff:Buffer = this.credentials[i].toBuffer();

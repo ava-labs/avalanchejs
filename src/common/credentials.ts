@@ -6,6 +6,7 @@ import { NBytes } from './nbytes';
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { AVMConstants } from '../apis/avm';
 
 
 /**
@@ -101,6 +102,7 @@ export class Signature extends NBytes {
 export abstract class Credential extends Serializable{
   protected _typeName = "Credential";
   protected _typeID = undefined;
+  getEncodingID(codecID:number = AVMConstants.LATESTCODEC): number | void {};
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);

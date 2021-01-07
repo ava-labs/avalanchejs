@@ -62,12 +62,7 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
    * Returns the id of the [[BaseTx]]
    */
   getTxType = (codecID: number = 1): number => {
-    if(codecID === 0) {
-      return this._typeID;
-
-    } else if(codecID === 1)  {
-      return this._typeID;
-    }
+    return this._typeID;
   } 
 
   /**

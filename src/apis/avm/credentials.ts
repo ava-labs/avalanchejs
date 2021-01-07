@@ -33,6 +33,14 @@ export class SECPCredential extends Credential {
     return this._typeID;
   }
 
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.SECPCREDENTIAL;
+    } else if (codecID === 1) {
+      return AVMConstants.SECPCREDENTIAL_CODECONE;
+    }
+  }
+
   clone():this {
     let newbase:SECPCredential = new SECPCredential();
     newbase.fromBuffer(this.toBuffer());
@@ -58,6 +66,14 @@ export class NFTCredential extends Credential {
 
   getCredentialID():number {
     return this._typeID;
+  }
+
+  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+    if(codecID === 0) {
+      return AVMConstants.NFTCREDENTIAL;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTCREDENTIAL_CODECONE;
+    }
   }
 
   clone():this {

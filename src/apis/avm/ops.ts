@@ -335,7 +335,7 @@ export class SECPMintOperation extends Operation {
   /**
    * Returns the buffer representing the [[SECPMintOperation]] instance.
    */
-  toBuffer():Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     let superbuff:Buffer = super.toBuffer();
     let mintoutBuff:Buffer = this.mintOutput.toBuffer();
     let transferOutBuff:Buffer = this.transferOutput.toBuffer();
