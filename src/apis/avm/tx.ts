@@ -81,8 +81,8 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    *
    * @returns A signed [[StandardTx]]
    */
-  sign(kc:KeyChain):Tx {
-    const txbuff = this.toBuffer();
+  sign(kc:KeyChain, codecID:number = AVMConstants.LATESTCODEC):Tx {
+    const txbuff = this.toBuffer(codecID);
     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
