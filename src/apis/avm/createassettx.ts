@@ -49,7 +49,7 @@ export class CreateAssetTx extends BaseTx {
   /**
    * Returns the id of the [[CreateAssetTx]]
    */
-  getTxType = (codecID: number = 1): number => {
+  getTxType = (): number => {
     return this._typeID;
   } 
 
