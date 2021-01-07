@@ -377,8 +377,8 @@ export abstract class StandardTx<
    * @remarks
    * unlike most toStrings, this returns in cb58 serialization format
    */
-  toString():string {
-    return bintools.cb58Encode(this.toBuffer());
+  toString(codecID:number = AVMConstants.LATESTCODEC):string {
+    return bintools.cb58Encode(this.toBuffer(codecID));
   }
 
   /**
