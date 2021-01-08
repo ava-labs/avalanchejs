@@ -131,7 +131,7 @@ export abstract class Credential extends Serializable{
     return this.sigArray.length - 1;
   };
 
-  fromBuffer(bytes, offset:number = 0):number {
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
     const siglen:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.sigArray = [];
