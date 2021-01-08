@@ -102,7 +102,6 @@ export class Signature extends NBytes {
 export abstract class Credential extends Serializable{
   protected _typeName = "Credential";
   protected _typeID = undefined;
-  getEncodingID(codecID:number = AVMConstants.LATESTCODEC): number | void {};
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -122,7 +121,7 @@ export abstract class Credential extends Serializable{
 
   protected sigArray:Array<Signature> = [];
 
-  abstract getCredentialID():number;
+  abstract getCredentialID(codecID?:number):number;
 
   /**
      * Adds a signature to the credentials and returns the index off the added signature.

@@ -18,7 +18,6 @@ const serializer = Serialization.getInstance();
 export abstract class Input extends Serializable {
   protected _typeName = "Input";
   protected _typeID = undefined;
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number | void {};
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -54,7 +53,7 @@ export abstract class Input extends Serializable {
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
-  abstract getInputID():number;
+  abstract getInputID(codecID?:number):number;
 
   /**
    * Returns the array of [[SigIdx]] for this [[Input]]
@@ -152,7 +151,7 @@ export abstract class StandardParseableInput extends Serializable {
   toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     const inbuff:Buffer = this.input.toBuffer();
     const inid:Buffer = Buffer.alloc(4);
-    inid.writeUInt32BE(this.input.getEncodingID(codecID) as number, 0);
+    inid.writeUInt32BE(this.input.getInputID(codecID), 0);
     const barr:Array<Buffer> = [inid, inbuff];
     return Buffer.concat(barr, inid.length + inbuff.length);
   }

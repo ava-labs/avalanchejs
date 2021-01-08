@@ -40,7 +40,6 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
 export abstract class Operation extends Serializable{
   protected _typeName = "Operation";
   protected _typeID = undefined;
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number | void {};
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -76,7 +75,7 @@ export abstract class Operation extends Serializable{
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
-  abstract getOperationID():number;
+  abstract getOperationID(codecID?:number):number;
 
   /**
      * Returns the array of [[SigIdx]] for this [[Operation]]
@@ -219,13 +218,13 @@ export class TransferableOperation extends Serializable {
     let bsize:number = this.assetid.length + numutxoIDs.length;
     const barr:Array<Buffer> = [this.assetid, numutxoIDs];
     this.utxoIDs = this.utxoIDs.sort(UTXOID.comparator());
-    for (let i = 0; i < this.utxoIDs.length; i++) {
-      const b:Buffer = this.utxoIDs[i].toBuffer();
+    this.utxoIDs.forEach((utxoID: UTXOID) => {
+      const b:Buffer = utxoID.toBuffer();
       barr.push(b);
       bsize += b.length;
-    }
+    })
     const opid:Buffer = Buffer.alloc(4);
-    opid.writeUInt32BE(this.operation.getEncodingID(codecID) as number, 0);
+    opid.writeUInt32BE(this.operation.getOperationID(codecID), 0);
     barr.push(opid);
     bsize += opid.length;
     const b:Buffer = this.operation.toBuffer();
@@ -263,6 +262,7 @@ export class TransferableOperation extends Serializable {
  */
 export class SECPMintOperation extends Operation {
   protected _typeName = "SECPMintOperation";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.SECPMINTOPID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
@@ -287,21 +287,19 @@ export class SECPMintOperation extends Operation {
   /**
    * Returns the operation ID.
    */
-  getOperationID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOperationID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.SECPMINTOPID;
     } else if (codecID === 1) {
-      return AVMConstants.SECPMINTOPID_CODECONE;
+      this._typeID = AVMConstants.SECPMINTOPID_CODECONE;
+      return this._typeID;
     }
   }
 
   /**
    * Returns the credential ID.
    */
+  // TODO - Do we need to conditionally pass back SECPCREDENTIAL_CODECONE?
   getCredentialID():number {
     return AVMConstants.SECPCREDENTIAL;
   }
@@ -376,6 +374,7 @@ export class SECPMintOperation extends Operation {
  */
 export class NFTMintOperation extends Operation {
   protected _typeName = "NFTMintOperation";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.NFTMINTOPID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
@@ -405,21 +404,19 @@ export class NFTMintOperation extends Operation {
   /**
    * Returns the operation ID.
    */
-  getOperationID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOperationID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.NFTMINTOPID;
     } else if (codecID === 1) {
-      return AVMConstants.NFTMINTOPID_CODECONE;
+      this._typeID = AVMConstants.NFTMINTOPID_CODECONE;
+      return this._typeID;
     }
   }
 
   /**
    * Returns the credential ID.
    */
+  // TODO - Do we need to conditionally pass back NFTCREDENTIAL_CODECONE?
   getCredentialID():number {
     return AVMConstants.NFTCREDENTIAL;
   }
@@ -533,6 +530,7 @@ export class NFTMintOperation extends Operation {
  */
 export class NFTTransferOperation extends Operation {
   protected _typeName = "NFTTransferOperation";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.NFTXFEROPID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
@@ -553,21 +551,19 @@ export class NFTTransferOperation extends Operation {
   /**
    * Returns the operation ID.
    */
-  getOperationID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOperationID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.NFTXFEROPID;
     } else if (codecID === 1) {
-      return AVMConstants.NFTXFEROPID_CODECONE;
+      this._typeID = AVMConstants.NFTXFEROPID_CODECONE;
+      return this._typeID;
     }
   }
 
   /**
    * Returns the credential ID.
    */
+  // TODO - Do we need to conditionally pass back NFTCREDENTIAL_CODECONE?
   getCredentialID():number {
     return AVMConstants.NFTCREDENTIAL;
   }

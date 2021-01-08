@@ -308,14 +308,13 @@ export class OutputOwners extends Serializable {
 export abstract class Output extends OutputOwners {
   protected _typeName = "Output";
   protected _typeID = undefined;
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number | void {};
   
   //serialize and deserialize both are inherited
 
   /**
    * Returns the outputID for the output which tells parsers what type it is
    */
-  abstract getOutputID():number;
+  abstract getOutputID(codecID?:number):number;
  
   abstract clone():this;
 
@@ -363,7 +362,7 @@ export abstract class StandardParseableOutput extends Serializable {
   toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
     const outbuff:Buffer = this.output.toBuffer();
     const outid:Buffer = Buffer.alloc(4);
-    outid.writeUInt32BE(this.output.getEncodingID(codecID) as number, 0);
+    outid.writeUInt32BE(this.output.getOutputID(codecID), 0);
     const barr:Array<Buffer> = [outid, outbuff];
     return Buffer.concat(barr, outid.length + outbuff.length);
   }

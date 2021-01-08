@@ -76,6 +76,7 @@ export abstract class AmountInput extends StandardAmountInput {
 
 export class SECPTransferInput extends AmountInput {
   protected _typeName = "SECPTransferInput";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.SECPXFERINPUTID;
 
   //serialize and deserialize both are inherited
@@ -83,18 +84,16 @@ export class SECPTransferInput extends AmountInput {
   /**
      * Returns the inputID for this input
      */
-  getInputID():number {
-    return AVMConstants.SECPXFERINPUTID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getInputID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.SECPXFERINPUTID;
     } else if (codecID === 1) {
-      return AVMConstants.SECPXFERINPUTID_CODECONE;
+      this._typeID = AVMConstants.SECPXFERINPUTID_CODECONE;
+      return this._typeID;
     }
   }
 
+  // TODO - Do we need to conditionally pass back SECPCREDENTIAL_CODECONE?
   getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
 
   create(...args:any[]):this{

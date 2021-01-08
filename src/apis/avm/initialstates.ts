@@ -91,8 +91,8 @@ export class InitialStates extends Serializable{
     const klen:Buffer = Buffer.alloc(4);
     klen.writeUInt32BE(keys.length, 0);
     buff.push(klen);
-    for (let i = 0; i < keys.length; i++) {
-      const fxid:number = keys[i];
+    keys.forEach((key:number) => {
+      const fxid:number = key;
       const fxidbuff:Buffer = Buffer.alloc(4);
       fxidbuff.writeUInt32BE(fxid, 0);
       buff.push(fxidbuff);
@@ -100,13 +100,13 @@ export class InitialStates extends Serializable{
       const statelen:Buffer = Buffer.alloc(4);
       statelen.writeUInt32BE(initialState.length, 0);
       buff.push(statelen);
-      for (let j = 0; j < initialState.length; j++) {
+      initialState.forEach((inState:Output) => {
         const outputid:Buffer = Buffer.alloc(4);
-        outputid.writeInt32BE(initialState[j].getEncodingID(codecID) as number, 0);
+        outputid.writeInt32BE(inState.getOutputID(codecID), 0);
         buff.push(outputid);
-        buff.push(initialState[j].toBuffer());
-      }
-    }
+        buff.push(inState.toBuffer());
+      });
+    });
     return Buffer.concat(buff);
   }
 

@@ -25,19 +25,17 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 
 export class SECPCredential extends Credential {
   protected _typeName = "SECPCredential";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.SECPCREDENTIAL;
 
   //serialize and deserialize both are inherited
 
-  getCredentialID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getCredentialID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.SECPCREDENTIAL;
     } else if (codecID === 1) {
-      return AVMConstants.SECPCREDENTIAL_CODECONE;
+      this._typeID = AVMConstants.SECPCREDENTIAL_CODECONE;
+      return this._typeID;
     }
   }
 
@@ -60,19 +58,17 @@ export class SECPCredential extends Credential {
 
 export class NFTCredential extends Credential {
   protected _typeName = "NFTCredential";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.NFTCREDENTIAL;
 
   //serialize and deserialize both are inherited
 
-  getCredentialID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getCredentialID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.NFTCREDENTIAL;
     } else if (codecID === 1) {
-      return AVMConstants.NFTCREDENTIAL_CODECONE;
+      this._typeID = AVMConstants.NFTCREDENTIAL_CODECONE;
+      return this._typeID;
     }
   }
 

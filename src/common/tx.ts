@@ -92,25 +92,25 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
+  toBuffer(codecID:number = AVMConstants.LATESTCODEC):Buffer {
     this.outs.sort(StandardTransferableOutput.comparator());
     this.ins.sort(StandardTransferableInput.comparator());
     this.numouts.writeUInt32BE(this.outs.length, 0);
     this.numins.writeUInt32BE(this.ins.length, 0);
     let bsize:number = this.networkid.length + this.blockchainid.length + this.numouts.length;
     const barr:Array<Buffer> = [this.networkid, this.blockchainid, this.numouts];
-    for (let i = 0; i < this.outs.length; i++) {
-      const b:Buffer = this.outs[i].toBuffer(codecID);
+    this.outs.forEach((out: StandardTransferableOutput) => {
+      const b:Buffer = out.toBuffer(codecID);
       barr.push(b);
       bsize += b.length;
-    }
+    });
     barr.push(this.numins);
     bsize += this.numins.length;
-    for (let i = 0; i < this.ins.length; i++) {
-      const b:Buffer = this.ins[i].toBuffer(codecID);
+    this.ins.forEach((input: StandardTransferableInput) => {
+      const b:Buffer = input.toBuffer(codecID);
       barr.push(b);
       bsize += b.length;
-    }
+    });
     let memolen:Buffer = Buffer.alloc(4);
     memolen.writeUInt32BE(this.memo.length, 0);
     barr.push(memolen);
@@ -269,12 +269,9 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     codecBuf.writeUInt16BE(codecID, 0)
     this.codecid = codecID;
     const txtype:Buffer = Buffer.alloc(4);
-    if(codecID === 0) {
-      // in this case the final result is the same for all tx types in both codec 0 and 1
-      txtype.writeUInt32BE(this.transaction.getTxType(), 0);
-    } else if (codecID === 1) {
-      txtype.writeUInt32BE(this.transaction.getTxType(), 0);
-    }
+    // in this case the final result is the same for all tx types 
+    // in both codec 0 and 1
+    txtype.writeUInt32BE(this.transaction.getTxType(), 0);
     const basebuff = this.transaction.toBuffer(codecID);
     return Buffer.concat([codecBuf, txtype, basebuff], codecBuf.length + txtype.length + basebuff.length);
   }
@@ -346,7 +343,7 @@ export abstract class StandardTx<
     bsize += credlen.length;
     for (let i = 0; i < this.credentials.length; i++) {
       const credid:Buffer = Buffer.alloc(4);
-      credid.writeUInt32BE(this.credentials[i].getEncodingID(codecID) as number, 0);
+      credid.writeUInt32BE(this.credentials[i].getCredentialID(codecID), 0);
       barr.push(credid);
       bsize += credid.length;
       const credbuff:Buffer = this.credentials[i].toBuffer();

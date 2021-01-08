@@ -99,6 +99,7 @@ export abstract class NFTOutput extends BaseNFTOutput {
  */
 export class SECPTransferOutput extends AmountOutput {
   protected _typeName = "SECPTransferOutput";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.SECPXFEROUTPUTID;
 
   //serialize and deserialize both are inherited
@@ -106,15 +107,12 @@ export class SECPTransferOutput extends AmountOutput {
   /**
      * Returns the outputID for this output
      */
-  getOutputID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOutputID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.SECPXFEROUTPUTID;
     } else if (codecID === 1) {
-      return AVMConstants.SECPXFEROUTPUTID_CODECONE;
+      this._typeID = AVMConstants.SECPXFEROUTPUTID_CODECONE
+      return this._typeID;
     }
   }
 
@@ -135,6 +133,7 @@ export class SECPTransferOutput extends AmountOutput {
  */
 export class SECPMintOutput extends Output {
   protected _typeName = "SECPMintOutput";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.SECPMINTOUTPUTID;
 
   //serialize and deserialize both are inherited
@@ -142,15 +141,12 @@ export class SECPMintOutput extends Output {
   /**
    * Returns the outputID for this output
    */
-  getOutputID():number {
-    return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOutputID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.SECPMINTOUTPUTID;
     } else if (codecID === 1) {
-      return AVMConstants.SECPMINTOUTPUTID_CODECONE;
+      this._typeID = AVMConstants.SECPMINTOUTPUTID_CODECONE;
+      return this._typeID;
     }
   }
 
@@ -183,6 +179,7 @@ export class SECPMintOutput extends Output {
  */
 export class NFTMintOutput extends NFTOutput {
   protected _typeName = "NFTMintOutput";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.NFTMINTOUTPUTID;
 
   //serialize and deserialize both are inherited
@@ -190,15 +187,12 @@ export class NFTMintOutput extends NFTOutput {
   /**
    * Returns the outputID for this output
    */
-  getOutputID():number {
-      return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOutputID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.NFTMINTOUTPUTID;
     } else if (codecID === 1) {
-      return AVMConstants.NFTMINTOUTPUTID_CODECONE;
+      this._typeID = AVMConstants.NFTMINTOUTPUTID_CODECONE;
+      return this._typeID;
     }
   }
 
@@ -252,6 +246,7 @@ export class NFTMintOutput extends NFTOutput {
  */
 export class NFTTransferOutput extends NFTOutput {
   protected _typeName = "NFTTransferOutput";
+  // TODO - Bump _typeID to *_CODECONE after Apricot
   protected _typeID = AVMConstants.NFTXFEROUTPUTID;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
@@ -274,15 +269,12 @@ export class NFTTransferOutput extends NFTOutput {
   /**
    * Returns the outputID for this output
    */
-  getOutputID():number {
-      return this._typeID;
-  }
-
-  getEncodingID(codecID: number = AVMConstants.LATESTCODEC): number {
+  getOutputID(codecID: number = AVMConstants.LATESTCODEC):number {
     if(codecID === 0) {
       return AVMConstants.NFTXFEROUTPUTID;
     } else if (codecID === 1) {
-      return AVMConstants.NFTXFEROUTPUTID_CODECONE;
+      this._typeID = AVMConstants.NFTXFEROUTPUTID_CODECONE;
+      return this._typeID;
     }
   }
 

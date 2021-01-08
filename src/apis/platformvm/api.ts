@@ -16,7 +16,8 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXO, UTXOSet } from './utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { Index, PlatformVMUTXOResponse } from 'src/common';
+import { Index } from 'src/common';
+import { iPlatformVMUTXOResponse } from "./interfaces";
 
 /**
  * @ignore
@@ -893,7 +894,7 @@ export class PlatformVMAPI extends JRPCAPI {
     limit: number = 0,
     startIndex: Index = undefined,
     persistOpts: PersistanceOptions = undefined
-  ): Promise<PlatformVMUTXOResponse> => {
+  ): Promise<iPlatformVMUTXOResponse> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
@@ -982,7 +983,7 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = bintools.cb58Encode(sourceChain);
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
-    const platformVMUTXOResponse: PlatformVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+    const platformVMUTXOResponse: iPlatformVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const atomicUTXOs: UTXOSet = platformVMUTXOResponse.utxos;
     const avaxAssetID: Buffer = await this.getAVAXAssetID();
 
