@@ -26,7 +26,6 @@ import { EVMConstants } from './constants';
 import { 
   Asset,
   Index, 
-  EVMUTXOResponse 
 } from './../../common/interfaces'
 import { EVMInput } from './inputs';
 import { 
@@ -34,6 +33,7 @@ import {
   TransferableOutput 
 } from './outputs';
 import { ExportTx } from './exporttx';
+import { iEVMUTXOResponse } from './interfaces';
 
 /**
  * @ignore
@@ -307,7 +307,7 @@ export class EVMAPI extends JRPCAPI {
     sourceChain: string = undefined,
     limit: number = 0,
     startIndex: Index = undefined
-  ): Promise<EVMUTXOResponse> => {
+  ): Promise<iEVMUTXOResponse> => {
     if(typeof addresses === "string") {
       addresses = [addresses];
     }
@@ -489,9 +489,9 @@ export class EVMAPI extends JRPCAPI {
    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s).
    *
    * @param utxoset A set of UTXOs that the transaction is built on
-   * @param toAddress The address to send the funds
    * @param ownerAddresses The addresses being used to import
    * @param sourceChain The chainid for where the import is coming from
+   * @param toAddress The address to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
@@ -501,9 +501,9 @@ export class EVMAPI extends JRPCAPI {
    */
   buildImportTx = async (
     utxoset: UTXOSet, 
-    toAddress: string,
     ownerAddresses: string[],
     sourceChain: Buffer | string,
+    toAddress: string,
     fromAddresses: string[]
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
@@ -518,7 +518,7 @@ export class EVMAPI extends JRPCAPI {
       // if there is no sourceChain passed in or the sourceChain is any data type other than a Buffer then throw an error
       throw new Error('Error - EVMAPI.buildImportTx: sourceChain is undefined or invalid sourceChain type.');
     }
-    const evmUTXOResponse: EVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+    const evmUTXOResponse: iEVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const atomicUTXOs: UTXOSet = evmUTXOResponse.utxos;
     const avaxAssetID: Buffer = await this.getAVAXAssetID();
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();

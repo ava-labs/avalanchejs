@@ -19,11 +19,6 @@ export interface UTXOResponse {
   endIndex: Index
 }
 
-
-export interface EVMUTXOResponse extends UTXOResponse {
-  utxos: EVMUTXOSet
-}
-
 export interface Asset {
   name: string
   symbol: string
