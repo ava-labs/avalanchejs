@@ -19,6 +19,11 @@ export interface UTXOResponse {
   endIndex: Index
 }
 
+export interface iUTXOID {
+  txID:string
+  outputIndex:number
+}
+
 export interface Asset {
   name: string
   symbol: string

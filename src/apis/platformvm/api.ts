@@ -17,7 +17,7 @@ import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXO, UTXOSet } from './utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { Index } from 'src/common';
-import { iPlatformVMUTXOResponse } from "./interfaces";
+import { iGetBalanceParams, iGetBalanceResponse, iPlatformVMUTXOResponse } from "./interfaces";
 
 /**
  * @ignore
@@ -350,12 +350,12 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
-  getBalance = async (address:string):Promise<object> => {
+  getBalance = async (address:string):Promise<iGetBalanceResponse> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
       throw new Error(`Error - PlatformVMAPI.getBalance: Invalid address format ${address}`);
     }
-    const params:any = {
+    const params:iGetBalanceParams = {
       address
     };
     return  this.callMethod('platform.getBalance', params).then((response:RequestResponseData) => response.data.result);
