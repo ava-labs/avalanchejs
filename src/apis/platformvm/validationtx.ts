@@ -101,16 +101,16 @@ export abstract class ValidatorTx extends BaseTx {
     }
     
     constructor(
-        networkid:number, 
-        blockchainid:Buffer, 
-        outs:Array<TransferableOutput>, 
-        ins:Array<TransferableInput>, 
-        memo?:Buffer, 
-        nodeID?:Buffer, 
-        startTime?:BN, 
-        endTime?:BN
+        networkID: number, 
+        blockchainID: Buffer, 
+        outs: TransferableOutput[], 
+        ins: TransferableInput[], 
+        memo?: Buffer, 
+        nodeID?: Buffer, 
+        startTime?: BN, 
+        endTime?: BN
     ) {
-        super(networkid, blockchainid, outs, ins, memo);
+        super(networkID, blockchainID, outs, ins, memo);
         this.nodeID = nodeID;
         this.startTime = bintools.fromBNToBuffer(startTime, 8);
         this.endTime = bintools.fromBNToBuffer(endTime, 8);
@@ -168,28 +168,28 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     /**
      * Class representing an unsigned AddSubnetValidatorTx transaction.
      *
-     * @param networkid Optional. Networkid, [[DefaultNetworkID]]
-     * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
+     * @param networkID Optional. NetworkID, [[DefaultNetworkID]]
+     * @param blockchainID Optional. BlockchainID, default Buffer.alloc(32, 16)
      * @param outs Optional. Array of the [[TransferableOutput]]s
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
-     * @param nodeID Optional. The node ID of the validator being added.
+     * @param nodeID Optional. The nodeID of the validator being added.
      * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
      * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param weight Optional. The amount of nAVAX the validator is staking.
      */
     constructor(
-        networkid:number = DefaultNetworkID, 
-        blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
-        memo:Buffer = undefined, 
-        nodeID:Buffer = undefined, 
-        startTime:BN = undefined, 
-        endTime:BN = undefined,
-        weight:BN = undefined,
+        networkID: number = DefaultNetworkID, 
+        blockchainID: Buffer = Buffer.alloc(32, 16), 
+        outs: TransferableOutput[] = undefined, 
+        ins: TransferableInput[] = undefined, 
+        memo: Buffer = undefined, 
+        nodeID: Buffer = undefined, 
+        startTime: BN = undefined, 
+        endTime: BN = undefined,
+        weight: BN = undefined,
     ) {
-        super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime);
+        super(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime);
         if(typeof weight !== undefined){
             this.weight = bintools.fromBNToBuffer(weight, 8);
         }
@@ -439,12 +439,12 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     /**
      * Class representing an unsigned AddDelegatorTx transaction.
      *
-     * @param networkid Optional. Networkid, [[DefaultNetworkID]]
-     * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
+     * @param networkID Optional. NetworkID, [[DefaultNetworkID]]
+     * @param blockchainID Optional. BlockchainID, default Buffer.alloc(32, 16)
      * @param outs Optional. Array of the [[TransferableOutput]]s
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
-     * @param nodeID Optional. The node ID of the validator being added.
+     * @param nodeID Optional. The nodeID of the validator being added.
      * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
      * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
      * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
@@ -452,19 +452,19 @@ export class AddDelegatorTx extends WeightedValidatorTx {
      * @param rewardOwners Optional. The [[ParseableOutput]] containing a [[SECPOwnerOutput]] for the rewards.
      */
     constructor(
-        networkid:number = DefaultNetworkID, 
-        blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
-        memo:Buffer = undefined, 
-        nodeID:Buffer = undefined, 
-        startTime:BN = undefined, 
-        endTime:BN = undefined,
-        stakeAmount:BN = undefined,
-        stakeOuts:Array<TransferableOutput> = undefined,
-        rewardOwners:ParseableOutput = undefined
+        networkID: number = DefaultNetworkID, 
+        blockchainID: Buffer = Buffer.alloc(32, 16), 
+        outs: TransferableOutput[] = undefined, 
+        ins: TransferableInput[] = undefined, 
+        memo: Buffer = undefined, 
+        nodeID: Buffer = undefined, 
+        startTime: BN = undefined, 
+        endTime: BN = undefined,
+        stakeAmount: BN = undefined,
+        stakeOuts: TransferableOutput[] = undefined,
+        rewardOwners: ParseableOutput = undefined
     ) {
-        super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount);
+        super(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, stakeAmount);
         if(typeof stakeOuts !== undefined){
             this.stakeOuts = stakeOuts
         }
@@ -535,8 +535,8 @@ export class AddValidatorTx extends AddDelegatorTx {
     /**
      * Class representing an unsigned AddValidatorTx transaction.
      *
-     * @param networkid Optional. Networkid, [[DefaultNetworkID]]
-     * @param blockchainid Optional. Blockchainid, default Buffer.alloc(32, 16)
+     * @param networkID Optional. NetworkID, [[DefaultNetworkID]]
+     * @param blockchainID Optional. BlockchainID, default Buffer.alloc(32, 16)
      * @param outs Optional. Array of the [[TransferableOutput]]s
      * @param ins Optional. Array of the [[TransferableInput]]s
      * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -552,22 +552,22 @@ export class AddValidatorTx extends AddDelegatorTx {
      * period is over, 1.2345% of the reward goes to the validator and the rest goes to the delegator.
      */
     constructor(
-        networkid:number = DefaultNetworkID, 
-        blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
-        memo:Buffer = undefined, 
-        nodeID:Buffer = undefined, 
-        startTime:BN = undefined, 
-        endTime:BN = undefined,
-        stakeAmount:BN = undefined,
-        stakeOuts:Array<TransferableOutput> = undefined,
-        rewardOwners:ParseableOutput = undefined,
-        delegationFee:number = undefined
+        networkID: number = DefaultNetworkID, 
+        blockchainID: Buffer = Buffer.alloc(32, 16), 
+        outs: TransferableOutput[] = undefined, 
+        ins: TransferableInput[] = undefined, 
+        memo: Buffer = undefined, 
+        nodeID: Buffer = undefined, 
+        startTime: BN = undefined, 
+        endTime: BN = undefined,
+        stakeAmount: BN = undefined,
+        stakeOuts: TransferableOutput[] = undefined,
+        rewardOwners: ParseableOutput = undefined,
+        delegationFee: number = undefined
     ) {
         super(
-            networkid, 
-            blockchainid, 
+            networkID, 
+            blockchainID, 
             outs, 
             ins, 
             memo, 

@@ -132,8 +132,8 @@ export class ExportTx extends BaseTx {
   /**
    * Class representing an unsigned Export transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -141,18 +141,22 @@ export class ExportTx extends BaseTx {
    * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
    */
   constructor(
-    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, destinationChain:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
+    networkID: number = DefaultNetworkID, 
+    blockchainID: Buffer = Buffer.alloc(32, 16), 
+    outs: TransferableOutput[] = undefined, 
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined, 
+    destinationChain: Buffer = undefined, 
+    exportOuts: TransferableOutput[] = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo);
+    super(networkID, blockchainID, outs, ins, memo);
     this.destinationChain = destinationChain; //do not correct, it should bomb on toBuffer if not provided
     if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
-      for (let i = 0; i < exportOuts.length; i++) {
-        if (!(exportOuts[i] instanceof TransferableOutput)) {
+      exportOuts.forEach((exportOut: TransferableOutput) => {
+        if (!(exportOut instanceof TransferableOutput)) {
           throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
         }
-      }
+      });
       this.exportOuts = exportOuts;
     }
   }

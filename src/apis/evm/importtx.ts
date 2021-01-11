@@ -189,21 +189,21 @@ export class ImportTx extends EVMBaseTx {
   /**
    * Class representing an unsigned Import transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
-   * @param sourceChainid Optional chainid for the source inputs to import. Default platform chainid.
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
+   * @param sourceChainID Optional chainID for the source inputs to import. Default platform chainid.
    * @param importIns Array of [[TransferableInput]]s used in the transaction
    * @param outs Optional array of the [[EVMOutput]]s
    */
   constructor(
-    networkid: number = DefaultNetworkID, 
-    blockchainid: Buffer = Buffer.alloc(32, 16), 
-    sourceChainid: Buffer = Buffer.alloc(32, 16), 
+    networkID: number = DefaultNetworkID, 
+    blockchainID: Buffer = Buffer.alloc(32, 16), 
+    sourceChainID: Buffer = Buffer.alloc(32, 16), 
     importIns: TransferableInput[] = undefined,
     outs: EVMOutput[] = undefined
   ) {
-    super(networkid, blockchainid);
-    this.sourceChain = sourceChainid;
+    super(networkID, blockchainID);
+    this.sourceChain = sourceChainID;
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {

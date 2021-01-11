@@ -147,8 +147,8 @@ export class CreateAssetTx extends BaseTx {
   /**
    * Class representing an unsigned Create Asset transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -158,12 +158,17 @@ export class CreateAssetTx extends BaseTx {
    * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
    */
   constructor(
-    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16),
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, name:string = undefined, symbol:string = undefined, denomination:number = undefined,
-    initialstate:InitialStates = undefined
+    networkID: number = DefaultNetworkID, 
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined, 
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined, 
+    name: string = undefined, 
+    symbol: string = undefined, 
+    denomination: number = undefined,
+    initialstate: InitialStates = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo);
+    super(networkID, blockchainID, outs, ins, memo);
     if (
       typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number'
             && denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
