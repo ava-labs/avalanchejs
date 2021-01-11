@@ -24,7 +24,7 @@ const serializer = Serialization.getInstance();
 /**
  * Class representing a base for all transactions.
  */
-export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
+export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
   protected _typeName = "BaseTx";
   protected _typeID = AVMConstants.BASETX;
 

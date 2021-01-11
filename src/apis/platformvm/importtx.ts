@@ -88,7 +88,7 @@ export class ImportTx extends BaseTx {
    */
   toBuffer():Buffer {
     if(typeof this.sourceChain === "undefined") {
-      throw new Error(`ImportTx.toBuffer -- ${this.sourceChain} is undefined`);
+      throw new Error(`ImportTx.toBuffer -- given sourceChain ${this.sourceChain} is undefined`);
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
     let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
