@@ -18,3 +18,12 @@ export interface iGetBalanceParams {
 export interface iAVMUTXOResponse extends UTXOResponse {
   utxos: UTXOSet
 }
+
+export interface iGetTxStatusParams {
+  txID: string
+}
+
+export interface iGetTxStatusResponse {
+  status: string
+  epoch?: number
+}

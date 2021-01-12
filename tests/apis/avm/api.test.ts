@@ -23,6 +23,7 @@ import { PlatformChainID } from 'src/utils/constants';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { ONEAVAX } from 'src/utils/constants';
 import { Serializable, Serialization } from 'src/utils/serialization';
+import { iGetTxStatusResponse } from 'src/apis/avm/interfaces';
 
 /**
  * @ignore
@@ -505,10 +506,11 @@ test("import", async ()=>{
   test('getTxStatus', async () => {
     const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
-    const result:Promise<string> = api.getTxStatus(txid);
+    const result:Promise<iGetTxStatusResponse> = api.getTxStatus(txid);
     const payload:object = {
       result: {
         status: 'accepted',
+        epoch: 1
       },
     };
     const responseObj = {
@@ -516,7 +518,7 @@ test("import", async ()=>{
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+    const response:iGetTxStatusResponse = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe('accepted');

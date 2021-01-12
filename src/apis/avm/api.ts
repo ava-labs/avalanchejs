@@ -22,7 +22,13 @@ import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
 import { SECPTransferOutput } from './outputs';
 import { Index } from '../../../src/common';
-import { iAVMUTXOResponse, iGetBalanceParams, iGetBalanceResponse } from './interfaces';
+import { 
+  iAVMUTXOResponse, 
+  iGetBalanceParams, 
+  iGetBalanceResponse, 
+  iGetTxStatusParams, 
+  iGetTxStatusResponse 
+} from './interfaces';
 
 /**
  * @ignore
@@ -628,11 +634,11 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the status retrieved from the node
    */
-  getTxStatus = async (txid:string):Promise<string> => {
-    const params:any = {
+  getTxStatus = async (txid:string):Promise<iGetTxStatusResponse> => {
+    const params:iGetTxStatusParams = {
       txID: txid,
     };
-    return this.callMethod('avm.getTxStatus', params).then((response:RequestResponseData) => response.data.result.status);
+    return this.callMethod('avm.getTxStatus', params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
