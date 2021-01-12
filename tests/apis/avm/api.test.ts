@@ -521,7 +521,7 @@ test("import", async ()=>{
     const response:iGetTxStatusResponse = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe('accepted');
+    expect(response).toEqual(payload["result"]);
   });
 
   test('getAssetDescription as string', async () => {
