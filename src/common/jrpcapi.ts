@@ -7,6 +7,7 @@ import { AxiosRequestConfig } from 'axios';
 import BinTools from '../utils/bintools';
 import AvalancheCore from '../avalanche';
 import { APIBase, RequestResponseData } from './apibase';
+import { iRPC } from './interfaces';
 
 /**
  * @ignore
@@ -18,45 +19,51 @@ export class JRPCAPI extends APIBase {
 
   protected rpcid = 1;
 
-  callMethod = async (method:string,
-    params?:Array<object> | object,
-    baseurl?:string):Promise<RequestResponseData> => {
-    const ep = baseurl || this.baseurl;
-    const rpc:any = {};
+  callMethod = async (
+    method: string,
+    params?: object[] | object,
+    baseurl?: string,
+    headers?: object
+  ):Promise<RequestResponseData> => {
+    const ep: string = baseurl || this.baseurl;
+    const rpc: iRPC = {};
     rpc.id = this.rpcid;
     rpc.method = method;
 
     // Set parameters if exists
     if (params) {
       rpc.params = params;
-    } else if (this.jrpcVersion === '1.0') {
+    } else if (this.jrpcVersion === "1.0") {
       rpc.params = [];
     }
 
-    if (this.jrpcVersion !== '1.0') {
+    if (this.jrpcVersion !== "1.0") {
       rpc.jsonrpc = this.jrpcVersion;
     }
 
-    const headers:object = { 'Content-Type': 'application/json;charset=UTF-8' };
+    let headrs: object = { "Content-Type": "application/json;charset=UTF-8" };
+    if(headers) {
+      headrs = {...headrs, ...headers};
+    }
 
-    const axConf:AxiosRequestConfig = {
+    const axConf: AxiosRequestConfig = {
       baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
-      responseType: 'json',
+      responseType: "json",
     };
 
-    return this.core.post(ep, {}, JSON.stringify(rpc), headers, axConf)
-      .then((resp:RequestResponseData) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          this.rpcid += 1;
-          if (typeof resp.data === 'string') {
-            resp.data = JSON.parse(resp.data);
-          }
-          if (typeof resp.data === 'object' && (resp.data === null || 'error' in resp.data)) {
-            throw new Error(`Error returned: ${JSON.stringify(resp.data)}`);
-          }
+    return this.core.post(ep, {}, JSON.stringify(rpc), headrs, axConf)
+    .then((resp:RequestResponseData) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        this.rpcid += 1;
+        if (typeof resp.data === "string") {
+          resp.data = JSON.parse(resp.data);
         }
-        return resp;
-      });
+        if (typeof resp.data === "object" && (resp.data === null || "error" in resp.data)) {
+          throw new Error(`Error returned: ${JSON.stringify(resp.data)}`);
+        }
+      }
+      return resp;
+    });
   };
 
   /**

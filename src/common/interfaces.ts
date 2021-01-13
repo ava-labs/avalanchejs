@@ -39,9 +39,16 @@ export interface Asset {
 }
 export interface Payload {
   result: {
-    name: string,
-    symbol: string,
-    assetID: string,
+    name: string
+    symbol: string
+    assetID: string
     denomination: number
   }
+}
+
+export interface iRPC {
+  id?: number
+  method?: string
+  params?: object[] | object
+  jsonrpc?: string
 }
