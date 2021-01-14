@@ -9,14 +9,30 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 import { KeyChain } from './keychain';
-import { Defaults, PlatformChainID, ONEAVAX } from '../../utils/constants';
+import { 
+  Defaults, 
+  PlatformChainID, 
+  ONEAVAX 
+} from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
-import { UnsignedTx, Tx } from './tx';
+import { 
+  UnsignedTx, 
+  Tx 
+} from './tx';
 import { PayloadBase } from '../../utils/payload';
-import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXO, UTXOSet } from './utxos';
+import { 
+  UnixNow, 
+  NodeIDStringToBuffer 
+} from '../../utils/helperfunctions';
+import { 
+  UTXO, 
+  UTXOSet 
+} from './utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { Index, PlatformVMUTXOResponse } from 'src/common';
+import { 
+  iIndex, 
+  iPlatformVMUTXOResponse 
+} from 'src/common';
 
 /**
  * @ignore
@@ -891,9 +907,9 @@ export class PlatformVMAPI extends JRPCAPI {
     addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
-    startIndex: Index = undefined,
+    startIndex: iIndex = undefined,
     persistOpts: PersistanceOptions = undefined
-  ): Promise<PlatformVMUTXOResponse> => {
+  ): Promise<iPlatformVMUTXOResponse> => {
     
     if(typeof addresses === "string") {
       addresses = [addresses];
@@ -982,7 +998,7 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = bintools.cb58Encode(sourceChain);
       throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
-    const platformVMUTXOResponse: PlatformVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+    const platformVMUTXOResponse: iPlatformVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const atomicUTXOs: UTXOSet = platformVMUTXOResponse.utxos;
     const avaxAssetID: Buffer = await this.getAVAXAssetID();
 
