@@ -634,11 +634,12 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the status retrieved from the node
    */
-  getTxStatus = async (txid:string):Promise<iGetTxStatusResponse> => {
-    const params:iGetTxStatusParams = {
+  getTxStatus = async (txid: string): Promise<iGetTxStatusResponse> => {
+    const params: iGetTxStatusParams = {
       txID: txid,
     };
-    return this.callMethod('avm.getTxStatus', params).then((response:RequestResponseData) => response.data.result);
+    const response: RequestResponseData = await this.callMethod('avm.getTxStatus', params);
+    return response.data.result;
   };
 
   /**

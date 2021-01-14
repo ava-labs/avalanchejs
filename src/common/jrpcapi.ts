@@ -77,8 +77,3 @@ export class JRPCAPI extends APIBase {
     this.rpcid = 1;
   }
 }
-
-
-
-
-
