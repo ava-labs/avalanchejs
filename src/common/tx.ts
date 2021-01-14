@@ -6,18 +6,31 @@ import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Credential } from './credentials';
 import BN from 'bn.js';
-import { StandardKeyChain, StandardKeyPair } from './keychain';
-import { StandardAmountInput, StandardTransferableInput } from './input';
-import { StandardAmountOutput, StandardTransferableOutput } from './output';
+import { 
+  StandardKeyChain, 
+  StandardKeyPair 
+} from './keychain';
+import { 
+  StandardAmountInput, 
+  StandardTransferableInput 
+} from './input';
+import { 
+  StandardAmountOutput, 
+  StandardTransferableOutput 
+} from './output';
 import { DefaultNetworkID } from '../utils/constants';
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { 
+  Serializable, 
+  Serialization, 
+  SerializedEncoding 
+} from '../utils/serialization';
 import { AVMConstants } from '../../src/apis/avm/constants';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
@@ -147,16 +160,22 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Class representing a StandardBaseTx which is the foundation for all transactions.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
+  constructor(
+    networkID: number = DefaultNetworkID, 
+    blockchainID: Buffer = Buffer.alloc(32, 16), 
+    outs: StandardTransferableOutput[] = undefined, 
+    ins: StandardTransferableInput[] = undefined, 
+    memo: Buffer = undefined
+  ) {
     super();
-    this.networkid.writeUInt32BE(networkid, 0);
-    this.blockchainid = blockchainid;
+    this.networkid.writeUInt32BE(networkID, 0);
+    this.blockchainid = blockchainID;
     if(typeof memo != "undefined"){
       this.memo = memo;
     }
