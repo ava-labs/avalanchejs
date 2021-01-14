@@ -4,15 +4,12 @@
  */
 
 import { AxiosRequestConfig } from 'axios';
-import BinTools from '../utils/bintools';
 import AvalancheCore from '../avalanche';
-import { APIBase, RequestResponseData } from './apibase';
+import { 
+  APIBase, 
+  RequestResponseData 
+} from './apibase';
 import { iRPC } from './interfaces';
-
-/**
- * @ignore
- */
-const bintools = BinTools.getInstance();
 
 export class JRPCAPI extends APIBase {
   protected jrpcVersion:string = '2.0';
