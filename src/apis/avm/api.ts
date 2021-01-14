@@ -57,27 +57,27 @@ export class AVMAPI extends JRPCAPI {
   /**
    * @ignore
    */
-  protected keychain:KeyChain = new KeyChain('', '');
+  protected keychain: KeyChain = new KeyChain("", "");
 
-  protected blockchainID:string = '';
+  protected blockchainID: string = "";
 
-  protected blockchainAlias:string = undefined;
+  protected blockchainAlias: string = undefined;
 
-  protected AVAXAssetID:Buffer = undefined;
+  protected AVAXAssetID: Buffer = undefined;
 
-  protected txFee:BN = undefined;
+  protected txFee: BN = undefined;
 
-  protected creationTxFee:BN = undefined;
+  protected creationTxFee: BN = undefined;
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
    *
    * @returns The alias for the blockchainID
    */
-  getBlockchainAlias = ():string => {
+  getBlockchainAlias = (): string => {
     if(typeof this.blockchainAlias === "undefined"){
-      const netid:number = this.core.getNetworkID();
-      if (netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
+      const netid: number = this.core.getNetworkID();
+      if(netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
         this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
         return this.blockchainAlias;
       } else {
@@ -94,7 +94,7 @@ export class AVMAPI extends JRPCAPI {
    * @param alias The alias for the blockchainID.
    * 
    */
-  setBlockchainAlias = (alias:string):string => {
+  setBlockchainAlias = (alias: string): string => {
     this.blockchainAlias = alias;
     /* istanbul ignore next */
     return undefined;
@@ -105,7 +105,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The blockchainID
    */
-  getBlockchainID = ():string => this.blockchainID;
+  getBlockchainID = (): string => this.blockchainID;
 
   /**
    * Refresh blockchainID, and if a blockchainID is passed in, use that.
@@ -114,8 +114,8 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The blockchainID
    */
-  refreshBlockchainID = (blockchainID:string = undefined):boolean => {
-    const netid:number = this.core.getNetworkID();
+  refreshBlockchainID = (blockchainID: string = undefined): boolean => {
+    const netid: number = this.core.getNetworkID();
     if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
       this.blockchainID = Defaults.network[netid].X.blockchainID; //default to X-Chain
       return true;
@@ -131,14 +131,14 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
    */
-  parseAddress = (addr:string):Buffer => {
-    const alias:string = this.getBlockchainAlias();
-    const blockchainID:string = this.getBlockchainID();
+  parseAddress = (addr: string): Buffer => {
+    const alias: string = this.getBlockchainAlias();
+    const blockchainID: string = this.getBlockchainID();
     return bintools.parseAddress(addr, blockchainID, alias, AVMConstants.ADDRESSLENGTH);
   };
 
-  addressFromBuffer = (address:Buffer):string => {
-    const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
+  addressFromBuffer = (address: Buffer): string => {
+    const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
     return bintools.addressToString(this.core.getHRP(), chainid, address);
   };
 
@@ -149,9 +149,9 @@ export class AVMAPI extends JRPCAPI {
    * 
    * @returns The the provided string representing the AVAX AssetID
    */
-  getAVAXAssetID = async (refresh:boolean = false):Promise<Buffer> => {
+  getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === 'undefined' || refresh) {
-      const asset:{
+      const asset: {
         name: string;
         symbol: string;
         assetID: Buffer;
@@ -169,7 +169,7 @@ export class AVMAPI extends JRPCAPI {
    * 
    * @returns The the provided string representing the AVAX AssetID
    */
-  setAVAXAssetID = (avaxAssetID:string | Buffer) => {
+  setAVAXAssetID = (avaxAssetID: string | Buffer): void => {
     if(typeof avaxAssetID === "string") {
       avaxAssetID = bintools.cb58Decode(avaxAssetID);
     }
@@ -181,7 +181,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getDefaultTxFee =  ():BN => {
+  getDefaultTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["txFee"]) : new BN(0);
   }
 
@@ -190,7 +190,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getTxFee = ():BN => {
+  getTxFee = (): BN => {
     if(typeof this.txFee === "undefined") {
       this.txFee = this.getDefaultTxFee();
     }
@@ -202,7 +202,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
-  setTxFee = (fee:BN) => {
+  setTxFee = (fee: BN): void => {
     this.txFee = fee;
   }
 
@@ -212,7 +212,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getDefaultCreationTxFee =  ():BN => {
+  getDefaultCreationTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["creationTxFee"]) : new BN(0);
   }
 
@@ -221,7 +221,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
-  getCreationTxFee = ():BN => {
+  getCreationTxFee = (): BN => {
     if(typeof this.creationTxFee === "undefined") {
       this.creationTxFee = this.getDefaultCreationTxFee();
     }
@@ -233,7 +233,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
-  setCreationTxFee = (fee:BN) => {
+  setCreationTxFee = (fee: BN): void => {
     this.creationTxFee = fee;
   }
 
@@ -242,15 +242,15 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns The instance of [[KeyChain]] for this class
    */
-  keyChain = ():KeyChain => this.keychain;
+  keyChain = (): KeyChain => this.keychain;
 
   /**
    * @ignore
    */
-  newKeyChain = ():KeyChain => {
+  newKeyChain = (): KeyChain => {
     // warning, overwrites the old keychain
-    const alias = this.getBlockchainAlias();
-    if (alias) {
+    const alias: string = this.getBlockchainAlias();
+    if(alias) {
       this.keychain = new KeyChain(this.core.getHRP(), alias);
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
@@ -268,10 +268,10 @@ export class AVMAPI extends JRPCAPI {
    * @remarks
    * A "Goose Egg Transaction" is when the fee far exceeds a reasonable amount
    */
-  checkGooseEgg = async (utx:UnsignedTx, outTotal:BN = new BN(0)): Promise<boolean> => {
-    const avaxAssetID:Buffer = await this.getAVAXAssetID();
-    let outputTotal:BN = outTotal.gt(new BN(0)) ? outTotal : utx.getOutputTotal(avaxAssetID);
-    const fee:BN = utx.getBurn(avaxAssetID);
+  checkGooseEgg = async (utx: UnsignedTx, outTotal: BN = new BN(0)): Promise<boolean> => {
+    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const outputTotal: BN = outTotal.gt(new BN(0)) ? outTotal : utx.getOutputTotal(avaxAssetID);
+    const fee: BN = utx.getBurn(avaxAssetID);
     if(fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
       return true;
     } else {
@@ -288,12 +288,12 @@ export class AVMAPI extends JRPCAPI {
      * @returns Promise with the balance of the assetID as a {@link https://github.com/indutny/bn.js/|BN} on the provided address for the blockchain.
      */
 
-  getBalance = async (address:string, assetID:string):Promise<iGetBalanceResponse> => {
+  getBalance = async (address: string, assetID: string): Promise<iGetBalanceResponse> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.getBalance: Invalid address format ${address}`);
     }
-    const params:iGetBalanceParams = {
+    const params: iGetBalanceParams = {
       address,
       assetID,
     };
@@ -308,8 +308,8 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Promise for a string representing the address created by the vm.
      */
-  createAddress = async (username:string, password:string):Promise<string> => {
-    const params:any = {
+  createAddress = async (username: string, password: string): Promise<string> => {
+    const params: any = {
       username,
       password,
     };
@@ -342,8 +342,15 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
    */
-  createFixedCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, initialHolders:Array<object>):Promise<string> => {
-    const params:any = {
+  createFixedCapAsset = async (
+    username: string, 
+    password: string, 
+    name: string, 
+    symbol: string, 
+    denomination: number, 
+    initialHolders: object[]
+  ): Promise<string> => {
+    const params: any = {
       name,
       symbol,
       denomination,
@@ -386,8 +393,15 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
      */
-  createVariableCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, minterSets:Array<object>):Promise<string> => {
-    const params:any = {
+  createVariableCapAsset = async (
+    username: string, 
+    password: string, 
+    name: string, 
+    symbol: string, 
+    denomination: number, 
+    minterSets: object[]
+  ): Promise<string> => {
+    const params: any = {
       name,
       symbol,
       denomination,
@@ -408,9 +422,16 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
      */
-  mint = async (username:string, password:string, amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
-    let asset:string;
-    let amnt:BN;
+  mint = async (
+    username: string, 
+    password: string, 
+    amount: number | BN, 
+    assetID: Buffer | string, 
+    to: string, 
+    minters: string[]
+  ): Promise<string> => {
+    let asset: string;
+    let amnt: BN;
     if (typeof assetID !== 'string') {
       asset = bintools.cb58Encode(assetID);
     } else {
@@ -421,7 +442,7 @@ export class AVMAPI extends JRPCAPI {
     } else {
       amnt = amount;
     }
-    const params:any = {
+    const params: any = {
       username: username,
       password: password,
       amount: amnt.toString(10),

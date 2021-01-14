@@ -6,7 +6,6 @@ import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 
-
 /**
  * Class for interacting with a node's AdminAPI.
  *
@@ -22,19 +21,19 @@ export class AdminAPI extends JRPCAPI {
      * Assign an API an alias, a different endpoint for the API. The original endpoint will still
      * work. This change only affects this node; other nodes will not know about this alias.
      *
-     * @param endpoint The original endpoint of the API. endpoint should only include the part of
+     * @param endpoint The original endpoint of the API. Endpoint should only include the part of
      * the endpoint after /ext/
      * @param alias The API being aliased can now be called at ext/alias
      *
      * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
      */
-  alias = async (endpoint:string, alias:string):Promise<boolean> => {
-    const params:any = {
+  alias = async (endpoint: string, alias: string): Promise<boolean> => {
+    const params: any = {
       endpoint,
       alias,
     };
-    return this.callMethod('admin.alias', params)
-      .then((response:RequestResponseData) => response.data.result.success);
+    const response: RequestResponseData = await this.callMethod('admin.alias', params);
+    return response.data.result.success;
   };
 
   /**
