@@ -5,6 +5,11 @@
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
+import { 
+  iNewTokenParams,
+  iRevokeTokenParams,
+  iChangePasswordParams
+} from './interfaces';
 
 /**
  * Class for interacting with a node's AuthAPI.
@@ -22,13 +27,13 @@ export class AuthAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the authorization token.
      */
-    newToken = async (password:string, endpoints:Array<string>):Promise<string> => {
-        const params:any = {
-            password,
-            endpoints
-        };
-        return this.callMethod('auth.newToken', params)
-            .then((response:RequestResponseData) => response.data.result.token);
+    newToken = async (password: string, endpoints: string[]): Promise<string> => {
+      const params: iNewTokenParams = {
+        password,
+        endpoints
+      };
+      const response: RequestResponseData = await this.callMethod('auth.newToken', params);
+      return response.data.result.token;
     };
 
 
@@ -40,13 +45,13 @@ export class AuthAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<boolean> indicating if a token was successfully revoked.
      */
-    revokeToken = async (password:string, token:string):Promise<boolean> => {
-        const params:any = {
-            password,
-            token
-        };
-        return this.callMethod('auth.revokeToken', params)
-            .then((response:RequestResponseData) => response.data.result.success);
+    revokeToken = async (password: string, token: string): Promise<boolean> => {
+      const params: iRevokeTokenParams = {
+        password,
+        token
+      };
+      const response: RequestResponseData = await this.callMethod('auth.revokeToken', params);
+      return response.data.result.success;
     };
 
     /**
@@ -57,14 +62,14 @@ export class AuthAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<boolean> indicating if the password was successfully changed.
      */
-    changePassword = async (oldPassword:string, newPassword:string):Promise<boolean> => {
-        const params:any = {
-            oldPassword,
-            newPassword
-        };
-        return this.callMethod('auth.changePassword', params)
-            .then((response:RequestResponseData) => response.data.result.success);
+    changePassword = async (oldPassword: string, newPassword: string): Promise<boolean> => {
+      const params: iChangePasswordParams = {
+        oldPassword,
+        newPassword
+      };
+      const response: RequestResponseData = await this.callMethod('auth.changePassword', params);
+      return response.data.result.success;
     };
 
-    constructor(core:AvalancheCore, baseurl:string = '/ext/auth') { super(core, baseurl); }
+    constructor(core: AvalancheCore, baseurl: string = '/ext/auth') { super(core, baseurl); }
 }

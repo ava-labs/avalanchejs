@@ -352,23 +352,23 @@ export abstract class StandardTx<
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
-    const txbuff:Buffer = this.unsignedTx.toBuffer(codecID);
-    let bsize:number = txbuff.length;
-    const credlen:Buffer = Buffer.alloc(4);
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+    const txbuff: Buffer = this.unsignedTx.toBuffer(codecID);
+    let bsize: number = txbuff.length;
+    const credlen: Buffer = Buffer.alloc(4);
     credlen.writeUInt32BE(this.credentials.length, 0);
-    const barr:Array<Buffer> = [txbuff, credlen];
+    const barr: Buffer[] = [txbuff, credlen];
     bsize += credlen.length;
-    for (let i = 0; i < this.credentials.length; i++) {
-      const credid:Buffer = Buffer.alloc(4);
-      credid.writeUInt32BE(this.credentials[i].getCredentialID(codecID), 0);
+    this.credentials.forEach((credential: Credential) => {
+      const credid: Buffer = Buffer.alloc(4);
+      credid.writeUInt32BE(credential.getCredentialID(codecID), 0);
       barr.push(credid);
       bsize += credid.length;
-      const credbuff:Buffer = this.credentials[i].toBuffer();
+      const credbuff: Buffer = credential.toBuffer();
       bsize += credbuff.length;
       barr.push(credbuff);
-    }
-    const buff:Buffer = Buffer.concat(barr, bsize);
+    });
+    const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
 

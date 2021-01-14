@@ -2,10 +2,11 @@
  * @packageDocumentation
  * @module API-Health
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
 
+import AvalancheCore from "../../avalanche";
+import { JRPCAPI } from "../../common/jrpcapi";
+import { RequestResponseData } from "../../common/apibase";
+import { iGetLivenessResponse } from "./interfaces";
 
 /**
  * Class for interacting with a node API that is using the node's HealthApi.
@@ -19,8 +20,10 @@ export class HealthAPI extends JRPCAPI {
      *
      * @returns Promise for an object containing the health check response
      */
-  getLiveness = async ():Promise<object> => this.callMethod('health.getLiveness')
-    .then((response:RequestResponseData) => response.data.result);
+  getLiveness = async (): Promise<iGetLivenessResponse> => {
+    const response: RequestResponseData = await this.callMethod("health.getLiveness");
+    return response.data.result;
+  } 
 
   /**
      * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
@@ -28,6 +31,6 @@ export class HealthAPI extends JRPCAPI {
      * @param core A reference to the Avalanche class
      * @param baseurl Defaults to the string "/ext/health" as the path to blockchain's baseurl
      */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/health') { super(core, baseurl); }
+  constructor(core: AvalancheCore, baseurl: string = "/ext/health") { super(core, baseurl); }
 }
 

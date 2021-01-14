@@ -2,10 +2,15 @@
  * @packageDocumentation
  * @module API-Info
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche";
+import { JRPCAPI } from "../../common/jrpcapi";
+import { RequestResponseData } from "../../common/apibase";
 import BN from "bn.js";
+import { 
+  iGetBlockchainIDParams, 
+  iGetTxFeeResponse, 
+  iIsBootstrappedParams 
+} from "./interfaces";
 
 /**
  * Class for interacting with a node's InfoAPI.
@@ -22,12 +27,12 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the base 58 string representation of the blockchainID.
    */
-  getBlockchainID = async (alias:string):Promise<string> => {
-    const params:any = {
+  getBlockchainID = async (alias: string): Promise<string> => {
+    const params: iGetBlockchainIDParams = {
       alias,
     };
-    return this.callMethod('info.getBlockchainID', params)
-      .then((response:RequestResponseData) => response.data.result.blockchainID);
+    const response: RequestResponseData = await this.callMethod("info.getBlockchainID", params);
+    return response.data.result.blockchainID;
   };
 
   /**
@@ -35,10 +40,10 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<number> of the networkID.
    */
-  getNetworkID = async ():Promise<number> => {
-    const params:any = {};
-    return this.callMethod('info.getNetworkID', params)
-      .then((response:RequestResponseData) => response.data.result.networkID);
+  getNetworkID = async (): Promise<number> => {
+    const params: any = {};
+    const response: RequestResponseData = await this.callMethod("info.getNetworkID", params);
+    return response.data.result.networkID;
   };
 
   /**
@@ -46,18 +51,20 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the network name.
    */
-  getNetworkName = async ():Promise<string> => this.callMethod('info.getNetworkName')
-    .then((response:RequestResponseData) => response.data.result.networkName);
+  getNetworkName = async (): Promise<string> => {
+    const response: RequestResponseData = await this.callMethod("info.getNetworkName");
+    return response.data.result.networkName;
+  }
 
   /**
    * Fetches the nodeID from the node.
    *
    * @returns Returns a Promise<string> of the nodeID.
    */
-  getNodeID = async ():Promise<string> => {
-    const params:any = {};
-    return this.callMethod('info.getNodeID', params)
-      .then((response:RequestResponseData) => response.data.result.nodeID);
+  getNodeID = async (): Promise<string> => {
+    const params: any = {};
+    const response: RequestResponseData = await this.callMethod("info.getNodeID", params);
+    return response.data.result.nodeID;
   };
 
   /**
@@ -65,22 +72,22 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the version of Gecko.
    */
-  getNodeVersion = async ():Promise<string> => this.callMethod('info.getNodeVersion')
-    .then((response:RequestResponseData) => response.data.result.version);
+  getNodeVersion = async (): Promise<string> => {
+    const response: RequestResponseData = await this.callMethod("info.getNodeVersion");
+    return response.data.result.version;
+  }
 
   /**
    * Fetches the transaction fee from the node.
    *
-   * @returns Returns a Promise<object> of the transaction fee in nAVAX.
+   * @returns Returns a Promise<iGetTxFeeResponse> with both txFee and creationTxFee in nAVAX.
    */
-  getTxFee = async ():Promise<{txFee:BN, creationTxFee:BN}> => {
-    return this.callMethod('info.getTxFee')
-        .then((response:RequestResponseData) => {
-          return {
-            txFee: new BN(response.data.result.txFee, 10),
-            creationTxFee: new BN(response.data.result.creationTxFee, 10)
-          }
-        });
+  getTxFee = async (): Promise<iGetTxFeeResponse> => {
+    const response: RequestResponseData = await this.callMethod("info.getTxFee");
+    return {
+      txFee: new BN(response.data.result.txFee, 10),
+      creationTxFee: new BN(response.data.result.creationTxFee, 10)
+    }
   };
 
   /**
@@ -89,12 +96,12 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<boolean> of whether the chain has completed bootstrapping.
    */
-  isBootstrapped = async (chain:string):Promise<boolean> => {
-    const params:any = {
+  isBootstrapped = async (chain: string): Promise<boolean> => {
+    const params: iIsBootstrappedParams = {
       chain
     };
-    return this.callMethod('info.isBootstrapped', params)
-        .then((response:RequestResponseData) => response.data.result.isBootstrapped);
+    const response: RequestResponseData = await this.callMethod("info.isBootstrapped", params);
+    return response.data.result.isBootstrapped;
   };
 
   /**
@@ -102,8 +109,10 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Promise for the list of connected peers in <ip>:<port> format.
    */
-  peers = async ():Promise<Array<string>> => this.callMethod('info.peers')
-    .then((response:RequestResponseData) => response.data.result.peers);
+  peers = async (): Promise<string[]> => {
+    const response: RequestResponseData = await this.callMethod("info.peers");
+    return response.data.result.peers;
+  } 
 
-  constructor(core:AvalancheCore, baseurl:string = '/ext/info') { super(core, baseurl); }
+  constructor(core: AvalancheCore, baseurl: string = "/ext/info") { super(core, baseurl); }
 }
