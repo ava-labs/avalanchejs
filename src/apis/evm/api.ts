@@ -25,8 +25,8 @@ import {
 import { EVMConstants } from './constants';
 import { 
   Asset,
-  Index, 
-  EVMUTXOResponse 
+  iIndex, 
+  iEVMUTXOResponse 
 } from './../../common/interfaces'
 import { EVMInput } from './inputs';
 import { 
@@ -306,8 +306,8 @@ export class EVMAPI extends JRPCAPI {
     addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
-    startIndex: Index = undefined
-  ): Promise<EVMUTXOResponse> => {
+    startIndex: iIndex = undefined
+  ): Promise<iEVMUTXOResponse> => {
     if(typeof addresses === "string") {
       addresses = [addresses];
     }
@@ -518,7 +518,7 @@ export class EVMAPI extends JRPCAPI {
       // if there is no sourceChain passed in or the sourceChain is any data type other than a Buffer then throw an error
       throw new Error('Error - EVMAPI.buildImportTx: sourceChain is undefined or invalid sourceChain type.');
     }
-    const evmUTXOResponse: EVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
+    const evmUTXOResponse: iEVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const atomicUTXOs: UTXOSet = evmUTXOResponse.utxos;
     const avaxAssetID: Buffer = await this.getAVAXAssetID();
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
