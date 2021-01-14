@@ -165,25 +165,25 @@ export class OutputOwners extends Serializable {
    *
    * @returns Returns the string representing the address.
    */
-  getAddress = (idx:number):Buffer => {
+  getAddress = (idx: number): Buffer => {
     if (idx < this.addresses.length) {
       return this.addresses[idx].toBuffer();
     }
-    throw new Error('Error - Output.getAddress: idx out of range');
+    throw new Error(`Error - Output.getAddress: idx, ${idx}, out of range`);
   };
 
   /**
    * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
    */
-  meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
-    let now:BN;
+  meetsThreshold = (addresses: Buffer[], asOf: BN = undefined): boolean => {
+    let now: BN;
     if (typeof asOf === 'undefined') {
       now = UnixNow();
     } else {
       now = asOf;
     }
-    const qualified:Array<Buffer> = this.getSpenders(addresses, now);
-    const threshold:number = this.threshold.readUInt32BE(0);
+    const qualified: Buffer[] = this.getSpenders(addresses, now);
+    const threshold: number = this.threshold.readUInt32BE(0);
     if (qualified.length >= threshold) {
       return true;
     }
@@ -194,22 +194,22 @@ export class OutputOwners extends Serializable {
   /**
    * Given an array of addresses and an optional timestamp, select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
    */
-  getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
-    const qualified:Array<Buffer> = [];
-    let now:BN;
+  getSpenders = (addresses: Buffer[], asOf: BN = undefined): Buffer[] => {
+    const qualified: Buffer[] = [];
+    let now: BN;
     if (typeof asOf === 'undefined') {
       now = UnixNow();
     } else {
       now = asOf;
     }
-    const locktime:BN = bintools.fromBufferToBN(this.locktime);
+    const locktime: BN = bintools.fromBufferToBN(this.locktime);
     if (now.lte(locktime)) { // not unlocked, not spendable
       return qualified;
     }
 
-    const threshold:number = this.threshold.readUInt32BE(0);
-    for (let i = 0; i < this.addresses.length && qualified.length < threshold; i++) {
-      for (let j = 0; j < addresses.length && qualified.length < threshold; j++) {
+    const threshold: number = this.threshold.readUInt32BE(0);
+    for (let i: number = 0; i < this.addresses.length && qualified.length < threshold; i++) {
+      for (let j: number = 0; j < addresses.length && qualified.length < threshold; j++) {
         if (addresses[j].toString('hex') === this.addresses[i].toBuffer().toString('hex')) {
           qualified.push(addresses[j]);
         }
@@ -222,17 +222,17 @@ export class OutputOwners extends Serializable {
   /**
    * Returns a base-58 string representing the [[Output]].
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.locktime = bintools.copyFrom(bytes, offset, offset + 8);
     offset += 8;
     this.threshold = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
     this.numaddrs = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    const numaddrs:number = this.numaddrs.readUInt32BE(0);
+    const numaddrs: number = this.numaddrs.readUInt32BE(0);
     this.addresses = [];
-    for (let i = 0; i < numaddrs; i++) {
-      const addr:Address = new Address();
+    for (let i: number = 0; i < numaddrs; i++) {
+      const addr: Address = new Address();
       offset = addr.fromBuffer(bytes, offset);
       this.addresses.push(addr);
     }
@@ -259,7 +259,7 @@ export class OutputOwners extends Serializable {
   /**
    * Returns a base-58 string representing the [[Output]].
    */
-  toString():string {
+  toString(): string {
     return bintools.bufferToB58(this.toBuffer());
   }
 

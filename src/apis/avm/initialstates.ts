@@ -85,23 +85,23 @@ export class InitialStates extends Serializable{
     return offset;
   }
 
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
-    const buff:Array<Buffer> = [];
-    const keys:Array<number> = Object.keys(this.fxs).map((k) => parseInt(k, 10)).sort();
-    const klen:Buffer = Buffer.alloc(4);
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+    const buff: Buffer[] = [];
+    const keys: number[] = Object.keys(this.fxs).map((k: string) => parseInt(k, 10)).sort();
+    const klen: Buffer = Buffer.alloc(4);
     klen.writeUInt32BE(keys.length, 0);
     buff.push(klen);
-    keys.forEach((key:number) => {
-      const fxid:number = key;
-      const fxidbuff:Buffer = Buffer.alloc(4);
+    keys.forEach((key: number) => {
+      const fxid: number = key;
+      const fxidbuff: Buffer = Buffer.alloc(4);
       fxidbuff.writeUInt32BE(fxid, 0);
       buff.push(fxidbuff);
-      const initialState = this.fxs[fxid].sort(Output.comparator());
-      const statelen:Buffer = Buffer.alloc(4);
+      const initialState: Output[] = this.fxs[fxid].sort(Output.comparator());
+      const statelen: Buffer = Buffer.alloc(4);
       statelen.writeUInt32BE(initialState.length, 0);
       buff.push(statelen);
-      initialState.forEach((inState:Output) => {
-        const outputid:Buffer = Buffer.alloc(4);
+      initialState.forEach((inState: Output) => {
+        const outputid: Buffer = Buffer.alloc(4);
         outputid.writeInt32BE(inState.getOutputID(codecID), 0);
         buff.push(outputid);
         buff.push(inState.toBuffer());

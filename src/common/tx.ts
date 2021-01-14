@@ -46,53 +46,53 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   }
 
 
-  protected networkid:Buffer = Buffer.alloc(4);
-  protected blockchainid:Buffer = Buffer.alloc(32);
-  protected numouts:Buffer = Buffer.alloc(4);
-  protected outs:Array<StandardTransferableOutput>;
-  protected numins:Buffer = Buffer.alloc(4);
-  protected ins:Array<StandardTransferableInput>;
-  protected memo:Buffer = Buffer.alloc(0);
+  protected networkid: Buffer = Buffer.alloc(4);
+  protected blockchainid: Buffer = Buffer.alloc(32);
+  protected numouts: Buffer = Buffer.alloc(4);
+  protected outs: StandardTransferableOutput[];
+  protected numins: Buffer = Buffer.alloc(4);
+  protected ins: StandardTransferableInput[];
+  protected memo: Buffer = Buffer.alloc(0);
 
   /**
    * Returns the id of the [[StandardBaseTx]]
    */
-  abstract getTxType:() => number;
+  abstract getTxType(): number;
 
   /**
    * Returns the NetworkID as a number
    */
-  getNetworkID = ():number => this.networkid.readUInt32BE(0);
+  getNetworkID = (): number => this.networkid.readUInt32BE(0);
 
   /**
    * Returns the Buffer representation of the BlockchainID
    */
-  getBlockchainID = ():Buffer => this.blockchainid;
+  getBlockchainID = (): Buffer => this.blockchainid;
 
   /**
    * Returns the array of [[StandardTransferableInput]]s
    */
-  abstract getIns():Array<StandardTransferableInput>;
+  abstract getIns(): StandardTransferableInput[];
 
   /**
    * Returns the array of [[StandardTransferableOutput]]s
    */
-  abstract getOuts():Array<StandardTransferableOutput>;
+  abstract getOuts(): StandardTransferableOutput[];
 
   /**
    * Returns the array of combined total [[StandardTransferableOutput]]s
    */
-  abstract getTotalOuts():Array<StandardTransferableOutput>;
+  abstract getTotalOuts(): StandardTransferableOutput[];
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo 
    */
-  getMemo = ():Buffer => this.memo;
+  getMemo = (): Buffer => this.memo;
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
    */
-  toBuffer(codecID:number = AVMConstants.LATESTCODEC):Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
     this.outs.sort(StandardTransferableOutput.comparator());
     this.ins.sort(StandardTransferableInput.comparator());
     this.numouts.writeUInt32BE(this.outs.length, 0);

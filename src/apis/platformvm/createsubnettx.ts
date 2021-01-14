@@ -29,19 +29,19 @@ export class CreateSubnetTx extends BaseTx {
     this.subnetOwners.deserialize(fields["subnetOwners"], encoding);
   }
 
-  protected subnetOwners:SECPOwnerOutput = undefined;
+  protected subnetOwners: SECPOwnerOutput = undefined;
 
   /**
    * Returns the id of the [[CreateSubnetTx]]
    */
-  getTxType = ():number => {
+  getTxType = (): number => {
     return this._typeID;
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the reward address.
    */
-  getSubnetOwners():SECPOwnerOutput {
+  getSubnetOwners(): SECPOwnerOutput {
       return this.subnetOwners;
   }
 
@@ -55,7 +55,7 @@ export class CreateSubnetTx extends BaseTx {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
       offset = super.fromBuffer(bytes, offset);
       this.subnetOwners = new SECPOwnerOutput();
       offset = this.subnetOwners.fromBuffer(bytes, offset);
@@ -65,14 +65,14 @@ export class CreateSubnetTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateSubnetTx]].
    */
-  toBuffer():Buffer {
-      if(typeof this.subnetOwners === "undefined" || !(this.subnetOwners instanceof SECPOwnerOutput)) {
-          throw new Error("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
-      }
-      let typeID:Buffer = Buffer.alloc(4);
-      typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0);
-      let barr:Array<Buffer> = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
-      return Buffer.concat(barr);
+  toBuffer(): Buffer {
+    if(typeof this.subnetOwners === "undefined" || !(this.subnetOwners instanceof SECPOwnerOutput)) {
+        throw new Error("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
+    }
+    let typeID: Buffer = Buffer.alloc(4);
+    typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0);
+    let barr: Buffer[] = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
+    return Buffer.concat(barr);
   }
 
   /**

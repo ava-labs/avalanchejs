@@ -75,17 +75,17 @@ export abstract class Operation extends Serializable{
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
-  abstract getOperationID(codecID?:number):number;
+  abstract getOperationID(codecID?: number): number;
 
   /**
      * Returns the array of [[SigIdx]] for this [[Operation]]
      */
-  getSigIdxs = ():Array<SigIdx> => this.sigIdxs;
+  getSigIdxs = (): SigIdx[] => this.sigIdxs;
 
   /**
    * Returns the credential ID.
    */
-  abstract getCredentialID():number;
+  abstract getCredentialID(): number;
 
   /**
      * Creates and adds a [[SigIdx]] to the [[Operation]].
@@ -118,15 +118,15 @@ export abstract class Operation extends Serializable{
     return offset;
   }
 
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
-    let bsize:number = this.sigCount.length;
-    const barr:Array<Buffer> = [this.sigCount];
-    for (let i = 0; i < this.sigIdxs.length; i++) {
-      const b:Buffer = this.sigIdxs[i].toBuffer();
+    let bsize: number = this.sigCount.length;
+    const barr: Buffer[] = [this.sigCount];
+    this.sigIdxs.forEach((sigIdx: SigIdx) => {
+      const b: Buffer = sigIdx.toBuffer();
       barr.push(b);
       bsize += b.length;
-    }
+    });
     return Buffer.concat(barr, bsize);
   }
 

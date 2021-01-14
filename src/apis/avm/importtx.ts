@@ -74,7 +74,7 @@ export class ImportTx extends BaseTx {
      *
      * @remarks assume not-checksummed
      */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes:Buffer, offset:number = 0): number {
     offset = super.fromBuffer(bytes, offset);
     this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
@@ -92,16 +92,16 @@ export class ImportTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
     if(typeof this.sourceChain === "undefined") {
       throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(codecID), this.sourceChain, this.numIns];
+    let barr: Buffer[] = [super.toBuffer(codecID), this.sourceChain, this.numIns];
     this.importIns = this.importIns.sort(TransferableInput.comparator());
-    for(let i = 0; i < this.importIns.length; i++) {
-        barr.push(this.importIns[i].toBuffer(codecID));
-    }
+    this.importIns.forEach((importIn: TransferableInput) => {
+      barr.push(importIn.toBuffer(codecID));
+    });
     return Buffer.concat(barr);
   }
   /**

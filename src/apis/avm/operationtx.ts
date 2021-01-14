@@ -65,13 +65,13 @@ export class OperationTx extends BaseTx {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0, codecid:number = AVMConstants.LATESTCODEC):number {
+  fromBuffer(bytes: Buffer, offset: number = 0, codecid: number = AVMConstants.LATESTCODEC): number {
     offset = super.fromBuffer(bytes, offset);
     this.numOps = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    const numOps:number = this.numOps.readUInt32BE(0);
-    for (let i:number = 0; i < numOps; i++) {
-      const op:TransferableOperation = new TransferableOperation();
+    const numOps: number = this.numOps.readUInt32BE(0);
+    for (let i: number = 0; i < numOps; i++) {
+      const op: TransferableOperation = new TransferableOperation();
       offset = op.fromBuffer(bytes, offset);
       this.ops.push(op);
     }
@@ -81,20 +81,20 @@ export class OperationTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
-      this.numOps.writeUInt32BE(this.ops.length, 0);
-      let barr:Array<Buffer> = [super.toBuffer(codecID), this.numOps];
-      this.ops = this.ops.sort(TransferableOperation.comparator());
-      for(let i = 0; i < this.ops.length; i++) {
-          barr.push(this.ops[i].toBuffer(codecID));
-      }
-      return Buffer.concat(barr);
+  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+    this.numOps.writeUInt32BE(this.ops.length, 0);
+    let barr: Buffer[] = [super.toBuffer(codecID), this.numOps];
+    this.ops = this.ops.sort(TransferableOperation.comparator());
+    this.ops.forEach((op: TransferableOperation) => {
+      barr.push(op.toBuffer(codecID));
+    });
+    return Buffer.concat(barr);
   }
 
   /**
    * Returns an array of [[TransferableOperation]]s in this transaction.
    */
-  getOperations():Array<TransferableOperation> {
+  getOperations(): TransferableOperation[] {
     return this.ops;
   }
 

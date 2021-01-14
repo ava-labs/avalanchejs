@@ -30,7 +30,7 @@ export class SECPCredential extends Credential {
 
   //serialize and deserialize both are inherited
 
-  getCredentialID(codecID: number = AVMConstants.LATESTCODEC):number {
+  getCredentialID(codecID: number = AVMConstants.LATESTCODEC): number {
     if(codecID === 0) {
       return AVMConstants.SECPCREDENTIAL;
     } else if (codecID === 1) {
@@ -63,7 +63,7 @@ export class NFTCredential extends Credential {
 
   //serialize and deserialize both are inherited
 
-  getCredentialID(codecID: number = AVMConstants.LATESTCODEC):number {
+  getCredentialID(codecID: number = AVMConstants.LATESTCODEC): number {
     if(codecID === 0) {
       return AVMConstants.NFTCREDENTIAL;
     } else if (codecID === 1) {
