@@ -3,9 +3,9 @@
  * @module EVM-Interfaces
  */
 
-import { UTXOResponse } from "./../../common/interfaces";
+import { iUTXOResponse } from "./../../common/interfaces";
 import { UTXOSet } from "./../../apis/evm";
 
-export interface iEVMUTXOResponse extends UTXOResponse {
+export interface iEVMUTXOResponse extends iUTXOResponse {
   utxos: UTXOSet
 }

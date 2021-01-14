@@ -3,11 +3,14 @@
  * @module PlatformVM-Interfaces
  */
 
-import { iUTXOID, UTXOResponse } from "./../../common/interfaces";
+import { 
+  iUTXOID, 
+  iUTXOResponse 
+} from "./../../common/interfaces";
 import { UTXOSet } from "./../../apis/platformvm";
 import BN from "bn.js";
 
-export interface iPlatformVMUTXOResponse extends UTXOResponse {
+export interface iPlatformVMUTXOResponse extends iUTXOResponse {
   utxos:UTXOSet
 }
 

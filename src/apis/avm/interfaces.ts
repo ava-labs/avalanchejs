@@ -3,7 +3,10 @@
  * @module AVM-Interfaces
  */
 
-import { iUTXOID, UTXOResponse } from "./../../common/interfaces";
+import { 
+  iUTXOID, 
+  iUTXOResponse 
+} from "./../../common/interfaces";
 import { UTXOSet } from "./../../apis/avm";
 export interface iGetBalanceResponse {
   balance:string
@@ -15,7 +18,7 @@ export interface iGetBalanceParams {
   assetID:string
 }
 
-export interface iAVMUTXOResponse extends UTXOResponse {
+export interface iAVMUTXOResponse extends iUTXOResponse {
   utxos: UTXOSet
 }
 
