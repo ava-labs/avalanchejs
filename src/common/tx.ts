@@ -6,17 +6,30 @@ import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Credential } from './credentials';
 import BN from 'bn.js';
-import { StandardKeyChain, StandardKeyPair } from './keychain';
-import { StandardAmountInput, StandardTransferableInput } from './input';
-import { StandardAmountOutput, StandardTransferableOutput } from './output';
+import { 
+  StandardKeyChain, 
+  StandardKeyPair 
+} from './keychain';
+import { 
+  StandardAmountInput, 
+  StandardTransferableInput 
+} from './input';
+import { 
+  StandardAmountOutput, 
+  StandardTransferableOutput 
+} from './output';
 import { DefaultNetworkID } from '../utils/constants';
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { 
+  Serializable, 
+  Serialization, 
+  SerializedEncoding 
+} from '../utils/serialization';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
@@ -44,14 +57,13 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     this.memo = serializer.decoder(fields["memo"], encoding, "hex", "Buffer");
   }
 
-
-  protected networkid:Buffer = Buffer.alloc(4);
-  protected blockchainid:Buffer = Buffer.alloc(32);
-  protected numouts:Buffer = Buffer.alloc(4);
-  protected outs:Array<StandardTransferableOutput>;
-  protected numins:Buffer = Buffer.alloc(4);
-  protected ins:Array<StandardTransferableInput>;
-  protected memo:Buffer = Buffer.alloc(4);
+  protected networkid: Buffer = Buffer.alloc(4);
+  protected blockchainid: Buffer = Buffer.alloc(32);
+  protected numouts: Buffer = Buffer.alloc(4);
+  protected outs: StandardTransferableOutput[];
+  protected numins: Buffer = Buffer.alloc(4);
+  protected ins: StandardTransferableInput[];
+  protected memo: Buffer = Buffer.alloc(0);
 
   /**
    * Returns the id of the [[StandardBaseTx]]
@@ -156,10 +168,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     super();
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
-    if(typeof memo === "undefined"){
-      this.memo = Buffer.alloc(4);
-      this.memo.writeUInt32BE(0,0);
-    } else {
+    if(typeof memo != "undefined"){
       this.memo = memo;
     }
     
