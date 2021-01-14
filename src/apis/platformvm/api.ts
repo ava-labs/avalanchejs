@@ -9,20 +9,37 @@ import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BinTools from '../../utils/bintools';
 import { KeyChain } from './keychain';
-import { Defaults, PlatformChainID, ONEAVAX } from '../../utils/constants';
+import { 
+  Defaults, 
+  PlatformChainID, 
+  ONEAVAX 
+} from '../../utils/constants';
 import { PlatformVMConstants } from './constants';
-import { UnsignedTx, Tx } from './tx';
+import { 
+  UnsignedTx, 
+  Tx 
+} from './tx';
 import { PayloadBase } from '../../utils/payload';
-import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXO, UTXOSet } from './utxos';
+import { 
+  UnixNow, 
+  NodeIDStringToBuffer 
+} from '../../utils/helperfunctions';
+import { 
+  UTXO, 
+  UTXOSet 
+} from './utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { Index } from 'src/common';
-import { iGetBalanceParams, iGetBalanceResponse, iPlatformVMUTXOResponse } from "./interfaces";
+import { iIndex } from 'src/common';
+import { 
+  iGetBalanceParams, 
+  iGetBalanceResponse, 
+  iPlatformVMUTXOResponse 
+} from "./interfaces";
 
 /**
  * @ignore
  */
-const bintools:BinTools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -892,7 +909,7 @@ export class PlatformVMAPI extends JRPCAPI {
     addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
-    startIndex: Index = undefined,
+    startIndex: iIndex = undefined,
     persistOpts: PersistanceOptions = undefined
   ): Promise<iPlatformVMUTXOResponse> => {
     

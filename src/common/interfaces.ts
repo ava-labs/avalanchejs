@@ -4,19 +4,16 @@
  */
 
 import { Buffer } from 'buffer/';
-import { UTXOSet as AVMUTXOSet } from 'src/apis/avm';
-import { UTXOSet as EVMUTXOSet } from 'src/apis/evm';
-import { UTXOSet as PlatformVMUTXOSet } from 'src/apis/platformvm';
 
-export interface Index {
+export interface iIndex {
   address: string
   utxo: string
 }
 
-export interface UTXOResponse {
+export interface iUTXOResponse {
   numFetched: number
   encoding: string
-  endIndex: Index
+  endIndex: iIndex
 }
 
 export interface iUTXOID {
@@ -24,17 +21,24 @@ export interface iUTXOID {
   outputIndex:number
 }
 
-export interface Asset {
+export interface iAsset {
   name: string
   symbol: string
   assetID: Buffer
   denomination: number
 }
-export interface Payload {
+export interface iPayload {
   result: {
-    name: string,
-    symbol: string,
-    assetID: string,
+    name: string
+    symbol: string
+    assetID: string
     denomination: number
   }
+}
+
+export interface iRPC {
+  id?: number
+  method?: string
+  params?: object[] | object
+  jsonrpc?: string
 }

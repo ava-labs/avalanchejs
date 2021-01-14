@@ -4,7 +4,7 @@ import { EVMAPI } from "src/apis/evm/api";
 import BinTools from "src/utils/bintools";
 import * as bech32 from "bech32";
 import createHash from "create-hash";
-import { Payload } from "../../../src/common/interfaces";
+import { iPayload } from "../../../src/common/interfaces";
 import { Defaults } from "src/utils/constants";
 import { 
   Avalanche, 
@@ -92,7 +92,7 @@ describe("EVMAPI", () => {
     const assetIDBuf: Buffer = Buffer.from(createHash("sha256").update(name).digest());
     const assetIDStr: string = bintools.cb58Encode(assetIDBuf);
     const result: Promise<object> = api.getAssetDescription(assetIDStr);
-    const payload: Payload = {
+    const payload: iPayload = {
       result: {
         name: name,
         symbol: symbol,
@@ -102,7 +102,7 @@ describe("EVMAPI", () => {
     };
 
     const responseObj: {
-      data: Payload
+      data: iPayload
     } = {
       data: payload,
     };
@@ -124,9 +124,7 @@ describe("EVMAPI", () => {
     const assetIDBuf: Buffer = Buffer.from(createHash("sha256").update(name).digest());
     const assetIDStr: string = bintools.cb58Encode(assetIDBuf);
     const result: Promise<object> = api.getAssetDescription(assetIDBuf);
-    console.log("========")
-    console.log(result)
-    const payload: Payload = {
+    const payload: iPayload = {
       result: {
         name: name,
         symbol: symbol,
@@ -136,7 +134,7 @@ describe("EVMAPI", () => {
     };
 
     const responseObj: {
-      data: Payload
+      data: iPayload
     } = {
       data: payload,
     };

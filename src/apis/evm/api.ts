@@ -24,8 +24,8 @@ import {
 } from './tx';
 import { EVMConstants } from './constants';
 import { 
-  Asset,
-  Index, 
+  iAsset,
+  iIndex
 } from './../../common/interfaces'
 import { EVMInput } from './inputs';
 import { 
@@ -184,7 +184,7 @@ export class EVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === 'undefined' || refresh) {
-      const asset: Asset = await this.getAssetDescription(PrimaryAssetAlias);
+      const asset: iAsset = await this.getAssetDescription(PrimaryAssetAlias);
       this.AVAXAssetID = asset.assetID;
     }
     return this.AVAXAssetID;
@@ -306,7 +306,7 @@ export class EVMAPI extends JRPCAPI {
     addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
-    startIndex: Index = undefined
+    startIndex: iIndex = undefined
   ): Promise<iEVMUTXOResponse> => {
     if(typeof addresses === "string") {
       addresses = [addresses];
