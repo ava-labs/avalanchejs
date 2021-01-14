@@ -56,10 +56,11 @@ export class CreateSubnetTx extends BaseTx {
    * @remarks assume not-checksummed
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-      offset = super.fromBuffer(bytes, offset);
-      this.subnetOwners = new SECPOwnerOutput();
-      offset = this.subnetOwners.fromBuffer(bytes, offset);
-      return offset;
+    offset = super.fromBuffer(bytes, offset);
+    this.subnetOwners = new SECPOwnerOutput();
+    offset += 4;
+    offset = this.subnetOwners.fromBuffer(bytes, offset);
+    return offset;
     }
   
   /**
