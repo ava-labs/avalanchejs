@@ -3,13 +3,13 @@
  * @module API-Admin
  */
 
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche";
+import { JRPCAPI } from "../../common/jrpcapi";
+import { RequestResponseData } from "../../common/apibase";
 import {
   iAliasParams, 
   iAliasChainParams 
-} from './interfaces';
+} from "./interfaces";
 
 /**
  * Class for interacting with a node's AdminAPI.
@@ -37,7 +37,7 @@ export class AdminAPI extends JRPCAPI {
       endpoint,
       alias,
     };
-    const response: RequestResponseData = await this.callMethod('admin.alias', params);
+    const response: RequestResponseData = await this.callMethod("admin.alias", params);
     return response.data.result.success;
   };
 
@@ -55,7 +55,7 @@ export class AdminAPI extends JRPCAPI {
       chain,
       alias,
     };
-    const response: RequestResponseData = await this.callMethod('admin.aliasChain', params);
+    const response: RequestResponseData = await this.callMethod("admin.aliasChain", params);
     return response.data.result.success;
   };
 
@@ -66,7 +66,7 @@ export class AdminAPI extends JRPCAPI {
      */
   lockProfile = async (): Promise<boolean> => {
     const params: any = {};
-    const response: RequestResponseData = await this.callMethod('admin.lockProfile', params);
+    const response: RequestResponseData = await this.callMethod("admin.lockProfile", params);
     return response.data.result.success;
   };
 
@@ -77,7 +77,7 @@ export class AdminAPI extends JRPCAPI {
      */
   memoryProfile = async (): Promise<boolean> => {
     const params: any = {};
-    const response: RequestResponseData = await this.callMethod('admin.memoryProfile', params);
+    const response: RequestResponseData = await this.callMethod("admin.memoryProfile", params);
     return response.data.result.success;
   };
 
@@ -89,7 +89,7 @@ export class AdminAPI extends JRPCAPI {
      */
   startCPUProfiler = async (): Promise<boolean> => {
     const params: any = {};
-    const response: RequestResponseData = await this.callMethod('admin.startCPUProfiler', params);
+    const response: RequestResponseData = await this.callMethod("admin.startCPUProfiler", params);
     return response.data.result.success;
   };
 
@@ -99,7 +99,7 @@ export class AdminAPI extends JRPCAPI {
      * @returns Promise for a boolean that is true on success.
      */
   stopCPUProfiler = async (): Promise<boolean> => {
-    const response: RequestResponseData = await this.callMethod('admin.stopCPUProfiler');
+    const response: RequestResponseData = await this.callMethod("admin.stopCPUProfiler");
     return response.data.result.success;
   } 
 
@@ -110,5 +110,5 @@ export class AdminAPI extends JRPCAPI {
      * @param core A reference to the Avalanche class
      * @param baseurl Defaults to the string "/ext/admin" as the path to rpc's baseurl
      */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/admin') { super(core, baseurl); }
+  constructor(core: AvalancheCore, baseurl: string = "/ext/admin") { super(core, baseurl); }
 }

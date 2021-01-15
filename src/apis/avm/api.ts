@@ -2,43 +2,43 @@
  * @packageDocumentation
  * @module API-AVM
  */
-import BN from 'bn.js';
-import { Buffer } from 'buffer/';
-import AvalancheCore from '../../avalanche';
-import BinTools from '../../utils/bintools';
+import BN from "bn.js";
+import { Buffer } from "buffer/";
+import AvalancheCore from "../../avalanche";
+import BinTools from "../../utils/bintools";
 import { 
   UTXO, 
   UTXOSet 
-} from './utxos';
-import { AVMConstants } from './constants';
-import { KeyChain } from './keychain';
+} from "./utxos";
+import { AVMConstants } from "./constants";
+import { KeyChain } from "./keychain";
 import { 
   Tx, 
   UnsignedTx 
-} from './tx';
-import { PayloadBase } from '../../utils/payload';
-import { SECPMintOutput } from './outputs';
-import { InitialStates } from './initialstates';
-import { UnixNow } from '../../utils/helperfunctions';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+} from "./tx";
+import { PayloadBase } from "../../utils/payload";
+import { SECPMintOutput } from "./outputs";
+import { InitialStates } from "./initialstates";
+import { UnixNow } from "../../utils/helperfunctions";
+import { JRPCAPI } from "../../common/jrpcapi";
+import { RequestResponseData } from "../../common/apibase";
 import { 
   Defaults, 
   PrimaryAssetAlias, 
   ONEAVAX 
-} from '../../utils/constants';
-import { MinterSet } from './minterset';
-import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { OutputOwners } from '../../common/output';
-import { SECPTransferOutput } from './outputs';
-import { iIndex } from '../../../src/common';
+} from "../../utils/constants";
+import { MinterSet } from "./minterset";
+import { PersistanceOptions } from "../../utils/persistenceoptions";
+import { OutputOwners } from "../../common/output";
+import { SECPTransferOutput } from "./outputs";
+import { iIndex } from "../../../src/common";
 import { 
   iAVMUTXOResponse, 
   iGetBalanceParams, 
   iGetBalanceResponse, 
   iGetTxStatusParams, 
   iGetTxStatusResponse 
-} from './interfaces';
+} from "./interfaces";
 
 /**
  * @ignore
@@ -116,10 +116,10 @@ export class AVMAPI extends JRPCAPI {
    */
   refreshBlockchainID = (blockchainID: string = undefined): boolean => {
     const netid: number = this.core.getNetworkID();
-    if (typeof blockchainID === 'undefined' && typeof Defaults.network[netid] !== "undefined") {
+    if (typeof blockchainID === "undefined" && typeof Defaults.network[netid] !== "undefined") {
       this.blockchainID = Defaults.network[netid].X.blockchainID; //default to X-Chain
       return true;
-    } if (typeof blockchainID === 'string') {
+    } if (typeof blockchainID === "string") {
       this.blockchainID = blockchainID;
       return true;
     }
@@ -150,7 +150,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns The the provided string representing the AVAX AssetID
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
-    if (typeof this.AVAXAssetID === 'undefined' || refresh) {
+    if (typeof this.AVAXAssetID === "undefined" || refresh) {
       const asset: {
         name: string;
         symbol: string;
@@ -289,7 +289,7 @@ export class AVMAPI extends JRPCAPI {
      */
 
   getBalance = async (address: string, assetID: string): Promise<iGetBalanceResponse> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.getBalance: Invalid address format ${address}`);
     }
@@ -297,7 +297,7 @@ export class AVMAPI extends JRPCAPI {
       address,
       assetID,
     };
-    return this.callMethod('avm.getBalance', params).then((response:RequestResponseData) => response.data.result);
+    return this.callMethod("avm.getBalance", params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -313,7 +313,7 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('avm.createAddress', params).then((response:RequestResponseData) => response.data.result.address);
+    return this.callMethod("avm.createAddress", params).then((response:RequestResponseData) => response.data.result.address);
   };
 
   /**
@@ -358,7 +358,7 @@ export class AVMAPI extends JRPCAPI {
       password,
       initialHolders,
     };
-    return this.callMethod('avm.createFixedCapAsset', params).then((response:RequestResponseData) => response.data.result.assetID);
+    return this.callMethod("avm.createFixedCapAsset", params).then((response:RequestResponseData) => response.data.result.assetID);
   };
 
   /**
@@ -409,7 +409,7 @@ export class AVMAPI extends JRPCAPI {
       password,
       minterSets,
     };
-    return this.callMethod('avm.createVariableCapAsset', params).then((response:RequestResponseData) => response.data.result.assetID);
+    return this.callMethod("avm.createVariableCapAsset", params).then((response:RequestResponseData) => response.data.result.assetID);
   };
 
   /**
@@ -432,12 +432,12 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<string> => {
     let asset: string;
     let amnt: BN;
-    if (typeof assetID !== 'string') {
+    if (typeof assetID !== "string") {
       asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
     }
-    if (typeof amount === 'number') {
+    if (typeof amount === "number") {
       amnt = new BN(amount);
     } else {
       amnt = amount;
@@ -450,7 +450,7 @@ export class AVMAPI extends JRPCAPI {
       to,
       minters
     };
-    return this.callMethod('avm.mint', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod("avm.mint", params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -463,7 +463,7 @@ export class AVMAPI extends JRPCAPI {
      * @returns Promise with the decrypted private key as store in the database
      */
   exportKey = async (username:string, password:string, address:string):Promise<string> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.exportKey: Invalid address format ${address}`);
     }
@@ -472,7 +472,7 @@ export class AVMAPI extends JRPCAPI {
       password,
       address,
     };
-    return this.callMethod('avm.exportKey', params).then((response:RequestResponseData) => response.data.result.privateKey);
+    return this.callMethod("avm.exportKey", params).then((response:RequestResponseData) => response.data.result.privateKey);
   };
 
   /**
@@ -490,7 +490,7 @@ export class AVMAPI extends JRPCAPI {
       password,
       privateKey,
     };
-    return this.callMethod('avm.importKey', params).then((response:RequestResponseData) => response.data.result.address);
+    return this.callMethod("avm.importKey", params).then((response:RequestResponseData) => response.data.result.address);
   };
 
   /**
@@ -514,7 +514,7 @@ export class AVMAPI extends JRPCAPI {
       password,
       assetID
     };
-    return this.callMethod('avm.export', params).then((response: RequestResponseData) => response.data.result.txID);
+    return this.callMethod("avm.export", params).then((response: RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -536,7 +536,7 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('avm.exportAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod("avm.exportAVAX", params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -560,7 +560,7 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('avm.import', params)
+    return this.callMethod("avm.import", params)
       .then((response:RequestResponseData) => response.data.result.txID);
   };
 
@@ -582,7 +582,7 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('avm.importAVAX', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod("avm.importAVAX", params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -598,7 +598,7 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod('avm.listAddresses', params).then((response:RequestResponseData) => response.data.result.addresses);
+    return this.callMethod("avm.listAddresses", params).then((response:RequestResponseData) => response.data.result.addresses);
   };
 
   /**
@@ -609,14 +609,14 @@ export class AVMAPI extends JRPCAPI {
      * @returns Promise of an object mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
      */
   getAllBalances = async (address:string):Promise<Array<object>> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.getAllBalances: Invalid address format ${address}`);
     }
     const params:any = {
       address,
     };
-    return this.callMethod('avm.getAllBalances', params).then((response:RequestResponseData) => response.data.result.balances);
+    return this.callMethod("avm.getAllBalances", params).then((response:RequestResponseData) => response.data.result.balances);
   };
 
   /**
@@ -628,7 +628,7 @@ export class AVMAPI extends JRPCAPI {
      */
   getAssetDescription = async (assetID:Buffer | string):Promise<{name:string;symbol:string;assetID:Buffer;denomination:number}> => {
     let asset:string;
-    if (typeof assetID !== 'string') {
+    if (typeof assetID !== "string") {
       asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
@@ -636,7 +636,7 @@ export class AVMAPI extends JRPCAPI {
     const params:any = {
       assetID: asset,
     };
-    return this.callMethod('avm.getAssetDescription', params).then((response:RequestResponseData) => ({
+    return this.callMethod("avm.getAssetDescription", params).then((response:RequestResponseData) => ({
       name: response.data.result.name,
       symbol: response.data.result.symbol,
       assetID: bintools.cb58Decode(response.data.result.assetID),
@@ -655,7 +655,7 @@ export class AVMAPI extends JRPCAPI {
     const params:any = {
       txID: txid,
     };
-    return this.callMethod('avm.getTx', params).then((response:RequestResponseData) => response.data.result.tx);
+    return this.callMethod("avm.getTx", params).then((response:RequestResponseData) => response.data.result.tx);
   };
 
   /**
@@ -669,7 +669,7 @@ export class AVMAPI extends JRPCAPI {
     const params: iGetTxStatusParams = {
       txID: txid,
     };
-    const response: RequestResponseData = await this.callMethod('avm.getTxStatus', params);
+    const response: RequestResponseData = await this.callMethod("avm.getTxStatus", params);
     return response.data.result;
   };
 
@@ -712,11 +712,11 @@ export class AVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    return this.callMethod('avm.getUTXOs', params).then((response:RequestResponseData) => {
+    return this.callMethod("avm.getUTXOs", params).then((response:RequestResponseData) => {
 
       const utxos:UTXOSet = new UTXOSet();
       let data = response.data.result.utxos;
-      if (persistOpts && typeof persistOpts === 'object') {
+      if (persistOpts && typeof persistOpts === "object") {
         if (this.db.has(persistOpts.getName())) {
           const selfArray:Array<string> = this.db.get(persistOpts.getName());
           if (Array.isArray(selfArray)) {
@@ -767,11 +767,11 @@ export class AVMAPI extends JRPCAPI {
     locktime:BN = new BN(0), 
     threshold:number = 1
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildBaseTx").map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildBaseTx").map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildBaseTx").map((a) => bintools.stringToAddress(a));
 
-    if (typeof assetID === 'string') {
+    if (typeof assetID === "string") {
       assetID = bintools.cb58Decode(assetID);
     }
 
@@ -830,8 +830,8 @@ export class AVMAPI extends JRPCAPI {
     locktime:BN = new BN(0), 
     threshold:number = 1,
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildNFTTransferTx").map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildNFTTransferTx").map((a) => bintools.stringToAddress(a));
     const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
@@ -840,7 +840,7 @@ export class AVMAPI extends JRPCAPI {
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
     let utxoidArray:Array<string> = [];
-    if (typeof utxoid === 'string') {
+    if (typeof utxoid === "string") {
       utxoidArray = [utxoid];
     } else if (Array.isArray(utxoid)) {
       utxoidArray = utxoid;
@@ -898,9 +898,9 @@ export class AVMAPI extends JRPCAPI {
     locktime:BN = new BN(0), 
     threshold:number = 1
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, "buildImportTx").map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildImportTx").map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildImportTx").map((a) => bintools.stringToAddress(a));
 
     let srcChain:string = undefined;
 
@@ -1002,8 +1002,8 @@ export class AVMAPI extends JRPCAPI {
       to.push(bintools.stringToAddress(a));
     });
 
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
+    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildExportTx").map((a) => bintools.stringToAddress(a));
+    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildExportTx").map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1261,7 +1261,7 @@ export class AVMAPI extends JRPCAPI {
       payload = payload.getPayload();
     }
 
-    if(typeof utxoid === 'string') {
+    if(typeof utxoid === "string") {
         utxoid = [utxoid];
     }
 
@@ -1308,8 +1308,8 @@ export class AVMAPI extends JRPCAPI {
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx:string | Buffer | Tx):Promise<string> => {
-    let Transaction = '';
-    if (typeof tx === 'string') {
+    let Transaction = "";
+    if (typeof tx === "string") {
       Transaction = tx;
     } else if (tx instanceof Buffer) {
       const txobj:Tx = new Tx();
@@ -1319,12 +1319,12 @@ export class AVMAPI extends JRPCAPI {
       Transaction = tx.toString();
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+      throw new Error("Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx");
     }
     const params:any = {
       tx: Transaction.toString(),
     };
-    return this.callMethod('avm.issueTx', params).then((response:RequestResponseData) => response.data.result.txID);
+    return this.callMethod("avm.issueTx", params).then((response:RequestResponseData) => response.data.result.txID);
   };
 
   /**
@@ -1345,17 +1345,17 @@ export class AVMAPI extends JRPCAPI {
     let asset:string;
     let amnt:BN;
 
-    if (typeof this.parseAddress(to) === 'undefined') {
+    if (typeof this.parseAddress(to) === "undefined") {
       /* istanbul ignore next */
       throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
     }
 
-    if (typeof assetID !== 'string') {
+    if (typeof assetID !== "string") {
       asset = bintools.cb58Encode(assetID);
     } else {
       asset = assetID;
     }
-    if (typeof amount === 'number') {
+    if (typeof amount === "number") {
       amnt = new BN(amount);
     } else {
       amnt = amount;
@@ -1369,13 +1369,13 @@ export class AVMAPI extends JRPCAPI {
       to: to
     };
 
-    from = this._cleanAddressArray(from, 'send');
+    from = this._cleanAddressArray(from, "send");
     if(typeof from !== "undefined"){
       params["from"] = from;
     }
 
-    if (typeof changeAddr !== 'undefined') {
-      if(typeof this.parseAddress(changeAddr) === 'undefined') {
+    if (typeof changeAddr !== "undefined") {
+      if(typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
         throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
       }
@@ -1383,14 +1383,14 @@ export class AVMAPI extends JRPCAPI {
     } 
 
     if(typeof memo !== "undefined") {
-      if(typeof memo !== 'string') {
+      if(typeof memo !== "string") {
         params["memo"] = bintools.cb58Encode(memo);
       } else {
         params["memo"] = memo;
       }
     }
     
-    return this.callMethod('avm.send', params).then((response:RequestResponseData) => response.data.result);
+    return this.callMethod("avm.send", params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -1416,16 +1416,16 @@ export class AVMAPI extends JRPCAPI {
     let sOutputs:Array<{assetID:string, amount:string, to:string}> = [];
 
     sendOutputs.forEach((output) => {
-      if (typeof this.parseAddress(output.to) === 'undefined') {
+      if (typeof this.parseAddress(output.to) === "undefined") {
         /* istanbul ignore next */
         throw new Error(`Error - AVMAPI.sendMultiple: Invalid address format ${output.to}`);
       }
-      if (typeof output.assetID !== 'string') {
+      if (typeof output.assetID !== "string") {
         asset = bintools.cb58Encode(output.assetID);
       } else {
         asset = output.assetID;
       }
-      if (typeof output.amount === 'number') {
+      if (typeof output.amount === "number") {
         amnt = new BN(output.amount);
       } else {
         amnt = output.amount;
@@ -1439,13 +1439,13 @@ export class AVMAPI extends JRPCAPI {
       outputs: sOutputs,
     };
 
-    from = this._cleanAddressArray(from, 'send');
+    from = this._cleanAddressArray(from, "send");
     if(typeof from !== "undefined"){
       params["from"] = from;
     }
 
-    if (typeof changeAddr !== 'undefined') {
-      if(typeof this.parseAddress(changeAddr) === 'undefined') {
+    if (typeof changeAddr !== "undefined") {
+      if(typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
         throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
       }
@@ -1453,14 +1453,14 @@ export class AVMAPI extends JRPCAPI {
     } 
 
     if(typeof memo !== "undefined") {
-      if(typeof memo !== 'string') {
+      if(typeof memo !== "string") {
         params["memo"] = bintools.cb58Encode(memo);
       } else {
         params["memo"] = memo;
       }
     }
     
-    return this.callMethod('avm.sendMultiple', params).then((response:RequestResponseData) => response.data.result);
+    return this.callMethod("avm.sendMultiple", params).then((response:RequestResponseData) => response.data.result);
   };
 
   /**
@@ -1474,7 +1474,7 @@ export class AVMAPI extends JRPCAPI {
     const params:any = {
       genesisData,
     };
-    return this.callMethod('avm.buildGenesis', params).then((response:RequestResponseData) => {
+    return this.callMethod("avm.buildGenesis", params).then((response:RequestResponseData) => {
       const r = response.data.result.bytes;
       return r;
     });
@@ -1486,10 +1486,10 @@ export class AVMAPI extends JRPCAPI {
   protected _cleanAddressArray(addresses:Array<string> | Array<Buffer>, caller:string):Array<string> {
     const addrs:Array<string> = [];
     const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
-    if (addresses && addresses.length > 0) {
-      for (let i = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === 'string') {
-          if (typeof this.parseAddress(addresses[i] as string) === 'undefined') {
+    if(addresses && addresses.length > 0) {
+      for(let i = 0; i < addresses.length; i++) {
+        if (typeof addresses[i] === "string") {
+          if (typeof this.parseAddress(addresses[i] as string) === "undefined") {
             /* istanbul ignore next */
             throw new Error(`Error - AVMAPI.${caller}: Invalid address format ${addresses[i]}`);
           }
@@ -1507,14 +1507,14 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/bc/X" as the path to blockchain's baseurl
-   * @param blockchainID The Blockchain's ID. Defaults to an empty string: ''
+   * @param blockchainID The Blockchain's ID. Defaults to an empty string: ""
    */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/bc/X', blockchainID:string = '') {
+  constructor(core: AvalancheCore, baseurl: string = "/ext/bc/X", blockchainID: string = "") {
     super(core, baseurl);
     this.blockchainID = blockchainID;
-    const netid:number = core.getNetworkID();
-    if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
-      const { alias } = Defaults.network[netid][blockchainID];
+    const netID: number = core.getNetworkID();
+    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
+      const { alias } = Defaults.network[netID][blockchainID];
       this.keychain = new KeyChain(this.core.getHRP(), alias);
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID);

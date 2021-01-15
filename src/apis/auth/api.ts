@@ -2,14 +2,14 @@
  * @packageDocumentation
  * @module API-Auth
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche";
+import { JRPCAPI } from "../../common/jrpcapi";
+import { RequestResponseData } from "../../common/apibase";
 import { 
   iNewTokenParams,
   iRevokeTokenParams,
   iChangePasswordParams
-} from './interfaces';
+} from "./interfaces";
 
 /**
  * Class for interacting with a node's AuthAPI.
@@ -32,7 +32,7 @@ export class AuthAPI extends JRPCAPI {
         password,
         endpoints
       };
-      const response: RequestResponseData = await this.callMethod('auth.newToken', params);
+      const response: RequestResponseData = await this.callMethod("auth.newToken", params);
       return response.data.result.token;
     };
 
@@ -50,7 +50,7 @@ export class AuthAPI extends JRPCAPI {
         password,
         token
       };
-      const response: RequestResponseData = await this.callMethod('auth.revokeToken', params);
+      const response: RequestResponseData = await this.callMethod("auth.revokeToken", params);
       return response.data.result.success;
     };
 
@@ -67,9 +67,9 @@ export class AuthAPI extends JRPCAPI {
         oldPassword,
         newPassword
       };
-      const response: RequestResponseData = await this.callMethod('auth.changePassword', params);
+      const response: RequestResponseData = await this.callMethod("auth.changePassword", params);
       return response.data.result.success;
     };
 
-    constructor(core: AvalancheCore, baseurl: string = '/ext/auth') { super(core, baseurl); }
+    constructor(core: AvalancheCore, baseurl: string = "/ext/auth") { super(core, baseurl); }
 }
