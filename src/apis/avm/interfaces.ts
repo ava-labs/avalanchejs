@@ -4,6 +4,7 @@
  */
 
 import { 
+  iIndex,
   iUTXOID, 
   iUTXOResponse 
 } from "./../../common/interfaces";
@@ -140,4 +141,48 @@ export interface iSendParams {
   from?: string[] | Buffer[]
   changeAddr?: string
   memo?: string | Buffer
+}
+
+export interface iGetTxParams {
+  txID: string
+}
+
+export interface iIssueTxParams {
+  tx: string | Buffer | Tx
+}
+
+export interface iSendMultipleParams {
+  username: string
+  password: string
+  sendOutputs: Array<iSendOutput>
+  from: string[] | Buffer[]
+  changeAddr: string
+  memo: string | Buffer
+}
+
+export interface iSendMultipleResponse {
+  txID: string 
+  changeAddr: string
+}
+
+export interface iSendOutput {
+  assetID: string | Buffer 
+  amount: number | BN 
+  to: string
+}
+
+export interface iGetUTXOsParams {
+  addresses: string[] | string
+  limit: number
+  sourceChain?: string
+  startIndex?: iIndex
+}
+
+export interface iCreateVariableCapAssetParams {
+  username: string
+  password: string
+  name: string
+  symbol: string
+  denomination: number
+  minterSets: object[]
 }

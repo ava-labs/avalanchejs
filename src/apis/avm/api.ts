@@ -52,7 +52,14 @@ import {
   iBalance,
   iGetAssetDescriptionParams,
   iSendResponse,
-  iSendParams
+  iSendParams,
+  iGetTxParams,
+  iIssueTxParams,
+  iSendMultipleParams,
+  iSendMultipleResponse,
+  iSendOutput,
+  iGetUTXOsParams,
+  iCreateVariableCapAssetParams
 } from "./interfaces";
 
 /**
@@ -420,7 +427,7 @@ export class AVMAPI extends JRPCAPI {
     denomination: number, 
     minterSets: object[]
   ): Promise<string> => {
-    const params: any = {
+    const params: iCreateVariableCapAssetParams = {
       name,
       symbol,
       denomination,
@@ -704,7 +711,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns Returns a Promise<string> containing the bytes retrieved from the node
    */
   getTx = async (txid: string): Promise<string> => {
-    const params: any = {
+    const params: iGetTxParams = {
       txID: txid,
     };
     const response: RequestResponseData = await this.callMethod("avm.getTx", params);
@@ -744,7 +751,7 @@ export class AVMAPI extends JRPCAPI {
   getUTXOs = async (
     addresses: string[] | string,
     sourceChain: string = undefined,
-    limit:number = 0,
+    limit: number = 0,
     startIndex: iIndex = undefined,
     persistOpts: PersistanceOptions = undefined
   ): Promise<iAVMUTXOResponse> => {
@@ -753,10 +760,11 @@ export class AVMAPI extends JRPCAPI {
       addresses = [addresses];
     }
 
-    const params: any = {
+    const params: iGetUTXOsParams = {
       addresses: addresses,
       limit
     };
+
     if(typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex;
     }
@@ -765,27 +773,26 @@ export class AVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    return this.callMethod("avm.getUTXOs", params).then((response:RequestResponseData) => {
+    const response: RequestResponseData = await this.callMethod("avm.getUTXOs", params);
 
-      const utxos:UTXOSet = new UTXOSet();
-      let data = response.data.result.utxos;
-      if (persistOpts && typeof persistOpts === "object") {
-        if (this.db.has(persistOpts.getName())) {
-          const selfArray:Array<string> = this.db.get(persistOpts.getName());
-          if (Array.isArray(selfArray)) {
-            utxos.addArray(data);
-            const self:UTXOSet = new UTXOSet();
-            self.addArray(selfArray);
-            self.mergeByRule(utxos, persistOpts.getMergeRule());
-            data = self.getAllUTXOStrings();
-          }
+    const utxos:UTXOSet = new UTXOSet();
+    let data = response.data.result.utxos;
+    if (persistOpts && typeof persistOpts === "object") {
+      if (this.db.has(persistOpts.getName())) {
+        const selfArray:Array<string> = this.db.get(persistOpts.getName());
+        if (Array.isArray(selfArray)) {
+          utxos.addArray(data);
+          const self:UTXOSet = new UTXOSet();
+          self.addArray(selfArray);
+          self.mergeByRule(utxos, persistOpts.getMergeRule());
+          data = self.getAllUTXOStrings();
         }
-        this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
       }
-      utxos.addArray(data, false);
-      response.data.result.utxos = utxos;
-      return response.data.result;
-    });
+      this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
+    }
+    utxos.addArray(data, false);
+    response.data.result.utxos = utxos;
+    return response.data.result;
   };
 
   /**
@@ -970,7 +977,7 @@ export class AVMAPI extends JRPCAPI {
       sourceChain = bintools.cb58Decode(sourceChain);
     } else if(!(sourceChain instanceof Buffer)) {
     srcChain = bintools.cb58Encode(sourceChain);
-    throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
+    throw new Error(`Error - AVMAPI.buildImportTx: Invalid destinationChain type: ${(typeof sourceChain)}`);
   }
   
   const avmUTXOResponse: iAVMUTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)
@@ -1391,7 +1398,7 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new Error("Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx");
     }
-    const params: any = {
+    const params: iIssueTxParams = {
       tx: Transaction.toString(),
     };
     const response: RequestResponseData = await this.callMethod("avm.issueTx", params);
