@@ -59,7 +59,8 @@ import {
   iSendMultipleResponse,
   iSendOutput,
   iGetUTXOsParams,
-  iCreateVariableCapAssetParams
+  iCreateVariableCapAssetParams,
+  iAsset
 } from "./interfaces";
 
 /**
@@ -97,9 +98,9 @@ export class AVMAPI extends JRPCAPI {
    */
   getBlockchainAlias = (): string => {
     if(typeof this.blockchainAlias === "undefined"){
-      const netid: number = this.core.getNetworkID();
-      if(netid in Defaults.network && this.blockchainID in Defaults.network[netid]) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
+      const netID: number = this.core.getNetworkID();
+      if(netID in Defaults.network && this.blockchainID in Defaults.network[netID]) {
+        this.blockchainAlias = Defaults.network[netID][this.blockchainID].alias;
         return this.blockchainAlias;
       } else {
         /* istanbul ignore next */
@@ -115,10 +116,8 @@ export class AVMAPI extends JRPCAPI {
    * @param alias The alias for the blockchainID.
    * 
    */
-  setBlockchainAlias = (alias: string): string => {
+  setBlockchainAlias = (alias: string): void => {
     this.blockchainAlias = alias;
-    /* istanbul ignore next */
-    return undefined;
   };
 
   /**
@@ -136,9 +135,9 @@ export class AVMAPI extends JRPCAPI {
    * @returns The blockchainID
    */
   refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netid: number = this.core.getNetworkID();
-    if (typeof blockchainID === "undefined" && typeof Defaults.network[netid] !== "undefined") {
-      this.blockchainID = Defaults.network[netid].X.blockchainID; //default to X-Chain
+    const netID: number = this.core.getNetworkID();
+    if (typeof blockchainID === "undefined" && typeof Defaults.network[netID] !== "undefined") {
+      this.blockchainID = Defaults.network[netID].X.blockchainID; //default to X-Chain
       return true;
     } if (typeof blockchainID === "string") {
       this.blockchainID = blockchainID;
@@ -159,8 +158,8 @@ export class AVMAPI extends JRPCAPI {
   };
 
   addressFromBuffer = (address: Buffer): string => {
-    const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
-    return bintools.addressToString(this.core.getHRP(), chainid, address);
+    const chainID: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
+    return bintools.addressToString(this.core.getHRP(), chainID, address);
   };
 
   /**
@@ -172,12 +171,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
-      const asset: {
-        name: string;
-        symbol: string;
-        assetID: Buffer;
-        denomination: number;
-      } = await this.getAssetDescription(PrimaryAssetAlias);
+      const asset: iAsset = await this.getAssetDescription(PrimaryAssetAlias);
       this.AVAXAssetID = asset.assetID;
     }
     return this.AVAXAssetID;
@@ -684,7 +678,7 @@ export class AVMAPI extends JRPCAPI {
      * @returns Returns a Promise<object> with keys "name" and "symbol".
      */
   // getAssetDescription = async (assetID: Buffer | string): Promise<iGetAssetDescriptionResponse> => {
-  getAssetDescription = async (assetID: Buffer | string): Promise<{name:string;symbol:string;assetID:Buffer;denomination:number}> => {
+  getAssetDescription = async (assetID: Buffer | string): Promise<iAsset> => {
     let asset: string;
     if (typeof assetID !== "string") {
       asset = bintools.cb58Encode(assetID);

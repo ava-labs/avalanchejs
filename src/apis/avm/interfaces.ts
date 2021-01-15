@@ -10,7 +10,8 @@ import {
 } from "./../../common/interfaces";
 import { Tx, UTXOSet } from "./../../apis/avm";
 import BN from "bn.js";
-import Buffer from "buffer/"
+import { Buffer } from "buffer/"
+
 export interface iGetBalanceResponse {
   balance:string
   utxoIDs:iUTXOID[] 
@@ -185,4 +186,11 @@ export interface iCreateVariableCapAssetParams {
   symbol: string
   denomination: number
   minterSets: object[]
+}
+
+export interface iAsset {
+  name: string
+  symbol: string
+  assetID: Buffer
+  denomination: number
 }

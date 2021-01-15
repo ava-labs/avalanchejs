@@ -33,7 +33,10 @@ import {
   TransferableOutput 
 } from "./outputs";
 import { ExportTx } from "./exporttx";
-import { iEVMUTXOResponse } from "./interfaces";
+import { 
+  iEVMUTXOResponse, 
+  iGetUTXOsParams 
+} from "./interfaces";
 
 /**
  * @ignore
@@ -86,10 +89,8 @@ export class EVMAPI extends JRPCAPI {
    * @param alias The alias for the blockchainID.
    * 
    */
-  setBlockchainAlias = (alias: string): string => {
+  setBlockchainAlias = (alias: string): void => {
     this.blockchainAlias = alias;
-    /* istanbul ignore next */
-    return undefined;
   };
 
 
@@ -256,7 +257,8 @@ export class EVMAPI extends JRPCAPI {
       password,
       assetID
     };
-    return this.callMethod("avax.export", params).then((response: RequestResponseData) => response.data.result.txID);
+    const response: RequestResponseData = await this.callMethod("avax.export", params);
+    return response.data.result.txID;
   };
 
   /**
@@ -288,7 +290,8 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod("avax.exportAVAX", params).then((response: RequestResponseData) => response.data.result.txID);
+    const response: RequestResponseData = await this.callMethod("avax.exportAVAX", params);
+    return response.data.result.txID;
   };
 
   /**
@@ -312,7 +315,7 @@ export class EVMAPI extends JRPCAPI {
       addresses = [addresses];
     }
 
-    const params: any = {
+    const params: iGetUTXOsParams = {
       addresses: addresses,
       limit
     };
@@ -324,13 +327,12 @@ export class EVMAPI extends JRPCAPI {
       params.sourceChain = sourceChain;
     }
 
-    return this.callMethod("avax.getUTXOs", params).then((response: RequestResponseData) => {
-      const utxos: UTXOSet = new UTXOSet();
-      let data: any = response.data.result.utxos;
-      utxos.addArray(data, false);
-      response.data.result.utxos = utxos;
-      return response.data.result;
-    });
+    const response: RequestResponseData = await this.callMethod("avax.getUTXOs", params);
+    const utxos: UTXOSet = new UTXOSet();
+    let data: any = response.data.result.utxos;
+    utxos.addArray(data, false);
+    response.data.result.utxos = utxos;
+    return response.data.result;
   }
 
   /**
@@ -351,8 +353,7 @@ export class EVMAPI extends JRPCAPI {
     password: string, 
     to: string, 
     sourceChain: string
-  )
-  : Promise<string> => {
+  ): Promise<string> => {
     const params: {
       username: string, 
       password: string, 
@@ -364,8 +365,8 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod("avax.import", params)
-      .then((response: RequestResponseData) => response.data.result.txID);
+    const response: RequestResponseData = await this.callMethod("avax.import", params);
+    return response.data.result.txID;
   };
 
   /**
@@ -386,8 +387,8 @@ export class EVMAPI extends JRPCAPI {
     username: string, 
     password: string, 
     to: string, 
-    sourceChain: string) : 
-  Promise<string> => {
+    sourceChain: string
+  ): Promise<string> => {
     const params: {
       username: string, 
       password: string, 
@@ -399,8 +400,8 @@ export class EVMAPI extends JRPCAPI {
       username,
       password,
     };
-    return this.callMethod("avax.importAVAX", params)
-      .then((response: RequestResponseData) => response.data.result.txID);
+    const response: RequestResponseData = await this.callMethod("avax.importAVAX", params);
+    return response.data.result.txID;
   };
 
   /**
@@ -426,7 +427,8 @@ export class EVMAPI extends JRPCAPI {
       password,
       privateKey,
     };
-    return this.callMethod("avax.importKey", params).then((response: RequestResponseData) => response.data.result.address);
+    const response: RequestResponseData = await this.callMethod("avax.importKey", params);
+    return response.data.result.address;
   };
 
   /**
@@ -455,7 +457,8 @@ export class EVMAPI extends JRPCAPI {
     } = {
       tx: Transaction.toString(),
     };
-    return this.callMethod("avax.issueTx", params).then((response: RequestResponseData) => response.data.result.txID);
+    const response: RequestResponseData = await this.callMethod("avax.issueTx", params);
+    return response.data.result.txID;
   };
 
   /**
@@ -481,7 +484,8 @@ export class EVMAPI extends JRPCAPI {
       password,
       address,
     };
-    return this.callMethod("avax.exportKey", params).then((response: RequestResponseData) => response.data.result.privateKey);
+    const response: RequestResponseData = await this.callMethod("avax.exportKey", params);
+    return response.data.result.privateKey;
   };
 
   /**
