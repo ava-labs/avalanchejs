@@ -3,10 +3,10 @@
  * @module Common-AssetAmount
  */
 
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
-import { StandardTransferableOutput } from './output';
-import { StandardTransferableInput } from './input';
+import { Buffer } from "buffer/";
+import BN from "bn.js";
+import { StandardTransferableOutput } from "./output";
+import { StandardTransferableInput } from "./input";
 
 /**
  * Class for managing asset amounts in the UTXOSet fee calcuation
@@ -76,8 +76,7 @@ export class AssetAmount {
   spendAmount = (amt: BN, stakeableLocked: boolean = false): boolean => {
     if (this.finished) {
       /* istanbul ignore next */
-      throw new Error('Error - AssetAmount.spendAmount: attempted to spend '
-        + 'excess funds');
+      throw new Error("Error - AssetAmount.spendAmount: attempted to spend excess funds");
     }
     this.spent = this.spent.add(amt);
     if (stakeableLocked) {
@@ -106,48 +105,48 @@ export class AssetAmount {
 }
 
 export abstract class StandardAssetAmountDestination<TO extends StandardTransferableOutput, TI extends StandardTransferableInput>  {
-  protected amounts: Array<AssetAmount> = [];
-  protected destinations: Array<Buffer> = [];
-  protected senders: Array<Buffer> = [];
-  protected changeAddresses: Array<Buffer> = [];
+  protected amounts: AssetAmount[] = [];
+  protected destinations: Buffer[] = [];
+  protected senders: Buffer[] = [];
+  protected changeAddresses: Buffer[] = [];
   protected amountkey: object = {};
-  protected inputs: Array<TI> = [];
-  protected outputs: Array<TO> = [];
-  protected change: Array<TO> = [];
+  protected inputs: TI[] = [];
+  protected outputs: TO[] = [];
+  protected change: TO[] = [];
 
   // TODO: should this function allow for repeated calls with the same
   //       assetID?
-  addAssetAmount = (assetID: Buffer, amount: BN, burn: BN) => {
+  addAssetAmount = (assetID: Buffer, amount: BN, burn: BN): void => {
     let aa: AssetAmount = new AssetAmount(assetID, amount, burn);
     this.amounts.push(aa);
     this.amountkey[aa.getAssetIDString()] = aa;
   }
 
-  addInput = (input: TI) => {
+  addInput = (input: TI): void => {
     this.inputs.push(input);
   }
 
-  addOutput = (output: TO) => {
+  addOutput = (output: TO): void => {
     this.outputs.push(output);
   }
 
-  addChange = (output: TO) => {
+  addChange = (output: TO): void => {
     this.change.push(output);
   }
 
-  getAmounts = (): Array<AssetAmount> => {
+  getAmounts = (): AssetAmount[] => {
     return this.amounts;
   }
 
-  getDestinations = (): Array<Buffer> => {
+  getDestinations = (): Buffer[] => {
     return this.destinations;
   }
 
-  getSenders = (): Array<Buffer> => {
+  getSenders = (): Buffer[] => {
     return this.senders;
   }
 
-  getChangeAddresses = (): Array<Buffer> => {
+  getChangeAddresses = (): Buffer[] => {
     return this.changeAddresses;
   }
 
@@ -159,33 +158,32 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
     return (assetHexStr in this.amountkey);
   }
 
-  getInputs = (): Array<TI> => {
+  getInputs = (): TI[] => {
     return this.inputs;
   }
 
-  getOutputs = (): Array<TO> => {
+  getOutputs = (): TO[] => {
     return this.outputs;
   }
 
-  getChangeOutputs = (): Array<TO> => {
+  getChangeOutputs = (): TO[] => {
     return this.change;
   }
 
-  getAllOutputs = (): Array<TO> => {
+  getAllOutputs = (): TO[] => {
     return this.outputs.concat(this.change);
   }
 
   canComplete = (): boolean => {
     for (let i = 0; i < this.amounts.length; i++) {
       if (!this.amounts[i].isFinished()) {
-
         return false;
       }
     }
     return true;
   }
 
-  constructor(destinations: Array<Buffer>, senders: Array<Buffer>, changeAddresses: Array<Buffer>) {
+  constructor(destinations: Buffer[], senders: Buffer[], changeAddresses: Buffer[]) {
     this.destinations = destinations;
     this.changeAddresses = changeAddresses;
     this.senders = senders;

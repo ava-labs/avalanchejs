@@ -3,16 +3,16 @@
  * @module Common-NBytes
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../utils/bintools';
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../utils/bintools";
+import { Serializable, Serialization, SerializedEncoding } from "../utils/serialization";
 
 
 /**
  * @ignore
  */
-const bintools:BinTools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Abstract class that implements basic functionality for managing a
@@ -25,22 +25,22 @@ export abstract class NBytes extends Serializable {
   protected _typeName = "NBytes";
   protected _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields:object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding);
     return {
       ...fields,
       "bsize": serializer.encoder(this.bsize, encoding, "number", "decimalString", 4),
       "bytes": serializer.encoder(this.bytes, encoding, "Buffer", "hex", this.bsize)
     }
   };
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.bsize = serializer.decoder(fields["bsize"], encoding, "decimalString", "number", 4);
     this.bytes = serializer.decoder(fields["bytes"], encoding, "hex", "Buffer", this.bsize);
   }
 
-  protected bytes:Buffer;
-  protected bsize:number;
+  protected bytes: Buffer;
+  protected bsize: number;
 
   /**
    * Returns the length of the {@link https://github.com/feross/buffer|Buffer}.
@@ -54,12 +54,12 @@ export abstract class NBytes extends Serializable {
    *
    * @returns The size of the {@link https://github.com/feross/buffer|Buffer}
    */
-  fromString(b58str:string):number {
+  fromString(b58str: string): number {
     try {
       this.fromBuffer(bintools.b58ToBuffer(b58str));
     } catch (e) {
       /* istanbul ignore next */
-      const emsg:string = `Error - NBytes.fromString: ${e}`;
+      const emsg: string = `Error - NBytes.fromString: ${e}`;
       /* istanbul ignore next */
       throw new Error(emsg);
     }
@@ -71,7 +71,7 @@ export abstract class NBytes extends Serializable {
    *
    * @returns The size of the {@link https://github.com/feross/buffer|Buffer}
    */
-  fromBuffer(buff:Buffer, offset:number = 0):number {
+  fromBuffer(buff: Buffer, offset: number = 0): number {
     try {
       if (buff.length - offset < this.bsize) {
         /* istanbul ignore next */
@@ -81,7 +81,7 @@ export abstract class NBytes extends Serializable {
       this.bytes = bintools.copyFrom(buff, offset, offset + this.bsize);
     } catch (e) {
       /* istanbul ignore next */
-      const emsg:string = `Error - NBytes.fromBuffer: ${e}`;
+      const emsg: string = `Error - NBytes.fromBuffer: ${e}`;
       /* istanbul ignore next */
       throw new Error(emsg);
     }
@@ -91,19 +91,18 @@ export abstract class NBytes extends Serializable {
   /**
    * @returns A reference to the stored {@link https://github.com/feross/buffer|Buffer}
    */
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     return this.bytes;
   }
 
   /**
    * @returns A base-58 string of the stored {@link https://github.com/feross/buffer|Buffer}
    */
-  toString():string {
+  toString(): string {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  abstract clone():this;
+  abstract clone(): this;
 
-  abstract create(...args:any[]):this;
-  
+  abstract create(...args: any[]): this;
 }

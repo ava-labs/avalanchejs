@@ -18,7 +18,7 @@ export abstract class StandardKeyPair {
        *
        * @param entropy Optional parameter that may be necessary to produce secure keys
        */
-    generateKey:(entropy?:Buffer) => void;
+    generateKey:(entropy?: Buffer) => void;
   
     /**
        * Imports a private key and generates the appropriate public key.
@@ -27,7 +27,7 @@ export abstract class StandardKeyPair {
        *
        * @returns true on success, false on failure
        */
-    importKey:(privk:Buffer) => boolean;
+    importKey:(privk: Buffer) => boolean;
   
     /**
        * Takes a message, signs it, and returns the signature.
@@ -36,7 +36,7 @@ export abstract class StandardKeyPair {
        *
        * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
        */
-    sign:(msg:Buffer) => Buffer;
+    sign:(msg: Buffer) => Buffer;
   
     /**
        * Recovers the public key of a message signer from a message and its associated signature.
@@ -47,7 +47,7 @@ export abstract class StandardKeyPair {
        * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public
        * key of the signer
        */
-    recover:(msg:Buffer, sig:Buffer) => Buffer;
+    recover:(msg: Buffer, sig: Buffer) => Buffer;
   
     /**
        * Verifies that the private key associated with the provided public key produces the
@@ -59,21 +59,21 @@ export abstract class StandardKeyPair {
        *
        * @returns True on success, false on failure
        */
-    verify:(msg:Buffer, sig:Buffer, pubk:Buffer) => boolean;
+    verify:(msg: Buffer, sig: Buffer, pubk: Buffer) => boolean;
   
     /**
        * Returns a reference to the private key.
        *
        * @returns A {@link https://github.com/feross/buffer|Buffer} containing the private key
        */
-    getPrivateKey = ():Buffer => this.privk;
+    getPrivateKey = (): Buffer => this.privk;
   
     /**
        * Returns a reference to the public key.
        *
        * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public key
        */
-    getPublicKey = ():Buffer => this.pubk;
+    getPublicKey = (): Buffer => this.pubk;
   
     /**
        * Returns a string representation of the private key.
@@ -103,9 +103,9 @@ export abstract class StandardKeyPair {
      */
     getAddressString:() => string
 
-    abstract create(...args:any[]):this;
+    abstract create(...args: any[]): this;
 
-    abstract clone():this;
+    abstract clone(): this;
   
   }
   
@@ -132,7 +132,7 @@ export abstract class StandardKeyPair {
        *
        * @returns A new [[StandardKeyPair]]
        */
-    importKey:(privk:Buffer) => KPClass;
+    importKey:(privk: Buffer) => KPClass;
   
     /**
        * Gets an array of addresses stored in the [[StandardKeyChain]].
@@ -140,22 +140,21 @@ export abstract class StandardKeyPair {
        * @returns An array of {@link https://github.com/feross/buffer|Buffer}  representations
        * of the addresses
        */
-    getAddresses = ():Array<Buffer> => Object.values(this.keys).map((kp) => kp.getAddress());
+    getAddresses = (): Buffer[] => Object.values(this.keys).map((kp) => kp.getAddress());
   
     /**
        * Gets an array of addresses stored in the [[StandardKeyChain]].
        *
        * @returns An array of string representations of the addresses
        */
-    getAddressStrings = ():Array<string> => Object.values(this.keys)
-      .map((kp) => kp.getAddressString());
+    getAddressStrings = (): string[] => Object.values(this.keys).map((kp) => kp.getAddressString());
   
     /**
        * Adds the key pair to the list of the keys managed in the [[StandardKeyChain]].
        *
        * @param newKey A key pair of the appropriate class to be added to the [[StandardKeyChain]]
        */
-    addKey(newKey:KPClass) {
+    addKey(newKey: KPClass): void {
       this.keys[newKey.getAddress().toString('hex')] = newKey;
     };
   
@@ -167,8 +166,8 @@ export abstract class StandardKeyPair {
        *
        * @returns The boolean true if a key was removed.
        */
-    removeKey = (key:KPClass | Buffer) => {
-      let kaddr:string;
+    removeKey = (key: KPClass | Buffer): boolean => {
+      let kaddr: string;
       if (key instanceof Buffer) {
         kaddr = key.toString('hex');
       } else {
@@ -188,7 +187,7 @@ export abstract class StandardKeyPair {
        *
        * @returns True on success, false if not found
        */
-    hasKey = (address:Buffer):boolean => (address.toString('hex') in this.keys);
+    hasKey = (address: Buffer): boolean => (address.toString('hex') in this.keys);
   
     /**
        * Returns the [[StandardKeyPair]] listed under the provided address
@@ -198,12 +197,12 @@ export abstract class StandardKeyPair {
        *
        * @returns A reference to the [[StandardKeyPair]] in the keys database
        */
-    getKey = (address:Buffer): KPClass => this.keys[address.toString('hex')];
+    getKey = (address: Buffer): KPClass => this.keys[address.toString('hex')];
 
-    abstract create(...args:any[]):this;
+    abstract create(...args: any[]): this;
 
-    abstract clone():this;
+    abstract clone(): this;
 
-    abstract union(kc:this):this;
+    abstract union(kc: this): this;
     
   }

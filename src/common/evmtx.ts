@@ -3,15 +3,28 @@
  * @module Common-Transactions
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../utils/bintools';
-import { Credential } from './credentials';
-import BN from 'bn.js';
-import { StandardKeyChain, StandardKeyPair } from './keychain';
-import { StandardAmountInput, StandardTransferableInput } from './input';
-import { StandardAmountOutput, StandardTransferableOutput } from './output';
-import { DefaultNetworkID } from '../utils/constants';
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../utils/bintools";
+import { Credential } from "./credentials";
+import BN from "bn.js";
+import { 
+  StandardKeyChain, 
+  StandardKeyPair 
+} from "./keychain";
+import { 
+  StandardAmountInput, 
+  StandardTransferableInput 
+} from "./input";
+import { 
+  StandardAmountOutput, 
+  StandardTransferableOutput 
+} from "./output";
+import { DefaultNetworkID } from "../utils/constants";
+import { 
+  Serializable, 
+  Serialization, 
+  SerializedEncoding 
+} from "../utils/serialization";
 
 /**
  * @ignore
@@ -85,15 +98,15 @@ export abstract class EVMStandardBaseTx<KPClass extends StandardKeyPair, KCClass
   /**
    * Class representing a StandardBaseTx which is the foundation for all transactions.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    */
-  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16)) {
+  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16)) {
     super();
-    this.networkid.writeUInt32BE(networkid, 0);
-    this.blockchainid = blockchainid;
+    this.networkid.writeUInt32BE(networkID, 0);
+    this.blockchainid = blockchainID;
   }
 }
 
@@ -116,7 +129,7 @@ SBTx extends EVMStandardBaseTx<KPClass, KCClass>
     };
   };
 
-  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex"): void {
     super.deserialize(fields, encoding);
     this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "number");
   }
@@ -143,12 +156,12 @@ SBTx extends EVMStandardBaseTx<KPClass, KCClass>
    */
   getInputTotal = (assetID: Buffer): BN=> {
     const ins: StandardTransferableInput[] = [];
-    const aIDHex: string = assetID.toString('hex');
+    const aIDHex: string = assetID.toString("hex");
     let total: BN = new BN(0);
     ins.forEach((input: StandardTransferableInput) => {
       // only check StandardAmountInputs
-      if(input.getInput() instanceof StandardAmountInput && aIDHex === input.getAssetID().toString('hex')) {
-        const i = input.getInput() as StandardAmountInput;
+      if(input.getInput() instanceof StandardAmountInput && aIDHex === input.getAssetID().toString("hex")) {
+        const i: StandardAmountInput = input.getInput() as StandardAmountInput;
         total = total.add(i.getAmount());
       }
     });
@@ -160,12 +173,12 @@ SBTx extends EVMStandardBaseTx<KPClass, KCClass>
    */
   getOutputTotal = (assetID: Buffer): BN => {
     const outs: StandardTransferableOutput[] = [];
-    const aIDHex: string = assetID.toString('hex');
+    const aIDHex: string = assetID.toString("hex");
     let total: BN = new BN(0);
 
     outs.forEach((out: StandardTransferableOutput) => {
       // only check StandardAmountOutput
-      if(out.getOutput() instanceof StandardAmountOutput && aIDHex === out.getAssetID().toString('hex')) {
+      if(out.getOutput() instanceof StandardAmountOutput && aIDHex === out.getAssetID().toString("hex")) {
         const output: StandardAmountOutput = out.getOutput() as StandardAmountOutput;
         total = total.add(output.getAmount());
       }
@@ -305,9 +318,9 @@ export abstract class EVMStandardTx<
    */
   constructor(unsignedTx: SUBTx = undefined, credentials: Credential[] = undefined) {
     super();
-    if (typeof unsignedTx !== 'undefined') {
+    if (typeof unsignedTx !== "undefined") {
       this.unsignedTx = unsignedTx;
-      if (typeof credentials !== 'undefined') {
+      if (typeof credentials !== "undefined") {
         this.credentials = credentials;
       }
     }

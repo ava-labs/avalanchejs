@@ -3,7 +3,7 @@
  * @module Common-Interfaces
  */
 
-import { Buffer } from 'buffer/';
+import { Buffer } from "buffer/";
 
 export interface iIndex {
   address: string

@@ -3,25 +3,25 @@
  * @module Common-JRPCAPI
  */
 
-import { AxiosRequestConfig } from 'axios';
-import AvalancheCore from '../avalanche';
+import { AxiosRequestConfig } from "axios";
+import AvalancheCore from "../avalanche";
 import { 
   APIBase, 
   RequestResponseData 
-} from './apibase';
-import { iRPC } from './interfaces';
+} from "./apibase";
+import { iRPC } from "./interfaces";
 
 export class JRPCAPI extends APIBase {
-  protected jrpcVersion:string = '2.0';
+  protected jrpcVersion: string = "2.0";
 
-  protected rpcid = 1;
+  protected rpcid: number = 1;
 
   callMethod = async (
     method: string,
     params?: object[] | object,
     baseurl?: string,
     headers?: object
-  ):Promise<RequestResponseData> => {
+  ): Promise<RequestResponseData> => {
     const ep: string = baseurl || this.baseurl;
     const rpc: iRPC = {};
     rpc.id = this.rpcid;
@@ -49,7 +49,7 @@ export class JRPCAPI extends APIBase {
     };
 
     return this.core.post(ep, {}, JSON.stringify(rpc), headrs, axConf)
-    .then((resp:RequestResponseData) => {
+    .then((resp: RequestResponseData) => {
       if (resp.status >= 200 && resp.status < 300) {
         this.rpcid += 1;
         if (typeof resp.data === "string") {
@@ -67,7 +67,7 @@ export class JRPCAPI extends APIBase {
      * Returns the rpcid, a strictly-increasing number, starting from 1, indicating the next
      * request ID that will be sent.
      */
-  getRPCID = ():number => this.rpcid;
+  getRPCID = (): number => this.rpcid;
 
   /**
      *
@@ -75,7 +75,11 @@ export class JRPCAPI extends APIBase {
      * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
      * @param jrpcVersion The jrpc version to use, default "2.0".
      */
-  constructor(core:AvalancheCore, baseurl:string, jrpcVersion:string = '2.0') {
+  constructor(
+    core: AvalancheCore, 
+    baseurl: string, 
+    jrpcVersion: string = "2.0"
+  ) {
     super(core, baseurl);
     this.jrpcVersion = jrpcVersion;
     this.rpcid = 1;
