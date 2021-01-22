@@ -3,27 +3,27 @@
  * @module API-EVM-ImportTx
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { EVMConstants } from './constants';
-import { EVMOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { EVMBaseTx } from './basetx';
-import { SelectCredentialClass } from './credentials';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { EVMConstants } from "./constants";
+import { EVMOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { EVMBaseTx } from "./basetx";
+import { SelectCredentialClass } from "./credentials";
 import { 
   Signature, 
   SigIdx, 
   Credential 
-} from '../../common/credentials';
+} from "../../common/credentials";
 import { 
   KeyChain, 
   KeyPair 
-} from './keychain';
-import { DefaultNetworkID } from '../../utils/constants';
+} from "./keychain";
+import { DefaultNetworkID } from "../../utils/constants";
 import { 
   Serialization, 
   SerializedEncoding 
-} from '../../utils/serialization';
+} from "../../utils/serialization";
 
 /**
  * @ignore
@@ -204,7 +204,7 @@ export class ImportTx extends EVMBaseTx {
   ) {
     super(networkID, blockchainID);
     this.sourceChain = sourceChainID;
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {
           throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
@@ -212,7 +212,7 @@ export class ImportTx extends EVMBaseTx {
       });
       this.importIns = importIns;
     }
-    if (typeof outs !== 'undefined' && Array.isArray(outs)) {
+    if (typeof outs !== "undefined" && Array.isArray(outs)) {
       outs.forEach((out: EVMOutput) => {
         if (!(out instanceof EVMOutput)) {
           throw new Error("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");

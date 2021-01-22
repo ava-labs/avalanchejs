@@ -3,39 +3,39 @@
  * @module API-EVM-UTXOs
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
 import BN from "bn.js";
 import { 
   AmountOutput, 
   SelectOutputClass, 
   TransferableOutput, 
   EVMOutput 
-} from './outputs';
-import { EVMConstants } from './constants';
+} from "./outputs";
+import { EVMConstants } from "./constants";
 import { 
   EVMInput, 
   SECPTransferInput, 
   TransferableInput 
-} from './inputs';
-import { Output } from '../../common/output';
-import { UnixNow } from '../../utils/helperfunctions';
+} from "./inputs";
+import { Output } from "../../common/output";
+import { UnixNow } from "../../utils/helperfunctions";
 import { 
   StandardUTXO, 
   StandardUTXOSet 
-} from '../../common/utxos';
-import { PlatformChainID } from '../../utils/constants';
+} from "../../common/utxos";
+import { PlatformChainID } from "../../utils/constants";
 import { 
   StandardAssetAmountDestination, 
   AssetAmount 
-} from '../../common/assetamount';
+} from "../../common/assetamount";
 import { 
   Serialization, 
   SerializedEncoding 
-} from '../../utils/serialization';
-import { UnsignedTx } from './tx';
-import { ImportTx } from './importtx';
-import { ExportTx } from './exporttx';
+} from "../../utils/serialization";
+import { UnsignedTx } from "./tx";
+import { ImportTx } from "./importtx";
+import { ExportTx } from "./exporttx";
  
  /**
   * @ignore
@@ -153,7 +153,7 @@ import { ExportTx } from './exporttx';
    parseUTXO(utxo: UTXO | string): UTXO {
      const utxovar: UTXO = new UTXO();
      // force a copy
-     if (typeof utxo === 'string') {
+     if (typeof utxo === "string") {
        utxovar.fromBuffer(bintools.cb58Decode(utxo));
      } else if (utxo instanceof UTXO) {
        utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
@@ -397,19 +397,19 @@ import { ExportTx } from './exporttx';
       return undefined;
     }
 
-    if(typeof feeAssetID === 'undefined') {
+    if(typeof feeAssetID === "undefined") {
       feeAssetID = avaxAssetID;
-    } else if (feeAssetID.toString('hex') !== avaxAssetID.toString('hex')) {
+    } else if (feeAssetID.toString("hex") !== avaxAssetID.toString("hex")) {
       /* istanbul ignore next */
-      throw new Error('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
+      throw new Error("Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID");
     }
 
-    if(typeof destinationChain === 'undefined') {
+    if(typeof destinationChain === "undefined") {
       destinationChain = bintools.cb58Decode(PlatformChainID);
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
-    if(avaxAssetID.toString('hex') === feeAssetID.toString('hex')){
+    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
       aad.addAssetAmount(avaxAssetID, amount, fee);
     } else {
       aad.addAssetAmount(avaxAssetID, amount, zero);
@@ -418,7 +418,7 @@ import { ExportTx } from './exporttx';
       }
     }
     const success: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
-    if(typeof success === 'undefined') {
+    if(typeof success === "undefined") {
       outs = aad.getChangeOutputs();
       exportouts = aad.getOutputs();
     } else {

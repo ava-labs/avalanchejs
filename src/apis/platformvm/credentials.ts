@@ -3,8 +3,8 @@
  * @module API-PlatformVM-Credentials
  */
 
-import { PlatformVMConstants } from './constants';
-import { Credential } from '../../common/credentials';
+import { PlatformVMConstants } from "./constants";
+import { Credential } from "../../common/credentials";
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.
@@ -13,12 +13,12 @@ import { Credential } from '../../common/credentials';
  *
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
-  if (credid === PlatformVMConstants.SECPCREDENTIAL) {
+export const SelectCredentialClass = (credID: number, ...args: any[]): Credential => {
+  if (credID === PlatformVMConstants.SECPCREDENTIAL) {
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
+  throw new Error(`Error - SelectCredentialClass: unknown credid ${credID}`);
 };
 
 export class SECPCredential extends Credential {
@@ -27,24 +27,22 @@ export class SECPCredential extends Credential {
 
   //serialize and deserialize both are inherited
 
-  getCredentialID():number {
+  getCredentialID(): number {
     return this._typeID;
   }
 
-
-  clone():this {
-    let newbase:SECPCredential = new SECPCredential();
+  clone(): this {
+    let newbase: SECPCredential = new SECPCredential();
     newbase.fromBuffer(this.toBuffer());
     return newbase as this;
   }
 
-  create(...args:any[]):this {
+  create(...args: any[]): this {
     return new SECPCredential(...args) as this;
   }
 
-  select(id:number, ...args:any[]):Credential {
-    let newbasetx:Credential = SelectCredentialClass(id, ...args);
+  select(id: number, ...args: any[]): Credential {
+    let newbasetx: Credential = SelectCredentialClass(id, ...args);
     return newbasetx;
   }
 }
-

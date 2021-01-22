@@ -2,17 +2,18 @@
  * @packageDocumentation
  * @module API-PlatformVM-ImportTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { PlatformVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { KeyChain, KeyPair } from './keychain';
-import { SelectCredentialClass } from './credentials';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { BaseTx } from './basetx';
-import { DefaultNetworkID } from '../../utils/constants';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { PlatformVMConstants } from "./constants";
+import { TransferableOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { KeyChain, KeyPair } from "./keychain";
+import { SelectCredentialClass } from "./credentials";
+import { Signature, SigIdx, Credential } from "../../common/credentials";
+import { BaseTx } from "./basetx";
+import { DefaultNetworkID } from "../../utils/constants";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore
@@ -162,12 +163,12 @@ export class ImportTx extends BaseTx {
   ) {
     super(networkID, blockchainID, outs, ins, memo);
     this.sourceChain = sourceChain; // do no correct, if it's wrong it'll bomb on toBuffer
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
-      for (let i = 0; i < importIns.length; i++) {
-        if (!(importIns[i] instanceof TransferableInput)) {
+    if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
+      importIns.forEach((importIn: TransferableInput) => {
+        if (!(importIn instanceof TransferableInput)) {
           throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
-      }
+      });
       this.importIns = importIns;
     }
   }

@@ -2,15 +2,14 @@
  * @packageDocumentation
  * @module API-PlatformVM-CreateSubnetTx
  */
-import { Buffer } from 'buffer/';
-import { BaseTx } from './basetx';
-import { PlatformVMConstants } from './constants';
-import { DefaultNetworkID } from '../../utils/constants';
-import { TransferableOutput, SECPOwnerOutput} from './outputs';
-import { TransferableInput } from './inputs';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
 
-const serializer = Serialization.getInstance();
+import { Buffer } from "buffer/";
+import { BaseTx } from "./basetx";
+import { PlatformVMConstants } from "./constants";
+import { DefaultNetworkID } from "../../utils/constants";
+import { TransferableOutput, SECPOwnerOutput} from "./outputs";
+import { TransferableInput } from "./inputs";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 export class CreateSubnetTx extends BaseTx {
   protected _typeName = "SECPCredential";

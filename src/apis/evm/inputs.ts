@@ -2,18 +2,19 @@
  * @packageDocumentation
  * @module API-EVM-Inputs
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { EVMConstants } from './constants';
+
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { EVMConstants } from "./constants";
 import { 
   Input, 
   StandardTransferableInput, 
   StandardAmountInput 
-} from '../../common/input';
-import { SerializedEncoding } from '../../utils/serialization';
-import { EVMOutput } from './outputs';
-import BN from 'bn.js';
-import { SigIdx } from '../../common/credentials';
+} from "../../common/input";
+import { SerializedEncoding } from "../../utils/serialization";
+import { EVMOutput } from "./outputs";
+import BN from "bn.js";
+import { SigIdx } from "../../common/credentials";
 
 /**
  * @ignore
@@ -197,10 +198,10 @@ export class EVMInput extends EVMOutput {
   ) {
     super(address, amount, assetID);
 
-    if (typeof nonce !== 'undefined') {
+    if (typeof nonce !== "undefined") {
       // convert number nonce to BN
-      let n:BN;
-      if (typeof nonce === 'number') {
+      let n: BN;
+      if (typeof nonce === "number") {
         n = new BN(nonce);
       } else {
         n = nonce;

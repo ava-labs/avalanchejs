@@ -3,8 +3,8 @@
  * @module API-EVM-Credentials
  */
 
-import { EVMConstants } from './constants';
-import { Credential } from '../../common/credentials';
+import { EVMConstants } from "./constants";
+import { Credential } from "../../common/credentials";
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.
@@ -13,12 +13,12 @@ import { Credential } from '../../common/credentials';
  *
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid: number, ...args: any[]): Credential => {
-  if (credid === EVMConstants.SECPCREDENTIAL) {
+export const SelectCredentialClass = (credID: number, ...args: any[]): Credential => {
+  if (credID === EVMConstants.SECPCREDENTIAL) {
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
+  throw new Error(`Error - SelectCredentialClass: unknown credD ${credID}`);
 };
 
 export class SECPCredential extends Credential {
@@ -46,4 +46,3 @@ export class SECPCredential extends Credential {
     return credential;
   }
 }
-

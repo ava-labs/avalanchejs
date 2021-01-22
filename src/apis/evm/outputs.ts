@@ -2,12 +2,17 @@
  * @packageDocumentation
  * @module API-EVM-Outputs
  */
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
-import BinTools from '../../utils/bintools';
-import { EVMConstants } from './constants';
-import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
-import { SerializedEncoding } from '../../utils/serialization';
+
+import { Buffer } from "buffer/";
+import BN from "bn.js";
+import BinTools from "../../utils/bintools";
+import { EVMConstants } from "./constants";
+import { 
+  Output, 
+  StandardAmountOutput, 
+  StandardTransferableOutput 
+} from "../../common/output";
+import { SerializedEncoding } from "../../utils/serialization";
 
 const bintools: BinTools = BinTools.getInstance();
 
@@ -107,7 +112,7 @@ export class EVMOutput {
   /**
    * Returns the address as a bech32 encoded string.
    */
-  getAddressString = (): string => this.address.toString('hex');
+  getAddressString = (): string => this.address.toString("hex");
 
   /**
    * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
@@ -171,11 +176,11 @@ export class EVMOutput {
     amount: BN | number = undefined, 
     assetID: Buffer | string = undefined
   ) {
-    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetID !== 'undefined') {
-      if(typeof address === 'string') {
+    if (typeof address !== "undefined" && typeof amount !== "undefined" && typeof assetID !== "undefined") {
+      if(typeof address === "string") {
         // if present then remove `0x` prefix
         let prefix: string = address.substring(0, 2);
-        if(prefix === '0x') {
+        if(prefix === "0x") {
           address = address.split('x')[1];
         }
         address = Buffer.from(address, 'hex');

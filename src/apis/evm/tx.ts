@@ -3,21 +3,21 @@
  * @module API-EVM-Transactions
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { EVMConstants } from './constants';
-import { SelectCredentialClass } from './credentials';
-import { KeyChain, KeyPair } from './keychain';
-import { Credential } from '../../common/credentials';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { EVMConstants } from "./constants";
+import { SelectCredentialClass } from "./credentials";
+import { KeyChain, KeyPair } from "./keychain";
+import { Credential } from "../../common/credentials";
 import { 
   EVMStandardTx, 
   EVMStandardUnsignedTx 
-} from '../../common/evmtx';
-import createHash from 'create-hash';
-import { EVMBaseTx } from './basetx';
-import { ImportTx } from './importtx';
-import { ExportTx } from './exporttx';
-import { SerializedEncoding } from '../../utils/serialization';
+} from "../../common/evmtx";
+import createHash from "create-hash";
+import { EVMBaseTx } from "./basetx";
+import { ImportTx } from "./importtx";
+import { ExportTx } from "./exporttx";
+import { SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore
@@ -75,7 +75,7 @@ export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBase
    */
   sign(kc: KeyChain): Tx {
     const txbuff: Buffer = this.toBuffer();
-    const msg: Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
+    const msg: Buffer = Buffer.from(createHash("sha256").update(txbuff).digest());
     const sigs: Credential[] = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }

@@ -3,17 +3,17 @@
  * @module API-EVM-BaseTx
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
 import { 
   KeyChain, 
   KeyPair 
-} from './keychain';
-import { EVMStandardBaseTx } from '../../common/evmtx';
-import { Credential } from '../../common/credentials';
-import { DefaultNetworkID } from '../../utils/constants';
-import { SelectTxClass } from './tx';
-import { SerializedEncoding } from '../../utils/serialization';
+} from "./keychain";
+import { EVMStandardBaseTx } from "../../common/evmtx";
+import { Credential } from "../../common/credentials";
+import { DefaultNetworkID } from "../../utils/constants";
+import { SelectTxClass } from "./tx";
+import { SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore

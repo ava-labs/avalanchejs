@@ -3,12 +3,12 @@
  * @module API-EVM-KeyChain
  */
 
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
 import { 
   SECP256k1KeyChain, 
   SECP256k1KeyPair 
-} from '../../common/secp256k1';
+} from "../../common/secp256k1";
 
 /**
  * @ignore
@@ -19,8 +19,8 @@ const bintools: BinTools = BinTools.getInstance();
  * Class for representing a private and public keypair on an AVM Chain. 
  */
 export class KeyPair extends SECP256k1KeyPair {
-  protected chainID: string = '';
-  protected hrp: string = '';
+  protected chainID: string = "";
+  protected hrp: string = "";
 
   /**
    * Returns the address's string representation.
@@ -91,8 +91,8 @@ export class KeyPair extends SECP256k1KeyPair {
   * @typeparam KeyPair Class extending [[SECP256k1KeyChain]] which is used as the key in [[KeyChain]]
   */
 export class KeyChain extends SECP256k1KeyChain<KeyPair> {
-  hrp: string = '';
-  chainID: string = '';
+  hrp: string = "";
+  chainID: string = "";
 
   /**
     * Makes a new key pair, returns the address.
@@ -121,8 +121,8 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   importKey = (privk: Buffer | string): KeyPair => {
     let keypair: KeyPair = new KeyPair(this.hrp, this.chainID);
     let pk: Buffer;
-    if(typeof privk === 'string'){
-      pk = bintools.cb58Decode(privk.split('-')[1]);
+    if(typeof privk === "string"){
+      pk = bintools.cb58Decode(privk.split("-")[1]);
     } else {
       pk = bintools.copyFrom(privk);
     }

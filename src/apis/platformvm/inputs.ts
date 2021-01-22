@@ -2,34 +2,43 @@
  * @packageDocumentation
  * @module API-PlatformVM-Inputs
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { PlatformVMConstants } from './constants';
-import { Input, StandardTransferableInput, StandardAmountInput, StandardParseableInput } from '../../common/input';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
-import BN from 'bn.js';
+
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { PlatformVMConstants } from "./constants";
+import { 
+  Input, 
+  StandardTransferableInput, 
+  StandardAmountInput, 
+  StandardParseableInput 
+} from "../../common/input";
+import { 
+  Serialization, 
+  SerializedEncoding 
+} from "../../utils/serialization";
+import BN from "bn.js";
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
  *
- * @param inputid A number representing the inputID parsed prior to the bytes passed in
+ * @param inputID A number representing the inputID parsed prior to the bytes passed in
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
-  if (inputid === PlatformVMConstants.SECPINPUTID) {
+export const SelectInputClass = (inputID: number, ...args: any[]): Input => {
+  if (inputID === PlatformVMConstants.SECPINPUTID) {
     return new SECPTransferInput(...args);
-  } else if (inputid === PlatformVMConstants.STAKEABLELOCKINID) {
+  } else if (inputID === PlatformVMConstants.STAKEABLELOCKINID) {
     return new StakeableLockIn(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
+  throw new Error(`Error - SelectInputClass: unknown inputid ${inputID}`);
 };
 
 export class ParseableInput extends StandardParseableInput{
@@ -38,14 +47,14 @@ export class ParseableInput extends StandardParseableInput{
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.input = SelectInputClass(fields["input"]["_typeID"]);
     this.input.deserialize(fields["input"], encoding);
   }
 
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
-    const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    const inputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.input = SelectInputClass(inputid);
     return this.input.fromBuffer(bytes, offset);
@@ -58,7 +67,7 @@ export class TransferableInput extends StandardTransferableInput {
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.input = SelectInputClass(fields["input"]["_typeID"]);
     this.input.deserialize(fields["input"], encoding);
@@ -71,14 +80,14 @@ export class TransferableInput extends StandardTransferableInput {
    *
    * @returns The length of the raw [[TransferableInput]]
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number { 
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
     this.assetid = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
     offset += 32;
-    const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    const inputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.input = SelectInputClass(inputid);
     return this.input.fromBuffer(bytes, offset);

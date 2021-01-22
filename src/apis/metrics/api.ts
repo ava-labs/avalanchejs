@@ -7,7 +7,6 @@ import { RESTAPI } from "../../common/restapi";
 import { RequestResponseData } from "../../common/apibase";
 import { AxiosRequestConfig } from "axios";
 
-
 /**
  * Class for interacting with a node API that is using the node's MetricsApi.
  *

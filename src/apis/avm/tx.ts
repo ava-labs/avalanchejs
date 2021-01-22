@@ -2,26 +2,26 @@
  * @packageDocumentation
  * @module API-AVM-Transactions
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { SelectCredentialClass } from './credentials';
-import { KeyChain, KeyPair } from './keychain';
-import { Credential } from '../../common/credentials';
-import { StandardTx, StandardUnsignedTx } from '../../common/tx';
-import createHash from 'create-hash';
-import { BaseTx } from './basetx';
-import { CreateAssetTx } from './createassettx';
-import { OperationTx } from './operationtx';
-import { ImportTx } from './importtx';
-import { ExportTx } from './exporttx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { SelectCredentialClass } from "./credentials";
+import { KeyChain, KeyPair } from "./keychain";
+import { Credential } from "../../common/credentials";
+import { StandardTx, StandardUnsignedTx } from "../../common/tx";
+import createHash from "create-hash";
+import { BaseTx } from "./basetx";
+import { CreateAssetTx } from "./createassettx";
+import { OperationTx } from "./operationtx";
+import { ImportTx } from "./importtx";
+import { ExportTx } from "./exporttx";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
@@ -83,7 +83,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    */
   sign(kc:KeyChain, codecID:number = AVMConstants.LATESTCODEC):Tx {
     const txbuff = this.toBuffer(codecID);
-    const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
+    const msg:Buffer = Buffer.from(createHash("sha256").update(txbuff).digest());
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
@@ -131,5 +131,4 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     }
     return offset;
   }
-
 }
