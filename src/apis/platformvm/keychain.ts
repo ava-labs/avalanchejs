@@ -2,9 +2,13 @@
  * @packageDocumentation
  * @module API-PlatformVM-KeyChain
  */
+
 import { Buffer } from "buffer/";
-import BinTools from '../../utils/bintools';
-import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
+import BinTools from "../../utils/bintools";
+import { 
+  SECP256k1KeyChain, 
+  SECP256k1KeyPair 
+} from "../../common/secp256k1";
 
 /**
  * @ignore
@@ -17,17 +21,17 @@ const bintools: BinTools = BinTools.getInstance();
  */
 export class KeyPair extends SECP256k1KeyPair {
 
-    protected chainid:string = '';
-    protected hrp:string = '';
+    protected chainid: string = "";
+    protected hrp: string = "";
 
     /**
      * Returns the address's string representation.
      * 
      * @returns A string representation of the address
      */
-    getAddressString = ():string => {
-        const addr:Buffer = this.addressFromPublicKey(this.pubk);
-        return bintools.addressToString(this.hrp, this.chainid, addr);
+    getAddressString = (): string => {
+      const addr: Buffer = this.addressFromPublicKey(this.pubk);
+      return bintools.addressToString(this.hrp, this.chainid, addr);
     }
 
     /**
@@ -35,52 +39,51 @@ export class KeyPair extends SECP256k1KeyPair {
        *
        * @returns The [[KeyPair]]'s chainID
        */
-    getChainID = ():string => this.chainid;
+    getChainID = (): string => this.chainid;
 
     /**
      * Sets the the chainID associated with this key.
      *
      * @param chainid String for the chainID
      */
-    setChainID = (chainid:string):void => {
+    setChainID = (chainid: string): void => {
         this.chainid = chainid;
     };
     
-
     /**
      * Returns the Human-Readable-Part of the network associated with this key.
      *
      * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
      */
-    getHRP = ():string => this.hrp;
+    getHRP = (): string => this.hrp;
   
     /**
      * Sets the the Human-Readable-Part of the network associated with this key.
      *
      * @param hrp String for the Human-Readable-Part of Bech32 addresses
      */
-    setHRP = (hrp:string):void => {
+    setHRP = (hrp: string): void => {
       this.hrp = hrp;
     };
 
-    clone():this {
-        let newkp:KeyPair = new KeyPair(this.hrp, this.chainid);
-        newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
-        return newkp as this;
+    clone(): this {
+      let newkp: KeyPair = new KeyPair(this.hrp, this.chainid);
+      newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
+      return newkp as this;
     }
 
-    create(...args:any[]):this {
-        if(args.length == 2){
-            return new KeyPair(args[0], args[1]) as this;
-        }
-        return new KeyPair(this.hrp, this.chainid) as this;
+    create(...args: any[]): this {
+      if(args.length == 2){
+        return new KeyPair(args[0], args[1]) as this;
+      }
+      return new KeyPair(this.hrp, this.chainid) as this;
     }
 
-    constructor(hrp:string, chainid:string) {
-        super();
-        this.chainid = chainid;
-        this.hrp = hrp;
-        this.generateKey();
+    constructor(hrp: string, chainID: string) {
+      super();
+      this.chainid = chainID;
+      this.hrp = hrp;
+      this.generateKey();
     }
     
 }

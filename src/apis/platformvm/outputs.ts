@@ -19,15 +19,15 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
-    if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
-      return new SECPTransferOutput( ...args);
-    } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
-      return new SECPOwnerOutput(...args);
-    } else if(outputid == PlatformVMConstants.STAKEABLELOCKOUTID) {
-      return new StakeableLockOut(...args);
-    }
-    throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
+export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
+  if(outputID === PlatformVMConstants.SECPXFEROUTPUTID){
+    return new SECPTransferOutput(...args);
+  } else if(outputID === PlatformVMConstants.SECPOWNEROUTPUTID) {
+    return new SECPOwnerOutput(...args);
+  } else if(outputID === PlatformVMConstants.STAKEABLELOCKOUTID) {
+    return new StakeableLockOut(...args);
+  }
+  throw new Error(`Error - SelectOutputClass: unknown outputID ${outputID}`);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{

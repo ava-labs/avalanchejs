@@ -25,7 +25,7 @@ describe('Outputs', () => {
           expect(outpayment).toBeInstanceOf(SECPTransferOutput);
           expect(() => {
               SelectOutputClass(99);
-          }).toThrow("Error - SelectOutputClass: unknown outputid");
+          }).toThrow("Error - SelectOutputClass: unknown outputID");
       });
 
       test('comparator', () => {
