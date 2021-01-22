@@ -84,7 +84,7 @@ export class SECPTransferInput extends AmountInput {
   /**
      * Returns the inputID for this input
      */
-  getInputID(codecID: number = AVMConstants.LATESTCODEC):number {
+  getInputID(codecID: number = AVMConstants.LATESTCODEC): number {
     if(codecID === 0) {
       return AVMConstants.SECPXFERINPUTID;
     } else if (codecID === 1) {
@@ -93,14 +93,19 @@ export class SECPTransferInput extends AmountInput {
     }
   }
 
-  // TODO - Do we need to conditionally pass back SECPCREDENTIAL_CODECONE?
-  getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
+  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
+    if(codecID === 0) {
+      return AVMConstants.SECPCREDENTIAL;
+    } else if (codecID === 1) {
+      return AVMConstants.SECPCREDENTIAL_CODECONE;
+    }
+  }
 
-  create(...args:any[]):this{
+  create(...args:any[]): this{
     return new SECPTransferInput(...args) as this;
   }
 
-  clone():this {
+  clone(): this {
     const newout:SECPTransferInput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;

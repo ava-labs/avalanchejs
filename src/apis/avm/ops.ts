@@ -314,9 +314,12 @@ export class SECPMintOperation extends Operation {
   /**
    * Returns the credential ID.
    */
-  // TODO - Do we need to conditionally pass back SECPCREDENTIAL_CODECONE?
-  getCredentialID(): number {
-    return AVMConstants.SECPCREDENTIAL;
+  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
+    if(codecID === 0) {
+      return AVMConstants.SECPCREDENTIAL;
+    } else if (codecID === 1) {
+      return AVMConstants.SECPCREDENTIAL_CODECONE;
+    }
   }
 
   /**
