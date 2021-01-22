@@ -2,15 +2,15 @@
  * @packageDocumentation
  * @module API-AVM-ExportTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { TransferableOutput, AmountOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { BaseTx } from './basetx';
-import { DefaultNetworkID } from '../../utils/constants';
-import BN from 'bn.js';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { TransferableOutput, AmountOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { BaseTx } from "./basetx";
+import { DefaultNetworkID } from "../../utils/constants";
+import BN from "bn.js";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 
 /**
@@ -158,7 +158,7 @@ export class ExportTx extends BaseTx {
   ) {
     super(networkID, blockchainID, outs, ins, memo);
     this.destinationChain = destinationChain; // no correction, if they don't pass a chainid here, it will BOMB on toBuffer
-    if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
+    if (typeof exportOuts !== "undefined" && Array.isArray(exportOuts)) {
       for (let i:number = 0; i < exportOuts.length; i++) {
         if (!(exportOuts[i] instanceof TransferableOutput)) {
           throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");

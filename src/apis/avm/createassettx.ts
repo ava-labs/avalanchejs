@@ -2,15 +2,15 @@
  * @packageDocumentation
  * @module API-AVM-CreateAssetTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { InitialStates } from './initialstates';
-import { BaseTx } from './basetx';
-import { DefaultNetworkID } from '../../utils/constants';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { TransferableOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { InitialStates } from "./initialstates";
+import { BaseTx } from "./basetx";
+import { DefaultNetworkID } from "../../utils/constants";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore
@@ -41,8 +41,8 @@ export class CreateAssetTx extends BaseTx {
     this.initialstate.deserialize(fields["initialstate"], encoding);
   }
 
-  protected name:string = '';
-  protected symbol:string = '';
+  protected name:string = "";
+  protected symbol:string = "";
   protected denomination:Buffer = Buffer.alloc(1);
   protected initialstate:InitialStates = new InitialStates();
 
@@ -94,12 +94,12 @@ export class CreateAssetTx extends BaseTx {
 
     const namesize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
-    this.name = bintools.copyFrom(bytes, offset, offset + namesize).toString('utf8');
+    this.name = bintools.copyFrom(bytes, offset, offset + namesize).toString("utf8");
     offset += namesize;
 
     const symsize:number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
-    this.symbol = bintools.copyFrom(bytes, offset, offset + symsize).toString('utf8');
+    this.symbol = bintools.copyFrom(bytes, offset, offset + symsize).toString("utf8");
     offset += symsize;
 
     this.denomination = bintools.copyFrom(bytes, offset, offset + 1);
@@ -120,12 +120,12 @@ export class CreateAssetTx extends BaseTx {
     const initstatebuff:Buffer = this.initialstate.toBuffer(codecID);
 
     const namebuff:Buffer = Buffer.alloc(this.name.length);
-    namebuff.write(this.name, 0, this.name.length, 'utf8');
+    namebuff.write(this.name, 0, this.name.length, "utf8");
     const namesize:Buffer = Buffer.alloc(2);
     namesize.writeUInt16BE(this.name.length, 0);
 
     const symbuff:Buffer = Buffer.alloc(this.symbol.length);
-    symbuff.write(this.symbol, 0, this.symbol.length, 'utf8');
+    symbuff.write(this.symbol, 0, this.symbol.length, "utf8");
     const symsize:Buffer = Buffer.alloc(2);
     symsize.writeUInt16BE(this.symbol.length, 0);
 
@@ -170,8 +170,8 @@ export class CreateAssetTx extends BaseTx {
   ) {
     super(networkID, blockchainID, outs, ins, memo);
     if (
-      typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number'
-            && denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
+      typeof name === "string" && typeof symbol === "string" && typeof denomination === "number"
+            && denomination >= 0 && denomination <= 32 && typeof initialstate !== "undefined"
     ) {
       this.initialstate = initialstate;
       this.name = name;

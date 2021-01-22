@@ -2,11 +2,11 @@
  * @packageDocumentation
  * @module API-AVM-Inputs
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { Input, StandardTransferableInput, StandardAmountInput } from "../../common/input";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore

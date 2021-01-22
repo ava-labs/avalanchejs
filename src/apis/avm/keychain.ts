@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module API-AVM-KeyChain
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { SECP256k1KeyChain, SECP256k1KeyPair } from "../../common/secp256k1";
 
 /**
  * @ignore
@@ -17,8 +17,8 @@ const bintools: BinTools = BinTools.getInstance();
  */
 export class KeyPair extends SECP256k1KeyPair {
 
-    protected chainid:string = '';
-    protected hrp:string = '';
+    protected chainid:string = "";
+    protected hrp:string = "";
 
     /**
      * Returns the address's string representation.
@@ -46,7 +46,6 @@ export class KeyPair extends SECP256k1KeyPair {
         this.chainid = chainid;
     };
     
-
     /**
      * Returns the Human-Readable-Part of the network associated with this key.
      *
@@ -92,8 +91,8 @@ export class KeyPair extends SECP256k1KeyPair {
  */
 export class KeyChain extends SECP256k1KeyChain<KeyPair> {
 
-    hrp:string = '';
-    chainid:string = '';
+    hrp:string = "";
+    chainid:string = "";
 
     /**
      * Makes a new key pair, returns the address.
@@ -121,8 +120,8 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
     importKey = (privk:Buffer | string):KeyPair => {
         let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
         let pk:Buffer;
-        if(typeof privk === 'string'){
-            pk = bintools.cb58Decode(privk.split('-')[1]);
+        if(typeof privk === "string"){
+            pk = bintools.cb58Decode(privk.split("-")[1]);
         } else {
             pk = bintools.copyFrom(privk);
         }

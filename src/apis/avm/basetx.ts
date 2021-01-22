@@ -2,18 +2,18 @@
  * @packageDocumentation
  * @module API-AVM-BaseTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { SelectCredentialClass } from './credentials';
-import { KeyChain, KeyPair } from './keychain';
-import { StandardBaseTx } from '../../common/tx';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { DefaultNetworkID } from '../../utils/constants';
-import { SelectTxClass } from './tx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { TransferableOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { SelectCredentialClass } from "./credentials";
+import { KeyChain, KeyPair } from "./keychain";
+import { StandardBaseTx } from "../../common/tx";
+import { Signature, SigIdx, Credential } from "../../common/credentials";
+import { DefaultNetworkID } from "../../utils/constants";
+import { SelectTxClass } from "./tx";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore

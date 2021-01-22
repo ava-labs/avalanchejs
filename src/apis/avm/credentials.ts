@@ -3,8 +3,8 @@
  * @module API-AVM-Credentials
  */
 
-import { AVMConstants } from './constants';
-import { Credential } from '../../common/credentials';
+import { AVMConstants } from "./constants";
+import { Credential } from "../../common/credentials";
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.

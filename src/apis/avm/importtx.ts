@@ -2,17 +2,17 @@
  * @packageDocumentation
  * @module API-AVM-ImportTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { BaseTx } from './basetx';
-import { SelectCredentialClass } from './credentials';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { KeyChain, KeyPair } from './keychain';
-import { DefaultNetworkID } from '../../utils/constants';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { TransferableOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { BaseTx } from "./basetx";
+import { SelectCredentialClass } from "./credentials";
+import { Signature, SigIdx, Credential } from "../../common/credentials";
+import { KeyChain, KeyPair } from "./keychain";
+import { DefaultNetworkID } from "../../utils/constants";
+import { Serialization, SerializedEncoding } from "../../utils/serialization";
 
 /**
  * @ignore
@@ -168,7 +168,7 @@ export class ImportTx extends BaseTx {
   ) {
     super(networkID, blockchainID, outs, ins, memo);
     this.sourceChain = sourceChain; // do not correct, if it's wrong it'll bomb on toBuffer
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
       for (let i = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
           throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");

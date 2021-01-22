@@ -8,18 +8,21 @@ import {
   iUTXOID, 
   iUTXOResponse 
 } from "./../../common/interfaces";
-import { Tx, UTXOSet } from "./../../apis/avm";
+import { 
+  Tx, 
+  UTXOSet 
+} from "./../../apis/avm";
 import BN from "bn.js";
 import { Buffer } from "buffer/"
 
 export interface iGetBalanceResponse {
-  balance:string
-  utxoIDs:iUTXOID[] 
+  balance: string
+  utxoIDs: iUTXOID[] 
 }
 
 export interface iGetBalanceParams {
-  address:string
-  assetID:string
+  address: string
+  assetID: string
 }
 
 export interface iAVMUTXOResponse extends iUTXOResponse {

@@ -2,24 +2,30 @@
  * @packageDocumentation
  * @module API-AVM-OperationTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { TransferableOperation } from './ops';
-import { SelectCredentialClass } from './credentials';
-import { KeyChain, KeyPair } from './keychain';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { BaseTx } from './basetx';
-import { DefaultNetworkID } from '../../utils/constants';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+
+import { Buffer } from "buffer/";
+import BinTools from "../../utils/bintools";
+import { AVMConstants } from "./constants";
+import { TransferableOutput } from "./outputs";
+import { TransferableInput } from "./inputs";
+import { TransferableOperation } from "./ops";
+import { SelectCredentialClass } from "./credentials";
+import { KeyChain, KeyPair } from "./keychain";
+import { 
+  Signature, 
+  SigIdx, 
+  Credential 
+} from "../../common/credentials";
+import { BaseTx } from "./basetx";
+import { DefaultNetworkID } from "../../utils/constants";
+import { 
+  SerializedEncoding 
+} from "../../utils/serialization";
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Class representing an unsigned Operation transaction.
@@ -28,17 +34,18 @@ export class OperationTx extends BaseTx {
   protected _typeName = "OperationTx";
   protected _typeID = AVMConstants.OPERATIONTX;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields:object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding);
     return {
       ...fields,
       "ops": this.ops.map((o) => o.serialize(encoding))
     }
   };
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.ops = fields["ops"].map((o:object) => {
-      let op:TransferableOperation = new TransferableOperation();
+      let op: TransferableOperation = new TransferableOperation();
       op.deserialize(o, encoding);
       return op;
     });
@@ -46,13 +53,13 @@ export class OperationTx extends BaseTx {
     this.numOps.writeUInt32BE(this.ops.length,0);
   }
 
-  protected numOps:Buffer = Buffer.alloc(4);
-  protected ops:Array<TransferableOperation> = [];
+  protected numOps: Buffer = Buffer.alloc(4);
+  protected ops: TransferableOperation[] = [];
 
   /**
    * Returns the id of the [[OperationTx]]
    */
-  getTxType = ():number => {
+  getTxType = (): number => {
     return this._typeID;
   }
 
@@ -106,31 +113,31 @@ export class OperationTx extends BaseTx {
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = super.sign(msg, kc);
-    for (let i = 0; i < this.ops.length; i++) {
-      const cred:Credential = SelectCredentialClass(this.ops[i].getOperation().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.ops[i].getOperation().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
-        const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
-        const signval:Buffer = keypair.sign(msg);
-        const sig:Signature = new Signature();
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = super.sign(msg, kc);
+    this.ops.forEach((op) => {
+      const cred: Credential = SelectCredentialClass(op.getOperation().getCredentialID());
+      const sigidxs: SigIdx[] = op.getOperation().getSigIdxs();
+      sigidxs.forEach((sigidx: SigIdx) => {
+        const keypair: KeyPair = kc.getKey(sigidx.getSource());
+        const signval: Buffer = keypair.sign(msg);
+        const sig: Signature = new Signature();
         sig.fromBuffer(signval);
         cred.addSignature(sig);
-      }
+      });
       sigs.push(cred);
-    }
+    });
     return sigs;
   }
 
-  clone():this {
-      let newbase:OperationTx = new OperationTx();
-      newbase.fromBuffer(this.toBuffer());
-      return newbase as this;
+  clone(): this {
+    let newbase: OperationTx = new OperationTx();
+    newbase.fromBuffer(this.toBuffer());
+    return newbase as this;
   }
 
-  create(...args:any[]):this {
-      return new OperationTx(...args) as this;
+  create(...args: any[]): this {
+    return new OperationTx(...args) as this;
   }
 
   /**
@@ -152,7 +159,7 @@ export class OperationTx extends BaseTx {
     ops: TransferableOperation[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo);
-    if (typeof ops !== 'undefined' && Array.isArray(ops)) {
+    if (typeof ops !== "undefined" && Array.isArray(ops)) {
       ops.forEach((op: TransferableOperation) => {
         if (!(op instanceof TransferableOperation)) {
           throw new Error("Error - OperationTx.constructor: invalid op in array parameter 'ops'");
