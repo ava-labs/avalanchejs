@@ -37,7 +37,7 @@ export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
   } else if(outputID === AVMConstants.NFTXFEROUTPUTID || outputID === AVMConstants.NFTXFEROUTPUTID_CODECONE){
     return new NFTTransferOutput(...args);
   }
-  throw new Error(`Error - SelectOutputClass: unknown outputid ${outputID}`);
+  throw new Error(`Error - SelectOutputClass: unknown outputID ${outputID}`);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{

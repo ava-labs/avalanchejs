@@ -3,19 +3,23 @@
  * @module Common-Output
  */
 
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
-import BinTools from '../utils/bintools';
-import { NBytes } from './nbytes';
-import { UnixNow } from '../utils/helperfunctions';
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
-import { AVMConstants } from '../../src/apis/avm/constants';
+import { Buffer } from "buffer/";
+import BN from "bn.js";
+import BinTools from "../utils/bintools";
+import { NBytes } from "./nbytes";
+import { UnixNow } from "../utils/helperfunctions";
+import { 
+  Serializable, 
+  Serialization, 
+  SerializedEncoding 
+} from "../utils/serialization";
+import { AVMConstants } from "../../src/apis/avm/constants";
 
 /**
  * @ignore
  */
-const bintools:BinTools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
+const serializer: Serialization = Serialization.getInstance();
 
 /**
  * Class for representing an address used in [[Output]] types
@@ -26,20 +30,20 @@ export class Address extends NBytes {
 
   //serialize and deserialize both are inherited
 
-  protected bytes = Buffer.alloc(20);
-  protected bsize = 20;
+  protected bytes: Buffer = Buffer.alloc(20);
+  protected bsize: number = 20;
 
   /**
    * Returns a function used to sort an array of [[Address]]es
    */
   static comparator = ()
-      :(a:Address, b:Address) => (1|-1|0) => (a:Address, b:Address)
+      :(a: Address, b: Address) => (1|-1|0) => (a: Address, b: Address)
       :(1|-1|0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1|-1|0);
 
   /**
      * Returns a base-58 representation of the [[Address]].
      */
-  toString():string {
+  toString(): string {
     return bintools.cb58Encode(this.toBuffer());
   }
 
@@ -50,31 +54,31 @@ export class Address extends NBytes {
      *
      * @returns The length of the raw [[Address]]
      */
-  fromString(addr:string):number {
-    const addrbuff:Buffer = bintools.b58ToBuffer(addr);
+  fromString(addr: string): number {
+    const addrbuff: Buffer = bintools.b58ToBuffer(addr);
     if (addrbuff.length === 24 && bintools.validateChecksum(addrbuff)) {
-      const newbuff:Buffer = bintools.copyFrom(addrbuff, 0, addrbuff.length - 4);
+      const newbuff: Buffer = bintools.copyFrom(addrbuff, 0, addrbuff.length - 4);
       if (newbuff.length === 20) {
         this.bytes = newbuff;
       }
     } else if (addrbuff.length === 24) {
-      throw new Error('Error - Address.fromString: invalid checksum on address');
+      throw new Error("Error - Address.fromString: invalid checksum on address");
     } else if (addrbuff.length === 20) {
       this.bytes = addrbuff;
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - Address.fromString: invalid address');
+      throw new Error("Error - Address.fromString: invalid address");
     }
     return this.getSize();
   }
 
-  clone():this {
-    let newbase:Address = new Address();
+  clone(): this {
+    let newbase: Address = new Address();
     newbase.fromBuffer(this.toBuffer());
     return newbase as this;
   }
 
-  create(...args:any[]):this {
+  create(...args: any[]): this {
     return new Address() as this;
   }
 
@@ -93,8 +97,8 @@ export class OutputOwners extends Serializable {
   protected _typeName = "OutputOwners";
   protected _typeID = undefined;
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields:object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding);
     return {
       ...fields,
       "locktime": serializer.encoder(this.locktime, encoding, "Buffer", "decimalString", 8),
@@ -102,12 +106,13 @@ export class OutputOwners extends Serializable {
       "addresses": this.addresses.map((a) => a.serialize(encoding))
     }
   };
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+
+  deserialize(fields: object, encoding: SerializedEncoding = "hex"): void {
     super.deserialize(fields, encoding);
     this.locktime = serializer.decoder(fields["locktime"], encoding, "decimalString", "Buffer", 8);
     this.threshold = serializer.decoder(fields["threshold"], encoding, "decimalString", "Buffer", 4);
     this.addresses = fields["addresses"].map((a:object) => {
-      let addr:Address = new Address();
+      let addr: Address = new Address();
       addr.deserialize(a, encoding);
       return addr;
     });
@@ -115,29 +120,29 @@ export class OutputOwners extends Serializable {
     this.numaddrs.writeUInt32BE(this.addresses.length, 0);
   }
 
-  protected locktime:Buffer = Buffer.alloc(8);
-  protected threshold:Buffer = Buffer.alloc(4);
-  protected numaddrs:Buffer = Buffer.alloc(4);
-  protected addresses:Array<Address> = [];
+  protected locktime: Buffer = Buffer.alloc(8);
+  protected threshold: Buffer = Buffer.alloc(4);
+  protected numaddrs: Buffer = Buffer.alloc(4);
+  protected addresses: Address[] = [];
 
   /**
    * Returns the threshold of signers required to spend this output.
    */
-  getThreshold = ():number => this.threshold.readUInt32BE(0);
+  getThreshold = (): number => this.threshold.readUInt32BE(0);
 
   /**
    * Returns the a {@link https://github.com/indutny/bn.js/|BN} repersenting the UNIX Timestamp when the lock is made available.
    */
-  getLocktime = ():BN => bintools.fromBufferToBN(this.locktime);
+  getLocktime = (): BN => bintools.fromBufferToBN(this.locktime);
 
   /**
    * Returns an array of {@link https://github.com/feross/buffer|Buffer}s for the addresses.
    */
-  getAddresses = ():Array<Buffer> => {
-    const result:Array<Buffer> = [];
-    for (let i = 0; i < this.addresses.length; i++) {
-      result.push(this.addresses[i].toBuffer());
-    }
+  getAddresses = (): Buffer[] => {
+    const result: Buffer[] = [];
+    this.addresses.forEach((address: Address) => {
+      result.push(address.toBuffer());
+    });
     return result;
   };
 
@@ -148,7 +153,7 @@ export class OutputOwners extends Serializable {
    *
    * @returns The index of the address.
    */
-  getAddressIdx = (address:Buffer):number => {
+  getAddressIdx = (address: Buffer): number => {
     for (let i = 0; i < this.addresses.length; i++) {
       if (this.addresses[i].toBuffer().toString('hex') === address.toString('hex')) {
         return i;
@@ -166,7 +171,7 @@ export class OutputOwners extends Serializable {
    * @returns Returns the string representing the address.
    */
   getAddress = (idx: number): Buffer => {
-    if (idx < this.addresses.length) {
+    if(idx < this.addresses.length) {
       return this.addresses[idx].toBuffer();
     }
     throw new Error(`Error - Output.getAddress: idx, ${idx}, out of range`);
@@ -177,7 +182,7 @@ export class OutputOwners extends Serializable {
    */
   meetsThreshold = (addresses: Buffer[], asOf: BN = undefined): boolean => {
     let now: BN;
-    if (typeof asOf === 'undefined') {
+    if (typeof asOf === "undefined") {
       now = UnixNow();
     } else {
       now = asOf;
@@ -197,7 +202,7 @@ export class OutputOwners extends Serializable {
   getSpenders = (addresses: Buffer[], asOf: BN = undefined): Buffer[] => {
     const qualified: Buffer[] = [];
     let now: BN;
-    if (typeof asOf === 'undefined') {
+    if (typeof asOf === "undefined") {
       now = UnixNow();
     } else {
       now = asOf;
@@ -210,7 +215,7 @@ export class OutputOwners extends Serializable {
     const threshold: number = this.threshold.readUInt32BE(0);
     for (let i: number = 0; i < this.addresses.length && qualified.length < threshold; i++) {
       for (let j: number = 0; j < addresses.length && qualified.length < threshold; j++) {
-        if (addresses[j].toString('hex') === this.addresses[i].toBuffer().toString('hex')) {
+        if (addresses[j].toString("hex") === this.addresses[i].toBuffer().toString("hex")) {
           qualified.push(addresses[j]);
         }
       }
@@ -231,7 +236,7 @@ export class OutputOwners extends Serializable {
     offset += 4;
     const numaddrs: number = this.numaddrs.readUInt32BE(0);
     this.addresses = [];
-    for (let i: number = 0; i < numaddrs; i++) {
+    for(let i: number = 0; i < numaddrs; i++) {
       const addr: Address = new Address();
       offset = addr.fromBuffer(bytes, offset);
       this.addresses.push(addr);
@@ -243,16 +248,16 @@ export class OutputOwners extends Serializable {
   /**
    * Returns the buffer representing the [[Output]] instance.
    */
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     this.addresses.sort(Address.comparator());
     this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-    let bsize:number = this.locktime.length + this.threshold.length + this.numaddrs.length;
-    const barr:Array<Buffer> = [this.locktime, this.threshold, this.numaddrs];
-    for (let i:number = 0; i < this.addresses.length; i++) {
-      const b: Buffer = this.addresses[i].toBuffer();
+    let bsize: number = this.locktime.length + this.threshold.length + this.numaddrs.length;
+    const barr: Buffer[] = [this.locktime, this.threshold, this.numaddrs];
+    this.addresses.forEach((addy: Address) => {
+      const b: Buffer = addy.toBuffer();
       barr.push(b);
       bsize += b.length;
-    }
+    });
     return Buffer.concat(barr, bsize);
   }
 
@@ -263,24 +268,24 @@ export class OutputOwners extends Serializable {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  static comparator = ():(a:Output, b:Output) => (1|-1|0) => (a:Output, b:Output):(1|-1|0) => {
-    const aoutid:Buffer = Buffer.alloc(4);
+  static comparator = ():(a: Output, b: Output) => (1|-1|0) => (a: Output, b: Output):(1|-1|0) => {
+    const aoutid: Buffer = Buffer.alloc(4);
     aoutid.writeUInt32BE(a.getOutputID(), 0);
-    const abuff:Buffer = a.toBuffer();
+    const abuff: Buffer = a.toBuffer();
 
-    const boutid:Buffer = Buffer.alloc(4);
+    const boutid: Buffer = Buffer.alloc(4);
     boutid.writeUInt32BE(b.getOutputID(), 0);
-    const bbuff:Buffer = b.toBuffer();
+    const bbuff: Buffer = b.toBuffer();
 
-    const asort:Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
-    const bsort:Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
+    const asort: Buffer = Buffer.concat([aoutid, abuff], aoutid.length + abuff.length);
+    const bsort: Buffer = Buffer.concat([boutid, bbuff], boutid.length + bbuff.length);
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
   /**
    * An [[Output]] class which contains addresses, locktimes, and thresholds.
    *
-   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing output owner's addresses
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing output owner"s addresses
    * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
    * @param threshold A number representing the the threshold number of signers required to sign the transaction
    */
@@ -417,7 +422,7 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
    */
   constructor(assetID:Buffer = undefined, output:Output = undefined) {
     super(output);
-    if (typeof assetID !== 'undefined') {
+    if (typeof assetID !== "undefined") {
       this.assetID = assetID;
     }
   }

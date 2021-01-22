@@ -19,13 +19,14 @@ describe('Outputs', () => {
       let addrpay = [addrs[0], addrs[1]];
       let fallLocktime:BN = locktime.add(new BN(50));
 
-      test('SelectOutputClass', () => {
-          let goodout:SECPTransferOutput = new SECPTransferOutput(new BN(2600), addrpay, fallLocktime, 1);
-          let outpayment:Output = SelectOutputClass(goodout.getOutputID());
+      test('SelectOutputClass', (): void => {
+          const goodout: SECPTransferOutput = new SECPTransferOutput(new BN(2600), addrpay, fallLocktime, 1);
+          const outpayment: Output = SelectOutputClass(goodout.getOutputID());
+          const classID: number = 99;
           expect(outpayment).toBeInstanceOf(SECPTransferOutput);
           expect(() => {
-              SelectOutputClass(99);
-          }).toThrow("Error - SelectOutputClass: unknown outputID");
+              SelectOutputClass(classID);
+          }).toThrow(`Error - SelectOutputClass: unknown outputID ${classID}`);
       });
 
       test('comparator', () => {
