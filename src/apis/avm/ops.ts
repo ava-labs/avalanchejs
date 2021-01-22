@@ -435,9 +435,12 @@ export class NFTMintOperation extends Operation {
   /**
    * Returns the credential ID.
    */
-  // TODO - Do we need to conditionally pass back NFTCREDENTIAL_CODECONE?
-  getCredentialID(): number {
-    return AVMConstants.NFTCREDENTIAL;
+  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
+    if(codecID === 0) {
+      return AVMConstants.NFTCREDENTIAL;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTCREDENTIAL_CODECONE;
+    }
   }
 
   /**
@@ -586,9 +589,12 @@ export class NFTTransferOperation extends Operation {
   /**
    * Returns the credential ID.
    */
-  // TODO - Do we need to conditionally pass back NFTCREDENTIAL_CODECONE?
-  getCredentialID(): number {
-    return AVMConstants.NFTCREDENTIAL;
+  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
+    if(codecID === 0) {
+      return AVMConstants.NFTCREDENTIAL;
+    } else if (codecID === 1) {
+      return AVMConstants.NFTCREDENTIAL_CODECONE;
+    }
   }
 
   getOutput = (): NFTTransferOutput => this.output;
