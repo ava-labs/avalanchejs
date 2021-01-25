@@ -50,8 +50,6 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   protected _typeName = "UnsignedTx";
   protected _typeID = undefined;
-  // TODO - Uncomment to set codecid
-  // protected codecid = 1;
 
   //serialize is inherited
 
@@ -66,11 +64,13 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
-    this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
+    // TODO confirm this codecid works
+    const codecID: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0);
     offset += 2;
     const txtype:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.transaction = SelectTxClass(txtype);
+    this.transaction.setCodecID(codecID);
     return this.transaction.fromBuffer(bytes, offset);
   }
   
@@ -81,8 +81,8 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    *
    * @returns A signed [[StandardTx]]
    */
-  sign(kc:KeyChain, codecID:number = AVMConstants.LATESTCODEC):Tx {
-    const txbuff = this.toBuffer(codecID);
+  sign(kc:KeyChain):Tx {
+    const txbuff = this.toBuffer();
     const msg:Buffer = Buffer.from(createHash("sha256").update(txbuff).digest());
     const sigs:Array<Credential> = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);

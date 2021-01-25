@@ -25,18 +25,18 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
 
 export class SECPCredential extends Credential {
   protected _typeName = "SECPCredential";
-  // TODO - Bump _typeID to *_CODECONE after Apricot
-  protected _typeID = AVMConstants.SECPCREDENTIAL;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.SECPCREDENTIAL : AVMConstants.SECPCREDENTIAL_CODECONE;
 
   //serialize and deserialize both are inherited
 
-  getCredentialID(codecID: number = AVMConstants.LATESTCODEC): number {
-    if(codecID === 0) {
-      return AVMConstants.SECPCREDENTIAL;
-    } else if (codecID === 1) {
-      this._typeID = AVMConstants.SECPCREDENTIAL_CODECONE;
-      return this._typeID;
-    }
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.SECPCREDENTIAL : AVMConstants.SECPCREDENTIAL_CODECONE;
+  }
+
+  getCredentialID(): number {
+    return this._typeID;
   }
 
   clone():this {
@@ -58,18 +58,18 @@ export class SECPCredential extends Credential {
 
 export class NFTCredential extends Credential {
   protected _typeName = "NFTCredential";
-  // TODO - Bump _typeID to *_CODECONE after Apricot
-  protected _typeID = AVMConstants.NFTCREDENTIAL;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.NFTCREDENTIAL : AVMConstants.NFTCREDENTIAL_CODECONE;
 
   //serialize and deserialize both are inherited
 
-  getCredentialID(codecID: number = AVMConstants.LATESTCODEC): number {
-    if(codecID === 0) {
-      return AVMConstants.NFTCREDENTIAL;
-    } else if (codecID === 1) {
-      this._typeID = AVMConstants.NFTCREDENTIAL_CODECONE;
-      return this._typeID;
-    }
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.NFTCREDENTIAL : AVMConstants.NFTCREDENTIAL_CODECONE;
+  }
+
+  getCredentialID(): number {
+    return this._typeID;
   }
 
   clone():this {

@@ -24,7 +24,8 @@ const serializer = Serialization.getInstance();
  */
 export class ExportTx extends BaseTx {
   protected _typeName = "ExportTx";
-  protected _typeID = AVMConstants.EXPORTTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.EXPORTTX : AVMConstants.EXPORTTX_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -49,6 +50,11 @@ export class ExportTx extends BaseTx {
   protected destinationChain:Buffer = undefined;
   protected numOuts:Buffer = Buffer.alloc(4);
   protected exportOuts:Array<TransferableOutput> = [];
+
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.EXPORTTX : AVMConstants.EXPORTTX_CODECONE;
+  }
 
   /**
      * Returns the id of the [[ExportTx]]
@@ -113,15 +119,15 @@ export class ExportTx extends BaseTx {
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
      */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     if(typeof this.destinationChain === "undefined") {
       throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
     this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
-    let barr: Buffer[] = [super.toBuffer(codecID), this.destinationChain, this.numOuts];
+    let barr: Buffer[] = [super.toBuffer(), this.destinationChain, this.numOuts];
     this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
     this.exportOuts.forEach((exportOut: TransferableOutput) => {
-      barr.push(exportOut.toBuffer(codecID));
+      barr.push(exportOut.toBuffer());
     });
     return Buffer.concat(barr);
   }

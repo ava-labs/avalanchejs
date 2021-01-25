@@ -84,7 +84,7 @@ export abstract class Operation extends Serializable{
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
-  abstract getOperationID(codecID?: number): number;
+  abstract getOperationID(): number;
 
   /**
      * Returns the array of [[SigIdx]] for this [[Operation]]
@@ -222,7 +222,7 @@ export class TransferableOperation extends Serializable {
     return this.operation.fromBuffer(bytes, offset);
   }
 
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     const numutxoIDs: Buffer = Buffer.alloc(4);
     numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
     let bsize: number = this.assetid.length + numutxoIDs.length;
@@ -234,7 +234,7 @@ export class TransferableOperation extends Serializable {
       bsize += b.length;
     })
     const opid: Buffer = Buffer.alloc(4);
-    opid.writeUInt32BE(this.operation.getOperationID(codecID), 0);
+    opid.writeUInt32BE(this.operation.getOperationID(), 0);
     barr.push(opid);
     bsize += opid.length;
     const b: Buffer = this.operation.toBuffer();
@@ -276,8 +276,8 @@ export class TransferableOperation extends Serializable {
  */
 export class SECPMintOperation extends Operation {
   protected _typeName = "SECPMintOperation";
-  // TODO - Bump _typeID to *_CODECONE after Apricot
-  protected _typeID = AVMConstants.SECPMINTOPID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.SECPMINTOPID : AVMConstants.SECPMINTOPID_CODECONE;
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding);
@@ -299,25 +299,25 @@ export class SECPMintOperation extends Operation {
   protected mintOutput: SECPMintOutput = undefined;
   protected transferOutput: SECPTransferOutput = undefined;
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.SECPMINTOPID : AVMConstants.SECPMINTOPID_CODECONE;
+  }
+
   /**
    * Returns the operation ID.
    */
-  getOperationID(codecID: number = AVMConstants.LATESTCODEC): number {
-    if(codecID === 0) {
-      return AVMConstants.SECPMINTOPID;
-    } else if (codecID === 1) {
-      this._typeID = AVMConstants.SECPMINTOPID_CODECONE;
-      return this._typeID;
-    }
+  getOperationID(): number {
+    return this._typeID;
   }
 
   /**
    * Returns the credential ID.
    */
-  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
-    if(codecID === 0) {
+  getCredentialID (): number {
+    if(this._codecID === 0) {
       return AVMConstants.SECPCREDENTIAL;
-    } else if (codecID === 1) {
+    } else if (this._codecID === 1) {
       return AVMConstants.SECPCREDENTIAL_CODECONE;
     }
   }
@@ -351,7 +351,7 @@ export class SECPMintOperation extends Operation {
   /**
    * Returns the buffer representing the [[SECPMintOperation]] instance.
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     let superbuff: Buffer = super.toBuffer();
     let mintoutBuff: Buffer = this.mintOutput.toBuffer();
     let transferOutBuff: Buffer = this.transferOutput.toBuffer();
@@ -392,8 +392,8 @@ export class SECPMintOperation extends Operation {
  */
 export class NFTMintOperation extends Operation {
   protected _typeName = "NFTMintOperation";
-  // TODO - Bump _typeID to *_CODECONE after Apricot
-  protected _typeID = AVMConstants.NFTMINTOPID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.NFTMINTOPID : AVMConstants.NFTMINTOPID_CODECONE;
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding);
@@ -420,25 +420,25 @@ export class NFTMintOperation extends Operation {
   protected payload: Buffer;
   protected outputOwners: OutputOwners[] = [];
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.NFTMINTOPID : AVMConstants.NFTMINTOPID_CODECONE;
+  }
+
   /**
    * Returns the operation ID.
    */
-  getOperationID(codecID: number = AVMConstants.LATESTCODEC): number {
-    if(codecID === 0) {
-      return AVMConstants.NFTMINTOPID;
-    } else if (codecID === 1) {
-      this._typeID = AVMConstants.NFTMINTOPID_CODECONE;
-      return this._typeID;
-    }
+  getOperationID(): number {
+    return this._typeID;
   }
 
   /**
    * Returns the credential ID.
    */
-  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
-    if(codecID === 0) {
+  getCredentialID = (): number => {
+    if(this._codecID === 0) {
       return AVMConstants.NFTCREDENTIAL;
-    } else if (codecID === 1) {
+    } else if (this._codecID === 1) {
       return AVMConstants.NFTCREDENTIAL_CODECONE;
     }
   }
@@ -555,8 +555,8 @@ export class NFTMintOperation extends Operation {
  */
 export class NFTTransferOperation extends Operation {
   protected _typeName = "NFTTransferOperation";
-  // TODO - Bump _typeID to *_CODECONE after Apricot
-  protected _typeID = AVMConstants.NFTXFEROPID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.NFTXFEROPID : AVMConstants.NFTXFEROPID_CODECONE;
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding);
@@ -574,25 +574,25 @@ export class NFTTransferOperation extends Operation {
 
   protected output: NFTTransferOutput;
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.NFTXFEROPID : AVMConstants.NFTXFEROPID_CODECONE;
+  }
+
   /**
    * Returns the operation ID.
    */
-  getOperationID(codecID: number = AVMConstants.LATESTCODEC): number {
-    if(codecID === 0) {
-      return AVMConstants.NFTXFEROPID;
-    } else if (codecID === 1) {
-      this._typeID = AVMConstants.NFTXFEROPID_CODECONE;
-      return this._typeID;
-    }
+  getOperationID(): number {
+    return this._typeID;
   }
 
   /**
    * Returns the credential ID.
    */
-  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
-    if(codecID === 0) {
+  getCredentialID (): number {
+    if(this._codecID === 0) {
       return AVMConstants.NFTCREDENTIAL;
-    } else if (codecID === 1) {
+    } else if (this._codecID === 1) {
       return AVMConstants.NFTCREDENTIAL_CODECONE;
     }
   }

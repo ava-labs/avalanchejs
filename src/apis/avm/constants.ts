@@ -44,13 +44,23 @@ export class AVMConstants {
 
   static BASETX:number = 0;
 
+  static BASETX_CODECONE:number = 0;
+
   static CREATEASSETTX:number = 1;
+
+  static CREATEASSETTX_CODECONE:number = 1;
 
   static OPERATIONTX:number = 2;
 
+  static OPERATIONTX_CODECONE:number = 2;
+
   static IMPORTTX:number = 3;
 
+  static IMPORTTX_CODECONE:number = 3;
+
   static EXPORTTX:number = 4;
+
+  static EXPORTTX_CODECONE:number = 4;
 
   static SECPCREDENTIAL:number = 9;
   

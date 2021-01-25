@@ -20,7 +20,8 @@ const serializer = Serialization.getInstance();
 
 export class CreateAssetTx extends BaseTx {
   protected _typeName = "CreateAssetTx";
-  protected _typeID = AVMConstants.CREATEASSETTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -45,6 +46,11 @@ export class CreateAssetTx extends BaseTx {
   protected symbol:string = "";
   protected denomination:Buffer = Buffer.alloc(1);
   protected initialstate:InitialStates = new InitialStates();
+
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE;
+  }
 
   /**
    * Returns the id of the [[CreateAssetTx]]
@@ -115,9 +121,9 @@ export class CreateAssetTx extends BaseTx {
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateAssetTx]].
      */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
-    const superbuff:Buffer = super.toBuffer(codecID);
-    const initstatebuff:Buffer = this.initialstate.toBuffer(codecID);
+  toBuffer():Buffer {
+    const superbuff:Buffer = super.toBuffer();
+    const initstatebuff:Buffer = this.initialstate.toBuffer();
 
     const namebuff:Buffer = Buffer.alloc(this.name.length);
     namebuff.write(this.name, 0, this.name.length, "utf8");

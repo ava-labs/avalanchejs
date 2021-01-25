@@ -121,6 +121,7 @@
      return utxo as this;
    }
  
+   // TODO - do we need to change here?
    create(
      codecID: number = AVMConstants.LATESTCODEC, 
      txid: Buffer = undefined,

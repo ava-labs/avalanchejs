@@ -124,8 +124,6 @@ const n0C:object = {
   chainID: 43111
 };
 
-// TODO: UPDATE FOR MAINNET
-
 const n1X:object = {
   blockchainID: '2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM',
   alias: XChainAlias,
@@ -159,8 +157,6 @@ const n1C:object = {
   gasPrice: GWEI.mul(new BN(470)), 
   chainID: 43114
 };
-
-// END TODO
 
 const n2X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
@@ -259,7 +255,6 @@ const n4C:object = {
   chainID: 43110
 };
 
-// TODO: UPDATE FOR FUJI
 const n5X:object = {
   blockchainID: '2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm',
   alias: XChainAlias,
@@ -293,8 +288,6 @@ const n5C:object = {
   gasPrice: GWEI.mul(new BN(470)), 
   chainID: 43113
 };
-
-// END TODO
 
 const n12345X:any = { ...n5X };
 n12345X.blockchainID = '2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed';

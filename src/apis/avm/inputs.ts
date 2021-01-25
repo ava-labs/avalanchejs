@@ -76,37 +76,37 @@ export abstract class AmountInput extends StandardAmountInput {
 
 export class SECPTransferInput extends AmountInput {
   protected _typeName = "SECPTransferInput";
-  // TODO - Bump _typeID to *_CODECONE after Apricot
-  protected _typeID = AVMConstants.SECPXFERINPUTID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.SECPXFERINPUTID : AVMConstants.SECPXFERINPUTID_CODECONE;
 
   //serialize and deserialize both are inherited
+
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.SECPXFERINPUTID : AVMConstants.SECPXFERINPUTID_CODECONE;
+  }
 
   /**
      * Returns the inputID for this input
      */
-  getInputID(codecID: number = AVMConstants.LATESTCODEC): number {
-    if(codecID === 0) {
-      return AVMConstants.SECPXFERINPUTID;
-    } else if (codecID === 1) {
-      this._typeID = AVMConstants.SECPXFERINPUTID_CODECONE;
-      return this._typeID;
-    }
+  getInputID(): number {
+    return this._typeID;
   }
 
-  getCredentialID = (codecID: number = AVMConstants.LATESTCODEC): number => {
-    if(codecID === 0) {
+  getCredentialID(): number {
+    if(this._codecID === 0) {
       return AVMConstants.SECPCREDENTIAL;
-    } else if (codecID === 1) {
+    } else if (this._codecID === 1) {
       return AVMConstants.SECPCREDENTIAL_CODECONE;
     }
   }
 
-  create(...args:any[]): this{
+  create(...args: any[]): this {
     return new SECPTransferInput(...args) as this;
   }
 
   clone(): this {
-    const newout:SECPTransferInput = this.create()
+    const newout: SECPTransferInput = this.create()
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }

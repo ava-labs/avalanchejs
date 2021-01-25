@@ -36,21 +36,29 @@ export type SerializedEncoding =
 ;
 
 export abstract class Serializable {
-    protected _typeName:string = undefined;
-    protected _typeID:number = undefined;
+    protected _typeName: string = undefined;
+    protected _typeID: number = undefined;
+    protected _codecID: number = undefined;
 
     /**
      * Used in serialization. TypeName is a string name for the type of object being output.
      */
-    getTypeName():string {
-        return this._typeName;
+    getTypeName(): string {
+      return this._typeName;
     }
 
     /**
      * Used in serialization. Optional. TypeID is a number for the typeID of object being output.
      */
-    getTypeID():number {
-        return this._typeID
+    getTypeID(): number {
+      return this._typeID
+    }
+
+    /**
+     * Used in serialization. Optional. TypeID is a number for the typeID of object being output.
+     */
+    getCodecID(): number {
+      return this._codecID
     }
 
     //sometimes the parent class manages the fields
@@ -58,7 +66,8 @@ export abstract class Serializable {
     serialize(encoding?:SerializedEncoding):object {
         return {
             "_typeName": this._typeName,
-            "_typeID": (typeof this._typeID === "undefined" ? null : this._typeID)
+            "_typeID": (typeof this._typeID === "undefined" ? null : this._typeID),
+            "_codecID": (typeof this._codecID === "undefined" ? null : this._codecID)
         }
     }; 
     deserialize(fields:object, encoding?:SerializedEncoding) {
@@ -74,6 +83,14 @@ export abstract class Serializable {
             }
             if(fields["_typeID"] !== this._typeID) {
                 throw new Error("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- recieved: " + fields["_typeID"]);
+            }
+        }
+        if(typeof fields["_codecID"] !== "undefined" && fields["_codecID"] !== null) {
+            if(typeof fields["_codecID"] !== "number") {
+                throw new Error("Error - Serializable.deserialize: _codecID must be a number, found: " + typeof fields["_codecID"]);
+            }
+            if(fields["_codecID"] !== this._codecID) {
+                throw new Error("Error - Serializable.deserialize: _codecID mismatch -- expected: " + this._codecID + " -- recieved: " + fields["_codecID"]);
             }
         }
     };

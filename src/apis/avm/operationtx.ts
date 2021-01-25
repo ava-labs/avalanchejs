@@ -32,7 +32,8 @@ const bintools: BinTools = BinTools.getInstance();
  */
 export class OperationTx extends BaseTx {
   protected _typeName = "OperationTx";
-  protected _typeID = AVMConstants.OPERATIONTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE;
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding);
@@ -88,12 +89,12 @@ export class OperationTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     this.numOps.writeUInt32BE(this.ops.length, 0);
-    let barr: Buffer[] = [super.toBuffer(codecID), this.numOps];
+    let barr: Buffer[] = [super.toBuffer(), this.numOps];
     this.ops = this.ops.sort(TransferableOperation.comparator());
     this.ops.forEach((op: TransferableOperation) => {
-      barr.push(op.toBuffer(codecID));
+      barr.push(op.toBuffer());
     });
     return Buffer.concat(barr);
   }

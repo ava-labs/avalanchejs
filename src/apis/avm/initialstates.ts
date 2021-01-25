@@ -85,7 +85,7 @@ export class InitialStates extends Serializable{
     return offset;
   }
 
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     const buff: Buffer[] = [];
     const keys: number[] = Object.keys(this.fxs).map((k: string) => parseInt(k, 10)).sort();
     const klen: Buffer = Buffer.alloc(4);
@@ -102,7 +102,7 @@ export class InitialStates extends Serializable{
       buff.push(statelen);
       initialState.forEach((inState: Output) => {
         const outputid: Buffer = Buffer.alloc(4);
-        outputid.writeInt32BE(inState.getOutputID(codecID), 0);
+        outputid.writeInt32BE(inState.getOutputID(), 0);
         buff.push(outputid);
         buff.push(inState.toBuffer());
       });

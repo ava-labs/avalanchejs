@@ -104,7 +104,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     this.outs.sort(StandardTransferableOutput.comparator());
     this.ins.sort(StandardTransferableInput.comparator());
     this.numouts.writeUInt32BE(this.outs.length, 0);
@@ -112,14 +112,14 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     let bsize:number = this.networkid.length + this.blockchainid.length + this.numouts.length;
     const barr:Array<Buffer> = [this.networkid, this.blockchainid, this.numouts];
     this.outs.forEach((out: StandardTransferableOutput) => {
-      const b:Buffer = out.toBuffer(codecID);
+      const b:Buffer = out.toBuffer();
       barr.push(b);
       bsize += b.length;
     });
     barr.push(this.numins);
     bsize += this.numins.length;
     this.ins.forEach((input: StandardTransferableInput) => {
-      const b:Buffer = input.toBuffer(codecID);
+      const b:Buffer = input.toBuffer();
       barr.push(b);
       bsize += b.length;
     });
@@ -202,30 +202,27 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "codecid": serializer.encoder(this.codecid, encoding, "number", "decimalString", 2),
       "transaction": this.transaction.serialize(encoding)
     };
   };
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "number");
   }
 
-  protected codecid:number = AVMConstants.LATESTCODEC;
   protected transaction:SBTx;
 
   /**
    * Returns the CodecID as a number
    */
-  getCodecID = ():number => this.codecid;
+  getCodecID = ():number => this._codecID;
 
   /**
   * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
   */
   getCodecIDBuffer = ():Buffer => {
     let codecBuf:Buffer = Buffer.alloc(2);
-    codecBuf.writeUInt16BE(this.codecid, 0);
+    codecBuf.writeUInt16BE(this._codecID, 0);
     return codecBuf;
   } 
 
@@ -282,15 +279,12 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
 
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC):Buffer {
+  toBuffer():Buffer {
     const codecBuf:Buffer = Buffer.alloc(2);
-    codecBuf.writeUInt16BE(codecID, 0)
-    this.codecid = codecID;
+    codecBuf.writeUInt16BE(this.transaction.getCodecID(), 0)
     const txtype:Buffer = Buffer.alloc(4);
-    // in this case the final result is the same for all tx types 
-    // in both codec 0 and 1
     txtype.writeUInt32BE(this.transaction.getTxType(), 0);
-    const basebuff = this.transaction.toBuffer(codecID);
+    const basebuff = this.transaction.toBuffer();
     return Buffer.concat([codecBuf, txtype, basebuff], codecBuf.length + txtype.length + basebuff.length);
   }
 
@@ -307,9 +301,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     StandardUnsignedTx<KPClass, KCClass, SBTx>
   >;
 
-  constructor(transaction:SBTx = undefined, codecid:number = 0) {
+  constructor(transaction:SBTx = undefined) {
     super();
-    this.codecid = codecid;
     this.transaction = transaction;
   }
 }
@@ -352,16 +345,19 @@ export abstract class StandardTx<
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
-    const txbuff: Buffer = this.unsignedTx.toBuffer(codecID);
+  toBuffer(): Buffer {
+    const tx = this.unsignedTx.getTransaction()
+    const codecID: number = tx.getCodecID();
+    const txbuff: Buffer = this.unsignedTx.toBuffer();
     let bsize: number = txbuff.length;
     const credlen: Buffer = Buffer.alloc(4);
     credlen.writeUInt32BE(this.credentials.length, 0);
     const barr: Buffer[] = [txbuff, credlen];
     bsize += credlen.length;
     this.credentials.forEach((credential: Credential) => {
+      credential.setCodecID(codecID)
       const credid: Buffer = Buffer.alloc(4);
-      credid.writeUInt32BE(credential.getCredentialID(codecID), 0);
+      credid.writeUInt32BE(credential.getCredentialID(), 0);
       barr.push(credid);
       bsize += credid.length;
       const credbuff: Buffer = credential.toBuffer();
@@ -392,8 +388,8 @@ export abstract class StandardTx<
    * @remarks
    * unlike most toStrings, this returns in cb58 serialization format
    */
-  toString(codecID:number = AVMConstants.LATESTCODEC):string {
-    return bintools.cb58Encode(this.toBuffer(codecID));
+  toString():string {
+    return bintools.cb58Encode(this.toBuffer());
   }
 
   /**

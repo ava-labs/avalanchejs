@@ -53,7 +53,7 @@ export abstract class Input extends Serializable {
     return Buffer.compare(asort, bsort) as (1|-1|0);
   };
 
-  abstract getInputID(codecID?: number): number;
+  abstract getInputID(): number;
 
   /**
    * Returns the array of [[SigIdx]] for this [[Input]]
@@ -148,10 +148,10 @@ export abstract class StandardParseableInput extends Serializable {
   // must be implemented to select input types for the VM in question
   abstract fromBuffer(bytes: Buffer, offset?: number): number; 
 
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
+  toBuffer(): Buffer {
     const inbuff: Buffer = this.input.toBuffer();
     const inid: Buffer = Buffer.alloc(4);
-    inid.writeUInt32BE(this.input.getInputID(codecID), 0);
+    inid.writeUInt32BE(this.input.getInputID(), 0);
     const barr: Buffer[] = [inid, inbuff];
     return Buffer.concat(barr, inid.length + inbuff.length);
   }
@@ -228,8 +228,8 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTransferableInput]].
    */
-  toBuffer(codecID: number = AVMConstants.LATESTCODEC): Buffer {
-    const parseableBuff: Buffer = super.toBuffer(codecID);
+  toBuffer(): Buffer {
+    const parseableBuff: Buffer = super.toBuffer();
     const bsize: number = this.txid.length + this.outputidx.length + this.assetid.length + parseableBuff.length;
     const barr: Buffer[] = [this.txid, this.outputidx, this.assetid, parseableBuff];
     const buff: Buffer = Buffer.concat(barr, bsize);
