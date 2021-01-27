@@ -12,3 +12,5 @@ Tests for the Avalanche [AVM RPC](https://docs.avax.network/build/avalanchego-ap
 * [exportTx-avax-cchain.ts](./exportTx-avax-cchain.ts)
 * [importTx-ant-cchain.ts](./importTx-ant-cchain.ts)
 * [importTx-avax-cchain.ts](./importTx-avax-cchain.ts)
+* [operationTx-mint-ant.ts](./operationTx-mint-ant.ts)
+* [operationTx-mint-avax.ts](./operationTx-mint-avax.ts)
