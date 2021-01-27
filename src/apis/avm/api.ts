@@ -938,7 +938,8 @@ export class AVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0), 
-    threshold:number = 1
+    threshold:number = 1,
+    assetID:string = undefined
   ):Promise<UnsignedTx> => {
     
     let prefixes:object = {};
@@ -973,12 +974,15 @@ export class AVMAPI extends JRPCAPI {
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    if(typeof assetID === "undefined") {
+      assetID = bintools.cb58Encode(avaxAssetID);
+    }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       amount,
-      avaxAssetID, 
+      bintools.cb58Decode(assetID), 
       to,
       from,
       change,

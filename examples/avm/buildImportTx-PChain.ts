@@ -28,7 +28,7 @@ const pChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildImportTx to import AVAX to the X-Chain from the P-Chain or the P-Chain")
+const memo: Buffer = bintools.stringToBuffer("AVM utility method buildImportTx to import AVAX to the X-Chain from the P-Chain")
         
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings, pChainBlockchainID)

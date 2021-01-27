@@ -815,7 +815,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     networkid:number, 
     blockchainid:Buffer,
     amount:BN,
-    avaxAssetID:Buffer,
+    assetID:Buffer,
     toAddresses:Array<Buffer>,
     fromAddresses:Array<Buffer>,
     changeAddresses:Array<Buffer> = undefined,
@@ -842,11 +842,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     if(typeof feeAssetID === "undefined") {
-      feeAssetID = avaxAssetID;
-    } else if (feeAssetID.toString("hex") !== avaxAssetID.toString("hex")) {
-      /* istanbul ignore next */
-      throw new Error('Error - UTXOSet.buildExportTx: '
-      + `feeAssetID must match avaxAssetID`);
+      feeAssetID = assetID;
     }
 
     if(typeof destinationChain === "undefined") {
@@ -854,10 +850,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     const aad:AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
-    if(avaxAssetID.toString("hex") === feeAssetID.toString("hex")){
-      aad.addAssetAmount(avaxAssetID, amount, fee);
+    if(assetID.toString("hex") === feeAssetID.toString("hex")){
+      aad.addAssetAmount(assetID, amount, fee);
     } else {
-      aad.addAssetAmount(avaxAssetID, amount, zero);
+      aad.addAssetAmount(assetID, amount, zero);
       if(this._feeCheck(fee, feeAssetID)){
         aad.addAssetAmount(feeAssetID, zero, fee);
       }
