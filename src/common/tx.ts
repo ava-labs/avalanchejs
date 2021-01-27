@@ -334,6 +334,8 @@ export abstract class StandardTx<
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
    */
   toBuffer():Buffer {
+    const tx = this.unsignedTx.getTransaction();
+    const codecID: number = tx.getCodecID();
     const txbuff:Buffer = this.unsignedTx.toBuffer();
     let bsize:number = txbuff.length;
     const credlen:Buffer = Buffer.alloc(4);
@@ -341,6 +343,7 @@ export abstract class StandardTx<
     const barr:Array<Buffer> = [txbuff, credlen];
     bsize += credlen.length;
     for (let i = 0; i < this.credentials.length; i++) {
+      this.credentials[i].setCodecID(codecID);
       const credid:Buffer = Buffer.alloc(4);
       credid.writeUInt32BE(this.credentials[i].getCredentialID(), 0);
       barr.push(credid);
