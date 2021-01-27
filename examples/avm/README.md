@@ -1,4 +1,4 @@
-# AVM RPC
+# AVM
 
 Tests for the Avalanche [AVM RPC](https://docs.avax.network/build/avalanchego-apis/exchange-chain-x-chain-api)
 
