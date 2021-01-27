@@ -2,6 +2,20 @@
 
 Tests for the Avalanche [AVM RPC](https://docs.avax.network/build/avalanchego-apis/exchange-chain-x-chain-api)
 
+## High Level
+
+* [buildBaseTx-ant.ts](./buildBaseTx-ant.ts)
+* [buildBaseTx-avax.ts](./buildBaseTx-avax.ts)
+* [buildCreateAssetTx-ant.ts](./buildCreateAssetTx-ant.ts)
+* [buildCreateNFTAssetTx.ts](./buildCreateNFTAssetTx.ts)
+* [buildCreateNFTMintTx.ts](./buildCreateNFTMintTx.ts)
+* [buildExportTx-PChain.ts](./buildExportTx-PChain.ts)
+* [buildImportTx-PChain.ts](./buildImportTx-PChain.ts)
+* [buildNFTTransferTx.ts](./buildNFTTransferTx.ts)
+* [buildSECPMintTx-ant.ts](./buildSECPMintTx-ant.ts)
+
+## Manual
+
 * [baseTx-ant.ts](./baseTx-ant.ts)
 * [baseTx-avax-create-multisig.ts](./baseTx-avax-create-multisig.ts)
 * [baseTx-avax-send-multisig.ts](./baseTx-avax-send-multisig.ts)
