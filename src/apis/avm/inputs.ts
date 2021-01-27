@@ -22,7 +22,7 @@ const serializer = Serialization.getInstance();
  * @returns An instance of an [[Input]]-extended class.
  */
 export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
-  if (inputid === AVMConstants.SECPINPUTID) {
+  if (inputid === AVMConstants.SECPINPUTID || inputid === AVMConstants.SECPINPUTID_CODECONE) {
     return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
@@ -76,18 +76,30 @@ export abstract class AmountInput extends StandardAmountInput {
 
 export class SECPTransferInput extends AmountInput {
   protected _typeName = "SECPTransferInput";
-  protected _typeID = AVMConstants.SECPINPUTID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.SECPINPUTID : AVMConstants.SECPINPUTID_CODECONE;
 
   //serialize and deserialize both are inherited
+
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.SECPINPUTID : AVMConstants.SECPINPUTID_CODECONE;
+  }
 
   /**
      * Returns the inputID for this input
      */
   getInputID():number {
-    return AVMConstants.SECPINPUTID;
+    return this._typeID;
   }
 
-  getCredentialID = ():number => AVMConstants.SECPCREDENTIAL;
+  getCredentialID(): number {
+    if(this._codecID === 0) {
+      return AVMConstants.SECPCREDENTIAL;
+    } else if (this._codecID === 1) {
+      return AVMConstants.SECPCREDENTIAL_CODECONE;
+    }
+  }
 
   create(...args:any[]):this{
     return new SECPTransferInput(...args) as this;

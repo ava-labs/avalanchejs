@@ -26,7 +26,8 @@ const serializer = Serialization.getInstance();
  */
 export class OperationTx extends BaseTx {
   protected _typeName = "OperationTx";
-  protected _typeID = AVMConstants.OPERATIONTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -49,6 +50,11 @@ export class OperationTx extends BaseTx {
   protected numOps:Buffer = Buffer.alloc(4);
   protected ops:Array<TransferableOperation> = [];
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE;
+  }
+
   /**
    * Returns the id of the [[OperationTx]]
    */
@@ -65,7 +71,7 @@ export class OperationTx extends BaseTx {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0, codecid:number = AVMConstants.LATESTCODEC):number {
+  fromBuffer(bytes:Buffer, offset:number = 0):number {
     offset = super.fromBuffer(bytes, offset);
     this.numOps = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;

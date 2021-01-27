@@ -25,7 +25,8 @@ const serializer = Serialization.getInstance();
  */
 export class ImportTx extends BaseTx {
   protected _typeName = "ImportTx";
-  protected _typeID = AVMConstants.IMPORTTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -50,6 +51,11 @@ export class ImportTx extends BaseTx {
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
   protected importIns:Array<TransferableInput> = [];
+
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE;
+  }
 
   /**
      * Returns the id of the [[ImportTx]]

@@ -121,6 +121,7 @@ export abstract class Credential extends Serializable{
   protected sigArray:Array<Signature> = [];
 
   abstract getCredentialID():number;
+  setCodecID(codecID: number):void {};
 
   /**
      * Adds a signature to the credentials and returns the index off the added signature.

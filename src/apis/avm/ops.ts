@@ -23,11 +23,11 @@ const serializer = Serialization.getInstance();
  * @returns An instance of an [[Operation]]-extended class.
  */
 export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation => {
-    if(opid == AVMConstants.SECPMINTOPID) {
+    if(opid === AVMConstants.SECPMINTOPID || opid === AVMConstants.SECPMINTOPID_CODECONE) {
       return new SECPMintOperation(...args);
-    } else if(opid == AVMConstants.NFTMINTOPID){
+    } else if(opid === AVMConstants.NFTMINTOPID || opid === AVMConstants.NFTMINTOPID_CODECONE){
       return new NFTMintOperation(...args);
-    } else if(opid == AVMConstants.NFTXFEROPID){
+    } else if(opid === AVMConstants.NFTXFEROPID || opid === AVMConstants.NFTXFEROPID_CODECONE){
       return new NFTTransferOperation(...args);
     }
     /* istanbul ignore next */
@@ -262,7 +262,8 @@ export class TransferableOperation extends Serializable {
  */
 export class SECPMintOperation extends Operation {
   protected _typeName = "SECPMintOperation";
-  protected _typeID = AVMConstants.SECPMINTOPID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.SECPMINTOPID : AVMConstants.SECPMINTOPID_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -283,6 +284,11 @@ export class SECPMintOperation extends Operation {
   protected mintOutput:SECPMintOutput = undefined;
   protected transferOutput:SECPTransferOutput = undefined;
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.SECPMINTOPID : AVMConstants.SECPMINTOPID_CODECONE;
+  }
+
   /**
    * Returns the operation ID.
    */
@@ -293,8 +299,12 @@ export class SECPMintOperation extends Operation {
   /**
    * Returns the credential ID.
    */
-  getCredentialID():number {
-    return AVMConstants.SECPCREDENTIAL;
+  getCredentialID (): number {
+    if(this._codecID === 0) {
+      return AVMConstants.SECPCREDENTIAL;
+    } else if (this._codecID === 1) {
+      return AVMConstants.SECPCREDENTIAL_CODECONE;
+    }
   }
 
   /**
@@ -367,7 +377,8 @@ export class SECPMintOperation extends Operation {
  */
 export class NFTMintOperation extends Operation {
   protected _typeName = "NFTMintOperation";
-  protected _typeID = AVMConstants.NFTMINTOPID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.NFTMINTOPID : AVMConstants.NFTMINTOPID_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -395,6 +406,11 @@ export class NFTMintOperation extends Operation {
   protected payload:Buffer;
   protected outputOwners:Array<OutputOwners> = [];
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.NFTMINTOPID : AVMConstants.NFTMINTOPID_CODECONE;
+  }
+
   /**
    * Returns the operation ID.
    */
@@ -405,8 +421,12 @@ export class NFTMintOperation extends Operation {
   /**
    * Returns the credential ID.
    */
-  getCredentialID():number {
-    return AVMConstants.NFTCREDENTIAL;
+  getCredentialID = (): number => {
+    if(this._codecID === 0) {
+      return AVMConstants.NFTCREDENTIAL;
+    } else if (this._codecID === 1) {
+      return AVMConstants.NFTCREDENTIAL_CODECONE;
+    }
   }
 
   /**
@@ -518,7 +538,8 @@ export class NFTMintOperation extends Operation {
  */
 export class NFTTransferOperation extends Operation {
   protected _typeName = "NFTTransferOperation";
-  protected _typeID = AVMConstants.NFTXFEROPID;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.NFTXFEROPID : AVMConstants.NFTXFEROPID_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -535,6 +556,11 @@ export class NFTTransferOperation extends Operation {
 
   protected output:NFTTransferOutput;
 
+  setCodecID(codecID: number): void {
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.NFTXFEROPID : AVMConstants.NFTXFEROPID_CODECONE;
+  }
+
   /**
    * Returns the operation ID.
    */
@@ -545,8 +571,12 @@ export class NFTTransferOperation extends Operation {
   /**
    * Returns the credential ID.
    */
-  getCredentialID():number {
-    return AVMConstants.NFTCREDENTIAL;
+  getCredentialID (): number {
+    if(this._codecID === 0) {
+      return AVMConstants.NFTCREDENTIAL;
+    } else if (this._codecID === 1) {
+      return AVMConstants.NFTCREDENTIAL_CODECONE;
+    }
   }
 
   getOutput = ():NFTTransferOutput => this.output;

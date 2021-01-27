@@ -267,11 +267,12 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
   abstract fromBuffer(bytes:Buffer, offset?:number):number;
 
   toBuffer():Buffer {
-    const codecid:Buffer = this.getCodecIDBuffer();
+    const codecBuf:Buffer = Buffer.alloc(2);
+    codecBuf.writeUInt16BE(this.transaction.getCodecID(), 0)
     const txtype:Buffer = Buffer.alloc(4);
     txtype.writeUInt32BE(this.transaction.getTxType(), 0);
     const basebuff = this.transaction.toBuffer();
-    return Buffer.concat([codecid, txtype, basebuff], codecid.length + txtype.length + basebuff.length);
+    return Buffer.concat([codecBuf, txtype, basebuff], codecBuf.length + txtype.length + basebuff.length);
   }
 
   /**
