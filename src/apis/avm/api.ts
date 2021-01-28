@@ -925,6 +925,8 @@ export class AVMAPI extends JRPCAPI {
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param assetID Optional. The assetID of the asset to send. Defaults to AVAX assetID. 
+   * Regardless of the asset which you're exporting, all fees are paid in AVAX.
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
    */
