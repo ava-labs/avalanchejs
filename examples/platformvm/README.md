@@ -10,5 +10,5 @@ Tests for the Avalanche [PlatformVM RPC](https://docs.avax.network/build/avalanc
 * [buildExportTx.ts](./buildExportTx.ts)
 * [buildImportTx.ts](./buildImportTx.ts)
 * [createSubnetTx.ts](./createSubnetTx.ts)
-* [exportTx-avax-xchain.ts](./exportTx-avax-xchain.ts)
-* [importTx-avax-xchain.ts](./importTx-avax-xchain.ts)
+* [exportTx-xchain.ts](./exportTx-xchain.ts)
+* [importTx-xchain.ts](./importTx-xchain.ts)

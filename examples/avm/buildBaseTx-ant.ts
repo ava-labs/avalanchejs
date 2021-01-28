@@ -33,7 +33,7 @@ const main = async (): Promise<any> => {
   const amount: BN = new BN(5)
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const assetID: string = "2hrWPkPoNJRgtx24jimCfgiyzAf5DpG2hEBUpVfW8tT76RsRHh"
+  const assetID: string = "2DLukZZms6BdwsUea4DtWHReGa6reRw3QWGJfC7z5p7tqHCSxK"
   
   const unsignedTx: UnsignedTx = await xchain.buildBaseTx(
     utxoSet,

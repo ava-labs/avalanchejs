@@ -40,7 +40,6 @@ const importedIns: TransferableInput[] = []
 const evmOutputs: EVMOutput[] = []
           
 const main = async (): Promise<any> => {
-  const avaxAsetID: Buffer = await cchain.getAVAXAssetID()
   const u: any = await cchain.getUTXOs(cAddressStrings[0], "X")
   const utxoSet: UTXOSet = u.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()

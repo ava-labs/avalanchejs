@@ -60,7 +60,7 @@ const main = async (): Promise<any> => {
   ], "ext/bc/C/rpc")
   const antAssetBalance: number = parseInt(antAssetBalanceResponse.data.result, 16)
   let avaxBalance: BN = await web3.eth.getBalance(cHexAddress)
-  avaxBalance = new BN(avaxBalance.toString().substring(0, 15))
+  avaxBalance = new BN(avaxBalance.toString().substring(0, 17))
   const fee: BN = cchain.getDefaultTxFee()
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount;

@@ -51,7 +51,7 @@ const main = async (): Promise<any> => {
   const avaxAssetIDBuf: Buffer = await xchain.getAVAXAssetID()
   const avaxAssetIDStr: string = bintools.cb58Encode(avaxAssetIDBuf)
   let balance: BN = await web3.eth.getBalance(cHexAddress)
-  balance = new BN(balance.toString().substring(0, 15))
+  balance = new BN(balance.toString().substring(0, 17))
   const fee: BN = cchain.getDefaultTxFee()
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount;
