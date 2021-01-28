@@ -21,7 +21,7 @@ import {
   ParseableOutput
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common";
-import { Defaults, UnixNow } from "../../src/utils"
+import { Defaults, NodeIDStringToBuffer, UnixNow } from "../../src/utils"
       
 const ip: string = "localhost"
 const port: number = 9650
@@ -43,7 +43,7 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = bintools.stringToBuffer("Manually add a validator to the primary subnet")
-const nodeID: string = "DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
+const nodeID: string = "NodeID-DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
 const startTime: BN = UnixNow().add(new BN(60 * 1))
 const endTime: BN = startTime.add(new BN(26300000))
 const delegationFee: number = 10
@@ -89,7 +89,7 @@ const main = async (): Promise<any> => {
     outputs,
     inputs,
     memo,
-    bintools.cb58Decode(nodeID),
+    NodeIDStringToBuffer(nodeID),
     startTime,
     endTime,
     stakeAmount.minValidatorStake,
