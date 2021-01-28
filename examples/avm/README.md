@@ -6,13 +6,16 @@ Tests for the Avalanche [AVM RPC](https://docs.avax.network/build/avalanchego-ap
 
 * [buildBaseTx-ant.ts](./buildBaseTx-ant.ts)
 * [buildBaseTx-avax.ts](./buildBaseTx-avax.ts)
-* [buildCreateAssetTx-ant.ts](./buildCreateAssetTx-ant.ts)
+* [buildCreateAssetTx.ts](./buildCreateAssetTx.ts)
 * [buildCreateNFTAssetTx.ts](./buildCreateNFTAssetTx.ts)
 * [buildCreateNFTMintTx.ts](./buildCreateNFTMintTx.ts)
-* [buildExportTx-PChain.ts](./buildExportTx-PChain.ts)
-* [buildImportTx-PChain.ts](./buildImportTx-PChain.ts)
+* [buildExportTx-cchain-ant.ts](./buildExportTx-cchain-ant.ts)
+* [buildExportTx-cchain-avax.ts](./buildExportTx-cchain-avax.ts)
+* [buildExportTx-pchain.ts](./buildExportTx-pchain.ts)
+* [buildImportTx-cchain.ts](./buildImportTx-cchain.ts)
+* [buildImportTx-pchain.ts](./buildImportTx-pchain.ts)
 * [buildNFTTransferTx.ts](./buildNFTTransferTx.ts)
-* [buildSECPMintTx-ant.ts](./buildSECPMintTx-ant.ts)
+* [buildSECPMintTx.ts](./buildSECPMintTx.ts)
 
 ## Manual
 
