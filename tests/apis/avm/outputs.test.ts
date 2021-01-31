@@ -40,6 +40,15 @@ describe('Outputs', () => {
           expect(cmp(outpayment1, outpayment3)).toBe(1);
       });
 
+    test("NFTMintOutput codec ids", () => {
+        const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
+        expect(nftMintOutput.getCodecID()).toBe(0);
+        nftMintOutput.setCodecID(1)
+        expect(nftMintOutput.getCodecID()).toBe(1);
+        nftMintOutput.setCodecID(0)
+        expect(nftMintOutput.getCodecID()).toBe(0);
+    });
+
       test('Functionality', () => {
           let out:NFTMintOutput = new NFTMintOutput(0, addrs, fallLocktime, 3);
           expect(out.getOutputID()).toBe(10);
@@ -135,6 +144,18 @@ describe('Outputs', () => {
           expect(m4).toBe(true);
       });
 
+      test("SECPTransferOutput codec ids", () => {
+        const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
+        expect(secPTransferOutput.getCodecID()).toBe(0);
+        expect(secPTransferOutput.getOutputID()).toBe(7);
+        secPTransferOutput.setCodecID(1)
+        expect(secPTransferOutput.getCodecID()).toBe(1);
+        expect(secPTransferOutput.getOutputID()).toBe(65538);
+        secPTransferOutput.setCodecID(0)
+        expect(secPTransferOutput.getCodecID()).toBe(0);
+        expect(secPTransferOutput.getOutputID()).toBe(7);
+      });
+
       test('SECPMintOutput', () => {
         let out:SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
         expect(out.getOutputID()).toBe(6);
@@ -164,5 +185,17 @@ describe('Outputs', () => {
         let m4:boolean = out.meetsThreshold(addrs, locktime.add(new BN(100)));
         expect(m4).toBe(true);
     });
+
+      test("SECPMintOutput codec ids", () => {
+        let secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
+        expect(secpMintOutput.getCodecID()).toBe(0);
+        expect(secpMintOutput.getOutputID()).toBe(6);
+        secpMintOutput.setCodecID(1)
+        expect(secpMintOutput.getCodecID()).toBe(1);
+        expect(secpMintOutput.getOutputID()).toBe(65537);
+        secpMintOutput.setCodecID(0)
+        expect(secpMintOutput.getCodecID()).toBe(0);
+        expect(secpMintOutput.getOutputID()).toBe(6);
+      });
     });
 });

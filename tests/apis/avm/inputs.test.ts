@@ -112,4 +112,16 @@ describe('Inputs', () => {
     expect(cmp(in2, in2)).toBe(0);
     expect(cmp(in3, in3)).toBe(0);
   });
+
+  test('TransferableInput codec ids', () => {
+    const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
+    expect(secpTransferInput.getCodecID()).toBe(0);
+    expect(secpTransferInput.getInputID()).toBe(5);
+    secpTransferInput.setCodecID(1)
+    expect(secpTransferInput.getCodecID()).toBe(1);
+    expect(secpTransferInput.getInputID()).toBe(65536);
+    secpTransferInput.setCodecID(0)
+    expect(secpTransferInput.getCodecID()).toBe(0);
+    expect(secpTransferInput.getInputID()).toBe(5);
+  });
 });

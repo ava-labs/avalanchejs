@@ -162,6 +162,66 @@ describe('Transactions', () => {
     set.addArray(utxos);
   });
 
+  test("BaseTx codec ids", () => {
+    const baseTx: BaseTx = new BaseTx();
+    expect(baseTx.getCodecID()).toBe(0);
+    expect(baseTx.getTypeID()).toBe(0);
+    baseTx.setCodecID(1)
+    expect(baseTx.getCodecID()).toBe(1);
+    expect(baseTx.getTypeID()).toBe(0);
+    baseTx.setCodecID(0)
+    expect(baseTx.getCodecID()).toBe(0);
+    expect(baseTx.getTypeID()).toBe(0);
+  });
+
+  test("CreateAssetTx codec ids", () => {
+    const createAssetTx: CreateAssetTx = new CreateAssetTx();
+    expect(createAssetTx.getCodecID()).toBe(0);
+    expect(createAssetTx.getTypeID()).toBe(1);
+    createAssetTx.setCodecID(1)
+    expect(createAssetTx.getCodecID()).toBe(1);
+    expect(createAssetTx.getTypeID()).toBe(1);
+    createAssetTx.setCodecID(0)
+    expect(createAssetTx.getCodecID()).toBe(0);
+    expect(createAssetTx.getTypeID()).toBe(1);
+  });
+
+  test("OperationTx codec ids", () => {
+    const operationTx: OperationTx = new OperationTx();
+    expect(operationTx.getCodecID()).toBe(0);
+    expect(operationTx.getTypeID()).toBe(2);
+    operationTx.setCodecID(1)
+    expect(operationTx.getCodecID()).toBe(1);
+    expect(operationTx.getTypeID()).toBe(2);
+    operationTx.setCodecID(0)
+    expect(operationTx.getCodecID()).toBe(0);
+    expect(operationTx.getTypeID()).toBe(2);
+  });
+
+  test("ImportTx codec ids", () => {
+    const importTx: ImportTx = new ImportTx();
+    expect(importTx.getCodecID()).toBe(0);
+    expect(importTx.getTypeID()).toBe(3);
+    importTx.setCodecID(1)
+    expect(importTx.getCodecID()).toBe(1);
+    expect(importTx.getTypeID()).toBe(3);
+    importTx.setCodecID(0)
+    expect(importTx.getCodecID()).toBe(0);
+    expect(importTx.getTypeID()).toBe(3);
+  });
+
+  test("ExportTx codec ids", () => {
+    const exportTx: ExportTx = new ExportTx();
+    expect(exportTx.getCodecID()).toBe(0);
+    expect(exportTx.getTypeID()).toBe(4);
+    exportTx.setCodecID(1)
+    expect(exportTx.getCodecID()).toBe(1);
+    expect(exportTx.getTypeID()).toBe(4);
+    exportTx.setCodecID(0)
+    expect(exportTx.getCodecID()).toBe(0);
+    expect(exportTx.getTypeID()).toBe(4);
+  });
+
   test('Create small BaseTx that is Goose Egg Tx', async () => {
     const bintools: BinTools = BinTools.getInstance();
     const outs:TransferableOutput[] = [];

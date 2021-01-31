@@ -67,6 +67,20 @@ describe('Operations', () => {
             opcopy.fromBuffer(opb);
             expect(opcopy.toString()).toBe(op.toString());
         });
+
+        test("NFTMintOperation codec ids", () => {
+          const outputOwners: OutputOwners[] = [];
+          outputOwners.push(new OutputOwners(addrs, locktime, 1));
+          const nftMintOperation: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
+          expect(nftMintOperation.getCodecID()).toBe(0);
+          expect(nftMintOperation.getOperationID()).toBe(12);
+          nftMintOperation.setCodecID(1)
+          expect(nftMintOperation.getCodecID()).toBe(1);
+          expect(nftMintOperation.getOperationID()).toBe(131074);
+          nftMintOperation.setCodecID(0)
+          expect(nftMintOperation.getCodecID()).toBe(0);
+          expect(nftMintOperation.getOperationID()).toBe(12);
+        });
     })
 
     describe('NFTTransferOperation', () => {
@@ -108,6 +122,18 @@ describe('Operations', () => {
             expect(sigidx[0].getSource().toString("hex")).toBe(addrs[0].toString("hex"));
             opcopy.fromBuffer(op.toBuffer());
             expect(opcopy.toString()).toBe(op.toString());
+        });
+
+        test("NFTTransferOperation codec ids", () => {
+          const nftTransferOperation: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
+          expect(nftTransferOperation.getCodecID()).toBe(0);
+          expect(nftTransferOperation.getOperationID()).toBe(13);
+          nftTransferOperation.setCodecID(1)
+          expect(nftTransferOperation.getCodecID()).toBe(1);
+          expect(nftTransferOperation.getOperationID()).toBe(131075);
+          nftTransferOperation.setCodecID(0)
+          expect(nftTransferOperation.getCodecID()).toBe(0);
+          expect(nftTransferOperation.getOperationID()).toBe(13);
         });
     })
 
