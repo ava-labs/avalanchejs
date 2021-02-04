@@ -115,7 +115,7 @@ describe('Inputs', () => {
     expect(cmp(in3, in3)).toBe(0);
   });
 
-  test('TransferableInput codec ids', () => {
+  test('SECPTransferInput codecIDs', (): void => {
     const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
     expect(secpTransferInput.getCodecID()).toBe(codecID_zero);
     expect(secpTransferInput.getInputID()).toBe(AVMConstants.SECPINPUTID);
@@ -127,7 +127,7 @@ describe('Inputs', () => {
     expect(secpTransferInput.getInputID()).toBe(AVMConstants.SECPINPUTID);
   });
 
-  test('Invalid TransferableInput codec ids', () => {
+  test("Invalid SECPTransferInput codecID", (): void => {
     const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
     expect(() => {
       secpTransferInput.setCodecID(2)

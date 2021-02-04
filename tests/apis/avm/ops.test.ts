@@ -69,7 +69,7 @@ describe('Operations', () => {
             expect(opcopy.toString()).toBe(op.toString());
         });
 
-        test("NFTMintOperation codec ids", () => {
+        test("NFTMintOperation codecIDs", (): void => {
           const outputOwners: OutputOwners[] = [];
           outputOwners.push(new OutputOwners(addrs, locktime, 1));
           const nftMintOperation: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
@@ -81,6 +81,15 @@ describe('Operations', () => {
           nftMintOperation.setCodecID(codecID_zero)
           expect(nftMintOperation.getCodecID()).toBe(codecID_zero);
           expect(nftMintOperation.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
+        });
+
+        test("Invalid NFTMintOperation codecID", (): void => {
+          const outputOwners: OutputOwners[] = [];
+          outputOwners.push(new OutputOwners(addrs, locktime, 1));
+          const nftMintOperation: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
+          expect(() => {
+            nftMintOperation.setCodecID(2)
+          }).toThrow("Error - NFTMintOperation.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
         });
     })
 
@@ -125,7 +134,7 @@ describe('Operations', () => {
             expect(opcopy.toString()).toBe(op.toString());
         });
 
-        test("NFTTransferOperation codec ids", () => {
+        test("NFTTransferOperation codecIDs", (): void => {
           const nftTransferOperation: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
           expect(nftTransferOperation.getCodecID()).toBe(codecID_zero);
           expect(nftTransferOperation.getOperationID()).toBe(AVMConstants.NFTXFEROPID);
@@ -135,6 +144,13 @@ describe('Operations', () => {
           nftTransferOperation.setCodecID(codecID_zero)
           expect(nftTransferOperation.getCodecID()).toBe(codecID_zero);
           expect(nftTransferOperation.getOperationID()).toBe(AVMConstants.NFTXFEROPID);
+        });
+
+        test("Invalid NFTTransferOperation codecID", (): void => {
+          const nftTransferOperation: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
+          expect(() => {
+            nftTransferOperation.setCodecID(2)
+          }).toThrow("Error - NFTTransferOperation.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
         });
     })
 

@@ -43,17 +43,24 @@ describe('Outputs', () => {
           expect(cmp(outpayment1, outpayment3)).toBe(1);
       });
 
-    test("NFTMintOutput codec ids", () => {
-        const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
-        expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
-        expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
-        nftMintOutput.setCodecID(codecID_one)
-        expect(nftMintOutput.getCodecID()).toBe(codecID_one);
-        expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID_CODECONE);
-        nftMintOutput.setCodecID(codecID_zero)
-        expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
-        expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
-    });
+      test("NFTMintOutput codecIDs", (): void => {
+          const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
+          expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
+          expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
+          nftMintOutput.setCodecID(codecID_one)
+          expect(nftMintOutput.getCodecID()).toBe(codecID_one);
+          expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID_CODECONE);
+          nftMintOutput.setCodecID(codecID_zero)
+          expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
+          expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
+      });
+
+      test("Invalid NFTMintOutput codecID", (): void => {
+          const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
+          expect(() => {
+            nftMintOutput.setCodecID(2)
+          }).toThrow("Error - NFTMintOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+      });
 
       test('Functionality', () => {
           let out:NFTMintOutput = new NFTMintOutput(0, addrs, fallLocktime, 3);
@@ -150,7 +157,7 @@ describe('Outputs', () => {
           expect(m4).toBe(true);
       });
 
-      test("SECPTransferOutput codec ids", () => {
+      test("SECPTransferOutput codecIDs", () => {
         const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
         expect(secPTransferOutput.getCodecID()).toBe(codecID_zero);
         expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID);
@@ -160,6 +167,13 @@ describe('Outputs', () => {
         secPTransferOutput.setCodecID(codecID_zero)
         expect(secPTransferOutput.getCodecID()).toBe(codecID_zero);
         expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID);
+      });
+
+      test("Invalid SECPTransferOutput codecID", (): void => {
+          const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
+          expect(() => {
+            secPTransferOutput.setCodecID(2)
+          }).toThrow("Error - SECPTransferOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
       });
 
       test('SECPMintOutput', () => {
@@ -192,7 +206,7 @@ describe('Outputs', () => {
         expect(m4).toBe(true);
     });
 
-      test("SECPMintOutput codec ids", () => {
+      test("SECPMintOutput codecIDs", () => {
         let secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
         expect(secpMintOutput.getCodecID()).toBe(codecID_zero);
         expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID);
@@ -202,6 +216,13 @@ describe('Outputs', () => {
         secpMintOutput.setCodecID(codecID_zero)
         expect(secpMintOutput.getCodecID()).toBe(codecID_zero);
         expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID);
+      });
+
+      test("Invalid SECPMintOutput codecID", (): void => {
+          const secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
+          expect(() => {
+            secpMintOutput.setCodecID(2)
+          }).toThrow("Error - SECPMintOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
       });
     });
 });

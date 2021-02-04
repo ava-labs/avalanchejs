@@ -164,7 +164,7 @@ describe('Transactions', () => {
     set.addArray(utxos);
   });
 
-  test("BaseTx codec ids", () => {
+  test("BaseTx codecIDs", () => {
     const baseTx: BaseTx = new BaseTx();
     expect(baseTx.getCodecID()).toBe(codecID_zero);
     expect(baseTx.getTypeID()).toBe(AVMConstants.BASETX);
@@ -176,7 +176,14 @@ describe('Transactions', () => {
     expect(baseTx.getTypeID()).toBe(AVMConstants.BASETX);
   });
 
-  test("CreateAssetTx codec ids", () => {
+  test("Invalid BaseTx codecID", (): void => {
+    const baseTx: BaseTx = new BaseTx();
+    expect(() => {
+      baseTx.setCodecID(2)
+    }).toThrow("Error - BaseTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+  });
+
+  test("CreateAssetTx codecIDs", () => {
     const createAssetTx: CreateAssetTx = new CreateAssetTx();
     expect(createAssetTx.getCodecID()).toBe(codecID_zero);
     expect(createAssetTx.getTypeID()).toBe(AVMConstants.CREATEASSETTX);
@@ -188,7 +195,14 @@ describe('Transactions', () => {
     expect(createAssetTx.getTypeID()).toBe(AVMConstants.CREATEASSETTX);
   });
 
-  test("OperationTx codec ids", () => {
+  test("Invalid CreateAssetTx codecID", (): void => {
+    const createAssetTx: CreateAssetTx = new CreateAssetTx();
+    expect(() => {
+      createAssetTx.setCodecID(2)
+    }).toThrow("Error - CreateAssetTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+  });
+
+  test("OperationTx codecIDs", () => {
     const operationTx: OperationTx = new OperationTx();
     expect(operationTx.getCodecID()).toBe(codecID_zero);
     expect(operationTx.getTypeID()).toBe(AVMConstants.OPERATIONTX);
@@ -200,7 +214,14 @@ describe('Transactions', () => {
     expect(operationTx.getTypeID()).toBe(AVMConstants.OPERATIONTX);
   });
 
-  test("ImportTx codec ids", () => {
+  test("Invalid OperationTx codecID", (): void => {
+    const operationTx: OperationTx = new OperationTx();
+    expect(() => {
+      operationTx.setCodecID(2)
+    }).toThrow("Error - OperationTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+  });
+
+  test("ImportTx codecIDs", () => {
     const importTx: ImportTx = new ImportTx();
     expect(importTx.getCodecID()).toBe(codecID_zero);
     expect(importTx.getTypeID()).toBe(AVMConstants.IMPORTTX);
@@ -212,7 +233,14 @@ describe('Transactions', () => {
     expect(importTx.getTypeID()).toBe(AVMConstants.IMPORTTX);
   });
 
-  test("ExportTx codec ids", () => {
+  test("Invalid ImportTx codecID", (): void => {
+    const importTx: ImportTx = new ImportTx();
+    expect(() => {
+      importTx.setCodecID(2)
+    }).toThrow("Error - ImportTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+  });
+
+  test("ExportTx codecIDs", () => {
     const exportTx: ExportTx = new ExportTx();
     expect(exportTx.getCodecID()).toBe(codecID_zero);
     expect(exportTx.getTypeID()).toBe(AVMConstants.EXPORTTX);
@@ -222,6 +250,13 @@ describe('Transactions', () => {
     exportTx.setCodecID(codecID_zero)
     expect(exportTx.getCodecID()).toBe(codecID_zero);
     expect(exportTx.getTypeID()).toBe(AVMConstants.EXPORTTX);
+  });
+
+  test("Invalid ExportTx codecID", (): void => {
+    const exportTx: ExportTx = new ExportTx();
+    expect(() => {
+      exportTx.setCodecID(2)
+    }).toThrow("Error - ExportTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
   });
 
   test('Create small BaseTx that is Goose Egg Tx', async () => {
