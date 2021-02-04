@@ -93,7 +93,7 @@ const main = async (): Promise<any> => {
     memo
   )
   // Uncomment for codecID 00 01
-  // secpTransferInput.setCodecID(codecID)
+  // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
   const id: string = await xchain.issueTx(tx)

@@ -4,10 +4,13 @@ import BinTools from 'src/utils/bintools';
 import { SECPTransferOutput, SelectOutputClass, NFTMintOutput } from 'src/apis/avm/outputs';
 import { Output } from 'src/common/output';
 import { SECPMintOutput } from '../../../src/apis/avm/outputs';
+import { AVMConstants } from 'src/apis/avm';
 
 const bintools = BinTools.getInstance();
 
 describe('Outputs', () => {
+    const codecID_zero: number = 0;
+    const codecID_one: number = 1;
     describe('NFTMintOutput', () => {
       let addrs:Array<Buffer> = [
           bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
@@ -42,11 +45,14 @@ describe('Outputs', () => {
 
     test("NFTMintOutput codec ids", () => {
         const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
-        expect(nftMintOutput.getCodecID()).toBe(0);
-        nftMintOutput.setCodecID(1)
-        expect(nftMintOutput.getCodecID()).toBe(1);
-        nftMintOutput.setCodecID(0)
-        expect(nftMintOutput.getCodecID()).toBe(0);
+        expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
+        expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
+        nftMintOutput.setCodecID(codecID_one)
+        expect(nftMintOutput.getCodecID()).toBe(codecID_one);
+        expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID_CODECONE);
+        nftMintOutput.setCodecID(codecID_zero)
+        expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
+        expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
     });
 
       test('Functionality', () => {
@@ -146,14 +152,14 @@ describe('Outputs', () => {
 
       test("SECPTransferOutput codec ids", () => {
         const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
-        expect(secPTransferOutput.getCodecID()).toBe(0);
-        expect(secPTransferOutput.getOutputID()).toBe(7);
-        secPTransferOutput.setCodecID(1)
-        expect(secPTransferOutput.getCodecID()).toBe(1);
-        expect(secPTransferOutput.getOutputID()).toBe(65538);
-        secPTransferOutput.setCodecID(0)
-        expect(secPTransferOutput.getCodecID()).toBe(0);
-        expect(secPTransferOutput.getOutputID()).toBe(7);
+        expect(secPTransferOutput.getCodecID()).toBe(codecID_zero);
+        expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID);
+        secPTransferOutput.setCodecID(codecID_one)
+        expect(secPTransferOutput.getCodecID()).toBe(codecID_one);
+        expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID_CODECONE);
+        secPTransferOutput.setCodecID(codecID_zero)
+        expect(secPTransferOutput.getCodecID()).toBe(codecID_zero);
+        expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID);
       });
 
       test('SECPMintOutput', () => {
@@ -188,14 +194,14 @@ describe('Outputs', () => {
 
       test("SECPMintOutput codec ids", () => {
         let secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
-        expect(secpMintOutput.getCodecID()).toBe(0);
-        expect(secpMintOutput.getOutputID()).toBe(6);
-        secpMintOutput.setCodecID(1)
-        expect(secpMintOutput.getCodecID()).toBe(1);
-        expect(secpMintOutput.getOutputID()).toBe(65537);
-        secpMintOutput.setCodecID(0)
-        expect(secpMintOutput.getCodecID()).toBe(0);
-        expect(secpMintOutput.getOutputID()).toBe(6);
+        expect(secpMintOutput.getCodecID()).toBe(codecID_zero);
+        expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID);
+        secpMintOutput.setCodecID(codecID_one)
+        expect(secpMintOutput.getCodecID()).toBe(codecID_one);
+        expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID_CODECONE);
+        secpMintOutput.setCodecID(codecID_zero)
+        expect(secpMintOutput.getCodecID()).toBe(codecID_zero);
+        expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID);
       });
     });
 });

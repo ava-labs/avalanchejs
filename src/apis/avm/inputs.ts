@@ -82,6 +82,10 @@ export class SECPTransferInput extends AmountInput {
   //serialize and deserialize both are inherited
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - SECPTransferInput.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPINPUTID : AVMConstants.SECPINPUTID_CODECONE;
   }

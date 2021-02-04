@@ -51,6 +51,10 @@ export class OperationTx extends BaseTx {
   protected ops:Array<TransferableOperation> = [];
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - OperationTx.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE;
   }

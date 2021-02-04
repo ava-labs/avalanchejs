@@ -1,11 +1,11 @@
-import { 
+import {
   Avalanche,
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
-  AVMAPI, 
+  AVMAPI,
   KeyChain as AVMKeyChain,
   SECPTransferOutput,
   SECPTransferInput,
@@ -19,7 +19,7 @@ import {
   BaseTx
 } from "../../src/apis/avm"
 import { Defaults } from "../../src/utils"
-    
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -40,15 +40,15 @@ const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = bintools.stringToBuffer("AVM manual BaseTx to send AVAX")
 // Uncomment for codecID 00 01
-// const codecID: number = 1;
-    
+const codecID: number = 2
+
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
   const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
   const balance: BN = new BN(getBalanceResponse['balance'])
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
-//   secpTransferOutput.setCodecID(codecID)
+  // secpTransferOutput.setCodecID(codecID)
   const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
   outputs.push(transferableOutput)
 
@@ -70,7 +70,7 @@ const main = async (): Promise<any> => {
     inputs.push(input)
   })
 
-  const baseTx: BaseTx = new BaseTx (
+  const baseTx: BaseTx = new BaseTx(
     networkID,
     bintools.cb58Decode(blockchainid),
     outputs,
@@ -78,12 +78,14 @@ const main = async (): Promise<any> => {
     memo
   )
   // Uncomment for codecID 00 01
-//   baseTx.setCodecID(codecID)
+  baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
+  // console.log(tx.toBuffer().toString("hex"))
+  // const serialized: any = baseTx.serialize("display")
+  // console.log(JSON.stringify(serialized))
   const id: string = await xchain.issueTx(tx)
   console.log(id)
 }
-  
+
 main()
-  

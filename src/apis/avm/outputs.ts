@@ -105,6 +105,10 @@ export class SECPTransferOutput extends AmountOutput {
   //serialize and deserialize both are inherited
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - SECPTransferOutput.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPXFEROUTPUTID : AVMConstants.SECPXFEROUTPUTID_CODECONE;
   }
@@ -139,6 +143,10 @@ export class SECPMintOutput extends Output {
   //serialize and deserialize both are inherited
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - SECPMintOutput.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPMINTOUTPUTID : AVMConstants.SECPMINTOUTPUTID_CODECONE;
   }
@@ -185,6 +193,10 @@ export class NFTMintOutput extends NFTOutput {
   //serialize and deserialize both are inherited
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - NFTMintOutput.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTMINTOUTPUTID : AVMConstants.NFTMINTOUTPUTID_CODECONE;
   }
@@ -267,6 +279,10 @@ export class NFTTransferOutput extends NFTOutput {
   protected payload:Buffer;
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - NFTTransferOutput.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTXFEROUTPUTID : AVMConstants.NFTXFEROUTPUTID_CODECONE;
   }

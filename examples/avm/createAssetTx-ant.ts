@@ -53,7 +53,7 @@ const main = async (): Promise<any> => {
   const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
-//   secpTransferOutput.setCodecID(codecID)
+  // secpTransferOutput.setCodecID(codecID)
   const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
   outputs.push(transferableOutput)
   
@@ -67,9 +67,9 @@ const main = async (): Promise<any> => {
     const outputidx: Buffer = utxo.getOutputIdx()
   
     const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-    secpTransferInput.addSignatureIdx(0, xAddresses[0])
     // Uncomment for codecID 00 01
     // secpTransferInput.setCodecID(codecID)
+    secpTransferInput.addSignatureIdx(0, xAddresses[0])
   
     const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
     inputs.push(input)
@@ -78,10 +78,10 @@ const main = async (): Promise<any> => {
   const amount: BN = new BN(507)
   const vcapSecpOutput = new SECPTransferOutput(amount, xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
-//   vcapSecpOutput.setCodecID(codecID)
+  // vcapSecpOutput.setCodecID(codecID)
   const secpMintOutput: SECPMintOutput = new SECPMintOutput(xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
-//   secpMintOutput.setCodecID(codecID)
+  // secpMintOutput.setCodecID(codecID)
   
   const initialStates: InitialStates = new InitialStates()
   initialStates.addOutput(vcapSecpOutput)
@@ -99,7 +99,7 @@ const main = async (): Promise<any> => {
     initialStates
   )
   // Uncomment for codecID 00 01
-//   createAssetTx.setCodecID(codecID)
+  // createAssetTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(createAssetTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
   const id: string = await xchain.issueTx(tx)
