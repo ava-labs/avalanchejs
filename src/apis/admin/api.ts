@@ -56,6 +56,21 @@ export class AdminAPI extends JRPCAPI {
   };
 
   /**
+   * Get all aliases for given blockchain
+   *
+   * @param chain The blockchain’s ID
+   *
+   * @returns Returns a Promise<string[]> containing aliases of the blockchain.
+   */
+  getChainAliases = async (chain:string):Promise<string[]> => {
+    const params:any = {
+      chain,
+    };
+    return this.callMethod('admin.getChainAliases', params)
+      .then((response:RequestResponseData) => response.data.result.aliases);
+  };
+
+  /**
      * Dump the mutex statistics of the node to the specified file.
      *
      * @returns Promise for a boolean that is true on success.
