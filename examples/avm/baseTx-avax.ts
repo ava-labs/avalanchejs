@@ -40,7 +40,7 @@ const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = bintools.stringToBuffer("AVM manual BaseTx to send AVAX")
 // Uncomment for codecID 00 01
-const codecID: number = 2
+// const codecID: number = 1
 
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
@@ -78,7 +78,7 @@ const main = async (): Promise<any> => {
     memo
   )
   // Uncomment for codecID 00 01
-  baseTx.setCodecID(codecID)
+  // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
   // console.log(tx.toBuffer().toString("hex"))

@@ -56,7 +56,7 @@ const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = bintools.stringToBuffer("AVM manual OperationTx to mint an ANT")
 // Uncomment for codecID 00 01
-// const codecID: number = 1    
+// const codecID: number = 1
       
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
