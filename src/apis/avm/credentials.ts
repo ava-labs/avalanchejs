@@ -31,6 +31,10 @@ export class SECPCredential extends Credential {
   //serialize and deserialize both are inherited
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - SECPCredential.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPCREDENTIAL : AVMConstants.SECPCREDENTIAL_CODECONE;
   }
@@ -64,6 +68,10 @@ export class NFTCredential extends Credential {
   //serialize and deserialize both are inherited
 
   setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - NFTCredential.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTCREDENTIAL : AVMConstants.NFTCREDENTIAL_CODECONE;
   }
