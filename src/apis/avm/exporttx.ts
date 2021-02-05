@@ -24,7 +24,8 @@ const serializer = Serialization.getInstance();
  */
 export class ExportTx extends BaseTx {
   protected _typeName = "ExportTx";
-  protected _typeID = AVMConstants.EXPORTTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.EXPORTTX : AVMConstants.EXPORTTX_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -49,6 +50,15 @@ export class ExportTx extends BaseTx {
   protected destinationChain:Buffer = undefined;
   protected numOuts:Buffer = Buffer.alloc(4);
   protected exportOuts:Array<TransferableOutput> = [];
+
+  setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - ExportTx.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.EXPORTTX : AVMConstants.EXPORTTX_CODECONE;
+  }
 
   /**
      * Returns the id of the [[ExportTx]]

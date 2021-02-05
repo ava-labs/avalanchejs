@@ -20,7 +20,8 @@ const serializer = Serialization.getInstance();
 
 export class CreateAssetTx extends BaseTx {
   protected _typeName = "CreateAssetTx";
-  protected _typeID = AVMConstants.CREATEASSETTX;
+  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE;
 
   serialize(encoding:SerializedEncoding = "hex"):object {
     let fields:object = super.serialize(encoding);
@@ -45,6 +46,15 @@ export class CreateAssetTx extends BaseTx {
   protected symbol:string = '';
   protected denomination:Buffer = Buffer.alloc(1);
   protected initialstate:InitialStates = new InitialStates();
+
+  setCodecID(codecID: number): void {
+    if(codecID !== 0 && codecID !== 1) {
+      /* istanbul ignore next */
+        throw new Error(`Error - CreateAssetTx.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+    }
+    this._codecID = codecID;
+    this._typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE;
+  }
 
   /**
    * Returns the id of the [[CreateAssetTx]]

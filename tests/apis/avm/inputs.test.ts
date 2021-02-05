@@ -25,6 +25,8 @@ describe('Inputs', () => {
   let utxos:Array<UTXO>;
   let hrp:string = "tests";
   const amnt:number = 10000;
+  const codecID_zero: number = 0;
+  const codecID_one: number = 1;
   beforeEach(() => {
     set = new UTXOSet();
     keymgr1 = new KeyChain(hrp, 'X');
@@ -111,5 +113,24 @@ describe('Inputs', () => {
     expect(cmp(in1, in1)).toBe(0);
     expect(cmp(in2, in2)).toBe(0);
     expect(cmp(in3, in3)).toBe(0);
+  });
+
+  test('SECPTransferInput codecIDs', (): void => {
+    const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
+    expect(secpTransferInput.getCodecID()).toBe(codecID_zero);
+    expect(secpTransferInput.getInputID()).toBe(AVMConstants.SECPINPUTID);
+    secpTransferInput.setCodecID(codecID_one)
+    expect(secpTransferInput.getCodecID()).toBe(codecID_one);
+    expect(secpTransferInput.getInputID()).toBe(AVMConstants.SECPINPUTID_CODECONE);
+    secpTransferInput.setCodecID(codecID_zero)
+    expect(secpTransferInput.getCodecID()).toBe(codecID_zero);
+    expect(secpTransferInput.getInputID()).toBe(AVMConstants.SECPINPUTID);
+  });
+
+  test("Invalid SECPTransferInput codecID", (): void => {
+    const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
+    expect(() => {
+      secpTransferInput.setCodecID(2)
+    }).toThrow("Error - SECPTransferInput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
   });
 });

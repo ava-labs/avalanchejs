@@ -4,10 +4,13 @@ import BinTools from 'src/utils/bintools';
 import { SECPTransferOutput, SelectOutputClass, NFTMintOutput } from 'src/apis/avm/outputs';
 import { Output } from 'src/common/output';
 import { SECPMintOutput } from '../../../src/apis/avm/outputs';
+import { AVMConstants } from 'src/apis/avm';
 
 const bintools = BinTools.getInstance();
 
 describe('Outputs', () => {
+    const codecID_zero: number = 0;
+    const codecID_one: number = 1;
     describe('NFTMintOutput', () => {
       let addrs:Array<Buffer> = [
           bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
@@ -38,6 +41,25 @@ describe('Outputs', () => {
           expect(cmp(outpayment3, outpayment3)).toBe(0);
           expect(cmp(outpayment1, outpayment2)).toBe(-1);
           expect(cmp(outpayment1, outpayment3)).toBe(1);
+      });
+
+      test("NFTMintOutput codecIDs", (): void => {
+          const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
+          expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
+          expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
+          nftMintOutput.setCodecID(codecID_one)
+          expect(nftMintOutput.getCodecID()).toBe(codecID_one);
+          expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID_CODECONE);
+          nftMintOutput.setCodecID(codecID_zero)
+          expect(nftMintOutput.getCodecID()).toBe(codecID_zero);
+          expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID);
+      });
+
+      test("Invalid NFTMintOutput codecID", (): void => {
+          const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
+          expect(() => {
+            nftMintOutput.setCodecID(2)
+          }).toThrow("Error - NFTMintOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
       });
 
       test('Functionality', () => {
@@ -135,6 +157,25 @@ describe('Outputs', () => {
           expect(m4).toBe(true);
       });
 
+      test("SECPTransferOutput codecIDs", () => {
+        const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
+        expect(secPTransferOutput.getCodecID()).toBe(codecID_zero);
+        expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID);
+        secPTransferOutput.setCodecID(codecID_one)
+        expect(secPTransferOutput.getCodecID()).toBe(codecID_one);
+        expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID_CODECONE);
+        secPTransferOutput.setCodecID(codecID_zero)
+        expect(secPTransferOutput.getCodecID()).toBe(codecID_zero);
+        expect(secPTransferOutput.getOutputID()).toBe(AVMConstants.SECPXFEROUTPUTID);
+      });
+
+      test("Invalid SECPTransferOutput codecID", (): void => {
+          const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
+          expect(() => {
+            secPTransferOutput.setCodecID(2)
+          }).toThrow("Error - SECPTransferOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+      });
+
       test('SECPMintOutput', () => {
         let out:SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
         expect(out.getOutputID()).toBe(6);
@@ -164,5 +205,24 @@ describe('Outputs', () => {
         let m4:boolean = out.meetsThreshold(addrs, locktime.add(new BN(100)));
         expect(m4).toBe(true);
     });
+
+      test("SECPMintOutput codecIDs", () => {
+        let secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
+        expect(secpMintOutput.getCodecID()).toBe(codecID_zero);
+        expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID);
+        secpMintOutput.setCodecID(codecID_one)
+        expect(secpMintOutput.getCodecID()).toBe(codecID_one);
+        expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID_CODECONE);
+        secpMintOutput.setCodecID(codecID_zero)
+        expect(secpMintOutput.getCodecID()).toBe(codecID_zero);
+        expect(secpMintOutput.getOutputID()).toBe(AVMConstants.SECPMINTOUTPUTID);
+      });
+
+      test("Invalid SECPMintOutput codecID", (): void => {
+          const secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
+          expect(() => {
+            secpMintOutput.setCodecID(2)
+          }).toThrow("Error - SECPMintOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+      });
     });
 });

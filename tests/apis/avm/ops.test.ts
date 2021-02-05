@@ -16,6 +16,8 @@ import { UTXOID } from 'src/apis/avm/ops';
 const bintools = BinTools.getInstance();
 
 describe('Operations', () => {
+    const codecID_zero: number = 0;
+    const codecID_one: number = 1;
     let assetID:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
     let assetIDBuff:Buffer = Buffer.from(assetID, "hex");
     let addrs:Array<Buffer> = [
@@ -25,7 +27,6 @@ describe('Operations', () => {
     ].sort();
 
     let locktime:BN = new BN(54321);
-    let addrpay = [addrs[0], addrs[1]];
 
     let payload:Buffer = Buffer.alloc(1024);
     payload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8" );
@@ -66,6 +67,29 @@ describe('Operations', () => {
             let opb:Buffer = op.toBuffer();
             opcopy.fromBuffer(opb);
             expect(opcopy.toString()).toBe(op.toString());
+        });
+
+        test("NFTMintOperation codecIDs", (): void => {
+          const outputOwners: OutputOwners[] = [];
+          outputOwners.push(new OutputOwners(addrs, locktime, 1));
+          const nftMintOperation: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
+          expect(nftMintOperation.getCodecID()).toBe(codecID_zero);
+          expect(nftMintOperation.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
+          nftMintOperation.setCodecID(codecID_one)
+          expect(nftMintOperation.getCodecID()).toBe(codecID_one);
+          expect(nftMintOperation.getOperationID()).toBe(AVMConstants.NFTMINTOPID_CODECONE);
+          nftMintOperation.setCodecID(codecID_zero)
+          expect(nftMintOperation.getCodecID()).toBe(codecID_zero);
+          expect(nftMintOperation.getOperationID()).toBe(AVMConstants.NFTMINTOPID);
+        });
+
+        test("Invalid NFTMintOperation codecID", (): void => {
+          const outputOwners: OutputOwners[] = [];
+          outputOwners.push(new OutputOwners(addrs, locktime, 1));
+          const nftMintOperation: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
+          expect(() => {
+            nftMintOperation.setCodecID(2)
+          }).toThrow("Error - NFTMintOperation.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
         });
     })
 
@@ -108,6 +132,25 @@ describe('Operations', () => {
             expect(sigidx[0].getSource().toString("hex")).toBe(addrs[0].toString("hex"));
             opcopy.fromBuffer(op.toBuffer());
             expect(opcopy.toString()).toBe(op.toString());
+        });
+
+        test("NFTTransferOperation codecIDs", (): void => {
+          const nftTransferOperation: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
+          expect(nftTransferOperation.getCodecID()).toBe(codecID_zero);
+          expect(nftTransferOperation.getOperationID()).toBe(AVMConstants.NFTXFEROPID);
+          nftTransferOperation.setCodecID(codecID_one)
+          expect(nftTransferOperation.getCodecID()).toBe(codecID_one);
+          expect(nftTransferOperation.getOperationID()).toBe(AVMConstants.NFTXFEROPID_CODECONE);
+          nftTransferOperation.setCodecID(codecID_zero)
+          expect(nftTransferOperation.getCodecID()).toBe(codecID_zero);
+          expect(nftTransferOperation.getOperationID()).toBe(AVMConstants.NFTXFEROPID);
+        });
+
+        test("Invalid NFTTransferOperation codecID", (): void => {
+          const nftTransferOperation: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
+          expect(() => {
+            nftTransferOperation.setCodecID(2)
+          }).toThrow("Error - NFTTransferOperation.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
         });
     })
 

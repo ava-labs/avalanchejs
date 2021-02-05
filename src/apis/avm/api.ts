@@ -925,6 +925,8 @@ export class AVMAPI extends JRPCAPI {
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param assetID Optional. The assetID of the asset to send. Defaults to AVAX assetID. 
+   * Regardless of the asset which you're exporting, all fees are paid in AVAX.
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
    */
@@ -938,7 +940,8 @@ export class AVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0), 
-    threshold:number = 1
+    threshold:number = 1,
+    assetID:string = undefined
   ):Promise<UnsignedTx> => {
     
     let prefixes:object = {};
@@ -973,12 +976,15 @@ export class AVMAPI extends JRPCAPI {
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
+    if(typeof assetID === "undefined") {
+      assetID = bintools.cb58Encode(avaxAssetID);
+    }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildExportTx(
       this.core.getNetworkID(), 
       bintools.cb58Decode(this.blockchainID), 
       amount,
-      avaxAssetID, 
+      bintools.cb58Decode(assetID), 
       to,
       from,
       change,
