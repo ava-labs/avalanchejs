@@ -70,7 +70,7 @@
     "bn.js": "4.11.8",
     "buffer": "5.5.0",
     "create-hash": "1.2.0",
-    "elliptic": "6.5.3",
+    "elliptic": "6.5.4",
     "node-forge": "^0.10.0",
     "secp256k1": "4.0.2",
     "store2": "2.11.0",
