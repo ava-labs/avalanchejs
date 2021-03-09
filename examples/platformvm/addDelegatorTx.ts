@@ -42,7 +42,7 @@ const stakeOuts: TransferableOutput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("Manually add a delegator to the primary subnet")
+const memo: Buffer = Buffer.from("Manually add a delegator to the primary subnet")
 const nodeID: string = "NodeID-DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
 const startTime: BN = UnixNow().add(new BN(60 * 1))
 const endTime: BN = startTime.add(new BN(2630000))
@@ -98,8 +98,8 @@ const main = async (): Promise<any> => {
 
   const unsignedTx: UnsignedTx = new UnsignedTx(addDelegatorTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
-  const id: string = await pchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

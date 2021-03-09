@@ -54,7 +54,7 @@ const operations: TransferableOperation[] = []
 const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("AVM manual OperationTx to mint an ANT")
+const memo: Buffer = Buffer.from("AVM manual OperationTx to mint an ANT")
 // Uncomment for codecID 00 01
 // const codecID: number = 1
       
@@ -133,8 +133,8 @@ const main = async (): Promise<any> => {
   // operationTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(operationTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

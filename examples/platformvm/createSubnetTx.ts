@@ -40,7 +40,7 @@ const inputs: TransferableInput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("Manually create a subnet")
+const memo: Buffer = Buffer.from("Manually create a subnet")
    
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
@@ -81,8 +81,8 @@ const main = async (): Promise<any> => {
 
   const unsignedTx: UnsignedTx = new UnsignedTx(createSubnetTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
-  const id: string = await pchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

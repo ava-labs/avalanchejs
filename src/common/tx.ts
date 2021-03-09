@@ -51,7 +51,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   protected outs:Array<StandardTransferableOutput>;
   protected numins:Buffer = Buffer.alloc(4);
   protected ins:Array<StandardTransferableInput>;
-  protected memo:Buffer = Buffer.alloc(4);
+  protected memo: Buffer = Buffer.alloc(0);
 
   /**
    * Returns the id of the [[StandardBaseTx]]
@@ -156,10 +156,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     super();
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
-    if(typeof memo === "undefined"){
-      this.memo = Buffer.alloc(4);
-      this.memo.writeUInt32BE(0,0);
-    } else {
+    if(typeof memo != "undefined"){
       this.memo = memo;
     }
     

@@ -28,7 +28,7 @@ const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildImportTx to import AVAX to the X-Chain from the C-Chain")
+const memo: Buffer = Buffer.from("AVM utility method buildImportTx to import AVAX to the X-Chain from the C-Chain")
         
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings, cChainBlockchainID)
@@ -47,8 +47,8 @@ const main = async (): Promise<any> => {
     threshold
   )
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
       
 main()

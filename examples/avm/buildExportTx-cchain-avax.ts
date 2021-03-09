@@ -32,7 +32,7 @@ const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildExportTx to export AVAX to the C-Chain from the X-Chain")
+const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export AVAX to the C-Chain from the X-Chain")
 const fee: BN = xchain.getDefaultTxFee()
         
 const main = async (): Promise<any> => {
@@ -57,8 +57,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
       
 main()

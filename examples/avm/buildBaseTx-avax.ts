@@ -27,7 +27,7 @@ const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildBaseTx to send AVAX")
+const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX");
 const fee: BN = xchain.getDefaultTxFee()
       
 const main = async (): Promise<any> => {
@@ -51,9 +51,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()
-    

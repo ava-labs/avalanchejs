@@ -39,7 +39,7 @@ xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildNFTTransferTx to transfer an ANT")
+const memo: Buffer = Buffer.from("AVM utility method buildNFTTransferTx to transfer an ANT")
 const asOf: BN = UnixNow()
       
 const main = async (): Promise<any> => {
@@ -71,7 +71,7 @@ const main = async (): Promise<any> => {
   
   const tx: Tx = unsignedTx.sign(xKeychain)
   const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  console.log(`Success! TXID: ${id}`)
 }
     
 main()
