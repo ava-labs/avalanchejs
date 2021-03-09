@@ -40,7 +40,7 @@ const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("Manually Export AVAX from X-Chain to P-Chain")
+const memo: Buffer = Buffer.from("Manually Export AVAX from X-Chain to P-Chain")
       
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
@@ -77,8 +77,8 @@ const main = async (): Promise<any> => {
   )
   const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

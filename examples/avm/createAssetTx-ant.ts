@@ -40,7 +40,7 @@ const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("AVM manual CreateAssetTx to create an ANT")
+const memo: Buffer = Buffer.from("AVM manual CreateAssetTx to create an ANT")
 const name: string = "TestToken"
 const symbol: string = "TEST"
 const denomination: number = 3
@@ -102,8 +102,8 @@ const main = async (): Promise<any> => {
   // createAssetTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(createAssetTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

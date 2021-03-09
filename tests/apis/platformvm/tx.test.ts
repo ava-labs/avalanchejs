@@ -42,7 +42,7 @@ describe('Transactions', () => {
   let api:PlatformVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
-  const memo:Buffer = bintools.stringToBuffer("AvalancheJS");
+  const memo:Buffer = Buffer.from("AvalancheJS");
   const blockchainID:Buffer = bintools.cb58Decode(PlatformChainID);
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());

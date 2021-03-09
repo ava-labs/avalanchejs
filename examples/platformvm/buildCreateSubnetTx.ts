@@ -25,7 +25,7 @@ const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUr
 pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const threshold: number = 1
-const memo: Buffer = bintools.stringToBuffer("PlatformVM utility method buildCreateSubnetTx to create a new subnet")
+const memo: Buffer = Buffer.from("PlatformVM utility method buildCreateSubnetTx to create a new subnet")
 const asOf: BN = UnixNow()
  
 const main = async (): Promise<any> => {
@@ -43,8 +43,8 @@ const main = async (): Promise<any> => {
   )
 
   const tx: Tx = unsignedTx.sign(pKeychain)
-  const id: string = await pchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
   
 main()

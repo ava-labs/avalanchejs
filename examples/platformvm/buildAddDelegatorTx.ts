@@ -26,7 +26,7 @@ pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("PlatformVM utility method buildAddDelegatorTx to add a delegator to the primary subnet")
+const memo: Buffer = Buffer.from("PlatformVM utility method buildAddDelegatorTx to add a delegator to the primary subnet")
 const asOf: BN = UnixNow()
 const nodeID: string = "NodeID-DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
 const startTime: BN = UnixNow().add(new BN(60 * 1))
@@ -54,8 +54,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(pKeychain)
-  const id: string = await pchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()
