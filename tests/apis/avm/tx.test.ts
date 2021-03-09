@@ -49,7 +49,7 @@ describe('Transactions', () => {
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
-  const memo:Buffer = bintools.stringToBuffer("AvalancheJS");
+  const memo:Buffer = Buffer.from("AvalancheJS");
   const blockchainid:string = Defaults.network[netid].X.blockchainID;
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());

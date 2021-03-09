@@ -28,7 +28,7 @@ const xChainBlockchainID: string = Defaults.network['12345'].X.blockchainID
 const pChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("PlatformVM utility method buildImportTx to import AVAX to the P-Chain from the X-Chain")
+const memo: Buffer = Buffer.from("PlatformVM utility method buildImportTx to import AVAX to the P-Chain from the X-Chain")
 const asOf: BN = UnixNow()
    
 const main = async (): Promise<any> => {
@@ -47,8 +47,8 @@ const main = async (): Promise<any> => {
     threshold
   )
   const tx: Tx = unsignedTx.sign(pKeychain)
-  const id: string = await pchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

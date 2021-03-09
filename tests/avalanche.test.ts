@@ -32,6 +32,7 @@ describe('Avalanche', () => {
         expect(avalanche.getProtocol()).toBe(protocol);
         expect(avalanche.getURL()).toBe(`${protocol}://${ip}:${port}`);
         expect(avalanche.getNetworkID()).toBe(12345);
+        expect(avalanche.getHeaders()).toStrictEqual({});
         avalanche.setNetworkID(50);
         expect(avalanche.getNetworkID()).toBe(50);
         avalanche.setNetworkID(12345);
@@ -79,6 +80,12 @@ describe('Avalanche', () => {
         expect(avalanche.api("keystore2").getDB()).toHaveProperty("namespace");
     });
 
+    test("Customize headers", () => {
+      avalanche.setHeader("X-Custom-Header", "example");
+      expect(avalanche.getHeaders()).toStrictEqual({
+        "X-Custom-Header": "example"
+      });
+    });
 });
 
 describe('HTTP Operations', () => {

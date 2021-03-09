@@ -257,7 +257,7 @@ export default class BinTools {
      *
      * @param bytes A {@link https://github.com/feross/buffer|Buffer} to serialize
      *
-     * @returns A serialized base-58 strig of the Buffer.
+     * @returns A serialized base-58 string of the Buffer.
      */
   cb58Encode = (bytes:Buffer):string => {
     const x:Buffer = this.addChecksum(bytes);

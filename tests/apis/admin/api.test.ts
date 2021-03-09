@@ -62,6 +62,29 @@ describe('Admin', () => {
     expect(response).toBe(true);
   });
 
+  test('getChainAliases', async () => {
+    const ch:string = 'chain';
+    const result:Promise<string[]> = admin.getChainAliases(ch);
+    const payload:object = {
+      result: {
+        aliases: [
+            "alias1",
+            "alias2"
+        ],
+      },
+    };
+    const responseObj = {
+      data: payload,
+    };
+
+    mockAxios.mockResponse(responseObj);
+    const response:string[] = await result;
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    // @ts-ignore
+    expect(response).toBe(payload.result.aliases);
+  });
+
   test('lockProfile', async () => {
     const result:Promise<boolean> = admin.lockProfile();
     const payload:object = {

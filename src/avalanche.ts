@@ -30,6 +30,8 @@ export default class AvalancheCore {
 
   protected auth:string = undefined;
 
+  protected headers:{ [k: string]: string } = {};
+
   protected apis:{ [k: string]: APIBase } = {};
 
   /**
@@ -68,6 +70,11 @@ export default class AvalancheCore {
   getURL = ():string => this.url;
 
   /**
+   * Returns the custom headers
+   */
+  getHeaders = ():object => this.headers;
+
+  /**
      * Returns the networkID;
      */
   getNetworkID = ():number => this.networkID;
@@ -97,8 +104,18 @@ export default class AvalancheCore {
   };
 
   /**
+   * Adds a new custom header to be included with all requests.
+   *
+   * @param key Header name
+   * @param value Header value
+   */
+  setHeader = (key:string,value:string):void => {
+    this.headers[key] = value
+  }
+
+  /**
    * Sets the temporary auth token used for communicating with the node.
-   * 
+   *
    * @param auth A temporary token provided by the node enabling access to the endpoints on the node.
    */
   setAuthToken = (auth:string):void => {
@@ -106,6 +123,12 @@ export default class AvalancheCore {
   }
 
   protected _setHeaders = (headers:object):object => {
+    if (typeof this.headers === "object") {
+      for (const [key, value] of Object.entries(this.headers)) {
+        headers[key] = value;
+      }
+    }
+
     if(typeof this.auth === "string"){
       headers["Authorization"] = "Bearer " + this.auth;
     }
