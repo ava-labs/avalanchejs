@@ -933,6 +933,7 @@ export class PlatformVMAPI extends JRPCAPI {
       }
       utxos.addArray(data, false);
       response.data.result.utxos = utxos;
+      response.data.result.numFetched = parseInt(response.data.result.numFetched)
       return response.data.result;
     });
   };
