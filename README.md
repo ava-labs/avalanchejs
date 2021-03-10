@@ -6,26 +6,28 @@ AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform.
 
 The APIs currently supported by default are:
 
-  * Admin API
-  * AVM API (X-Chain)
-  * Health API
-  * Info API
-  * Keystore API
-  * Metrics API
-  * PlatformVM API
+* Admin API
+* AVM API (X-Chain)
+* Health API
+* Info API
+* Keystore API
+* Metrics API
+* PlatformVM API
 
 We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network). 
 
   Using AvalancheJS, developers can:
 
-  * Locally manage private keys
-  * Retrieve balances on addresses
-  * Get UTXOs for addresses
-  * Build and sign transactions
-  * Issue signed transactions to the X-Chain
-  * Create a Subnetwork
-  * Administer a local node
-  * Retrieve Avalanche network information from a node
+* Locally manage private keys
+* Retrieve balances on addresses
+* Get UTXOs for addresses
+* Build and sign transactions
+* Issue signed transactions to the X-Chain, P-Chain, and C-Chain
+* Cross-chain swaps between the X-Chain<->P-Chain and between the X-Chain<->C-Chain
+* Add Validators and Delegators to the Primary Subnetwork by staking AVAX
+* Create a Subnetwork
+* Administer a local node
+* Retrieve Avalanche network information from a node
 
 ### Requirements
 
