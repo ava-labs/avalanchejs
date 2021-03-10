@@ -1,8 +1,8 @@
 # AvalancheJS - The Avalanche Platform JavaScript Library
 
-## Overview 
+## Overview
 
-AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The AvalancheJS library allows one to issue commands to the Avalanche node APIs. 
+AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The AvalancheJS library allows one to issue commands to the Avalanche node APIs.
 
 The APIs currently supported by default are:
 
@@ -14,7 +14,7 @@ The APIs currently supported by default are:
 * Metrics API
 * PlatformVM API
 
-We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network). 
+We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network).
 
   Using AvalancheJS, developers can:
 
@@ -31,7 +31,7 @@ We built AvalancheJS with ease of use in mind. With this library, any Javascript
 
 ### Requirements
 
-AvalancheJS requires Node.js LTS version 12.14.1 or higher to compile.
+AvalancheJS requires Node.js LTS version 14.16.0 or higher to compile.
 
 ### Installation
 
@@ -50,6 +50,7 @@ The AvalancheJS library can be imported into your existing Node.js project as fo
 ```js
 const avalanche = require("avalanche");
 ```
+
 Or into your TypeScript project like this:
 
 ```js
@@ -60,21 +61,21 @@ import { Avalanche } from "avalanche"
 
 ```js
 import {
-    Avalanche,
-    BinTools,
-    Buffer,
-    BN
-  } from "avalanche"
+  Avalanche,
+  BinTools,
+  Buffer,
+  BN
+} from "avalanche"
 
 let bintools = BinTools.getInstance();
 ```
 
 The above lines import the libraries used in the tutorials. The libraries include:
   
-  * avalanche: Our javascript module.
-  * bn.js: A bignumber module use by AvalancheJS.
-  * buffer: A Buffer library.
-  * BinTools: A singleton built into AvalancheJS that is used for dealing with binary data.
+* avalanche: Our javascript module.
+* bn.js: A bignumber module use by AvalancheJS.
+* buffer: A Buffer library.
+* BinTools: A singleton built into AvalancheJS that is used for dealing with binary data.
 
 ## Example 1 &mdash; Managing X-Chain Keys
 
@@ -82,11 +83,11 @@ AvalancheJS comes with its own AVM Keychain. This KeyChain is used in the functi
 
 ```js
 import {
-    Avalanche,
-    BinTools,
-    Buffer,
-    BN
-  } from "avalanche" 
+  Avalanche,
+  BinTools,
+  Buffer,
+  BN
+} from "avalanche" 
 
 let bintools = BinTools.getInstance();
 
@@ -139,7 +140,6 @@ let exists = myKeychain.hasKey(newAddress1); //returns true if the address is ma
 let keypair = myKeychain.getKey(newAddress1); //returns the KeyPair class
 ```
 
-
 ### Working with KeyPairs
 
 The X-Chain's KeyPair has standardized KeyPair functionality. The following operations are available on any KeyPair that implements this interface.
@@ -173,15 +173,15 @@ This example creates an asset in the X-Chain and publishes it to the Avalanche P
 ```js
 
 import {
-    Avalanche,
-    BinTools,
-    Buffer,
-    BN
-  } from "avalanche" 
+  Avalanche,
+  BinTools,
+  Buffer,
+  BN
+} from "avalanche" 
 import {
-    InitialStates,
-    SECPTransferOutput
-  } from "avalanche/dist/apis/avm"
+  InitialStates,
+  SECPTransferOutput
+} from "avalanche/dist/apis/avm"
 
 let myNetworkID = 12345; //default is 3, we want to override that for our local network
 let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
@@ -191,7 +191,7 @@ let xchain = avax.XChain(); //returns a reference to the X-Chain used by Avalanc
 
 ### Describe the new asset
 
-The first steps in creating a new asset using AvalancheJS is to determine the qualities of the asset. We will give the asset a name, a ticker symbol, as well as a denomination. 
+The first steps in creating a new asset using AvalancheJS is to determine the qualities of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
 
 ```js
 // Name our new coin and give it a symbol
@@ -205,7 +205,7 @@ let denomination = 9;
 
 ### Creating the initial state
 
-We want to mint an asset with 400 coins to all of our managed keys, 500 to the second address we know of, and 600 to the second and third address. This sets up the state that will result from the Create Asset transaction. 
+We want to mint an asset with 400 coins to all of our managed keys, 500 to the second address we know of, and 600 to the second and third address. This sets up the state that will result from the Create Asset transaction.
 
 *Note: This example assumes we have the keys already managed in our X-Chain's Keychain.*
 
@@ -226,7 +226,7 @@ initialState.addOutput(secpOutput3);
 
 ### Creating the signed transaction
 
-Now that we know what we want an asset to look like, we create an output to send to the network. There is an AVM helper function `buildCreateAssetTx()` which does just that. 
+Now that we know what we want an asset to look like, we create an output to send to the network. There is an AVM helper function `buildCreateAssetTx()` which does just that.
 
 ```js
 // Fetch the UTXOSet for our addresses
@@ -248,7 +248,7 @@ let signed = xchain.keyChain().signTx(unsigned); //returns a Tx class
 
 ### Issue the signed transaction
 
-Now that we have a signed transaction ready to send to the network, let's issue it! 
+Now that we have a signed transaction ready to send to the network, let's issue it!
 
 Using the AvalancheJS X-Chain API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
@@ -280,10 +280,10 @@ let status = await xchain.getTxStatus(txid);
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 
-  * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
-  * "Processing" indicates that the transaction is being voted on.
-  * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
-  * "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
+* "Accepted" indicates that the transaction has been accepted as valid by the network and executed
+* "Processing" indicates that the transaction is being voted on.
+* "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
+* "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
 
 ### Identifying the newly created asset
 
@@ -295,11 +295,11 @@ This example sends an asset in the X-Chain to a single recipient. The first step
 
 ```js
 import {
-    Avalanche,
-    BinTools,
-    Buffer,
-    BN
-  } from "avalanche" 
+  Avalanche,
+  BinTools,
+  Buffer,
+  BN
+} from "avalanche" 
 
 let myNetworkID = 1; //default is 3, we want to override that for our local network
 let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
@@ -311,11 +311,11 @@ We're also assuming that the keystore contains a list of addresses used in this 
 
 ### Getting the UTXO Set
 
-The X-Chain stores all available balances in a datastore called Unspent Transaction Outputs (UTXOs). A UTXO Set is the unique list of outputs produced by transactions, addresses that can spend those outputs, and other variables such as lockout times (a timestamp after which the output can be spent) and thresholds (how many signers are required to spend the output). 
+The X-Chain stores all available balances in a datastore called Unspent Transaction Outputs (UTXOs). A UTXO Set is the unique list of outputs produced by transactions, addresses that can spend those outputs, and other variables such as lockout times (a timestamp after which the output can be spent) and thresholds (how many signers are required to spend the output).
 
-For the case of this example, we're going to create a simple transaction that spends an amount of available coins and sends it to a single address without any restrictions. The management of the UTXOs will mostly be abstracted away. 
+For the case of this example, we're going to create a simple transaction that spends an amount of available coins and sends it to a single address without any restrictions. The management of the UTXOs will mostly be abstracted away.
 
-However, we do need to get the UTXO Set for the addresses we're managing. 
+However, we do need to get the UTXO Set for the addresses we're managing.
 
 ```js
 let myAddresses = xchain.keyChain().getAddresses(); //returns an array of addresses the KeyChain manages
@@ -331,6 +331,7 @@ The `buildBaseTx()` helper function sends a single asset type. We have a particu
 let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
 let mybalance = utxos.getBalance(myAddresses, assetid); //returns 400 as a BN
 ```
+
 We have 400 coins! We're going to now send 100 of those coins to our friend's address.
 
 ```js
@@ -363,14 +364,14 @@ let status = await xchain.getTxStatus(txid);
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
 
-  * "Accepted" indicates that the transaction has been accepted as valid by the network and executed
-  * "Processing" indicates that the transaction is being voted on.
-  * "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
-  * "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
+* "Accepted" indicates that the transaction has been accepted as valid by the network and executed
+* "Processing" indicates that the transaction is being voted on.
+* "Unknown" indicates that node knows nothing about the transaction, indicating the node doesn't have it
+* "Rejected" indicates the node knows about the transaction, but it conflicted with an accepted transaction
 
 ### Check the results
 
-The transaction finally came back as "Accepted", now let's update the UTXOSet and verify that the transaction balance is as we expected. 
+The transaction finally came back as "Accepted", now let's update the UTXOSet and verify that the transaction balance is as we expected.
 
 *Note: In a real network the balance isn't guaranteed to match this scenario. Transaction fees or additional spends may vary the balance. For the purpose of this example, we assume neither of those cases.*
 
@@ -378,7 +379,7 @@ The transaction finally came back as "Accepted", now let's update the UTXOSet an
 let updatedUTXOs = await xchain.getUTXOs();
 let newBalance = updatedUTXOs.getBalance(myAddresses, assetid);
 if(newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()){
-    throw Error("heyyy these should equal!");
+  throw Error("heyyy these should equal!");
 }
 ```
 
