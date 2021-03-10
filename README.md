@@ -243,14 +243,14 @@ const unsigned = await xchain.buildCreateAssetTx(
   denomination // the asse's denomination 
 );
 
-const signed = xchain.keyChain().signTx(unsigned); // returns a Tx class
+const signed = unsigned.sign(xchain); // returns a Tx class
 ```
 
 ### Issue the signed transaction
 
 Now that we have a signed transaction ready to send to the network, let's issue it!
 
-Using the AvalancheJS X-Chain API, we going to call the issueTx function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the AvalancheJS X-Chain API, we going to call the `issueTx` function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
@@ -301,10 +301,9 @@ import {
   BN
 } from "avalanche" 
 
-const myNetworkID = 1; // default is 3, we want to override that for our local network
-const myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
-const avax = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-const xchain = avax.XChain(); // returns a reference to the X-Chain used by AvalancheJS
+const myNetworkID = 12345; // default is 1, we want to override that for our local network
+const avalanche = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID);
+const xchain = avalanche.XChain(); // returns a reference to the X-Chain used by AvalancheJS
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
@@ -318,9 +317,10 @@ For the case of this example, we're going to create a simple transaction that sp
 However, we do need to get the UTXO Set for the addresses we're managing.
 
 ```js
-const myAddresses = xchain.keyChain().getAddresses(); // returns an array of addresses the KeyChain manages
+const myAddresses = xchain.keyChain().getAddresses(); // returns an array of addresses the KeyChain manages as buffers
 const addressStrings = xchain.keyChain().getAddressStrings(); // returns an array of addresses the KeyChain manages as strings
-const utxos = await xchain.getUTXOs(myAddresses);
+const u = await xchain.getUTXOs(myAddresses);
+const utxos = u.utxos
 ```
 
 ### Spending the UTXOs
@@ -328,14 +328,14 @@ const utxos = await xchain.getUTXOs(myAddresses);
 The `buildBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
-const assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; // avaSerialized string
+const assetid = "8pfG5CTyL5KBVaKrEnCvNJR95dUWAKc1hrffcVxfgi8qGhqjm"; // cb58 string
 const mybalance = utxos.getBalance(myAddresses, assetid); // returns 400 as a BN
 ```
 
 We have 400 coins! We're going to now send 100 of those coins to our friend's address.
 
 ```js
-const sendAmount = new BN(100); //amounts are in BN format
+const sendAmount = new BN(100); // amounts are in BN format
 const friendsAddress = "X-avax1k26jvfdzyukms95puxcceyzsa3lzwf5ftt0fjk"; // address format is Bech32
 
 // The below returns a UnsignedTx
@@ -376,7 +376,8 @@ The transaction finally came back as "Accepted", now let's update the UTXOSet an
 *Note: In a real network the balance isn't guaranteed to match this scenario. Transaction fees or additional spends may vary the balance. For the purpose of this example, we assume neither of those cases.*
 
 ```js
-const updatedUTXOs = await xchain.getUTXOs();
+const updatedU = await xchain.getUTXOs();
+const updatedUTXOs = updatedU.utxos;
 const newBalance = updatedUTXOs.getBalance(myAddresses, assetid);
 if(newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()){
   throw Error("heyyy these should equal!");
