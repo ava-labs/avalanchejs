@@ -11,8 +11,14 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
-import { KeyChain, EVMAPI } from "../../src/apis/evm";
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  KeyChain as EVMKeyChain, 
+  EVMAPI 
+} from "../../src/apis/evm";
+import { 
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
         
 const ip: string = "localhost"
 const port: number = 9650
@@ -23,10 +29,10 @@ const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
 const bintools: BinTools = BinTools.getInstance()
 const xKeychain: AVMKeyChain = xchain.keyChain()
-const pKeychain: KeyChain = cchain.keyChain()
+const cKeychain: EVMKeyChain = cchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
-pKeychain.importKey(privKey)
+cKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
@@ -42,7 +48,6 @@ const main = async (): Promise<any> => {
   const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
   const balance: BN = new BN(getBalanceResponse.balance)
   const amount: BN = balance.sub(fee)
-  const assetID: string = "2hrWPkPoNJRgtx24jimCfgiyzAf5DpG2hEBUpVfW8tT76RsRHh"
     
   const unsignedTx: UnsignedTx = await xchain.buildExportTx(
     utxoSet,
