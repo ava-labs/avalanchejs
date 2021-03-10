@@ -7,12 +7,14 @@ AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform.
 The APIs currently supported by default are:
 
 * Admin API
+* Auth API
 * AVM API (X-Chain)
+* EVM API (C-Chain)
 * Health API
 * Info API
 * Keystore API
 * Metrics API
-* PlatformVM API
+* PlatformVM API (P-Chain)
 
 We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network).
 
@@ -63,19 +65,19 @@ import { Avalanche } from "avalanche"
 import {
   Avalanche,
   BinTools,
-  Buffer,
-  BN
+  BN,
+  Buffer
 } from "avalanche"
 
-let bintools = BinTools.getInstance();
+const bintools = BinTools.getInstance();
 ```
 
 The above lines import the libraries used in the tutorials. The libraries include:
   
-* avalanche: Our javascript module.
-* bn.js: A bignumber module use by AvalancheJS.
-* buffer: A Buffer library.
+* Avalanche: Our javascript module.
 * BinTools: A singleton built into AvalancheJS that is used for dealing with binary data.
+* [BN](https://www.npmjs.com/package/bn.js): A bignumber module use by AvalancheJS.
+* [Buffer](https://www.npmjs.com/package/buffer): A Buffer library.
 
 ## Example 1 &mdash; Managing X-Chain Keys
 
@@ -89,12 +91,11 @@ import {
   BN
 } from "avalanche" 
 
-let bintools = BinTools.getInstance();
+const bintools = BinTools.getInstance();
 
-let myNetworkID = 12345; //default is 3, we want to override that for our local network
-let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
-let ava = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = ava.XChain(); //returns a reference to the X-Chain used by AvalancheJS
+const myNetworkID = 12345; //default is 1, we want to override that for our local network
+const avalanche = new Avalanche("localhost", 9650, "http", myNetworkID);
+const xchain = avalanche.XChain(); //returns a reference to the X-Chain used by AvalancheJS
 ```
 
 ### Accessing the KeyChain
@@ -102,7 +103,7 @@ let xchain = ava.XChain(); //returns a reference to the X-Chain used by Avalanch
 The KeyChain is accessed through the X-Chain and can be referenced directly or through a reference variable.
 
 ```js
-let myKeychain = xchain.keyChain();
+const myKeychain = xchain.keyChain();
 ```
 
 This exposes the instance of the class AVMKeyChain which is created when the X-Chain API is created. At present, this supports secp256k1 curve for ECDSA key pairs.
@@ -112,21 +113,21 @@ This exposes the instance of the class AVMKeyChain which is created when the X-C
 The KeyChain has the ability to create new KeyPairs for you and return the address assocated with the key pair.
 
 ```js
-let newAddress1 = myKeychain.makeKey(); //returns a Buffer for the address
+const newAddress1 = myKeychain.makeKey(); // returns an instance of the KeyPair class
 ```
 
 You may also import your exsting private key into the KeyChain using either a Buffer...
 
 ```js
-let mypk = bintools.cb58Decode("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5"); //returns a Buffer
-let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
+const mypk = bintools.cb58Decode("JaCCSxdoWfo3ao5KwenXrJjJR7cBTQ287G1C5qpv2hr2tCCdb"); // returns a Buffer
+const newAddress2 = myKeychain.importKey(mypk); // returns an instance of the KeyPair class
 ```
 
-... or an Avalanche serialized string works, too:
+... or an CB58 string works, too:
 
 ```js
-let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
-let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
+const mypk = "PrivateKey-JaCCSxdoWfo3ao5KwenXrJjJR7cBTQ287G1C5qpv2hr2tCCdb";
+const newAddress2 = myKeychain.importKey(mypk); // returns an instance of the KeyPair class
 ```
 
 ### Working with KeyChains
@@ -134,10 +135,10 @@ let newAddress2 = myKeychain.importKey(mypk); //returns a Buffer for the address
 The X-Chains's KeyChain has standardized key management capabilities. The following functions are available on any KeyChain that implements this interface.
 
 ```js
-let addresses = myKeychain.getAddresses(); //returns an array of Buffers for the addresses
-let addressStrings = myKeychain.getAddressStrings(); //returns an array of strings for the addresses
-let exists = myKeychain.hasKey(newAddress1); //returns true if the address is managed
-let keypair = myKeychain.getKey(newAddress1); //returns the KeyPair class
+const addresses = myKeychain.getAddresses(); // returns an array of Buffers for the addresses
+const addressStrings = myKeychain.getAddressStrings(); // returns an array of strings for the addresses
+const exists = myKeychain.hasKey(addresses[0]); // returns true if the address is managed
+const keypair = myKeychain.getKey(addresses[0]); // returns the KeyPair class
 ```
 
 ### Working with KeyPairs
@@ -145,25 +146,25 @@ let keypair = myKeychain.getKey(newAddress1); //returns the KeyPair class
 The X-Chain's KeyPair has standardized KeyPair functionality. The following operations are available on any KeyPair that implements this interface.
 
 ```js
-let address = keypair.getAddress(); //returns Buffer
-let addressString = keypair.getAddressString(); //returns string
+const address = keypair.getAddress(); // returns Buffer
+const addressString = keypair.getAddressString(); // returns string
 
-let pubk = keypair.getPublicKey(); //returns Buffer
-let pubkstr = keypair.getPublicKeyString(); //returns a CB58 encoded string
+const pubk = keypair.getPublicKey(); // returns Buffer
+const pubkstr = keypair.getPublicKeyString(); // returns a CB58 encoded string
 
-let privk = keypair.getPrivateKey(); //returns Buffer
-let privkstr = keypair.getPrivateKeyString(); //returns a CB58 encoded string
+const privk = keypair.getPrivateKey(); //returns Buffer
+const privkstr = keypair.getPrivateKeyString(); //returns a CB58 encoded string
 
-keypair.generateKey(); //creates a new random KeyPair
+keypair.generateKey(); // creates a new random KeyPair
 
-let mypk = "24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5";
-let successul = keypair.importKey(mypk); //returns boolean if private key imported successfully
+const mypk = bintools.cb58Decode("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5");
+const successul = keypair.importKey(mypk); // returns boolean if private key imported successfully
 
-let message = Buffer.from("Wubalubadubdub");
-let signature = keypair.sign(message); //returns a Buffer with the signature
+const message = Buffer.from("Through consensus to the stars");
+const signature = keypair.sign(message); // returns a Buffer with the signature
 
-let signerPubk = keypair.recover(message, signature);
-let isValid = keypair.verify(message, signature); //returns a boolean
+const signerPubk = keypair.recover(message, signature); // returns a Buffer
+const isValid = keypair.verify(message, signature); // returns a boolean
 ```
 
 ## Example 2 &mdash; Creating An Asset
@@ -183,10 +184,9 @@ import {
   SECPTransferOutput
 } from "avalanche/dist/apis/avm"
 
-let myNetworkID = 12345; //default is 3, we want to override that for our local network
-let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
-let avax = new Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = avax.XChain(); //returns a reference to the X-Chain used by AvalancheJS
+const myNetworkID = 12345; // default is 1, we want to override that for our local network
+const avalanche = new Avalanche("localhost", 9650, "http", myNetworkID);
+const xchain = avalanche.XChain(); // returns a reference to the X-Chain used by AvalancheJS
 ```
 
 ### Describe the new asset
@@ -195,12 +195,12 @@ The first steps in creating a new asset using AvalancheJS is to determine the qu
 
 ```js
 // Name our new coin and give it a symbol
-let name = "Rickcoin is the most intelligent coin";
-let symbol = "RICK";
+const name = "TeamRocket";
+const symbol = "ROKT";
 
 // Where is the decimal point indicate what 1 asset is and where fractional assets begin
 // Ex: 1 AVAX is denomination 9, so the smallest unit of AVAX is nanoAVAX (nAVAX) at 10^-9 AVAX
-let denomination = 9;
+const denomination = 9;
 ```
 
 ### Creating the initial state
@@ -210,15 +210,15 @@ We want to mint an asset with 400 coins to all of our managed keys, 500 to the s
 *Note: This example assumes we have the keys already managed in our X-Chain's Keychain.*
 
 ```js
-let addresses = xchain.keyChain().getAddresses();
+const addresses = xchain.keyChain().getAddresses();
 
 // Create outputs for the asset's initial state
-let secpOutput1 = new SECPTransferOutput(new BN(400), new BN(400), 1, addresses);
-let secpOutput2 = new SECPTransferOutput(new BN(500), new BN(400), 1, [addresses[1]]);
-let secpOutput3 = new SECPTransferOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
+const secpOutput1 = new SECPTransferOutput(new BN(400), new BN(400), 1, addresses);
+const secpOutput2 = new SECPTransferOutput(new BN(500), new BN(400), 1, [addresses[1]]);
+const secpOutput3 = new SECPTransferOutput(new BN(600), new BN(400), 1, [addresses[1], addresses[2]]);
 
 // Populate the initialStates with the outputs
-let initialState = new InitialStates();
+const initialState = new InitialStates();
 initialState.addOutput(secpOutput1);
 initialState.addOutput(secpOutput2);
 initialState.addOutput(secpOutput3);
@@ -230,10 +230,10 @@ Now that we know what we want an asset to look like, we create an output to send
 
 ```js
 // Fetch the UTXOSet for our addresses
-let utxos = await xchain.getUTXOs(addresses);
+const utxos = await xchain.getUTXOs(addresses);
 
 // Make an unsigned Create Asset transaction from the data compiled earlier
-let unsigned = await xchain.buildCreateAssetTx(
+const unsigned = await xchain.buildCreateAssetTx(
   utxos, // the UTXOSet containing the UTXOs we're going to spend
   addresses, // the addresses which will pay the fees
   addresses, // the addresses which recieve the change from the spent UTXOs
@@ -243,7 +243,7 @@ let unsigned = await xchain.buildCreateAssetTx(
   denomination // the asse's denomination 
 );
 
-let signed = xchain.keyChain().signTx(unsigned); //returns a Tx class
+const signed = xchain.keyChain().signTx(unsigned); // returns a Tx class
 ```
 
 ### Issue the signed transaction
@@ -254,17 +254,17 @@ Using the AvalancheJS X-Chain API, we going to call the issueTx function. This f
 
 ```js
 // using the Tx class
-let txid = await xchain.issueTx(signed); //returns a CB58 serialized string for the TxID
+const txid = await xchain.issueTx(signed); // returns a CB58 serialized string for the TxID
 ```
 
 ```js
 // using the base-58 representation
-let txid = await xchain.issueTx(signed.toString()); //returns a CB58 serialized string for the TxID
+const txid = await xchain.issueTx(signed.toString()); // returns a CB58 serialized string for the TxID
 ```
 
 ```js
 // using the transaction Buffer
-let txid = await xchain.issueTx(signed.toBuffer()); //returns a CB58 serialized string for the TxID
+const txid = await xchain.issueTx(signed.toBuffer()); // returns a CB58 serialized string for the TxID
 ```
 
 We assume ONE of those methods are used to issue the transaction.
@@ -275,7 +275,7 @@ Now that we sent the transaction to the network, it takes a few seconds to deter
 
 ```js
 // returns one of: "Accepted", "Processing", "Unknown", and "Rejected"
-let status = await xchain.getTxStatus(txid); 
+const status = await xchain.getTxStatus(txid); 
 ```
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
@@ -301,10 +301,10 @@ import {
   BN
 } from "avalanche" 
 
-let myNetworkID = 1; //default is 3, we want to override that for our local network
-let myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
-let avax = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
-let xchain = avax.XChain(); //returns a reference to the X-Chain used by AvalancheJS
+const myNetworkID = 1; // default is 3, we want to override that for our local network
+const myBlockchainID = "GJABrZ9A6UQFpwjPU8MDxDd8vuyRoDVeDAXc694wJ5t3zEkhU"; // The X-Chain blockchainID on this network
+const avax = new avalanche.Avalanche("localhost", 9650, "http", myNetworkID, myBlockchainID);
+const xchain = avax.XChain(); // returns a reference to the X-Chain used by AvalancheJS
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
@@ -318,9 +318,9 @@ For the case of this example, we're going to create a simple transaction that sp
 However, we do need to get the UTXO Set for the addresses we're managing.
 
 ```js
-let myAddresses = xchain.keyChain().getAddresses(); //returns an array of addresses the KeyChain manages
-let addressStrings = xchain.keyChain().getAddressStrings(); //returns an array of addresses the KeyChain manages as strings
-let utxos = await xchain.getUTXOs(myAddresses);
+const myAddresses = xchain.keyChain().getAddresses(); // returns an array of addresses the KeyChain manages
+const addressStrings = xchain.keyChain().getAddressStrings(); // returns an array of addresses the KeyChain manages as strings
+const utxos = await xchain.getUTXOs(myAddresses);
 ```
 
 ### Spending the UTXOs
@@ -328,27 +328,27 @@ let utxos = await xchain.getUTXOs(myAddresses);
 The `buildBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
-let assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; //avaSerialized string
-let mybalance = utxos.getBalance(myAddresses, assetid); //returns 400 as a BN
+const assetid = "23wKfz3viWLmjWo2UZ7xWegjvnZFenGAVkouwQCeB9ubPXodG6"; // avaSerialized string
+const mybalance = utxos.getBalance(myAddresses, assetid); // returns 400 as a BN
 ```
 
 We have 400 coins! We're going to now send 100 of those coins to our friend's address.
 
 ```js
-let sendAmount = new BN(100); //amounts are in BN format
-let friendsAddress = "X-avax1k26jvfdzyukms95puxcceyzsa3lzwf5ftt0fjk"; // address format is Bech32
+const sendAmount = new BN(100); //amounts are in BN format
+const friendsAddress = "X-avax1k26jvfdzyukms95puxcceyzsa3lzwf5ftt0fjk"; // address format is Bech32
 
-//The below returns a UnsignedTx
-//Parameters sent are (in order of appearance):
+// The below returns a UnsignedTx
+// Parameters sent are (in order of appearance):
 //   * The UTXO Set
 //   * The amount being sent as a BN
 //   * An array of addresses to send the funds
 //   * An array of addresses sending the funds
 //   * An array of addresses any leftover funds are sent
 //   * The AssetID of the funds being sent
-let unsignedTx = await xchain.buildBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
-let signedTx = xchain.signTx(unsignedTx);
-let txid = await xchain.issueTx(signedTx);
+const unsignedTx = await xchain.buildBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
+const signedTx = xchain.signTx(unsignedTx);
+const txid = await xchain.issueTx(signedTx);
 ```
 
 And the transaction is sent!
@@ -359,7 +359,7 @@ Now that we sent the transaction to the network, it takes a few seconds to deter
 
 ```js
 // returns one of: "Accepted", "Processing", "Unknown", and "Rejected"
-let status = await xchain.getTxStatus(txid);
+const status = await xchain.getTxStatus(txid);
 ```
 
 The statuses can be one of "Accepted", "Processing", "Unknown", and "Rejected":
@@ -376,8 +376,8 @@ The transaction finally came back as "Accepted", now let's update the UTXOSet an
 *Note: In a real network the balance isn't guaranteed to match this scenario. Transaction fees or additional spends may vary the balance. For the purpose of this example, we assume neither of those cases.*
 
 ```js
-let updatedUTXOs = await xchain.getUTXOs();
-let newBalance = updatedUTXOs.getBalance(myAddresses, assetid);
+const updatedUTXOs = await xchain.getUTXOs();
+const newBalance = updatedUTXOs.getBalance(myAddresses, assetid);
 if(newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()){
   throw Error("heyyy these should equal!");
 }
