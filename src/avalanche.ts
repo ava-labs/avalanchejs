@@ -46,7 +46,11 @@ export default class AvalancheCore {
     this.ip = ip;
     this.port = port;
     this.protocol = protocol;
-    this.url = `${protocol}://${ip}:${port}`;
+    let url : string = `${protocol}://${ip}`;
+    if(port != undefined && typeof port === 'number' && port >= 0) {
+      url = `${url}:${port}`;
+    }
+    this.url = url;
   };
 
   /**
