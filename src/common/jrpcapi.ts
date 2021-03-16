@@ -48,7 +48,7 @@ export class JRPCAPI extends APIBase {
     let baseURL: string = `${this.core.getProtocol()}://${this.core.getIP()}`;
     const port: number = this.core.getPort();
     if(port != undefined && typeof port === 'number' && port >= 0) {
-      baseURL = `${baseURL}:${this.core.getPort()}`;
+      baseURL = `${baseURL}:${port}`;
     }
 
     const axConf:AxiosRequestConfig = {
