@@ -22,7 +22,7 @@ export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
   if(outputID == EVMConstants.SECPXFEROUTPUTID){
     return new SECPTransferOutput( ...args);
   }
-  throw new Error(`Error - SelectOutputClass: unknown outputID ${outputID}`);
+  throw new Error(`Error - SelectOutputClass: unknown outputID`);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{

@@ -142,7 +142,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     } else {
       /* istanbul ignore next */
-      throw new Error(`Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string: ${utxo}`);
+      throw new Error(`Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string`);
     }
     return utxovar
   }

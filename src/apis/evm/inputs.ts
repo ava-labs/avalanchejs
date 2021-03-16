@@ -32,7 +32,7 @@ export const SelectInputClass = (inputID: number, ...args: any[]): Input => {
     return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectInputClass: unknown inputID ${inputID}`);
+  throw new Error(`Error - SelectInputClass: unknown inputID`);
 };
 
 export class TransferableInput extends StandardTransferableInput {

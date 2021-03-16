@@ -43,7 +43,7 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
     return new ExportTx(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectTxClass: unknown txtype ${txtype}`);
+  throw new Error(`Error - SelectTxClass: unknown txtype`);
 };
 
 

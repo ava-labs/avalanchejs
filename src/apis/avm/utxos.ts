@@ -146,7 +146,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     } else {
       /* istanbul ignore next */
-      throw new Error(`Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string: ${utxo}`);
+      throw new Error(`Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string`);
     }
     return utxovar
   }
@@ -446,7 +446,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       let idx:number = out.getAddressIdx(spenders[j]);
       if(idx == -1) {
           /* istanbul ignore next */
-          throw new Error(`Error - UTXOSet.buildSECPMintTx: no such address in output: ${spenders[j]}`);
+          throw new Error(`Error - UTXOSet.buildSECPMintTx: no such address in output`);
       }
       mintOp.addSignatureIdx(idx, spenders[j]);
     }
@@ -586,7 +586,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             idx = out.getAddressIdx(spenders[j]);
             if(idx == -1){
                 /* istanbul ignore next */
-                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: no such address in output: ${spenders[j]}`);
+                throw new Error(`Error - UTXOSet.buildCreateNFTMintTx: no such address in output`);
             }
             nftMintOperation.addSignatureIdx(idx, spenders[j]);
         }

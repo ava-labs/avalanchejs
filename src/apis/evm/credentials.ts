@@ -18,7 +18,7 @@ export const SelectCredentialClass = (credid: number, ...args: any[]): Credentia
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
+  throw new Error(`Error - SelectCredentialClass: unknown credid`);
 };
 
 export class SECPCredential extends Credential {
