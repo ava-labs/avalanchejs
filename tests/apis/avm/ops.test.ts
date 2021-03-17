@@ -89,7 +89,7 @@ describe('Operations', () => {
           const nftMintOperation: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
           expect(() => {
             nftMintOperation.setCodecID(2)
-          }).toThrow("Error - NFTMintOperation.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+          }).toThrow("Error - NFTMintOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
         });
     })
 
@@ -150,7 +150,7 @@ describe('Operations', () => {
           const nftTransferOperation: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1));
           expect(() => {
             nftTransferOperation.setCodecID(2)
-          }).toThrow("Error - NFTTransferOperation.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+          }).toThrow("Error - NFTTransferOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
         });
     })
 

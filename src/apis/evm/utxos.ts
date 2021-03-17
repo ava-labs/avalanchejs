@@ -159,7 +159,7 @@ import { ExportTx } from './exporttx';
        utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
      } else {
        /* istanbul ignore next */
-       throw new Error(`Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string: ${utxo}`);
+       throw new Error("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
      }
      return utxovar
    }
@@ -209,7 +209,7 @@ import { ExportTx } from './exporttx';
              const idx: number = uout.getAddressIdx(spender);
              if (idx === -1) {
                /* istanbul ignore next */
-               throw new Error(`Error - UTXOSet.getMinimumSpendable: no such address in output: ${spender}`);
+               throw new Error("Error - UTXOSet.getMinimumSpendable: no such address in output");
              }
              xferin.getInput().addSignatureIdx(idx, spender);
            });
@@ -325,7 +325,7 @@ import { ExportTx } from './exporttx';
          const idx: number = output.getAddressIdx(spender);
          if (idx === -1) {
            /* istanbul ignore next */
-           throw new Error(`Error - UTXOSet.buildImportTx: no such address in output: ${spender}`);
+           throw new Error("Error - UTXOSet.buildImportTx: no such address in output");
          }
          xferin.getInput().addSignatureIdx(idx, spender);
        });

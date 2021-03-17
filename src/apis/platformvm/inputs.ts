@@ -29,7 +29,7 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
     return new StakeableLockIn(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectInputClass: unknown inputid ${inputid}`);
+  throw new Error("Error - SelectInputClass: unknown inputid");
 };
 
 export class ParseableInput extends StandardParseableInput{

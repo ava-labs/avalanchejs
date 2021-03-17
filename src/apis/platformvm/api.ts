@@ -351,7 +351,7 @@ export class PlatformVMAPI extends JRPCAPI {
   getBalance = async (address:string):Promise<object> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error(`Error - PlatformVMAPI.getBalance: Invalid address format ${address}`);
+      throw new Error("Error - PlatformVMAPI.getBalance: Invalid address format");
     }
     const params:any = {
       address
@@ -1405,7 +1405,7 @@ export class PlatformVMAPI extends JRPCAPI {
         if (typeof addresses[i] === 'string') {
           if (typeof this.parseAddress(addresses[i] as string) === 'undefined') {
             /* istanbul ignore next */
-            throw new Error(`Error - PlatformVMAPI.${caller}: Invalid address format ${addresses[i]}`);
+            throw new Error("Error - Invalid address format");
           }
           addrs.push(addresses[i] as string);
         } else {

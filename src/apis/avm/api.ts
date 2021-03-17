@@ -51,6 +51,7 @@ export class AVMAPI extends JRPCAPI {
 
   protected creationTxFee:BN = undefined;
 
+
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
    *
@@ -272,7 +273,7 @@ export class AVMAPI extends JRPCAPI {
   getBalance = async (address:string, assetID:string):Promise<object> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.getBalance: Invalid address format ${address}`);
+      throw new Error("Error - AVMAPI.getBalance: Invalid address format");
     }
     const params:any = {
       address,
@@ -425,7 +426,7 @@ export class AVMAPI extends JRPCAPI {
   exportKey = async (username:string, password:string, address:string):Promise<string> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.exportKey: Invalid address format ${address}`);
+      throw new Error("Error - AVMAPI.exportKey: Invalid address format");
     }
     const params:any = {
       username,
@@ -571,7 +572,7 @@ export class AVMAPI extends JRPCAPI {
   getAllBalances = async (address:string):Promise<Array<object>> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.getAllBalances: Invalid address format ${address}`);
+      throw new Error("Error - AVMAPI.getAllBalances: Invalid address format");
     }
     const params:any = {
       address,
@@ -1316,7 +1317,7 @@ export class AVMAPI extends JRPCAPI {
 
     if (typeof this.parseAddress(to) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error(`Error - AVMAPI.send: Invalid address format ${to}`);
+      throw new Error("Error - AVMAPI.send: Invalid address format");
     }
 
     if (typeof assetID !== 'string') {
@@ -1346,7 +1347,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== 'undefined') {
       if(typeof this.parseAddress(changeAddr) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+        throw new Error("Error - AVMAPI.send: Invalid address format");
       }
       params["changeAddr"] = changeAddr;
     } 
@@ -1387,7 +1388,7 @@ export class AVMAPI extends JRPCAPI {
     sendOutputs.forEach((output) => {
       if (typeof this.parseAddress(output.to) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error(`Error - AVMAPI.sendMultiple: Invalid address format ${output.to}`);
+        throw new Error("Error - AVMAPI.sendMultiple: Invalid address format");
       }
       if (typeof output.assetID !== 'string') {
         asset = bintools.cb58Encode(output.assetID);
@@ -1416,7 +1417,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== 'undefined') {
       if(typeof this.parseAddress(changeAddr) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error(`Error - AVMAPI.send: Invalid address format ${changeAddr}`);
+        throw new Error("Error - AVMAPI.send: Invalid address format");
       }
       params["changeAddr"] = changeAddr;
     } 
@@ -1460,7 +1461,7 @@ export class AVMAPI extends JRPCAPI {
         if (typeof addresses[i] === 'string') {
           if (typeof this.parseAddress(addresses[i] as string) === 'undefined') {
             /* istanbul ignore next */
-            throw new Error(`Error - AVMAPI.${caller}: Invalid address format ${addresses[i]}`);
+            throw new Error("Error - AVMAPI.${caller}: Invalid address format");
           }
           addrs.push(addresses[i] as string);
         } else {

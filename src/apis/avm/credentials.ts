@@ -20,7 +20,7 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
     return new NFTCredential(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectCredentialClass: unknown credid ${credid}`);
+  throw new Error("Error - SelectCredentialClass: unknown credid");
 };
 
 export class SECPCredential extends Credential {
@@ -33,7 +33,7 @@ export class SECPCredential extends Credential {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - SECPCredential.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - SECPCredential.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPCREDENTIAL : AVMConstants.SECPCREDENTIAL_CODECONE;
@@ -70,7 +70,7 @@ export class NFTCredential extends Credential {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - NFTCredential.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - NFTCredential.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTCREDENTIAL : AVMConstants.NFTCREDENTIAL_CODECONE;

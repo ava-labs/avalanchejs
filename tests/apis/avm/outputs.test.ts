@@ -59,7 +59,7 @@ describe('Outputs', () => {
           const nftMintOutput: NFTMintOutput = new NFTMintOutput(1, addrs, fallLocktime, 1);
           expect(() => {
             nftMintOutput.setCodecID(2)
-          }).toThrow("Error - NFTMintOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+          }).toThrow("Error - NFTMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
       });
 
       test('Functionality', () => {
@@ -173,7 +173,7 @@ describe('Outputs', () => {
           const secPTransferOutput: SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
           expect(() => {
             secPTransferOutput.setCodecID(2)
-          }).toThrow("Error - SECPTransferOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+          }).toThrow("Error - SECPTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
       });
 
       test('SECPMintOutput', () => {
@@ -222,7 +222,7 @@ describe('Outputs', () => {
           const secpMintOutput: SECPMintOutput = new SECPMintOutput(addrs, locktime, 3);
           expect(() => {
             secpMintOutput.setCodecID(2)
-          }).toThrow("Error - SECPMintOutput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+          }).toThrow("Error - SECPMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
       });
     });
 });

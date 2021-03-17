@@ -55,7 +55,7 @@ export class ImportTx extends BaseTx {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - ImportTx.setCodecID: codecID ${codecID}, is not valid. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE;
