@@ -38,7 +38,7 @@ export const SelectTxClass = (txTypeID: number, ...args: any[]): EVMBaseTx => {
     return new ExportTx(...args);
   }
   /* istanbul ignore next */
-  throw new Error(`Error - SelectTxClass: unknown txType`);
+  throw new Error("Error - SelectTxClass: unknown txType");
 };
 
 export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBaseTx> {

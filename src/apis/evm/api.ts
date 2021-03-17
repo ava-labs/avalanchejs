@@ -527,7 +527,7 @@ export class EVMAPI extends JRPCAPI {
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
 
     if(atomics.length === 0){
-      throw new Error(`Error - EVMAPI.buildImportTx: no atomic utxos to import`);
+      throw new Error("Error - EVMAPI.buildImportTx: no atomic utxos to import");
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
@@ -585,7 +585,7 @@ export class EVMAPI extends JRPCAPI {
     } else if (typeof destinationChain === "string") {
       destinationChain = bintools.cb58Decode(destinationChain); 
     } else if(!(destinationChain instanceof Buffer)) {
-      throw new Error(`Error - EVMAPI.buildExportTx: Invalid destinationChain type`);
+      throw new Error("Error - EVMAPI.buildExportTx: Invalid destinationChain type");
     }
     if(destinationChain.length !== 32) {
       throw new Error("Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
@@ -654,7 +654,7 @@ export class EVMAPI extends JRPCAPI {
         if (typeof address === 'string') {
           if (typeof this.parseAddress(address as string) === 'undefined') {
             /* istanbul ignore next */
-            throw new Error(`Error - Invalid address format`);
+            throw new Error("Error - Invalid address format");
           }
           addrs.push(address as string);
         } else {

@@ -45,7 +45,7 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
     return new CreateSubnetTx(...args);
   } 
   /* istanbul ignore next */
-  throw new Error(`Error - SelectTxClass: unknown txtype`);
+  throw new Error("Error - SelectTxClass: unknown txtype");
 };
 
 export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {

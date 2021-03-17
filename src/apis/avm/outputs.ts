@@ -107,7 +107,7 @@ export class SECPTransferOutput extends AmountOutput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - SECPTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - SECPTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPXFEROUTPUTID : AVMConstants.SECPXFEROUTPUTID_CODECONE;
@@ -145,7 +145,7 @@ export class SECPMintOutput extends Output {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - SECPMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - SECPMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPMINTOUTPUTID : AVMConstants.SECPMINTOUTPUTID_CODECONE;
@@ -195,7 +195,7 @@ export class NFTMintOutput extends NFTOutput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - NFTMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - NFTMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTMINTOUTPUTID : AVMConstants.NFTMINTOUTPUTID_CODECONE;
@@ -281,7 +281,7 @@ export class NFTTransferOutput extends NFTOutput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error(`Error - NFTTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.`);
+        throw new Error("Error - NFTTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTXFEROUTPUTID : AVMConstants.NFTXFEROUTPUTID_CODECONE;

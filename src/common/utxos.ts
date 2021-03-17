@@ -594,7 +594,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
         uSet = this.union(utxoset);
         return uSet.difference(this) as this;
       default:
-        throw new Error(`Error - StandardUTXOSet.mergeByRule: bad MergeRule`);
+        throw new Error("Error - StandardUTXOSet.mergeByRule: bad MergeRule");
     }
   };
 }
