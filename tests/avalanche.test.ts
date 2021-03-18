@@ -17,7 +17,7 @@ describe('Avalanche', () => {
     const protocol = "https";
     let avalanche:Avalanche;
     beforeAll(() => {
-        avalanche = new Avalanche(ip,port,protocol, 12345, undefined, undefined, undefined, true);
+        avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
         avalanche.addAPI("admin", AdminAPI);
         avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainid)
         avalanche.addAPI("health", HealthAPI);
@@ -26,7 +26,12 @@ describe('Avalanche', () => {
         avalanche.addAPI("metrics", MetricsAPI);
         avalanche.addAPI("pchain", PlatformVMAPI);
     });
-    test('Can initialize', () => {
+    test('Can initialize without port', () => {
+        const a = new Avalanche(ip, undefined, protocol, 12345);
+        expect(a.getPort()).toBe(undefined);
+        expect(a.getURL()).toBe(`${protocol}://${ip}`);
+    });
+    test('Can initialize with port', () => {
         expect(avalanche.getIP()).toBe(ip);
         expect(avalanche.getPort()).toBe(port);
         expect(avalanche.getProtocol()).toBe(protocol);

@@ -21,7 +21,11 @@ import {
   ParseableOutput
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common";
-import { Defaults, NodeIDStringToBuffer, UnixNow } from "../../src/utils"
+import { 
+  Defaults, 
+  NodeIDStringToBuffer, 
+  UnixNow 
+} from "../../src/utils"
       
 const ip: string = "localhost"
 const port: number = 9650

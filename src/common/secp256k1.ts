@@ -121,7 +121,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
     /**
      * Returns a string representation of the private key.
      * 
-     * @returns A cb58 serialized string representation of the public key
+     * @returns A cb58 serialized string representation of the private key
      */
     getPrivateKeyString = ():string => {
         return "PrivateKey-" + bintools.cb58Encode(this.privk);
