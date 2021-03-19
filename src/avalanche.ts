@@ -32,6 +32,8 @@ export default class AvalancheCore {
 
   protected headers:{ [k: string]: string } = {};
 
+  protected requestConfig: AxiosRequestConfig = {};
+
   protected apis:{ [k: string]: APIBase } = {};
 
   /**
@@ -79,6 +81,11 @@ export default class AvalancheCore {
   getHeaders = ():object => this.headers;
 
   /**
+   * Returns the custom request config
+   */
+  getRequestConfig = (): AxiosRequestConfig => this.requestConfig;
+
+  /**
      * Returns the networkID;
      */
   getNetworkID = ():number => this.networkID;
@@ -109,12 +116,22 @@ export default class AvalancheCore {
 
   /**
    * Adds a new custom header to be included with all requests.
-   *
+   * 
    * @param key Header name
    * @param value Header value
    */
   setHeader = (key:string,value:string):void => {
     this.headers[key] = value
+  }
+
+  /**
+   * Adds a new custom config value to be included with all requests.
+   *
+   * @param key Config name
+   * @param value Config value
+   */
+  setRequestConfig = (key: string, value: string|boolean): void => {
+    this.requestConfig[key] = value;
   }
 
   /**
@@ -187,11 +204,15 @@ export default class AvalancheCore {
     axiosConfig:AxiosRequestConfig = undefined): Promise<RequestResponseData> => {
     let config:AxiosRequestConfig;
     if (axiosConfig) {
-      config = axiosConfig;
+      config = {
+        ...axiosConfig,
+        ...this.requestConfig
+      }
     } else {
       config = {
         baseURL: `${this.protocol}://${this.ip}:${this.port}`,
         responseType: 'text',
+        ...this.requestConfig
       };
     }
     config.url = baseurl;

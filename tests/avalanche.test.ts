@@ -42,6 +42,11 @@ describe('Avalanche', () => {
         expect(avalanche.getNetworkID()).toBe(50);
         avalanche.setNetworkID(12345);
         expect(avalanche.getNetworkID()).toBe(12345);
+        expect(avalanche.getRequestConfig()).toStrictEqual({});
+        avalanche.setRequestConfig("withCredentials", true)
+        expect(avalanche.getRequestConfig()).toStrictEqual({
+          withCredentials: true
+        });
     });
 
     test('Endpoints correct', () => {
