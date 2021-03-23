@@ -121,7 +121,27 @@ export default class AvalancheCore {
    * @param value Header value
    */
   setHeader = (key:string,value:string):void => {
-    this.headers[key] = value
+    this.headers[key] = value;
+  }
+
+  /**
+   * Removes a previously added custom header.
+   * 
+   * @param key Header name
+   */
+  removeHeader = (key: string):void => {
+    delete this.headers[key];
+  }
+
+  /**
+   * Removes all headers.
+   */
+  removeAllHeaders = ():void => {
+    for (let prop in this.headers) {
+      if (Object.prototype.hasOwnProperty.call(this.headers, prop)) {
+        delete this.headers[prop];
+      }
+    }
   }
 
   /**
@@ -132,6 +152,26 @@ export default class AvalancheCore {
    */
   setRequestConfig = (key: string, value: string|boolean): void => {
     this.requestConfig[key] = value;
+  }
+
+  /**
+   * Removes a previously added request config.
+   * 
+   * @param key Header name
+   */
+  removeRequestConfig = (key: string):void => {
+    delete this.requestConfig[key];
+  }
+
+  /**
+   * Removes all request configs.
+   */
+  removeAllRequestConfigs = ():void => {
+    for (let prop in this.requestConfig) {
+      if (Object.prototype.hasOwnProperty.call(this.requestConfig, prop)) {
+        delete this.requestConfig[prop];
+      }
+    }
   }
 
   /**
