@@ -301,7 +301,7 @@ n12345X.blockchainID = '2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed';
 const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
-n12345C.blockchainID = '26sSDdFXoKeShAqVfvugUiUQKhMZtHYDLeBqmBfNfcdjziTrZA';
+n12345C.blockchainID = '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR';
 n12345C.chainID = 43111;
 
 export class Defaults {
@@ -367,7 +367,7 @@ export class Defaults {
       P: n12345P,
       '11111111111111111111111111111111LpoYY': n12345P,
       C: n12345C,
-      '26sSDdFXoKeShAqVfvugUiUQKhMZtHYDLeBqmBfNfcdjziTrZA': n12345C,
+      '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR': n12345C,
     },
   };
 }
