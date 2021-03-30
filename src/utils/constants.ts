@@ -302,7 +302,7 @@ const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
 n12345C.blockchainID = '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR';
-n12345C.chainID = 43111;
+n12345C.chainID = 43112;
 
 export class Defaults {
   static network = {
