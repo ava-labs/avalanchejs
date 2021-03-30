@@ -351,7 +351,7 @@ export class Defaults {
       C: n4C,
       'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK': n4C,
     },
-    5: { // update before fuji
+    5: {
       hrp: NetworkIDToHRP[5],
       X: n5X,
       '2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm': n5X,
