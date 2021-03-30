@@ -87,9 +87,39 @@ describe('Avalanche', () => {
 
     test("Customize headers", () => {
       avalanche.setHeader("X-Custom-Header", "example");
+      avalanche.setHeader("X-Foo", "Foo");
+      avalanche.setHeader("X-Bar", "Bar");
       expect(avalanche.getHeaders()).toStrictEqual({
-        "X-Custom-Header": "example"
+        "X-Custom-Header": "example",
+        "X-Foo": "Foo",
+        "X-Bar": "Bar",
       });
+      avalanche.removeHeader("X-Foo");
+      expect(avalanche.getHeaders()).toStrictEqual({
+        "X-Custom-Header": "example",
+        "X-Bar": "Bar",
+      });
+      avalanche.removeAllHeaders();
+      expect(avalanche.getHeaders()).toStrictEqual({});
+    });
+
+    test("Customize request config", () => {
+      expect(avalanche.getRequestConfig()).toStrictEqual({});
+      avalanche.setRequestConfig("withCredentials", true)
+      avalanche.setRequestConfig("withFoo", "Foo")
+      avalanche.setRequestConfig("withBar", "Bar")
+      expect(avalanche.getRequestConfig()).toStrictEqual({
+        withCredentials: true,
+        withFoo: "Foo",
+        withBar: "Bar"
+      });
+      avalanche.removeRequestConfig("withFoo");
+      expect(avalanche.getRequestConfig()).toStrictEqual({
+        withCredentials: true,
+        withBar: "Bar"
+      });
+      avalanche.removeAllRequestConfigs();
+      expect(avalanche.getRequestConfig()).toStrictEqual({});
     });
 });
 
