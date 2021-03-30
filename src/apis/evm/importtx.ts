@@ -218,7 +218,11 @@ export class ImportTx extends EVMBaseTx {
           throw new Error("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
         }
       });
-      this.outs = outs;
+      this.outs = outs.sort((a, b) => {
+        const sorta = a.toBuffer();
+        const sortb = b.toBuffer();
+        return Buffer.compare(sorta, sortb) as (1|-1|0);
+      });
     }
   }
 }
