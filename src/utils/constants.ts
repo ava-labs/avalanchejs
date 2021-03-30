@@ -302,7 +302,7 @@ const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
 n12345C.blockchainID = '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR';
-n12345C.chainID = 43111;
+n12345C.chainID = 43112;
 
 export class Defaults {
   static network = {
@@ -351,7 +351,7 @@ export class Defaults {
       C: n4C,
       'saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK': n4C,
     },
-    5: { // update before fuji
+    5: {
       hrp: NetworkIDToHRP[5],
       X: n5X,
       '2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm': n5X,
