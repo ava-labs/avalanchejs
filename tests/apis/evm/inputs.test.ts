@@ -11,6 +11,7 @@ import {
 import { EVMConstants } from 'src/apis/evm/constants';
 import { Input } from 'src/common/input';
 import { Output } from 'src/common/output';
+import { EVMInput } from 'src/apis/evm';
 
 /**
  * @ignore
@@ -111,5 +112,35 @@ describe('Inputs', () => {
     expect(cmp(in1, in1)).toBe(0);
     expect(cmp(in2, in2)).toBe(0);
     expect(cmp(in3, in3)).toBe(0);
+  });
+
+  test('EVMInput comparator', () => {
+    const address1: string = "X-local1n8cjyy4hdw96dsvdsdf9mcuswu4wq333gqtfq2";
+    const address2: string = "X-local17pm5mywjrdvkz8c3f25ll0tmshs900qf0wrwxc";
+    const address3: string = "X-local1u9z02vhut6ur5gvt8xh2g3e4xaadt2h37u3zqe";
+    const amount1: number = 1;
+    const amount2: number = 2;
+    const amount3: number = 3;
+    const assetID1: string = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe";
+    const assetID2: string = "vvKCjrpggyQ8FhJ2D5EAKPh8x8y4JK93JQiWRpTKpEouydRbG";
+    const assetID3: string = "eRo1eb2Yxd87KuMYANBSha3n138wtqRhFz2xjftsXWnmpCxyh";
+    const nonce1: number = 0;
+    const nonce2: number = 1;
+    const nonce3: number = 2;
+
+    const inpt1: EVMInput = new EVMInput(address1, amount1, assetID1, nonce1);
+    const inpt2: EVMInput = new EVMInput(address2, amount2, assetID2, nonce2);
+    const inpt3: EVMInput = new EVMInput(address3, amount3, assetID3, nonce3);
+
+    const cmp = EVMInput.comparator();
+    expect(cmp(inpt1, inpt2)).toBe(-1);
+    expect(cmp(inpt1, inpt3)).toBe(-1);
+    expect(cmp(inpt2, inpt3)).toBe(-1);
+    expect(cmp(inpt1, inpt1)).toBe(0);
+    expect(cmp(inpt2, inpt2)).toBe(0);
+    expect(cmp(inpt3, inpt3)).toBe(0);
+    expect(cmp(inpt2, inpt1)).toBe(1);
+    expect(cmp(inpt3, inpt1)).toBe(1);
+    expect(cmp(inpt3, inpt2)).toBe(1);
   });
 });
