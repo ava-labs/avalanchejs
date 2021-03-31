@@ -113,6 +113,15 @@ export class EVMInput extends EVMOutput {
   protected sigIdxs: SigIdx[] = []; // idxs of signers from utxo
 
   /**
+  * Returns a function used to sort an array of [[EVMInput]]s
+  */
+  static comparator = (): (a: EVMInput, b: EVMInput) => (1|-1|0) => (a: EVMInput, b: EVMInput): (1|-1|0) => {
+    const sorta: Buffer = a.toBuffer();
+    const sortb: Buffer = b.toBuffer();
+    return Buffer.compare(sorta, sortb) as (1|-1|0);
+  }
+
+  /**
    * Returns the array of [[SigIdx]] for this [[Input]]
    */
   getSigIdxs = (): SigIdx[] => this.sigIdxs;

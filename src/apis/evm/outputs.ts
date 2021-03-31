@@ -100,6 +100,15 @@ export class EVMOutput {
   protected assetID: Buffer = Buffer.alloc(32);
 
   /**
+  * Returns a function used to sort an array of [[EVMOutput]]s
+  */
+  static comparator = (): (a: EVMOutput, b: EVMOutput) => (1|-1|0) => (a: EVMOutput, b: EVMOutput): (1|-1|0) => {
+    const sorta: Buffer = a.toBuffer();
+    const sortb: Buffer = b.toBuffer();
+    return Buffer.compare(sorta, sortb) as (1|-1|0);
+  }
+
+  /**
    * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
    */
   getAddress = (): Buffer => this.address;
