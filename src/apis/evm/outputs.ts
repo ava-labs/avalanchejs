@@ -104,8 +104,14 @@ export class EVMOutput {
   * Returns a function used to sort an array of [[EVMOutput]]s
   */
   static comparator = (): (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput) => (1|-1|0) => (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput): (1|-1|0) => {
-    const sorta: Buffer = a.toBuffer();
-    const sortb: Buffer = b.toBuffer();
+    // primarily sort by address
+    let sorta: Buffer = a.getAddress();
+    let sortb: Buffer = b.getAddress();
+    // secondarily sort by assetID
+    if(sorta.equals(sortb)) {
+      sorta = a.getAssetID();
+      sortb = b.getAssetID();
+    }
     return Buffer.compare(sorta, sortb) as (1|-1|0);
   }
 
