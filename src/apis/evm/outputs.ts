@@ -8,6 +8,7 @@ import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
 import { SerializedEncoding } from '../../utils/serialization';
+import { EVMInput } from './inputs';
 
 const bintools: BinTools = BinTools.getInstance();
 
@@ -102,7 +103,7 @@ export class EVMOutput {
   /**
   * Returns a function used to sort an array of [[EVMOutput]]s
   */
-  static comparator = (): (a: EVMOutput, b: EVMOutput) => (1|-1|0) => (a: EVMOutput, b: EVMOutput): (1|-1|0) => {
+  static comparator = (): (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput) => (1|-1|0) => (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput): (1|-1|0) => {
     const sorta: Buffer = a.toBuffer();
     const sortb: Buffer = b.toBuffer();
     return Buffer.compare(sorta, sortb) as (1|-1|0);
