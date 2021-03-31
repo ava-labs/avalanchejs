@@ -64,7 +64,7 @@ export class JRPCAPI extends APIBase {
             resp.data = JSON.parse(resp.data);
           }
           if (typeof resp.data === 'object' && (resp.data === null || 'error' in resp.data)) {
-            throw new Error("Error");
+            throw new Error(`${resp.data.error.message}`);
           }
         }
         return resp;
