@@ -156,7 +156,7 @@ const n1C:object = {
   alias: CChainAlias,
   vm: CChainVMName,
   txFee: MILLIAVAX,
-  gasPrice: GWEI.mul(new BN(470)), 
+  gasPrice: GWEI.mul(new BN(225)), 
   chainID: 43114
 };
 
@@ -290,7 +290,7 @@ const n5C:object = {
   alias: CChainAlias,
   vm: CChainVMName,
   txFee: MILLIAVAX,
-  gasPrice: GWEI.mul(new BN(470)), 
+  gasPrice: GWEI.mul(new BN(225)), 
   chainID: 43113
 };
 
