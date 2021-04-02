@@ -27,9 +27,10 @@ import {
  */
 export class IndexAPI extends JRPCAPI {
     /**
-     * TODO - add description
+     * Get last accepted tx, vtx or block
      *
      * @param encoding 
+     * @param baseurl
      *
      * @returns Returns a Promise<GetLastAcceptedResponse>.
      */
@@ -48,10 +49,11 @@ export class IndexAPI extends JRPCAPI {
     };
 
     /**
-     * TODO - add description
+     * Get container by index
      *
      * @param index
      * @param encoding 
+     * @param baseurl
      *
      * @returns Returns a Promise<GetContainerByIndexResponse>.
      */
@@ -71,10 +73,11 @@ export class IndexAPI extends JRPCAPI {
     };
 
     /**
-     * TODO - add description
+     * Get contrainer by ID
      *
      * @param containerID
      * @param encoding 
+     * @param baseurl
      *
      * @returns Returns a Promise<GetContainerByIDResponse>.
      */
@@ -94,11 +97,12 @@ export class IndexAPI extends JRPCAPI {
     };
 
     /**
-     * TODO - add description
+     * Get container range
      *
      * @param startIndex
      * @param numToFetch
      * @param encoding 
+     * @param baseurl
      *
      * @returns Returns a Promise<GetContainerRangeResponse>.
      */
@@ -119,10 +123,11 @@ export class IndexAPI extends JRPCAPI {
     };
 
     /**
-     * TODO - add description
+     * Get index by containerID
      *
      * @param containerID
      * @param encoding 
+     * @param baseurl
      *
      * @returns Returns a Promise<GetIndexResponse>.
      */
@@ -142,10 +147,11 @@ export class IndexAPI extends JRPCAPI {
     };
 
     /**
-     * TODO - add description
+     * Check if container is accepted
      *
      * @param containerID
      * @param encoding 
+     * @param baseurl
      *
      * @returns Returns a Promise<GetIsAcceptedResponse>.
      */

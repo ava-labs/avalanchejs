@@ -15,7 +15,7 @@ const index: IndexAPI = avalanche.Index();
   
 const main = async (): Promise<any> => {
   const encoding: string = 'cb58';
-  const baseurl: string = "/ext/index/C/block"  
+  const baseurl: string = "/ext/index/X/tx"  
   const lastAccepted: GetLastAcceptedResponse = await index.getLastAccepted(encoding, baseurl);
   console.log(lastAccepted);
 }
