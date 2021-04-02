@@ -23,6 +23,10 @@ export interface Asset {
   denomination: number
 }
 
+export interface BaseIndexParams {
+  encoding: string
+}
+
 export interface BaseIndexResponse {
   id: string
   bytes: string
@@ -31,40 +35,33 @@ export interface BaseIndexResponse {
   index: string
 }
 
-export interface GetLastAcceptedParams {
-  encoding: string
-}
+export interface GetLastAcceptedParams extends BaseIndexParams {}
 
 export interface GetLastAcceptedResponse extends BaseIndexResponse {}
 
-export interface GetContainerByIndexParams {
-  index: string,
-  encoding: string
+export interface GetContainerByIndexParams extends BaseIndexParams {
+  index: string
 }
 
 export interface GetContainerByIndexResponse extends BaseIndexResponse {}
 
-export interface GetContainerByIDParams {
-  containerID: string,
-  encoding: string
+export interface GetContainerByIDParams extends BaseIndexParams {
+  containerID: string
 }
 
 export interface GetContainerByIDResponse extends BaseIndexResponse {}
 
-export interface GetContainerRangeParams {
+export interface GetContainerRangeParams extends BaseIndexParams {
   startIndex: number,
-  numToFetch: number,
-  encoding: string
+  numToFetch: number
 }
 
 export interface GetContainerRangeResponse extends BaseIndexResponse {}
 
-export interface GetIndexParams {
-  containerID: string,
-  encoding: string
+export interface GetIndexParams extends BaseIndexParams {
+  containerID: string
 }
 
-export interface GetIsAcceptedParams {
-  containerID: string,
-  encoding: string
+export interface GetIsAcceptedParams extends BaseIndexParams {
+  containerID: string
 }
