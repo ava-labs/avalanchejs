@@ -14,9 +14,10 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID);
 const index: IndexAPI = avalanche.Index();
   
 const main = async (): Promise<any> => {
-  const containerID: string = "2CiVMmk7Uk1SaKzYYkrbQjiBbd7rDBUocNjpzUJxhsJ27ezJcF";
+  const containerID: string = "2ceDnmxh59AsXqTG95vf3dr2a7ohXprNn9mvWgQJ39uHryBecT";
   const encoding: string = 'cb58';
-  const containerByIndex: GetContainerByIDResponse = await index.getContainerByID(containerID, encoding);
+  const baseurl: string = "/ext/index/C/block"
+  const containerByIndex: GetContainerByIDResponse = await index.getContainerByID(containerID, encoding, baseurl);
   console.log(containerByIndex);
 }
     

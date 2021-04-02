@@ -11,9 +11,10 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID);
 const index: IndexAPI = avalanche.Index();
   
 const main = async (): Promise<any> => {
-  const containerID: string = "2CiVMmk7Uk1SaKzYYkrbQjiBbd7rDBUocNjpzUJxhsJ27ezJcF";
+  const containerID: string = "2ceDnmxh59AsXqTG95vf3dr2a7ohXprNn9mvWgQJ39uHryBecT";
   const encoding: string = "hex";
-  const containerRange: boolean = await index.isAccepted(containerID, encoding);
+  const baseurl: string = "/ext/index/C/block"
+  const containerRange: boolean = await index.isAccepted(containerID, encoding, baseurl);
   console.log(containerRange);
 }
     

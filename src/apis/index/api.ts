@@ -33,7 +33,8 @@ export class IndexAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<GetLastAcceptedResponse>.
      */
-    getLastAccepted = async (encoding: string = "cb58"): Promise<GetLastAcceptedResponse> => {
+     getLastAccepted = async (encoding: string = "cb58", baseurl: string = this.getBaseURL()): Promise<GetLastAcceptedResponse> => {
+      this.setBaseURL(baseurl)
       const params: GetLastAcceptedParams = {
         encoding
       };
@@ -54,7 +55,8 @@ export class IndexAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<GetContainerByIndexResponse>.
      */
-     getContainerByIndex = async (index: string = "0", encoding: string = "cb58"): Promise<GetContainerByIndexResponse> => {
+     getContainerByIndex = async (index: string = "0", encoding: string = "cb58", baseurl: string = this.getBaseURL()): Promise<GetContainerByIndexResponse> => {
+      this.setBaseURL(baseurl)
       const params: GetContainerByIndexParams = {
         index,
         encoding
@@ -76,7 +78,8 @@ export class IndexAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<GetContainerByIDResponse>.
      */
-     getContainerByID = async (containerID: string = "0", encoding: string = "cb58"): Promise<GetContainerByIDResponse> => {
+     getContainerByID = async (containerID: string = "0", encoding: string = "cb58", baseurl: string = this.getBaseURL()): Promise<GetContainerByIDResponse> => {
+      this.setBaseURL(baseurl)
       const params: GetContainerByIDParams = {
         containerID,
         encoding
@@ -99,7 +102,8 @@ export class IndexAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<GetContainerRangeResponse>.
      */
-     getContainerRange = async (startIndex: number = 0, numToFetch: number = 100, encoding: string = "hex"): Promise<GetContainerRangeResponse[]> => {
+     getContainerRange = async (startIndex: number = 0, numToFetch: number = 100, encoding: string = "hex", baseurl: string = this.getBaseURL()): Promise<GetContainerRangeResponse[]> => {
+      this.setBaseURL(baseurl)
       const params: GetContainerRangeParams = {
         startIndex,
         numToFetch,
@@ -122,7 +126,8 @@ export class IndexAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<GetIndexResponse>.
      */
-     getIndex = async (containerID: string = "", encoding: string = "hex"): Promise<string> => {
+     getIndex = async (containerID: string = "", encoding: string = "hex", baseurl: string = this.getBaseURL()): Promise<string> => {
+      this.setBaseURL(baseurl)
       const params: GetIndexParams = {
         containerID,
         encoding
@@ -144,18 +149,19 @@ export class IndexAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<GetIsAcceptedResponse>.
      */
-     isAccepted = async (containerID: string = "", encoding: string = "hex"): Promise<boolean> => {
-      const params: GetIsAcceptedParams = {
-        containerID,
-        encoding
-      };
+     isAccepted = async (containerID: string = "", encoding: string = "hex", baseurl: string = this.getBaseURL()): Promise<boolean> => {
+       this.setBaseURL(baseurl)
+       const params: GetIsAcceptedParams = {
+         containerID,
+         encoding
+       };
 
-      try {
-        const response: RequestResponseData = await this.callMethod("index.isAccepted", params);
-        return response['data']['result'];
-      } catch (error) {
-        console.log(error)
-      }
+       try {
+         const response: RequestResponseData = await this.callMethod("index.isAccepted", params);
+         return response['data']['result'];
+       } catch (error) {
+         console.log(error)
+       }
     };
 
     constructor(core: AvalancheCore, baseurl: string = "/ext/index/X/tx") { super(core, baseurl); }
