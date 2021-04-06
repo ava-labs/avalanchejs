@@ -13,6 +13,9 @@ import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { KeyChain, KeyPair } from './keychain';
 import { DefaultNetworkID } from '../../utils/constants';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { CodecIdError, 
+         ChainIdError, 
+         TransferableInputError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -55,7 +58,7 @@ export class ImportTx extends BaseTx {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE;
@@ -104,7 +107,7 @@ export class ImportTx extends BaseTx {
    */
   toBuffer():Buffer {
     if(typeof this.sourceChain === "undefined") {
-      throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
+      throw new ChainIdError("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
     let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
@@ -177,7 +180,7 @@ export class ImportTx extends BaseTx {
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       for (let i = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
-          throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
+          throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       }
       this.importIns = importIns;

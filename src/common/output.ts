@@ -9,6 +9,7 @@ import BinTools from '../utils/bintools';
 import { NBytes } from './nbytes';
 import { UnixNow } from '../utils/helperfunctions';
 import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { ChecksumError, AddressError, AddressIndexError } from '../utils/errors';
 
 /**
  * @ignore
@@ -57,12 +58,12 @@ export class Address extends NBytes {
         this.bytes = newbuff;
       }
     } else if (addrbuff.length === 24) {
-      throw new Error('Error - Address.fromString: invalid checksum on address');
+      throw new ChecksumError('Error - Address.fromString: invalid checksum on address');
     } else if (addrbuff.length === 20) {
       this.bytes = addrbuff;
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - Address.fromString: invalid address');
+      throw new AddressError('Error - Address.fromString: invalid address');
     }
     return this.getSize();
   }
@@ -168,7 +169,7 @@ export class OutputOwners extends Serializable {
     if (idx < this.addresses.length) {
       return this.addresses[idx].toBuffer();
     }
-    throw new Error('Error - Output.getAddress: idx out of range');
+    throw new AddressIndexError('Error - Output.getAddress: idx out of range');
   };
 
   /**

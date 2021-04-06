@@ -31,6 +31,7 @@ import {
   TransferableOutput 
 } from './outputs';
 import { ExportTx } from './exporttx';
+import { TransactionError, ChainIdError, NoAtomicUTXOsError, AddressError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -451,7 +452,7 @@ export class EVMAPI extends JRPCAPI {
       Transaction = tx.toString();
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - avax.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+      throw new TransactionError('Error - avax.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
     const params: {
       tx: string
@@ -519,7 +520,7 @@ export class EVMAPI extends JRPCAPI {
       sourceChain = bintools.cb58Decode(sourceChain);
     } else if(typeof sourceChain === "undefined" || !(sourceChain instanceof Buffer)) {
       // if there is no sourceChain passed in or the sourceChain is any data type other than a Buffer then throw an error
-      throw new Error('Error - EVMAPI.buildImportTx: sourceChain is undefined or invalid sourceChain type.');
+      throw new ChainIdError('Error - EVMAPI.buildImportTx: sourceChain is undefined or invalid sourceChain type.');
     }
     const utxoResponse: UTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const atomicUTXOs: UTXOSet = utxoResponse.utxos;
@@ -527,7 +528,7 @@ export class EVMAPI extends JRPCAPI {
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
 
     if(atomics.length === 0){
-      throw new Error("Error - EVMAPI.buildImportTx: no atomic utxos to import");
+      throw new NoAtomicUTXOsError("Error - EVMAPI.buildImportTx: no atomic utxos to import");
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
@@ -577,18 +578,18 @@ export class EVMAPI extends JRPCAPI {
       prefixes[address.split("-")[0]] = true;
     });
     if(Object.keys(prefixes).length !== 1){
-      throw new Error("Error - EVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
+      throw new AddressError("Error - EVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
     }
     
     if(typeof destinationChain === "undefined") {
-      throw new Error("Error - EVMAPI.buildExportTx: Destination ChainID is undefined.");
+      throw new ChainIdError("Error - EVMAPI.buildExportTx: Destination ChainID is undefined.");
     } else if (typeof destinationChain === "string") {
       destinationChain = bintools.cb58Decode(destinationChain); 
     } else if(!(destinationChain instanceof Buffer)) {
-      throw new Error("Error - EVMAPI.buildExportTx: Invalid destinationChain type");
+      throw new ChainIdError("Error - EVMAPI.buildExportTx: Invalid destinationChain type");
     }
     if(destinationChain.length !== 32) {
-      throw new Error("Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
+      throw new ChainIdError("Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
     const fee: BN = this.getTxFee();
 
@@ -654,7 +655,7 @@ export class EVMAPI extends JRPCAPI {
         if (typeof address === 'string') {
           if (typeof this.parseAddress(address as string) === 'undefined') {
             /* istanbul ignore next */
-            throw new Error("Error - Invalid address format");
+            throw new AddressError("Error - Invalid address format");
           }
           addrs.push(address as string);
         } else {

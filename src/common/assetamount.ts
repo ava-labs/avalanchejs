@@ -7,6 +7,7 @@ import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import { StandardTransferableOutput } from './output';
 import { StandardTransferableInput } from './input';
+import { InsufficientFundsError } from '../utils/errors';
 
 /**
  * Class for managing asset amounts in the UTXOSet fee calcuation
@@ -76,7 +77,7 @@ export class AssetAmount {
   spendAmount = (amt: BN, stakeableLocked: boolean = false): boolean => {
     if (this.finished) {
       /* istanbul ignore next */
-      throw new Error('Error - AssetAmount.spendAmount: attempted to spend '
+      throw new InsufficientFundsError('Error - AssetAmount.spendAmount: attempted to spend '
         + 'excess funds');
     }
     this.spent = this.spent.add(amt);

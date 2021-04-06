@@ -8,6 +8,7 @@ import { PlatformVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, StandardParseableOutput, Address } from '../../common/output';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import BN from 'bn.js';
+import { OutputIdError } from '../../utils/errors';
 
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
@@ -27,7 +28,7 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
     } else if(outputid == PlatformVMConstants.STAKEABLELOCKOUTID) {
       return new StakeableLockOut(...args);
     }
-    throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
+    throw new OutputIdError("Error - SelectOutputClass: unknown outputid " + outputid);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{

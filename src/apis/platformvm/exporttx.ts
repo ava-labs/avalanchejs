@@ -12,6 +12,7 @@ import { DefaultNetworkID } from '../../utils/constants';
 import BN from 'bn.js';
 import { AmountOutput } from '../platformvm/outputs';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { ChainIdError, TransferableOutputError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -108,7 +109,7 @@ export class ExportTx extends BaseTx {
    */
   toBuffer():Buffer {
     if(typeof this.destinationChain === "undefined") {
-      throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
+      throw new ChainIdError("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
     this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
     let barr:Array<Buffer> = [super.toBuffer(), this.destinationChain, this.numOuts];
@@ -150,7 +151,7 @@ export class ExportTx extends BaseTx {
     if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
       for (let i = 0; i < exportOuts.length; i++) {
         if (!(exportOuts[i] instanceof TransferableOutput)) {
-          throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
+          throw new TransferableOutputError("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
         }
       }
       this.exportOuts = exportOuts;

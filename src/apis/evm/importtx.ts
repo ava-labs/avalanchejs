@@ -24,6 +24,7 @@ import {
   Serialization, 
   SerializedEncoding 
 } from '../../utils/serialization';
+import { ChainIdError, TransferableInputError, EVMOutputError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -117,7 +118,7 @@ export class ImportTx extends EVMBaseTx {
    */
   toBuffer(): Buffer {
     if(typeof this.sourceChain === "undefined") {
-      throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
+      throw new ChainIdError("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
     this.numOuts.writeUInt32BE(this.outs.length, 0);
@@ -207,7 +208,7 @@ export class ImportTx extends EVMBaseTx {
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {
-          throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
+          throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       });
       this.importIns = importIns;
@@ -215,7 +216,7 @@ export class ImportTx extends EVMBaseTx {
     if (typeof outs !== 'undefined' && Array.isArray(outs)) {
       outs.forEach((out: EVMOutput) => {
         if (!(out instanceof EVMOutput)) {
-          throw new Error("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
+          throw new EVMOutputError("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
         }
       });
       if(outs.length > 1) {

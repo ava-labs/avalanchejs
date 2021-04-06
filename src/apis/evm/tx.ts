@@ -18,6 +18,7 @@ import { EVMBaseTx } from './basetx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
 import { SerializedEncoding } from '../../utils/serialization';
+import { TransactionError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -38,7 +39,7 @@ export const SelectTxClass = (txTypeID: number, ...args: any[]): EVMBaseTx => {
     return new ExportTx(...args);
   }
   /* istanbul ignore next */
-  throw new Error("Error - SelectTxClass: unknown txType");
+  throw new Error("TransactionError - SelectTxClass: unknown txType");
 };
 
 export class UnsignedTx extends EVMStandardUnsignedTx<KeyPair, KeyChain, EVMBaseTx> {

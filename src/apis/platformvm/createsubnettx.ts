@@ -9,6 +9,7 @@ import { DefaultNetworkID } from '../../utils/constants';
 import { TransferableOutput, SECPOwnerOutput} from './outputs';
 import { TransferableInput } from './inputs';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SubnetOwnerError } from '../../utils/errors';
 
 const serializer = Serialization.getInstance();
 
@@ -67,7 +68,7 @@ export class CreateSubnetTx extends BaseTx {
    */
   toBuffer():Buffer {
       if(typeof this.subnetOwners === "undefined" || !(this.subnetOwners instanceof SECPOwnerOutput)) {
-          throw new Error("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
+          throw new SubnetOwnerError("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
       }
       let typeID:Buffer = Buffer.alloc(4);
       typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0);

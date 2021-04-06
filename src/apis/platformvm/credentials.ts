@@ -5,6 +5,7 @@
 
 import { PlatformVMConstants } from './constants';
 import { Credential } from '../../common/credentials';
+import { CredIdError } from '../../utils/errors';
 
 /**
  * Takes a buffer representing the credential and returns the proper [[Credential]] instance.
@@ -18,7 +19,7 @@ export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credent
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
-  throw new Error("Error - SelectCredentialClass: unknown credid");
+  throw new CredIdError("Error - SelectCredentialClass: unknown credid");
 };
 
 export class SECPCredential extends Credential {
