@@ -9,6 +9,7 @@ import { AVMAPI } from './apis/avm/api';
 import { EVMAPI } from './apis/evm/api';
 import { HealthAPI } from './apis/health/api';
 import { InfoAPI } from './apis/info/api';
+import { IndexAPI } from './apis/index/api';
 import { KeystoreAPI } from './apis/keystore/api';
 import { MetricsAPI } from './apis/metrics/api';
 import { PlatformVMAPI } from './apis/platformvm/api';
@@ -58,6 +59,11 @@ export default class Avalanche extends AvalancheCore {
      * Returns a reference to the Info RPC for a node.
      */
   Info = () => this.apis.info as InfoAPI;
+
+  /**
+     * Returns a reference to the Index RPC for a node.
+     */
+  Index = () => this.apis.index as IndexAPI;
 
   /**
      * Returns a reference to the Metrics RPC.
@@ -139,6 +145,7 @@ export default class Avalanche extends AvalancheCore {
       this.addAPI('cchain', EVMAPI, '/ext/bc/C/avax', cchainid);
       this.addAPI('health', HealthAPI);
       this.addAPI('info', InfoAPI);
+      this.addAPI('index', IndexAPI);
       this.addAPI('keystore', KeystoreAPI);
       this.addAPI('metrics', MetricsAPI);
       this.addAPI('pchain', PlatformVMAPI);
@@ -161,6 +168,7 @@ export * as avm from './apis/avm';
 export * as evm from './apis/evm';
 export * as health from './apis/health';
 export * as info from './apis/info';
+export * as index from './apis/index';
 export * as keystore from './apis/keystore';
 export * as metrics from './apis/metrics';
 export * as platformvm from './apis/platformvm';
