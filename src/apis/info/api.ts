@@ -6,6 +6,7 @@ import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
 import BN from "bn.js";
+import { PeersParams, PeersResponse } from 'src/common/interfaces';
 
 /**
  * Class for interacting with a node's InfoAPI.
@@ -99,11 +100,19 @@ export class InfoAPI extends JRPCAPI {
 
   /**
    * Returns the peers connected to the node.
+   * @param nodeIDs an optional parameter to specify what nodeID's descriptions should be returned. 
+   * If this parameter is left empty, descriptions for all active connections will be returned. 
+   * If the node is not connected to a specified nodeID, it will be omitted from the response.
    *
-   * @returns Promise for the list of connected peers in <ip>:<port> format.
+   * @returns Promise for the list of connected peers in PeersResponse format.
    */
-  peers = async ():Promise<Array<string>> => this.callMethod('info.peers')
-    .then((response:RequestResponseData) => response.data.result.peers);
+  peers = async (nodeIDs: string[] = []): Promise<PeersResponse[]> => {
+    const params: PeersParams = {
+      nodeIDs
+    };
+    const response: RequestResponseData = await this.callMethod('info.peers', params)
+    return response.data.result.peers;
+  }
 
   constructor(core:AvalancheCore, baseurl:string = '/ext/info') { super(core, baseurl); }
 }
