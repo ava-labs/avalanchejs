@@ -2,6 +2,7 @@ import mockAxios from 'jest-mock-axios';
 import { Avalanche } from 'src';
 import { InfoAPI } from 'src/apis/info/api';
 import BN from "bn.js";
+import { PeersParams, PeersResponse } from 'src/common';
 
 describe('Info', () => {
   const ip:string = '127.0.0.1';
@@ -166,8 +167,26 @@ describe('Info', () => {
   });
 
   test('peers', async () => {
-    const peers = ['p1', 'p2'];
-    const result:Promise<Array<string>> = info.peers();
+    const peers = [{
+      ip: '127.0.0.1:60300',
+      publicIP: '127.0.0.1:9659',
+      nodeID: 'NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5',
+      version: 'avalanche/1.3.2',
+      up: true,
+      lastSent: '2021-04-14T08:15:06-07:00',
+      lastReceived: '2021-04-14T08:15:06-07:00',
+      benched: null
+    }, {
+      ip: '127.0.0.1:60302',
+      publicIP: '127.0.0.1:9655',
+      nodeID: 'NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN',
+      version: 'avalanche/1.3.2',
+      up: true,
+      lastSent: '2021-04-14T08:15:06-07:00',
+      lastReceived: '2021-04-14T08:15:06-07:00',
+      benched: null
+    }];
+    const result: Promise<PeersResponse[]> = info.peers();
     const payload:object = {
       result: {
         peers,
@@ -178,7 +197,7 @@ describe('Info', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:Array<string> = await result;
+    const response: PeersResponse[] = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(peers);
