@@ -14,6 +14,7 @@ import { DefaultNetworkID } from '../../utils/constants';
 import { bufferToNodeIDString } from '../../utils/helperfunctions';
 import { AmountOutput, ParseableOutput } from './outputs';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { DelegationFeeError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -582,7 +583,7 @@ export class AddValidatorTx extends AddDelegatorTx {
             if(delegationFee >= 0 && delegationFee <= 100) {
                 this.delegationFee = parseFloat(delegationFee.toFixed(4));
             } else {
-                throw new Error("AddValidatorTx.constructor -- delegationFee must be in the range of 0 and 100, inclusively.");
+                throw new DelegationFeeError("AddValidatorTx.constructor -- delegationFee must be in the range of 0 and 100, inclusively.");
             }
         }
     }

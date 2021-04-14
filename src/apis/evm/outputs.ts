@@ -9,6 +9,7 @@ import { EVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
 import { SerializedEncoding } from '../../utils/serialization';
 import { EVMInput } from './inputs';
+import { OutputIdError } from '../../utils/errors';
 
 const bintools: BinTools = BinTools.getInstance();
 
@@ -23,7 +24,7 @@ export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
   if(outputID == EVMConstants.SECPXFEROUTPUTID){
     return new SECPTransferOutput( ...args);
   }
-  throw new Error("Error - SelectOutputClass: unknown outputID");
+  throw new OutputIdError("Error - SelectOutputClass: unknown outputID");
 }
 
 export class TransferableOutput extends StandardTransferableOutput{

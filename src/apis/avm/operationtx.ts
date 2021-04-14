@@ -14,6 +14,7 @@ import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { CodecIdError, OperationError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -53,7 +54,7 @@ export class OperationTx extends BaseTx {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE;
@@ -162,7 +163,7 @@ export class OperationTx extends BaseTx {
     if (typeof ops !== 'undefined' && Array.isArray(ops)) {
       for (let i = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {
-          throw new Error("Error - OperationTx.constructor: invalid op in array parameter 'ops'");
+          throw new OperationError("Error - OperationTx.constructor: invalid op in array parameter 'ops'");
         }
       }
       this.ops = ops;

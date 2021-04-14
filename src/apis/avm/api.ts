@@ -21,6 +21,13 @@ import { MinterSet } from './minterset';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
 import { OutputOwners } from '../../common/output';
 import { SECPTransferOutput } from './outputs';
+import { AddressError, 
+         GooseEggCheckError, 
+         ChainIdError, 
+         NoAtomicUTXOsError, 
+         SymbolError, 
+         NameError,
+         TransactionError } from "../../utils/errors";
 
 /**
  * @ignore
@@ -273,7 +280,7 @@ export class AVMAPI extends JRPCAPI {
   getBalance = async (address:string, assetID:string):Promise<object> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error("Error - AVMAPI.getBalance: Invalid address format");
+      throw new AddressError("Error - AVMAPI.getBalance: Invalid address format");
     }
     const params:any = {
       address,
@@ -426,7 +433,7 @@ export class AVMAPI extends JRPCAPI {
   exportKey = async (username:string, password:string, address:string):Promise<string> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error("Error - AVMAPI.exportKey: Invalid address format");
+      throw new AddressError("Error - AVMAPI.exportKey: Invalid address format");
     }
     const params:any = {
       username,
@@ -572,7 +579,7 @@ export class AVMAPI extends JRPCAPI {
   getAllBalances = async (address:string):Promise<Array<object>> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error("Error - AVMAPI.getAllBalances: Invalid address format");
+      throw new AddressError("Error - AVMAPI.getAllBalances: Invalid address format");
     }
     const params:any = {
       address,
@@ -758,7 +765,7 @@ export class AVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildBaseTx:Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -824,7 +831,7 @@ export class AVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildNFTTransferTx:Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -869,13 +876,13 @@ export class AVMAPI extends JRPCAPI {
     let srcChain:string = undefined;
 
     if(typeof sourceChain === "undefined") {
-      throw new Error("Error - AVMAPI.buildImportTx: Source ChainID is undefined.");
+      throw new ChainIdError("Error - AVMAPI.buildImportTx: Source ChainID is undefined.");
     } else if (typeof sourceChain === "string") {
       srcChain = sourceChain;
       sourceChain = bintools.cb58Decode(sourceChain);
     } else if(!(sourceChain instanceof Buffer)) {
     srcChain = bintools.cb58Encode(sourceChain);
-    throw new Error("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
+    throw new ChainIdError("Error - AVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
   }
   
   const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
@@ -884,7 +891,7 @@ export class AVMAPI extends JRPCAPI {
   const atomics = atomicUTXOs.getAllUTXOs();
 
   if(atomics.length === 0){
-    throw new Error("Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " + srcChain + " using addresses: " + ownerAddresses.join(", ") );
+    throw new NoAtomicUTXOsError("Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " + srcChain + " using addresses: " + ownerAddresses.join(", ") );
   }
 
   if( memo instanceof PayloadBase) {
@@ -906,7 +913,7 @@ export class AVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildImportTx:Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -950,18 +957,18 @@ export class AVMAPI extends JRPCAPI {
       prefixes[a.split("-")[0]] = true;
     });
     if(Object.keys(prefixes).length !== 1){
-      throw new Error("Error - AVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
+      throw new AddressError("Error - AVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
     }
     
     if(typeof destinationChain === "undefined") {
-      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID is undefined.");
+      throw new ChainIdError("Error - AVMAPI.buildExportTx: Destination ChainID is undefined.");
     } else if (typeof destinationChain === "string") {
       destinationChain = bintools.cb58Decode(destinationChain); //
     } else if(!(destinationChain instanceof Buffer)) {
-      throw new Error("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
+      throw new ChainIdError("Error - AVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
     }
     if(destinationChain.length !== 32) {
-      throw new Error("Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
+      throw new ChainIdError("Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
 
     let to:Array<Buffer> = [];
@@ -997,7 +1004,7 @@ export class AVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildExportTx:Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1043,12 +1050,12 @@ export class AVMAPI extends JRPCAPI {
     /* istanbul ignore next */
     if(symbol.length > AVMConstants.SYMBOLMAXLEN){
         /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+        throw new SymbolError("Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
     }
     /* istanbul ignore next */
     if(name.length > AVMConstants.ASSETNAMELEN) {
       /* istanbul ignore next */
-      throw new Error("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+      throw new NameError("Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
@@ -1069,7 +1076,7 @@ export class AVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee())) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildCreateAssetTx:Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1107,7 +1114,7 @@ export class AVMAPI extends JRPCAPI {
     );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildSECPMintTx:Failed Goose Egg Check");
     }
     return builtUnsignedTx;
   }
@@ -1167,11 +1174,11 @@ export class AVMAPI extends JRPCAPI {
 
     if(name.length > AVMConstants.ASSETNAMELEN) {
       /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
+        throw new NameError("Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " + AVMConstants.ASSETNAMELEN);
     }
     if(symbol.length > AVMConstants.SYMBOLMAXLEN){
       /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
+        throw new SymbolError("Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " + AVMConstants.SYMBOLMAXLEN);
     }
     let avaxAssetID:Buffer = await this.getAVAXAssetID();
     const builtUnsignedTx:UnsignedTx = utxoset.buildCreateNFTAssetTx(
@@ -1188,7 +1195,7 @@ export class AVMAPI extends JRPCAPI {
     );
     if(! await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee())) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildCreateNFTAssetTx:Failed Goose Egg Check");
     }
     return builtUnsignedTx;
   }
@@ -1256,7 +1263,7 @@ export class AVMAPI extends JRPCAPI {
     );
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Error - AVMAPI.buildCreateNFTMintTx:Failed Goose Egg Check");
     }
     return builtUnsignedTx;
   }
@@ -1289,7 +1296,7 @@ export class AVMAPI extends JRPCAPI {
       Transaction = tx.toString();
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - avm.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+      throw new TransactionError('Error - AVMAPI.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
     const params:any = {
       tx: Transaction.toString(),
@@ -1317,7 +1324,7 @@ export class AVMAPI extends JRPCAPI {
 
     if (typeof this.parseAddress(to) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error("Error - AVMAPI.send: Invalid address format");
+      throw new AddressError("Error - AVMAPI.send: Invalid address format");
     }
 
     if (typeof assetID !== 'string') {
@@ -1347,7 +1354,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== 'undefined') {
       if(typeof this.parseAddress(changeAddr) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.send: Invalid address format");
+        throw new AddressError("Error - AVMAPI.send: Invalid address format");
       }
       params["changeAddr"] = changeAddr;
     } 
@@ -1388,7 +1395,7 @@ export class AVMAPI extends JRPCAPI {
     sendOutputs.forEach((output) => {
       if (typeof this.parseAddress(output.to) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.sendMultiple: Invalid address format");
+        throw new AddressError("Error - AVMAPI.sendMultiple: Invalid address format");
       }
       if (typeof output.assetID !== 'string') {
         asset = bintools.cb58Encode(output.assetID);
@@ -1417,7 +1424,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== 'undefined') {
       if(typeof this.parseAddress(changeAddr) === 'undefined') {
         /* istanbul ignore next */
-        throw new Error("Error - AVMAPI.send: Invalid address format");
+        throw new AddressError("Error - AVMAPI.send: Invalid address format");
       }
       params["changeAddr"] = changeAddr;
     } 
@@ -1461,7 +1468,7 @@ export class AVMAPI extends JRPCAPI {
         if (typeof addresses[i] === 'string') {
           if (typeof this.parseAddress(addresses[i] as string) === 'undefined') {
             /* istanbul ignore next */
-            throw new Error("Error - AVMAPI.${caller}: Invalid address format");
+            throw new AddressError("Error - AVMAPI.${caller}: Invalid address format");
           }
           addrs.push(addresses[i] as string);
         } else {

@@ -16,6 +16,13 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { AddressError, 
+         TransactionError, 
+         ChainIdError, 
+         GooseEggCheckError, 
+         TimeError, 
+         StakeError,
+         DelegationFeeError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -351,7 +358,7 @@ export class PlatformVMAPI extends JRPCAPI {
   getBalance = async (address:string):Promise<object> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
-      throw new Error("Error - PlatformVMAPI.getBalance: Invalid address format");
+      throw new AddressError("Error - PlatformVMAPI.getBalance: Invalid address format");
     }
     const params:any = {
       address
@@ -711,7 +718,7 @@ export class PlatformVMAPI extends JRPCAPI {
       Transaction = tx.toString();
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - platform.issueTx: provided tx is not expected type of string, Buffer, or Tx');
+      throw new TransactionError('Error - platform.issueTx: provided tx is not expected type of string, Buffer, or Tx');
     }
     const params:any = {
       tx: Transaction.toString(),
@@ -978,13 +985,13 @@ export class PlatformVMAPI extends JRPCAPI {
     let srcChain:string = undefined;
 
     if(typeof sourceChain === "undefined") {
-      throw new Error("Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined.");
+      throw new ChainIdError("Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined.");
     } else if (typeof sourceChain === "string") {
       srcChain = sourceChain;
       sourceChain = bintools.cb58Decode(sourceChain);
     } else if(!(sourceChain instanceof Buffer)) {
       srcChain = bintools.cb58Encode(sourceChain);
-      throw new Error("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
+      throw new ChainIdError("Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " + (typeof sourceChain) );
     }
     const atomicUTXOs:UTXOSet = await (await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)).utxos;
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
@@ -1010,7 +1017,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1051,18 +1058,18 @@ export class PlatformVMAPI extends JRPCAPI {
       prefixes[a.split("-")[0]] = true;
     });
     if(Object.keys(prefixes).length !== 1){
-      throw new Error("Error - PlatformVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
+      throw new AddressError("Error - PlatformVMAPI.buildExportTx: To addresses must have the same chainID prefix.");
     }
 
     if(typeof destinationChain === "undefined") {
-      throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID is undefined.");
+      throw new ChainIdError("Error - PlatformVMAPI.buildExportTx: Destination ChainID is undefined.");
     } else if (typeof destinationChain === "string") {
       destinationChain = bintools.cb58Decode(destinationChain); //
     } else if(!(destinationChain instanceof Buffer)) {
-      throw new Error("Error - PlatformVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
+      throw new ChainIdError("Error - PlatformVMAPI.buildExportTx: Invalid destinationChain type: " + (typeof destinationChain) );
     }
     if(destinationChain.length !== 32) {
-      throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
+      throw new ChainIdError("Error - PlatformVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
     /*
     if(bintools.cb58Encode(destinationChain) !== Defaults.network[this.core.getNetworkID()].X["blockchainID"]) {
@@ -1098,7 +1105,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1216,14 +1223,14 @@ export class PlatformVMAPI extends JRPCAPI {
 
     const minStake:BN = (await this.getMinStake())["minDelegatorStake"];
     if(stakeAmount.lt(minStake)) {
-      throw new Error("PlatformVMAPI.buildAddDelegatorTx -- stake amount must be at least " + minStake.toString(10));
+      throw new StakeError("PlatformVMAPI.buildAddDelegatorTx -- stake amount must be at least " + minStake.toString(10));
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("PlatformVMAPI.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new TimeError("PlatformVMAPI.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildAddDelegatorTx(
@@ -1246,7 +1253,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
     if(!await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1301,18 +1308,18 @@ export class PlatformVMAPI extends JRPCAPI {
 
     const minStake:BN = (await this.getMinStake())["minValidatorStake"];
     if(stakeAmount.lt(minStake)) {
-      throw new Error("PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " + minStake.toString(10));
+      throw new StakeError("PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " + minStake.toString(10));
     }
 
     if(typeof delegationFee !== "number" || delegationFee > 100 || delegationFee < 0){
-      throw new Error("PlatformVMAPI.buildAddValidatorTx -- delegationFee must be a number between 0 and 100");
+      throw new DelegationFeeError("PlatformVMAPI.buildAddValidatorTx -- delegationFee must be a number between 0 and 100");
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
     
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new TimeError("PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildAddValidatorTx(
@@ -1336,7 +1343,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1388,7 +1395,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
     if(! await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee())) {
       /* istanbul ignore next */
-      throw new Error("Failed Goose Egg Check");
+      throw new GooseEggCheckError("Failed Goose Egg Check");
     }
 
     return builtUnsignedTx;
@@ -1405,7 +1412,7 @@ export class PlatformVMAPI extends JRPCAPI {
         if (typeof addresses[i] === 'string') {
           if (typeof this.parseAddress(addresses[i] as string) === 'undefined') {
             /* istanbul ignore next */
-            throw new Error("Error - Invalid address format");
+            throw new AddressError("Error - Invalid address format");
           }
           addrs.push(addresses[i] as string);
         } else {

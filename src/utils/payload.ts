@@ -7,6 +7,7 @@ import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
 import Web3Utils from "web3-utils";
+import { TypeIdError, HexError } from '../utils/errors';
 
 /**
  * @ignore
@@ -129,7 +130,7 @@ export class PayloadTypes {
             case 30:
                 return new MAGNETPayload(...args);
         }
-        throw new Error("Error - PayloadTypes.select: unknown typeid " + typeid);
+        throw new TypeIdError("Error - PayloadTypes.select: unknown typeid " + typeid);
     }
 
     /**
@@ -302,7 +303,7 @@ export class HEXSTRPayload extends PayloadBase {
             this.payload = payload;
         } else if(typeof payload === "string") {
             if(payload.startsWith("0x") ||!payload.match(/^[0-9A-Fa-f]+$/) ){
-                throw new Error("HEXSTRPayload.constructor -- hex string may not start with 0x and must be in /^[0-9A-Fa-f]+$/: " + payload);
+                throw new HexError("HEXSTRPayload.constructor -- hex string may not start with 0x and must be in /^[0-9A-Fa-f]+$/: " + payload);
             }
             this.payload = Buffer.from(payload, "hex");
         }

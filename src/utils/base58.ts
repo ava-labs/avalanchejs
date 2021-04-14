@@ -4,6 +4,7 @@
  */
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
+import { Base58Error } from '../utils/errors';
 
 /**
  * A Base58 class that uses the cross-platform Buffer module. Built so that Typescript
@@ -113,7 +114,7 @@ export class Base58 {
     for (let i:number = b.length - 1; i >= 0; i--) {
       const tmp:number = this.b58[b.charCodeAt(i)];
       if (tmp === 255) {
-        throw new Error('Error - Base58.decode: not a valid base58 string');
+        throw new Base58Error('Error - Base58.decode: not a valid base58 string');
       }
       const scratch:BN = new BN(tmp);
       scratch.imul(j);

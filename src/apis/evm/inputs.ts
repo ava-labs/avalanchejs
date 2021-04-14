@@ -14,6 +14,7 @@ import { SerializedEncoding } from '../../utils/serialization';
 import { EVMOutput } from './outputs';
 import BN from 'bn.js';
 import { SigIdx } from '../../common/credentials';
+import { InputIdError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -32,7 +33,7 @@ export const SelectInputClass = (inputID: number, ...args: any[]): Input => {
     return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
-  throw new Error("Error - SelectInputClass: unknown inputID");
+  throw new InputIdError("Error - SelectInputClass: unknown inputID");
 };
 
 export class TransferableInput extends StandardTransferableInput {
