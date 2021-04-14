@@ -6,6 +6,7 @@ import BinTools from '../utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from './helperfunctions';
+import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from '../utils/errors';
 
 export const SERIALIZATIONVERSION = 0;
 
@@ -72,25 +73,25 @@ export abstract class Serializable {
     }; 
     deserialize(fields:object, encoding?:SerializedEncoding) {
         if(typeof fields["_typeName"] !== "string") {
-            throw new Error("Error - Serializable.deserialize: _typeName must be a string, found: " + typeof fields["_typeName"]);
+            throw new TypeNameError("Error - Serializable.deserialize: _typeName must be a string, found: " + typeof fields["_typeName"]);
         }
         if(fields["_typeName"] !== this._typeName) {
-            throw new Error("Error - Serializable.deserialize: _typeName mismatch -- expected: " + this._typeName + " -- recieved: " + fields["_typeName"]);
+            throw new TypeNameError("Error - Serializable.deserialize: _typeName mismatch -- expected: " + this._typeName + " -- recieved: " + fields["_typeName"]);
         }
         if(typeof fields["_typeID"] !== "undefined" && fields["_typeID"] !== null) {
             if(typeof fields["_typeID"] !== "number") {
-                throw new Error("Error - Serializable.deserialize: _typeID must be a number, found: " + typeof fields["_typeID"]);
+                throw new TypeIdError("Error - Serializable.deserialize: _typeID must be a number, found: " + typeof fields["_typeID"]);
             }
             if(fields["_typeID"] !== this._typeID) {
-                throw new Error("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- recieved: " + fields["_typeID"]);
+                throw new TypeIdError("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- recieved: " + fields["_typeID"]);
             }
         }
         if(typeof fields["_codecID"] !== "undefined" && fields["_codecID"] !== null) {
             if(typeof fields["_codecID"] !== "number") {
-                throw new Error("Error - Serializable.deserialize: _codecID must be a number, found: " + typeof fields["_codecID"]);
+                throw new CodecIdError("Error - Serializable.deserialize: _codecID must be a number, found: " + typeof fields["_codecID"]);
             }
             if(fields["_codecID"] !== this._codecID) {
-                throw new Error("Error - Serializable.deserialize: _codecID mismatch -- expected: " + this._codecID + " -- recieved: " + fields["_codecID"]);
+                throw new CodecIdError("Error - Serializable.deserialize: _codecID mismatch -- expected: " + this._codecID + " -- recieved: " + fields["_codecID"]);
             }
         }
     };
@@ -197,7 +198,7 @@ export class Serialization {
 
     encoder(value:any, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):string {
         if(typeof value === "undefined"){
-            throw new Error("Error - Serializable.encoder: value passed is undefined");
+            throw new UnknownTypeError("Error - Serializable.encoder: value passed is undefined");
         }
         if(encoding !== "display"){
             outtype = encoding;
@@ -209,7 +210,7 @@ export class Serialization {
 
     decoder(value:string, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
         if(typeof value === "undefined"){
-            throw new Error("Error - Serializable.decoder: value passed is undefined");
+            throw new UnknownTypeError("Error - Serializable.decoder: value passed is undefined");
         }
         if(encoding !== "display") {
             intype = encoding;

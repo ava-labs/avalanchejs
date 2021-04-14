@@ -11,6 +11,10 @@ import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';
 import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
 import { off } from 'process';
+import { InvalidOperationIdError,
+         CodecIdError,
+         ChecksumError,
+         AddressError } from '../../utils/errors';
 
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
@@ -31,7 +35,7 @@ export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation 
       return new NFTTransferOperation(...args);
     }
     /* istanbul ignore next */
-    throw new Error("Error - SelectOperationClass: unknown opid " + opid);
+    throw new InvalidOperationIdError("Error - SelectOperationClass: unknown opid " + opid);
 }
 
 /**
@@ -287,7 +291,7 @@ export class SECPMintOperation extends Operation {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - SECPMintOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - SECPMintOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPMINTOPID : AVMConstants.SECPMINTOPID_CODECONE;
@@ -411,7 +415,7 @@ export class NFTMintOperation extends Operation {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - NFTMintOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - NFTMintOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTMINTOPID : AVMConstants.NFTMINTOPID_CODECONE;
@@ -565,7 +569,7 @@ export class NFTTransferOperation extends Operation {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - NFTTransferOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - NFTTransferOperation.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTXFEROPID : AVMConstants.NFTXFEROPID_CODECONE;
@@ -675,12 +679,12 @@ export class UTXOID extends NBytes {
         this.bytes = newbuff;
       }
     } else if (utxoidbuff.length === 40) {
-      throw new Error('Error - UTXOID.fromString: invalid checksum on address');
+      throw new ChecksumError('Error - UTXOID.fromString: invalid checksum on address');
     } else if (utxoidbuff.length === 36) {
       this.bytes = utxoidbuff;
     } else {
       /* istanbul ignore next */
-      throw new Error('Error - UTXOID.fromString: invalid address');
+      throw new AddressError('Error - UTXOID.fromString: invalid address');
     }
     return this.getSize();
     

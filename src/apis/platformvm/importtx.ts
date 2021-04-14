@@ -13,6 +13,7 @@ import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { ChainIdError, TransferableInputError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -88,7 +89,7 @@ export class ImportTx extends BaseTx {
    */
   toBuffer():Buffer {
     if(typeof this.sourceChain === "undefined") {
-      throw new Error("ImportTx.toBuffer -- this.sourceChain is undefined");
+      throw new ChainIdError("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
     let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
@@ -161,7 +162,7 @@ export class ImportTx extends BaseTx {
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       for (let i = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
-          throw new Error("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
+          throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       }
       this.importIns = importIns;

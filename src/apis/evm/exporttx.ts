@@ -20,6 +20,7 @@ import {
   SerializedEncoding 
 } from '../../utils/serialization';
 import { TransferableOutput } from './outputs';
+import { ChainIdError, EVMInputError, TransferableOutputError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -77,7 +78,7 @@ export class ExportTx extends EVMBaseTx {
    */
   toBuffer(): Buffer {
     if(typeof this.destinationChain === "undefined") {
-      throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
+      throw new ChainIdError("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
     this.numInputs.writeUInt32BE(this.inputs.length, 0);
     this.numExportedOutputs.writeUInt32BE(this.exportedOutputs.length, 0);
@@ -175,7 +176,7 @@ export class ExportTx extends EVMBaseTx {
     if (typeof inputs !== 'undefined' && Array.isArray(inputs)) {
       inputs.forEach((input: EVMInput) => {
         if (!(input instanceof EVMInput)) {
-          throw new Error("Error - ExportTx.constructor: invalid EVMInput in array parameter 'inputs'");
+          throw new EVMInputError("Error - ExportTx.constructor: invalid EVMInput in array parameter 'inputs'");
         }
       });
       if(inputs.length > 1) {
@@ -186,7 +187,7 @@ export class ExportTx extends EVMBaseTx {
     if (typeof exportedOutputs !== 'undefined' && Array.isArray(exportedOutputs)) {
         exportedOutputs.forEach((exportedOutput: TransferableOutput) => {
         if (!(exportedOutput instanceof TransferableOutput)) {
-          throw new Error("Error - ExportTx.constructor: TransferableOutput EVMInput in array parameter 'exportedOutputs'");
+          throw new TransferableOutputError("Error - ExportTx.constructor: TransferableOutput EVMInput in array parameter 'exportedOutputs'");
         }
       });
       this.exportedOutputs = exportedOutputs;

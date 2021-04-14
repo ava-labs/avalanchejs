@@ -9,6 +9,7 @@ import { Output, StandardAmountOutput } from './output';
 import { UnixNow } from '../utils/helperfunctions';
 import { MergeRule } from '../utils/constants';
 import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { MergeRuleError } from '../utils/errors';
 
 /**
  * @ignore
@@ -594,7 +595,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
         uSet = this.union(utxoset);
         return uSet.difference(this) as this;
       default:
-        throw new Error("Error - StandardUTXOSet.mergeByRule: bad MergeRule");
+        throw new MergeRuleError("Error - StandardUTXOSet.mergeByRule: bad MergeRule");
     }
   };
 }

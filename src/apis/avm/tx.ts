@@ -16,6 +16,7 @@ import { OperationTx } from './operationtx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { TransactionError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -43,7 +44,7 @@ export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
     return new ExportTx(...args);
   }
   /* istanbul ignore next */
-  throw new Error("Error - SelectTxClass: unknown txtype");
+  throw new TransactionError("Error - SelectTxClass: unknown txtype");
 };
 
 
