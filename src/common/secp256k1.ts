@@ -7,6 +7,7 @@ import * as elliptic from "elliptic";
 import createHash from "create-hash";
 import BinTools from '../utils/bintools';
 import { StandardKeyPair, StandardKeyChain } from './keychain';
+import { PublicKeyError } from '../utils/errors';
 
 /**
  * @ignore
@@ -115,7 +116,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
           return ripesha;
         }
         /* istanbul ignore next */
-        throw new Error('Unable to make address.');
+        throw new PublicKeyError('Unable to make address.');
       };
 
     /**

@@ -11,6 +11,7 @@ import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
 import BN from 'bn.js';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { CodecIdError, ChainIdError, TransferableOutputError } from '../../utils/errors';
 
 
 /**
@@ -54,7 +55,7 @@ export class ExportTx extends BaseTx {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - ExportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - ExportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.EXPORTTX : AVMConstants.EXPORTTX_CODECONE;
@@ -125,7 +126,7 @@ export class ExportTx extends BaseTx {
      */
   toBuffer():Buffer {
     if(typeof this.destinationChain === "undefined") {
-      throw new Error("ExportTx.toBuffer -- this.destinationChain is undefined");
+      throw new ChainIdError("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
     this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
     let barr:Array<Buffer> = [super.toBuffer(), this.destinationChain, this.numOuts];
@@ -167,7 +168,7 @@ export class ExportTx extends BaseTx {
     if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
       for (let i:number = 0; i < exportOuts.length; i++) {
         if (!(exportOuts[i] instanceof TransferableOutput)) {
-          throw new Error("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
+          throw new TransferableOutputError("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
         }
       }
       this.exportOuts = exportOuts;

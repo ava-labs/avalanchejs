@@ -20,6 +20,12 @@ import { Output } from '../../common/output';
 import { AddDelegatorTx, AddValidatorTx } from './validationtx';
 import { CreateSubnetTx } from './createsubnettx';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { UTXOError, 
+         AddressError, 
+         InsufficientFundsError, 
+         ThresholdError, 
+         FeeAssetError,
+         TimeError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -142,7 +148,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     } else {
       /* istanbul ignore next */
-      throw new Error("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
+      throw new UTXOError("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
     }
     return utxovar
   }
@@ -305,7 +311,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           // invalid arguments.
 
           /* istanbul ignore next */
-          throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
+          throw new AddressError('Error - UTXOSet.getMinimumSpendable: no such '
             + `address in output: ${spender}`);
         }
         input.addSignatureIdx(idx, spender);
@@ -325,7 +331,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     if (!aad.canComplete()) {
       // After running through all the UTXOs, we still weren't able to get all
       // the necessary funds, so this transaction can't be made.
-      return new Error('Error - UTXOSet.getMinimumSpendable: insufficient '
+      return new InsufficientFundsError('Error - UTXOSet.getMinimumSpendable: insufficient '
         + 'funds to create the transaction');
     }
 
@@ -492,7 +498,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     if (threshold > toAddresses.length) {
       /* istanbul ignore next */
-      throw new Error("Error - UTXOSet.buildBaseTx: threshold is greater than number of addresses");
+      throw new ThresholdError("Error - UTXOSet.buildBaseTx: threshold is greater than number of addresses");
     }
 
     if (typeof changeAddresses === "undefined") {
@@ -612,7 +618,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const idx: number = output.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */
-          throw new Error('Error - UTXOSet.buildImportTx: no such '
+          throw new AddressError('Error - UTXOSet.buildImportTx: no such '
             + `address in output: ${spenders[j]}`);
         }
         xferin.getInput().addSignatureIdx(idx, spenders[j]);
@@ -700,7 +706,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       feeAssetID = avaxAssetID;
     } else if (feeAssetID.toString("hex") !== avaxAssetID.toString("hex")) {
       /* istanbul ignore next */
-      throw new Error('Error - UTXOSet.buildExportTx: '
+      throw new FeeAssetError('Error - UTXOSet.buildExportTx: '
         + `feeAssetID must match avaxAssetID`);
     }
 
@@ -846,7 +852,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const zero: BN = new BN(0);
     const now: BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("UTXOSet.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new TimeError("UTXOSet.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
@@ -926,11 +932,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     const zero: BN = new BN(0);
     const now: BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("UTXOSet.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new TimeError("UTXOSet.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     if (delegationFee > 100 || delegationFee < 0) {
-      throw new Error("UTXOSet.buildAddValidatorTx -- startTime must be in the range of 0 to 100, inclusively");
+      throw new TimeError("UTXOSet.buildAddValidatorTx -- startTime must be in the range of 0 to 100, inclusively");
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);

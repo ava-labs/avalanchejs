@@ -8,6 +8,7 @@ import { PlatformVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput, StandardParseableInput } from '../../common/input';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import BN from 'bn.js';
+import { InputIdError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -29,7 +30,7 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
     return new StakeableLockIn(...args);
   }
   /* istanbul ignore next */
-  throw new Error("Error - SelectInputClass: unknown inputid");
+  throw new InputIdError("Error - SelectInputClass: unknown inputid");
 };
 
 export class ParseableInput extends StandardParseableInput{

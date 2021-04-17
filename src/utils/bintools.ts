@@ -8,6 +8,7 @@ import createHash from 'create-hash';
 import * as bech32 from 'bech32';
 import { Base58 } from './base58';
 import { Defaults } from './constants';
+import { ChecksumError } from '../utils/errors';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using
@@ -277,7 +278,7 @@ export default class BinTools {
     if (this.validateChecksum(bytes)) {
       return this.copyFrom(bytes, 0, bytes.length - 4);
     }
-    throw new Error('Error - BinTools.cb58Decode: invalid checksum');
+    throw new ChecksumError('Error - BinTools.cb58Decode: invalid checksum');
   };
 
   addressToString = (hrp:string, chainid:string, bytes:Buffer)

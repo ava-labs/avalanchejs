@@ -6,6 +6,7 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
 import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization';
+import { BufferSizeError } from '../utils/errors';
 
 
 /**
@@ -75,7 +76,7 @@ export abstract class NBytes extends Serializable {
     try {
       if (buff.length - offset < this.bsize) {
         /* istanbul ignore next */
-        throw new Error("Error - NBytes.fromBuffer: not enough space available in buffer.");
+        throw new BufferSizeError("Error - NBytes.fromBuffer: not enough space available in buffer.");
       }
 
       this.bytes = bintools.copyFrom(buff, offset, offset + this.bsize);

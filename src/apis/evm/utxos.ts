@@ -36,6 +36,7 @@ import {
 import { UnsignedTx } from './tx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
+import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '../../utils/errors';
  
  /**
   * @ignore
@@ -159,7 +160,7 @@ import { ExportTx } from './exporttx';
        utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
      } else {
        /* istanbul ignore next */
-       throw new Error("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
+       throw new UTXOError("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
      }
      return utxovar
    }
@@ -209,7 +210,7 @@ import { ExportTx } from './exporttx';
              const idx: number = uout.getAddressIdx(spender);
              if (idx === -1) {
                /* istanbul ignore next */
-               throw new Error("Error - UTXOSet.getMinimumSpendable: no such address in output");
+               throw new AddressError("Error - UTXOSet.getMinimumSpendable: no such address in output");
              }
              xferin.getInput().addSignatureIdx(idx, spender);
            });
@@ -229,7 +230,7 @@ import { ExportTx } from './exporttx';
        }
      }
      if(!aad.canComplete()) {
-       return new Error(`Error - UTXOSet.getMinimumSpendable: insufficient funds to create the transaction`);
+       return new InsufficientFundsError(`Error - UTXOSet.getMinimumSpendable: insufficient funds to create the transaction`);
      }
      const amounts: AssetAmount[] = aad.getAmounts();
      const zero: BN = new BN(0);
@@ -325,7 +326,7 @@ import { ExportTx } from './exporttx';
          const idx: number = output.getAddressIdx(spender);
          if (idx === -1) {
            /* istanbul ignore next */
-           throw new Error("Error - UTXOSet.buildImportTx: no such address in output");
+           throw new AddressError("Error - UTXOSet.buildImportTx: no such address in output");
          }
          xferin.getInput().addSignatureIdx(idx, spender);
        });
@@ -401,7 +402,7 @@ import { ExportTx } from './exporttx';
       feeAssetID = avaxAssetID;
     } else if (feeAssetID.toString('hex') !== avaxAssetID.toString('hex')) {
       /* istanbul ignore next */
-      throw new Error('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
+      throw new FeeAssetError('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
     }
 
     if(typeof destinationChain === 'undefined') {
