@@ -93,7 +93,7 @@ describe("Payload", () => {
             expect(c0.typeID()).toBe(typeid);
             expect(c0.typeName()).toBe(typename);
             let c1:PayloadBase = payloadTypes.select(typeid, buff);
-            let c2:PayloadBase = payloadTypes.select(typeid, inputstr);
+            let c2:PayloadBase = payloadTypes.select(typeid, inputstr, hrp);
             let c3:PayloadBase = payloadTypes.select(typeid);
             c3.fromBuffer(c1.toBuffer());
             let c4:PayloadBase = payloadTypes.select(typeid);
@@ -142,14 +142,14 @@ describe("Payload", () => {
 
         test("XCHAINADDRPayload special cases", () => {
             let addr:string = "X-" + bech;
-            let pl:XCHAINADDRPayload = new XCHAINADDRPayload(addr);
+            let pl:XCHAINADDRPayload = new XCHAINADDRPayload(addr, hrp);
             expect(pl.returnType(hrp)).toBe(addr);
             expect(pl.returnChainID()).toBe("X");
         });
 
         test("PCHAINADDRPayload special cases", () => {
             let addr:string = "P-" + bech;
-            let pl:PCHAINADDRPayload = new PCHAINADDRPayload(addr);
+            let pl:PCHAINADDRPayload = new PCHAINADDRPayload(addr, hrp);
             expect(pl.returnType(hrp)).toBe(addr);
             expect(pl.returnChainID()).toBe("P");
         });

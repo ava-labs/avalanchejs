@@ -8,7 +8,7 @@ import createHash from 'create-hash';
 import * as bech32 from 'bech32';
 import { Base58 } from './base58';
 import { Defaults } from './constants';
-import { ChecksumError } from '../utils/errors';
+import { Bech32Error, ChecksumError } from '../utils/errors';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using
@@ -284,11 +284,36 @@ export default class BinTools {
   addressToString = (hrp:string, chainid:string, bytes:Buffer)
   :string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
-  stringToAddress = (address:string):Buffer => {
-    const parts:Array<string> = address.trim().split('-');
-    if(parts[1].startsWith("0x") || parts[1].match(/^[0-9A-F]+$/i)){
+  stringToAddress = (address: string, hrp?: string): Buffer => {
+    const parts: string[] = address.trim().split('-');
+
+    if(parts[0].length < 1) {
+      throw new Bech32Error('Error - Valid address must have prefix before -');
+    }
+
+    if(parts.length < 2) {
+      throw new Bech32Error('Error - Valid address should include -');
+    }
+
+    // ETH-style address
+    if(parts[1].startsWith("0x") || parts[1].match(/^[0-9A-F]+$/i)) {
       return Buffer.from(parts[1].replace("0x", ""), "hex");
     }
+
+    const split: number = parts[1].lastIndexOf('1');
+    if(split < 0) {
+      throw new Bech32Error('Error - Valid address must include separator (1)');
+    }
+
+    const humanReadablePart: string = parts[1].slice(0, split);
+    if(humanReadablePart.length < 1) {
+      throw new Bech32Error('Error - HRP should be at least 1 character');
+    }
+
+    if(humanReadablePart !== 'avax' && humanReadablePart !== 'fuji' && humanReadablePart != 'local' && humanReadablePart != hrp) {
+      throw new Bech32Error('Error - Invalid HRP');
+    }
+
     return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words));
   };
 

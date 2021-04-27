@@ -413,12 +413,16 @@ export abstract class ChainAddressPayload extends PayloadBase {
     /**
      * @param payload Buffer or address string
      */
-    constructor(payload:any = undefined){
+    constructor(payload:any = undefined, hrp?: string){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(typeof payload === "string") {
-            this.payload = bintools.stringToAddress(payload);
+            if(hrp != undefined) {
+              this.payload = bintools.stringToAddress(payload, hrp);
+            } else {
+              this.payload = bintools.stringToAddress(payload);
+            }
         }
     }
 }
