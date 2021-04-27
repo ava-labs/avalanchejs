@@ -286,7 +286,6 @@ export default class BinTools {
   :string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
   stringToAddress = (address: string, hrp?: string): Buffer => {
- 
     if(address.substring(0, 2) === "0x") {
       // ETH-style address
       if(utils.isAddress(address)) {
