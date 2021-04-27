@@ -161,31 +161,61 @@ describe('BinTools', () => {
   });
 
   test('stringToAddress', () => {
+    // Missing prefix
     let addr: string = "-avax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
     expect((): void => {
       bintools.stringToAddress(addr);
     }).toThrow('Error - Valid address must have prefix before -');
 
+    // Missing -
     addr = "Xavax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
     expect((): void => {
       bintools.stringToAddress(addr);
     }).toThrow('Error - Valid address should include -');
 
+    // Missing seperator (1)
     addr = "X-avax3a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
     expect((): void => {
       bintools.stringToAddress(addr);
     }).toThrow('Error - Valid address must include separator (1)');
 
+    // Missing HRP
     addr = "X-13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
     expect((): void => {
       bintools.stringToAddress(addr);
     }).toThrow('Error - HRP should be at least 1 character');
 
+    // Invalid HRP
     addr = "X-avax11ycxp65vz60m87mkm2hsw3m5fadjlpldzntvr33";
     expect((): void => {
       bintools.stringToAddress(addr);
     }).toThrow('Error - Invalid HRP');
 
+    // Extra character in data bytes
+    addr = "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdswtvnucd";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Invalid checksum for local1dcfyuug87xqayl4fpp02z9dvknwhafdswtvnucd');
+
+    // Change character in data bytes
+    addr = "X-local1dcfyuug8fxqayl4fpp02z9dvknwhafdstvnucd";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Invalid checksum for local1dcfyuug8fxqayl4fpp02z9dvknwhafdstvnucd');
+
+    // Invalid character in data bytes
+    addr = "X-local1dcfyuug87xqbyl4fpp02z9dvknwhafdstvnucd";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Unknown character b');
+
+    // Change character in checksum
+    addr = "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnuce";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Invalid checksum for local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnuce');
+
+    // Invalid ETH-style address
     addr = "0x.db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC";
     expect((): void => {
       bintools.stringToAddress(addr);
