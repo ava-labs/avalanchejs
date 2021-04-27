@@ -289,7 +289,7 @@ export default class BinTools {
     if(address.substring(0, 2) === "0x") {
       // ETH-style address
       if(utils.isAddress(address)) {
-        return Buffer.from(address.replace("0x", ""), "hex");
+        return Buffer.from(address.substring(2,), "hex");
       } else {
         throw new HexError('Error - Invalid address');
       }
