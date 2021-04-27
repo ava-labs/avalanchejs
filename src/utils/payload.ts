@@ -413,12 +413,16 @@ export abstract class ChainAddressPayload extends PayloadBase {
     /**
      * @param payload Buffer or address string
      */
-    constructor(payload:any = undefined){
+    constructor(payload:any = undefined, hrp?: string){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(typeof payload === "string") {
-            this.payload = bintools.stringToAddress(payload);
+            if(hrp != undefined) {
+              this.payload = bintools.stringToAddress(payload, hrp);
+            } else {
+              this.payload = bintools.stringToAddress(payload);
+            }
         }
     }
 }
@@ -445,13 +449,6 @@ export class PCHAINADDRPayload extends ChainAddressPayload {
 export class CCHAINADDRPayload extends ChainAddressPayload {
     protected typeid = 8;
     protected chainid = "C";
-
-    /**
-     * Returns an address string for the payload.
-     */
-    returnType():string {
-        return this.chainid + "-" + Web3Utils.toChecksumAddress("0x" + this.payload.toString("hex"));
-    }
 }
 
 /**
