@@ -156,8 +156,8 @@ describe("Payload", () => {
 
         test("CCHAINADDRPayload special cases", () => {
             let addr:string = "C-" + bech;
-            let pl:CCHAINADDRPayload = new CCHAINADDRPayload(addr);
-            expect(pl.returnType()).toBe(addr);
+            let pl:CCHAINADDRPayload = new CCHAINADDRPayload(addr, hrp);
+            expect(pl.returnType(hrp)).toBe(addr);
             expect(pl.returnChainID()).toBe("C");
         });
 

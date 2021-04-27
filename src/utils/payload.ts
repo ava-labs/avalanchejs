@@ -449,13 +449,6 @@ export class PCHAINADDRPayload extends ChainAddressPayload {
 export class CCHAINADDRPayload extends ChainAddressPayload {
     protected typeid = 8;
     protected chainid = "C";
-
-    /**
-     * Returns an address string for the payload.
-     */
-    returnType():string {
-        return this.chainid + "-" + Web3Utils.toChecksumAddress("0x" + this.payload.toString("hex"));
-    }
 }
 
 /**
