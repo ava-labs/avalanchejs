@@ -294,7 +294,7 @@ export default class BinTools {
         throw new HexError('Error - Invalid address');
       }
     } else {
-      // Bec32
+      // Bech32 addresses
       const parts: string[] = address.trim().split('-');
 
       if(parts.length < 2) {
