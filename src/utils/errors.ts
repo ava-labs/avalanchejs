@@ -36,6 +36,7 @@ const HEX_ERROR_CODE:string = "1034";
 const TYPE_ID_ERROR_CODE:string = "1035";
 const TYPE_NAME_ERROR_CODE:string = "1035";
 const UNKNOWN_TYPE_ERROR_CODE:string = "1036";
+const BECH32_ERROR_CODE:string = "1037";
 
 class AvalancheError extends Error {
   errorCode: string;
@@ -313,5 +314,13 @@ export class UnknownTypeError extends AvalancheError {
   constructor(m:string) {
     super(m, UNKNOWN_TYPE_ERROR_CODE);
     Object.setPrototypeOf(this, UnknownTypeError.prototype);
+  }
+}
+
+
+export class Bech32Error extends AvalancheError {
+  constructor(m:string) {
+    super(m, BECH32_ERROR_CODE);
+    Object.setPrototypeOf(this, Bech32Error.prototype);
   }
 }

@@ -159,4 +159,160 @@ describe('BinTools', () => {
       bintools.cb58Decode(serbufffaulty);
     }).toThrow('Error - BinTools.cb58Decode: invalid checksum');
   });
+
+  test('stringToAddress', () => {
+    // Missing prefix
+    let addr: string = "-avax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Error - Valid address must have prefix before -');
+
+    // Missing -
+    addr = "Xavax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Error - Valid address should include -');
+
+    // Missing seperator (1)
+    addr = "X-avax3a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Error - Valid address must include separator (1)');
+
+    // Missing HRP
+    addr = "X-13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Error - HRP should be at least 1 character');
+
+    // Invalid HRP
+    addr = "X-avax11ycxp65vz60m87mkm2hsw3m5fadjlpldzntvr33";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Error - Invalid HRP');
+
+    // Extra character in data bytes
+    addr = "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdswtvnucd";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Invalid checksum for local1dcfyuug87xqayl4fpp02z9dvknwhafdswtvnucd');
+
+    // Change character in data bytes
+    addr = "X-local1dcfyuug8fxqayl4fpp02z9dvknwhafdstvnucd";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Invalid checksum for local1dcfyuug8fxqayl4fpp02z9dvknwhafdstvnucd');
+
+    // Invalid character in data bytes
+    addr = "X-local1dcfyuug87xqbyl4fpp02z9dvknwhafdstvnucd";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Unknown character b');
+
+    // Change character in checksum
+    addr = "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnuce";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Invalid checksum for local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnuce');
+
+    // Invalid ETH-style address
+    addr = "0x.db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC";
+    expect((): void => {
+      bintools.stringToAddress(addr);
+    }).toThrow('Error - Invalid address');
+
+    let addrs: string[] = [
+      'X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
+      'X-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
+      'X-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
+    ];
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+    addrs = [
+      'X-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
+      'X-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
+      'X-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
+    ];
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+    addrs = [
+      'X-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9',
+      'X-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw',
+      'X-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5'
+    ];
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+    addrs = [
+      'P-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
+      'P-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
+      'P-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
+    ]
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+    addrs = [
+      'P-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
+      'P-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
+      'P-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
+    ]
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+    addrs = [
+      'P-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9',
+      'P-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw',
+      'P-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5'
+    ]
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+
+    addrs = [
+      'C-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
+      'C-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
+      'C-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
+    ];
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+
+    addrs = [
+      'C-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
+      'C-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
+      'C-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
+    ];
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+
+    addrs = [
+      'C-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9',
+      'C-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw',
+      'C-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5'
+    ];
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+
+    addrs = [
+      "X-foo1dcfyuug87xqayl4fpp02z9dvknwhafds4k3km3",
+      "X-foo1ltghj033re64920k786uprcp82p9e36jqdqjh6",
+      "X-foo1dq4q9seql2spxrkd7rl82uck5ej3nvlha97akq"
+    ]
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address, "foo");
+    });
+
+    addrs = [
+      "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC",
+      "0xC1ad78FDd4aEd027EbD5e9eee878f44dc1E29358",
+      "0x5B44bC2622dc5DD66a94cd5f2aDc3a49abb864dE"
+    ]
+    addrs.forEach((address: string): void => {
+      bintools.stringToAddress(address);
+    });
+  });
 });

@@ -56,7 +56,7 @@ describe("Payload", () => {
         ["BIGNUM", bnhex, bintools.bufferToB58(Buffer.from(bnhex, "hex"))], 
         ["XCHAINADDR", "X-" + bech, cb58buf], 
         ["PCHAINADDR", "P-" + bech, cb58buf], 
-        ["CCHAINADDR", "C-0x" + chex, bintools.bufferToB58(Buffer.from(chex, "hex"))], 
+        ["CCHAINADDR", "C-" + bech, cb58buf], 
         ["TXID", cb58str, cb58buf], 
         ["ASSETID", cb58str, cb58buf], 
         ["UTXOID",  cb58str, cb58buf], 
@@ -93,7 +93,7 @@ describe("Payload", () => {
             expect(c0.typeID()).toBe(typeid);
             expect(c0.typeName()).toBe(typename);
             let c1:PayloadBase = payloadTypes.select(typeid, buff);
-            let c2:PayloadBase = payloadTypes.select(typeid, inputstr);
+            let c2:PayloadBase = payloadTypes.select(typeid, inputstr, hrp);
             let c3:PayloadBase = payloadTypes.select(typeid);
             c3.fromBuffer(c1.toBuffer());
             let c4:PayloadBase = payloadTypes.select(typeid);
@@ -142,22 +142,22 @@ describe("Payload", () => {
 
         test("XCHAINADDRPayload special cases", () => {
             let addr:string = "X-" + bech;
-            let pl:XCHAINADDRPayload = new XCHAINADDRPayload(addr);
+            let pl:XCHAINADDRPayload = new XCHAINADDRPayload(addr, hrp);
             expect(pl.returnType(hrp)).toBe(addr);
             expect(pl.returnChainID()).toBe("X");
         });
 
         test("PCHAINADDRPayload special cases", () => {
             let addr:string = "P-" + bech;
-            let pl:PCHAINADDRPayload = new PCHAINADDRPayload(addr);
+            let pl:PCHAINADDRPayload = new PCHAINADDRPayload(addr, hrp);
             expect(pl.returnType(hrp)).toBe(addr);
             expect(pl.returnChainID()).toBe("P");
         });
 
         test("CCHAINADDRPayload special cases", () => {
-            let addr:string = "C-0x" + chex;
-            let pl:CCHAINADDRPayload = new CCHAINADDRPayload(addr);
-            expect(pl.returnType()).toBe(addr);
+            let addr:string = "C-" + bech;
+            let pl:CCHAINADDRPayload = new CCHAINADDRPayload(addr, hrp);
+            expect(pl.returnType(hrp)).toBe(addr);
             expect(pl.returnChainID()).toBe("C");
         });
 
