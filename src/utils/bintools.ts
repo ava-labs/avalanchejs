@@ -286,12 +286,19 @@ export default class BinTools {
   :string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
   stringToAddress = (address: string, hrp?: string): Buffer => {
-    if(address.substring(0, 2) === "0x") {
-      // ETH-style address
-      if(utils.isAddress(address)) {
-        return Buffer.from(address.replace("0x", ""), "hex");
+    const validteETHStyleAddress = (a: string) => {
+      if(utils.isAddress(a)) {
+        return Buffer.from(a.replace("0x", ""), "hex");
       } else {
         throw new HexError('Error - Invalid address');
+      }
+    };
+    if(address.substring(0, 2) === "0x") {
+      // ETH-style address
+      try {
+        return validteETHStyleAddress(address);
+      } catch (error) {
+        throw error;
       }
     } else {
       // Bech32 addresses
@@ -305,21 +312,29 @@ export default class BinTools {
         throw new Bech32Error('Error - Valid address must have prefix before -');
       }
 
-      const split: number = parts[1].lastIndexOf('1');
-      if(split < 0) {
-        throw new Bech32Error('Error - Valid address must include separator (1)');
-      }
+      if(parts[1].substring(0, 2) === "0x") {
+        try {
+          return validteETHStyleAddress(parts[1]);
+        } catch (error) {
+          throw error;
+        }
+      } else {
+        const split: number = parts[1].lastIndexOf('1');
+        if(split < 0) {
+          throw new Bech32Error('Error - Valid address must include separator (1)');
+        }
 
-      const humanReadablePart: string = parts[1].slice(0, split);
-      if(humanReadablePart.length < 1) {
-        throw new Bech32Error('Error - HRP should be at least 1 character');
-      }
+        const humanReadablePart: string = parts[1].slice(0, split);
+        if(humanReadablePart.length < 1) {
+          throw new Bech32Error('Error - HRP should be at least 1 character');
+        }
 
-      if(humanReadablePart !== 'avax' && humanReadablePart !== 'fuji' && humanReadablePart != 'local' && humanReadablePart != hrp) {
-        throw new Bech32Error('Error - Invalid HRP');
-      }
+        if(humanReadablePart !== 'avax' && humanReadablePart !== 'fuji' && humanReadablePart != 'local' && humanReadablePart != hrp) {
+          throw new Bech32Error('Error - Invalid HRP');
+        }
 
-      return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words));
+        return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words));
+      }
     }
   };
 
