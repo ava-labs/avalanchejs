@@ -287,12 +287,12 @@ export default class BinTools {
   stringToAddress = (address: string, hrp?: string): Buffer => {
     const parts: string[] = address.trim().split('-');
 
-    if(parts[0].length < 1) {
-      throw new Bech32Error('Error - Valid address must have prefix before -');
-    }
-
     if(parts.length < 2) {
       throw new Bech32Error('Error - Valid address should include -');
+    }
+
+    if(parts[0].length < 1) {
+      throw new Bech32Error('Error - Valid address must have prefix before -');
     }
 
     // ETH-style address
