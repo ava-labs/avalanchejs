@@ -300,41 +300,40 @@ export default class BinTools {
       } catch (error) {
         throw error;
       }
+    }
+    // Bech32 addresses
+    const parts: string[] = address.trim().split('-');
+
+    if(parts.length < 2) {
+      throw new Bech32Error('Error - Valid address should include -');
+    }
+
+    if(parts[0].length < 1) {
+      throw new Bech32Error('Error - Valid address must have prefix before -');
+    }
+
+    if(parts[1].substring(0, 2) === "0x") {
+      try {
+        return validteETHStyleAddress(parts[1]);
+      } catch (error) {
+        throw error;
+      }
     } else {
-      // Bech32 addresses
-      const parts: string[] = address.trim().split('-');
-
-      if(parts.length < 2) {
-        throw new Bech32Error('Error - Valid address should include -');
+      const split: number = parts[1].lastIndexOf('1');
+      if(split < 0) {
+        throw new Bech32Error('Error - Valid address must include separator (1)');
       }
 
-      if(parts[0].length < 1) {
-        throw new Bech32Error('Error - Valid address must have prefix before -');
+      const humanReadablePart: string = parts[1].slice(0, split);
+      if(humanReadablePart.length < 1) {
+        throw new Bech32Error('Error - HRP should be at least 1 character');
       }
 
-      if(parts[1].substring(0, 2) === "0x") {
-        try {
-          return validteETHStyleAddress(parts[1]);
-        } catch (error) {
-          throw error;
-        }
-      } else {
-        const split: number = parts[1].lastIndexOf('1');
-        if(split < 0) {
-          throw new Bech32Error('Error - Valid address must include separator (1)');
-        }
-
-        const humanReadablePart: string = parts[1].slice(0, split);
-        if(humanReadablePart.length < 1) {
-          throw new Bech32Error('Error - HRP should be at least 1 character');
-        }
-
-        if(humanReadablePart !== 'avax' && humanReadablePart !== 'fuji' && humanReadablePart != 'local' && humanReadablePart != hrp) {
-          throw new Bech32Error('Error - Invalid HRP');
-        }
-
-        return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words));
+      if(humanReadablePart !== 'avax' && humanReadablePart !== 'fuji' && humanReadablePart != 'local' && humanReadablePart != hrp) {
+        throw new Bech32Error('Error - Invalid HRP');
       }
+
+      return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words));
     }
   };
 
