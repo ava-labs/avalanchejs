@@ -286,7 +286,7 @@ export default class BinTools {
   :string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
   stringToAddress = (address: string, hrp?: string): Buffer => {
-    const validteETHStyleAddress = (a: string) => {
+    const validateETHStyleAddress = (a: string) => {
       if(utils.isAddress(a)) {
         return Buffer.from(a.replace("0x", ""), "hex");
       } else {
@@ -296,7 +296,7 @@ export default class BinTools {
     if(address.substring(0, 2) === "0x") {
       // ETH-style address
       try {
-        return validteETHStyleAddress(address);
+        return validateETHStyleAddress(address);
       } catch (error) {
         throw error;
       }
@@ -314,7 +314,7 @@ export default class BinTools {
 
     if(parts[1].substring(0, 2) === "0x") {
       try {
-        return validteETHStyleAddress(parts[1]);
+        return validateETHStyleAddress(parts[1]);
       } catch (error) {
         throw error;
       }
