@@ -191,11 +191,6 @@ describe('BinTools', () => {
       bintools.stringToAddress(addr);
     }).toThrow('Error - Invalid address');
 
-    addr = "C-0x.db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC";
-    expect((): void => {
-      bintools.stringToAddress(addr);
-    }).toThrow('Error - Invalid address');
-
     let addrs: string[] = [
       'X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
       'X-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
@@ -285,15 +280,6 @@ describe('BinTools', () => {
       "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC",
       "0xC1ad78FDd4aEd027EbD5e9eee878f44dc1E29358",
       "0x5B44bC2622dc5DD66a94cd5f2aDc3a49abb864dE"
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address);
-    });
-
-    addrs = [
-      "C-0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC",
-      "C-0xC1ad78FDd4aEd027EbD5e9eee878f44dc1E29358",
-      "C-0x5B44bC2622dc5DD66a94cd5f2aDc3a49abb864dE"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address);

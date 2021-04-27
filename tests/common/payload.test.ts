@@ -56,7 +56,7 @@ describe("Payload", () => {
         ["BIGNUM", bnhex, bintools.bufferToB58(Buffer.from(bnhex, "hex"))], 
         ["XCHAINADDR", "X-" + bech, cb58buf], 
         ["PCHAINADDR", "P-" + bech, cb58buf], 
-        ["CCHAINADDR", "C-0x" + chex, bintools.bufferToB58(Buffer.from(chex, "hex"))], 
+        ["CCHAINADDR", "C-" + bech, cb58buf], 
         ["TXID", cb58str, cb58buf], 
         ["ASSETID", cb58str, cb58buf], 
         ["UTXOID",  cb58str, cb58buf], 
@@ -155,7 +155,7 @@ describe("Payload", () => {
         });
 
         test("CCHAINADDRPayload special cases", () => {
-            let addr:string = "C-0x" + chex;
+            let addr:string = "C-" + bech;
             let pl:CCHAINADDRPayload = new CCHAINADDRPayload(addr);
             expect(pl.returnType()).toBe(addr);
             expect(pl.returnChainID()).toBe("C");
