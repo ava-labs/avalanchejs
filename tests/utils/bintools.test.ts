@@ -245,9 +245,9 @@ describe('BinTools', () => {
     });
 
     addrs = [
-      'C-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
-      'C-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
-      'C-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
+      'C-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
+      'C-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
+      'C-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
     ];
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address);
