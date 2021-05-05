@@ -4,6 +4,7 @@
  */
 
 import { Buffer } from 'buffer/';
+import BN from "bn.js";
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
 import { EVMOutput } from './outputs';
@@ -19,7 +20,7 @@ import {
   KeyChain, 
   KeyPair 
 } from './keychain';
-import { DefaultNetworkID } from '../../utils/constants';
+import { DefaultNetworkID, MILLIAVAX } from '../../utils/constants';
 import { 
   Serialization, 
   SerializedEncoding 
@@ -245,5 +246,28 @@ export class ImportTx extends EVMBaseTx {
           seenAssetSends.set(address, [assetID]);
         }
       });
+      // make sure this transaction pays the required avax fee
+      let requiredFee: BN = MILLIAVAX; // TODO is this fee right? what is an appropriate way of getting the fee? should this be in constants.ts?
+      let feeDiff: BN = new BN(0);
+      let AVAXAssetID: Buffer = new Buffer('test'); // TODO get Avax asset ID
+      // sum incoming AVAX
+      this.importIns.forEach((importIn: TransferableInput) => {
+        if (importIn.getAssetID() === AVAXAssetID) {
+          // TODO what is the correct way of getting the amount of an input?
+          let transferInput: AmountInput = importIn.getInput();
+          let input: StandardAmountInput = transferInput.getInput() as StandardAmountInput;
+          feeDiff.iadd(input.getAmount());
+        }
+      });
+      // subtract all outgoing AVAX
+      this.outs.forEach((out: EVMOutput) => {
+        if (out.getAssetID() === AVAXAssetID) {
+          feeDiff.isub(out.getAmount());
+        }
+      });
+      if (feeDiff < requiredFee) {
+        let errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: transaction did not pay fee of ${requiredFee} AVAX, only burns ${feeDiff} AVAX`;
+        throw new EVMFeeError(errorMessage);
+      }
   }
 }
