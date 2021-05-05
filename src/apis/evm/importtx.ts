@@ -16,6 +16,7 @@ import {
   SigIdx, 
   Credential 
 } from '../../common/credentials';
+import { StandardAmountInput } from '../../common/input';
 import { 
   KeyChain, 
   KeyPair 
@@ -26,7 +27,6 @@ import {
   SerializedEncoding 
 } from '../../utils/serialization';
 import { ChainIdError, TransferableInputError, EVMOutputError, EVMFeeError } from '../../utils/errors';
-import { StandardAmountInput } from 'dist/common';
 
 /**
  * @ignore
@@ -233,8 +233,8 @@ export class ImportTx extends EVMBaseTx {
       // - enforce uniqueness of pair(address, assetid) for each out
       let seenAssetSends: Map<string, string[]> = new Map();
       this.outs.forEach((out: EVMOutput) => {
-        let address: string = out.getAddressString();
-        let assetID: string = out.getAssetID().toString('hex');
+        const address: string = out.getAddressString();
+        const assetID: string = out.getAssetID().toString('hex');
         if (seenAssetSends.has(address)) {
           let assetsSentToAddress: string[] = seenAssetSends.get(address);
           if (assetsSentToAddress.includes(assetID)) {
@@ -247,9 +247,9 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      let requiredFee: BN = Defaults[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm API here
+      const requiredFee: BN = Defaults[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm API here
       let feeDiff: BN = new BN(0);
-      let AVAXAssetIDHex: string = new Buffer('test').toString('hex'); // TODO/REVIEWER QUESTION: the appropriate way of getting this ID is by querying the API, but we don't have access to the evm API here
+      const AVAXAssetIDHex: string = "dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db"; // TODO/REVIEWER QUESTION: the appropriate way of getting this ID is by querying the API, but we don't have access to the evm API here
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
       this.importIns.forEach((input: TransferableInput) => {
