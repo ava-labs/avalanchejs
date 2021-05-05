@@ -230,7 +230,7 @@ export class ImportTx extends EVMBaseTx {
   }
 
   private validateApricotPhaseTwo() {
-      // - enforce uniqueness of pair(address, assetid) for each out
+      // enforce uniqueness of pair(address, assetid) for each out
       let seenAssetSends: Map<string, string[]> = new Map();
       this.outs.forEach((out: EVMOutput) => {
         const address: string = out.getAddressString();
