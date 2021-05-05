@@ -26,7 +26,7 @@ import {
   SerializedEncoding 
 } from '../../utils/serialization';
 import { ChainIdError, TransferableInputError, EVMOutputError, EVMFeeError } from '../../utils/errors';
-import { StandardAmountInput, StandardTransferableInput } from 'dist/common';
+import { StandardAmountInput } from 'dist/common';
 
 /**
  * @ignore
@@ -249,19 +249,20 @@ export class ImportTx extends EVMBaseTx {
       // make sure this transaction pays the required avax fee
       let requiredFee: BN = MILLIAVAX; // TODO is this fee right? what is an appropriate way of getting the fee? should this be in constants.ts?
       let feeDiff: BN = new BN(0);
-      let AVAXAssetID: Buffer = new Buffer('test'); // TODO get Avax asset ID
+      let AVAXAssetIDHex: string = new Buffer('test').toString('hex'); // TODO get Avax asset ID
+      // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
-      this.importIns.forEach((importIn: TransferableInput) => {
-        if (importIn.getAssetID() === AVAXAssetID) {
-          // TODO what is the correct way of getting the amount of an input?
-          let transferInput: AmountInput = importIn.getInput();
-          let input: StandardAmountInput = transferInput.getInput() as StandardAmountInput;
-          feeDiff.iadd(input.getAmount());
+      this.importIns.forEach((input: TransferableInput) => {
+        // only check StandardAmountInputs
+        if(input.getInput() instanceof StandardAmountInput && AVAXAssetIDHex === input.getAssetID().toString('hex')) {
+          const ui = input.getInput() as unknown;
+          const i = ui as StandardAmountInput;
+          feeDiff.iadd(i.getAmount());
         }
       });
       // subtract all outgoing AVAX
       this.outs.forEach((out: EVMOutput) => {
-        if (out.getAssetID() === AVAXAssetID) {
+        if (AVAXAssetIDHex === out.getAssetID().toString('hex')) {
           feeDiff.isub(out.getAmount());
         }
       });
