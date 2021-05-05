@@ -247,9 +247,9 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      let requiredFee: BN = Defaults[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm api here
+      let requiredFee: BN = Defaults[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm API here
       let feeDiff: BN = new BN(0);
-      let AVAXAssetIDHex: string = new Buffer('test').toString('hex'); // TODO get Avax asset ID
+      let AVAXAssetIDHex: string = new Buffer('test').toString('hex'); // TODO/REVIEWER QUESTION: the appropriate way of getting this ID is by querying the API, but we don't have access to the evm API here
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
       this.importIns.forEach((input: TransferableInput) => {
