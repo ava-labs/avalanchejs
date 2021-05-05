@@ -20,7 +20,7 @@ import {
   KeyChain, 
   KeyPair 
 } from './keychain';
-import { DefaultNetworkID, MILLIAVAX } from '../../utils/constants';
+import { DefaultNetworkID, Defaults } from '../../utils/constants';
 import { 
   Serialization, 
   SerializedEncoding 
@@ -247,7 +247,7 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      let requiredFee: BN = MILLIAVAX; // TODO is this fee right? what is an appropriate way of getting the fee? should this be in constants.ts?
+      let requiredFee: BN = Defaults[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm api here
       let feeDiff: BN = new BN(0);
       let AVAXAssetIDHex: string = new Buffer('test').toString('hex'); // TODO get Avax asset ID
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
