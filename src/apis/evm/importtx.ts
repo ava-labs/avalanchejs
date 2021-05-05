@@ -24,7 +24,8 @@ import {
   Serialization, 
   SerializedEncoding 
 } from '../../utils/serialization';
-import { ChainIdError, TransferableInputError, EVMOutputError } from '../../utils/errors';
+import { ChainIdError, TransferableInputError, EVMOutputError, EVMFeeError } from '../../utils/errors';
+import { StandardAmountInput, StandardTransferableInput } from 'dist/common';
 
 /**
  * @ignore
@@ -223,6 +224,26 @@ export class ImportTx extends EVMBaseTx {
         outs = outs.sort(EVMOutput.comparator());
       }
       this.outs = outs;
+      this.validateApricotPhaseTwo();
     }
+  }
+
+  private validateApricotPhaseTwo() {
+      // - enforce uniqueness of pair(address, assetid) for each out
+      let seenAssetSends: Map<string, string[]> = new Map();
+      this.outs.forEach((out: EVMOutput) => {
+        let address: string = out.getAddressString();
+        let assetID: string = out.getAssetID().toString('hex');
+        if (seenAssetSends.has(address)) {
+          let assetsSentToAddress: string[] = seenAssetSends.get(address);
+          if (assetsSentToAddress.includes(assetID)) {
+            let errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: duplicate (address, assetID) pair found in outputs: (${address},${assetID})`;
+            throw new EVMOutputError(errorMessage);
+          }
+          assetsSentToAddress.push(assetID);
+        } else {
+          seenAssetSends.set(address, [assetID]);
+        }
+      });
   }
 }
