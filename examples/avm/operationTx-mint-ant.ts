@@ -48,6 +48,7 @@ xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const blockchainid: string = Defaults.network['12345'].X.blockchainID
+const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetId)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const operations: TransferableOperation[] = []
@@ -59,7 +60,6 @@ const memo: Buffer = Buffer.from("AVM manual OperationTx to mint an ANT")
 // const codecID: number = 1
       
 const main = async (): Promise<any> => {
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
