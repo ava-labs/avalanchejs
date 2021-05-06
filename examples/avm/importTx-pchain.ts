@@ -32,7 +32,7 @@ const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUr
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainid: string = Defaults.network['12345'].X.blockchainID
+const blockchainID: string = Defaults.network['12345'].X.blockchainID
 const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetId)
 const cChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
 const importedInputs: TransferableInput[] = []
@@ -70,7 +70,7 @@ const main = async (): Promise<any> => {
   
   const importTx: ImportTx = new ImportTx(
     networkID,
-    bintools.cb58Decode(blockchainid),
+    bintools.cb58Decode(blockchainID),
     outputs,
     inputs,
     memo,
