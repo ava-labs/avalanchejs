@@ -249,7 +249,7 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      const requiredFee: BN = Defaults.network[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm API here
+      const requiredFee: BN = Defaults.network[DefaultNetworkID].C.txFee;
       const feeDiff: BN = new BN(0);
       const AVAXAssetIDHex: string = Defaults.network[DefaultNetworkID].X.avaxAssetId;
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
