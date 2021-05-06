@@ -249,26 +249,28 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      const requiredFee: BN = Defaults.network[DefaultNetworkID].C.txFee;
+      // TODO how to handle which network is selected?
+      const selectedNetwork: number = 12345;
+      const requiredFee: BN = Defaults.network[selectedNetwork].C.txFee;
       const feeDiff: BN = new BN(0);
-      const avaxAssetIDHex: string = Defaults.network[DefaultNetworkID].X.avaxAssetId;
+      const avaxAssetID: string = Defaults.network[selectedNetwork].X.avaxAssetId;
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
       this.importIns.forEach((input: TransferableInput): void => {
         // only check StandardAmountInputs
-        if(input.getInput() instanceof StandardAmountInput && avaxAssetIDHex === input.getAssetID().toString('hex')) {
+        if(input.getInput() instanceof StandardAmountInput && avaxAssetID === bintools.cb58Encode(input.getAssetID())) {
           const ui = input.getInput() as unknown;
           const i = ui as StandardAmountInput;
           feeDiff.iadd(i.getAmount());
         }
       });
       // subtract all outgoing AVAX
-      this.outs.forEach((out: EVMOutput): void => {
-        if(avaxAssetIDHex === out.getAssetID().toString('hex')) {
-          feeDiff.isub(out.getAmount());
+      this.outs.forEach((output: EVMOutput): void => {
+        if(avaxAssetID === bintools.cb58Encode(output.getAssetID())) {
+          feeDiff.isub(output.getAmount());
         }
       });
-      if(feeDiff < requiredFee) {
+      if(feeDiff.lt(requiredFee)) {
         const errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: transaction did not pay fee of ${requiredFee} AVAX, only burns ${feeDiff} AVAX`;
         throw new EVMFeeError(errorMessage);
       }
