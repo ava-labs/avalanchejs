@@ -294,14 +294,12 @@ const n5C:object = {
   chainID: 43113
 };
 
-// END TODO
-
 const n12345X:any = { ...n5X };
 n12345X.blockchainID = '2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed';
 const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
-n12345C.blockchainID = '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR';
+n12345C.blockchainID = '2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU';
 n12345C.chainID = 43112;
 
 export class Defaults {
@@ -315,7 +313,7 @@ export class Defaults {
       C: n0C,
       '2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb': n0C,
     }, 
-    1: { // update before mainnet
+    1: {
       hrp: NetworkIDToHRP[1],
       X: n1X,
       '2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM': n1X,
@@ -367,7 +365,7 @@ export class Defaults {
       P: n12345P,
       '11111111111111111111111111111111LpoYY': n12345P,
       C: n12345C,
-      '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR': n12345C,
+      '2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU': n12345C,
     },
   };
 }

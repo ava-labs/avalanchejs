@@ -330,6 +330,6 @@ export class Bech32Error extends AvalancheError {
 export class EVMFeeError extends AvalancheError {
   constructor(m:string) {
     super(m, EVM_FEE_ERROR_CODE);
-    Object.setPrototypeOf(this, Bech32Error.prototype);
+    Object.setPrototypeOf(this, EVMFeeError.prototype);
   }
 }
