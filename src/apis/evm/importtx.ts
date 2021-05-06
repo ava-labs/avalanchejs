@@ -229,30 +229,32 @@ export class ImportTx extends EVMBaseTx {
     }
   }
 
-  private validateApricotPhaseTwo() {
-      // enforce uniqueness of pair(address, assetid) for each out
-      let seenAssetSends: Map<string, string[]> = new Map();
-      this.outs.forEach((out: EVMOutput) => {
+  private validateApricotPhaseTwo(): void {
+      // enforce uniqueness of pair(address, assetId) for each out
+      const seenAssetSends: Map<string, string[]> = new Map();
+      this.outs.forEach((out: EVMOutput): void => {
         const address: string = out.getAddressString();
-        const assetID: string = out.getAssetID().toString('hex');
-        if (seenAssetSends.has(address)) {
-          let assetsSentToAddress: string[] = seenAssetSends.get(address);
-          if (assetsSentToAddress.includes(assetID)) {
-            let errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: duplicate (address, assetID) pair found in outputs: (${address},${assetID})`;
+        // TODO - does this need to be error detected? (capital letters)
+        const assetId: string = bintools.cb58Encode(out.getAssetID());
+        if(seenAssetSends.has(address)) {
+          const assetsSentToAddress: string[] = seenAssetSends.get(address);
+          if(assetsSentToAddress.includes(assetId)) {
+            // TODO - should the address have error detection?
+            const errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: duplicate (address, assetId) pair found in outputs: (0x${address}, ${assetId})`;
             throw new EVMOutputError(errorMessage);
           }
-          assetsSentToAddress.push(assetID);
+          assetsSentToAddress.push(assetId);
         } else {
-          seenAssetSends.set(address, [assetID]);
+          seenAssetSends.set(address, [assetId]);
         }
       });
       // make sure this transaction pays the required avax fee
-      const requiredFee: BN = Defaults[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm API here
-      let feeDiff: BN = new BN(0);
-      const AVAXAssetIDHex: string = "dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db"; // TODO/REVIEWER QUESTION: the appropriate way of getting this ID is by querying the API, but we don't have access to the evm API here
+      const requiredFee: BN = Defaults.network[DefaultNetworkID].C.txFee; // REVIEWER QUESTION is this the appropriate way of getting the tx fee? We don't have access to the evm API here
+      const feeDiff: BN = new BN(0);
+      const AVAXAssetIDHex: string = Defaults.network[DefaultNetworkID].X.avaxAssetId;
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
-      this.importIns.forEach((input: TransferableInput) => {
+      this.importIns.forEach((input: TransferableInput): void => {
         // only check StandardAmountInputs
         if(input.getInput() instanceof StandardAmountInput && AVAXAssetIDHex === input.getAssetID().toString('hex')) {
           const ui = input.getInput() as unknown;
@@ -261,13 +263,13 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // subtract all outgoing AVAX
-      this.outs.forEach((out: EVMOutput) => {
-        if (AVAXAssetIDHex === out.getAssetID().toString('hex')) {
+      this.outs.forEach((out: EVMOutput): void => {
+        if(AVAXAssetIDHex === out.getAssetID().toString('hex')) {
           feeDiff.isub(out.getAmount());
         }
       });
-      if (feeDiff < requiredFee) {
-        let errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: transaction did not pay fee of ${requiredFee} AVAX, only burns ${feeDiff} AVAX`;
+      if(feeDiff < requiredFee) {
+        const errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: transaction did not pay fee of ${requiredFee} AVAX, only burns ${feeDiff} AVAX`;
         throw new EVMFeeError(errorMessage);
       }
   }
