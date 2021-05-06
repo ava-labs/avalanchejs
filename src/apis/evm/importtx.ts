@@ -232,15 +232,15 @@ export class ImportTx extends EVMBaseTx {
   private validateOuts(): void {
       // enforce uniqueness of pair(address, assetId) for each out
       const seenAssetSends: Map<string, string[]> = new Map();
-      this.outs.forEach((out: EVMOutput): void => {
-        const address: string = out.getAddressString();
+      this.outs.forEach((evmOutput: EVMOutput): void => {
+        const address: string = evmOutput.getAddressString();
         // TODO - does this need to be error detected? (capital letters)
-        const assetId: string = bintools.cb58Encode(out.getAssetID());
+        const assetId: string = bintools.cb58Encode(evmOutput.getAssetID());
         if(seenAssetSends.has(address)) {
           const assetsSentToAddress: string[] = seenAssetSends.get(address);
           if(assetsSentToAddress.includes(assetId)) {
             // TODO - should the address have error detection?
-            const errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: duplicate (address, assetId) pair found in outputs: (0x${address}, ${assetId})`;
+            const errorMessage: string = `Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x${address}, ${assetId})`;
             throw new EVMOutputError(errorMessage);
           }
           assetsSentToAddress.push(assetId);
@@ -265,9 +265,9 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // subtract all outgoing AVAX
-      this.outs.forEach((output: EVMOutput): void => {
-        if(avaxAssetID === bintools.cb58Encode(output.getAssetID())) {
-          feeDiff.isub(output.getAmount());
+      this.outs.forEach((evmOutput: EVMOutput): void => {
+        if(avaxAssetID === bintools.cb58Encode(evmOutput.getAssetID())) {
+          feeDiff.isub(evmOutput.getAmount());
         }
       });
       if(feeDiff.lt(requiredFee)) {
