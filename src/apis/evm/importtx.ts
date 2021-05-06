@@ -225,11 +225,11 @@ export class ImportTx extends EVMBaseTx {
         outs = outs.sort(EVMOutput.comparator());
       }
       this.outs = outs;
-      this.validateApricotPhaseTwo();
+      this.validateOuts();
     }
   }
 
-  private validateApricotPhaseTwo(): void {
+  private validateOuts(): void {
       // enforce uniqueness of pair(address, assetId) for each out
       const seenAssetSends: Map<string, string[]> = new Map();
       this.outs.forEach((out: EVMOutput): void => {
@@ -251,12 +251,12 @@ export class ImportTx extends EVMBaseTx {
       // make sure this transaction pays the required avax fee
       const requiredFee: BN = Defaults.network[DefaultNetworkID].C.txFee;
       const feeDiff: BN = new BN(0);
-      const AVAXAssetIDHex: string = Defaults.network[DefaultNetworkID].X.avaxAssetId;
+      const avaxAssetIDHex: string = Defaults.network[DefaultNetworkID].X.avaxAssetId;
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
       this.importIns.forEach((input: TransferableInput): void => {
         // only check StandardAmountInputs
-        if(input.getInput() instanceof StandardAmountInput && AVAXAssetIDHex === input.getAssetID().toString('hex')) {
+        if(input.getInput() instanceof StandardAmountInput && avaxAssetIDHex === input.getAssetID().toString('hex')) {
           const ui = input.getInput() as unknown;
           const i = ui as StandardAmountInput;
           feeDiff.iadd(i.getAmount());
@@ -264,7 +264,7 @@ export class ImportTx extends EVMBaseTx {
       });
       // subtract all outgoing AVAX
       this.outs.forEach((out: EVMOutput): void => {
-        if(AVAXAssetIDHex === out.getAssetID().toString('hex')) {
+        if(avaxAssetIDHex === out.getAssetID().toString('hex')) {
           feeDiff.isub(out.getAmount());
         }
       });
