@@ -71,15 +71,13 @@ describe('EVM Transactions', () => {
     });
 
     test("ANT EVMOutput success", (): void => {
-      // Creating 2 outputs with the same address and ANT assetID
-      // Paying the fee w/ AVAX
       const outputidx: Buffer = Buffer.from("");
-      // fee input
+      // Paying the fee w/ AVAX
       const input: SECPTransferInput = new SECPTransferInput(fee);
       const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
       importedIns.push(xferin);
 
-      let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
+      const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
       const importTx: ImportTx = new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
       expect(importTx).toBeInstanceOf(ImportTx);
@@ -103,12 +101,17 @@ describe('EVM Transactions', () => {
       }).toThrow("Error - 1000000 AVAX required for fee and only 0 AVAX provided");
     });
 
-  //   test("Single underfunded AVAX EVMOutput", (): void => {
-  //     const evmOutput: EVMOutput = new EVMOutput(cHexAddress, ONEAVAX, avaxAssetID);
-  //     evmOutputs.push(evmOutput);
-  //     expect((): void => {
-  //       new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
-  //     }).toThrow("Error - 1000000 AVAX required for fee and only -2 AVAX provided");
-  //   });
+    test("Single underfunded AVAX EVMOutput", (): void => {
+      const outputidx: Buffer = Buffer.from("");
+      const input: SECPTransferInput = new SECPTransferInput(new BN(507));
+      const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
+      importedIns.push(xferin);
+
+      const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, new BN(0), avaxAssetID);
+      evmOutputs.push(evmOutput);
+      expect((): void => {
+        new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
+      }).toThrow("Error - 1000000 AVAX required for fee and only 507 AVAX provided");
+    });
   });
 });
