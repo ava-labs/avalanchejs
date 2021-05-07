@@ -34,7 +34,8 @@ const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const blockchainID: string = Defaults.network['12345'].X.blockchainID
 const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const exportedOuts: TransferableOutput[] = []
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
@@ -58,7 +59,6 @@ const main = async (): Promise<any> => {
     const outputidx: Buffer = utxo.getOutputIdx()
     let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
     if(avaxAssetIDBuf.toString("hex") === assetID.toString("hex")) {
-      assetID = avaxAssetIDBuf
       secpTransferOutput = new SECPTransferOutput(amt.sub(fee), xAddresses, locktime, threshold)
     } else {
       secpTransferOutput = new SECPTransferOutput(amt, xAddresses, locktime, threshold)

@@ -33,7 +33,8 @@ xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const blockchainID: string = Defaults.network['12345'].X.blockchainID
-const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const cChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
 const importedInputs: TransferableInput[] = []
 const outputs: TransferableOutput[] = []
@@ -59,13 +60,13 @@ const main = async (): Promise<any> => {
   // Uncomment for codecID 00 01
   // secpTransferInput.setCodecID(codecID)
   
-  const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
+  const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetIDBuf, secpTransferInput)
   importedInputs.push(input)
   
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amt.sub(fee), xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
   // secpTransferOutput.setCodecID(codecID)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
+  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
   outputs.push(transferableOutput)
   
   const importTx: ImportTx = new ImportTx(

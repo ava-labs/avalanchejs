@@ -50,7 +50,8 @@ xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const blockchainID: string = Defaults.network['12345'].X.blockchainID
-const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const operations: TransferableOperation[] = []
@@ -75,18 +76,18 @@ const main = async (): Promise<any> => {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
   
-      if(assetID.toString('hex') === avaxAssetID.toString('hex')) {
+      if(assetID.toString('hex') === avaxAssetIDBuf.toString('hex')) {
         const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amt.sub(fee), xAddresses, locktime, threshold)
         // Uncomment for codecID 00 01
         // secpTransferOutput.setCodecID(codecID)
-        const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
+        const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
         outputs.push(transferableOutput)
     
         const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
         // Uncomment for codecID 00 01
         // secpTransferInput.setCodecID(codecID)
         secpTransferInput.addSignatureIdx(0, xAddresses[0])
-        const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
+        const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetIDBuf, secpTransferInput)
         inputs.push(input)
       } else {
         const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amt, xAddresses, locktime, threshold)

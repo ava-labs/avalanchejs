@@ -27,7 +27,7 @@ const xKeychain: AVMKeyChain = xchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)
@@ -35,7 +35,7 @@ const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX");
 const fee: BN = xchain.getDefaultTxFee()
       
 const main = async (): Promise<any> => {
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
+  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
   const balance: BN = new BN(getBalanceResponse.balance)
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos

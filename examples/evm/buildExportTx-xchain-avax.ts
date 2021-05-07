@@ -1,5 +1,6 @@
 import { 
-  Avalanche, BinTools, BN, Buffer
+  Avalanche, 
+  BN
 } from "../../src"
 import { 
   AVMAPI, 
