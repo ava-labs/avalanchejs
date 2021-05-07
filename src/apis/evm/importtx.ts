@@ -230,11 +230,24 @@ export class ImportTx extends EVMBaseTx {
   }
 
   private validateOuts(): void {
-      // enforce uniqueness of pair(address, assetId) for each out
+      // This Map enforce uniqueness of pair(address, assetId) for each EVMOutput
+      // For each imported assetID, each ETH-style C-Chain address can 
+      // have excactly 1 EVMOutput.
+      // Map(2) {
+      //   '0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC' => [
+      //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
+      //     'F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38'
+      //   ],
+      //   '0xecC3B2968B277b837a81A7181e0b94EB1Ca54EdE' => [
+      //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
+      //     '2Df96yHyhNc3vooieNNhyKwrjEfTsV2ReMo5FKjMpr8vwN4Jqy',
+      //     'SfSXBzDb9GZ9R2uH61qZKe8nxQHW9KERW9Kq9WRe4vHJZRN3e'
+      //   ]
+      // }
       const seenAssetSends: Map<string, string[]> = new Map();
       this.outs.forEach((evmOutput: EVMOutput): void => {
-        const address: string = evmOutput.getAddressString();
         // TODO - does this need to be error detected? (capital letters)
+        const address: string = evmOutput.getAddressString();
         const assetId: string = bintools.cb58Encode(evmOutput.getAssetID());
         if(seenAssetSends.has(address)) {
           const assetsSentToAddress: string[] = seenAssetSends.get(address);
