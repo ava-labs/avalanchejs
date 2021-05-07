@@ -1,5 +1,5 @@
 export * from './api';
-// export * from './basetx';
+export * from './basetx';
 export * from './constants';
 export * from './credentials';
 export * from './inputs';

@@ -36,6 +36,7 @@ cKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
+const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export AVAX to the C-Chain from the X-Chain")
@@ -44,7 +45,6 @@ const fee: BN = xchain.getDefaultTxFee()
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
   const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
   const balance: BN = new BN(getBalanceResponse.balance)
   const amount: BN = balance.sub(fee)

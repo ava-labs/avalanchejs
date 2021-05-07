@@ -32,7 +32,8 @@ const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUr
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainid: string = Defaults.network['12345'].X.blockchainID
+const blockchainID: string = Defaults.network['12345'].X.blockchainID
+const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
@@ -43,7 +44,6 @@ const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX")
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
   const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
   const balance: BN = new BN(getBalanceResponse['balance'])
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
@@ -72,7 +72,7 @@ const main = async (): Promise<any> => {
 
   const baseTx: BaseTx = new BaseTx(
     networkID,
-    bintools.cb58Decode(blockchainid),
+    bintools.cb58Decode(blockchainID),
     outputs,
     inputs,
     memo

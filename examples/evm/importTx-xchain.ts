@@ -38,6 +38,7 @@ const xChainBlockchainIdStr: string = Defaults.network['12345'].X.blockchainID
 const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
 const importedIns: TransferableInput[] = []
 const evmOutputs: EVMOutput[] = []
+const fee: BN = cchain.getDefaultTxFee()
           
 const main = async (): Promise<any> => {
   const u: any = await cchain.getUTXOs(cAddressStrings[0], "X")
@@ -54,7 +55,7 @@ const main = async (): Promise<any> => {
     const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input)
     importedIns.push(xferin)
   
-    const evmOutput: EVMOutput = new EVMOutput(cHexAddress, amt, assetID)
+    const evmOutput: EVMOutput = new EVMOutput(cHexAddress, amt.sub(fee), assetID)
     evmOutputs.push(evmOutput)
   })
       

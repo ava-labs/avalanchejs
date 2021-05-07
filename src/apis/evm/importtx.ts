@@ -4,6 +4,7 @@
  */
 
 import { Buffer } from 'buffer/';
+import BN from "bn.js";
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
 import { EVMOutput } from './outputs';
@@ -15,16 +16,17 @@ import {
   SigIdx, 
   Credential 
 } from '../../common/credentials';
+import { StandardAmountInput } from '../../common/input';
 import { 
   KeyChain, 
   KeyPair 
 } from './keychain';
-import { DefaultNetworkID } from '../../utils/constants';
+import { DefaultNetworkID, Defaults } from '../../utils/constants';
 import { 
   Serialization, 
   SerializedEncoding 
 } from '../../utils/serialization';
-import { ChainIdError, TransferableInputError, EVMOutputError } from '../../utils/errors';
+import { ChainIdError, TransferableInputError, EVMOutputError, EVMFeeError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -205,15 +207,18 @@ export class ImportTx extends EVMBaseTx {
   ) {
     super(networkid, blockchainid);
     this.sourceChain = sourceChainid;
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    let inputsPassed: boolean = false;
+    let outputsPassed: boolean = false;
+    if(typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {
           throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       });
+      inputsPassed = true;
       this.importIns = importIns;
     }
-    if (typeof outs !== 'undefined' && Array.isArray(outs)) {
+    if(typeof outs !== 'undefined' && Array.isArray(outs)) {
       outs.forEach((out: EVMOutput) => {
         if (!(out instanceof EVMOutput)) {
           throw new EVMOutputError("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
@@ -222,7 +227,67 @@ export class ImportTx extends EVMBaseTx {
       if(outs.length > 1) {
         outs = outs.sort(EVMOutput.comparator());
       }
+      outputsPassed = true;
       this.outs = outs;
     }
+    if(inputsPassed && outputsPassed) {
+      this.validateOuts();
+    }
+  }
+
+  private validateOuts(): void {
+      // This Map enforce uniqueness of pair(address, assetId) for each EVMOutput
+      // For each imported assetID, each ETH-style C-Chain address can 
+      // have exactly 1 EVMOutput.
+      // Map(2) {
+      //   '0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC' => [
+      //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
+      //     'F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38'
+      //   ],
+      //   '0xecC3B2968B277b837a81A7181e0b94EB1Ca54EdE' => [
+      //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
+      //     '2Df96yHyhNc3vooieNNhyKwrjEfTsV2ReMo5FKjMpr8vwN4Jqy',
+      //     'SfSXBzDb9GZ9R2uH61qZKe8nxQHW9KERW9Kq9WRe4vHJZRN3e'
+      //   ]
+      // }
+      const seenAssetSends: Map<string, string[]> = new Map();
+      this.outs.forEach((evmOutput: EVMOutput): void => {
+        const address: string = evmOutput.getAddressString();
+        const assetId: string = bintools.cb58Encode(evmOutput.getAssetID());
+        if(seenAssetSends.has(address)) {
+          const assetsSentToAddress: string[] = seenAssetSends.get(address);
+          if(assetsSentToAddress.includes(assetId)) {
+            const errorMessage: string = `Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x${address}, ${assetId})`;
+            throw new EVMOutputError(errorMessage);
+          }
+          assetsSentToAddress.push(assetId);
+        } else {
+          seenAssetSends.set(address, [assetId]);
+        }
+      });
+      // make sure this transaction pays the required avax fee
+      const selectedNetwork: number = this.getNetworkID();
+      const requiredFee: BN = Defaults.network[selectedNetwork].C.txFee;
+      const feeDiff: BN = new BN(0);
+      const avaxAssetID: string = Defaults.network[selectedNetwork].X.avaxAssetID;
+      // sum incoming AVAX
+      this.importIns.forEach((input: TransferableInput): void => {
+        // only check StandardAmountInputs
+        if(input.getInput() instanceof StandardAmountInput && avaxAssetID === bintools.cb58Encode(input.getAssetID())) {
+          const ui = input.getInput() as unknown;
+          const i = ui as StandardAmountInput;
+          feeDiff.iadd(i.getAmount());
+        }
+      });
+      // subtract all outgoing AVAX
+      this.outs.forEach((evmOutput: EVMOutput): void => {
+        if(avaxAssetID === bintools.cb58Encode(evmOutput.getAssetID())) {
+          feeDiff.isub(evmOutput.getAmount());
+        }
+      });
+      if(feeDiff.lt(requiredFee)) {
+        const errorMessage: string = `Error - ${requiredFee} AVAX required for fee and only ${feeDiff} AVAX provided`;
+        throw new EVMFeeError(errorMessage);
+      }
   }
 }

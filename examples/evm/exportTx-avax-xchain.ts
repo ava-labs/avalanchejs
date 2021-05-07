@@ -39,6 +39,7 @@ const xChainBlockchainIdStr: string = Defaults.network['12345'].X.blockchainID
 const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
 const cChainBlockchainIdStr: string = Defaults.network['12345'].C.blockchainID
 const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const evmInputs: EVMInput[] = []
 const exportedOuts: TransferableOutput[] = []
@@ -48,7 +49,6 @@ const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
         
 const main = async (): Promise<any> => {
-  const avaxAssetIDBuf: Buffer = await xchain.getAVAXAssetID()
   const avaxAssetIDStr: string = bintools.cb58Encode(avaxAssetIDBuf)
   let balance: BN = await web3.eth.getBalance(cHexAddress)
   balance = new BN(balance.toString().substring(0, 17))
