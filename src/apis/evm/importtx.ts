@@ -207,15 +207,18 @@ export class ImportTx extends EVMBaseTx {
   ) {
     super(networkid, blockchainid);
     this.sourceChain = sourceChainid;
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    let inputsPassed: boolean = false;
+    let outputsPassed: boolean = false;
+    if(typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {
           throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       });
+      inputsPassed = true;
       this.importIns = importIns;
     }
-    if (typeof outs !== 'undefined' && Array.isArray(outs)) {
+    if(typeof outs !== 'undefined' && Array.isArray(outs)) {
       outs.forEach((out: EVMOutput) => {
         if (!(out instanceof EVMOutput)) {
           throw new EVMOutputError("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
@@ -224,22 +227,36 @@ export class ImportTx extends EVMBaseTx {
       if(outs.length > 1) {
         outs = outs.sort(EVMOutput.comparator());
       }
+      outputsPassed = true;
       this.outs = outs;
+    }
+    if(inputsPassed && outputsPassed) {
       this.validateOuts();
     }
   }
 
   private validateOuts(): void {
-      // enforce uniqueness of pair(address, assetId) for each out
+      // This Map enforce uniqueness of pair(address, assetId) for each EVMOutput
+      // For each imported assetID, each ETH-style C-Chain address can 
+      // have exactly 1 EVMOutput.
+      // Map(2) {
+      //   '0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC' => [
+      //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
+      //     'F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38'
+      //   ],
+      //   '0xecC3B2968B277b837a81A7181e0b94EB1Ca54EdE' => [
+      //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
+      //     '2Df96yHyhNc3vooieNNhyKwrjEfTsV2ReMo5FKjMpr8vwN4Jqy',
+      //     'SfSXBzDb9GZ9R2uH61qZKe8nxQHW9KERW9Kq9WRe4vHJZRN3e'
+      //   ]
+      // }
       const seenAssetSends: Map<string, string[]> = new Map();
       this.outs.forEach((evmOutput: EVMOutput): void => {
         const address: string = evmOutput.getAddressString();
-        // TODO - does this need to be error detected? (capital letters)
         const assetId: string = bintools.cb58Encode(evmOutput.getAssetID());
         if(seenAssetSends.has(address)) {
           const assetsSentToAddress: string[] = seenAssetSends.get(address);
           if(assetsSentToAddress.includes(assetId)) {
-            // TODO - should the address have error detection?
             const errorMessage: string = `Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x${address}, ${assetId})`;
             throw new EVMOutputError(errorMessage);
           }
@@ -249,8 +266,7 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      // TODO how to handle which network is selected?
-      const selectedNetwork: number = 12345;
+      const selectedNetwork: number = this.getNetworkID();
       const requiredFee: BN = Defaults.network[selectedNetwork].C.txFee;
       const feeDiff: BN = new BN(0);
       const avaxAssetID: string = Defaults.network[selectedNetwork].X.avaxAssetID;
