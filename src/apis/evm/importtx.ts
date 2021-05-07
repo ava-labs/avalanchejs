@@ -271,7 +271,7 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       if(feeDiff.lt(requiredFee)) {
-        const errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: transaction did not pay fee of ${requiredFee} AVAX, only burns ${feeDiff} AVAX`;
+        const errorMessage: string = `Error - ${requiredFee} AVAX required for fee and only ${feeDiff} AVAX provided`;
         throw new EVMFeeError(errorMessage);
       }
   }
