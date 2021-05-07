@@ -24,7 +24,7 @@ describe('EVM Transactions', () => {
       evmOutputs.push(evmOutput);
 
       expect((): void => {
-        new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
+        new ImportTx(undefined, undefined, undefined, [], evmOutputs);
       }).toThrow("Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, 2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe)");
     });
 
@@ -47,7 +47,7 @@ describe('EVM Transactions', () => {
       evmOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
       expect((): void => {
-        new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
+        new ImportTx(undefined, undefined, undefined, [], evmOutputs);
       }).toThrow("Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38)");
     });
 
@@ -55,7 +55,7 @@ describe('EVM Transactions', () => {
       const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, new BN(0), avaxAssetID);
       evmOutputs.push(evmOutput);
       expect((): void => {
-        new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
+        new ImportTx(undefined, undefined, undefined, [], evmOutputs);
       }).toThrow("Error - 1000000 AVAX required for fee and only 0 AVAX provided");
     });
 
@@ -65,7 +65,7 @@ describe('EVM Transactions', () => {
       const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
       expect((): void => {
-        new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
+        new ImportTx(undefined, undefined, undefined, [], evmOutputs);
       }).toThrow("Error - 1000000 AVAX required for fee and only 0 AVAX provided");
     });
 
