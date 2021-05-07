@@ -253,7 +253,7 @@ export class ImportTx extends EVMBaseTx {
       const selectedNetwork: number = 12345;
       const requiredFee: BN = Defaults.network[selectedNetwork].C.txFee;
       const feeDiff: BN = new BN(0);
-      const avaxAssetID: string = Defaults.network[selectedNetwork].X.avaxAssetId;
+      const avaxAssetID: string = Defaults.network[selectedNetwork].X.avaxAssetID;
       // TODO/REVIEWER NOTE I feel like we should be able to use `getBurn` from `common/evmtx.ts` but I can't figure out how to get the hierarchy/inheritance/import to work right
       // sum incoming AVAX
       this.importIns.forEach((input: TransferableInput): void => {
@@ -271,7 +271,7 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       if(feeDiff.lt(requiredFee)) {
-        const errorMessage: string = `Error - ImportTx validating Apricot Phase Two rules: transaction did not pay fee of ${requiredFee} AVAX, only burns ${feeDiff} AVAX`;
+        const errorMessage: string = `Error - ${requiredFee} AVAX required for fee and only ${feeDiff} AVAX provided`;
         throw new EVMFeeError(errorMessage);
       }
   }

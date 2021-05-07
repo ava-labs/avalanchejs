@@ -28,7 +28,7 @@ cKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const xChainBlockchainIdStr: string = Defaults.network['12345'].X.blockchainID
-const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetId
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const Web3 = require('web3');
 const path: string = '/ext/bc/C/rpc'

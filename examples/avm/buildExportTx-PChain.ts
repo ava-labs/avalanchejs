@@ -30,7 +30,7 @@ pKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const pChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
-const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetId)
+const avaxAssetID: Buffer = bintools.cb58Decode(Defaults.network['12345'].X.avaxAssetID)
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export AVAX to the P-Chain from the X-Chain")
