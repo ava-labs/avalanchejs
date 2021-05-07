@@ -3,7 +3,7 @@ import {
   SECPTransferInput, 
   TransferableInput 
 } from 'src/apis/evm';
-import { Defaults } from 'src/utils/constants';
+import { Defaults, MILLIAVAX } from 'src/utils/constants';
 import { ONEAVAX } from '../../../src/utils/constants';
 import { EVMOutput } from 'src/apis/evm';
 import BN from "bn.js";
@@ -70,15 +70,29 @@ describe('EVM Transactions', () => {
       }).toThrow("Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38)");
     });
 
-    test("ANT EVMOutput success", (): void => {
+    test("Single ANT EVMOutput success", (): void => {
       const outputidx: Buffer = Buffer.from("");
-      // Paying the fee w/ AVAX
       const input: SECPTransferInput = new SECPTransferInput(fee);
       const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
       importedIns.push(xferin);
 
       const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
+      const importTx: ImportTx = new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
+      expect(importTx).toBeInstanceOf(ImportTx);
+    });
+
+    test("Multiple ANT EVMOutput success", (): void => {
+      const outputidx: Buffer = Buffer.from("");
+      const input: SECPTransferInput = new SECPTransferInput(fee);
+      const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
+      importedIns.push(xferin);
+
+      let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
+      evmOutputs.push(evmOutput);
+      evmOutput = new EVMOutput(cHexAddress2, ONEAVAX, antAssetID);
+      evmOutputs.push(evmOutput);
+
       const importTx: ImportTx = new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
       expect(importTx).toBeInstanceOf(ImportTx);
     });
@@ -101,7 +115,7 @@ describe('EVM Transactions', () => {
       }).toThrow("Error - 1000000 AVAX required for fee and only 0 AVAX provided");
     });
 
-    test("Single underfunded AVAX EVMOutput", (): void => {
+    test("Single underfunded AVAX EVMOutput fail", (): void => {
       const outputidx: Buffer = Buffer.from("");
       const input: SECPTransferInput = new SECPTransferInput(new BN(507));
       const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
@@ -112,6 +126,18 @@ describe('EVM Transactions', () => {
       expect((): void => {
         new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
       }).toThrow("Error - 1000000 AVAX required for fee and only 507 AVAX provided");
+    });
+
+    test("Single AVAX EVMOutput success", (): void => {
+      const outputidx: Buffer = Buffer.from("");
+      const input: SECPTransferInput = new SECPTransferInput(ONEAVAX);
+      const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
+      importedIns.push(xferin);
+
+      const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX.sub(MILLIAVAX), avaxAssetID);
+      evmOutputs.push(evmOutput);
+      const importTx: ImportTx = new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
+      expect(importTx).toBeInstanceOf(ImportTx);
     });
   });
 });
