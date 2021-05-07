@@ -246,13 +246,11 @@ export class ImportTx extends EVMBaseTx {
       // }
       const seenAssetSends: Map<string, string[]> = new Map();
       this.outs.forEach((evmOutput: EVMOutput): void => {
-        // TODO - does this need to be error detected? (capital letters)
         const address: string = evmOutput.getAddressString();
         const assetId: string = bintools.cb58Encode(evmOutput.getAssetID());
         if(seenAssetSends.has(address)) {
           const assetsSentToAddress: string[] = seenAssetSends.get(address);
           if(assetsSentToAddress.includes(assetId)) {
-            // TODO - should the address have error detection?
             const errorMessage: string = `Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x${address}, ${assetId})`;
             throw new EVMOutputError(errorMessage);
           }
