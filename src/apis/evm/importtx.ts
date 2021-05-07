@@ -232,7 +232,7 @@ export class ImportTx extends EVMBaseTx {
   private validateOuts(): void {
       // This Map enforce uniqueness of pair(address, assetId) for each EVMOutput
       // For each imported assetID, each ETH-style C-Chain address can 
-      // have excactly 1 EVMOutput.
+      // have exactly 1 EVMOutput.
       // Map(2) {
       //   '0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC' => [
       //     'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
