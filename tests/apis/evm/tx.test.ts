@@ -22,6 +22,7 @@ const blockchainID: string = Defaults.network['12345'].C.blockchainID;
 const sourcechainID: string = Defaults.network['12345'].X.blockchainID;
 let evmOutputs: EVMOutput[];
 let importedIns: TransferableInput[];
+const fee: BN = Defaults.network['12345'].C.txFee;
 
 beforeEach((): void => {
   evmOutputs = [];
@@ -44,17 +45,18 @@ describe('EVM Transactions', () => {
 
     test("Multi AVAX EVMOutput success", (): void => {
       // Creating 2 outputs with different addresses valid
-      const outputidx: Buffer = Buffer.from("")
-      const input: SECPTransferInput = new SECPTransferInput(ONEAVAX)
-      const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input)
-      importedIns.push(xferin)
+      const outputidx: Buffer = Buffer.from("");
+      const input: SECPTransferInput = new SECPTransferInput(ONEAVAX);
+      const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
+      importedIns.push(xferin);
 
       let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX.div(new BN(3)), avaxAssetID);
       evmOutputs.push(evmOutput);
       evmOutput = new EVMOutput(cHexAddress2, ONEAVAX.div(new BN(3)), avaxAssetID);
       evmOutputs.push(evmOutput);
 
-      new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
+      const importTx: ImportTx = new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
+      expect(importTx).toBeInstanceOf(ImportTx);
     });
 
     test("Multi ANT EVMOutput fail", (): void => {
@@ -66,6 +68,21 @@ describe('EVM Transactions', () => {
       expect((): void => {
         new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), [], evmOutputs);
       }).toThrow("Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38)");
+    });
+
+    test("ANT EVMOutput success", (): void => {
+      // Creating 2 outputs with the same address and ANT assetID
+      // Paying the fee w/ AVAX
+      const outputidx: Buffer = Buffer.from("");
+      // fee input
+      const input: SECPTransferInput = new SECPTransferInput(fee);
+      const xferin: TransferableInput = new TransferableInput(bintools.cb58Decode(txID), outputidx, bintools.cb58Decode(avaxAssetID), input);
+      importedIns.push(xferin);
+
+      let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
+      evmOutputs.push(evmOutput);
+      const importTx: ImportTx = new ImportTx(networkID, bintools.cb58Decode(blockchainID), bintools.cb58Decode(sourcechainID), importedIns, evmOutputs);
+      expect(importTx).toBeInstanceOf(ImportTx);
     });
 
     test("Single AVAX EVMOutput fail", (): void => {
