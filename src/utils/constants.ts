@@ -127,10 +127,10 @@ const n0C:object = {
 // End Manhattan 
 
 // Start mainnet
-let avaxAssetId: string = 'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z';
+let avaxAssetID: string = 'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z';
 const n1X:object = {
   blockchainID: '2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM',
-  avaxAssetId: avaxAssetId,
+  avaxAssetID: avaxAssetID,
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
@@ -139,7 +139,7 @@ const n1X:object = {
 
 const n1P:object = {
   blockchainID: PlatformChainID,
-  avaxAssetId: avaxAssetId,
+  avaxAssetID: avaxAssetID,
   alias: PChainAlias,
   vm: PChainVMName,
   txFee: MILLIAVAX,
@@ -269,10 +269,10 @@ const n4C:object = {
 // End Everest
 
 // Start Fuji
-avaxAssetId = 'U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK';
+avaxAssetID = 'U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK';
 const n5X:object = {
   blockchainID: '2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm',
-  avaxAssetId: avaxAssetId,
+  avaxAssetID: avaxAssetID,
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
@@ -281,7 +281,7 @@ const n5X:object = {
 
 const n5P:object = {
   blockchainID: PlatformChainID,
-  avaxAssetId: avaxAssetId,
+  avaxAssetID: avaxAssetID,
   alias: PChainAlias,
   vm: PChainVMName,
   txFee: MILLIAVAX,
@@ -308,15 +308,15 @@ const n5C:object = {
 // End Fuji
 
 // Start local network
-avaxAssetId = '2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe';
+avaxAssetID = '2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe';
 const n12345X:any = { ...n5X };
 n12345X.blockchainID = '2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed';
-n12345X.avaxAssetId = avaxAssetId;
+n12345X.avaxAssetID = avaxAssetID;
 const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
 n12345C.blockchainID = '2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU';
-n12345C.avaxAssetId = avaxAssetId;
+n12345C.avaxAssetID = avaxAssetID;
 n12345C.chainID = 43112;
 // End local network
 
