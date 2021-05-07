@@ -209,7 +209,7 @@ export class ImportTx extends EVMBaseTx {
     this.sourceChain = sourceChainid;
     let inputsPassed: boolean = false;
     let outputsPassed: boolean = false;
-    if(typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    if(typeof importIns !== 'undefined' && Array.isArray(importIns) && importIns.length > 0) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {
           throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
@@ -218,7 +218,7 @@ export class ImportTx extends EVMBaseTx {
       inputsPassed = true;
       this.importIns = importIns;
     }
-    if(typeof outs !== 'undefined' && Array.isArray(outs)) {
+    if(typeof outs !== 'undefined' && Array.isArray(outs) && outs.length > 0) {
       outs.forEach((out: EVMOutput) => {
         if (!(out instanceof EVMOutput)) {
           throw new EVMOutputError("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
