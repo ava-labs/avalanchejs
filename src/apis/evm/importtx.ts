@@ -207,15 +207,18 @@ export class ImportTx extends EVMBaseTx {
   ) {
     super(networkid, blockchainid);
     this.sourceChain = sourceChainid;
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    let inputsPassed: boolean = false;
+    let outputsPassed: boolean = false;
+    if(typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       importIns.forEach((importIn: TransferableInput) => {
         if (!(importIn instanceof TransferableInput)) {
           throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }
       });
+      inputsPassed = true;
       this.importIns = importIns;
     }
-    if (typeof outs !== 'undefined' && Array.isArray(outs)) {
+    if(typeof outs !== 'undefined' && Array.isArray(outs)) {
       outs.forEach((out: EVMOutput) => {
         if (!(out instanceof EVMOutput)) {
           throw new EVMOutputError("Error - ImportTx.constructor: invalid EVMOutput in array parameter 'outs'");
@@ -224,7 +227,10 @@ export class ImportTx extends EVMBaseTx {
       if(outs.length > 1) {
         outs = outs.sort(EVMOutput.comparator());
       }
+      outputsPassed = true;
       this.outs = outs;
+    }
+    if(inputsPassed && outputsPassed) {
       this.validateOuts();
     }
   }
