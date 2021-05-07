@@ -262,8 +262,7 @@ export class ImportTx extends EVMBaseTx {
         }
       });
       // make sure this transaction pays the required avax fee
-      // TODO how to handle which network is selected?
-      const selectedNetwork: number = 12345;
+      const selectedNetwork: number = this.getNetworkID();
       const requiredFee: BN = Defaults.network[selectedNetwork].C.txFee;
       const feeDiff: BN = new BN(0);
       const avaxAssetID: string = Defaults.network[selectedNetwork].X.avaxAssetID;

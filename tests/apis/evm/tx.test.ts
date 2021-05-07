@@ -4,7 +4,8 @@ import { ONEAVAX } from '../../../src/utils/constants';
 import { EVMOutput } from 'src/apis/evm';
 
 describe('EVM Transactions', () => {
-  const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC";
+  const cHexAddress1: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC";
+  const cHexAddress2: string = "0xecC3B2968B277b837a81A7181e0b94EB1Ca54EdE";
   const antAssetID: string = "F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38";
   const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID;
   let evmOutputs: EVMOutput[];
@@ -16,9 +17,21 @@ describe('EVM Transactions', () => {
   describe('ImportTx', () => {
     test("Multi AVAX EVMOutput fail", (): void => {
       // Creating 2 outputs with the same address and AVAX assetID is invalid
-      let evmOutput: EVMOutput = new EVMOutput(cHexAddress, ONEAVAX, avaxAssetID);
+      let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, avaxAssetID);
       evmOutputs.push(evmOutput);
-      evmOutput = new EVMOutput(cHexAddress, ONEAVAX, avaxAssetID);
+      evmOutput = new EVMOutput(cHexAddress1, ONEAVAX, avaxAssetID);
+      evmOutputs.push(evmOutput);
+
+      expect((): void => {
+        new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
+      }).toThrow("Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, 2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe)");
+    });
+
+    test("Multi AVAX EVMOutput success", (): void => {
+      // Creating 2 outputs with different addresses valid
+      let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, avaxAssetID);
+      evmOutputs.push(evmOutput);
+      evmOutput = new EVMOutput(cHexAddress2, ONEAVAX, avaxAssetID);
       evmOutputs.push(evmOutput);
 
       expect((): void => {
@@ -28,9 +41,9 @@ describe('EVM Transactions', () => {
 
     test("Multi ANT EVMOutput fail", (): void => {
       // Creating 2 outputs with the same address and ANT assetID is invalid
-      let evmOutput: EVMOutput = new EVMOutput(cHexAddress, ONEAVAX, antAssetID);
+      let evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
-      evmOutput = new EVMOutput(cHexAddress, ONEAVAX, antAssetID);
+      evmOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
       expect((): void => {
         new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
@@ -39,7 +52,7 @@ describe('EVM Transactions', () => {
 
     test("Single ANT EVMOutput fail", (): void => {
       // If the output is a non-avax assetID then don't subtract a fee
-      const evmOutput: EVMOutput = new EVMOutput(cHexAddress, ONEAVAX, antAssetID);
+      const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, ONEAVAX, antAssetID);
       evmOutputs.push(evmOutput);
       expect((): void => {
         new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
