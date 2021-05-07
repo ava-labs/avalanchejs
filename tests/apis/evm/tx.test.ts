@@ -2,6 +2,7 @@ import { ImportTx } from 'src/apis/evm';
 import { Defaults } from 'src/utils/constants';
 import { ONEAVAX } from '../../../src/utils/constants';
 import { EVMOutput } from 'src/apis/evm';
+import BN from "bn.js";
 
 describe('EVM Transactions', () => {
   const cHexAddress1: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC";
@@ -49,6 +50,15 @@ describe('EVM Transactions', () => {
         new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
       }).toThrow("Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38)");
     });
+
+    test("Single AVAX EVMOutput fail", (): void => {
+      const evmOutput: EVMOutput = new EVMOutput(cHexAddress1, new BN(0), antAssetID);
+      evmOutputs.push(evmOutput);
+      expect((): void => {
+        new ImportTx(undefined, undefined, undefined, undefined, evmOutputs);
+      }).toThrow("Error - 1000000 AVAX required for fee and only 0 AVAX provided");
+    });
+
 
     test("Single ANT EVMOutput fail", (): void => {
       // If the output is a non-avax assetID then don't subtract a fee
