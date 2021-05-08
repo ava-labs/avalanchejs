@@ -292,19 +292,17 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
      }
  
      let feepaid: BN = new BN(0);
-     const feeAssetStr: string = feeAssetID.toString("hex");
      atomics.forEach((atomic: UTXO) => {
        const assetID: Buffer = atomic.getAssetID(); 
        const output: AmountOutput = atomic.getOutput() as AmountOutput;
        const amt: BN = output.getAmount().clone();
  
        let infeeamount: BN = amt.clone();
-       const assetStr: string = assetID.toString("hex");
        if(
          typeof feeAssetID !== "undefined" && 
          fee.gt(zero) && 
          feepaid.lt(fee) && 
-         assetStr === feeAssetStr
+         (Buffer.compare(feeAssetID, assetID) === 0)
        ) 
        {
          feepaid = feepaid.add(infeeamount);
@@ -339,7 +337,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
        if(infeeamount.gt(zero)) {
          const evmOutput: EVMOutput = new EVMOutput(
            toAddresses[0],
-           amt,
+           (Buffer.compare(feeAssetID, assetID) === 0 ? infeeamount : amt),
            assetID
          );
          outs.push(evmOutput);
