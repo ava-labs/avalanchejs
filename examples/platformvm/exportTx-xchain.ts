@@ -3,11 +3,11 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import { 
   AVMAPI,
   KeyChain as AVMKeyChain 
-} from "../../src/apis/avm";
+} from "../../src/apis/avm"
 import {
   PlatformVMAPI, 
   KeyChain,
@@ -22,7 +22,7 @@ import {
   Tx,
   ExportTx
 } from "../../src/apis/platformvm"
-import { Output } from "../../src/common";
+import { Output } from "../../src/common"
 import { Defaults } from "../../src/utils"
       
 const ip: string = "localhost"

@@ -31,7 +31,7 @@ const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const xChainBlockchainIdStr: string = Defaults.network['12345'].X.blockchainID
 const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
-const Web3 = require('web3');
+const Web3 = require('web3')
 const path: string = '/ext/bc/C/rpc'
 const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
@@ -41,7 +41,7 @@ const main = async (): Promise<any> => {
   const fee: BN = cchain.getDefaultTxFee()
   balance = new BN(balance.toString().substring(0, 17))
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
-  const nonce: number = txcount;
+  const nonce: number = txcount
   const locktime: BN = new BN(0)
   const avaxAmount: BN = balance.sub(fee)
       

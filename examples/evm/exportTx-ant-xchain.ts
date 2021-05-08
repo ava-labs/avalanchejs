@@ -45,7 +45,7 @@ const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const evmInputs: EVMInput[] = []
 let exportedOuts: TransferableOutput[] = []
-const Web3 = require('web3');
+const Web3 = require('web3')
 const path: string = '/ext/bc/C/rpc'
 const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
@@ -63,7 +63,7 @@ const main = async (): Promise<any> => {
   avaxBalance = new BN(avaxBalance.toString().substring(0, 17))
   const fee: BN = cchain.getDefaultTxFee()
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
-  const nonce: number = txcount;
+  const nonce: number = txcount
   const locktime: BN = new BN(0)
     
   let evmInput: EVMInput = new EVMInput(cHexAddress, avaxBalance, avaxAssetID, nonce)
@@ -81,7 +81,7 @@ const main = async (): Promise<any> => {
   secpTransferOutput = new SECPTransferOutput(new BN(antAssetBalance), xAddresses, locktime, threshold)
   transferableOutput = new TransferableOutput(antAssetIDBuf, secpTransferOutput)
   exportedOuts.push(transferableOutput)
-  exportedOuts = exportedOuts.sort(TransferableOutput.comparator());
+  exportedOuts = exportedOuts.sort(TransferableOutput.comparator())
     
   const exportTx: ExportTx = new ExportTx(
     networkID,
