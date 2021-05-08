@@ -2,7 +2,7 @@ import {
   Avalanche,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain as AVMKeyChain,
@@ -13,7 +13,7 @@ import {
 import { 
   KeyChain as EVMKeyChain, 
   EVMAPI 
-} from "../../src/apis/evm";
+} from "../../src/apis/evm"
 import { 
   Defaults, 
   UnixNow 

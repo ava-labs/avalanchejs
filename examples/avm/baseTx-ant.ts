@@ -54,7 +54,7 @@ const main = async (): Promise<any> => {
       const amt: BN = amountOutput.getAmount().clone()
       const txid: Buffer = utxo.getTxID()
       const outputidx: Buffer = utxo.getOutputIdx()
-      const assetID: Buffer = utxo.getAssetID();
+      const assetID: Buffer = utxo.getAssetID()
   
       if(assetID.toString('hex') === avaxAssetIDBuf.toString('hex')) {
         const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amt.sub(fee), xAddresses, locktime, threshold)

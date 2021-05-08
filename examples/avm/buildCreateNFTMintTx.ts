@@ -13,7 +13,7 @@ import {
   AVMConstants,
   UTXO
 } from "../../src/apis/avm"
-import { OutputOwners } from "../../src/common";
+import { OutputOwners } from "../../src/common"
 import { UnixNow } from "../../src/utils"
       
 const getUTXOIDs = (utxoSet: UTXOSet, txid: string, outputType: number = AVMConstants.SECPXFEROUTPUTID_CODECONE, assetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"): string[] => {

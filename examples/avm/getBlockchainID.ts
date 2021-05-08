@@ -12,7 +12,7 @@ const xchain: AVMAPI = avalanche.XChain()
   
 const main = async (): Promise<any> => {
   const blockchainID: string = xchain.getBlockchainID()
-  console.log(blockchainID);
+  console.log(blockchainID)
 }
     
 main()

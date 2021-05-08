@@ -67,10 +67,10 @@ const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO, index: number) => {
+  utxos.forEach((utxo: UTXO): void => {
     const txid: Buffer = utxo.getTxID()
     const outputidx: Buffer = utxo.getOutputIdx()
-    const assetID: Buffer = utxo.getAssetID();
+    const assetID: Buffer = utxo.getAssetID()
     if(utxo.getOutput().getTypeID() != 10 && utxo.getOutput().getTypeID() != 11) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
