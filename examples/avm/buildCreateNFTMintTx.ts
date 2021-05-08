@@ -3,7 +3,7 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain,

@@ -2,7 +2,7 @@ import {
   Avalanche,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain as AVMKeyChain,
@@ -10,8 +10,14 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
-import { KeyChain, PlatformVMAPI } from "../../src/apis/platformvm";
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  KeyChain as PlatformVMKeyChain, 
+  PlatformVMAPI 
+} from "../../src/apis/platformvm"
+import { 
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
         
 const ip: string = "localhost"
 const port: number = 9650
@@ -21,7 +27,7 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const pchain: PlatformVMAPI = avalanche.PChain()
 const xKeychain: AVMKeyChain = xchain.keyChain()
-const pKeychain: KeyChain = pchain.keyChain()
+const pKeychain: PlatformVMKeyChain = pchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)

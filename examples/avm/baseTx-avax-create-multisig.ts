@@ -3,10 +3,10 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
-  KeyChain as AVMKeyChain,
+  KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
   TransferableOutput,
@@ -27,7 +27,7 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
+const xKeychain: KeyChain = xchain.keyChain()
 let privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 // X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u
 xKeychain.importKey(privKey)

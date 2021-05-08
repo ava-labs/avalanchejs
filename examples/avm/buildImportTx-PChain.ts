@@ -3,7 +3,7 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain,
@@ -11,7 +11,10 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
         
 const ip: string = "localhost"
 const port: number = 9650

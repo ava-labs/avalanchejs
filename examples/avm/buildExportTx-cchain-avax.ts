@@ -1,9 +1,8 @@
 import { 
   Avalanche,
-  BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain as AVMKeyChain,
@@ -14,7 +13,7 @@ import {
 import { 
   KeyChain as EVMKeyChain, 
   EVMAPI 
-} from "../../src/apis/evm";
+} from "../../src/apis/evm"
 import { 
   Defaults, 
   UnixNow 
@@ -27,7 +26,6 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
-const bintools: BinTools = BinTools.getInstance()
 const xKeychain: AVMKeyChain = xchain.keyChain()
 const cKeychain: EVMKeyChain = cchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
