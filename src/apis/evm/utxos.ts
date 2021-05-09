@@ -349,7 +349,6 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
 
      for (let [assetID, amount] of map) {
        // Create single EVMOutput for each assetID
-       console.log(assetID, amount.toString());
         const evmOutput: EVMOutput = new EVMOutput(
           toAddress,
           new BN(amount.amount),
