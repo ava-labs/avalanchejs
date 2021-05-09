@@ -292,7 +292,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
      }
  
      let feepaid: BN = new BN(0);
-     const map: Map<string, {amount: string}> = new Map();
+     const map: Map<string, string> = new Map();
      atomics.forEach((atomic: UTXO) => {
        const assetIDBuf: Buffer = atomic.getAssetID(); 
        const assetID: string = bintools.cb58Encode(atomic.getAssetID()); 
@@ -336,22 +336,16 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
        ins = ins.sort(TransferableInput.comparator());
 
        if(map.has(assetID)) {
-         let a: BN = new BN(map.get(assetID).amount);
-         map.set(assetID, {
-           amount: a.add(infeeamount).toString()
-         });
-       } else {
-         map.set(assetID, {
-           amount: infeeamount.toString()
-         });
+         infeeamount = infeeamount.add(new BN(map.get(assetID)));
        }
+       map.set(assetID, infeeamount.toString());
      });
 
-     for (let [assetID, amount] of map) {
+     for(let [assetID, amount] of map) {
        // Create single EVMOutput for each assetID
         const evmOutput: EVMOutput = new EVMOutput(
           toAddress,
-          new BN(amount.amount),
+          new BN(amount),
           bintools.cb58Decode(assetID)
         );
         outs.push(evmOutput);
