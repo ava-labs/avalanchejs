@@ -536,7 +536,7 @@ export class EVMAPI extends JRPCAPI {
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
       networkID,
       bintools.cb58Decode(this.blockchainID), 
-      [toAddress],
+      toAddress,
       from,
       atomics,
       sourceChain,
