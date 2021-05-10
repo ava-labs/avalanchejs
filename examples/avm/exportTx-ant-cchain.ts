@@ -3,10 +3,10 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
-  KeyChain as AVMKeyChain,
+  KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
   TransferableOutput,
@@ -27,13 +27,15 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
+const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainid: string = Defaults.network['12345'].X.blockchainID
+const blockchainID: string = Defaults.network['12345'].X.blockchainID
 const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const exportedOuts: TransferableOutput[] = []
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
@@ -45,7 +47,6 @@ const memo: Buffer = Buffer.from("Manually Export AVAX and ANT from X-Chain to C
 // const codecID: number = 1
       
 const main = async (): Promise<any> => {
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
@@ -57,8 +58,7 @@ const main = async (): Promise<any> => {
     let assetID: Buffer = utxo.getAssetID()
     const outputidx: Buffer = utxo.getOutputIdx()
     let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
-    if(avaxAssetID.toString("hex") === assetID.toString("hex")) {
-      assetID = avaxAssetID
+    if(avaxAssetIDBuf.toString("hex") === assetID.toString("hex")) {
       secpTransferOutput = new SECPTransferOutput(amt.sub(fee), xAddresses, locktime, threshold)
     } else {
       secpTransferOutput = new SECPTransferOutput(amt, xAddresses, locktime, threshold)
@@ -80,7 +80,7 @@ const main = async (): Promise<any> => {
   
   const exportTx: ExportTx = new ExportTx(
     networkID,
-    bintools.cb58Decode(blockchainid),
+    bintools.cb58Decode(blockchainID),
     outputs,
     inputs,
     memo,

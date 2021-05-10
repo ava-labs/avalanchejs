@@ -2,7 +2,7 @@ import {
   Avalanche,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain as AVMKeyChain,
@@ -13,7 +13,7 @@ import {
 import { 
   KeyChain as EVMKeyChain, 
   EVMAPI 
-} from "../../src/apis/evm";
+} from "../../src/apis/evm"
 import { 
   Defaults, 
   UnixNow 
@@ -41,9 +41,9 @@ const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export ANT
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const amount: BN = new BN(500)
+  const amount: BN = new BN(350)
   const threshold: number = 1
-  const assetID: string = "2DLukZZms6BdwsUea4DtWHReGa6reRw3QWGJfC7z5p7tqHCSxK"
+  const assetID: string = "2HgQ12Akkpht8vX9RGuGMTvPXhBnGuaSTQncxWCw22NXkxuaKn"
     
   const unsignedTx: UnsignedTx = await xchain.buildExportTx(
     utxoSet,

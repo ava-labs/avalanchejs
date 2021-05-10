@@ -524,7 +524,9 @@ export class EVMAPI extends JRPCAPI {
     }
     const utxoResponse: UTXOResponse = await this.getUTXOs(ownerAddresses, srcChain, 0, undefined);
     const atomicUTXOs: UTXOSet = utxoResponse.utxos;
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const networkID: number = this.core.getNetworkID();
+    const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID;
+    const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID);
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
 
     if(atomics.length === 0){
@@ -532,14 +534,14 @@ export class EVMAPI extends JRPCAPI {
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
-      this.core.getNetworkID(),
+      networkID,
       bintools.cb58Decode(this.blockchainID), 
-      [toAddress],
+      toAddress,
       from,
       atomics,
       sourceChain,
       this.getTxFee(),
-      avaxAssetID
+      avaxAssetIDBuf
     );
 
     return builtUnsignedTx;

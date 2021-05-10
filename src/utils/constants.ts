@@ -90,6 +90,7 @@ export const AVAXGWEI:BN = NANOAVAX.clone();
 
 export const AVAXSTAKECAP:BN = ONEAVAX.mul(new BN(3000000));
 
+// Start Manhattan 
 const n0X:object = {
   blockchainID: '2vrXWHgGxh5n3YsLHMV16YVVJTpT4z45Fmb4y3bL6si8kLCyg9',
   alias: XChainAlias,
@@ -123,11 +124,13 @@ const n0C:object = {
   gasPrice: GWEI.mul(new BN(470)), //equivalent to gas price
   chainID: 43111
 };
+// End Manhattan 
 
-// TODO: UPDATE FOR MAINNET
-
+// Start mainnet
+let avaxAssetID: string = 'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z';
 const n1X:object = {
   blockchainID: '2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM',
+  avaxAssetID: avaxAssetID,
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
@@ -136,6 +139,7 @@ const n1X:object = {
 
 const n1P:object = {
   blockchainID: PlatformChainID,
+  avaxAssetID: avaxAssetID,
   alias: PChainAlias,
   vm: PChainVMName,
   txFee: MILLIAVAX,
@@ -159,9 +163,9 @@ const n1C:object = {
   gasPrice: GWEI.mul(new BN(225)), 
   chainID: 43114
 };
+// End Mainnet
 
-// END TODO
-
+// Start Cascade
 const n2X:object = {
   blockchainID: '4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM',
   alias: XChainAlias,
@@ -193,7 +197,9 @@ const n2C:object = {
   vm: CChainVMName,
   gasPrice: 0
 };
+// End Cascade
 
+// Start Denali
 const n3X:object = {
   blockchainID: 'rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L',
   alias: XChainAlias,
@@ -225,7 +231,9 @@ const n3C:object = {
   vm: CChainVMName,
   gasPrice: 0
 };
+// End Denali
 
+// Start Everest
 const n4X:object = {
   blockchainID: 'jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC',
   alias: XChainAlias,
@@ -258,10 +266,13 @@ const n4C:object = {
   gasPrice: GWEI.mul(new BN(470)),
   chainID: 43110
 };
+// End Everest
 
-// TODO: UPDATE FOR FUJI
+// Start Fuji
+avaxAssetID = 'U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK';
 const n5X:object = {
   blockchainID: '2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm',
+  avaxAssetID: avaxAssetID,
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
@@ -270,6 +281,7 @@ const n5X:object = {
 
 const n5P:object = {
   blockchainID: PlatformChainID,
+  avaxAssetID: avaxAssetID,
   alias: PChainAlias,
   vm: PChainVMName,
   txFee: MILLIAVAX,
@@ -293,16 +305,20 @@ const n5C:object = {
   gasPrice: GWEI.mul(new BN(225)), 
   chainID: 43113
 };
+// End Fuji
 
-// END TODO
-
+// Start local network
+avaxAssetID = '2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe';
 const n12345X:any = { ...n5X };
 n12345X.blockchainID = '2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed';
+n12345X.avaxAssetID = avaxAssetID;
 const n12345P:any = { ...n5P };
 n12345P.blockchainID = PlatformChainID;
 const n12345C:any = { ...n5C };
-n12345C.blockchainID = '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR';
+n12345C.blockchainID = '2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU';
+n12345C.avaxAssetID = avaxAssetID;
 n12345C.chainID = 43112;
+// End local network
 
 export class Defaults {
   static network = {
@@ -315,7 +331,7 @@ export class Defaults {
       C: n0C,
       '2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb': n0C,
     }, 
-    1: { // update before mainnet
+    1: {
       hrp: NetworkIDToHRP[1],
       X: n1X,
       '2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM': n1X,
@@ -367,7 +383,7 @@ export class Defaults {
       P: n12345P,
       '11111111111111111111111111111111LpoYY': n12345P,
       C: n12345C,
-      '2XFHbWN57HrjHW1JqhP9wzj92eYHpiH7EGLnY9mNfWn9w9CvWR': n12345C,
+      '2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU': n12345C,
     },
   };
 }

@@ -259,7 +259,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
      *
      * @param networkID The number representing NetworkID of the node
      * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param toAddresses The addresses to send the funds
+     * @param toAddress The address to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param importIns An array of [[TransferableInput]]s being imported
      * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
@@ -275,7 +275,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
     buildImportTx = (
      networkID: number, 
      blockchainID: Buffer,
-     toAddresses: string[],
+     toAddress: string,
      fromAddresses: Buffer[],
      atomics: UTXO[],
      sourceChain: Buffer = undefined, 
@@ -292,19 +292,19 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
      }
  
      let feepaid: BN = new BN(0);
-     const feeAssetStr: string = feeAssetID.toString("hex");
+     const map: Map<string, string> = new Map();
      atomics.forEach((atomic: UTXO) => {
-       const assetID: Buffer = atomic.getAssetID(); 
+       const assetIDBuf: Buffer = atomic.getAssetID(); 
+       const assetID: string = bintools.cb58Encode(atomic.getAssetID()); 
        const output: AmountOutput = atomic.getOutput() as AmountOutput;
        const amt: BN = output.getAmount().clone();
  
        let infeeamount: BN = amt.clone();
-       const assetStr: string = assetID.toString("hex");
        if(
          typeof feeAssetID !== "undefined" && 
          fee.gt(zero) && 
          feepaid.lt(fee) && 
-         assetStr === feeAssetStr
+         (Buffer.compare(feeAssetID, assetIDBuf) === 0)
        ) 
        {
          feepaid = feepaid.add(infeeamount);
@@ -319,7 +319,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
        const txid: Buffer = atomic.getTxID();
        const outputidx: Buffer = atomic.getOutputIdx();
        const input: SECPTransferInput = new SECPTransferInput(amt);
-       const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
+       const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetIDBuf, input);
        const from: Buffer[] = output.getAddresses(); 
        const spenders: Buffer[] = output.getSpenders(from);
        spenders.forEach((spender: Buffer) => {
@@ -335,16 +335,21 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
        // lexicographically sort array
        ins = ins.sort(TransferableInput.comparator());
 
-       // add extra outputs for each amount (calculated from the imported inputs), minus fees
-       if(infeeamount.gt(zero)) {
-         const evmOutput: EVMOutput = new EVMOutput(
-           toAddresses[0],
-           amt,
-           assetID
-         );
-         outs.push(evmOutput);
+       if(map.has(assetID)) {
+         infeeamount = infeeamount.add(new BN(map.get(assetID)));
        }
+       map.set(assetID, infeeamount.toString());
      });
+
+     for(let [assetID, amount] of map) {
+       // Create single EVMOutput for each assetID
+        const evmOutput: EVMOutput = new EVMOutput(
+          toAddress,
+          new BN(amount),
+          bintools.cb58Decode(assetID)
+        );
+        outs.push(evmOutput);
+     } 
 
      const importTx: ImportTx = new ImportTx(networkID, blockchainID, sourceChain, ins, outs);
      return new UnsignedTx(importTx);

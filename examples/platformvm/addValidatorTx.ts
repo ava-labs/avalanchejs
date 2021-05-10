@@ -3,7 +3,7 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   PlatformVMAPI, 
   KeyChain,
@@ -20,7 +20,7 @@ import {
   SECPOwnerOutput,
   ParseableOutput
 } from "../../src/apis/platformvm"
-import { Output } from "../../src/common";
+import { Output } from "../../src/common"
 import { Defaults, NodeIDStringToBuffer, UnixNow } from "../../src/utils"
       
 const ip: string = "localhost"

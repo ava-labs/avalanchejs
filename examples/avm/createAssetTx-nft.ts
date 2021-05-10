@@ -3,10 +3,10 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
-  KeyChain as AVMKeyChain,
+  KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
   TransferableOutput,
@@ -31,12 +31,14 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
+const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainid: string = Defaults.network['12345'].X.blockchainID
+const blockchainID: string = Defaults.network['12345'].X.blockchainID
+const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
@@ -51,13 +53,12 @@ const groupID: number = 0
 // const codecID: number = 1
       
 const main = async (): Promise<any> => {
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
+  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], (avaxAssetID))
   const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
 //   secpTransferOutput.setCodecID(codecID)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
+  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
   outputs.push(transferableOutput)
   
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
@@ -66,7 +67,7 @@ const main = async (): Promise<any> => {
   utxos.forEach((utxo: UTXO): void => {
     const outputID: number = utxo.getOutput().getTypeID() 
     const assetID: Buffer = utxo.getAssetID()
-    if(outputID === 7 && assetID.toString("hex") === avaxAssetID.toString("hex")) {
+    if(outputID === 7 && assetID.toString("hex") === avaxAssetIDBuf.toString("hex")) {
     const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
     const amt: BN = amountOutput.getAmount().clone()
     const txid: Buffer = utxo.getTxID()
@@ -77,7 +78,7 @@ const main = async (): Promise<any> => {
     // secpTransferInput.setCodecID(codecID)
     secpTransferInput.addSignatureIdx(0, xAddresses[0])
   
-    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
+    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetIDBuf, secpTransferInput)
     inputs.push(input)
     }
   })
@@ -98,7 +99,7 @@ const main = async (): Promise<any> => {
   
   const createAssetTx: CreateAssetTx = new CreateAssetTx(
     networkID,
-    bintools.cb58Decode(blockchainid),
+    bintools.cb58Decode(blockchainID),
     outputs,
     inputs,
     memo,

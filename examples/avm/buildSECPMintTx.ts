@@ -3,7 +3,7 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain,
@@ -15,7 +15,7 @@ import {
   SECPTransferOutput,
   UTXO
 } from "../../src/apis/avm"
-import { UnixNow } from "../../src/utils";
+import { UnixNow } from "../../src/utils"
   
 const getUTXOIDs = (utxoSet: UTXOSet, txid: string, outputType: number = AVMConstants.SECPXFEROUTPUTID_CODECONE, assetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"): string[] => {
   const utxoids: string[] = utxoSet.getUTXOIDs()
