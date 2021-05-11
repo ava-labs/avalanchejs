@@ -20,21 +20,16 @@ import {
   Defaults 
 } from "../../src/utils"
     
-const ip: string = "api.avax-test.network"
-const port: number = 443
-const protocol: string = "https"
-const networkID: number = 5
-// const ip: string = "localhost"
-// const port: number = 9650
-// const protocol: string = "http"
-// const networkID: number = 12345
+const ip: string = "localhost"
+const port: number = 9650
+const protocol: string = "http"
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-console.log(xAddressStrings)
 const avaxAssetID: string = Defaults.network[networkID].X['avaxAssetID']
 const asOf: BN = UnixNow()
 const threshold: number = 1
