@@ -11,7 +11,7 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
   
 const main = async (): Promise<any> => {
-  const alias: string = await xchain.getBlockchainAlias()
+  const alias: string = xchain.getBlockchainAlias()
   console.log(alias)
 }
     

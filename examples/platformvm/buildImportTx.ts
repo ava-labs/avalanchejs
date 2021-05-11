@@ -10,7 +10,12 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/platformvm"
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
       
 const ip: string = "localhost"
 const port: number = 9650
@@ -19,11 +24,11 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const xChainBlockchainID: string = Defaults.network['12345'].X.blockchainID
-const pChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
+const xChainBlockchainID: string = Defaults.network[networkID].X.blockchainID
+const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("PlatformVM utility method buildImportTx to import AVAX to the P-Chain from the X-Chain")

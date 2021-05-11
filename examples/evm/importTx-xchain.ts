@@ -17,7 +17,11 @@ import {
   UnsignedTx, 
   Tx 
 } from "../../src/apis/evm"
-import { Defaults } from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
+  Defaults 
+} from "../../src/utils"
           
 const ip: string = "localhost"
 const port: number = 9650
@@ -28,13 +32,13 @@ const cchain: EVMAPI = avalanche.CChain()
 const bintools: BinTools = BinTools.getInstance()
 const cKeychain: KeyChain = cchain.keyChain()
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 cKeychain.importKey(privKey)
 const cAddresses: Buffer[] = cchain.keyChain().getAddresses()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const cChainBlockchainIdStr: string = Defaults.network['12345'].C.blockchainID
+const cChainBlockchainIdStr: string = Defaults.network[networkID].C.blockchainID
 const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
-const xChainBlockchainIdStr: string = Defaults.network['12345'].X.blockchainID
+const xChainBlockchainIdStr: string = Defaults.network[networkID].X.blockchainID
 const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
 const importedIns: TransferableInput[] = []
 const evmOutputs: EVMOutput[] = []

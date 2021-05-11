@@ -68,7 +68,7 @@ export const XChainVMName:string = "avm";
 export const CChainVMName:string = "evm";
 export const PChainVMName:string = "platformvm";
 
-export const DefaultLocalGenesisPrivateKey = "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN";
+export const DefaultLocalGenesisPrivateKey: string = "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN";
 
 export const ONEAVAX:BN = new BN(1000000000);
 
