@@ -15,6 +15,8 @@ import {
   PlatformVMAPI 
 } from "../../src/apis/platformvm"
 import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey, 
   Defaults, 
   UnixNow 
 } from "../../src/utils"
@@ -28,13 +30,13 @@ const xchain: AVMAPI = avalanche.XChain()
 const pchain: PlatformVMAPI = avalanche.PChain()
 const xKeychain: AVMKeyChain = xchain.keyChain()
 const pKeychain: PlatformVMKeyChain = pchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const pChainBlockchainID: string = Defaults.network['12345'].P.blockchainID
-const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export AVAX to the P-Chain from the X-Chain")

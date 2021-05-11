@@ -16,6 +16,7 @@ Tests for the Avalanche [AVM RPC](https://docs.avax.network/build/avalanchego-ap
 * [buildImportTx-pchain.ts](./buildImportTx-pchain.ts)
 * [buildNFTTransferTx.ts](./buildNFTTransferTx.ts)
 * [buildSECPMintTx.ts](./buildSECPMintTx.ts)
+* [createKeypair.ts](./createKeypair.ts)
 
 ## Manual
 

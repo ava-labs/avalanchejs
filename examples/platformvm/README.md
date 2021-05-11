@@ -9,6 +9,7 @@ Tests for the Avalanche [PlatformVM RPC](https://docs.avax.network/build/avalanc
 * [buildCreateSubnetTx.ts](./buildCreateSubnetTx.ts)
 * [buildExportTx.ts](./buildExportTx.ts)
 * [buildImportTx.ts](./buildImportTx.ts)
+* [createKeypair.ts](./createKeypair.ts)
 * [createSubnetTx.ts](./createSubnetTx.ts)
 * [exportTx-xchain.ts](./exportTx-xchain.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
