@@ -14,7 +14,12 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/platformvm"
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
       
 const ip: string = "localhost"
 const port: number = 9650
@@ -25,12 +30,12 @@ const xchain: AVMAPI = avalanche.XChain()
 const pchain: PlatformVMAPI = avalanche.PChain()
 const xKeychain: AVMKeyChain = xchain.keyChain()
 const pKeychain: KeyChain = pchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const xChainBlockchainID: string = Defaults.network['12345'].X.blockchainID
+const xChainBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)

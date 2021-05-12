@@ -18,7 +18,11 @@ import {
   SECPTransferOutput,
   TransferableOutput
 } from "../../src/apis/evm"
-import { Defaults } from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
+  Defaults 
+} from "../../src/utils"
         
 const ip: string = "localhost"
 const port: number = 9650
@@ -29,17 +33,17 @@ const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
 const bintools: BinTools = BinTools.getInstance()
 const xKeychain: AVMKeyChain = xchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN-"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 const cKeychain: EVMKeyChain = cchain.keyChain()
 xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const cAddresses: Buffer[] = cchain.keyChain().getAddresses()
-const xChainBlockchainIdStr: string = Defaults.network['12345'].X.blockchainID
+const xChainBlockchainIdStr: string = Defaults.network[networkID].X.blockchainID
 const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
-const cChainBlockchainIdStr: string = Defaults.network['12345'].C.blockchainID
+const cChainBlockchainIdStr: string = Defaults.network[networkID].C.blockchainID
 const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
-const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const evmInputs: EVMInput[] = []

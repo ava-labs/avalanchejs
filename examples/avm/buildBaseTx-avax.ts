@@ -1,7 +1,8 @@
 import { 
   Avalanche,
   BN,
-  Buffer
+  Buffer,
+  BinTools
 } from "../../src"
 import {
   AVMAPI, 
@@ -11,6 +12,10 @@ import {
   Tx
 } from "../../src/apis/avm"
 import { 
+} from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
   UnixNow, 
   Defaults 
 } from "../../src/utils"
@@ -22,15 +27,16 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const avaxAssetID: string = Defaults.network['12345'].X.avaxAssetID
+const avaxAssetID: string = Defaults.network[networkID].X['avaxAssetID']
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX")
 const fee: BN = xchain.getDefaultTxFee()
+const bintools = BinTools.getInstance();
       
 const main = async (): Promise<any> => {
   const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
