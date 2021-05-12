@@ -57,10 +57,9 @@ const main = async (): Promise<any> => {
     threshold
   )
   
-  // const tx: Tx = unsignedTx.sign(xKeychain)
-  // console.log(tx.getUnsignedTx().getOutputTotal(bintools.cb58Decode(avaxAssetID)).toString())
-  // const txid: string = await xchain.issueTx(tx)
-  // console.log(`Success! TXID: ${txid}`)
+  const tx: Tx = unsignedTx.sign(xKeychain)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()
