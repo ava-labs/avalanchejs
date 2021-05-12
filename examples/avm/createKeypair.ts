@@ -3,7 +3,8 @@ import {
 } from "../../dist"
 import { 
   AVMAPI, 
-  KeyChain 
+  KeyChain,
+  KeyPair 
 } from "../../dist/apis/avm"
   
 const ip: string = 'localhost'
@@ -15,7 +16,7 @@ const xchain: AVMAPI = avalanche.XChain()
  
 const main = async (): Promise<any> => {
   const keychain: KeyChain = xchain.keyChain()
-  const keypair = keychain.makeKey()
+  const keypair: KeyPair = keychain.makeKey()
   const response: {
     address: string
     publicKey: string

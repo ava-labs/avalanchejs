@@ -3,7 +3,8 @@ import {
 } from "../../dist"
 import { 
   PlatformVMAPI, 
-  KeyChain 
+  KeyChain,
+  KeyPair 
 } from "../../dist/apis/platformvm"
   
 const ip: string = 'localhost'
@@ -15,7 +16,7 @@ const pchain: PlatformVMAPI = avalanche.PChain()
  
 const main = async (): Promise<any> => {
   const keychain: KeyChain = pchain.keyChain()
-  const keypair = keychain.makeKey()
+  const keypair: KeyPair = keychain.makeKey()
   const response: {
     address: string
     publicKey: string
