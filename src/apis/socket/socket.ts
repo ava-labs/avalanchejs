@@ -10,6 +10,7 @@ export class Socket extends WebSocket {
   onmessage;
   onclose;
   onerror;
+
   send(data: any, cb?): void {
     super.send(data, cb);
   }
