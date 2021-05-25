@@ -8,11 +8,13 @@ import { AuthAPI } from './apis/auth/api';
 import { AVMAPI } from './apis/avm/api';
 import { EVMAPI } from './apis/evm/api';
 import { HealthAPI } from './apis/health/api';
-import { InfoAPI } from './apis/info/api';
 import { IndexAPI } from './apis/index/api';
+import { InfoAPI } from './apis/info/api';
 import { KeystoreAPI } from './apis/keystore/api';
 import { MetricsAPI } from './apis/metrics/api';
 import { PlatformVMAPI } from './apis/platformvm/api';
+import { Socket } from './apis/socket/socket';
+import { PubSub } from './utils/pubsub';
 import { DefaultNetworkID, Defaults } from './utils/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';
@@ -56,14 +58,14 @@ export default class Avalanche extends AvalancheCore {
   Health = () => this.apis.health as HealthAPI;
 
   /**
-     * Returns a reference to the Info RPC for a node.
-     */
-  Info = () => this.apis.info as InfoAPI;
-
-  /**
      * Returns a reference to the Index RPC for a node.
      */
   Index = () => this.apis.index as IndexAPI;
+
+  /**
+     * Returns a reference to the Info RPC for a node.
+     */
+  Info = () => this.apis.info as InfoAPI;
 
   /**
      * Returns a reference to the Metrics RPC.
@@ -159,6 +161,8 @@ export { DB };
 export { AvalancheCore };
 export { BN };
 export { Buffer };
+export { Socket };
+export { PubSub };
 
 export * as utils from './utils';
 export * as common from './common';
