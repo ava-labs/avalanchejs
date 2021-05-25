@@ -11,6 +11,9 @@ export const NodeIDPrefix:string = "NodeID-";
 
 export const PrimaryAssetAlias:string = "AVAX";
 
+export const MainnetAPI: string = "api.avax.network";
+export const FujiAPI: string = "api.avax-test.network";
+
 export const NetworkIDToHRP:object = {
   0: "custom",
   1: "avax",

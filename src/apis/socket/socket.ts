@@ -2,14 +2,9 @@
  * @packageDocumentation
  * @module API-Socket
  */
+import { ClientRequestArgs } from "http";
 import WebSocket from "isomorphic-ws";
-/**
- * Class for interacting with a node"s InfoAPI.
- *
- * @category RPCAPIs
- *
- * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
- */
+import { MainnetAPI } from "src/utils";
 export class Socket extends WebSocket {
   onopen;
   onmessage;
@@ -18,10 +13,14 @@ export class Socket extends WebSocket {
   send(data: any, cb?): void {
     super.send(data, cb);
   }
+
   close(mcode?: number, data?: string): void {
     super.close(mcode, data);
   }
-  constructor(baseurl: string = "wss://api.avax.network:443/ext/bc/X/events") { 
-    super(baseurl);
+
+  constructor(
+    address: string | import("url").URL = `wss://${MainnetAPI}:443/ext/bc/X/events`, 
+    options?: WebSocket.ClientOptions | ClientRequestArgs) { 
+    super(address, options);
   }
 }
