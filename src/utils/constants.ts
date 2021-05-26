@@ -11,8 +11,8 @@ export const NodeIDPrefix:string = "NodeID-";
 
 export const PrimaryAssetAlias:string = "AVAX";
 
-export const MainnetAPI: string = "api.avax.network";
-export const FujiAPI: string = "api.avax-test.network";
+export const MainnetAPI: string = "api.avax.network"
+export const FujiAPI: string = "api.avax-test.network"
 
 export const NetworkIDToHRP:object = {
   0: "custom",
@@ -72,6 +72,8 @@ export const CChainVMName:string = "evm";
 export const PChainVMName:string = "platformvm";
 
 export const DefaultLocalGenesisPrivateKey: string = "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN";
+export const DefaultEVMLocalGenesisPrivateKey: string = "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
+export const DefaultEVMLocalGenesisAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 
 export const ONEAVAX:BN = new BN(1000000000);
 
