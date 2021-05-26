@@ -1,4 +1,4 @@
-import { PubSub } from "../../dist/utils/pubsub"
+import { PubSub } from "../../src"
 
 const main = async (): Promise<any> => {
   const pubsub: PubSub = new PubSub()
