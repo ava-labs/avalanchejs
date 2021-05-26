@@ -1,7 +1,6 @@
 # PubSub Utility
 
-<!-- TODO - fix url -->
-Tests for the Avalanche [PubSub](https://docs.avax.network/build/avalanchego-apis/info-api) Utility
+Tests for the Avalanche PubSub Utility
 
 * [newSet.ts](./newSet.ts)
 * [newBloom.ts](./newBloom.ts)
