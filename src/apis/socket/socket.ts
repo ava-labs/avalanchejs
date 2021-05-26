@@ -6,12 +6,12 @@ import { ClientRequestArgs } from "http"
 import WebSocket from "isomorphic-ws"
 import { MainnetAPI } from "../../../src/utils"
 export class Socket extends WebSocket {
-  onopen
-  onmessage
-  onclose
-  onerror
+  onopen: any
+  onmessage: any
+  onclose: any
+  onerror: any
 
-  send(data: any, cb?): void {
+  send(data: any, cb?: any): void {
     super.send(data, cb)
   }
 

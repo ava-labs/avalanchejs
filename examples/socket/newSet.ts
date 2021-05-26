@@ -1,5 +1,7 @@
-import { PubSub } from "../../src/utils/pubsub"
-import { Socket } from "../../src"
+import {
+  PubSub,
+  Socket
+} from "../../src"
 
 const protocol: string = "ws"
 const host: string = "localhost"
