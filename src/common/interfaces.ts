@@ -3,7 +3,7 @@
  * @module Common-Interfaces
  */
 
-import { Buffer } from 'buffer/';
+import { Buffer } from 'buffer/'
 
 export interface Index {
   address: string
@@ -35,28 +35,28 @@ export interface BaseIndexResponse {
   index: string
 }
 
-export interface GetLastAcceptedParams extends BaseIndexParams {}
+export interface GetLastAcceptedParams extends BaseIndexParams { }
 
-export interface GetLastAcceptedResponse extends BaseIndexResponse {}
+export interface GetLastAcceptedResponse extends BaseIndexResponse { }
 
 export interface GetContainerByIndexParams extends BaseIndexParams {
   index: string
 }
 
-export interface GetContainerByIndexResponse extends BaseIndexResponse {}
+export interface GetContainerByIndexResponse extends BaseIndexResponse { }
 
 export interface GetContainerByIDParams extends BaseIndexParams {
   containerID: string
 }
 
-export interface GetContainerByIDResponse extends BaseIndexResponse {}
+export interface GetContainerByIDResponse extends BaseIndexResponse { }
 
 export interface GetContainerRangeParams extends BaseIndexParams {
   startIndex: number,
   numToFetch: number
 }
 
-export interface GetContainerRangeResponse extends BaseIndexResponse {}
+export interface GetContainerRangeResponse extends BaseIndexResponse { }
 
 export interface GetIndexParams extends BaseIndexParams {
   containerID: string
@@ -79,10 +79,21 @@ export interface PeersParams {
 }
 
 export interface PeersResponse {
-  ip: string;
-  publicIP: string;
-  nodeID: string;
-  version: string;
-  lastSent: string;
-  lastReceived: string;
+  ip: string
+  publicIP: string
+  nodeID: string
+  version: string
+  lastSent: string
+  lastReceived: string
+}
+
+export interface GetRewardUTXOsParams {
+  txID: string
+  encoding: string
+}
+
+export interface GetRewardUTXOsResponse {
+  numFetched: number
+  utxos: string[]
+  encoding: string
 }
