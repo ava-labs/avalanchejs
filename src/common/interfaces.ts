@@ -5,6 +5,7 @@
 
 import { Buffer } from 'buffer/';
 import { BN } from 'src'
+import { TransferableOutput } from 'src/apis/platformvm'
 
 export interface Index {
   address: string
@@ -40,7 +41,7 @@ export interface GetStakeParams {
 
 export interface GetStakeResponse {
   staked: BN
-  stakedOuts: null | StakedOuts[]
+  stakedOuts: null | TransferableOutput[]
 }
 export interface BaseIndexParams {
   encoding: string
