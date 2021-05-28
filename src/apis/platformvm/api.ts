@@ -796,7 +796,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const response: RequestResponseData = await this.callMethod("platform.getStake", params)
     return {
       staked: new BN(response.data.result.staked, 10),
-      stakedOuts: response.data.result.stakedOuts
+      stakedOuts: response.data.result.stakedOutputs
     }
   }
 

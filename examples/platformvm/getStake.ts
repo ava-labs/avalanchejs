@@ -5,6 +5,7 @@ import {
   PlatformVMAPI, 
   KeyChain
 } from "../../src/apis/platformvm"
+import { GetStakeResponse } from "../../src/common"
       
 const ip: string = "localhost"
 const port: number = 9650
@@ -18,8 +19,8 @@ pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
    
 const main = async (): Promise<any> => {
-  const txid: string = await pchain.getStake(pAddressStrings)
-  console.log(`Success! TXID: ${txid}`)
+  const getStakeResponse: GetStakeResponse = await pchain.getStake(pAddressStrings)
+  console.log(getStakeResponse)
 }
     
 main()
