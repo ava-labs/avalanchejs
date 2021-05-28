@@ -35,6 +35,7 @@ export interface StakedOuts {
 
 export interface GetStakeParams {
   addresses: string[]
+  encoding: string
 }
 
 export interface GetStakeResponse {

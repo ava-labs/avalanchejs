@@ -789,9 +789,10 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the total amount staked for an array of addresses.
    */
-  getStake = async (addresses:string[]): Promise<GetStakeResponse> => {
+  getStake = async (addresses: string[], encoding: string = "cb58"): Promise<GetStakeResponse> => {
     const params: GetStakeParams = {
-      addresses
+      addresses,
+      encoding
     }
     const response: RequestResponseData = await this.callMethod("platform.getStake", params)
     return {
