@@ -44,8 +44,6 @@ export class TransferableOutput extends StandardTransferableOutput{
   }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
-    // account for codec
-    offset += 2;
     this.assetID = bintools.copyFrom(bytes, offset, offset + PlatformVMConstants.ASSETIDLEN);
     offset += PlatformVMConstants.ASSETIDLEN;
     const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
