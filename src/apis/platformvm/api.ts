@@ -798,13 +798,13 @@ export class PlatformVMAPI extends JRPCAPI {
     const response: RequestResponseData = await this.callMethod("platform.getStake", params)
     return {
       staked: new BN(response.data.result.staked, 10),
-      stakedOuts: response.data.result.stakedOutputs.map((stakedOut: string): TransferableOutput => {
+      stakedOutputs: response.data.result.stakedOutputs.map((stakedOutput: string): TransferableOutput => {
         const transferableOutput: TransferableOutput = new TransferableOutput()
         let buf: Buffer
         if(encoding === "cb58") {
-          buf = bintools.cb58Decode(stakedOut)
+          buf = bintools.cb58Decode(stakedOutput)
         } else {
-          buf = Buffer.from(stakedOut.replace(/0x/g, ""), "hex")
+          buf = Buffer.from(stakedOutput.replace(/0x/g, ""), "hex")
         }
         transferableOutput.fromBuffer(buf, 2)
         return transferableOutput
