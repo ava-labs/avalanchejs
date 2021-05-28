@@ -8,6 +8,7 @@ import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput } from '../../common/output';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { OutputIdError, CodecIdError } from '../../utils/errors';
 
 const bintools = BinTools.getInstance();
 const serializer = Serialization.getInstance();
@@ -29,7 +30,7 @@ export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output =>
     } else if(outputid === AVMConstants.NFTXFEROUTPUTID || outputid === AVMConstants.NFTXFEROUTPUTID_CODECONE){
       return new NFTTransferOutput(...args);
     }
-    throw new Error("Error - SelectOutputClass: unknown outputid " + outputid);
+    throw new OutputIdError("Error - SelectOutputClass: unknown outputid " + outputid);
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
@@ -107,7 +108,7 @@ export class SECPTransferOutput extends AmountOutput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - SECPTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - SECPTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPXFEROUTPUTID : AVMConstants.SECPXFEROUTPUTID_CODECONE;
@@ -145,7 +146,7 @@ export class SECPMintOutput extends Output {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - SECPMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - SECPMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPMINTOUTPUTID : AVMConstants.SECPMINTOUTPUTID_CODECONE;
@@ -195,7 +196,7 @@ export class NFTMintOutput extends NFTOutput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - NFTMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - NFTMintOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTMINTOUTPUTID : AVMConstants.NFTMINTOUTPUTID_CODECONE;
@@ -281,7 +282,7 @@ export class NFTTransferOutput extends NFTOutput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - NFTTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - NFTTransferOutput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.NFTXFEROUTPUTID : AVMConstants.NFTXFEROUTPUTID_CODECONE;

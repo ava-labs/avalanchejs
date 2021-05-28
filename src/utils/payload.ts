@@ -6,7 +6,7 @@
 import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
-import Web3Utils from "web3-utils";
+import { TypeIdError, HexError } from '../utils/errors';
 
 /**
  * @ignore
@@ -129,7 +129,7 @@ export class PayloadTypes {
             case 30:
                 return new MAGNETPayload(...args);
         }
-        throw new Error("Error - PayloadTypes.select: unknown typeid " + typeid);
+        throw new TypeIdError("Error - PayloadTypes.select: unknown typeid " + typeid);
     }
 
     /**
@@ -302,7 +302,7 @@ export class HEXSTRPayload extends PayloadBase {
             this.payload = payload;
         } else if(typeof payload === "string") {
             if(payload.startsWith("0x") ||!payload.match(/^[0-9A-Fa-f]+$/) ){
-                throw new Error("HEXSTRPayload.constructor -- hex string may not start with 0x and must be in /^[0-9A-Fa-f]+$/: " + payload);
+                throw new HexError("HEXSTRPayload.constructor -- hex string may not start with 0x and must be in /^[0-9A-Fa-f]+$/: " + payload);
             }
             this.payload = Buffer.from(payload, "hex");
         }
@@ -412,12 +412,16 @@ export abstract class ChainAddressPayload extends PayloadBase {
     /**
      * @param payload Buffer or address string
      */
-    constructor(payload:any = undefined){
+    constructor(payload:any = undefined, hrp?: string){
         super();
         if(payload instanceof Buffer){
             this.payload = payload;
         } else if(typeof payload === "string") {
-            this.payload = bintools.stringToAddress(payload);
+            if(hrp != undefined) {
+              this.payload = bintools.stringToAddress(payload, hrp);
+            } else {
+              this.payload = bintools.stringToAddress(payload);
+            }
         }
     }
 }
@@ -444,13 +448,6 @@ export class PCHAINADDRPayload extends ChainAddressPayload {
 export class CCHAINADDRPayload extends ChainAddressPayload {
     protected typeid = 8;
     protected chainid = "C";
-
-    /**
-     * Returns an address string for the payload.
-     */
-    returnType():string {
-        return this.chainid + "-" + Web3Utils.toChecksumAddress("0x" + this.payload.toString("hex"));
-    }
 }
 
 /**

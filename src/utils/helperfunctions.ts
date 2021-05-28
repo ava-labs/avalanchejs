@@ -7,6 +7,7 @@ import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP } from './constants';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 import BinTools from '../utils/bintools';
+import { PrivateKeyError, NodeIdError } from '../utils/errors';
 
 /**
  * @ignore
@@ -49,7 +50,7 @@ export function bufferToPrivateKeyString(pk:Buffer):string {
  */
 export function privateKeyStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("PrivateKey-")) {
-    throw new Error("Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'");
+    throw new PrivateKeyError("Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'");
   }
   let pksplit:Array<string> = pk.split("-");
   return bintools.cb58Decode(pksplit[pksplit.length - 1]);
@@ -71,7 +72,7 @@ export function bufferToNodeIDString(pk:Buffer):string {
  */
 export function NodeIDStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("NodeID-")) {
-    throw new Error("Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'");
+    throw new NodeIdError("Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'");
   }
   let pksplit:Array<string> = pk.split("-");
   return bintools.cb58Decode(pksplit[pksplit.length - 1]);

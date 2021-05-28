@@ -7,6 +7,7 @@ import BinTools from '../../utils/bintools';
 import { AVMConstants } from './constants';
 import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { InputIdError, CodecIdError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -26,7 +27,7 @@ export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
     return new SECPTransferInput(...args);
   }
   /* istanbul ignore next */
-  throw new Error("Error - SelectInputClass: unknown inputid");
+  throw new InputIdError("Error - SelectInputClass: unknown inputid");
 };
 
 export class TransferableInput extends StandardTransferableInput {
@@ -84,7 +85,7 @@ export class SECPTransferInput extends AmountInput {
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-        throw new Error("Error - SECPTransferInput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
+        throw new CodecIdError("Error - SECPTransferInput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
     }
     this._codecID = codecID;
     this._typeID = this._codecID === 0 ? AVMConstants.SECPINPUTID : AVMConstants.SECPINPUTID_CODECONE;

@@ -3,10 +3,10 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
-  KeyChain as AVMKeyChain,
+  KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
   TransferableOutput,
@@ -18,8 +18,11 @@ import {
   Tx,
   BaseTx
 } from "../../src/apis/avm"
-import { Defaults } from "../../src/utils"
-      
+import { 
+  Defaults, 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey 
+} from "../../src/utils"
       
 const ip: string = "localhost"
 const port: number = 9650
@@ -28,8 +31,8 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
-let privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const xKeychain: KeyChain = xchain.keyChain()
+let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 // X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u
 xKeychain.importKey(privKey)
 privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
@@ -39,9 +42,10 @@ privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
 // X-local1aekly2mwnsz6lswd6u0jqvd9u6yddt58duwcc9
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-  
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainid: string = Defaults.network['12345'].X.blockchainID
+const blockchainID: string = Defaults.network[networkID].X.blockchainID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
@@ -52,13 +56,12 @@ const memo: Buffer = Buffer.from("AVM manual spend multisig BaseTx to send AVAX"
 // const codecID: number = 1
       
 const main = async (): Promise<any> => {
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
+  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
   const balance: BN = new BN(getBalanceResponse['balance'])
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), [xAddresses[0]], locktime, threshold)
   // Uncomment for codecID 00 01
 //   secpTransferOutput.setCodecID(codecID)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
+  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
   outputs.push(transferableOutput)
   
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
@@ -79,13 +82,13 @@ const main = async (): Promise<any> => {
     }
     })
   
-    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
+    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetIDBuf, secpTransferInput)
     inputs.push(input)
   })
   
   const baseTx: BaseTx = new BaseTx (
     networkID,
-    bintools.cb58Decode(blockchainid),
+    bintools.cb58Decode(blockchainID),
     outputs,
     inputs,
     memo

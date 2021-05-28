@@ -1,17 +1,24 @@
 import { 
   Avalanche,
-  BinTools,
   BN,
-  Buffer
-} from "../../src";
+  Buffer,
+  BinTools
+} from "../../src"
 import {
   AVMAPI, 
-  KeyChain as AVMKeyChain,
+  KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
-import { UnixNow } from "../../src/utils"
+import { 
+} from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
+  UnixNow, 
+  Defaults 
+} from "../../src/utils"
     
 const ip: string = "localhost"
 const port: number = 9650
@@ -19,20 +26,20 @@ const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
-const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const xKeychain: KeyChain = xchain.keyChain()
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
+const avaxAssetID: string = Defaults.network[networkID].X['avaxAssetID']
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX");
+const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX")
 const fee: BN = xchain.getDefaultTxFee()
+const bintools = BinTools.getInstance();
       
 const main = async (): Promise<any> => {
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
+  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
   const balance: BN = new BN(getBalanceResponse.balance)
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos

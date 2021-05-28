@@ -8,10 +8,13 @@ import { AuthAPI } from './apis/auth/api';
 import { AVMAPI } from './apis/avm/api';
 import { EVMAPI } from './apis/evm/api';
 import { HealthAPI } from './apis/health/api';
+import { IndexAPI } from './apis/index/api';
 import { InfoAPI } from './apis/info/api';
 import { KeystoreAPI } from './apis/keystore/api';
 import { MetricsAPI } from './apis/metrics/api';
 import { PlatformVMAPI } from './apis/platformvm/api';
+import { Socket } from './apis/socket/socket';
+import { PubSub } from './utils/pubsub';
 import { DefaultNetworkID, Defaults } from './utils/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';
@@ -53,6 +56,11 @@ export default class Avalanche extends AvalancheCore {
      * Returns a reference to the Health RPC for a node.
      */
   Health = () => this.apis.health as HealthAPI;
+
+  /**
+     * Returns a reference to the Index RPC for a node.
+     */
+  Index = () => this.apis.index as IndexAPI;
 
   /**
      * Returns a reference to the Info RPC for a node.
@@ -139,6 +147,7 @@ export default class Avalanche extends AvalancheCore {
       this.addAPI('cchain', EVMAPI, '/ext/bc/C/avax', cchainid);
       this.addAPI('health', HealthAPI);
       this.addAPI('info', InfoAPI);
+      this.addAPI('index', IndexAPI);
       this.addAPI('keystore', KeystoreAPI);
       this.addAPI('metrics', MetricsAPI);
       this.addAPI('pchain', PlatformVMAPI);
@@ -152,6 +161,8 @@ export { DB };
 export { AvalancheCore };
 export { BN };
 export { Buffer };
+export { Socket };
+export { PubSub };
 
 export * as utils from './utils';
 export * as common from './common';
@@ -161,6 +172,7 @@ export * as avm from './apis/avm';
 export * as evm from './apis/evm';
 export * as health from './apis/health';
 export * as info from './apis/info';
+export * as index from './apis/index';
 export * as keystore from './apis/keystore';
 export * as metrics from './apis/metrics';
 export * as platformvm from './apis/platformvm';

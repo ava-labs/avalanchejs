@@ -1,17 +1,20 @@
 import { 
   Avalanche,
-  BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
-  KeyChain as AVMKeyChain,
+  KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
 import { UnixNow } from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey 
+} from "../../src/utils"
     
 const ip: string = "localhost"
 const port: number = 9650
@@ -19,8 +22,8 @@ const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
-const xKeychain: AVMKeyChain = xchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const xKeychain: KeyChain = xchain.keyChain()
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const asOf: BN = UnixNow()

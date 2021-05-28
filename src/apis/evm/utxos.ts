@@ -36,6 +36,7 @@ import {
 import { UnsignedTx } from './tx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
+import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '../../utils/errors';
  
  /**
   * @ignore
@@ -159,7 +160,7 @@ import { ExportTx } from './exporttx';
        utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
      } else {
        /* istanbul ignore next */
-       throw new Error("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
+       throw new UTXOError("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
      }
      return utxovar
    }
@@ -209,7 +210,7 @@ import { ExportTx } from './exporttx';
              const idx: number = uout.getAddressIdx(spender);
              if (idx === -1) {
                /* istanbul ignore next */
-               throw new Error("Error - UTXOSet.getMinimumSpendable: no such address in output");
+               throw new AddressError("Error - UTXOSet.getMinimumSpendable: no such address in output");
              }
              xferin.getInput().addSignatureIdx(idx, spender);
            });
@@ -229,7 +230,7 @@ import { ExportTx } from './exporttx';
        }
      }
      if(!aad.canComplete()) {
-       return new Error(`Error - UTXOSet.getMinimumSpendable: insufficient funds to create the transaction`);
+       return new InsufficientFundsError(`Error - UTXOSet.getMinimumSpendable: insufficient funds to create the transaction`);
      }
      const amounts: AssetAmount[] = aad.getAmounts();
      const zero: BN = new BN(0);
@@ -258,7 +259,7 @@ import { ExportTx } from './exporttx';
      *
      * @param networkID The number representing NetworkID of the node
      * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
-     * @param toAddresses The addresses to send the funds
+     * @param toAddress The address to send the funds
      * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
      * @param importIns An array of [[TransferableInput]]s being imported
      * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
@@ -274,7 +275,7 @@ import { ExportTx } from './exporttx';
     buildImportTx = (
      networkID: number, 
      blockchainID: Buffer,
-     toAddresses: string[],
+     toAddress: string,
      fromAddresses: Buffer[],
      atomics: UTXO[],
      sourceChain: Buffer = undefined, 
@@ -291,19 +292,19 @@ import { ExportTx } from './exporttx';
      }
  
      let feepaid: BN = new BN(0);
-     const feeAssetStr: string = feeAssetID.toString("hex");
+     const map: Map<string, string> = new Map();
      atomics.forEach((atomic: UTXO) => {
-       const assetID: Buffer = atomic.getAssetID(); 
+       const assetIDBuf: Buffer = atomic.getAssetID(); 
+       const assetID: string = bintools.cb58Encode(atomic.getAssetID()); 
        const output: AmountOutput = atomic.getOutput() as AmountOutput;
        const amt: BN = output.getAmount().clone();
  
        let infeeamount: BN = amt.clone();
-       const assetStr: string = assetID.toString("hex");
        if(
          typeof feeAssetID !== "undefined" && 
          fee.gt(zero) && 
          feepaid.lt(fee) && 
-         assetStr === feeAssetStr
+         (Buffer.compare(feeAssetID, assetIDBuf) === 0)
        ) 
        {
          feepaid = feepaid.add(infeeamount);
@@ -318,14 +319,14 @@ import { ExportTx } from './exporttx';
        const txid: Buffer = atomic.getTxID();
        const outputidx: Buffer = atomic.getOutputIdx();
        const input: SECPTransferInput = new SECPTransferInput(amt);
-       const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
+       const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetIDBuf, input);
        const from: Buffer[] = output.getAddresses(); 
        const spenders: Buffer[] = output.getSpenders(from);
        spenders.forEach((spender: Buffer) => {
          const idx: number = output.getAddressIdx(spender);
          if (idx === -1) {
            /* istanbul ignore next */
-           throw new Error("Error - UTXOSet.buildImportTx: no such address in output");
+           throw new AddressError("Error - UTXOSet.buildImportTx: no such address in output");
          }
          xferin.getInput().addSignatureIdx(idx, spender);
        });
@@ -334,16 +335,21 @@ import { ExportTx } from './exporttx';
        // lexicographically sort array
        ins = ins.sort(TransferableInput.comparator());
 
-       // add extra outputs for each amount (calculated from the imported inputs), minus fees
-       if(infeeamount.gt(zero)) {
-         const evmOutput: EVMOutput = new EVMOutput(
-           toAddresses[0],
-           amt,
-           assetID
-         );
-         outs.push(evmOutput);
+       if(map.has(assetID)) {
+         infeeamount = infeeamount.add(new BN(map.get(assetID)));
        }
+       map.set(assetID, infeeamount.toString());
      });
+
+     for(let [assetID, amount] of map) {
+       // Create single EVMOutput for each assetID
+        const evmOutput: EVMOutput = new EVMOutput(
+          toAddress,
+          new BN(amount),
+          bintools.cb58Decode(assetID)
+        );
+        outs.push(evmOutput);
+     } 
 
      const importTx: ImportTx = new ImportTx(networkID, blockchainID, sourceChain, ins, outs);
      return new UnsignedTx(importTx);
@@ -401,7 +407,7 @@ import { ExportTx } from './exporttx';
       feeAssetID = avaxAssetID;
     } else if (feeAssetID.toString('hex') !== avaxAssetID.toString('hex')) {
       /* istanbul ignore next */
-      throw new Error('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
+      throw new FeeAssetError('Error - UTXOSet.buildExportTx: feeAssetID must match avaxAssetID');
     }
 
     if(typeof destinationChain === 'undefined') {

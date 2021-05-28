@@ -1,9 +1,8 @@
 import { 
   Avalanche,
-  BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain as AVMKeyChain,
@@ -14,8 +13,10 @@ import {
 import { 
   KeyChain as EVMKeyChain, 
   EVMAPI 
-} from "../../src/apis/evm";
+} from "../../src/apis/evm"
 import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey,
   Defaults, 
   UnixNow 
 } from "../../src/utils"
@@ -27,15 +28,15 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
-const bintools: BinTools = BinTools.getInstance()
 const xKeychain: AVMKeyChain = xchain.keyChain()
 const cKeychain: EVMKeyChain = cchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
+const cChainBlockchainID: string = Defaults.network[networkID].C.blockchainID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export AVAX to the C-Chain from the X-Chain")
@@ -44,8 +45,7 @@ const fee: BN = xchain.getDefaultTxFee()
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const avaxAssetID: Buffer = await xchain.getAVAXAssetID()
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], bintools.cb58Encode(avaxAssetID))
+  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
   const balance: BN = new BN(getBalanceResponse.balance)
   const amount: BN = balance.sub(fee)
     

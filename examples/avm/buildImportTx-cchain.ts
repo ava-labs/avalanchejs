@@ -3,7 +3,7 @@ import {
   BinTools,
   BN,
   Buffer
-} from "../../src";
+} from "../../src"
 import {
   AVMAPI, 
   KeyChain,
@@ -11,7 +11,12 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  PrivateKeyPrefix, 
+  DefaultLocalGenesisPrivateKey, 
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
         
 const ip: string = "localhost"
 const port: number = 9650
@@ -21,10 +26,10 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
 const xKeychain: KeyChain = xchain.keyChain()
-const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
+const cChainBlockchainID: string = Defaults.network[networkID].C.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()

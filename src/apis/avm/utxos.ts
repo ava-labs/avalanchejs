@@ -23,6 +23,7 @@ import { ImportTx } from './importtx';
 import { PlatformChainID } from '../../utils/constants';
 import { StandardAssetAmountDestination, AssetAmount } from '../../common/assetamount';
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { UTXOError, AddressError, InsufficientFundsError, ThresholdError, SECPMintOutputError } from '../../utils/errors';
 
 /**
  * @ignore
@@ -146,7 +147,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       utxovar.fromBuffer(utxo.toBuffer()); // forces a copy
     } else {
       /* istanbul ignore next */
-      throw new Error("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
+      throw new UTXOError("Error - UTXO.parseUTXO: utxo parameter is not a UTXO or string");
     }
     return utxovar
   }
@@ -191,7 +192,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             const idx:number = uout.getAddressIdx(spenders[j]);
             if (idx === -1) {
               /* istanbul ignore next */
-              throw new Error('Error - UTXOSet.getMinimumSpendable: no such '
+              throw new AddressError('Error - UTXOSet.getMinimumSpendable: no such '
               + `address in output: ${spenders[j]}`);
             }
             xferin.getInput().addSignatureIdx(idx, spenders[j]);
@@ -212,7 +213,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
     if(!aad.canComplete()) {
-      return new Error('Error - UTXOSet.getMinimumSpendable: insufficient '
+      return new InsufficientFundsError('Error - UTXOSet.getMinimumSpendable: insufficient '
       + 'funds to create the transaction');
     }
     const amounts:Array<AssetAmount> = aad.getAmounts();
@@ -276,7 +277,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     if(threshold > toAddresses.length) {
       /* istanbul ignore next */
-      throw new Error("Error - UTXOSet.buildBaseTx: threshold is greater than number of addresses");
+      throw new ThresholdError("Error - UTXOSet.buildBaseTx: threshold is greater than number of addresses");
     }
 
     if(typeof changeAddresses === "undefined") {
@@ -375,7 +376,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         if(mintOutputs[i] instanceof SECPMintOutput){
           initialState.addOutput(mintOutputs[i]);
         } else {
-          throw new Error("Error - UTXOSet.buildCreateAssetTx: A submitted mintOutput was not of type SECPMintOutput");
+          throw new SECPMintOutputError("Error - UTXOSet.buildCreateAssetTx: A submitted mintOutput was not of type SECPMintOutput");
         }
       }
     }
@@ -434,10 +435,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     
     let utxo:UTXO = this.getUTXO(mintUTXOID);
     if(typeof utxo === "undefined") {
-      throw new Error("Error - UTXOSet.buildSECPMintTx: UTXOID not found");
+      throw new UTXOError("Error - UTXOSet.buildSECPMintTx: UTXOID not found");
     }
     if(utxo.getOutput().getOutputID() !== AVMConstants.SECPMINTOUTPUTID) {
-      throw new Error("Error - UTXOSet.buildSECPMintTx: UTXO is not a SECPMINTOUTPUTID");
+      throw new SECPMintOutputError("Error - UTXOSet.buildSECPMintTx: UTXO is not a SECPMINTOUTPUTID");
     }
     let out:SECPMintOutput = utxo.getOutput() as SECPMintOutput;
     let spenders:Array<Buffer> = out.getSpenders(fromAddresses, asOf);
@@ -586,7 +587,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
             idx = out.getAddressIdx(spenders[j]);
             if(idx == -1){
                 /* istanbul ignore next */
-                throw new Error("Error - UTXOSet.buildCreateNFTMintTx: no such address in output");
+                throw new AddressError("Error - UTXOSet.buildCreateNFTMintTx: no such address in output");
             }
             nftMintOperation.addSignatureIdx(idx, spenders[j]);
         }
@@ -664,7 +665,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const idx:number = out.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */
-          throw new Error('Error - UTXOSet.buildNFTTransferTx: '
+          throw new AddressError('Error - UTXOSet.buildNFTTransferTx: '
           + `no such address in output: ${spenders[j]}`);
         }
         op.addSignatureIdx(idx, spenders[j]);
@@ -757,7 +758,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
         const idx:number = output.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */
-          throw new Error('Error - UTXOSet.buildImportTx: no such '
+          throw new AddressError('Error - UTXOSet.buildImportTx: no such '
           + `address in output: ${spenders[j]}`);
         }
         xferin.getInput().addSignatureIdx(idx, spenders[j]);
