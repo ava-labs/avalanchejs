@@ -16,6 +16,7 @@ import { PayloadBase } from '../../utils/payload';
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
 import { UTXOSet } from '../platformvm/utxos';
 import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { GetStakeParams, GetStakeResponse } from 'src/common'
 
 /**
  * @ignore
@@ -778,27 +779,15 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the total amount staked for an array of addresses.
    */
-  getStake = async (addresses:Array<string>):Promise<{
-    staked: BN,
-    stakedOuts: null | [{
-      nodeID: string
-      stakedUntil: string,
-      stakeOnlyUntil: string,
-      owners: string[],
-      threshold: string
-      amount: string
-    }]
-  }> => {
-    const params:any = {
+  getStake = async (addresses:string[]): Promise<GetStakeResponse> => {
+    const params: GetStakeParams = {
       addresses
-    };
-    return this.callMethod('platform.getStake', params)
-      .then((response:RequestResponseData) => {
-        return {
-          staked: new BN(response.data.result.staked, 10),
-          stakedOuts: response.data.result.stakedOuts
-        }
-      });
+    }
+    const response: RequestResponseData = await this.callMethod("platform.getStake", params)
+    return {
+      staked: new BN(response.data.result.staked, 10),
+      stakedOuts: response.data.result.stakedOuts
+    }
   }
 
   /**

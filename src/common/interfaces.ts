@@ -4,6 +4,7 @@
  */
 
 import { Buffer } from 'buffer/';
+import { BN } from 'src'
 
 export interface Index {
   address: string
@@ -21,4 +22,22 @@ export interface Asset {
   symbol: string
   assetID: Buffer
   denomination: number
+}
+
+export interface StakedOuts {
+  nodeID: string
+  stakedUntil: string
+  stakeOnlyUntil: string
+  owners: string[]
+  threshold: string
+  amount: string
+}
+
+export interface GetStakeParams {
+  addresses: string[]
+}
+
+export interface GetStakeResponse {
+  staked: BN
+  stakedOuts: null | StakedOuts[]
 }
