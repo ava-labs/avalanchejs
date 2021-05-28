@@ -26,6 +26,8 @@ import {
   DelegationFeeError
 } from '../../utils/errors'
 import { GetRewardUTXOsParams, GetRewardUTXOsResponse } from 'src/common'
+import { GetStakeParams, GetStakeResponse } from 'src/common'
+import { TransferableOutput } from '../platformvm/outputs'
 
 /**
  * @ignore
@@ -81,9 +83,9 @@ export class PlatformVMAPI extends JRPCAPI {
 
   /**
    * Sets the alias for the blockchainID.
-   * 
+   *
    * @param alias The alias for the blockchainID.
-   * 
+   *
    */
   setBlockchainAlias = (alias: string): string => {
     this.blockchainAlias = alias
@@ -137,7 +139,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * Fetches the AVAX AssetID and returns it in a Promise.
    *
    * @param refresh This function caches the response. Refresh = true will bust the cache.
-   * 
+   *
    * @returns The the provided string representing the AVAX AssetID
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
@@ -150,9 +152,9 @@ export class PlatformVMAPI extends JRPCAPI {
 
   /**
    * Overrides the defaults and sets the cache to a specific AVAX AssetID
-   * 
+   *
    * @param avaxAssetID A cb58 string or Buffer representing the AVAX AssetID
-   * 
+   *
    * @returns The the provided string representing the AVAX AssetID
    */
   setAVAXAssetID = (avaxAssetID: string | Buffer) => {
@@ -245,7 +247,7 @@ export class PlatformVMAPI extends JRPCAPI {
   };
 
   /**
-   * Helper function which determines if a tx is a goose egg transaction. 
+   * Helper function which determines if a tx is a goose egg transaction.
    *
    * @param utx An UnsignedTx
    *
@@ -462,10 +464,10 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param stakeAmount The amount of nAVAX the validator is staking as
    * a {@link https://github.com/indutny/bn.js/|BN}
    * @param rewardAddress The address the validator reward will go to, if there is one.
-   * @param delegationFeeRate Optional. A {@link https://github.com/indutny/bn.js/|BN} for the percent fee this validator 
-   * charges when others delegate stake to them. Up to 4 decimal places allowed; additional decimal places are ignored. 
-   * Must be between 0 and 100, inclusive. For example, if delegationFeeRate is 1.2345 and someone delegates to this 
-   * validator, then when the delegation period is over, 1.2345% of the reward goes to the validator and the rest goes 
+   * @param delegationFeeRate Optional. A {@link https://github.com/indutny/bn.js/|BN} for the percent fee this validator
+   * charges when others delegate stake to them. Up to 4 decimal places allowed; additional decimal places are ignored.
+   * Must be between 0 and 100, inclusive. For example, if delegationFeeRate is 1.2345 and someone delegates to this
+   * validator, then when the delegation period is over, 1.2345% of the reward goes to the validator and the rest goes
    * to the delegator.
    *
    * @returns Promise for a base58 string of the unsigned transaction.
@@ -605,7 +607,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Get the Subnet that validates a given blockchain.
    *
-   * @param blockchainID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58 
+   * @param blockchainID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58
    * encoded string for the blockchainID or its alias.
    *
    * @returns Promise for a string of the subnetID that validates the blockchain.
@@ -749,7 +751,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
   /**
    * Gets the minimum staking amount.
-   * 
+   *
    * @param refresh A boolean to bypass the local cached value of Minimum Stake Amount, polling the node instead.
    */
   getMinStake = async (refresh: boolean = false): Promise<{ minValidatorStake: BN, minDelegatorStake: BN }> => {
@@ -788,19 +790,33 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the total amount staked for an array of addresses.
    */
-  getStake = async (addresses: Array<string>): Promise<BN> => {
-    const params: any = {
-      addresses
+  getStake = async (addresses: string[], encoding: string = "cb58"): Promise<GetStakeResponse> => {
+    const params: GetStakeParams = {
+      addresses,
+      encoding
     }
-    return this.callMethod('platform.getStake', params)
-      .then((response: RequestResponseData) => new BN(response.data.result.staked, 10))
+    const response: RequestResponseData = await this.callMethod("platform.getStake", params)
+    return {
+      staked: new BN(response.data.result.staked, 10),
+      stakedOutputs: response.data.result.stakedOutputs.map((stakedOutput: string): TransferableOutput => {
+        const transferableOutput: TransferableOutput = new TransferableOutput()
+        let buf: Buffer
+        if(encoding === "cb58") {
+          buf = bintools.cb58Decode(stakedOutput)
+        } else {
+          buf = Buffer.from(stakedOutput.replace(/0x/g, ""), "hex")
+        }
+        transferableOutput.fromBuffer(buf, 2)
+        return transferableOutput
+      })
+    }
   }
 
   /**
    * Get all the subnets that exist.
    *
    * @param ids IDs of the subnets to retrieve information about. If omitted, gets all subnets
-   * 
+   *
    * @returns Promise for an array of objects containing fields "id",
    * "controlKeys", and "threshold".
    */
@@ -1127,20 +1143,20 @@ export class PlatformVMAPI extends JRPCAPI {
   * @param weight The amount of weight for this subnet validator.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-  *  
+  *
   * @returns An unsigned transaction created from the passed in parameters.
   */
 
   /* Re-implement when subnetValidator signing process is clearer
   buildAddSubnetValidatorTx = async (
-    utxoset:UTXOSet, 
+    utxoset:UTXOSet,
     fromAddresses:Array<string>,
     changeAddresses:Array<string>,
-    nodeID:string, 
-    startTime:BN, 
+    nodeID:string,
+    startTime:BN,
     endTime:BN,
     weight:BN,
-    memo:PayloadBase|Buffer = undefined, 
+    memo:PayloadBase|Buffer = undefined,
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
     const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddSubnetValidatorTx').map((a) => bintools.stringToAddress(a));
@@ -1151,21 +1167,21 @@ export class PlatformVMAPI extends JRPCAPI {
     }
 
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
-    
+
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new Error("PlatformVMAPI.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
 
     const builtUnsignedTx:UnsignedTx = utxoset.buildAddSubnetValidatorTx(
-      this.core.getNetworkID(), 
-      bintools.cb58Decode(this.blockchainID), 
+      this.core.getNetworkID(),
+      bintools.cb58Decode(this.blockchainID),
       from,
       change,
       NodeIDStringToBuffer(nodeID),
       startTime, endTime,
-      weight, 
-      this.getFee(), 
+      weight,
+      this.getFee(),
       avaxAssetID,
       memo, asOf
     );
@@ -1197,7 +1213,7 @@ return builtUnsignedTx;
   * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-  *  
+  *
   * @returns An unsigned transaction created from the passed in parameters.
   */
   buildAddDelegatorTx = async (
@@ -1276,12 +1292,12 @@ return builtUnsignedTx;
   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
   * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
-  * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100. 
+  * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100.
   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs
   * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
   * @param memo Optional contains arbitrary bytes, up to 256 bytes
   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-  *  
+  *
   * @returns An unsigned transaction created from the passed in parameters.
   */
   buildAddValidatorTx = async (
@@ -1362,7 +1378,7 @@ return builtUnsignedTx;
     * @param subnetOwnerThreshold A number indicating the amount of signatures required to add validators to a subnet
     * @param memo Optional contains arbitrary bytes, up to 256 bytes
     * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-    * 
+    *
     * @returns An unsigned transaction created from the passed in parameters.
     */
   buildCreateSubnetTx = async (
@@ -1455,7 +1471,6 @@ return builtUnsignedTx;
       txID,
       encoding
     }
-    console.log(params)
     const response: RequestResponseData = await this.callMethod("platform.getRewardUTXOs", params)
     return response.data.result
   }

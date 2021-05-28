@@ -3,7 +3,9 @@
  * @module Common-Interfaces
  */
 
-import { Buffer } from 'buffer/'
+import { Buffer } from 'buffer/';
+import { BN } from 'src'
+import { TransferableOutput } from 'src/apis/platformvm'
 
 export interface Index {
   address: string
@@ -23,6 +25,24 @@ export interface Asset {
   denomination: number
 }
 
+export interface StakedOuts {
+  nodeID: string
+  stakedUntil: string
+  stakeOnlyUntil: string
+  owners: string[]
+  threshold: string
+  amount: string
+}
+
+export interface GetStakeParams {
+  addresses: string[]
+  encoding: string
+}
+
+export interface GetStakeResponse {
+  staked: BN
+  stakedOutputs: TransferableOutput[]
+}
 export interface BaseIndexParams {
   encoding: string
 }
