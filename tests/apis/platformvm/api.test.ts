@@ -212,10 +212,24 @@ describe('PlatformVMAPI', () => {
 
   test('getStake', async () => {
     const staked = new BN('100', 10)
-    const result: Promise<object> = api.getStake([addrA])
+    const stakedOuts: string[] = [
+      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000060bd6180000000070000000fb750430000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc316895eb3",
+      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000060bd618000000007000000d18c2e280000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc3714de759",
+      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000061340880000000070000000fb750430000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc379b89461",
+      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff00000016000000006134088000000007000000d18c2e280000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc3c7aa35d1",
+      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff00000016000000006134088000000007000001d1a94a200000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc38fd232d8"
+    ]
+    const objs: TransferableOutput[] = stakedOuts.map((stakedOut: string): TransferableOutput => {
+      const transferableOutput: TransferableOutput = new TransferableOutput()
+      let buf: Buffer = Buffer.from(stakedOut.replace(/0x/g, ""), "hex")
+      transferableOutput.fromBuffer(buf, 2)
+      return transferableOutput
+    })
+    const result: Promise<object> = api.getStake([addrA], "hex")
     const payload: object = {
       result: {
-        staked
+        staked,
+        stakedOuts
       },
     }
     const responseObj = {
@@ -226,7 +240,8 @@ describe('PlatformVMAPI', () => {
     const response: object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(JSON.stringify(response)).toBe(JSON.stringify(staked))
+    expect(JSON.stringify(response["staked"])).toBe(JSON.stringify(staked))
+    expect(JSON.stringify(response["stakedOuts"])).toBe(JSON.stringify(objs))
   })
 
 
