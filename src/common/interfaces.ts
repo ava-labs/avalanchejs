@@ -41,7 +41,7 @@ export interface GetStakeParams {
 
 export interface GetStakeResponse {
   staked: BN
-  stakedOuts: null | TransferableOutput[]
+  stakedOuts: TransferableOutput[]
 }
 export interface BaseIndexParams {
   encoding: string
