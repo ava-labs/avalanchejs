@@ -92,7 +92,7 @@ describe('AVMAPI', () => {
 
   test('can Send 2', async () => {
     const txId:string = 'asdfhvl234';
-    const memo:Buffer = bintools.stringToBuffer("hello world")
+    const memo:Buffer = Buffer.from("hello world")
     const changeAddr:string = "X-local1"
     const result:Promise<object> = api.send(username, password, bintools.b58ToBuffer('6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF'), new BN(10), addrA, [addrB], addrA, memo);
     const payload:object = {

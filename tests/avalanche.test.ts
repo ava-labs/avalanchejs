@@ -17,7 +17,7 @@ describe('Avalanche', () => {
     const protocol = "https";
     let avalanche:Avalanche;
     beforeAll(() => {
-        avalanche = new Avalanche(ip,port,protocol, 12345, undefined, undefined, undefined, true);
+        avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
         avalanche.addAPI("admin", AdminAPI);
         avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainid)
         avalanche.addAPI("health", HealthAPI);
@@ -26,12 +26,18 @@ describe('Avalanche', () => {
         avalanche.addAPI("metrics", MetricsAPI);
         avalanche.addAPI("pchain", PlatformVMAPI);
     });
-    test('Can initialize', () => {
+    test('Can initialize without port', () => {
+        const a = new Avalanche(ip, undefined, protocol, 12345);
+        expect(a.getPort()).toBe(undefined);
+        expect(a.getURL()).toBe(`${protocol}://${ip}`);
+    });
+    test('Can initialize with port', () => {
         expect(avalanche.getIP()).toBe(ip);
         expect(avalanche.getPort()).toBe(port);
         expect(avalanche.getProtocol()).toBe(protocol);
         expect(avalanche.getURL()).toBe(`${protocol}://${ip}:${port}`);
         expect(avalanche.getNetworkID()).toBe(12345);
+        expect(avalanche.getHeaders()).toStrictEqual({});
         avalanche.setNetworkID(50);
         expect(avalanche.getNetworkID()).toBe(50);
         avalanche.setNetworkID(12345);
@@ -79,6 +85,42 @@ describe('Avalanche', () => {
         expect(avalanche.api("keystore2").getDB()).toHaveProperty("namespace");
     });
 
+    test("Customize headers", () => {
+      avalanche.setHeader("X-Custom-Header", "example");
+      avalanche.setHeader("X-Foo", "Foo");
+      avalanche.setHeader("X-Bar", "Bar");
+      expect(avalanche.getHeaders()).toStrictEqual({
+        "X-Custom-Header": "example",
+        "X-Foo": "Foo",
+        "X-Bar": "Bar",
+      });
+      avalanche.removeHeader("X-Foo");
+      expect(avalanche.getHeaders()).toStrictEqual({
+        "X-Custom-Header": "example",
+        "X-Bar": "Bar",
+      });
+      avalanche.removeAllHeaders();
+      expect(avalanche.getHeaders()).toStrictEqual({});
+    });
+
+    test("Customize request config", () => {
+      expect(avalanche.getRequestConfig()).toStrictEqual({});
+      avalanche.setRequestConfig("withCredentials", true)
+      avalanche.setRequestConfig("withFoo", "Foo")
+      avalanche.setRequestConfig("withBar", "Bar")
+      expect(avalanche.getRequestConfig()).toStrictEqual({
+        withCredentials: true,
+        withFoo: "Foo",
+        withBar: "Bar"
+      });
+      avalanche.removeRequestConfig("withFoo");
+      expect(avalanche.getRequestConfig()).toStrictEqual({
+        withCredentials: true,
+        withBar: "Bar"
+      });
+      avalanche.removeAllRequestConfigs();
+      expect(avalanche.getRequestConfig()).toStrictEqual({});
+    });
 });
 
 describe('HTTP Operations', () => {

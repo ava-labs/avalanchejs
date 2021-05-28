@@ -18,9 +18,12 @@ export class JRPCAPI extends APIBase {
 
   protected rpcid = 1;
 
-  callMethod = async (method:string,
+  callMethod = async (
+    method:string,
     params?:Array<object> | object,
-    baseurl?:string):Promise<RequestResponseData> => {
+    baseurl?:string,
+    headers?: object
+    ):Promise<RequestResponseData> => {
     const ep = baseurl || this.baseurl;
     const rpc:any = {};
     rpc.id = this.rpcid;
@@ -37,14 +40,23 @@ export class JRPCAPI extends APIBase {
       rpc.jsonrpc = this.jrpcVersion;
     }
 
-    const headers:object = { 'Content-Type': 'application/json;charset=UTF-8' };
+    let headrs:object = { 'Content-Type': 'application/json;charset=UTF-8' };
+    if(headers) {
+      headrs = {...headrs, ...headers};
+    }
+
+    let baseURL: string = `${this.core.getProtocol()}://${this.core.getIP()}`;
+    const port: number = this.core.getPort();
+    if(port != undefined && typeof port === 'number' && port >= 0) {
+      baseURL = `${baseURL}:${port}`;
+    }
 
     const axConf:AxiosRequestConfig = {
-      baseURL: `${this.core.getProtocol()}://${this.core.getIP()}:${this.core.getPort()}`,
+      baseURL: baseURL,
       responseType: 'json',
     };
 
-    return this.core.post(ep, {}, JSON.stringify(rpc), headers, axConf)
+    return this.core.post(ep, {}, JSON.stringify(rpc), headrs, axConf)
       .then((resp:RequestResponseData) => {
         if (resp.status >= 200 && resp.status < 300) {
           this.rpcid += 1;
@@ -52,7 +64,7 @@ export class JRPCAPI extends APIBase {
             resp.data = JSON.parse(resp.data);
           }
           if (typeof resp.data === 'object' && (resp.data === null || 'error' in resp.data)) {
-            throw new Error(`Error returned: ${JSON.stringify(resp.data)}`);
+            throw new Error(`${resp.data.error.message}`);
           }
         }
         return resp;

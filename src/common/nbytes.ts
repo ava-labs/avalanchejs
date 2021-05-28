@@ -75,7 +75,7 @@ export abstract class NBytes extends Serializable {
     try {
       if (buff.length - offset < this.bsize) {
         /* istanbul ignore next */
-        throw new Error(`Buffer length must be ${this.bsize} bytes. Only have ${buff.length - offset} remaining in buffer.`);
+        throw new Error("Error - NBytes.fromBuffer: not enough space available in buffer.");
       }
 
       this.bytes = bintools.copyFrom(buff, offset, offset + this.bsize);

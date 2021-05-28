@@ -29,7 +29,7 @@ const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildCreateNFTAssetTx to create an NFT")
+const memo: Buffer = Buffer.from("AVM utility method buildCreateNFTAssetTx to create an NFT")
 const name: string = "non fungible token" 
 const symbol: string = "NFT" 
       
@@ -50,8 +50,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

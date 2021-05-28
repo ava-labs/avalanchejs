@@ -38,7 +38,7 @@ const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("AVM manual BaseTx to send AVAX and ANT")
+const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX and ANT")
 // Uncomment for codecID 00 01
 // const codecID: number = 1
       
@@ -96,8 +96,8 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()

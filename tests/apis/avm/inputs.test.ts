@@ -131,6 +131,6 @@ describe('Inputs', () => {
     const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
     expect(() => {
       secpTransferInput.setCodecID(2)
-    }).toThrow("Error - SECPTransferInput.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+    }).toThrow("Error - SECPTransferInput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 });

@@ -7,7 +7,7 @@ import {
 } from "../../src/apis/avm"
 import {
   EVMAPI, 
-  KeyChain,
+  KeyChain as EVMKeyChain,
   UnsignedTx, 
   Tx,
   UTXOSet
@@ -24,7 +24,7 @@ const cchain: EVMAPI = avalanche.CChain()
 const xKeychain: AVMKeyChain = xchain.keyChain()
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
-const cKeychain: KeyChain = cchain.keyChain()
+const cKeychain: EVMKeyChain = cchain.keyChain()
 xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
@@ -43,8 +43,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(cKeychain)
-  const id: string = await cchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await cchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
         
 main()

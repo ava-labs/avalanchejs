@@ -30,6 +30,10 @@ export default class AvalancheCore {
 
   protected auth:string = undefined;
 
+  protected headers:{ [k: string]: string } = {};
+
+  protected requestConfig: AxiosRequestConfig = {};
+
   protected apis:{ [k: string]: APIBase } = {};
 
   /**
@@ -44,7 +48,11 @@ export default class AvalancheCore {
     this.ip = ip;
     this.port = port;
     this.protocol = protocol;
-    this.url = `${protocol}://${ip}:${port}`;
+    let url : string = `${protocol}://${ip}`;
+    if(port != undefined && typeof port === 'number' && port >= 0) {
+      url = `${url}:${port}`;
+    }
+    this.url = url;
   };
 
   /**
@@ -66,6 +74,16 @@ export default class AvalancheCore {
      * Returns the URL of the Avalanche node (ip + port);
      */
   getURL = ():string => this.url;
+
+  /**
+   * Returns the custom headers
+   */
+  getHeaders = ():object => this.headers;
+
+  /**
+   * Returns the custom request config
+   */
+  getRequestConfig = (): AxiosRequestConfig => this.requestConfig;
 
   /**
      * Returns the networkID;
@@ -97,8 +115,68 @@ export default class AvalancheCore {
   };
 
   /**
-   * Sets the temporary auth token used for communicating with the node.
+   * Adds a new custom header to be included with all requests.
    * 
+   * @param key Header name
+   * @param value Header value
+   */
+  setHeader = (key:string,value:string):void => {
+    this.headers[key] = value;
+  }
+
+  /**
+   * Removes a previously added custom header.
+   * 
+   * @param key Header name
+   */
+  removeHeader = (key: string):void => {
+    delete this.headers[key];
+  }
+
+  /**
+   * Removes all headers.
+   */
+  removeAllHeaders = ():void => {
+    for (let prop in this.headers) {
+      if (Object.prototype.hasOwnProperty.call(this.headers, prop)) {
+        delete this.headers[prop];
+      }
+    }
+  }
+
+  /**
+   * Adds a new custom config value to be included with all requests.
+   *
+   * @param key Config name
+   * @param value Config value
+   */
+  setRequestConfig = (key: string, value: string|boolean): void => {
+    this.requestConfig[key] = value;
+  }
+
+  /**
+   * Removes a previously added request config.
+   * 
+   * @param key Header name
+   */
+  removeRequestConfig = (key: string):void => {
+    delete this.requestConfig[key];
+  }
+
+  /**
+   * Removes all request configs.
+   */
+  removeAllRequestConfigs = ():void => {
+    for (let prop in this.requestConfig) {
+      if (Object.prototype.hasOwnProperty.call(this.requestConfig, prop)) {
+        delete this.requestConfig[prop];
+      }
+    }
+  }
+
+  /**
+   * Sets the temporary auth token used for communicating with the node.
+   *
    * @param auth A temporary token provided by the node enabling access to the endpoints on the node.
    */
   setAuthToken = (auth:string):void => {
@@ -106,6 +184,12 @@ export default class AvalancheCore {
   }
 
   protected _setHeaders = (headers:object):object => {
+    if (typeof this.headers === "object") {
+      for (const [key, value] of Object.entries(this.headers)) {
+        headers[key] = value;
+      }
+    }
+
     if(typeof this.auth === "string"){
       headers["Authorization"] = "Bearer " + this.auth;
     }
@@ -160,11 +244,15 @@ export default class AvalancheCore {
     axiosConfig:AxiosRequestConfig = undefined): Promise<RequestResponseData> => {
     let config:AxiosRequestConfig;
     if (axiosConfig) {
-      config = axiosConfig;
+      config = {
+        ...axiosConfig,
+        ...this.requestConfig
+      }
     } else {
       config = {
         baseURL: `${this.protocol}://${this.ip}:${this.port}`,
         responseType: 'text',
+        ...this.requestConfig
       };
     }
     config.url = baseurl;

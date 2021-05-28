@@ -8,6 +8,7 @@ import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
 import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
 import { SerializedEncoding } from '../../utils/serialization';
+import { EVMInput } from './inputs';
 
 const bintools: BinTools = BinTools.getInstance();
 
@@ -22,7 +23,7 @@ export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
   if(outputID == EVMConstants.SECPXFEROUTPUTID){
     return new SECPTransferOutput( ...args);
   }
-  throw new Error(`Error - SelectOutputClass: unknown outputID ${outputID}`);
+  throw new Error("Error - SelectOutputClass: unknown outputID");
 }
 
 export class TransferableOutput extends StandardTransferableOutput{
@@ -98,6 +99,21 @@ export class EVMOutput {
   protected amount: Buffer = Buffer.alloc(8);
   protected amountValue: BN = new BN(0);
   protected assetID: Buffer = Buffer.alloc(32);
+
+  /**
+  * Returns a function used to sort an array of [[EVMOutput]]s
+  */
+  static comparator = (): (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput) => (1|-1|0) => (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput): (1|-1|0) => {
+    // primarily sort by address
+    let sorta: Buffer = a.getAddress();
+    let sortb: Buffer = b.getAddress();
+    // secondarily sort by assetID
+    if(sorta.equals(sortb)) {
+      sorta = a.getAssetID();
+      sortb = b.getAssetID();
+    }
+    return Buffer.compare(sorta, sortb) as (1|-1|0);
+  }
 
   /**
    * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}

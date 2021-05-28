@@ -68,8 +68,8 @@ const main = async (): Promise<any> => {
 
   const unsignedTx: UnsignedTx = new UnsignedTx(importTx)
   const tx: Tx = unsignedTx.sign(cKeychain)
-  const id: string = await cchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await cchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
         
 main()

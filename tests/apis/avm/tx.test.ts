@@ -49,7 +49,7 @@ describe('Transactions', () => {
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
-  const memo:Buffer = bintools.stringToBuffer("AvalancheJS");
+  const memo:Buffer = Buffer.from("AvalancheJS");
   const blockchainid:string = Defaults.network[netid].X.blockchainID;
   const alias:string = 'X';
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
@@ -180,7 +180,7 @@ describe('Transactions', () => {
     const baseTx: BaseTx = new BaseTx();
     expect(() => {
       baseTx.setCodecID(2)
-    }).toThrow("Error - BaseTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+    }).toThrow("Error - BaseTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
   test("CreateAssetTx codecIDs", () => {
@@ -199,7 +199,7 @@ describe('Transactions', () => {
     const createAssetTx: CreateAssetTx = new CreateAssetTx();
     expect(() => {
       createAssetTx.setCodecID(2)
-    }).toThrow("Error - CreateAssetTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+    }).toThrow("Error - CreateAssetTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
   test("OperationTx codecIDs", () => {
@@ -218,7 +218,7 @@ describe('Transactions', () => {
     const operationTx: OperationTx = new OperationTx();
     expect(() => {
       operationTx.setCodecID(2)
-    }).toThrow("Error - OperationTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+    }).toThrow("Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
   test("ImportTx codecIDs", () => {
@@ -237,7 +237,7 @@ describe('Transactions', () => {
     const importTx: ImportTx = new ImportTx();
     expect(() => {
       importTx.setCodecID(2)
-    }).toThrow("Error - ImportTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+    }).toThrow("Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
   test("ExportTx codecIDs", () => {
@@ -256,7 +256,7 @@ describe('Transactions', () => {
     const exportTx: ExportTx = new ExportTx();
     expect(() => {
       exportTx.setCodecID(2)
-    }).toThrow("Error - ExportTx.setCodecID: codecID 2, is not valid. Valid codecIDs are 0 and 1.");
+    }).toThrow("Error - ExportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
   test('Create small BaseTx that is Goose Egg Tx', async () => {

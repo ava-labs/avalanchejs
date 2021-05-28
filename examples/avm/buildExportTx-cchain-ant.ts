@@ -1,6 +1,5 @@
 import { 
   Avalanche,
-  BinTools,
   BN,
   Buffer
 } from "../../src";
@@ -11,8 +10,14 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/avm"
-import { KeyChain, EVMAPI } from "../../src/apis/evm";
-import { Defaults, UnixNow } from "../../src/utils"
+import { 
+  KeyChain as EVMKeyChain, 
+  EVMAPI 
+} from "../../src/apis/evm";
+import { 
+  Defaults, 
+  UnixNow 
+} from "../../src/utils"
         
 const ip: string = "localhost"
 const port: number = 9650
@@ -21,18 +26,17 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
-const bintools: BinTools = BinTools.getInstance()
 const xKeychain: AVMKeyChain = xchain.keyChain()
-const pKeychain: KeyChain = cchain.keyChain()
+const cKeychain: EVMKeyChain = cchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
-pKeychain.importKey(privKey)
+cKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const cChainBlockchainID: string = Defaults.network['12345'].C.blockchainID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildExportTx to export ANT to the C-Chain from the X-Chain")
+const memo: Buffer = Buffer.from("AVM utility method buildExportTx to export ANT to the C-Chain from the X-Chain")
         
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
@@ -56,8 +60,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
       
 main()

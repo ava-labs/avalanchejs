@@ -111,7 +111,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
         }
         if (pubk.length === 33) {
           const sha256:Buffer = Buffer.from(createHash('sha256').update(pubk).digest());
-          const ripesha:Buffer = Buffer.from(createHash('rmd160').update(sha256).digest());
+          const ripesha:Buffer = Buffer.from(createHash('ripemd160').update(sha256).digest());
           return ripesha;
         }
         /* istanbul ignore next */
@@ -121,7 +121,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
     /**
      * Returns a string representation of the private key.
      * 
-     * @returns A cb58 serialized string representation of the public key
+     * @returns A cb58 serialized string representation of the private key
      */
     getPrivateKeyString = ():string => {
         return "PrivateKey-" + bintools.cb58Encode(this.privk);

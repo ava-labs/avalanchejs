@@ -19,7 +19,6 @@ const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
-const bintools: BinTools = BinTools.getInstance()
 const xKeychain: AVMKeyChain = xchain.keyChain()
 const privKey: string = "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 xKeychain.importKey(privKey)
@@ -27,7 +26,7 @@ const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = bintools.stringToBuffer("AVM utility method buildBaseTx to send an ANT")
+const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send an ANT")
       
 const main = async (): Promise<any> => {
   const amount: BN = new BN(5)
@@ -49,8 +48,8 @@ const main = async (): Promise<any> => {
   )
   
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(id)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
     
 main()
