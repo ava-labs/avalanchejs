@@ -1459,7 +1459,6 @@ return builtUnsignedTx;
       txID,
       encoding
     }
-    console.log(params)
     const response: RequestResponseData = await this.callMethod("platform.getRewardUTXOs", params)
     return response.data.result
   }
