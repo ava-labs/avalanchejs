@@ -3,7 +3,7 @@ name: Test + build Image
 on:
   push:
     branches:
-      - e2e
+      - e2e_avalanchejs
 
 jobs:
   e2e_test:
