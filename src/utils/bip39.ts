@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Utils-Mnemonic
+ * @module Utils-BIP39
  */
 
 import { Buffer } from 'buffer/'
