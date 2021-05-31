@@ -5,7 +5,6 @@
 
 import { Buffer } from 'buffer/'
 import { Wordlist } from 'ethers'
-import { WordLists } from 'src/common/interfaces'
 import { InvalidEntropy } from './errors'
 const bip39 = require('bip39')
 const randomBytes = require("randombytes")
@@ -13,11 +12,6 @@ const randomBytes = require("randombytes")
 /**
  * Implementation of Mnemonic. Mnemonic code for generating deterministic keys.
  *
- * ```js
- * let Mnemonic: Mnemonic = new Mnemonic();
- * let str:string = b58.encode(somebuffer);
- * let buff:Buffer = b58.decode(somestring);
- * ```
  */
 export class BIP39 {
 
