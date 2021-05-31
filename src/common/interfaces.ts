@@ -117,3 +117,18 @@ export interface GetRewardUTXOsResponse {
   utxos: string[]
   encoding: string
 }
+
+export interface WordLists {
+  czech: string[]
+  chinese_simplified: string[]
+  chinese_traditional: string[]
+  korean: string[]
+  french: string[]
+  italian: string[]
+  spanish: string[]
+  japanese: string[]
+  JA: string[]
+  portuguese: string[]
+  english: string[]
+  EN: string[]
+}
