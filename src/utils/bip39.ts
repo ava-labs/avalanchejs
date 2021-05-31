@@ -6,15 +6,14 @@
 import { Buffer } from 'buffer/'
 import { Wordlist } from 'ethers'
 import { InvalidEntropy } from './errors'
-const bip39 = require('bip39')
-const randomBytes = require("randombytes")
+const bip39: any = require('bip39')
+const randomBytes: any = require("randombytes")
 
 /**
  * Implementation of Mnemonic. Mnemonic code for generating deterministic keys.
  *
  */
 export class BIP39 {
-
   private static instance: BIP39
   private constructor() { }
   protected wordlists: string[] = bip39.wordlists
