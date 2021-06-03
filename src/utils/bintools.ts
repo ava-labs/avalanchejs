@@ -61,13 +61,21 @@ export default class BinTools {
   }
 
   /**
-   * Returns true if base58, otherwise false
-   * @param str the string to verify is base58
+   * Returns true if cb58, otherwise false
+   * @param cb58 the string to verify is cb58
    */
-  isBase58(str:string) {
-    if (str ==='' || str.trim() ===''){ return false; }
+  isCB58(cb58: string): boolean {
+    return this.isBase58(cb58)
+  }
+
+  /**
+   * Returns true if base58, otherwise false
+   * @param base58 the string to verify is base58
+   */
+  isBase58(base58: string): boolean {
+    if (base58 === '' || base58.trim() === '') { return false }
     try {
-        return this.b58.encode(this.b58.decode(str)) === str;
+      return this.b58.encode(this.b58.decode(base58)) === base58;
     } catch (err) {
         return false;
     }
@@ -75,11 +83,15 @@ export default class BinTools {
 
   /**
    * Returns true if hexidecimal, otherwise false
-   * @param str the string to verify is hexidecimal
+   * @param hex the string to verify is hexidecimal
    */
-  isHex(str:string) {
-    if (str ==='' || str.trim() ===''){ return false; }
-    return (str.startsWith("0x") && str.slice(2).match(/^[0-9A-Fa-f]/g) || str.match(/^[0-9A-Fa-f]/g));
+  isHex(hex: string): boolean {
+    if (hex === '' || hex.trim() === '') { return false }
+    if ((hex.startsWith("0x") && hex.slice(2).match(/^[0-9A-Fa-f]/g) || hex.match(/^[0-9A-Fa-f]/g))) {
+      return true
+    } else {
+      return false
+    }
   }
 
   /**

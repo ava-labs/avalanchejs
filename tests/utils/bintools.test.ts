@@ -160,6 +160,39 @@ describe('BinTools', () => {
     }).toThrow('Error - BinTools.cb58Decode: invalid checksum');
   });
 
+  test('isCB58', (): void => {
+    const validCB581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
+    const validCB582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
+    const invalidCB581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
+    const invalidCB582: string = ""
+    expect(bintools.isCB58(validCB581)).toBe(true)
+    expect(bintools.isCB58(validCB582)).toBe(true)
+    expect(bintools.isCB58(invalidCB581)).toBe(false)
+    expect(bintools.isCB58(invalidCB582)).toBe(false)
+  })
+
+  test('isBase58', (): void => {
+    const validBase581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
+    const validBase582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
+    const invalidBase581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
+    const invalidBase582: string = ""
+    expect(bintools.isBase58(validBase581)).toBe(true)
+    expect(bintools.isBase58(validBase582)).toBe(true)
+    expect(bintools.isBase58(invalidBase581)).toBe(false)
+    expect(bintools.isBase58(invalidBase582)).toBe(false)
+  })
+
+  test('isHex', (): void => {
+    const validHex1: string = "0x95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d01612940bd5"
+    const validHex2: string = "95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d01612940bd5"
+    const invalidHex1: string = "rrrrr.c2b7a6ee7ad7e597c2f5349b03e461c36c2e1e5.fc98a84d016129zzzzz"
+    const invalidHex2: string = ""
+    expect(bintools.isHex(validHex1)).toBe(true)
+    expect(bintools.isHex(validHex2)).toBe(true)
+    expect(bintools.isHex(invalidHex1)).toBe(false)
+    expect(bintools.isHex(invalidHex2)).toBe(false)
+  });
+
   test('stringToAddress', () => {
     // Missing prefix
     let addr: string = "-avax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
