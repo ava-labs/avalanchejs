@@ -185,4 +185,24 @@ describe('EVMAPI', () => {
     expect(bc3).toBe(n5bcID);
 
   });
+
+  test("getAtomicTxStatus", async (): Promise<void> => {
+    const txID: string = "FCry2Z1Su9KZqK1XRMhxQS6XuPorxDm3C3RBT7hw32ojiqyvP"
+
+    const result: Promise<string> = api.getAtomicTxStatus(txID)
+    const payload: object = {
+      result: {
+        status: 'Accepted',
+      },
+    }
+    const responseObj = {
+      data: payload,
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe('Accepted')
+  })
 });

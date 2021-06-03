@@ -117,3 +117,7 @@ export interface GetRewardUTXOsResponse {
   utxos: string[]
   encoding: string
 }
+
+export interface GetAtomicTxStatusParams {
+  txID: string
+}
