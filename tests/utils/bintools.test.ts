@@ -161,14 +161,14 @@ describe('BinTools', () => {
   });
 
   test('isCB58', (): void => {
-    const validBase581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
-    const validBase582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
-    const invalidBase581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
-    const invalidBase582: string = ""
-    expect(bintools.isCB58(validBase581)).toBe(true)
-    expect(bintools.isCB58(validBase582)).toBe(true)
-    expect(bintools.isCB58(invalidBase581)).toBe(false)
-    expect(bintools.isCB58(invalidBase582)).toBe(false)
+    const validCB581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
+    const validCB582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
+    const invalidCB581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
+    const invalidCB582: string = ""
+    expect(bintools.isCB58(validCB581)).toBe(true)
+    expect(bintools.isCB58(validCB582)).toBe(true)
+    expect(bintools.isCB58(invalidCB581)).toBe(false)
+    expect(bintools.isCB58(invalidCB582)).toBe(false)
   })
 
   test('isBase58', (): void => {
