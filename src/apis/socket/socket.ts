@@ -4,7 +4,7 @@
  */
 import { ClientRequestArgs } from "http"
 import WebSocket from "isomorphic-ws"
-import { MainnetAPI } from "../../../src/utils"
+import { MainnetAPI } from "../../utils"
 export class Socket extends WebSocket {
   // Fires once the connection has been established between the client and the server
   onopen: any
