@@ -10,7 +10,7 @@ const bip39: any = require('bip39')
 const randomBytes: any = require("randombytes")
 
 /**
- * Implementation of Mnemonic. Mnemonic code for generating deterministic keys.
+ * BIP39 Mnemonic code for generating deterministic keys.
  *
  */
 export default class Mnemonic {
