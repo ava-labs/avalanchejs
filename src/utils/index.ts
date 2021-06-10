@@ -1,6 +1,6 @@
 export * from './base58'
 export * from './bintools'
-export * from './bip39'
+export * from './mnemonic'
 export * from './constants'
 export * from './db'
 export * from './helperfunctions'

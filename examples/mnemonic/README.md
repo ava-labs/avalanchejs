@@ -1,4 +1,4 @@
-# BIP39
+# Mnemonic
 
 Scripts for creating and validating mnemonics in multiple languages.
 
@@ -8,4 +8,6 @@ Scripts for creating and validating mnemonics in multiple languages.
 * [mnemonicToEntropy.ts](./mnemonicToEntropy.ts)
 * [mnemonicToSeed.ts](./mnemonicToSeed.ts)
 * [mnemonicToSeedSync.ts](./mnemonicToSeedSync.ts)
-* [entropyToMnemonic.ts](./entropyToMnemonic.ts)
+* [validateMnemonic.ts](./validateMnemonic.ts)
+* [setDefaultWordlist.ts](./setDefaultWordlist.ts)
+* [getDefaultWordlist.ts](./getDefaultWordlist.ts)

@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Utils-BIP39
+ * @module Utils-Mnemonic
  */
 
 import { Buffer } from 'buffer/'
@@ -13,19 +13,19 @@ const randomBytes: any = require("randombytes")
  * Implementation of Mnemonic. Mnemonic code for generating deterministic keys.
  *
  */
-export class BIP39 {
-  private static instance: BIP39
+export default class Mnemonic {
+  private static instance: Mnemonic
   private constructor() { }
   protected wordlists: string[] = bip39.wordlists
 
   /**
    * Retrieves the Mnemonic singleton.
    */
-  static getInstance(): BIP39 {
-    if (!BIP39.instance) {
-      BIP39.instance = new BIP39()
+  static getInstance(): Mnemonic {
+    if (!Mnemonic.instance) {
+      Mnemonic.instance = new Mnemonic()
     }
-    return BIP39.instance
+    return Mnemonic.instance
   }
 
   /**
@@ -63,7 +63,7 @@ export class BIP39 {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer}
    */
-  mnemonicToSeed(mnemonic: string, password: string): Buffer {
+  async mnemonicToSeed(mnemonic: string, password: string): Promise<Buffer> {
     return bip39.mnemonicToSeed(mnemonic, password)
   }
 
@@ -117,10 +117,9 @@ export class BIP39 {
    *
    * @param language the language as a string
    *
-   * @returns A string
    */
-  setDefaultWordlist(language: string): string {
-    return bip39.setDefaultWordlist(language)
+  setDefaultWordlist(language: string): void {
+    bip39.setDefaultWordlist(language)
   }
 
   /**
@@ -140,8 +139,7 @@ export class BIP39 {
    * @param wordlist Optional
    * 
    */
-  generateMnemonic(
-    strength?: number,
+  generateMnemonic(strength?: number,
     rng?: (size: number) => Buffer,
     wordlist?: string[],
   ): string {

@@ -1,351 +1,116 @@
-import BinTools from 'src/utils/bintools'
+import Mnemonic from 'src/utils/mnemonic'
+const randomBytes: any = require('randombytes')
+
+
 import BN from 'bn.js'
 import { Buffer } from 'buffer/'
 
-const bintools = BinTools.getInstance()
+const mnemonic = Mnemonic.getInstance()
+const entropy: string = "9d7c99e77261acb88a5ed717f625d5d3ed5569e0f60429cc6eb9c4e91f48fb7c"
+const langs: string[] = [
+  "japanese",
+  "spanish",
+  "italian",
+  "french",
+  "korean",
+  "czech",
+  "portuguese",
+  "chinese_traditional",
+  "chinese_simplified"
+]
 
-describe('BinTools', () => {
-  const hexstr: string = '00112233445566778899aabbccddeeff'
-  const hexstr2: string = '0001020304050607080909080706050403020100'
-  const hexstr3: string = '0001020304050607080909080706050403020101'
-  const hexbuffstr1: string = '000461736466' // = asdf
-  const hexbuffstr2: string = '000761626364656667' // = abcdefg
-  const hexbuffstr3: string = '00076f6b0066696e65' // = ok<null>fineokfine
-  const b58str: string = '1UoWww8DGaVGLtea7zU7p'
-  const b58str2: string = '1Bhh3pU9gLXZiJv73kmqZwHJ4F'
-  const b58str3: string = '1Bhh3pU9gLXZiJv73kmqZwHJ4G'
-  const buff: Buffer = Buffer.from(hexstr, 'hex')
-  const buff2: Buffer = Buffer.from(hexstr2, 'hex')
-  const buff3: Buffer = Buffer.from(hexstr3, 'hex')
-  const checksum: string = '323e6811'
-  const serializedChecksum: string = '148vjpuxYXixb8DcbaWyeDE2fEG' // serialized hexstr + checksum
-  test('copyFrom conducts a true copy', () => {
-    const buff: Buffer = Buffer.from(hexstr, 'hex')
-    const newbuff: Buffer = bintools.copyFrom(buff, 0, 10)
-    expect(newbuff.length).toBe(10)
-    expect(newbuff.readUInt8(0)).toBe(0)
-    expect(newbuff.readUInt8(9)).toBe(153)
-    // verify that the original buffer isn't touched by writes
-    newbuff.writeUInt8(153, 4)
-    expect(newbuff.readUInt8(4)).toBe(153)
-    expect(buff.readUInt8(4)).toBe(68)
-    // test with no end specified
-    const newbuff2: Buffer = bintools.copyFrom(buff, 2)
-    expect(newbuff2.length).toBe(14)
-    expect(newbuff2.readUInt8(0)).toBe(34)
-    expect(newbuff2.readUInt8(7)).toBe(153)
-  })
+const mnemnonics: string[] = [
+  "ていし　みっか　せんせい　みっか　えいぶん　さつたば　かいよう　へんたい　うやまう　にちじょう　せっかく　とける　ぶどう　にんぷ　たいうん　はいそう　かえる　したて　なめらか　だじゃれ　だんれつ　てんぼうだい　もくようび　そむく",
+  "nueve tenis lágrima tenis baile folleto canica sonoro autor perla jardín oxígeno sensor piscina lonja rabo cañón germen pegar marrón molino opuesto trébol llaga",
+  "pergamena tensione maratona tensione becco geco cena srotolato badilata regola lumaca prelievo somma rifasare motivato sarcasmo ceramica ibernato randagio ninfa orafo polmonite tuffato modulo",
+  "mobile surface héron surface batterie éthanol capsule serein bafouer pangolin gravir nuisible salive peintre intense préfixe carabine fatal orque label lucide neurone toucher informer",
+  "운반 특별 시인 특별 귀신 빗물 농민 취업 구입 작년 스님 이윽고 체험 장애인 아흔 제작 농장 상추 입사 언덕 염려 의외로 학급 씨름",
+  "pohnutka vize nikam vize datum ledvina export uklidnit cirkus revolver naslepo procento traverza rozjezd odliv slavnost fajfka lyra rande omluva panovat poukaz vyrvat ochladit",
+  "mesada surdina guincho surdina aumentar escrita brilho sediado assador ostentar goela nevoeiro rouco panqueca inovador postal brochura faceta ontem judoca linhagem munido torque indeciso",
+  "烯 逮 岩 逮 資 衛 走 賦 料 默 膠 辛 杯 挑 戶 陶 議 劉 拍 謀 浮 休 煩 慮",
+  "烯 逮 岩 逮 资 卫 走 赋 料 默 胶 辛 杯 挑 户 陶 议 刘 拍 谋 浮 休 烦 虑"
+]
 
-  test('bufferToString', () => {
-    const bres: string = bintools.bufferToString(Buffer.from(hexbuffstr1, 'hex'))
-    expect(bres).toBe(Buffer.from(hexbuffstr1.slice(4), 'hex').toString('utf8'))
-    // testing null character edge case
-    const bres2: string = bintools.bufferToString(Buffer.from(hexbuffstr2, 'hex'))
-    expect(bres2).toBe(Buffer.from(hexbuffstr2.slice(4), 'hex').toString('utf8'))
-    // testing null character edge case
-    const bres3: string = bintools.bufferToString(Buffer.from(hexbuffstr3, 'hex'))
-    expect(bres3).toBe(Buffer.from(hexbuffstr3.slice(4), 'hex').toString('utf8'))
-  })
+const seeds: string[] = [
+  "2ed50c99aa2ee350f0a46c8427d69f9f5c7c5864be7a64ae96695374a0a5a02a3c5075312234f05f8f4c840aa486c99131f84b81c56daff5c31a89cdc7b50424",
+  "04c6cfd9337642f47e21e28632f9744fd1b56c57454ebae5c627c2a4b16e47c0948b9c582041bbb1590e128a25ae79d7055ed8aecdbc030920a67205da24846d",
+  "c4274544eb6c375d2caa70af8c6a67e3b751c518cbb35244891c7b74a12a5e06d5ce5b925f134930e17f5e86b21146d096715c7645a250dbba1d2ba35bc07317",
+  "00e5b5e4785763d6f92fe1ad7c5a7e7dd0fd375bd441473198d2486990ca5a924b5cb6b6831dc94d446c9b3180eefe2d799887bcfc1ee6d8f4f0650e594c9d1b",
+  "d8dcc049712867ba7d1bc0e2874d8ec38ee26088d1e2affa10ffac30cf1d0b915bbb6c79bfafbb1db0e8cd66880bf4ba52c53b949f6a3adbba1821dd3045c7cb",
+  "a81d8a917861cb8a1ffd2e94452e08fd6dc4d2577bad3ac089f56279521b1c95caebe57ac6c3d126d8abd4d6a3f2c3d8c207bd36fbf75a5e797c5a8f1992c651",
+  "b9fc39d7f138a95b8f31436e02a8711b3164cd45a211673f7137429b45faf77a1604682b51803a983638c46a8b2c13237c87ab4b685a1fa5c65700dc7136ccfc",
+  "1a5f3eab01276bf7d9b06c42be90fb4b8106b278b4bbaf922f3da6821a63b4d69fa9285fec0936e0f04a1b2a25a65064cd51c111c75063dbe59e4de336b35f85",
+  "53bcb9fe403a4a45bee2a2a04dabfa3f2018db349d0e5200175bd345aaa3a3bd45a88a6fb7244914ad156961742f7b4ea7f8ffd83fcae5b1166b73b2ad943f76"
+]
 
-  test('stringToBuffer', () => {
-    const bres: Buffer = bintools.stringToBuffer('asdf')
-    expect(bres.slice(2).toString()).toBe(Buffer.from(hexbuffstr1.slice(4), 'hex').toString('utf8'))
-    // testing null character edge case
-    const bres2: Buffer = bintools.stringToBuffer('abcdefg')
-    expect(bres2.slice(2).toString()).toBe(Buffer.from(hexbuffstr2.slice(4), 'hex').toString('utf8'))
-    // testing null character edge case
-    const bres3: Buffer = bintools.stringToBuffer(Buffer.from(hexbuffstr3.slice(4), 'hex').toString('utf8'))
-    expect(bres3.slice(2).toString()).toBe(Buffer.from(hexbuffstr3.slice(4), 'hex').toString('utf8'))
-  })
+describe('Mnemonic', () => {
+  const mnenmnic: string = "output tooth keep tooth bracket fox city sustain blood raise install pond stem reject long scene clap gloom purpose mean music piece unknown light"
 
-  test('bufferToB58', () => {
-    const b58res: string = bintools.bufferToB58(buff)
-    expect(b58res).toBe(b58str)
-    // testing null character edge case
-    const b58res2: string = bintools.bufferToB58(buff2)
-    expect(b58res2).toBe(b58str2)
-    // testing null character edge case
-    const b58res3: string = bintools.bufferToB58(buff3)
-    expect(b58res3).toBe(b58str3)
-  })
-
-  test('b58ToBuffer', () => {
-    expect(() => {
-      bintools.b58ToBuffer('0OO0O not a valid b58 string 0OO0O')
-    }).toThrow('Error - Base58.decode: not a valid base58 string')
-
-    const buffres: Buffer = bintools.b58ToBuffer(b58str)
-    expect(buffres.toString()).toBe(buff.toString())
-    // testing zeros character edge case
-    const buffres2: Buffer = bintools.b58ToBuffer(b58str2)
-    expect(buffres2.toString()).toBe(buff2.toString())
-    // testing zeros character edge case
-    const buffres3: Buffer = bintools.b58ToBuffer(b58str3)
-    expect(buffres3.toString()).toBe(buff3.toString())
-  })
-
-  test('fromBufferToArrayBuffer', () => {
-    const arrbuff: ArrayBuffer = bintools.fromBufferToArrayBuffer(buff)
-    expect(arrbuff.byteLength).toBe(buff.length)
-    for (let i: number = 0; i < buff.length; i++) {
-      expect(arrbuff[i]).toBe(buff[i])
-    }
-    // verify that the original buffer isn't touched by writes
-    arrbuff[2] = 55
-    expect(buff[2]).not.toBe(55)
-  })
-
-  test('fromArrayBufferToBuffer', () => {
-    const arrbuff: ArrayBuffer = new ArrayBuffer(10)
-    for (let i: number = 0; i < 10; i++) {
-      arrbuff[i] = i
-    }
-    const newbuff: Buffer = bintools.fromArrayBufferToBuffer(arrbuff)
-    expect(newbuff.length).toBe(arrbuff.byteLength)
-    for (let i: number = 0; i < newbuff.length; i++) {
-      expect(newbuff[i]).toBe(arrbuff[i])
-    }
-    // verify that the original buffer isnt touched by writes
-    newbuff[3] = 55
-    expect(arrbuff[3]).not.toBe(newbuff[3])
-  })
-
-  test('fromBufferToBN', () => {
-    const bign: BN = bintools.fromBufferToBN(buff)
-    expect(bign.toString('hex', hexstr.length)).toBe(hexstr)
-  })
-
-  test('fromBNToBuffer', () => {
-    const bn1: BN = new BN(hexstr, 'hex', 'be')
-    const bn2: BN = new BN(hexstr, 'hex', 'be')
-    const b1: Buffer = bintools.fromBNToBuffer(bn1)
-    const b2: Buffer = bintools.fromBNToBuffer(bn2, buff.length)
-
-    expect(b1.length).toBe(buff.length - 1)
-    expect(b1.toString('hex')).toBe(hexstr.slice(2))
-
-    expect(b2.length).toBe(buff.length)
-    expect(b2.toString('hex')).toBe(hexstr)
-  })
-
-  test('addChecksum', () => {
-    const buffchecked: Buffer = bintools.addChecksum(buff)
-    expect(buffchecked.length).toBe(buff.length + 4)
-    expect(buffchecked.slice(16).toString('hex')).toBe(checksum)
-  })
-
-  test('validteChecksum', () => {
-    const checksummed: string = hexstr + checksum
-    const badsummed: string = `${hexstr}324e7822`
-    expect(bintools.validateChecksum(Buffer.from(checksummed, 'hex'))).toBe(true)
-    expect(bintools.validateChecksum(buff)).toBe(false)
-    expect(bintools.validateChecksum(Buffer.from(badsummed, 'hex'))).toBe(false)
-  })
-
-  test('cb58Encode', () => {
-    const fromBuff: string = bintools.cb58Encode(buff)
-    expect(fromBuff).toBe(serializedChecksum)
-  })
-
-  test('cb58Decode', () => {
-    const serbuff: Buffer = bintools.b58ToBuffer(serializedChecksum)
-    const dsr1: Buffer = bintools.cb58Decode(serializedChecksum)
-    const dsr2: Buffer = bintools.cb58Decode(serbuff)
-    const serbufffaulty: Buffer = bintools.copyFrom(serbuff)
-    serbufffaulty[serbufffaulty.length - 1] = serbufffaulty[serbufffaulty.length - 1] - 1
-    expect(dsr1.toString('hex')).toBe(hexstr)
-    expect(dsr2.toString('hex')).toBe(hexstr)
-    expect(() => {
-      bintools.cb58Decode(serbufffaulty)
-    }).toThrow('Error - BinTools.cb58Decode: invalid checksum')
-  })
-
-  test('isCB58', (): void => {
-    const validBase581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
-    const validBase582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
-    const invalidBase581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
-    const invalidBase582: string = ""
-    expect(bintools.isCB58(validBase581)).toBe(true)
-    expect(bintools.isCB58(validBase582)).toBe(true)
-    expect(bintools.isCB58(invalidBase581)).toBe(false)
-    expect(bintools.isCB58(invalidBase582)).toBe(false)
-  })
-
-  test('isBase58', (): void => {
-    const validBase581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
-    const validBase582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
-    const invalidBase581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
-    const invalidBase582: string = ""
-    expect(bintools.isBase58(validBase581)).toBe(true)
-    expect(bintools.isBase58(validBase582)).toBe(true)
-    expect(bintools.isBase58(invalidBase581)).toBe(false)
-    expect(bintools.isBase58(invalidBase582)).toBe(false)
-  })
-
-  test('isHex', (): void => {
-    const validHex1: string = "0x95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d01612940bd5"
-    const validHex2: string = "95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d01612940bd5"
-    const invalidHex1: string = "rrrrr.c2b7a6ee7ad7e597c2f5349b03e461c36c2e1e5.fc98a84d016129zzzzz"
-    const invalidHex2: string = ""
-    expect(bintools.isHex(validHex1)).toBe(true)
-    expect(bintools.isHex(validHex2)).toBe(true)
-    expect(bintools.isHex(invalidHex1)).toBe(false)
-    expect(bintools.isHex(invalidHex2)).toBe(false)
-  })
-
-  test('stringToAddress', () => {
-    // Missing prefix
-    let addr: string = "-avax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Error - Valid address must have prefix before -')
-
-    // Missing -
-    addr = "Xavax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Error - Valid address should include -')
-
-    // Missing seperator (1)
-    addr = "X-avax3a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Error - Valid address must include separator (1)')
-
-    // Missing HRP
-    addr = "X-13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Error - HRP should be at least 1 character')
-
-    // Invalid HRP
-    addr = "X-avax11ycxp65vz60m87mkm2hsw3m5fadjlpldzntvr33"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Error - Invalid HRP')
-
-    // Extra character in data bytes
-    addr = "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdswtvnucd"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Invalid checksum for local1dcfyuug87xqayl4fpp02z9dvknwhafdswtvnucd')
-
-    // Change character in data bytes
-    addr = "X-local1dcfyuug8fxqayl4fpp02z9dvknwhafdstvnucd"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Invalid checksum for local1dcfyuug8fxqayl4fpp02z9dvknwhafdstvnucd')
-
-    // Invalid character in data bytes
-    addr = "X-local1dcfyuug87xqbyl4fpp02z9dvknwhafdstvnucd"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Unknown character b')
-
-    // Change character in checksum
-    addr = "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnuce"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Invalid checksum for local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnuce')
-
-    // Invalid ETH-style address
-    addr = "0x.db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
-    expect((): void => {
-      bintools.stringToAddress(addr)
-    }).toThrow('Error - Invalid address')
-
-    let addrs: string[] = [
-      'X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
-      'X-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
-      'X-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
+  test('entropyToMnemonic', (): void => {
+    langs.forEach((lang: string, index: number): void => {
+      const wordlist = mnemonic.getWordlists(lang) as string[]
+      const entropyToMnemonic: string = mnemonic.entropyToMnemonic(entropy, wordlist)
+      expect(mnemnonics[index]).toBe(entropyToMnemonic)
     })
-    addrs = [
-      'X-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
-      'X-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
-      'X-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
-    })
-    addrs = [
-      'X-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9',
-      'X-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw',
-      'X-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
-    })
-    addrs = [
-      'P-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
-      'P-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
-      'P-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
-    })
-    addrs = [
-      'P-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
-      'P-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
-      'P-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
-    })
-    addrs = [
-      'P-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9',
-      'P-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw',
-      'P-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
-    })
+  })
 
-    addrs = [
-      'C-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd',
-      'C-local1ltghj033re64920k786uprcp82p9e36j7hzc5x',
-      'C-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
+  test('generateMnemonic', (): void => {
+    const strength: number = 256
+    langs.forEach((lang: string): void => {
+      const wordlist = mnemonic.getWordlists(lang) as string[]
+      const m: string = mnemonic.generateMnemonic(strength, randomBytes, wordlist)
+      expect(typeof m === "string").toBeTruthy()
     })
+  })
 
-    addrs = [
-      'C-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6',
-      'C-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3',
-      'C-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
+  test('getWordlists', (): void => {
+    langs.forEach((lang: string): void => {
+      const wordlist = mnemonic.getWordlists(lang) as string[]
+      expect(typeof wordlist === "object").toBeTruthy()
     })
+  })
 
-    addrs = [
-      'C-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9',
-      'C-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw',
-      'C-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5'
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
+  test('mnemonicToEntropy', (): void => {
+    mnemnonics.forEach((mnemnnic: string, index: number): void => {
+      const wordlist = mnemonic.getWordlists(langs[index]) as string[]
+      const mnemonicToEntropy: string = mnemonic.mnemonicToEntropy(mnemnnic, wordlist)
+      expect(mnemonicToEntropy).toBe(entropy)
     })
+  })
 
-    addrs = [
-      "X-foo1dcfyuug87xqayl4fpp02z9dvknwhafds4k3km3",
-      "X-foo1ltghj033re64920k786uprcp82p9e36jqdqjh6",
-      "X-foo1dq4q9seql2spxrkd7rl82uck5ej3nvlha97akq"
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address, "foo")
+  test('mnemonicToSeed', async (): Promise<void> => {
+    mnemnonics.forEach(async (mnemnnic: string): Promise<any> => {
+      const password: string = "password"
+      const mnemonicToSeed: Buffer = await mnemonic.mnemonicToSeed(mnemnnic, password)
+      expect(typeof mnemonicToSeed === "object").toBeTruthy()
     })
+  })
 
-    addrs = [
-      "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC",
-      "0xC1ad78FDd4aEd027EbD5e9eee878f44dc1E29358",
-      "0x5B44bC2622dc5DD66a94cd5f2aDc3a49abb864dE"
-    ]
-    addrs.forEach((address: string): void => {
-      bintools.stringToAddress(address)
+  test('mnemonicToSeedSync', (): void => {
+    mnemnonics.forEach((mnemnnic: string, index: number): void => {
+      const password: string = "password"
+      const mnemonicToSeedSync: Buffer = mnemonic.mnemonicToSeedSync(mnemnnic, password)
+      expect(mnemonicToSeedSync.toString('hex')).toBe(seeds[index])
+    })
+  })
+
+  test('validateMnemonic', (): void => {
+    mnemnonics.forEach((mnemnnic: string, index: number): void => {
+      const wordlist = mnemonic.getWordlists(langs[index]) as string[]
+      const validateMnemonic: string = mnemonic.validateMnemonic(mnemnnic, wordlist)
+      expect(validateMnemonic).toBeTruthy()
+    })
+  })
+
+  test('setDefaultWordlist', (): void => {
+    langs.forEach((lang: string, index: number): void => {
+      mnemonic.setDefaultWordlist(lang)
+      const getDefaultWordlist: string = mnemonic.getDefaultWordlist()
+      const wordlist = mnemonic.getWordlists(lang) as string[]
+      const m: string = mnemonic.generateMnemonic(256, randomBytes, wordlist)
+      expect(getDefaultWordlist).toBe(lang)
+      expect(typeof wordlist === "object").toBeTruthy()
+      expect(typeof m === "string").toBeTruthy()
     })
   })
 })
