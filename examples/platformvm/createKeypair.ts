@@ -1,11 +1,11 @@
 import { 
   Avalanche
-} from "../../dist"
+} from "../../src"
 import { 
   PlatformVMAPI, 
   KeyChain,
   KeyPair 
-} from "../../dist/apis/platformvm"
+} from "../../src/apis/platformvm"
   
 const ip: string = 'localhost'
 const port: number = 9650
@@ -16,7 +16,7 @@ const pchain: PlatformVMAPI = avalanche.PChain()
  
 const main = async (): Promise<any> => {
   const keychain: KeyChain = pchain.keyChain()
-  const keypair: KeyPair = keychain.makeKey()
+  const keypair: KeyPair = keychain.getKey(xAddresses[0])
   const response: {
     address: string
     publicKey: string

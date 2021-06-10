@@ -38,6 +38,7 @@ const TYPE_NAME_ERROR_CODE:string = "1035";
 const UNKNOWN_TYPE_ERROR_CODE:string = "1036";
 const BECH32_ERROR_CODE:string = "1037";
 const EVM_FEE_ERROR_CODE:string = "1038";
+const INVALID_ENTROPY: string = "1039"
 
 class AvalancheError extends Error {
   errorCode: string;
@@ -318,7 +319,6 @@ export class UnknownTypeError extends AvalancheError {
   }
 }
 
-
 export class Bech32Error extends AvalancheError {
   constructor(m:string) {
     super(m, BECH32_ERROR_CODE);
@@ -326,10 +326,16 @@ export class Bech32Error extends AvalancheError {
   }
 }
 
-
 export class EVMFeeError extends AvalancheError {
-  constructor(m:string) {
-    super(m, EVM_FEE_ERROR_CODE);
-    Object.setPrototypeOf(this, EVMFeeError.prototype);
+  constructor(m: string) {
+    super(m, EVM_FEE_ERROR_CODE)
+    Object.setPrototypeOf(this, EVMFeeError.prototype)
+  }
+}
+
+export class InvalidEntropy extends AvalancheError {
+  constructor(m: string) {
+    super(m, INVALID_ENTROPY)
+    Object.setPrototypeOf(this, InvalidEntropy.prototype);
   }
 }

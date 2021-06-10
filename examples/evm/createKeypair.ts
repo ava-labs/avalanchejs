@@ -1,11 +1,11 @@
 import { 
   Avalanche
-} from "../../dist"
+} from "../../src"
 import { 
   EVMAPI, 
   KeyChain,
   KeyPair 
-} from "../../dist/apis/evm"
+} from "../../src/apis/evm"
   
 const ip: string = 'localhost'
 const port: number = 9650

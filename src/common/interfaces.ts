@@ -118,6 +118,20 @@ export interface GetRewardUTXOsResponse {
   encoding: string
 }
 
+export interface WordLists {
+  czech: string[]
+  chinese_simplified: string[]
+  chinese_traditional: string[]
+  korean: string[]
+  french: string[]
+  italian: string[]
+  spanish: string[]
+  japanese: string[]
+  JA: string[]
+  portuguese: string[]
+  english: string[]
+  EN: string[]
+}
 export interface GetAtomicTxStatusParams {
   txID: string
 }
