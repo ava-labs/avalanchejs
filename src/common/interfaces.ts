@@ -132,3 +132,6 @@ export interface WordLists {
   english: string[]
   EN: string[]
 }
+export interface GetAtomicTxStatusParams {
+  txID: string
+}

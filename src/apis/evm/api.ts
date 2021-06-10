@@ -22,6 +22,7 @@ import { Tx, UnsignedTx } from './tx';
 import { EVMConstants } from './constants';
 import { 
   Asset,
+  GetAtomicTxStatusParams,
   Index, 
   UTXOResponse 
 } from './../../common/interfaces'
@@ -31,7 +32,12 @@ import {
   TransferableOutput 
 } from './outputs';
 import { ExportTx } from './exporttx';
-import { TransactionError, ChainIdError, NoAtomicUTXOsError, AddressError } from '../../utils/errors';
+import {
+  TransactionError,
+  ChainIdError,
+  NoAtomicUTXOsError,
+  AddressError
+} from '../../utils/errors';
 
 /**
  * @ignore
@@ -210,6 +216,22 @@ export class EVMAPI extends JRPCAPI {
   getDefaultTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network ? new BN(Defaults.network[this.core.getNetworkID()]["C"]["txFee"]) : new BN(0);
   }
+
+  /**
+   * Returns the status of a provided atomic transaction ID by calling the node's `getAtomicTxStatus` method.
+   *
+   * @param txID The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the status retrieved from the node
+   */
+  getAtomicTxStatus = async (txID: string): Promise<string> => {
+    const params: GetAtomicTxStatusParams = {
+      txID
+    }
+
+    const response: RequestResponseData = await this.callMethod("avax.getAtomicTxStatus", params)
+    return response.data.result.status
+  };
 
   /**
    * Gets the tx fee for this chain.
