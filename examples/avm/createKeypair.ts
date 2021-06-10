@@ -1,7 +1,4 @@
-import { 
-  Avalanche,
-  Buffer 
-} from "../../src"
+import { Avalanche } from "../../src"
 import { 
   AVMAPI, 
   KeyChain,
@@ -15,15 +12,10 @@ const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
-const xKeychain: KeyChain = xchain.keyChain()
-const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const keychain: KeyChain = xchain.keyChain()
-const keypair: KeyPair = keychain.getKey(xAddresses[0])
  
 const main = async (): Promise<any> => {
   const keychain: KeyChain = xchain.keyChain()
+  const keypair: KeyPair = keychain.makeKey()
 
   const response: {
     address: string
