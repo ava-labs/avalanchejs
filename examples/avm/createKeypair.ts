@@ -4,7 +4,6 @@ import {
   KeyChain,
   KeyPair 
 } from "../../src/apis/avm"
-import { PrivateKeyPrefix, DefaultLocalGenesisPrivateKey } from "../../src/utils"
   
 const ip: string = "localhost"
 const port: number = 9650
