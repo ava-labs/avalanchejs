@@ -2,7 +2,7 @@
 
 ## Overview
 
-AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The AvalancheJS library allows one to issue commands to the Avalanche node APIs.
+AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The AvalancheJS library allows you to issue commands to the Avalanche node APIs.
 
 The APIs currently supported by default are:
 
@@ -25,7 +25,7 @@ We built AvalancheJS with ease of use in mind. With this library, any Javascript
 * Get UTXOs for addresses
 * Build and sign transactions
 * Issue signed transactions to the X-Chain, P-Chain, and C-Chain
-* Cross-chain swaps between the X-Chain<->P-Chain and between the X-Chain<->C-Chain
+* Perform cross-chain swaps between the X-Chain<->P-Chain and between the X-Chain<->C-Chain
 * Add Validators and Delegators to the Primary Subnetwork by staking AVAX
 * Create a Subnetwork
 * Administer a local node
@@ -110,13 +110,13 @@ This exposes the instance of the class AVMKeyChain which is created when the X-C
 
 ### Creating X-Chain key pairs
 
-The KeyChain has the ability to create new KeyPairs for you and return the address assocated with the key pair.
+The KeyChain has the ability to create new KeyPairs for you and return the address associated with the key pair.
 
 ```js
 const newAddress1 = myKeychain.makeKey(); // returns an instance of the KeyPair class
 ```
 
-You may also import your exsting private key into the KeyChain using either a Buffer...
+You may also import your existing private key into the KeyChain using either a Buffer...
 
 ```js
 const mypk = bintools.cb58Decode("JaCCSxdoWfo3ao5KwenXrJjJR7cBTQ287G1C5qpv2hr2tCCdb"); // returns a Buffer
@@ -158,7 +158,7 @@ const privkstr = keypair.getPrivateKeyString(); //returns a CB58 encoded string
 keypair.generateKey(); // creates a new random KeyPair
 
 const mypk = bintools.cb58Decode("24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5");
-const successul = keypair.importKey(mypk); // returns boolean if private key imported successfully
+const successful = keypair.importKey(mypk); // returns boolean if private key imported successfully
 
 const message = Buffer.from("Through consensus to the stars");
 const signature = keypair.sign(message); // returns a Buffer with the signature
