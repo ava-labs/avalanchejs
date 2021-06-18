@@ -25,8 +25,7 @@ import {
   StakeError,
   DelegationFeeError
 } from '../../utils/errors'
-import { GetRewardUTXOsParams, GetRewardUTXOsResponse } from 'src/common'
-import { GetStakeParams, GetStakeResponse } from 'src/common'
+import { GetRewardUTXOsParams, GetRewardUTXOsResponse, GetStakeParams, GetStakeResponse } from '../../common';
 import { TransferableOutput } from '../platformvm/outputs'
 
 /**

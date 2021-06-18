@@ -11,7 +11,7 @@ import {
   IsBootstrappedParams, 
   PeersParams, 
   PeersResponse
-} from 'src/common/interfaces';
+} from '../../common/interfaces';
 
 /**
  * Class for interacting with a node's InfoAPI.
