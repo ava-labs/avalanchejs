@@ -16,7 +16,7 @@ import {
     GetContainerRangeResponse,
     GetIndexParams,
     GetIsAcceptedParams,
-} from 'src/common/interfaces';
+} from '../../common/interfaces';
 
 /**
  * Class for interacting with a node's IndexAPI.

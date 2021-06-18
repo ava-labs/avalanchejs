@@ -4,8 +4,8 @@
  */
 
 import { Buffer } from 'buffer/';
-import { BN } from 'src'
-import { TransferableOutput } from 'src/apis/platformvm'
+import BN from 'bn.js';
+import { TransferableOutput } from '../apis/platformvm';
 
 export interface Index {
   address: string
