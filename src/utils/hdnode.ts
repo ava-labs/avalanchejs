@@ -21,6 +21,7 @@ export default class HDNode {
   /**
   * Derives the HDNode at path from the current HDNode.
   * @param path 
+  * @returns derived child HDNode
   */
   derive(path: string): HDNode {
     const hdKey = this.hdkey.derive(path)
@@ -36,6 +37,7 @@ export default class HDNode {
   /**
   * Signs the buffer hash with the private key using secp256k1 and returns the signature as a buffer.
   * @param hash 
+  * @returns signature as a Buffer
   */
   sign(hash: Buffer): Buffer {
     const sig: Buffer = this.hdkey.sign(hash)
@@ -46,7 +48,8 @@ export default class HDNode {
   * Verifies that the signature is valid for hash and the HDNode's public key using secp256k1.
   * @param hash 
   * @param signature 
-  * @returns true for valid, false for invalid. Throws if the hash or signature is the wrong length.
+  * @returns true for valid, false for invalid.
+  * @throws if the hash or signature is the wrong length.
   */
   verify(hash: Buffer, signature: Buffer): boolean {
     return this.hdkey.verify(hash, signature)
