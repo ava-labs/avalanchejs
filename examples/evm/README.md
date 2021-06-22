@@ -8,5 +8,6 @@ Tests for the Avalanche [EVM](https://docs.avax.network/build/avalanchego-apis/c
 * [createKeypair.ts](./createKeypair.ts)
 * [exportTx-ant-xchain.ts](./exportTx-ant-xchain.ts)
 * [exportTx-avax-xchain.ts](./exportTx-avax-xchain.ts)
+* [getAssetBalance.ts](./getAssetBalance.ts)
 * [getAtomicTxStatus.ts](./getAtomicTxStatus.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
