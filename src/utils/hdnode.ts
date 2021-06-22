@@ -8,7 +8,6 @@ import hdnode from 'hdkey'
 
 /**
  * BIP32 hierarchical deterministic keys.
- *
  */
 
 export default class HDNode {
@@ -69,7 +68,6 @@ export default class HDNode {
   */
   constructor(from: string | Buffer) {
     if (Buffer.isBuffer(from)) {
-      // TODO - confirm this doesn't fail if an xpriv is passed in as a Buffer
       from = from.toString()
     }
     if (from.substring(0, 2) === "xp") {
