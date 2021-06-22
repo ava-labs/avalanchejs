@@ -186,6 +186,27 @@ describe('EVMAPI', () => {
 
   });
 
+  test("getAssetBalance", async (): Promise<void> => {
+    const address: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
+    const hexStr: string = "0x0"
+    const blockHeight: string = hexStr
+    const assetID: string = "FCry2Z1Su9KZqK1XRMhxQS6XuPorxDm3C3RBT7hw32ojiqyvP"
+
+    const result: Promise<string> = api.getAssetBalance(address, blockHeight, assetID)
+    const payload: object = {
+      result: hexStr
+    }
+    const responseObj = {
+      data: payload,
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(hexStr)
+  })
+
   test("getAtomicTxStatus", async (): Promise<void> => {
     const txID: string = "FCry2Z1Su9KZqK1XRMhxQS6XuPorxDm3C3RBT7hw32ojiqyvP"
 

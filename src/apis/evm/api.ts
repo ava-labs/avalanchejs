@@ -218,6 +218,29 @@ export class EVMAPI extends JRPCAPI {
   }
 
   /**
+   * returns the amount of [assetID] for the given address in the state of the given block number. 
+   * "latest", "pending", and "accepted" meta block numbers are also allowed.
+   *
+   * @param hexAddress The hex representation of the address
+   * @param blockHeight The block height
+   * @param assetID The asset ID
+   *
+   * @returns Returns a Promise<string> containing the balance
+   */
+  getAssetBalance = async (hexAddress: string, blockHeight: string, assetID: string): Promise<string> => {
+    const params: string[] = [
+      hexAddress,
+      blockHeight,
+      assetID
+    ]
+
+    const method: string = "eth_getAssetBalance"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(method, params, path)
+    return response.data.result
+  };
+
+  /**
    * Returns the status of a provided atomic transaction ID by calling the node's `getAtomicTxStatus` method.
    *
    * @param txID The string representation of the transaction ID
