@@ -5,6 +5,8 @@
 
 import { Buffer } from 'buffer/'
 import hdnode from 'hdkey'
+import BinTools from './bintools'
+const bintools: BinTools = BinTools.getInstance()
 
 /**
  * BIP32 hierarchical deterministic keys.
@@ -14,6 +16,7 @@ export default class HDNode {
   private hdkey: any
   publicKey: Buffer
   privateKey: Buffer
+  privateKeyCB58: string
   chainCode: Buffer
   privateExtendedKey: string
   publicExtendedKey: string
@@ -62,25 +65,30 @@ export default class HDNode {
   wipePrivateData() {
     this.privateKey = null
     this.privateExtendedKey = null
+    this.privateKeyCB58 = null
     this.hdkey.wipePrivateData()
   }
+
 
   /**
   * Creates an HDNode from a master seed or an extended public/private key
   * @param from seed or key to create HDNode from
   */
   constructor(from: string | Buffer) {
-    if (Buffer.isBuffer(from)) {
-      from = from.toString()
-    }
-    if (from.substring(0, 2) === "xp") {
-      // create HDNode from extended public or private key
+    if (typeof from === "string" && from.substring(0, 2) === "xp") {
       this.hdkey = hdnode.fromExtendedKey(from)
+    } else if (Buffer.isBuffer(from)) {
+      this.hdkey = hdnode.fromMasterSeed(from as unknown as globalThis.Buffer)
     } else {
       this.hdkey = hdnode.fromMasterSeed(Buffer.from(from) as unknown as globalThis.Buffer)
     }
     this.publicKey = this.hdkey.publicKey
     this.privateKey = this.hdkey.privateKey
+    if (this.privateKey) {
+      this.privateKeyCB58 = `PrivateKey-${bintools.cb58Encode(this.privateKey)}`
+    } else {
+      this.privateExtendedKey = null
+    }
     this.chainCode = this.hdkey.chainCode
     this.privateExtendedKey = this.hdkey.privateExtendedKey
     this.publicExtendedKey = this.hdkey.publicExtendedKey

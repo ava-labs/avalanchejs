@@ -51,8 +51,9 @@ export default class Mnemonic {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer}
    */
-  mnemonicToSeedSync(mnemonic: string, password: string): Buffer {
-    return bip39.mnemonicToSeedSync(mnemonic, password)
+  mnemonicToSeedSync(mnemonic: string, password: string = ""): Buffer {
+    const seed: Buffer = bip39.mnemonicToSeedSync(mnemonic, password)
+    return Buffer.from(seed)
   }
 
   /**
@@ -63,8 +64,9 @@ export default class Mnemonic {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer}
    */
-  async mnemonicToSeed(mnemonic: string, password: string): Promise<Buffer> {
-    return bip39.mnemonicToSeed(mnemonic, password)
+  async mnemonicToSeed(mnemonic: string, password: string = ""): Promise<Buffer> {
+    const seed: Buffer = await bip39.mnemonicToSeed(mnemonic, password)
+    return Buffer.from(seed)
   }
 
   /**
@@ -75,10 +77,7 @@ export default class Mnemonic {
    *
    * @returns A string
    */
-  mnemonicToEntropy(
-    mnemonic: string,
-    wordlist?: string[]
-  ): string {
+  mnemonicToEntropy(mnemonic: string, wordlist?: string[]): string {
     return bip39.mnemonicToEntropy(mnemonic, wordlist)
   }
 
@@ -90,10 +89,7 @@ export default class Mnemonic {
    *
    * @returns A string
    */
-  entropyToMnemonic(
-    entropy: Buffer | string,
-    wordlist?: string[]
-  ): string {
+  entropyToMnemonic(entropy: Buffer | string, wordlist?: string[]): string {
     return bip39.entropyToMnemonic(entropy, wordlist)
   }
 
@@ -105,10 +101,7 @@ export default class Mnemonic {
    *
    * @returns A string
    */
-  validateMnemonic(
-    mnemonic: string,
-    wordlist?: string[]
-  ): string {
+  validateMnemonic(mnemonic: string, wordlist?: string[]): string {
     return bip39.validateMnemonic(mnemonic, wordlist)
   }
 
