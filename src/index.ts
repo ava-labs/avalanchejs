@@ -14,11 +14,13 @@ import { KeystoreAPI } from './apis/keystore/api';
 import { MetricsAPI } from './apis/metrics/api';
 import { PlatformVMAPI } from './apis/platformvm/api';
 import { Socket } from './apis/socket/socket';
-import { PubSub } from './utils/pubsub';
 import { DefaultNetworkID, Defaults } from './utils/constants';
 import { getPreferredHRP } from './utils/helperfunctions';
 import BinTools from './utils/bintools';
 import DB from './utils/db';
+import Mnemonic from './utils/mnemonic'
+import PubSub from './utils/pubsub'
+import HDNode from "./utils/hdnode"
 import BN from "bn.js";
 import { Buffer } from 'buffer/';
 
@@ -163,6 +165,8 @@ export { BN };
 export { Buffer };
 export { Socket };
 export { PubSub };
+export { Mnemonic }
+export { HDNode }
 
 export * as utils from './utils';
 export * as common from './common';
@@ -176,4 +180,3 @@ export * as index from './apis/index';
 export * as keystore from './apis/keystore';
 export * as metrics from './apis/metrics';
 export * as platformvm from './apis/platformvm';
-
