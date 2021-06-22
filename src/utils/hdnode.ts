@@ -44,7 +44,7 @@ export default class HDNode {
   }
 
   /**
-  * Verifies that the signature is valid for hash and the hdkey's public key using secp256k1. 
+  * Verifies that the signature is valid for hash and the HDNode's public key using secp256k1.
   * @param hash 
   * @param signature 
   * @returns true for valid, false for invalid. Throws if the hash or signature is the wrong length.
@@ -54,7 +54,7 @@ export default class HDNode {
   }
 
   /**
-  * Wipes all record of the private key from the hdkey instance. 
+  * Wipes all record of the private key from the HDNode instance.
   * After calling this method, the instance will behave as if it was created via an xpub.
   */
   wipePrivateData() {
