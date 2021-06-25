@@ -489,8 +489,6 @@ export class AddValidatorTx extends AddDelegatorTx {
         let dbuff:Buffer = serializer.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
         this.delegationFee = dbuff.readUInt32BE(0) / AddValidatorTx.delegatorMultiplier;
     }
-  
-
 
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
