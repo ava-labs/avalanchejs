@@ -7,11 +7,13 @@ import { Buffer } from "buffer/";
 import BinTools  from './bintools';
 import BN from "bn.js";
 import { TypeIdError, HexError } from '../utils/errors';
+import { Serialization, SerializedType } from '../utils/serialization'
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance();
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for determining payload types and managing the lookup table.
@@ -407,7 +409,8 @@ export abstract class ChainAddressPayload extends PayloadBase {
      * Returns an address string for the payload.
      */
     returnType(hrp:string):string {
-        return bintools.addressToString(hrp, this.chainid, this.payload);
+      const type: SerializedType = "bech32"
+      return serialization.bufferToType(this.payload, type, hrp, this.chainid)
     }
     /**
      * @param payload Buffer or address string

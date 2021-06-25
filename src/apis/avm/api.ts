@@ -29,10 +29,12 @@ import { AddressError,
          NameError,
          TransactionError } from "../../utils/errors";
 
+import { Serialization, SerializedType } from '../../utils'
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 
 /**
@@ -129,7 +131,8 @@ export class AVMAPI extends JRPCAPI {
 
   addressFromBuffer = (address:Buffer):string => {
     const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
-    return bintools.addressToString(this.core.getHRP(), chainid, address);
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(address, type, this.core.getHRP(), chainid)
   };
 
   /**
@@ -1472,7 +1475,8 @@ export class AVMAPI extends JRPCAPI {
           }
           addrs.push(addresses[i] as string);
         } else {
-          addrs.push(bintools.addressToString(this.core.getHRP(), chainid, addresses[i] as Buffer));
+          const type: SerializedType = "bech32"
+          addrs.push(serialization.bufferToType(addresses[i] as Buffer, type, this.core.getHRP(), chainid))
         }
       }
     }

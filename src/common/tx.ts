@@ -44,7 +44,6 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     this.memo = serializer.decoder(fields["memo"], encoding, "hex", "Buffer");
   }
 
-
   protected networkid:Buffer = Buffer.alloc(4);
   protected blockchainid:Buffer = Buffer.alloc(32);
   protected numouts:Buffer = Buffer.alloc(4);

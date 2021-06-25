@@ -18,7 +18,7 @@ import { UnixNow } from 'src/utils/helperfunctions'
 import { UTF8Payload } from 'src/utils/payload'
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions'
 import { ONEAVAX } from 'src/utils/constants'
-import { Serializable, Serialization } from 'src/utils/serialization'
+import { Serializable, Serialization, SerializedType } from 'src/utils/serialization'
 import { AddValidatorTx } from 'src/apis/platformvm/validationtx'
 import { GetRewardUTXOsResponse } from 'src/common'
 
@@ -986,11 +986,12 @@ describe('PlatformVMAPI', () => {
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
       const amount: BN = new BN(90)
+      const type: SerializedType = "bech32"
       const txu1: UnsignedTx = await platformvm.buildExportTx(
         set,
         amount,
         bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]),
-        addrbuff3.map((a) => bintools.addressToString(avalanche.getHRP(), "P", a)),
+        addrbuff3.map((a) => serializer.bufferToType(a, type, avalanche.getHRP(), "P")),
         addrs1,
         addrs2,
         new UTF8Payload("hello world"), UnixNow()

@@ -27,11 +27,13 @@ import {
 } from '../../utils/errors'
 import { GetRewardUTXOsParams, GetRewardUTXOsResponse, GetStakeParams, GetStakeResponse } from '../../common';
 import { TransferableOutput } from '../platformvm/outputs'
+import { Serialization, SerializedType } from '../../utils'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -131,7 +133,8 @@ export class PlatformVMAPI extends JRPCAPI {
 
   addressFromBuffer = (address: Buffer): string => {
     const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID()
-    return bintools.addressToString(this.core.getHRP(), chainid, address)
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(address, type, this.core.getHRP(), chainid)
   };
 
   /**
@@ -1434,7 +1437,8 @@ return builtUnsignedTx;
           }
           addrs.push(addresses[i] as string)
         } else {
-          addrs.push(bintools.addressToString(this.core.getHRP(), chainid, addresses[i] as Buffer))
+          const type: SerializedType = "bech32"
+          addrs.push(serialization.bufferToType(addresses[i] as Buffer, type, this.core.getHRP(), chainid))
         }
       }
     }

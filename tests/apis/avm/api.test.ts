@@ -22,7 +22,7 @@ import { MinterSet } from 'src/apis/avm/minterset';
 import { PlatformChainID } from 'src/utils/constants';
 import { PersistanceOptions } from 'src/utils/persistenceoptions';
 import { ONEAVAX } from 'src/utils/constants';
-import { Serializable, Serialization } from 'src/utils/serialization';
+import { Serializable, Serialization, SerializedType } from 'src/utils/serialization';
 
 /**
  * @ignore
@@ -1571,11 +1571,12 @@ test("import", async ()=>{
       const addrbuff2 = addrs2.map((a) => avm.parseAddress(a));
       const addrbuff3 = addrs3.map((a) => avm.parseAddress(a));
       const amount:BN = new BN(90);
+      const type: SerializedType = "bech32"
       const txu1:UnsignedTx = await avm.buildExportTx(
         set, 
         amount, 
         bintools.cb58Decode(PlatformChainID),
-        addrbuff3.map((a) => bintools.addressToString(avalanche.getHRP(), "P", a)), 
+        addrbuff3.map((a) => serializer.bufferToType(a, type, avalanche.getHRP(), "P")),
         addrs1, 
         addrs2,
         new UTF8Payload("hello world"), UnixNow()
