@@ -14,8 +14,8 @@ import { MergeRuleError } from '../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for representing a single StandardUTXO.
@@ -28,19 +28,19 @@ export abstract class StandardUTXO extends Serializable{
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "codecid": serializer.encoder(this.codecid, encoding, "Buffer", "decimalString"),
-      "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
-      "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
-      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "codecid": serialization.encoder(this.codecid, encoding, "Buffer", "decimalString"),
+      "txid": serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
+      "outputidx": serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
+      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58"),
       "output": this.output.serialize(encoding)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "Buffer", 2);
-    this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
-    this.outputidx = serializer.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4);
-    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.codecid = serialization.decoder(fields["codecid"], encoding, "decimalString", "Buffer", 2)
+    this.txid = serialization.decoder(fields["txid"], encoding, "cb58", "Buffer", 32)
+    this.outputidx = serialization.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4)
+    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
   }
 
   protected codecid:Buffer = Buffer.alloc(2);
@@ -170,16 +170,16 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
     let fields:object = super.serialize(encoding);
     let utxos = {};
     for(let utxoid in this.utxos) {
-      let utxoidCleaned:string = serializer.encoder(utxoid, encoding, "base58", "base58");
+      let utxoidCleaned: string = serialization.encoder(utxoid, encoding, "base58", "base58");
       utxos[utxoidCleaned] = this.utxos[utxoid].serialize(encoding);
     }
     let addressUTXOs = {};
     for(let address in this.addressUTXOs) {
-      let addressCleaned:string = serializer.encoder(address, encoding, "hex", "cb58");
+      let addressCleaned: string = serialization.encoder(address, encoding, "hex", "cb58");
       let utxobalance = {};
       for(let utxoid in this.addressUTXOs[address]){
-        let utxoidCleaned:string = serializer.encoder(utxoid, encoding, "base58", "base58");
-        utxobalance[utxoidCleaned] = serializer.encoder(this.addressUTXOs[address][utxoid], encoding, "BN", "decimalString");
+        let utxoidCleaned: string = serialization.encoder(utxoid, encoding, "base58", "base58")
+        utxobalance[utxoidCleaned] = serialization.encoder(this.addressUTXOs[address][utxoid], encoding, "BN", "decimalString");
       }
       addressUTXOs[addressCleaned] = utxobalance;
     }
