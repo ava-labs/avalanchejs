@@ -232,7 +232,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     calcSubnetAuthIdxs = (addrs:Buffer[]):Buffer[] => {
         let idxs:Buffer[] = [];
         addrs = addrs.sort();
-        for(let i = 0; i < addrs.length; i++){
+        for(let i: number = 0; i < addrs.length; i++){
             let idx:Buffer = Buffer.alloc(4);
             idx.writeUInt32BE(i,0);
             idxs.push(idx);
@@ -251,7 +251,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
         let sublenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let sublen:number = sublenbuff.readUInt32BE(0);
-        for(let i = 0; i < sublen; i++){
+        for(let i: number = 0; i < sublen; i++){
 
         }
         offset = this.subnetAuth.fromBuffer(bytes, offset);
@@ -269,7 +269,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     sign(msg:Buffer, kc:KeyChain):Credential[] {
         let creds:SECPCredential[] = super.sign(msg, kc);
         const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
-        for(let i = 0; i  < this.subnetAuth.length ; i++) {
+        for(let i: number = 0; i  < this.subnetAuth.length ; i++) {
             if(!kc.hasKey(this.subnetAuth[i])) {
                 throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.");
             }
@@ -372,7 +372,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
      */
     getStakeOutsTotal():BN {
         let val:BN = new BN(0);
-        for(let i = 0; i < this.stakeOuts.length; i++){
+      for (let i: number = 0; i < this.stakeOuts.length; i++) {
           val = val.add((this.stakeOuts[i].getOutput() as AmountOutput).getAmount());
         }
         return val;
@@ -395,7 +395,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         offset += 4;
         const outcount:number = numstakeouts.readUInt32BE(0);
         this.stakeOuts = [];
-        for(let i = 0; i < outcount; i++) {
+      for (let i: number = 0; i < outcount; i++) {
             const xferout:TransferableOutput = new TransferableOutput();
             offset = xferout.fromBuffer(bytes, offset);
             this.stakeOuts.push(xferout);
@@ -416,7 +416,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
       let barr: Buffer[] = [super.toBuffer(), numouts];
         bsize += numouts.length;
         this.stakeOuts = this.stakeOuts.sort(TransferableOutput.comparator());
-        for(let i = 0; i < this.stakeOuts.length; i++) {
+      for (let i: number = 0; i < this.stakeOuts.length; i++) {
             let out:Buffer = this.stakeOuts[i].toBuffer();
             barr.push(out);
             bsize += out.length;

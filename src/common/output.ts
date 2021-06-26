@@ -135,7 +135,7 @@ export class OutputOwners extends Serializable {
    */
   getAddresses = (): Buffer[] => {
     const result: Buffer[] = [];
-    for (let i = 0; i < this.addresses.length; i++) {
+    for (let i: number = 0; i < this.addresses.length; i++) {
       result.push(this.addresses[i].toBuffer());
     }
     return result;
@@ -149,7 +149,7 @@ export class OutputOwners extends Serializable {
    * @returns The index of the address.
    */
   getAddressIdx = (address:Buffer):number => {
-    for (let i = 0; i < this.addresses.length; i++) {
+    for (let i: number = 0; i < this.addresses.length; i++) {
       if (this.addresses[i].toBuffer().toString('hex') === address.toString('hex')) {
         return i;
       }
@@ -208,8 +208,8 @@ export class OutputOwners extends Serializable {
     }
 
     const threshold:number = this.threshold.readUInt32BE(0);
-    for (let i = 0; i < this.addresses.length && qualified.length < threshold; i++) {
-      for (let j = 0; j < addresses.length && qualified.length < threshold; j++) {
+    for (let i: number = 0; i < this.addresses.length && qualified.length < threshold; i++) {
+      for (let j: number = 0; j < addresses.length && qualified.length < threshold; j++) {
         if (addresses[j].toString('hex') === this.addresses[i].toBuffer().toString('hex')) {
           qualified.push(addresses[j]);
         }
@@ -231,7 +231,7 @@ export class OutputOwners extends Serializable {
     offset += 4;
     const numaddrs:number = this.numaddrs.readUInt32BE(0);
     this.addresses = [];
-    for (let i = 0; i < numaddrs; i++) {
+    for (let i: number = 0; i < numaddrs; i++) {
       const addr:Address = new Address();
       offset = addr.fromBuffer(bytes, offset);
       this.addresses.push(addr);
@@ -288,7 +288,7 @@ export class OutputOwners extends Serializable {
     super();
     if(typeof addresses !== "undefined" && addresses.length) {
       const addrs: Address[] = [];
-      for (let i = 0; i < addresses.length; i++) {
+      for (let i: number = 0; i < addresses.length; i++) {
         addrs[i] = new Address();
         addrs[i].fromBuffer(addresses[i]);
       }

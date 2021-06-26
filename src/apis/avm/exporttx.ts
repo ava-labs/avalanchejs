@@ -80,7 +80,7 @@ export class ExportTx extends BaseTx {
    */
   getExportTotal():BN {
     let val:BN = new BN(0);
-    for(let i = 0; i < this.exportOuts.length; i++){
+    for (let i: number = 0; i < this.exportOuts.length; i++) {
       val = val.add((this.exportOuts[i].getOutput() as AmountOutput).getAmount());
     }
     return val;
@@ -131,7 +131,7 @@ export class ExportTx extends BaseTx {
     this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
     let barr: Buffer[] = [super.toBuffer(), this.destinationChain, this.numOuts];
     this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
-    for(let i = 0; i < this.exportOuts.length; i++) {
+    for (let i: number = 0; i < this.exportOuts.length; i++) {
         barr.push(this.exportOuts[i].toBuffer());
     }
     return Buffer.concat(barr);

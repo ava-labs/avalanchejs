@@ -94,7 +94,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
     offset += 4;
     const outcount:number = this.numouts.readUInt32BE(0);
     this.outs = [];
-    for (let i = 0; i < outcount; i++) {
+    for (let i: number = 0; i < outcount; i++) {
       const xferout:TransferableOutput = new TransferableOutput();
       offset = xferout.fromBuffer(bytes, offset);
       this.outs.push(xferout);
@@ -104,7 +104,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
     offset += 4;
     const incount:number = this.numins.readUInt32BE(0);
     this.ins = [];
-    for (let i = 0; i < incount; i++) {
+    for (let i: number = 0; i < incount; i++) {
       const xferin:TransferableInput = new TransferableInput();
       offset = xferin.fromBuffer(bytes, offset);
       this.ins.push(xferin);
@@ -126,10 +126,10 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = [];
-    for (let i = 0; i < this.ins.length; i++) {
+    for (let i: number = 0; i < this.ins.length; i++) {
       const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
       const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
+      for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
         const sig:Signature = new Signature();

@@ -64,7 +64,7 @@ export class InitialStates extends Serializable{
     const klen:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
     const klennum:number = klen.readUInt32BE(0);
-    for (let i = 0; i < klennum; i++) {
+    for (let i: number = 0; i < klennum; i++) {
       const fxidbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
       offset += 4;
       const fxid:number = fxidbuff.readUInt32BE(0);
@@ -72,7 +72,7 @@ export class InitialStates extends Serializable{
       const statelenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
       offset += 4;
       const statelen:number = statelenbuff.readUInt32BE(0);
-      for (let j = 0; j < statelen; j++) {
+      for (let j: number = 0; j < statelen; j++) {
         const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
         offset += 4;
         const out:Output = SelectOutputClass(outputid);
@@ -90,7 +90,7 @@ export class InitialStates extends Serializable{
     const klen:Buffer = Buffer.alloc(4);
     klen.writeUInt32BE(keys.length, 0);
     buff.push(klen);
-    for (let i = 0; i < keys.length; i++) {
+    for (let i: number = 0; i < keys.length; i++) {
       const fxid:number = keys[i];
       const fxidbuff:Buffer = Buffer.alloc(4);
       fxidbuff.writeUInt32BE(fxid, 0);
@@ -99,7 +99,7 @@ export class InitialStates extends Serializable{
       const statelen:Buffer = Buffer.alloc(4);
       statelen.writeUInt32BE(initialState.length, 0);
       buff.push(statelen);
-      for (let j = 0; j < initialState.length; j++) {
+      for (let j: number = 0; j < initialState.length; j++) {
         const outputid:Buffer = Buffer.alloc(4);
         outputid.writeInt32BE(initialState[j].getOutputID(), 0);
         buff.push(outputid);

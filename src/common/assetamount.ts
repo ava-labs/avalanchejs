@@ -177,7 +177,7 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
   }
 
   canComplete = (): boolean => {
-    for (let i = 0; i < this.amounts.length; i++) {
+    for (let i: number = 0; i < this.amounts.length; i++) {
       if (!this.amounts[i].isFinished()) {
 
         return false;

@@ -125,7 +125,7 @@ export abstract class Operation extends Serializable{
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     let bsize:number = this.sigCount.length;
     const barr: Buffer[] = [this.sigCount];
-    for (let i = 0; i < this.sigIdxs.length; i++) {
+    for (let i: number = 0; i < this.sigIdxs.length; i++) {
       const b:Buffer = this.sigIdxs[i].toBuffer();
       barr.push(b);
       bsize += b.length;
@@ -204,7 +204,7 @@ export class TransferableOperation extends Serializable {
     const numutxoIDs:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.utxoIDs = [];
-    for (let i = 0; i < numutxoIDs; i++) {
+    for (let i: number = 0; i < numutxoIDs; i++) {
       const utxoid:UTXOID = new UTXOID();
       offset = utxoid.fromBuffer(bytes, offset);
       this.utxoIDs.push(utxoid);
@@ -221,7 +221,7 @@ export class TransferableOperation extends Serializable {
     let bsize:number = this.assetid.length + numutxoIDs.length;
     const barr: Buffer[] = [this.assetid, numutxoIDs];
     this.utxoIDs = this.utxoIDs.sort(UTXOID.comparator());
-    for (let i = 0; i < this.utxoIDs.length; i++) {
+    for (let i: number = 0; i < this.utxoIDs.length; i++) {
       const b:Buffer = this.utxoIDs[i].toBuffer();
       barr.push(b);
       bsize += b.length;
@@ -245,7 +245,7 @@ export class TransferableOperation extends Serializable {
     ) {
       this.assetid = assetid;
       this.operation = operation;
-      for (let i = 0; i < utxoids.length; i++) {
+      for (let i: number = 0; i < utxoids.length; i++) {
         const utxoid:UTXOID = new UTXOID();
         if (typeof utxoids[i] === 'string') {
           utxoid.fromString(utxoids[i] as string);
@@ -509,7 +509,7 @@ export class NFTMintOperation extends Operation {
       outputownerslen
     ];
 
-    for(let i = 0; i < this.outputOwners.length; i++) {
+    for (let i: number = 0; i < this.outputOwners.length; i++) {
       let b:Buffer = this.outputOwners[i].toBuffer();
       barr.push(b);
       bsize += b.length;

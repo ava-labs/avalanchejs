@@ -112,7 +112,7 @@ export class ImportTx extends BaseTx {
     this.numIns.writeUInt32BE(this.importIns.length, 0);
     let barr: Buffer[] = [super.toBuffer(), this.sourceChain, this.numIns];
     this.importIns = this.importIns.sort(TransferableInput.comparator());
-    for(let i = 0; i < this.importIns.length; i++) {
+    for (let i: number = 0; i < this.importIns.length; i++) {
         barr.push(this.importIns[i].toBuffer());
     }
     return Buffer.concat(barr);
@@ -144,10 +144,10 @@ export class ImportTx extends BaseTx {
      */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = super.sign(msg, kc);
-    for (let i = 0; i < this.importIns.length; i++) {
+    for (let i: number = 0; i < this.importIns.length; i++) {
       const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
       const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
+      for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
         const sig:Signature = new Signature();
@@ -178,7 +178,7 @@ export class ImportTx extends BaseTx {
     super(networkid, blockchainid, outs, ins, memo);
     this.sourceChain = sourceChain; // do not correct, if it's wrong it'll bomb on toBuffer
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
-      for (let i = 0; i < importIns.length; i++) {
+      for (let i: number = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
           throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }

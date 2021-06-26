@@ -95,7 +95,7 @@ export class OperationTx extends BaseTx {
       this.numOps.writeUInt32BE(this.ops.length, 0);
     let barr: Buffer[] = [super.toBuffer(), this.numOps];
       this.ops = this.ops.sort(TransferableOperation.comparator());
-      for(let i = 0; i < this.ops.length; i++) {
+    for (let i: number = 0; i < this.ops.length; i++) {
           barr.push(this.ops[i].toBuffer());
       }
       return Buffer.concat(barr);
@@ -118,10 +118,10 @@ export class OperationTx extends BaseTx {
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = super.sign(msg, kc);
-    for (let i = 0; i < this.ops.length; i++) {
+    for (let i: number = 0; i < this.ops.length; i++) {
       const cred:Credential = SelectCredentialClass(this.ops[i].getOperation().getCredentialID());
       const sigidxs: SigIdx[] = this.ops[i].getOperation().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
+      for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
         const sig:Signature = new Signature();
@@ -160,7 +160,7 @@ export class OperationTx extends BaseTx {
   ) {
     super(networkid, blockchainid, outs, ins, memo);
     if (typeof ops !== 'undefined' && Array.isArray(ops)) {
-      for (let i = 0; i < ops.length; i++) {
+      for (let i: number = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {
           throw new OperationError("Error - OperationTx.constructor: invalid op in array parameter 'ops'");
         }

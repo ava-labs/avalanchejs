@@ -97,14 +97,14 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     this.numins.writeUInt32BE(this.ins.length, 0);
     let bsize:number = this.networkid.length + this.blockchainid.length + this.numouts.length;
     const barr: Buffer[] = [this.networkid, this.blockchainid, this.numouts];
-    for (let i = 0; i < this.outs.length; i++) {
+    for (let i: number = 0; i < this.outs.length; i++) {
       const b:Buffer = this.outs[i].toBuffer();
       barr.push(b);
       bsize += b.length;
     }
     barr.push(this.numins);
     bsize += this.numins.length;
-    for (let i = 0; i < this.ins.length; i++) {
+    for (let i: number = 0; i < this.ins.length; i++) {
       const b:Buffer = this.ins[i].toBuffer();
       barr.push(b);
       bsize += b.length;
@@ -338,7 +338,7 @@ export abstract class StandardTx<
     credlen.writeUInt32BE(this.credentials.length, 0);
     const barr: Buffer[] = [txbuff, credlen];
     bsize += credlen.length;
-    for (let i = 0; i < this.credentials.length; i++) {
+    for (let i: number = 0; i < this.credentials.length; i++) {
       this.credentials[i].setCodecID(codecID);
       const credid:Buffer = Buffer.alloc(4);
       credid.writeUInt32BE(this.credentials[i].getCredentialID(), 0);

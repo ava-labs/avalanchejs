@@ -1764,25 +1764,25 @@ describe('PlatformVMAPI', (): void => {
 
       let intotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Ins.length; i++) {
+      for (let i: number = 0; i < txu1Ins.length; i++) {
         intotal = intotal.add((txu1Ins[i].getInput() as AmountInput).getAmount())
       }
 
       let outtotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Outs.length; i++) {
+      for (let i: number = 0; i < txu1Outs.length; i++) {
         outtotal = outtotal.add((txu1Outs[i].getOutput() as AmountOutput).getAmount())
       }
 
       let staketotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Stake.length; i++) {
+      for (let i: number = 0; i < txu1Stake.length; i++) {
         staketotal = staketotal.add((txu1Stake[i].getOutput() as AmountOutput).getAmount())
       }
 
       let totaltotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Total.length; i++) {
+      for (let i: number = 0; i < txu1Total.length; i++) {
         totaltotal = totaltotal.add((txu1Total[i].getOutput() as AmountOutput).getAmount())
       }
 

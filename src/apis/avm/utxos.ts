@@ -172,7 +172,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   getMinimumSpendable = (aad:AssetAmountDestination, asOf:BN = UnixNow(), locktime:BN = new BN(0), threshold:number = 1):Error => {
     const utxoArray: UTXO[] = this.getAllUTXOs();
     const outids:object = {};
-    for(let i = 0; i < utxoArray.length && !aad.canComplete(); i++) {
+    for(let i: number = 0; i < utxoArray.length && !aad.canComplete(); i++) {
       const u:UTXO = utxoArray[i];
       const assetKey:string = u.getAssetID().toString("hex");
       const fromAddresses: Buffer[] = aad.getSenders();
@@ -188,7 +188,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
           const input:SECPTransferInput = new SECPTransferInput(amount);
           const xferin:TransferableInput = new TransferableInput(txid, outputidx, u.getAssetID(), input);
           const spenders: Buffer[] = uout.getSpenders(fromAddresses, asOf);
-          for (let j = 0; j < spenders.length; j++) {
+          for (let j: number = 0; j < spenders.length; j++) {
             const idx:number = uout.getAddressIdx(spenders[j]);
             if (idx === -1) {
               /* istanbul ignore next */
@@ -218,7 +218,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
     const amounts: AssetAmount[] = aad.getAmounts();
     const zero:BN = new BN(0);
-    for(let i = 0; i < amounts.length; i++) {
+    for(let i: number = 0; i < amounts.length; i++) {
       const assetKey:string = amounts[i].getAssetIDString();
       const amount:BN = amounts[i].getAmount();
       if (amount.gt(zero)) {
@@ -372,7 +372,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
     if(typeof mintOutputs !== "undefined"){
-      for(let i = 0; i < mintOutputs.length; i++){
+      for(let i: number = 0; i < mintOutputs.length; i++){
         if(mintOutputs[i] instanceof SECPMintOutput){
           initialState.addOutput(mintOutputs[i]);
         } else {
@@ -661,7 +661,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       );
       const op:NFTTransferOperation = new NFTTransferOperation(outbound);
   
-      for (let j = 0; j < spenders.length; j++) {
+      for (let j: number = 0; j < spenders.length; j++) {
         const idx:number = out.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */
@@ -754,7 +754,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const xferin:TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
       const from: Buffer[] = output.getAddresses()
       const spenders: Buffer[] = output.getSpenders(from, asOf);
-      for (let j = 0; j < spenders.length; j++) {
+      for (let j: number = 0; j < spenders.length; j++) {
         const idx:number = output.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */

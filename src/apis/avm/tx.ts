@@ -99,7 +99,7 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     this.unsignedTx = new UnsignedTx();
     this.unsignedTx.deserialize(fields["unsignedTx"], encoding);
     this.credentials = [];
-    for(let i = 0; i < fields["credentials"].length; i++){
+    for (let i: number = 0; i < fields["credentials"].length; i++) {
       const cred:Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
       cred.deserialize(fields["credentials"][i], encoding);
       this.credentials.push(cred);
@@ -120,7 +120,7 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     const numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.credentials = [];
-    for (let i = 0; i < numcreds; i++) {
+    for (let i: number = 0; i < numcreds; i++) {
       const credid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
       offset += 4;
       const cred:Credential = SelectCredentialClass(credid);

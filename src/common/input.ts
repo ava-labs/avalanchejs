@@ -82,7 +82,7 @@ export abstract class Input extends Serializable {
     offset += 4;
     const sigCount:number = this.sigCount.readUInt32BE(0);
     this.sigIdxs = [];
-    for (let i = 0; i < sigCount; i++) {
+    for (let i: number = 0; i < sigCount; i++) {
       const sigidx = new SigIdx();
       const sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
       sigidx.fromBuffer(sigbuff);
@@ -96,7 +96,7 @@ export abstract class Input extends Serializable {
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     let bsize:number = this.sigCount.length;
     const barr: Buffer[] = [this.sigCount];
-    for (let i = 0; i < this.sigIdxs.length; i++) {
+    for (let i: number = 0; i < this.sigIdxs.length; i++) {
       const b:Buffer = this.sigIdxs[i].toBuffer();
       barr.push(b);
       bsize += b.length;

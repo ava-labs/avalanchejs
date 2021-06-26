@@ -614,7 +614,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
       const from: Buffer[] = output.getAddresses()
       const spenders: Buffer[] = output.getSpenders(from, asOf);
-      for (let j = 0; j < spenders.length; j++) {
+      for (let j: number = 0; j < spenders.length; j++) {
         const idx: number = output.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */
