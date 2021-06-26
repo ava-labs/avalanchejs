@@ -18,23 +18,23 @@ const bintools: BinTools = BinTools.getInstance()
 describe('Operations', (): void => {
   const codecID_zero: number = 0
   const codecID_one: number = 1
-  let assetID: string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533"
-  let assetIDBuff: Buffer = Buffer.from(assetID, "hex")
-  let addrs: Buffer[] = [
+  const assetID: string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533"
+  const assetIDBuff: Buffer = Buffer.from(assetID, "hex")
+  const addrs: Buffer[] = [
         bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
         bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
         bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
   ].sort()
 
-  let locktime: BN = new BN(54321)
+  const locktime: BN = new BN(54321)
 
-  let payload: Buffer = Buffer.alloc(1024)
+  const payload: Buffer = Buffer.alloc(1024)
   payload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, "utf8")
 
   describe('NFTMintOperation', (): void => {
     test('SelectOperationClass', (): void => {
-      let goodop: NFTMintOperation = new NFTMintOperation(0, Buffer.from(""), [])
-      let operation: Operation = SelectOperationClass(goodop.getOperationID())
+      const goodop: NFTMintOperation = new NFTMintOperation(0, Buffer.from(""), [])
+      const operation: Operation = SelectOperationClass(goodop.getOperationID())
       expect(operation).toBeInstanceOf(NFTMintOperation)
             expect(() => {
               SelectOperationClass(99)
@@ -42,12 +42,12 @@ describe('Operations', (): void => {
     })
 
       test('comparator', (): void => {
-        let outputOwners: OutputOwners[] = []
+        const outputOwners: OutputOwners[] = []
         outputOwners.push(new OutputOwners(addrs, locktime, 1))
-        let op1: NFTMintOperation = new NFTMintOperation(1, payload, outputOwners)
-        let op2: NFTMintOperation = new NFTMintOperation(2, payload, outputOwners)
-        let op3: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners)
-        let cmp = NFTMintOperation.comparator()
+        const op1: NFTMintOperation = new NFTMintOperation(1, payload, outputOwners)
+        const op2: NFTMintOperation = new NFTMintOperation(2, payload, outputOwners)
+        const op3: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners)
+        const cmp = NFTMintOperation.comparator()
         expect(cmp(op1, op1)).toBe(0)
         expect(cmp(op2, op2)).toBe(0)
         expect(cmp(op3, op3)).toBe(0)
@@ -56,15 +56,15 @@ describe('Operations', (): void => {
       })
 
       test('Functionality', (): void => {
-        let outputOwners: OutputOwners[] = []
+        const outputOwners: OutputOwners[] = []
         outputOwners.push(new OutputOwners(addrs, locktime, 1))
-        let op: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners)
+        const op: NFTMintOperation = new NFTMintOperation(0, payload, outputOwners)
         
         expect(op.getOperationID()).toBe(AVMConstants.NFTMINTOPID)
         expect(op.getOutputOwners().toString()).toBe(outputOwners.toString())
         
-        let opcopy: NFTMintOperation = new NFTMintOperation()
-        let opb: Buffer = op.toBuffer()
+        const opcopy: NFTMintOperation = new NFTMintOperation()
+        const opb: Buffer = op.toBuffer()
         opcopy.fromBuffer(opb)
         expect(opcopy.toString()).toBe(op.toString())
       })
@@ -95,9 +95,9 @@ describe('Operations', (): void => {
 
   describe('NFTTransferOperation', (): void => {
     test('SelectOperationClass', (): void => {
-      let nout: NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1)
-      let goodop: NFTTransferOperation = new NFTTransferOperation(nout)
-      let operation: Operation = SelectOperationClass(goodop.getOperationID())
+      const nout: NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1)
+      const goodop: NFTTransferOperation = new NFTTransferOperation(nout)
+      const operation: Operation = SelectOperationClass(goodop.getOperationID())
       expect(operation).toBeInstanceOf(NFTTransferOperation)
           expect((): void => {
             SelectOperationClass(99)
@@ -105,10 +105,10 @@ describe('Operations', (): void => {
     })
 
       test('comparator', (): void => {
-        let op1: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1))
-        let op2: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1001, payload, addrs, locktime, 1))
-        let op3: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(999, payload, addrs, locktime, 1))
-        let cmp = NFTTransferOperation.comparator()
+        const op1: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1000, payload, addrs, locktime, 1))
+        const op2: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(1001, payload, addrs, locktime, 1))
+        const op3: NFTTransferOperation = new NFTTransferOperation(new NFTTransferOutput(999, payload, addrs, locktime, 1))
+        const cmp = NFTTransferOperation.comparator()
         expect(cmp(op1, op1)).toBe(0)
         expect(cmp(op2, op2)).toBe(0)
         expect(cmp(op3, op3)).toBe(0)
@@ -117,18 +117,18 @@ describe('Operations', (): void => {
       })
 
       test('Functionality', (): void => {
-        let nout: NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1)
-        let op: NFTTransferOperation = new NFTTransferOperation(nout)
+        const nout: NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1)
+        const op: NFTTransferOperation = new NFTTransferOperation(nout)
         
         expect(op.getOperationID()).toBe(AVMConstants.NFTXFEROPID)
         expect(op.getOutput().toString()).toBe(nout.toString())
         
-        let opcopy: NFTTransferOperation = new NFTTransferOperation()
+        const opcopy: NFTTransferOperation = new NFTTransferOperation()
         opcopy.fromBuffer(op.toBuffer())
         expect(opcopy.toString()).toBe(op.toString())
         
         op.addSignatureIdx(0, addrs[0])
-        let sigidx: SigIdx[] = op.getSigIdxs()
+        const sigidx: SigIdx[] = op.getSigIdxs()
         expect(sigidx[0].getSource().toString("hex")).toBe(addrs[0].toString("hex"))
         opcopy.fromBuffer(op.toBuffer())
         expect(opcopy.toString()).toBe(op.toString())
@@ -156,24 +156,24 @@ describe('Operations', (): void => {
 
 
   test('TransferableOperation', (): void => {
-    let nout: NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1)
-    let op: NFTTransferOperation = new NFTTransferOperation(nout)
-    let nfttxid: Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000), 32)).digest())
-    let nftoutputidx: Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(1000), 4))
-    let nftutxo: UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, nftoutputidx, assetIDBuff, nout)
-    let xferop: TransferableOperation = new TransferableOperation(assetIDBuff, [nftutxo.getUTXOID()], op)
+    const nout: NFTTransferOutput = new NFTTransferOutput(1000, payload, addrs, locktime, 1)
+    const op: NFTTransferOperation = new NFTTransferOperation(nout)
+    const nfttxid: Buffer = Buffer.from(createHash("sha256").update(bintools.fromBNToBuffer(new BN(1000), 32)).digest())
+    const nftoutputidx: Buffer = Buffer.from(bintools.fromBNToBuffer(new BN(1000), 4))
+    const nftutxo: UTXO = new UTXO(AVMConstants.LATESTCODEC, nfttxid, nftoutputidx, assetIDBuff, nout)
+    const xferop: TransferableOperation = new TransferableOperation(assetIDBuff, [nftutxo.getUTXOID()], op)
 
-    let xferop2: TransferableOperation = new TransferableOperation(assetIDBuff, [Buffer.concat([nfttxid, nftoutputidx])], op)
-    let uid: UTXOID = new UTXOID()
+    const xferop2: TransferableOperation = new TransferableOperation(assetIDBuff, [Buffer.concat([nfttxid, nftoutputidx])], op)
+    const uid: UTXOID = new UTXOID()
     uid.fromString(nftutxo.getUTXOID())
-    let xferop3: TransferableOperation = new TransferableOperation(assetIDBuff, [uid], op)
+    const xferop3: TransferableOperation = new TransferableOperation(assetIDBuff, [uid], op)
 
     expect(xferop.getAssetID().toString("hex")).toBe(assetID)
-    let utxoiddeserialized: Buffer = bintools.cb58Decode(xferop.getUTXOIDs()[0].toString())
+    const utxoiddeserialized: Buffer = bintools.cb58Decode(xferop.getUTXOIDs()[0].toString())
     expect(bintools.bufferToB58(utxoiddeserialized)).toBe(nftutxo.getUTXOID())
     expect(xferop.getOperation().toString()).toBe(op.toString())
 
-    let opcopy: TransferableOperation = new TransferableOperation()
+    const opcopy: TransferableOperation = new TransferableOperation()
     opcopy.fromBuffer(xferop.toBuffer())
     expect(opcopy.toString()).toBe(xferop.toString())
 

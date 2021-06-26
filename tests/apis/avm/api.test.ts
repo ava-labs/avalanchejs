@@ -23,16 +23,16 @@ import { PlatformChainID } from 'src/utils/constants'
 import { PersistanceOptions } from 'src/utils/persistenceoptions'
 import { ONEAVAX } from 'src/utils/constants'
 import { Serializable, Serialization, SerializedType } from 'src/utils/serialization'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
-
 const dumpSerailization: boolean = false
 
-function serialzeit(aThing:Serializable, name:string){
+const serialzeit = (aThing: Serializable, name: string): void => {
   if(dumpSerailization){
     console.log(JSON.stringify(serialization.serialize(aThing, "avm", "hex", name + " -- Hex Encoded")))
     console.log(JSON.stringify(serialization.serialize(aThing, "avm", "display", name + " -- Human-Readable")))
@@ -67,7 +67,7 @@ describe('AVMAPI', (): void => {
     mockAxios.reset()
   })
 
-  test('can Send 1', async () => {
+  test('can Send 1', async (): Promise<void> => {
     const txId: string = 'asdfhvl234'
     const memo: string = "hello world"
     const changeAddr:string = "X-local1"
@@ -78,7 +78,7 @@ describe('AVMAPI', (): void => {
         changeAddr: changeAddr
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -101,7 +101,7 @@ describe('AVMAPI', (): void => {
         changeAddr: changeAddr
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -124,7 +124,7 @@ describe('AVMAPI', (): void => {
         changeAddr: changeAddr
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -137,32 +137,31 @@ describe('AVMAPI', (): void => {
   })
 
   test('refreshBlockchainID', async (): Promise<void> => {
-    let n3bcID: string = Defaults.network[3].X["blockchainID"]
-    let n12345bcID: string = Defaults.network[12345].X["blockchainID"]
-    let testAPI: AVMAPI = new AVMAPI(avalanche, '/ext/bc/avm', n3bcID)
-    let bc1: string = testAPI.getBlockchainID()
+    const n3bcID: string = Defaults.network[3].X["blockchainID"]
+    const n12345bcID: string = Defaults.network[12345].X["blockchainID"]
+    const testAPI: AVMAPI = new AVMAPI(avalanche, '/ext/bc/avm', n3bcID)
+    const bc1: string = testAPI.getBlockchainID()
     expect(bc1).toBe(n3bcID)
 
     testAPI.refreshBlockchainID()
-    let bc2: string = testAPI.getBlockchainID()
+    const bc2: string = testAPI.getBlockchainID()
     expect(bc2).toBe(n12345bcID)
 
     testAPI.refreshBlockchainID(n3bcID)
-    let bc3: string = testAPI.getBlockchainID()
+    const bc3: string = testAPI.getBlockchainID()
     expect(bc3).toBe(n3bcID)
 
   })
 
   test('listAddresses', async (): Promise<void> => {
     const addresses = [addrA, addrB]
-
     const result: Promise<string[]> = api.listAddresses(username, password)
     const payload:object = {
       result: {
         addresses,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -175,14 +174,13 @@ describe('AVMAPI', (): void => {
 
   test('importKey', async (): Promise<void> => {
     const address = addrC
-
     const result: Promise<string> = api.importKey(username, password, 'key')
     const payload:object = {
       result: {
         address,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -194,7 +192,7 @@ describe('AVMAPI', (): void => {
   })
 
   test('getBalance', async (): Promise<void> => {
-    const balance = new BN('100', 10)
+    const balance: BN = new BN('100', 10)
     const respobj = {
       balance,
       utxoIDs: [
@@ -209,7 +207,7 @@ describe('AVMAPI', (): void => {
     const payload:object = {
       result: respobj,
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -221,7 +219,7 @@ describe('AVMAPI', (): void => {
   })
 
   test('exportKey', async (): Promise<void> => {
-    const key = 'sdfglvlj2h3v45'
+    const key: string = 'sdfglvlj2h3v45'
 
     const result: Promise<string> = api.exportKey(username, password, addrA)
     const payload:object = {
@@ -229,7 +227,7 @@ describe('AVMAPI', (): void => {
         privateKey: key,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -241,98 +239,98 @@ describe('AVMAPI', (): void => {
   })
 
   test("export", async (): Promise<void> => {
-    let amount = new BN(100)
-    let to = "abcdef"
-    let assetID = "AVAX"
-    let username = "Robert"
-    let password = "Paulson"
-    let txID = "valid"
-    let result: Promise<string> = api.export(username, password, to, amount, assetID)
-    let payload:object = {
+    const amount: BN = new BN(100)
+    const to: string = "abcdef"
+    const assetID: string = "AVAX"
+    const username: string = "Robert"
+    const password: string = "Paulson"
+    const txID: string = "valid"
+    const result: Promise<string> = api.export(username, password, to, amount, assetID)
+    const payload: object = {
         "result": {
             "txID": txID
         }
     }
-    let responseObj = {
+    const responseObj: HttpResponse = {
         data: payload
     }
 
     mockAxios.mockResponse(responseObj)
-    let response: string = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
   })
 
   test("exportAVAX", async (): Promise<void> => {
-    let amount = new BN(100)
-    let to = "abcdef"
-    let username = "Robert"
-    let password = "Paulson"
-    let txID = "valid"
-    let result: Promise<string> = api.exportAVAX(username, password, to, amount)
-    let payload:object = {
+    const amount: BN = new BN(100)
+    const to: string = "abcdef"
+    const username: string = "Robert"
+    const password: string = "Paulson"
+    const txID: string = "valid"
+    const result: Promise<string> = api.exportAVAX(username, password, to, amount)
+    const payload: object = {
         "result": {
             "txID": txID
         }
     }
-    let responseObj = {
+    const responseObj: HttpResponse = {
         data: payload
     }
 
     mockAxios.mockResponse(responseObj)
-    let response: string = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
   })
 
   test("import", async (): Promise<void> => {
-    let to = "abcdef"
-    let username = "Robert"
-    let password = "Paulson"
-    let txID = "valid"
-    let result: Promise<string> = api.import(username, password, to, blockchainid)
-  let payload:object = {
+    const to: string = "abcdef"
+    const username: string = "Robert"
+    const password: string = "Paulson"
+    const txID: string = "valid"
+    const result: Promise<string> = api.import(username, password, to, blockchainid)
+    const payload: object = {
       "result": {
           "txID": txID
       }
-  }
-  let responseObj = {
+    }
+    const responseObj: HttpResponse = {
       data: payload
-  }
+    }
 
     mockAxios.mockResponse(responseObj)
-    let response: string = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
   })
 
   test("importAVAX", async (): Promise<void> => {
-    let to = "abcdef"
-    let username = "Robert"
-    let password = "Paulson"
-    let txID = "valid"
-    let result: Promise<string> = api.importAVAX(username, password, to, blockchainid)
-    let payload:object = {
-        "result": {
-            "txID": txID
-        }
+    const to: string = "abcdef"
+    const username: string = "Robert"
+    const password: string = "Paulson"
+    const txID: string = "valid"
+    const result: Promise<string> = api.importAVAX(username, password, to, blockchainid)
+    const payload: object = {
+      "result": {
+        "txID": txID
+      }
     }
-    let responseObj = {
-        data: payload
+    const responseObj: HttpResponse = {
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
-    let response: string = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
   })
 
   test('createAddress', async (): Promise<void> => {
-    const alias = 'randomalias'
+    const alias: string = 'randomalias'
 
     const result: Promise<string> = api.createAddress(username, password)
     const payload:object = {
@@ -340,7 +338,7 @@ describe('AVMAPI', (): void => {
         address: alias,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -374,7 +372,7 @@ describe('AVMAPI', (): void => {
         assetID: assetid,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -414,7 +412,7 @@ describe('AVMAPI', (): void => {
         assetID: assetid,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -442,7 +440,7 @@ describe('AVMAPI', (): void => {
         txID: 'sometx',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -470,7 +468,7 @@ describe('AVMAPI', (): void => {
         txID: 'sometx',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -490,7 +488,7 @@ describe('AVMAPI', (): void => {
         tx: 'sometx',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -511,7 +509,7 @@ describe('AVMAPI', (): void => {
         status: 'accepted',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -535,7 +533,7 @@ describe('AVMAPI', (): void => {
         denomination: '10',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -562,7 +560,7 @@ describe('AVMAPI', (): void => {
         denomination: '11',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -601,7 +599,7 @@ describe('AVMAPI', (): void => {
         stopIndex: {address: "a", utxo: "b"}
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -674,7 +672,7 @@ describe('AVMAPI', (): void => {
           denomination: `${denomination}`,
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
 
@@ -919,7 +917,7 @@ describe('AVMAPI', (): void => {
           txID: txid,
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
       mockAxios.mockResponse(responseObj)
@@ -939,7 +937,7 @@ describe('AVMAPI', (): void => {
           txID: txid,
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
 
@@ -960,7 +958,7 @@ describe('AVMAPI', (): void => {
           txID: txid,
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
 
@@ -1385,7 +1383,7 @@ describe('AVMAPI', (): void => {
           utxos:[fungutxostr]
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
 

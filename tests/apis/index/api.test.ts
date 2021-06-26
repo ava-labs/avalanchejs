@@ -1,4 +1,5 @@
 import mockAxios from 'jest-mock-axios'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 import { Avalanche } from 'src'
 import { IndexAPI } from 'src/apis/index/api'
 import { GetLastAcceptedResponse } from 'src/common/interfaces'
@@ -39,7 +40,7 @@ describe('Index', () => {
     const payload: object = {
       result: respobj,
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -64,7 +65,7 @@ describe('Index', () => {
     const payload: object = {
       result: respobj,
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -89,7 +90,7 @@ describe('Index', () => {
     const payload: object = {
       result: respobj,
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -116,7 +117,7 @@ describe('Index', () => {
     const payload: object = {
       result: respobj,
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -136,7 +137,7 @@ describe('Index', () => {
         index: "0"
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -156,7 +157,7 @@ describe('Index', () => {
     const payload:object = {
       result: true
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 

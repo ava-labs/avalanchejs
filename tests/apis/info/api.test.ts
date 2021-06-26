@@ -3,6 +3,7 @@ import { Avalanche } from 'src'
 import { InfoAPI } from 'src/apis/info/api'
 import BN from "bn.js"
 import { PeersParams, PeersResponse } from 'src/common'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 describe('Info', () => {
   const ip: string = '127.0.0.1'
@@ -27,7 +28,7 @@ describe('Info', () => {
         blockchainID: avalanche.XChain().getBlockchainID(),
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -45,7 +46,7 @@ describe('Info', () => {
         networkID: 12345,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -64,7 +65,7 @@ describe('Info', () => {
         creationTxFee: "10000000"
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -83,7 +84,7 @@ describe('Info', () => {
         networkName: 'denali',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -101,7 +102,7 @@ describe('Info', () => {
         nodeID: 'abcd',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -119,7 +120,7 @@ describe('Info', () => {
         version: 'avalanche/0.5.5',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -137,7 +138,7 @@ describe('Info', () => {
         isBootstrapped: false,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -155,7 +156,7 @@ describe('Info', () => {
         isBootstrapped: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -192,7 +193,7 @@ describe('Info', () => {
         peers,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 

@@ -1,5 +1,5 @@
 import mockAxios from 'jest-mock-axios'
-
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 import { Avalanche } from 'src'
 import { AdminAPI } from 'src/apis/admin/api'
 
@@ -27,7 +27,7 @@ describe('Admin', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -47,7 +47,7 @@ describe('Admin', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -69,7 +69,7 @@ describe('Admin', (): void => {
         ],
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -88,7 +88,7 @@ describe('Admin', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -106,7 +106,7 @@ describe('Admin', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -124,7 +124,7 @@ describe('Admin', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -142,7 +142,7 @@ describe('Admin', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 

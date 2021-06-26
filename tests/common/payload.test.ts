@@ -11,7 +11,6 @@ describe("Payload", () => {
 
   let cb58str: string = "MBcQpm1PsdfBKYscN3AYP56MusRDMZGF9"
   let cb58buf: string = bintools.bufferToB58(bintools.cb58Decode(cb58str))
-  let chex: string = "849c0F8c6d9942a2605517AeaBe00133Cb159f8D"
   let bech: string = bech32.encode(hrp, bech32.toWords(bintools.b58ToBuffer(cb58buf)))
   let binstr: string = "Bx4v7ytutz3"
   let utf8str: string = "I am the very model of a modern Major-General."
@@ -28,8 +27,6 @@ describe("Payload", () => {
   let ipfsstr: string = "QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV"
   let onionstr: string = "https://el33th4xor.onion"
   let magnetstr: string = "magnet:?xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a"
-
-    
 
     test("PayloadTypes", () => {
       expect(() => { payloadTypes.select(867309) }).toThrow()

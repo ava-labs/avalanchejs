@@ -85,11 +85,8 @@ describe('Inputs', (): void => {
 
   test('Input comparator', (): void => {
     const inpt1: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount())
-
     const inpt2: SECPTransferInput = new SECPTransferInput((utxos[1].getOutput() as AmountOutput).getAmount())
-
     const inpt3: SECPTransferInput = new SECPTransferInput((utxos[2].getOutput() as AmountOutput).getAmount())
-
     const cmp = Input.comparator()
     expect(cmp(inpt1, inpt2)).toBe(-1)
     expect(cmp(inpt1, inpt3)).toBe(-1)

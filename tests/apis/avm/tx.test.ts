@@ -23,7 +23,7 @@ import { ExportTx } from 'src/apis/avm/exporttx'
 import { PlatformChainID } from 'src/utils/constants'
 import { Defaults } from 'src/utils/constants'
 import { ONEAVAX } from '../../../src/utils/constants'
-
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 /**
  * @ignore
@@ -87,7 +87,7 @@ describe('Transactions', (): void => {
         denomination: `${denomination}`,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -260,7 +260,6 @@ describe('Transactions', (): void => {
   })
 
   test('Create small BaseTx that is Goose Egg Tx', async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("266")
@@ -280,7 +279,6 @@ describe('Transactions', (): void => {
   })
 
   test('confirm inputTotal, outputTotal and fee are correct', async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
     // AVAX assetID
     const assetID: Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL")
     const outs: TransferableOutput[] = []
@@ -308,7 +306,6 @@ describe('Transactions', (): void => {
 
 
   test("Create small BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("267")
@@ -328,7 +325,6 @@ describe('Transactions', (): void => {
   })
 
   test('Create large BaseTx that is Goose Egg Tx', async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("609555500000")
@@ -348,7 +344,6 @@ describe('Transactions', (): void => {
   })
 
   test("Create large BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("44995609555500000")

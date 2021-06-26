@@ -327,7 +327,7 @@ describe('UTXOSet', (): void => {
       })
 
       test('unknown merge rule', (): void => {
-        expect(() => {
+        expect((): void => {
           set.mergeByRule(setA, 'ERROR')
         }).toThrow()
         const setArray: UTXO[] = setG.getAllUTXOs()

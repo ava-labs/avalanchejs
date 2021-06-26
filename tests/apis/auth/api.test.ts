@@ -1,4 +1,5 @@
 import mockAxios from 'jest-mock-axios'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 import { Avalanche } from 'src'
 import { AuthAPI } from 'src/apis/auth/api'
 
@@ -12,9 +13,7 @@ describe('Auth', (): void => {
   // We think we're a Rick, but we're totally a Jerry.
   let password: string = "Weddings are basically funerals with a cake. -- Rich Sanchez"
   let newPassword: string = "Sometimes science is more art than science, Morty. -- Rich Sanchez"
-
   let testToken: string = "To live is to risk it all otherwise you're just an inert chunk of randomly assembled molecules drifting wherever the universe blows you. -- Rick Sanchez"
-
   let testEndpoints: string[] = ["/ext/opt/bin/bash/foo", "/dev/null", "/tmp"]
 
   beforeAll((): void => {
@@ -32,7 +31,7 @@ describe('Auth', (): void => {
         token: testToken,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -50,7 +49,7 @@ describe('Auth', (): void => {
         success: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -69,7 +68,7 @@ describe('Auth', (): void => {
         success: false,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 

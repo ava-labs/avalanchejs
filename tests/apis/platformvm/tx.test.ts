@@ -17,7 +17,7 @@ import { BaseTx } from 'src/apis/platformvm/basetx'
 import { ImportTx } from 'src/apis/platformvm/importtx'
 import { ExportTx } from 'src/apis/platformvm/exporttx'
 import { PlatformChainID } from 'src/utils/constants'
-
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 /**
  * @ignore
@@ -62,10 +62,8 @@ describe('Transactions', (): void => {
   let avaxAssetID: Buffer
 
   beforeAll(async (): Promise<void> => {
-    
     avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, null, true)
     api = new PlatformVMAPI(avalanche, '/ext/bc/P')
-
     const result: Promise<Buffer> = api.getAVAXAssetID()
     const payload:object = {
       result: {
@@ -75,7 +73,7 @@ describe('Transactions', (): void => {
         denomination: `${denomination}`,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 

@@ -9,16 +9,10 @@ const bintools: BinTools = BinTools.getInstance()
 
 describe('UTXO', (): void => {
   const utxohex: string = '000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d'
-  const outputhex: string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d'
   const outputidx: string = '00000001'
   const outtxid: string = '38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5'
   const outaid: string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558'
-  const opaddr: string = 'FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG'
-  const opamt: string = '4dd5'
-  const oplocktime: string = '00'
   const utxobuff: Buffer = Buffer.from(utxohex, 'hex')
-
-  const otheraddr: string = 'MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8'
 
   // Payment
   const OPUTXOstr: string = bintools.cb58Encode(utxobuff)
@@ -48,8 +42,7 @@ describe('UTXO', (): void => {
   describe('Funtionality', (): void => {
     const u1: UTXO = new UTXO()
     u1.fromBuffer(utxobuff)
-    const u1hex: string = u1.toBuffer().toString('hex')
-    test('getAssetID NonCA', () => {
+    test('getAssetID NonCA', (): void => {
       const assetid: Buffer = u1.getAssetID()
       expect(assetid.toString('hex', 0, assetid.length)).toBe(outaid)
     })
@@ -170,7 +163,7 @@ describe('UTXOSet', (): void => {
   describe('Functionality', (): void => {
     let set: UTXOSet
     let utxos: UTXO[]
-    beforeEach(() => {
+    beforeEach((): void => {
       set = new UTXOSet()
       set.addArray(utxostrs)
       utxos = set.getAllUTXOs()
@@ -320,7 +313,7 @@ describe('UTXOSet', (): void => {
       })
 
       test('unknown merge rule', (): void => {
-        expect(() => {
+        expect((): void => {
           set.mergeByRule(setA, 'ERROR')
         }).toThrow()
         const setArray: UTXO[] = setG.getAllUTXOs()

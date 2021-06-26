@@ -9,6 +9,7 @@ import { MetricsAPI } from "src/apis/metrics/api"
 import { PlatformVMAPI } from "src/apis/platformvm/api"
 import { TestAPI } from './testlib'
 import { AxiosRequestConfig } from 'axios'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 describe('Avalanche', (): void => {
   const blockchainid: string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
@@ -147,7 +148,7 @@ describe('HTTP Operations', (): void => {
         output: input,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
     mockAxios.mockResponse(responseObj)
@@ -169,7 +170,7 @@ describe('HTTP Operations', (): void => {
         output: input,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
     mockAxios.mockResponse(responseObj)
@@ -187,7 +188,7 @@ describe('HTTP Operations', (): void => {
         output: input,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
     mockAxios.mockResponse(responseObj)
@@ -205,7 +206,7 @@ describe('HTTP Operations', (): void => {
         output: input,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
     mockAxios.mockResponse(responseObj)
@@ -223,7 +224,7 @@ describe('HTTP Operations', (): void => {
         output: input,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
     mockAxios.mockResponse(responseObj)

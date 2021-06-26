@@ -3,6 +3,7 @@ import mockAxios from 'jest-mock-axios'
 import { Avalanche } from 'src'
 import BinTools from 'src/utils/bintools'
 import { HealthAPI } from 'src/apis/health/api'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 /**
  * @ignore
@@ -42,7 +43,7 @@ describe('Health', (): void => {
         healthy: true,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
