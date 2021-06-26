@@ -53,7 +53,7 @@ export class MinterSet extends Serializable{
         return this.minters;
     }
 
-  protected _cleanAddresses = (addresses: Array<string | Buffer>): Buffer[] => {
+  protected _cleanAddresses = (addresses: string[] | Buffer[]): Buffer[] => {
     let addrs: Buffer[] = [];
         for(let i:number = 0; i < addresses.length; i++) {
             if(typeof addresses[i] === "string") {
@@ -70,7 +70,7 @@ export class MinterSet extends Serializable{
      * @param threshold The number of signatures required to mint more of an asset by signing a minting transaction
      * @param minters Array of addresss which are authorized to sign a minting transaction
      */
-    constructor(threshold:number, minters:Array<string|Buffer>) {
+  constructor(threshold: number, minters: string[] | Buffer[]) {
         super();
         this.threshold = threshold;
         this.minters = this._cleanAddresses(minters);

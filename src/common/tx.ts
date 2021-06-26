@@ -47,9 +47,9 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   protected networkid:Buffer = Buffer.alloc(4);
   protected blockchainid:Buffer = Buffer.alloc(32);
   protected numouts:Buffer = Buffer.alloc(4);
-  protected outs:Array<StandardTransferableOutput>;
+  protected outs: StandardTransferableOutput[];
   protected numins:Buffer = Buffer.alloc(4);
-  protected ins:Array<StandardTransferableInput>;
+  protected ins: StandardTransferableInput[];
   protected memo: Buffer = Buffer.alloc(0);
 
   /**
@@ -70,17 +70,17 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Returns the array of [[StandardTransferableInput]]s
    */
-  abstract getIns():Array<StandardTransferableInput>;
+  abstract getIns(): StandardTransferableInput[];
 
   /**
    * Returns the array of [[StandardTransferableOutput]]s
    */
-  abstract getOuts():Array<StandardTransferableOutput>;
+  abstract getOuts(): StandardTransferableOutput[];
 
   /**
    * Returns the array of combined total [[StandardTransferableOutput]]s
    */
-  abstract getTotalOuts():Array<StandardTransferableOutput>;
+  abstract getTotalOuts(): StandardTransferableOutput[];
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo 
@@ -151,7 +151,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<StandardTransferableOutput> = undefined, ins:Array<StandardTransferableInput> = undefined, memo:Buffer = undefined) {
+  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), outs: StandardTransferableOutput[] = undefined, ins: StandardTransferableInput[] = undefined, memo: Buffer = undefined) {
     super();
     this.networkid.writeUInt32BE(networkid, 0);
     this.blockchainid = blockchainid;
@@ -213,7 +213,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
    * Returns the inputTotal as a BN 
    */
   getInputTotal = (assetID:Buffer):BN=> {
-    const ins:Array<StandardTransferableInput> = this.getTransaction().getIns();
+    const ins: StandardTransferableInput[] = this.getTransaction().getIns();
     const aIDHex:string = assetID.toString('hex');
     let total:BN = new BN(0);
 
@@ -233,7 +233,7 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
    * Returns the outputTotal as a BN
    */
   getOutputTotal = (assetID:Buffer):BN => {
-    const outs:Array<StandardTransferableOutput> = this.getTransaction().getTotalOuts();
+    const outs: StandardTransferableOutput[] = this.getTransaction().getTotalOuts();
     const aIDHex:string = assetID.toString('hex');
     let total:BN = new BN(0);
 

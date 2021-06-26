@@ -1386,14 +1386,14 @@ export class AVMAPI extends JRPCAPI {
    * @returns Promise for the string representing the transaction's ID.
    */
   sendMultiple = async (username:string, password:string, 
-      sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, 
+    sendOutputs: { assetID: string | Buffer, amount: number | BN, to: string }[],
     from: string[] | Buffer[] = undefined,
       changeAddr:string = undefined, 
       memo:string | Buffer = undefined
     ):Promise<{txID: string, changeAddr: string}> => {
     let asset:string;
     let amnt:BN;
-    let sOutputs:Array<{assetID:string, amount:string, to:string}> = [];
+    let sOutputs: { assetID: string, amount: string, to: string }[] = [];
 
     sendOutputs.forEach((output) => {
       if (typeof this.parseAddress(output.to) === 'undefined') {

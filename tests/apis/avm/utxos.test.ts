@@ -74,7 +74,7 @@ describe('UTXO', (): void => {
   });
 });
 
-const setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXOSet>):boolean => {
+const setMergeTester = (input: UTXOSet, equal: UTXOSet[], notEqual: UTXOSet[]): boolean => {
   const instr:string = JSON.stringify(input.getUTXOIDs().sort());
   for (let i:number = 0; i < equal.length; i++) {
     if (JSON.stringify(equal[i].getUTXOIDs().sort()) != instr) {

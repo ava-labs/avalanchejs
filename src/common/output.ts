@@ -118,7 +118,7 @@ export class OutputOwners extends Serializable {
   protected locktime:Buffer = Buffer.alloc(8);
   protected threshold:Buffer = Buffer.alloc(4);
   protected numaddrs:Buffer = Buffer.alloc(4);
-  protected addresses:Array<Address> = [];
+  protected addresses: Address[] = [];
 
   /**
    * Returns the threshold of signers required to spend this output.
@@ -287,7 +287,7 @@ export class OutputOwners extends Serializable {
   constructor(addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined) {
     super();
     if(typeof addresses !== "undefined" && addresses.length) {
-      const addrs:Array<Address> = [];
+      const addrs: Address[] = [];
       for (let i = 0; i < addresses.length; i++) {
         addrs[i] = new Address();
         addrs[i].fromBuffer(addresses[i]);

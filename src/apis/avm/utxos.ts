@@ -216,7 +216,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       return new InsufficientFundsError('Error - UTXOSet.getMinimumSpendable: insufficient '
       + 'funds to create the transaction');
     }
-    const amounts:Array<AssetAmount> = aad.getAmounts();
+    const amounts: AssetAmount[] = aad.getAmounts();
     const zero:BN = new BN(0);
     for(let i = 0; i < amounts.length; i++) {
       const assetKey:string = amounts[i].getAssetIDString();
@@ -484,7 +484,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       blockchainid:Buffer, 
     fromAddresses: Buffer[],
     changeAddresses: Buffer[],
-      minterSets:Array<MinterSet>,
+    minterSets: MinterSet[],
       name:string, 
       symbol:string,
       fee:BN = undefined,

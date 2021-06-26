@@ -1170,7 +1170,7 @@ describe('AVMAPI', (): void => {
 
     test('buildCreateNFTAssetTx', async (): Promise<void> => {
       avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]));
-      let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
+      let minterSets: MinterSet[] = [new MinterSet(1, addrs1)];
       let locktime:BN = new BN(0);
 
       let txu1:UnsignedTx = await avm.buildCreateNFTAssetTx(

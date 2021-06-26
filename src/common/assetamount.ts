@@ -107,7 +107,7 @@ export class AssetAmount {
 }
 
 export abstract class StandardAssetAmountDestination<TO extends StandardTransferableOutput, TI extends StandardTransferableInput>  {
-  protected amounts: Array<AssetAmount> = [];
+  protected amounts: AssetAmount[] = [];
   protected destinations: Buffer[] = [];
   protected senders: Buffer[] = [];
   protected changeAddresses: Buffer[] = [];
@@ -136,7 +136,7 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
     this.change.push(output);
   }
 
-  getAmounts = (): Array<AssetAmount> => {
+  getAmounts = (): AssetAmount[] => {
     return this.amounts;
   }
 

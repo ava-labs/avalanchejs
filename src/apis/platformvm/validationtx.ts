@@ -267,7 +267,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
 
 
     sign(msg:Buffer, kc:KeyChain):Credential[] {
-        let creds:Array<SECPCredential> = super.sign(msg, kc);
+        let creds:SECPCredential[] = super.sign(msg, kc);
         const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
         for(let i = 0; i  < this.subnetAuth.length ; i++) {
             if(!kc.hasKey(this.subnetAuth[i])) {

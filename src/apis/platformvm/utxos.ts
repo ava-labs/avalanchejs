@@ -342,7 +342,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     // assetAmounts is an array of asset descriptions and how much is left to
     // spend for them.
-    const assetAmounts: Array<AssetAmount> = aad.getAmounts();
+    const assetAmounts: AssetAmount[] = aad.getAmounts();
     assetAmounts.forEach((assetAmount: AssetAmount) => {
       // change is the amount that should be returned back to the source of the
       // funds.
@@ -355,7 +355,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       const assetID: Buffer = assetAmount.getAssetID();
       const assetKey: string = assetAmount.getAssetIDString();
-      const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
+      const lockedOutputs: StakeableLockOut[] = outs[assetKey].lockedStakeable;
       lockedOutputs.forEach((lockedOutput: StakeableLockOut, i: number) => {
         const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
         const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();

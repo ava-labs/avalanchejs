@@ -172,7 +172,7 @@ export class TransferableOperation extends Serializable {
   }
 
   protected assetid:Buffer = Buffer.alloc(32);
-  protected utxoIDs:Array<UTXOID> = [];
+  protected utxoIDs: UTXOID[] = [];
   protected operation:Operation;
 
   /**
@@ -191,7 +191,7 @@ export class TransferableOperation extends Serializable {
   /**
    * Returns an array of UTXOIDs in this operation.
    */
-  getUTXOIDs = ():Array<UTXOID> => this.utxoIDs;
+  getUTXOIDs = (): UTXOID[] => this.utxoIDs;
 
   /**
    * Returns the operation
@@ -236,7 +236,7 @@ export class TransferableOperation extends Serializable {
     return Buffer.concat(barr, bsize);
   }
 
-  constructor(assetid:Buffer = undefined, utxoids:Array<UTXOID|string|Buffer> = undefined, operation:Operation = undefined) {
+  constructor(assetid: Buffer = undefined, utxoids: UTXOID[] | string[] | Buffer[] = undefined, operation: Operation = undefined) {
     super();
     if (
       typeof assetid !== 'undefined' && assetid.length === AVMConstants.ASSETIDLEN

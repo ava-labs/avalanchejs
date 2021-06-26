@@ -118,7 +118,7 @@ export abstract class Credential extends Serializable{
     });
   }
 
-  protected sigArray:Array<Signature> = [];
+  protected sigArray: Signature[] = [];
 
   abstract getCredentialID():number;
   setCodecID(codecID: number):void {};
@@ -162,7 +162,7 @@ export abstract class Credential extends Serializable{
 
   abstract select(id:number, ...args:any[]):Credential;
 
-  constructor(sigarray:Array<Signature> = undefined) {
+  constructor(sigarray: Signature[] = undefined) {
     super();
     if (typeof sigarray !== 'undefined') {
       /* istanbul ignore next */

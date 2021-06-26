@@ -263,8 +263,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of StandardUTXOs which were added.
      */
-  addArray(utxos:Array<string | UTXOClass>, overwrite:boolean = false):Array<StandardUTXO> {
-    const added:Array<UTXOClass> = [];
+  addArray(utxos: string[] | UTXOClass[], overwrite: boolean = false): StandardUTXO[] {
+    const added: UTXOClass[] = [];
     for (let i = 0; i < utxos.length; i++) {
       let result:UTXOClass = this.add(utxos[i], overwrite);
       if (typeof result !== 'undefined') {
@@ -316,8 +316,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of UTXOs which were removed.
      */
-  removeArray = (utxos:Array<string | UTXOClass>):Array<UTXOClass> => {
-    const removed:Array<UTXOClass> = [];
+  removeArray = (utxos: string[] | UTXOClass[]): UTXOClass[] => {
+    const removed: UTXOClass[] = [];
     for (let i = 0; i < utxos.length; i++) {
       const result:UTXOClass = this.remove(utxos[i]);
       if (typeof result !== 'undefined') {
@@ -343,8 +343,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of [[StandardUTXO]]s.
      */
-  getAllUTXOs = (utxoids: string[] = undefined): Array<UTXOClass> => {
-    let results:Array<UTXOClass> = [];
+  getAllUTXOs = (utxoids: string[] = undefined): UTXOClass[] => {
+    let results: UTXOClass[] = [];
     if (typeof utxoids !== 'undefined' && Array.isArray(utxoids)) {
       for (let i = 0; i < utxoids.length; i++) {
         if (utxoids[i] in this.utxos && !(utxoids[i] in results)) {
@@ -427,7 +427,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      */
   getBalance = (addresses: Buffer[], assetID: Buffer | string, asOf: BN = undefined): BN => {
     const utxoids: string[] = this.getUTXOIDs(addresses);
-    const utxos:Array<StandardUTXO> = this.getAllUTXOs(utxoids);
+    const utxos: StandardUTXO[] = this.getAllUTXOs(utxoids);
     let spend:BN = new BN(0);
     let asset:Buffer;
     if (typeof assetID === 'string') {
@@ -476,7 +476,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
 
   filter(args:any[], lambda:(utxo:UTXOClass, ...largs:any[]) => boolean):this {
     let newset:this = this.clone();
-    let utxos:Array<UTXOClass> = this.getAllUTXOs();
+    let utxos: UTXOClass[] = this.getAllUTXOs();
     for(let i = 0; i < utxos.length; i++){
       if(lambda(utxos[i], ...args) === false) {
         newset.remove(utxos[i]);
@@ -495,8 +495,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      */
   merge = (utxoset: this, hasUTXOIDs: string[] = undefined): this => {
     const results:this = this.create();
-    const utxos1:Array<UTXOClass> = this.getAllUTXOs(hasUTXOIDs);
-    const utxos2:Array<UTXOClass> = utxoset.getAllUTXOs(hasUTXOIDs);
+    const utxos1: UTXOClass[] = this.getAllUTXOs(hasUTXOIDs)
+    const utxos2: UTXOClass[] = utxoset.getAllUTXOs(hasUTXOIDs);
     const process = (utxo:UTXOClass) => {
       results.add(utxo);
     };
