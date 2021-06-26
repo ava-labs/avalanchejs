@@ -20,8 +20,8 @@ import { CodecIdError,
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class representing an unsigned Import transaction.
@@ -35,13 +35,13 @@ export class ImportTx extends BaseTx {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "sourceChain": serializer.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
+      "sourceChain": serialization.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
       "importIns": this.importIns.map((i) => i.serialize(encoding))
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.sourceChain = serializer.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
+    this.sourceChain = serialization.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
     this.importIns = fields["importIns"].map((i:object) => {
       let ii:TransferableInput = new TransferableInput();
       ii.deserialize(i, encoding);

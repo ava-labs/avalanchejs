@@ -13,14 +13,13 @@ import { KeyChain, KeyPair } from './keychain';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { BaseTx } from './basetx';
 import { DefaultNetworkID } from '../../utils/constants';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SerializedEncoding } from '../../utils/serialization';
 import { CodecIdError, OperationError } from '../../utils/errors';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Class representing an unsigned Operation transaction.

@@ -19,8 +19,8 @@ import { DelegationFeeError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Abstract class representing an transactions with validation information.
@@ -33,16 +33,16 @@ export abstract class ValidatorTx extends BaseTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "nodeID":serializer.encoder(this.nodeID, encoding, "Buffer", "nodeID"),
-            "startTime":serializer.encoder(this.startTime, encoding, "Buffer", "decimalString"),
-            "endTime":serializer.encoder(this.endTime, encoding, "Buffer", "decimalString")
+          "nodeID": serialization.encoder(this.nodeID, encoding, "Buffer", "nodeID"),
+          "startTime": serialization.encoder(this.startTime, encoding, "Buffer", "decimalString"),
+          "endTime": serialization.encoder(this.endTime, encoding, "Buffer", "decimalString")
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        this.nodeID = serializer.decoder(fields["nodeID"], encoding, "nodeID", "Buffer", 20);
-        this.startTime = serializer.decoder(fields["startTime"], encoding, "decimalString", "Buffer", 8);
-        this.endTime = serializer.decoder(fields["endTime"], encoding, "decimalString", "Buffer", 8);
+      this.nodeID = serialization.decoder(fields["nodeID"], encoding, "nodeID", "Buffer", 20)
+      this.startTime = serialization.decoder(fields["startTime"], encoding, "decimalString", "Buffer", 8)
+      this.endTime = serialization.decoder(fields["endTime"], encoding, "decimalString", "Buffer", 8);
     }
 
     protected nodeID:Buffer = Buffer.alloc(20);
@@ -127,12 +127,12 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "weight": serializer.encoder(this.weight, encoding, "Buffer", "decimalString")
+          "weight": serialization.encoder(this.weight, encoding, "Buffer", "decimalString")
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        this.weight = serializer.decoder(fields["weight"], encoding, "decimalString", "Buffer", 8);
+      this.weight = serialization.decoder(fields["weight"], encoding, "decimalString", "Buffer", 8);
     }
 
     protected weight:Buffer = Buffer.alloc(8);
@@ -481,12 +481,12 @@ export class AddValidatorTx extends AddDelegatorTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "delegationFee": serializer.encoder(this.getDelegationFeeBuffer(), encoding, "Buffer", "decimalString", 4)
+          "delegationFee": serialization.encoder(this.getDelegationFeeBuffer(), encoding, "Buffer", "decimalString", 4)
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        let dbuff:Buffer = serializer.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
+      let dbuff: Buffer = serialization.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
         this.delegationFee = dbuff.readUInt32BE(0) / AddValidatorTx.delegatorMultiplier;
     }
 

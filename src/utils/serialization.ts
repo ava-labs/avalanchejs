@@ -115,6 +115,15 @@ export class Serialization {
         return Serialization.instance;
     }
 
+
+  /**
+   * An [[Output]] class which contains an NFT mint for an assetID.
+   *
+   * @param groupID A number specifies the group this NFT is issued to
+   * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
+   * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+   */
     bufferToType(vb:Buffer, type:SerializedType, ...args:Array<any>):any {
         if(type === "BN") {
             return new BN(vb.toString("hex"), "hex");
@@ -208,31 +217,31 @@ export class Serialization {
   }
 
 
-    decoder(value:string, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
-        if(typeof value === "undefined"){
-            throw new UnknownTypeError("Error - Serializable.decoder: value passed is undefined");
-        }
-        if(encoding !== "display") {
-            intype = encoding;
-        } 
-        let vb:Buffer = this.typeToBuffer(value, intype, ...args);
-        return this.bufferToType(vb, outtype, ...args);
+  decoder(value: string, encoding: SerializedEncoding, intype: SerializedType, outtype: SerializedType, ...args: any[]): any {
+    if (typeof value === "undefined") {
+      throw new UnknownTypeError("Error - Serializable.decoder: value passed is undefined")
     }
+    if (encoding !== "display") {
+      intype = encoding
+    }
+    const vb: Buffer = this.typeToBuffer(value, intype, ...args)
+    return this.bufferToType(vb, outtype, ...args)
+  }
 
-    serialize(serialize:Serializable, vm:string, encoding:SerializedEncoding = "display", notes:string = undefined):object {
-        if(typeof notes === "undefined"){
-            notes = serialize.getTypeName();
-        }
-        return {
-            vm,
-            encoding,
-            version: SERIALIZATIONVERSION,
-            notes,
-            fields: serialize.serialize(encoding)
-        }
+  serialize(serialize: Serializable, vm: string, encoding: SerializedEncoding = "display", notes: string = undefined): object {
+    if (typeof notes === "undefined") {
+      notes = serialize.getTypeName()
     }
+    return {
+      vm,
+      encoding,
+      version: SERIALIZATIONVERSION,
+      notes,
+      fields: serialize.serialize(encoding)
+    }
+  }
 
-    deserialize(input:object, output:Serializable) {
-        output.deserialize(input["fields"], input["encoding"]);
-    }
+  deserialize(input: object, output: Serializable) {
+    output.deserialize(input["fields"], input["encoding"])
+  }
 }

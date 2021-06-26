@@ -12,7 +12,7 @@ import { Serialization, SerializedType } from '../utils/serialization'
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 /**

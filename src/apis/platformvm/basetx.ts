@@ -13,13 +13,12 @@ import { StandardBaseTx } from '../../common/tx';
 import { Signature, SigIdx, Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
 import { SelectTxClass } from '../platformvm/tx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SerializedEncoding } from '../../utils/serialization';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
 /**
  * Class representing a base for all transactions.

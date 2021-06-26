@@ -28,8 +28,8 @@ import { ONEAVAX } from '../../../src/utils/constants';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-describe('Transactions', () => {
+const bintools: BinTools = BinTools.getInstance()
+describe('Transactions', (): void => {
   let set:UTXOSet;
   let keymgr1:KeyChain;
   let keymgr2:KeyChain;
@@ -74,7 +74,7 @@ describe('Transactions', () => {
   const denomination:number = 8;
   let avaxAssetID:Buffer;
 
-  beforeAll(async () => {
+  beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(ip, port, protocol, netid, undefined, undefined, null, true);
     api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid);
 
@@ -95,7 +95,7 @@ describe('Transactions', () => {
     avaxAssetID = await result;
   });
 
-  beforeEach(() => {
+  beforeEach((): void => {
     set = new UTXOSet();
     keymgr1 = new KeyChain(avalanche.getHRP(), alias);
     keymgr2 = new KeyChain(avalanche.getHRP(), alias);
@@ -164,7 +164,7 @@ describe('Transactions', () => {
     set.addArray(utxos);
   });
 
-  test("BaseTx codecIDs", () => {
+  test("BaseTx codecIDs", (): void => {
     const baseTx: BaseTx = new BaseTx();
     expect(baseTx.getCodecID()).toBe(codecID_zero);
     expect(baseTx.getTypeID()).toBe(AVMConstants.BASETX);
@@ -178,12 +178,12 @@ describe('Transactions', () => {
 
   test("Invalid BaseTx codecID", (): void => {
     const baseTx: BaseTx = new BaseTx();
-    expect(() => {
+    expect((): void => {
       baseTx.setCodecID(2)
     }).toThrow("Error - BaseTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
-  test("CreateAssetTx codecIDs", () => {
+  test("CreateAssetTx codecIDs", (): void => {
     const createAssetTx: CreateAssetTx = new CreateAssetTx();
     expect(createAssetTx.getCodecID()).toBe(codecID_zero);
     expect(createAssetTx.getTypeID()).toBe(AVMConstants.CREATEASSETTX);
@@ -197,12 +197,12 @@ describe('Transactions', () => {
 
   test("Invalid CreateAssetTx codecID", (): void => {
     const createAssetTx: CreateAssetTx = new CreateAssetTx();
-    expect(() => {
+    expect((): void => {
       createAssetTx.setCodecID(2)
     }).toThrow("Error - CreateAssetTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
-  test("OperationTx codecIDs", () => {
+  test("OperationTx codecIDs", (): void => {
     const operationTx: OperationTx = new OperationTx();
     expect(operationTx.getCodecID()).toBe(codecID_zero);
     expect(operationTx.getTypeID()).toBe(AVMConstants.OPERATIONTX);
@@ -216,12 +216,12 @@ describe('Transactions', () => {
 
   test("Invalid OperationTx codecID", (): void => {
     const operationTx: OperationTx = new OperationTx();
-    expect(() => {
+    expect((): void => {
       operationTx.setCodecID(2)
     }).toThrow("Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
-  test("ImportTx codecIDs", () => {
+  test("ImportTx codecIDs", (): void => {
     const importTx: ImportTx = new ImportTx();
     expect(importTx.getCodecID()).toBe(codecID_zero);
     expect(importTx.getTypeID()).toBe(AVMConstants.IMPORTTX);
@@ -235,12 +235,12 @@ describe('Transactions', () => {
 
   test("Invalid ImportTx codecID", (): void => {
     const importTx: ImportTx = new ImportTx();
-    expect(() => {
+    expect((): void => {
       importTx.setCodecID(2)
     }).toThrow("Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
-  test("ExportTx codecIDs", () => {
+  test("ExportTx codecIDs", (): void => {
     const exportTx: ExportTx = new ExportTx();
     expect(exportTx.getCodecID()).toBe(codecID_zero);
     expect(exportTx.getTypeID()).toBe(AVMConstants.EXPORTTX);
@@ -254,12 +254,12 @@ describe('Transactions', () => {
 
   test("Invalid ExportTx codecID", (): void => {
     const exportTx: ExportTx = new ExportTx();
-    expect(() => {
+    expect((): void => {
       exportTx.setCodecID(2)
     }).toThrow("Error - ExportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });
 
-  test('Create small BaseTx that is Goose Egg Tx', async () => {
+  test('Create small BaseTx that is Goose Egg Tx', async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance();
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
@@ -279,7 +279,7 @@ describe('Transactions', () => {
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true);
   });
 
-  test('confirm inputTotal, outputTotal and fee are correct', async () => {
+  test('confirm inputTotal, outputTotal and fee are correct', async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance();
     // AVAX assetID
     const assetID:Buffer = bintools.cb58Decode("n8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL");
@@ -307,7 +307,7 @@ describe('Transactions', () => {
   });
 
 
-  test("Create small BaseTx that isn't Goose Egg Tx", async () => {
+  test("Create small BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance();
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
@@ -327,7 +327,7 @@ describe('Transactions', () => {
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true);
   });
 
-  test('Create large BaseTx that is Goose Egg Tx', async () => {
+  test('Create large BaseTx that is Goose Egg Tx', async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance();
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
@@ -347,7 +347,7 @@ describe('Transactions', () => {
     expect(await api.checkGooseEgg(unsignedTx)).toBe(false);
   });
 
-  test("Create large BaseTx that isn't Goose Egg Tx", async () => {
+  test("Create large BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance();
     const outs:TransferableOutput[] = [];
     const ins:TransferableInput[] = [];
@@ -367,7 +367,7 @@ describe('Transactions', () => {
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true);
   });
 
-  test('Creation UnsignedTx', () => {
+  test('Creation UnsignedTx', (): void => {
     const baseTx:BaseTx = new BaseTx(netid, blockchainID, outputs, inputs);
     const txu:UnsignedTx = new UnsignedTx(baseTx);
     const txins:Array<TransferableInput> = txu.getTransaction().getIns();
@@ -402,8 +402,8 @@ describe('Transactions', () => {
     expect(txunew.toString()).toBe(txu.toString());
   });
 
-  test('Creation UnsignedTx Check Amount', () => {
-    expect(() => {
+  test('Creation UnsignedTx Check Amount', (): void => {
+    expect((): void => {
       set.buildBaseTx(
         netid, blockchainID,
         ONEAVAX.mul(new BN(amnt * 10000)), assetID,
@@ -412,7 +412,7 @@ describe('Transactions', () => {
     }).toThrow();
   });
 
-  test('CreateAssetTX', () => {
+  test('CreateAssetTX', (): void => {
     const secpbase1:SECPTransferOutput = new SECPTransferOutput(new BN(777), addrs3, locktime, 1);
     const secpbase2:SECPTransferOutput = new SECPTransferOutput(new BN(888), addrs2, locktime, 1);
     const secpbase3:SECPTransferOutput = new SECPTransferOutput(new BN(999), addrs2, locktime, 1);
@@ -463,7 +463,7 @@ describe('Transactions', () => {
     expect(txunew.toString()).toBe(txu.toString());
   });
 
-  test('Creation OperationTx', () => {
+  test('Creation OperationTx', (): void => {
     const optx:OperationTx = new OperationTx(
       netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), ops,
     );
@@ -475,12 +475,12 @@ describe('Transactions', () => {
     expect(optx.getOperations().length).toBe(ops.length);
   });
 
-  test('Creation ImportTx', () => {
+  test('Creation ImportTx', (): void => {
     const bombtx:ImportTx = new ImportTx(
       netid, blockchainID,  outputs, inputs, new UTF8Payload("hello world").getPayload(), undefined, importIns
     );
 
-    expect(() => {
+    expect((): void => {
       bombtx.toBuffer();
     }).toThrow();
 
@@ -496,12 +496,12 @@ describe('Transactions', () => {
     expect(importtx.getImportInputs().length).toBe(importIns.length);
   });
 
-  test('Creation ExportTx', () => {
+  test('Creation ExportTx', (): void => {
     const bombtx:ExportTx = new ExportTx(
       netid, blockchainID, outputs, inputs, undefined, undefined, exportOuts
     );
 
-    expect(() => {
+    expect((): void => {
       bombtx.toBuffer();
     }).toThrow();
 
@@ -517,7 +517,7 @@ describe('Transactions', () => {
     expect(exporttx.getExportOutputs().length).toBe(exportOuts.length);
   });
 
-  test('Creation Tx1 with asof, locktime, threshold', () => {
+  test('Creation Tx1 with asof, locktime, threshold', (): void => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
       new BN(9000), assetID, addrs3, addrs1, addrs1, undefined, undefined, undefined,
@@ -530,7 +530,7 @@ describe('Transactions', () => {
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
     expect(tx2.toString()).toBe(tx.toString());
   });
-  test('Creation Tx2 without asof, locktime, threshold', () => {
+  test('Creation Tx2 without asof, locktime, threshold', (): void => {
     const txu:UnsignedTx = set.buildBaseTx(
       netid, blockchainID,
       new BN(9000), assetID,
@@ -543,7 +543,7 @@ describe('Transactions', () => {
     expect(tx2.toString()).toBe(tx.toString());
   });
 
-  test('Creation Tx3 using OperationTx', () => {
+  test('Creation Tx3 using OperationTx', (): void => {
     const txu:UnsignedTx = set.buildNFTTransferTx(
       netid, blockchainID, 
       addrs3, addrs1, addrs2, nftutxoids, new BN(90), avaxAssetID, undefined,
@@ -555,7 +555,7 @@ describe('Transactions', () => {
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
   });
 
-  test('Creation Tx4 using ImportTx', () => {
+  test('Creation Tx4 using ImportTx', (): void => {
     const txu:UnsignedTx = set.buildImportTx(
       netid, blockchainID, addrs3, addrs1, addrs2, importUTXOs, bintools.cb58Decode(PlatformChainID), new BN(90), assetID,
       new UTF8Payload("hello world").getPayload(), UnixNow());
@@ -565,7 +565,7 @@ describe('Transactions', () => {
     expect(tx2.toBuffer().toString('hex')).toBe(tx.toBuffer().toString('hex'));
   });
 
-  test('Creation Tx5 using ExportTx', () => {
+  test('Creation Tx5 using ExportTx', (): void => {
     const txu:UnsignedTx = set.buildExportTx(
       netid, blockchainID, new BN(90), avaxAssetID,
       addrs3, addrs1, addrs2, bintools.cb58Decode(PlatformChainID), 
@@ -576,5 +576,4 @@ describe('Transactions', () => {
     tx2.fromBuffer(tx.toBuffer());
     expect(tx.toBuffer().toString('hex')).toBe(tx2.toBuffer().toString('hex'));
   });
-
 });

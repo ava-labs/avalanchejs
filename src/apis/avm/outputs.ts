@@ -10,8 +10,8 @@ import { Output, StandardAmountOutput, StandardTransferableOutput, BaseNFTOutput
 import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import { OutputIdError, CodecIdError } from '../../utils/errors';
 
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -266,12 +266,12 @@ export class NFTTransferOutput extends NFTOutput {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex", this.payload.length)
+      "payload": serialization.encoder(this.payload, encoding, "Buffer", "hex", this.payload.length)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
+    this.payload = serialization.decoder(fields["payload"], encoding, "hex", "Buffer");
     this.sizePayload = Buffer.alloc(4);
     this.sizePayload.writeUInt32BE(this.payload.length, 0);
   }

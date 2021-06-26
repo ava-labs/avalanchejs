@@ -4,11 +4,11 @@ import BinTools from 'src/utils/bintools';
 import { SECPTransferOutput, SelectOutputClass } from 'src/apis/platformvm/outputs';
 import { Output } from 'src/common/output';
 
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
-describe('Outputs', () => {
+describe('Outputs', (): void => {
 
-    describe('SECPTransferOutput', () => {
+  describe('SECPTransferOutput', (): void => {
       let addrs:Array<Buffer> = [
           bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
           bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
@@ -19,7 +19,7 @@ describe('Outputs', () => {
       let addrpay = [addrs[0], addrs[1]];
       let fallLocktime:BN = locktime.add(new BN(50));
 
-      test('SelectOutputClass', () => {
+      test('SelectOutputClass', (): void => {
           let goodout:SECPTransferOutput = new SECPTransferOutput(new BN(2600), addrpay, fallLocktime, 1);
           let outpayment:Output = SelectOutputClass(goodout.getOutputID());
           expect(outpayment).toBeInstanceOf(SECPTransferOutput);
@@ -28,7 +28,7 @@ describe('Outputs', () => {
           }).toThrow("Error - SelectOutputClass: unknown outputid");
       });
 
-      test('comparator', () => {
+      test('comparator', (): void => {
           let outpayment1:Output = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
           let outpayment2:Output = new SECPTransferOutput(new BN(10001), addrs, locktime, 3);
           let outpayment3:Output = new SECPTransferOutput(new BN(9999), addrs, locktime, 3);
@@ -40,7 +40,7 @@ describe('Outputs', () => {
           expect(cmp(outpayment1, outpayment3)).toBe(1);
       });
 
-      test('SECPTransferOutput', () => {
+      test('SECPTransferOutput', (): void => {
           let out:SECPTransferOutput = new SECPTransferOutput(new BN(10000), addrs, locktime, 3);
           expect(out.getOutputID()).toBe(7);
           expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(JSON.stringify(addrs.sort()));

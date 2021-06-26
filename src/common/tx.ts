@@ -15,8 +15,8 @@ import { Serializable, Serialization, SerializedEncoding } from '../utils/serial
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class representing a base for all transactions.
@@ -29,19 +29,19 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "networkid": serializer.encoder(this.networkid, encoding, "Buffer", "decimalString"),
-      "blockchainid": serializer.encoder(this.blockchainid, encoding, "Buffer", "cb58"),
+      "networkid": serialization.encoder(this.networkid, encoding, "Buffer", "decimalString"),
+      "blockchainid": serialization.encoder(this.blockchainid, encoding, "Buffer", "cb58"),
       "outs": this.outs.map((o) => o.serialize(encoding)),
       "ins": this.ins.map((i) => i.serialize(encoding)),
-      "memo": serializer.encoder(this.memo, encoding, "Buffer", "hex")
+      "memo": serialization.encoder(this.memo, encoding, "Buffer", "hex")
     }
   };
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.networkid = serializer.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4);
-    this.blockchainid = serializer.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32);
-    this.memo = serializer.decoder(fields["memo"], encoding, "hex", "Buffer");
+    this.networkid = serialization.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4)
+    this.blockchainid = serialization.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32)
+    this.memo = serialization.decoder(fields["memo"], encoding, "hex", "Buffer");
   }
 
   protected networkid:Buffer = Buffer.alloc(4);
@@ -182,14 +182,14 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "codecid": serializer.encoder(this.codecid, encoding, "number", "decimalString", 2),
+      "codecid": serialization.encoder(this.codecid, encoding, "number", "decimalString", 2),
       "transaction": this.transaction.serialize(encoding)
     };
   };
 
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "number");
+    this.codecid = serialization.decoder(fields["codecid"], encoding, "decimalString", "number");
   }
 
   protected codecid:number = 0;

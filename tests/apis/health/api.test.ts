@@ -7,25 +7,24 @@ import { HealthAPI } from 'src/apis/health/api';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
-describe('Health', () => {
-  const ip = '127.0.0.1';
-  const port = 9650;
-  const protocol = 'https';
-
-  const avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
+describe('Health', (): void => {
+  const ip: string = '127.0.0.1'
+  const port: number = 9650
+  const protocol: string = 'https'
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
   let health:HealthAPI;
 
-  beforeAll(() => {
+  beforeAll((): void => {
     health = new HealthAPI(avalanche);
   });
 
-  afterEach(() => {
+  afterEach((): void => {
     mockAxios.reset();
   });
 
-  test('getLiveness ', async () => {
+  test('getLiveness ', async (): Promise<void> => {
     const result:Promise<object> = health.getLiveness();
     const payload:any = {
       result: {

@@ -15,14 +15,13 @@ import { CreateAssetTx } from './createassettx';
 import { OperationTx } from './operationtx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SerializedEncoding } from '../../utils/serialization';
 import { TransactionError } from '../../utils/errors';
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
 /**
  * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.

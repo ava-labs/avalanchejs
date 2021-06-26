@@ -4,18 +4,11 @@
  */
 
 import { AxiosRequestConfig } from 'axios';
-import BinTools from '../utils/bintools';
 import AvalancheCore from '../avalanche';
 import { APIBase, RequestResponseData } from './apibase';
 
-/**
- * @ignore
- */
-const bintools = BinTools.getInstance();
-
 export class RESTAPI extends APIBase {
-  protected contentType:string;
-
+  protected contentType: string;
   protected acceptType:string;
 
   protected prepHeaders = (contentType?:string, acceptType?:string):object => {

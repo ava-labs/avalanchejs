@@ -15,8 +15,9 @@ import { Output } from 'src/common/output';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-describe('Inputs', () => {
+const bintools: BinTools = BinTools.getInstance()
+
+describe('Inputs', (): void => {
   let set:UTXOSet;
   let keymgr1:KeyChain;
   let keymgr2:KeyChain;
@@ -27,7 +28,7 @@ describe('Inputs', () => {
   const amnt:number = 10000;
   const codecID_zero: number = 0;
   const codecID_one: number = 1;
-  beforeEach(() => {
+  beforeEach((): void => {
     set = new UTXOSet();
     keymgr1 = new KeyChain(hrp, 'X');
     keymgr2 = new KeyChain(hrp, 'X');
@@ -55,7 +56,7 @@ describe('Inputs', () => {
     }
     set.addArray(utxos);
   });
-  test('SECPInput', () => {
+  test('SECPInput', (): void => {
     let u:UTXO;
     let txid:Buffer;
     let txidx:Buffer;
@@ -82,7 +83,7 @@ describe('Inputs', () => {
     expect(newin.getSigIdxs().toString()).toBe(input.getSigIdxs().toString());
   });
 
-  test('Input comparator', () => {
+  test('Input comparator', (): void => {
     const inpt1:SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
 
     const inpt2:SECPTransferInput = new SECPTransferInput((utxos[1].getOutput() as AmountOutput).getAmount());
@@ -97,7 +98,7 @@ describe('Inputs', () => {
     expect(cmp(inpt3, inpt3)).toBe(0);
   });
 
-  test('TransferableInput comparator', () => {
+  test('TransferableInput comparator', (): void => {
     const inpt1:SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
     const in1:TransferableInput = new TransferableInput(utxos[0].getTxID(), utxos[0].getOutputIdx(), utxos[0].getAssetID(), inpt1);
 
@@ -129,7 +130,7 @@ describe('Inputs', () => {
 
   test("Invalid SECPTransferInput codecID", (): void => {
     const secpTransferInput: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
-    expect(() => {
+    expect((): void => {
       secpTransferInput.setCodecID(2)
     }).toThrow("Error - SECPTransferInput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.");
   });

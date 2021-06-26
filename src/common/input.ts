@@ -11,8 +11,8 @@ import { Serializable, Serialization, SerializedEncoding } from '../utils/serial
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 export abstract class Input extends Serializable {
   protected _typeName = "Input";
@@ -176,16 +176,16 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
-      "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
-      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "txid": serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
+      "outputidx": serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
+      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58"),
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
-    this.outputidx = serializer.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4);
-    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.txid = serialization.decoder(fields["txid"], encoding, "cb58", "Buffer", 32)
+    this.outputidx = serialization.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4)
+    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
     //input deserialization must be implmented in child classes
   }
 
@@ -273,12 +273,12 @@ export abstract class StandardAmountInput extends Input {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString", 8)
+      "amount": serialization.encoder(this.amount, encoding, "Buffer", "decimalString", 8)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.amount = serializer.decoder(fields["amount"], encoding, "decimalString", "Buffer", 8);
+    this.amount = serialization.decoder(fields["amount"], encoding, "decimalString", "Buffer", 8);
     this.amountValue = bintools.fromBufferToBN(this.amount);
   }
 

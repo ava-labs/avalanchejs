@@ -30,8 +30,8 @@ import { UTXOError,
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for representing a single UTXO.
@@ -121,17 +121,17 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     super.deserialize(fields, encoding);
     let utxos = {};
     for (let utxoid in fields["utxos"]) {
-      let utxoidCleaned: string = serializer.decoder(utxoid, encoding, "base58", "base58");
+      let utxoidCleaned: string = serialization.decoder(utxoid, encoding, "base58", "base58");
       utxos[utxoidCleaned] = new UTXO();
       utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding);
     }
     let addressUTXOs = {};
     for (let address in fields["addressUTXOs"]) {
-      let addressCleaned: string = serializer.decoder(address, encoding, "cb58", "hex");
+      let addressCleaned: string = serialization.decoder(address, encoding, "cb58", "hex");
       let utxobalance = {};
       for (let utxoid in fields["addressUTXOs"][address]) {
-        let utxoidCleaned: string = serializer.decoder(utxoid, encoding, "base58", "base58");
-        utxobalance[utxoidCleaned] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
+        let utxoidCleaned: string = serialization.decoder(utxoid, encoding, "base58", "base58")
+        utxobalance[utxoidCleaned] = serialization.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
       }
       addressUTXOs[addressCleaned] = utxobalance;
     }

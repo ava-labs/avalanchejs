@@ -16,8 +16,8 @@ import { CodecIdError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 export class CreateAssetTx extends BaseTx {
   protected _typeName = "CreateAssetTx";
@@ -28,17 +28,17 @@ export class CreateAssetTx extends BaseTx {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "name": serializer.encoder(this.name, encoding, "utf8", "utf8"),
-      "symbol": serializer.encoder(this.symbol, encoding, "utf8", "utf8"),
-      "denomination": serializer.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
+      "name": serialization.encoder(this.name, encoding, "utf8", "utf8"),
+      "symbol": serialization.encoder(this.symbol, encoding, "utf8", "utf8"),
+      "denomination": serialization.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
       "initialstate": this.initialstate.serialize(encoding)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.name = serializer.decoder(fields["name"], encoding, "utf8", "utf8");
-    this.symbol = serializer.decoder(fields["symbol"], encoding, "utf8", "utf8");
-    this.denomination = serializer.decoder(fields["denomination"], encoding, "decimalString", "Buffer", 1);
+    this.name = serialization.decoder(fields["name"], encoding, "utf8", "utf8")
+    this.symbol = serialization.decoder(fields["symbol"], encoding, "utf8", "utf8")
+    this.denomination = serialization.decoder(fields["denomination"], encoding, "decimalString", "Buffer", 1);
     this.initialstate = new InitialStates();
     this.initialstate.deserialize(fields["initialstate"], encoding);
   }

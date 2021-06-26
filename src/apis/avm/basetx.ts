@@ -19,8 +19,8 @@ import { CodecIdError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
@@ -44,8 +44,8 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
       newIn.deserialize(i, encoding);
       return newIn;
     });
-    this.numouts = serializer.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4);
-    this.numins = serializer.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
+    this.numouts = serialization.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4)
+    this.numins = serialization.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
   }
 
   getOuts():Array<TransferableOutput> {

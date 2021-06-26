@@ -16,8 +16,8 @@ import { EVMInput } from 'src/apis/evm';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-describe('Inputs', () => {
+const bintools: BinTools = BinTools.getInstance()
+describe('Inputs', (): void => {
   let set: UTXOSet;
   let keymgr1: KeyChain;
   let keymgr2: KeyChain;
@@ -26,7 +26,7 @@ describe('Inputs', () => {
   let utxos: UTXO[];
   let hrp: string = "tests";
   const amnt: number = 10000;
-  beforeEach(() => {
+  beforeEach((): void => {
     set = new UTXOSet();
     keymgr1 = new KeyChain(hrp, 'C');
     keymgr2 = new KeyChain(hrp, 'C');
@@ -54,7 +54,7 @@ describe('Inputs', () => {
     }
     set.addArray(utxos);
   });
-  test('SECPInput', () => {
+  test('SECPInput', (): void => {
     let u: UTXO;
     let txid: Buffer;
     let txidx: Buffer;
@@ -81,7 +81,7 @@ describe('Inputs', () => {
     expect(newin.getSigIdxs().toString()).toBe(input.getSigIdxs().toString());
   });
 
-  test('Input comparator', () => {
+  test('Input comparator', (): void => {
     const inpt1: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
 
     const inpt2: SECPTransferInput = new SECPTransferInput((utxos[1].getOutput() as AmountOutput).getAmount());
@@ -96,7 +96,7 @@ describe('Inputs', () => {
     expect(cmp(inpt3, inpt3)).toBe(0);
   });
 
-  test('TransferableInput comparator', () => {
+  test('TransferableInput comparator', (): void => {
     const inpt1: SECPTransferInput = new SECPTransferInput((utxos[0].getOutput() as AmountOutput).getAmount());
     const in1: TransferableInput = new TransferableInput(utxos[0].getTxID(), utxos[0].getOutputIdx(), utxos[0].getAssetID(), inpt1);
 
@@ -114,7 +114,7 @@ describe('Inputs', () => {
     expect(cmp(in3, in3)).toBe(0);
   });
 
-  test('EVMInput comparator', () => {
+  test('EVMInput comparator', (): void => {
     let inputs: EVMInput[] = [];
     const address1: string = "0x55ee05dF718f1a5C1441e76190EB1a19eE2C9430";
     const address3: string = "0x9632a79656af553F58738B0FB750320158495942";

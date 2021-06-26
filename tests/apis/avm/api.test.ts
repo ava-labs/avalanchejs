@@ -27,15 +27,15 @@ import { Serializable, Serialization, SerializedType } from 'src/utils/serializa
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 const dumpSerailization:boolean = false;
 
 function serialzeit(aThing:Serializable, name:string){
   if(dumpSerailization){
-    console.log(JSON.stringify(serializer.serialize(aThing, "avm", "hex", name + " -- Hex Encoded")));
-    console.log(JSON.stringify(serializer.serialize(aThing, "avm", "display", name + " -- Human-Readable")));
+    console.log(JSON.stringify(serialization.serialize(aThing, "avm", "hex", name + " -- Hex Encoded")))
+    console.log(JSON.stringify(serialization.serialize(aThing, "avm", "display", name + " -- Human-Readable")));
   }
 }
 
@@ -1576,7 +1576,7 @@ test("import", async ()=>{
         set, 
         amount, 
         bintools.cb58Decode(PlatformChainID),
-        addrbuff3.map((a) => serializer.bufferToType(a, type, avalanche.getHRP(), "P")),
+        addrbuff3.map((a) => serialization.bufferToType(a, type, avalanche.getHRP(), "P")),
         addrs1, 
         addrs2,
         new UTF8Payload("hello world"), UnixNow()

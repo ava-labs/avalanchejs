@@ -5,69 +5,63 @@ import { UTXO, UTXOSet } from 'src/apis/platformvm/utxos';
 import { AmountOutput } from 'src/apis/platformvm/outputs';
 import { UnixNow } from 'src/utils/helperfunctions';
 
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
-describe('UTXO', () => {
-  const utxohex:string = '000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d';
-  const outputhex:string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d';
+describe('UTXO', (): void => {
+  const utxohex: string = '000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d';
   const outputidx:string = '00000001';
   const outtxid:string = '38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5';
-  const outaid:string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558';
-  const opaddr:string = 'FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG';
-  const opamt:string = '4dd5';
-  const oplocktime:string = '00';
+  const outaid: string = '3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558';
   const utxobuff:Buffer = Buffer.from(utxohex, 'hex');
-
-  const otheraddr:string = 'MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8';
 
   // Payment
   const OPUTXOstr:string = bintools.cb58Encode(utxobuff);
   // "U9rFgK5jjdXmV8k5tpqeXkimzrN3o9eCCcXesyhMBBZu9MQJCDTDo5Wn5psKvzJVMJpiMbdkfDXkp7sKZddfCZdxpuDmyNy7VFka19zMW4jcz6DRQvNfA2kvJYKk96zc7uizgp3i2FYWrB8mr1sPJ8oP9Th64GQ5yHd8";
 
   // implies fromString and fromBuffer
-  test('Creation', () => {
+  test('Creation', (): void => {
     const u1:UTXO = new UTXO();
     u1.fromBuffer(utxobuff);
     const u1hex:string = u1.toBuffer().toString('hex');
     expect(u1hex).toBe(utxohex);
   });
 
-  test('Empty Creation', () => {
+  test('Empty Creation', (): void => {
     const u1:UTXO = new UTXO();
     expect(() => {
       u1.toBuffer();
     }).toThrow();
   });
 
-  test('Creation of Type', () => {
+  test('Creation of Type', (): void => {
     const op:UTXO = new UTXO();
     op.fromString(OPUTXOstr);
     expect(op.getOutput().getOutputID()).toBe(7);
   });
 
-  describe('Funtionality', () => {
+  describe('Funtionality', (): void => {
     const u1:UTXO = new UTXO();
     u1.fromBuffer(utxobuff);
     const u1hex:string = u1.toBuffer().toString('hex');
-    test('getAssetID NonCA', () => {
+    test('getAssetID NonCA', (): void => {
       const assetid:Buffer = u1.getAssetID();
       expect(assetid.toString('hex', 0, assetid.length)).toBe(outaid);
     });
-    test('getTxID', () => {
+    test('getTxID', (): void => {
       const txid:Buffer = u1.getTxID();
       expect(txid.toString('hex', 0, txid.length)).toBe(outtxid);
     });
-    test('getOutputIdx', () => {
+    test('getOutputIdx', (): void => {
       const txidx:Buffer = u1.getOutputIdx();
       expect(txidx.toString('hex', 0, txidx.length)).toBe(outputidx);
     });
-    test('getUTXOID', () => {
+    test('getUTXOID', (): void => {
       const txid:Buffer = Buffer.from(outtxid, 'hex');
       const txidx:Buffer = Buffer.from(outputidx, 'hex');
       const utxoid:string = bintools.bufferToB58(Buffer.concat([txid, txidx]));
       expect(u1.getUTXOID()).toBe(utxoid);
     });
-    test('toString', () => {
+    test('toString', (): void => {
       const serialized:string = u1.toString();
       expect(serialized).toBe(bintools.cb58Encode(utxobuff));
     });
@@ -90,7 +84,7 @@ const setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXO
   return true;
 };
 
-describe('UTXOSet', () => {
+describe('UTXOSet', (): void => {
   const utxostrs:Array<string> = [
     bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex')),
     bintools.cb58Encode(Buffer.from('0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
@@ -100,7 +94,7 @@ describe('UTXOSet', () => {
     bintools.cb58Decode('FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG'),
     bintools.cb58Decode('MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8'),
   ];
-  test('Creation', () => {
+  test('Creation', (): void => {
     const set:UTXOSet = new UTXOSet();
     set.add(utxostrs[0]);
     const utxo:UTXO = new UTXO();
@@ -110,31 +104,20 @@ describe('UTXOSet', () => {
 
   });
 
-  test('Serialization', () => {
+  test('Serialization', (): void => {
     const set:UTXOSet = new UTXOSet();
     set.addArray([...utxostrs]);
     let setobj:object = set.serialize("cb58");
-    let setstr:string = JSON.stringify(setobj);
-    /*
-    console.log("-----SET1 JSON-----");
-    console.log(setstr);
-    console.log("-----SET1 ENDN-----");
-    */
+    let setstr: string = JSON.stringify(setobj);
     let set2newobj:object = JSON.parse(setstr);
     let set2:UTXOSet = new UTXOSet();
     set2.deserialize(set2newobj, "cb58");
     let set2obj:object = set2.serialize("cb58");
-    let set2str:string = JSON.stringify(set2obj);
-    /*
-    console.log("-----SET2 JSON-----");
-    console.log(set2str);
-    console.log("-----SET2 ENDN-----");
-    */
-
+    let set2str: string = JSON.stringify(set2obj);
     expect(set2.getAllUTXOStrings().sort().join(',')).toBe(set.getAllUTXOStrings().sort().join(','));
   });
 
-  test('Mutliple add', () => {
+  test('Mutliple add', (): void => {
     const set:UTXOSet = new UTXOSet();
     // first add
     for (let i:number = 0; i < utxostrs.length; i++) {
@@ -150,7 +133,7 @@ describe('UTXOSet', () => {
     }
   });
 
-  test('addArray', () => {
+  test('addArray', (): void => {
     const set:UTXOSet = new UTXOSet();
     set.addArray(utxostrs);
     for (let i:number = 0; i < utxostrs.length; i++) {
@@ -180,7 +163,7 @@ describe('UTXOSet', () => {
     r.deserialize(t);
   });
 
-  test('overwriting UTXO', () => {
+  test('overwriting UTXO', (): void => {
     const set:UTXOSet = new UTXOSet();
     set.addArray(utxostrs);
     const testutxo:UTXO = new UTXO();
@@ -191,7 +174,7 @@ describe('UTXOSet', () => {
     expect(set.addArray(utxostrs, false).length).toBe(0);
   });
 
-  describe('Functionality', () => {
+  describe('Functionality', (): void => {
     let set:UTXOSet;
     let utxos:Array<UTXO>;
     beforeEach(() => {
@@ -200,7 +183,7 @@ describe('UTXOSet', () => {
       utxos = set.getAllUTXOs();
     });
 
-    test('remove', () => {
+    test('remove', (): void => {
       const testutxo:UTXO = new UTXO();
       testutxo.fromString(utxostrs[0]);
       expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
@@ -209,7 +192,7 @@ describe('UTXOSet', () => {
       expect(set.remove(utxostrs[0]).toString()).toBe(testutxo.toString());
     });
 
-    test('removeArray', () => {
+    test('removeArray', (): void => {
       const testutxo:UTXO = new UTXO();
       testutxo.fromString(utxostrs[0]);
       expect(set.removeArray(utxostrs).length).toBe(3);
@@ -220,14 +203,14 @@ describe('UTXOSet', () => {
       expect(set.removeArray(utxos).length).toBe(3);
     });
 
-    test('getUTXOIDs', () => {
+    test('getUTXOIDs', (): void => {
       const uids:Array<string> = set.getUTXOIDs();
       for (let i:number = 0; i < utxos.length; i++) {
         expect(uids.indexOf(utxos[i].getUTXOID())).not.toBe(-1);
       }
     });
 
-    test('getAllUTXOs', () => {
+    test('getAllUTXOs', (): void => {
       const allutxos:Array<UTXO> = set.getAllUTXOs();
       const ustrs:Array<string> = [];
       for (let i:number = 0; i < allutxos.length; i++) {
@@ -247,7 +230,7 @@ describe('UTXOSet', () => {
       }
     });
 
-    test('getUTXOIDs By Address', () => {
+    test('getUTXOIDs By Address', (): void => {
       let utxoids:Array<string>;
       utxoids = set.getUTXOIDs([addrs[0]]);
       expect(utxoids.length).toBe(1);
@@ -257,7 +240,7 @@ describe('UTXOSet', () => {
       expect(utxoids.length).toBe(3);
     });
 
-    test('getAllUTXOStrings', () => {
+    test('getAllUTXOStrings', (): void => {
       const ustrs:Array<string> = set.getAllUTXOStrings();
       for (let i:number = 0; i < utxostrs.length; i++) {
         expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
@@ -269,11 +252,11 @@ describe('UTXOSet', () => {
       }
     });
 
-    test('getAddresses', () => {
+    test('getAddresses', (): void => {
       expect(set.getAddresses().sort()).toStrictEqual(addrs.sort());
     });
 
-    test('getBalance', () => {
+    test('getBalance', (): void => {
       let balance1:BN;
       let balance2:BN;
       balance1 = new BN(0);
@@ -296,7 +279,7 @@ describe('UTXOSet', () => {
       expect(balance1.toString()).toBe(balance2.toString());
     });
 
-    test('getAssetIDs', () => {
+    test('getAssetIDs', (): void => {
       const assetIDs:Array<Buffer> = set.getAssetIDs();
       for (let i:number = 0; i < utxos.length; i++) {
         expect(assetIDs).toContain(utxos[i].getAssetID());
@@ -305,7 +288,7 @@ describe('UTXOSet', () => {
       expect(set.getAssetIDs(addresses)).toEqual(set.getAssetIDs());
     });
 
-    describe('Merge Rules', () => {
+    describe('Merge Rules', (): void => {
       let setA:UTXOSet;
       let setB:UTXOSet;
       let setC:UTXOSet;
@@ -317,7 +300,7 @@ describe('UTXOSet', () => {
       // Take-or-Leave
       const newutxo:string = bintools.cb58Encode(Buffer.from('0000acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626', 'hex'));
 
-      beforeEach(() => {
+      beforeEach((): void => {
         setA = new UTXOSet();
         setA.addArray([utxostrs[0], utxostrs[2]]);
 
@@ -343,14 +326,14 @@ describe('UTXOSet', () => {
         setH.addArray([newutxo]); // set with only a new element
       });
 
-      test('unknown merge rule', () => {
+      test('unknown merge rule', (): void => {
         expect(() => {
           set.mergeByRule(setA, 'ERROR');
         }).toThrow();
         const setArray:Array<UTXO> = setG.getAllUTXOs();
       });
 
-      test('intersection', () => {
+      test('intersection', (): void => {
         let results:UTXOSet;
         let test:boolean;
 
@@ -371,7 +354,7 @@ describe('UTXOSet', () => {
         expect(test).toBe(true);
       });
 
-      test('differenceSelf', () => {
+      test('differenceSelf', (): void => {
         let results:UTXOSet;
         let test:boolean;
 
@@ -392,7 +375,7 @@ describe('UTXOSet', () => {
         expect(test).toBe(true);
       });
 
-      test('differenceNew', () => {
+      test('differenceNew', (): void => {
         let results:UTXOSet;
         let test:boolean;
 
@@ -413,7 +396,7 @@ describe('UTXOSet', () => {
         expect(test).toBe(true);
       });
 
-      test('symDifference', () => {
+      test('symDifference', (): void => {
         let results:UTXOSet;
         let test:boolean;
 
@@ -434,7 +417,7 @@ describe('UTXOSet', () => {
         expect(test).toBe(true);
       });
 
-      test('union', () => {
+      test('union', (): void => {
         let results:UTXOSet;
         let test:boolean;
 
@@ -455,7 +438,7 @@ describe('UTXOSet', () => {
         expect(test).toBe(true);
       });
 
-      test('unionMinusNew', () => {
+      test('unionMinusNew', (): void => {
         let results:UTXOSet;
         let test:boolean;
 
@@ -476,7 +459,7 @@ describe('UTXOSet', () => {
         expect(test).toBe(true);
       });
 
-      test('unionMinusSelf', () => {
+      test('unionMinusSelf', (): void => {
         let results:UTXOSet;
         let test:boolean;
 

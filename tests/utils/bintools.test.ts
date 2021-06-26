@@ -2,9 +2,9 @@ import BinTools from 'src/utils/bintools';
 import BN from 'bn.js';
 import { Buffer } from 'buffer/';
 
-const bintools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
-describe('BinTools', () => {
+describe('BinTools', (): void => {
   const hexstr:string = '00112233445566778899aabbccddeeff';
   const hexstr2:string = '0001020304050607080909080706050403020100';
   const hexstr3:string = '0001020304050607080909080706050403020101';
@@ -19,7 +19,7 @@ describe('BinTools', () => {
   const buff3:Buffer = Buffer.from(hexstr3, 'hex');
   const checksum:string = '323e6811';
   const serializedChecksum:string = '148vjpuxYXixb8DcbaWyeDE2fEG'; // serialized hexstr + checksum
-  test('copyFrom conducts a true copy', () => {
+  test('copyFrom conducts a true copy', (): void => {
     const buff:Buffer = Buffer.from(hexstr, 'hex');
     const newbuff:Buffer = bintools.copyFrom(buff, 0, 10);
     expect(newbuff.length).toBe(10);
@@ -36,7 +36,7 @@ describe('BinTools', () => {
     expect(newbuff2.readUInt8(7)).toBe(153);
   });
 
-  test('bufferToString', () => {
+  test('bufferToString', (): void => {
     const bres:string = bintools.bufferToString(Buffer.from(hexbuffstr1, 'hex'));
     expect(bres).toBe(Buffer.from(hexbuffstr1.slice(4), 'hex').toString('utf8'));
     // testing null character edge case
@@ -47,7 +47,7 @@ describe('BinTools', () => {
     expect(bres3).toBe(Buffer.from(hexbuffstr3.slice(4), 'hex').toString('utf8'));
   });
 
-  test('stringToBuffer', () => {
+  test('stringToBuffer', (): void => {
     const bres:Buffer = bintools.stringToBuffer('asdf');
     expect(bres.slice(2).toString()).toBe(Buffer.from(hexbuffstr1.slice(4), 'hex').toString('utf8'));
     // testing null character edge case
@@ -58,7 +58,7 @@ describe('BinTools', () => {
     expect(bres3.slice(2).toString()).toBe(Buffer.from(hexbuffstr3.slice(4), 'hex').toString('utf8'));
   });
 
-  test('bufferToB58', () => {
+  test('bufferToB58', (): void => {
     const b58res:string = bintools.bufferToB58(buff);
     expect(b58res).toBe(b58str);
     // testing null character edge case
@@ -69,8 +69,8 @@ describe('BinTools', () => {
     expect(b58res3).toBe(b58str3);
   });
 
-  test('b58ToBuffer', () => {
-    expect(() => {
+  test('b58ToBuffer', (): void => {
+    expect((): void => {
       bintools.b58ToBuffer('0OO0O not a valid b58 string 0OO0O');
     }).toThrow('Error - Base58.decode: not a valid base58 string');
 
@@ -84,7 +84,7 @@ describe('BinTools', () => {
     expect(buffres3.toString()).toBe(buff3.toString());
   });
 
-  test('fromBufferToArrayBuffer', () => {
+  test('fromBufferToArrayBuffer', (): void => {
     const arrbuff:ArrayBuffer = bintools.fromBufferToArrayBuffer(buff);
     expect(arrbuff.byteLength).toBe(buff.length);
     for (let i:number = 0; i < buff.length; i++) {
@@ -95,7 +95,7 @@ describe('BinTools', () => {
     expect(buff[2]).not.toBe(55);
   });
 
-  test('fromArrayBufferToBuffer', () => {
+  test('fromArrayBufferToBuffer', (): void => {
     const arrbuff:ArrayBuffer = new ArrayBuffer(10);
     for (let i:number = 0; i < 10; i++) {
       arrbuff[i] = i;
@@ -110,12 +110,12 @@ describe('BinTools', () => {
     expect(arrbuff[3]).not.toBe(newbuff[3]);
   });
 
-  test('fromBufferToBN', () => {
+  test('fromBufferToBN', (): void => {
     const bign:BN = bintools.fromBufferToBN(buff);
     expect(bign.toString('hex', hexstr.length)).toBe(hexstr);
   });
 
-  test('fromBNToBuffer', () => {
+  test('fromBNToBuffer', (): void => {
     const bn1:BN = new BN(hexstr, 'hex', 'be');
     const bn2:BN = new BN(hexstr, 'hex', 'be');
     const b1:Buffer = bintools.fromBNToBuffer(bn1);
@@ -128,13 +128,13 @@ describe('BinTools', () => {
     expect(b2.toString('hex')).toBe(hexstr);
   });
 
-  test('addChecksum', () => {
+  test('addChecksum', (): void => {
     const buffchecked:Buffer = bintools.addChecksum(buff);
     expect(buffchecked.length).toBe(buff.length + 4);
     expect(buffchecked.slice(16).toString('hex')).toBe(checksum);
   });
 
-  test('validteChecksum', () => {
+  test('validteChecksum', (): void => {
     const checksummed:string = hexstr + checksum;
     const badsummed:string = `${hexstr}324e7822`;
     expect(bintools.validateChecksum(Buffer.from(checksummed, 'hex'))).toBe(true);
@@ -142,12 +142,12 @@ describe('BinTools', () => {
     expect(bintools.validateChecksum(Buffer.from(badsummed, 'hex'))).toBe(false);
   });
 
-  test('cb58Encode', () => {
+  test('cb58Encode', (): void => {
     const fromBuff:string = bintools.cb58Encode(buff);
     expect(fromBuff).toBe(serializedChecksum);
   });
 
-  test('cb58Decode', () => {
+  test('cb58Decode', (): void => {
     const serbuff:Buffer = bintools.b58ToBuffer(serializedChecksum);
     const dsr1:Buffer = bintools.cb58Decode(serializedChecksum);
     const dsr2:Buffer = bintools.cb58Decode(serbuff);
@@ -193,7 +193,7 @@ describe('BinTools', () => {
     expect(bintools.isHex(invalidHex2)).toBe(false)
   });
 
-  test('stringToAddress', () => {
+  test('stringToAddress', (): void => {
     // Missing prefix
     let addr: string = "-avax13a4ye34zdfa33zeg3udnz533d6msfuqkds9hq7";
     expect((): void => {

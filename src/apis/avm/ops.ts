@@ -10,14 +10,13 @@ import { NBytes } from '../../common/nbytes';
 import { SigIdx } from '../../common/credentials';
 import { OutputOwners } from '../../common/output';
 import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization';
-import { off } from 'process';
 import { InvalidOperationIdError,
          CodecIdError,
          ChecksumError,
          AddressError } from '../../utils/errors';
 
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Operation]] instance.
@@ -155,14 +154,14 @@ export class TransferableOperation extends Serializable {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58", 32),
+      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58", 32),
       "utxoIDs": this.utxoIDs.map((u) => u.serialize(encoding)),
       "operation": this.operation.serialize(encoding)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
     this.utxoIDs = fields["utxoIDs"].map((u:object) => {
       let utxoid:UTXOID = new UTXOID();
       utxoid.deserialize(u, encoding);
@@ -392,15 +391,15 @@ export class NFTMintOperation extends Operation {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "groupID": serializer.encoder(this.groupID, encoding, "Buffer", "decimalString", 4),
-      "payload": serializer.encoder(this.payload, encoding, "Buffer", "hex"),
+      "groupID": serialization.encoder(this.groupID, encoding, "Buffer", "decimalString", 4),
+      "payload": serialization.encoder(this.payload, encoding, "Buffer", "hex"),
       "outputOwners": this.outputOwners.map((o) => o.serialize(encoding))
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.groupID = serializer.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4);
-    this.payload = serializer.decoder(fields["payload"], encoding, "hex", "Buffer");
+    this.groupID = serialization.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4)
+    this.payload = serialization.decoder(fields["payload"], encoding, "hex", "Buffer");
     this.outputOwners = fields["outputOwners"].map((o:object) => {
       let oo:OutputOwners = new OutputOwners();
       oo.deserialize(o, encoding);

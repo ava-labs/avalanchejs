@@ -12,8 +12,7 @@ import { Serializable, Serialization, SerializedEncoding } from '../../utils/ser
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Class for creating initial output states used in asset creation

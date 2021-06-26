@@ -12,8 +12,7 @@ import { InputIdError, CodecIdError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.

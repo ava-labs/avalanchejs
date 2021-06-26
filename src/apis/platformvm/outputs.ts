@@ -10,8 +10,8 @@ import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import BN from 'bn.js';
 import { OutputIdError } from '../../utils/errors';
 
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -132,7 +132,7 @@ export class StakeableLockOut extends AmountOutput {
     let fields:object = super.serialize(encoding);
     let outobj:object = {
       ...fields, //included anywayyyy... not ideal
-      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
+      "stakeableLocktime": serialization.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
       "transferableOutput": this.transferableOutput.serialize(encoding)
     };
     delete outobj["addresses"];
@@ -147,7 +147,7 @@ export class StakeableLockOut extends AmountOutput {
     fields["threshold"] =  "1";
     fields["amount"] = "99";
     super.deserialize(fields, encoding);
-    this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.stakeableLocktime = serialization.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
     this.transferableOutput = new ParseableOutput();
     this.transferableOutput.deserialize(fields["transferableOutput"], encoding);
     this.synchronize();

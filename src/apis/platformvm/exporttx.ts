@@ -17,8 +17,8 @@ import { ChainIdError, TransferableOutputError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 /**
  * Class representing an unsigned Export transaction.
@@ -31,13 +31,13 @@ export class ExportTx extends BaseTx {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "destinationChain": serializer.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
+      "destinationChain": serialization.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
       "exportOuts": this.exportOuts.map((e) => e.serialize(encoding))
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.destinationChain = serializer.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
+    this.destinationChain = serialization.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
     this.exportOuts = fields["exportOuts"].map((e:object) => {
       let eo:TransferableOutput = new TransferableOutput();
       eo.deserialize(e, encoding);
