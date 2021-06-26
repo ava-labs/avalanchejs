@@ -157,7 +157,7 @@ export class Serialization {
         } else if(type === "Buffer") {
             return v;
         } else if(type === "bech32") {
-            return this.bintools.stringToAddress(v);
+          return this.bintools.stringToAddress(v, ...args)
         } else if(type === "nodeID") {
             return NodeIDStringToBuffer(v);
         } else if(type === "privateKey") {
@@ -196,16 +196,16 @@ export class Serialization {
         return undefined;
     }
 
-    encoder(value:any, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):string {
-        if(typeof value === "undefined"){
-            throw new UnknownTypeError("Error - Serializable.encoder: value passed is undefined");
-        }
-        if(encoding !== "display"){
-            outtype = encoding;
-        }
-        let vb:Buffer = this.typeToBuffer(value, intype, ...args);
-        return this.bufferToType(vb, outtype, ...args);
+  encoder(value: any, encoding: SerializedEncoding, intype: SerializedType, outtype: SerializedType, ...args: any[]): any {
+    if (typeof value === "undefined") {
+      throw new UnknownTypeError("Error - Serializable.encoder: value passed is undefined")
     }
+    if (encoding !== "display") {
+      outtype = encoding
+    }
+    const vb: Buffer = this.typeToBuffer(value, intype, ...args)
+    return this.bufferToType(vb, outtype, ...args)
+  }
 
 
     decoder(value:string, encoding:SerializedEncoding, intype:SerializedType, outtype:SerializedType, ...args:Array<any>):any {
