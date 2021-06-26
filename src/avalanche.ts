@@ -216,9 +216,9 @@ export default class AvalancheCore {
    *
    */
   addAPI = <GA extends APIBase>(apiName:string,
-    ConstructorFN: new(avax:AvalancheCore, baseurl?:string, ...args:Array<any>) => GA,
+    ConstructorFN: new (avax: AvalancheCore, baseurl?: string, ...args: any[]) => GA,
     baseurl:string = undefined,
-    ...args:Array<any>) => {
+    ...args: any[]) => {
     if (typeof baseurl === 'undefined') {
       this.apis[apiName] = new ConstructorFN(this, undefined, ...args);
     } else {

@@ -45,17 +45,17 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
     this.numins.writeUInt32BE(this.ins.length, 0);
   }
 
-  getOuts():Array<TransferableOutput> {
-    return this.outs as Array<TransferableOutput>;
+  getOuts(): TransferableOutput[] {
+    return this.outs as TransferableOutput[];
   }
 
-  getIns():Array<TransferableInput> {
-    return this.ins as Array<TransferableInput>;
+  getIns(): TransferableInput[] {
+    return this.ins as TransferableInput[];
   }
 
 
-  getTotalOuts():Array<TransferableOutput> {
-    return this.getOuts() as Array<TransferableOutput>;
+  getTotalOuts(): TransferableOutput[] {
+    return this.getOuts() as TransferableOutput[];
   }
 
   /**
@@ -113,11 +113,11 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = [];
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = [];
     for (let i = 0; i < this.ins.length; i++) {
       const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
+      const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs();
       for (let j = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
@@ -154,7 +154,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, memo:Buffer = undefined) {
+  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined, memo: Buffer = undefined) {
     super(networkid, blockchainid, outs, ins, memo);
   }
 }

@@ -37,7 +37,7 @@ export class MinterSet extends Serializable{
     }
   
     protected threshold:number;
-    protected minters:Array<Buffer> = [];
+  protected minters: Buffer[] = [];
 
     /**
      * Returns the threshold.
@@ -49,12 +49,12 @@ export class MinterSet extends Serializable{
     /**
      * Returns the minters.
      */
-    getMinters = ():Array<Buffer> => {
+  getMinters = (): Buffer[] => {
         return this.minters;
     }
 
-    protected  _cleanAddresses = (addresses:Array<string|Buffer>):Array<Buffer> => {
-        let addrs:Array<Buffer> = [];
+  protected _cleanAddresses = (addresses: Array<string | Buffer>): Buffer[] => {
+    let addrs: Buffer[] = [];
         for(let i:number = 0; i < addresses.length; i++) {
             if(typeof addresses[i] === "string") {
                 addrs.push(bintools.stringToAddress(addresses[i] as string));

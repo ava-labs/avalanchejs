@@ -25,7 +25,7 @@ const serialization: Serialization = Serialization.getInstance();
  *
  * @returns An instance of an [[Operation]]-extended class.
  */
-export const SelectOperationClass = (opid:number, ...args:Array<any>):Operation => {
+export const SelectOperationClass = (opid: number, ...args: any[]): Operation => {
     if(opid === AVMConstants.SECPMINTOPID || opid === AVMConstants.SECPMINTOPID_CODECONE) {
       return new SECPMintOperation(...args);
     } else if(opid === AVMConstants.NFTMINTOPID || opid === AVMConstants.NFTMINTOPID_CODECONE){
@@ -62,7 +62,7 @@ export abstract class Operation extends Serializable{
   }
 
   protected sigCount:Buffer = Buffer.alloc(4);
-  protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
+  protected sigIdxs: SigIdx[] = []; // idxs of signers from utxo
 
   static comparator = ():(a:Operation, b:Operation) => (1|-1|0) => (a:Operation, b:Operation):(1|-1|0) => {
     const aoutid:Buffer = Buffer.alloc(4);
@@ -83,7 +83,7 @@ export abstract class Operation extends Serializable{
   /**
      * Returns the array of [[SigIdx]] for this [[Operation]]
      */
-  getSigIdxs = ():Array<SigIdx> => this.sigIdxs;
+  getSigIdxs = (): SigIdx[] => this.sigIdxs;
 
   /**
    * Returns the credential ID.
@@ -124,7 +124,7 @@ export abstract class Operation extends Serializable{
   toBuffer():Buffer {
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     let bsize:number = this.sigCount.length;
-    const barr:Array<Buffer> = [this.sigCount];
+    const barr: Buffer[] = [this.sigCount];
     for (let i = 0; i < this.sigIdxs.length; i++) {
       const b:Buffer = this.sigIdxs[i].toBuffer();
       barr.push(b);
@@ -219,7 +219,7 @@ export class TransferableOperation extends Serializable {
     const numutxoIDs = Buffer.alloc(4);
     numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0);
     let bsize:number = this.assetid.length + numutxoIDs.length;
-    const barr:Array<Buffer> = [this.assetid, numutxoIDs];
+    const barr: Buffer[] = [this.assetid, numutxoIDs];
     this.utxoIDs = this.utxoIDs.sort(UTXOID.comparator());
     for (let i = 0; i < this.utxoIDs.length; i++) {
       const b:Buffer = this.utxoIDs[i].toBuffer();
@@ -352,7 +352,7 @@ export class SECPMintOperation extends Operation {
       mintoutBuff.length + 
       transferOutBuff.length; 
 
-    let barr:Array<Buffer> = [
+    let barr: Buffer[] = [
       superbuff, 
       mintoutBuff,
       transferOutBuff
@@ -409,7 +409,7 @@ export class NFTMintOperation extends Operation {
 
   protected groupID:Buffer = Buffer.alloc(4);
   protected payload:Buffer;
-  protected outputOwners:Array<OutputOwners> = [];
+  protected outputOwners: OutputOwners[] = [];
 
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
@@ -457,7 +457,7 @@ export class NFTMintOperation extends Operation {
   /**
    * Returns the outputOwners.
    */
-  getOutputOwners = ():Array<OutputOwners> => {
+  getOutputOwners = (): OutputOwners[] => {
     return this.outputOwners;
   }
 
@@ -501,7 +501,7 @@ export class NFTMintOperation extends Operation {
       this.payload.length +
       outputownerslen.length; 
 
-    let barr:Array<Buffer> = [
+    let barr: Buffer[] = [
       superbuff, 
       this.groupID,
       payloadlen,
@@ -532,7 +532,7 @@ export class NFTMintOperation extends Operation {
    * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
    * @param outputOwners An array of outputOwners
    */
-  constructor(groupID:number = undefined, payload:Buffer = undefined, outputOwners:Array<OutputOwners> = undefined){
+  constructor(groupID: number = undefined, payload: Buffer = undefined, outputOwners: OutputOwners[] = undefined) {
     super();
     if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && outputOwners.length) {
       this.groupID.writeUInt32BE((groupID ? groupID : 0), 0);
@@ -610,7 +610,7 @@ export class NFTTransferOperation extends Operation {
     const superbuff:Buffer = super.toBuffer();
     const outbuff:Buffer = this.output.toBuffer();
     const bsize:number = superbuff.length + outbuff.length;
-    const barr:Array<Buffer> = [superbuff, outbuff];
+    const barr: Buffer[] = [superbuff, outbuff];
     return Buffer.concat(barr, bsize);
   }
 

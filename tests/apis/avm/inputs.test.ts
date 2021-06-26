@@ -21,9 +21,9 @@ describe('Inputs', (): void => {
   let set:UTXOSet;
   let keymgr1:KeyChain;
   let keymgr2:KeyChain;
-  let addrs1:Array<Buffer>;
-  let addrs2:Array<Buffer>;
-  let utxos:Array<UTXO>;
+  let addrs1: Buffer[]
+  let addrs2: Buffer[]
+  let utxos: UTXO[];
   let hrp:string = "tests";
   const amnt:number = 10000;
   const codecID_zero: number = 0;
@@ -40,7 +40,7 @@ describe('Inputs', (): void => {
       addrs2.push(keymgr2.makeKey().getAddress());
     }
     const amount:BN = new BN(amnt);
-    const addresses:Array<Buffer> = keymgr1.getAddresses();
+    const addresses: Buffer[] = keymgr1.getAddresses();
     const locktime:BN = new BN(54321);
     const threshold:number = 3;
 

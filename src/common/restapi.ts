@@ -43,7 +43,7 @@ export class RESTAPI extends APIBase {
     return this.core.get(ep, {}, headers, this.axConf()).then((resp:RequestResponseData) => resp);
   };
 
-  post = async (method:string, params?:Array<object> | object, baseurl?:string,
+  post = async (method: string, params?: object[] | object, baseurl?: string,
     contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
     const ep:string = baseurl || this.baseurl;
     const rpc:any = {};
@@ -61,7 +61,7 @@ export class RESTAPI extends APIBase {
   };
 
   put = async (method:string,
-    params?:Array<object> | object,
+    params?: object[] | object,
     baseurl?:string,
     contentType?:string,
     acceptType?:string):Promise<RequestResponseData> => {
@@ -80,7 +80,7 @@ export class RESTAPI extends APIBase {
       .then((resp:RequestResponseData) => resp);
   };
 
-  delete = async (method:string, params?:Array<object> | object, baseurl?:string,
+  delete = async (method: string, params?: object[] | object, baseurl?: string,
     contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
     const ep:string = baseurl || this.baseurl;
     const rpc:any = {};
@@ -96,7 +96,7 @@ export class RESTAPI extends APIBase {
     return this.core.delete(ep, {}, headers, this.axConf()).then((resp:RequestResponseData) => resp);
   };
 
-  patch = async (method:string, params?:Array<object> | object, baseurl?:string,
+  patch = async (method: string, params?: object[] | object, baseurl?: string,
     contentType?:string, acceptType?:string):Promise<RequestResponseData> => {
     const ep:string = baseurl || this.baseurl;
     const rpc:any = {};

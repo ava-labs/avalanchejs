@@ -72,7 +72,7 @@ export class CreateSubnetTx extends BaseTx {
       }
       let typeID:Buffer = Buffer.alloc(4);
       typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0);
-      let barr:Array<Buffer> = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
+    let barr: Buffer[] = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
       return Buffer.concat(barr);
   }
 
@@ -89,8 +89,8 @@ export class CreateSubnetTx extends BaseTx {
   constructor(
     networkid:number = DefaultNetworkID, 
     blockchainid:Buffer = Buffer.alloc(32, 16), 
-    outs:Array<TransferableOutput> = undefined, 
-    ins:Array<TransferableInput> = undefined,
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
     memo:Buffer = undefined,
     subnetOwners:SECPOwnerOutput = undefined
   ) {

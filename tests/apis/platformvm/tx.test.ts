@@ -28,17 +28,17 @@ describe('Transactions', (): void => {
   let keymgr1:KeyChain;
   let keymgr2:KeyChain;
   let keymgr3:KeyChain;
-  let addrs1:Array<Buffer>;
-  let addrs2:Array<Buffer>;
-  let addrs3:Array<Buffer>;
-  let utxos:Array<UTXO>;
-  let inputs:Array<TransferableInput>;
-  let outputs:Array<TransferableOutput>;
-  let importIns:Array<TransferableInput>;
-  let importUTXOs:Array<UTXO>;
-  let exportOuts:Array<TransferableOutput>;
-  let fungutxos:Array<UTXO>;
-  let exportUTXOIDS:Array<string>;
+  let addrs1: Buffer[]
+  let addrs2: Buffer[]
+  let addrs3: Buffer[]
+  let utxos: UTXO[]
+  let inputs: TransferableInput[]
+  let outputs: TransferableOutput[]
+  let importIns: TransferableInput[]
+  let importUTXOs: UTXO[]
+  let exportOuts: TransferableOutput[]
+  let fungutxos: UTXO[]
+  let exportUTXOIDS: string[];
   let api:PlatformVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
@@ -48,8 +48,8 @@ describe('Transactions', (): void => {
   const assetID:Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest());
   const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
   let amount:BN;
-  let addresses:Array<Buffer>;
-  let fallAddresses:Array<Buffer>;
+  let addresses: Buffer[]
+  let fallAddresses: Buffer[];
   let locktime:BN;
   let fallLocktime:BN;
   let threshold:number;
@@ -265,8 +265,8 @@ describe('Transactions', (): void => {
   test('Creation UnsignedTx', (): void => {
     const baseTx:BaseTx = new BaseTx(netid, blockchainID, outputs, inputs);
     const txu:UnsignedTx = new UnsignedTx(baseTx);
-    const txins:Array<TransferableInput> = txu.getTransaction().getIns();
-    const txouts:Array<TransferableOutput> = txu.getTransaction().getOuts();
+    const txins: TransferableInput[] = txu.getTransaction().getIns()
+    const txouts: TransferableOutput[] = txu.getTransaction().getOuts();
     expect(txins.length).toBe(inputs.length);
     expect(txouts.length).toBe(outputs.length);
 
@@ -274,8 +274,8 @@ describe('Transactions', (): void => {
     expect(txu.getTransaction().getNetworkID()).toBe(12345);
     expect(txu.getTransaction().getBlockchainID().toString('hex')).toBe(blockchainID.toString('hex'));
 
-    let a:Array<string> = [];
-    let b:Array<string> = [];
+    let a: string[] = []
+    let b: string[] = [];
     for (let i:number = 0; i < txins.length; i++) {
       a.push(txins[i].toString());
       b.push(inputs[i].toString());

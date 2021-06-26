@@ -20,7 +20,7 @@ const serialization: Serialization = Serialization.getInstance();
  *
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
+export const SelectOutputClass = (outputid: number, ...args: any[]): Output => {
     if(outputid === AVMConstants.SECPXFEROUTPUTID || outputid === AVMConstants.SECPXFEROUTPUTID_CODECONE){
       return new SECPTransferOutput(...args);
     } else if(outputid === AVMConstants.SECPMINTOUTPUTID || outputid === AVMConstants.SECPMINTOUTPUTID_CODECONE){
@@ -224,7 +224,7 @@ export class NFTMintOutput extends NFTOutput {
   toBuffer():Buffer {
       let superbuff:Buffer = super.toBuffer();
       let bsize:number = this.groupID.length + superbuff.length;
-      let barr:Array<Buffer> = [this.groupID, superbuff];
+    let barr: Buffer[] = [this.groupID, superbuff];
       return Buffer.concat(barr,bsize);
   }
 
@@ -246,7 +246,7 @@ export class NFTMintOutput extends NFTOutput {
    * @param threshold A number representing the the threshold number of signers required to sign the transaction
    * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
    */
-  constructor(groupID:number = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined){
+  constructor(groupID: number = undefined, addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined) {
       super(addresses, locktime, threshold);
       if(typeof groupID !== 'undefined') {
           this.groupID.writeUInt32BE(groupID, 0);
@@ -328,7 +328,7 @@ export class NFTTransferOutput extends NFTOutput {
     const superbuff:Buffer = super.toBuffer();
     const bsize:number = this.groupID.length + this.sizePayload.length + this.payload.length + superbuff.length;
     this.sizePayload.writeUInt32BE(this.payload.length, 0);
-    const barr:Array<Buffer> = [this.groupID, this.sizePayload, this.payload, superbuff];
+    const barr: Buffer[] = [this.groupID, this.sizePayload, this.payload, superbuff];
     return Buffer.concat(barr, bsize);
   }
 
@@ -352,7 +352,7 @@ export class NFTTransferOutput extends NFTOutput {
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
 
      */
-  constructor(groupID:number = undefined, payload:Buffer = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined, ) {
+  constructor(groupID: number = undefined, payload: Buffer = undefined, addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined,) {
     super(addresses, locktime, threshold);
     if (typeof groupID !== 'undefined' && typeof payload !== 'undefined') {
       this.groupID.writeUInt32BE(groupID, 0);

@@ -34,18 +34,18 @@ describe('Transactions', (): void => {
   let keymgr1:KeyChain;
   let keymgr2:KeyChain;
   let keymgr3:KeyChain;
-  let addrs1:Array<Buffer>;
-  let addrs2:Array<Buffer>;
-  let addrs3:Array<Buffer>;
-  let utxos:Array<UTXO>;
-  let inputs:Array<TransferableInput>;
-  let outputs:Array<TransferableOutput>;
-  let ops:Array<TransferableOperation>;
-  let importIns:Array<TransferableInput>;
-  let importUTXOs:Array<UTXO>;
-  let exportOuts:Array<TransferableOutput>;
-  let fungutxos:Array<UTXO>;
-  let exportUTXOIDS:Array<string>;
+  let addrs1: Buffer[]
+  let addrs2: Buffer[]
+  let addrs3: Buffer[]
+  let utxos: UTXO[]
+  let inputs: TransferableInput[]
+  let outputs: TransferableOutput[]
+  let ops: TransferableOperation[]
+  let importIns: TransferableInput[]
+  let importUTXOs: UTXO[]
+  let exportOuts: TransferableOutput[]
+  let fungutxos: UTXO[]
+  let exportUTXOIDS: string[];
   let api:AVMAPI;
   const amnt:number = 10000;
   const netid:number = 12345;
@@ -57,13 +57,13 @@ describe('Transactions', (): void => {
   const codecID_zero: number = 0;
   const codecID_one: number = 1;
   let amount:BN;
-  let addresses:Array<Buffer>;
-  let fallAddresses:Array<Buffer>;
+  let addresses: Buffer[]
+  let fallAddresses: Buffer[];
   let locktime:BN;
   let fallLocktime:BN;
   let threshold:number;
   let fallThreshold:number;
-  const nftutxoids:Array<string> = [];
+  const nftutxoids: string[] = [];
   const ip = '127.0.0.1';
   const port = 8080;
   const protocol = 'http';
@@ -370,8 +370,8 @@ describe('Transactions', (): void => {
   test('Creation UnsignedTx', (): void => {
     const baseTx:BaseTx = new BaseTx(netid, blockchainID, outputs, inputs);
     const txu:UnsignedTx = new UnsignedTx(baseTx);
-    const txins:Array<TransferableInput> = txu.getTransaction().getIns();
-    const txouts:Array<TransferableOutput> = txu.getTransaction().getOuts();
+    const txins: TransferableInput[] = txu.getTransaction().getIns()
+    const txouts: TransferableOutput[] = txu.getTransaction().getOuts();
     expect(txins.length).toBe(inputs.length);
     expect(txouts.length).toBe(outputs.length);
 
@@ -379,8 +379,8 @@ describe('Transactions', (): void => {
     expect(txu.getTransaction().getNetworkID()).toBe(12345);
     expect(txu.getTransaction().getBlockchainID().toString('hex')).toBe(blockchainID.toString('hex'));
 
-    let a:Array<string> = [];
-    let b:Array<string> = [];
+    let a: string[] = []
+    let b: string[] = [];
     for (let i:number = 0; i < txins.length; i++) {
       a.push(txins[i].toString());
       b.push(inputs[i].toString());
@@ -424,8 +424,8 @@ describe('Transactions', (): void => {
     const symbol:string = 'RICK';
     const denomination:number = 9;
     const txu:CreateAssetTx = new CreateAssetTx(netid, blockchainID, outputs, inputs, new UTF8Payload("hello world").getPayload(), name, symbol, denomination, initialState);
-    const txins:Array<TransferableInput> = txu.getIns();
-    const txouts:Array<TransferableOutput> = txu.getOuts();
+    const txins: TransferableInput[] = txu.getIns()
+    const txouts: TransferableOutput[] = txu.getOuts();
     const initState:InitialStates = txu.getInitialStates();
     expect(txins.length).toBe(inputs.length);
     expect(txouts.length).toBe(outputs.length);
@@ -440,8 +440,8 @@ describe('Transactions', (): void => {
     expect(txu.getDenomination()).toBe(denomination);
     expect(txu.getDenominationBuffer().readUInt8(0)).toBe(denomination);
 
-    let a:Array<string> = [];
-    let b:Array<string> = [];
+    let a: string[] = []
+    let b: string[] = [];
     for (let i:number = 0; i < txins.length; i++) {
       a.push(txins[i].toString());
       b.push(inputs[i].toString());

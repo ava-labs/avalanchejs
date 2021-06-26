@@ -96,7 +96,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     this.numouts.writeUInt32BE(this.outs.length, 0);
     this.numins.writeUInt32BE(this.ins.length, 0);
     let bsize:number = this.networkid.length + this.blockchainid.length + this.numouts.length;
-    const barr:Array<Buffer> = [this.networkid, this.blockchainid, this.numouts];
+    const barr: Buffer[] = [this.networkid, this.blockchainid, this.numouts];
     for (let i = 0; i < this.outs.length; i++) {
       const b:Buffer = this.outs[i].toBuffer();
       barr.push(b);
@@ -134,7 +134,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
    *
    * @returns An array of [[Credential]]s
    */
-  abstract sign(msg:Buffer, kc:StandardKeyChain<KPClass>):Array<Credential>;
+  abstract sign(msg: Buffer, kc: StandardKeyChain<KPClass>): Credential[];
 
   abstract clone():this;
 
@@ -315,7 +315,7 @@ export abstract class StandardTx<
   };
 
   protected unsignedTx:SUBTx = undefined;
-  protected credentials:Array<Credential> = [];
+  protected credentials: Credential[] = [];
 
   /**
    * Returns the [[StandardUnsignedTx]]
@@ -336,7 +336,7 @@ export abstract class StandardTx<
     let bsize:number = txbuff.length;
     const credlen:Buffer = Buffer.alloc(4);
     credlen.writeUInt32BE(this.credentials.length, 0);
-    const barr:Array<Buffer> = [txbuff, credlen];
+    const barr: Buffer[] = [txbuff, credlen];
     bsize += credlen.length;
     for (let i = 0; i < this.credentials.length; i++) {
       this.credentials[i].setCodecID(codecID);
@@ -382,7 +382,7 @@ export abstract class StandardTx<
    * @param unsignedTx Optional [[StandardUnsignedTx]]
    * @param signatures Optional array of [[Credential]]s
    */
-  constructor(unsignedTx:SUBTx = undefined, credentials:Array<Credential> = undefined) {
+  constructor(unsignedTx: SUBTx = undefined, credentials: Credential[] = undefined) {
     super();
     if (typeof unsignedTx !== 'undefined') {
       this.unsignedTx = unsignedTx;

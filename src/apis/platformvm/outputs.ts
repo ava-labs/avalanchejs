@@ -20,7 +20,7 @@ const serialization: Serialization = Serialization.getInstance()
  *
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
+export const SelectOutputClass = (outputid: number, ...args: any[]): Output => {
     if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
       return new SECPTransferOutput( ...args);
     } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
@@ -210,7 +210,7 @@ export class StakeableLockOut extends AmountOutput {
   toBuffer():Buffer {
     let xferoutBuff:Buffer = this.transferableOutput.toBuffer();
     const bsize:number = this.stakeableLocktime.length + xferoutBuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, xferoutBuff];
+    const barr: Buffer[] = [this.stakeableLocktime, xferoutBuff];
     return Buffer.concat(barr, bsize);
   }
 
@@ -241,7 +241,7 @@ export class StakeableLockOut extends AmountOutput {
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
    * @param transferableOutput A [[ParseableOutput]] which is embedded into this output.
    */
-  constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined, stakeableLocktime:BN = undefined, transferableOutput:ParseableOutput = undefined) {
+  constructor(amount: BN = undefined, addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined, stakeableLocktime: BN = undefined, transferableOutput: ParseableOutput = undefined) {
     super(amount, addresses, locktime, threshold);
     if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);

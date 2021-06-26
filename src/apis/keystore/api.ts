@@ -74,7 +74,7 @@ export class KeystoreAPI extends JRPCAPI {
      *
      * @returns Promise of an array with all user names.
      */
-  listUsers = async ():Promise<Array<string>> => this.callMethod('keystore.listUsers')
+  listUsers = async (): Promise<string[]> => this.callMethod('keystore.listUsers')
     .then((response:RequestResponseData) => response.data.result.users);
 
   /**

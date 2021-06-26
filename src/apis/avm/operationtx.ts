@@ -48,7 +48,7 @@ export class OperationTx extends BaseTx {
   }
 
   protected numOps:Buffer = Buffer.alloc(4);
-  protected ops:Array<TransferableOperation> = [];
+  protected ops: TransferableOperation[] = [];
 
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
@@ -93,7 +93,7 @@ export class OperationTx extends BaseTx {
    */
   toBuffer():Buffer {
       this.numOps.writeUInt32BE(this.ops.length, 0);
-      let barr:Array<Buffer> = [super.toBuffer(), this.numOps];
+    let barr: Buffer[] = [super.toBuffer(), this.numOps];
       this.ops = this.ops.sort(TransferableOperation.comparator());
       for(let i = 0; i < this.ops.length; i++) {
           barr.push(this.ops[i].toBuffer());
@@ -104,7 +104,7 @@ export class OperationTx extends BaseTx {
   /**
    * Returns an array of [[TransferableOperation]]s in this transaction.
    */
-  getOperations():Array<TransferableOperation> {
+  getOperations(): TransferableOperation[] {
     return this.ops;
   }
 
@@ -116,11 +116,11 @@ export class OperationTx extends BaseTx {
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = super.sign(msg, kc);
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = super.sign(msg, kc);
     for (let i = 0; i < this.ops.length; i++) {
       const cred:Credential = SelectCredentialClass(this.ops[i].getOperation().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.ops[i].getOperation().getSigIdxs();
+      const sigidxs: SigIdx[] = this.ops[i].getOperation().getSigIdxs();
       for (let j = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
@@ -155,8 +155,8 @@ export class OperationTx extends BaseTx {
    */
   constructor(
     networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16),
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, ops:Array<TransferableOperation> = undefined
+    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined, ops: TransferableOperation[] = undefined
   ) {
     super(networkid, blockchainid, outs, ins, memo);
     if (typeof ops !== 'undefined' && Array.isArray(ops)) {

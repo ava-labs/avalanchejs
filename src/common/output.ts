@@ -133,8 +133,8 @@ export class OutputOwners extends Serializable {
   /**
    * Returns an array of {@link https://github.com/feross/buffer|Buffer}s for the addresses.
    */
-  getAddresses = ():Array<Buffer> => {
-    const result:Array<Buffer> = [];
+  getAddresses = (): Buffer[] => {
+    const result: Buffer[] = [];
     for (let i = 0; i < this.addresses.length; i++) {
       result.push(this.addresses[i].toBuffer());
     }
@@ -175,14 +175,14 @@ export class OutputOwners extends Serializable {
   /**
    * Given an array of address {@link https://github.com/feross/buffer|Buffer}s and an optional timestamp, returns true if the addresses meet the threshold required to spend the output.
    */
-  meetsThreshold = (addresses:Array<Buffer>, asOf:BN = undefined):boolean => {
+  meetsThreshold = (addresses: Buffer[], asOf: BN = undefined): boolean => {
     let now:BN;
     if (typeof asOf === 'undefined') {
       now = UnixNow();
     } else {
       now = asOf;
     }
-    const qualified:Array<Buffer> = this.getSpenders(addresses, now);
+    const qualified: Buffer[] = this.getSpenders(addresses, now);
     const threshold:number = this.threshold.readUInt32BE(0);
     if (qualified.length >= threshold) {
       return true;
@@ -194,8 +194,8 @@ export class OutputOwners extends Serializable {
   /**
    * Given an array of addresses and an optional timestamp, select an array of address {@link https://github.com/feross/buffer|Buffer}s of qualified spenders for the output.
    */
-  getSpenders = (addresses:Array<Buffer>, asOf:BN = undefined):Array<Buffer> => {
-    const qualified:Array<Buffer> = [];
+  getSpenders = (addresses: Buffer[], asOf: BN = undefined): Buffer[] => {
+    const qualified: Buffer[] = [];
     let now:BN;
     if (typeof asOf === 'undefined') {
       now = UnixNow();
@@ -247,7 +247,7 @@ export class OutputOwners extends Serializable {
     this.addresses.sort(Address.comparator());
     this.numaddrs.writeUInt32BE(this.addresses.length, 0);
     let bsize:number = this.locktime.length + this.threshold.length + this.numaddrs.length;
-    const barr:Array<Buffer> = [this.locktime, this.threshold, this.numaddrs];
+    const barr: Buffer[] = [this.locktime, this.threshold, this.numaddrs];
     for (let i:number = 0; i < this.addresses.length; i++) {
       const b: Buffer = this.addresses[i].toBuffer();
       barr.push(b);
@@ -284,7 +284,7 @@ export class OutputOwners extends Serializable {
    * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
    * @param threshold A number representing the the threshold number of signers required to sign the transaction
    */
-  constructor(addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
+  constructor(addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined) {
     super();
     if(typeof addresses !== "undefined" && addresses.length) {
       const addrs:Array<Address> = [];
@@ -363,7 +363,7 @@ export abstract class StandardParseableOutput extends Serializable {
     const outbuff:Buffer = this.output.toBuffer();
     const outid:Buffer = Buffer.alloc(4);
     outid.writeUInt32BE(this.output.getOutputID(), 0);
-    const barr:Array<Buffer> = [outid, outbuff];
+    const barr: Buffer[] = [outid, outbuff];
     return Buffer.concat(barr, outid.length + outbuff.length);
   }
   
@@ -405,7 +405,7 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
 
   toBuffer():Buffer {
     const parseableBuff:Buffer = super.toBuffer();
-    const barr:Array<Buffer> = [this.assetID, parseableBuff];
+    const barr: Buffer[] = [this.assetID, parseableBuff];
     return Buffer.concat(barr, this.assetID.length + parseableBuff.length);
   }
 
@@ -468,7 +468,7 @@ export abstract class StandardAmountOutput extends Output {
     const superbuff:Buffer = super.toBuffer();
     const bsize:number = this.amount.length + superbuff.length;
     this.numaddrs.writeUInt32BE(this.addresses.length, 0);
-    const barr:Array<Buffer> = [this.amount, superbuff];
+    const barr: Buffer[] = [this.amount, superbuff];
     return Buffer.concat(barr, bsize);
   }
 
@@ -480,7 +480,7 @@ export abstract class StandardAmountOutput extends Output {
    * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
    * @param threshold A number representing the the threshold number of signers required to sign the transaction
    */
-  constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined) {
+  constructor(amount: BN = undefined, addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined) {
     super(addresses, locktime, threshold);
     if (typeof amount !== "undefined") {
       this.amountValue = amount.clone();

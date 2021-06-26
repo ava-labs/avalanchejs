@@ -14,7 +14,7 @@ export class JRPCAPI extends APIBase {
 
   callMethod = async (
     method:string,
-    params?:Array<object> | object,
+    params?: object[] | object,
     baseurl?:string,
     headers?: object
     ):Promise<RequestResponseData> => {

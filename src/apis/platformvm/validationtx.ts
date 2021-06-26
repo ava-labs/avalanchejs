@@ -104,8 +104,8 @@ export abstract class ValidatorTx extends BaseTx {
     constructor(
         networkid:number, 
         blockchainid:Buffer, 
-        outs:Array<TransferableOutput>, 
-        ins:Array<TransferableInput>, 
+      outs: TransferableOutput[],
+      ins: TransferableInput[],
         memo?:Buffer, 
         nodeID?:Buffer, 
         startTime?:BN, 
@@ -182,8 +182,8 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+      outs: TransferableOutput[] = undefined,
+      ins: TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
@@ -201,8 +201,8 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
 
 export class AddSubnetValidatorTx extends WeightedValidatorTx {
     protected subnetID:Buffer = Buffer.alloc(32);
-    protected subnetAddrs:Array<Buffer> = [];
-    protected subnetAuthIdxs:Array<Buffer> = [];
+    protected subnetAddrs:Buffer[] = [];
+    protected subnetAuthIdxs:Buffer[] = [];
 
 
     getTxType = ():number => {
@@ -220,17 +220,17 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    getSubnetAuthAddresses = ():Array<Buffer> => {
+    getSubnetAuthAddresses = ():Buffer[] => {
         return this.subnetAddrs;
     }
 
 
-    setSubnetAuthAddresses = (addrs:Array<Buffer>):void => {
+    setSubnetAuthAddresses = (addrs:Buffer[]):void => {
         this.subnetAddrs = addrs;
     }
 
-    calcSubnetAuthIdxs = (addrs:Array<Buffer>):Array<Buffer> => {
-        let idxs:Array<Buffer> = [];
+    calcSubnetAuthIdxs = (addrs:Buffer[]):Buffer[] => {
+        let idxs:Buffer[] = [];
         addrs = addrs.sort();
         for(let i = 0; i < addrs.length; i++){
             let idx:Buffer = Buffer.alloc(4);
@@ -240,7 +240,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    getSubnetAuthIdxs = ():Array<Buffer> => {
+    getSubnetAuthIdxs = ():Buffer[] => {
         return this.subnetAddrs;
     }
 
@@ -266,7 +266,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
+    sign(msg:Buffer, kc:KeyChain):Credential[] {
         let creds:Array<SECPCredential> = super.sign(msg, kc);
         const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
         for(let i = 0; i  < this.subnetAuth.length ; i++) {
@@ -288,15 +288,15 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+        outs:TransferableOutput[] = undefined,
+        ins:TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
         endTime:BN = undefined,
         weight:BN = undefined,
         subnetID:Buffer = undefined,
-        subnetAuth:Array<Buffer> = undefined
+        subnetAuth:Buffer[] = undefined
     ) {
         super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, weight);
         if(typeof subnetID !== undefined){
@@ -336,7 +336,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         this.rewardOwners.deserialize(fields["rewardOwners"], encoding);
     }
     
-    protected stakeOuts:Array<TransferableOutput> = [];
+  protected stakeOuts: TransferableOutput[] = [];
     protected rewardOwners:ParseableOutput = undefined;
   
     /**
@@ -363,7 +363,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     /**
      * Returns the array of outputs being staked.
      */
-    getStakeOuts():Array<TransferableOutput> {
+  getStakeOuts(): TransferableOutput[] {
         return this.stakeOuts;
     }
 
@@ -385,8 +385,8 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         return this.rewardOwners;
     }
     
-    getTotalOuts():Array<TransferableOutput> {
-        return [...this.getOuts() as Array<TransferableOutput>, ...this.getStakeOuts()];
+  getTotalOuts(): TransferableOutput[] {
+    return [...this.getOuts() as TransferableOutput[], ...this.getStakeOuts()];
     }
 
     fromBuffer(bytes:Buffer, offset:number = 0):number {
@@ -413,7 +413,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         let bsize:number = superbuff.length;
         const numouts:Buffer = Buffer.alloc(4);
         numouts.writeUInt32BE(this.stakeOuts.length, 0);
-        let barr:Array<Buffer> = [super.toBuffer(), numouts];
+      let barr: Buffer[] = [super.toBuffer(), numouts];
         bsize += numouts.length;
         this.stakeOuts = this.stakeOuts.sort(TransferableOutput.comparator());
         for(let i = 0; i < this.stakeOuts.length; i++) {
@@ -455,14 +455,14 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+      outs: TransferableOutput[] = undefined,
+      ins: TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
         endTime:BN = undefined,
         stakeAmount:BN = undefined,
-        stakeOuts:Array<TransferableOutput> = undefined,
+      stakeOuts: TransferableOutput[] = undefined,
         rewardOwners:ParseableOutput = undefined
     ) {
         super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount);
@@ -553,14 +553,14 @@ export class AddValidatorTx extends AddDelegatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+      outs: TransferableOutput[] = undefined,
+      ins: TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
         endTime:BN = undefined,
         stakeAmount:BN = undefined,
-        stakeOuts:Array<TransferableOutput> = undefined,
+      stakeOuts: TransferableOutput[] = undefined,
         rewardOwners:ParseableOutput = undefined,
         delegationFee:number = undefined
     ) {

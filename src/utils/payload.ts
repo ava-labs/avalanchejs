@@ -20,7 +20,7 @@ const serialization: Serialization = Serialization.getInstance()
  */
 export class PayloadTypes {
     private static instance: PayloadTypes;
-    protected types:Array<string> = [];
+  protected types: string[] = [];
 
     /**
      * Given an encoded payload buffer returns the payload content (minus typeID).
@@ -66,7 +66,7 @@ export class PayloadTypes {
     /**
      * Given a TypeID returns the proper [[PayloadBase]].
      */
-    select(typeid:number, ...args:Array<any>):PayloadBase {
+  select(typeid: number, ...args: any[]): PayloadBase {
         switch(typeid) {
             case 0:
                 return new BINPayload(...args);

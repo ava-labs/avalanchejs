@@ -3,26 +3,22 @@ import mockAxios from 'jest-mock-axios';
 import { Avalanche } from 'src';
 import { AdminAPI } from 'src/apis/admin/api';
 
-describe('Admin', () => {
-  const ip = '127.0.0.1';
-  const port = 9650;
-  const protocol = 'https';
+describe('Admin', (): void => {
+  const ip: string = '127.0.0.1'
+  const port: number = 9650
+  const protocol: string = 'https'
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, undefined, false)
+  let admin: AdminAPI
 
-  const username = 'AvaLabs';
-  const password = 'password';
-
-  const avalanche:Avalanche = new Avalanche(ip, port, protocol, 12345, 'What is my purpose? You pass butter. Oh my god.', undefined, undefined, false);
-  let admin:AdminAPI;
-
-  beforeAll(() => {
+  beforeAll((): void => {
     admin = avalanche.Admin();
   });
 
-  afterEach(() => {
+  afterEach((): void => {
     mockAxios.reset();
   });
 
-  test('alias', async () => {
+  test('alias', async (): Promise<void> => {
     const ep:string = '/ext/something';
     const al:string = '/ext/anotherthing';
     const result:Promise<boolean> = admin.alias(ep, al);
@@ -42,7 +38,7 @@ describe('Admin', () => {
     expect(response).toBe(true);
   });
 
-  test('aliasChain', async () => {
+  test('aliasChain', async (): Promise<void> => {
     const ch:string = 'abcd';
     const al:string = 'myChain';
     const result:Promise<boolean> = admin.aliasChain(ch, al);
@@ -62,7 +58,7 @@ describe('Admin', () => {
     expect(response).toBe(true);
   });
 
-  test('getChainAliases', async () => {
+  test('getChainAliases', async (): Promise<void> => {
     const ch:string = 'chain';
     const result:Promise<string[]> = admin.getChainAliases(ch);
     const payload:object = {
@@ -103,7 +99,7 @@ describe('Admin', () => {
     expect(response).toBe(true);
   });
 
-  test('memoryProfile', async () => {
+  test('memoryProfile', async (): Promise<void> => {
     const result:Promise<boolean> = admin.memoryProfile();
     const payload:object = {
       result: {
@@ -121,7 +117,7 @@ describe('Admin', () => {
     expect(response).toBe(true);
   });
 
-  test('startCPUProfiler', async () => {
+  test('startCPUProfiler', async (): Promise<void> => {
     const result:Promise<boolean> = admin.startCPUProfiler();
     const payload:object = {
       result: {
@@ -139,7 +135,7 @@ describe('Admin', () => {
     expect(response).toBe(true);
   });
 
-  test('stopCPUProfiler', async () => {
+  test('stopCPUProfiler', async (): Promise<void> => {
     const result:Promise<boolean> = admin.stopCPUProfiler();
     const payload:object = {
       result: {

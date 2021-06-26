@@ -146,7 +146,7 @@ export abstract class Credential extends Serializable{
   toBuffer():Buffer {
     const siglen:Buffer = Buffer.alloc(4);
     siglen.writeInt32BE(this.sigArray.length, 0);
-    const barr:Array<Buffer> = [siglen];
+    const barr: Buffer[] = [siglen];
     let bsize:number = siglen.length;
     for (let i:number = 0; i < this.sigArray.length; i++) {
       const sigbuff:Buffer = this.sigArray[i].toBuffer();

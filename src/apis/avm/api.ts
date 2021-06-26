@@ -334,7 +334,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
    */
-  createFixedCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, initialHolders:Array<object>):Promise<string> => {
+  createFixedCapAsset = async (username: string, password: string, name: string, symbol: string, denomination: number, initialHolders: object[]): Promise<string> => {
     const params:any = {
       name,
       symbol,
@@ -378,7 +378,7 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
      */
-  createVariableCapAsset = async (username:string, password:string, name:string, symbol:string, denomination:number, minterSets:Array<object>):Promise<string> => {
+  createVariableCapAsset = async (username: string, password: string, name: string, symbol: string, denomination: number, minterSets: object[]): Promise<string> => {
     const params:any = {
       name,
       symbol,
@@ -400,7 +400,7 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
      */
-  mint = async (username:string, password:string, amount:number | BN, assetID:Buffer | string, to:string, minters:Array<string>):Promise<string> => {
+  mint = async (username: string, password: string, amount: number | BN, assetID: Buffer | string, to: string, minters: string[]): Promise<string> => {
     let asset:string;
     let amnt:BN;
     if (typeof assetID !== 'string') {
@@ -564,7 +564,7 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Promise of an array of address strings in the format specified by the blockchain.
      */
-  listAddresses = async (username:string, password:string): Promise<Array<string>> => {
+  listAddresses = async (username: string, password: string): Promise<string[]> => {
     const params:any = {
       username,
       password,
@@ -579,7 +579,7 @@ export class AVMAPI extends JRPCAPI {
      *
      * @returns Promise of an object mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
      */
-  getAllBalances = async (address:string):Promise<Array<object>> => {
+  getAllBalances = async (address: string): Promise<object[]> => {
     if (typeof this.parseAddress(address) === 'undefined') {
       /* istanbul ignore next */
       throw new AddressError("Error - AVMAPI.getAllBalances: Invalid address format");
@@ -659,7 +659,7 @@ export class AVMAPI extends JRPCAPI {
    *
    */
   getUTXOs = async (
-    addresses:Array<string> | string,
+    addresses: string[] | string,
     sourceChain:string = undefined,
     limit:number = 0,
     startIndex:{address:string, utxo:string} = undefined,
@@ -692,7 +692,7 @@ export class AVMAPI extends JRPCAPI {
       let data = response.data.result.utxos;
       if (persistOpts && typeof persistOpts === 'object') {
         if (this.db.has(persistOpts.getName())) {
-          const selfArray:Array<string> = this.db.get(persistOpts.getName());
+          const selfArray: string[] = this.db.get(persistOpts.getName());
           if (Array.isArray(selfArray)) {
             utxos.addArray(data);
             const self:UTXOSet = new UTXOSet();
@@ -733,17 +733,17 @@ export class AVMAPI extends JRPCAPI {
     utxoset:UTXOSet, 
     amount:BN, 
     assetID:Buffer | string = undefined, 
-    toAddresses:Array<string>, 
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string>, 
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[],
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0), 
     threshold:number = 1
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a));
 
     if (typeof assetID === 'string') {
       assetID = bintools.cb58Decode(assetID);
@@ -795,25 +795,25 @@ export class AVMAPI extends JRPCAPI {
    */
   buildNFTTransferTx = async (
     utxoset:UTXOSet, 
-    toAddresses:Array<string>, 
-    fromAddresses:Array<string>, 
-    changeAddresses:Array<string>, 
-    utxoid:string | Array<string>, 
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[],
+    utxoid: string | string[],
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(), 
     locktime:BN = new BN(0), 
     threshold:number = 1,
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildNFTTransferTx').map((a) => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
     }
     const avaxAssetID:Buffer = await this.getAVAXAssetID();
 
-    let utxoidArray:Array<string> = [];
+    let utxoidArray: string[] = [];
     if (typeof utxoid === 'string') {
       utxoidArray = [utxoid];
     } else if (Array.isArray(utxoid)) {
@@ -862,19 +862,19 @@ export class AVMAPI extends JRPCAPI {
    */
   buildImportTx = async (
     utxoset:UTXOSet, 
-    ownerAddresses:Array<string>,
+    ownerAddresses: string[],
     sourceChain:Buffer | string,
-    toAddresses:Array<string>, 
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string> = undefined,
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[] = undefined,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(), 
     locktime:BN = new BN(0), 
     threshold:number = 1
   ):Promise<UnsignedTx> => {
-    const to:Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
 
     let srcChain:string = undefined;
 
@@ -945,9 +945,9 @@ export class AVMAPI extends JRPCAPI {
     utxoset:UTXOSet, 
     amount:BN,
     destinationChain:Buffer | string,
-    toAddresses:Array<string>, 
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string> = undefined,
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[] = undefined,
     memo:PayloadBase|Buffer = undefined, 
     asOf:BN = UnixNow(),
     locktime:BN = new BN(0), 
@@ -974,13 +974,13 @@ export class AVMAPI extends JRPCAPI {
       throw new ChainIdError("Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.");
     }
 
-    let to:Array<Buffer> = [];
+    let to: Buffer[] = [];
     toAddresses.map((a) => {
       to.push(bintools.stringToAddress(a));
     });
 
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1033,18 +1033,18 @@ export class AVMAPI extends JRPCAPI {
    */
   buildCreateAssetTx = async (
       utxoset:UTXOSet, 
-      fromAddresses:Array<string>, 
-      changeAddresses:Array<string> ,
+    fromAddresses: string[],
+    changeAddresses: string[],
       initialStates:InitialStates, 
       name:string, 
       symbol:string, 
       denomination:number, 
-      mintOutputs:Array<SECPMintOutput> = undefined,
+    mintOutputs: SECPMintOutput[] = undefined,
       memo:PayloadBase|Buffer = undefined, 
       asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
-    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a));
-    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+    let from: Buffer[] = this._cleanAddressArray(fromAddresses, "buildCreateAssetTx").map(a => bintools.stringToAddress(a))
+    let change: Buffer[] = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1089,13 +1089,13 @@ export class AVMAPI extends JRPCAPI {
     utxoset:UTXOSet,  
     mintOwner:SECPMintOutput,
     transferOwner:SECPTransferOutput,
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string>,
+    fromAddresses: string[],
+    changeAddresses: string[],
     mintUTXOID:string,
     memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
   ): Promise<any> => {
-    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildSECPMintTx").map(a => bintools.stringToAddress(a));
-    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildSECPMintTx").map(a => bintools.stringToAddress(a));
+    let from: Buffer[] = this._cleanAddressArray(fromAddresses, "buildSECPMintTx").map(a => bintools.stringToAddress(a))
+    let change: Buffer[] = this._cleanAddressArray(changeAddresses, "buildSECPMintTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1161,15 +1161,15 @@ export class AVMAPI extends JRPCAPI {
   */
   buildCreateNFTAssetTx = async (
     utxoset:UTXOSet, 
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string>,
+    fromAddresses: string[],
+    changeAddresses: string[],
     minterSets:MinterSet[], 
     name:string, 
     symbol:string, 
     memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow(), locktime:BN = new BN(0)
   ): Promise<UnsignedTx> => {
-    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
-    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
+    let from: Buffer[] = this._cleanAddressArray(fromAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a))
+    let change: Buffer[] = this._cleanAddressArray(changeAddresses, "buildCreateNFTAssetTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1222,16 +1222,16 @@ export class AVMAPI extends JRPCAPI {
   */
   buildCreateNFTMintTx = async (
     utxoset:UTXOSet,  
-    owners:Array<OutputOwners>|OutputOwners, 
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string>,
-    utxoid:string|Array<string>,
+    owners: OutputOwners[] | OutputOwners,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    utxoid: string | string[],
     groupID:number = 0, 
     payload:PayloadBase|Buffer = undefined, 
     memo:PayloadBase|Buffer = undefined, asOf:BN = UnixNow()
   ): Promise<any> => {
-    let from:Array<Buffer> = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
-    let change:Array<Buffer> = this._cleanAddressArray(changeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
+    let from: Buffer[] = this._cleanAddressArray(fromAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a))
+    let change: Buffer[] = this._cleanAddressArray(changeAddresses, "buildCreateNFTMintTx").map(a => bintools.stringToAddress(a));
     
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1321,7 +1321,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Promise for the string representing the transaction's ID.
    */
-  send = async (username:string, password:string, assetID:string | Buffer, amount:number | BN, to:string, from:Array<string> | Array<Buffer> = undefined, changeAddr:string = undefined, memo:string | Buffer = undefined):Promise<{txID: string, changeAddr: string}> => {
+  send = async (username: string, password: string, assetID: string | Buffer, amount: number | BN, to: string, from: string[] | Buffer[] = undefined, changeAddr: string = undefined, memo: string | Buffer = undefined): Promise<{ txID: string, changeAddr: string }> => {
     let asset:string;
     let amnt:BN;
 
@@ -1387,7 +1387,7 @@ export class AVMAPI extends JRPCAPI {
    */
   sendMultiple = async (username:string, password:string, 
       sendOutputs:Array<{assetID:string | Buffer, amount:number | BN, to:string}>, 
-      from:Array<string> | Array<Buffer> = undefined, 
+    from: string[] | Buffer[] = undefined,
       changeAddr:string = undefined, 
       memo:string | Buffer = undefined
     ):Promise<{txID: string, changeAddr: string}> => {
@@ -1463,8 +1463,8 @@ export class AVMAPI extends JRPCAPI {
   /**
    * @ignore
    */
-  protected _cleanAddressArray(addresses:Array<string> | Array<Buffer>, caller:string):Array<string> {
-    const addrs:Array<string> = [];
+  protected _cleanAddressArray(addresses: string[] | Buffer[], caller: string): string[] {
+    const addrs: string[] = [];
     const chainid:string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
     if (addresses && addresses.length > 0) {
       for (let i = 0; i < addresses.length; i++) {

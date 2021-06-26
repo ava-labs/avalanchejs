@@ -36,7 +36,7 @@ export abstract class Input extends Serializable {
   }
 
   protected sigCount:Buffer = Buffer.alloc(4);
-  protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
+  protected sigIdxs: SigIdx[] = []; // idxs of signers from utxo
 
   static comparator = ():(a:Input, b:Input) => (1|-1|0) => (a:Input, b:Input):(1|-1|0) => {
     const aoutid:Buffer = Buffer.alloc(4);
@@ -57,7 +57,7 @@ export abstract class Input extends Serializable {
   /**
    * Returns the array of [[SigIdx]] for this [[Input]]
    */
-  getSigIdxs = ():Array<SigIdx> => this.sigIdxs;
+  getSigIdxs = (): SigIdx[] => this.sigIdxs;
 
   abstract getCredentialID():number;
 
@@ -95,7 +95,7 @@ export abstract class Input extends Serializable {
   toBuffer():Buffer {
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     let bsize:number = this.sigCount.length;
-    const barr:Array<Buffer> = [this.sigCount];
+    const barr: Buffer[] = [this.sigCount];
     for (let i = 0; i < this.sigIdxs.length; i++) {
       const b:Buffer = this.sigIdxs[i].toBuffer();
       barr.push(b);
@@ -151,7 +151,7 @@ export abstract class StandardParseableInput extends Serializable {
     const inbuff:Buffer = this.input.toBuffer();
     const inid:Buffer = Buffer.alloc(4);
     inid.writeUInt32BE(this.input.getInputID(), 0);
-    const barr:Array<Buffer> = [inid, inbuff];
+    const barr: Buffer[] = [inid, inbuff];
     return Buffer.concat(barr, inid.length + inbuff.length);
   }
   
@@ -230,7 +230,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
   toBuffer():Buffer {
     const parseableBuff:Buffer = super.toBuffer();
     const bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + parseableBuff.length;
-    const barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, parseableBuff];
+    const barr: Buffer[] = [this.txid, this.outputidx, this.assetid, parseableBuff];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -306,7 +306,7 @@ export abstract class StandardAmountInput extends Input {
   toBuffer():Buffer {
     const superbuff:Buffer = super.toBuffer();
     const bsize:number = this.amount.length + superbuff.length;
-    const barr:Array<Buffer> = [this.amount, superbuff];
+    const barr: Buffer[] = [this.amount, superbuff];
     return Buffer.concat(barr, bsize);
   }
 

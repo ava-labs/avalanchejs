@@ -53,7 +53,7 @@ export class ImportTx extends BaseTx {
 
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
-  protected importIns:Array<TransferableInput> = [];
+  protected importIns: TransferableInput[] = [];
 
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
@@ -110,7 +110,7 @@ export class ImportTx extends BaseTx {
       throw new ChainIdError("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
+    let barr: Buffer[] = [super.toBuffer(), this.sourceChain, this.numIns];
     this.importIns = this.importIns.sort(TransferableInput.comparator());
     for(let i = 0; i < this.importIns.length; i++) {
         barr.push(this.importIns[i].toBuffer());
@@ -120,7 +120,7 @@ export class ImportTx extends BaseTx {
   /**
      * Returns an array of [[TransferableInput]]s in this transaction.
      */
-  getImportInputs():Array<TransferableInput> {
+  getImportInputs(): TransferableInput[] {
     return this.importIns;
   }
 
@@ -142,11 +142,11 @@ export class ImportTx extends BaseTx {
      *
      * @returns An array of [[Credential]]s
      */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = super.sign(msg, kc);
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = super.sign(msg, kc);
     for (let i = 0; i < this.importIns.length; i++) {
       const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
+      const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs();
       for (let j = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
@@ -172,8 +172,8 @@ export class ImportTx extends BaseTx {
    */
   constructor(
     networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, sourceChain:Buffer = undefined, importIns:Array<TransferableInput> = undefined
+    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined, sourceChain: Buffer = undefined, importIns: TransferableInput[] = undefined
   ) {
     super(networkid, blockchainid, outs, ins, memo);
     this.sourceChain = sourceChain; // do not correct, if it's wrong it'll bomb on toBuffer

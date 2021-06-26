@@ -141,7 +141,7 @@ export class CreateAssetTx extends BaseTx {
     symsize.writeUInt16BE(this.symbol.length, 0);
 
     const bsize:number = superbuff.length + namesize.length + namebuff.length + symsize.length + symbuff.length + this.denomination.length + initstatebuff.length;
-    const barr:Array<Buffer> = [superbuff, namesize, namebuff, symsize, symbuff, this.denomination, initstatebuff];
+    const barr: Buffer[] = [superbuff, namesize, namebuff, symsize, symbuff, this.denomination, initstatebuff];
     return Buffer.concat(barr, bsize);
   }
 
@@ -170,7 +170,7 @@ export class CreateAssetTx extends BaseTx {
    */
   constructor(
     networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16),
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
+    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
     memo:Buffer = undefined, name:string = undefined, symbol:string = undefined, denomination:number = undefined,
     initialstate:InitialStates = undefined
   ) {

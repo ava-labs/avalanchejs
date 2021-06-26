@@ -91,12 +91,12 @@ const setMergeTester = (input:UTXOSet, equal:Array<UTXOSet>, notEqual:Array<UTXO
 };
 
 describe('UTXOSet', (): void => {
-  const utxostrs:Array<string> = [
+  const utxostrs: string[] = [
     bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex')),
     bintools.cb58Encode(Buffer.from('0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
     bintools.cb58Encode(Buffer.from('0000f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex')),
   ];
-  const addrs:Array<Buffer> = [
+  const addrs: Buffer[] = [
     bintools.cb58Decode('FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG'),
     bintools.cb58Decode('MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8'),
   ];
@@ -105,7 +105,7 @@ describe('UTXOSet', (): void => {
     set.add(utxostrs[0]);
     const utxo:UTXO = new UTXO();
     utxo.fromString(utxostrs[0]);
-    const setArray:Array<UTXO> = set.getAllUTXOs();
+    const setArray: UTXO[] = set.getAllUTXOs();
     expect(utxo.toString()).toBe(setArray[0].toString());
   });
 
@@ -169,7 +169,7 @@ describe('UTXOSet', (): void => {
 
   describe('Functionality', (): void => {
     let set:UTXOSet;
-    let utxos:Array<UTXO>;
+    let utxos: UTXO[];
     beforeEach(() => {
       set = new UTXOSet();
       set.addArray(utxostrs);
@@ -197,24 +197,24 @@ describe('UTXOSet', (): void => {
     });
 
     test('getUTXOIDs', (): void => {
-      const uids:Array<string> = set.getUTXOIDs();
+      const uids: string[] = set.getUTXOIDs();
       for (let i:number = 0; i < utxos.length; i++) {
         expect(uids.indexOf(utxos[i].getUTXOID())).not.toBe(-1);
       }
     });
 
     test('getAllUTXOs', (): void => {
-      const allutxos:Array<UTXO> = set.getAllUTXOs();
-      const ustrs:Array<string> = [];
+      const allutxos: UTXO[] = set.getAllUTXOs()
+      const ustrs: string[] = [];
       for (let i:number = 0; i < allutxos.length; i++) {
         ustrs.push(allutxos[i].toString());
       }
       for (let i:number = 0; i < utxostrs.length; i++) {
         expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
       }
-      const uids:Array<string> = set.getUTXOIDs();
-      const allutxos2:Array<UTXO> = set.getAllUTXOs(uids);
-      const ustrs2:Array<string> = [];
+      const uids: string[] = set.getUTXOIDs()
+      const allutxos2: UTXO[] = set.getAllUTXOs(uids)
+      const ustrs2: string[] = [];
       for (let i:number = 0; i < allutxos.length; i++) {
         ustrs2.push(allutxos2[i].toString());
       }
@@ -224,7 +224,7 @@ describe('UTXOSet', (): void => {
     });
 
     test('getUTXOIDs By Address', (): void => {
-      let utxoids:Array<string>;
+      let utxoids: string[];
       utxoids = set.getUTXOIDs([addrs[0]]);
       expect(utxoids.length).toBe(1);
       utxoids = set.getUTXOIDs(addrs);
@@ -234,12 +234,12 @@ describe('UTXOSet', (): void => {
     });
 
     test('getAllUTXOStrings', (): void => {
-      const ustrs:Array<string> = set.getAllUTXOStrings();
+      const ustrs: string[] = set.getAllUTXOStrings();
       for (let i:number = 0; i < utxostrs.length; i++) {
         expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1);
       }
-      const uids:Array<string> = set.getUTXOIDs();
-      const ustrs2:Array<string> = set.getAllUTXOStrings(uids);
+      const uids: string[] = set.getUTXOIDs()
+      const ustrs2: string[] = set.getAllUTXOStrings(uids);
       for (let i:number = 0; i < utxostrs.length; i++) {
         expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1);
       }
@@ -273,11 +273,11 @@ describe('UTXOSet', (): void => {
     });
 
     test('getAssetIDs', (): void => {
-      const assetIDs:Array<Buffer> = set.getAssetIDs();
+      const assetIDs: Buffer[] = set.getAssetIDs();
       for (let i:number = 0; i < utxos.length; i++) {
         expect(assetIDs).toContain(utxos[i].getAssetID());
       }
-      const addresses:Array<Buffer> = set.getAddresses();
+      const addresses: Buffer[] = set.getAddresses();
       expect(set.getAssetIDs(addresses)).toEqual(set.getAssetIDs());
     });
 
@@ -323,7 +323,7 @@ describe('UTXOSet', (): void => {
         expect(() => {
           set.mergeByRule(setA, 'ERROR');
         }).toThrow();
-        const setArray:Array<UTXO> = setG.getAllUTXOs();
+        const setArray: UTXO[] = setG.getAllUTXOs();
       });
 
       test('intersection', (): void => {

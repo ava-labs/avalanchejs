@@ -106,7 +106,7 @@ export abstract class StandardUTXO extends Serializable{
     const outbuff:Buffer = this.output.toBuffer();
     const outputidbuffer:Buffer = Buffer.alloc(4);
     outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0);
-    const barr:Array<Buffer> = [this.codecid, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
+    const barr: Buffer[] = [this.codecid, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff];
     return Buffer.concat(barr, 
       this.codecid.length + this.txid.length 
       + this.outputidx.length + this.assetid.length
@@ -241,7 +241,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
     const utxoid:string = utxovar.getUTXOID();
     if (!(utxoid in this.utxos) || overwrite === true) {
       this.utxos[utxoid] = utxovar;
-      const addresses:Array<Buffer> = utxovar.getOutput().getAddresses();
+      const addresses: Buffer[] = utxovar.getOutput().getAddresses();
       const locktime:BN = utxovar.getOutput().getLocktime();
       for (let i = 0; i < addresses.length; i++) {
         const address:string = addresses[i].toString('hex');
@@ -343,7 +343,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of [[StandardUTXO]]s.
      */
-  getAllUTXOs = (utxoids:Array<string> = undefined):Array<UTXOClass> => {
+  getAllUTXOs = (utxoids: string[] = undefined): Array<UTXOClass> => {
     let results:Array<UTXOClass> = [];
     if (typeof utxoids !== 'undefined' && Array.isArray(utxoids)) {
       for (let i = 0; i < utxoids.length; i++) {
@@ -364,8 +364,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of [[StandardUTXO]]s as cb58 serialized strings.
      */
-  getAllUTXOStrings = (utxoids:Array<string> = undefined):Array<string> => {
-    const results:Array<string> = [];
+  getAllUTXOStrings = (utxoids: string[] = undefined): string[] => {
+    const results: string[] = [];
     const utxos = Object.keys(this.utxos);
     if (typeof utxoids !== 'undefined' && Array.isArray(utxoids)) {
       for (let i = 0; i < utxoids.length; i++) {
@@ -389,9 +389,9 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of addresses.
      */
-  getUTXOIDs = (addresses:Array<Buffer> = undefined, spendable:boolean = true):Array<string> => {
+  getUTXOIDs = (addresses: Buffer[] = undefined, spendable: boolean = true): string[] => {
     if (typeof addresses !== 'undefined') {
-      const results:Array<string> = [];
+      const results: string[] = [];
       const now:BN = UnixNow();
       for (let i = 0; i < addresses.length; i++) {
         if (addresses[i].toString('hex') in this.addressUTXOs) {
@@ -413,7 +413,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
   /**
      * Gets the addresses in the [[StandardUTXOSet]] and returns an array of {@link https://github.com/feross/buffer|Buffer}.
      */
-  getAddresses = ():Array<Buffer> => Object.keys(this.addressUTXOs)
+  getAddresses = (): Buffer[] => Object.keys(this.addressUTXOs)
     .map((k) => Buffer.from(k, 'hex'));
 
   /**
@@ -425,8 +425,8 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns Returns the total balance as a {@link https://github.com/indutny/bn.js/|BN}.
      */
-  getBalance = (addresses:Array<Buffer>, assetID:Buffer|string, asOf:BN = undefined):BN => {
-    const utxoids:Array<string> = this.getUTXOIDs(addresses);
+  getBalance = (addresses: Buffer[], assetID: Buffer | string, asOf: BN = undefined): BN => {
+    const utxoids: string[] = this.getUTXOIDs(addresses);
     const utxos:Array<StandardUTXO> = this.getAllUTXOs(utxoids);
     let spend:BN = new BN(0);
     let asset:Buffer;
@@ -452,9 +452,9 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns An array of {@link https://github.com/feross/buffer|Buffer} representing the Asset IDs.
      */
-  getAssetIDs = (addresses:Array<Buffer> = undefined):Array<Buffer> => {
+  getAssetIDs = (addresses: Buffer[] = undefined): Buffer[] => {
     const results:Set<Buffer> = new Set();
-    let utxoids:Array<string> = [];
+    let utxoids: string[] = [];
     if (typeof addresses !== 'undefined') {
       utxoids = this.getUTXOIDs(addresses);
     } else {
@@ -493,7 +493,7 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      *
      * @returns A new StandardUTXOSet that contains all the filtered elements.
      */
-  merge = (utxoset:this, hasUTXOIDs:Array<string> = undefined):this => {
+  merge = (utxoset: this, hasUTXOIDs: string[] = undefined): this => {
     const results:this = this.create();
     const utxos1:Array<UTXOClass> = this.getAllUTXOs(hasUTXOIDs);
     const utxos2:Array<UTXOClass> = utxoset.getAllUTXOs(hasUTXOIDs);
@@ -513,9 +513,9 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      * @returns A new StandardUTXOSet containing the intersection
      */
   intersection = (utxoset:this):this => {
-    const us1:Array<string> = this.getUTXOIDs();
-    const us2:Array<string> = utxoset.getUTXOIDs();
-    const results:Array<string> = us1.filter((utxoid) => us2.includes(utxoid));
+    const us1: string[] = this.getUTXOIDs()
+    const us2: string[] = utxoset.getUTXOIDs()
+    const results: string[] = us1.filter((utxoid) => us2.includes(utxoid));
     return this.merge(utxoset, results) as this;
   };
 
@@ -527,9 +527,9 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      * @returns A new StandardUTXOSet containing the difference
      */
   difference = (utxoset:this):this => {
-    const us1:Array<string> = this.getUTXOIDs();
-    const us2:Array<string> = utxoset.getUTXOIDs();
-    const results:Array<string> = us1.filter((utxoid) => !us2.includes(utxoid));
+    const us1: string[] = this.getUTXOIDs()
+    const us2: string[] = utxoset.getUTXOIDs()
+    const results: string[] = us1.filter((utxoid) => !us2.includes(utxoid));
     return this.merge(utxoset, results) as this;
   };
 
@@ -541,9 +541,9 @@ export abstract class StandardUTXOSet<UTXOClass extends StandardUTXO> extends Se
      * @returns A new StandardUTXOSet containing the symmetrical difference
      */
   symDifference = (utxoset:this):this => {
-    const us1:Array<string> = this.getUTXOIDs();
-    const us2:Array<string> = utxoset.getUTXOIDs();
-    const results:Array<string> = us1.filter((utxoid) => !us2.includes(utxoid))
+    const us1: string[] = this.getUTXOIDs()
+    const us2: string[] = utxoset.getUTXOIDs()
+    const results: string[] = us1.filter((utxoid) => !us2.includes(utxoid))
       .concat(us2.filter((utxoid) => !us1.includes(utxoid)));
     return this.merge(utxoset, results) as this;
   };

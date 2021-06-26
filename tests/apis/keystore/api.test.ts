@@ -99,7 +99,7 @@ describe('Keystore', () => {
   test('listUsers', async () => {
     const accounts = ['acc1', 'acc2'];
 
-    const result:Promise<Array<string>> = keystore.listUsers();
+    const result: Promise<string[]> = keystore.listUsers();
     const payload:object = {
       result: {
         users: accounts,
@@ -110,7 +110,7 @@ describe('Keystore', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:Array<string> = await result;
+    const response: string[] = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(accounts);

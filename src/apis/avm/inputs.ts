@@ -21,7 +21,7 @@ const bintools: BinTools = BinTools.getInstance();
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
+export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
   if (inputid === AVMConstants.SECPINPUTID || inputid === AVMConstants.SECPINPUTID_CODECONE) {
     return new SECPTransferInput(...args);
   }

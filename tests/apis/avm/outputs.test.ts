@@ -12,7 +12,7 @@ describe('Outputs', (): void => {
     const codecID_zero: number = 0;
     const codecID_one: number = 1;
   describe('NFTMintOutput', (): void => {
-      let addrs:Array<Buffer> = [
+    let addrs: Buffer[] = [
           bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
           bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
           bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
@@ -79,7 +79,7 @@ describe('Outputs', (): void => {
           let b:Buffer = out.toBuffer();
           expect(out.toString()).toBe(bintools.bufferToB58(b));
 
-          let s:Array<Buffer> = out.getSpenders(addrs);
+        let s: Buffer[] = out.getSpenders(addrs);
           expect(JSON.stringify(s.sort())).toBe(JSON.stringify(addrs.sort()));
 
           let m1:boolean = out.meetsThreshold([addrs[0]]);
@@ -94,7 +94,7 @@ describe('Outputs', (): void => {
     })
 
   describe('SECPTransferOutput', (): void => {
-      let addrs:Array<Buffer> = [
+    let addrs: Buffer[] = [
           bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
           bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
           bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
@@ -144,7 +144,7 @@ describe('Outputs', (): void => {
           let b:Buffer = out.toBuffer();
           expect(out.toString()).toBe(bintools.bufferToB58(b));
 
-          let s:Array<Buffer> = out.getSpenders(addrs);
+        let s: Buffer[] = out.getSpenders(addrs);
           expect(JSON.stringify(s.sort())).toBe(JSON.stringify(addrs.sort()));
 
           let m1:boolean = out.meetsThreshold([addrs[0]]);
@@ -193,7 +193,7 @@ describe('Outputs', (): void => {
         let b:Buffer = out.toBuffer();
         expect(out.toString()).toBe(bintools.bufferToB58(b));
 
-        let s:Array<Buffer> = out.getSpenders(addrs);
+        let s: Buffer[] = out.getSpenders(addrs);
         expect(JSON.stringify(s.sort())).toBe(JSON.stringify(addrs.sort()));
 
         let m1:boolean = out.meetsThreshold([addrs[0]]);

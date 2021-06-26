@@ -87,7 +87,7 @@ describe('PlatformVMAPI', () => {
   test('listAddresses', async () => {
     const addresses = [addrA, addrB]
 
-    const result: Promise<Array<string>> = api.listAddresses(username, password)
+    const result: Promise<string[]> = api.listAddresses(username, password)
     const payload: object = {
       result: {
         addresses,
@@ -98,7 +98,7 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(addresses)
@@ -323,7 +323,7 @@ describe('PlatformVMAPI', () => {
       subnetID: 'subnetID',
       vmID: 'vmID',
     }]
-    const result: Promise<Array<object>> = api.getBlockchains()
+    const result: Promise<object[]> = api.getBlockchains()
     const payload: object = {
       result: {
         blockchains: resp,
@@ -334,14 +334,14 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<object> = await result
+    const response: object[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
   })
 
   test('getSubnets 1', async () => {
-    const resp: Array<object> = [{
+    const resp: object[] = [{
       id: 'id',
       controlKeys: ['controlKeys'],
       threshold: 'threshold',
@@ -573,7 +573,7 @@ describe('PlatformVMAPI', () => {
   test('sampleValidators 1', async () => {
     let subnetID
     const validators = ['val1', 'val2']
-    const result: Promise<Array<string>> = api.sampleValidators(10, subnetID)
+    const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
         validators,
@@ -584,7 +584,7 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(validators)
@@ -593,7 +593,7 @@ describe('PlatformVMAPI', () => {
   test('sampleValidators 2', async () => {
     const subnetID = 'abcdef'
     const validators = ['val1', 'val2']
-    const result: Promise<Array<string>> = api.sampleValidators(10, subnetID)
+    const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
         validators,
@@ -604,7 +604,7 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(validators)
@@ -613,7 +613,7 @@ describe('PlatformVMAPI', () => {
   test('sampleValidators 3', async () => {
     const subnetID = Buffer.from('abcdef', 'hex')
     const validators = ['val1', 'val2']
-    const result: Promise<Array<string>> = api.sampleValidators(10, subnetID)
+    const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
         validators,
@@ -647,7 +647,7 @@ describe('PlatformVMAPI', () => {
   test('validates 1', async () => {
     let subnetID
     const resp = ['valid']
-    const result: Promise<Array<string>> = api.validates(subnetID)
+    const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
         blockchainIDs: resp,
@@ -658,7 +658,7 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
@@ -667,7 +667,7 @@ describe('PlatformVMAPI', () => {
   test('validates 2', async () => {
     const subnetID = 'deadbeef'
     const resp = ['valid']
-    const result: Promise<Array<string>> = api.validates(subnetID)
+    const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
         blockchainIDs: resp,
@@ -678,7 +678,7 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
@@ -687,7 +687,7 @@ describe('PlatformVMAPI', () => {
   test('validates 3', async () => {
     const subnetID = Buffer.from('abcdef', 'hex')
     const resp = ['valid']
-    const result: Promise<Array<string>> = api.validates(subnetID)
+    const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
         blockchainIDs: resp,
@@ -698,7 +698,7 @@ describe('PlatformVMAPI', () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
@@ -755,7 +755,7 @@ describe('PlatformVMAPI', () => {
 
     const persistOpts: PersistanceOptions = new PersistanceOptions('test', true, 'union')
     expect(persistOpts.getMergeRule()).toBe('union')
-    let addresses: Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a))
+    let addresses: string[] = set.getAddresses().map((a) => api.addressFromBuffer(a))
     let result: Promise<{
       numFetched: number,
       utxos: UTXOSet,
@@ -794,22 +794,22 @@ describe('PlatformVMAPI', () => {
     let lset: UTXOSet
     let keymgr2: KeyChain
     let keymgr3: KeyChain
-    let addrs1: Array<string>
-    let addrs2: Array<string>
-    let addrs3: Array<string>
-    let addressbuffs: Array<Buffer> = []
-    let addresses: Array<string> = []
-    let utxos: Array<UTXO>
-    let lutxos: Array<UTXO>
-    let inputs: Array<TransferableInput>
-    let outputs: Array<TransferableOutput>
+    let addrs1: string[]
+    let addrs2: string[]
+    let addrs3: string[]
+    let addressbuffs: Buffer[] = []
+    let addresses: string[] = []
+    let utxos: UTXO[]
+    let lutxos: UTXO[]
+    let inputs: TransferableInput[]
+    let outputs: TransferableOutput[]
     const amnt: number = 10000
     const assetID: Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest())
     const NFTassetID: Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest())
     let secpbase1: SECPTransferOutput
     let secpbase2: SECPTransferOutput
     let secpbase3: SECPTransferOutput
-    let fungutxoids: Array<string> = []
+    let fungutxoids: string[] = []
     let platformvm: PlatformVMAPI
     const fee: number = 10
     const name: string = 'Mortycoin is the dumb as a sack of hammers.'

@@ -23,7 +23,7 @@ const serialization: Serialization = Serialization.getInstance()
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
+export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
   if (inputid === PlatformVMConstants.SECPINPUTID) {
     return new SECPTransferInput(...args);
   } else if (inputid === PlatformVMConstants.STAKEABLELOCKINID) {
@@ -203,7 +203,7 @@ export class StakeableLockIn extends AmountInput {
   toBuffer():Buffer {
     const xferinBuff:Buffer = this.transferableInput.toBuffer();
     const bsize:number = this.stakeableLocktime.length + xferinBuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, xferinBuff];
+    const barr: Buffer[] = [this.stakeableLocktime, xferinBuff];
     return Buffer.concat(barr, bsize);
   }
   

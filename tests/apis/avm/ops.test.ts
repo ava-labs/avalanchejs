@@ -20,7 +20,7 @@ describe('Operations', (): void => {
     const codecID_one: number = 1;
     let assetID:string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533";
     let assetIDBuff:Buffer = Buffer.from(assetID, "hex");
-    let addrs:Array<Buffer> = [
+  let addrs: Buffer[] = [
         bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
         bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
         bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
@@ -42,7 +42,7 @@ describe('Operations', (): void => {
         });
 
       test('comparator', (): void => {
-            let outputOwners:Array<OutputOwners> = [];
+        let outputOwners: OutputOwners[] = [];
             outputOwners.push(new OutputOwners(addrs, locktime, 1));
             let op1:NFTMintOperation = new NFTMintOperation(1, payload, outputOwners);
             let op2:NFTMintOperation = new NFTMintOperation(2, payload, outputOwners);
@@ -56,7 +56,7 @@ describe('Operations', (): void => {
         });
 
       test('Functionality', (): void => {
-            let outputOwners:Array<OutputOwners> = [];
+        let outputOwners: OutputOwners[] = [];
             outputOwners.push(new OutputOwners(addrs, locktime, 1));
             let op:NFTMintOperation = new NFTMintOperation(0, payload, outputOwners);
         
@@ -128,7 +128,7 @@ describe('Operations', (): void => {
             expect(opcopy.toString()).toBe(op.toString());
         
             op.addSignatureIdx(0, addrs[0]);
-            let sigidx:Array<SigIdx> = op.getSigIdxs();
+        let sigidx: SigIdx[] = op.getSigIdxs();
             expect(sigidx[0].getSource().toString("hex")).toBe(addrs[0].toString("hex"));
             opcopy.fromBuffer(op.toBuffer());
             expect(opcopy.toString()).toBe(op.toString());

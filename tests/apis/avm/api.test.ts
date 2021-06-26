@@ -39,7 +39,7 @@ function serialzeit(aThing:Serializable, name:string){
   }
 }
 
-describe('AVMAPI', () => {
+describe('AVMAPI', (): void => {
   const networkid:number = 12345;
   const blockchainid:string = Defaults.network[networkid].X.blockchainID;
   const ip:string = '127.0.0.1';
@@ -58,12 +58,12 @@ describe('AVMAPI', () => {
   const addrB:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")));
   const addrC:string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")));
 
-  beforeAll(() => {
+  beforeAll((): void => {
     api = new AVMAPI(avalanche, '/ext/bc/X', blockchainid);
     alias = api.getBlockchainAlias();
   });
 
-  afterEach(() => {
+  afterEach((): void => {
     mockAxios.reset();
   });
 
@@ -90,7 +90,7 @@ describe('AVMAPI', () => {
     expect(response['changeAddr']).toBe(changeAddr);
   });
 
-  test('can Send 2', async () => {
+  test('can Send 2', async (): Promise<void> => {
     const txId:string = 'asdfhvl234';
     const memo:Buffer = Buffer.from("hello world")
     const changeAddr:string = "X-local1"
@@ -113,7 +113,7 @@ describe('AVMAPI', () => {
     expect(response['changeAddr']).toBe(changeAddr);
   });
 
-  test('can Send Multiple', async () => {
+  test('can Send Multiple', async (): Promise<void> => {
     const txId:string = 'asdfhvl234';
     const memo:string = "hello world";
     const changeAddr:string = "X-local1"
@@ -136,7 +136,7 @@ describe('AVMAPI', () => {
     expect(response['changeAddr']).toBe(changeAddr);
   });
 
-  test('refreshBlockchainID', async () => {
+  test('refreshBlockchainID', async (): Promise<void> => {
     let n3bcID:string = Defaults.network[3].X["blockchainID"];
     let n12345bcID:string = Defaults.network[12345].X["blockchainID"];
     let testAPI:AVMAPI = new AVMAPI(avalanche, '/ext/bc/avm', n3bcID);
@@ -153,10 +153,10 @@ describe('AVMAPI', () => {
 
   });
 
-  test('listAddresses', async () => {
+  test('listAddresses', async (): Promise<void> => {
     const addresses = [addrA, addrB];
 
-    const result:Promise<Array<string>> = api.listAddresses(username, password);
+    const result: Promise<string[]> = api.listAddresses(username, password);
     const payload:object = {
       result: {
         addresses,
@@ -167,13 +167,13 @@ describe('AVMAPI', () => {
     };
 
     mockAxios.mockResponse(responseObj);
-    const response:Array<string> = await result;
+    const response: string[] = await result;
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1);
     expect(response).toBe(addresses);
   });
 
-  test('importKey', async () => {
+  test('importKey', async (): Promise<void> => {
     const address = addrC;
 
     const result:Promise<string> = api.importKey(username, password, 'key');
@@ -193,7 +193,7 @@ describe('AVMAPI', () => {
     expect(response).toBe(address);
   });
 
-  test('getBalance', async () => {
+  test('getBalance', async (): Promise<void> => {
     const balance = new BN('100', 10);
     const respobj = {
       balance,
@@ -220,7 +220,7 @@ describe('AVMAPI', () => {
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj));
   });
 
-  test('exportKey', async () => {
+  test('exportKey', async (): Promise<void> => {
     const key = 'sdfglvlj2h3v45';
 
     const result:Promise<string> = api.exportKey(username, password, addrA);
@@ -240,7 +240,7 @@ describe('AVMAPI', () => {
     expect(response).toBe(key);
   });
 
-  test("export", async ()=>{
+  test("export", async (): Promise<void> => {
     let amount = new BN(100);
     let to = "abcdef";
     let assetID = "AVAX"
@@ -264,7 +264,7 @@ describe('AVMAPI', () => {
     expect(response).toBe(txID);
   });
 
-  test("exportAVAX", async ()=>{
+  test("exportAVAX", async (): Promise<void> => {
     let amount = new BN(100);
     let to = "abcdef";
     let username = "Robert";
@@ -287,7 +287,7 @@ describe('AVMAPI', () => {
     expect(response).toBe(txID);
 });
 
-test("import", async ()=>{
+  test("import", async (): Promise<void> => {
   let to = "abcdef";
   let username = "Robert";
   let password = "Paulson";
@@ -309,7 +309,7 @@ test("import", async ()=>{
   expect(response).toBe(txID);
 });
 
-  test("importAVAX", async ()=>{
+  test("importAVAX", async (): Promise<void> => {
     let to = "abcdef";
     let username = "Robert";
     let password = "Paulson";
@@ -331,7 +331,7 @@ test("import", async ()=>{
     expect(response).toBe(txID);
 });
 
-  test('createAddress', async () => {
+  test('createAddress', async (): Promise<void> => {
     const alias = 'randomalias';
 
     const result:Promise<string> = api.createAddress(username, password);
@@ -351,13 +351,13 @@ test("import", async ()=>{
     expect(response).toBe(alias);
   });
 
-  test('createFixedCapAsset', async () => {
+  test('createFixedCapAsset', async (): Promise<void> => {
     const kp:KeyPair = new KeyPair(avalanche.getHRP(), alias);
     kp.importKey(Buffer.from('ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676', 'hex'));
 
     const denomination:number = 0;
     const assetid:string = '8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533';
-    const initialHolders:Array<object> = [
+    const initialHolders: object[] = [
       {
         address: '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh',
         amount: '10000',
@@ -391,7 +391,7 @@ test("import", async ()=>{
 
     const denomination:number = 0;
     const assetid:string = '8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533';
-    const minterSets:Array<object> = [
+    const minterSets: object[] = [
       {
         minters: [
           '4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q',
@@ -425,13 +425,13 @@ test("import", async ()=>{
     expect(response).toBe(assetid);
   });
 
-  test('mint 1', async () => {
+  test('mint 1', async (): Promise<void> => {
     const username:string = 'Collin';
     const password:string = 'Cusce';
     const amount:number = 2;
     const assetID:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
-    const minters:Array<string> = [
+    const minters: string[] = [
       'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF',
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
@@ -453,13 +453,13 @@ test("import", async ()=>{
     expect(response).toBe('sometx');
   });
 
-  test('mint 2', async () => {
+  test('mint 2', async (): Promise<void> => {
     const username:string = 'Collin';
     const password:string = 'Cusce';
     const amount:BN = new BN(1);
     const assetID:Buffer = Buffer.from('f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7', 'hex');
     const to:string = 'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF';
-    const minters:Array<string> = [
+    const minters: string[] = [
       'dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF',
       '2fE6iibqfERz5wenXE6qyvinsxDvFhHZk',
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
@@ -481,7 +481,7 @@ test("import", async ()=>{
     expect(response).toBe('sometx');
   });
 
-  test('getTx', async () => {
+  test('getTx', async (): Promise<void> => {
     const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
     const result:Promise<string> = api.getTx(txid);
@@ -502,7 +502,7 @@ test("import", async ()=>{
   });
 
 
-  test('getTxStatus', async () => {
+  test('getTxStatus', async (): Promise<void> => {
     const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
 
     const result:Promise<string> = api.getTxStatus(txid);
@@ -549,7 +549,7 @@ test("import", async ()=>{
     expect(response.denomination).toBe(10);
   });
 
-  test('getAssetDescription as Buffer', async () => {
+  test('getAssetDescription as Buffer', async (): Promise<void> => {
     const assetid:Buffer = Buffer.from('8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533', 'hex');
     const assetidstr:string = bintools.cb58Encode(Buffer.from('8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533', 'hex'));
 
@@ -576,7 +576,7 @@ test("import", async ()=>{
     expect(response.denomination).toBe(11);
   });
 
-  test('getUTXOs', async () => {
+  test('getUTXOs', async (): Promise<void> => {
     // Payment
     const OPUTXOstr1:string = bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex'));
     const OPUTXOstr2:string = bintools.cb58Encode(Buffer.from('0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'));
@@ -588,7 +588,7 @@ test("import", async ()=>{
 
     const persistOpts:PersistanceOptions = new PersistanceOptions('test', true, 'union');
     expect(persistOpts.getMergeRule()).toBe('union');
-    let addresses:Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a));
+    let addresses: string[] = set.getAddresses().map((a) => api.addressFromBuffer(a));
     let result:Promise<{
       numFetched:number,
       utxos:UTXOSet,
@@ -621,19 +621,19 @@ test("import", async ()=>{
     expect(JSON.stringify(response.getAllUTXOStrings().sort())).toBe(JSON.stringify(set.getAllUTXOStrings().sort()));
   });
 
-  describe('Transactions', () => {
+  describe('Transactions', (): void => {
     let set:UTXOSet;
     let keymgr2:KeyChain;
     let keymgr3:KeyChain;
-    let addrs1:Array<string>;
-    let addrs2:Array<string>;
-    let addrs3:Array<string>;
-    let addressbuffs:Array<Buffer> = [];
-    let addresses:Array<string> = [];
-    let utxos:Array<UTXO>;
-    let inputs:Array<TransferableInput>;
-    let outputs:Array<TransferableOutput>;
-    let ops:Array<TransferableOperation>;
+    let addrs1: string[]
+    let addrs2: string[]
+    let addrs3: string[]
+    let addressbuffs: Buffer[] = []
+    let addresses: string[] = []
+    let utxos: UTXO[]
+    let inputs: TransferableInput[]
+    let outputs: TransferableOutput[]
+    let ops: TransferableOperation[];
     const amnt:number = 10000;
     const assetID:Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest());
     const NFTassetID:Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest());
@@ -645,8 +645,8 @@ test("import", async ()=>{
     let nftpbase2:NFTMintOutput;
     let nftpbase3:NFTMintOutput;
     let nftInitialState:InitialStates;
-    let nftutxoids:Array<string> = [];
-    let fungutxoids:Array<string> = [];
+    let nftutxoids: string[] = []
+    let fungutxoids: string[] = [];
     let avm:AVMAPI;
     const fee:number = 10;
     const name:string = 'Mortycoin is the dumb as a sack of hammers.';
@@ -663,7 +663,7 @@ test("import", async ()=>{
 
     let xfersecpmintop:TransferableOperation;
 
-    beforeEach(async () => {
+    beforeEach(async (): Promise<void> => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainid);
       const result:Promise<Buffer> = avm.getAVAXAssetID(true);
       const payload:object = {
@@ -769,7 +769,7 @@ test("import", async ()=>{
 
     });
 
-    test('signTx', async () => {
+    test('signTx', async (): Promise<void> => {
       const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
       const txu2:UnsignedTx = set.buildBaseTx(
         networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
@@ -787,7 +787,7 @@ test("import", async ()=>{
       expect(tx2.toString()).toBe(tx1.toString());
     });
 
-    test('buildBaseTx1', async () => {
+    test('buildBaseTx1', async (): Promise<void> => {
       const txu1:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1, new UTF8Payload("hello world").getContent());
       let memobuf:Buffer = Buffer.from("hello world");
       const txu2:UnsignedTx = set.buildBaseTx(
@@ -804,14 +804,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -828,14 +821,7 @@ test("import", async ()=>{
 
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -851,7 +837,7 @@ test("import", async ()=>{
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
     });
 
-    test('buildBaseTx2', async () => {
+    test('buildBaseTx2', async (): Promise<void> => {
       const txu1:UnsignedTx = await avm.buildBaseTx(
         set, new BN(amnt).sub(new BN(100)), bintools.cb58Encode(assetID), 
         addrs3, addrs1, addrs2, 
@@ -868,7 +854,7 @@ test("import", async ()=>{
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
       expect(txu2.toString()).toBe(txu1.toString());
 
-      const outies = txu1.getTransaction().getOuts().sort(TransferableOutput.comparator()) as Array<TransferableOutput>;
+      const outies = txu1.getTransaction().getOuts().sort(TransferableOutput.comparator()) as TransferableOutput[];
 
       expect(outies.length).toBe(2);
       const outaddr0 = outies[0].getOutput().getAddresses().map((a) => avm.addressFromBuffer(a));
@@ -887,14 +873,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -911,14 +890,7 @@ test("import", async ()=>{
 
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -936,7 +908,7 @@ test("import", async ()=>{
       serialzeit(tx1, "BaseTx");
     });
 
-    test('issueTx Serialized', async () => {
+    test('issueTx Serialized', async (): Promise<void> => {
       const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
       const tx = avm.signTx(txu);
       const txid:string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7';
@@ -956,7 +928,7 @@ test("import", async ()=>{
         expect(response).toBe(txid);
       });
 
-    test('issueTx Buffer', async () => {
+    test('issueTx Buffer', async (): Promise<void> => {
       const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
       const tx = avm.signTx(txu);
 
@@ -976,7 +948,7 @@ test("import", async ()=>{
 
       expect(response).toBe(txid);
     });
-    test('issueTx Class Tx', async () => {
+    test('issueTx Class Tx', async (): Promise<void> => {
       const txu:UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
       const tx = avm.signTx(txu);
 
@@ -998,7 +970,7 @@ test("import", async ()=>{
       expect(response).toBe(txid);
     });
 
-    test('buildCreateAssetTx - Fixed Cap', async () => {
+    test('buildCreateAssetTx - Fixed Cap', async (): Promise<void> => {
       avm.setCreationTxFee(new BN(fee));
       const txu1:UnsignedTx = await avm.buildCreateAssetTx(
         set, 
@@ -1030,14 +1002,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1054,14 +1019,7 @@ test("import", async ()=>{
 
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1079,9 +1037,9 @@ test("import", async ()=>{
       serialzeit(tx1, "CreateAssetTx");
     });
 
-    test('buildCreateAssetTx - Variable Cap', async () => {
+    test('buildCreateAssetTx - Variable Cap', async (): Promise<void> => {
       avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]));
-      let mintOutputs:Array<SECPMintOutput>  = [secpMintOut1, secpMintOut2];
+      let mintOutputs: SECPMintOutput[] = [secpMintOut1, secpMintOut2];
       const txu1:UnsignedTx = await avm.buildCreateAssetTx(
         set, 
         addrs1, 
@@ -1113,14 +1071,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1137,14 +1088,7 @@ test("import", async ()=>{
 
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1160,7 +1104,7 @@ test("import", async ()=>{
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx);
     });
 
-    test('buildSECPMintTx', async () => {
+    test('buildSECPMintTx', async (): Promise<void> => {
       avm.setTxFee(new BN(fee));
       let newMinter:SECPMintOutput = new SECPMintOutput(addrs3.map((a) => avm.parseAddress(a)), new BN(0), 1);
       const txu1:UnsignedTx = await avm.buildSECPMintTx(
@@ -1189,14 +1133,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1213,14 +1150,7 @@ test("import", async ()=>{
 
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1238,7 +1168,7 @@ test("import", async ()=>{
       serialzeit(tx1, "SECPMintTx");
     });
 
-    test('buildCreateNFTAssetTx', async () => {
+    test('buildCreateNFTAssetTx', async (): Promise<void> => {
       avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]));
       let minterSets:Array<MinterSet> = [new MinterSet(1, addrs1)];
       let locktime:BN = new BN(0);
@@ -1260,14 +1190,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1284,14 +1207,7 @@ test("import", async ()=>{
 
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1309,7 +1225,7 @@ test("import", async ()=>{
       serialzeit(tx1, "CreateNFTAssetTx");
     }); 
 
-    test('buildCreateNFTMintTx', async () => {
+    test('buildCreateNFTMintTx', async (): Promise<void> => {
       avm.setTxFee(new BN(fee));
       let groupID:number = 0;
       let locktime:BN = new BN(0);
@@ -1318,7 +1234,7 @@ test("import", async ()=>{
       let addrbuff1: Buffer[] = addrs1.map(a => avm.parseAddress(a));
       let addrbuff2: Buffer[] = addrs2.map(a => avm.parseAddress(a));
       let addrbuff3: Buffer[] = addrs3.map(a => avm.parseAddress(a));
-      let outputOwners:Array<OutputOwners> = [];
+      let outputOwners: OutputOwners[] = [];
       let oo:OutputOwners = new OutputOwners(addrbuff3, locktime, threshold);
       outputOwners.push();
        
@@ -1356,14 +1272,7 @@ test("import", async ()=>{
     let tx1:Tx = txu1.sign(avm.keyChain());
     let checkTx:string = tx1.toBuffer().toString("hex");
     let tx1obj:object = tx1.serialize("hex");
-    let tx1str:string = JSON.stringify(tx1obj);
-    
-    /*
-    console.log("-----Test1 JSON-----");
-    console.log(tx1str);
-    console.log("-----Test1 ENDN-----");
-    */
-    
+      let tx1str: string = JSON.stringify(tx1obj);
     let tx2newobj:object = JSON.parse(tx1str);
     let tx2:Tx = new Tx();
     tx2.deserialize(tx2newobj, "hex");
@@ -1380,14 +1289,7 @@ test("import", async ()=>{
 
     let tx3:Tx = txu1.sign(avm.keyChain());
     let tx3obj:object = tx3.serialize("display");
-    let tx3str:string = JSON.stringify(tx3obj);
-    
-    /*
-    console.log("-----Test3 JSON-----");
-    console.log(tx3str);
-    console.log("-----Test3 ENDN-----");
-    */
-    
+      let tx3str: string = JSON.stringify(tx3obj);
     let tx4newobj:object = JSON.parse(tx3str);
     let tx4:Tx = new Tx();
     tx4.deserialize(tx4newobj, "display");
@@ -1406,7 +1308,7 @@ test("import", async ()=>{
 
   });
 
-    test('buildNFTTransferTx', async () => {
+    test('buildNFTTransferTx', async (): Promise<void> => {
       avm.setTxFee(new BN(fee));
       const pload:Buffer = Buffer.alloc(1024);
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8');
@@ -1429,14 +1331,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1453,14 +1348,7 @@ test("import", async ()=>{
   
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1479,7 +1367,7 @@ test("import", async ()=>{
 
     });
 
-    test('buildImportTx', async () => {
+    test('buildImportTx', async (): Promise<void> => {
       let locktime:BN = new BN(0);
       let threshold:number = 1;
       avm.setTxFee(new BN(fee));
@@ -1516,14 +1404,7 @@ test("import", async ()=>{
       let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1540,14 +1421,7 @@ test("import", async ()=>{
   
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1565,7 +1439,7 @@ test("import", async ()=>{
       serialzeit(tx1, "ImportTx");
     });
 
-    test('buildExportTx', async () => {
+    test('buildExportTx', async (): Promise<void> => {
       avm.setTxFee(new BN(fee));
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a));
       const addrbuff2 = addrs2.map((a) => avm.parseAddress(a));
@@ -1616,14 +1490,7 @@ test("import", async ()=>{
             let tx1:Tx = txu1.sign(avm.keyChain());
       let checkTx:string = tx1.toBuffer().toString("hex");
       let tx1obj:object = tx1.serialize("hex");
-      let tx1str:string = JSON.stringify(tx1obj);
-      
-      /*
-      console.log("-----Test1 JSON-----");
-      console.log(tx1str);
-      console.log("-----Test1 ENDN-----");
-      */
-      
+      let tx1str: string = JSON.stringify(tx1obj);
       let tx2newobj:object = JSON.parse(tx1str);
       let tx2:Tx = new Tx();
       tx2.deserialize(tx2newobj, "hex");
@@ -1640,14 +1507,7 @@ test("import", async ()=>{
   
       let tx3:Tx = txu1.sign(avm.keyChain());
       let tx3obj:object = tx3.serialize("display");
-      let tx3str:string = JSON.stringify(tx3obj);
-      
-      /*
-      console.log("-----Test3 JSON-----");
-      console.log(tx3str);
-      console.log("-----Test3 ENDN-----");
-      */
-      
+      let tx3str: string = JSON.stringify(tx3obj);
       let tx4newobj:object = JSON.parse(tx3str);
       let tx4:Tx = new Tx();
       tx4.deserialize(tx4newobj, "display");
@@ -1666,7 +1526,7 @@ test("import", async ()=>{
 
     });
 
-    test('buildGenesis', async ()=>{
+    test('buildGenesis', async (): Promise<void> => {
         let genesisData:object = {
             genesisData : {
                 assetAlias1: {

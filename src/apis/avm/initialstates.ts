@@ -34,7 +34,7 @@ export class InitialStates extends Serializable{
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    let unflat:{[fxid:number]:Array<Output>} = {};
+    let unflat: { [fxid: number]: Output[] } = {};
     for(let fxid in fields["fxs"]){
       unflat[fxid] = fields["fxs"][fxid].map((o:object) => {
         let out:Output = SelectOutputClass(o["_typeID"]);
@@ -45,7 +45,7 @@ export class InitialStates extends Serializable{
     this.fxs = unflat;
   }
 
-  protected fxs:{[fxid:number]:Array<Output>} = {};
+  protected fxs: { [fxid: number]: Output[] } = {};
 
   /**
      *
@@ -60,7 +60,7 @@ export class InitialStates extends Serializable{
   }
 
   fromBuffer(bytes:Buffer, offset:number = 0):number {
-    const result:{[fxid:number]:Array<Output>} = [];
+    const result: { [fxid: number]: Output[] } = [];
     const klen:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
     const klennum:number = klen.readUInt32BE(0);
@@ -85,8 +85,8 @@ export class InitialStates extends Serializable{
   }
 
   toBuffer():Buffer {
-    const buff:Array<Buffer> = [];
-    const keys:Array<number> = Object.keys(this.fxs).map((k) => parseInt(k, 10)).sort();
+    const buff: Buffer[] = []
+    const keys: number[] = Object.keys(this.fxs).map((k) => parseInt(k, 10)).sort();
     const klen:Buffer = Buffer.alloc(4);
     klen.writeUInt32BE(keys.length, 0);
     buff.push(klen);

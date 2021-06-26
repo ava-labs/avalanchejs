@@ -30,7 +30,7 @@ const bintools: BinTools = BinTools.getInstance()
  *
  * @returns An instance of an [[BaseTx]]-extended class.
  */
-export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
+export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
   if (txtype === PlatformVMConstants.BASETX) {
     return new BaseTx(...args);
   } else if (txtype === PlatformVMConstants.IMPORTTX) {
@@ -83,7 +83,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   sign(kc:KeyChain):Tx {
     const txbuff = this.toBuffer();
     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
-    const sigs:Array<Credential> = this.transaction.sign(msg, kc);
+    const sigs: Credential[] = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
 }
