@@ -1,6 +1,6 @@
-import mockAxios from 'jest-mock-axios';
-import { Avalanche } from 'src';
-import { AuthAPI } from 'src/apis/auth/api';
+import mockAxios from 'jest-mock-axios'
+import { Avalanche } from 'src'
+import { AuthAPI } from 'src/apis/auth/api'
 
 describe('Auth', (): void => {
   const ip: string = '127.0.0.1'
@@ -10,73 +10,73 @@ describe('Auth', (): void => {
   let auth: AuthAPI
 
   // We think we're a Rick, but we're totally a Jerry.
-  let password:string = "Weddings are basically funerals with a cake. -- Rich Sanchez";
-  let newPassword:string = "Sometimes science is more art than science, Morty. -- Rich Sanchez";
+  let password: string = "Weddings are basically funerals with a cake. -- Rich Sanchez"
+  let newPassword: string = "Sometimes science is more art than science, Morty. -- Rich Sanchez"
 
-  let testToken:string = "To live is to risk it all; otherwise you're just an inert chunk of randomly assembled molecules drifting wherever the universe blows you. -- Rick Sanchez"
+  let testToken: string = "To live is to risk it all otherwise you're just an inert chunk of randomly assembled molecules drifting wherever the universe blows you. -- Rick Sanchez"
 
-  let testEndpoints: string[] = ["/ext/opt/bin/bash/foo", "/dev/null", "/tmp"];
+  let testEndpoints: string[] = ["/ext/opt/bin/bash/foo", "/dev/null", "/tmp"]
 
   beforeAll((): void => {
-    auth = avalanche.Auth();
-  });
+    auth = avalanche.Auth()
+  })
 
   afterEach((): void => {
-    mockAxios.reset();
-  });
+    mockAxios.reset()
+  })
 
   test('newToken', async (): Promise<void> => {
-    const result:Promise<string> = auth.newToken(password, testEndpoints);
+    const result: Promise<string> = auth.newToken(password, testEndpoints)
     const payload:object = {
       result: {
         token: testToken,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:string = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(testToken);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(testToken)
+  })
 
   test('revokeToken', async (): Promise<void> => {
-    const result:Promise<boolean> = auth.revokeToken(password, testToken);
+    const result: Promise<boolean> = auth.revokeToken(password, testToken)
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
 
 
   test('changePassword', async (): Promise<void> => {
-    const result:Promise<boolean> = auth.changePassword(password, newPassword);
+    const result: Promise<boolean> = auth.changePassword(password, newPassword)
     const payload:object = {
       result: {
         success: false,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(false);
-  });
-});
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(false)
+  })
+})

@@ -1,8 +1,8 @@
-import mockAxios from 'jest-mock-axios';
+import mockAxios from 'jest-mock-axios'
 
-import { Avalanche } from 'src';
-import BinTools from 'src/utils/bintools';
-import { HealthAPI } from 'src/apis/health/api';
+import { Avalanche } from 'src'
+import BinTools from 'src/utils/bintools'
+import { HealthAPI } from 'src/apis/health/api'
 
 /**
  * @ignore
@@ -13,19 +13,19 @@ describe('Health', (): void => {
   const ip: string = '127.0.0.1'
   const port: number = 9650
   const protocol: string = 'https'
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true);
-  let health:HealthAPI;
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true)
+  let health: HealthAPI
 
   beforeAll((): void => {
-    health = new HealthAPI(avalanche);
-  });
+    health = new HealthAPI(avalanche)
+  })
 
   afterEach((): void => {
-    mockAxios.reset();
-  });
+    mockAxios.reset()
+  })
 
   test('getLiveness ', async (): Promise<void> => {
-    const result:Promise<object> = health.getLiveness();
+    const result: Promise<object> = health.getLiveness()
     const payload:any = {
       result: {
         checks: {
@@ -41,15 +41,15 @@ describe('Health', (): void => {
         },
         healthy: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:any = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: any = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(payload.result);
-  });
-});
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(payload.result)
+  })
+})

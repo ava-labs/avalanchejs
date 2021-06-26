@@ -1,7 +1,7 @@
-import mockAxios from 'jest-mock-axios';
+import mockAxios from 'jest-mock-axios'
 
-import { Avalanche } from 'src';
-import { AdminAPI } from 'src/apis/admin/api';
+import { Avalanche } from 'src'
+import { AdminAPI } from 'src/apis/admin/api'
 
 describe('Admin', (): void => {
   const ip: string = '127.0.0.1'
@@ -11,56 +11,56 @@ describe('Admin', (): void => {
   let admin: AdminAPI
 
   beforeAll((): void => {
-    admin = avalanche.Admin();
-  });
+    admin = avalanche.Admin()
+  })
 
   afterEach((): void => {
-    mockAxios.reset();
-  });
+    mockAxios.reset()
+  })
 
   test('alias', async (): Promise<void> => {
-    const ep:string = '/ext/something';
-    const al:string = '/ext/anotherthing';
-    const result:Promise<boolean> = admin.alias(ep, al);
+    const ep: string = '/ext/something'
+    const al: string = '/ext/anotherthing'
+    const result: Promise<boolean> = admin.alias(ep, al)
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
 
   test('aliasChain', async (): Promise<void> => {
-    const ch:string = 'abcd';
-    const al:string = 'myChain';
-    const result:Promise<boolean> = admin.aliasChain(ch, al);
+    const ch: string = 'abcd'
+    const al: string = 'myChain'
+    const result: Promise<boolean> = admin.aliasChain(ch, al)
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
 
   test('getChainAliases', async (): Promise<void> => {
-    const ch:string = 'chain';
-    const result:Promise<string[]> = admin.getChainAliases(ch);
+    const ch: string = 'chain'
+    const result: Promise<string[]> = admin.getChainAliases(ch)
     const payload:object = {
       result: {
         aliases: [
@@ -68,88 +68,88 @@ describe('Admin', (): void => {
             "alias2"
         ],
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:string[] = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: string[] = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
     // @ts-ignore
-    expect(response).toBe(payload.result.aliases);
-  });
+    expect(response).toBe(payload.result.aliases)
+  })
 
   test('lockProfile', async () => {
-    const result:Promise<boolean> = admin.lockProfile();
+    const result: Promise<boolean> = admin.lockProfile()
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
 
   test('memoryProfile', async (): Promise<void> => {
-    const result:Promise<boolean> = admin.memoryProfile();
+    const result: Promise<boolean> = admin.memoryProfile()
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
 
   test('startCPUProfiler', async (): Promise<void> => {
-    const result:Promise<boolean> = admin.startCPUProfiler();
+    const result: Promise<boolean> = admin.startCPUProfiler()
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
 
   test('stopCPUProfiler', async (): Promise<void> => {
-    const result:Promise<boolean> = admin.stopCPUProfiler();
+    const result: Promise<boolean> = admin.stopCPUProfiler()
     const payload:object = {
       result: {
         success: true,
       },
-    };
+    }
     const responseObj = {
       data: payload,
-    };
+    }
 
-    mockAxios.mockResponse(responseObj);
-    const response:boolean = await result;
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
 
-    expect(mockAxios.request).toHaveBeenCalledTimes(1);
-    expect(response).toBe(true);
-  });
-});
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(true)
+  })
+})
