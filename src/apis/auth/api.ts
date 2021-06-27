@@ -22,7 +22,7 @@ export class AuthAPI extends JRPCAPI {
      *
      * @returns Returns a Promise<string> containing the authorization token.
      */
-    newToken = async (password:string, endpoints:Array<string>):Promise<string> => {
+  newToken = async (password: string, endpoints: string[]): Promise<string> => {
         const params:any = {
             password,
             endpoints

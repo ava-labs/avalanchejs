@@ -11,8 +11,8 @@ import { Serializable, Serialization, SerializedEncoding } from '../utils/serial
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 export abstract class Input extends Serializable {
   protected _typeName = "Input";
@@ -36,7 +36,7 @@ export abstract class Input extends Serializable {
   }
 
   protected sigCount:Buffer = Buffer.alloc(4);
-  protected sigIdxs:Array<SigIdx> = []; // idxs of signers from utxo
+  protected sigIdxs: SigIdx[] = []; // idxs of signers from utxo
 
   static comparator = ():(a:Input, b:Input) => (1|-1|0) => (a:Input, b:Input):(1|-1|0) => {
     const aoutid:Buffer = Buffer.alloc(4);
@@ -57,7 +57,7 @@ export abstract class Input extends Serializable {
   /**
    * Returns the array of [[SigIdx]] for this [[Input]]
    */
-  getSigIdxs = ():Array<SigIdx> => this.sigIdxs;
+  getSigIdxs = (): SigIdx[] => this.sigIdxs;
 
   abstract getCredentialID():number;
 
@@ -82,7 +82,7 @@ export abstract class Input extends Serializable {
     offset += 4;
     const sigCount:number = this.sigCount.readUInt32BE(0);
     this.sigIdxs = [];
-    for (let i = 0; i < sigCount; i++) {
+    for (let i: number = 0; i < sigCount; i++) {
       const sigidx = new SigIdx();
       const sigbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
       sigidx.fromBuffer(sigbuff);
@@ -95,8 +95,8 @@ export abstract class Input extends Serializable {
   toBuffer():Buffer {
     this.sigCount.writeUInt32BE(this.sigIdxs.length, 0);
     let bsize:number = this.sigCount.length;
-    const barr:Array<Buffer> = [this.sigCount];
-    for (let i = 0; i < this.sigIdxs.length; i++) {
+    const barr: Buffer[] = [this.sigCount];
+    for (let i: number = 0; i < this.sigIdxs.length; i++) {
       const b:Buffer = this.sigIdxs[i].toBuffer();
       barr.push(b);
       bsize += b.length;
@@ -151,7 +151,7 @@ export abstract class StandardParseableInput extends Serializable {
     const inbuff:Buffer = this.input.toBuffer();
     const inid:Buffer = Buffer.alloc(4);
     inid.writeUInt32BE(this.input.getInputID(), 0);
-    const barr:Array<Buffer> = [inid, inbuff];
+    const barr: Buffer[] = [inid, inbuff];
     return Buffer.concat(barr, inid.length + inbuff.length);
   }
   
@@ -176,16 +176,16 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "txid": serializer.encoder(this.txid, encoding, "Buffer", "cb58"),
-      "outputidx": serializer.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
-      "assetid": serializer.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      "txid": serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
+      "outputidx": serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
+      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58"),
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.txid = serializer.decoder(fields["txid"], encoding, "cb58", "Buffer", 32);
-    this.outputidx = serializer.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4);
-    this.assetid = serializer.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.txid = serialization.decoder(fields["txid"], encoding, "cb58", "Buffer", 32)
+    this.outputidx = serialization.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4)
+    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
     //input deserialization must be implmented in child classes
   }
 
@@ -230,7 +230,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
   toBuffer():Buffer {
     const parseableBuff:Buffer = super.toBuffer();
     const bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + parseableBuff.length;
-    const barr:Array<Buffer> = [this.txid, this.outputidx, this.assetid, parseableBuff];
+    const barr: Buffer[] = [this.txid, this.outputidx, this.assetid, parseableBuff];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -273,12 +273,12 @@ export abstract class StandardAmountInput extends Input {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "amount": serializer.encoder(this.amount, encoding, "Buffer", "decimalString", 8)
+      "amount": serialization.encoder(this.amount, encoding, "Buffer", "decimalString", 8)
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.amount = serializer.decoder(fields["amount"], encoding, "decimalString", "Buffer", 8);
+    this.amount = serialization.decoder(fields["amount"], encoding, "decimalString", "Buffer", 8);
     this.amountValue = bintools.fromBufferToBN(this.amount);
   }
 
@@ -306,7 +306,7 @@ export abstract class StandardAmountInput extends Input {
   toBuffer():Buffer {
     const superbuff:Buffer = super.toBuffer();
     const bsize:number = this.amount.length + superbuff.length;
-    const barr:Array<Buffer> = [this.amount, superbuff];
+    const barr: Buffer[] = [this.amount, superbuff];
     return Buffer.concat(barr, bsize);
   }
 

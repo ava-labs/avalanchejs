@@ -13,7 +13,7 @@ import createHash from 'create-hash';
 import { BaseTx } from './basetx';
 import { ImportTx } from './importtx';
 import { ExportTx } from './exporttx';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
+import { SerializedEncoding } from '../../utils/serialization';
 import { AddDelegatorTx, AddValidatorTx } from './validationtx';
 import { CreateSubnetTx } from './createsubnettx';
 import { TransactionError } from '../../utils/errors';
@@ -21,8 +21,7 @@ import { TransactionError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
 /**
  * Takes a buffer representing the output and returns the proper [[BaseTx]] instance.
@@ -31,7 +30,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[BaseTx]]-extended class.
  */
-export const SelectTxClass = (txtype:number, ...args:Array<any>):BaseTx => {
+export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
   if (txtype === PlatformVMConstants.BASETX) {
     return new BaseTx(...args);
   } else if (txtype === PlatformVMConstants.IMPORTTX) {
@@ -84,7 +83,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   sign(kc:KeyChain):Tx {
     const txbuff = this.toBuffer();
     const msg:Buffer = Buffer.from(createHash('sha256').update(txbuff).digest());
-    const sigs:Array<Credential> = this.transaction.sign(msg, kc);
+    const sigs: Credential[] = this.transaction.sign(msg, kc);
     return new Tx(this, sigs);
   }
 }
@@ -100,7 +99,7 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     this.unsignedTx = new UnsignedTx();
     this.unsignedTx.deserialize(fields["unsignedTx"], encoding);
     this.credentials = [];
-    for(let i = 0; i < fields["credentials"].length; i++){
+    for (let i: number = 0; i < fields["credentials"].length; i++) {
       const cred:Credential = SelectCredentialClass(fields["credentials"][i]["_typeID"]);
       cred.deserialize(fields["credentials"][i], encoding);
       this.credentials.push(cred);
@@ -121,7 +120,7 @@ export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
     const numcreds:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
     this.credentials = [];
-    for (let i = 0; i < numcreds; i++) {
+    for (let i: number = 0; i < numcreds; i++) {
       const credid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
       offset += 4;
       const cred:Credential = SelectCredentialClass(credid);

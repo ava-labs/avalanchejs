@@ -140,14 +140,14 @@ export abstract class StandardKeyPair {
        * @returns An array of {@link https://github.com/feross/buffer|Buffer}  representations
        * of the addresses
        */
-    getAddresses = ():Array<Buffer> => Object.values(this.keys).map((kp) => kp.getAddress());
+    getAddresses = (): Buffer[] => Object.values(this.keys).map((kp) => kp.getAddress());
   
     /**
        * Gets an array of addresses stored in the [[StandardKeyChain]].
        *
        * @returns An array of string representations of the addresses
        */
-    getAddressStrings = ():Array<string> => Object.values(this.keys)
+    getAddressStrings = (): string[] => Object.values(this.keys)
       .map((kp) => kp.getAddressString());
   
     /**

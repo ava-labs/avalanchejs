@@ -13,8 +13,8 @@ import { InputIdError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
@@ -23,7 +23,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
+export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
   if (inputid === PlatformVMConstants.SECPINPUTID) {
     return new SECPTransferInput(...args);
   } else if (inputid === PlatformVMConstants.STAKEABLELOCKINID) {
@@ -138,7 +138,7 @@ export class StakeableLockIn extends AmountInput {
     let fields:object = super.serialize(encoding);
     let outobj:object = {
       ...fields,
-      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
+      "stakeableLocktime": serialization.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
       "transferableInput": this.transferableInput.serialize(encoding)
     };
     delete outobj["sigIdxs"];
@@ -151,7 +151,7 @@ export class StakeableLockIn extends AmountInput {
     fields["sigCount"] = "0";
     fields["amount"] = "98";
     super.deserialize(fields, encoding);
-    this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.stakeableLocktime = serialization.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
     this.transferableInput = new ParseableInput();
     this.transferableInput.deserialize(fields["transferableInput"], encoding);
     this.synchronize();
@@ -203,7 +203,7 @@ export class StakeableLockIn extends AmountInput {
   toBuffer():Buffer {
     const xferinBuff:Buffer = this.transferableInput.toBuffer();
     const bsize:number = this.stakeableLocktime.length + xferinBuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, xferinBuff];
+    const barr: Buffer[] = [this.stakeableLocktime, xferinBuff];
     return Buffer.concat(barr, bsize);
   }
   

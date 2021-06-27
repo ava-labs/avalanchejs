@@ -5,11 +5,13 @@
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
 import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
+import { Serialization, SerializedType } from '../../utils'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance();
+const serialization: Serialization = Serialization.getInstance()
 
 
 /**
@@ -25,10 +27,11 @@ export class KeyPair extends SECP256k1KeyPair {
      * 
      * @returns A string representation of the address
      */
-    getAddressString = ():string => {
-        const addr:Buffer = this.addressFromPublicKey(this.pubk);
-        return bintools.addressToString(this.hrp, this.chainid, addr);
-    }
+  getAddressString = (): string => {
+    const addr: Buffer = this.addressFromPublicKey(this.pubk)
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(addr, type, this.hrp, this.chainid)
+  }
 
     /**
        * Returns the chainID associated with this key.

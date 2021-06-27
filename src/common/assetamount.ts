@@ -107,14 +107,14 @@ export class AssetAmount {
 }
 
 export abstract class StandardAssetAmountDestination<TO extends StandardTransferableOutput, TI extends StandardTransferableInput>  {
-  protected amounts: Array<AssetAmount> = [];
-  protected destinations: Array<Buffer> = [];
-  protected senders: Array<Buffer> = [];
-  protected changeAddresses: Array<Buffer> = [];
+  protected amounts: AssetAmount[] = [];
+  protected destinations: Buffer[] = [];
+  protected senders: Buffer[] = [];
+  protected changeAddresses: Buffer[] = [];
   protected amountkey: object = {};
-  protected inputs: Array<TI> = [];
-  protected outputs: Array<TO> = [];
-  protected change: Array<TO> = [];
+  protected inputs: TI[] = [];
+  protected outputs: TO[] = [];
+  protected change: TO[] = [];
 
   // TODO: should this function allow for repeated calls with the same
   //       assetID?
@@ -136,19 +136,19 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
     this.change.push(output);
   }
 
-  getAmounts = (): Array<AssetAmount> => {
+  getAmounts = (): AssetAmount[] => {
     return this.amounts;
   }
 
-  getDestinations = (): Array<Buffer> => {
+  getDestinations = (): Buffer[] => {
     return this.destinations;
   }
 
-  getSenders = (): Array<Buffer> => {
+  getSenders = (): Buffer[] => {
     return this.senders;
   }
 
-  getChangeAddresses = (): Array<Buffer> => {
+  getChangeAddresses = (): Buffer[] => {
     return this.changeAddresses;
   }
 
@@ -160,24 +160,24 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
     return (assetHexStr in this.amountkey);
   }
 
-  getInputs = (): Array<TI> => {
+  getInputs = (): TI[] => {
     return this.inputs;
   }
 
-  getOutputs = (): Array<TO> => {
+  getOutputs = (): TO[] => {
     return this.outputs;
   }
 
-  getChangeOutputs = (): Array<TO> => {
+  getChangeOutputs = (): TO[] => {
     return this.change;
   }
 
-  getAllOutputs = (): Array<TO> => {
+  getAllOutputs = (): TO[] => {
     return this.outputs.concat(this.change);
   }
 
   canComplete = (): boolean => {
-    for (let i = 0; i < this.amounts.length; i++) {
+    for (let i: number = 0; i < this.amounts.length; i++) {
       if (!this.amounts[i].isFinished()) {
 
         return false;
@@ -186,7 +186,7 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
     return true;
   }
 
-  constructor(destinations: Array<Buffer>, senders: Array<Buffer>, changeAddresses: Array<Buffer>) {
+  constructor(destinations: Buffer[], senders: Buffer[], changeAddresses: Buffer[]) {
     this.destinations = destinations;
     this.changeAddresses = changeAddresses;
     this.senders = senders;

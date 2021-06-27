@@ -18,8 +18,8 @@ import { ChainIdError, TransferableInputError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 
 /**
@@ -33,13 +33,13 @@ export class ImportTx extends BaseTx {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "sourceChain": serializer.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
+      "sourceChain": serialization.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
       "importIns": this.importIns.map((i) => i.serialize(encoding))
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.sourceChain = serializer.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
+    this.sourceChain = serialization.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32);
     this.importIns = fields["importIns"].map((i:object) => {
       let ii:TransferableInput = new TransferableInput();
       ii.deserialize(i, encoding);
@@ -51,7 +51,7 @@ export class ImportTx extends BaseTx {
 
   protected sourceChain:Buffer = Buffer.alloc(32);
   protected numIns:Buffer = Buffer.alloc(4);
-  protected importIns:Array<TransferableInput> = [];
+  protected importIns: TransferableInput[] = [];
 
   /**
      * Returns the id of the [[ImportTx]]
@@ -92,9 +92,9 @@ export class ImportTx extends BaseTx {
       throw new ChainIdError("ImportTx.toBuffer -- this.sourceChain is undefined");
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(), this.sourceChain, this.numIns];
+    let barr: Buffer[] = [super.toBuffer(), this.sourceChain, this.numIns];
     this.importIns = this.importIns.sort(TransferableInput.comparator());
-    for(let i = 0; i < this.importIns.length; i++) {
+    for (let i: number = 0; i < this.importIns.length; i++) {
         barr.push(this.importIns[i].toBuffer());
     }
     return Buffer.concat(barr);
@@ -102,7 +102,7 @@ export class ImportTx extends BaseTx {
   /**
      * Returns an array of [[TransferableInput]]s in this transaction.
      */
-  getImportInputs():Array<TransferableInput> {
+  getImportInputs(): TransferableInput[] {
     return this.importIns;
   }
 
@@ -114,12 +114,12 @@ export class ImportTx extends BaseTx {
      *
      * @returns An array of [[Credential]]s
      */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = super.sign(msg, kc);
-    for (let i = 0; i < this.importIns.length; i++) {
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = super.sign(msg, kc);
+    for (let i: number = 0; i < this.importIns.length; i++) {
       const cred:Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.importIns[i].getInput().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
+      const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs();
+      for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
         const sig:Signature = new Signature();
@@ -154,13 +154,13 @@ export class ImportTx extends BaseTx {
    */
   constructor(
     networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, sourceChain:Buffer = undefined, importIns:Array<TransferableInput> = undefined
+    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined, sourceChain: Buffer = undefined, importIns: TransferableInput[] = undefined
   ) {
     super(networkid, blockchainid, outs, ins, memo);
     this.sourceChain = sourceChain; // do no correct, if it's wrong it'll bomb on toBuffer
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
-      for (let i = 0; i < importIns.length; i++) {
+      for (let i: number = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
           throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'");
         }

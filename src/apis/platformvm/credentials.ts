@@ -14,7 +14,7 @@ import { CredIdError } from '../../utils/errors';
  *
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
+export const SelectCredentialClass = (credid: number, ...args: any[]): Credential => {
   if (credid === PlatformVMConstants.SECPCREDENTIAL) {
     return new SECPCredential(...args);
   }

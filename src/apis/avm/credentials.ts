@@ -14,7 +14,7 @@ import { CredIdError, CodecIdError } from '../../utils/errors';
  *
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid:number, ...args:Array<any>):Credential => {
+export const SelectCredentialClass = (credid: number, ...args: any[]): Credential => {
   if (credid === AVMConstants.SECPCREDENTIAL || credid === AVMConstants.SECPCREDENTIAL_CODECONE) {
     return new SECPCredential(...args);
   } if (credid === AVMConstants.NFTCREDENTIAL || credid === AVMConstants.NFTCREDENTIAL_CODECONE) {

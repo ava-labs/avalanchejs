@@ -38,11 +38,13 @@ import {
   NoAtomicUTXOsError,
   AddressError
 } from '../../utils/errors';
+import { Serialization, SerializedType } from '../../utils'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance();
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for interacting with a node's EVMAPI 
@@ -139,7 +141,8 @@ export class EVMAPI extends JRPCAPI {
 
   addressFromBuffer = (address: Buffer): string => {
     const chainID: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID();
-    return bintools.addressToString(this.core.getHRP(), chainID, address);
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(address, type, this.core.getHRP(), chainID)
   };
 
   /**
@@ -555,7 +558,7 @@ export class EVMAPI extends JRPCAPI {
     sourceChain: Buffer | string,
     fromAddresses: string[]
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a) => bintools.stringToAddress(a));
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildImportTx').map((a: string): Buffer => bintools.stringToAddress(a));
     let srcChain: string = undefined;
 
     if(typeof sourceChain === "string") {
@@ -706,7 +709,8 @@ export class EVMAPI extends JRPCAPI {
           }
           addrs.push(address as string);
         } else {
-          addrs.push(bintools.addressToString(this.core.getHRP(), chainid, address as Buffer));
+          const type: SerializedType = "bech32"
+          addrs.push(serialization.bufferToType(address as Buffer, type, this.core.getHRP(), chainid))
         }
       });
     }

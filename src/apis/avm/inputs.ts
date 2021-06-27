@@ -12,8 +12,7 @@ import { InputIdError, CodecIdError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance();
 
 /**
  * Takes a buffer representing the output and returns the proper [[Input]] instance.
@@ -22,7 +21,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid:number, ...args:Array<any>):Input => {
+export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
   if (inputid === AVMConstants.SECPINPUTID || inputid === AVMConstants.SECPINPUTID_CODECONE) {
     return new SECPTransferInput(...args);
   }

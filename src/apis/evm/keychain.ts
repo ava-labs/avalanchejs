@@ -9,11 +9,13 @@ import {
   SECP256k1KeyChain, 
   SECP256k1KeyPair 
 } from '../../common/secp256k1';
+import { Serialization, SerializedType } from '../../utils'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance();
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for representing a private and public keypair on an AVM Chain. 
@@ -29,7 +31,8 @@ export class KeyPair extends SECP256k1KeyPair {
     */
   getAddressString = (): string => {
     const addr: Buffer = this.addressFromPublicKey(this.pubk);
-    return bintools.addressToString(this.hrp, this.chainID, addr);
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(addr, type, this.hrp, this.chainID)
   }
 
   /**

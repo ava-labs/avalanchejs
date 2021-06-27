@@ -19,8 +19,8 @@ import { DelegationFeeError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Abstract class representing an transactions with validation information.
@@ -33,16 +33,16 @@ export abstract class ValidatorTx extends BaseTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "nodeID":serializer.encoder(this.nodeID, encoding, "Buffer", "nodeID"),
-            "startTime":serializer.encoder(this.startTime, encoding, "Buffer", "decimalString"),
-            "endTime":serializer.encoder(this.endTime, encoding, "Buffer", "decimalString")
+          "nodeID": serialization.encoder(this.nodeID, encoding, "Buffer", "nodeID"),
+          "startTime": serialization.encoder(this.startTime, encoding, "Buffer", "decimalString"),
+          "endTime": serialization.encoder(this.endTime, encoding, "Buffer", "decimalString")
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        this.nodeID = serializer.decoder(fields["nodeID"], encoding, "nodeID", "Buffer", 20);
-        this.startTime = serializer.decoder(fields["startTime"], encoding, "decimalString", "Buffer", 8);
-        this.endTime = serializer.decoder(fields["endTime"], encoding, "decimalString", "Buffer", 8);
+      this.nodeID = serialization.decoder(fields["nodeID"], encoding, "nodeID", "Buffer", 20)
+      this.startTime = serialization.decoder(fields["startTime"], encoding, "decimalString", "Buffer", 8)
+      this.endTime = serialization.decoder(fields["endTime"], encoding, "decimalString", "Buffer", 8);
     }
 
     protected nodeID:Buffer = Buffer.alloc(20);
@@ -104,8 +104,8 @@ export abstract class ValidatorTx extends BaseTx {
     constructor(
         networkid:number, 
         blockchainid:Buffer, 
-        outs:Array<TransferableOutput>, 
-        ins:Array<TransferableInput>, 
+      outs: TransferableOutput[],
+      ins: TransferableInput[],
         memo?:Buffer, 
         nodeID?:Buffer, 
         startTime?:BN, 
@@ -127,12 +127,12 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "weight": serializer.encoder(this.weight, encoding, "Buffer", "decimalString")
+          "weight": serialization.encoder(this.weight, encoding, "Buffer", "decimalString")
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        this.weight = serializer.decoder(fields["weight"], encoding, "decimalString", "Buffer", 8);
+      this.weight = serialization.decoder(fields["weight"], encoding, "decimalString", "Buffer", 8);
     }
 
     protected weight:Buffer = Buffer.alloc(8);
@@ -182,8 +182,8 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+      outs: TransferableOutput[] = undefined,
+      ins: TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
@@ -201,8 +201,8 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
 
 export class AddSubnetValidatorTx extends WeightedValidatorTx {
     protected subnetID:Buffer = Buffer.alloc(32);
-    protected subnetAddrs:Array<Buffer> = [];
-    protected subnetAuthIdxs:Array<Buffer> = [];
+    protected subnetAddrs:Buffer[] = [];
+    protected subnetAuthIdxs:Buffer[] = [];
 
 
     getTxType = ():number => {
@@ -220,19 +220,19 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    getSubnetAuthAddresses = ():Array<Buffer> => {
+    getSubnetAuthAddresses = ():Buffer[] => {
         return this.subnetAddrs;
     }
 
 
-    setSubnetAuthAddresses = (addrs:Array<Buffer>):void => {
+    setSubnetAuthAddresses = (addrs:Buffer[]):void => {
         this.subnetAddrs = addrs;
     }
 
-    calcSubnetAuthIdxs = (addrs:Array<Buffer>):Array<Buffer> => {
-        let idxs:Array<Buffer> = [];
+    calcSubnetAuthIdxs = (addrs:Buffer[]):Buffer[] => {
+        let idxs:Buffer[] = [];
         addrs = addrs.sort();
-        for(let i = 0; i < addrs.length; i++){
+        for(let i: number = 0; i < addrs.length; i++){
             let idx:Buffer = Buffer.alloc(4);
             idx.writeUInt32BE(i,0);
             idxs.push(idx);
@@ -240,7 +240,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    getSubnetAuthIdxs = ():Array<Buffer> => {
+    getSubnetAuthIdxs = ():Buffer[] => {
         return this.subnetAddrs;
     }
 
@@ -251,7 +251,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
         let sublenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
         offset += 4;
         let sublen:number = sublenbuff.readUInt32BE(0);
-        for(let i = 0; i < sublen; i++){
+        for(let i: number = 0; i < sublen; i++){
 
         }
         offset = this.subnetAuth.fromBuffer(bytes, offset);
@@ -266,10 +266,10 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     }
 
 
-    sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-        let creds:Array<SECPCredential> = super.sign(msg, kc);
+    sign(msg:Buffer, kc:KeyChain):Credential[] {
+        let creds:SECPCredential[] = super.sign(msg, kc);
         const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
-        for(let i = 0; i  < this.subnetAuth.length ; i++) {
+        for(let i: number = 0; i  < this.subnetAuth.length ; i++) {
             if(!kc.hasKey(this.subnetAuth[i])) {
                 throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.");
             }
@@ -288,15 +288,15 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+        outs:TransferableOutput[] = undefined,
+        ins:TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
         endTime:BN = undefined,
         weight:BN = undefined,
         subnetID:Buffer = undefined,
-        subnetAuth:Array<Buffer> = undefined
+        subnetAuth:Buffer[] = undefined
     ) {
         super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, weight);
         if(typeof subnetID !== undefined){
@@ -336,7 +336,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         this.rewardOwners.deserialize(fields["rewardOwners"], encoding);
     }
     
-    protected stakeOuts:Array<TransferableOutput> = [];
+  protected stakeOuts: TransferableOutput[] = [];
     protected rewardOwners:ParseableOutput = undefined;
   
     /**
@@ -363,7 +363,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     /**
      * Returns the array of outputs being staked.
      */
-    getStakeOuts():Array<TransferableOutput> {
+  getStakeOuts(): TransferableOutput[] {
         return this.stakeOuts;
     }
 
@@ -372,7 +372,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
      */
     getStakeOutsTotal():BN {
         let val:BN = new BN(0);
-        for(let i = 0; i < this.stakeOuts.length; i++){
+      for (let i: number = 0; i < this.stakeOuts.length; i++) {
           val = val.add((this.stakeOuts[i].getOutput() as AmountOutput).getAmount());
         }
         return val;
@@ -385,8 +385,8 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         return this.rewardOwners;
     }
     
-    getTotalOuts():Array<TransferableOutput> {
-        return [...this.getOuts() as Array<TransferableOutput>, ...this.getStakeOuts()];
+  getTotalOuts(): TransferableOutput[] {
+    return [...this.getOuts() as TransferableOutput[], ...this.getStakeOuts()];
     }
 
     fromBuffer(bytes:Buffer, offset:number = 0):number {
@@ -395,7 +395,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         offset += 4;
         const outcount:number = numstakeouts.readUInt32BE(0);
         this.stakeOuts = [];
-        for(let i = 0; i < outcount; i++) {
+      for (let i: number = 0; i < outcount; i++) {
             const xferout:TransferableOutput = new TransferableOutput();
             offset = xferout.fromBuffer(bytes, offset);
             this.stakeOuts.push(xferout);
@@ -413,10 +413,10 @@ export class AddDelegatorTx extends WeightedValidatorTx {
         let bsize:number = superbuff.length;
         const numouts:Buffer = Buffer.alloc(4);
         numouts.writeUInt32BE(this.stakeOuts.length, 0);
-        let barr:Array<Buffer> = [super.toBuffer(), numouts];
+      let barr: Buffer[] = [super.toBuffer(), numouts];
         bsize += numouts.length;
         this.stakeOuts = this.stakeOuts.sort(TransferableOutput.comparator());
-        for(let i = 0; i < this.stakeOuts.length; i++) {
+      for (let i: number = 0; i < this.stakeOuts.length; i++) {
             let out:Buffer = this.stakeOuts[i].toBuffer();
             barr.push(out);
             bsize += out.length;
@@ -455,14 +455,14 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+      outs: TransferableOutput[] = undefined,
+      ins: TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
         endTime:BN = undefined,
         stakeAmount:BN = undefined,
-        stakeOuts:Array<TransferableOutput> = undefined,
+      stakeOuts: TransferableOutput[] = undefined,
         rewardOwners:ParseableOutput = undefined
     ) {
         super(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount);
@@ -481,16 +481,14 @@ export class AddValidatorTx extends AddDelegatorTx {
         let fields:object = super.serialize(encoding);
         return {
             ...fields,
-            "delegationFee": serializer.encoder(this.getDelegationFeeBuffer(), encoding, "Buffer", "decimalString", 4)
+          "delegationFee": serialization.encoder(this.getDelegationFeeBuffer(), encoding, "Buffer", "decimalString", 4)
         }
     };
     deserialize(fields:object, encoding:SerializedEncoding = "hex") {
         super.deserialize(fields, encoding);
-        let dbuff:Buffer = serializer.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
+      let dbuff: Buffer = serialization.decoder(fields["delegationFee"], encoding, "decimalString", "Buffer", 4);
         this.delegationFee = dbuff.readUInt32BE(0) / AddValidatorTx.delegatorMultiplier;
     }
-  
-
 
     protected delegationFee:number = 0;
     private static delegatorMultiplier:number = 10000;
@@ -555,14 +553,14 @@ export class AddValidatorTx extends AddDelegatorTx {
     constructor(
         networkid:number = DefaultNetworkID, 
         blockchainid:Buffer = Buffer.alloc(32, 16), 
-        outs:Array<TransferableOutput> = undefined, 
-        ins:Array<TransferableInput> = undefined, 
+      outs: TransferableOutput[] = undefined,
+      ins: TransferableInput[] = undefined,
         memo:Buffer = undefined, 
         nodeID:Buffer = undefined, 
         startTime:BN = undefined, 
         endTime:BN = undefined,
         stakeAmount:BN = undefined,
-        stakeOuts:Array<TransferableOutput> = undefined,
+      stakeOuts: TransferableOutput[] = undefined,
         rewardOwners:ParseableOutput = undefined,
         delegationFee:number = undefined
     ) {

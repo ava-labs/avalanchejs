@@ -19,13 +19,13 @@ import { CodecIdError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 /**
  * Class representing a base for all transactions.
  */
-export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
+export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   protected _typeName = "BaseTx";
   protected _codecID = AVMConstants.LATESTCODEC;
   protected _typeID = this._codecID === 0 ? AVMConstants.BASETX : AVMConstants.BASETX_CODECONE;
@@ -44,20 +44,20 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
       newIn.deserialize(i, encoding);
       return newIn;
     });
-    this.numouts = serializer.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4);
-    this.numins = serializer.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
+    this.numouts = serialization.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4)
+    this.numins = serialization.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4);
   }
 
-  getOuts():Array<TransferableOutput> {
-    return this.outs as Array<TransferableOutput>;
+  getOuts(): TransferableOutput[] {
+    return this.outs as TransferableOutput[];
   }
 
-  getIns():Array<TransferableInput> {
-    return this.ins as Array<TransferableInput>;
+  getIns(): TransferableInput[] {
+    return this.ins as TransferableInput[];
   }
 
-  getTotalOuts():Array<TransferableOutput> {
-    return this.getOuts() as Array<TransferableOutput>;
+  getTotalOuts(): TransferableOutput[] {
+    return this.getOuts() as TransferableOutput[];
   }
 
   setCodecID(codecID: number): void {
@@ -94,7 +94,7 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     offset += 4;
     const outcount:number = this.numouts.readUInt32BE(0);
     this.outs = [];
-    for (let i = 0; i < outcount; i++) {
+    for (let i: number = 0; i < outcount; i++) {
       const xferout:TransferableOutput = new TransferableOutput();
       offset = xferout.fromBuffer(bytes, offset);
       this.outs.push(xferout);
@@ -104,7 +104,7 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
     offset += 4;
     const incount:number = this.numins.readUInt32BE(0);
     this.ins = [];
-    for (let i = 0; i < incount; i++) {
+    for (let i: number = 0; i < incount; i++) {
       const xferin:TransferableInput = new TransferableInput();
       offset = xferin.fromBuffer(bytes, offset);
       this.ins.push(xferin);
@@ -124,12 +124,12 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg:Buffer, kc:KeyChain):Array<Credential> {
-    const sigs:Array<Credential> = [];
-    for (let i = 0; i < this.ins.length; i++) {
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = [];
+    for (let i: number = 0; i < this.ins.length; i++) {
       const cred:Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID());
-      const sigidxs:Array<SigIdx> = this.ins[i].getInput().getSigIdxs();
-      for (let j = 0; j < sigidxs.length; j++) {
+      const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs();
+      for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair:KeyPair = kc.getKey(sigidxs[j].getSource());
         const signval:Buffer = keypair.sign(msg);
         const sig:Signature = new Signature();
@@ -165,7 +165,7 @@ export class BaseTx  extends StandardBaseTx<KeyPair, KeyChain>{
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined, memo:Buffer = undefined) {
+  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined, memo: Buffer = undefined) {
     super(networkid, blockchainid, outs, ins, memo);
   }
 }

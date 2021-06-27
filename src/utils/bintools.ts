@@ -112,7 +112,7 @@ export default class BinTools {
    * @param address the string to verify is address
    */
   isPrimaryBechAddress = (address:string):boolean => {
-    const parts:Array<string> = address.trim().split('-');
+    const parts: string[] = address.trim().split('-');
     if(parts.length !== 2) {
       return false;
     }
@@ -185,7 +185,7 @@ export default class BinTools {
   fromBufferToArrayBuffer = (buff:Buffer):ArrayBuffer => {
     const ab = new ArrayBuffer(buff.length);
     const view = new Uint8Array(ab);
-    for (let i = 0; i < buff.length; ++i) {
+    for (let i: number = 0; i < buff.length; ++i) {
       view[i] = buff[i];
     }
     return view;
@@ -198,7 +198,7 @@ export default class BinTools {
      */
   fromArrayBufferToBuffer = (ab:ArrayBuffer):Buffer => {
     const buf = Buffer.alloc(ab.byteLength);
-    for (let i = 0; i < ab.byteLength; ++i) {
+    for (let i: number = 0; i < ab.byteLength; ++i) {
       buf[i] = ab[i];
     }
     return buf;
@@ -349,7 +349,7 @@ export default class BinTools {
     blockchainID:string,
     alias:string = undefined,
     addrlen:number = 20):Buffer => {
-    const abc:Array<string> = addr.split('-');
+    const abc: string[] = addr.split('-');
     if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
         const addrbuff = this.stringToAddress(addr);
         if ((addrlen && addrbuff.length === addrlen) || !(addrlen)) {

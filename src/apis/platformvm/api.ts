@@ -14,7 +14,7 @@ import { PlatformVMConstants } from './constants'
 import { UnsignedTx, Tx } from './tx'
 import { PayloadBase } from '../../utils/payload'
 import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions'
-import { UTXOSet } from '../platformvm/utxos'
+import { UTXO, UTXOSet } from '../platformvm/utxos'
 import { PersistanceOptions } from '../../utils/persistenceoptions'
 import {
   AddressError,
@@ -27,11 +27,13 @@ import {
 } from '../../utils/errors'
 import { GetRewardUTXOsParams, GetRewardUTXOsResponse, GetStakeParams, GetStakeResponse } from '../../common';
 import { TransferableOutput } from '../platformvm/outputs'
+import { Serialization, SerializedType } from '../../utils'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -131,7 +133,8 @@ export class PlatformVMAPI extends JRPCAPI {
 
   addressFromBuffer = (address: Buffer): string => {
     const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID()
-    return bintools.addressToString(this.core.getHRP(), chainid, address)
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(address, type, this.core.getHRP(), chainid)
   };
 
   /**
@@ -294,7 +297,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     subnetID: Buffer | string = undefined,
     vmID: string,
-    fxIDs: Array<number>,
+    fxIDs: number[],
     name: string,
     genesis: string,
   )
@@ -378,7 +381,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of addresses.
    */
-  listAddresses = async (username: string, password: string): Promise<Array<string>> => {
+  listAddresses = async (username: string, password: string): Promise<string[]> => {
     const params: any = {
       username,
       password,
@@ -439,7 +442,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   sampleValidators = async (sampleSize: number,
     subnetID: Buffer | string = undefined)
-    : Promise<Array<string>> => {
+    : Promise<string[]> => {
     const params: any = {
       size: sampleSize.toString(),
     }
@@ -589,7 +592,7 @@ export class PlatformVMAPI extends JRPCAPI {
   createSubnet = async (
     username: string,
     password: string,
-    controlKeys: Array<string>,
+    controlKeys: string[],
     threshold: number
   )
     : Promise<string> => {
@@ -627,7 +630,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of blockchainIDs the subnet validates.
    */
-  validates = async (subnetID: Buffer | string): Promise<Array<string>> => {
+  validates = async (subnetID: Buffer | string): Promise<string[]> => {
     const params: any = {
       subnetID,
     }
@@ -645,7 +648,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of objects containing fields "id", "subnetID", and "vmID".
    */
-  getBlockchains = async (): Promise<Array<object>> => {
+  getBlockchains = async (): Promise<object[]> => {
     const params: any = {}
     return this.callMethod('platform.getBlockchains', params)
       .then((response: RequestResponseData) => response.data.result.blockchains)
@@ -819,7 +822,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of objects containing fields "id",
    * "controlKeys", and "threshold".
    */
-  getSubnets = async (ids: Array<string> = undefined): Promise<Array<object>> => {
+  getSubnets = async (ids: string[] = undefined): Promise<object[]> => {
     const params: any = {}
     if (typeof ids !== undefined) {
       params.ids = ids
@@ -912,7 +915,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    */
   getUTXOs = async (
-    addresses: Array<string> | string,
+    addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
     startIndex: { address: string, utxo: string } = undefined,
@@ -945,7 +948,7 @@ export class PlatformVMAPI extends JRPCAPI {
       let data = response.data.result.utxos
       if (persistOpts && typeof persistOpts === 'object') {
         if (this.db.has(persistOpts.getName())) {
-          const selfArray: Array<string> = this.db.get(persistOpts.getName())
+          const selfArray: string[] = this.db.get(persistOpts.getName())
           if (Array.isArray(selfArray)) {
             utxos.addArray(data)
             const self: UTXOSet = new UTXOSet()
@@ -986,19 +989,19 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildImportTx = async (
     utxoset: UTXOSet,
-    ownerAddresses: Array<string>,
+    ownerAddresses: string[],
     sourceChain: Buffer | string,
-    toAddresses: Array<string>,
-    fromAddresses: Array<string>,
-    changeAddresses: Array<string> = undefined,
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[] = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0),
     threshold: number = 1
   ): Promise<UnsignedTx> => {
-    const to: Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a))
-    const from: Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a))
-    const change: Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a) => bintools.stringToAddress(a))
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildBaseTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildBaseTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildBaseTx').map((a: string): Buffer => bintools.stringToAddress(a))
 
     let srcChain: string = undefined
 
@@ -1018,7 +1021,7 @@ export class PlatformVMAPI extends JRPCAPI {
       memo = memo.getPayload()
     }
 
-    const atomics = atomicUTXOs.getAllUTXOs()
+    const atomics: UTXO[] = atomicUTXOs.getAllUTXOs()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
       this.core.getNetworkID(),
@@ -1062,9 +1065,9 @@ export class PlatformVMAPI extends JRPCAPI {
     utxoset: UTXOSet,
     amount: BN,
     destinationChain: Buffer | string,
-    toAddresses: Array<string>,
-    fromAddresses: Array<string>,
-    changeAddresses: Array<string> = undefined,
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[] = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0),
@@ -1072,7 +1075,7 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
 
     let prefixes: object = {}
-    toAddresses.map((a) => {
+    toAddresses.map((a: string): void => {
       prefixes[a.split("-")[0]] = true
     })
     if (Object.keys(prefixes).length !== 1) {
@@ -1094,12 +1097,12 @@ export class PlatformVMAPI extends JRPCAPI {
       throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must The X-Chain ID in the current version of AvalancheJS.");
     }*/
 
-    let to: Array<Buffer> = []
-    toAddresses.map((a) => {
+    let to: Buffer[] = []
+    toAddresses.map((a: string): void => {
       to.push(bintools.stringToAddress(a))
     })
-    const from: Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a))
-    const change: Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a) => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildExportTx').map((a): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildExportTx').map((a): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1149,8 +1152,8 @@ export class PlatformVMAPI extends JRPCAPI {
   /* Re-implement when subnetValidator signing process is clearer
   buildAddSubnetValidatorTx = async (
     utxoset:UTXOSet,
-    fromAddresses:Array<string>,
-    changeAddresses:Array<string>,
+    fromAddresses:string[],
+    changeAddresses:string[],
     nodeID:string,
     startTime:BN,
     endTime:BN,
@@ -1158,8 +1161,8 @@ export class PlatformVMAPI extends JRPCAPI {
     memo:PayloadBase|Buffer = undefined,
     asOf:BN = UnixNow()
   ):Promise<UnsignedTx> => {
-    const from:Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddSubnetValidatorTx').map((a) => bintools.stringToAddress(a));
-    const change:Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddSubnetValidatorTx').map((a) => bintools.stringToAddress(a));
+    const from:Buffer[] = this._cleanAddressArray(fromAddresses, 'buildAddSubnetValidatorTx').map((a): Buffer => bintools.stringToAddress(a));
+    const change:Buffer[] = this._cleanAddressArray(changeAddresses, 'buildAddSubnetValidatorTx').map((a): Buffer => bintools.stringToAddress(a));
 
     if( memo instanceof PayloadBase) {
       memo = memo.getPayload();
@@ -1200,7 +1203,7 @@ return builtUnsignedTx;
   * [[UnsignedTx]] manually and import the [[AddDelegatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieved the staked tokens at the end of the staking period
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who received the staked tokens at the end of the staking period
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
@@ -1217,23 +1220,23 @@ return builtUnsignedTx;
   */
   buildAddDelegatorTx = async (
     utxoset: UTXOSet,
-    toAddresses: Array<string>,
-    fromAddresses: Array<string>,
-    changeAddresses: Array<string>,
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[],
     nodeID: string,
     startTime: BN,
     endTime: BN,
     stakeAmount: BN,
-    rewardAddresses: Array<string>,
+    rewardAddresses: string[],
     rewardLocktime: BN = new BN(0),
     rewardThreshold: number = 1,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
-    const to: Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a))
-    const from: Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a))
-    const change: Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddDelegatorTx').map((a) => bintools.stringToAddress(a))
-    const rewards: Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a))
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildAddDelegatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildAddDelegatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildAddDelegatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const rewards: Buffer[] = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1283,7 +1286,7 @@ return builtUnsignedTx;
   * [[UnsignedTx]] manually and import the [[AddValidatorTx]] class directly.
   *
   * @param utxoset A set of UTXOs that the transaction is built on
-  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieved the staked tokens at the end of the staking period
+  * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who received the staked tokens at the end of the staking period
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
@@ -1301,24 +1304,24 @@ return builtUnsignedTx;
   */
   buildAddValidatorTx = async (
     utxoset: UTXOSet,
-    toAddresses: Array<string>,
-    fromAddresses: Array<string>,
-    changeAddresses: Array<string>,
+    toAddresses: string[],
+    fromAddresses: string[],
+    changeAddresses: string[],
     nodeID: string,
     startTime: BN,
     endTime: BN,
     stakeAmount: BN,
-    rewardAddresses: Array<string>,
+    rewardAddresses: string[],
     delegationFee: number,
     rewardLocktime: BN = new BN(0),
     rewardThreshold: number = 1,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
-    const to: Array<Buffer> = this._cleanAddressArray(toAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a))
-    const from: Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a))
-    const change: Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a))
-    const rewards: Array<Buffer> = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a) => bintools.stringToAddress(a))
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, 'buildAddValidatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildAddValidatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildAddValidatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const rewards: Buffer[] = this._cleanAddressArray(rewardAddresses, 'buildAddValidatorTx').map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1382,16 +1385,16 @@ return builtUnsignedTx;
     */
   buildCreateSubnetTx = async (
     utxoset: UTXOSet,
-    fromAddresses: Array<string>,
-    changeAddresses: Array<string>,
-    subnetOwnerAddresses: Array<string>,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    subnetOwnerAddresses: string[],
     subnetOwnerThreshold: number,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
-    const from: Array<Buffer> = this._cleanAddressArray(fromAddresses, 'buildCreateSubnetTx').map((a) => bintools.stringToAddress(a))
-    const change: Array<Buffer> = this._cleanAddressArray(changeAddresses, 'buildCreateSubnetTx').map((a) => bintools.stringToAddress(a))
-    const owners: Array<Buffer> = this._cleanAddressArray(subnetOwnerAddresses, 'buildCreateSubnetTx').map((a) => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, 'buildCreateSubnetTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(changeAddresses, 'buildCreateSubnetTx').map((a: string): Buffer => bintools.stringToAddress(a))
+    const owners: Buffer[] = this._cleanAddressArray(subnetOwnerAddresses, 'buildCreateSubnetTx').map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1422,11 +1425,11 @@ return builtUnsignedTx;
   /**
    * @ignore
    */
-  protected _cleanAddressArray(addresses: Array<string> | Array<Buffer>, caller: string): Array<string> {
-    const addrs: Array<string> = []
+  protected _cleanAddressArray(addresses: string[] | Buffer[], caller: string): string[] {
+    const addrs: string[] = []
     const chainid: string = this.getBlockchainAlias() ? this.getBlockchainAlias() : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
-      for (let i = 0; i < addresses.length; i++) {
+      for (let i: number = 0; i < addresses.length; i++) {
         if (typeof addresses[i] === 'string') {
           if (typeof this.parseAddress(addresses[i] as string) === 'undefined') {
             /* istanbul ignore next */
@@ -1434,7 +1437,8 @@ return builtUnsignedTx;
           }
           addrs.push(addresses[i] as string)
         } else {
-          addrs.push(bintools.addressToString(this.core.getHRP(), chainid, addresses[i] as Buffer))
+          const type: SerializedType = "bech32"
+          addrs.push(serialization.bufferToType(addresses[i] as Buffer, type, this.core.getHRP(), chainid))
         }
       }
     }
