@@ -69,13 +69,13 @@ describe('UTXO', (): void => {
 
 const setMergeTester = (input: UTXOSet, equal: UTXOSet[], notEqual: UTXOSet[]): boolean => {
   const instr: string = JSON.stringify(input.getUTXOIDs().sort())
-  for (let i:number = 0; i < equal.length; i++) {
+  for (let i: number = 0; i < equal.length; i++) {
     if (JSON.stringify(equal[i].getUTXOIDs().sort()) != instr) {
       return false
     }
   }
 
-  for (let i:number = 0; i < notEqual.length; i++) {
+  for (let i: number = 0; i < notEqual.length; i++) {
     if (JSON.stringify(notEqual[i].getUTXOIDs().sort()) == instr) {
       return false
     }
@@ -105,11 +105,11 @@ describe('UTXOSet', (): void => {
   test('Mutliple add', (): void => {
     const set: UTXOSet = new UTXOSet()
     // first add
-    for (let i:number = 0; i < utxostrs.length; i++) {
+    for (let i: number = 0; i < utxostrs.length; i++) {
       set.add(utxostrs[i])
     }
     // the verify (do these steps separate to ensure no overwrites)
-    for (let i:number = 0; i < utxostrs.length; i++) {
+    for (let i: number = 0; i < utxostrs.length; i++) {
       expect(set.includes(utxostrs[i])).toBe(true)
       const utxo: UTXO = new UTXO()
       utxo.fromString(utxostrs[i])
@@ -121,7 +121,7 @@ describe('UTXOSet', (): void => {
   test('addArray', (): void => {
     const set: UTXOSet = new UTXOSet()
     set.addArray(utxostrs)
-    for (let i:number = 0; i < utxostrs.length; i++) {
+    for (let i: number = 0; i < utxostrs.length; i++) {
       const e1: UTXO = new UTXO()
       e1.fromString(utxostrs[i])
       expect(set.includes(e1)).toBe(true)
@@ -132,7 +132,7 @@ describe('UTXOSet', (): void => {
     }
 
     set.addArray(set.getAllUTXOs())
-    for (let i:number = 0; i < utxostrs.length; i++) {
+    for (let i: number = 0; i < utxostrs.length; i++) {
       const utxo: UTXO = new UTXO()
       utxo.fromString(utxostrs[i])
       expect(set.includes(utxo)).toBe(true)
@@ -191,7 +191,7 @@ describe('UTXOSet', (): void => {
 
     test('getUTXOIDs', (): void => {
       const uids: string[] = set.getUTXOIDs()
-      for (let i:number = 0; i < utxos.length; i++) {
+      for (let i: number = 0; i < utxos.length; i++) {
         expect(uids.indexOf(utxos[i].getUTXOID())).not.toBe(-1)
       }
     })
@@ -199,19 +199,19 @@ describe('UTXOSet', (): void => {
     test('getAllUTXOs', (): void => {
       const allutxos: UTXO[] = set.getAllUTXOs()
       const ustrs: string[] = []
-      for (let i:number = 0; i < allutxos.length; i++) {
+      for (let i: number = 0; i < allutxos.length; i++) {
         ustrs.push(allutxos[i].toString())
       }
-      for (let i:number = 0; i < utxostrs.length; i++) {
+      for (let i: number = 0; i < utxostrs.length; i++) {
         expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1)
       }
       const uids: string[] = set.getUTXOIDs()
       const allutxos2: UTXO[] = set.getAllUTXOs(uids)
       const ustrs2: string[] = []
-      for (let i:number = 0; i < allutxos.length; i++) {
+      for (let i: number = 0; i < allutxos.length; i++) {
         ustrs2.push(allutxos2[i].toString())
       }
-      for (let i:number = 0; i < utxostrs.length; i++) {
+      for (let i: number = 0; i < utxostrs.length; i++) {
         expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1)
       }
     })
@@ -228,12 +228,12 @@ describe('UTXOSet', (): void => {
 
     test('getAllUTXOStrings', (): void => {
       const ustrs: string[] = set.getAllUTXOStrings()
-      for (let i:number = 0; i < utxostrs.length; i++) {
+      for (let i: number = 0; i < utxostrs.length; i++) {
         expect(ustrs.indexOf(utxostrs[i])).not.toBe(-1)
       }
       const uids: string[] = set.getUTXOIDs()
       const ustrs2: string[] = set.getAllUTXOStrings(uids)
-      for (let i:number = 0; i < utxostrs.length; i++) {
+      for (let i: number = 0; i < utxostrs.length; i++) {
         expect(ustrs2.indexOf(utxostrs[i])).not.toBe(-1)
       }
     })
@@ -247,7 +247,7 @@ describe('UTXOSet', (): void => {
       let balance2: BN
       balance1 = new BN(0)
       balance2 = new BN(0)
-      for (let i:number = 0; i < utxos.length; i++) {
+      for (let i: number = 0; i < utxos.length; i++) {
         const assetid = utxos[i].getAssetID()
         balance1.add(set.getBalance(addrs, assetid))
         balance2.add((utxos[i].getOutput() as AmountOutput).getAmount())
@@ -257,7 +257,7 @@ describe('UTXOSet', (): void => {
       balance1 = new BN(0)
       balance2 = new BN(0)
       const now: BN = UnixNow()
-      for (let i:number = 0; i < utxos.length; i++) {
+      for (let i: number = 0; i < utxos.length; i++) {
         const assetid = bintools.cb58Encode(utxos[i].getAssetID())
         balance1.add(set.getBalance(addrs, assetid, now))
         balance2.add((utxos[i].getOutput() as AmountOutput).getAmount())
@@ -267,7 +267,7 @@ describe('UTXOSet', (): void => {
 
     test('getAssetIDs', (): void => {
       const assetIDs: Buffer[] = set.getAssetIDs()
-      for (let i:number = 0; i < utxos.length; i++) {
+      for (let i: number = 0; i < utxos.length; i++) {
         expect(assetIDs).toContain(utxos[i].getAssetID())
       }
       const addresses: Buffer[] = set.getAddresses()
