@@ -70,7 +70,7 @@ export class MinterSet extends Serializable{
    * @param threshold The number of signatures required to mint more of an asset by signing a minting transaction
    * @param minters Array of addresss which are authorized to sign a minting transaction
    */
-  constructor(threshold: number, minters: string[] | Buffer[]) {
+  constructor(threshold: number = 1, minters: string[] | Buffer[] = []) {
     super()
     this.threshold = threshold
     this.minters = this._cleanAddresses(minters)

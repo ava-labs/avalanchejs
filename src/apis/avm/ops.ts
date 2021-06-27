@@ -401,7 +401,12 @@ export class NFTMintOperation extends Operation {
     super.deserialize(fields, encoding)
     this.groupID = serialization.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4)
     this.payload = serialization.decoder(fields["payload"], encoding, "hex", "Buffer")
-    this.outputOwners = fields["outputOwners"].map((o:object) => {
+    // this.outputOwners = fields["outputOwners"].map((o: NFTMintOutput) => {
+    //   let oo: NFTMintOutput = new NFTMintOutput()
+    //   oo.deserialize(o, encoding)
+    //   return oo
+    // })
+    this.outputOwners = fields["outputOwners"].map((o: object) => {
       let oo: OutputOwners = new OutputOwners()
       oo.deserialize(o, encoding)
       return oo
@@ -437,6 +442,13 @@ export class NFTMintOperation extends Operation {
     } else if (this._codecID === 1) {
       return AVMConstants.NFTCREDENTIAL_CODECONE
     }
+  }
+
+  /**
+   * Returns the payload.
+   */
+  getGroupID = (): Buffer => {
+    return bintools.copyFrom(this.groupID, 0)
   }
 
   /**

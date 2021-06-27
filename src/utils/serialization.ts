@@ -76,14 +76,14 @@ export abstract class Serializable {
       throw new TypeNameError("Error - Serializable.deserialize: _typeName must be a string, found: " + typeof fields["_typeName"])
     }
     if (fields["_typeName"] !== this._typeName) {
-      throw new TypeNameError("Error - Serializable.deserialize: _typeName mismatch -- expected: " + this._typeName + " -- recieved: " + fields["_typeName"])
+      throw new TypeNameError("Error - Serializable.deserialize: _typeName mismatch -- expected: " + this._typeName + " -- received: " + fields["_typeName"])
     }
     if (typeof fields["_typeID"] !== "undefined" && fields["_typeID"] !== null) {
       if (typeof fields["_typeID"] !== "number") {
         throw new TypeIdError("Error - Serializable.deserialize: _typeID must be a number, found: " + typeof fields["_typeID"])
       }
       if (fields["_typeID"] !== this._typeID) {
-        throw new TypeIdError("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- recieved: " + fields["_typeID"])
+        throw new TypeIdError("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- received: " + fields["_typeID"])
       }
     }
     if (typeof fields["_codecID"] !== "undefined" && fields["_codecID"] !== null) {
@@ -91,7 +91,7 @@ export abstract class Serializable {
         throw new CodecIdError("Error - Serializable.deserialize: _codecID must be a number, found: " + typeof fields["_codecID"])
       }
       if (fields["_codecID"] !== this._codecID) {
-        throw new CodecIdError("Error - Serializable.deserialize: _codecID mismatch -- expected: " + this._codecID + " -- recieved: " + fields["_codecID"])
+        throw new CodecIdError("Error - Serializable.deserialize: _codecID mismatch -- expected: " + this._codecID + " -- received: " + fields["_codecID"])
       }
     }
   }
