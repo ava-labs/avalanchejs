@@ -7,6 +7,7 @@ import BN from 'bn.js'
 import { Buffer } from 'buffer/'
 import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from './helperfunctions'
 import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from '../utils/errors'
+import { Serialized } from 'src/common'
 
 export const SERIALIZATIONVERSION: number = 0
 export type SerializedType = 
@@ -253,7 +254,7 @@ export class Serialization {
     return this.bufferToType(vb, outtype, ...args)
   }
 
-  serialize(serialize: Serializable, vm: string, encoding: SerializedEncoding = "display", notes: string = undefined): object {
+  serialize(serialize: Serializable, vm: string, encoding: SerializedEncoding = "display", notes: string = undefined): Serialized {
     if (typeof notes === "undefined") {
       notes = serialize.getTypeName()
     }
@@ -266,7 +267,7 @@ export class Serialization {
     }
   }
 
-  deserialize(input: object, output: Serializable) {
-    output.deserialize(input["fields"], input["encoding"])
+  deserialize(input: Serialized, output: Serializable) {
+    output.deserialize(input.fields, input.encoding)
   }
 }

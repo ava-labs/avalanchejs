@@ -155,7 +155,7 @@ describe('BinTools', (): void => {
     serbufffaulty[serbufffaulty.length - 1] = serbufffaulty[serbufffaulty.length - 1] - 1
     expect(dsr1.toString('hex')).toBe(hexstr)
     expect(dsr2.toString('hex')).toBe(hexstr)
-    expect(() => {
+    expect((): void => {
       bintools.cb58Decode(serbufffaulty)
     }).toThrow('Error - BinTools.cb58Decode: invalid checksum')
   })

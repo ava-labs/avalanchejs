@@ -2,48 +2,46 @@
  * @packageDocumentation
  * @module API-PlatformVM-CreateSubnetTx
  */
-import { Buffer } from 'buffer/';
-import { BaseTx } from './basetx';
-import { PlatformVMConstants } from './constants';
-import { DefaultNetworkID } from '../../utils/constants';
-import { TransferableOutput, SECPOwnerOutput} from './outputs';
-import { TransferableInput } from './inputs';
-import { Serialization, SerializedEncoding } from '../../utils/serialization';
-import { SubnetOwnerError } from '../../utils/errors';
-
-const serializer = Serialization.getInstance();
+import { Buffer } from 'buffer/'
+import { BaseTx } from './basetx'
+import { PlatformVMConstants } from './constants'
+import { DefaultNetworkID } from '../../utils/constants'
+import { TransferableOutput, SECPOwnerOutput } from './outputs'
+import { TransferableInput } from './inputs'
+import { SerializedEncoding } from '../../utils/serialization'
+import { SubnetOwnerError } from '../../utils/errors'
 
 export class CreateSubnetTx extends BaseTx {
-  protected _typeName = "SECPCredential";
-  protected _typeID = PlatformVMConstants.CREATESUBNETTX;
+  protected _typeName = "SECPCredential"
+  protected _typeID = PlatformVMConstants.CREATESUBNETTX
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields:object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding)
     return {
       ...fields,
       "subnetOwners": this.subnetOwners.serialize(encoding)
     }
-  };
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
-    super.deserialize(fields, encoding);
-    this.subnetOwners = new SECPOwnerOutput();
-    this.subnetOwners.deserialize(fields["subnetOwners"], encoding);
+  }
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding)
+    this.subnetOwners = new SECPOwnerOutput()
+    this.subnetOwners.deserialize(fields["subnetOwners"], encoding)
   }
 
-  protected subnetOwners:SECPOwnerOutput = undefined;
+  protected subnetOwners: SECPOwnerOutput = undefined
 
   /**
    * Returns the id of the [[CreateSubnetTx]]
    */
   getTxType = ():number => {
-    return this._typeID;
+    return this._typeID
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the reward address.
    */
-  getSubnetOwners():SECPOwnerOutput {
-      return this.subnetOwners;
+  getSubnetOwners(): SECPOwnerOutput {
+    return this.subnetOwners
   }
 
   /**
@@ -56,11 +54,11 @@ export class CreateSubnetTx extends BaseTx {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
-      offset = super.fromBuffer(bytes, offset);
-      this.subnetOwners = new SECPOwnerOutput();
-      offset = this.subnetOwners.fromBuffer(bytes, offset);
-      return offset;
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    offset = super.fromBuffer(bytes, offset)
+    this.subnetOwners = new SECPOwnerOutput()
+    offset = this.subnetOwners.fromBuffer(bytes, offset)
+    return offset
     }
   
   /**
@@ -68,12 +66,12 @@ export class CreateSubnetTx extends BaseTx {
    */
   toBuffer():Buffer {
       if(typeof this.subnetOwners === "undefined" || !(this.subnetOwners instanceof SECPOwnerOutput)) {
-          throw new SubnetOwnerError("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput");
+        throw new SubnetOwnerError("CreateSubnetTx.toBuffer -- this.subnetOwners is not a SECPOwnerOutput")
       }
-      let typeID:Buffer = Buffer.alloc(4);
-      typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0);
-    let barr: Buffer[] = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()];
-      return Buffer.concat(barr);
+    let typeID: Buffer = Buffer.alloc(4)
+    typeID.writeUInt32BE(this.subnetOwners.getOutputID(), 0)
+    let barr: Buffer[] = [super.toBuffer(), typeID, this.subnetOwners.toBuffer()]
+    return Buffer.concat(barr)
   }
 
   /**
@@ -94,8 +92,8 @@ export class CreateSubnetTx extends BaseTx {
     memo:Buffer = undefined,
     subnetOwners:SECPOwnerOutput = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo);
-    this.subnetOwners = subnetOwners;
+    super(networkid, blockchainid, outs, ins, memo)
+    this.subnetOwners = subnetOwners
   }
 }
   

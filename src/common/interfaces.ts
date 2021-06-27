@@ -6,6 +6,7 @@
 import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import { TransferableOutput } from '../apis/platformvm';
+import { SerializedEncoding } from 'src/utils'
 
 export interface Index {
   address: string
@@ -134,4 +135,12 @@ export interface WordLists {
 }
 export interface GetAtomicTxStatusParams {
   txID: string
+}
+
+export interface Serialized {
+  vm: string
+  encoding: SerializedEncoding
+  version: number
+  notes: string
+  fields: object
 }
