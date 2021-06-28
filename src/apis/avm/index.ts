@@ -4,6 +4,8 @@ export * from './constants';
 export * from './createassettx';
 export * from './credentials';
 export * from './exporttx';
+export * from './genesisasset'
+export * from './genesisdata';
 export * from './importtx';
 export * from './initialstates';
 export * from './inputs';

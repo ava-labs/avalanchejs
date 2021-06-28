@@ -2,15 +2,15 @@
  * @packageDocumentation
  * @module API-AVM-KeyChain
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1';
+import { Buffer } from 'buffer/'
+import BinTools from '../../utils/bintools'
+import { SECP256k1KeyChain, SECP256k1KeyPair } from '../../common/secp256k1'
 import { Serialization, SerializedType } from '../../utils'
 
 /**
  * @ignore
  */
-const bintools: BinTools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 
@@ -19,8 +19,8 @@ const serialization: Serialization = Serialization.getInstance()
  */
 export class KeyPair extends SECP256k1KeyPair {
 
-    protected chainid:string = '';
-    protected hrp:string = '';
+  protected chainid: string = ''
+  protected hrp: string = ''
 
     /**
      * Returns the address's string representation.
@@ -38,16 +38,16 @@ export class KeyPair extends SECP256k1KeyPair {
        *
        * @returns The [[KeyPair]]'s chainID
        */
-    getChainID = ():string => this.chainid;
+  getChainID = (): string => this.chainid
 
     /**
      * Sets the the chainID associated with this key.
      *
      * @param chainid String for the chainID
      */
-    setChainID = (chainid:string):void => {
-        this.chainid = chainid;
-    };
+  setChainID = (chainid: string): void => {
+    this.chainid = chainid
+  }
     
 
     /**
@@ -55,35 +55,35 @@ export class KeyPair extends SECP256k1KeyPair {
      *
      * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
      */
-    getHRP = ():string => this.hrp;
+  getHRP = (): string => this.hrp
   
     /**
      * Sets the the Human-Readable-Part of the network associated with this key.
      *
      * @param hrp String for the Human-Readable-Part of Bech32 addresses
      */
-    setHRP = (hrp:string):void => {
-      this.hrp = hrp;
-    };
+  setHRP = (hrp: string): void => {
+    this.hrp = hrp
+  }
 
-    clone():this {
-        let newkp:KeyPair = new KeyPair(this.hrp, this.chainid);
-        newkp.importKey(bintools.copyFrom(this.getPrivateKey()));
-        return newkp as this;
+  clone(): this {
+    let newkp: KeyPair = new KeyPair(this.hrp, this.chainid)
+    newkp.importKey(bintools.copyFrom(this.getPrivateKey()))
+    return newkp as this
     }
 
-    create(...args:any[]):this {
+  create(...args: any[]): this {
         if(args.length == 2){
-            return new KeyPair(args[0], args[1]) as this;
+          return new KeyPair(args[0], args[1]) as this
         }
-        return new KeyPair(this.hrp, this.chainid) as this;
+    return new KeyPair(this.hrp, this.chainid) as this
     }
 
-    constructor(hrp:string, chainid:string) {
-        super();
-        this.chainid = chainid;
-        this.hrp = hrp;
-        this.generateKey();
+  constructor(hrp: string, chainid: string) {
+    super()
+    this.chainid = chainid
+    this.hrp = hrp
+    this.generateKey()
     }
     
 }
@@ -95,23 +95,23 @@ export class KeyPair extends SECP256k1KeyPair {
  */
 export class KeyChain extends SECP256k1KeyChain<KeyPair> {
 
-    hrp:string = '';
-    chainid:string = '';
+  hrp: string = ''
+  chainid: string = ''
 
     /**
      * Makes a new key pair, returns the address.
      * 
      * @returns The new key pair
      */
-    makeKey = ():KeyPair => {
-        let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
-        this.addKey(keypair);
+  makeKey = (): KeyPair => {
+    let keypair: KeyPair = new KeyPair(this.hrp, this.chainid)
+    this.addKey(keypair)
         return keypair
     }
 
-    addKey = (newKey:KeyPair) => {
-        newKey.setChainID(this.chainid);
-        super.addKey(newKey);
+  addKey = (newKey: KeyPair) => {
+    newKey.setChainID(this.chainid)
+    super.addKey(newKey)
     }
 
     /**
@@ -121,50 +121,50 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
      * 
      * @returns The new key pair
      */
-    importKey = (privk:Buffer | string):KeyPair => {
-        let keypair:KeyPair = new KeyPair(this.hrp, this.chainid);
-        let pk:Buffer;
+  importKey = (privk: Buffer | string): KeyPair => {
+    let keypair: KeyPair = new KeyPair(this.hrp, this.chainid)
+    let pk: Buffer
         if(typeof privk === 'string'){
-            pk = bintools.cb58Decode(privk.split('-')[1]);
+          pk = bintools.cb58Decode(privk.split('-')[1])
         } else {
-            pk = bintools.copyFrom(privk);
+          pk = bintools.copyFrom(privk)
         }
-        keypair.importKey(pk);
+      keypair.importKey(pk)
         if(!(keypair.getAddress().toString("hex") in this.keys)){
-            this.addKey(keypair);
+          this.addKey(keypair)
         }
-        return keypair;
+      return keypair
     }
 
     create(...args:any[]):this {
         if(args.length == 2){
-            return new KeyChain(args[0], args[1]) as this;
+          return new KeyChain(args[0], args[1]) as this
         }
-        return new KeyChain(this.hrp, this.chainid) as this;
-    };
+      return new KeyChain(this.hrp, this.chainid) as this
+    }
 
-    clone():this {
-        const newkc:KeyChain = new KeyChain(this.hrp, this.chainid);
+  clone(): this {
+    const newkc: KeyChain = new KeyChain(this.hrp, this.chainid)
         for(let k in this.keys){
-            newkc.addKey(this.keys[k].clone());
+          newkc.addKey(this.keys[k].clone())
         }
-        return newkc as this;
-    };
+      return newkc as this
+    }
 
-    union(kc:this):this {
-        let newkc:KeyChain = kc.clone();
+  union(kc: this): this {
+    let newkc: KeyChain = kc.clone()
         for(let k in this.keys){
-            newkc.addKey(this.keys[k].clone());
+          newkc.addKey(this.keys[k].clone())
         }
-        return newkc as this;
+      return newkc as this
     }
 
     /**
      * Returns instance of KeyChain.
      */
-    constructor(hrp:string, chainid:string){
-        super();
-        this.hrp = hrp;
-        this.chainid = chainid;
+  constructor(hrp: string, chainid: string) {
+    super()
+    this.hrp = hrp
+    this.chainid = chainid
     }
 }
