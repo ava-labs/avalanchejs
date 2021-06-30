@@ -50,9 +50,9 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    * @remarks assume not-checksummed
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
+    this.networkID = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
+    this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     return offset;
   }

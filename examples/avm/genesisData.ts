@@ -9,13 +9,10 @@ import {
   KeyChain as AVMKeyChain,
   SECPTransferOutput,
   SECPTransferInput,
-  TransferableOutput,
   TransferableInput,
   UTXOSet,
   UTXO,
   AmountOutput,
-  UnsignedTx,
-  Tx,
   GenesisAsset,
   GenesisData,
   SECPMintOutput,
@@ -41,11 +38,8 @@ const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainID: string = "11111111111111111111111111111111LpoYY"
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
-const outputs: TransferableOutput[] = []
-const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
@@ -57,32 +51,6 @@ const denomination: number = 1
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
-  const balance: BN = new BN(getBalanceResponse.balance)
-  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
-  // Uncomment for codecID 00 01
-  // secpTransferOutput.setCodecID(codecID)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
-  // outputs.push(transferableOutput)
-
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
-    const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-    const amt: BN = amountOutput.getAmount().clone()
-    const txid: Buffer = utxo.getTxID()
-    const outputidx: Buffer = utxo.getOutputIdx()
-
-    const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-    // Uncomment for codecID 00 01
-    // secpTransferInput.setCodecID(codecID)
-    secpTransferInput.addSignatureIdx(0, xAddresses[0])
-
-    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetIDBuf, secpTransferInput)
-    // inputs.push(input)
-  })
-
   const amount: BN = new BN(100000)
   const vcapSecpOutput = new SECPTransferOutput(amount, xAddresses, locktime, threshold)
   // Uncomment for codecID 00 01
@@ -94,17 +62,21 @@ const main = async (): Promise<any> => {
   const initialStates: InitialStates = new InitialStates()
   initialStates.addOutput(vcapSecpOutput)
   // initialStates.addOutput(secpMintOutput)
+  const assetAlias: string = name
 
   const genesisAsset: GenesisAsset = new GenesisAsset(
-    memo,
+    networkID,
+    assetAlias,
     name,
     symbol,
     denomination,
-    initialStates
+    initialStates,
+    memo,
   )
   const genesisAssets: GenesisAsset[] = [genesisAsset]
-  const genesisdata: GenesisData = new GenesisData(networkID, genesisAssets)
-  const b: Buffer = genesisdata.toBuffer()
+  const genesisData: GenesisData = new GenesisData(genesisAssets)
+  console.log(genesisData.serialize("display"))
+  const b: Buffer = genesisData.toBuffer()
   console.log(b.toString('hex'))
   const cb58: string = serialization.bufferToType(b, "cb58")
   console.log(cb58)

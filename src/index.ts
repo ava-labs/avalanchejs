@@ -92,7 +92,7 @@ export default class Avalanche extends AvalancheCore {
      * @param port The port to resolve to reach the Avalanche Client RPC APIs
      * @param protocol The protocol string to use before a "://" in a request,
      * ex: "http", "https", "git", "ws", etc ...
-     * @param networkid Sets the NetworkID of the class. Default [[DefaultNetworkID]]
+     * @param networkID Sets the NetworkID of the class. Default [[DefaultNetworkID]]
      * @param XChainID Sets the blockchainID for the AVM. Will try to auto-detect,
      * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
      * @param CChainID Sets the blockchainID for the EVM. Will try to auto-detect,

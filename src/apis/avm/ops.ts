@@ -389,7 +389,7 @@ export class NFTMintOperation extends Operation {
   protected _typeID = this._codecID === 0 ? AVMConstants.NFTMINTOPID : AVMConstants.NFTMINTOPID_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       "groupID": serialization.encoder(this.groupID, encoding, "Buffer", "decimalString", 4),

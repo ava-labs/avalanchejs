@@ -9,11 +9,11 @@ const alias: string = 'X'
 const hrp: string = "tests"
 
 describe('AVMKeyPair', (): void => {
-  const networkid: number = 12345
+  const networkID: number = 12345
   const ip: string = '127.0.0.1'
   const port: number = 9650
   const protocol: string = 'https'
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true)
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID, undefined, undefined, undefined, true)
 
   test('human readable part', (): void => {
     let hrp: string = avalanche.getHRP()

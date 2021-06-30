@@ -25,7 +25,7 @@ export class CreateAssetTx extends BaseTx {
   protected _typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       "name": serialization.encoder(this.name, encoding, "utf8", "utf8"),
@@ -158,8 +158,8 @@ export class CreateAssetTx extends BaseTx {
   /**
    * Class representing an unsigned Create Asset transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -169,12 +169,12 @@ export class CreateAssetTx extends BaseTx {
    * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
    */
   constructor(
-    networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16),
+    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
     outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
     memo: Buffer = undefined, name: string = undefined, symbol: string = undefined, denomination: number = undefined,
     initialstate: InitialStates = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo)
+    super(networkID, blockchainID, outs, ins, memo)
     if (
       typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number'
             && denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'

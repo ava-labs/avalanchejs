@@ -50,7 +50,7 @@ describe('Transactions', (): void => {
   const amnt: number = 10000
   const netid: number = 12345
   const memo: Buffer = Buffer.from("AvalancheJS")
-  const blockchainid: string = Defaults.network[netid].X.blockchainID
+  const bID: string = Defaults.network[netid].X.blockchainID
   const alias: string = 'X'
   const assetID: Buffer = Buffer.from(createHash('sha256').update("Well, now, don't you tell me to smile, you stick around I'll make it worth your while.").digest())
   const NFTassetID: Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest())
@@ -68,7 +68,7 @@ describe('Transactions', (): void => {
   const port = 8080
   const protocol = 'http'
   let avalanche: Avalanche
-  const blockchainID: Buffer = bintools.cb58Decode(blockchainid)
+  const blockchainID: Buffer = bintools.cb58Decode(bID)
   const name: string = 'Mortycoin is the dumb as a sack of hammers.'
   const symbol: string = 'morT'
   const denomination: number = 8
@@ -76,7 +76,7 @@ describe('Transactions', (): void => {
 
   beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(ip, port, protocol, netid, undefined, undefined, null, true)
-    api = new AVMAPI(avalanche, '/ext/bc/avm', blockchainid)
+    api = new AVMAPI(avalanche, '/ext/bc/avm', bID)
 
     const result: Promise<Buffer> = api.getAVAXAssetID()
     const payload:object = {

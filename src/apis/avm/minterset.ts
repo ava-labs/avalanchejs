@@ -23,7 +23,7 @@ export class MinterSet extends Serializable{
   protected _typeID = undefined
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       "threshold": serialization.encoder(this.threshold, encoding, "number", "decimalString", 4),

@@ -30,19 +30,19 @@ export abstract class EVMStandardBaseTx<KPClass extends StandardKeyPair, KCClass
     let fields: object = super.serialize(encoding);
     return {
       ...fields,
-      "networkid": serializer.encoder(this.networkid, encoding, "Buffer", "decimalString"),
-      "blockchainid": serializer.encoder(this.blockchainid, encoding, "Buffer", "cb58")
+      "networkID": serializer.encoder(this.networkID, encoding, "Buffer", "decimalString"),
+      "blockchainID": serializer.encoder(this.blockchainID, encoding, "Buffer", "cb58")
     }
   };
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.networkid = serializer.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4);
-    this.blockchainid = serializer.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32);
+    this.networkID = serializer.decoder(fields["networkID"], encoding, "decimalString", "Buffer", 4)
+    this.blockchainID = serializer.decoder(fields["blockchainID"], encoding, "cb58", "Buffer", 32);
   }
 
-  protected networkid: Buffer = Buffer.alloc(4);
-  protected blockchainid: Buffer = Buffer.alloc(32);
+  protected networkID: Buffer = Buffer.alloc(4);
+  protected blockchainID: Buffer = Buffer.alloc(32);
 
   /**
    * Returns the id of the [[StandardBaseTx]]
@@ -52,19 +52,19 @@ export abstract class EVMStandardBaseTx<KPClass extends StandardKeyPair, KCClass
   /**
    * Returns the NetworkID as a number
    */
-  getNetworkID = (): number => this.networkid.readUInt32BE(0);
+  getNetworkID = (): number => this.networkID.readUInt32BE(0);
 
   /**
    * Returns the Buffer representation of the BlockchainID
    */
-  getBlockchainID = (): Buffer => this.blockchainid;
+  getBlockchainID = (): Buffer => this.blockchainID;
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
    */
   toBuffer(): Buffer {
-    let bsize: number = this.networkid.length + this.blockchainid.length;
-    const barr: Buffer[] = [this.networkid, this.blockchainid];
+    let bsize: number = this.networkID.length + this.blockchainID.length
+    const barr: Buffer[] = [this.networkID, this.blockchainID];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -85,15 +85,15 @@ export abstract class EVMStandardBaseTx<KPClass extends StandardKeyPair, KCClass
   /**
    * Class representing a StandardBaseTx which is the foundation for all transactions.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    */
-  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16)) {
+  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16)) {
     super();
-    this.networkid.writeUInt32BE(networkid, 0);
-    this.blockchainid = blockchainid;
+    this.networkID.writeUInt32BE(networkID, 0)
+    this.blockchainID = blockchainID;
   }
 }
 
@@ -111,30 +111,30 @@ SBTx extends EVMStandardBaseTx<KPClass, KCClass>
     let fields: object = super.serialize(encoding);
     return {
       ...fields,
-      "codecid": serializer.encoder(this.codecid, encoding, "number", "decimalString", 2),
+      "codecID": serializer.encoder(this.codecID, encoding, "number", "decimalString", 2),
       "transaction": this.transaction.serialize(encoding)
     };
   };
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.codecid = serializer.decoder(fields["codecid"], encoding, "decimalString", "number");
+    this.codecID = serializer.decoder(fields["codecID"], encoding, "decimalString", "number");
   }
 
-  protected codecid: number = 0;
+  protected codecID: number = 0;
   protected transaction: SBTx;
 
   /**
    * Returns the CodecID as a number
    */
-  getCodecID = (): number => this.codecid;
+  getCodecID = (): number => this.codecID;
 
   /**
   * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
   */
   getCodecIDBuffer = (): Buffer => {
     let codecBuf: Buffer = Buffer.alloc(2);
-    codecBuf.writeUInt16BE(this.codecid, 0);
+    codecBuf.writeUInt16BE(this.codecID, 0);
     return codecBuf;
   } 
 
@@ -188,11 +188,11 @@ SBTx extends EVMStandardBaseTx<KPClass, KCClass>
   abstract fromBuffer(bytes: Buffer, offset?: number): number;
 
   toBuffer(): Buffer {
-    const codecid: Buffer = this.getCodecIDBuffer();
+    const codecID: Buffer = this.getCodecIDBuffer();
     const txtype: Buffer = Buffer.alloc(4);
     txtype.writeUInt32BE(this.transaction.getTxType(), 0);
     const basebuff: Buffer = this.transaction.toBuffer();
-    return Buffer.concat([codecid, txtype, basebuff], codecid.length + txtype.length + basebuff.length);
+    return Buffer.concat([codecID, txtype, basebuff], codecID.length + txtype.length + basebuff.length);
   }
 
   /**
@@ -208,9 +208,9 @@ SBTx extends EVMStandardBaseTx<KPClass, KCClass>
     EVMStandardUnsignedTx<KPClass, KCClass, SBTx>
   >;
 
-  constructor(transaction: SBTx = undefined, codecid: number = 0) {
+  constructor(transaction: SBTx = undefined, codecID: number = 0) {
     super();
-    this.codecid = codecid;
+    this.codecID = codecID;
     this.transaction = transaction;
   }
 }

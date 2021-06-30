@@ -16,13 +16,17 @@ const serialization: Serialization = Serialization.getInstance()
 
 export class GenesisAsset extends CreateAssetTx {
   protected _typeName = "GenesisAsset"
-  protected _codecID = AVMConstants.LATESTCODEC
-  protected _typeID: number = undefined
+  protected _codecID = undefined
+  protected _typeID = undefined
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
+    delete fields["blockchainID"]
+    delete fields["outs"]
+    delete fields["ins"]
     return {
       ...fields,
+      "assetAlias": serialization.encoder(this.assetAlias, encoding, "utf8", "utf8"),
       "name": serialization.encoder(this.name, encoding, "utf8", "utf8"),
       "symbol": serialization.encoder(this.symbol, encoding, "utf8", "utf8"),
       "denomination": serialization.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
@@ -39,12 +43,19 @@ export class GenesisAsset extends CreateAssetTx {
     this.initialstate.deserialize(fields["initialstate"], encoding)
   }
 
+  protected assetAlias: string = ''
+
+  /**
+   * Returns the string representation of the assetAlias
+   */
+  getAssetAlias = (): string => this.assetAlias
+
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisAsset]].
    */
-  toBuffer(networkID: number = serialization.bufferToType(this.networkid, "BN").toNumber()): Buffer {
+  toBuffer(): Buffer {
     // asset alias
-    const assetAlias: string = this.getName()
+    const assetAlias: string = this.getAssetAlias()
     const assetAliasbuffSize: Buffer = Buffer.alloc(2)
     assetAliasbuffSize.writeUInt16BE(assetAlias.length, 0)
     let bsize: number = assetAliasbuffSize.length
@@ -54,10 +65,10 @@ export class GenesisAsset extends CreateAssetTx {
     bsize += assetAliasbuff.length
     barr.push(assetAliasbuff)
 
-    const networkidbuff: Buffer = Buffer.alloc(4)
-    networkidbuff.writeUInt32BE(networkID, 0)
-    bsize += networkidbuff.length
-    barr.push(networkidbuff)
+    const networkIDBuff: Buffer = Buffer.alloc(4)
+    networkIDBuff.writeUInt32BE(serialization.bufferToType(this.networkID, "BN").toNumber(), 0)
+    bsize += networkIDBuff.length
+    barr.push(networkIDBuff)
 
     // Blockchain ID
     bsize += 32
@@ -124,21 +135,25 @@ export class GenesisAsset extends CreateAssetTx {
    * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
    */
   constructor(
-    memo: Buffer = undefined,
+    networkID: number = DefaultNetworkID,
+    assetAlias: string = undefined,
     name: string = undefined,
     symbol: string = undefined,
     denomination: number = undefined,
-    initialstate: InitialStates = undefined
+    initialstate: InitialStates = undefined,
+    memo: Buffer = undefined
   ) {
-    super(DefaultNetworkID, Buffer.alloc(32, 16), [], [], memo)
+    super(networkID, Buffer.alloc(32, 16), [], [], memo)
     if (
-      typeof name === 'string' && typeof symbol === 'string' && typeof denomination === 'number'
-      && denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
+      typeof assetAlias === 'string' && typeof name === 'string' &&
+      typeof symbol === 'string' && typeof denomination === 'number' &&
+      denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
     ) {
-      this.initialstate = initialstate
+      this.assetAlias = assetAlias
       this.name = name
       this.symbol = symbol
       this.denomination.writeUInt8(denomination, 0)
+      this.initialstate = initialstate
     }
   }
 }

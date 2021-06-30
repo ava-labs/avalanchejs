@@ -33,7 +33,7 @@ export class ImportTx extends BaseTx {
   protected _typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       "sourceChain": serialization.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
@@ -163,8 +163,8 @@ export class ImportTx extends BaseTx {
   /**
    * Class representing an unsigned Import transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -172,11 +172,11 @@ export class ImportTx extends BaseTx {
    * @param importIns Array of [[TransferableInput]]s used in the transaction
    */
   constructor(
-    networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16),
+    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
     outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
     memo: Buffer = undefined, sourceChain: Buffer = undefined, importIns: TransferableInput[] = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo)
+    super(networkID, blockchainID, outs, ins, memo)
     this.sourceChain = sourceChain // do not correct, if it's wrong it'll bomb on toBuffer
     if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
       for (let i: number = 0; i < importIns.length; i++) {
