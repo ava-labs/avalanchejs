@@ -40,8 +40,8 @@ const serialzeit = (aThing: Serializable, name: string): void => {
 }
 
 describe('AVMAPI', (): void => {
-  const networkid: number = 12345
-  const blockchainid: string = Defaults.network[networkid].X.blockchainID
+  const networkID: number = 12345
+  const blockchainID: string = Defaults.network[networkID].X.blockchainID
   const ip: string = '127.0.0.1'
   const port: number = 9650
   const protocol: string = 'https'
@@ -49,7 +49,7 @@ describe('AVMAPI', (): void => {
   const username: string = 'AvaLabs'
   const password: string = 'password'
 
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true)
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID, undefined, undefined, undefined, true)
   let api: AVMAPI
   let alias: string
 
@@ -59,7 +59,7 @@ describe('AVMAPI', (): void => {
   const addrC: string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")))
 
   beforeAll((): void => {
-    api = new AVMAPI(avalanche, '/ext/bc/X', blockchainid)
+    api = new AVMAPI(avalanche, '/ext/bc/X', blockchainID)
     alias = api.getBlockchainAlias()
   })
 
@@ -290,7 +290,7 @@ describe('AVMAPI', (): void => {
     const username: string = "Robert"
     const password: string = "Paulson"
     const txID: string = "valid"
-    const result: Promise<string> = api.import(username, password, to, blockchainid)
+    const result: Promise<string> = api.import(username, password, to, blockchainID)
     const payload: object = {
       "result": {
           "txID": txID
@@ -312,7 +312,7 @@ describe('AVMAPI', (): void => {
     const username: string = "Robert"
     const password: string = "Paulson"
     const txID: string = "valid"
-    const result: Promise<string> = api.importAVAX(username, password, to, blockchainid)
+    const result: Promise<string> = api.importAVAX(username, password, to, blockchainID)
     const payload: object = {
       "result": {
         "txID": txID
@@ -662,7 +662,7 @@ describe('AVMAPI', (): void => {
     let xfersecpmintop: TransferableOperation
 
     beforeEach(async (): Promise<void> => {
-      avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainid)
+      avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainID)
       const result: Promise<Buffer> = avm.getAVAXAssetID(true)
       const payload:object = {
         result: {
@@ -770,7 +770,7 @@ describe('AVMAPI', (): void => {
     test('signTx', async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1)
       const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
+        networkID, bintools.cb58Decode(blockchainID), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
@@ -789,7 +789,7 @@ describe('AVMAPI', (): void => {
       const txu1: UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1, new UTF8Payload("hello world").getContent())
       let memobuf: Buffer = Buffer.from("hello world")
       const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
+        networkID, bintools.cb58Decode(blockchainID), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
@@ -841,7 +841,7 @@ describe('AVMAPI', (): void => {
         addrs3, addrs1, addrs2, 
         new UTF8Payload("hello world"))
       const txu2:UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt).sub(new BN(100)), assetID,
+        networkID, bintools.cb58Decode(blockchainID), new BN(amnt).sub(new BN(100)), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
         addrs2.map((a) => avm.parseAddress(a)),
@@ -1319,7 +1319,7 @@ describe('AVMAPI', (): void => {
       )
 
       const txu2:UnsignedTx = set.buildNFTTransferTx(
-        networkid, bintools.cb58Decode(blockchainid), addrbuff3, addrbuff1, addrbuff2,
+        networkID, bintools.cb58Decode(blockchainID), addrbuff3, addrbuff1, addrbuff2,
         [nftutxoids[1]], avm.getTxFee(), assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
       )
 
@@ -1391,7 +1391,7 @@ describe('AVMAPI', (): void => {
       const txu1: UnsignedTx = await result
 
       const txu2:UnsignedTx = set.buildImportTx(
-        networkid, bintools.cb58Decode(blockchainid), 
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), avm.getTxFee(), await avm.getAVAXAssetID(), 
         new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
       )
@@ -1455,7 +1455,7 @@ describe('AVMAPI', (): void => {
       )
 
       const txu2:UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         amount,
         assetID, 
         addrbuff3, 
@@ -1477,7 +1477,7 @@ describe('AVMAPI', (): void => {
       )
 
       const txu4:UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid), amount,
+        networkID, bintools.cb58Decode(blockchainID), amount,
         assetID, addrbuff3, addrbuff1, addrbuff2, undefined, avm.getTxFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
       )

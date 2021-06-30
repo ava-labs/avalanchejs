@@ -28,7 +28,7 @@ export abstract class StandardUTXO extends Serializable{
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "codecid": serialization.encoder(this.codecid, encoding, "Buffer", "decimalString"),
+      "codecID": serialization.encoder(this.codecID, encoding, "Buffer", "decimalString"),
       "txid": serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
       "outputidx": serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
       "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58"),
@@ -37,13 +37,13 @@ export abstract class StandardUTXO extends Serializable{
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.codecid = serialization.decoder(fields["codecid"], encoding, "decimalString", "Buffer", 2)
+    this.codecID = serialization.decoder(fields["codecID"], encoding, "decimalString", "Buffer", 2)
     this.txid = serialization.decoder(fields["txid"], encoding, "cb58", "Buffer", 32)
     this.outputidx = serialization.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4)
     this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32)
   }
 
-  protected codecid: Buffer = Buffer.alloc(2)
+  protected codecID: Buffer = Buffer.alloc(2)
   protected txid: Buffer = Buffer.alloc(32)
   protected outputidx: Buffer = Buffer.alloc(4)
   protected assetid: Buffer = Buffer.alloc(32)
@@ -54,12 +54,12 @@ export abstract class StandardUTXO extends Serializable{
      */
   getCodecID = ()
   /* istanbul ignore next */
-    : number => this.codecid.readUInt8(0)
+    : number => this.codecID.readUInt8(0)
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
     */
-  getCodecIDBuffer = (): Buffer => this.codecid
+  getCodecIDBuffer = (): Buffer => this.codecID
 
   /**
      * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -106,9 +106,9 @@ export abstract class StandardUTXO extends Serializable{
     const outbuff: Buffer = this.output.toBuffer()
     const outputidbuffer: Buffer = Buffer.alloc(4)
     outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0)
-    const barr: Buffer[] = [this.codecid, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff]
+    const barr: Buffer[] = [this.codecID, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff]
     return Buffer.concat(barr, 
-      this.codecid.length + this.txid.length 
+      this.codecID.length + this.txid.length
       + this.outputidx.length + this.assetid.length
       + outputidbuffer.length + outbuff.length)
   }
@@ -139,7 +139,7 @@ export abstract class StandardUTXO extends Serializable{
     output:Output = undefined){
     super()
     if (typeof codecID !== 'undefined') {
-      this.codecid.writeUInt8(codecID, 0)
+      this.codecID.writeUInt8(codecID, 0)
     }
     if (typeof txID !== 'undefined') {
       this.txid = txID

@@ -77,22 +77,22 @@ export class CreateSubnetTx extends BaseTx {
   /**
    * Class representing an unsigned Create Subnet transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    * @param subnetOwners Optional [[SECPOwnerOutput]] class for specifying who owns the subnet.
   */
   constructor(
-    networkid:number = DefaultNetworkID, 
-    blockchainid:Buffer = Buffer.alloc(32, 16), 
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
     outs: TransferableOutput[] = undefined,
     ins: TransferableInput[] = undefined,
     memo:Buffer = undefined,
     subnetOwners:SECPOwnerOutput = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo)
+    super(networkID, blockchainID, outs, ins, memo)
     this.subnetOwners = subnetOwners
   }
 }

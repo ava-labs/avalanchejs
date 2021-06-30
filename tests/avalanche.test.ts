@@ -12,7 +12,7 @@ import { AxiosRequestConfig } from 'axios'
 import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 describe('Avalanche', (): void => {
-  const blockchainid: string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
+  const blockchainID: string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
   const ip = '127.0.0.1'
   const port = 9650
   const protocol = "https"
@@ -20,7 +20,7 @@ describe('Avalanche', (): void => {
   beforeAll((): void => {
     avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true)
     avalanche.addAPI("admin", AdminAPI)
-        avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainid)
+    avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainID)
     avalanche.addAPI("health", HealthAPI)
     avalanche.addAPI("info", InfoAPI)
     avalanche.addAPI("keystore", KeystoreAPI)

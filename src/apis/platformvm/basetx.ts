@@ -75,9 +75,9 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
    * @remarks assume not-checksummed
    */
   fromBuffer(bytes:Buffer, offset:number = 0):number {
-    this.networkid = bintools.copyFrom(bytes, offset, offset + 4);
+    this.networkID = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    this.blockchainid = bintools.copyFrom(bytes, offset, offset + 32);
+    this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     this.numouts = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
@@ -148,13 +148,13 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain>{
   /**
    * Class representing a BaseTx which is the foundation for all transactions.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined, memo: Buffer = undefined) {
-    super(networkid, blockchainid, outs, ins, memo);
+  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16), outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined, memo: Buffer = undefined) {
+    super(networkID, blockchainID, outs, ins, memo);
   }
 }

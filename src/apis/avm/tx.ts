@@ -64,7 +64,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   }
 
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.codecid = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
+    this.codecID = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
     offset += 2
     const txtype: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
     offset += 4

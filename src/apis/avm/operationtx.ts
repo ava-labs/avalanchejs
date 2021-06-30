@@ -29,14 +29,14 @@ export class OperationTx extends BaseTx {
   protected _codecID = AVMConstants.LATESTCODEC
   protected _typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE
 
-  serialize(encoding:SerializedEncoding = "hex"):object {
-    let fields: object = super.serialize(encoding)
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       "ops": this.ops.map((o) => o.serialize(encoding))
     }
   }
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
     this.ops = fields["ops"].map((o:object) => {
       let op: TransferableOperation = new TransferableOperation()
@@ -62,7 +62,7 @@ export class OperationTx extends BaseTx {
   /**
    * Returns the id of the [[OperationTx]]
    */
-  getTxType = ():number => {
+  getTxType = (): number => {
     return this._typeID
   }
 
@@ -75,7 +75,7 @@ export class OperationTx extends BaseTx {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
     this.numOps = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
@@ -91,7 +91,7 @@ export class OperationTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
    */
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     this.numOps.writeUInt32BE(this.ops.length, 0)
     let barr: Buffer[] = [super.toBuffer(), this.numOps]
     this.ops = this.ops.sort(TransferableOperation.comparator())
@@ -146,19 +146,19 @@ export class OperationTx extends BaseTx {
   /**
    * Class representing an unsigned Operation transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    * @param ops Array of [[Operation]]s used in the transaction
    */
   constructor(
-    networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16),
+    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
     outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
     memo: Buffer = undefined, ops: TransferableOperation[] = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo)
+    super(networkID, blockchainID, outs, ins, memo)
     if (typeof ops !== 'undefined' && Array.isArray(ops)) {
       for (let i: number = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {

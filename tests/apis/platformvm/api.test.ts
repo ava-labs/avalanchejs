@@ -39,8 +39,8 @@ const serialzeit = (aThing: Serializable, name: string): void => {
 }
 
 describe('PlatformVMAPI', (): void => {
-  const networkid: number = 12345
-  const blockchainid: string = PlatformChainID
+  const networkID: number = 12345
+  const blockchainID: string = PlatformChainID
   const ip: string = '127.0.0.1'
   const port: number = 9650
   const protocol: string = 'https'
@@ -52,7 +52,7 @@ describe('PlatformVMAPI', (): void => {
   const username: string = 'AvaLabs'
   const password: string = 'password'
 
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true)
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID, undefined, undefined, undefined, true)
   let api: PlatformVMAPI
   let alias: string
 
@@ -471,7 +471,7 @@ describe('PlatformVMAPI', (): void => {
     const username: string = "Robert"
     const password = "Paulson"
     const txID = "valid"
-    const result: Promise<string> = api.importAVAX(username, password, to, blockchainid)
+    const result: Promise<string> = api.importAVAX(username, password, to, blockchainID)
     const payload: object = {
       "result": {
         "txID": txID
@@ -914,7 +914,7 @@ describe('PlatformVMAPI', (): void => {
     test('signTx', async (): Promise<void> => {
       const assetID: Buffer = await platformvm.getAVAXAssetID()
       const txu2: UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
+        networkID, bintools.cb58Decode(blockchainID), new BN(amnt), assetID,
         addrs3.map((a): Buffer => platformvm.parseAddress(a)),
         addrs1.map((a): Buffer => platformvm.parseAddress(a)),
         addrs1.map((a): Buffer => platformvm.parseAddress(a)),
@@ -951,7 +951,7 @@ describe('PlatformVMAPI', (): void => {
       const txu1: UnsignedTx = await result
 
       const txu2: UnsignedTx = set.buildImportTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), platformvm.getTxFee(), await platformvm.getAVAXAssetID(),
         new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
       )
@@ -1002,7 +1002,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         amount,
         assetID,
         addrbuff3,
@@ -1024,7 +1024,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu4: UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid), amount,
+        networkID, bintools.cb58Decode(blockchainID), amount,
         assetID, addrbuff3, addrbuff1, addrbuff2, undefined, platformvm.getTxFee(), assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       )
@@ -1079,7 +1079,7 @@ describe('PlatformVMAPI', (): void => {
           );
     
           const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
-            networkid, bintools.cb58Decode(blockchainid), 
+            networkID, bintools.cb58Decode(blockchainID),
             addrbuff1,         
             addrbuff2, 
             NodeIDStringToBuffer(nodeID), 
@@ -1099,12 +1099,12 @@ describe('PlatformVMAPI', (): void => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkid]["P"].minDelegationStake
+      const amount: BN = Defaults.network[networkID]["P"].minDelegationStake
 
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(Defaults.network[networkID]["P"].minStake, Defaults.network[networkID]["P"].minDelegationStake)
 
       const txu1: UnsignedTx = await platformvm.buildAddDelegatorTx(
         set,
@@ -1122,7 +1122,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = set.buildAddDelegatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1183,8 +1183,8 @@ describe('PlatformVMAPI', (): void => {
       const parseableOutput2: ParseableOutput = new ParseableOutput(secpTransferOutput2)
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2)
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
-      const stakeAmount: BN = Defaults.network[networkid]["P"].minStake
-      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake)
+      const stakeAmount: BN = Defaults.network[networkID]["P"].minStake
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkID]["P"].minDelegationStake)
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
       const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib')
@@ -1292,7 +1292,7 @@ describe('PlatformVMAPI', (): void => {
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2)
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
       const stakeAmount: BN = new BN('10000003000000000')
-      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkID]["P"].minDelegationStake)
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
       const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib')
@@ -1402,7 +1402,7 @@ describe('PlatformVMAPI', (): void => {
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2)
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
       const stakeAmount: BN = new BN('10000003000000000')
-      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkID]["P"].minDelegationStake)
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
       const txid0: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib')
@@ -1494,12 +1494,12 @@ describe('PlatformVMAPI', (): void => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee))
+      const amount: BN = Defaults.network[networkID]["P"].minStake.add(new BN(fee))
 
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(Defaults.network[networkID]["P"].minStake, Defaults.network[networkID]["P"].minDelegationStake)
 
       const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
         set,
@@ -1518,7 +1518,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = set.buildAddValidatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1567,11 +1567,11 @@ describe('PlatformVMAPI', (): void => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkid]["P"].minDelegationStake
+      const amount: BN = Defaults.network[networkID]["P"].minDelegationStake
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(Defaults.network[networkID]["P"].minStake, Defaults.network[networkID]["P"].minDelegationStake)
 
       const txu1: UnsignedTx = await platformvm.buildAddDelegatorTx(
         lset,
@@ -1589,7 +1589,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = lset.buildAddDelegatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1661,7 +1661,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = lset.buildAddValidatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1809,7 +1809,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = set.buildCreateSubnetTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
         addrbuff3,
@@ -1862,7 +1862,7 @@ describe('PlatformVMAPI', (): void => {
       )
 
       const txu2: UnsignedTx = lset.buildCreateSubnetTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
         addrbuff3,

@@ -26,11 +26,11 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   protected _typeID = undefined
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "networkid": serialization.encoder(this.networkid, encoding, "Buffer", "decimalString"),
-      "blockchainid": serialization.encoder(this.blockchainid, encoding, "Buffer", "cb58"),
+      "networkID": serialization.encoder(this.networkID, encoding, "Buffer", "decimalString"),
+      "blockchainID": serialization.encoder(this.blockchainID, encoding, "Buffer", "cb58"),
       "outs": this.outs.map((o) => o.serialize(encoding)),
       "ins": this.ins.map((i) => i.serialize(encoding)),
       "memo": serialization.encoder(this.memo, encoding, "Buffer", "hex")
@@ -39,13 +39,13 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.networkid = serialization.decoder(fields["networkid"], encoding, "decimalString", "Buffer", 4)
-    this.blockchainid = serialization.decoder(fields["blockchainid"], encoding, "cb58", "Buffer", 32)
+    this.networkID = serialization.decoder(fields["networkID"], encoding, "decimalString", "Buffer", 4)
+    this.blockchainID = serialization.decoder(fields["blockchainID"], encoding, "cb58", "Buffer", 32)
     this.memo = serialization.decoder(fields["memo"], encoding, "hex", "Buffer")
   }
 
-  protected networkid: Buffer = Buffer.alloc(4)
-  protected blockchainid: Buffer = Buffer.alloc(32)
+  protected networkID: Buffer = Buffer.alloc(4)
+  protected blockchainID: Buffer = Buffer.alloc(32)
   protected numouts: Buffer = Buffer.alloc(4)
   protected outs: StandardTransferableOutput[]
   protected numins: Buffer = Buffer.alloc(4)
@@ -60,12 +60,12 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Returns the NetworkID as a number
    */
-  getNetworkID = (): number => this.networkid.readUInt32BE(0)
+  getNetworkID = (): number => this.networkID.readUInt32BE(0)
 
   /**
    * Returns the Buffer representation of the BlockchainID
    */
-  getBlockchainID = (): Buffer => this.blockchainid
+  getBlockchainID = (): Buffer => this.blockchainID
 
   /**
    * Returns the array of [[StandardTransferableInput]]s
@@ -95,8 +95,8 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     this.ins.sort(StandardTransferableInput.comparator())
     this.numouts.writeUInt32BE(this.outs.length, 0)
     this.numins.writeUInt32BE(this.ins.length, 0)
-    let bsize: number = this.networkid.length + this.blockchainid.length + this.numouts.length
-    const barr: Buffer[] = [this.networkid, this.blockchainid, this.numouts]
+    let bsize: number = this.networkID.length + this.blockchainID.length + this.numouts.length
+    const barr: Buffer[] = [this.networkID, this.blockchainID, this.numouts]
     for (let i: number = 0; i < this.outs.length; i++) {
       const b: Buffer = this.outs[i].toBuffer()
       barr.push(b)
@@ -145,16 +145,16 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
   /**
    * Class representing a StandardBaseTx which is the foundation for all transactions.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkid: number = DefaultNetworkID, blockchainid: Buffer = Buffer.alloc(32, 16), outs: StandardTransferableOutput[] = undefined, ins: StandardTransferableInput[] = undefined, memo: Buffer = undefined) {
+  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16), outs: StandardTransferableOutput[] = undefined, ins: StandardTransferableInput[] = undefined, memo: Buffer = undefined) {
     super()
-    this.networkid.writeUInt32BE(networkid, 0)
-    this.blockchainid = blockchainid
+    this.networkID.writeUInt32BE(networkID, 0)
+    this.blockchainID = blockchainID
     if(typeof memo != "undefined"){
       this.memo = memo
     }
@@ -182,30 +182,30 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "codecid": serialization.encoder(this.codecid, encoding, "number", "decimalString", 2),
+      "codecID": serialization.encoder(this.codecID, encoding, "number", "decimalString", 2),
       "transaction": this.transaction.serialize(encoding)
     }
   }
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.codecid = serialization.decoder(fields["codecid"], encoding, "decimalString", "number")
+    this.codecID = serialization.decoder(fields["codecID"], encoding, "decimalString", "number")
   }
 
-  protected codecid: number = 0
+  protected codecID: number = 0
   protected transaction: SBTx
 
   /**
    * Returns the CodecID as a number
    */
-  getCodecID = (): number => this.codecid
+  getCodecID = (): number => this.codecID
 
   /**
   * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
   */
   getCodecIDBuffer = (): Buffer => {
     let codecBuf: Buffer = Buffer.alloc(2)
-    codecBuf.writeUInt16BE(this.codecid, 0)
+    codecBuf.writeUInt16BE(this.codecID, 0)
     return codecBuf
   } 
 
@@ -284,9 +284,9 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     StandardUnsignedTx<KPClass, KCClass, SBTx>
     >
 
-  constructor(transaction: SBTx = undefined, codecid: number = 0) {
+  constructor(transaction: SBTx = undefined, codecID: number = 0) {
     super()
-    this.codecid = codecid
+    this.codecID = codecID
     this.transaction = transaction
   }
 }
@@ -347,10 +347,10 @@ export abstract class StandardTx<
     bsize += credlen.length
     for (let i: number = 0; i < this.credentials.length; i++) {
       this.credentials[i].setCodecID(codecID)
-      const credid: Buffer = Buffer.alloc(4)
-      credid.writeUInt32BE(this.credentials[i].getCredentialID(), 0)
-      barr.push(credid)
-      bsize += credid.length
+      const credID: Buffer = Buffer.alloc(4)
+      credID.writeUInt32BE(this.credentials[i].getCredentialID(), 0)
+      barr.push(credID)
+      bsize += credID.length
       const credbuff: Buffer = this.credentials[i].toBuffer()
       bsize += credbuff.length
       barr.push(credbuff)
@@ -369,7 +369,7 @@ export abstract class StandardTx<
    * @remarks
    * unlike most fromStrings, it expects the string to be serialized in cb58 format
    */
-  fromString(serialized:string):number {
+  fromString(serialized: string): number {
     return this.fromBuffer(bintools.cb58Decode(serialized))
   }
 
@@ -379,7 +379,7 @@ export abstract class StandardTx<
    * @remarks
    * unlike most toStrings, this returns in cb58 serialization format
    */
-  toString():string {
+  toString(): string {
     return bintools.cb58Encode(this.toBuffer())
   }
 

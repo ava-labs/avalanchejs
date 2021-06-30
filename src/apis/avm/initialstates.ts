@@ -22,8 +22,8 @@ export class InitialStates extends Serializable {
   protected _typeID = undefined
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
-    let flatfxs: object = {}
+    const fields: object = super.serialize(encoding)
+    const flatfxs: object = {}
     for(let fxid in this.fxs){
       flatfxs[fxid] = this.fxs[fxid].map((o: Output): object => o.serialize(encoding))
     }

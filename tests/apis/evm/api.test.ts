@@ -12,22 +12,22 @@ import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 const bintools: BinTools = BinTools.getInstance()
 
 describe('EVMAPI', (): void => {
-  const networkid: number = 12345
-  const blockchainid: string = Defaults.network[networkid].C.blockchainID
+  const networkID: number = 12345
+  const blockchainID: string = Defaults.network[networkID].C.blockchainID
   const ip: string = '127.0.0.1'
   const port: number = 9650
   const protocol: string = 'https'
   const username: string = 'AvaLabs'
   const password: string = 'password'
 
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true)
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID, undefined, undefined, undefined, true)
   let api: EVMAPI
 
   const addrA: string = 'C-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")))
   const addrC: string = 'C-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")))
 
   beforeAll((): void => {
-    api = new EVMAPI(avalanche, '/ext/bc/C/avax', blockchainid)
+    api = new EVMAPI(avalanche, '/ext/bc/C/avax', blockchainID)
   })
 
   afterEach((): void => {
@@ -126,7 +126,7 @@ describe('EVMAPI', (): void => {
     let username: string = "Robert"
     let password: string = "Paulson"
     let txID: string = "valid"
-    let result: Promise<string> = api.importAVAX(username, password, to, blockchainid)
+    let result: Promise<string> = api.importAVAX(username, password, to, blockchainID)
     let payload: object = {
         "result": {
             "txID": txID
@@ -148,7 +148,7 @@ describe('EVMAPI', (): void => {
     let username: string = "Robert"
     let password: string = "Paulson"
     let txID: string = "valid"
-    let result: Promise<string> = api.import(username, password, to, blockchainid)
+    let result: Promise<string> = api.import(username, password, to, blockchainID)
     let payload: object = {
         "result": {
             "txID": txID

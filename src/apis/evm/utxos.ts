@@ -60,7 +60,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
    }
  
    fromBuffer(bytes: Buffer, offset: number = 0):number {
-     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
+     this.codecID = bintools.copyFrom(bytes, offset, offset + 2);
      offset += 2;
      this.txid = bintools.copyFrom(bytes, offset, offset + 32);
      offset += 32;
