@@ -3,10 +3,9 @@
  * @module API-AVM-GenesisData
  */
 import { Buffer } from "buffer/"
-import { AVMConstants } from "./constants"
 import { Serializable, Serialization, SerializedEncoding } from "../../utils/serialization"
 import { GenesisAsset } from "."
-import { DefaultNetworkID, SerializedType } from "src/utils"
+import { DefaultNetworkID, SerializedType } from "../../utils"
 
 /**
  * @ignore
