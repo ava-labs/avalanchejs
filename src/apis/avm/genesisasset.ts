@@ -35,7 +35,11 @@ export class GenesisAsset extends CreateAssetTx {
   }
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+    fields["blockchainID"] = Buffer.alloc(32, 16).toString("hex")
+    fields["outs"] = []
+    fields["ins"] = []
     super.deserialize(fields, encoding)
+    this.assetAlias = serialization.decoder(fields["assetAlias"], encoding, "utf8", "utf8")
     this.name = serialization.decoder(fields["name"], encoding, "utf8", "utf8")
     this.symbol = serialization.decoder(fields["symbol"], encoding, "utf8", "utf8")
     this.denomination = serialization.decoder(fields["denomination"], encoding, "decimalString", "Buffer", 1)

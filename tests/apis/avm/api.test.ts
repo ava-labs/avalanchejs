@@ -53,10 +53,9 @@ describe('AVMAPI', (): void => {
   let api: AVMAPI
   let alias: string
 
-
-  const addrA: string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")))
-  const addrB: string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")))
-  const addrC: string = 'X-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")))
+  const addrA: string = `X-${bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")))}`
+  const addrB: string = `X-${bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")))}`
+  const addrC: string = `X-${bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")))}`
 
   beforeAll((): void => {
     api = new AVMAPI(avalanche, '/ext/bc/X', blockchainID)
@@ -72,14 +71,14 @@ describe('AVMAPI', (): void => {
     const memo: string = "hello world"
     const changeAddr:string = "X-local1"
     const result: Promise<object> = api.send(username, password, 'assetId', 10, addrA, [addrB], addrA, memo)
-    const payload:object = {
+    const payload: object = {
       result: {
         txID: txId,
         changeAddr: changeAddr
-      },
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -95,14 +94,14 @@ describe('AVMAPI', (): void => {
     const memo:Buffer = Buffer.from("hello world")
     const changeAddr:string = "X-local1"
     const result: Promise<object> = api.send(username, password, bintools.b58ToBuffer('6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF'), new BN(10), addrA, [addrB], addrA, memo)
-    const payload:object = {
+    const payload: object = {
       result: {
         txID: txId,
         changeAddr: changeAddr
-      },
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -118,14 +117,14 @@ describe('AVMAPI', (): void => {
     const memo: string = "hello world"
     const changeAddr:string = "X-local1"
     const result: Promise<object> = api.sendMultiple(username, password, [{ assetID: 'assetId', amount: 10, to: addrA }], [addrB], addrA, memo)
-    const payload:object = {
+    const payload: object = {
       result: {
         txID: txId,
         changeAddr: changeAddr
-      },
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -156,13 +155,13 @@ describe('AVMAPI', (): void => {
   test('listAddresses', async (): Promise<void> => {
     const addresses = [addrA, addrB]
     const result: Promise<string[]> = api.listAddresses(username, password)
-    const payload:object = {
+    const payload: object = {
       result: {
-        addresses,
-      },
+        addresses
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -175,10 +174,10 @@ describe('AVMAPI', (): void => {
   test('importKey', async (): Promise<void> => {
     const address = addrC
     const result: Promise<string> = api.importKey(username, password, 'key')
-    const payload:object = {
+    const payload: object = {
       result: {
-        address,
-      },
+        address
+      }
     }
     const responseObj: HttpResponse = {
       data: payload,
@@ -204,11 +203,11 @@ describe('AVMAPI', (): void => {
     }
 
     const result: Promise<object> = api.getBalance(addrA, 'ATH')
-    const payload:object = {
-      result: respobj,
+    const payload: object = {
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -222,10 +221,10 @@ describe('AVMAPI', (): void => {
     const key: string = 'sdfglvlj2h3v45'
 
     const result: Promise<string> = api.exportKey(username, password, addrA)
-    const payload:object = {
+    const payload: object = {
       result: {
-        privateKey: key,
-      },
+        privateKey: key
+      }
     }
     const responseObj: HttpResponse = {
       data: payload,
@@ -247,12 +246,12 @@ describe('AVMAPI', (): void => {
     const txID: string = "valid"
     const result: Promise<string> = api.export(username, password, to, amount, assetID)
     const payload: object = {
-        "result": {
-            "txID": txID
-        }
+      "result": {
+        "txID": txID
+      }
     }
     const responseObj: HttpResponse = {
-        data: payload
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -270,9 +269,9 @@ describe('AVMAPI', (): void => {
     const txID: string = "valid"
     const result: Promise<string> = api.exportAVAX(username, password, to, amount)
     const payload: object = {
-        "result": {
-            "txID": txID
-        }
+      "result": {
+        "txID": txID
+      }
     }
     const responseObj: HttpResponse = {
         data: payload
@@ -333,7 +332,7 @@ describe('AVMAPI', (): void => {
     const alias: string = 'randomalias'
 
     const result: Promise<string> = api.createAddress(username, password)
-    const payload:object = {
+    const payload: object = {
       result: {
         address: alias,
       },
@@ -367,7 +366,7 @@ describe('AVMAPI', (): void => {
     ]
 
     const result: Promise<string> = api.createFixedCapAsset(username, password, 'Some Coin', 'SCC', denomination, initialHolders)
-    const payload:object = {
+    const payload: object = {
       result: {
         assetID: assetid,
       },
@@ -407,7 +406,7 @@ describe('AVMAPI', (): void => {
     ]
 
     const result: Promise<string> = api.createVariableCapAsset(username, password, 'Some Coin', 'SCC', denomination, minterSets)
-    const payload:object = {
+    const payload: object = {
       result: {
         assetID: assetid,
       },
@@ -435,7 +434,7 @@ describe('AVMAPI', (): void => {
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ]
     const result: Promise<string> = api.mint(username, password, amount, assetID, to, minters)
-    const payload:object = {
+    const payload: object = {
       result: {
         txID: 'sometx',
       },
@@ -463,7 +462,7 @@ describe('AVMAPI', (): void => {
       '7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU',
     ]
     const result: Promise<string> = api.mint(username, password, amount, assetID, to, minters)
-    const payload:object = {
+    const payload: object = {
       result: {
         txID: 'sometx',
       },
@@ -483,7 +482,7 @@ describe('AVMAPI', (): void => {
     const txid: string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7'
 
     const result: Promise<string> = api.getTx(txid)
-    const payload:object = {
+    const payload: object = {
       result: {
         tx: 'sometx',
       },
@@ -504,7 +503,7 @@ describe('AVMAPI', (): void => {
     const txid: string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7'
 
     const result: Promise<string> = api.getTxStatus(txid)
-    const payload:object = {
+    const payload: object = {
       result: {
         status: 'accepted',
       },
@@ -525,7 +524,7 @@ describe('AVMAPI', (): void => {
     const assetidstr: string = bintools.cb58Encode(assetid)
 
     const result: Promise<object> = api.getAssetDescription(assetidstr)
-    const payload:object = {
+    const payload: object = {
       result: {
         name: 'Collin Coin',
         symbol: 'CKC',
@@ -552,7 +551,7 @@ describe('AVMAPI', (): void => {
     const assetidstr: string = bintools.cb58Encode(Buffer.from('8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533', 'hex'))
 
     const result: Promise<object> = api.getAssetDescription(assetid)
-    const payload:object = {
+    const payload: object = {
       result: {
         name: 'Collin Coin',
         symbol: 'CKC',
@@ -587,12 +586,12 @@ describe('AVMAPI', (): void => {
     const persistOpts: PersistanceOptions = new PersistanceOptions('test', true, 'union')
     expect(persistOpts.getMergeRule()).toBe('union')
     let addresses: string[] = set.getAddresses().map((a) => api.addressFromBuffer(a))
-    let result:Promise<{
-      numFetched:number,
-      utxos:UTXOSet,
-      endIndex:{address:string, utxo:string}
+    let result: Promise<{
+      numFetched: number,
+      utxos: UTXOSet,
+      endIndex: { address: string, utxo: string }
     }> = api.getUTXOs(addresses, api.getBlockchainID(), 0, undefined, persistOpts)
-    const payload:object = {
+    const payload: object = {
       result: {
         numFetched:3,
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
@@ -632,7 +631,7 @@ describe('AVMAPI', (): void => {
     let inputs: TransferableInput[]
     let outputs: TransferableOutput[]
     let ops: TransferableOperation[]
-    const amnt: number = 10000
+    let amnt: number = 10000
     const assetID: Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest())
     const NFTassetID: Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest())
     let secpbase1: SECPTransferOutput
@@ -664,12 +663,12 @@ describe('AVMAPI', (): void => {
     beforeEach(async (): Promise<void> => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainID)
       const result: Promise<Buffer> = avm.getAVAXAssetID(true)
-      const payload:object = {
+      const payload: object = {
         result: {
           name,
           symbol,
           assetID: bintools.cb58Encode(assetID),
-          denomination: `${denomination}`,
+          denomination: denomination,
         },
       }
       const responseObj: HttpResponse = {
@@ -694,7 +693,7 @@ describe('AVMAPI', (): void => {
       const pload: Buffer = Buffer.alloc(1024)
       pload.write("All you Trekkies and TV addicts, Don't mean to diss don't mean to bring static.", 0, 1024, 'utf8')
 
-      for (let i:number = 0; i < 3; i++) {
+      for (let i: number = 0; i < 3; i++) {
         addrs1.push(avm.addressFromBuffer(avm.keyChain().makeKey().getAddress()))
         addrs2.push(avm.addressFromBuffer(keymgr2.makeKey().getAddress()))
         addrs3.push(avm.addressFromBuffer(keymgr3.makeKey().getAddress()))
@@ -704,7 +703,7 @@ describe('AVMAPI', (): void => {
       addresses = addressbuffs.map((a) => avm.addressFromBuffer(a))
       const locktime: BN = new BN(54321)
       const threshold: number = 3
-      for (let i:number = 0; i < 5; i++) {
+      for (let i: number = 0; i < 5; i++) {
         let txid: Buffer = Buffer.from(createHash('sha256').update(bintools.fromBNToBuffer(new BN(i), 32)).digest())
         let txidx: Buffer = Buffer.alloc(4)
         txidx.writeUInt32BE(i, 0)
@@ -769,7 +768,7 @@ describe('AVMAPI', (): void => {
 
     test('signTx', async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1)
-      const txu2:UnsignedTx = set.buildBaseTx(
+      const txu2: UnsignedTx = set.buildBaseTx(
         networkID, bintools.cb58Decode(blockchainID), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
@@ -787,8 +786,8 @@ describe('AVMAPI', (): void => {
 
     test('buildBaseTx1', async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1, new UTF8Payload("hello world").getContent())
-      let memobuf: Buffer = Buffer.from("hello world")
-      const txu2:UnsignedTx = set.buildBaseTx(
+      const memobuf: Buffer = Buffer.from("hello world")
+      const txu2: UnsignedTx = set.buildBaseTx(
         networkID, bintools.cb58Decode(blockchainID), new BN(amnt), assetID,
         addrs3.map((a) => avm.parseAddress(a)),
         addrs1.map((a) => avm.parseAddress(a)),
@@ -799,17 +798,17 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -817,16 +816,16 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
@@ -836,7 +835,7 @@ describe('AVMAPI', (): void => {
     })
 
     test('buildBaseTx2', async (): Promise<void> => {
-      const txu1:UnsignedTx = await avm.buildBaseTx(
+      const txu1: UnsignedTx = await avm.buildBaseTx(
         set, new BN(amnt).sub(new BN(100)), bintools.cb58Encode(assetID), 
         addrs3, addrs1, addrs2, 
         new UTF8Payload("hello world"))
@@ -868,17 +867,17 @@ describe('AVMAPI', (): void => {
                 || (testaddr3 == testout0 && testaddr2 == testout1),
       ).toBe(true)
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -886,16 +885,16 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
@@ -921,7 +920,7 @@ describe('AVMAPI', (): void => {
         data: payload,
       }
       mockAxios.mockResponse(responseObj)
-      let response: string = await result
+      const response: string = await result
 
       expect(response).toBe(txid)
     })
@@ -980,7 +979,7 @@ describe('AVMAPI', (): void => {
         denomination
       )
   
-      const txu2:UnsignedTx = set.buildCreateAssetTx(
+      const txu2: UnsignedTx = set.buildCreateAssetTx(
         avalanche.getNetworkID(), 
         bintools.cb58Decode(avm.getBlockchainID()), 
         addrs1.map((a) => avm.parseAddress(a)), 
@@ -997,17 +996,17 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1015,30 +1014,29 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
       */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
-
       serialzeit(tx1, "CreateAssetTx")
     })
 
     test('buildCreateAssetTx - Variable Cap', async (): Promise<void> => {
       avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]))
-      let mintOutputs: SECPMintOutput[] = [secpMintOut1, secpMintOut2]
-      const txu1:UnsignedTx = await avm.buildCreateAssetTx(
+      const mintOutputs: SECPMintOutput[] = [secpMintOut1, secpMintOut2]
+      const txu1: UnsignedTx = await avm.buildCreateAssetTx(
         set, 
         addrs1, 
         addrs2,
@@ -1049,7 +1047,7 @@ describe('AVMAPI', (): void => {
         mintOutputs
       )
   
-      const txu2:UnsignedTx = set.buildCreateAssetTx(
+      const txu2: UnsignedTx = set.buildCreateAssetTx(
         avalanche.getNetworkID(), 
         bintools.cb58Decode(avm.getBlockchainID()), 
         addrs1.map((a) => avm.parseAddress(a)), 
@@ -1066,17 +1064,17 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1084,16 +1082,16 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
@@ -1104,8 +1102,8 @@ describe('AVMAPI', (): void => {
 
     test('buildSECPMintTx', async (): Promise<void> => {
       avm.setTxFee(new BN(fee))
-      let newMinter: SECPMintOutput = new SECPMintOutput(addrs3.map((a) => avm.parseAddress(a)), new BN(0), 1)
-      const txu1:UnsignedTx = await avm.buildSECPMintTx(
+      const newMinter: SECPMintOutput = new SECPMintOutput(addrs3.map((a) => avm.parseAddress(a)), new BN(0), 1)
+      const txu1: UnsignedTx = await avm.buildSECPMintTx(
         set, 
         newMinter,
         secpMintXferOut1,
@@ -1114,7 +1112,7 @@ describe('AVMAPI', (): void => {
         secpMintUTXO.getUTXOID()
       )
   
-      const txu2:UnsignedTx = set.buildSECPMintTx(
+      const txu2: UnsignedTx = set.buildSECPMintTx(
         avalanche.getNetworkID(), 
         bintools.cb58Decode(avm.getBlockchainID()),
         newMinter,
@@ -1128,17 +1126,17 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1146,16 +1144,16 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
@@ -1168,34 +1166,34 @@ describe('AVMAPI', (): void => {
 
     test('buildCreateNFTAssetTx', async (): Promise<void> => {
       avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]))
-      let minterSets: MinterSet[] = [new MinterSet(1, addrs1)]
-      let locktime: BN = new BN(0)
+      const minterSets: MinterSet[] = [new MinterSet(1, addrs1)]
+      const locktime: BN = new BN(0)
 
-      let txu1:UnsignedTx = await avm.buildCreateNFTAssetTx(
-          set, addrs1, addrs2, minterSets,
-          name, symbol, new UTF8Payload("hello world"), UnixNow(), locktime
+      const txu1: UnsignedTx = await avm.buildCreateNFTAssetTx(
+        set, addrs1, addrs2, minterSets,
+        name, symbol, new UTF8Payload("hello world"), UnixNow(), locktime
       )
       
-      let txu2:UnsignedTx = set.buildCreateNFTAssetTx(
-          avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
-          addrs1.map(a => avm.parseAddress(a)), addrs2.map((a) => avm.parseAddress(a)), minterSets, 
-          name, symbol, avm.getCreationTxFee(), assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), locktime
+      const txu2: UnsignedTx = set.buildCreateNFTAssetTx(
+        avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()),
+        addrs1.map(a => avm.parseAddress(a)), addrs2.map((a) => avm.parseAddress(a)), minterSets,
+        name, symbol, avm.getCreationTxFee(), assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), locktime
       )
 
       expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1203,48 +1201,47 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
       */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
-
       serialzeit(tx1, "CreateNFTAssetTx")
     })
 
     test('buildCreateNFTMintTx', async (): Promise<void> => {
       avm.setTxFee(new BN(fee))
-      let groupID: number = 0
-      let locktime: BN = new BN(0)
-      let threshold: number = 1
-      let payload: Buffer = Buffer.from("Avalanche")
-      let addrbuff1: Buffer[] = addrs1.map(a => avm.parseAddress(a))
-      let addrbuff2: Buffer[] = addrs2.map(a => avm.parseAddress(a))
-      let addrbuff3: Buffer[] = addrs3.map(a => avm.parseAddress(a))
-      let outputOwners: OutputOwners[] = []
-      let oo: OutputOwners = new OutputOwners(addrbuff3, locktime, threshold)
+      const groupID: number = 0
+      const locktime: BN = new BN(0)
+      const threshold: number = 1
+      const payload: Buffer = Buffer.from("Avalanche")
+      const addrbuff1: Buffer[] = addrs1.map(a => avm.parseAddress(a))
+      const addrbuff2: Buffer[] = addrs2.map(a => avm.parseAddress(a))
+      const addrbuff3: Buffer[] = addrs3.map(a => avm.parseAddress(a))
+      const outputOwners: OutputOwners[] = []
+      const oo: OutputOwners = new OutputOwners(addrbuff3, locktime, threshold)
       outputOwners.push()
        
-      let txu1:UnsignedTx = await avm.buildCreateNFTMintTx(
-          set, oo, addrs1, addrs2, nftutxoids, groupID, payload, 
-          undefined, UnixNow()
+      const txu1: UnsignedTx = await avm.buildCreateNFTMintTx(
+        set, oo, addrs1, addrs2, nftutxoids, groupID, payload,
+        undefined, UnixNow()
       )
 
-      let txu2:UnsignedTx = set.buildCreateNFTMintTx(
-          avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
-          [oo], addrbuff1, addrbuff2, nftutxoids, groupID, payload, 
-          avm.getTxFee(), assetID, undefined, UnixNow()
+      const txu2: UnsignedTx = set.buildCreateNFTMintTx(
+        avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()),
+        [oo], addrbuff1, addrbuff2, nftutxoids, groupID, payload,
+        avm.getTxFee(), assetID, undefined, UnixNow()
       )
 
       expect(txu2.toBuffer().toString("hex")).toBe(txu1.toBuffer().toString("hex"))
@@ -1253,57 +1250,55 @@ describe('AVMAPI', (): void => {
       outputOwners.push(oo)
       outputOwners.push(new OutputOwners(addrbuff3, locktime, threshold + 1))
 
-      let txu3:UnsignedTx = await avm.buildCreateNFTMintTx(
+      const txu3: UnsignedTx = await avm.buildCreateNFTMintTx(
         set, outputOwners, addrs1, addrs2, nftutxoids, groupID, payload, 
         undefined, UnixNow()
       )
 
-    let txu4:UnsignedTx = set.buildCreateNFTMintTx(
+      const txu4: UnsignedTx = set.buildCreateNFTMintTx(
         avalanche.getNetworkID(), bintools.cb58Decode(avm.getBlockchainID()), 
         outputOwners, addrbuff1, addrbuff2, nftutxoids, groupID, payload, 
         avm.getTxFee(), assetID, undefined, UnixNow()
-    )
+      )
 
       expect(txu4.toBuffer().toString("hex")).toBe(txu3.toBuffer().toString("hex"))
       expect(txu4.toString()).toBe(txu3.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
     
-    /*
-    let tx2obj:object = tx2.serialize("hex")
-    let tx2str:string = JSON.stringify(tx2obj)
-    console.log("-----Test2 JSON-----")
-    console.log(tx2str)
-    console.log("-----Test2 ENDN-----")
-    */
+      /*
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
+      console.log("-----Test2 JSON-----")
+      console.log(tx2str)
+      console.log("-----Test2 ENDN-----")
+      */
     
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
     
-    /*
-    let tx4obj:object = tx4.serialize("display")
-    let tx4str:string = JSON.stringify(tx4obj)
-    console.log("-----Test4 JSON-----")
-    console.log(tx4str)
-    console.log("-----Test4 ENDN-----")
-    */
+      /*
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
+      console.log("-----Test4 JSON-----")
+      console.log(tx4str)
+      console.log("-----Test4 ENDN-----")
+      */
     
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
-
       serialzeit(tx1, "CreateNFTMintTx")
-
     })
 
     test('buildNFTTransferTx', async (): Promise<void> => {
@@ -1313,12 +1308,12 @@ describe('AVMAPI', (): void => {
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a))
       const addrbuff2 = addrs2.map(a => avm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => avm.parseAddress(a))
-      const txu1:UnsignedTx = await avm.buildNFTTransferTx(
+      const txu1: UnsignedTx = await avm.buildNFTTransferTx(
         set, addrs3, addrs1, addrs2, nftutxoids[1],
         new UTF8Payload("hello world"), UnixNow(), new BN(0), 1,
       )
 
-      const txu2:UnsignedTx = set.buildNFTTransferTx(
+      const txu2: UnsignedTx = set.buildNFTTransferTx(
         networkID, bintools.cb58Decode(blockchainID), addrbuff3, addrbuff1, addrbuff2,
         [nftutxoids[1]], avm.getTxFee(), assetID, new UTF8Payload("hello world").getPayload(), UnixNow(), new BN(0), 1,
       )
@@ -1326,17 +1321,17 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1344,30 +1339,28 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
   
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
       */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
-
       serialzeit(tx1, "NFTTransferTx")
-
     })
 
     test('buildImportTx', async (): Promise<void> => {
-      let locktime: BN = new BN(0)
-      let threshold: number = 1
+      const locktime: BN = new BN(0)
+      const threshold: number = 1
       avm.setTxFee(new BN(fee))
       const addrbuff1 = addrs1.map((a) => avm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => avm.parseAddress(a))
@@ -1375,22 +1368,22 @@ describe('AVMAPI', (): void => {
       const fungutxo: UTXO = set.getUTXO(fungutxoids[1])
       const fungutxostr: string = fungutxo.toString()
       
-      const result:Promise<UnsignedTx> = avm.buildImportTx(
+      const result: Promise<UnsignedTx> = avm.buildImportTx(
         set, addrs1, PlatformChainID, addrs3, addrs1, addrs2, new UTF8Payload("hello world"), UnixNow(), locktime, threshold
       )
       const payload:object = {
         result: {
           utxos:[fungutxostr]
-        },
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
       const txu1: UnsignedTx = await result
 
-      const txu2:UnsignedTx = set.buildImportTx(
+      const txu2: UnsignedTx = set.buildImportTx(
         networkID, bintools.cb58Decode(blockchainID),
         addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), avm.getTxFee(), await avm.getAVAXAssetID(), 
         new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
@@ -1399,17 +1392,17 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1417,23 +1410,22 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
   
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
       */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
-
       serialzeit(tx1, "ImportTx")
     })
 
@@ -1444,7 +1436,7 @@ describe('AVMAPI', (): void => {
       const addrbuff3 = addrs3.map((a) => avm.parseAddress(a))
       const amount: BN = new BN(90)
       const type: SerializedType = "bech32"
-      const txu1:UnsignedTx = await avm.buildExportTx(
+      const txu1: UnsignedTx = await avm.buildExportTx(
         set, 
         amount, 
         bintools.cb58Decode(PlatformChainID),
@@ -1454,7 +1446,7 @@ describe('AVMAPI', (): void => {
         new UTF8Payload("hello world"), UnixNow()
       )
 
-      const txu2:UnsignedTx = set.buildExportTx(
+      const txu2: UnsignedTx = set.buildExportTx(
         networkID, bintools.cb58Decode(blockchainID),
         amount,
         assetID, 
@@ -1470,13 +1462,13 @@ describe('AVMAPI', (): void => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      const txu3:UnsignedTx = await avm.buildExportTx(
+      const txu3: UnsignedTx = await avm.buildExportTx(
         set, amount, PlatformChainID, 
         addrs3, addrs1, addrs2, 
         new UTF8Payload("hello world"), UnixNow()
       )
 
-      const txu4:UnsignedTx = set.buildExportTx(
+      const txu4: UnsignedTx = set.buildExportTx(
         networkID, bintools.cb58Decode(blockchainID), amount,
         assetID, addrbuff3, addrbuff1, addrbuff2, undefined, avm.getTxFee(), assetID, 
         new UTF8Payload("hello world").getPayload(), UnixNow()
@@ -1485,17 +1477,17 @@ describe('AVMAPI', (): void => {
       expect(txu4.toBuffer().toString('hex')).toBe(txu3.toBuffer().toString('hex'))
       expect(txu4.toString()).toBe(txu3.toString())
 
-      let tx1: Tx = txu1.sign(avm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx1: Tx = txu1.sign(avm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
       
       /*
-      let tx2obj:object = tx2.serialize("hex")
-      let tx2str:string = JSON.stringify(tx2obj)
+      const tx2obj:object = tx2.serialize("hex")
+      const tx2str:string = JSON.stringify(tx2obj)
       console.log("-----Test2 JSON-----")
       console.log(tx2str)
       console.log("-----Test2 ENDN-----")
@@ -1503,86 +1495,85 @@ describe('AVMAPI', (): void => {
       
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
   
-      let tx3: Tx = txu1.sign(avm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
+      const tx3: Tx = txu1.sign(avm.keyChain())
+      const tx3obj: object = tx3.serialize("display")
+      const tx3str: string = JSON.stringify(tx3obj)
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
       tx4.deserialize(tx4newobj, "display")
       
       /*
-      let tx4obj:object = tx4.serialize("display")
-      let tx4str:string = JSON.stringify(tx4obj)
+      const tx4obj:object = tx4.serialize("display")
+      const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
       console.log("-----Test4 ENDN-----")
       */
       
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
-
       serialzeit(tx1, "ExportTx")
-
     })
 
     test('buildGenesis', async (): Promise<void> => {
-        let genesisData:object = {
-            genesisData : {
-                assetAlias1: {
-                    name: "human readable name",
-                    symbol: "AVAL",
-                    initialState: {
-                        fixedCap : [
-                            {
-                                amount: 1000,
-                                address: "A"
-                            },
-                            {
-                                amount: 5000,
-                                address: "B"
-                            },
-                        ]
-                    }
+      const genesisData: object = {
+        genesisData: {
+          assetAlias1: {
+            name: "human readable name",
+            symbol: "AVAL",
+            initialState: {
+              fixedCap: [
+                {
+                  amount: 1000,
+                  address: "A"
                 },
-                assetAliasCanBeAnythingUnique: {
-                    name: "human readable name",
-                    symbol: "AVAL",
-                    initialState: {
-                        variableCap : [
-                            {
-                                minters: [
-                                    "A",
-                                    "B"
-                                ],
-                                threshold: 1
-                            },
-                            {
-                                minters: [
-                                    "A",
-                                    "B",
-                                    "C"
-                                ],
-                                threshold: 2
-                            }
-                        ]
-                    }
+                {
+                  amount: 5000,
+                  address: "B"
                 }
+              ]
             }
+          },
+          assetAliasCanBeAnythingUnique: {
+            name: "human readable name",
+            symbol: "AVAL",
+            initialState: {
+              variableCap: [
+                {
+                  minters: [
+                    "A",
+                    "B"
+                  ],
+                  threshold: 1
+                },
+                {
+                  minters: [
+                    "A",
+                    "B",
+                    "C"
+                  ],
+                  threshold: 2
+                }
+              ]
+            }
+          }
         }
-        let bytes:string = "111TNWzUtHKoSvxohjyfEwE2X228ZDGBngZ4mdMUVMnVnjtnawW1b1zbAhzyAM1v6d7ECNj6DXsT7qDmhSEf3DWgXRj7ECwBX36ZXFc9tWVB2qHURoUfdDvFsBeSRqatCmj76eZQMGZDgBFRNijRhPNKUap7bCeKpHDtuCZc4YpPkd4mR84dLL2AL1b4K46eirWKMaFVjA5btYS4DnyUx5cLpAq3d35kEdNdU5zH3rTU18S4TxYV8voMPcLCTZ3h4zRsM5jW1cUzjWVvKg7uYS2oR9qXRFcgy1gwNTFZGstySuvSF7MZeZF4zSdNgC4rbY9H94RVhqe8rW7MXqMSZB6vBTB2BpgF6tNFehmYxEXwjaKRrimX91utvZe9YjgGbDr8XHsXCnXXg4ZDCjapCy4HmmRUtUoAduGNBdGVMiwE9WvVbpMFFcNfgDXGz9NiatgSnkxQALTHvGXXm8bn4CoLFzKnAtq3KwiWqHmV3GjFYeUm3m8Zee9VDfZAvDsha51acxfto1htstxYu66DWpT36YT18WSbxibZcKXa7gZrrsCwyzid8CCWw79DbaLCUiq9u47VqofG1kgxwuuyHb8NVnTgRTkQASSbj232fyG7YeX4mAvZY7a7K7yfSyzJaXdUdR7aLeCdLP6mbFDqUMrN6YEkU2X8d4Ck3T"
+      }
+      const bytes: string = "111TNWzUtHKoSvxohjyfEwE2X228ZDGBngZ4mdMUVMnVnjtnawW1b1zbAhzyAM1v6d7ECNj6DXsT7qDmhSEf3DWgXRj7ECwBX36ZXFc9tWVB2qHURoUfdDvFsBeSRqatCmj76eZQMGZDgBFRNijRhPNKUap7bCeKpHDtuCZc4YpPkd4mR84dLL2AL1b4K46eirWKMaFVjA5btYS4DnyUx5cLpAq3d35kEdNdU5zH3rTU18S4TxYV8voMPcLCTZ3h4zRsM5jW1cUzjWVvKg7uYS2oR9qXRFcgy1gwNTFZGstySuvSF7MZeZF4zSdNgC4rbY9H94RVhqe8rW7MXqMSZB6vBTB2BpgF6tNFehmYxEXwjaKRrimX91utvZe9YjgGbDr8XHsXCnXXg4ZDCjapCy4HmmRUtUoAduGNBdGVMiwE9WvVbpMFFcNfgDXGz9NiatgSnkxQALTHvGXXm8bn4CoLFzKnAtq3KwiWqHmV3GjFYeUm3m8Zee9VDfZAvDsha51acxfto1htstxYu66DWpT36YT18WSbxibZcKXa7gZrrsCwyzid8CCWw79DbaLCUiq9u47VqofG1kgxwuuyHb8NVnTgRTkQASSbj232fyG7YeX4mAvZY7a7K7yfSyzJaXdUdR7aLeCdLP6mbFDqUMrN6YEkU2X8d4Ck3T"
 
-      let result: Promise<string> = api.buildGenesis(genesisData)
-        let payload:object = {
-            "result": {
-                'bytes': bytes
-            }
+      const result: Promise<string> = api.buildGenesis(genesisData)
+      const payload: object = {
+        "result": {
+          'bytes': bytes
         }
-        let responseObj = {
-            data: payload
-        }
+      }
+      const responseObj: {
+        data: object
+      } = {
+        data: payload
+      }
 
       mockAxios.mockResponse(responseObj)
-      let response: string = await result
-
+      const response: string = await result
       expect(response).toBe(bytes)
     })
   })

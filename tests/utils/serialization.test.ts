@@ -222,13 +222,11 @@ describe("Serialization", (): void => {
       const groupID: number = 12345
 
       test("GenesisAsset", (): void => {
-        console.log("2------------")
         const assetAlias: string = "asset1"
         const name: string = "asset1"
         const symbol: string = "MFCA"
         const denomination: number = 1
         const vcapSecpOutput = new SECPTransferOutput(amount, [addressBuf], locktime, threshold)
-
         const initialStates: InitialStates = new InitialStates()
         initialStates.addOutput(vcapSecpOutput)
         const genesisasset: GenesisAsset = new GenesisAsset(networkID, assetAlias, name, symbol, denomination, initialStates, memo)
@@ -244,17 +242,21 @@ describe("Serialization", (): void => {
         expect(serialized.fields["networkID"]).toBe(networkIDHex)
         expect(serialized.fields["memo"]).toBe(mHex)
 
-        // serialization.deserialize(serialized, genesisasset2)
-        // expect(genesisasset2.getTypeName()).toBe("BaseTx")
-        // expect(genesisasset2.getTypeID()).toBe(0)
-        // expect(genesisasset2.getCodecID()).toBe(0)
-        // expect(genesisasset2.getBlockchainID().toString(hex)).toBe(blockchainIDHex)
-        // expect(genesisasset2.getNetworkID()).toBe(networkID)
-        // expect(genesisasset2.getOuts()).toStrictEqual([])
-        // expect(genesisasset2.getIns()).toStrictEqual([])
-        // expect(serialization.bufferToType(genesisasset2.getMemo(), cb58)).toBe(m)
-        // expect(genesisasset2.toBuffer().toString(hex)).toBe(genesisasset2.toBuffer().toString(hex))
-        // expect(genesisasset2.toString()).toBe(genesisasset2.toString())
+        serialization.deserialize(serialized, genesisasset2)
+        expect(genesisasset2.getTypeName()).toBe("GenesisAsset")
+        expect(genesisasset2.getTypeID()).toBeUndefined()
+        expect(genesisasset2.getCodecID()).toBeUndefined()
+        expect(genesisasset2.getBlockchainID().toString(hex)).toBe("1010101010101010101010101010101010101010101010101010101010101010")
+        expect(genesisasset2.getNetworkID()).toBe(networkID)
+        expect(genesisasset2.getOuts()).toStrictEqual([])
+        expect(genesisasset2.getIns()).toStrictEqual([])
+        expect(genesisasset2.getAssetAlias()).toBe(assetAlias)
+        expect(genesisasset2.getName()).toBe(name)
+        expect(genesisasset2.getSymbol()).toBe(symbol)
+        expect(genesisasset2.getDenomination()).toBe(denomination)
+        expect(serialization.bufferToType(genesisasset2.getMemo(), cb58)).toBe(m)
+        expect(genesisasset2.toBuffer().toString(hex)).toBe(genesisasset.toBuffer().toString(hex))
+        expect(genesisasset2.toString()).toBe(genesisasset.toString())
       })
 
       test("BaseTx", (): void => {
