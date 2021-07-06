@@ -12,6 +12,10 @@ import { CreateAssetTx } from "./createassettx"
  * @ignore
  */
 const serialization: Serialization = Serialization.getInstance()
+const utf8: SerializedType = "utf8"
+const bn: SerializedType = "BN"
+const buffer: SerializedType = "Buffer"
+const decimalString: SerializedType = "decimalString"
 
 export class GenesisAsset extends CreateAssetTx {
   protected _typeName = "GenesisAsset"
@@ -25,10 +29,10 @@ export class GenesisAsset extends CreateAssetTx {
     delete fields["ins"]
     return {
       ...fields,
-      assetAlias: serialization.encoder(this.assetAlias, encoding, "utf8", "utf8"),
-      name: serialization.encoder(this.name, encoding, "utf8", "utf8"),
-      symbol: serialization.encoder(this.symbol, encoding, "utf8", "utf8"),
-      denomination: serialization.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
+      assetAlias: serialization.encoder(this.assetAlias, encoding, utf8, utf8),
+      name: serialization.encoder(this.name, encoding, utf8, utf8),
+      symbol: serialization.encoder(this.symbol, encoding, utf8, utf8),
+      denomination: serialization.encoder(this.denomination, encoding, buffer, decimalString, 1),
       initialState: this.initialState.serialize(encoding)
     }
   }
@@ -38,10 +42,10 @@ export class GenesisAsset extends CreateAssetTx {
     fields["outs"] = []
     fields["ins"] = []
     super.deserialize(fields, encoding)
-    this.assetAlias = serialization.decoder(fields["assetAlias"], encoding, "utf8", "utf8")
-    this.name = serialization.decoder(fields["name"], encoding, "utf8", "utf8")
-    this.symbol = serialization.decoder(fields["symbol"], encoding, "utf8", "utf8")
-    this.denomination = serialization.decoder(fields["denomination"], encoding, "decimalString", "Buffer", 1)
+    this.assetAlias = serialization.decoder(fields["assetAlias"], encoding, utf8, utf8)
+    this.name = serialization.decoder(fields["name"], encoding, utf8, utf8)
+    this.symbol = serialization.decoder(fields["symbol"], encoding, utf8, utf8)
+    this.denomination = serialization.decoder(fields["denomination"], encoding, decimalString, buffer, 1)
     this.initialState = new InitialStates()
     this.initialState.deserialize(fields["initialState"], encoding)
   }
@@ -53,12 +57,12 @@ export class GenesisAsset extends CreateAssetTx {
    */
   getAssetAlias = (): string => this.assetAlias
 
+  // TODO fromBuffer
+
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisAsset]].
    */
   toBuffer(): Buffer {
-    const utf8: SerializedType = "utf8"
-    const BN: SerializedType = "BN"
     // asset alias
     const assetAlias: string = this.getAssetAlias()
     const assetAliasbuffSize: Buffer = Buffer.alloc(2)
@@ -71,7 +75,7 @@ export class GenesisAsset extends CreateAssetTx {
     barr.push(assetAliasbuff)
 
     const networkIDBuff: Buffer = Buffer.alloc(4)
-    networkIDBuff.writeUInt32BE(serialization.bufferToType(this.networkID, BN).toNumber(), 0)
+    networkIDBuff.writeUInt32BE(serialization.bufferToType(this.networkID, bn).toNumber(), 0)
     bsize += networkIDBuff.length
     barr.push(networkIDBuff)
 

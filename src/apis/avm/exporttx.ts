@@ -53,6 +53,11 @@ export class ExportTx extends BaseTx {
   protected numOuts: Buffer = Buffer.alloc(4)
   protected exportOuts: TransferableOutput[] = []
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */

@@ -45,8 +45,8 @@ describe("UTXO", (): void => {
     const u1: UTXO = new UTXO()
     u1.fromBuffer(utxobuff)
     test("getAssetID NonCA", (): void => {
-      const assetid: Buffer = u1.getAssetID()
-      expect(assetid.toString("hex", 0, assetid.length)).toBe(outaid)
+      const assetID: Buffer = u1.getAssetID()
+      expect(assetID.toString("hex", 0, assetID.length)).toBe(outaid)
     })
     test("getTxID", (): void => {
       const txid: Buffer = u1.getTxID()
@@ -250,8 +250,8 @@ describe("UTXOSet", (): void => {
       balance1 = new BN(0)
       balance2 = new BN(0)
       for (let i: number = 0; i < utxos.length; i++) {
-        const assetid = utxos[i].getAssetID()
-        balance1.add(set.getBalance(addrs, assetid))
+        const assetID = utxos[i].getAssetID()
+        balance1.add(set.getBalance(addrs, assetID))
         balance2.add((utxos[i].getOutput() as AmountOutput).getAmount())
       }
       expect(balance1.toString()).toBe(balance2.toString())
@@ -260,8 +260,8 @@ describe("UTXOSet", (): void => {
       balance2 = new BN(0)
       const now: BN = UnixNow()
       for (let i: number = 0; i < utxos.length; i++) {
-        const assetid = bintools.cb58Encode(utxos[i].getAssetID())
-        balance1.add(set.getBalance(addrs, assetid, now))
+        const assetID = bintools.cb58Encode(utxos[i].getAssetID())
+        balance1.add(set.getBalance(addrs, assetID, now))
         balance2.add((utxos[i].getOutput() as AmountOutput).getAmount())
       }
       expect(balance1.toString()).toBe(balance2.toString())

@@ -63,6 +63,11 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
     return this.getOuts() as TransferableOutput[]
   }
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */

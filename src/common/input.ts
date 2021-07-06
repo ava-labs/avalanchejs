@@ -176,22 +176,22 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "txid": serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
-      "outputidx": serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
-      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58"),
+      txid: serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
+      outputidx: serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
+      assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58"),
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
     this.txid = serialization.decoder(fields["txid"], encoding, "cb58", "Buffer", 32)
     this.outputidx = serialization.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4)
-    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32);
+    this.assetID = serialization.decoder(fields["assetID"], encoding, "cb58", "Buffer", 32);
     //input deserialization must be implmented in child classes
   }
 
   protected txid:Buffer = Buffer.alloc(32);
   protected outputidx:Buffer = Buffer.alloc(4);
-  protected assetid:Buffer = Buffer.alloc(32);
+  protected assetID: Buffer = Buffer.alloc(32);
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} of the TxID.
@@ -220,7 +220,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
   /**
    * Returns the assetID of the input.
    */
-  getAssetID = ():Buffer => this.assetid;
+  getAssetID = (): Buffer => this.assetID;
 
   abstract fromBuffer(bytes:Buffer, offset?:number):number; 
 
@@ -229,8 +229,8 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
    */
   toBuffer():Buffer {
     const parseableBuff:Buffer = super.toBuffer();
-    const bsize:number = this.txid.length + this.outputidx.length + this.assetid.length + parseableBuff.length;
-    const barr: Buffer[] = [this.txid, this.outputidx, this.assetid, parseableBuff];
+    const bsize: number = this.txid.length + this.outputidx.length + this.assetID.length + parseableBuff.length
+    const barr: Buffer[] = [this.txid, this.outputidx, this.assetID, parseableBuff];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
   }
@@ -257,7 +257,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput{
       this.input = input;
       this.txid = txid;
       this.outputidx = outputidx;
-      this.assetid = assetID;
+      this.assetID = assetID;
     }
   }
 }

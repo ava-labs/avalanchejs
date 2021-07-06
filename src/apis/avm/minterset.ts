@@ -5,13 +5,17 @@
 
 import { Buffer } from "buffer/"
 import BinTools from '../../utils/bintools'
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization'
+import { Serializable, Serialization, SerializedEncoding, SerializedType } from '../../utils/serialization'
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const decimalString: SerializedType = "decimalString"
+const cb58: SerializedType = "cb58"
+const num: SerializedType = "number"
+const buffer: SerializedType = "Buffer"
 
 /**
  * Class for representing a threshold and set of minting addresses in Avalanche. 
@@ -26,14 +30,14 @@ export class MinterSet extends Serializable{
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "threshold": serialization.encoder(this.threshold, encoding, "number", "decimalString", 4),
-      "minters": this.minters.map((m) => serialization.encoder(m, encoding, "Buffer", "cb58", 20))
+      threshold: serialization.encoder(this.threshold, encoding, num, decimalString, 4),
+      minters: this.minters.map((m) => serialization.encoder(m, encoding, buffer, cb58, 20))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.threshold = serialization.decoder(fields["threshold"], encoding, "decimalString", "number", 4)
-    this.minters = fields["minters"].map((m: string) => serialization.decoder(m, encoding, "cb58", "Buffer", 20))
+    this.threshold = serialization.decoder(fields["threshold"], encoding, decimalString, num, 4)
+    this.minters = fields["minters"].map((m: string) => serialization.decoder(m, encoding, cb58, buffer, 20))
   }
   
   protected threshold: number

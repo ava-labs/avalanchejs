@@ -2,22 +2,26 @@
  * @packageDocumentation
  * @module API-AVM-Operations
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { NFTTransferOutput, SECPMintOutput, SECPTransferOutput } from './outputs'
-import { NBytes } from '../../common/nbytes'
-import { SigIdx } from '../../common/credentials'
-import { OutputOwners } from '../../common/output'
-import { Serializable, Serialization, SerializedEncoding } from '../../utils/serialization'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { NFTTransferOutput, SECPMintOutput, SECPTransferOutput } from "./outputs"
+import { NBytes } from "../../common/nbytes"
+import { SigIdx } from "../../common/credentials"
+import { OutputOwners } from "../../common/output"
+import { Serializable, Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
 import { InvalidOperationIdError,
-         CodecIdError,
-         ChecksumError,
+  CodecIdError,
+  ChecksumError,
   AddressError
-} from '../../utils/errors'
+} from "../../utils/errors"
 
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const cb58: SerializedType = "cb58"
+const buffer: SerializedType = "Buffer"
+const hex: SerializedType = "hex"
+const decimalString: SerializedType = "decimalString"
 
 /**
  * Takes a buffer representing the output and returns the proper [[Operation]] instance.
@@ -35,7 +39,7 @@ export const SelectOperationClass = (opid: number, ...args: any[]): Operation =>
       return new NFTTransferOperation(...args)
     }
     /* istanbul ignore next */
-  throw new InvalidOperationIdError("Error - SelectOperationClass: unknown opid " + opid)
+  throw new InvalidOperationIdError(`Error - SelectOperationClass: unknown opid ${opid}`)
 }
 
 /**
@@ -49,7 +53,7 @@ export abstract class Operation extends Serializable{
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "sigIdxs": this.sigIdxs.map((s: SigIdx): object => s.serialize(encoding))
+      sigIdxs: this.sigIdxs.map((s: SigIdx): object => s.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -82,8 +86,8 @@ export abstract class Operation extends Serializable{
   abstract getOperationID(): number
 
   /**
-     * Returns the array of [[SigIdx]] for this [[Operation]]
-     */
+   * Returns the array of [[SigIdx]] for this [[Operation]]
+   */
   getSigIdxs = (): SigIdx[] => this.sigIdxs
 
   /**
@@ -92,11 +96,11 @@ export abstract class Operation extends Serializable{
   abstract getCredentialID(): number
 
   /**
-     * Creates and adds a [[SigIdx]] to the [[Operation]].
-     *
-     * @param addressIdx The index of the address to reference in the signatures
-     * @param address The address of the source of the signature
-     */
+   * Creates and adds a [[SigIdx]] to the [[Operation]].
+   *
+   * @param addressIdx The index of the address to reference in the signatures
+   * @param address The address of the source of the signature
+   */
   addSignatureIdx = (addressIdx: number, address: Buffer) => {
     const sigidx: SigIdx = new SigIdx()
     const b: Buffer = Buffer.alloc(4)
@@ -155,14 +159,14 @@ export class TransferableOperation extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58", 32),
-      "utxoIDs": this.utxoIDs.map((u) => u.serialize(encoding)),
-      "operation": this.operation.serialize(encoding)
+      assetID: serialization.encoder(this.assetID, encoding, buffer, cb58, 32),
+      utxoIDs: this.utxoIDs.map((u) => u.serialize(encoding)),
+      operation: this.operation.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32)
+    this.assetID = serialization.decoder(fields["assetID"], encoding, cb58, buffer, 32)
     this.utxoIDs = fields["utxoIDs"].map((u:object) => {
       let utxoid: UTXOID = new UTXOID()
       utxoid.deserialize(u, encoding)
@@ -172,7 +176,7 @@ export class TransferableOperation extends Serializable {
     this.operation.deserialize(fields["operation"], encoding)
   }
 
-  protected assetid: Buffer = Buffer.alloc(32)
+  protected assetID: Buffer = Buffer.alloc(32)
   protected utxoIDs: UTXOID[] = []
   protected operation: Operation
 
@@ -187,7 +191,7 @@ export class TransferableOperation extends Serializable {
   /**
    * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
    */
-  getAssetID = (): Buffer => this.assetid
+  getAssetID = (): Buffer => this.assetID
 
   /**
    * Returns an array of UTXOIDs in this operation.
@@ -200,7 +204,7 @@ export class TransferableOperation extends Serializable {
   getOperation = (): Operation => this.operation
 
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.assetid = bintools.copyFrom(bytes, offset, offset + 32)
+    this.assetID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
     const numutxoIDs: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
     offset += 4
@@ -219,8 +223,8 @@ export class TransferableOperation extends Serializable {
   toBuffer(): Buffer {
     const numutxoIDs = Buffer.alloc(4)
     numutxoIDs.writeUInt32BE(this.utxoIDs.length, 0)
-    let bsize: number = this.assetid.length + numutxoIDs.length
-    const barr: Buffer[] = [this.assetid, numutxoIDs]
+    let bsize: number = this.assetID.length + numutxoIDs.length
+    const barr: Buffer[] = [this.assetID, numutxoIDs]
     this.utxoIDs = this.utxoIDs.sort(UTXOID.comparator())
     for (let i: number = 0; i < this.utxoIDs.length; i++) {
       const b: Buffer = this.utxoIDs[i].toBuffer()
@@ -237,18 +241,18 @@ export class TransferableOperation extends Serializable {
     return Buffer.concat(barr, bsize)
   }
 
-  constructor(assetid: Buffer = undefined, utxoids: UTXOID[] | string[] | Buffer[] = undefined, operation: Operation = undefined) {
+  constructor(assetID: Buffer = undefined, utxoids: UTXOID[] | string[] | Buffer[] = undefined, operation: Operation = undefined) {
     super()
     if (
-      typeof assetid !== 'undefined' && assetid.length === AVMConstants.ASSETIDLEN
-            && operation instanceof Operation && typeof utxoids !== 'undefined'
+      typeof assetID !== "undefined" && assetID.length === AVMConstants.ASSETIDLEN
+      && operation instanceof Operation && typeof utxoids !== "undefined"
             && Array.isArray(utxoids)
     ) {
-      this.assetid = assetid
+      this.assetID = assetID
       this.operation = operation
       for (let i: number = 0; i < utxoids.length; i++) {
         const utxoid: UTXOID = new UTXOID()
-        if (typeof utxoids[i] === 'string') {
+        if (typeof utxoids[i] === "string") {
           utxoid.fromString(utxoids[i] as string)
         } else if (utxoids[i] instanceof Buffer) {
           utxoid.fromBuffer(utxoids[i] as Buffer)
@@ -273,8 +277,8 @@ export class SECPMintOperation extends Operation {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "mintOutput": this.mintOutput.serialize(encoding),
-      "transferOutputs": this.transferOutput.serialize(encoding)
+      mintOutput: this.mintOutput.serialize(encoding),
+      transferOutputs: this.transferOutput.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -288,6 +292,11 @@ export class SECPMintOperation extends Operation {
   protected mintOutput: SECPMintOutput = undefined
   protected transferOutput: SECPTransferOutput = undefined
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -345,15 +354,15 @@ export class SECPMintOperation extends Operation {
    * Returns the buffer representing the [[SECPMintOperation]] instance.
    */
   toBuffer(): Buffer {
-    let superbuff: Buffer = super.toBuffer()
-    let mintoutBuff: Buffer = this.mintOutput.toBuffer()
-    let transferOutBuff: Buffer = this.transferOutput.toBuffer()
-    let bsize:number = 
+    const superbuff: Buffer = super.toBuffer()
+    const mintoutBuff: Buffer = this.mintOutput.toBuffer()
+    const transferOutBuff: Buffer = this.transferOutput.toBuffer()
+    const bsize: number =
       superbuff.length + 
       mintoutBuff.length + 
       transferOutBuff.length
 
-    let barr: Buffer[] = [
+    const barr: Buffer[] = [
       superbuff, 
       mintoutBuff,
       transferOutBuff
@@ -370,10 +379,10 @@ export class SECPMintOperation extends Operation {
    */
   constructor(mintOutput: SECPMintOutput = undefined, transferOutput: SECPTransferOutput = undefined) {
     super()
-    if(typeof mintOutput !== 'undefined') {
+    if (typeof mintOutput !== "undefined") {
       this.mintOutput = mintOutput
     } 
-    if(typeof transferOutput !== 'undefined') {
+    if (typeof transferOutput !== "undefined") {
       this.transferOutput = transferOutput
     }
   }
@@ -392,21 +401,21 @@ export class NFTMintOperation extends Operation {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "groupID": serialization.encoder(this.groupID, encoding, "Buffer", "decimalString", 4),
-      "payload": serialization.encoder(this.payload, encoding, "Buffer", "hex"),
-      "outputOwners": this.outputOwners.map((o) => o.serialize(encoding))
+      groupID: serialization.encoder(this.groupID, encoding, buffer, decimalString, 4),
+      payload: serialization.encoder(this.payload, encoding, buffer, hex),
+      outputOwners: this.outputOwners.map((o) => o.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.groupID = serialization.decoder(fields["groupID"], encoding, "decimalString", "Buffer", 4)
-    this.payload = serialization.decoder(fields["payload"], encoding, "hex", "Buffer")
+    this.groupID = serialization.decoder(fields["groupID"], encoding, decimalString, buffer, 4)
+    this.payload = serialization.decoder(fields["payload"], encoding, hex, buffer)
     // this.outputOwners = fields["outputOwners"].map((o: NFTMintOutput) => {
     //   let oo: NFTMintOutput = new NFTMintOutput()
     //   oo.deserialize(o, encoding)
     //   return oo
     // })
-    this.outputOwners = fields["outputOwners"].map((o: object) => {
+    this.outputOwners = fields["outputOwners"].map((o: object): OutputOwners => {
       let oo: OutputOwners = new OutputOwners()
       oo.deserialize(o, encoding)
       return oo
@@ -417,6 +426,11 @@ export class NFTMintOperation extends Operation {
   protected payload: Buffer
   protected outputOwners: OutputOwners[] = []
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -427,15 +441,15 @@ export class NFTMintOperation extends Operation {
   }
 
   /**
-   * Returns the operation ID.
-   */
+  * Returns the operation ID.
+  */
   getOperationID(): number {
     return this._typeID
   }
 
   /**
-   * Returns the credential ID.
-   */
+  * Returns the credential ID.
+  */
   getCredentialID = (): number => {
     if(this._codecID === 0) {
       return AVMConstants.NFTCREDENTIAL
@@ -445,22 +459,22 @@ export class NFTMintOperation extends Operation {
   }
 
   /**
-   * Returns the payload.
-   */
+  * Returns the payload.
+  */
   getGroupID = (): Buffer => {
     return bintools.copyFrom(this.groupID, 0)
   }
 
   /**
-   * Returns the payload.
-   */
+  * Returns the payload.
+  */
   getPayload = (): Buffer => {
     return bintools.copyFrom(this.payload, 0)
   }
 
   /**
-   * Returns the payload's raw {@link https://github.com/feross/buffer|Buffer} with length prepended, for use with [[PayloadBase]]'s fromBuffer
-   */
+  * Returns the payload's raw {@link https://github.com/feross/buffer|Buffer} with length prepended, for use with [[PayloadBase]]'s fromBuffer
+  */
   getPayloadBuffer = (): Buffer => {
     let payloadlen: Buffer = Buffer.alloc(4)
     payloadlen.writeUInt32BE(this.payload.length, 0)
@@ -468,15 +482,15 @@ export class NFTMintOperation extends Operation {
   }
 
   /**
-   * Returns the outputOwners.
-   */
+  * Returns the outputOwners.
+  */
   getOutputOwners = (): OutputOwners[] => {
     return this.outputOwners
   }
 
   /**
-   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the updated offset.
-   */
+  * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTMintOperation]] and returns the updated offset.
+  */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
     this.groupID = bintools.copyFrom(bytes, offset, offset + 4)
@@ -497,24 +511,24 @@ export class NFTMintOperation extends Operation {
   }
 
   /**
-   * Returns the buffer representing the [[NFTMintOperation]] instance.
-   */
+  * Returns the buffer representing the [[NFTMintOperation]] instance.
+  */
   toBuffer(): Buffer {
-    let superbuff: Buffer = super.toBuffer()
-    let payloadlen: Buffer = Buffer.alloc(4)
+    const superbuff: Buffer = super.toBuffer()
+    const payloadlen: Buffer = Buffer.alloc(4)
     payloadlen.writeUInt32BE(this.payload.length, 0)
 
-    let outputownerslen: Buffer = Buffer.alloc(4)
+    const outputownerslen: Buffer = Buffer.alloc(4)
     outputownerslen.writeUInt32BE(this.outputOwners.length, 0)
 
-    let bsize:number = 
+    let bsize: number =
       superbuff.length + 
       this.groupID.length + 
       payloadlen.length + 
       this.payload.length +
       outputownerslen.length
 
-    let barr: Buffer[] = [
+    const barr: Buffer[] = [
       superbuff, 
       this.groupID,
       payloadlen,
@@ -532,22 +546,22 @@ export class NFTMintOperation extends Operation {
   }
 
   /**
-   * Returns a base-58 string representing the [[NFTMintOperation]].
-   */
+  * Returns a base-58 string representing the [[NFTMintOperation]].
+  */
   toString(): string {
     return bintools.bufferToB58(this.toBuffer())
   }
 
   /**
-   * An [[Operation]] class which contains an NFT on an assetID.
-   * 
-   * @param groupID The group to which to issue the NFT Output
-   * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
-   * @param outputOwners An array of outputOwners
-   */
+  * An [[Operation]] class which contains an NFT on an assetID.
+  *
+  * @param groupID The group to which to issue the NFT Output
+  * @param payload A {@link https://github.com/feross/buffer|Buffer} of the NFT payload
+  * @param outputOwners An array of outputOwners
+  */
   constructor(groupID: number = undefined, payload: Buffer = undefined, outputOwners: OutputOwners[] = undefined) {
     super()
-    if(typeof groupID !== 'undefined' && typeof payload !== 'undefined' && outputOwners.length) {
+    if (typeof groupID !== "undefined" && typeof payload !== "undefined" && outputOwners.length) {
       this.groupID.writeUInt32BE((groupID ? groupID : 0), 0)
       this.payload = payload
       this.outputOwners = outputOwners
@@ -556,18 +570,18 @@ export class NFTMintOperation extends Operation {
 }
 
 /**
- * A [[Operation]] class which specifies a NFT Transfer Op.
- */
+* A [[Operation]] class which specifies a NFT Transfer Op.
+*/
 export class NFTTransferOperation extends Operation {
   protected _typeName = "NFTTransferOperation"
   protected _codecID = AVMConstants.LATESTCODEC
   protected _typeID = this._codecID === 0 ? AVMConstants.NFTXFEROPID : AVMConstants.NFTXFEROPID_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
-    let fields: object = super.serialize(encoding)
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "output": this.output.serialize(encoding)
+      output: this.output.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -578,6 +592,11 @@ export class NFTTransferOperation extends Operation {
 
   protected output: NFTTransferOutput
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -588,15 +607,15 @@ export class NFTTransferOperation extends Operation {
   }
 
   /**
-   * Returns the operation ID.
-   */
+  * Returns the operation ID.
+  */
   getOperationID(): number {
     return this._typeID
   }
 
   /**
-   * Returns the credential ID.
-   */
+  * Returns the credential ID.
+  */
   getCredentialID (): number {
     if(this._codecID === 0) {
       return AVMConstants.NFTCREDENTIAL
@@ -608,8 +627,8 @@ export class NFTTransferOperation extends Operation {
   getOutput = (): NFTTransferOutput => this.output
 
   /**
-     * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOperation]] and returns the updated offset.
-     */
+  * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[NFTTransferOperation]] and returns the updated offset.
+  */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
     this.output = new NFTTransferOutput()
@@ -617,8 +636,8 @@ export class NFTTransferOperation extends Operation {
   }
 
   /**
-     * Returns the buffer representing the [[NFTTransferOperation]] instance.
-     */
+  * Returns the buffer representing the [[NFTTransferOperation]] instance.
+  */
   toBuffer(): Buffer {
     const superbuff: Buffer = super.toBuffer()
     const outbuff: Buffer = this.output.toBuffer()
@@ -628,32 +647,28 @@ export class NFTTransferOperation extends Operation {
   }
 
   /**
-     * Returns a base-58 string representing the [[NFTTransferOperation]].
-     */
+  * Returns a base-58 string representing the [[NFTTransferOperation]].
+  */
   toString(): string {
     return bintools.bufferToB58(this.toBuffer())
   }
 
   /**
-     * An [[Operation]] class which contains an NFT on an assetID.
-     *
-     * @param output An [[NFTTransferOutput]]
-     */
+  * An [[Operation]] class which contains an NFT on an assetID.
+  *
+  * @param output An [[NFTTransferOutput]]
+  */
   constructor(output: NFTTransferOutput = undefined) {
     super()
-    if (typeof output !== 'undefined') {
+    if (typeof output !== "undefined") {
       this.output = output
     }
   }
 }
 
 /**
- * CKC - Make generic, use everywhere.
- */
-
-/**
- * Class for representing a UTXOID used in [[TransferableOp]] types
- */
+* Class for representing a UTXOID used in [[TransferableOp]] types
+*/
 export class UTXOID extends NBytes {
   protected _typeName = "UTXOID"
   protected _typeID = undefined
@@ -664,25 +679,25 @@ export class UTXOID extends NBytes {
   protected bsize = 36
 
   /**
-     * Returns a function used to sort an array of [[UTXOID]]s
-     */
+  * Returns a function used to sort an array of [[UTXOID]]s
+  */
   static comparator = (): (a: UTXOID, b: UTXOID) => (1 | -1 | 0) => (a: UTXOID, b: UTXOID)
     : (1 | -1 | 0) => Buffer.compare(a.toBuffer(), b.toBuffer()) as (1 | -1 | 0)
 
   /**
-     * Returns a base-58 representation of the [[UTXOID]].
-     */
+  * Returns a base-58 representation of the [[UTXOID]].
+  */
   toString(): string {
     return bintools.cb58Encode(this.toBuffer())
   }
 
   /**
-     * Takes a base-58 string containing an [[UTXOID]], parses it, populates the class, and returns the length of the UTXOID in bytes.
-     *
-     * @param bytes A base-58 string containing a raw [[UTXOID]]
-     *
-     * @returns The length of the raw [[UTXOID]]
-     */
+  * Takes a base-58 string containing an [[UTXOID]], parses it, populates the class, and returns the length of the UTXOID in bytes.
+  *
+  * @param bytes A base-58 string containing a raw [[UTXOID]]
+  *
+  * @returns The length of the raw [[UTXOID]]
+  */
   fromString(utxoid: string): number {
     const utxoidbuff: Buffer = bintools.b58ToBuffer(utxoid)
     if (utxoidbuff.length === 40 && bintools.validateChecksum(utxoidbuff)) {
@@ -691,19 +706,19 @@ export class UTXOID extends NBytes {
         this.bytes = newbuff
       }
     } else if (utxoidbuff.length === 40) {
-      throw new ChecksumError('Error - UTXOID.fromString: invalid checksum on address')
+      throw new ChecksumError("Error - UTXOID.fromString: invalid checksum on address")
     } else if (utxoidbuff.length === 36) {
       this.bytes = utxoidbuff
     } else {
       /* istanbul ignore next */
-      throw new AddressError('Error - UTXOID.fromString: invalid address')
+      throw new AddressError("Error - UTXOID.fromString: invalid address")
     }
     return this.getSize()
     
   }
 
   clone(): this {
-    let newbase: UTXOID = new UTXOID()
+    const newbase: UTXOID = new UTXOID()
     newbase.fromBuffer(this.toBuffer())
     return newbase as this
   }
@@ -713,8 +728,8 @@ export class UTXOID extends NBytes {
   }
 
   /**
-     * Class for representing a UTXOID used in [[TransferableOp]] types
-     */
+  * Class for representing a UTXOID used in [[TransferableOp]] types
+  */
   constructor() {
     super()
   }

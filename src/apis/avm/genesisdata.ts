@@ -18,8 +18,6 @@ const buffer: SerializedType = "Buffer"
 
 export class GenesisData extends Serializable {
   protected _typeName = "GenesisData"
-  protected _codecID = AVMConstants.LATESTCODEC
-  // protected _typeID: number = undefined
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding)
@@ -49,6 +47,8 @@ export class GenesisData extends Serializable {
    * Returns the NetworkID as a number
    */
   getNetworkID = (): number => this.networkID.readUInt32BE(0)
+
+  // TODO fromBuffer
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisData]].

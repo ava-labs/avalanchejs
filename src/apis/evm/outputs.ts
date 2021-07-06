@@ -132,7 +132,7 @@ export class EVMOutput {
   getAmount = (): BN => this.amountValue.clone();
 
   /**
-   * Returns the assetid of the input as {@link https://github.com/feross/buffer|Buffer}
+   * Returns the assetID of the input as {@link https://github.com/feross/buffer|Buffer}
    */ 
   getAssetID = (): Buffer => this.assetID;
  

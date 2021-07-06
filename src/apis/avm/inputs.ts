@@ -53,7 +53,7 @@ export class TransferableInput extends StandardTransferableInput {
     offset += 32
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
-    this.assetid = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN)
+    this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN)
     offset += 32
     const inputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
     offset += 4
@@ -81,6 +81,11 @@ export class SECPTransferInput extends AmountInput {
 
   //serialize and deserialize both are inherited
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */

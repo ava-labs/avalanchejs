@@ -28,11 +28,11 @@ export abstract class StandardUTXO extends Serializable{
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "codecID": serialization.encoder(this.codecID, encoding, "Buffer", "decimalString"),
-      "txid": serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
-      "outputidx": serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
-      "assetid": serialization.encoder(this.assetid, encoding, "Buffer", "cb58"),
-      "output": this.output.serialize(encoding)
+      codecID: serialization.encoder(this.codecID, encoding, "Buffer", "decimalString"),
+      txid: serialization.encoder(this.txid, encoding, "Buffer", "cb58"),
+      outputidx: serialization.encoder(this.outputidx, encoding, "Buffer", "decimalString"),
+      assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58"),
+      output: this.output.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -40,13 +40,13 @@ export abstract class StandardUTXO extends Serializable{
     this.codecID = serialization.decoder(fields["codecID"], encoding, "decimalString", "Buffer", 2)
     this.txid = serialization.decoder(fields["txid"], encoding, "cb58", "Buffer", 32)
     this.outputidx = serialization.decoder(fields["outputidx"], encoding, "decimalString", "Buffer", 4)
-    this.assetid = serialization.decoder(fields["assetid"], encoding, "cb58", "Buffer", 32)
+    this.assetID = serialization.decoder(fields["assetID"], encoding, "cb58", "Buffer", 32)
   }
 
   protected codecID: Buffer = Buffer.alloc(2)
   protected txid: Buffer = Buffer.alloc(32)
   protected outputidx: Buffer = Buffer.alloc(4)
-  protected assetid: Buffer = Buffer.alloc(32)
+  protected assetID: Buffer = Buffer.alloc(32)
   protected output: Output = undefined
 
   /**
@@ -78,7 +78,7 @@ export abstract class StandardUTXO extends Serializable{
   /**
      * Returns the assetID as a {@link https://github.com/feross/buffer|Buffer}.
      */
-  getAssetID = (): Buffer => this.assetid
+  getAssetID = (): Buffer => this.assetID
 
   /**
      * Returns the UTXOID as a base-58 string (UTXOID is a string )
@@ -106,10 +106,10 @@ export abstract class StandardUTXO extends Serializable{
     const outbuff: Buffer = this.output.toBuffer()
     const outputidbuffer: Buffer = Buffer.alloc(4)
     outputidbuffer.writeUInt32BE(this.output.getOutputID(), 0)
-    const barr: Buffer[] = [this.codecID, this.txid, this.outputidx, this.assetid, outputidbuffer, outbuff]
+    const barr: Buffer[] = [this.codecID, this.txid, this.outputidx, this.assetID, outputidbuffer, outbuff]
     return Buffer.concat(barr, 
       this.codecID.length + this.txid.length
-      + this.outputidx.length + this.assetid.length
+      + this.outputidx.length + this.assetID.length
       + outputidbuffer.length + outbuff.length)
   }
 
@@ -121,7 +121,7 @@ export abstract class StandardUTXO extends Serializable{
 
   abstract create(codecID?: number, txid?: Buffer,
     outputidx?:Buffer | number,
-    assetid?:Buffer,
+    assetID?: Buffer,
     output?: Output): this
 
   /**
@@ -130,12 +130,12 @@ export abstract class StandardUTXO extends Serializable{
      * @param codecID Optional number which specifies the codeID of the UTXO. Default 0
      * @param txID Optional {@link https://github.com/feross/buffer|Buffer} of transaction ID for the StandardUTXO
      * @param txidx Optional {@link https://github.com/feross/buffer|Buffer} or number for the index of the transaction's [[Output]]
-     * @param assetid Optional {@link https://github.com/feross/buffer|Buffer} of the asset ID for the StandardUTXO
+     * @param assetID Optional {@link https://github.com/feross/buffer|Buffer} of the asset ID for the StandardUTXO
      * @param outputid Optional {@link https://github.com/feross/buffer|Buffer} or number of the output ID for the StandardUTXO
      */
   constructor(codecID: number = 0, txID: Buffer = undefined,
     outputidx:Buffer | number = undefined,
-    assetid:Buffer = undefined,
+    assetID: Buffer = undefined,
     output:Output = undefined){
     super()
     if (typeof codecID !== 'undefined') {
@@ -150,8 +150,8 @@ export abstract class StandardUTXO extends Serializable{
       this.outputidx = outputidx
     } 
 
-    if(typeof assetid !== 'undefined') {
-      this.assetid = assetid
+    if (typeof assetID !== 'undefined') {
+      this.assetID = assetID
     }
     if(typeof output !== 'undefined') {
       this.output = output

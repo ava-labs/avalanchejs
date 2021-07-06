@@ -205,7 +205,7 @@ describe("Serialization", (): void => {
     const threshold: number = 1
     const thresholdHex: string = "00000001"
     const minters: string[] = [xAddress]
-    const assetid: Buffer = serialization.typeToBuffer(cChainID, cb58)
+    const assetID: Buffer = serialization.typeToBuffer(cChainID, cb58)
     const assetidHex: string = "9d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19"
     const payload: Buffer = Buffer.from("From snowflake to Avalanche")
     const groupIDHex: string = "00003039"
@@ -561,7 +561,7 @@ describe("Serialization", (): void => {
         const transferOutput: SECPTransferOutput = new SECPTransferOutput()
         const utxoids: string[] = []
         const secpmintoperation: SECPMintOperation = new SECPMintOperation(secpmintoutput, transferOutput)
-        const transferableoperation: TransferableOperation = new TransferableOperation(assetid, utxoids, secpmintoperation)
+        const transferableoperation: TransferableOperation = new TransferableOperation(assetID, utxoids, secpmintoperation)
         const transferableoperation2: TransferableOperation = new TransferableOperation()
         const notes: string = "AVM TransferableOperation"
         const serialized: Serialized = serialization.serialize(transferableoperation, vm, hex, notes)
@@ -571,14 +571,14 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeName"]).toBe("TransferableOperation")
         expect(serialized.fields["_typeID"]).toBeNull()
         expect(serialized.fields["_codecID"]).toBeNull()
-        expect(serialized.fields["assetid"]).toBe(assetidHex)
+        expect(serialized.fields["assetID"]).toBe(assetidHex)
         expect(serialized.fields["utxoIDs"]).toStrictEqual([])
 
         serialization.deserialize(serialized, transferableoperation2)
         expect(transferableoperation2.getTypeName()).toBe("TransferableOperation")
         expect(transferableoperation2.getTypeID()).toBeUndefined()
         expect(transferableoperation2.getCodecID()).toBeUndefined()
-        expect(transferableoperation2.getAssetID().toString(hex)).toBe(assetid.toString(hex))
+        expect(transferableoperation2.getAssetID().toString(hex)).toBe(assetID.toString(hex))
         expect(transferableoperation2.getUTXOIDs()).toStrictEqual([])
         expect(transferableoperation2.toBuffer().toString(hex)).toBe(transferableoperation.toBuffer().toString(hex))
         expect(transferableoperation2.toString()).toBe(transferableoperation.toString())
@@ -691,7 +691,7 @@ describe("Serialization", (): void => {
 
       test("TransferableOutput", (): void => {
         const secpmintoutput: SECPMintOutput = new SECPMintOutput()
-        const transferableoutput: TransferableOutput = new TransferableOutput(assetid, secpmintoutput)
+        const transferableoutput: TransferableOutput = new TransferableOutput(assetID, secpmintoutput)
         const transferableoutput2: TransferableOutput = new TransferableOutput()
         const notes: string = "AVM TransferableOutput"
         const serialized: Serialized = serialization.serialize(transferableoutput, vm, hex, notes)
@@ -707,7 +707,7 @@ describe("Serialization", (): void => {
         expect(transferableoutput2.getTypeName()).toBe("TransferableOutput")
         expect(transferableoutput2.getTypeID()).toBeUndefined()
         expect(transferableoutput2.getCodecID()).toBeUndefined()
-        expect(transferableoutput2.getAssetID().toString(hex)).toBe(assetid.toString(hex))
+        expect(transferableoutput2.getAssetID().toString(hex)).toBe(assetID.toString(hex))
         expect(transferableoutput2.toBuffer().toString(hex)).toBe(transferableoutput.toBuffer().toString(hex))
         expect(transferableoutput2.toString()).toBe(transferableoutput.toString())
       })
@@ -891,7 +891,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_codecID"]).toBeNull()
         expect(serialized.fields["txid"]).toBe(txidHex)
         expect(serialized.fields["outputidx"]).toBe(outputidxHex)
-        expect(serialized.fields["assetid"]).toBe(assetidHex)
+        expect(serialized.fields["assetID"]).toBe(assetidHex)
 
         serialization.deserialize(serialized, utxo2)
         expect(utxo2.getTypeName()).toBe("UTXO")

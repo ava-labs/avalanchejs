@@ -354,7 +354,7 @@ describe("AVMAPI", (): void => {
     kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"))
 
     const denomination: number = 0
-    const assetid: string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533"
+    const assetID: string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533"
     const initialHolders: object[] = [
       {
         address: "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
@@ -369,7 +369,7 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.createFixedCapAsset(username, password, "Some Coin", "SCC", denomination, initialHolders)
     const payload: object = {
       result: {
-        assetID: assetid,
+        assetID: assetID,
       },
     }
     const responseObj: HttpResponse = {
@@ -380,7 +380,7 @@ describe("AVMAPI", (): void => {
     const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(assetid)
+    expect(response).toBe(assetID)
   })
 
   test("createVariableCapAsset", async () => {
@@ -388,7 +388,7 @@ describe("AVMAPI", (): void => {
     kp.importKey(Buffer.from("ef9bf2d4436491c153967c9709dd8e82795bdb9b5ad44ee22c2903005d1cf676", "hex"))
 
     const denomination: number = 0
-    const assetid: string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533"
+    const assetID: string = "8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533"
     const minterSets: object[] = [
       {
         minters: [
@@ -409,7 +409,7 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.createVariableCapAsset(username, password, "Some Coin", "SCC", denomination, minterSets)
     const payload: object = {
       result: {
-        assetID: assetid,
+        assetID: assetID,
       }
     }
     const responseObj: HttpResponse = {
@@ -420,7 +420,7 @@ describe("AVMAPI", (): void => {
     const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(assetid)
+    expect(response).toBe(assetID)
   })
 
   test("mint 1", async (): Promise<void> => {
@@ -521,8 +521,8 @@ describe("AVMAPI", (): void => {
   })
 
   test("getAssetDescription as string", async () => {
-    const assetid: Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", "hex")
-    const assetidstr: string = bintools.cb58Encode(assetid)
+    const assetID: Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", "hex")
+    const assetidstr: string = bintools.cb58Encode(assetID)
 
     const result: Promise<object> = api.getAssetDescription(assetidstr)
     const payload: object = {
@@ -543,15 +543,15 @@ describe("AVMAPI", (): void => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response.name).toBe("Collin Coin")
     expect(response.symbol).toBe("CKC")
-    expect(response.assetID.toString("hex")).toBe(assetid.toString("hex"))
+    expect(response.assetID.toString("hex")).toBe(assetID.toString("hex"))
     expect(response.denomination).toBe(10)
   })
 
   test("getAssetDescription as Buffer", async (): Promise<void> => {
-    const assetid: Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", "hex")
+    const assetID: Buffer = Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", "hex")
     const assetidstr: string = bintools.cb58Encode(Buffer.from("8a5d2d32e68bc50036e4d086044617fe4a0a0296b274999ba568ea92da46d533", "hex"))
 
-    const result: Promise<object> = api.getAssetDescription(assetid)
+    const result: Promise<object> = api.getAssetDescription(assetID)
     const payload: object = {
       result: {
         name: "Collin Coin",
@@ -570,7 +570,7 @@ describe("AVMAPI", (): void => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response.name).toBe("Collin Coin")
     expect(response.symbol).toBe("CKC")
-    expect(response.assetID.toString("hex")).toBe(assetid.toString("hex"))
+    expect(response.assetID.toString("hex")).toBe(assetID.toString("hex"))
     expect(response.denomination).toBe(11)
   })
 

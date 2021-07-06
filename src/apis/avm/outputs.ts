@@ -103,6 +103,11 @@ export class SECPTransferOutput extends AmountOutput {
 
   //serialize and deserialize both are inherited
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -140,6 +145,11 @@ export class SECPMintOutput extends Output {
 
   //serialize and deserialize both are inherited
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -190,6 +200,11 @@ export class NFTMintOutput extends NFTOutput {
 
   //serialize and deserialize both are inherited
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -276,6 +291,11 @@ export class NFTTransferOutput extends NFTOutput {
   protected sizePayload: Buffer = Buffer.alloc(4)
   protected payload: Buffer
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
