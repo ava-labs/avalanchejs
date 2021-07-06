@@ -3,7 +3,7 @@
  * @module API-Socket
  */
 import { ClientRequestArgs } from "http"
-import WebSocket from "isomorphic-ws"
+import WebSocket = require('ws');
 import { MainnetAPI } from "../../utils"
 export class Socket extends WebSocket {
   // Fires once the connection has been established between the client and the server
