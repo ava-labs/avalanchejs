@@ -2,39 +2,37 @@
  * @packageDocumentation
  * @module Utils-Serialization
  */
-import BinTools from '../utils/bintools'
-import BN from 'bn.js'
-import { Buffer } from 'buffer/'
-import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from './helperfunctions'
-import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from '../utils/errors'
-import { Serialized } from 'src/common'
+import BinTools from "../utils/bintools"
+import BN from "bn.js"
+import { Buffer } from "buffer/"
+import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from "./helperfunctions"
+import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from "../utils/errors"
+import { Serialized } from "src/common"
 
 export const SERIALIZATIONVERSION: number = 0
 export type SerializedType = 
-  'hex' 
-| 'BN' 
-| 'Buffer' 
-| 'bech32' 
-| 'nodeID'
-| 'privateKey'
-| 'cb58' 
-| 'base58' 
-| 'base64' 
-| 'decimalString'
-| 'number'
-| 'utf8'
-;
+  "hex"
+  | "BN"
+  | "Buffer"
+  | "bech32"
+  | "nodeID"
+  | "privateKey"
+  | "cb58"
+  | "base58"
+  | "base64"
+  | "decimalString"
+  | "number"
+  | "utf8"
 
 export type SerializedEncoding = 
-  'hex' 
-| 'cb58' 
-| 'base58' 
-| 'base64' 
-| 'decimalString'
-| 'number'
-| 'utf8'
-| 'display'
-;
+  "hex"
+  | "cb58"
+  | "base58"
+  | "base64"
+  | "decimalString"
+  | "number"
+  | "utf8"
+  | "display"
 
 export abstract class Serializable {
   protected _typeName: string = undefined
@@ -63,7 +61,7 @@ export abstract class Serializable {
   }
 
   //sometimes the parent class manages the fields
-  //these are so you can say super.serialize(encoding); 
+  //these are so you can say super.serialize(encoding) 
   serialize(encoding?: SerializedEncoding): object {
     return {
       "_typeName": this._typeName,
@@ -98,7 +96,7 @@ export abstract class Serializable {
 }
 
 export class Serialization {
-  private static instance: Serialization;
+  private static instance: Serialization
   
   private constructor() {
     this.bintools = BinTools.getInstance()
@@ -128,7 +126,7 @@ export class Serialization {
       return new BN(vb.toString("hex"), "hex")
     } else if (type === "Buffer") {
       if (args.length == 1 && typeof args[0] === "number") {
-        vb = Buffer.from(vb.toString("hex").padStart(args[0] * 2, '0'), "hex")
+        vb = Buffer.from(vb.toString("hex").padStart(args[0] * 2, "0"), "hex")
       }
       return vb
     } else if (type === "bech32") {
@@ -167,9 +165,9 @@ export class Serialization {
     if (type === "BN") {
       let str: string = (v as BN).toString("hex")
       if (args.length == 1 && typeof args[0] === "number") {
-        return Buffer.from(str.padStart(args[0] * 2, '0'), 'hex')
+        return Buffer.from(str.padStart(args[0] * 2, "0"), "hex")
       }
-      return Buffer.from(str, 'hex')
+      return Buffer.from(str, "hex")
     } else if (type === "Buffer") {
       return v
     } else if (type === "bech32") {
@@ -192,22 +190,22 @@ export class Serialization {
     } else if (type === "decimalString") {
       let str: string = new BN(v as string, 10).toString("hex")
       if (args.length == 1 && typeof args[0] === "number") {
-        return Buffer.from(str.padStart(args[0] * 2, '0'), 'hex')
+        return Buffer.from(str.padStart(args[0] * 2, "0"), "hex")
       }
-      return Buffer.from(str, 'hex')
+      return Buffer.from(str, "hex")
     } else if (type === "number") {
       let str: string = new BN(v, 10).toString("hex")
       if (args.length == 1 && typeof args[0] === "number") {
-        return Buffer.from(str.padStart(args[0] * 2, '0'), 'hex')
+        return Buffer.from(str.padStart(args[0] * 2, "0"), "hex")
       }
-      return Buffer.from(str, 'hex')
+      return Buffer.from(str, "hex")
     } else if (type === "utf8") {
       if (args.length == 1 && typeof args[0] === "number") {
         let b: Buffer = Buffer.alloc(args[0])
         b.write(v)
         return b
       }
-      return Buffer.from(v, 'utf8')
+      return Buffer.from(v, "utf8")
     }
     return undefined
   }

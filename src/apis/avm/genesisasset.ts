@@ -6,7 +6,7 @@ import { Buffer } from 'buffer/'
 import { AVMConstants } from './constants'
 import { InitialStates } from './initialstates'
 import { DefaultNetworkID } from '../../utils/constants'
-import { Serialization, SerializedEncoding } from '../../utils/serialization'
+import { Serialization, SerializedEncoding, SerializedType } from '../../utils/serialization'
 import { CreateAssetTx } from './createassettx'
 
 /**
@@ -58,6 +58,8 @@ export class GenesisAsset extends CreateAssetTx {
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisAsset]].
    */
   toBuffer(): Buffer {
+    const utf8: SerializedType = "utf8"
+    const BN: SerializedType = "BN"
     // asset alias
     const assetAlias: string = this.getAssetAlias()
     const assetAliasbuffSize: Buffer = Buffer.alloc(2)
@@ -65,12 +67,12 @@ export class GenesisAsset extends CreateAssetTx {
     let bsize: number = assetAliasbuffSize.length
     let barr: Buffer[] = [assetAliasbuffSize]
     const assetAliasbuff: Buffer = Buffer.alloc(assetAlias.length)
-    assetAliasbuff.write(assetAlias, 0, assetAlias.length, 'utf8')
+    assetAliasbuff.write(assetAlias, 0, assetAlias.length, utf8)
     bsize += assetAliasbuff.length
     barr.push(assetAliasbuff)
 
     const networkIDBuff: Buffer = Buffer.alloc(4)
-    networkIDBuff.writeUInt32BE(serialization.bufferToType(this.networkID, "BN").toNumber(), 0)
+    networkIDBuff.writeUInt32BE(serialization.bufferToType(this.networkID, BN).toNumber(), 0)
     bsize += networkIDBuff.length
     barr.push(networkIDBuff)
 
@@ -97,13 +99,14 @@ export class GenesisAsset extends CreateAssetTx {
     barr.push(memo)
 
     // asset name
-    // currently same as asset alias
-    // TODO - allow users to pass in alias and name
-    bsize += assetAliasbuffSize.length
-    barr.push(assetAliasbuffSize)
-
-    bsize += assetAliasbuff.length
-    barr.push(assetAliasbuff)
+    const name: string = this.getName()
+    const namebuffSize: Buffer = Buffer.alloc(2)
+    bsize += namebuffSize.length
+    barr.push(namebuffSize)
+    const namebuff: Buffer = Buffer.alloc(name.length)
+    namebuff.write(name, 0, name.length, utf8)
+    bsize += namebuff.length
+    barr.push(namebuff)
 
     // symbol
     const symbol: string = this.getSymbol()
@@ -113,7 +116,7 @@ export class GenesisAsset extends CreateAssetTx {
     barr.push(symbolbuffSize)
 
     const symbolbuff: Buffer = Buffer.alloc(symbol.length)
-    symbolbuff.write(symbol, 0, symbol.length, 'utf8')
+    symbolbuff.write(symbol, 0, symbol.length, utf8)
     bsize += symbolbuff.length
     barr.push(symbolbuff)
 

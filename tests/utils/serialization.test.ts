@@ -193,6 +193,7 @@ describe("Serialization", (): void => {
     const cChainIDHex: string = "9d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19"
     const hex: SerializedEncoding = "hex"
     const cb58: SerializedEncoding = "cb58"
+    const utf8: SerializedType = "utf8"
     const amount: BN = new BN(0)
     const amountHex: string = "0000000000000000"
     const bytes: string = '0000000000000000000000000000000000000000'
@@ -225,6 +226,8 @@ describe("Serialization", (): void => {
         const assetAlias: string = "asset1"
         const name: string = "asset1"
         const symbol: string = "MFCA"
+        const nameHex: string = serialization.encoder(name, hex, utf8, utf8)
+        const symbolHex: string = serialization.encoder(symbol, hex, utf8, utf8)
         const denomination: number = 1
         const vcapSecpOutput = new SECPTransferOutput(amount, [addressBuf], locktime, threshold)
         const initialStates: InitialStates = new InitialStates()
@@ -240,6 +243,9 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeID"]).toBeNull()
         expect(serialized.fields["_codecID"]).toBeNull()
         expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["name"]).toBe(nameHex)
+        expect(serialized.fields["symbol"]).toBe(symbolHex)
+        expect(serialized.fields["denomination"]).toBe("01")
         expect(serialized.fields["memo"]).toBe(mHex)
 
         serialization.deserialize(serialized, genesisasset2)
