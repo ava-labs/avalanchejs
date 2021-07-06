@@ -2,21 +2,25 @@
  * @packageDocumentation
  * @module Common-Transactions
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../utils/bintools'
-import { Credential } from './credentials'
-import BN from 'bn.js'
-import { StandardKeyChain, StandardKeyPair } from './keychain'
-import { StandardAmountInput, StandardTransferableInput } from './input'
-import { StandardAmountOutput, StandardTransferableOutput } from './output'
-import { DefaultNetworkID } from '../utils/constants'
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization'
+import { Buffer } from "buffer/"
+import BinTools from "../utils/bintools"
+import { Credential } from "./credentials"
+import BN from "bn.js"
+import { StandardKeyChain, StandardKeyPair } from "./keychain"
+import { StandardAmountInput, StandardTransferableInput } from "./input"
+import { StandardAmountOutput, StandardTransferableOutput } from "./output"
+import { DefaultNetworkID } from "../utils/constants"
+import { Serializable, Serialization, SerializedEncoding, SerializedType } from "../utils/serialization"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const cb58: SerializedType = "cb58"
+const hex: SerializedType = "hex"
+const decimalString: SerializedType = "decimalString"
+const buffer: SerializedType = "Buffer"
 
 /**
  * Class representing a base for all transactions.
@@ -29,19 +33,19 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "networkID": serialization.encoder(this.networkID, encoding, "Buffer", "decimalString"),
-      "blockchainID": serialization.encoder(this.blockchainID, encoding, "Buffer", "cb58"),
-      "outs": this.outs.map((o) => o.serialize(encoding)),
-      "ins": this.ins.map((i) => i.serialize(encoding)),
-      "memo": serialization.encoder(this.memo, encoding, "Buffer", "hex")
+      networkID: serialization.encoder(this.networkID, encoding, buffer, decimalString),
+      blockchainID: serialization.encoder(this.blockchainID, encoding, buffer, cb58),
+      outs: this.outs.map((o) => o.serialize(encoding)),
+      ins: this.ins.map((i) => i.serialize(encoding)),
+      memo: serialization.encoder(this.memo, encoding, buffer, hex)
     }
   }
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.networkID = serialization.decoder(fields["networkID"], encoding, "decimalString", "Buffer", 4)
-    this.blockchainID = serialization.decoder(fields["blockchainID"], encoding, "cb58", "Buffer", 32)
-    this.memo = serialization.decoder(fields["memo"], encoding, "hex", "Buffer")
+    this.networkID = serialization.decoder(fields["networkID"], encoding, decimalString, buffer, 4)
+    this.blockchainID = serialization.decoder(fields["blockchainID"], encoding, cb58, buffer, 32)
+    this.memo = serialization.decoder(fields["memo"], encoding, hex, buffer)
   }
 
   protected networkID: Buffer = Buffer.alloc(4)
@@ -159,7 +163,7 @@ export abstract class StandardBaseTx<KPClass extends StandardKeyPair, KCClass ex
       this.memo = memo
     }
     
-    if (typeof ins !== 'undefined' && typeof outs !== 'undefined') {
+    if (typeof ins !== "undefined" && typeof outs !== "undefined") {
       this.numouts.writeUInt32BE(outs.length, 0)
       this.outs = outs.sort(StandardTransferableOutput.comparator())
       this.numins.writeUInt32BE(ins.length, 0)
@@ -214,14 +218,14 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
    */
   getInputTotal = (assetID: Buffer): BN => {
     const ins: StandardTransferableInput[] = this.getTransaction().getIns()
-    const aIDHex: string = assetID.toString('hex')
+    const aIDHex: string = assetID.toString("hex")
     let total: BN = new BN(0)
 
     for (let i: number = 0; i < ins.length; i++) {
        
 
       // only check StandardAmountInputs
-      if(ins[i].getInput() instanceof StandardAmountInput && aIDHex === ins[i].getAssetID().toString('hex')) {
+      if (ins[i].getInput() instanceof StandardAmountInput && aIDHex === ins[i].getAssetID().toString("hex")) {
         const input = ins[i].getInput() as StandardAmountInput
         total = total.add(input.getAmount())
       }
@@ -234,13 +238,13 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
    */
   getOutputTotal = (assetID: Buffer): BN => {
     const outs: StandardTransferableOutput[] = this.getTransaction().getTotalOuts()
-    const aIDHex: string = assetID.toString('hex')
+    const aIDHex: string = assetID.toString("hex")
     let total: BN = new BN(0)
 
     for (let i: number = 0; i < outs.length; i++) {
 
       // only check StandardAmountOutput
-      if(outs[i].getOutput() instanceof StandardAmountOutput && aIDHex === outs[i].getAssetID().toString('hex')) {
+      if (outs[i].getOutput() instanceof StandardAmountOutput && aIDHex === outs[i].getAssetID().toString("hex")) {
         const output: StandardAmountOutput = outs[i].getOutput() as StandardAmountOutput
         total = total.add(output.getAmount())
       }
@@ -391,9 +395,9 @@ export abstract class StandardTx<
    */
   constructor(unsignedTx: SUBTx = undefined, credentials: Credential[] = undefined) {
     super()
-    if (typeof unsignedTx !== 'undefined') {
+    if (typeof unsignedTx !== "undefined") {
       this.unsignedTx = unsignedTx
-      if (typeof credentials !== 'undefined') {
+      if (typeof credentials !== "undefined") {
         this.credentials = credentials
       }
     }

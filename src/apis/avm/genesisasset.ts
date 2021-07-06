@@ -2,12 +2,11 @@
  * @packageDocumentation
  * @module API-AVM-GenesisAsset
  */
-import { Buffer } from 'buffer/'
-import { AVMConstants } from './constants'
-import { InitialStates } from './initialstates'
-import { DefaultNetworkID } from '../../utils/constants'
-import { Serialization, SerializedEncoding, SerializedType } from '../../utils/serialization'
-import { CreateAssetTx } from './createassettx'
+import { Buffer } from "buffer/"
+import { InitialStates } from "./initialstates"
+import { DefaultNetworkID } from "../../utils/constants"
+import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import { CreateAssetTx } from "./createassettx"
 
 /**
  * @ignore
@@ -26,11 +25,11 @@ export class GenesisAsset extends CreateAssetTx {
     delete fields["ins"]
     return {
       ...fields,
-      "assetAlias": serialization.encoder(this.assetAlias, encoding, "utf8", "utf8"),
-      "name": serialization.encoder(this.name, encoding, "utf8", "utf8"),
-      "symbol": serialization.encoder(this.symbol, encoding, "utf8", "utf8"),
-      "denomination": serialization.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
-      "initialstate": this.initialstate.serialize(encoding)
+      assetAlias: serialization.encoder(this.assetAlias, encoding, "utf8", "utf8"),
+      name: serialization.encoder(this.name, encoding, "utf8", "utf8"),
+      symbol: serialization.encoder(this.symbol, encoding, "utf8", "utf8"),
+      denomination: serialization.encoder(this.denomination, encoding, "Buffer", "decimalString", 1),
+      initialState: this.initialState.serialize(encoding)
     }
   }
 
@@ -43,11 +42,11 @@ export class GenesisAsset extends CreateAssetTx {
     this.name = serialization.decoder(fields["name"], encoding, "utf8", "utf8")
     this.symbol = serialization.decoder(fields["symbol"], encoding, "utf8", "utf8")
     this.denomination = serialization.decoder(fields["denomination"], encoding, "decimalString", "Buffer", 1)
-    this.initialstate = new InitialStates()
-    this.initialstate.deserialize(fields["initialstate"], encoding)
+    this.initialState = new InitialStates()
+    this.initialState.deserialize(fields["initialState"], encoding)
   }
 
-  protected assetAlias: string = ''
+  protected assetAlias: string = ""
 
   /**
    * Returns the string representation of the assetAlias
@@ -127,8 +126,8 @@ export class GenesisAsset extends CreateAssetTx {
     bsize += denominationbuffSize.length
     barr.push(denominationbuffSize)
 
-    bsize += this.initialstate.toBuffer().length
-    barr.push(this.initialstate.toBuffer())
+    bsize += this.initialState.toBuffer().length
+    barr.push(this.initialState.toBuffer())
     return Buffer.concat(barr, bsize)
   }
 
@@ -139,7 +138,7 @@ export class GenesisAsset extends CreateAssetTx {
    * @param name String for the descriptive name of the asset
    * @param symbol String for the ticker symbol of the asset
    * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
-   * @param initialstate Optional [[InitialStates]] that represent the intial state of a created asset
+   * @param initialState Optional [[InitialStates]] that represent the intial state of a created asset
    */
   constructor(
     networkID: number = DefaultNetworkID,
@@ -147,20 +146,20 @@ export class GenesisAsset extends CreateAssetTx {
     name: string = undefined,
     symbol: string = undefined,
     denomination: number = undefined,
-    initialstate: InitialStates = undefined,
+    initialState: InitialStates = undefined,
     memo: Buffer = undefined
   ) {
     super(networkID, Buffer.alloc(32, 16), [], [], memo)
     if (
-      typeof assetAlias === 'string' && typeof name === 'string' &&
-      typeof symbol === 'string' && typeof denomination === 'number' &&
-      denomination >= 0 && denomination <= 32 && typeof initialstate !== 'undefined'
+      typeof assetAlias === "string" && typeof name === "string" &&
+      typeof symbol === "string" && typeof denomination === "number" &&
+      denomination >= 0 && denomination <= 32 && typeof initialState !== "undefined"
     ) {
       this.assetAlias = assetAlias
       this.name = name
       this.symbol = symbol
       this.denomination.writeUInt8(denomination, 0)
-      this.initialstate = initialstate
+      this.initialState = initialState
     }
   }
 }

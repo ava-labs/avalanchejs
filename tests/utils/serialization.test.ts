@@ -1,9 +1,9 @@
-import BN from 'bn.js'
-import { Buffer } from 'buffer/'
-import { BaseTx, CreateAssetTx, ExportTx, GenesisAsset, ImportTx, InitialStates, MinterSet, NFTCredential, NFTMintOperation, NFTMintOutput, NFTTransferOperation, NFTTransferOutput, OperationTx, SECPCredential, SECPMintOperation, SECPMintOutput, SECPTransferInput, SECPTransferOutput, TransferableInput, TransferableOperation, TransferableOutput, Tx, UnsignedTx, UTXO, UTXOID, UTXOSet } from 'src/apis/avm'
-import { Address, Serialized, Signature } from 'src/common'
-import { Defaults, Serialization, SerializedEncoding, SerializedType } from '../../src/utils'
-import { getPreferredHRP } from '../../src/utils'
+import BN from "bn.js"
+import { Buffer } from "buffer/"
+import { BaseTx, CreateAssetTx, ExportTx, GenesisAsset, ImportTx, InitialStates, MinterSet, NFTCredential, NFTMintOperation, NFTMintOutput, NFTTransferOperation, NFTTransferOutput, OperationTx, SECPCredential, SECPMintOperation, SECPMintOutput, SECPTransferInput, SECPTransferOutput, TransferableInput, TransferableOperation, TransferableOutput, Tx, UnsignedTx, UTXO, UTXOID, UTXOSet } from "src/apis/avm"
+import { Address, Serialized, Signature } from "src/common"
+import { Defaults, Serialization, SerializedEncoding, SerializedType } from "../../src/utils"
+import { getPreferredHRP } from "../../src/utils"
 
 const serialization: Serialization = Serialization.getInstance()
 
@@ -180,7 +180,7 @@ describe("Serialization", (): void => {
     test("Buffer", (): void => {
       const str: string = serialization.encoder(denomination, encoding, "Buffer", "decimalString", 1)
       const decoded: Buffer = serialization.decoder(str, encoding, "decimalString", "Buffer", 1)
-      expect(denomination.toString('hex')).toBe(decoded.toString('hex'))
+      expect(denomination.toString("hex")).toBe(decoded.toString("hex"))
     })
   })
 
@@ -196,14 +196,14 @@ describe("Serialization", (): void => {
     const utf8: SerializedType = "utf8"
     const amount: BN = new BN(0)
     const amountHex: string = "0000000000000000"
-    const bytes: string = '0000000000000000000000000000000000000000'
+    const bytes: string = "0000000000000000000000000000000000000000"
     const xAddress: string = "X-avax1pdurs53v6vtue9sw7am9ayjqh9mcnqe9s80sgn"
-    const xAddressHex: string = '0b7838522cd317cc960ef7765e9240b977898325'
+    const xAddressHex: string = "0b7838522cd317cc960ef7765e9240b977898325"
     const address: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
     const bech32: SerializedType = "bech32"
     const addressBuf: Buffer = serialization.typeToBuffer(address, bech32)
     const threshold: number = 1
-    const thresholdHex: string = '00000001'
+    const thresholdHex: string = "00000001"
     const minters: string[] = [xAddress]
     const assetid: Buffer = serialization.typeToBuffer(cChainID, cb58)
     const assetidHex: string = "9d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19"
@@ -211,7 +211,7 @@ describe("Serialization", (): void => {
     const groupIDHex: string = "00003039"
     const payloadHex: string = "46726f6d20736e6f77666c616b6520746f204176616c616e636865"
     const locktime: BN = new BN(0)
-    const locktimeHex: string = '0000000000000000'
+    const locktimeHex: string = "0000000000000000"
 
     describe("AVM", (): void => {
       const blockchainIDCB58: Buffer = serialization.typeToBuffer(Defaults.network[12345]["X"].blockchainID, cb58)
@@ -297,13 +297,13 @@ describe("Serialization", (): void => {
 
       test("CreateAssetTx", (): void => {
         const name: string = "Test Token"
-        const nameHex: string = '5465737420546f6b656e'
+        const nameHex: string = "5465737420546f6b656e"
         const symbol: string = "TEST"
-        const symbolHex: string = '54455354'
+        const symbolHex: string = "54455354"
         const denomination: number = 1
-        const denominationHex: string = '01'
-        const initialstate: InitialStates = new InitialStates()
-        const createassettx: CreateAssetTx = new CreateAssetTx(networkID, blockchainIDCB58, outs, ins, memo, name, symbol, denomination, initialstate)
+        const denominationHex: string = "01"
+        const initialState: InitialStates = new InitialStates()
+        const createassettx: CreateAssetTx = new CreateAssetTx(networkID, blockchainIDCB58, outs, ins, memo, name, symbol, denomination, initialState)
         const createassettx2: CreateAssetTx = new CreateAssetTx()
         const notes: string = "AVM CreateAssetTx"
         const serialized: Serialized = serialization.serialize(createassettx, vm, hex, notes)
@@ -490,10 +490,10 @@ describe("Serialization", (): void => {
       })
 
       test("InitialStates", (): void => {
-        const initialstates: InitialStates = new InitialStates()
-        const initialstates2: InitialStates = new InitialStates()
+        const initialStates: InitialStates = new InitialStates()
+        const initialStates2: InitialStates = new InitialStates()
         const notes: string = "AVM InitialStates"
-        const serialized: Serialized = serialization.serialize(initialstates, vm, hex, notes)
+        const serialized: Serialized = serialization.serialize(initialStates, vm, hex, notes)
         expect(serialized.vm).toBe(vm)
         expect(serialized.encoding).toBe(hex)
         expect(serialized.notes).toBe(notes)
@@ -502,12 +502,12 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_codecID"]).toBeNull()
         expect(serialized.fields["fxs"]).toStrictEqual({})
 
-        serialization.deserialize(serialized, initialstates2)
-        expect(initialstates2.getTypeName()).toBe("InitialStates")
-        expect(initialstates2.getTypeID()).toBeUndefined()
-        expect(initialstates2.getCodecID()).toBeUndefined()
-        expect(initialstates2.toBuffer().toString(hex)).toBe(initialstates.toBuffer().toString(hex))
-        expect(initialstates2.toString()).toBe(initialstates.toString())
+        serialization.deserialize(serialized, initialStates2)
+        expect(initialStates2.getTypeName()).toBe("InitialStates")
+        expect(initialStates2.getTypeID()).toBeUndefined()
+        expect(initialStates2.getCodecID()).toBeUndefined()
+        expect(initialStates2.toBuffer().toString(hex)).toBe(initialStates.toBuffer().toString(hex))
+        expect(initialStates2.toString()).toBe(initialStates.toString())
       })
 
       test("SECPTransferInput", (): void => {
@@ -632,8 +632,8 @@ describe("Serialization", (): void => {
         // expect(nftmintoperation2.getCodecID()).toBe(0)
         // expect(nftmintoperation2.getSigIdxs()).toStrictEqual([])
         // expect(nftmintoperation2.getGroupID()).toBe(groupIDHex)
-        // expect(nftmintoperation2.getPayload().toString('hex')).toBe(payload.toString('hex'))
-        // expect(nftmintoperation2.toBuffer().toString('hex')).toBe(nftmintoperation.toBuffer().toString('hex'))
+        // expect(nftmintoperation2.getPayload().toString("hex")).toBe(payload.toString("hex"))
+        // expect(nftmintoperation2.toBuffer().toString("hex")).toBe(nftmintoperation.toBuffer().toString("hex"))
         // expect(nftmintoperation2.toString()).toBe(nftmintoperation.toString())
       })
 
@@ -930,7 +930,7 @@ describe("Serialization", (): void => {
       })
 
       test("Address", (): void => {
-        const bsize: string = '00000014'
+        const bsize: string = "00000014"
         const address: Address = new Address()
         const address2: Address = new Address()
         const notes: string = "Address"

@@ -4,11 +4,11 @@
  */
 
 import { Buffer } from "buffer/"
-import BinTools from '../../utils/bintools'
-import { Output } from '../../common/output'
-import { SelectOutputClass } from './outputs'
-import { AVMConstants } from './constants'
-import { Serializable, SerializedEncoding } from '../../utils/serialization'
+import BinTools from "../../utils/bintools"
+import { Output } from "../../common/output"
+import { SelectOutputClass } from "./outputs"
+import { AVMConstants } from "./constants"
+import { Serializable, SerializedEncoding } from "../../utils/serialization"
 /**
  * @ignore
  */
@@ -29,7 +29,7 @@ export class InitialStates extends Serializable {
     }
     return {
       ...fields,
-      "fxs": flatfxs
+      fxs: flatfxs
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

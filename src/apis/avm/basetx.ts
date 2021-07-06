@@ -2,25 +2,28 @@
  * @packageDocumentation
  * @module API-AVM-BaseTx
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { TransferableOutput } from './outputs'
-import { TransferableInput } from './inputs'
-import { SelectCredentialClass } from './credentials'
-import { KeyChain, KeyPair } from './keychain'
-import { StandardBaseTx } from '../../common/tx'
-import { Signature, SigIdx, Credential } from '../../common/credentials'
-import { DefaultNetworkID } from '../../utils/constants'
-import { SelectTxClass } from './tx'
-import { Serialization, SerializedEncoding } from '../../utils/serialization'
-import { CodecIdError } from '../../utils/errors'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { TransferableOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
+import { SelectCredentialClass } from "./credentials"
+import { KeyChain, KeyPair } from "./keychain"
+import { StandardBaseTx } from "../../common/tx"
+import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { DefaultNetworkID } from "../../utils/constants"
+import { SelectTxClass } from "./tx"
+import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import { CodecIdError } from "../../utils/errors"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const decimalString: SerializedType = "decimalString"
+const buffer: SerializedType = "Buffer"
+const display: SerializedEncoding = "display"
 
 /**
  * Class representing a base for all transactions.
@@ -44,8 +47,8 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
       newIn.deserialize(i, encoding)
       return newIn
     })
-    this.numouts = serialization.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4)
-    this.numins = serialization.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4)
+    this.numouts = serialization.decoder(this.outs.length.toString(), display, decimalString, buffer, 4)
+    this.numins = serialization.decoder(this.ins.length.toString(), display, decimalString, buffer, 4)
   }
 
   getOuts(): TransferableOutput[] {

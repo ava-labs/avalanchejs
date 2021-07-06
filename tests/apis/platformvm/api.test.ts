@@ -18,7 +18,7 @@ import { UnixNow } from 'src/utils/helperfunctions'
 import { UTF8Payload } from 'src/utils/payload'
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions'
 import { ONEAVAX } from 'src/utils/constants'
-import { Serializable, Serialization, SerializedType } from 'src/utils/serialization'
+import { Serializable, Serialization, SerializedEncoding, SerializedType } from 'src/utils/serialization'
 import { AddValidatorTx } from 'src/apis/platformvm/validationtx'
 import { GetRewardUTXOsResponse } from 'src/common'
 import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
@@ -28,7 +28,7 @@ import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
  */
 const bintools = BinTools.getInstance()
 const serializer = Serialization.getInstance()
-
+const display: SerializedEncoding = "display"
 const dumpSerialization: boolean = false
 
 const serialzeit = (aThing: Serializable, name: string): void => {
@@ -971,12 +971,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1047,12 +1047,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1153,12 +1153,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1550,12 +1550,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1620,12 +1620,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1693,12 +1693,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1833,12 +1833,12 @@ describe('PlatformVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(platformvm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
 
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 

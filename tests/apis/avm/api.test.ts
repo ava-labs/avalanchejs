@@ -22,7 +22,7 @@ import { MinterSet } from 'src/apis/avm/minterset'
 import { PlatformChainID } from 'src/utils/constants'
 import { PersistanceOptions } from 'src/utils/persistenceoptions'
 import { ONEAVAX } from 'src/utils/constants'
-import { Serializable, Serialization, SerializedType } from 'src/utils/serialization'
+import { Serializable, Serialization, SerializedEncoding, SerializedType } from 'src/utils/serialization'
 import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 /**
@@ -31,6 +31,7 @@ import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 const dumpSerailization: boolean = false
+const display: SerializedEncoding = "display"
 
 const serialzeit = (aThing: Serializable, name: string): void => {
   if(dumpSerailization){
@@ -817,14 +818,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -886,14 +887,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1015,14 +1016,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1083,14 +1084,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1145,14 +1146,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1202,14 +1203,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1283,14 +1284,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
     
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1340,14 +1341,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
   
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1411,14 +1412,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
   
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)
@@ -1496,14 +1497,14 @@ describe('AVMAPI', (): void => {
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
   
       const tx3: Tx = txu1.sign(avm.keyChain())
-      const tx3obj: object = tx3.serialize("display")
+      const tx3obj: object = tx3.serialize(display)
       const tx3str: string = JSON.stringify(tx3obj)
       const tx4newobj: object = JSON.parse(tx3str)
       const tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      tx4.deserialize(tx4newobj, display)
       
       /*
-      const tx4obj:object = tx4.serialize("display")
+      const tx4obj:object = tx4.serialize(display)
       const tx4str:string = JSON.stringify(tx4obj)
       console.log("-----Test4 JSON-----")
       console.log(tx4str)

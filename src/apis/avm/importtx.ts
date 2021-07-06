@@ -2,27 +2,29 @@
  * @packageDocumentation
  * @module API-AVM-ImportTx
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { TransferableOutput } from './outputs'
-import { TransferableInput } from './inputs'
-import { BaseTx } from './basetx'
-import { SelectCredentialClass } from './credentials'
-import { Signature, SigIdx, Credential } from '../../common/credentials'
-import { KeyChain, KeyPair } from './keychain'
-import { DefaultNetworkID } from '../../utils/constants'
-import { Serialization, SerializedEncoding } from '../../utils/serialization'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { TransferableOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
+import { BaseTx } from "./basetx"
+import { SelectCredentialClass } from "./credentials"
+import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { KeyChain, KeyPair } from "./keychain"
+import { DefaultNetworkID } from "../../utils/constants"
+import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
 import { CodecIdError, 
          ChainIdError, 
   TransferableInputError
-} from '../../utils/errors'
+} from "../../utils/errors"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const cb58: SerializedType = "cb58"
+const buffer: SerializedType = "Buffer"
 
 /**
  * Class representing an unsigned Import transaction.
@@ -36,14 +38,14 @@ export class ImportTx extends BaseTx {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "sourceChain": serialization.encoder(this.sourceChain, encoding, "Buffer", "cb58"),
-      "importIns": this.importIns.map((i) => i.serialize(encoding))
+      sourceChain: serialization.encoder(this.sourceChain, encoding, buffer, cb58),
+      importIns: this.importIns.map((i) => i.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.sourceChain = serialization.decoder(fields["sourceChain"], encoding, "cb58", "Buffer", 32)
-    this.importIns = fields["importIns"].map((i:object) => {
+    this.sourceChain = serialization.decoder(fields["sourceChain"], encoding, cb58, buffer, 32)
+    this.importIns = fields["importIns"].map((i: object): TransferableInput => {
       let ii: TransferableInput = new TransferableInput()
       ii.deserialize(i, encoding)
       return ii
@@ -177,11 +179,11 @@ export class ImportTx extends BaseTx {
     memo: Buffer = undefined, sourceChain: Buffer = undefined, importIns: TransferableInput[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
-    this.sourceChain = sourceChain // do not correct, if it's wrong it'll bomb on toBuffer
-    if (typeof importIns !== 'undefined' && Array.isArray(importIns)) {
+    this.sourceChain = sourceChain // do not correct, if it"s wrong it"ll bomb on toBuffer
+    if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
       for (let i: number = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
-          throw new TransferableInputError("Error - ImportTx.constructor: invalid TransferableInput in array parameter 'importIns'")
+          throw new TransferableInputError(`Error - ImportTx.constructor: invalid TransferableInput in array parameter ${importIns}`)
         }
       }
       this.importIns = importIns

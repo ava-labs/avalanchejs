@@ -33,7 +33,7 @@ export class OperationTx extends BaseTx {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "ops": this.ops.map((o) => o.serialize(encoding))
+      ops: this.ops.map((o) => o.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
