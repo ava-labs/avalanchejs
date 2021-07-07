@@ -7,6 +7,7 @@ import { InitialStates } from "./initialstates"
 import { DefaultNetworkID } from "../../utils/constants"
 import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
 import { CreateAssetTx } from "./createassettx"
+import BN from "bn.js"
 
 /**
  * @ignore
@@ -62,7 +63,7 @@ export class GenesisAsset extends CreateAssetTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisAsset]].
    */
-  toBuffer(): Buffer {
+  toBuffer(networkID: number = DefaultNetworkID): Buffer {
     // asset alias
     const assetAlias: string = this.getAssetAlias()
     const assetAliasbuffSize: Buffer = Buffer.alloc(2)
@@ -75,7 +76,7 @@ export class GenesisAsset extends CreateAssetTx {
     barr.push(assetAliasbuff)
 
     const networkIDBuff: Buffer = Buffer.alloc(4)
-    networkIDBuff.writeUInt32BE(serialization.bufferToType(this.networkID, bn).toNumber(), 0)
+    networkIDBuff.writeUInt32BE(new BN(networkID).toNumber(), 0)
     bsize += networkIDBuff.length
     barr.push(networkIDBuff)
 
@@ -104,6 +105,7 @@ export class GenesisAsset extends CreateAssetTx {
     // asset name
     const name: string = this.getName()
     const namebuffSize: Buffer = Buffer.alloc(2)
+    namebuffSize.writeUInt16BE(name.length, 0)
     bsize += namebuffSize.length
     barr.push(namebuffSize)
     const namebuff: Buffer = Buffer.alloc(name.length)
@@ -138,14 +140,14 @@ export class GenesisAsset extends CreateAssetTx {
   /**
   * Class representing a GenesisAsset
    *
-   * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
-   * @param name String for the descriptive name of the asset
-   * @param symbol String for the ticker symbol of the asset
+   * @param assetAlias Optional String for the asset alias
+   * @param name Optional String for the descriptive name of the asset
+   * @param symbol Optional String for the ticker symbol of the asset
    * @param denomination Optional number for the denomination which is 10^D. D must be >= 0 and <= 32. Ex: $1 AVAX = 10^9 $nAVAX
    * @param initialState Optional [[InitialStates]] that represent the intial state of a created asset
+   * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
   constructor(
-    networkID: number = DefaultNetworkID,
     assetAlias: string = undefined,
     name: string = undefined,
     symbol: string = undefined,
@@ -153,7 +155,7 @@ export class GenesisAsset extends CreateAssetTx {
     initialState: InitialStates = undefined,
     memo: Buffer = undefined
   ) {
-    super(networkID, Buffer.alloc(32, 16), [], [], memo)
+    super(DefaultNetworkID, Buffer.alloc(32, 16), [], [], memo)
     if (
       typeof assetAlias === "string" && typeof name === "string" &&
       typeof symbol === "string" && typeof denomination === "number" &&

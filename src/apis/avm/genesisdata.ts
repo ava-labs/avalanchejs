@@ -1,30 +1,31 @@
 /**
- * @packageDocumentation
- * @module API-AVM-GenesisData
- */
+* @packageDocumentation
+* @module API-AVM-GenesisData
+*/
 import { Buffer } from "buffer/"
 import { Serializable, Serialization, SerializedEncoding } from "../../utils/serialization"
+import { AVMConstants } from "./constants"
 import { GenesisAsset } from "."
 import { DefaultNetworkID, SerializedType } from "../../utils"
 
 /**
- * @ignore
- */
+* @ignore
+*/
 const serialization: Serialization = Serialization.getInstance()
 const decimalString: SerializedType = "decimalString"
-const utf8: SerializedType = "utf8"
 const buffer: SerializedType = "Buffer"
 
 export class GenesisData extends Serializable {
   protected _typeName = "GenesisData"
+  protected _codecID = AVMConstants.LATESTCODEC
 
+  // TODO - setCodecID?
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
       genesisAssets: this.genesisAssets.map((genesisAsset: GenesisAsset) => genesisAsset.serialize(encoding)),
       networkID: serialization.encoder(this.networkID, encoding, buffer, decimalString),
-      encoding: serialization.encoder(this.encoding, encoding, utf8, utf8),
     }
   }
 
@@ -40,18 +41,22 @@ export class GenesisData extends Serializable {
 
   protected genesisAssets: GenesisAsset[]
   protected networkID: Buffer = Buffer.alloc(4)
-  protected encoding: string = ""
 
   /**
-   * Returns the NetworkID as a number
-   */
+  * Returns the GenesisAssets[]
+  */
+  getGenesisAssets = (): GenesisAsset[] => this.genesisAssets
+
+  /**
+  * Returns the NetworkID as a number
+  */
   getNetworkID = (): number => this.networkID.readUInt32BE(0)
 
   // TODO fromBuffer
 
   /**
-   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisData]].
-   */
+  * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisData]].
+  */
   toBuffer(): Buffer {
     // codec id
     const codecbuffSize: Buffer = Buffer.alloc(2)
@@ -65,8 +70,7 @@ export class GenesisData extends Serializable {
     let barr: Buffer[] = [codecbuffSize, numAssetsbuffSize]
 
     this.genesisAssets.forEach((genesisAsset: GenesisAsset): void => {
-      const b: Buffer = genesisAsset.toBuffer()
-
+      const b: Buffer = genesisAsset.toBuffer(this.getNetworkID())
       bsize += b.length
       barr.push(b)
     })
@@ -77,11 +81,11 @@ export class GenesisData extends Serializable {
   * Class representing AVM GenesisData
   *
   * @param genesisAssets Optional GenesisAsset[]
+  * @param networkID Optional DefaultNetworkID
   */
-  constructor(genesisAssets: GenesisAsset[] = [], networkID: number = DefaultNetworkID, encoding: SerializedEncoding = "hex") {
+  constructor(genesisAssets: GenesisAsset[] = [], networkID: number = DefaultNetworkID) {
     super()
     this.genesisAssets = genesisAssets
     this.networkID.writeUInt32BE(networkID, 0)
-    this.encoding = encoding
   }
 }
