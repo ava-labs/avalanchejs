@@ -13,6 +13,7 @@ describe("AVM", (): void => {
   test("GenesisAsset", (): void => {
     const m: string = "2Zc54v4ek37TEwu4LiV3j41PUMRd6acDDU3ZCVSxE7X"
     const mHex: string = "66726f6d20736e6f77666c616b6520746f206176616c616e636865"
+    const blockchainIDHex: string = "0000000000000000000000000000000000000000000000000000000000000000"
     const hex: SerializedEncoding = "hex"
     const cb58: SerializedType = "cb58"
     const bech32: SerializedType = "bech32"
@@ -31,19 +32,22 @@ describe("AVM", (): void => {
     const vcapSecpOutput = new SECPTransferOutput(amount, [addressBuf], locktime, threshold)
     const initialStates: InitialStates = new InitialStates()
     initialStates.addOutput(vcapSecpOutput)
-    const genesisasset: GenesisAsset = new GenesisAsset(assetAlias, name, symbol, denomination, initialStates, memo)
-    expect(genesisasset.getTypeName()).toBe("GenesisAsset")
-    expect(genesisasset.getTypeID()).toBeUndefined()
-    expect(genesisasset.getCodecID()).toBeUndefined()
-    expect(genesisasset.getNetworkID()).toBe(DefaultNetworkID)
-    expect(genesisasset.getName()).toBe(name)
-    expect(genesisasset.getAssetAlias()).toBe(assetAlias)
-    expect(genesisasset.getSymbol()).toBe(symbol)
-    expect(genesisasset.getDenomination()).toBe(denomination)
-    expect(genesisasset.getBlockchainID().toString(hex)).toBe("1010101010101010101010101010101010101010101010101010101010101010")
-    expect(genesisasset.getIns()).toEqual(outs)
-    expect(genesisasset.getOuts()).toEqual(ins)
-    expect(genesisasset.getInitialStates()).toStrictEqual(initialStates)
-    expect(genesisasset.getMemo().toString(hex)).toBe(mHex)
+    const genesisAsset: GenesisAsset = new GenesisAsset(assetAlias, name, symbol, denomination, initialStates, memo)
+    const genesisAsset2: GenesisAsset = new GenesisAsset()
+    genesisAsset2.fromBuffer(genesisAsset.toBuffer())
+    expect(genesisAsset.toBuffer().toString("hex")).toBe(genesisAsset2.toBuffer().toString("hex"))
+    expect(genesisAsset.getTypeName()).toBe("GenesisAsset")
+    expect(genesisAsset.getTypeID()).toBeUndefined()
+    expect(genesisAsset.getCodecID()).toBeUndefined()
+    expect(genesisAsset.getNetworkID()).toBe(DefaultNetworkID)
+    expect(genesisAsset.getName()).toBe(name)
+    expect(genesisAsset.getAssetAlias()).toBe(assetAlias)
+    expect(genesisAsset.getSymbol()).toBe(symbol)
+    expect(genesisAsset.getDenomination()).toBe(denomination)
+    expect(genesisAsset.getBlockchainID().toString(hex)).toBe(blockchainIDHex)
+    expect(genesisAsset.getIns()).toEqual(outs)
+    expect(genesisAsset.getOuts()).toEqual(ins)
+    expect(genesisAsset.getInitialStates()).toStrictEqual(initialStates)
+    expect(genesisAsset.getMemo().toString(hex)).toBe(mHex)
   })
 })

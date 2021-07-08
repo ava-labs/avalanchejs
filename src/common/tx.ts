@@ -186,8 +186,8 @@ SBTx extends StandardBaseTx<KPClass, KCClass>
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "codecID": serialization.encoder(this.codecID, encoding, "number", "decimalString", 2),
-      "transaction": this.transaction.serialize(encoding)
+      codecID: serialization.encoder(this.codecID, encoding, "number", "decimalString", 2),
+      transaction: this.transaction.serialize(encoding)
     }
   }
 

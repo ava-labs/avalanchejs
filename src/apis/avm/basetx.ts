@@ -93,7 +93,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.networkID = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
     this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32)

@@ -3,6 +3,7 @@
  * @module API-AVM-GenesisAsset
  */
 import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
 import { InitialStates } from "./initialstates"
 import { DefaultNetworkID } from "../../utils/constants"
 import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
@@ -13,8 +14,8 @@ import BN from "bn.js"
  * @ignore
  */
 const serialization: Serialization = Serialization.getInstance()
+const bintools: BinTools = BinTools.getInstance()
 const utf8: SerializedType = "utf8"
-const bn: SerializedType = "BN"
 const buffer: SerializedType = "Buffer"
 const decimalString: SerializedType = "decimalString"
 
@@ -58,7 +59,23 @@ export class GenesisAsset extends CreateAssetTx {
    */
   getAssetAlias = (): string => this.assetAlias
 
-  // TODO fromBuffer
+  /**
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[GenesisAsset]], parses it, populates the class, and returns the length of the [[GenesisAsset]] in bytes.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[GenesisAsset]]
+   *
+   * @returns The length of the raw [[GenesisAsset]]
+   *
+   * @remarks assume not-checksummed
+   */
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    const assetAliasSize: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
+    offset += 2
+    this.assetAlias = bintools.copyFrom(bytes, offset, offset + assetAliasSize).toString("utf8")
+    offset += assetAliasSize
+    offset += super.fromBuffer(bytes, offset)
+    return offset
+  }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisAsset]].
@@ -155,7 +172,7 @@ export class GenesisAsset extends CreateAssetTx {
     initialState: InitialStates = undefined,
     memo: Buffer = undefined
   ) {
-    super(DefaultNetworkID, Buffer.alloc(32, 16), [], [], memo)
+    super(DefaultNetworkID, Buffer.alloc(32), [], [], memo)
     if (
       typeof assetAlias === "string" && typeof name === "string" &&
       typeof symbol === "string" && typeof denomination === "number" &&

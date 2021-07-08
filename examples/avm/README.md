@@ -27,7 +27,6 @@ Tests for the [Avalanche Virtual Machine](https://docs.avax.network/build/refere
 * [exportTx-ant-cchain.ts](./exportTx-ant-cchain.ts)
 * [exportTx-avax-cchain.ts](./exportTx-avax-cchain.ts)
 * [exportTx-avax-pchain.ts](./exportTx-avax-pchain.ts)
-* [genesisAsset.ts](./genesisAsset.ts)
 * [genesisData.ts](./genesisData.ts)
 * [getAllBalances.ts](./getAllBalances.ts)
 * [getAssetDescription.ts](./getAssetDescription.ts)

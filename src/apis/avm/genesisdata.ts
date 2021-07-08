@@ -3,6 +3,7 @@
 * @module API-AVM-GenesisData
 */
 import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
 import { Serializable, Serialization, SerializedEncoding } from "../../utils/serialization"
 import { AVMConstants } from "./constants"
 import { GenesisAsset } from "."
@@ -12,6 +13,7 @@ import { DefaultNetworkID, SerializedType } from "../../utils"
 * @ignore
 */
 const serialization: Serialization = Serialization.getInstance()
+const bintools: BinTools = BinTools.getInstance()
 const decimalString: SerializedType = "decimalString"
 const buffer: SerializedType = "Buffer"
 
@@ -52,7 +54,32 @@ export class GenesisData extends Serializable {
   */
   getNetworkID = (): number => this.networkID.readUInt32BE(0)
 
-  // TODO fromBuffer
+  /**
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[GenesisAsset]], parses it, populates the class, and returns the length of the [[GenesisAsset]] in bytes.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[GenesisAsset]]
+   *
+   * @returns The length of the raw [[GenesisAsset]]
+   *
+   * @remarks assume not-checksummed
+   */
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    this._codecID = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
+    offset += 2
+    const numGenesisAssets = bintools.copyFrom(bytes, offset, offset + 4)
+    offset += 4
+    const assetCount: number = numGenesisAssets.readUInt32BE(0)
+    this.genesisAssets = []
+    for (let i: number = 0; i < assetCount; i++) {
+      const genesisAsset: GenesisAsset = new GenesisAsset()
+      offset = genesisAsset.fromBuffer(bytes, offset)
+      this.genesisAssets.push(genesisAsset)
+      if (i === 0) {
+        this.networkID.writeUInt32BE(genesisAsset.getNetworkID(), 0)
+      }
+    }
+    return offset
+  }
 
   /**
   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[GenesisData]].
