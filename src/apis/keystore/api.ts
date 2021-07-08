@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module API-Keystore
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche"
+import { JRPCAPI } from "../../common/jrpcapi"
+import { RequestResponseData } from "../../common/apibase"
 
 /**
  * Class for interacting with a node API that is using the node's KeystoreAPI.
@@ -24,14 +24,14 @@ export class KeystoreAPI extends JRPCAPI {
      *
      * @returns Promise for a boolean with true on success
      */
-  createUser = async (username:string, password:string):Promise<boolean> => {
-    const params:any = {
+  createUser = async (username: string, password: string): Promise<boolean> => {
+    const params: any = {
       username,
-      password,
-    };
-    return this.callMethod('keystore.createUser', params)
-      .then((response:RequestResponseData) => response.data.result.success);
-  };
+      password
+    }
+    const response: RequestResponseData = await this.callMethod("keystore.createUser", params)
+    return response.data.result.success
+  }
 
   /**
      * Exports a user. The user can be imported to another node with keystore.importUser .
@@ -41,41 +41,43 @@ export class KeystoreAPI extends JRPCAPI {
      *
      * @returns Promise with a string importable using importUser
      */
-  exportUser = async (username:string, password:string):Promise<string> => {
-    const params:any = {
+  exportUser = async (username: string, password: string): Promise<string> => {
+    const params: any = {
       username,
-      password,
-    };
-    return this.callMethod('keystore.exportUser', params)
-      .then((response:RequestResponseData) => response.data.result.user);
-  };
+      password
+    }
+    const response: RequestResponseData = await this.callMethod("keystore.exportUser", params)
+    return response.data.result.user
+  }
 
   /**
      * Imports a user file into the node's user database and assigns it to a username.
      *
      * @param username The name the user file should be imported into
-     * @param user cb58 serialized string represetning a user's data
-     * @param password The user's password
+     * @param user cb58 serialized string represetning a user"s data
+     * @param password The user"s password
      *
      * @returns A promise with a true-value on success.
      */
-  importUser = async (username:string, user:string, password:string):Promise<boolean> => {
-    const params:any = {
+  importUser = async (username: string, user: string, password: string): Promise<boolean> => {
+    const params: any = {
       username,
       user,
-      password,
-    };
-    return this.callMethod('keystore.importUser', params)
-      .then((response:RequestResponseData) => response.data.result.success);
-  };
+      password
+    }
+    const response: RequestResponseData = await this.callMethod("keystore.importUser", params)
+    return response.data.result.success
+  }
 
   /**
      * Lists the names of all users on the node.
      *
      * @returns Promise of an array with all user names.
      */
-  listUsers = async (): Promise<string[]> => this.callMethod('keystore.listUsers')
-    .then((response:RequestResponseData) => response.data.result.users);
+  listUsers = async (): Promise<string[]> => {
+    const response: RequestResponseData = await this.callMethod("keystore.listUsers")
+    return response.data.result.users
+  }
 
   /**
      * Deletes a user in the node's database.
@@ -85,20 +87,20 @@ export class KeystoreAPI extends JRPCAPI {
      *
      * @returns Promise for a boolean with true on success
      */
-  deleteUser = async (username:string, password:string):Promise<boolean> => {
-    const params:any = {
+  deleteUser = async (username: string, password: string): Promise<boolean> => {
+    const params: any = {
       username,
-      password,
-    };
-    return this.callMethod('keystore.deleteUser', params)
-      .then((response:RequestResponseData) => response.data.result.success);
-  };
+      password
+    }
+    const response: RequestResponseData = await this.callMethod("keystore.deleteUser", params)
+    return response.data.result.success
+  }
 
   /**
      * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
      *
      * @param core A reference to the Avalanche class
-     * @param baseurl Defaults to the string "/ext/keystore" as the path to blockchain's baseurl
+     * @param baseurl Defaults to the string "/ext/keystore" as the path to blockchain"s baseurl
      */
-  constructor(core:AvalancheCore, baseurl:string = '/ext/keystore') { super(core, baseurl); }
+  constructor(core: AvalancheCore, baseurl: string = "/ext/keystore") { super(core, baseurl) }
 }

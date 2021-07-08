@@ -184,7 +184,7 @@ export class ImportTx extends BaseTx {
     memo: Buffer = undefined, sourceChain: Buffer = undefined, importIns: TransferableInput[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
-    this.sourceChain = sourceChain // do not correct, if it"s wrong it"ll bomb on toBuffer
+    this.sourceChain = sourceChain // do not correct, if it's wrong it'll bomb on toBuffer
     if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
       for (let i: number = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {

@@ -21,7 +21,7 @@ export class KeyPair extends SECP256k1KeyPair {
   protected hrp: string = ""
 
   /**
-  * Returns the address"s string representation.
+  * Returns the address's string representation.
   *
   * @returns A string representation of the address
   */
@@ -34,7 +34,7 @@ export class KeyPair extends SECP256k1KeyPair {
   /**
   * Returns the chainID associated with this key.
   *
-  * @returns The [[KeyPair]]"s chainID
+  * @returns The [[KeyPair]]'s chainID
   */
   getChainID = (): string => this.chainid
 
@@ -51,7 +51,7 @@ export class KeyPair extends SECP256k1KeyPair {
   /**
   * Returns the Human-Readable-Part of the network associated with this key.
   *
-  * @returns The [[KeyPair]]"s Human-Readable-Part of the network"s Bech32 addressing scheme
+  * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
   */
   getHRP = (): string => this.hrp
   

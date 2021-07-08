@@ -1,24 +1,24 @@
-import mockAxios from 'jest-mock-axios'
+import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
 import { AVMAPI } from "src/apis/avm/api"
 import { AdminAPI } from "src/apis/admin/api"
-import { HealthAPI } from 'src/apis/health/api'
+import { HealthAPI } from "src/apis/health/api"
 import { InfoAPI } from "src/apis/info/api"
 import { KeystoreAPI } from "src/apis/keystore/api"
 import { MetricsAPI } from "src/apis/metrics/api"
 import { PlatformVMAPI } from "src/apis/platformvm/api"
-import { TestAPI } from './testlib'
-import { AxiosRequestConfig } from 'axios'
-import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
+import { TestAPI } from "./testlib"
+import { AxiosRequestConfig } from "axios"
+import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
-describe('Avalanche', (): void => {
+describe("Avalanche", (): void => {
   const blockchainID: string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
-  const ip = '127.0.0.1'
-  const port = 9650
+  const host: string = "127.0.0.1"
+  const port: number = 9650
   const protocol = "https"
   let avalanche: Avalanche
   beforeAll((): void => {
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true)
+    avalanche = new Avalanche(host, port, protocol, 12345, undefined, undefined, undefined, true)
     avalanche.addAPI("admin", AdminAPI)
     avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainID)
     avalanche.addAPI("health", HealthAPI)
@@ -27,16 +27,17 @@ describe('Avalanche', (): void => {
     avalanche.addAPI("metrics", MetricsAPI)
     avalanche.addAPI("pchain", PlatformVMAPI)
   })
-  test('Can initialize without port', (): void => {
-    const a = new Avalanche(ip, undefined, protocol, 12345)
+  test("Can initialize without port", (): void => {
+    const a = new Avalanche(host, undefined, protocol, 12345)
     expect(a.getPort()).toBe(undefined)
-    expect(a.getURL()).toBe(`${protocol}://${ip}`)
+    expect(a.getURL()).toBe(`${protocol}://${host}`)
   })
-  test('Can initialize with port', (): void => {
-    expect(avalanche.getIP()).toBe(ip)
+  test("Can initialize with port", (): void => {
+    expect(avalanche.getIP()).toBe(host)
+    expect(avalanche.getHost()).toBe(host)
     expect(avalanche.getPort()).toBe(port)
     expect(avalanche.getProtocol()).toBe(protocol)
-    expect(avalanche.getURL()).toBe(`${protocol}://${ip}:${port}`)
+    expect(avalanche.getURL()).toBe(`${protocol}://${host}:${port}`)
     expect(avalanche.getNetworkID()).toBe(12345)
     expect(avalanche.getHeaders()).toStrictEqual({})
     avalanche.setNetworkID(50)
@@ -45,7 +46,7 @@ describe('Avalanche', (): void => {
     expect(avalanche.getNetworkID()).toBe(12345)
   })
 
-  test('Endpoints correct', (): void => {
+  test("Endpoints correct", (): void => {
     expect(avalanche.Admin()).not.toBeInstanceOf(AVMAPI)
     expect(avalanche.Admin()).toBeInstanceOf(AdminAPI)
         
@@ -73,7 +74,7 @@ describe('Avalanche', (): void => {
     expect(avalanche.NodeKeys().getRPCID()).toBe(1)
   })
 
-  test('Create new API', (): void => {
+  test("Create new API", (): void => {
     avalanche.addAPI("avm2", AVMAPI)
     expect(avalanche.api("avm2")).toBeInstanceOf(AVMAPI)
 
@@ -124,24 +125,24 @@ describe('Avalanche', (): void => {
   })
 })
 
-describe('HTTP Operations', (): void => {
-  const ip: string = '127.0.0.1'
+describe("HTTP Operations", (): void => {
+  const host: string = "127.0.0.1"
   const port: number = 8080
-  const protocol: string = 'http'
-  const path: string = '/ext/testingrequests'
+  const protocol: string = "http"
+  const path: string = "/ext/testingrequests"
   let avalanche: Avalanche
   beforeAll((): void => {
-    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true)
-    avalanche.addAPI('testingrequests', TestAPI, path)
+    avalanche = new Avalanche(host, port, protocol, 12345, undefined, undefined, undefined, true)
+    avalanche.addAPI("testingrequests", TestAPI, path)
   })
 
   afterEach((): void => {
     mockAxios.reset()
   })
 
-  test('GET works', async (): Promise<void> => {
-    const input: string = 'TestGET'
-    const api: TestAPI = avalanche.api('testingrequests')
+  test("GET works", async (): Promise<void> => {
+    const input: string = "TestGET"
+    const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestGET(input, `/${input}`)
     const payload:object = {
       result: {
@@ -157,12 +158,12 @@ describe('HTTP Operations', (): void => {
     expect(response.output).toBe(input)
   })
 
-  test('DELETE works', async (): Promise<void> => {
-    const input: string = 'TestDELETE'
-    const api: TestAPI = avalanche.api('testingrequests')
+  test("DELETE works", async (): Promise<void> => {
+    const input: string = "TestDELETE"
+    const api: TestAPI = avalanche.api("testingrequests")
     const axiosConfig:AxiosRequestConfig = {
-      baseURL: `${protocol}://${ip}:${port}`,
-      responseType: 'text',
+      baseURL: `${protocol}://${host}:${port}`,
+      responseType: "text",
     }
     const result: Promise<object> = api.TestDELETE(input, `/${input}`, axiosConfig)
     const payload:object = {
@@ -179,9 +180,9 @@ describe('HTTP Operations', (): void => {
     expect(response.output).toBe(input)
   })
 
-  test('POST works', async (): Promise<void> => {
-    const input: string = 'TestPOST'
-    const api: TestAPI = avalanche.api('testingrequests')
+  test("POST works", async (): Promise<void> => {
+    const input: string = "TestPOST"
+    const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestPOST(input, `/${input}`)
     const payload:object = {
       result: {
@@ -197,9 +198,9 @@ describe('HTTP Operations', (): void => {
     expect(response.output).toBe(input)
   })
 
-  test('PUT works', async (): Promise<void> => {
-    const input: string = 'TestPUT'
-    const api: TestAPI = avalanche.api('testingrequests')
+  test("PUT works", async (): Promise<void> => {
+    const input: string = "TestPUT"
+    const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestPUT(input, `/${input}`)
     const payload:object = {
       result: {
@@ -215,9 +216,9 @@ describe('HTTP Operations', (): void => {
     expect(response.output).toBe(input)
   })
 
-  test('PATCH works', async (): Promise<void> => {
-    const input: string = 'TestPATCH'
-    const api: TestAPI = avalanche.api('testingrequests')
+  test("PATCH works", async (): Promise<void> => {
+    const input: string = "TestPATCH"
+    const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestPATCH(input, `/${input}`)
     const payload:object = {
       result: {
