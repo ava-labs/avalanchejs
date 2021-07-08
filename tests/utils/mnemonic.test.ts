@@ -1,10 +1,7 @@
 import Mnemonic from 'src/utils/mnemonic'
-const randomBytes: any = require('randombytes')
-
-
-import BN from 'bn.js'
 import { Buffer } from 'buffer/'
 
+const randomBytes: any = require('randombytes')
 const mnemonic = Mnemonic.getInstance()
 const entropy: string = "9d7c99e77261acb88a5ed717f625d5d3ed5569e0f60429cc6eb9c4e91f48fb7c"
 const langs: string[] = [

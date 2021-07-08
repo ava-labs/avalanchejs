@@ -5,27 +5,17 @@
 
 import { StoreAPI } from 'store2';
 import { ClientRequest } from 'http';
-import BinTools from '../utils/bintools';
 import DB from '../utils/db';
 import AvalancheCore from '../avalanche';
-
-/**
- * @ignore
- */
-const bintools = BinTools.getInstance();
 
 /**
  * Response data for HTTP requests.
  */
 export class RequestResponseData {
   data: any;
-
-  headers:any;
-
+  headers: any;
   status: number;
-
   statusText: string;
-
   request:ClientRequest | XMLHttpRequest;
 }
 

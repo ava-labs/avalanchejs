@@ -10,8 +10,8 @@ import { Serialization, SerializedEncoding } from '../../utils/serialization';
 import BN from 'bn.js';
 import { OutputIdError } from '../../utils/errors';
 
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Takes a buffer representing the output and returns the proper Output instance.
@@ -20,7 +20,7 @@ const serializer = Serialization.getInstance();
  *
  * @returns An instance of an [[Output]]-extended class.
  */
-export const SelectOutputClass = (outputid:number, ...args:Array<any>):Output => {
+export const SelectOutputClass = (outputid: number, ...args: any[]): Output => {
     if(outputid == PlatformVMConstants.SECPXFEROUTPUTID){
       return new SECPTransferOutput( ...args);
     } else if(outputid == PlatformVMConstants.SECPOWNEROUTPUTID) {
@@ -132,7 +132,7 @@ export class StakeableLockOut extends AmountOutput {
     let fields:object = super.serialize(encoding);
     let outobj:object = {
       ...fields, //included anywayyyy... not ideal
-      "stakeableLocktime": serializer.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
+      "stakeableLocktime": serialization.encoder(this.stakeableLocktime, encoding, "Buffer", "decimalString", 8),
       "transferableOutput": this.transferableOutput.serialize(encoding)
     };
     delete outobj["addresses"];
@@ -147,7 +147,7 @@ export class StakeableLockOut extends AmountOutput {
     fields["threshold"] =  "1";
     fields["amount"] = "99";
     super.deserialize(fields, encoding);
-    this.stakeableLocktime = serializer.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
+    this.stakeableLocktime = serialization.decoder(fields["stakeableLocktime"], encoding, "decimalString", "Buffer", 8);
     this.transferableOutput = new ParseableOutput();
     this.transferableOutput.deserialize(fields["transferableOutput"], encoding);
     this.synchronize();
@@ -210,7 +210,7 @@ export class StakeableLockOut extends AmountOutput {
   toBuffer():Buffer {
     let xferoutBuff:Buffer = this.transferableOutput.toBuffer();
     const bsize:number = this.stakeableLocktime.length + xferoutBuff.length;
-    const barr:Array<Buffer> = [this.stakeableLocktime, xferoutBuff];
+    const barr: Buffer[] = [this.stakeableLocktime, xferoutBuff];
     return Buffer.concat(barr, bsize);
   }
 
@@ -241,7 +241,7 @@ export class StakeableLockOut extends AmountOutput {
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
    * @param transferableOutput A [[ParseableOutput]] which is embedded into this output.
    */
-  constructor(amount:BN = undefined, addresses:Array<Buffer> = undefined, locktime:BN = undefined, threshold:number = undefined, stakeableLocktime:BN = undefined, transferableOutput:ParseableOutput = undefined) {
+  constructor(amount: BN = undefined, addresses: Buffer[] = undefined, locktime: BN = undefined, threshold: number = undefined, stakeableLocktime: BN = undefined, transferableOutput: ParseableOutput = undefined) {
     super(amount, addresses, locktime, threshold);
     if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8);

@@ -49,7 +49,6 @@ const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX")
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  return false
   const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
   const balance: BN = new BN(getBalanceResponse['balance'])
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)

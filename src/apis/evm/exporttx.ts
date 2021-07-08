@@ -158,20 +158,20 @@ export class ExportTx extends EVMBaseTx {
   /**
    * Class representing a ExportTx.
    *
-   * @param networkid Optional networkid
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param destinationChain Optional destinationChain, default Buffer.alloc(32, 16)
    * @param inputs Optional array of the [[EVMInputs]]s
    * @param exportedOutputs Optional array of the [[EVMOutputs]]s
    */
   constructor(
-    networkid: number = undefined, 
-    blockchainid: Buffer = Buffer.alloc(32, 16), 
+    networkID: number = undefined,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
     destinationChain: Buffer = Buffer.alloc(32, 16), 
     inputs: EVMInput[] = undefined, 
     exportedOutputs: TransferableOutput[] = undefined
   ) {
-    super(networkid, blockchainid);
+    super(networkID, blockchainID);
     this.destinationChain = destinationChain;
     if (typeof inputs !== 'undefined' && Array.isArray(inputs)) {
       inputs.forEach((input: EVMInput) => {

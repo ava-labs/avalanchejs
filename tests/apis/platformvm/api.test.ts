@@ -18,28 +18,29 @@ import { UnixNow } from 'src/utils/helperfunctions'
 import { UTF8Payload } from 'src/utils/payload'
 import { NodeIDStringToBuffer } from 'src/utils/helperfunctions'
 import { ONEAVAX } from 'src/utils/constants'
-import { Serializable, Serialization } from 'src/utils/serialization'
+import { Serializable, Serialization, SerializedEncoding, SerializedType } from 'src/utils/serialization'
 import { AddValidatorTx } from 'src/apis/platformvm/validationtx'
 import { GetRewardUTXOsResponse } from 'src/common'
+import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
 
 /**
  * @ignore
  */
 const bintools = BinTools.getInstance()
 const serializer = Serialization.getInstance()
-
+const display: SerializedEncoding = "display"
 const dumpSerialization: boolean = false
 
-function serialzeit(aThing: Serializable, name: string) {
+const serialzeit = (aThing: Serializable, name: string): void => {
   if (dumpSerialization) {
     console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "hex", name + " -- Hex Encoded")))
     console.log(JSON.stringify(serializer.serialize(aThing, "platformvm", "display", name + " -- Human-Readable")))
   }
 }
 
-describe('PlatformVMAPI', () => {
-  const networkid: number = 12345
-  const blockchainid: string = PlatformChainID
+describe('PlatformVMAPI', (): void => {
+  const networkID: number = 12345
+  const blockchainID: string = PlatformChainID
   const ip: string = '127.0.0.1'
   const port: number = 9650
   const protocol: string = 'https'
@@ -51,7 +52,7 @@ describe('PlatformVMAPI', () => {
   const username: string = 'AvaLabs'
   const password: string = 'password'
 
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkid, undefined, undefined, undefined, true)
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID, undefined, undefined, undefined, true)
   let api: PlatformVMAPI
   let alias: string
 
@@ -59,16 +60,16 @@ describe('PlatformVMAPI', () => {
   const addrB: string = 'P-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")))
   const addrC: string = 'P-' + bech32.encode(avalanche.getHRP(), bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")))
 
-  beforeAll(() => {
+  beforeAll((): void => {
     api = new PlatformVMAPI(avalanche, '/ext/bc/P')
     alias = api.getBlockchainAlias()
   })
 
-  afterEach(() => {
+  afterEach((): void => {
     mockAxios.reset()
   })
 
-  test('refreshBlockchainID', async () => {
+  test('refreshBlockchainID', async (): Promise<void> => {
     let n3bcID: string = Defaults.network[3].P["blockchainID"]
     let testAPI: PlatformVMAPI = new PlatformVMAPI(avalanche, '/ext/bc/P')
     let bc1: string = testAPI.getBlockchainID()
@@ -84,28 +85,28 @@ describe('PlatformVMAPI', () => {
 
   })
 
-  test('listAddresses', async () => {
-    const addresses = [addrA, addrB]
+  test('listAddresses', async (): Promise<void> => {
+    const addresses: string[] = [addrA, addrB]
 
-    const result: Promise<Array<string>> = api.listAddresses(username, password)
+    const result: Promise<string[]> = api.listAddresses(username, password)
     const payload: object = {
       result: {
         addresses,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(addresses)
   })
 
-  test('importKey', async () => {
-    const address = addrC
+  test('importKey', async (): Promise<void> => {
+    const address: string = addrC
 
     const result: Promise<string> = api.importKey(username, password, 'key')
     const payload: object = {
@@ -113,7 +114,7 @@ describe('PlatformVMAPI', () => {
         address,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -124,9 +125,9 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(address)
   })
 
-  test('getBalance', async () => {
-    const balance = new BN('100', 10)
-    const respobj = {
+  test('getBalance', async (): Promise<void> => {
+    const balance: BN = new BN('100', 10)
+    const respobj: object = {
       balance,
       utxoIDs: [
         {
@@ -139,7 +140,7 @@ describe('PlatformVMAPI', () => {
     const payload: object = {
       result: respobj,
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -150,15 +151,15 @@ describe('PlatformVMAPI', () => {
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
   })
 
-  test('getCurrentSupply', async () => {
-    const supply = new BN('1000000000000', 10)
+  test('getCurrentSupply', async (): Promise<void> => {
+    const supply: BN = new BN('1000000000000', 10)
     const result: Promise<BN> = api.getCurrentSupply()
     const payload: object = {
       result: {
         supply
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -169,15 +170,15 @@ describe('PlatformVMAPI', () => {
     expect(response.toString(10)).toBe(supply.toString(10))
   })
 
-  test('getHeight', async () => {
-    const height = new BN('100', 10)
+  test('getHeight', async (): Promise<void> => {
+    const height: BN = new BN('100', 10)
     const result: Promise<BN> = api.getHeight()
     const payload: object = {
       result: {
         height
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -188,9 +189,9 @@ describe('PlatformVMAPI', () => {
     expect(response.toString(10)).toBe(height.toString(10))
   })
 
-  test('getMinStake', async () => {
-    const minStake = new BN("2000000000000", 10)
-    const minDelegate = new BN("25000000000", 10)
+  test('getMinStake', async (): Promise<void> => {
+    const minStake: BN = new BN("2000000000000", 10)
+    const minDelegate: BN = new BN("25000000000", 10)
     const result: Promise<object> = api.getMinStake()
     const payload: object = {
       result: {
@@ -198,7 +199,7 @@ describe('PlatformVMAPI', () => {
         minDelegatorStake: "25000000000"
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -210,8 +211,8 @@ describe('PlatformVMAPI', () => {
     expect(response["minDelegatorStake"].toString(10)).toBe(minDelegate.toString(10))
   })
 
-  test('getStake', async () => {
-    const staked = new BN('100', 10)
+  test('getStake', async (): Promise<void> => {
+    const staked: BN = new BN('100', 10)
     const stakedOutputs: string[] = [
       "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000060bd6180000000070000000fb750430000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc316895eb3",
       "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000060bd618000000007000000d18c2e280000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc3714de759",
@@ -232,7 +233,7 @@ describe('PlatformVMAPI', () => {
         stakedOutputs
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -245,20 +246,20 @@ describe('PlatformVMAPI', () => {
   })
 
 
-  test('addSubnetValidator 1', async () => {
-    const nodeID = 'abcdef'
-    const subnetID = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
-    const startTime = new Date(1985, 5, 9, 12, 59, 43, 9)
-    const endTime = new Date(1982, 3, 1, 12, 58, 33, 7)
-    const weight = 13
-    const utx = 'valid'
+  test('addSubnetValidator 1', async (): Promise<void> => {
+    const nodeID: string = 'abcdef'
+    const subnetID: string = "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
+    const startTime: Date = new Date(1985, 5, 9, 12, 59, 43, 9)
+    const endTime: Date = new Date(1982, 3, 1, 12, 58, 33, 7)
+    const weight: number = 13
+    const utx: string = 'valid'
     const result: Promise<string> = api.addSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight)
     const payload: object = {
       result: {
         txID: utx,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -269,20 +270,20 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx)
   })
 
-  test('addSubnetValidator', async () => {
-    const nodeID = 'abcdef'
-    const subnetID = Buffer.from('abcdef', 'hex')
-    const startTime = new Date(1985, 5, 9, 12, 59, 43, 9)
-    const endTime = new Date(1982, 3, 1, 12, 58, 33, 7)
-    const weight = 13
-    const utx = 'valid'
+  test('addSubnetValidator', async (): Promise<void> => {
+    const nodeID: string = 'abcdef'
+    const subnetID: Buffer = Buffer.from('abcdef', 'hex')
+    const startTime: Date = new Date(1985, 5, 9, 12, 59, 43, 9)
+    const endTime: Date = new Date(1982, 3, 1, 12, 58, 33, 7)
+    const weight: number = 13
+    const utx: string = 'valid'
     const result: Promise<string> = api.addSubnetValidator(username, password, nodeID, subnetID, startTime, endTime, weight)
     const payload: object = {
       result: {
         txID: utx,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -293,20 +294,20 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx)
   })
 
-  test('addDelegator 1', async () => {
-    const nodeID = 'abcdef'
+  test('addDelegator 1', async (): Promise<void> => {
+    const nodeID: string = 'abcdef'
     const startTime = new Date(1985, 5, 9, 12, 59, 43, 9)
-    const endTime = new Date(1982, 3, 1, 12, 58, 33, 7)
-    const stakeAmount = new BN(13)
-    const rewardAddress = 'fedcba'
-    const utx = 'valid'
+    const endTime: Date = new Date(1982, 3, 1, 12, 58, 33, 7)
+    const stakeAmount: BN = new BN(13)
+    const rewardAddress: string = 'fedcba'
+    const utx: string = 'valid'
     const result: Promise<string> = api.addDelegator(username, password, nodeID, startTime, endTime, stakeAmount, rewardAddress)
     const payload: object = {
       result: {
         txID: utx,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -317,31 +318,31 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx)
   })
 
-  test('getBlockchains 1', async () => {
-    const resp = [{
+  test('getBlockchains 1', async (): Promise<void> => {
+    const resp: object[] = [{
       id: 'nodeID',
       subnetID: 'subnetID',
       vmID: 'vmID',
     }]
-    const result: Promise<Array<object>> = api.getBlockchains()
+    const result: Promise<object[]> = api.getBlockchains()
     const payload: object = {
       result: {
         blockchains: resp,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<object> = await result
+    const response: object[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
   })
 
-  test('getSubnets 1', async () => {
-    const resp: Array<object> = [{
+  test('getSubnets 1', async (): Promise<void> => {
+    const resp: object[] = [{
       id: 'id',
       controlKeys: ['controlKeys'],
       threshold: 'threshold',
@@ -352,7 +353,7 @@ describe('PlatformVMAPI', () => {
         subnets: resp,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -363,15 +364,15 @@ describe('PlatformVMAPI', () => {
     expect(response).toEqual(resp)
   })
 
-  test('getCurrentValidators 1', async () => {
-    const validators = ['val1', 'val2']
+  test('getCurrentValidators 1', async (): Promise<void> => {
+    const validators: string[] = ['val1', 'val2']
     const result: Promise<object> = api.getCurrentValidators()
     const payload: object = {
       result: {
         validators,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -382,16 +383,16 @@ describe('PlatformVMAPI', () => {
     expect(response).toStrictEqual({ validators })
   })
 
-  test('getCurrentValidators 2', async () => {
+  test('getCurrentValidators 2', async (): Promise<void> => {
     const subnetID: string = 'abcdef'
-    const validators = ['val1', 'val2']
+    const validators: string[] = ['val1', 'val2']
     const result: Promise<object> = api.getCurrentValidators(subnetID)
     const payload: object = {
       result: {
         validators,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -402,16 +403,16 @@ describe('PlatformVMAPI', () => {
     expect(response).toStrictEqual({ validators })
   })
 
-  test('getCurrentValidators 3', async () => {
+  test('getCurrentValidators 3', async (): Promise<void> => {
     const subnetID: Buffer = Buffer.from('abcdef', 'hex')
-    const validators = ['val1', 'val2']
+    const validators: string[] = ['val1', 'val2']
     const result: Promise<object> = api.getCurrentValidators(subnetID)
     const payload: object = {
       result: {
         validators,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -422,8 +423,8 @@ describe('PlatformVMAPI', () => {
     expect(response).toStrictEqual({ validators })
   })
 
-  test('exportKey', async () => {
-    const key = 'sdfglvlj2h3v45'
+  test('exportKey', async (): Promise<void> => {
+    const key: string = 'sdfglvlj2h3v45'
 
     const result: Promise<string> = api.exportKey(username, password, addrA)
     const payload: object = {
@@ -431,7 +432,7 @@ describe('PlatformVMAPI', () => {
         privateKey: key,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -442,52 +443,52 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(key)
   })
 
-  test("exportAVAX", async () => {
-    let amount = new BN(100)
-    let to = "abcdef"
-    let username = "Robert"
-    let password = "Paulson"
-    let txID = "valid"
-    let result: Promise<string> = api.exportAVAX(username, password, amount, to)
-    let payload: object = {
+  test("exportAVAX", async (): Promise<void> => {
+    const amount: BN = new BN(100)
+    const to: string = "abcdef"
+    const username: string = "Robert"
+    const password: string = "Paulson"
+    const txID: string = "valid"
+    const result: Promise<string> = api.exportAVAX(username, password, amount, to)
+    const payload: object = {
       "result": {
         "txID": txID
       }
     }
-    let responseObj = {
+    const responseObj: HttpResponse = {
       data: payload
     }
 
     mockAxios.mockResponse(responseObj)
-    let response: string = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
   })
 
-  test("importAVAX", async () => {
-    let to = "abcdef"
-    let username = "Robert"
-    let password = "Paulson"
-    let txID = "valid"
-    let result: Promise<string> = api.importAVAX(username, password, to, blockchainid)
-    let payload: object = {
+  test("importAVAX", async (): Promise<void> => {
+    const to: string = "abcdef"
+    const username: string = "Robert"
+    const password = "Paulson"
+    const txID = "valid"
+    const result: Promise<string> = api.importAVAX(username, password, to, blockchainID)
+    const payload: object = {
       "result": {
         "txID": txID
       }
     }
-    let responseObj = {
+    const responseObj: HttpResponse = {
       data: payload
     }
 
     mockAxios.mockResponse(responseObj)
-    let response: string = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
   })
 
-  test('createBlockchain', async () => {
+  test('createBlockchain', async (): Promise<void> => {
     const blockchainID: string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh'
     const vmID: string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh'
     const name: string = 'Some Blockchain'
@@ -499,7 +500,7 @@ describe('PlatformVMAPI', () => {
         txID: blockchainID,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -510,7 +511,7 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(blockchainID)
   })
 
-  test('getBlockchainStatus', async () => {
+  test('getBlockchainStatus', async (): Promise<void> => {
     const blockchainID: string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh'
     const result: Promise<string> = api.getBlockchainStatus(blockchainID)
     const payload: object = {
@@ -518,7 +519,7 @@ describe('PlatformVMAPI', () => {
         status: 'Accepted',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -529,8 +530,8 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe('Accepted')
   })
 
-  test('createAddress', async () => {
-    const alias = 'randomalias'
+  test('createAddress', async (): Promise<void> => {
+    const alias: string = 'randomalias'
 
     const result: Promise<string> = api.createAddress(username, password)
     const payload: object = {
@@ -538,7 +539,7 @@ describe('PlatformVMAPI', () => {
         address: alias,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -549,17 +550,17 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(alias)
   })
 
-  test('createSubnet 1', async () => {
-    const controlKeys = ['abcdef']
-    const threshold = 13
-    const utx = 'valid'
+  test('createSubnet 1', async (): Promise<void> => {
+    const controlKeys: string[] = ['abcdef']
+    const threshold: number = 13
+    const utx: string = 'valid'
     const result: Promise<string> = api.createSubnet(username, password, controlKeys, threshold)
     const payload: object = {
       result: {
         txID: utx,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -570,70 +571,76 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(utx)
   })
 
-  test('sampleValidators 1', async () => {
+  test('sampleValidators 1', async (): Promise<void> => {
     let subnetID
-    const validators = ['val1', 'val2']
-    const result: Promise<Array<string>> = api.sampleValidators(10, subnetID)
+    const validators: string[] = ['val1', 'val2']
+    const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
         validators,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(validators)
   })
 
-  test('sampleValidators 2', async () => {
-    const subnetID = 'abcdef'
-    const validators = ['val1', 'val2']
-    const result: Promise<Array<string>> = api.sampleValidators(10, subnetID)
+  test('sampleValidators 2', async (): Promise<void> => {
+    const subnetID: string = 'abcdef'
+    const validators: string[] = ['val1', 'val2']
+    const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
         validators,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(validators)
   })
 
-  test('sampleValidators 3', async () => {
+  test('sampleValidators 3', async (): Promise<void> => {
     const subnetID = Buffer.from('abcdef', 'hex')
-    const validators = ['val1', 'val2']
-    const result: Promise<Array<string>> = api.sampleValidators(10, subnetID)
+    const validators: string[] = ['val1', 'val2']
+    const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
         validators,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string[] = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(validators)
   })
 
-  test('validatedBy 1', async () => {
-    const blockchainID = 'abcdef'
-    const resp = 'valid'
+  test('validatedBy 1', async (): Promise<void> => {
+    const blockchainID: string = 'abcdef'
+    const resp: string = 'valid'
     const result: Promise<string> = api.validatedBy(blockchainID)
     const payload: object = {
       result: {
         subnetID: resp,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -644,67 +651,67 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe(resp)
   })
 
-  test('validates 1', async () => {
+  test('validates 1', async (): Promise<void> => {
     let subnetID
-    const resp = ['valid']
-    const result: Promise<Array<string>> = api.validates(subnetID)
+    const resp: string[] = ['valid']
+    const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
         blockchainIDs: resp,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
   })
 
-  test('validates 2', async () => {
-    const subnetID = 'deadbeef'
-    const resp = ['valid']
-    const result: Promise<Array<string>> = api.validates(subnetID)
+  test('validates 2', async (): Promise<void> => {
+    const subnetID: string = 'deadbeef'
+    const resp: string[] = ['valid']
+    const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
         blockchainIDs: resp,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
   })
 
-  test('validates 3', async () => {
+  test('validates 3', async (): Promise<void> => {
     const subnetID = Buffer.from('abcdef', 'hex')
-    const resp = ['valid']
-    const result: Promise<Array<string>> = api.validates(subnetID)
+    const resp: string[] = ['valid']
+    const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
         blockchainIDs: resp,
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: Array<string> = await result
+    const response: string[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
   })
 
-  test('getTx', async () => {
+  test('getTx', async (): Promise<void> => {
     const txid: string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7'
 
     const result: Promise<string> = api.getTx(txid)
@@ -713,7 +720,7 @@ describe('PlatformVMAPI', () => {
         tx: 'sometx',
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -725,14 +732,14 @@ describe('PlatformVMAPI', () => {
   })
 
 
-  test('getTxStatus', async () => {
+  test('getTxStatus', async (): Promise<void> => {
     const txid: string = 'f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7'
 
     const result: Promise<string | { status: string, reason: string }> = api.getTxStatus(txid)
     const payload: object = {
       result: 'accepted'
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -743,7 +750,7 @@ describe('PlatformVMAPI', () => {
     expect(response).toBe('accepted')
   })
 
-  test('getUTXOs', async () => {
+  test('getUTXOs', async (): Promise<void> => {
     // Payment
     const OPUTXOstr1: string = bintools.cb58Encode(Buffer.from('000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d', 'hex'))
     const OPUTXOstr2: string = bintools.cb58Encode(Buffer.from('0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e', 'hex'))
@@ -755,7 +762,7 @@ describe('PlatformVMAPI', () => {
 
     const persistOpts: PersistanceOptions = new PersistanceOptions('test', true, 'union')
     expect(persistOpts.getMergeRule()).toBe('union')
-    let addresses: Array<string> = set.getAddresses().map((a) => api.addressFromBuffer(a))
+    let addresses: string[] = set.getAddresses().map((a): string => api.addressFromBuffer(a))
     let result: Promise<{
       numFetched: number,
       utxos: UTXOSet,
@@ -768,7 +775,7 @@ describe('PlatformVMAPI', () => {
         stopIndex: { address: "a", utxo: "b" }
       },
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 
@@ -789,34 +796,33 @@ describe('PlatformVMAPI', () => {
   })
 
 
-  describe('Transactions', () => {
+  describe('Transactions', (): void => {
     let set: UTXOSet
     let lset: UTXOSet
     let keymgr2: KeyChain
     let keymgr3: KeyChain
-    let addrs1: Array<string>
-    let addrs2: Array<string>
-    let addrs3: Array<string>
-    let addressbuffs: Array<Buffer> = []
-    let addresses: Array<string> = []
-    let utxos: Array<UTXO>
-    let lutxos: Array<UTXO>
-    let inputs: Array<TransferableInput>
-    let outputs: Array<TransferableOutput>
+    let addrs1: string[]
+    let addrs2: string[]
+    let addrs3: string[]
+    let addressbuffs: Buffer[] = []
+    let addresses: string[] = []
+    let utxos: UTXO[]
+    let lutxos: UTXO[]
+    let inputs: TransferableInput[]
+    let outputs: TransferableOutput[]
     const amnt: number = 10000
     const assetID: Buffer = Buffer.from(createHash('sha256').update('mary had a little lamb').digest())
-    const NFTassetID: Buffer = Buffer.from(createHash('sha256').update("I can't stand it, I know you planned it, I'mma set straight this Watergate.'").digest())
     let secpbase1: SECPTransferOutput
     let secpbase2: SECPTransferOutput
     let secpbase3: SECPTransferOutput
-    let fungutxoids: Array<string> = []
+    let fungutxoids: string[] = []
     let platformvm: PlatformVMAPI
     const fee: number = 10
     const name: string = 'Mortycoin is the dumb as a sack of hammers.'
     const symbol: string = 'morT'
     const denomination: number = 8
 
-    beforeEach(async () => {
+    beforeEach(async (): Promise<void> => {
       platformvm = new PlatformVMAPI(avalanche, "/ext/bc/P")
       const result: Promise<Buffer> = platformvm.getAVAXAssetID()
       const payload: object = {
@@ -827,7 +833,7 @@ describe('PlatformVMAPI', () => {
           denomination: `${denomination}`,
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
 
@@ -900,30 +906,28 @@ describe('PlatformVMAPI', () => {
       lset.addArray(lutxos)
       lset.addArray(set.getAllUTXOs())
 
-
       secpbase1 = new SECPTransferOutput(new BN(777), addrs3.map((a) => platformvm.parseAddress(a)), UnixNow(), 1)
       secpbase2 = new SECPTransferOutput(new BN(888), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1)
       secpbase3 = new SECPTransferOutput(new BN(999), addrs2.map((a) => platformvm.parseAddress(a)), UnixNow(), 1)
-
     })
 
-    test('signTx', async () => {
-      const assetID = await platformvm.getAVAXAssetID()
+    test('signTx', async (): Promise<void> => {
+      const assetID: Buffer = await platformvm.getAVAXAssetID()
       const txu2: UnsignedTx = set.buildBaseTx(
-        networkid, bintools.cb58Decode(blockchainid), new BN(amnt), assetID,
-        addrs3.map((a) => platformvm.parseAddress(a)),
-        addrs1.map((a) => platformvm.parseAddress(a)),
-        addrs1.map((a) => platformvm.parseAddress(a)),
+        networkID, bintools.cb58Decode(blockchainID), new BN(amnt), assetID,
+        addrs3.map((a): Buffer => platformvm.parseAddress(a)),
+        addrs1.map((a): Buffer => platformvm.parseAddress(a)),
+        addrs1.map((a): Buffer => platformvm.parseAddress(a)),
         platformvm.getTxFee(), assetID,
         undefined, UnixNow(), new BN(0), 1,
       )
 
-      const tx2: Tx = txu2.sign(platformvm.keyChain())
+      txu2.sign(platformvm.keyChain())
     })
 
-    test('buildImportTx', async () => {
-      let locktime: BN = new BN(0)
-      let threshold: number = 1
+    test('buildImportTx', async (): Promise<void> => {
+      const locktime: BN = new BN(0)
+      const threshold: number = 1
       platformvm.setTxFee(new BN(fee))
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
@@ -939,7 +943,7 @@ describe('PlatformVMAPI', () => {
           utxos: [fungutxostr]
         },
       }
-      const responseObj = {
+      const responseObj: HttpResponse = {
         data: payload,
       }
 
@@ -947,7 +951,7 @@ describe('PlatformVMAPI', () => {
       const txu1: UnsignedTx = await result
 
       const txu2: UnsignedTx = set.buildImportTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff3, addrbuff1, addrbuff2, [fungutxo], bintools.cb58Decode(PlatformChainID), platformvm.getTxFee(), await platformvm.getAVAXAssetID(),
         new UTF8Payload("hello world").getPayload(), UnixNow(), locktime, threshold
       )
@@ -955,49 +959,50 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
       serialzeit(tx1, "ImportTx")
     })
 
-    test('buildExportTx', async () => {
+    test('buildExportTx', async (): Promise<void> => {
 
       platformvm.setTxFee(new BN(fee))
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
       const amount: BN = new BN(90)
+      const type: SerializedType = "bech32"
       const txu1: UnsignedTx = await platformvm.buildExportTx(
         set,
         amount,
         bintools.cb58Decode(Defaults.network[avalanche.getNetworkID()].X["blockchainID"]),
-        addrbuff3.map((a) => bintools.addressToString(avalanche.getHRP(), "P", a)),
+        addrbuff3.map((a) => serializer.bufferToType(a, type, avalanche.getHRP(), "P")),
         addrs1,
         addrs2,
         new UTF8Payload("hello world"), UnixNow()
       )
 
       const txu2: UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         amount,
         assetID,
         addrbuff3,
@@ -1019,7 +1024,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu4: UnsignedTx = set.buildExportTx(
-        networkid, bintools.cb58Decode(blockchainid), amount,
+        networkID, bintools.cb58Decode(blockchainID), amount,
         assetID, addrbuff3, addrbuff1, addrbuff2, undefined, platformvm.getTxFee(), assetID,
         new UTF8Payload("hello world").getPayload(), UnixNow()
       )
@@ -1027,28 +1032,27 @@ describe('PlatformVMAPI', () => {
       expect(txu4.toBuffer().toString('hex')).toBe(txu3.toBuffer().toString('hex'))
       expect(txu4.toString()).toBe(txu3.toString())
 
-
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1056,7 +1060,7 @@ describe('PlatformVMAPI', () => {
 
     })
     /*
-        test('buildAddSubnetValidatorTx', async () => {
+        test('buildAddSubnetValidatorTx', async (): Promise<void> => {
           platformvm.setFee(new BN(fee));
           const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
           const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
@@ -1075,7 +1079,7 @@ describe('PlatformVMAPI', () => {
           );
     
           const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
-            networkid, bintools.cb58Decode(blockchainid), 
+            networkID, bintools.cb58Decode(blockchainID),
             addrbuff1,         
             addrbuff2, 
             NodeIDStringToBuffer(nodeID), 
@@ -1091,16 +1095,16 @@ describe('PlatformVMAPI', () => {
     
         });
     */
-    test('buildAddDelegatorTx 1', async () => {
+    test('buildAddDelegatorTx 1', async (): Promise<void> => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkid]["P"].minDelegationStake
+      const amount: BN = Defaults.network[networkID]["P"].minDelegationStake
 
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(Defaults.network[networkID]["P"].minStake, Defaults.network[networkID]["P"].minDelegationStake)
 
       const txu1: UnsignedTx = await platformvm.buildAddDelegatorTx(
         set,
@@ -1118,7 +1122,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu2: UnsignedTx = set.buildAddDelegatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1137,32 +1141,31 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
       serialzeit(tx1, "AddDelegatorTx")
-
     })
 
-    test('buildAddValidatorTx sort StakeableLockOuts 1', async () => {
+    test('buildAddValidatorTx sort StakeableLockOuts 1', async (): Promise<void> => {
       // two UTXO. The 1st has a lesser stakeablelocktime and a greater amount of AVAX. The 2nd has a greater stakeablelocktime and a lesser amount of AVAX.
       // We expect this test to only consume the 2nd UTXO since it has the greater locktime.
       const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a))
@@ -1180,8 +1183,8 @@ describe('PlatformVMAPI', () => {
       const parseableOutput2: ParseableOutput = new ParseableOutput(secpTransferOutput2)
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2)
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
-      const stakeAmount: BN = Defaults.network[networkid]["P"].minStake
-      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake)
+      const stakeAmount: BN = Defaults.network[networkID]["P"].minStake
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkID]["P"].minDelegationStake)
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
       const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib')
@@ -1207,21 +1210,21 @@ describe('PlatformVMAPI', () => {
         addrs3,
         delegationFeeRate
       )
-      let tx = txu1.getTransaction() as AddValidatorTx
-      let ins: TransferableInput[] = tx.getIns()
+      const tx = txu1.getTransaction() as AddValidatorTx
+      const ins: TransferableInput[] = tx.getIns()
       // start test inputs
       // confirm only 1 input
       expect(ins.length).toBe(1)
-      let input: TransferableInput = ins[0]
-      let ai = input.getInput() as AmountInput
-      let ao = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput
-      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput
+      const input: TransferableInput = ins[0]
+      const ai = input.getInput() as AmountInput
+      const ao = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput
+      const ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput
       // confirm input amount matches the output w/ the greater staekablelock time but lesser amount
       expect(ai.getAmount().toString()).toEqual(ao.getAmount().toString())
       // confirm input amount doesn't match the output w/ the lesser staekablelock time but greater amount
       expect(ai.getAmount().toString()).not.toEqual(ao2.getAmount().toString())
 
-      let sli = input.getInput() as StakeableLockIn
+      const sli: StakeableLockIn = input.getInput() as StakeableLockIn
       // confirm input stakeablelock time matches the output w/ the greater stakeablelock time but lesser amount 
       expect(sli.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
       // confirm input stakeablelock time doesn't match the output w/ the lesser stakeablelock time but greater amount
@@ -1229,17 +1232,17 @@ describe('PlatformVMAPI', () => {
       // stop test inputs
 
       // start test outputs
-      let outs: TransferableOutput[] = tx.getOuts()
+      const outs: TransferableOutput[] = tx.getOuts()
       // confirm only 1 output
       expect(outs.length).toBe(1)
-      let output: TransferableOutput = outs[0]
-      let ao3 = output.getOutput() as AmountOutput
+      const output: TransferableOutput = outs[0]
+      const ao3 = output.getOutput() as AmountOutput
       // confirm output amount matches the output w/ the greater stakeablelock time but lesser amount sans the stake amount
       expect(ao3.getAmount().toString()).toEqual(ao.getAmount().sub(stakeAmount).toString())
       // confirm output amount doesn't match the output w/ the lesser stakeablelock time but greater amount
       expect(ao3.getAmount().toString()).not.toEqual(ao2.getAmount().toString())
 
-      let slo = output.getOutput() as StakeableLockOut
+      const slo: StakeableLockOut = output.getOutput() as StakeableLockOut
       // confirm output stakeablelock time matches the output w/ the greater stakeablelock time but lesser amount 
       expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
       // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time but lesser amount 
@@ -1254,12 +1257,12 @@ describe('PlatformVMAPI', () => {
       // confirm tx stake amount matches stakeAmount
       expect(tx.getStakeAmount().toString()).toEqual(stakeAmount.toString())
 
-      let stakeOuts: TransferableOutput[] = tx.getStakeOuts()
+      const stakeOuts: TransferableOutput[] = tx.getStakeOuts()
       // confirm only 1 stakeOut
       expect(stakeOuts.length).toBe(1)
 
-      let stakeOut: TransferableOutput = stakeOuts[0]
-      let slo2 = stakeOut.getOutput() as StakeableLockOut
+      const stakeOut: TransferableOutput = stakeOuts[0]
+      const slo2 = stakeOut.getOutput() as StakeableLockOut
       // confirm stakeOut stakeablelock time matches the output w/ the greater stakeablelock time but lesser amount 
       expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
       // confirm stakeOut stakeablelock time doesn't match the output w/ the greater stakeablelock time but lesser amount 
@@ -1269,12 +1272,11 @@ describe('PlatformVMAPI', () => {
       expect(slo2.getAmount().toString()).toEqual(stakeAmount.toString())
     })
 
-    test('buildAddValidatorTx sort StakeableLockOuts 2', async () => {
-
+    test('buildAddValidatorTx sort StakeableLockOuts 2', async (): Promise<void> => {
       // two UTXO. The 1st has a lesser stakeablelocktime and a greater amount of AVAX. The 2nd has a greater stakeablelocktime and a lesser amount of AVAX.
       // this time we're staking a greater amount than is available in the 2nd UTXO.
       // We expect this test to consume the full 2nd UTXO and a fraction of the 1st UTXO..
-      const addrbuff1: Buffer[] = addrs1.map((a) => platformvm.parseAddress(a))
+      const addrbuff1: Buffer[] = addrs1.map((a): Buffer => platformvm.parseAddress(a))
       const amount1: BN = new BN('20000000000000000')
       const amount2: BN = new BN('10000000000000000')
       const locktime1: BN = new BN(0)
@@ -1290,15 +1292,15 @@ describe('PlatformVMAPI', () => {
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2)
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
       const stakeAmount: BN = new BN('10000003000000000')
-      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkID]["P"].minDelegationStake)
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
       const txid: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib')
       const txid2: Buffer = bintools.cb58Decode('2JwDfm3C7p88rJQ1Y1xWLkWNMA1nqPzqnaC2Hi4PDNKiPnXgGv')
       const outputidx0: number = 0
       const outputidx1: number = 0
-      const assetID = await platformvm.getAVAXAssetID()
-      const assetID2 = await platformvm.getAVAXAssetID()
+      const assetID: Buffer = await platformvm.getAVAXAssetID()
+      const assetID2: Buffer = await platformvm.getAVAXAssetID()
       const utxo1: UTXO = new UTXO(codecID, txid, outputidx0, assetID, stakeableLockOut1)
       const utxo2: UTXO = new UTXO(codecID, txid2, outputidx1, assetID2, stakeableLockOut2)
       const utxoSet: UTXOSet = new UTXOSet()
@@ -1316,38 +1318,38 @@ describe('PlatformVMAPI', () => {
         addrs3,
         delegationFeeRate
       )
-      let tx = txu1.getTransaction() as AddValidatorTx
-      let ins: TransferableInput[] = tx.getIns()
+      const tx = txu1.getTransaction() as AddValidatorTx
+      const ins: TransferableInput[] = tx.getIns()
       // start test inputs
       // confirm only 1 input
       expect(ins.length).toBe(2)
-      let input1: TransferableInput = ins[0]
-      let input2: TransferableInput = ins[1]
-      let ai1 = input1.getInput() as AmountInput
-      let ai2 = input2.getInput() as AmountInput
-      let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput
-      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput
+      const input1: TransferableInput = ins[0]
+      const input2: TransferableInput = ins[1]
+      const ai1 = input1.getInput() as AmountInput
+      const ai2 = input2.getInput() as AmountInput
+      const ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput
+      const ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput
       // confirm each input amount matches the corresponding output 
       expect(ai2.getAmount().toString()).toEqual(ao1.getAmount().toString())
       expect(ai1.getAmount().toString()).toEqual(ao2.getAmount().toString())
 
-      let sli1 = input1.getInput() as StakeableLockIn
-      let sli2 = input2.getInput() as StakeableLockIn
+      const sli1 = input1.getInput() as StakeableLockIn
+      const sli2 = input2.getInput() as StakeableLockIn
       // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
       expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString())
       expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
       // stop test inputs
 
       // start test outputs
-      let outs: TransferableOutput[] = tx.getOuts()
+      const outs: TransferableOutput[] = tx.getOuts()
       // confirm only 1 output
       expect(outs.length).toBe(1)
-      let output: TransferableOutput = outs[0]
-      let ao3 = output.getOutput() as AmountOutput
+      const output: TransferableOutput = outs[0]
+      const ao3 = output.getOutput() as AmountOutput
       // confirm output amount matches the output amount sans the 2nd utxo amount and the stake amount
       expect(ao3.getAmount().toString()).toEqual(ao2.getAmount().sub(stakeAmount.sub(ao1.getAmount())).toString())
 
-      let slo = output.getOutput() as StakeableLockOut
+      const slo = output.getOutput() as StakeableLockOut
       // confirm output stakeablelock time matches the output w/ the lesser stakeablelock since the other was consumed
       expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString())
       // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time  
@@ -1375,7 +1377,7 @@ describe('PlatformVMAPI', () => {
       expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
     })
 
-    test('buildAddValidatorTx sort StakeableLockOuts 3', async () => {
+    test('buildAddValidatorTx sort StakeableLockOuts 3', async (): Promise<void> => {
       // three UTXO. 
       // The 1st is a SecpTransferableOutput. 
       // The 2nd has a lesser stakeablelocktime and a greater amount of AVAX. 
@@ -1400,7 +1402,7 @@ describe('PlatformVMAPI', () => {
       const stakeableLockOut2: StakeableLockOut = new StakeableLockOut(amount2, addrbuff1, locktime1, threshold, stakeableLockTime2, parseableOutput2)
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
       const stakeAmount: BN = new BN('10000003000000000')
-      platformvm.setMinStake(stakeAmount, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(stakeAmount, Defaults.network[networkID]["P"].minDelegationStake)
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
       const txid0: Buffer = bintools.cb58Decode('auhMFs24ffc2BRWKw6i7Qngcs8jSQUS9Ei2XwJsUpEq4sTVib')
@@ -1408,8 +1410,8 @@ describe('PlatformVMAPI', () => {
       const txid2: Buffer = bintools.cb58Decode('2JwDfm3C7p88rJQ1Y1xWLkWNMA1nqPzqnaC2Hi4PDNKiPnXgGv')
       const outputidx0: number = 0
       const outputidx1: number = 0
-      const assetID = await platformvm.getAVAXAssetID()
-      const assetID2 = await platformvm.getAVAXAssetID()
+      const assetID: Buffer = await platformvm.getAVAXAssetID()
+      const assetID2: Buffer = await platformvm.getAVAXAssetID()
       const utxo0: UTXO = new UTXO(codecID, txid0, outputidx0, assetID, secpTransferOutput0)
       const utxo1: UTXO = new UTXO(codecID, txid1, outputidx0, assetID, stakeableLockOut1)
       const utxo2: UTXO = new UTXO(codecID, txid2, outputidx1, assetID2, stakeableLockOut2)
@@ -1429,38 +1431,38 @@ describe('PlatformVMAPI', () => {
         addrs3,
         delegationFeeRate
       )
-      let tx = txu1.getTransaction() as AddValidatorTx
-      let ins: TransferableInput[] = tx.getIns()
+      const tx = txu1.getTransaction() as AddValidatorTx
+      const ins: TransferableInput[] = tx.getIns()
       // start test inputs
       // confirm only 1 input
       expect(ins.length).toBe(2)
-      let input1: TransferableInput = ins[0]
-      let input2: TransferableInput = ins[1]
-      let ai1 = input1.getInput() as AmountInput
-      let ai2 = input2.getInput() as AmountInput
-      let ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput
-      let ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput
+      const input1: TransferableInput = ins[0]
+      const input2: TransferableInput = ins[1]
+      const ai1 = input1.getInput() as AmountInput
+      const ai2 = input2.getInput() as AmountInput
+      const ao1 = stakeableLockOut2.getTransferableOutput().getOutput() as AmountOutput
+      const ao2 = stakeableLockOut1.getTransferableOutput().getOutput() as AmountOutput
       // confirm each input amount matches the corresponding output 
       expect(ai2.getAmount().toString()).toEqual(ao2.getAmount().toString())
       expect(ai1.getAmount().toString()).toEqual(ao1.getAmount().toString())
 
-      let sli1 = input1.getInput() as StakeableLockIn
-      let sli2 = input2.getInput() as StakeableLockIn
+      const sli1 = input1.getInput() as StakeableLockIn
+      const sli2 = input2.getInput() as StakeableLockIn
       // confirm input strakeablelock time matches the output w/ the greater staekablelock time but lesser amount 
       expect(sli1.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
       expect(sli2.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString())
       // stop test inputs
 
       // start test outputs
-      let outs: TransferableOutput[] = tx.getOuts()
+      const outs: TransferableOutput[] = tx.getOuts()
       // confirm only 1 output
       expect(outs.length).toBe(1)
-      let output: TransferableOutput = outs[0]
-      let ao3 = output.getOutput() as AmountOutput
+      const output: TransferableOutput = outs[0]
+      const ao3 = output.getOutput() as AmountOutput
       // confirm output amount matches the output amount sans the 2nd utxo amount and the stake amount
       expect(ao3.getAmount().toString()).toEqual(ao2.getAmount().sub(stakeAmount.sub(ao1.getAmount())).toString())
 
-      let slo = output.getOutput() as StakeableLockOut
+      const slo = output.getOutput() as StakeableLockOut
       // confirm output stakeablelock time matches the output w/ the lesser stakeablelock since the other was consumed
       expect(slo.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString())
       // confirm output stakeablelock time doesn't match the output w/ the greater stakeablelock time  
@@ -1475,29 +1477,29 @@ describe('PlatformVMAPI', () => {
       // confirm tx stake amount matches stakeAmount
       expect(tx.getStakeAmount().toString()).toEqual(stakeAmount.toString())
 
-      let stakeOuts: TransferableOutput[] = tx.getStakeOuts()
+      const stakeOuts: TransferableOutput[] = tx.getStakeOuts()
       // confirm 2 stakeOuts
       expect(stakeOuts.length).toBe(2)
 
-      let stakeOut1: TransferableOutput = stakeOuts[0]
-      let stakeOut2: TransferableOutput = stakeOuts[1]
-      let slo2 = stakeOut1.getOutput() as StakeableLockOut
-      let slo3 = stakeOut2.getOutput() as StakeableLockOut
+      const stakeOut1: TransferableOutput = stakeOuts[0]
+      const stakeOut2: TransferableOutput = stakeOuts[1]
+      const slo2 = stakeOut1.getOutput() as StakeableLockOut
+      const slo3 = stakeOut2.getOutput() as StakeableLockOut
       // confirm both stakeOut strakeablelock times matche the corresponding output  
       expect(slo3.getStakeableLocktime().toString()).toEqual(stakeableLockOut1.getStakeableLocktime().toString())
       expect(slo2.getStakeableLocktime().toString()).toEqual(stakeableLockOut2.getStakeableLocktime().toString())
     })
 
-    test('buildAddValidatorTx 1', async () => {
+    test('buildAddValidatorTx 1', async (): Promise<void> => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkid]["P"].minStake.add(new BN(fee))
+      const amount: BN = Defaults.network[networkID]["P"].minStake.add(new BN(fee))
 
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(Defaults.network[networkID]["P"].minStake, Defaults.network[networkID]["P"].minDelegationStake)
 
       const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
         set,
@@ -1516,7 +1518,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu2: UnsignedTx = set.buildAddValidatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1536,24 +1538,24 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1561,16 +1563,15 @@ describe('PlatformVMAPI', () => {
 
     })
 
-    test('buildAddDelegatorTx 2', async () => {
+    test('buildAddDelegatorTx 2', async (): Promise<void> => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkid]["P"].minDelegationStake
-
+      const amount: BN = Defaults.network[networkID]["P"].minDelegationStake
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
-      platformvm.setMinStake(Defaults.network[networkid]["P"].minStake, Defaults.network[networkid]["P"].minDelegationStake)
+      platformvm.setMinStake(Defaults.network[networkID]["P"].minStake, Defaults.network[networkID]["P"].minDelegationStake)
 
       const txu1: UnsignedTx = await platformvm.buildAddDelegatorTx(
         lset,
@@ -1588,7 +1589,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu2: UnsignedTx = lset.buildAddDelegatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1607,24 +1608,24 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1632,7 +1633,7 @@ describe('PlatformVMAPI', () => {
 
     })
 
-    test('buildAddValidatorTx 2', async () => {
+    test('buildAddValidatorTx 2', async (): Promise<void> => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
@@ -1660,7 +1661,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu2: UnsignedTx = lset.buildAddValidatorTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         assetID,
         addrbuff3,
         addrbuff1,
@@ -1680,24 +1681,24 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1705,7 +1706,7 @@ describe('PlatformVMAPI', () => {
 
     })
 
-    test('buildAddValidatorTx 3', async () => {
+    test('buildAddValidatorTx 3', async (): Promise<void> => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
@@ -1718,23 +1719,23 @@ describe('PlatformVMAPI', () => {
 
       //2 utxos; one lockedstakeable; other unlocked; both utxos have 2 avax; stake 3 AVAX
 
-      let dummySet: UTXOSet = new UTXOSet()
+      const dummySet: UTXOSet = new UTXOSet()
 
-      let lockedBaseOut: SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1)
-      let lockedBaseXOut: ParseableOutput = new ParseableOutput(lockedBaseOut)
-      let lockedOut: StakeableLockOut = new StakeableLockOut(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1, locktime, lockedBaseXOut)
+      const lockedBaseOut: SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1)
+      const lockedBaseXOut: ParseableOutput = new ParseableOutput(lockedBaseOut)
+      const lockedOut: StakeableLockOut = new StakeableLockOut(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1, locktime, lockedBaseXOut)
 
-      let txidLocked: Buffer = Buffer.alloc(32)
+      const txidLocked: Buffer = Buffer.alloc(32)
       txidLocked.fill(1)
-      let txidxLocked: Buffer = Buffer.alloc(4)
+      const txidxLocked: Buffer = Buffer.alloc(4)
       txidxLocked.writeUInt32BE(1, 0)
       const lu: UTXO = new UTXO(0, txidLocked, txidxLocked, assetID, lockedOut)
 
-      let txidUnlocked: Buffer = Buffer.alloc(32)
+      const txidUnlocked: Buffer = Buffer.alloc(32)
       txidUnlocked.fill(2)
-      let txidxUnlocked: Buffer = Buffer.alloc(4)
+      const txidxUnlocked: Buffer = Buffer.alloc(4)
       txidxUnlocked.writeUInt32BE(2, 0)
-      let unlockedOut: SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1)
+      const unlockedOut: SECPTransferOutput = new SECPTransferOutput(ONEAVAX.mul(new BN(2)), addrbuff1, locktime, 1)
       const ulu: UTXO = new UTXO(0, txidUnlocked, txidxUnlocked, assetID, unlockedOut)
 
       dummySet.add(ulu)
@@ -1756,32 +1757,32 @@ describe('PlatformVMAPI', () => {
         new UTF8Payload("hello world"), UnixNow()
       )
 
-      let txu1Ins = (txu1.getTransaction() as AddValidatorTx).getIns()
-      let txu1Outs = (txu1.getTransaction() as AddValidatorTx).getOuts()
-      let txu1Stake = (txu1.getTransaction() as AddValidatorTx).getStakeOuts()
-      let txu1Total = (txu1.getTransaction() as AddValidatorTx).getTotalOuts()
+      const txu1Ins: TransferableInput[] = (txu1.getTransaction() as AddValidatorTx).getIns()
+      const txu1Outs: TransferableOutput[] = (txu1.getTransaction() as AddValidatorTx).getOuts()
+      const txu1Stake: TransferableOutput[] = (txu1.getTransaction() as AddValidatorTx).getStakeOuts()
+      const txu1Total: TransferableOutput[] = (txu1.getTransaction() as AddValidatorTx).getTotalOuts()
 
       let intotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Ins.length; i++) {
+      for (let i: number = 0; i < txu1Ins.length; i++) {
         intotal = intotal.add((txu1Ins[i].getInput() as AmountInput).getAmount())
       }
 
       let outtotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Outs.length; i++) {
+      for (let i: number = 0; i < txu1Outs.length; i++) {
         outtotal = outtotal.add((txu1Outs[i].getOutput() as AmountOutput).getAmount())
       }
 
       let staketotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Stake.length; i++) {
+      for (let i: number = 0; i < txu1Stake.length; i++) {
         staketotal = staketotal.add((txu1Stake[i].getOutput() as AmountOutput).getAmount())
       }
 
       let totaltotal: BN = new BN(0)
 
-      for (let i = 0; i < txu1Total.length; i++) {
+      for (let i: number = 0; i < txu1Total.length; i++) {
         totaltotal = totaltotal.add((txu1Total[i].getOutput() as AmountOutput).getAmount())
       }
 
@@ -1792,11 +1793,11 @@ describe('PlatformVMAPI', () => {
 
     })
 
-    test('buildCreateSubnetTx1', async () => {
+    test('buildCreateSubnetTx1', async (): Promise<void> => {
       platformvm.setCreationTxFee(new BN(10))
-      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
-      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
-      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
+      const addrbuff1: Buffer[] = addrs1.map((a): Buffer => platformvm.parseAddress(a))
+      const addrbuff2: Buffer[] = addrs2.map((a): Buffer => platformvm.parseAddress(a))
+      const addrbuff3: Buffer[] = addrs3.map((a): Buffer => platformvm.parseAddress(a))
 
       const txu1: UnsignedTx = await platformvm.buildCreateSubnetTx(
         set,
@@ -1808,7 +1809,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu2: UnsignedTx = set.buildCreateSubnetTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
         addrbuff3,
@@ -1820,24 +1821,24 @@ describe('PlatformVMAPI', () => {
       expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'))
       expect(txu2.toString()).toBe(txu1.toString())
 
-      let tx1: Tx = txu1.sign(platformvm.keyChain())
-      let checkTx: string = tx1.toBuffer().toString("hex")
-      let tx1obj: object = tx1.serialize("hex")
-      let tx1str: string = JSON.stringify(tx1obj)
+      const tx1: Tx = txu1.sign(platformvm.keyChain())
+      const checkTx: string = tx1.toBuffer().toString("hex")
+      const tx1obj: object = tx1.serialize("hex")
+      const tx1str: string = JSON.stringify(tx1obj)
 
-      let tx2newobj: object = JSON.parse(tx1str)
-      let tx2: Tx = new Tx()
+      const tx2newobj: object = JSON.parse(tx1str)
+      const tx2: Tx = new Tx()
       tx2.deserialize(tx2newobj, "hex")
 
       expect(tx2.toBuffer().toString("hex")).toBe(checkTx)
 
-      let tx3: Tx = txu1.sign(platformvm.keyChain())
-      let tx3obj: object = tx3.serialize("display")
-      let tx3str: string = JSON.stringify(tx3obj)
+      const tx3: Tx = txu1.sign(platformvm.keyChain())
+      const tx3obj: object = tx3.serialize(display)
+      const tx3str: string = JSON.stringify(tx3obj)
 
-      let tx4newobj: object = JSON.parse(tx3str)
-      let tx4: Tx = new Tx()
-      tx4.deserialize(tx4newobj, "display")
+      const tx4newobj: object = JSON.parse(tx3str)
+      const tx4: Tx = new Tx()
+      tx4.deserialize(tx4newobj, display)
 
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
 
@@ -1845,7 +1846,7 @@ describe('PlatformVMAPI', () => {
 
     })
 
-    test('buildCreateSubnetTx 2', async () => {
+    test('buildCreateSubnetTx 2', async (): Promise<void> => {
       platformvm.setCreationTxFee(new BN(10))
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
@@ -1861,7 +1862,7 @@ describe('PlatformVMAPI', () => {
       )
 
       const txu2: UnsignedTx = lset.buildCreateSubnetTx(
-        networkid, bintools.cb58Decode(blockchainid),
+        networkID, bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
         addrbuff3,
@@ -1876,13 +1877,13 @@ describe('PlatformVMAPI', () => {
     })
   })
 
-  test('getRewardUTXOs', async () => {
+  test('getRewardUTXOs', async (): Promise<void> => {
     const txID: string = '7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh'
     const result: Promise<GetRewardUTXOsResponse> = api.getRewardUTXOs(txID)
     const payload: object = {
       result: { numFetched: '0', utxos: [], encoding: 'cb58' }
     }
-    const responseObj = {
+    const responseObj: HttpResponse = {
       data: payload,
     }
 

@@ -60,13 +60,13 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
    }
  
    fromBuffer(bytes: Buffer, offset: number = 0):number {
-     this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
+     this.codecID = bintools.copyFrom(bytes, offset, offset + 2);
      offset += 2;
      this.txid = bintools.copyFrom(bytes, offset, offset + 32);
      offset += 32;
      this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
      offset += 4;
-     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
+     this.assetID = bintools.copyFrom(bytes, offset, offset + 32);
      offset += 32;
      const outputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
      offset += 4;

@@ -17,8 +17,8 @@ import { ChainIdError, TransferableOutputError } from '../../utils/errors';
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance();
 
 /**
  * Class representing an unsigned Export transaction.
@@ -31,13 +31,13 @@ export class ExportTx extends BaseTx {
     let fields:object = super.serialize(encoding);
     return {
       ...fields,
-      "destinationChain": serializer.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
+      "destinationChain": serialization.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
       "exportOuts": this.exportOuts.map((e) => e.serialize(encoding))
     }
   };
   deserialize(fields:object, encoding:SerializedEncoding = "hex") {
     super.deserialize(fields, encoding);
-    this.destinationChain = serializer.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
+    this.destinationChain = serialization.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32);
     this.exportOuts = fields["exportOuts"].map((e:object) => {
       let eo:TransferableOutput = new TransferableOutput();
       eo.deserialize(e, encoding);
@@ -49,7 +49,7 @@ export class ExportTx extends BaseTx {
 
   protected destinationChain:Buffer = Buffer.alloc(32);
   protected numOuts:Buffer = Buffer.alloc(4);
-  protected exportOuts:Array<TransferableOutput> = [];
+  protected exportOuts: TransferableOutput[] = [];
 
   /**
    * Returns the id of the [[ExportTx]]
@@ -61,7 +61,7 @@ export class ExportTx extends BaseTx {
   /**
    * Returns an array of [[TransferableOutput]]s in this transaction.
    */
-  getExportOutputs():Array<TransferableOutput> {
+  getExportOutputs(): TransferableOutput[] {
     return this.exportOuts;
   }
 
@@ -70,14 +70,14 @@ export class ExportTx extends BaseTx {
    */
   getExportTotal():BN {
     let val:BN = new BN(0);
-    for(let i = 0; i < this.exportOuts.length; i++){
+    for(let i: number = 0; i < this.exportOuts.length; i++){
       val = val.add((this.exportOuts[i].getOutput() as AmountOutput).getAmount());
     }
     return val;
   }
 
-  getTotalOuts():Array<TransferableOutput> {
-    return [...this.getOuts() as Array<TransferableOutput>, ...this.getExportOutputs()];
+  getTotalOuts(): TransferableOutput[] {
+    return [...this.getOuts() as TransferableOutput[], ...this.getExportOutputs()];
   }
 
   /**
@@ -112,9 +112,9 @@ export class ExportTx extends BaseTx {
       throw new ChainIdError("ExportTx.toBuffer -- this.destinationChain is undefined");
     }
     this.numOuts.writeUInt32BE(this.exportOuts.length, 0);
-    let barr:Array<Buffer> = [super.toBuffer(), this.destinationChain, this.numOuts];
+    let barr: Buffer[] = [super.toBuffer(), this.destinationChain, this.numOuts];
     this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator());
-    for(let i = 0; i < this.exportOuts.length; i++) {
+    for(let i: number = 0; i < this.exportOuts.length; i++) {
         barr.push(this.exportOuts[i].toBuffer());
     }
     return Buffer.concat(barr);
@@ -133,8 +133,8 @@ export class ExportTx extends BaseTx {
   /**
    * Class representing an unsigned Export transaction.
    *
-   * @param networkid Optional networkid, [[DefaultNetworkID]]
-   * @param blockchainid Optional blockchainid, default Buffer.alloc(32, 16)
+   * @param networkID Optional networkID, [[DefaultNetworkID]]
+   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
@@ -142,14 +142,14 @@ export class ExportTx extends BaseTx {
    * @param exportOuts Array of [[TransferableOutputs]]s used in the transaction
    */
   constructor(
-    networkid:number = DefaultNetworkID, blockchainid:Buffer = Buffer.alloc(32, 16), 
-    outs:Array<TransferableOutput> = undefined, ins:Array<TransferableInput> = undefined,
-    memo:Buffer = undefined, destinationChain:Buffer = undefined, exportOuts:Array<TransferableOutput> = undefined
+    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined, destinationChain: Buffer = undefined, exportOuts: TransferableOutput[] = undefined
   ) {
-    super(networkid, blockchainid, outs, ins, memo);
+    super(networkID, blockchainID, outs, ins, memo);
     this.destinationChain = destinationChain; //do not correct, it should bomb on toBuffer if not provided
     if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
-      for (let i = 0; i < exportOuts.length; i++) {
+      for (let i: number = 0; i < exportOuts.length; i++) {
         if (!(exportOuts[i] instanceof TransferableOutput)) {
           throw new TransferableOutputError("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'");
         }

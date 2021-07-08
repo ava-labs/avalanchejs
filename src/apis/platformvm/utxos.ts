@@ -30,8 +30,8 @@ import { UTXOError,
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance();
-const serializer = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for representing a single UTXO.
@@ -49,13 +49,13 @@ export class UTXO extends StandardUTXO {
   }
 
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.codecid = bintools.copyFrom(bytes, offset, offset + 2);
+    this.codecID = bintools.copyFrom(bytes, offset, offset + 2);
     offset += 2;
     this.txid = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
+    this.assetID = bintools.copyFrom(bytes, offset, offset + 32);
     offset += 32;
     const outputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;
@@ -99,9 +99,9 @@ export class UTXO extends StandardUTXO {
     codecID: number = PlatformVMConstants.LATESTCODEC,
     txid: Buffer = undefined,
     outputidx: Buffer | number = undefined,
-    assetid: Buffer = undefined,
+    assetID: Buffer = undefined,
     output: Output = undefined): this {
-    return new UTXO(codecID, txid, outputidx, assetid, output) as this;
+    return new UTXO(codecID, txid, outputidx, assetID, output) as this;
   }
 
 }
@@ -121,17 +121,17 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     super.deserialize(fields, encoding);
     let utxos = {};
     for (let utxoid in fields["utxos"]) {
-      let utxoidCleaned: string = serializer.decoder(utxoid, encoding, "base58", "base58");
+      let utxoidCleaned: string = serialization.decoder(utxoid, encoding, "base58", "base58");
       utxos[utxoidCleaned] = new UTXO();
       utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding);
     }
     let addressUTXOs = {};
     for (let address in fields["addressUTXOs"]) {
-      let addressCleaned: string = serializer.decoder(address, encoding, "cb58", "hex");
+      let addressCleaned: string = serialization.decoder(address, encoding, "cb58", "hex");
       let utxobalance = {};
       for (let utxoid in fields["addressUTXOs"][address]) {
-        let utxoidCleaned: string = serializer.decoder(utxoid, encoding, "base58", "base58");
-        utxobalance[utxoidCleaned] = serializer.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
+        let utxoidCleaned: string = serialization.decoder(utxoid, encoding, "base58", "base58")
+        utxobalance[utxoidCleaned] = serialization.decoder(fields["addressUTXOs"][address][utxoid], encoding, "decimalString", "BN");
       }
       addressUTXOs[addressCleaned] = utxobalance;
     }
@@ -159,7 +159,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
   clone(): this {
     const newset: UTXOSet = this.create();
-    const allUTXOs: Array<UTXO> = this.getAllUTXOs();
+    const allUTXOs: UTXO[] = this.getAllUTXOs();
     newset.addArray(allUTXOs)
     return newset as this;
   }
@@ -301,7 +301,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       // TODO: getSpenders should return an array of indices rather than an
       // array of addresses.
-      const spenders: Array<Buffer> = amountOutput.getSpenders(fromAddresses, asOf);
+      const spenders: Buffer[] = amountOutput.getSpenders(fromAddresses, asOf);
       spenders.forEach((spender: Buffer) => {
         const idx: number = amountOutput.getAddressIdx(spender);
         if (idx === -1) {
@@ -342,7 +342,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     // assetAmounts is an array of asset descriptions and how much is left to
     // spend for them.
-    const assetAmounts: Array<AssetAmount> = aad.getAmounts();
+    const assetAmounts: AssetAmount[] = aad.getAmounts();
     assetAmounts.forEach((assetAmount: AssetAmount) => {
       // change is the amount that should be returned back to the source of the
       // funds.
@@ -355,7 +355,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
       const assetID: Buffer = assetAmount.getAssetID();
       const assetKey: string = assetAmount.getAssetIDString();
-      const lockedOutputs: Array<StakeableLockOut> = outs[assetKey].lockedStakeable;
+      const lockedOutputs: StakeableLockOut[] = outs[assetKey].lockedStakeable;
       lockedOutputs.forEach((lockedOutput: StakeableLockOut, i: number) => {
         const stakeableLocktime: BN = lockedOutput.getStakeableLocktime();
         const parseableOutput: ParseableOutput = lockedOutput.getTransferableOutput();
@@ -463,8 +463,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
    * Creates an [[UnsignedTx]] wrapping a [[BaseTx]]. For more granular control, you may create your own
    * [[UnsignedTx]] wrapping a [[BaseTx]] manually (with their corresponding [[TransferableInput]]s and [[TransferableOutput]]s).
    *
-   * @param networkid The number representing NetworkID of the node
-   * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+   * @param networkID The number representing NetworkID of the node
+   * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
    * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
    * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
    * @param toAddresses The addresses to send the funds
@@ -481,13 +481,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
    *
    */
   buildBaseTx = (
-    networkid: number,
-    blockchainid: Buffer,
+    networkID: number,
+    blockchainID: Buffer,
     amount: BN,
     assetID: Buffer,
-    toAddresses: Array<Buffer>,
-    fromAddresses: Array<Buffer>,
-    changeAddresses: Array<Buffer> = undefined,
+    toAddresses: Buffer[],
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[] = undefined,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
@@ -525,8 +525,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    let ins: Array<TransferableInput> = [];
-    let outs: Array<TransferableOutput> = [];
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = [];
 
     const minSpendableErr: Error = this.getMinimumSpendable(aad, asOf, locktime, threshold);
     if (typeof minSpendableErr === "undefined") {
@@ -536,7 +536,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw minSpendableErr;
     }
 
-    const baseTx: BaseTx = new BaseTx(networkid, blockchainid, outs, ins, memo);
+    const baseTx: BaseTx = new BaseTx(networkID, blockchainID, outs, ins, memo);
     return new UnsignedTx(baseTx);
 
   };
@@ -544,8 +544,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   /**
     * Creates an unsigned ImportTx transaction.
     *
-    * @param networkid The number representing NetworkID of the node
-    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+    * @param networkID The number representing NetworkID of the node
+    * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param toAddresses The addresses to send the funds
     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
     * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
@@ -561,12 +561,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     *
     */
   buildImportTx = (
-    networkid: number,
-    blockchainid: Buffer,
-    toAddresses: Array<Buffer>,
-    fromAddresses: Array<Buffer>,
-    changeAddresses: Array<Buffer>,
-    atomics: Array<UTXO>,
+    networkID: number,
+    blockchainID: Buffer,
+    toAddresses: Buffer[],
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
+    atomics: UTXO[],
     sourceChain: Buffer = undefined,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
@@ -576,13 +576,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     threshold: number = 1
   ): UnsignedTx => {
     const zero: BN = new BN(0);
-    let ins: Array<TransferableInput> = [];
-    let outs: Array<TransferableOutput> = [];
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = [];
     if (typeof fee === "undefined") {
       fee = zero.clone();
     }
 
-    const importIns: Array<TransferableInput> = [];
+    const importIns: TransferableInput[] = [];
     let feepaid: BN = new BN(0);
     let feeAssetStr: string = feeAssetID.toString("hex");
     for (let i: number = 0; i < atomics.length; i++) {
@@ -612,9 +612,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       const outputidx: Buffer = utxo.getOutputIdx();
       const input: SECPTransferInput = new SECPTransferInput(amt);
       const xferin: TransferableInput = new TransferableInput(txid, outputidx, assetID, input);
-      const from: Array<Buffer> = output.getAddresses();
-      const spenders: Array<Buffer> = output.getSpenders(from, asOf);
-      for (let j = 0; j < spenders.length; j++) {
+      const from: Buffer[] = output.getAddresses()
+      const spenders: Buffer[] = output.getSpenders(from, asOf);
+      for (let j: number = 0; j < spenders.length; j++) {
         const idx: number = output.getAddressIdx(spenders[j]);
         if (idx === -1) {
           /* istanbul ignore next */
@@ -647,15 +647,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
 
-    const importTx: ImportTx = new ImportTx(networkid, blockchainid, outs, ins, memo, sourceChain, importIns);
+    const importTx: ImportTx = new ImportTx(networkID, blockchainID, outs, ins, memo, sourceChain, importIns);
     return new UnsignedTx(importTx);
   };
 
   /**
     * Creates an unsigned ExportTx transaction. 
     *
-    * @param networkid The number representing NetworkID of the node
-    * @param blockchainid The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
+    * @param networkID The number representing NetworkID of the node
+    * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
     * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
     * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
     * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
@@ -673,13 +673,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     *
     */
   buildExportTx = (
-    networkid: number,
-    blockchainid: Buffer,
+    networkID: number,
+    blockchainID: Buffer,
     amount: BN,
     avaxAssetID: Buffer, // TODO: rename this to amountAssetID
-    toAddresses: Array<Buffer>,
-    fromAddresses: Array<Buffer>,
-    changeAddresses: Array<Buffer> = undefined,
+    toAddresses: Buffer[],
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[] = undefined,
     destinationChain: Buffer = undefined,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
@@ -688,9 +688,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     locktime: BN = new BN(0),
     threshold: number = 1,
   ): UnsignedTx => {
-    let ins: Array<TransferableInput> = [];
-    let outs: Array<TransferableOutput> = [];
-    let exportouts: Array<TransferableOutput> = [];
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+    let exportouts: TransferableOutput[] = [];
 
     if (typeof changeAddresses === "undefined") {
       changeAddresses = toAddresses;
@@ -711,7 +711,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     if (typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(Defaults.network[networkid].X["blockchainID"]);
+      destinationChain = bintools.cb58Decode(Defaults.network[networkID].X["blockchainID"]);
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(toAddresses, fromAddresses, changeAddresses);
@@ -733,7 +733,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       throw minSpendableErr;
     }
 
-    const exportTx: ExportTx = new ExportTx(networkid, blockchainid, outs, ins, memo, destinationChain, exportouts);
+    const exportTx: ExportTx = new ExportTx(networkID, blockchainID, outs, ins, memo, destinationChain, exportouts);
 
     return new UnsignedTx(exportTx);
   };
@@ -742,8 +742,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   /**
   * Class representing an unsigned [[AddSubnetValidatorTx]] transaction.
   *
-  * @param networkid Networkid, [[DefaultNetworkID]]
-  * @param blockchainid Blockchainid, default undefined
+  * @param networkID Networkid, [[DefaultNetworkID]]
+  * @param blockchainID Blockchainid, default undefined
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
   * @param nodeID The node ID of the validator being added.
@@ -762,10 +762,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
   /* must implement later once the transaction format signing process is clearer
   buildAddSubnetValidatorTx = (
-    networkid:number = DefaultNetworkID, 
-    blockchainid:Buffer,
-    fromAddresses:Array<Buffer>,
-    changeAddresses:Array<Buffer>,
+    networkID:number = DefaultNetworkID,
+    blockchainID:Buffer,
+    fromAddresses:Buffer[],
+    changeAddresses:Buffer[],
     nodeID:Buffer, 
     startTime:BN, 
     endTime:BN,
@@ -775,9 +775,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     memo:Buffer = undefined, 
     asOf:BN = UnixNow()
   ):UnsignedTx => {
-    let ins:Array<TransferableInput> = [];
-    let outs:Array<TransferableOutput> = [];
-    //let stakeOuts:Array<TransferableOutput> = [];
+    let ins:TransferableInput[] = [];
+    let outs:TransferableOutput[] = [];
+    //let stakeOuts:TransferableOutput[] = [];
     
     const zero:BN = new BN(0);
     const now:BN = UnixNow();
@@ -798,7 +798,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
       }
     }
    
-    const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, weight);
+    const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight);
     return new UnsignedTx(UTx);
   }
   */
@@ -806,8 +806,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   /**
   * Class representing an unsigned [[AddDelegatorTx]] transaction.
   *
-  * @param networkid Networkid, [[DefaultNetworkID]]
-  * @param blockchainid Blockchainid, default undefined
+  * @param networkID Networkid, [[DefaultNetworkID]]
+  * @param blockchainID Blockchainid, default undefined
   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
@@ -827,27 +827,27 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
   * @returns An unsigned transaction created from the passed in parameters.
   */
   buildAddDelegatorTx = (
-    networkid: number = DefaultNetworkID,
-    blockchainid: Buffer,
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
     avaxAssetID: Buffer,
-    toAddresses: Array<Buffer>,
-    fromAddresses: Array<Buffer>,
-    changeAddresses: Array<Buffer>,
+    toAddresses: Buffer[],
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
     nodeID: Buffer,
     startTime: BN,
     endTime: BN,
     stakeAmount: BN,
     rewardLocktime: BN,
     rewardThreshold: number,
-    rewardAddresses: Array<Buffer>,
+    rewardAddresses: Buffer[],
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
     asOf: BN = UnixNow(),
   ): UnsignedTx => {
-    let ins: Array<TransferableInput> = [];
-    let outs: Array<TransferableOutput> = [];
-    let stakeOuts: Array<TransferableOutput> = [];
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+    let stakeOuts: TransferableOutput[] = [];
 
     const zero: BN = new BN(0);
     const now: BN = UnixNow();
@@ -876,15 +876,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     const rewardOutputOwners: SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
 
-    const UTx: AddDelegatorTx = new AddDelegatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners));
+    const UTx: AddDelegatorTx = new AddDelegatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners));
     return new UnsignedTx(UTx);
   }
 
   /**
     * Class representing an unsigned [[AddValidatorTx]] transaction.
     *
-    * @param networkid Networkid, [[DefaultNetworkID]]
-    * @param blockchainid Blockchainid, default undefined
+    * @param networkID NetworkID, [[DefaultNetworkID]]
+    * @param blockchainID BlockchainID, default undefined
     * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
     * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
     * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
@@ -906,28 +906,28 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @returns An unsigned transaction created from the passed in parameters.
     */
   buildAddValidatorTx = (
-    networkid: number = DefaultNetworkID,
-    blockchainid: Buffer,
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
     avaxAssetID: Buffer,
-    toAddresses: Array<Buffer>,
-    fromAddresses: Array<Buffer>,
-    changeAddresses: Array<Buffer>,
+    toAddresses: Buffer[],
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
     nodeID: Buffer,
     startTime: BN,
     endTime: BN,
     stakeAmount: BN,
     rewardLocktime: BN,
     rewardThreshold: number,
-    rewardAddresses: Array<Buffer>,
+    rewardAddresses: Buffer[],
     delegationFee: number,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
     asOf: BN = UnixNow(),
   ): UnsignedTx => {
-    let ins: Array<TransferableInput> = [];
-    let outs: Array<TransferableOutput> = [];
-    let stakeOuts: Array<TransferableOutput> = [];
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+    let stakeOuts: TransferableOutput[] = [];
 
     const zero: BN = new BN(0);
     const now: BN = UnixNow();
@@ -960,15 +960,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
 
     const rewardOutputOwners: SECPOwnerOutput = new SECPOwnerOutput(rewardAddresses, rewardLocktime, rewardThreshold);
 
-    const UTx: AddValidatorTx = new AddValidatorTx(networkid, blockchainid, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners), delegationFee);
+    const UTx: AddValidatorTx = new AddValidatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, stakeAmount, stakeOuts, new ParseableOutput(rewardOutputOwners), delegationFee);
     return new UnsignedTx(UTx);
   }
 
   /**
     * Class representing an unsigned [[CreateSubnetTx]] transaction.
     *
-    * @param networkid Networkid, [[DefaultNetworkID]]
-    * @param blockchainid Blockchainid, default undefined
+    * @param networkID Networkid, [[DefaultNetworkID]]
+    * @param blockchainID Blockchainid, default undefined
     * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
     * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
     * @param subnetOwnerAddresses An array of {@link https://github.com/feross/buffer|Buffer} for the addresses to add to a subnet
@@ -981,11 +981,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     * @returns An unsigned transaction created from the passed in parameters.
     */
   buildCreateSubnetTx = (
-    networkid: number = DefaultNetworkID,
-    blockchainid: Buffer,
-    fromAddresses: Array<Buffer>,
-    changeAddresses: Array<Buffer>,
-    subnetOwnerAddresses: Array<Buffer>,
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
+    subnetOwnerAddresses: Buffer[],
     subnetOwnerThreshold: number,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
@@ -993,8 +993,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     asOf: BN = UnixNow(),
   ): UnsignedTx => {
     const zero: BN = new BN(0);
-    let ins: Array<TransferableInput> = [];
-    let outs: Array<TransferableOutput> = [];
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = [];
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
@@ -1009,7 +1009,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO>{
     }
 
     const locktime: BN = new BN(0)
-    const UTx: CreateSubnetTx = new CreateSubnetTx(networkid, blockchainid, outs, ins, memo, new SECPOwnerOutput(subnetOwnerAddresses, locktime, subnetOwnerThreshold));
+    const UTx: CreateSubnetTx = new CreateSubnetTx(networkID, blockchainID, outs, ins, memo, new SECPOwnerOutput(subnetOwnerAddresses, locktime, subnetOwnerThreshold));
     return new UnsignedTx(UTx);
   }
 

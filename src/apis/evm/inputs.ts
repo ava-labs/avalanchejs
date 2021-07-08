@@ -60,7 +60,7 @@ export class TransferableInput extends StandardTransferableInput {
     offset += 32;
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
     offset += 4;
-    this.assetid = bintools.copyFrom(bytes, offset, offset + EVMConstants.ASSETIDLEN);
+    this.assetID = bintools.copyFrom(bytes, offset, offset + EVMConstants.ASSETIDLEN);
     offset += 32;
     const inputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
     offset += 4;

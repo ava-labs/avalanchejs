@@ -52,7 +52,7 @@ export function privateKeyStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("PrivateKey-")) {
     throw new PrivateKeyError("Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'");
   }
-  let pksplit:Array<string> = pk.split("-");
+  let pksplit: string[] = pk.split("-");
   return bintools.cb58Decode(pksplit[pksplit.length - 1]);
 }
 
@@ -74,6 +74,6 @@ export function NodeIDStringToBuffer(pk:string):Buffer {
   if(!pk.startsWith("NodeID-")) {
     throw new NodeIdError("Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'");
   }
-  let pksplit:Array<string> = pk.split("-");
+  let pksplit: string[] = pk.split("-");
   return bintools.cb58Decode(pksplit[pksplit.length - 1]);
 }

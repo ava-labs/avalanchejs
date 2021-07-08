@@ -328,8 +328,8 @@ const utxos = u.utxos
 The `buildBaseTx()` helper function sends a single asset type. We have a particular assetID whose coins we want to send to a recipient address. This is an imaginary asset for this example which we believe to have 400 coins. Let's verify that we have the funds available for the transaction.
 
 ```js
-const assetid = "8pfG5CTyL5KBVaKrEnCvNJR95dUWAKc1hrffcVxfgi8qGhqjm"; // cb58 string
-const mybalance = utxos.getBalance(myAddresses, assetid); // returns 400 as a BN
+const assetID = "8pfG5CTyL5KBVaKrEnCvNJR95dUWAKc1hrffcVxfgi8qGhqjm"; // cb58 string
+const mybalance = utxos.getBalance(myAddresses, assetID); // returns 400 as a BN
 ```
 
 We have 400 coins! We're going to now send 100 of those coins to our friend's address.
@@ -346,7 +346,7 @@ const friendsAddress = "X-avax1k26jvfdzyukms95puxcceyzsa3lzwf5ftt0fjk"; // addre
 //   * An array of addresses sending the funds
 //   * An array of addresses any leftover funds are sent
 //   * The AssetID of the funds being sent
-const unsignedTx = await xchain.buildBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetid);
+const unsignedTx = await xchain.buildBaseTx(utxos, sendAmount, [friendsAddress], addressStrings, addressStrings, assetID);
 const signedTx = xchain.signTx(unsignedTx);
 const txid = await xchain.issueTx(signedTx);
 ```
@@ -378,7 +378,7 @@ The transaction finally came back as "Accepted", now let's update the UTXOSet an
 ```js
 const updatedU = await xchain.getUTXOs();
 const updatedUTXOs = updatedU.utxos;
-const newBalance = updatedUTXOs.getBalance(myAddresses, assetid);
+const newBalance = updatedUTXOs.getBalance(myAddresses, assetID);
 if(newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()){
   throw Error("heyyy these should equal!");
 }
