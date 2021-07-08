@@ -53,7 +53,7 @@ export class UTXO extends StandardUTXO {
     offset += 32
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
-    this.assetid = bintools.copyFrom(bytes, offset, offset + 32)
+    this.assetID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
     const outputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
     offset += 4
@@ -97,10 +97,10 @@ export class UTXO extends StandardUTXO {
     codecID: number = AVMConstants.LATESTCODEC,
     txid: Buffer = undefined,
     outputidx: Buffer | number = undefined,
-    assetid: Buffer = undefined,
+    assetID: Buffer = undefined,
     output: Output = undefined): this
   {
-    return new UTXO(codecID, txid, outputidx, assetid, output) as this
+    return new UTXO(codecID, txid, outputidx, assetID, output) as this
   }
 
 }

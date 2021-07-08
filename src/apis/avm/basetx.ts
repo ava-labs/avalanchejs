@@ -2,25 +2,28 @@
  * @packageDocumentation
  * @module API-AVM-BaseTx
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { TransferableOutput } from './outputs'
-import { TransferableInput } from './inputs'
-import { SelectCredentialClass } from './credentials'
-import { KeyChain, KeyPair } from './keychain'
-import { StandardBaseTx } from '../../common/tx'
-import { Signature, SigIdx, Credential } from '../../common/credentials'
-import { DefaultNetworkID } from '../../utils/constants'
-import { SelectTxClass } from './tx'
-import { Serialization, SerializedEncoding } from '../../utils/serialization'
-import { CodecIdError } from '../../utils/errors'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { TransferableOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
+import { SelectCredentialClass } from "./credentials"
+import { KeyChain, KeyPair } from "./keychain"
+import { StandardBaseTx } from "../../common/tx"
+import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { DefaultNetworkID } from "../../utils/constants"
+import { SelectTxClass } from "./tx"
+import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import { CodecIdError } from "../../utils/errors"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const decimalString: SerializedType = "decimalString"
+const buffer: SerializedType = "Buffer"
+const display: SerializedEncoding = "display"
 
 /**
  * Class representing a base for all transactions.
@@ -44,8 +47,8 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
       newIn.deserialize(i, encoding)
       return newIn
     })
-    this.numouts = serialization.decoder(this.outs.length.toString(), "display", "decimalString", "Buffer", 4)
-    this.numins = serialization.decoder(this.ins.length.toString(), "display", "decimalString", "Buffer", 4)
+    this.numouts = serialization.decoder(this.outs.length.toString(), display, decimalString, buffer, 4)
+    this.numins = serialization.decoder(this.ins.length.toString(), display, decimalString, buffer, 4)
   }
 
   getOuts(): TransferableOutput[] {
@@ -60,6 +63,11 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
     return this.getOuts() as TransferableOutput[]
   }
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -85,7 +93,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
    *
    * @remarks assume not-checksummed
    */
-  fromBuffer(bytes:Buffer, offset:number = 0):number {
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.networkID = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
     this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32)

@@ -66,7 +66,7 @@ import { UTXOError, AddressError, InsufficientFundsError, FeeAssetError } from '
      offset += 32;
      this.outputidx = bintools.copyFrom(bytes, offset, offset + 4);
      offset += 4;
-     this.assetid = bintools.copyFrom(bytes, offset, offset + 32);
+     this.assetID = bintools.copyFrom(bytes, offset, offset + 32);
      offset += 32;
      const outputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
      offset += 4;

@@ -2,19 +2,19 @@
  * @packageDocumentation
  * @module API-AVM-OperationTx
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { TransferableOutput } from './outputs'
-import { TransferableInput } from './inputs'
-import { TransferableOperation } from './ops'
-import { SelectCredentialClass } from './credentials'
-import { KeyChain, KeyPair } from './keychain'
-import { Signature, SigIdx, Credential } from '../../common/credentials'
-import { BaseTx } from './basetx'
-import { DefaultNetworkID } from '../../utils/constants'
-import { SerializedEncoding } from '../../utils/serialization'
-import { CodecIdError, OperationError } from '../../utils/errors'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { TransferableOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
+import { TransferableOperation } from "./ops"
+import { SelectCredentialClass } from "./credentials"
+import { KeyChain, KeyPair } from "./keychain"
+import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { BaseTx } from "./basetx"
+import { DefaultNetworkID } from "../../utils/constants"
+import { SerializedEncoding } from "../../utils/serialization"
+import { CodecIdError, OperationError } from "../../utils/errors"
 
 /**
  * @ignore
@@ -33,7 +33,7 @@ export class OperationTx extends BaseTx {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "ops": this.ops.map((o) => o.serialize(encoding))
+      ops: this.ops.map((o) => o.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -159,10 +159,10 @@ export class OperationTx extends BaseTx {
     memo: Buffer = undefined, ops: TransferableOperation[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
-    if (typeof ops !== 'undefined' && Array.isArray(ops)) {
+    if (typeof ops !== "undefined" && Array.isArray(ops)) {
       for (let i: number = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {
-          throw new OperationError("Error - OperationTx.constructor: invalid op in array parameter 'ops'")
+          throw new OperationError(`Error - OperationTx.constructor: invalid op in array parameter ${ops}`)
         }
       }
       this.ops = ops

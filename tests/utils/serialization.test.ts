@@ -1,9 +1,9 @@
-import BN from 'bn.js'
-import { Buffer } from 'buffer/'
-import { BaseTx, CreateAssetTx, ExportTx, GenesisAsset, ImportTx, InitialStates, MinterSet, NFTCredential, NFTMintOperation, NFTMintOutput, NFTTransferOperation, NFTTransferOutput, OperationTx, SECPCredential, SECPMintOperation, SECPMintOutput, SECPTransferInput, SECPTransferOutput, TransferableInput, TransferableOperation, TransferableOutput, Tx, UnsignedTx, UTXO, UTXOID, UTXOSet } from 'src/apis/avm'
-import { Address, Serialized, Signature } from 'src/common'
-import { Defaults, Serialization, SerializedEncoding, SerializedType } from '../../src/utils'
-import { getPreferredHRP } from '../../src/utils'
+import BN from "bn.js"
+import { Buffer } from "buffer/"
+import { BaseTx, CreateAssetTx, ExportTx, GenesisAsset, ImportTx, InitialStates, MinterSet, NFTCredential, NFTMintOperation, NFTMintOutput, NFTTransferOperation, NFTTransferOutput, OperationTx, SECPCredential, SECPMintOperation, SECPMintOutput, SECPTransferInput, SECPTransferOutput, TransferableInput, TransferableOperation, TransferableOutput, Tx, UnsignedTx, UTXO, UTXOID, UTXOSet } from "src/apis/avm"
+import { Address, Serialized, Signature } from "src/common"
+import { DefaultNetworkID, Defaults, Serialization, SerializedEncoding, SerializedType } from "../../src/utils"
+import { getPreferredHRP } from "../../src/utils"
 
 const serialization: Serialization = Serialization.getInstance()
 
@@ -180,7 +180,7 @@ describe("Serialization", (): void => {
     test("Buffer", (): void => {
       const str: string = serialization.encoder(denomination, encoding, "Buffer", "decimalString", 1)
       const decoded: Buffer = serialization.decoder(str, encoding, "decimalString", "Buffer", 1)
-      expect(denomination.toString('hex')).toBe(decoded.toString('hex'))
+      expect(denomination.toString("hex")).toBe(decoded.toString("hex"))
     })
   })
 
@@ -193,45 +193,47 @@ describe("Serialization", (): void => {
     const cChainIDHex: string = "9d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19"
     const hex: SerializedEncoding = "hex"
     const cb58: SerializedEncoding = "cb58"
+    const utf8: SerializedType = "utf8"
     const amount: BN = new BN(0)
     const amountHex: string = "0000000000000000"
-    const bytes: string = '0000000000000000000000000000000000000000'
+    const bytes: string = "0000000000000000000000000000000000000000"
     const xAddress: string = "X-avax1pdurs53v6vtue9sw7am9ayjqh9mcnqe9s80sgn"
-    const xAddressHex: string = '0b7838522cd317cc960ef7765e9240b977898325'
+    const xAddressHex: string = "0b7838522cd317cc960ef7765e9240b977898325"
     const address: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
     const bech32: SerializedType = "bech32"
     const addressBuf: Buffer = serialization.typeToBuffer(address, bech32)
     const threshold: number = 1
-    const thresholdHex: string = '00000001'
+    const thresholdHex: string = "00000001"
     const minters: string[] = [xAddress]
-    const assetid: Buffer = serialization.typeToBuffer(cChainID, cb58)
+    const assetID: Buffer = serialization.typeToBuffer(cChainID, cb58)
     const assetidHex: string = "9d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19"
     const payload: Buffer = Buffer.from("From snowflake to Avalanche")
     const groupIDHex: string = "00003039"
     const payloadHex: string = "46726f6d20736e6f77666c616b6520746f204176616c616e636865"
     const locktime: BN = new BN(0)
-    const locktimeHex: string = '0000000000000000'
+    const locktimeHex: string = "0000000000000000"
 
     describe("AVM", (): void => {
       const blockchainIDCB58: Buffer = serialization.typeToBuffer(Defaults.network[12345]["X"].blockchainID, cb58)
       const blockchainIDHex: string = "d891ad56056d9c01f18f43f58b5c784ad07a4a49cf3d1f11623804b5cba2c6bf"
-      const networkIDHex: string = "00003039"
+      const defaultNetworkIDHex: string = "00000001"
+      const localNetworkIDHex: string = "00003039"
       const outs: TransferableOutput[] = []
       const ins: TransferableInput[] = []
       const vm: string = "AVM"
       const groupID: number = 12345
 
       test("GenesisAsset", (): void => {
-        console.log("2------------")
         const assetAlias: string = "asset1"
         const name: string = "asset1"
         const symbol: string = "MFCA"
+        const nameHex: string = serialization.encoder(name, hex, utf8, utf8)
+        const symbolHex: string = serialization.encoder(symbol, hex, utf8, utf8)
         const denomination: number = 1
         const vcapSecpOutput = new SECPTransferOutput(amount, [addressBuf], locktime, threshold)
-
         const initialStates: InitialStates = new InitialStates()
         initialStates.addOutput(vcapSecpOutput)
-        const genesisasset: GenesisAsset = new GenesisAsset(networkID, assetAlias, name, symbol, denomination, initialStates, memo)
+        const genesisasset: GenesisAsset = new GenesisAsset(assetAlias, name, symbol, denomination, initialStates, memo)
         const genesisasset2: GenesisAsset = new GenesisAsset()
         const notes: string = "AVM GenesisAsset"
         const serialized: Serialized = serialization.serialize(genesisasset, vm, hex, notes)
@@ -241,20 +243,27 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeName"]).toBe("GenesisAsset")
         expect(serialized.fields["_typeID"]).toBeNull()
         expect(serialized.fields["_codecID"]).toBeNull()
-        expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["networkID"]).toBe(defaultNetworkIDHex)
+        expect(serialized.fields["name"]).toBe(nameHex)
+        expect(serialized.fields["symbol"]).toBe(symbolHex)
+        expect(serialized.fields["denomination"]).toBe("01")
         expect(serialized.fields["memo"]).toBe(mHex)
 
-        // serialization.deserialize(serialized, genesisasset2)
-        // expect(genesisasset2.getTypeName()).toBe("BaseTx")
-        // expect(genesisasset2.getTypeID()).toBe(0)
-        // expect(genesisasset2.getCodecID()).toBe(0)
-        // expect(genesisasset2.getBlockchainID().toString(hex)).toBe(blockchainIDHex)
-        // expect(genesisasset2.getNetworkID()).toBe(networkID)
-        // expect(genesisasset2.getOuts()).toStrictEqual([])
-        // expect(genesisasset2.getIns()).toStrictEqual([])
-        // expect(serialization.bufferToType(genesisasset2.getMemo(), cb58)).toBe(m)
-        // expect(genesisasset2.toBuffer().toString(hex)).toBe(genesisasset2.toBuffer().toString(hex))
-        // expect(genesisasset2.toString()).toBe(genesisasset2.toString())
+        serialization.deserialize(serialized, genesisasset2)
+        expect(genesisasset2.getTypeName()).toBe("GenesisAsset")
+        expect(genesisasset2.getTypeID()).toBeUndefined()
+        expect(genesisasset2.getCodecID()).toBeUndefined()
+        expect(genesisasset2.getBlockchainID().toString(hex)).toBe("1010101010101010101010101010101010101010101010101010101010101010")
+        expect(genesisasset2.getNetworkID()).toBe(DefaultNetworkID)
+        expect(genesisasset2.getOuts()).toStrictEqual([])
+        expect(genesisasset2.getIns()).toStrictEqual([])
+        expect(genesisasset2.getAssetAlias()).toBe(assetAlias)
+        expect(genesisasset2.getName()).toBe(name)
+        expect(genesisasset2.getSymbol()).toBe(symbol)
+        expect(genesisasset2.getDenomination()).toBe(denomination)
+        expect(serialization.bufferToType(genesisasset2.getMemo(), cb58)).toBe(m)
+        expect(genesisasset2.toBuffer().toString(hex)).toBe(genesisasset.toBuffer().toString(hex))
+        expect(genesisasset2.toString()).toBe(genesisasset.toString())
       })
 
       test("BaseTx", (): void => {
@@ -269,7 +278,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeID"]).toBe(0)
         expect(serialized.fields["_codecID"]).toBe(0)
         expect(serialized.fields["blockchainID"]).toBe(blockchainIDHex)
-        expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["networkID"]).toBe(localNetworkIDHex)
         expect(serialized.fields["outs"]).toStrictEqual([])
         expect(serialized.fields["ins"]).toStrictEqual([])
         expect(serialized.fields["memo"]).toBe(mHex)
@@ -289,13 +298,13 @@ describe("Serialization", (): void => {
 
       test("CreateAssetTx", (): void => {
         const name: string = "Test Token"
-        const nameHex: string = '5465737420546f6b656e'
+        const nameHex: string = "5465737420546f6b656e"
         const symbol: string = "TEST"
-        const symbolHex: string = '54455354'
+        const symbolHex: string = "54455354"
         const denomination: number = 1
-        const denominationHex: string = '01'
-        const initialstate: InitialStates = new InitialStates()
-        const createassettx: CreateAssetTx = new CreateAssetTx(networkID, blockchainIDCB58, outs, ins, memo, name, symbol, denomination, initialstate)
+        const denominationHex: string = "01"
+        const initialState: InitialStates = new InitialStates()
+        const createassettx: CreateAssetTx = new CreateAssetTx(networkID, blockchainIDCB58, outs, ins, memo, name, symbol, denomination, initialState)
         const createassettx2: CreateAssetTx = new CreateAssetTx()
         const notes: string = "AVM CreateAssetTx"
         const serialized: Serialized = serialization.serialize(createassettx, vm, hex, notes)
@@ -306,7 +315,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeID"]).toBe(1)
         expect(serialized.fields["_codecID"]).toBe(0)
         expect(serialized.fields["blockchainID"]).toBe(blockchainIDHex)
-        expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["networkID"]).toBe(localNetworkIDHex)
         expect(serialized.fields["outs"]).toStrictEqual([])
         expect(serialized.fields["ins"]).toStrictEqual([])
         expect(serialized.fields["memo"]).toBe(mHex)
@@ -343,7 +352,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeID"]).toBe(2)
         expect(serialized.fields["_codecID"]).toBe(0)
         expect(serialized.fields["blockchainID"]).toBe(blockchainIDHex)
-        expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["networkID"]).toBe(localNetworkIDHex)
         expect(serialized.fields["outs"]).toStrictEqual([])
         expect(serialized.fields["ins"]).toStrictEqual([])
         expect(serialized.fields["memo"]).toBe(mHex)
@@ -377,7 +386,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeID"]).toBe(3)
         expect(serialized.fields["_codecID"]).toBe(0)
         expect(serialized.fields["blockchainID"]).toBe(blockchainIDHex)
-        expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["networkID"]).toBe(localNetworkIDHex)
         expect(serialized.fields["outs"]).toStrictEqual([])
         expect(serialized.fields["ins"]).toStrictEqual([])
         expect(serialized.fields["memo"]).toBe(mHex)
@@ -413,7 +422,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeID"]).toBe(4)
         expect(serialized.fields["_codecID"]).toBe(0)
         expect(serialized.fields["blockchainID"]).toBe(blockchainIDHex)
-        expect(serialized.fields["networkID"]).toBe(networkIDHex)
+        expect(serialized.fields["networkID"]).toBe(localNetworkIDHex)
         expect(serialized.fields["outs"]).toStrictEqual([])
         expect(serialized.fields["ins"]).toStrictEqual([])
         expect(serialized.fields["memo"]).toBe(mHex)
@@ -482,10 +491,10 @@ describe("Serialization", (): void => {
       })
 
       test("InitialStates", (): void => {
-        const initialstates: InitialStates = new InitialStates()
-        const initialstates2: InitialStates = new InitialStates()
+        const initialStates: InitialStates = new InitialStates()
+        const initialStates2: InitialStates = new InitialStates()
         const notes: string = "AVM InitialStates"
-        const serialized: Serialized = serialization.serialize(initialstates, vm, hex, notes)
+        const serialized: Serialized = serialization.serialize(initialStates, vm, hex, notes)
         expect(serialized.vm).toBe(vm)
         expect(serialized.encoding).toBe(hex)
         expect(serialized.notes).toBe(notes)
@@ -494,12 +503,12 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_codecID"]).toBeNull()
         expect(serialized.fields["fxs"]).toStrictEqual({})
 
-        serialization.deserialize(serialized, initialstates2)
-        expect(initialstates2.getTypeName()).toBe("InitialStates")
-        expect(initialstates2.getTypeID()).toBeUndefined()
-        expect(initialstates2.getCodecID()).toBeUndefined()
-        expect(initialstates2.toBuffer().toString(hex)).toBe(initialstates.toBuffer().toString(hex))
-        expect(initialstates2.toString()).toBe(initialstates.toString())
+        serialization.deserialize(serialized, initialStates2)
+        expect(initialStates2.getTypeName()).toBe("InitialStates")
+        expect(initialStates2.getTypeID()).toBeUndefined()
+        expect(initialStates2.getCodecID()).toBeUndefined()
+        expect(initialStates2.toBuffer().toString(hex)).toBe(initialStates.toBuffer().toString(hex))
+        expect(initialStates2.toString()).toBe(initialStates.toString())
       })
 
       test("SECPTransferInput", (): void => {
@@ -553,7 +562,7 @@ describe("Serialization", (): void => {
         const transferOutput: SECPTransferOutput = new SECPTransferOutput()
         const utxoids: string[] = []
         const secpmintoperation: SECPMintOperation = new SECPMintOperation(secpmintoutput, transferOutput)
-        const transferableoperation: TransferableOperation = new TransferableOperation(assetid, utxoids, secpmintoperation)
+        const transferableoperation: TransferableOperation = new TransferableOperation(assetID, utxoids, secpmintoperation)
         const transferableoperation2: TransferableOperation = new TransferableOperation()
         const notes: string = "AVM TransferableOperation"
         const serialized: Serialized = serialization.serialize(transferableoperation, vm, hex, notes)
@@ -563,14 +572,14 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_typeName"]).toBe("TransferableOperation")
         expect(serialized.fields["_typeID"]).toBeNull()
         expect(serialized.fields["_codecID"]).toBeNull()
-        expect(serialized.fields["assetid"]).toBe(assetidHex)
+        expect(serialized.fields["assetID"]).toBe(assetidHex)
         expect(serialized.fields["utxoIDs"]).toStrictEqual([])
 
         serialization.deserialize(serialized, transferableoperation2)
         expect(transferableoperation2.getTypeName()).toBe("TransferableOperation")
         expect(transferableoperation2.getTypeID()).toBeUndefined()
         expect(transferableoperation2.getCodecID()).toBeUndefined()
-        expect(transferableoperation2.getAssetID().toString(hex)).toBe(assetid.toString(hex))
+        expect(transferableoperation2.getAssetID().toString(hex)).toBe(assetID.toString(hex))
         expect(transferableoperation2.getUTXOIDs()).toStrictEqual([])
         expect(transferableoperation2.toBuffer().toString(hex)).toBe(transferableoperation.toBuffer().toString(hex))
         expect(transferableoperation2.toString()).toBe(transferableoperation.toString())
@@ -624,8 +633,8 @@ describe("Serialization", (): void => {
         // expect(nftmintoperation2.getCodecID()).toBe(0)
         // expect(nftmintoperation2.getSigIdxs()).toStrictEqual([])
         // expect(nftmintoperation2.getGroupID()).toBe(groupIDHex)
-        // expect(nftmintoperation2.getPayload().toString('hex')).toBe(payload.toString('hex'))
-        // expect(nftmintoperation2.toBuffer().toString('hex')).toBe(nftmintoperation.toBuffer().toString('hex'))
+        // expect(nftmintoperation2.getPayload().toString("hex")).toBe(payload.toString("hex"))
+        // expect(nftmintoperation2.toBuffer().toString("hex")).toBe(nftmintoperation.toBuffer().toString("hex"))
         // expect(nftmintoperation2.toString()).toBe(nftmintoperation.toString())
       })
 
@@ -683,7 +692,7 @@ describe("Serialization", (): void => {
 
       test("TransferableOutput", (): void => {
         const secpmintoutput: SECPMintOutput = new SECPMintOutput()
-        const transferableoutput: TransferableOutput = new TransferableOutput(assetid, secpmintoutput)
+        const transferableoutput: TransferableOutput = new TransferableOutput(assetID, secpmintoutput)
         const transferableoutput2: TransferableOutput = new TransferableOutput()
         const notes: string = "AVM TransferableOutput"
         const serialized: Serialized = serialization.serialize(transferableoutput, vm, hex, notes)
@@ -699,7 +708,7 @@ describe("Serialization", (): void => {
         expect(transferableoutput2.getTypeName()).toBe("TransferableOutput")
         expect(transferableoutput2.getTypeID()).toBeUndefined()
         expect(transferableoutput2.getCodecID()).toBeUndefined()
-        expect(transferableoutput2.getAssetID().toString(hex)).toBe(assetid.toString(hex))
+        expect(transferableoutput2.getAssetID().toString(hex)).toBe(assetID.toString(hex))
         expect(transferableoutput2.toBuffer().toString(hex)).toBe(transferableoutput.toBuffer().toString(hex))
         expect(transferableoutput2.toString()).toBe(transferableoutput.toString())
       })
@@ -883,7 +892,7 @@ describe("Serialization", (): void => {
         expect(serialized.fields["_codecID"]).toBeNull()
         expect(serialized.fields["txid"]).toBe(txidHex)
         expect(serialized.fields["outputidx"]).toBe(outputidxHex)
-        expect(serialized.fields["assetid"]).toBe(assetidHex)
+        expect(serialized.fields["assetID"]).toBe(assetidHex)
 
         serialization.deserialize(serialized, utxo2)
         expect(utxo2.getTypeName()).toBe("UTXO")
@@ -922,7 +931,7 @@ describe("Serialization", (): void => {
       })
 
       test("Address", (): void => {
-        const bsize: string = '00000014'
+        const bsize: string = "00000014"
         const address: Address = new Address()
         const address2: Address = new Address()
         const notes: string = "Address"

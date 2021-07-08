@@ -31,6 +31,11 @@ export class SECPCredential extends Credential {
 
   //serialize and deserialize both are inherited
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -68,6 +73,11 @@ export class NFTCredential extends Credential {
 
   //serialize and deserialize both are inherited
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */

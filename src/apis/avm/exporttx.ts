@@ -2,22 +2,24 @@
  * @packageDocumentation
  * @module API-AVM-ExportTx
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { TransferableOutput, AmountOutput } from './outputs'
-import { TransferableInput } from './inputs'
-import { BaseTx } from './basetx'
-import { DefaultNetworkID } from '../../utils/constants'
-import BN from 'bn.js'
-import { Serialization, SerializedEncoding } from '../../utils/serialization'
-import { CodecIdError, ChainIdError, TransferableOutputError } from '../../utils/errors'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { TransferableOutput, AmountOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
+import { BaseTx } from "./basetx"
+import { DefaultNetworkID } from "../../utils/constants"
+import BN from "bn.js"
+import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import { CodecIdError, ChainIdError, TransferableOutputError } from "../../utils/errors"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+const cb58: SerializedType = "cb58"
+const buffer: SerializedType = "Buffer"
 
 /**
  * Class representing an unsigned Export transaction.
@@ -31,14 +33,14 @@ export class ExportTx extends BaseTx {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "destinationChain": serialization.encoder(this.destinationChain, encoding, "Buffer", "cb58"),
-      "exportOuts": this.exportOuts.map((e) => e.serialize(encoding))
+      destinationChain: serialization.encoder(this.destinationChain, encoding, buffer, cb58),
+      exportOuts: this.exportOuts.map((e) => e.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.destinationChain = serialization.decoder(fields["destinationChain"], encoding, "cb58", "Buffer", 32)
-    this.exportOuts = fields["exportOuts"].map((e:object) => {
+    this.destinationChain = serialization.decoder(fields["destinationChain"], encoding, cb58, buffer, 32)
+    this.exportOuts = fields["exportOuts"].map((e: object): TransferableOutput => {
       let eo: TransferableOutput = new TransferableOutput()
       eo.deserialize(e, encoding)
       return eo
@@ -51,6 +53,11 @@ export class ExportTx extends BaseTx {
   protected numOuts: Buffer = Buffer.alloc(4)
   protected exportOuts: TransferableOutput[] = []
 
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void {
     if(codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
@@ -163,11 +170,11 @@ export class ExportTx extends BaseTx {
     memo: Buffer = undefined, destinationChain: Buffer = undefined, exportOuts: TransferableOutput[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
-    this.destinationChain = destinationChain // no correction, if they don't pass a chainid here, it will BOMB on toBuffer
-    if (typeof exportOuts !== 'undefined' && Array.isArray(exportOuts)) {
+    this.destinationChain = destinationChain // no correction, if they don"t pass a chainid here, it will BOMB on toBuffer
+    if (typeof exportOuts !== "undefined" && Array.isArray(exportOuts)) {
       for (let i: number = 0; i < exportOuts.length; i++) {
         if (!(exportOuts[i] instanceof TransferableOutput)) {
-          throw new TransferableOutputError("Error - ExportTx.constructor: invalid TransferableOutput in array parameter 'exportOuts'")
+          throw new TransferableOutputError(`Error - ExportTx.constructor: invalid TransferableOutput in array parameter ${exportOuts}`)
         }
       }
       this.exportOuts = exportOuts

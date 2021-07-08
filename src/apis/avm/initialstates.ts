@@ -1,22 +1,22 @@
 /**
- * @packageDocumentation
- * @module API-AVM-InitialStates
- */
+* @packageDocumentation
+* @module API-AVM-InitialStates
+*/
 
 import { Buffer } from "buffer/"
-import BinTools from '../../utils/bintools'
-import { Output } from '../../common/output'
-import { SelectOutputClass } from './outputs'
-import { AVMConstants } from './constants'
-import { Serializable, SerializedEncoding } from '../../utils/serialization'
+import BinTools from "../../utils/bintools"
+import { Output } from "../../common/output"
+import { SelectOutputClass } from "./outputs"
+import { AVMConstants } from "./constants"
+import { Serializable, SerializedEncoding } from "../../utils/serialization"
 /**
- * @ignore
- */
+* @ignore
+*/
 const bintools: BinTools = BinTools.getInstance()
 
 /**
- * Class for creating initial output states used in asset creation
- */
+* Class for creating initial output states used in asset creation
+*/
 export class InitialStates extends Serializable {
   protected _typeName = "InitialStates"
   protected _typeID = undefined
@@ -29,15 +29,15 @@ export class InitialStates extends Serializable {
     }
     return {
       ...fields,
-      "fxs": flatfxs
+      fxs: flatfxs
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    let unflat: { [fxid: number]: Output[] } = {}
+    const unflat: { [fxid: number]: Output[] } = {}
     for(let fxid in fields["fxs"]){
       unflat[fxid] = fields["fxs"][fxid].map((o:object) => {
-        let out: Output = SelectOutputClass(o["_typeID"])
+        const out: Output = SelectOutputClass(o["_typeID"])
         out.deserialize(o, encoding)
         return out
       })

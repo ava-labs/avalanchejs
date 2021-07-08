@@ -2,10 +2,10 @@
  * @packageDocumentation
  * @module Common-Signature
  */
-import { NBytes } from './nbytes'
-import { Buffer } from 'buffer/'
-import BinTools from '../utils/bintools'
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization'
+import { NBytes } from "./nbytes"
+import { Buffer } from "buffer/"
+import BinTools from "../utils/bintools"
+import { Serializable, Serialization, SerializedEncoding } from "../utils/serialization"
 
 
 /**
@@ -106,7 +106,7 @@ export abstract class Credential extends Serializable{
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "sigArray": this.sigArray.map((s) => s.serialize(encoding))
+      sigArray: this.sigArray.map((s) => s.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -121,6 +121,12 @@ export abstract class Credential extends Serializable{
   protected sigArray: Signature[] = []
 
   abstract getCredentialID(): number
+
+  /**
+  * Set the codecID
+  *
+  * @param codecID The codecID to set
+  */
   setCodecID(codecID: number): void { }
 
   /**
@@ -157,14 +163,11 @@ export abstract class Credential extends Serializable{
   }
 
   abstract clone(): this
-
   abstract create(...args: any[]): this
-
   abstract select(id: number, ...args: any[]): Credential
-
   constructor(sigarray: Signature[] = undefined) {
     super()
-    if (typeof sigarray !== 'undefined') {
+    if (typeof sigarray !== "undefined") {
       /* istanbul ignore next */
       this.sigArray = sigarray
     }
