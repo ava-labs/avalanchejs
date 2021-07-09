@@ -33,7 +33,7 @@ export class JRPCAPI extends APIBase {
       rpc.jsonrpc = this.jrpcVersion
     }
 
-    let headrs: object = { "Content-Type": "application/jsoncharset=UTF-8" }
+    let headrs: object = { "Content-Type": "application/json;charset=UTF-8" }
     if(headers) {
       headrs = { ...headrs, ...headers }
     }
