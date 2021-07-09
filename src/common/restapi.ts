@@ -129,7 +129,7 @@ export class RESTAPI extends APIBase {
   */
   constructor(core: AvalancheCore,
     baseurl: string,
-    contentType: string = "application/jsoncharset=UTF-8",
+    contentType: string = "application/json;charset=UTF-8",
     acceptType: string = undefined) {
     super(core, baseurl)
     this.contentType = contentType
