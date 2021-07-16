@@ -173,6 +173,26 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
     return sigs
   }
 
+  signPartially(msg: Buffer, kc: KeyChain, address: Buffer): Credential[] {
+    const sigs: Credential[] = []
+    for (let i: number = 0; i < this.ins.length; i++) {
+      const cred: Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID())
+      const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs()
+      for (let j: number = 0; j < sigidxs.length; j++) {
+        if (!address.equals(sigidxs[j].getSource())) {
+          continue;
+        }
+        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
+      }
+      sigs.push(cred)
+    }
+    return sigs
+  }
+
   clone(): this {
     let newbase: BaseTx = new BaseTx()
     newbase.fromBuffer(this.toBuffer())

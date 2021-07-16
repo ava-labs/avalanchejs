@@ -136,6 +136,8 @@ export abstract class Credential extends Serializable {
    */
   setCodecID(codecID: number): void {}
 
+  getSignatures = (): Signature[] => this.sigArray
+
   /**
    * Adds a signature to the credentials and returns the index off the added signature.
    */
