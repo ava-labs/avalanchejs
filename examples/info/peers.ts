@@ -12,7 +12,7 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const info: InfoAPI = avalanche.Info()
   
 const main = async (): Promise<any> => {
-  const peers: PeersResponse = await info.peers([])
+  const peers: PeersResponse[] = await info.peers([])
   console.log(peers)
 }
     

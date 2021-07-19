@@ -173,7 +173,6 @@ describe('Info', () => {
       publicIP: '127.0.0.1:9659',
       nodeID: 'NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5',
       version: 'avalanche/1.3.2',
-      up: true,
       lastSent: '2021-04-14T08:15:06-07:00',
       lastReceived: '2021-04-14T08:15:06-07:00',
       benched: null
@@ -182,7 +181,6 @@ describe('Info', () => {
       publicIP: '127.0.0.1:9655',
       nodeID: 'NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN',
       version: 'avalanche/1.3.2',
-      up: true,
       lastSent: '2021-04-14T08:15:06-07:00',
       lastReceived: '2021-04-14T08:15:06-07:00',
       benched: null
@@ -190,11 +188,11 @@ describe('Info', () => {
     const result: Promise<PeersResponse[]> = info.peers()
     const payload:object = {
       result: {
-        peers,
-      },
+        peers
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
