@@ -1,7 +1,6 @@
 module.exports = {
-  // plugins: ['security'],
-  //  extends: ['prettier', 'plugin:security/recommended'],
-  extends: ['prettier'],
+  plugins: ['security'],
+  extends: ['prettier', 'plugin:security/recommended'],
   parserOptions: {
     project: 'tsconfig.json',
   },
