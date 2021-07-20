@@ -3,10 +3,10 @@
  * @module Common-Interfaces
  */
 
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
-import { TransferableOutput } from '../apis/platformvm';
-import { SerializedEncoding } from 'src/utils'
+import { Buffer } from "buffer/"
+import BN from "bn.js"
+import { TransferableOutput } from "../apis/platformvm"
+import { SerializedEncoding } from "../utils"
 
 export interface Index {
   address: string

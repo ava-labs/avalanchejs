@@ -7,7 +7,7 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from "./helperfunctions"
 import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from "../utils/errors"
-import { Serialized } from "src/common"
+import { Serialized } from "../common"
 
 export const SERIALIZATIONVERSION: number = 0
 export type SerializedType = 
