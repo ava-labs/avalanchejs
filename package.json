@@ -95,8 +95,8 @@
   "prettier": {
     "tabWidth": 2,
     "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
+    "semi": false,
+    "singleQuote": false,
     "jsxBracketSameLine": false
   }
 }
