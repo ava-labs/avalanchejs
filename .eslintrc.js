@@ -1,6 +1,9 @@
 module.exports = {
-  extends: ['prettier/@typescript-eslint', 'plugin:prettier/recommended'],
+  // plugins: ['security'],
+  //  extends: ['prettier', 'plugin:security/recommended'],
+  extends: ['prettier'],
   parserOptions: {
-    project: './tsconfig.json',
+    project: 'tsconfig.json',
   },
+  parser: '@typescript-eslint/parser',
 };

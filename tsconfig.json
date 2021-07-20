@@ -4,10 +4,7 @@
     "baseUrl": ".",
     "module": "commonjs",
     "target": "ES2015",
-    "lib": [
-      "dom",
-      "es2016"
-    ],
+    "lib": ["dom", "es2016"],
     "declaration": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
@@ -17,16 +14,10 @@
     "noFallthroughCasesInSwitch": true,
     "strictFunctionTypes": true,
     "esModuleInterop": true,
-    "typeRoots": [
-      "./typings/**",
-      "./node_modules/@types"
-    ]
+    "typeRoots": ["./typings/**", "./node_modules/@types"]
   },
-  "exclude": [
-    "node_modules",
-    "examples",
-    "typings"
-  ],
+  "include": ["./src", "./examples", "__mocks__/", "dist/"],
+  "exclude": ["node_modules", "typings"],
   "typeAcquisition": {
     "enable": true,
     "exclude": ["bn.js"]
