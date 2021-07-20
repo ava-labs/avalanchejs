@@ -38,47 +38,48 @@ export class AssetAmount {
 
   getAssetID = (): Buffer => {
     return this.assetID;
-  }
+  };
 
   getAssetIDString = (): string => {
-    return this.assetID.toString("hex");
-  }
+    return this.assetID.toString('hex');
+  };
 
   getAmount = (): BN => {
-    return this.amount
-  }
+    return this.amount;
+  };
 
   getSpent = (): BN => {
     return this.spent;
-  }
+  };
 
   getBurn = (): BN => {
     return this.burn;
-  }
+  };
 
   getChange = (): BN => {
     return this.change;
-  }
+  };
 
   getStakeableLockSpent = (): BN => {
     return this.stakeableLockSpent;
-  }
+  };
 
   getStakeableLockChange = (): boolean => {
     return this.stakeableLockChange;
-  }
+  };
 
   isFinished = (): boolean => {
     return this.finished;
-  }
+  };
 
   // spendAmount should only be called if this asset is still awaiting more
   // funds to consume.
   spendAmount = (amt: BN, stakeableLocked: boolean = false): boolean => {
     if (this.finished) {
       /* istanbul ignore next */
-      throw new InsufficientFundsError('Error - AssetAmount.spendAmount: attempted to spend '
-        + 'excess funds');
+      throw new InsufficientFundsError(
+        'Error - AssetAmount.spendAmount: attempted to spend ' + 'excess funds'
+      );
     }
     this.spent = this.spent.add(amt);
     if (stakeableLocked) {
@@ -94,19 +95,22 @@ export class AssetAmount {
       this.finished = true;
     }
     return this.finished;
-  }
+  };
 
   constructor(assetID: Buffer, amount: BN, burn: BN) {
     this.assetID = assetID;
-    this.amount = typeof amount === "undefined" ? new BN(0) : amount;
-    this.burn = typeof burn === "undefined" ? new BN(0) : burn;
+    this.amount = typeof amount === 'undefined' ? new BN(0) : amount;
+    this.burn = typeof burn === 'undefined' ? new BN(0) : burn;
     this.spent = new BN(0);
     this.stakeableLockSpent = new BN(0);
     this.stakeableLockChange = false;
   }
 }
 
-export abstract class StandardAssetAmountDestination<TO extends StandardTransferableOutput, TI extends StandardTransferableInput>  {
+export abstract class StandardAssetAmountDestination<
+  TO extends StandardTransferableOutput,
+  TI extends StandardTransferableInput
+> {
   protected amounts: AssetAmount[] = [];
   protected destinations: Buffer[] = [];
   protected senders: Buffer[] = [];
@@ -122,74 +126,76 @@ export abstract class StandardAssetAmountDestination<TO extends StandardTransfer
     let aa: AssetAmount = new AssetAmount(assetID, amount, burn);
     this.amounts.push(aa);
     this.amountkey[aa.getAssetIDString()] = aa;
-  }
+  };
 
   addInput = (input: TI) => {
     this.inputs.push(input);
-  }
+  };
 
   addOutput = (output: TO) => {
     this.outputs.push(output);
-  }
+  };
 
   addChange = (output: TO) => {
     this.change.push(output);
-  }
+  };
 
   getAmounts = (): AssetAmount[] => {
     return this.amounts;
-  }
+  };
 
   getDestinations = (): Buffer[] => {
     return this.destinations;
-  }
+  };
 
   getSenders = (): Buffer[] => {
     return this.senders;
-  }
+  };
 
   getChangeAddresses = (): Buffer[] => {
     return this.changeAddresses;
-  }
+  };
 
   getAssetAmount = (assetHexStr: string): AssetAmount => {
     return this.amountkey[assetHexStr];
-  }
+  };
 
   assetExists = (assetHexStr: string): boolean => {
-    return (assetHexStr in this.amountkey);
-  }
+    return assetHexStr in this.amountkey;
+  };
 
   getInputs = (): TI[] => {
     return this.inputs;
-  }
+  };
 
   getOutputs = (): TO[] => {
     return this.outputs;
-  }
+  };
 
   getChangeOutputs = (): TO[] => {
     return this.change;
-  }
+  };
 
   getAllOutputs = (): TO[] => {
     return this.outputs.concat(this.change);
-  }
+  };
 
   canComplete = (): boolean => {
     for (let i: number = 0; i < this.amounts.length; i++) {
       if (!this.amounts[i].isFinished()) {
-
         return false;
       }
     }
     return true;
-  }
+  };
 
-  constructor(destinations: Buffer[], senders: Buffer[], changeAddresses: Buffer[]) {
+  constructor(
+    destinations: Buffer[],
+    senders: Buffer[],
+    changeAddresses: Buffer[]
+  ) {
     this.destinations = destinations;
     this.changeAddresses = changeAddresses;
     this.senders = senders;
   }
-
 }

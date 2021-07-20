@@ -16,15 +16,15 @@ import store from 'store2';
  * ```
  */
 export default class DB {
-  private static instance:DB;
+  private static instance: DB;
 
   private static store = store;
 
   private constructor() {}
 
   /**
-     * Retrieves the database singleton.
-     */
+   * Retrieves the database singleton.
+   */
   static getInstance(): DB {
     if (!DB.instance) {
       DB.instance = new DB();
@@ -33,11 +33,11 @@ export default class DB {
   }
 
   /**
-     * Gets a namespace from the database singleton.
-     *
-     * @param ns Namespace to retrieve.
-     */
-  static getNamespace(ns:string): store.StoreAPI {
+   * Gets a namespace from the database singleton.
+   *
+   * @param ns Namespace to retrieve.
+   */
+  static getNamespace(ns: string): store.StoreAPI {
     return this.store.namespace(ns);
   }
 }

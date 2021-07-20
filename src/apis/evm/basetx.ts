@@ -5,10 +5,7 @@
 
 import { Buffer } from 'buffer/';
 import BinTools from '../../utils/bintools';
-import { 
-  KeyChain, 
-  KeyPair 
-} from './keychain';
+import { KeyChain, KeyPair } from './keychain';
 import { EVMStandardBaseTx } from '../../common/evmtx';
 import { Credential } from '../../common/credentials';
 import { DefaultNetworkID } from '../../utils/constants';
@@ -24,12 +21,12 @@ const bintools: BinTools = BinTools.getInstance();
  * Class representing a base for all transactions.
  */
 export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
-  protected _typeName = "BaseTx";
+  protected _typeName = 'BaseTx';
   protected _typeID = undefined;
 
   //serialize is inherited
 
-  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = 'hex') {
     super.deserialize(fields, encoding);
   }
 
@@ -38,7 +35,7 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    */
   getTxType = (): number => {
     return this._typeID;
-  }
+  };
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[BaseTx]], parses it, populates the class, and returns the length of the BaseTx in bytes.
@@ -91,7 +88,10 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    */
-  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16)) {
+  constructor(
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16)
+  ) {
     super(networkID, blockchainID);
   }
 }

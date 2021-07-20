@@ -5,12 +5,12 @@
 import AvalancheCore from '../../avalanche';
 import { JRPCAPI } from '../../common/jrpcapi';
 import { RequestResponseData } from '../../common/apibase';
-import BN from "bn.js";
-import { 
-  GetBlockchainIDParams, 
-  IsBootstrappedParams, 
-  PeersParams, 
-  PeersResponse
+import BN from 'bn.js';
+import {
+  GetBlockchainIDParams,
+  IsBootstrappedParams,
+  PeersParams,
+  PeersResponse,
 } from '../../common/interfaces';
 
 /**
@@ -33,7 +33,10 @@ export class InfoAPI extends JRPCAPI {
       alias,
     };
 
-    const response: RequestResponseData = await this.callMethod('info.getBlockchainID', params);
+    const response: RequestResponseData = await this.callMethod(
+      'info.getBlockchainID',
+      params
+    );
     return response.data.result.blockchainID;
   };
 
@@ -43,7 +46,9 @@ export class InfoAPI extends JRPCAPI {
    * @returns Returns a Promise<number> of the networkID.
    */
   getNetworkID = async (): Promise<number> => {
-    const response: RequestResponseData = await this.callMethod('info.getNetworkID');
+    const response: RequestResponseData = await this.callMethod(
+      'info.getNetworkID'
+    );
     return response.data.result.networkID;
   };
 
@@ -53,9 +58,11 @@ export class InfoAPI extends JRPCAPI {
    * @returns Returns a Promise<string> containing the network name.
    */
   getNetworkName = async (): Promise<string> => {
-    const response: RequestResponseData = await this.callMethod('info.getNetworkName');
+    const response: RequestResponseData = await this.callMethod(
+      'info.getNetworkName'
+    );
     return response.data.result.networkName;
-  }
+  };
 
   /**
    * Fetches the nodeID from the node.
@@ -63,7 +70,9 @@ export class InfoAPI extends JRPCAPI {
    * @returns Returns a Promise<string> of the nodeID.
    */
   getNodeID = async (): Promise<string> => {
-    const response: RequestResponseData = await this.callMethod('info.getNodeID');
+    const response: RequestResponseData = await this.callMethod(
+      'info.getNodeID'
+    );
     return response.data.result.nodeID;
   };
 
@@ -73,20 +82,24 @@ export class InfoAPI extends JRPCAPI {
    * @returns Returns a Promise<string> containing the version of Gecko.
    */
   getNodeVersion = async (): Promise<string> => {
-    const response: RequestResponseData = await this.callMethod('info.getNodeVersion');
+    const response: RequestResponseData = await this.callMethod(
+      'info.getNodeVersion'
+    );
     return response.data.result.version;
-  }
+  };
 
   /**
    * Fetches the transaction fee from the node.
    *
    * @returns Returns a Promise<object> of the transaction fee in nAVAX.
    */
-  getTxFee = async (): Promise<{txFee: BN, creationTxFee: BN}> => {
-    const response: RequestResponseData = await this.callMethod('info.getTxFee');
-    return  {
+  getTxFee = async (): Promise<{ txFee: BN; creationTxFee: BN }> => {
+    const response: RequestResponseData = await this.callMethod(
+      'info.getTxFee'
+    );
+    return {
       txFee: new BN(response.data.result.txFee, 10),
-      creationTxFee: new BN(response.data.result.creationTxFee, 10)
+      creationTxFee: new BN(response.data.result.creationTxFee, 10),
     };
   };
 
@@ -98,27 +111,35 @@ export class InfoAPI extends JRPCAPI {
    */
   isBootstrapped = async (chain: string): Promise<boolean> => {
     const params: IsBootstrappedParams = {
-      chain
+      chain,
     };
-    const response: RequestResponseData = await this.callMethod('info.isBootstrapped', params);
+    const response: RequestResponseData = await this.callMethod(
+      'info.isBootstrapped',
+      params
+    );
     return response.data.result.isBootstrapped;
   };
 
   /**
    * Returns the peers connected to the node.
-   * @param nodeIDs an optional parameter to specify what nodeID's descriptions should be returned. 
-   * If this parameter is left empty, descriptions for all active connections will be returned. 
+   * @param nodeIDs an optional parameter to specify what nodeID's descriptions should be returned.
+   * If this parameter is left empty, descriptions for all active connections will be returned.
    * If the node is not connected to a specified nodeID, it will be omitted from the response.
    *
    * @returns Promise for the list of connected peers in PeersResponse format.
    */
   peers = async (nodeIDs: string[] = []): Promise<PeersResponse[]> => {
     const params: PeersParams = {
-      nodeIDs
+      nodeIDs,
     };
-    const response: RequestResponseData = await this.callMethod('info.peers', params)
+    const response: RequestResponseData = await this.callMethod(
+      'info.peers',
+      params
+    );
     return response.data.result.peers;
-  }
+  };
 
-  constructor(core:AvalancheCore, baseurl:string = '/ext/info') { super(core, baseurl); }
+  constructor(core: AvalancheCore, baseurl: string = '/ext/info') {
+    super(core, baseurl);
+  }
 }

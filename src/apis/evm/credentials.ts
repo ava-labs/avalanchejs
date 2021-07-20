@@ -14,16 +14,19 @@ import { CredIdError } from '../../utils/errors';
  *
  * @returns An instance of an [[Credential]]-extended class.
  */
-export const SelectCredentialClass = (credid: number, ...args: any[]): Credential => {
+export const SelectCredentialClass = (
+  credid: number,
+  ...args: any[]
+): Credential => {
   if (credid === EVMConstants.SECPCREDENTIAL) {
     return new SECPCredential(...args);
   }
   /* istanbul ignore next */
-  throw new CredIdError("Error - SelectCredentialClass: unknown credid");
+  throw new CredIdError('Error - SelectCredentialClass: unknown credid');
 };
 
 export class SECPCredential extends Credential {
-  protected _typeName: string = "SECPCredential";
+  protected _typeName: string = 'SECPCredential';
   protected _typeID: number = EVMConstants.SECPCREDENTIAL;
 
   //serialize and deserialize both are inherited
@@ -47,4 +50,3 @@ export class SECPCredential extends Credential {
     return credential;
   }
 }
-

@@ -9,7 +9,7 @@ import * as bech32 from 'bech32';
 import { Base58 } from './base58';
 import { Defaults } from './constants';
 import { Bech32Error, ChecksumError, HexError } from '../utils/errors';
-import { utils } from "ethers";
+import { utils } from 'ethers';
 
 /**
  * A class containing tools useful in interacting with binary data cross-platform using
@@ -28,13 +28,13 @@ import { utils } from "ethers";
  * ```
  */
 export default class BinTools {
-  private static instance:BinTools;
+  private static instance: BinTools;
 
   private constructor() {
     this.b58 = Base58.getInstance();
   }
 
-  private b58:Base58;
+  private b58: Base58;
 
   /**
    * Retrieves the BinTools singleton.
@@ -50,13 +50,15 @@ export default class BinTools {
    * Returns true if base64, otherwise false
    * @param str the string to verify is Base64
    */
-  isBase64(str:string) {
-    if (str ==='' || str.trim() ===''){ return false; }
+  isBase64(str: string) {
+    if (str === '' || str.trim() === '') {
+      return false;
+    }
     try {
-        let b64:Buffer = Buffer.from(str, "base64");
-        return b64.toString("base64") === str;
+      let b64: Buffer = Buffer.from(str, 'base64');
+      return b64.toString('base64') === str;
     } catch (err) {
-        return false;
+      return false;
     }
   }
 
@@ -65,7 +67,7 @@ export default class BinTools {
    * @param cb58 the string to verify is cb58
    */
   isCB58(cb58: string): boolean {
-    return this.isBase58(cb58)
+    return this.isBase58(cb58);
   }
 
   /**
@@ -73,11 +75,13 @@ export default class BinTools {
    * @param base58 the string to verify is base58
    */
   isBase58(base58: string): boolean {
-    if (base58 === '' || base58.trim() === '') { return false }
+    if (base58 === '' || base58.trim() === '') {
+      return false;
+    }
     try {
       return this.b58.encode(this.b58.decode(base58)) === base58;
     } catch (err) {
-        return false;
+      return false;
     }
   }
 
@@ -86,11 +90,16 @@ export default class BinTools {
    * @param hex the string to verify is hexidecimal
    */
   isHex(hex: string): boolean {
-    if (hex === '' || hex.trim() === '') { return false }
-    if ((hex.startsWith("0x") && hex.slice(2).match(/^[0-9A-Fa-f]/g) || hex.match(/^[0-9A-Fa-f]/g))) {
-      return true
+    if (hex === '' || hex.trim() === '') {
+      return false;
+    }
+    if (
+      (hex.startsWith('0x') && hex.slice(2).match(/^[0-9A-Fa-f]/g)) ||
+      hex.match(/^[0-9A-Fa-f]/g)
+    ) {
+      return true;
     } else {
-      return false
+      return false;
     }
   }
 
@@ -98,12 +107,14 @@ export default class BinTools {
    * Returns true if decimal, otherwise false
    * @param str the string to verify is hexidecimal
    */
-  isDecimal(str:string) {
-    if (str ==='' || str.trim() ===''){ return false; }
+  isDecimal(str: string) {
+    if (str === '' || str.trim() === '') {
+      return false;
+    }
     try {
       return new BN(str, 10).toString(10) === str.trim();
     } catch (err) {
-        return false;
+      return false;
     }
   }
 
@@ -111,49 +122,53 @@ export default class BinTools {
    * Returns true if meets requirements to parse as an address as Bech32 on X-Chain or P-Chain, otherwise false
    * @param address the string to verify is address
    */
-  isPrimaryBechAddress = (address:string):boolean => {
+  isPrimaryBechAddress = (address: string): boolean => {
     const parts: string[] = address.trim().split('-');
-    if(parts.length !== 2) {
+    if (parts.length !== 2) {
       return false;
     }
     try {
       bech32.fromWords(bech32.decode(parts[1]).words);
-    } catch(err) {
-      return false
+    } catch (err) {
+      return false;
     }
     return true;
   };
 
+  /**
+   * Produces a string from a {@link https://github.com/feross/buffer|Buffer}
+   * representing a string. ONLY USED IN TRANSACTION FORMATTING, ASSUMED LENGTH IS PREPENDED.
+   *
+   * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to a string
+   */
+  bufferToString = (buff: Buffer): string =>
+    this.copyFrom(buff, 2).toString('utf8');
 
   /**
-     * Produces a string from a {@link https://github.com/feross/buffer|Buffer}
-     * representing a string. ONLY USED IN TRANSACTION FORMATTING, ASSUMED LENGTH IS PREPENDED.
-     *
-     * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to a string
-     */
-  bufferToString = (buff:Buffer):string => this.copyFrom(buff, 2).toString('utf8');
-
-  /**
-     * Produces a {@link https://github.com/feross/buffer|Buffer} from a string. ONLY USED IN TRANSACTION FORMATTING, LENGTH IS PREPENDED.
-     *
-     * @param str The string to convert to a {@link https://github.com/feross/buffer|Buffer}
-     */
-  stringToBuffer = (str:string):Buffer => {
-    const buff:Buffer = Buffer.alloc(2 + str.length);
+   * Produces a {@link https://github.com/feross/buffer|Buffer} from a string. ONLY USED IN TRANSACTION FORMATTING, LENGTH IS PREPENDED.
+   *
+   * @param str The string to convert to a {@link https://github.com/feross/buffer|Buffer}
+   */
+  stringToBuffer = (str: string): Buffer => {
+    const buff: Buffer = Buffer.alloc(2 + str.length);
     buff.writeUInt16BE(str.length, 0);
     buff.write(str, 2, str.length, 'utf8');
     return buff;
   };
 
   /**
-     * Makes a copy (no reference) of a {@link https://github.com/feross/buffer|Buffer}
-     * over provided indecies.
-     *
-     * @param buff The {@link https://github.com/feross/buffer|Buffer} to copy
-     * @param start The index to start the copy
-     * @param end The index to end the copy
-     */
-  copyFrom = (buff:Buffer, start:number = 0, end:number = undefined):Buffer => {
+   * Makes a copy (no reference) of a {@link https://github.com/feross/buffer|Buffer}
+   * over provided indecies.
+   *
+   * @param buff The {@link https://github.com/feross/buffer|Buffer} to copy
+   * @param start The index to start the copy
+   * @param end The index to end the copy
+   */
+  copyFrom = (
+    buff: Buffer,
+    start: number = 0,
+    end: number = undefined
+  ): Buffer => {
     if (end === undefined) {
       end = buff.length;
     }
@@ -161,28 +176,28 @@ export default class BinTools {
   };
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string of
-     * the {@link https://github.com/feross/buffer|Buffer}.
-     *
-     * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to base-58
-     */
-  bufferToB58 = (buff:Buffer):string => this.b58.encode(buff);
+   * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string of
+   * the {@link https://github.com/feross/buffer|Buffer}.
+   *
+   * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to base-58
+   */
+  bufferToB58 = (buff: Buffer): string => this.b58.encode(buff);
 
   /**
-     * Takes a base-58 string and returns a {@link https://github.com/feross/buffer|Buffer}.
-     *
-     * @param b58str The base-58 string to convert
-     * to a {@link https://github.com/feross/buffer|Buffer}
-     */
-  b58ToBuffer = (b58str:string):Buffer => this.b58.decode(b58str);
+   * Takes a base-58 string and returns a {@link https://github.com/feross/buffer|Buffer}.
+   *
+   * @param b58str The base-58 string to convert
+   * to a {@link https://github.com/feross/buffer|Buffer}
+   */
+  b58ToBuffer = (b58str: string): Buffer => this.b58.decode(b58str);
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} and returns an ArrayBuffer.
-     *
-     * @param buff The {@link https://github.com/feross/buffer|Buffer} to
-     * convert to an ArrayBuffer
-     */
-  fromBufferToArrayBuffer = (buff:Buffer):ArrayBuffer => {
+   * Takes a {@link https://github.com/feross/buffer|Buffer} and returns an ArrayBuffer.
+   *
+   * @param buff The {@link https://github.com/feross/buffer|Buffer} to
+   * convert to an ArrayBuffer
+   */
+  fromBufferToArrayBuffer = (buff: Buffer): ArrayBuffer => {
     const ab = new ArrayBuffer(buff.length);
     const view = new Uint8Array(ab);
     for (let i: number = 0; i < buff.length; ++i) {
@@ -192,11 +207,11 @@ export default class BinTools {
   };
 
   /**
-     * Takes an ArrayBuffer and converts it to a {@link https://github.com/feross/buffer|Buffer}.
-     *
-     * @param ab The ArrayBuffer to convert to a {@link https://github.com/feross/buffer|Buffer}
-     */
-  fromArrayBufferToBuffer = (ab:ArrayBuffer):Buffer => {
+   * Takes an ArrayBuffer and converts it to a {@link https://github.com/feross/buffer|Buffer}.
+   *
+   * @param ab The ArrayBuffer to convert to a {@link https://github.com/feross/buffer|Buffer}
+   */
+  fromArrayBufferToBuffer = (ab: ArrayBuffer): Buffer => {
     const buf = Buffer.alloc(ab.byteLength);
     for (let i: number = 0; i < ab.byteLength; ++i) {
       buf[i] = ab[i];
@@ -205,37 +220,38 @@ export default class BinTools {
   };
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} and converts it
-     * to a {@link https://github.com/indutny/bn.js/|BN}.
-     *
-     * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert
-     * to a {@link https://github.com/indutny/bn.js/|BN}
-     */
-  fromBufferToBN = (buff:Buffer):BN => {
-    if(typeof buff === "undefined") {
+   * Takes a {@link https://github.com/feross/buffer|Buffer} and converts it
+   * to a {@link https://github.com/indutny/bn.js/|BN}.
+   *
+   * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert
+   * to a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  fromBufferToBN = (buff: Buffer): BN => {
+    if (typeof buff === 'undefined') {
       return undefined;
     }
-    return new BN(buff.toString('hex'), 16, 'be')
+    return new BN(buff.toString('hex'), 16, 'be');
   };
-    /**
-     * Takes a {@link https://github.com/indutny/bn.js/|BN} and converts it
-     * to a {@link https://github.com/feross/buffer|Buffer}.
-     *
-     * @param bn The {@link https://github.com/indutny/bn.js/|BN} to convert
-     * to a {@link https://github.com/feross/buffer|Buffer}
-     * @param length The zero-padded length of the {@link https://github.com/feross/buffer|Buffer}
-     */
-  fromBNToBuffer = (bn:BN, length?:number):Buffer => {
-    if(typeof bn === "undefined") {
+  /**
+   * Takes a {@link https://github.com/indutny/bn.js/|BN} and converts it
+   * to a {@link https://github.com/feross/buffer|Buffer}.
+   *
+   * @param bn The {@link https://github.com/indutny/bn.js/|BN} to convert
+   * to a {@link https://github.com/feross/buffer|Buffer}
+   * @param length The zero-padded length of the {@link https://github.com/feross/buffer|Buffer}
+   */
+  fromBNToBuffer = (bn: BN, length?: number): Buffer => {
+    if (typeof bn === 'undefined') {
       return undefined;
     }
     const newarr = bn.toArray('be');
     /**
      * CKC: Still unsure why bn.toArray with a "be" and a length do not work right. Bug?
      */
-    if (length) { // bn toArray with the length parameter doesn't work correctly, need this.
+    if (length) {
+      // bn toArray with the length parameter doesn't work correctly, need this.
       const x = length - newarr.length;
-      for (let i:number = 0; i < x; i++) {
+      for (let i: number = 0; i < x; i++) {
         newarr.unshift(0);
       }
     }
@@ -243,48 +259,55 @@ export default class BinTools {
   };
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} and adds a checksum, returning
-     * a {@link https://github.com/feross/buffer|Buffer} with the 4-byte checksum appended.
-     *
-     * @param buff The {@link https://github.com/feross/buffer|Buffer} to append a checksum
-     */
-  addChecksum = (buff:Buffer):Buffer => {
-    const hashslice:Buffer = Buffer.from(createHash('sha256').update(buff).digest().slice(28));
+   * Takes a {@link https://github.com/feross/buffer|Buffer} and adds a checksum, returning
+   * a {@link https://github.com/feross/buffer|Buffer} with the 4-byte checksum appended.
+   *
+   * @param buff The {@link https://github.com/feross/buffer|Buffer} to append a checksum
+   */
+  addChecksum = (buff: Buffer): Buffer => {
+    const hashslice: Buffer = Buffer.from(
+      createHash('sha256').update(buff).digest().slice(28)
+    );
     return Buffer.concat([buff, hashslice]);
   };
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} with an appended 4-byte checksum
-     * and returns true if the checksum is valid, otherwise false.
-     *
-     * @param b The {@link https://github.com/feross/buffer|Buffer} to validate the checksum
-     */
-  validateChecksum = (buff:Buffer):boolean => {
-    const checkslice:Buffer = buff.slice(buff.length - 4);
-    const hashslice:Buffer = Buffer.from(createHash('sha256').update(buff.slice(0, buff.length - 4)).digest().slice(28));
+   * Takes a {@link https://github.com/feross/buffer|Buffer} with an appended 4-byte checksum
+   * and returns true if the checksum is valid, otherwise false.
+   *
+   * @param b The {@link https://github.com/feross/buffer|Buffer} to validate the checksum
+   */
+  validateChecksum = (buff: Buffer): boolean => {
+    const checkslice: Buffer = buff.slice(buff.length - 4);
+    const hashslice: Buffer = Buffer.from(
+      createHash('sha256')
+        .update(buff.slice(0, buff.length - 4))
+        .digest()
+        .slice(28)
+    );
     return checkslice.toString('hex') === hashslice.toString('hex');
   };
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string with
-     * checksum as per the cb58 standard.
-     *
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} to serialize
-     *
-     * @returns A serialized base-58 string of the Buffer.
-     */
-  cb58Encode = (bytes:Buffer):string => {
-    const x:Buffer = this.addChecksum(bytes);
+   * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string with
+   * checksum as per the cb58 standard.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} to serialize
+   *
+   * @returns A serialized base-58 string of the Buffer.
+   */
+  cb58Encode = (bytes: Buffer): string => {
+    const x: Buffer = this.addChecksum(bytes);
     return this.bufferToB58(x);
   };
 
   /**
-     * Takes a cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
-     * and returns a {@link https://github.com/feross/buffer|Buffer} of the original data. Throws on error.
-     *
-     * @param bytes A cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
-     */
-  cb58Decode = (bytes:Buffer | string):Buffer => {
+   * Takes a cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+   * and returns a {@link https://github.com/feross/buffer|Buffer} of the original data. Throws on error.
+   *
+   * @param bytes A cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+   */
+  cb58Decode = (bytes: Buffer | string): Buffer => {
     if (typeof bytes === 'string') {
       bytes = this.b58ToBuffer(bytes);
     }
@@ -294,13 +317,14 @@ export default class BinTools {
     throw new ChecksumError('Error - BinTools.cb58Decode: invalid checksum');
   };
 
-  addressToString = (hrp: string, chainid: string, bytes: Buffer): string => `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
+  addressToString = (hrp: string, chainid: string, bytes: Buffer): string =>
+    `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`;
 
   stringToAddress = (address: string, hrp?: string): Buffer => {
-    if(address.substring(0, 2) === "0x") {
+    if (address.substring(0, 2) === '0x') {
       // ETH-style address
-      if(utils.isAddress(address)) {
-        return Buffer.from(address.substring(2,), "hex");
+      if (utils.isAddress(address)) {
+        return Buffer.from(address.substring(2), 'hex');
       } else {
         throw new HexError('Error - Invalid address');
       }
@@ -308,25 +332,30 @@ export default class BinTools {
     // Bech32 addresses
     const parts: string[] = address.trim().split('-');
 
-    if(parts.length < 2) {
+    if (parts.length < 2) {
       throw new Bech32Error('Error - Valid address should include -');
     }
 
-    if(parts[0].length < 1) {
+    if (parts[0].length < 1) {
       throw new Bech32Error('Error - Valid address must have prefix before -');
     }
 
     const split: number = parts[1].lastIndexOf('1');
-    if(split < 0) {
+    if (split < 0) {
       throw new Bech32Error('Error - Valid address must include separator (1)');
     }
 
     const humanReadablePart: string = parts[1].slice(0, split);
-    if(humanReadablePart.length < 1) {
+    if (humanReadablePart.length < 1) {
       throw new Bech32Error('Error - HRP should be at least 1 character');
     }
 
-    if(humanReadablePart !== 'avax' && humanReadablePart !== 'fuji' && humanReadablePart != 'local' && humanReadablePart != hrp) {
+    if (
+      humanReadablePart !== 'avax' &&
+      humanReadablePart !== 'fuji' &&
+      humanReadablePart != 'local' &&
+      humanReadablePart != hrp
+    ) {
       throw new Bech32Error('Error - Invalid HRP');
     }
 
@@ -345,16 +374,21 @@ export default class BinTools {
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
    * undefined if not valid.
    */
-  parseAddress = (addr:string,
-    blockchainID:string,
-    alias:string = undefined,
-    addrlen:number = 20):Buffer => {
+  parseAddress = (
+    addr: string,
+    blockchainID: string,
+    alias: string = undefined,
+    addrlen: number = 20
+  ): Buffer => {
     const abc: string[] = addr.split('-');
-    if (abc.length === 2 && ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))) {
-        const addrbuff = this.stringToAddress(addr);
-        if ((addrlen && addrbuff.length === addrlen) || !(addrlen)) {
-          return addrbuff;
-        }
+    if (
+      abc.length === 2 &&
+      ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))
+    ) {
+      const addrbuff = this.stringToAddress(addr);
+      if ((addrlen && addrbuff.length === addrlen) || !addrlen) {
+        return addrbuff;
+      }
     }
     return undefined;
   };

@@ -16,25 +16,25 @@ export class RequestResponseData {
   headers: any;
   status: number;
   statusText: string;
-  request:ClientRequest | XMLHttpRequest;
+  request: ClientRequest | XMLHttpRequest;
 }
 
 /**
  * Abstract class defining a generic endpoint that all endpoints must implement (extend).
  */
 export abstract class APIBase {
-  protected core:AvalancheCore;
+  protected core: AvalancheCore;
 
-  protected baseurl:string;
+  protected baseurl: string;
 
-  protected db:StoreAPI;
+  protected db: StoreAPI;
 
   /**
-     * Sets the path of the APIs baseurl.
-     *
-     * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/X"
-     */
-  setBaseURL = (baseurl:string) => {
+   * Sets the path of the APIs baseurl.
+   *
+   * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/X"
+   */
+  setBaseURL = (baseurl: string) => {
     if (this.db && this.baseurl !== baseurl) {
       const backup = this.db.getAll();
       this.db.clearAll();
@@ -48,23 +48,22 @@ export abstract class APIBase {
   };
 
   /**
-     * Returns the baseurl's path.
-     */
-  getBaseURL = () : string => this.baseurl;
+   * Returns the baseurl's path.
+   */
+  getBaseURL = (): string => this.baseurl;
 
   /**
-     * Returns the baseurl's database.
-     */
-  getDB = ():StoreAPI => this.db;
+   * Returns the baseurl's database.
+   */
+  getDB = (): StoreAPI => this.db;
 
   /**
-     *
-     * @param core Reference to the Avalanche instance using this baseurl
-     * @param baseurl Path to the baseurl - ex: "/ext/bc/X"
-     */
-  constructor(core:AvalancheCore, baseurl:string) {
+   *
+   * @param core Reference to the Avalanche instance using this baseurl
+   * @param baseurl Path to the baseurl - ex: "/ext/bc/X"
+   */
+  constructor(core: AvalancheCore, baseurl: string) {
     this.core = core;
     this.setBaseURL(baseurl);
   }
 }
-

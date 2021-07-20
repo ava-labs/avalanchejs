@@ -2,37 +2,37 @@
  * @packageDocumentation
  * @module API-Socket
  */
-import { ClientRequestArgs } from "http"
-import WebSocket from "isomorphic-ws"
-import { MainnetAPI } from "../../utils"
+import { ClientRequestArgs } from 'http';
+import WebSocket from 'isomorphic-ws';
+import { MainnetAPI } from '../../utils';
 export class Socket extends WebSocket {
   // Fires once the connection has been established between the client and the server
-  onopen: any
+  onopen: any;
   // Fires when the server sends some data
-  onmessage: any
+  onmessage: any;
   // Fires after end of the communication between server and the client
-  onclose: any
+  onclose: any;
   // Fires for some mistake, which happens during the communication
-  onerror: any
+  onerror: any;
 
   /**
    * Send a message to the server
    *
-   * @param data 
+   * @param data
    * @param cb Optional
    */
   send(data: any, cb?: any): void {
-    super.send(data, cb)
+    super.send(data, cb);
   }
 
   /**
    * Terminates the connection completely
    *
-   * @param mcode Optional 
+   * @param mcode Optional
    * @param data Optional
    */
   close(mcode?: number, data?: string): void {
-    super.close(mcode, data)
+    super.close(mcode, data);
   }
 
   /**
@@ -42,8 +42,9 @@ export class Socket extends WebSocket {
    * @param options Optional
    */
   constructor(
-    url: string | import("url").URL = `wss://${MainnetAPI}:443/ext/bc/X/events`,
-    options?: WebSocket.ClientOptions | ClientRequestArgs) {
-    super(url, options)
+    url: string | import('url').URL = `wss://${MainnetAPI}:443/ext/bc/X/events`,
+    options?: WebSocket.ClientOptions | ClientRequestArgs
+  ) {
+    super(url, options);
   }
 }

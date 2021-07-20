@@ -6,7 +6,11 @@ import { Buffer } from 'buffer/';
 import BN from 'bn.js';
 import BinTools from '../../utils/bintools';
 import { EVMConstants } from './constants';
-import { Output, StandardAmountOutput, StandardTransferableOutput } from '../../common/output';
+import {
+  Output,
+  StandardAmountOutput,
+  StandardTransferableOutput,
+} from '../../common/output';
 import { SerializedEncoding } from '../../utils/serialization';
 import { EVMInput } from './inputs';
 import { OutputIdError } from '../../utils/errors';
@@ -21,28 +25,34 @@ const bintools: BinTools = BinTools.getInstance();
  * @returns An instance of an [[Output]]-extended class.
  */
 export const SelectOutputClass = (outputID: number, ...args: any[]): Output => {
-  if(outputID == EVMConstants.SECPXFEROUTPUTID){
-    return new SECPTransferOutput( ...args);
+  if (outputID == EVMConstants.SECPXFEROUTPUTID) {
+    return new SECPTransferOutput(...args);
   }
-  throw new OutputIdError("Error - SelectOutputClass: unknown outputID");
-}
+  throw new OutputIdError('Error - SelectOutputClass: unknown outputID');
+};
 
-export class TransferableOutput extends StandardTransferableOutput{
-  protected _typeName = "TransferableOutput";
+export class TransferableOutput extends StandardTransferableOutput {
+  protected _typeName = 'TransferableOutput';
   protected _typeID = undefined;
 
   //serialize is inherited
 
-  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = 'hex') {
     super.deserialize(fields, encoding);
-    this.output = SelectOutputClass(fields["output"]["_typeID"]);
-    this.output.deserialize(fields["output"], encoding);
+    this.output = SelectOutputClass(fields['output']['_typeID']);
+    this.output.deserialize(fields['output'], encoding);
   }
 
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.assetID = bintools.copyFrom(bytes, offset, offset + EVMConstants.ASSETIDLEN);
+    this.assetID = bintools.copyFrom(
+      bytes,
+      offset,
+      offset + EVMConstants.ASSETIDLEN
+    );
     offset += EVMConstants.ASSETIDLEN;
-    const outputid:number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0);
+    const outputid: number = bintools
+      .copyFrom(bytes, offset, offset + 4)
+      .readUInt32BE(0);
     offset += 4;
     this.output = SelectOutputClass(outputid);
     return this.output.fromBuffer(bytes, offset);
@@ -50,13 +60,13 @@ export class TransferableOutput extends StandardTransferableOutput{
 }
 
 export abstract class AmountOutput extends StandardAmountOutput {
-  protected _typeName = "AmountOutput";
+  protected _typeName = 'AmountOutput';
   protected _typeID = undefined;
 
   //serialize and deserialize both are inherited
-  
+
   /**
-   * 
+   *
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */
   makeTransferable(assetID: Buffer): TransferableOutput {
@@ -72,49 +82,51 @@ export abstract class AmountOutput extends StandardAmountOutput {
  * An [[Output]] class which specifies an Output that carries an ammount for an assetID and uses secp256k1 signature scheme.
  */
 export class SECPTransferOutput extends AmountOutput {
-  protected _typeName = "SECPTransferOutput";
+  protected _typeName = 'SECPTransferOutput';
   protected _typeID = EVMConstants.SECPXFEROUTPUTID;
 
   //serialize and deserialize both are inherited
 
   /**
-     * Returns the outputID for this output
-     */
+   * Returns the outputID for this output
+   */
   getOutputID(): number {
     return this._typeID;
   }
 
-  create(...args: any[]): this{
+  create(...args: any[]): this {
     return new SECPTransferOutput(...args) as this;
   }
 
   clone(): this {
-    const newout: SECPTransferOutput = this.create()
+    const newout: SECPTransferOutput = this.create();
     newout.fromBuffer(this.toBuffer());
     return newout as this;
   }
 }
 
 export class EVMOutput {
-  protected address: Buffer = Buffer.alloc(20); 
+  protected address: Buffer = Buffer.alloc(20);
   protected amount: Buffer = Buffer.alloc(8);
   protected amountValue: BN = new BN(0);
   protected assetID: Buffer = Buffer.alloc(32);
 
   /**
-  * Returns a function used to sort an array of [[EVMOutput]]s
-  */
-  static comparator = (): (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput) => (1|-1|0) => (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput): (1|-1|0) => {
-    // primarily sort by address
-    let sorta: Buffer = a.getAddress();
-    let sortb: Buffer = b.getAddress();
-    // secondarily sort by assetID
-    if(sorta.equals(sortb)) {
-      sorta = a.getAssetID();
-      sortb = b.getAssetID();
-    }
-    return Buffer.compare(sorta, sortb) as (1|-1|0);
-  }
+   * Returns a function used to sort an array of [[EVMOutput]]s
+   */
+  static comparator =
+    (): ((a: EVMOutput | EVMInput, b: EVMOutput | EVMInput) => 1 | -1 | 0) =>
+    (a: EVMOutput | EVMInput, b: EVMOutput | EVMInput): 1 | -1 | 0 => {
+      // primarily sort by address
+      let sorta: Buffer = a.getAddress();
+      let sortb: Buffer = b.getAddress();
+      // secondarily sort by assetID
+      if (sorta.equals(sortb)) {
+        sorta = a.getAssetID();
+        sortb = b.getAssetID();
+      }
+      return Buffer.compare(sorta, sortb) as 1 | -1 | 0;
+    };
 
   /**
    * Returns the address of the input as {@link https://github.com/feross/buffer|Buffer}
@@ -133,14 +145,15 @@ export class EVMOutput {
 
   /**
    * Returns the assetID of the input as {@link https://github.com/feross/buffer|Buffer}
-   */ 
+   */
   getAssetID = (): Buffer => this.assetID;
- 
+
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[EVMOutput]].
    */
-  toBuffer():Buffer {
-    const bsize: number = this.address.length + this.amount.length + this.assetID.length;
+  toBuffer(): Buffer {
+    const bsize: number =
+      this.address.length + this.amount.length + this.assetID.length;
     const barr: Buffer[] = [this.address, this.amount, this.assetID];
     const buff: Buffer = Buffer.concat(barr, bsize);
     return buff;
@@ -166,7 +179,7 @@ export class EVMOutput {
     return bintools.bufferToB58(this.toBuffer());
   }
 
-  create(...args: any[]): this{
+  create(...args: any[]): this {
     return new EVMOutput(...args) as this;
   }
 
@@ -184,15 +197,19 @@ export class EVMOutput {
    * @param assetID The assetID which is being sent as a {@link https://github.com/feross/buffer|Buffer} or a string.
    */
   constructor(
-    address: Buffer | string = undefined, 
-    amount: BN | number = undefined, 
+    address: Buffer | string = undefined,
+    amount: BN | number = undefined,
     assetID: Buffer | string = undefined
   ) {
-    if (typeof address !== 'undefined' && typeof amount !== 'undefined' && typeof assetID !== 'undefined') {
-      if(typeof address === 'string') {
+    if (
+      typeof address !== 'undefined' &&
+      typeof amount !== 'undefined' &&
+      typeof assetID !== 'undefined'
+    ) {
+      if (typeof address === 'string') {
         // if present then remove `0x` prefix
         let prefix: string = address.substring(0, 2);
-        if(prefix === '0x') {
+        if (prefix === '0x') {
           address = address.split('x')[1];
         }
         address = Buffer.from(address, 'hex');
@@ -207,7 +224,7 @@ export class EVMOutput {
       }
 
       // convert string assetID to Buffer
-      if(!(assetID instanceof Buffer)) {
+      if (!(assetID instanceof Buffer)) {
         assetID = bintools.cb58Decode(assetID);
       }
 
@@ -217,4 +234,4 @@ export class EVMOutput {
       this.assetID = assetID;
     }
   }
-}  
+}
