@@ -16,8 +16,7 @@
     "esModuleInterop": true,
     "typeRoots": ["./typings/**", "./node_modules/@types"]
   },
-  "include": ["./src", "./examples", "__mocks__/", "dist/"],
-  "exclude": ["node_modules", "typings"],
+  "exclude": ["node_modules", "examples", "typings"],
   "typeAcquisition": {
     "enable": true,
     "exclude": ["bn.js"]

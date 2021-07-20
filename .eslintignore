@@ -1,3 +1,4 @@
 /**/*.js
 /typings/*
 /tests/*
+/examples/*
