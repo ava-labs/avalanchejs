@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module API-Keystore
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche"
+import { JRPCAPI } from "../../common/jrpcapi"
+import { RequestResponseData } from "../../common/apibase"
 
 /**
  * Class for interacting with a node API that is using the node's KeystoreAPI.
@@ -28,13 +28,13 @@ export class KeystoreAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'keystore.createUser',
+      "keystore.createUser",
       params
-    );
-    return response.data.result.success;
-  };
+    )
+    return response.data.result.success
+  }
 
   /**
    * Exports a user. The user can be imported to another node with keystore.importUser .
@@ -48,13 +48,13 @@ export class KeystoreAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'keystore.exportUser',
+      "keystore.exportUser",
       params
-    );
-    return response.data.result.user;
-  };
+    )
+    return response.data.result.user
+  }
 
   /**
    * Imports a user file into the node's user database and assigns it to a username.
@@ -74,13 +74,13 @@ export class KeystoreAPI extends JRPCAPI {
       username,
       user,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'keystore.importUser',
+      "keystore.importUser",
       params
-    );
-    return response.data.result.success;
-  };
+    )
+    return response.data.result.success
+  }
 
   /**
    * Lists the names of all users on the node.
@@ -89,10 +89,10 @@ export class KeystoreAPI extends JRPCAPI {
    */
   listUsers = async (): Promise<string[]> => {
     const response: RequestResponseData = await this.callMethod(
-      'keystore.listUsers'
-    );
-    return response.data.result.users;
-  };
+      "keystore.listUsers"
+    )
+    return response.data.result.users
+  }
 
   /**
    * Deletes a user in the node's database.
@@ -106,13 +106,13 @@ export class KeystoreAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'keystore.deleteUser',
+      "keystore.deleteUser",
       params
-    );
-    return response.data.result.success;
-  };
+    )
+    return response.data.result.success
+  }
 
   /**
    * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
@@ -120,7 +120,7 @@ export class KeystoreAPI extends JRPCAPI {
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/keystore" as the path to blockchain"s baseurl
    */
-  constructor(core: AvalancheCore, baseurl: string = '/ext/keystore') {
-    super(core, baseurl);
+  constructor(core: AvalancheCore, baseurl: string = "/ext/keystore") {
+    super(core, baseurl)
   }
 }

@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module Utils-DB
  */
-import store from 'store2';
+import store from "store2"
 
 /**
  * A class for interacting with the {@link https://github.com/nbubna/store| store2 module}
@@ -16,9 +16,9 @@ import store from 'store2';
  * ```
  */
 export default class DB {
-  private static instance: DB;
+  private static instance: DB
 
-  private static store = store;
+  private static store = store
 
   private constructor() {}
 
@@ -27,9 +27,9 @@ export default class DB {
    */
   static getInstance(): DB {
     if (!DB.instance) {
-      DB.instance = new DB();
+      DB.instance = new DB()
     }
-    return DB.instance;
+    return DB.instance
   }
 
   /**
@@ -38,6 +38,6 @@ export default class DB {
    * @param ns Namespace to retrieve.
    */
   static getNamespace(ns: string): store.StoreAPI {
-    return this.store.namespace(ns);
+    return this.store.namespace(ns)
   }
 }

@@ -2,77 +2,77 @@
  * @packageDocumentation
  * @module API-AVM-OperationTx
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../../utils/bintools';
-import { AVMConstants } from './constants';
-import { TransferableOutput } from './outputs';
-import { TransferableInput } from './inputs';
-import { TransferableOperation } from './ops';
-import { SelectCredentialClass } from './credentials';
-import { KeyChain, KeyPair } from './keychain';
-import { Signature, SigIdx, Credential } from '../../common/credentials';
-import { BaseTx } from './basetx';
-import { DefaultNetworkID } from '../../utils/constants';
-import { SerializedEncoding } from '../../utils/serialization';
-import { CodecIdError, OperationError } from '../../utils/errors';
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import { TransferableOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
+import { TransferableOperation } from "./ops"
+import { SelectCredentialClass } from "./credentials"
+import { KeyChain, KeyPair } from "./keychain"
+import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { BaseTx } from "./basetx"
+import { DefaultNetworkID } from "../../utils/constants"
+import { SerializedEncoding } from "../../utils/serialization"
+import { CodecIdError, OperationError } from "../../utils/errors"
 
 /**
  * @ignore
  */
-const bintools: BinTools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
 /**
  * Class representing an unsigned Operation transaction.
  */
 export class OperationTx extends BaseTx {
-  protected _typeName = 'OperationTx';
-  protected _codecID = AVMConstants.LATESTCODEC;
+  protected _typeName = "OperationTx"
+  protected _codecID = AVMConstants.LATESTCODEC
   protected _typeID =
     this._codecID === 0
       ? AVMConstants.OPERATIONTX
-      : AVMConstants.OPERATIONTX_CODECONE;
+      : AVMConstants.OPERATIONTX_CODECONE
 
-  serialize(encoding: SerializedEncoding = 'hex'): object {
-    const fields: object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       ops: this.ops.map((o) => o.serialize(encoding)),
-    };
+    }
   }
-  deserialize(fields: object, encoding: SerializedEncoding = 'hex') {
-    super.deserialize(fields, encoding);
-    this.ops = fields['ops'].map((o: object) => {
-      let op: TransferableOperation = new TransferableOperation();
-      op.deserialize(o, encoding);
-      return op;
-    });
-    this.numOps = Buffer.alloc(4);
-    this.numOps.writeUInt32BE(this.ops.length, 0);
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding)
+    this.ops = fields["ops"].map((o: object) => {
+      let op: TransferableOperation = new TransferableOperation()
+      op.deserialize(o, encoding)
+      return op
+    })
+    this.numOps = Buffer.alloc(4)
+    this.numOps.writeUInt32BE(this.ops.length, 0)
   }
 
-  protected numOps: Buffer = Buffer.alloc(4);
-  protected ops: TransferableOperation[] = [];
+  protected numOps: Buffer = Buffer.alloc(4)
+  protected ops: TransferableOperation[] = []
 
   setCodecID(codecID: number): void {
     if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
       throw new CodecIdError(
-        'Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.'
-      );
+        "Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+      )
     }
-    this._codecID = codecID;
+    this._codecID = codecID
     this._typeID =
       this._codecID === 0
         ? AVMConstants.OPERATIONTX
-        : AVMConstants.OPERATIONTX_CODECONE;
+        : AVMConstants.OPERATIONTX_CODECONE
   }
 
   /**
    * Returns the id of the [[OperationTx]]
    */
   getTxType = (): number => {
-    return this._typeID;
-  };
+    return this._typeID
+  }
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[OperationTx]], parses it, populates the class, and returns the length of the [[OperationTx]] in bytes.
@@ -84,36 +84,36 @@ export class OperationTx extends BaseTx {
    * @remarks assume not-checksummed
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    offset = super.fromBuffer(bytes, offset);
-    this.numOps = bintools.copyFrom(bytes, offset, offset + 4);
-    offset += 4;
-    const numOps: number = this.numOps.readUInt32BE(0);
+    offset = super.fromBuffer(bytes, offset)
+    this.numOps = bintools.copyFrom(bytes, offset, offset + 4)
+    offset += 4
+    const numOps: number = this.numOps.readUInt32BE(0)
     for (let i: number = 0; i < numOps; i++) {
-      const op: TransferableOperation = new TransferableOperation();
-      offset = op.fromBuffer(bytes, offset);
-      this.ops.push(op);
+      const op: TransferableOperation = new TransferableOperation()
+      offset = op.fromBuffer(bytes, offset)
+      this.ops.push(op)
     }
-    return offset;
+    return offset
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[OperationTx]].
    */
   toBuffer(): Buffer {
-    this.numOps.writeUInt32BE(this.ops.length, 0);
-    let barr: Buffer[] = [super.toBuffer(), this.numOps];
-    this.ops = this.ops.sort(TransferableOperation.comparator());
+    this.numOps.writeUInt32BE(this.ops.length, 0)
+    let barr: Buffer[] = [super.toBuffer(), this.numOps]
+    this.ops = this.ops.sort(TransferableOperation.comparator())
     for (let i: number = 0; i < this.ops.length; i++) {
-      barr.push(this.ops[i].toBuffer());
+      barr.push(this.ops[i].toBuffer())
     }
-    return Buffer.concat(barr);
+    return Buffer.concat(barr)
   }
 
   /**
    * Returns an array of [[TransferableOperation]]s in this transaction.
    */
   getOperations(): TransferableOperation[] {
-    return this.ops;
+    return this.ops
   }
 
   /**
@@ -125,32 +125,32 @@ export class OperationTx extends BaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc);
+    const sigs: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.ops.length; i++) {
       const cred: Credential = SelectCredentialClass(
         this.ops[i].getOperation().getCredentialID()
-      );
-      const sigidxs: SigIdx[] = this.ops[i].getOperation().getSigIdxs();
+      )
+      const sigidxs: SigIdx[] = this.ops[i].getOperation().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource());
-        const signval: Buffer = keypair.sign(msg);
-        const sig: Signature = new Signature();
-        sig.fromBuffer(signval);
-        cred.addSignature(sig);
+        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
       }
-      sigs.push(cred);
+      sigs.push(cred)
     }
-    return sigs;
+    return sigs
   }
 
   clone(): this {
-    let newbase: OperationTx = new OperationTx();
-    newbase.fromBuffer(this.toBuffer());
-    return newbase as this;
+    let newbase: OperationTx = new OperationTx()
+    newbase.fromBuffer(this.toBuffer())
+    return newbase as this
   }
 
   create(...args: any[]): this {
-    return new OperationTx(...args) as this;
+    return new OperationTx(...args) as this
   }
 
   /**
@@ -171,16 +171,16 @@ export class OperationTx extends BaseTx {
     memo: Buffer = undefined,
     ops: TransferableOperation[] = undefined
   ) {
-    super(networkID, blockchainID, outs, ins, memo);
-    if (typeof ops !== 'undefined' && Array.isArray(ops)) {
+    super(networkID, blockchainID, outs, ins, memo)
+    if (typeof ops !== "undefined" && Array.isArray(ops)) {
       for (let i: number = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {
           throw new OperationError(
             `Error - OperationTx.constructor: invalid op in array parameter ${ops}`
-          );
+          )
         }
       }
-      this.ops = ops;
+      this.ops = ops
     }
   }
 }

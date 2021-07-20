@@ -2,10 +2,10 @@
  * @packageDocumentation
  * @module API-Metrics
  */
-import AvalancheCore from '../../avalanche';
-import { RESTAPI } from '../../common/restapi';
-import { RequestResponseData } from '../../common/apibase';
-import { AxiosRequestConfig } from 'axios';
+import AvalancheCore from "../../avalanche"
+import { RESTAPI } from "../../common/restapi"
+import { RequestResponseData } from "../../common/apibase"
+import { AxiosRequestConfig } from "axios"
 
 /**
  * Class for interacting with a node API that is using the node's MetricsApi.
@@ -18,18 +18,18 @@ export class MetricsAPI extends RESTAPI {
   protected axConf = (): AxiosRequestConfig => {
     return {
       baseURL: `${this.core.getProtocol()}://${this.core.getHost()}:${this.core.getPort()}`,
-      responseType: 'text',
-    };
-  };
+      responseType: "text",
+    }
+  }
 
   /**
    *
    * @returns Promise for an object containing the metrics response
    */
   getMetrics = async (): Promise<string> => {
-    const response: RequestResponseData = await this.post('');
-    return response.data as string;
-  };
+    const response: RequestResponseData = await this.post("")
+    return response.data as string
+  }
 
   /**
    * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
@@ -37,7 +37,7 @@ export class MetricsAPI extends RESTAPI {
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/metrics" as the path to blockchain's baseurl
    */
-  constructor(core: AvalancheCore, baseurl: string = '/ext/metrics') {
-    super(core, baseurl);
+  constructor(core: AvalancheCore, baseurl: string = "/ext/metrics") {
+    super(core, baseurl)
   }
 }

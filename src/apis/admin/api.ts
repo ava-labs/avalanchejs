@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module API-Admin
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche"
+import { JRPCAPI } from "../../common/jrpcapi"
+import { RequestResponseData } from "../../common/apibase"
 
 /**
  * Class for interacting with a node's AdminAPI.
@@ -30,13 +30,13 @@ export class AdminAPI extends JRPCAPI {
     const params: any = {
       endpoint,
       alias,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'admin.alias',
+      "admin.alias",
       params
-    );
-    return response.data.result.success;
-  };
+    )
+    return response.data.result.success
+  }
 
   /**
    * Give a blockchain an alias, a different name that can be used any place the blockchain’s
@@ -51,13 +51,13 @@ export class AdminAPI extends JRPCAPI {
     const params: any = {
       chain,
       alias,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'admin.aliasChain',
+      "admin.aliasChain",
       params
-    );
-    return response.data.result.success;
-  };
+    )
+    return response.data.result.success
+  }
 
   /**
    * Get all aliases for given blockchain
@@ -69,13 +69,13 @@ export class AdminAPI extends JRPCAPI {
   getChainAliases = async (chain: string): Promise<string[]> => {
     const params: any = {
       chain,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'admin.getChainAliases',
+      "admin.getChainAliases",
       params
-    );
-    return response.data.result.aliases;
-  };
+    )
+    return response.data.result.aliases
+  }
 
   /**
    * Dump the mutex statistics of the node to the specified file.
@@ -84,10 +84,10 @@ export class AdminAPI extends JRPCAPI {
    */
   lockProfile = async (): Promise<boolean> => {
     const response: RequestResponseData = await this.callMethod(
-      'admin.lockProfile'
-    );
-    return response.data.result.success;
-  };
+      "admin.lockProfile"
+    )
+    return response.data.result.success
+  }
 
   /**
    * Dump the current memory footprint of the node to the specified file.
@@ -96,10 +96,10 @@ export class AdminAPI extends JRPCAPI {
    */
   memoryProfile = async (): Promise<boolean> => {
     const response: RequestResponseData = await this.callMethod(
-      'admin.memoryProfile'
-    );
-    return response.data.result.success;
-  };
+      "admin.memoryProfile"
+    )
+    return response.data.result.success
+  }
 
   /**
    * Start profiling the cpu utilization of the node. Will dump the profile information into
@@ -109,10 +109,10 @@ export class AdminAPI extends JRPCAPI {
    */
   startCPUProfiler = async (): Promise<boolean> => {
     const response: RequestResponseData = await this.callMethod(
-      'admin.startCPUProfiler'
-    );
-    return response.data.result.success;
-  };
+      "admin.startCPUProfiler"
+    )
+    return response.data.result.success
+  }
 
   /**
    * Stop the CPU profile that was previously started.
@@ -121,10 +121,10 @@ export class AdminAPI extends JRPCAPI {
    */
   stopCPUProfiler = async (): Promise<boolean> => {
     const response: RequestResponseData = await this.callMethod(
-      'admin.stopCPUProfiler'
-    );
-    return response.data.result.success;
-  };
+      "admin.stopCPUProfiler"
+    )
+    return response.data.result.success
+  }
 
   /**
    * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]]
@@ -133,7 +133,7 @@ export class AdminAPI extends JRPCAPI {
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/admin" as the path to rpc's baseurl
    */
-  constructor(core: AvalancheCore, baseurl: string = '/ext/admin') {
-    super(core, baseurl);
+  constructor(core: AvalancheCore, baseurl: string = "/ext/admin") {
+    super(core, baseurl)
   }
 }

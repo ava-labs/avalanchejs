@@ -2,20 +2,20 @@
  * @packageDocumentation
  * @module API-PlatformVM
  */
-import { Buffer } from 'buffer/';
-import BN from 'bn.js';
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
-import BinTools from '../../utils/bintools';
-import { KeyChain } from './keychain';
-import { Defaults, PlatformChainID, ONEAVAX } from '../../utils/constants';
-import { PlatformVMConstants } from './constants';
-import { UnsignedTx, Tx } from './tx';
-import { PayloadBase } from '../../utils/payload';
-import { UnixNow, NodeIDStringToBuffer } from '../../utils/helperfunctions';
-import { UTXO, UTXOSet } from '../platformvm/utxos';
-import { PersistanceOptions } from '../../utils/persistenceoptions';
+import { Buffer } from "buffer/"
+import BN from "bn.js"
+import AvalancheCore from "../../avalanche"
+import { JRPCAPI } from "../../common/jrpcapi"
+import { RequestResponseData } from "../../common/apibase"
+import BinTools from "../../utils/bintools"
+import { KeyChain } from "./keychain"
+import { Defaults, PlatformChainID, ONEAVAX } from "../../utils/constants"
+import { PlatformVMConstants } from "./constants"
+import { UnsignedTx, Tx } from "./tx"
+import { PayloadBase } from "../../utils/payload"
+import { UnixNow, NodeIDStringToBuffer } from "../../utils/helperfunctions"
+import { UTXO, UTXOSet } from "../platformvm/utxos"
+import { PersistanceOptions } from "../../utils/persistenceoptions"
 import {
   AddressError,
   TransactionError,
@@ -24,21 +24,21 @@ import {
   TimeError,
   StakeError,
   DelegationFeeError,
-} from '../../utils/errors';
+} from "../../utils/errors"
 import {
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse,
-} from '../../common';
-import { TransferableOutput } from '../platformvm/outputs';
-import { Serialization, SerializedType } from '../../utils';
+} from "../../common"
+import { TransferableOutput } from "../platformvm/outputs"
+import { Serialization, SerializedType } from "../../utils"
 
 /**
  * @ignore
  */
-const bintools: BinTools = BinTools.getInstance();
-const serialization: Serialization = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -51,21 +51,21 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * @ignore
    */
-  protected keychain: KeyChain = new KeyChain('', '');
+  protected keychain: KeyChain = new KeyChain("", "")
 
-  protected blockchainID: string = PlatformChainID;
+  protected blockchainID: string = PlatformChainID
 
-  protected blockchainAlias: string = undefined;
+  protected blockchainAlias: string = undefined
 
-  protected AVAXAssetID: Buffer = undefined;
+  protected AVAXAssetID: Buffer = undefined
 
-  protected txFee: BN = undefined;
+  protected txFee: BN = undefined
 
-  protected creationTxFee: BN = undefined;
+  protected creationTxFee: BN = undefined
 
-  protected minValidatorStake: BN = undefined;
+  protected minValidatorStake: BN = undefined
 
-  protected minDelegatorStake: BN = undefined;
+  protected minDelegatorStake: BN = undefined
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -73,21 +73,21 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The alias for the blockchainID
    */
   getBlockchainAlias = (): string => {
-    if (typeof this.blockchainAlias === 'undefined') {
-      const netid: number = this.core.getNetworkID();
+    if (typeof this.blockchainAlias === "undefined") {
+      const netid: number = this.core.getNetworkID()
       if (
         netid in Defaults.network &&
         this.blockchainID in Defaults.network[netid]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
-        return this.blockchainAlias;
+        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        return this.blockchainAlias
       } else {
         /* istanbul ignore next */
-        return undefined;
+        return undefined
       }
     }
-    return this.blockchainAlias;
-  };
+    return this.blockchainAlias
+  }
 
   /**
    * Sets the alias for the blockchainID.
@@ -96,17 +96,17 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    */
   setBlockchainAlias = (alias: string): string => {
-    this.blockchainAlias = alias;
+    this.blockchainAlias = alias
     /* istanbul ignore next */
-    return undefined;
-  };
+    return undefined
+  }
 
   /**
    * Gets the blockchainID and returns it.
    *
    * @returns The blockchainID
    */
-  getBlockchainID = (): string => this.blockchainID;
+  getBlockchainID = (): string => this.blockchainID
 
   /**
    * Refresh blockchainID, and if a blockchainID is passed in, use that.
@@ -116,20 +116,20 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The blockchainID
    */
   refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netid: number = this.core.getNetworkID();
+    const netid: number = this.core.getNetworkID()
     if (
-      typeof blockchainID === 'undefined' &&
-      typeof Defaults.network[netid] !== 'undefined'
+      typeof blockchainID === "undefined" &&
+      typeof Defaults.network[netid] !== "undefined"
     ) {
-      this.blockchainID = PlatformChainID; //default to P-Chain
-      return true;
+      this.blockchainID = PlatformChainID //default to P-Chain
+      return true
     }
-    if (typeof blockchainID === 'string') {
-      this.blockchainID = blockchainID;
-      return true;
+    if (typeof blockchainID === "string") {
+      this.blockchainID = blockchainID
+      return true
     }
-    return false;
-  };
+    return false
+  }
 
   /**
    * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
@@ -137,28 +137,28 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
    */
   parseAddress = (addr: string): Buffer => {
-    const alias: string = this.getBlockchainAlias();
-    const blockchainID: string = this.getBlockchainID();
+    const alias: string = this.getBlockchainAlias()
+    const blockchainID: string = this.getBlockchainID()
     return bintools.parseAddress(
       addr,
       blockchainID,
       alias,
       PlatformVMConstants.ADDRESSLENGTH
-    );
-  };
+    )
+  }
 
   addressFromBuffer = (address: Buffer): string => {
     const chainid: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
-      : this.getBlockchainID();
-    const type: SerializedType = 'bech32';
+      : this.getBlockchainID()
+    const type: SerializedType = "bech32"
     return serialization.bufferToType(
       address,
       type,
       this.core.getHRP(),
       chainid
-    );
-  };
+    )
+  }
 
   /**
    * Fetches the AVAX AssetID and returns it in a Promise.
@@ -168,12 +168,12 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The the provided string representing the AVAX AssetID
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
-    if (typeof this.AVAXAssetID === 'undefined' || refresh) {
-      const assetID: string = await this.getStakingAssetID();
-      this.AVAXAssetID = bintools.cb58Decode(assetID);
+    if (typeof this.AVAXAssetID === "undefined" || refresh) {
+      const assetID: string = await this.getStakingAssetID()
+      this.AVAXAssetID = bintools.cb58Decode(assetID)
     }
-    return this.AVAXAssetID;
-  };
+    return this.AVAXAssetID
+  }
 
   /**
    * Overrides the defaults and sets the cache to a specific AVAX AssetID
@@ -183,11 +183,11 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The the provided string representing the AVAX AssetID
    */
   setAVAXAssetID = (avaxAssetID: string | Buffer) => {
-    if (typeof avaxAssetID === 'string') {
-      avaxAssetID = bintools.cb58Decode(avaxAssetID);
+    if (typeof avaxAssetID === "string") {
+      avaxAssetID = bintools.cb58Decode(avaxAssetID)
     }
-    this.AVAXAssetID = avaxAssetID;
-  };
+    this.AVAXAssetID = avaxAssetID
+  }
 
   /**
    * Gets the default tx fee for this chain.
@@ -196,9 +196,9 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getDefaultTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]['P']['txFee'])
-      : new BN(0);
-  };
+      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["txFee"])
+      : new BN(0)
+  }
 
   /**
    * Gets the tx fee for this chain.
@@ -206,11 +206,11 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getTxFee = (): BN => {
-    if (typeof this.txFee === 'undefined') {
-      this.txFee = this.getDefaultTxFee();
+    if (typeof this.txFee === "undefined") {
+      this.txFee = this.getDefaultTxFee()
     }
-    return this.txFee;
-  };
+    return this.txFee
+  }
 
   /**
    * Sets the tx fee for this chain.
@@ -218,8 +218,8 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
   setTxFee = (fee: BN) => {
-    this.txFee = fee;
-  };
+    this.txFee = fee
+  }
 
   /**
    * Gets the default creation fee for this chain.
@@ -228,9 +228,9 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getDefaultCreationTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]['P']['creationTxFee'])
-      : new BN(0);
-  };
+      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["creationTxFee"])
+      : new BN(0)
+  }
 
   /**
    * Gets the creation fee for this chain.
@@ -238,11 +238,11 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getCreationTxFee = (): BN => {
-    if (typeof this.creationTxFee === 'undefined') {
-      this.creationTxFee = this.getDefaultCreationTxFee();
+    if (typeof this.creationTxFee === "undefined") {
+      this.creationTxFee = this.getDefaultCreationTxFee()
     }
-    return this.creationTxFee;
-  };
+    return this.creationTxFee
+  }
 
   /**
    * Sets the creation fee for this chain.
@@ -250,29 +250,29 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
   setCreationTxFee = (fee: BN) => {
-    this.creationTxFee = fee;
-  };
+    this.creationTxFee = fee
+  }
 
   /**
    * Gets a reference to the keychain for this class.
    *
    * @returns The instance of [[]] for this class
    */
-  keyChain = (): KeyChain => this.keychain;
+  keyChain = (): KeyChain => this.keychain
 
   /**
    * @ignore
    */
   newKeyChain = (): KeyChain => {
     // warning, overwrites the old keychain
-    const alias = this.getBlockchainAlias();
+    const alias = this.getBlockchainAlias()
     if (alias) {
-      this.keychain = new KeyChain(this.core.getHRP(), alias);
+      this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
-      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
     }
-    return this.keychain;
-  };
+    return this.keychain
+  }
 
   /**
    * Helper function which determines if a tx is a goose egg transaction.
@@ -288,17 +288,17 @@ export class PlatformVMAPI extends JRPCAPI {
     utx: UnsignedTx,
     outTotal: BN = new BN(0)
   ): Promise<boolean> => {
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
     let outputTotal: BN = outTotal.gt(new BN(0))
       ? outTotal
-      : utx.getOutputTotal(avaxAssetID);
-    const fee: BN = utx.getBurn(avaxAssetID);
+      : utx.getOutputTotal(avaxAssetID)
+    const fee: BN = utx.getBurn(avaxAssetID)
     if (fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
-      return true;
+      return true
     } else {
-      return false;
+      return false
     }
-  };
+  }
 
   /**
    * Retrieves an assetID for a subnet"s staking assset.
@@ -307,10 +307,10 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getStakingAssetID = async (): Promise<string> => {
     const response: RequestResponseData = await this.callMethod(
-      'platform.getStakingAssetID'
-    );
-    return response.data.result.assetID;
-  };
+      "platform.getStakingAssetID"
+    )
+    return response.data.result.assetID
+  }
 
   /**
    * Creates a new blockchain.
@@ -341,18 +341,18 @@ export class PlatformVMAPI extends JRPCAPI {
       vmID,
       name,
       genesisData: genesis,
-    };
-    if (typeof subnetID === 'string') {
-      params.subnetID = subnetID;
-    } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.cb58Encode(subnetID);
+    }
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.createBlockchain',
+      "platform.createBlockchain",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Gets the status of a blockchain.
@@ -364,13 +364,13 @@ export class PlatformVMAPI extends JRPCAPI {
   getBlockchainStatus = async (blockchainID: string): Promise<string> => {
     const params: any = {
       blockchainID,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getBlockchainStatus',
+      "platform.getBlockchainStatus",
       params
-    );
-    return response.data.result.status;
-  };
+    )
+    return response.data.result.status
+  }
 
   /**
    * Create an address in the node's keystore.
@@ -387,13 +387,13 @@ export class PlatformVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.createAddress',
+      "platform.createAddress",
       params
-    );
-    return response.data.result.address;
-  };
+    )
+    return response.data.result.address
+  }
 
   /**
    * Gets the balance of a particular asset.
@@ -403,21 +403,21 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
   getBalance = async (address: string): Promise<object> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new AddressError(
-        'Error - PlatformVMAPI.getBalance: Invalid address format'
-      );
+        "Error - PlatformVMAPI.getBalance: Invalid address format"
+      )
     }
     const params: any = {
       address,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getBalance',
+      "platform.getBalance",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * List the addresses controlled by the user.
@@ -434,13 +434,13 @@ export class PlatformVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.listAddresses',
+      "platform.listAddresses",
       params
-    );
-    return response.data.result.addresses;
-  };
+    )
+    return response.data.result.addresses
+  }
 
   /**
    * Lists the set of current validators.
@@ -454,18 +454,18 @@ export class PlatformVMAPI extends JRPCAPI {
   getCurrentValidators = async (
     subnetID: Buffer | string = undefined
   ): Promise<object> => {
-    const params: any = {};
-    if (typeof subnetID === 'string') {
-      params.subnetID = subnetID;
-    } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.cb58Encode(subnetID);
+    const params: any = {}
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getCurrentValidators',
+      "platform.getCurrentValidators",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * Lists the set of pending validators.
@@ -479,19 +479,19 @@ export class PlatformVMAPI extends JRPCAPI {
   getPendingValidators = async (
     subnetID: Buffer | string = undefined
   ): Promise<object> => {
-    const params: any = {};
-    if (typeof subnetID === 'string') {
-      params.subnetID = subnetID;
-    } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.cb58Encode(subnetID);
+    const params: any = {}
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
     }
 
     const response: RequestResponseData = await this.callMethod(
-      'platform.getPendingValidators',
+      "platform.getPendingValidators",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * Samples `Size` validators from the current validator set.
@@ -508,18 +508,18 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<string[]> => {
     const params: any = {
       size: sampleSize.toString(),
-    };
-    if (typeof subnetID === 'string') {
-      params.subnetID = subnetID;
-    } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.cb58Encode(subnetID);
+    }
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.sampleValidators',
+      "platform.sampleValidators",
       params
-    );
-    return response.data.result.validators;
-  };
+    )
+    return response.data.result.validators
+  }
 
   /**
    * Add a validator to the Primary Network.
@@ -558,16 +558,16 @@ export class PlatformVMAPI extends JRPCAPI {
       endTime: endTime.getTime() / 1000,
       stakeAmount: stakeAmount.toString(10),
       rewardAddress,
-    };
-    if (typeof delegationFeeRate !== 'undefined') {
-      params.delegationFeeRate = delegationFeeRate.toString(10);
+    }
+    if (typeof delegationFeeRate !== "undefined") {
+      params.delegationFeeRate = delegationFeeRate.toString(10)
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.addValidator',
+      "platform.addValidator",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Add a validator to a Subnet other than the Primary Network. The validator must validate the Primary Network for the entire duration they validate this Subnet.
@@ -598,18 +598,18 @@ export class PlatformVMAPI extends JRPCAPI {
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
       weight,
-    };
-    if (typeof subnetID === 'string') {
-      params.subnetID = subnetID;
-    } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.cb58Encode(subnetID);
+    }
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.addSubnetValidator',
+      "platform.addSubnetValidator",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Add a delegator to the Primary Network.
@@ -643,13 +643,13 @@ export class PlatformVMAPI extends JRPCAPI {
       endTime: endTime.getTime() / 1000,
       stakeAmount: stakeAmount.toString(10),
       rewardAddress,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.addDelegator',
+      "platform.addDelegator",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Create an unsigned transaction to create a new Subnet. The unsigned transaction must be
@@ -674,13 +674,13 @@ export class PlatformVMAPI extends JRPCAPI {
       password,
       controlKeys,
       threshold,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.createSubnet',
+      "platform.createSubnet",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Get the Subnet that validates a given blockchain.
@@ -693,13 +693,13 @@ export class PlatformVMAPI extends JRPCAPI {
   validatedBy = async (blockchainID: string): Promise<string> => {
     const params: any = {
       blockchainID,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.validatedBy',
+      "platform.validatedBy",
       params
-    );
-    return response.data.result.subnetID;
-  };
+    )
+    return response.data.result.subnetID
+  }
 
   /**
    * Get the IDs of the blockchains a Subnet validates.
@@ -712,18 +712,18 @@ export class PlatformVMAPI extends JRPCAPI {
   validates = async (subnetID: Buffer | string): Promise<string[]> => {
     const params: any = {
       subnetID,
-    };
-    if (typeof subnetID === 'string') {
-      params.subnetID = subnetID;
-    } else if (typeof subnetID !== 'undefined') {
-      params.subnetID = bintools.cb58Encode(subnetID);
+    }
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.validates',
+      "platform.validates",
       params
-    );
-    return response.data.result.blockchainIDs;
-  };
+    )
+    return response.data.result.blockchainIDs
+  }
 
   /**
    * Get all the blockchains that exist (excluding the P-Chain).
@@ -732,10 +732,10 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getBlockchains = async (): Promise<object[]> => {
     const response: RequestResponseData = await this.callMethod(
-      'platform.getBlockchains'
-    );
-    return response.data.result.blockchains;
-  };
+      "platform.getBlockchains"
+    )
+    return response.data.result.blockchains
+  }
 
   /**
    * Send AVAX from an account on the P-Chain to an address on the X-Chain. This transaction
@@ -762,13 +762,13 @@ export class PlatformVMAPI extends JRPCAPI {
       password,
       to,
       amount: amount.toString(10),
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.exportAVAX',
+      "platform.exportAVAX",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Send AVAX from an account on the P-Chain to an address on the X-Chain. This transaction
@@ -796,13 +796,13 @@ export class PlatformVMAPI extends JRPCAPI {
       sourceChain,
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.importAVAX',
+      "platform.importAVAX",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
@@ -812,50 +812,50 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
-    let Transaction = '';
-    if (typeof tx === 'string') {
-      Transaction = tx;
+    let Transaction = ""
+    if (typeof tx === "string") {
+      Transaction = tx
     } else if (tx instanceof Buffer) {
-      const txobj: Tx = new Tx();
-      txobj.fromBuffer(tx);
-      Transaction = txobj.toString();
+      const txobj: Tx = new Tx()
+      txobj.fromBuffer(tx)
+      Transaction = txobj.toString()
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString();
+      Transaction = tx.toString()
     } else {
       /* istanbul ignore next */
       throw new TransactionError(
-        'Error - platform.issueTx: provided tx is not expected type of string, Buffer, or Tx'
-      );
+        "Error - platform.issueTx: provided tx is not expected type of string, Buffer, or Tx"
+      )
     }
     const params: any = {
       tx: Transaction.toString(),
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.issueTx',
+      "platform.issueTx",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Returns an upper bound on the amount of tokens that exist. Not monotonically increasing because this number can go down if a staker"s reward is denied.
    */
   getCurrentSupply = async (): Promise<BN> => {
     const response: RequestResponseData = await this.callMethod(
-      'platform.getCurrentSupply'
-    );
-    return new BN(response.data.result.supply, 10);
-  };
+      "platform.getCurrentSupply"
+    )
+    return new BN(response.data.result.supply, 10)
+  }
 
   /**
    * Returns the height of the platform chain.
    */
   getHeight = async (): Promise<BN> => {
     const response: RequestResponseData = await this.callMethod(
-      'platform.getHeight'
-    );
-    return new BN(response.data.result.height, 10);
-  };
+      "platform.getHeight"
+    )
+    return new BN(response.data.result.height, 10)
+  }
 
   /**
    * Gets the minimum staking amount.
@@ -867,24 +867,24 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<{ minValidatorStake: BN; minDelegatorStake: BN }> => {
     if (
       refresh !== true &&
-      typeof this.minValidatorStake !== 'undefined' &&
-      typeof this.minDelegatorStake !== 'undefined'
+      typeof this.minValidatorStake !== "undefined" &&
+      typeof this.minDelegatorStake !== "undefined"
     ) {
       return {
         minValidatorStake: this.minValidatorStake,
         minDelegatorStake: this.minDelegatorStake,
-      };
+      }
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getMinStake'
-    );
-    this.minValidatorStake = new BN(response.data.result.minValidatorStake, 10);
-    this.minDelegatorStake = new BN(response.data.result.minDelegatorStake, 10);
+      "platform.getMinStake"
+    )
+    this.minValidatorStake = new BN(response.data.result.minValidatorStake, 10)
+    this.minDelegatorStake = new BN(response.data.result.minDelegatorStake, 10)
     return {
       minValidatorStake: this.minValidatorStake,
       minDelegatorStake: this.minDelegatorStake,
-    };
-  };
+    }
+  }
 
   /**
    * Sets the minimum stake cached in this class.
@@ -895,47 +895,47 @@ export class PlatformVMAPI extends JRPCAPI {
     minValidatorStake: BN = undefined,
     minDelegatorStake: BN = undefined
   ): void => {
-    if (typeof minValidatorStake !== 'undefined') {
-      this.minValidatorStake = minValidatorStake;
+    if (typeof minValidatorStake !== "undefined") {
+      this.minValidatorStake = minValidatorStake
     }
-    if (typeof minDelegatorStake !== 'undefined') {
-      this.minDelegatorStake = minDelegatorStake;
+    if (typeof minDelegatorStake !== "undefined") {
+      this.minDelegatorStake = minDelegatorStake
     }
-  };
+  }
 
   /**
    * Gets the total amount staked for an array of addresses.
    */
   getStake = async (
     addresses: string[],
-    encoding: string = 'cb58'
+    encoding: string = "cb58"
   ): Promise<GetStakeResponse> => {
     const params: GetStakeParams = {
       addresses,
       encoding,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getStake',
+      "platform.getStake",
       params
-    );
+    )
     return {
       staked: new BN(response.data.result.staked, 10),
       stakedOutputs: response.data.result.stakedOutputs.map(
         (stakedOutput: string): TransferableOutput => {
           const transferableOutput: TransferableOutput =
-            new TransferableOutput();
-          let buf: Buffer;
-          if (encoding === 'cb58') {
-            buf = bintools.cb58Decode(stakedOutput);
+            new TransferableOutput()
+          let buf: Buffer
+          if (encoding === "cb58") {
+            buf = bintools.cb58Decode(stakedOutput)
           } else {
-            buf = Buffer.from(stakedOutput.replace(/0x/g, ''), 'hex');
+            buf = Buffer.from(stakedOutput.replace(/0x/g, ""), "hex")
           }
-          transferableOutput.fromBuffer(buf, 2);
-          return transferableOutput;
+          transferableOutput.fromBuffer(buf, 2)
+          return transferableOutput
         }
       ),
-    };
-  };
+    }
+  }
 
   /**
    * Get all the subnets that exist.
@@ -946,16 +946,16 @@ export class PlatformVMAPI extends JRPCAPI {
    * "controlKeys", and "threshold".
    */
   getSubnets = async (ids: string[] = undefined): Promise<object[]> => {
-    const params: any = {};
+    const params: any = {}
     if (typeof ids !== undefined) {
-      params.ids = ids;
+      params.ids = ids
     }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getSubnets',
+      "platform.getSubnets",
       params
-    );
-    return response.data.result.subnets;
-  };
+    )
+    return response.data.result.subnets
+  }
 
   /**
    * Exports the private key for an address.
@@ -975,13 +975,13 @@ export class PlatformVMAPI extends JRPCAPI {
       username,
       password,
       address,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.exportKey',
+      "platform.exportKey",
       params
-    );
-    return response.data.result.privateKey;
-  };
+    )
+    return response.data.result.privateKey
+  }
 
   /**
    * Give a user control over an address by providing the private key that controls the address.
@@ -1001,13 +1001,13 @@ export class PlatformVMAPI extends JRPCAPI {
       username,
       password,
       privateKey,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.importKey',
+      "platform.importKey",
       params
-    );
-    return response.data.result.address;
-  };
+    )
+    return response.data.result.address
+  }
 
   /**
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
@@ -1019,13 +1019,13 @@ export class PlatformVMAPI extends JRPCAPI {
   getTx = async (txid: string): Promise<string> => {
     const params: any = {
       txID: txid,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getTx',
+      "platform.getTx",
       params
-    );
-    return response.data.result.tx;
-  };
+    )
+    return response.data.result.tx
+  }
 
   /**
    * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
@@ -1042,13 +1042,13 @@ export class PlatformVMAPI extends JRPCAPI {
     const params: any = {
       txID: txid,
       includeReason: includeReason,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getTxStatus',
+      "platform.getTxStatus",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
@@ -1072,51 +1072,51 @@ export class PlatformVMAPI extends JRPCAPI {
     startIndex: { address: string; utxo: string } = undefined,
     persistOpts: PersistanceOptions = undefined
   ): Promise<{
-    numFetched: number;
-    utxos: UTXOSet;
-    endIndex: { address: string; utxo: string };
+    numFetched: number
+    utxos: UTXOSet
+    endIndex: { address: string; utxo: string }
   }> => {
-    if (typeof addresses === 'string') {
-      addresses = [addresses];
+    if (typeof addresses === "string") {
+      addresses = [addresses]
     }
 
     const params: any = {
       addresses: addresses,
       limit,
-    };
-    if (typeof startIndex !== 'undefined' && startIndex) {
-      params.startIndex = startIndex;
+    }
+    if (typeof startIndex !== "undefined" && startIndex) {
+      params.startIndex = startIndex
     }
 
-    if (typeof sourceChain !== 'undefined') {
-      params.sourceChain = sourceChain;
+    if (typeof sourceChain !== "undefined") {
+      params.sourceChain = sourceChain
     }
 
     const response: RequestResponseData = await this.callMethod(
-      'platform.getUTXOs',
+      "platform.getUTXOs",
       params
-    );
+    )
 
-    const utxos: UTXOSet = new UTXOSet();
-    let data = response.data.result.utxos;
-    if (persistOpts && typeof persistOpts === 'object') {
+    const utxos: UTXOSet = new UTXOSet()
+    let data = response.data.result.utxos
+    if (persistOpts && typeof persistOpts === "object") {
       if (this.db.has(persistOpts.getName())) {
-        const selfArray: string[] = this.db.get(persistOpts.getName());
+        const selfArray: string[] = this.db.get(persistOpts.getName())
         if (Array.isArray(selfArray)) {
-          utxos.addArray(data);
-          const self: UTXOSet = new UTXOSet();
-          self.addArray(selfArray);
-          self.mergeByRule(utxos, persistOpts.getMergeRule());
-          data = self.getAllUTXOStrings();
+          utxos.addArray(data)
+          const self: UTXOSet = new UTXOSet()
+          self.addArray(selfArray)
+          self.mergeByRule(utxos, persistOpts.getMergeRule())
+          data = self.getAllUTXOStrings()
         }
       }
-      this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
+      this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
     }
-    utxos.addArray(data, false);
-    response.data.result.utxos = utxos;
-    response.data.result.numFetched = parseInt(response.data.result.numFetched);
-    return response.data.result;
-  };
+    utxos.addArray(data, false)
+    response.data.result.utxos = utxos
+    response.data.result.numFetched = parseInt(response.data.result.numFetched)
+    return response.data.result
+  }
 
   /**
    * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
@@ -1152,43 +1152,43 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      'buildBaseTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildBaseTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildBaseTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildBaseTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildBaseTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildBaseTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
-    let srcChain: string = undefined;
+    let srcChain: string = undefined
 
-    if (typeof sourceChain === 'undefined') {
+    if (typeof sourceChain === "undefined") {
       throw new ChainIdError(
-        'Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined.'
-      );
-    } else if (typeof sourceChain === 'string') {
-      srcChain = sourceChain;
-      sourceChain = bintools.cb58Decode(sourceChain);
+        "Error - PlatformVMAPI.buildImportTx: Source ChainID is undefined."
+      )
+    } else if (typeof sourceChain === "string") {
+      srcChain = sourceChain
+      sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain);
+      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
-        'Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: ' +
+        "Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
-      );
+      )
     }
     const atomicUTXOs: UTXOSet = await (
       await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)
-    ).utxos;
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    ).utxos
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
+    const atomics: UTXO[] = atomicUTXOs.getAllUTXOs()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
       this.core.getNetworkID(),
@@ -1204,15 +1204,15 @@ export class PlatformVMAPI extends JRPCAPI {
       asOf,
       locktime,
       threshold
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
-      throw new GooseEggCheckError('Failed Goose Egg Check');
+      throw new GooseEggCheckError("Failed Goose Egg Check")
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
@@ -1243,56 +1243,56 @@ export class PlatformVMAPI extends JRPCAPI {
     locktime: BN = new BN(0),
     threshold: number = 1
   ): Promise<UnsignedTx> => {
-    let prefixes: object = {};
+    let prefixes: object = {}
     toAddresses.map((a: string): void => {
-      prefixes[a.split('-')[0]] = true;
-    });
+      prefixes[a.split("-")[0]] = true
+    })
     if (Object.keys(prefixes).length !== 1) {
       throw new AddressError(
-        'Error - PlatformVMAPI.buildExportTx: To addresses must have the same chainID prefix.'
-      );
+        "Error - PlatformVMAPI.buildExportTx: To addresses must have the same chainID prefix."
+      )
     }
 
-    if (typeof destinationChain === 'undefined') {
+    if (typeof destinationChain === "undefined") {
       throw new ChainIdError(
-        'Error - PlatformVMAPI.buildExportTx: Destination ChainID is undefined.'
-      );
-    } else if (typeof destinationChain === 'string') {
-      destinationChain = bintools.cb58Decode(destinationChain); //
+        "Error - PlatformVMAPI.buildExportTx: Destination ChainID is undefined."
+      )
+    } else if (typeof destinationChain === "string") {
+      destinationChain = bintools.cb58Decode(destinationChain) //
     } else if (!(destinationChain instanceof Buffer)) {
       throw new ChainIdError(
-        'Error - PlatformVMAPI.buildExportTx: Invalid destinationChain type: ' +
+        "Error - PlatformVMAPI.buildExportTx: Invalid destinationChain type: " +
           typeof destinationChain
-      );
+      )
     }
     if (destinationChain.length !== 32) {
       throw new ChainIdError(
-        'Error - PlatformVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.'
-      );
+        "Error - PlatformVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length."
+      )
     }
     /*
     if(bintools.cb58Encode(destinationChain) !== Defaults.network[this.core.getNetworkID()].X["blockchainID"]) {
       throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must The X-Chain ID in the current version of AvalancheJS.")
     }*/
 
-    let to: Buffer[] = [];
+    let to: Buffer[] = []
     toAddresses.map((a: string): void => {
-      to.push(bintools.stringToAddress(a));
-    });
+      to.push(bintools.stringToAddress(a))
+    })
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildExportTx'
-    ).map((a): Buffer => bintools.stringToAddress(a));
+      "buildExportTx"
+    ).map((a): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildExportTx'
-    ).map((a): Buffer => bintools.stringToAddress(a));
+      "buildExportTx"
+    ).map((a): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildExportTx(
       this.core.getNetworkID(),
@@ -1309,15 +1309,15 @@ export class PlatformVMAPI extends JRPCAPI {
       asOf,
       locktime,
       threshold
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
-      throw new GooseEggCheckError('Failed Goose Egg Check');
+      throw new GooseEggCheckError("Failed Goose Egg Check")
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned [[AddSubnetValidatorTx]]. For more granular control, you may create your own
@@ -1422,40 +1422,40 @@ return builtUnsignedTx
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      'buildAddDelegatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddDelegatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildAddDelegatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddDelegatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildAddDelegatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddDelegatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const rewards: Buffer[] = this._cleanAddressArray(
       rewardAddresses,
-      'buildAddValidatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddValidatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    const minStake: BN = (await this.getMinStake())['minDelegatorStake'];
+    const minStake: BN = (await this.getMinStake())["minDelegatorStake"]
     if (stakeAmount.lt(minStake)) {
       throw new StakeError(
-        'PlatformVMAPI.buildAddDelegatorTx -- stake amount must be at least ' +
+        "PlatformVMAPI.buildAddDelegatorTx -- stake amount must be at least " +
           minStake.toString(10)
-      );
+      )
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
-    const now: BN = UnixNow();
+    const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new TimeError(
-        'PlatformVMAPI.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime'
-      );
+        "PlatformVMAPI.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildAddDelegatorTx(
@@ -1476,15 +1476,15 @@ return builtUnsignedTx
       avaxAssetID,
       memo,
       asOf
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
-      throw new GooseEggCheckError('Failed Goose Egg Check');
+      throw new GooseEggCheckError("Failed Goose Egg Check")
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned [[AddValidatorTx]]. For more granular control, you may create your own
@@ -1525,50 +1525,50 @@ return builtUnsignedTx
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      'buildAddValidatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddValidatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildAddValidatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddValidatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildAddValidatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddValidatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const rewards: Buffer[] = this._cleanAddressArray(
       rewardAddresses,
-      'buildAddValidatorTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildAddValidatorTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    const minStake: BN = (await this.getMinStake())['minValidatorStake'];
+    const minStake: BN = (await this.getMinStake())["minValidatorStake"]
     if (stakeAmount.lt(minStake)) {
       throw new StakeError(
-        'PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least ' +
+        "PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " +
           minStake.toString(10)
-      );
+      )
     }
 
     if (
-      typeof delegationFee !== 'number' ||
+      typeof delegationFee !== "number" ||
       delegationFee > 100 ||
       delegationFee < 0
     ) {
       throw new DelegationFeeError(
-        'PlatformVMAPI.buildAddValidatorTx -- delegationFee must be a number between 0 and 100'
-      );
+        "PlatformVMAPI.buildAddValidatorTx -- delegationFee must be a number between 0 and 100"
+      )
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
-    const now: BN = UnixNow();
+    const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new TimeError(
-        'PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime'
-      );
+        "PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildAddValidatorTx(
@@ -1590,15 +1590,15 @@ return builtUnsignedTx
       avaxAssetID,
       memo,
       asOf
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
-      throw new GooseEggCheckError('Failed Goose Egg Check');
+      throw new GooseEggCheckError("Failed Goose Egg Check")
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Class representing an unsigned [[CreateSubnetTx]] transaction.
@@ -1624,22 +1624,22 @@ return builtUnsignedTx
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildCreateSubnetTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildCreateSubnetTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildCreateSubnetTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildCreateSubnetTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const owners: Buffer[] = this._cleanAddressArray(
       subnetOwnerAddresses,
-      'buildCreateSubnetTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildCreateSubnetTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateSubnetTx(
       this.core.getNetworkID(),
@@ -1652,15 +1652,15 @@ return builtUnsignedTx
       avaxAssetID,
       memo,
       asOf
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
       /* istanbul ignore next */
-      throw new GooseEggCheckError('Failed Goose Egg Check');
+      throw new GooseEggCheckError("Failed Goose Egg Check")
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * @ignore
@@ -1669,22 +1669,22 @@ return builtUnsignedTx
     addresses: string[] | Buffer[],
     caller: string
   ): string[] {
-    const addrs: string[] = [];
+    const addrs: string[] = []
     const chainid: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
-      : this.getBlockchainID();
+      : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
       for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === 'string') {
+        if (typeof addresses[i] === "string") {
           if (
-            typeof this.parseAddress(addresses[i] as string) === 'undefined'
+            typeof this.parseAddress(addresses[i] as string) === "undefined"
           ) {
             /* istanbul ignore next */
-            throw new AddressError('Error - Invalid address format');
+            throw new AddressError("Error - Invalid address format")
           }
-          addrs.push(addresses[i] as string);
+          addrs.push(addresses[i] as string)
         } else {
-          const bech32: SerializedType = 'bech32';
+          const bech32: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
               addresses[i] as Buffer,
@@ -1692,11 +1692,11 @@ return builtUnsignedTx
               this.core.getHRP(),
               chainid
             )
-          );
+          )
         }
       }
     }
-    return addrs;
+    return addrs
   }
 
   /**
@@ -1706,18 +1706,18 @@ return builtUnsignedTx
    * @param core A reference to the Avalanche class
    * @param baseurl Defaults to the string "/ext/P" as the path to blockchain"s baseurl
    */
-  constructor(core: AvalancheCore, baseurl: string = '/ext/bc/P') {
-    super(core, baseurl);
-    this.blockchainID = PlatformChainID;
-    const netid: number = core.getNetworkID();
+  constructor(core: AvalancheCore, baseurl: string = "/ext/bc/P") {
+    super(core, baseurl)
+    this.blockchainID = PlatformChainID
+    const netid: number = core.getNetworkID()
     if (
       netid in Defaults.network &&
       this.blockchainID in Defaults.network[netid]
     ) {
-      const { alias } = Defaults.network[netid][this.blockchainID];
-      this.keychain = new KeyChain(this.core.getHRP(), alias);
+      const { alias } = Defaults.network[netid][this.blockchainID]
+      this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
-      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
     }
   }
 
@@ -1733,11 +1733,11 @@ return builtUnsignedTx
     const params: GetRewardUTXOsParams = {
       txID,
       encoding,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'platform.getRewardUTXOs',
+      "platform.getRewardUTXOs",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 }

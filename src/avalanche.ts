@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module AvalancheCore
  */
-import axios, { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
-import { APIBase, RequestResponseData } from './common/apibase';
-import { getPreferredHRP } from './utils/helperfunctions';
+import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios"
+import { APIBase, RequestResponseData } from "./common/apibase"
+import { getPreferredHRP } from "./utils/helperfunctions"
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
@@ -16,27 +16,27 @@ import { getPreferredHRP } from './utils/helperfunctions';
  *
  */
 export default class AvalancheCore {
-  protected networkID: number = 0;
+  protected networkID: number = 0
 
-  protected hrp: string = '';
+  protected hrp: string = ""
 
-  protected protocol: string;
+  protected protocol: string
 
-  protected ip: string;
+  protected ip: string
 
-  protected host: string;
+  protected host: string
 
-  protected port: number;
+  protected port: number
 
-  protected url: string;
+  protected url: string
 
-  protected auth: string = undefined;
+  protected auth: string = undefined
 
-  protected headers: { [k: string]: string } = {};
+  protected headers: { [k: string]: string } = {}
 
-  protected requestConfig: AxiosRequestConfig = {};
+  protected requestConfig: AxiosRequestConfig = {}
 
-  protected apis: { [k: string]: APIBase } = {};
+  protected apis: { [k: string]: APIBase } = {}
 
   /**
    * Sets the address and port of the main Avalanche Client.
@@ -46,71 +46,71 @@ export default class AvalancheCore {
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", "git", "ws", etc ...
    */
-  setAddress = (host: string, port: number, protocol: string = 'http') => {
-    this.host = host;
-    this.port = port;
-    this.protocol = protocol;
-    let url: string = `${protocol}://${host}`;
-    if (port != undefined && typeof port === 'number' && port >= 0) {
-      url = `${url}:${port}`;
+  setAddress = (host: string, port: number, protocol: string = "http") => {
+    this.host = host
+    this.port = port
+    this.protocol = protocol
+    let url: string = `${protocol}://${host}`
+    if (port != undefined && typeof port === "number" && port >= 0) {
+      url = `${url}:${port}`
     }
-    this.url = url;
-  };
+    this.url = url
+  }
 
   /**
    * Returns the protocol such as "http", "https", "git", "ws", etc.
    */
-  getProtocol = (): string => this.protocol;
+  getProtocol = (): string => this.protocol
 
   /**
    * Returns the host for the Avalanche node.
    */
-  getHost = (): string => this.host;
+  getHost = (): string => this.host
 
   /**
    * Returns the IP for the Avalanche node.
    */
-  getIP = (): string => this.host;
+  getIP = (): string => this.host
 
   /**
    * Returns the port for the Avalanche node.
    */
-  getPort = (): number => this.port;
+  getPort = (): number => this.port
 
   /**
    * Returns the URL of the Avalanche node (ip + port)
    */
-  getURL = (): string => this.url;
+  getURL = (): string => this.url
 
   /**
    * Returns the custom headers
    */
-  getHeaders = (): object => this.headers;
+  getHeaders = (): object => this.headers
 
   /**
    * Returns the custom request config
    */
-  getRequestConfig = (): AxiosRequestConfig => this.requestConfig;
+  getRequestConfig = (): AxiosRequestConfig => this.requestConfig
 
   /**
    * Returns the networkID
    */
-  getNetworkID = (): number => this.networkID;
+  getNetworkID = (): number => this.networkID
 
   /**
    * Sets the networkID
    */
   setNetworkID = (netid: number) => {
-    this.networkID = netid;
-    this.hrp = getPreferredHRP(this.networkID);
-  };
+    this.networkID = netid
+    this.hrp = getPreferredHRP(this.networkID)
+  }
 
   /**
    * Returns the Human-Readable-Part of the network associated with this key.
    *
    * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
    */
-  getHRP = (): string => this.hrp;
+  getHRP = (): string => this.hrp
 
   /**
    * Sets the the Human-Readable-Part of the network associated with this key.
@@ -118,8 +118,8 @@ export default class AvalancheCore {
    * @param hrp String for the Human-Readable-Part of Bech32 addresses
    */
   setHRP = (hrp: string): void => {
-    this.hrp = hrp;
-  };
+    this.hrp = hrp
+  }
 
   /**
    * Adds a new custom header to be included with all requests.
@@ -128,8 +128,8 @@ export default class AvalancheCore {
    * @param value Header value
    */
   setHeader = (key: string, value: string): void => {
-    this.headers[key] = value;
-  };
+    this.headers[key] = value
+  }
 
   /**
    * Removes a previously added custom header.
@@ -137,8 +137,8 @@ export default class AvalancheCore {
    * @param key Header name
    */
   removeHeader = (key: string): void => {
-    delete this.headers[key];
-  };
+    delete this.headers[key]
+  }
 
   /**
    * Removes all headers.
@@ -146,10 +146,10 @@ export default class AvalancheCore {
   removeAllHeaders = (): void => {
     for (const prop in this.headers) {
       if (Object.prototype.hasOwnProperty.call(this.headers, prop)) {
-        delete this.headers[prop];
+        delete this.headers[prop]
       }
     }
-  };
+  }
 
   /**
    * Adds a new custom config value to be included with all requests.
@@ -158,8 +158,8 @@ export default class AvalancheCore {
    * @param value Config value
    */
   setRequestConfig = (key: string, value: string | boolean): void => {
-    this.requestConfig[key] = value;
-  };
+    this.requestConfig[key] = value
+  }
 
   /**
    * Removes a previously added request config.
@@ -167,8 +167,8 @@ export default class AvalancheCore {
    * @param key Header name
    */
   removeRequestConfig = (key: string): void => {
-    delete this.requestConfig[key];
-  };
+    delete this.requestConfig[key]
+  }
 
   /**
    * Removes all request configs.
@@ -176,10 +176,10 @@ export default class AvalancheCore {
   removeAllRequestConfigs = (): void => {
     for (const prop in this.requestConfig) {
       if (Object.prototype.hasOwnProperty.call(this.requestConfig, prop)) {
-        delete this.requestConfig[prop];
+        delete this.requestConfig[prop]
       }
     }
-  };
+  }
 
   /**
    * Sets the temporary auth token used for communicating with the node.
@@ -187,21 +187,21 @@ export default class AvalancheCore {
    * @param auth A temporary token provided by the node enabling access to the endpoints on the node.
    */
   setAuthToken = (auth: string): void => {
-    this.auth = auth;
-  };
+    this.auth = auth
+  }
 
   protected _setHeaders = (headers: any): object => {
-    if (typeof this.headers === 'object') {
+    if (typeof this.headers === "object") {
       for (const [key, value] of Object.entries(this.headers)) {
-        headers[key] = value;
+        headers[key] = value
       }
     }
 
-    if (typeof this.auth === 'string') {
-      headers.Authorization = `Bearer ${this.auth}`;
+    if (typeof this.auth === "string") {
+      headers.Authorization = `Bearer ${this.auth}`
     }
-    return headers;
-  };
+    return headers
+  }
 
   /**
    * Adds an API to the middleware. The API resolves to a registered blockchain's RPC.
@@ -232,19 +232,19 @@ export default class AvalancheCore {
     baseurl: string = undefined,
     ...args: any[]
   ) => {
-    if (typeof baseurl === 'undefined') {
-      this.apis[apiName] = new ConstructorFN(this, undefined, ...args);
+    if (typeof baseurl === "undefined") {
+      this.apis[apiName] = new ConstructorFN(this, undefined, ...args)
     } else {
-      this.apis[apiName] = new ConstructorFN(this, baseurl, ...args);
+      this.apis[apiName] = new ConstructorFN(this, baseurl, ...args)
     }
-  };
+  }
 
   /**
    * Retrieves a reference to an API by its apiName label.
    *
    * @param apiName Name of the API to return
    */
-  api = <GA extends APIBase>(apiName: string): GA => this.apis[apiName] as GA;
+  api = <GA extends APIBase>(apiName: string): GA => this.apis[apiName] as GA
 
   /**
    * @ignore
@@ -257,34 +257,34 @@ export default class AvalancheCore {
     headers: object = {},
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> => {
-    let config: AxiosRequestConfig;
+    let config: AxiosRequestConfig
     if (axiosConfig) {
       config = {
         ...axiosConfig,
         ...this.requestConfig,
-      };
+      }
     } else {
       config = {
         baseURL: `${this.protocol}://${this.ip}:${this.port}`,
-        responseType: 'text',
+        responseType: "text",
         ...this.requestConfig,
-      };
+      }
     }
-    config.url = baseurl;
-    config.method = xhrmethod;
-    config.headers = headers;
-    config.data = postdata;
-    config.params = getdata;
-    const resp: AxiosResponse<any> = await axios.request(config);
+    config.url = baseurl
+    config.method = xhrmethod
+    config.headers = headers
+    config.data = postdata
+    config.params = getdata
+    const resp: AxiosResponse<any> = await axios.request(config)
     // purging all that is axios
-    const xhrdata: RequestResponseData = new RequestResponseData();
-    xhrdata.data = resp.data;
-    xhrdata.headers = resp.headers;
-    xhrdata.request = resp.request;
-    xhrdata.status = resp.status;
-    xhrdata.statusText = resp.statusText;
-    return xhrdata;
-  };
+    const xhrdata: RequestResponseData = new RequestResponseData()
+    xhrdata.data = resp.data
+    xhrdata.headers = resp.headers
+    xhrdata.request = resp.request
+    xhrdata.status = resp.status
+    xhrdata.statusText = resp.statusText
+    return xhrdata
+  }
 
   /**
    * Makes a GET call to an API.
@@ -305,13 +305,13 @@ export default class AvalancheCore {
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> =>
     this._request(
-      'GET',
+      "GET",
       baseurl,
       getdata,
       {},
       this._setHeaders(headers),
       axiosConfig
-    );
+    )
 
   /**
    * Makes a DELETE call to an API.
@@ -332,13 +332,13 @@ export default class AvalancheCore {
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> =>
     this._request(
-      'DELETE',
+      "DELETE",
       baseurl,
       getdata,
       {},
       this._setHeaders(headers),
       axiosConfig
-    );
+    )
 
   /**
    * Makes a POST call to an API.
@@ -361,13 +361,13 @@ export default class AvalancheCore {
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> =>
     this._request(
-      'POST',
+      "POST",
       baseurl,
       getdata,
       postdata,
       this._setHeaders(headers),
       axiosConfig
-    );
+    )
 
   /**
    * Makes a PUT call to an API.
@@ -390,13 +390,13 @@ export default class AvalancheCore {
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> =>
     this._request(
-      'PUT',
+      "PUT",
       baseurl,
       getdata,
       postdata,
       this._setHeaders(headers),
       axiosConfig
-    );
+    )
 
   /**
    * Makes a PATCH call to an API.
@@ -419,13 +419,13 @@ export default class AvalancheCore {
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> =>
     this._request(
-      'PATCH',
+      "PATCH",
       baseurl,
       getdata,
       postdata,
       this._setHeaders(headers),
       axiosConfig
-    );
+    )
 
   /**
    * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
@@ -434,7 +434,7 @@ export default class AvalancheCore {
    * @param port The port to resolve to reach the Avalanche Client APIs
    * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
    */
-  constructor(host: string, port: number, protocol: string = 'http') {
-    this.setAddress(host, port, protocol);
+  constructor(host: string, port: number, protocol: string = "http") {
+    this.setAddress(host, port, protocol)
   }
 }

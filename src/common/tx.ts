@@ -2,30 +2,30 @@
  * @packageDocumentation
  * @module Common-Transactions
  */
-import { Buffer } from 'buffer/';
-import BinTools from '../utils/bintools';
-import { Credential } from './credentials';
-import BN from 'bn.js';
-import { StandardKeyChain, StandardKeyPair } from './keychain';
-import { StandardAmountInput, StandardTransferableInput } from './input';
-import { StandardAmountOutput, StandardTransferableOutput } from './output';
-import { DefaultNetworkID } from '../utils/constants';
+import { Buffer } from "buffer/"
+import BinTools from "../utils/bintools"
+import { Credential } from "./credentials"
+import BN from "bn.js"
+import { StandardKeyChain, StandardKeyPair } from "./keychain"
+import { StandardAmountInput, StandardTransferableInput } from "./input"
+import { StandardAmountOutput, StandardTransferableOutput } from "./output"
+import { DefaultNetworkID } from "../utils/constants"
 import {
   Serializable,
   Serialization,
   SerializedEncoding,
   SerializedType,
-} from '../utils/serialization';
+} from "../utils/serialization"
 
 /**
  * @ignore
  */
-const bintools: BinTools = BinTools.getInstance();
-const serialization: Serialization = Serialization.getInstance();
-const cb58: SerializedType = 'cb58';
-const hex: SerializedType = 'hex';
-const decimalString: SerializedType = 'decimalString';
-const buffer: SerializedType = 'Buffer';
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
+const cb58: SerializedType = "cb58"
+const hex: SerializedType = "hex"
+const decimalString: SerializedType = "decimalString"
+const buffer: SerializedType = "Buffer"
 
 /**
  * Class representing a base for all transactions.
@@ -34,11 +34,11 @@ export abstract class StandardBaseTx<
   KPClass extends StandardKeyPair,
   KCClass extends StandardKeyChain<KPClass>
 > extends Serializable {
-  protected _typeName = 'StandardBaseTx';
-  protected _typeID = undefined;
+  protected _typeName = "StandardBaseTx"
+  protected _typeID = undefined
 
-  serialize(encoding: SerializedEncoding = 'hex'): object {
-    const fields: object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    const fields: object = super.serialize(encoding)
     return {
       ...fields,
       networkID: serialization.encoder(
@@ -56,109 +56,109 @@ export abstract class StandardBaseTx<
       outs: this.outs.map((o) => o.serialize(encoding)),
       ins: this.ins.map((i) => i.serialize(encoding)),
       memo: serialization.encoder(this.memo, encoding, buffer, hex),
-    };
+    }
   }
 
-  deserialize(fields: object, encoding: SerializedEncoding = 'hex') {
-    super.deserialize(fields, encoding);
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding)
     this.networkID = serialization.decoder(
-      fields['networkID'],
+      fields["networkID"],
       encoding,
       decimalString,
       buffer,
       4
-    );
+    )
     this.blockchainID = serialization.decoder(
-      fields['blockchainID'],
+      fields["blockchainID"],
       encoding,
       cb58,
       buffer,
       32
-    );
-    this.memo = serialization.decoder(fields['memo'], encoding, hex, buffer);
+    )
+    this.memo = serialization.decoder(fields["memo"], encoding, hex, buffer)
   }
 
-  protected networkID: Buffer = Buffer.alloc(4);
-  protected blockchainID: Buffer = Buffer.alloc(32);
-  protected numouts: Buffer = Buffer.alloc(4);
-  protected outs: StandardTransferableOutput[];
-  protected numins: Buffer = Buffer.alloc(4);
-  protected ins: StandardTransferableInput[];
-  protected memo: Buffer = Buffer.alloc(0);
+  protected networkID: Buffer = Buffer.alloc(4)
+  protected blockchainID: Buffer = Buffer.alloc(32)
+  protected numouts: Buffer = Buffer.alloc(4)
+  protected outs: StandardTransferableOutput[]
+  protected numins: Buffer = Buffer.alloc(4)
+  protected ins: StandardTransferableInput[]
+  protected memo: Buffer = Buffer.alloc(0)
 
   /**
    * Returns the id of the [[StandardBaseTx]]
    */
-  abstract getTxType: () => number;
+  abstract getTxType: () => number
 
   /**
    * Returns the NetworkID as a number
    */
-  getNetworkID = (): number => this.networkID.readUInt32BE(0);
+  getNetworkID = (): number => this.networkID.readUInt32BE(0)
 
   /**
    * Returns the Buffer representation of the BlockchainID
    */
-  getBlockchainID = (): Buffer => this.blockchainID;
+  getBlockchainID = (): Buffer => this.blockchainID
 
   /**
    * Returns the array of [[StandardTransferableInput]]s
    */
-  abstract getIns(): StandardTransferableInput[];
+  abstract getIns(): StandardTransferableInput[]
 
   /**
    * Returns the array of [[StandardTransferableOutput]]s
    */
-  abstract getOuts(): StandardTransferableOutput[];
+  abstract getOuts(): StandardTransferableOutput[]
 
   /**
    * Returns the array of combined total [[StandardTransferableOutput]]s
    */
-  abstract getTotalOuts(): StandardTransferableOutput[];
+  abstract getTotalOuts(): StandardTransferableOutput[]
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo
    */
-  getMemo = (): Buffer => this.memo;
+  getMemo = (): Buffer => this.memo
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
    */
   toBuffer(): Buffer {
-    this.outs.sort(StandardTransferableOutput.comparator());
-    this.ins.sort(StandardTransferableInput.comparator());
-    this.numouts.writeUInt32BE(this.outs.length, 0);
-    this.numins.writeUInt32BE(this.ins.length, 0);
+    this.outs.sort(StandardTransferableOutput.comparator())
+    this.ins.sort(StandardTransferableInput.comparator())
+    this.numouts.writeUInt32BE(this.outs.length, 0)
+    this.numins.writeUInt32BE(this.ins.length, 0)
     let bsize: number =
-      this.networkID.length + this.blockchainID.length + this.numouts.length;
-    const barr: Buffer[] = [this.networkID, this.blockchainID, this.numouts];
+      this.networkID.length + this.blockchainID.length + this.numouts.length
+    const barr: Buffer[] = [this.networkID, this.blockchainID, this.numouts]
     for (let i: number = 0; i < this.outs.length; i++) {
-      const b: Buffer = this.outs[i].toBuffer();
-      barr.push(b);
-      bsize += b.length;
+      const b: Buffer = this.outs[i].toBuffer()
+      barr.push(b)
+      bsize += b.length
     }
-    barr.push(this.numins);
-    bsize += this.numins.length;
+    barr.push(this.numins)
+    bsize += this.numins.length
     for (let i: number = 0; i < this.ins.length; i++) {
-      const b: Buffer = this.ins[i].toBuffer();
-      barr.push(b);
-      bsize += b.length;
+      const b: Buffer = this.ins[i].toBuffer()
+      barr.push(b)
+      bsize += b.length
     }
-    let memolen: Buffer = Buffer.alloc(4);
-    memolen.writeUInt32BE(this.memo.length, 0);
-    barr.push(memolen);
-    bsize += 4;
-    barr.push(this.memo);
-    bsize += this.memo.length;
-    const buff: Buffer = Buffer.concat(barr, bsize);
-    return buff;
+    let memolen: Buffer = Buffer.alloc(4)
+    memolen.writeUInt32BE(this.memo.length, 0)
+    barr.push(memolen)
+    bsize += 4
+    barr.push(this.memo)
+    bsize += this.memo.length
+    const buff: Buffer = Buffer.concat(barr, bsize)
+    return buff
   }
 
   /**
    * Returns a base-58 representation of the [[StandardBaseTx]].
    */
   toString(): string {
-    return bintools.bufferToB58(this.toBuffer());
+    return bintools.bufferToB58(this.toBuffer())
   }
 
   /**
@@ -169,13 +169,13 @@ export abstract class StandardBaseTx<
    *
    * @returns An array of [[Credential]]s
    */
-  abstract sign(msg: Buffer, kc: StandardKeyChain<KPClass>): Credential[];
+  abstract sign(msg: Buffer, kc: StandardKeyChain<KPClass>): Credential[]
 
-  abstract clone(): this;
+  abstract clone(): this
 
-  abstract create(...args: any[]): this;
+  abstract create(...args: any[]): this
 
-  abstract select(id: number, ...args: any[]): this;
+  abstract select(id: number, ...args: any[]): this
 
   /**
    * Class representing a StandardBaseTx which is the foundation for all transactions.
@@ -193,18 +193,18 @@ export abstract class StandardBaseTx<
     ins: StandardTransferableInput[] = undefined,
     memo: Buffer = undefined
   ) {
-    super();
-    this.networkID.writeUInt32BE(networkID, 0);
-    this.blockchainID = blockchainID;
-    if (typeof memo != 'undefined') {
-      this.memo = memo;
+    super()
+    this.networkID.writeUInt32BE(networkID, 0)
+    this.blockchainID = blockchainID
+    if (typeof memo != "undefined") {
+      this.memo = memo
     }
 
-    if (typeof ins !== 'undefined' && typeof outs !== 'undefined') {
-      this.numouts.writeUInt32BE(outs.length, 0);
-      this.outs = outs.sort(StandardTransferableOutput.comparator());
-      this.numins.writeUInt32BE(ins.length, 0);
-      this.ins = ins.sort(StandardTransferableInput.comparator());
+    if (typeof ins !== "undefined" && typeof outs !== "undefined") {
+      this.numouts.writeUInt32BE(outs.length, 0)
+      this.outs = outs.sort(StandardTransferableOutput.comparator())
+      this.numins.writeUInt32BE(ins.length, 0)
+      this.ins = ins.sort(StandardTransferableInput.comparator())
     }
   }
 }
@@ -217,120 +217,120 @@ export abstract class StandardUnsignedTx<
   KCClass extends StandardKeyChain<KPClass>,
   SBTx extends StandardBaseTx<KPClass, KCClass>
 > extends Serializable {
-  protected _typeName = 'StandardUnsignedTx';
-  protected _typeID = undefined;
+  protected _typeName = "StandardUnsignedTx"
+  protected _typeID = undefined
 
-  serialize(encoding: SerializedEncoding = 'hex'): object {
-    let fields: object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding)
     return {
       ...fields,
       codecID: serialization.encoder(
         this.codecID,
         encoding,
-        'number',
-        'decimalString',
+        "number",
+        "decimalString",
         2
       ),
       transaction: this.transaction.serialize(encoding),
-    };
+    }
   }
 
-  deserialize(fields: object, encoding: SerializedEncoding = 'hex') {
-    super.deserialize(fields, encoding);
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding)
     this.codecID = serialization.decoder(
-      fields['codecID'],
+      fields["codecID"],
       encoding,
-      'decimalString',
-      'number'
-    );
+      "decimalString",
+      "number"
+    )
   }
 
-  protected codecID: number = 0;
-  protected transaction: SBTx;
+  protected codecID: number = 0
+  protected transaction: SBTx
 
   /**
    * Returns the CodecID as a number
    */
-  getCodecID = (): number => this.codecID;
+  getCodecID = (): number => this.codecID
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
    */
   getCodecIDBuffer = (): Buffer => {
-    let codecBuf: Buffer = Buffer.alloc(2);
-    codecBuf.writeUInt16BE(this.codecID, 0);
-    return codecBuf;
-  };
+    let codecBuf: Buffer = Buffer.alloc(2)
+    codecBuf.writeUInt16BE(this.codecID, 0)
+    return codecBuf
+  }
 
   /**
    * Returns the inputTotal as a BN
    */
   getInputTotal = (assetID: Buffer): BN => {
-    const ins: StandardTransferableInput[] = this.getTransaction().getIns();
-    const aIDHex: string = assetID.toString('hex');
-    let total: BN = new BN(0);
+    const ins: StandardTransferableInput[] = this.getTransaction().getIns()
+    const aIDHex: string = assetID.toString("hex")
+    let total: BN = new BN(0)
 
     for (let i: number = 0; i < ins.length; i++) {
       // only check StandardAmountInputs
       if (
         ins[i].getInput() instanceof StandardAmountInput &&
-        aIDHex === ins[i].getAssetID().toString('hex')
+        aIDHex === ins[i].getAssetID().toString("hex")
       ) {
-        const input = ins[i].getInput() as StandardAmountInput;
-        total = total.add(input.getAmount());
+        const input = ins[i].getInput() as StandardAmountInput
+        total = total.add(input.getAmount())
       }
     }
-    return total;
-  };
+    return total
+  }
 
   /**
    * Returns the outputTotal as a BN
    */
   getOutputTotal = (assetID: Buffer): BN => {
     const outs: StandardTransferableOutput[] =
-      this.getTransaction().getTotalOuts();
-    const aIDHex: string = assetID.toString('hex');
-    let total: BN = new BN(0);
+      this.getTransaction().getTotalOuts()
+    const aIDHex: string = assetID.toString("hex")
+    let total: BN = new BN(0)
 
     for (let i: number = 0; i < outs.length; i++) {
       // only check StandardAmountOutput
       if (
         outs[i].getOutput() instanceof StandardAmountOutput &&
-        aIDHex === outs[i].getAssetID().toString('hex')
+        aIDHex === outs[i].getAssetID().toString("hex")
       ) {
         const output: StandardAmountOutput = outs[
           i
-        ].getOutput() as StandardAmountOutput;
-        total = total.add(output.getAmount());
+        ].getOutput() as StandardAmountOutput
+        total = total.add(output.getAmount())
       }
     }
-    return total;
-  };
+    return total
+  }
 
   /**
    * Returns the number of burned tokens as a BN
    */
   getBurn = (assetID: Buffer): BN => {
-    return this.getInputTotal(assetID).sub(this.getOutputTotal(assetID));
-  };
+    return this.getInputTotal(assetID).sub(this.getOutputTotal(assetID))
+  }
 
   /**
    * Returns the Transaction
    */
-  abstract getTransaction(): SBTx;
+  abstract getTransaction(): SBTx
 
-  abstract fromBuffer(bytes: Buffer, offset?: number): number;
+  abstract fromBuffer(bytes: Buffer, offset?: number): number
 
   toBuffer(): Buffer {
-    const codecBuf: Buffer = Buffer.alloc(2);
-    codecBuf.writeUInt16BE(this.transaction.getCodecID(), 0);
-    const txtype: Buffer = Buffer.alloc(4);
-    txtype.writeUInt32BE(this.transaction.getTxType(), 0);
-    const basebuff = this.transaction.toBuffer();
+    const codecBuf: Buffer = Buffer.alloc(2)
+    codecBuf.writeUInt16BE(this.transaction.getCodecID(), 0)
+    const txtype: Buffer = Buffer.alloc(4)
+    txtype.writeUInt32BE(this.transaction.getTxType(), 0)
+    const basebuff = this.transaction.toBuffer()
     return Buffer.concat(
       [codecBuf, txtype, basebuff],
       codecBuf.length + txtype.length + basebuff.length
-    );
+    )
   }
 
   /**
@@ -342,12 +342,12 @@ export abstract class StandardUnsignedTx<
    */
   abstract sign(
     kc: KCClass
-  ): StandardTx<KPClass, KCClass, StandardUnsignedTx<KPClass, KCClass, SBTx>>;
+  ): StandardTx<KPClass, KCClass, StandardUnsignedTx<KPClass, KCClass, SBTx>>
 
   constructor(transaction: SBTx = undefined, codecID: number = 0) {
-    super();
-    this.codecID = codecID;
-    this.transaction = transaction;
+    super()
+    this.codecID = codecID
+    this.transaction = transaction
   }
 }
 
@@ -363,61 +363,61 @@ export abstract class StandardTx<
     StandardBaseTx<KPClass, KCClass>
   >
 > extends Serializable {
-  protected _typeName = 'StandardTx';
-  protected _typeID = undefined;
+  protected _typeName = "StandardTx"
+  protected _typeID = undefined
 
-  serialize(encoding: SerializedEncoding = 'hex'): object {
-    let fields: object = super.serialize(encoding);
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding)
     return {
       ...fields,
       unsignedTx: this.unsignedTx.serialize(encoding),
       credentials: this.credentials.map((c) => c.serialize(encoding)),
-    };
+    }
   }
 
-  protected unsignedTx: SUBTx = undefined;
-  protected credentials: Credential[] = [];
+  protected unsignedTx: SUBTx = undefined
+  protected credentials: Credential[] = []
 
   /**
    * Returns the [[Credential[]]]
    */
   getCredentials = (): Credential[] => {
-    return this.credentials;
-  };
+    return this.credentials
+  }
 
   /**
    * Returns the [[StandardUnsignedTx]]
    */
   getUnsignedTx = (): SUBTx => {
-    return this.unsignedTx;
-  };
+    return this.unsignedTx
+  }
 
-  abstract fromBuffer(bytes: Buffer, offset?: number): number;
+  abstract fromBuffer(bytes: Buffer, offset?: number): number
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
    */
   toBuffer(): Buffer {
-    const tx = this.unsignedTx.getTransaction();
-    const codecID: number = tx.getCodecID();
-    const txbuff: Buffer = this.unsignedTx.toBuffer();
-    let bsize: number = txbuff.length;
-    const credlen: Buffer = Buffer.alloc(4);
-    credlen.writeUInt32BE(this.credentials.length, 0);
-    const barr: Buffer[] = [txbuff, credlen];
-    bsize += credlen.length;
+    const tx = this.unsignedTx.getTransaction()
+    const codecID: number = tx.getCodecID()
+    const txbuff: Buffer = this.unsignedTx.toBuffer()
+    let bsize: number = txbuff.length
+    const credlen: Buffer = Buffer.alloc(4)
+    credlen.writeUInt32BE(this.credentials.length, 0)
+    const barr: Buffer[] = [txbuff, credlen]
+    bsize += credlen.length
     for (let i: number = 0; i < this.credentials.length; i++) {
-      this.credentials[i].setCodecID(codecID);
-      const credID: Buffer = Buffer.alloc(4);
-      credID.writeUInt32BE(this.credentials[i].getCredentialID(), 0);
-      barr.push(credID);
-      bsize += credID.length;
-      const credbuff: Buffer = this.credentials[i].toBuffer();
-      bsize += credbuff.length;
-      barr.push(credbuff);
+      this.credentials[i].setCodecID(codecID)
+      const credID: Buffer = Buffer.alloc(4)
+      credID.writeUInt32BE(this.credentials[i].getCredentialID(), 0)
+      barr.push(credID)
+      bsize += credID.length
+      const credbuff: Buffer = this.credentials[i].toBuffer()
+      bsize += credbuff.length
+      barr.push(credbuff)
     }
-    const buff: Buffer = Buffer.concat(barr, bsize);
-    return buff;
+    const buff: Buffer = Buffer.concat(barr, bsize)
+    return buff
   }
 
   /**
@@ -431,7 +431,7 @@ export abstract class StandardTx<
    * unlike most fromStrings, it expects the string to be serialized in cb58 format
    */
   fromString(serialized: string): number {
-    return this.fromBuffer(bintools.cb58Decode(serialized));
+    return this.fromBuffer(bintools.cb58Decode(serialized))
   }
 
   /**
@@ -441,7 +441,7 @@ export abstract class StandardTx<
    * unlike most toStrings, this returns in cb58 serialization format
    */
   toString(): string {
-    return bintools.cb58Encode(this.toBuffer());
+    return bintools.cb58Encode(this.toBuffer())
   }
 
   /**
@@ -454,11 +454,11 @@ export abstract class StandardTx<
     unsignedTx: SUBTx = undefined,
     credentials: Credential[] = undefined
   ) {
-    super();
-    if (typeof unsignedTx !== 'undefined') {
-      this.unsignedTx = unsignedTx;
-      if (typeof credentials !== 'undefined') {
-        this.credentials = credentials;
+    super()
+    if (typeof unsignedTx !== "undefined") {
+      this.unsignedTx = unsignedTx
+      if (typeof credentials !== "undefined") {
+        this.credentials = credentials
       }
     }
   }

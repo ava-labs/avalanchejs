@@ -1,6 +1,6 @@
 export default class PubSub {
   newSet() {
-    return JSON.stringify({ newSet: {} });
+    return JSON.stringify({ newSet: {} })
   }
   newBloom(maxElements: number = 1000, collisionProb: number = 0.01) {
     return JSON.stringify({
@@ -8,13 +8,13 @@ export default class PubSub {
         maxElements: maxElements,
         collisionProb: collisionProb,
       },
-    });
+    })
   }
   addAddresses(addresses: string[]) {
     return JSON.stringify({
       addAddresses: {
         addresses: addresses,
       },
-    });
+    })
   }
 }

@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module Index-Auth
  */
-import AvalancheCore from '../../avalanche';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
+import AvalancheCore from "../../avalanche"
+import { JRPCAPI } from "../../common/jrpcapi"
+import { RequestResponseData } from "../../common/apibase"
 import {
   GetLastAcceptedParams,
   GetLastAcceptedResponse,
@@ -16,7 +16,7 @@ import {
   GetContainerRangeResponse,
   GetIndexParams,
   GetIsAcceptedParams,
-} from '../../common/interfaces';
+} from "../../common/interfaces"
 
 /**
  * Class for interacting with a node's IndexAPI.
@@ -35,24 +35,24 @@ export class IndexAPI extends JRPCAPI {
    * @returns Returns a Promise<GetLastAcceptedResponse>.
    */
   getLastAccepted = async (
-    encoding: string = 'cb58',
+    encoding: string = "cb58",
     baseurl: string = this.getBaseURL()
   ): Promise<GetLastAcceptedResponse> => {
-    this.setBaseURL(baseurl);
+    this.setBaseURL(baseurl)
     const params: GetLastAcceptedParams = {
       encoding,
-    };
+    }
 
     try {
       const response: RequestResponseData = await this.callMethod(
-        'index.getLastAccepted',
+        "index.getLastAccepted",
         params
-      );
-      return response['data']['result'];
+      )
+      return response["data"]["result"]
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   /**
    * Get container by index
@@ -64,26 +64,26 @@ export class IndexAPI extends JRPCAPI {
    * @returns Returns a Promise<GetContainerByIndexResponse>.
    */
   getContainerByIndex = async (
-    index: string = '0',
-    encoding: string = 'cb58',
+    index: string = "0",
+    encoding: string = "cb58",
     baseurl: string = this.getBaseURL()
   ): Promise<GetContainerByIndexResponse> => {
-    this.setBaseURL(baseurl);
+    this.setBaseURL(baseurl)
     const params: GetContainerByIndexParams = {
       index,
       encoding,
-    };
+    }
 
     try {
       const response: RequestResponseData = await this.callMethod(
-        'index.getContainerByIndex',
+        "index.getContainerByIndex",
         params
-      );
-      return response['data']['result'];
+      )
+      return response["data"]["result"]
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   /**
    * Get contrainer by ID
@@ -95,26 +95,26 @@ export class IndexAPI extends JRPCAPI {
    * @returns Returns a Promise<GetContainerByIDResponse>.
    */
   getContainerByID = async (
-    containerID: string = '0',
-    encoding: string = 'cb58',
+    containerID: string = "0",
+    encoding: string = "cb58",
     baseurl: string = this.getBaseURL()
   ): Promise<GetContainerByIDResponse> => {
-    this.setBaseURL(baseurl);
+    this.setBaseURL(baseurl)
     const params: GetContainerByIDParams = {
       containerID,
       encoding,
-    };
+    }
 
     try {
       const response: RequestResponseData = await this.callMethod(
-        'index.getContainerByID',
+        "index.getContainerByID",
         params
-      );
-      return response['data']['result'];
+      )
+      return response["data"]["result"]
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   /**
    * Get container range
@@ -129,26 +129,26 @@ export class IndexAPI extends JRPCAPI {
   getContainerRange = async (
     startIndex: number = 0,
     numToFetch: number = 100,
-    encoding: string = 'cb58',
+    encoding: string = "cb58",
     baseurl: string = this.getBaseURL()
   ): Promise<GetContainerRangeResponse[]> => {
-    this.setBaseURL(baseurl);
+    this.setBaseURL(baseurl)
     const params: GetContainerRangeParams = {
       startIndex,
       numToFetch,
       encoding,
-    };
+    }
 
     try {
       const response: RequestResponseData = await this.callMethod(
-        'index.getContainerRange',
+        "index.getContainerRange",
         params
-      );
-      return response['data']['result'];
+      )
+      return response["data"]["result"]
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   /**
    * Get index by containerID
@@ -160,26 +160,26 @@ export class IndexAPI extends JRPCAPI {
    * @returns Returns a Promise<GetIndexResponse>.
    */
   getIndex = async (
-    containerID: string = '',
-    encoding: string = 'cb58',
+    containerID: string = "",
+    encoding: string = "cb58",
     baseurl: string = this.getBaseURL()
   ): Promise<string> => {
-    this.setBaseURL(baseurl);
+    this.setBaseURL(baseurl)
     const params: GetIndexParams = {
       containerID,
       encoding,
-    };
+    }
 
     try {
       const response: RequestResponseData = await this.callMethod(
-        'index.getIndex',
+        "index.getIndex",
         params
-      );
-      return response['data']['result']['index'];
+      )
+      return response["data"]["result"]["index"]
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
   /**
    * Check if container is accepted
@@ -191,28 +191,28 @@ export class IndexAPI extends JRPCAPI {
    * @returns Returns a Promise<GetIsAcceptedResponse>.
    */
   isAccepted = async (
-    containerID: string = '',
-    encoding: string = 'cb58',
+    containerID: string = "",
+    encoding: string = "cb58",
     baseurl: string = this.getBaseURL()
   ): Promise<boolean> => {
-    this.setBaseURL(baseurl);
+    this.setBaseURL(baseurl)
     const params: GetIsAcceptedParams = {
       containerID,
       encoding,
-    };
+    }
 
     try {
       const response: RequestResponseData = await this.callMethod(
-        'index.isAccepted',
+        "index.isAccepted",
         params
-      );
-      return response['data']['result'];
+      )
+      return response["data"]["result"]
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
+  }
 
-  constructor(core: AvalancheCore, baseurl: string = '/ext/index/X/tx') {
-    super(core, baseurl);
+  constructor(core: AvalancheCore, baseurl: string = "/ext/index/X/tx") {
+    super(core, baseurl)
   }
 }

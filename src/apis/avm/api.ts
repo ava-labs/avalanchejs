@@ -2,25 +2,25 @@
  * @packageDocumentation
  * @module API-AVM
  */
-import BN from 'bn.js';
-import { Buffer } from 'buffer/';
-import AvalancheCore from '../../avalanche';
-import BinTools from '../../utils/bintools';
-import { UTXO, UTXOSet } from './utxos';
-import { AVMConstants } from './constants';
-import { KeyChain } from './keychain';
-import { Tx, UnsignedTx } from './tx';
-import { PayloadBase } from '../../utils/payload';
-import { SECPMintOutput } from './outputs';
-import { InitialStates } from './initialstates';
-import { UnixNow } from '../../utils/helperfunctions';
-import { JRPCAPI } from '../../common/jrpcapi';
-import { RequestResponseData } from '../../common/apibase';
-import { Defaults, PrimaryAssetAlias, ONEAVAX } from '../../utils/constants';
-import { MinterSet } from './minterset';
-import { PersistanceOptions } from '../../utils/persistenceoptions';
-import { OutputOwners } from '../../common/output';
-import { SECPTransferOutput } from './outputs';
+import BN from "bn.js"
+import { Buffer } from "buffer/"
+import AvalancheCore from "../../avalanche"
+import BinTools from "../../utils/bintools"
+import { UTXO, UTXOSet } from "./utxos"
+import { AVMConstants } from "./constants"
+import { KeyChain } from "./keychain"
+import { Tx, UnsignedTx } from "./tx"
+import { PayloadBase } from "../../utils/payload"
+import { SECPMintOutput } from "./outputs"
+import { InitialStates } from "./initialstates"
+import { UnixNow } from "../../utils/helperfunctions"
+import { JRPCAPI } from "../../common/jrpcapi"
+import { RequestResponseData } from "../../common/apibase"
+import { Defaults, PrimaryAssetAlias, ONEAVAX } from "../../utils/constants"
+import { MinterSet } from "./minterset"
+import { PersistanceOptions } from "../../utils/persistenceoptions"
+import { OutputOwners } from "../../common/output"
+import { SECPTransferOutput } from "./outputs"
 import {
   AddressError,
   GooseEggCheckError,
@@ -29,14 +29,14 @@ import {
   SymbolError,
   NameError,
   TransactionError,
-} from '../../utils/errors';
-import { Serialization, SerializedType } from '../../utils';
+} from "../../utils/errors"
+import { Serialization, SerializedType } from "../../utils"
 
 /**
  * @ignore
  */
-const bintools: BinTools = BinTools.getInstance();
-const serialization: Serialization = Serialization.getInstance();
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for interacting with a node endpoint that is using the AVM.
@@ -49,12 +49,12 @@ export class AVMAPI extends JRPCAPI {
   /**
    * @ignore
    */
-  protected keychain: KeyChain = new KeyChain('', '');
-  protected blockchainID: string = '';
-  protected blockchainAlias: string = undefined;
-  protected AVAXAssetID: Buffer = undefined;
-  protected txFee: BN = undefined;
-  protected creationTxFee: BN = undefined;
+  protected keychain: KeyChain = new KeyChain("", "")
+  protected blockchainID: string = ""
+  protected blockchainAlias: string = undefined
+  protected AVAXAssetID: Buffer = undefined
+  protected txFee: BN = undefined
+  protected creationTxFee: BN = undefined
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
@@ -62,21 +62,21 @@ export class AVMAPI extends JRPCAPI {
    * @returns The alias for the blockchainID
    */
   getBlockchainAlias = (): string => {
-    if (typeof this.blockchainAlias === 'undefined') {
-      const netid: number = this.core.getNetworkID();
+    if (typeof this.blockchainAlias === "undefined") {
+      const netid: number = this.core.getNetworkID()
       if (
         netid in Defaults.network &&
         this.blockchainID in Defaults.network[netid]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias;
-        return this.blockchainAlias;
+        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        return this.blockchainAlias
       } else {
         /* istanbul ignore next */
-        return undefined;
+        return undefined
       }
     }
-    return this.blockchainAlias;
-  };
+    return this.blockchainAlias
+  }
 
   /**
    * Sets the alias for the blockchainID.
@@ -85,17 +85,17 @@ export class AVMAPI extends JRPCAPI {
    *
    */
   setBlockchainAlias = (alias: string): string => {
-    this.blockchainAlias = alias;
+    this.blockchainAlias = alias
     /* istanbul ignore next */
-    return undefined;
-  };
+    return undefined
+  }
 
   /**
    * Gets the blockchainID and returns it.
    *
    * @returns The blockchainID
    */
-  getBlockchainID = (): string => this.blockchainID;
+  getBlockchainID = (): string => this.blockchainID
 
   /**
    * Refresh blockchainID, and if a blockchainID is passed in, use that.
@@ -105,20 +105,20 @@ export class AVMAPI extends JRPCAPI {
    * @returns The blockchainID
    */
   refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netid: number = this.core.getNetworkID();
+    const netid: number = this.core.getNetworkID()
     if (
-      typeof blockchainID === 'undefined' &&
-      typeof Defaults.network[netid] !== 'undefined'
+      typeof blockchainID === "undefined" &&
+      typeof Defaults.network[netid] !== "undefined"
     ) {
-      this.blockchainID = Defaults.network[netid].X.blockchainID; //default to X-Chain
-      return true;
+      this.blockchainID = Defaults.network[netid].X.blockchainID //default to X-Chain
+      return true
     }
-    if (typeof blockchainID === 'string') {
-      this.blockchainID = blockchainID;
-      return true;
+    if (typeof blockchainID === "string") {
+      this.blockchainID = blockchainID
+      return true
     }
-    return false;
-  };
+    return false
+  }
 
   /**
    * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
@@ -126,28 +126,28 @@ export class AVMAPI extends JRPCAPI {
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
    */
   parseAddress = (addr: string): Buffer => {
-    const alias: string = this.getBlockchainAlias();
-    const blockchainID: string = this.getBlockchainID();
+    const alias: string = this.getBlockchainAlias()
+    const blockchainID: string = this.getBlockchainID()
     return bintools.parseAddress(
       addr,
       blockchainID,
       alias,
       AVMConstants.ADDRESSLENGTH
-    );
-  };
+    )
+  }
 
   addressFromBuffer = (address: Buffer): string => {
     const chainid: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
-      : this.getBlockchainID();
-    const type: SerializedType = 'bech32';
+      : this.getBlockchainID()
+    const type: SerializedType = "bech32"
     return serialization.bufferToType(
       address,
       type,
       this.core.getHRP(),
       chainid
-    );
-  };
+    )
+  }
 
   /**
    * Fetches the AVAX AssetID and returns it in a Promise.
@@ -157,17 +157,17 @@ export class AVMAPI extends JRPCAPI {
    * @returns The the provided string representing the AVAX AssetID
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
-    if (typeof this.AVAXAssetID === 'undefined' || refresh) {
+    if (typeof this.AVAXAssetID === "undefined" || refresh) {
       const asset: {
-        name: string;
-        symbol: string;
-        assetID: Buffer;
-        denomination: number;
-      } = await this.getAssetDescription(PrimaryAssetAlias);
-      this.AVAXAssetID = asset.assetID;
+        name: string
+        symbol: string
+        assetID: Buffer
+        denomination: number
+      } = await this.getAssetDescription(PrimaryAssetAlias)
+      this.AVAXAssetID = asset.assetID
     }
-    return this.AVAXAssetID;
-  };
+    return this.AVAXAssetID
+  }
 
   /**
    * Overrides the defaults and sets the cache to a specific AVAX AssetID
@@ -177,11 +177,11 @@ export class AVMAPI extends JRPCAPI {
    * @returns The the provided string representing the AVAX AssetID
    */
   setAVAXAssetID = (avaxAssetID: string | Buffer) => {
-    if (typeof avaxAssetID === 'string') {
-      avaxAssetID = bintools.cb58Decode(avaxAssetID);
+    if (typeof avaxAssetID === "string") {
+      avaxAssetID = bintools.cb58Decode(avaxAssetID)
     }
-    this.AVAXAssetID = avaxAssetID;
-  };
+    this.AVAXAssetID = avaxAssetID
+  }
 
   /**
    * Gets the default tx fee for this chain.
@@ -190,9 +190,9 @@ export class AVMAPI extends JRPCAPI {
    */
   getDefaultTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]['X']['txFee'])
-      : new BN(0);
-  };
+      ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["txFee"])
+      : new BN(0)
+  }
 
   /**
    * Gets the tx fee for this chain.
@@ -200,11 +200,11 @@ export class AVMAPI extends JRPCAPI {
    * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getTxFee = (): BN => {
-    if (typeof this.txFee === 'undefined') {
-      this.txFee = this.getDefaultTxFee();
+    if (typeof this.txFee === "undefined") {
+      this.txFee = this.getDefaultTxFee()
     }
-    return this.txFee;
-  };
+    return this.txFee
+  }
 
   /**
    * Sets the tx fee for this chain.
@@ -212,8 +212,8 @@ export class AVMAPI extends JRPCAPI {
    * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
   setTxFee = (fee: BN) => {
-    this.txFee = fee;
-  };
+    this.txFee = fee
+  }
 
   /**
    * Gets the default creation fee for this chain.
@@ -222,9 +222,9 @@ export class AVMAPI extends JRPCAPI {
    */
   getDefaultCreationTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]['X']['creationTxFee'])
-      : new BN(0);
-  };
+      ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["creationTxFee"])
+      : new BN(0)
+  }
 
   /**
    * Gets the creation fee for this chain.
@@ -232,11 +232,11 @@ export class AVMAPI extends JRPCAPI {
    * @returns The creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getCreationTxFee = (): BN => {
-    if (typeof this.creationTxFee === 'undefined') {
-      this.creationTxFee = this.getDefaultCreationTxFee();
+    if (typeof this.creationTxFee === "undefined") {
+      this.creationTxFee = this.getDefaultCreationTxFee()
     }
-    return this.creationTxFee;
-  };
+    return this.creationTxFee
+  }
 
   /**
    * Sets the creation fee for this chain.
@@ -244,29 +244,29 @@ export class AVMAPI extends JRPCAPI {
    * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
   setCreationTxFee = (fee: BN) => {
-    this.creationTxFee = fee;
-  };
+    this.creationTxFee = fee
+  }
 
   /**
    * Gets a reference to the keychain for this class.
    *
    * @returns The instance of [[KeyChain]] for this class
    */
-  keyChain = (): KeyChain => this.keychain;
+  keyChain = (): KeyChain => this.keychain
 
   /**
    * @ignore
    */
   newKeyChain = (): KeyChain => {
     // warning, overwrites the old keychain
-    const alias = this.getBlockchainAlias();
+    const alias = this.getBlockchainAlias()
     if (alias) {
-      this.keychain = new KeyChain(this.core.getHRP(), alias);
+      this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
-      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
     }
-    return this.keychain;
-  };
+    return this.keychain
+  }
 
   /**
    * Helper function which determines if a tx is a goose egg transaction.
@@ -282,17 +282,17 @@ export class AVMAPI extends JRPCAPI {
     utx: UnsignedTx,
     outTotal: BN = new BN(0)
   ): Promise<boolean> => {
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
     let outputTotal: BN = outTotal.gt(new BN(0))
       ? outTotal
-      : utx.getOutputTotal(avaxAssetID);
-    const fee: BN = utx.getBurn(avaxAssetID);
+      : utx.getOutputTotal(avaxAssetID)
+    const fee: BN = utx.getBurn(avaxAssetID)
     if (fee.lte(ONEAVAX.mul(new BN(10))) || fee.lte(outputTotal)) {
-      return true;
+      return true
     } else {
-      return false;
+      return false
     }
-  };
+  }
 
   /**
    * Gets the balance of a particular asset on a blockchain.
@@ -303,22 +303,22 @@ export class AVMAPI extends JRPCAPI {
    * @returns Promise with the balance of the assetID as a {@link https://github.com/indutny/bn.js/|BN} on the provided address for the blockchain.
    */
   getBalance = async (address: string, assetID: string): Promise<object> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new AddressError(
-        'Error - AVMAPI.getBalance: Invalid address format'
-      );
+        "Error - AVMAPI.getBalance: Invalid address format"
+      )
     }
     const params: any = {
       address,
       assetID,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.getBalance',
+      "avm.getBalance",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * Creates an address (and associated private keys) on a user on a blockchain.
@@ -335,13 +335,13 @@ export class AVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.createAddress',
+      "avm.createAddress",
       params
-    );
-    return response.data.result.address;
-  };
+    )
+    return response.data.result.address
+  }
 
   /**
    * Create a new fixed-cap, fungible asset. A quantity of it is created at initialization and there no more is ever created.
@@ -384,13 +384,13 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
       initialHolders,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.createFixedCapAsset',
+      "avm.createFixedCapAsset",
       params
-    );
-    return response.data.result.assetID;
-  };
+    )
+    return response.data.result.assetID
+  }
 
   /**
    * Create a new variable-cap, fungible asset. No units of the asset exist at initialization. Minters can mint units of this asset using createMintTx, signMintTx and sendMintTx.
@@ -439,13 +439,13 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
       minterSets,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.createVariableCapAsset',
+      "avm.createVariableCapAsset",
       params
-    );
-    return response.data.result.assetID;
-  };
+    )
+    return response.data.result.assetID
+  }
 
   /**
    * Create an unsigned transaction to mint more of an asset.
@@ -465,17 +465,17 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     minters: string[]
   ): Promise<string> => {
-    let asset: string;
-    let amnt: BN;
-    if (typeof assetID !== 'string') {
-      asset = bintools.cb58Encode(assetID);
+    let asset: string
+    let amnt: BN
+    if (typeof assetID !== "string") {
+      asset = bintools.cb58Encode(assetID)
     } else {
-      asset = assetID;
+      asset = assetID
     }
-    if (typeof amount === 'number') {
-      amnt = new BN(amount);
+    if (typeof amount === "number") {
+      amnt = new BN(amount)
     } else {
-      amnt = amount;
+      amnt = amount
     }
     const params: any = {
       username: username,
@@ -484,13 +484,13 @@ export class AVMAPI extends JRPCAPI {
       assetID: asset,
       to,
       minters,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.mint',
+      "avm.mint",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Exports the private key for an address.
@@ -506,23 +506,21 @@ export class AVMAPI extends JRPCAPI {
     password: string,
     address: string
   ): Promise<string> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
-      throw new AddressError(
-        'Error - AVMAPI.exportKey: Invalid address format'
-      );
+      throw new AddressError("Error - AVMAPI.exportKey: Invalid address format")
     }
     const params: any = {
       username,
       password,
       address,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.exportKey',
+      "avm.exportKey",
       params
-    );
-    return response.data.result.privateKey;
-  };
+    )
+    return response.data.result.privateKey
+  }
 
   /**
    * Imports a private key into the node's keystore under an user and for a blockchain.
@@ -542,13 +540,13 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
       privateKey,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.importKey',
+      "avm.importKey",
       params
-    );
-    return response.data.result.address;
-  };
+    )
+    return response.data.result.address
+  }
 
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from the X-Chain to an account on the P-Chain or C-Chain.
@@ -576,13 +574,13 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
       assetID,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.export',
+      "avm.export",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Send AVAX from the X-Chain to an account on the P-Chain or C-Chain.
@@ -607,13 +605,13 @@ export class AVMAPI extends JRPCAPI {
       amount: amount.toString(10),
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.exportAVAX',
+      "avm.exportAVAX",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from an account on the P-Chain or C-Chain to an address on the X-Chain. This transaction
@@ -639,13 +637,13 @@ export class AVMAPI extends JRPCAPI {
       sourceChain,
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.import',
+      "avm.import",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Finalize a transfer of AVAX from the P-Chain to the X-Chain.
@@ -669,13 +667,13 @@ export class AVMAPI extends JRPCAPI {
       sourceChain,
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.importAVAX',
+      "avm.importAVAX",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Lists all the addresses under a user.
@@ -692,13 +690,13 @@ export class AVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.listAddresses',
+      "avm.listAddresses",
       params
-    );
-    return response.data.result.addresses;
-  };
+    )
+    return response.data.result.addresses
+  }
 
   /**
    * Retrieves all assets for an address on a server and their associated balances.
@@ -708,21 +706,21 @@ export class AVMAPI extends JRPCAPI {
    * @returns Promise of an object mapping assetID strings with {@link https://github.com/indutny/bn.js/|BN} balance for the address on the blockchain.
    */
   getAllBalances = async (address: string): Promise<object[]> => {
-    if (typeof this.parseAddress(address) === 'undefined') {
+    if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new AddressError(
-        'Error - AVMAPI.getAllBalances: Invalid address format'
-      );
+        "Error - AVMAPI.getAllBalances: Invalid address format"
+      )
     }
     const params: any = {
       address,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.getAllBalances',
+      "avm.getAllBalances",
       params
-    );
-    return response.data.result.balances;
-  };
+    )
+    return response.data.result.balances
+  }
 
   /**
    * Retrieves an assets name and symbol.
@@ -734,31 +732,31 @@ export class AVMAPI extends JRPCAPI {
   getAssetDescription = async (
     assetID: Buffer | string
   ): Promise<{
-    name: string;
-    symbol: string;
-    assetID: Buffer;
-    denomination: number;
+    name: string
+    symbol: string
+    assetID: Buffer
+    denomination: number
   }> => {
-    let asset: string;
-    if (typeof assetID !== 'string') {
-      asset = bintools.cb58Encode(assetID);
+    let asset: string
+    if (typeof assetID !== "string") {
+      asset = bintools.cb58Encode(assetID)
     } else {
-      asset = assetID;
+      asset = assetID
     }
     const params: any = {
       assetID: asset,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.getAssetDescription',
+      "avm.getAssetDescription",
       params
-    );
+    )
     return {
       name: response.data.result.name,
       symbol: response.data.result.symbol,
       assetID: bintools.cb58Decode(response.data.result.assetID),
       denomination: parseInt(response.data.result.denomination, 10),
-    };
-  };
+    }
+  }
 
   /**
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
@@ -770,13 +768,13 @@ export class AVMAPI extends JRPCAPI {
   getTx = async (txid: string): Promise<string> => {
     const params: any = {
       txID: txid,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.getTx',
+      "avm.getTx",
       params
-    );
-    return response.data.result.tx;
-  };
+    )
+    return response.data.result.tx
+  }
 
   /**
    * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
@@ -788,13 +786,13 @@ export class AVMAPI extends JRPCAPI {
   getTxStatus = async (txid: string): Promise<string> => {
     const params: any = {
       txID: txid,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.getTxStatus',
+      "avm.getTxStatus",
       params
-    );
-    return response.data.result.status;
-  };
+    )
+    return response.data.result.status
+  }
 
   /**
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
@@ -818,49 +816,49 @@ export class AVMAPI extends JRPCAPI {
     startIndex: { address: string; utxo: string } = undefined,
     persistOpts: PersistanceOptions = undefined
   ): Promise<{
-    numFetched: number;
-    utxos: UTXOSet;
-    endIndex: { address: string; utxo: string };
+    numFetched: number
+    utxos: UTXOSet
+    endIndex: { address: string; utxo: string }
   }> => {
-    if (typeof addresses === 'string') {
-      addresses = [addresses];
+    if (typeof addresses === "string") {
+      addresses = [addresses]
     }
 
     const params: any = {
       addresses: addresses,
       limit,
-    };
-    if (typeof startIndex !== 'undefined' && startIndex) {
-      params.startIndex = startIndex;
+    }
+    if (typeof startIndex !== "undefined" && startIndex) {
+      params.startIndex = startIndex
     }
 
-    if (typeof sourceChain !== 'undefined') {
-      params.sourceChain = sourceChain;
+    if (typeof sourceChain !== "undefined") {
+      params.sourceChain = sourceChain
     }
 
     const response: RequestResponseData = await this.callMethod(
-      'avm.getUTXOs',
+      "avm.getUTXOs",
       params
-    );
-    const utxos: UTXOSet = new UTXOSet();
-    let data = response.data.result.utxos;
-    if (persistOpts && typeof persistOpts === 'object') {
+    )
+    const utxos: UTXOSet = new UTXOSet()
+    let data = response.data.result.utxos
+    if (persistOpts && typeof persistOpts === "object") {
       if (this.db.has(persistOpts.getName())) {
-        const selfArray: string[] = this.db.get(persistOpts.getName());
+        const selfArray: string[] = this.db.get(persistOpts.getName())
         if (Array.isArray(selfArray)) {
-          utxos.addArray(data);
-          const self: UTXOSet = new UTXOSet();
-          self.addArray(selfArray);
-          self.mergeByRule(utxos, persistOpts.getMergeRule());
-          data = self.getAllUTXOStrings();
+          utxos.addArray(data)
+          const self: UTXOSet = new UTXOSet()
+          self.addArray(selfArray)
+          self.mergeByRule(utxos, persistOpts.getMergeRule())
+          data = self.getAllUTXOStrings()
         }
       }
-      this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite());
+      this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
     }
-    utxos.addArray(data, false);
-    response.data.result.utxos = utxos;
-    return response.data.result;
-  };
+    utxos.addArray(data, false)
+    response.data.result.utxos = utxos
+    return response.data.result
+  }
 
   /**
    * Helper function which creates an unsigned transaction. For more granular control, you may create your own
@@ -896,23 +894,23 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      'buildBaseTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildBaseTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildBaseTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildBaseTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildBaseTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildBaseTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
-    if (typeof assetID === 'string') {
-      assetID = bintools.cb58Decode(assetID);
+    if (typeof assetID === "string") {
+      assetID = bintools.cb58Decode(assetID)
     }
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildBaseTx(
@@ -929,17 +927,17 @@ export class AVMAPI extends JRPCAPI {
       asOf,
       locktime,
       threshold
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildBaseTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildBaseTx:Failed Goose Egg Check"
+      )
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned NFT Transfer. For more granular control, you may create your own
@@ -973,27 +971,27 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      'buildNFTTransferTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildNFTTransferTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildNFTTransferTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildNFTTransferTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildCreateNFTAssetTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildCreateNFTAssetTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
-    let utxoidArray: string[] = [];
-    if (typeof utxoid === 'string') {
-      utxoidArray = [utxoid];
+    let utxoidArray: string[] = []
+    if (typeof utxoid === "string") {
+      utxoidArray = [utxoid]
     } else if (Array.isArray(utxoid)) {
-      utxoidArray = utxoid;
+      utxoidArray = utxoid
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildNFTTransferTx(
@@ -1009,17 +1007,17 @@ export class AVMAPI extends JRPCAPI {
       asOf,
       locktime,
       threshold
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildNFTTransferTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildNFTTransferTx:Failed Goose Egg Check"
+      )
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
@@ -1055,51 +1053,51 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      'buildImportTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildImportTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildImportTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildImportTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildImportTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildImportTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
-    let srcChain: string = undefined;
+    let srcChain: string = undefined
 
-    if (typeof sourceChain === 'undefined') {
+    if (typeof sourceChain === "undefined") {
       throw new ChainIdError(
-        'Error - AVMAPI.buildImportTx: Source ChainID is undefined.'
-      );
-    } else if (typeof sourceChain === 'string') {
-      srcChain = sourceChain;
-      sourceChain = bintools.cb58Decode(sourceChain);
+        "Error - AVMAPI.buildImportTx: Source ChainID is undefined."
+      )
+    } else if (typeof sourceChain === "string") {
+      srcChain = sourceChain
+      sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain);
+      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
-        'Error - AVMAPI.buildImportTx: Invalid destinationChain type: ' +
+        "Error - AVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
-      );
+      )
     }
 
     const atomicUTXOs: UTXOSet = (
       await this.getUTXOs(ownerAddresses, srcChain, 0, undefined)
-    ).utxos;
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
-    const atomics: UTXO[] = atomicUTXOs.getAllUTXOs();
+    ).utxos
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const atomics: UTXO[] = atomicUTXOs.getAllUTXOs()
 
     if (atomics.length === 0) {
       throw new NoAtomicUTXOsError(
-        'Error - AVMAPI.buildImportTx: No atomic UTXOs to import from ' +
+        "Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " +
           srcChain +
-          ' using addresses: ' +
-          ownerAddresses.join(', ')
-      );
+          " using addresses: " +
+          ownerAddresses.join(", ")
+      )
     }
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
@@ -1116,17 +1114,17 @@ export class AVMAPI extends JRPCAPI {
       asOf,
       locktime,
       threshold
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildImportTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildImportTx:Failed Goose Egg Check"
+      )
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned Export Tx. For more granular control, you may create your own
@@ -1160,55 +1158,55 @@ export class AVMAPI extends JRPCAPI {
     threshold: number = 1,
     assetID: string = undefined
   ): Promise<UnsignedTx> => {
-    let prefixes: object = {};
+    let prefixes: object = {}
     toAddresses.map((a: string): void => {
-      prefixes[a.split('-')[0]] = true;
-    });
+      prefixes[a.split("-")[0]] = true
+    })
     if (Object.keys(prefixes).length !== 1) {
       throw new AddressError(
-        'Error - AVMAPI.buildExportTx: To addresses must have the same chainID prefix.'
-      );
+        "Error - AVMAPI.buildExportTx: To addresses must have the same chainID prefix."
+      )
     }
 
-    if (typeof destinationChain === 'undefined') {
+    if (typeof destinationChain === "undefined") {
       throw new ChainIdError(
-        'Error - AVMAPI.buildExportTx: Destination ChainID is undefined.'
-      );
-    } else if (typeof destinationChain === 'string') {
-      destinationChain = bintools.cb58Decode(destinationChain); //
+        "Error - AVMAPI.buildExportTx: Destination ChainID is undefined."
+      )
+    } else if (typeof destinationChain === "string") {
+      destinationChain = bintools.cb58Decode(destinationChain) //
     } else if (!(destinationChain instanceof Buffer)) {
       throw new ChainIdError(
-        'Error - AVMAPI.buildExportTx: Invalid destinationChain type: ' +
+        "Error - AVMAPI.buildExportTx: Invalid destinationChain type: " +
           typeof destinationChain
-      );
+      )
     }
     if (destinationChain.length !== 32) {
       throw new ChainIdError(
-        'Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length.'
-      );
+        "Error - AVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length."
+      )
     }
 
-    let to: Buffer[] = [];
+    let to: Buffer[] = []
     toAddresses.map((a: string): void => {
-      to.push(bintools.stringToAddress(a));
-    });
+      to.push(bintools.stringToAddress(a))
+    })
 
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildExportTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildExportTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildExportTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildExportTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
-    if (typeof assetID === 'undefined') {
-      assetID = bintools.cb58Encode(avaxAssetID);
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    if (typeof assetID === "undefined") {
+      assetID = bintools.cb58Encode(avaxAssetID)
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildExportTx(
@@ -1226,17 +1224,17 @@ export class AVMAPI extends JRPCAPI {
       asOf,
       locktime,
       threshold
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildExportTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildExportTx:Failed Goose Egg Check"
+      )
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
@@ -1270,35 +1268,35 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     let from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildCreateAssetTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildCreateAssetTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     let change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildCreateNFTAssetTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildCreateNFTAssetTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
     /* istanbul ignore next */
     if (symbol.length > AVMConstants.SYMBOLMAXLEN) {
       /* istanbul ignore next */
       throw new SymbolError(
-        'Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of ' +
+        "Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " +
           AVMConstants.SYMBOLMAXLEN
-      );
+      )
     }
     /* istanbul ignore next */
     if (name.length > AVMConstants.ASSETNAMELEN) {
       /* istanbul ignore next */
       throw new NameError(
-        'Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of ' +
+        "Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " +
           AVMConstants.ASSETNAMELEN
-      );
+      )
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateAssetTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
@@ -1313,17 +1311,17 @@ export class AVMAPI extends JRPCAPI {
       avaxAssetID,
       memo,
       asOf
-    );
+    )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildCreateAssetTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildCreateAssetTx:Failed Goose Egg Check"
+      )
     }
 
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   buildSECPMintTx = async (
     utxoset: UTXOSet,
@@ -1337,18 +1335,18 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<any> => {
     let from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildSECPMintTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildSECPMintTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     let change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildSECPMintTx'
-    ).map((a: string): Buffer => bintools.stringToAddress(a));
+      "buildSECPMintTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
-    let avaxAssetID: Buffer = await this.getAVAXAssetID();
+    let avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildSECPMintTx(
       this.core.getNetworkID(),
@@ -1362,15 +1360,15 @@ export class AVMAPI extends JRPCAPI {
       avaxAssetID,
       memo,
       asOf
-    );
+    )
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildSECPMintTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildSECPMintTx:Failed Goose Egg Check"
+      )
     }
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
@@ -1422,32 +1420,32 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     let from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildCreateNFTAssetTx'
-    ).map((a) => bintools.stringToAddress(a));
+      "buildCreateNFTAssetTx"
+    ).map((a) => bintools.stringToAddress(a))
     let change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildCreateNFTAssetTx'
-    ).map((a) => bintools.stringToAddress(a));
+      "buildCreateNFTAssetTx"
+    ).map((a) => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
     if (name.length > AVMConstants.ASSETNAMELEN) {
       /* istanbul ignore next */
       throw new NameError(
-        'Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of ' +
+        "Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " +
           AVMConstants.ASSETNAMELEN
-      );
+      )
     }
     if (symbol.length > AVMConstants.SYMBOLMAXLEN) {
       /* istanbul ignore next */
       throw new SymbolError(
-        'Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of ' +
+        "Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " +
           AVMConstants.SYMBOLMAXLEN
-      );
+      )
     }
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateNFTAssetTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
@@ -1461,15 +1459,15 @@ export class AVMAPI extends JRPCAPI {
       memo,
       asOf,
       locktime
-    );
+    )
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildCreateNFTAssetTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildCreateNFTAssetTx:Failed Goose Egg Check"
+      )
     }
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Creates an unsigned transaction. For more granular control, you may create your own
@@ -1501,29 +1499,29 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<any> => {
     let from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      'buildCreateNFTMintTx'
-    ).map((a) => bintools.stringToAddress(a));
+      "buildCreateNFTMintTx"
+    ).map((a) => bintools.stringToAddress(a))
     let change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      'buildCreateNFTMintTx'
-    ).map((a) => bintools.stringToAddress(a));
+      "buildCreateNFTMintTx"
+    ).map((a) => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
-      memo = memo.getPayload();
+      memo = memo.getPayload()
     }
 
     if (payload instanceof PayloadBase) {
-      payload = payload.getPayload();
+      payload = payload.getPayload()
     }
 
-    if (typeof utxoid === 'string') {
-      utxoid = [utxoid];
+    if (typeof utxoid === "string") {
+      utxoid = [utxoid]
     }
 
-    const avaxAssetID: Buffer = await this.getAVAXAssetID();
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     if (owners instanceof OutputOwners) {
-      owners = [owners];
+      owners = [owners]
     }
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateNFTMintTx(
@@ -1539,15 +1537,15 @@ export class AVMAPI extends JRPCAPI {
       avaxAssetID,
       memo,
       asOf
-    );
+    )
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
       throw new GooseEggCheckError(
-        'Error - AVMAPI.buildCreateNFTMintTx:Failed Goose Egg Check'
-      );
+        "Error - AVMAPI.buildCreateNFTMintTx:Failed Goose Egg Check"
+      )
     }
-    return builtUnsignedTx;
-  };
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which takes an unsigned transaction and signs it, returning the resulting [[Tx]].
@@ -1556,7 +1554,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns A signed transaction of type [[Tx]]
    */
-  signTx = (utx: UnsignedTx): Tx => utx.sign(this.keychain);
+  signTx = (utx: UnsignedTx): Tx => utx.sign(this.keychain)
 
   /**
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
@@ -1566,30 +1564,30 @@ export class AVMAPI extends JRPCAPI {
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
-    let Transaction = '';
-    if (typeof tx === 'string') {
-      Transaction = tx;
+    let Transaction = ""
+    if (typeof tx === "string") {
+      Transaction = tx
     } else if (tx instanceof Buffer) {
-      const txobj: Tx = new Tx();
-      txobj.fromBuffer(tx);
-      Transaction = txobj.toString();
+      const txobj: Tx = new Tx()
+      txobj.fromBuffer(tx)
+      Transaction = txobj.toString()
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString();
+      Transaction = tx.toString()
     } else {
       /* istanbul ignore next */
       throw new TransactionError(
-        'Error - AVMAPI.issueTx: provided tx is not expected type of string, Buffer, or Tx'
-      );
+        "Error - AVMAPI.issueTx: provided tx is not expected type of string, Buffer, or Tx"
+      )
     }
     const params: any = {
       tx: Transaction.toString(),
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.issueTx',
+      "avm.issueTx",
       params
-    );
-    return response.data.result.txID;
-  };
+    )
+    return response.data.result.txID
+  }
 
   /**
    * Sends an amount of assetID to the specified address from a list of owned of addresses.
@@ -1615,23 +1613,23 @@ export class AVMAPI extends JRPCAPI {
     changeAddr: string = undefined,
     memo: string | Buffer = undefined
   ): Promise<{ txID: string; changeAddr: string }> => {
-    let asset: string;
-    let amnt: BN;
+    let asset: string
+    let amnt: BN
 
-    if (typeof this.parseAddress(to) === 'undefined') {
+    if (typeof this.parseAddress(to) === "undefined") {
       /* istanbul ignore next */
-      throw new AddressError('Error - AVMAPI.send: Invalid address format');
+      throw new AddressError("Error - AVMAPI.send: Invalid address format")
     }
 
-    if (typeof assetID !== 'string') {
-      asset = bintools.cb58Encode(assetID);
+    if (typeof assetID !== "string") {
+      asset = bintools.cb58Encode(assetID)
     } else {
-      asset = assetID;
+      asset = assetID
     }
-    if (typeof amount === 'number') {
-      amnt = new BN(amount);
+    if (typeof amount === "number") {
+      amnt = new BN(amount)
     } else {
-      amnt = amount;
+      amnt = amount
     }
 
     const params: any = {
@@ -1640,34 +1638,34 @@ export class AVMAPI extends JRPCAPI {
       assetID: asset,
       amount: amnt.toString(10),
       to: to,
-    };
-
-    from = this._cleanAddressArray(from, 'send');
-    if (typeof from !== 'undefined') {
-      params['from'] = from;
     }
 
-    if (typeof changeAddr !== 'undefined') {
-      if (typeof this.parseAddress(changeAddr) === 'undefined') {
+    from = this._cleanAddressArray(from, "send")
+    if (typeof from !== "undefined") {
+      params["from"] = from
+    }
+
+    if (typeof changeAddr !== "undefined") {
+      if (typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
-        throw new AddressError('Error - AVMAPI.send: Invalid address format');
+        throw new AddressError("Error - AVMAPI.send: Invalid address format")
       }
-      params['changeAddr'] = changeAddr;
+      params["changeAddr"] = changeAddr
     }
 
-    if (typeof memo !== 'undefined') {
-      if (typeof memo !== 'string') {
-        params['memo'] = bintools.cb58Encode(memo);
+    if (typeof memo !== "undefined") {
+      if (typeof memo !== "string") {
+        params["memo"] = bintools.cb58Encode(memo)
       } else {
-        params['memo'] = memo;
+        params["memo"] = memo
       }
     }
     const response: RequestResponseData = await this.callMethod(
-      'avm.send',
+      "avm.send",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * Sends an amount of assetID to an array of specified addresses from a list of owned of addresses.
@@ -1685,80 +1683,80 @@ export class AVMAPI extends JRPCAPI {
     username: string,
     password: string,
     sendOutputs: {
-      assetID: string | Buffer;
-      amount: number | BN;
-      to: string;
+      assetID: string | Buffer
+      amount: number | BN
+      to: string
     }[],
     from: string[] | Buffer[] = undefined,
     changeAddr: string = undefined,
     memo: string | Buffer = undefined
   ): Promise<{ txID: string; changeAddr: string }> => {
-    let asset: string;
-    let amnt: BN;
-    let sOutputs: { assetID: string; amount: string; to: string }[] = [];
+    let asset: string
+    let amnt: BN
+    let sOutputs: { assetID: string; amount: string; to: string }[] = []
 
     sendOutputs.forEach(
       (output: {
-        assetID: string | Buffer;
-        amount: number | BN;
-        to: string;
+        assetID: string | Buffer
+        amount: number | BN
+        to: string
       }) => {
-        if (typeof this.parseAddress(output.to) === 'undefined') {
+        if (typeof this.parseAddress(output.to) === "undefined") {
           /* istanbul ignore next */
           throw new AddressError(
-            'Error - AVMAPI.sendMultiple: Invalid address format'
-          );
+            "Error - AVMAPI.sendMultiple: Invalid address format"
+          )
         }
-        if (typeof output.assetID !== 'string') {
-          asset = bintools.cb58Encode(output.assetID);
+        if (typeof output.assetID !== "string") {
+          asset = bintools.cb58Encode(output.assetID)
         } else {
-          asset = output.assetID;
+          asset = output.assetID
         }
-        if (typeof output.amount === 'number') {
-          amnt = new BN(output.amount);
+        if (typeof output.amount === "number") {
+          amnt = new BN(output.amount)
         } else {
-          amnt = output.amount;
+          amnt = output.amount
         }
         sOutputs.push({
           to: output.to,
           assetID: asset,
           amount: amnt.toString(10),
-        });
+        })
       }
-    );
+    )
 
     const params: any = {
       username: username,
       password: password,
       outputs: sOutputs,
-    };
-
-    from = this._cleanAddressArray(from, 'send');
-    if (typeof from !== 'undefined') {
-      params['from'] = from;
     }
 
-    if (typeof changeAddr !== 'undefined') {
-      if (typeof this.parseAddress(changeAddr) === 'undefined') {
+    from = this._cleanAddressArray(from, "send")
+    if (typeof from !== "undefined") {
+      params["from"] = from
+    }
+
+    if (typeof changeAddr !== "undefined") {
+      if (typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
-        throw new AddressError('Error - AVMAPI.send: Invalid address format');
+        throw new AddressError("Error - AVMAPI.send: Invalid address format")
       }
-      params['changeAddr'] = changeAddr;
+      params["changeAddr"] = changeAddr
     }
 
-    if (typeof memo !== 'undefined') {
-      if (typeof memo !== 'string') {
-        params['memo'] = bintools.cb58Encode(memo);
+    if (typeof memo !== "undefined") {
+      if (typeof memo !== "string") {
+        params["memo"] = bintools.cb58Encode(memo)
       } else {
-        params['memo'] = memo;
+        params["memo"] = memo
       }
     }
     const response: RequestResponseData = await this.callMethod(
-      'avm.sendMultiple',
+      "avm.sendMultiple",
       params
-    );
-    return response.data.result;
-  };
+    )
+    return response.data.result
+  }
 
   /**
    * Given a JSON representation of this Virtual Machine’s genesis state, create the byte representation of that state.
@@ -1770,13 +1768,13 @@ export class AVMAPI extends JRPCAPI {
   buildGenesis = async (genesisData: object): Promise<string> => {
     const params: any = {
       genesisData,
-    };
+    }
     const response: RequestResponseData = await this.callMethod(
-      'avm.buildGenesis',
+      "avm.buildGenesis",
       params
-    );
-    return response.data.result.bytes;
-  };
+    )
+    return response.data.result.bytes
+  }
 
   /**
    * @ignore
@@ -1785,24 +1783,24 @@ export class AVMAPI extends JRPCAPI {
     addresses: string[] | Buffer[],
     caller: string
   ): string[] {
-    const addrs: string[] = [];
+    const addrs: string[] = []
     const chainid: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
-      : this.getBlockchainID();
+      : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
       for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === 'string') {
+        if (typeof addresses[i] === "string") {
           if (
-            typeof this.parseAddress(addresses[i] as string) === 'undefined'
+            typeof this.parseAddress(addresses[i] as string) === "undefined"
           ) {
             /* istanbul ignore next */
             throw new AddressError(
-              'Error - AVMAPI.${caller}: Invalid address format'
-            );
+              "Error - AVMAPI.${caller}: Invalid address format"
+            )
           }
-          addrs.push(addresses[i] as string);
+          addrs.push(addresses[i] as string)
         } else {
-          const type: SerializedType = 'bech32';
+          const type: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
               addresses[i] as Buffer,
@@ -1810,11 +1808,11 @@ export class AVMAPI extends JRPCAPI {
               this.core.getHRP(),
               chainid
             )
-          );
+          )
         }
       }
     }
-    return addrs;
+    return addrs
   }
 
   /**
@@ -1826,17 +1824,17 @@ export class AVMAPI extends JRPCAPI {
    */
   constructor(
     core: AvalancheCore,
-    baseurl: string = '/ext/bc/X',
-    blockchainID: string = ''
+    baseurl: string = "/ext/bc/X",
+    blockchainID: string = ""
   ) {
-    super(core, baseurl);
-    this.blockchainID = blockchainID;
-    const netid: number = core.getNetworkID();
+    super(core, baseurl)
+    this.blockchainID = blockchainID
+    const netid: number = core.getNetworkID()
     if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
-      const { alias } = Defaults.network[netid][blockchainID];
-      this.keychain = new KeyChain(this.core.getHRP(), alias);
+      const { alias } = Defaults.network[netid][blockchainID]
+      this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
-      this.keychain = new KeyChain(this.core.getHRP(), blockchainID);
+      this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
     }
   }
 }

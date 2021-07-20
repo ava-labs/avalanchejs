@@ -3,32 +3,32 @@
  * @module Utils-PersistanceOptions
  */
 
-import { MergeRule } from './constants';
+import { MergeRule } from "./constants"
 /**
  * A class for defining the persistance behavior of this an API call.
  *
  */
 export class PersistanceOptions {
-  protected name: string = undefined;
+  protected name: string = undefined
 
-  protected overwrite: boolean = false;
+  protected overwrite: boolean = false
 
-  protected mergeRule: MergeRule = 'union';
+  protected mergeRule: MergeRule = "union"
 
   /**
    * Returns the namespace of the instance
    */
-  getName = (): string => this.name;
+  getName = (): string => this.name
 
   /**
    * Returns the overwrite rule of the instance
    */
-  getOverwrite = (): boolean => this.overwrite;
+  getOverwrite = (): boolean => this.overwrite
 
   /**
    * Returns the [[MergeRule]] of the instance
    */
-  getMergeRule = (): MergeRule => this.mergeRule;
+  getMergeRule = (): MergeRule => this.mergeRule
 
   /**
    *
@@ -47,8 +47,8 @@ export class PersistanceOptions {
    *   * "unionMinusSelf" - the unique set of all elements contained in both sets, excluding values only found in the existing set
    */
   constructor(name: string, overwrite: boolean = false, mergeRule: MergeRule) {
-    this.name = name;
-    this.overwrite = overwrite;
-    this.mergeRule = mergeRule;
+    this.name = name
+    this.overwrite = overwrite
+    this.mergeRule = mergeRule
   }
 }

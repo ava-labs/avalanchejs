@@ -3,35 +3,35 @@
  * @module Utils-HelperFunctions
  */
 
-import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP } from './constants';
-import BN from 'bn.js';
-import { Buffer } from 'buffer/';
-import BinTools from '../utils/bintools';
-import { PrivateKeyError, NodeIdError } from '../utils/errors';
+import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP } from "./constants"
+import BN from "bn.js"
+import { Buffer } from "buffer/"
+import BinTools from "../utils/bintools"
+import { PrivateKeyError, NodeIdError } from "../utils/errors"
 
 /**
  * @ignore
  */
-const bintools: BinTools = BinTools.getInstance();
+const bintools: BinTools = BinTools.getInstance()
 
 export function getPreferredHRP(networkID: number = undefined) {
   if (networkID in NetworkIDToHRP) {
-    return NetworkIDToHRP[networkID];
-  } else if (typeof networkID === 'undefined') {
-    return NetworkIDToHRP[DefaultNetworkID];
+    return NetworkIDToHRP[networkID]
+  } else if (typeof networkID === "undefined") {
+    return NetworkIDToHRP[DefaultNetworkID]
   }
-  return FallbackHRP;
+  return FallbackHRP
 }
 
 export function MaxWeightFormula(staked: BN, cap: BN): BN {
-  return BN.min(staked.mul(new BN(5)), cap);
+  return BN.min(staked.mul(new BN(5)), cap)
 }
 
 /**
  * Function providing the current UNIX time using a {@link https://github.com/indutny/bn.js/|BN}.
  */
 export function UnixNow(): BN {
-  return new BN(Math.round(new Date().getTime() / 1000));
+  return new BN(Math.round(new Date().getTime() / 1000))
 }
 
 /**
@@ -40,7 +40,7 @@ export function UnixNow(): BN {
  * @param pk A {@link https://github.com/feross/buffer|Buffer} for the private key.
  */
 export function bufferToPrivateKeyString(pk: Buffer): string {
-  return 'PrivateKey-' + bintools.cb58Encode(pk);
+  return "PrivateKey-" + bintools.cb58Encode(pk)
 }
 
 /**
@@ -49,13 +49,13 @@ export function bufferToPrivateKeyString(pk: Buffer): string {
  * @param pk A string for the private key.
  */
 export function privateKeyStringToBuffer(pk: string): Buffer {
-  if (!pk.startsWith('PrivateKey-')) {
+  if (!pk.startsWith("PrivateKey-")) {
     throw new PrivateKeyError(
       "Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'"
-    );
+    )
   }
-  let pksplit: string[] = pk.split('-');
-  return bintools.cb58Decode(pksplit[pksplit.length - 1]);
+  let pksplit: string[] = pk.split("-")
+  return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }
 
 /**
@@ -64,7 +64,7 @@ export function privateKeyStringToBuffer(pk: string): Buffer {
  * @param pk A {@link https://github.com/feross/buffer|Buffer} for the nodeID.
  */
 export function bufferToNodeIDString(pk: Buffer): string {
-  return 'NodeID-' + bintools.cb58Encode(pk);
+  return "NodeID-" + bintools.cb58Encode(pk)
 }
 
 /**
@@ -73,11 +73,11 @@ export function bufferToNodeIDString(pk: Buffer): string {
  * @param pk A string for the nodeID.
  */
 export function NodeIDStringToBuffer(pk: string): Buffer {
-  if (!pk.startsWith('NodeID-')) {
+  if (!pk.startsWith("NodeID-")) {
     throw new NodeIdError(
       "Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'"
-    );
+    )
   }
-  let pksplit: string[] = pk.split('-');
-  return bintools.cb58Decode(pksplit[pksplit.length - 1]);
+  let pksplit: string[] = pk.split("-")
+  return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }

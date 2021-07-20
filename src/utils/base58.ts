@@ -2,9 +2,9 @@
  * @packageDocumentation
  * @module Utils-Base58
  */
-import BN from 'bn.js';
-import { Buffer } from 'buffer/';
-import { Base58Error } from '../utils/errors';
+import BN from "bn.js"
+import { Buffer } from "buffer/"
+import { Base58Error } from "../utils/errors"
 
 /**
  * A Base58 class that uses the cross-platform Buffer module. Built so that Typescript
@@ -17,7 +17,7 @@ import { Base58Error } from '../utils/errors';
  * ```
  */
 export class Base58 {
-  private static instance: Base58;
+  private static instance: Base58
 
   private constructor() {}
 
@@ -26,15 +26,15 @@ export class Base58 {
    */
   static getInstance(): Base58 {
     if (!Base58.instance) {
-      Base58.instance = new Base58();
+      Base58.instance = new Base58()
     }
-    return Base58.instance;
+    return Base58.instance
   }
 
   protected b58alphabet: string =
-    '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+    "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
-  protected alphabetIdx0 = '1';
+  protected alphabetIdx0 = "1"
 
   protected b58 = [
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
@@ -54,11 +54,11 @@ export class Base58 {
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     255, 255,
-  ];
+  ]
 
-  protected big58Radix: BN = new BN(58);
+  protected big58Radix: BN = new BN(58)
 
-  protected bigZero: BN = new BN(0);
+  protected bigZero: BN = new BN(0)
 
   /**
    * Encodes a {@link https://github.com/feross/buffer|Buffer} as a base-58 string
@@ -68,22 +68,22 @@ export class Base58 {
    * @returns A base-58 string.
    */
   encode = (buff: Buffer): string => {
-    let x: BN = new BN(buff.toString('hex'), 'hex', 'be');
-    let answer: string = ''; // = Buffer.alloc(buff.length*136/100, 0);
+    let x: BN = new BN(buff.toString("hex"), "hex", "be")
+    let answer: string = "" // = Buffer.alloc(buff.length*136/100, 0);
     while (x.cmp(this.bigZero) > 0) {
-      const mod: BN = x.mod(this.big58Radix);
-      x = x.div(this.big58Radix);
-      answer += this.b58alphabet[mod.toNumber()];
+      const mod: BN = x.mod(this.big58Radix)
+      x = x.div(this.big58Radix)
+      answer += this.b58alphabet[mod.toNumber()]
     }
 
     for (let i: number = 0; i < buff.length; i++) {
       if (buff.readUInt8(i) !== 0) {
-        break;
+        break
       }
-      answer += this.alphabetIdx0;
+      answer += this.alphabetIdx0
     }
-    return answer.split('').reverse().join('');
-  };
+    return answer.split("").reverse().join("")
+  }
 
   /**
    * Decodes a base-58 into a {@link https://github.com/feross/buffer|Buffer}
@@ -93,41 +93,41 @@ export class Base58 {
    * @returns A {@link https://github.com/feross/buffer|Buffer} from the decoded string.
    */
   decode = (b: string): Buffer => {
-    const answer: BN = new BN(0);
-    const j: BN = new BN(1);
+    const answer: BN = new BN(0)
+    const j: BN = new BN(1)
 
     for (let i: number = b.length - 1; i >= 0; i--) {
-      const tmp: number = this.b58[b.charCodeAt(i)];
+      const tmp: number = this.b58[b.charCodeAt(i)]
       if (tmp === 255) {
         throw new Base58Error(
-          'Error - Base58.decode: not a valid base58 string'
-        );
+          "Error - Base58.decode: not a valid base58 string"
+        )
       }
-      const scratch: BN = new BN(tmp);
-      scratch.imul(j);
-      answer.iadd(scratch);
-      j.imul(this.big58Radix);
+      const scratch: BN = new BN(tmp)
+      scratch.imul(j)
+      answer.iadd(scratch)
+      j.imul(this.big58Radix)
     }
 
     /* we need to make sure the prefaced 0's are put back to be even in this string */
-    let anshex = answer.toString('hex');
-    anshex = anshex.length % 2 ? `0${anshex}` : anshex;
+    let anshex = answer.toString("hex")
+    anshex = anshex.length % 2 ? `0${anshex}` : anshex
 
     /**
      * We need to replace all zeros that were removed during our conversation process.
      * This ensures the buffer returns is the appropriate length.
      */
-    const tmpval: Buffer = Buffer.from(anshex, 'hex');
-    let numZeros: number;
+    const tmpval: Buffer = Buffer.from(anshex, "hex")
+    let numZeros: number
     for (numZeros = 0; numZeros < b.length; numZeros++) {
       if (b[numZeros] !== this.alphabetIdx0) {
-        break;
+        break
       }
     }
-    const xlen: number = numZeros + tmpval.length;
-    const result: Buffer = Buffer.alloc(xlen, 0);
-    tmpval.copy(result, numZeros);
+    const xlen: number = numZeros + tmpval.length
+    const result: Buffer = Buffer.alloc(xlen, 0)
+    tmpval.copy(result, numZeros)
 
-    return result;
-  };
+    return result
+  }
 }
