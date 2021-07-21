@@ -1,10 +1,10 @@
-import {
-  BinTools
-} from "../../src"
+import { BinTools } from "../../src"
 const bintools: BinTools = BinTools.getInstance()
 const validBase581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
-const validBase582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
-const invalidBase581: string = "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
+const validBase582: string =
+  "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"
+const invalidBase581: string =
+  "ddd.tnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcHzzzz"
 const invalidBase582: string = ""
 
 const main = async (): Promise<any> => {

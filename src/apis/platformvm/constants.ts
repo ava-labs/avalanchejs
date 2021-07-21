@@ -4,53 +4,56 @@
  */
 
 export class PlatformVMConstants {
-  static LATESTCODEC:number = 0;
+  static LATESTCODEC: number = 0
 
-  static SECPFXID:number = 0;
+  static SECPFXID: number = 0
 
-  static SECPXFEROUTPUTID:number = 7;
-  
-  static SUBNETAUTHID:number = 10;
+  static SECPXFEROUTPUTID: number = 7
 
-  static SECPOWNEROUTPUTID:number = 11;
+  static SUBNETAUTHID: number = 10
 
-  static STAKEABLELOCKOUTID:number = 22;
+  static SECPOWNEROUTPUTID: number = 11
 
-  static SECPINPUTID:number = 5;
+  static STAKEABLELOCKOUTID: number = 22
 
-  static STAKEABLELOCKINID:number = 21;
+  static SECPINPUTID: number = 5
 
-  static LOCKEDSTAKEABLES: number[] = [PlatformVMConstants.STAKEABLELOCKINID, PlatformVMConstants.STAKEABLELOCKOUTID];
+  static STAKEABLELOCKINID: number = 21
 
-  static BASETX:number = 0;
+  static LOCKEDSTAKEABLES: number[] = [
+    PlatformVMConstants.STAKEABLELOCKINID,
+    PlatformVMConstants.STAKEABLELOCKOUTID,
+  ]
 
-  static ADDVALIDATORTX:number = 12;
+  static BASETX: number = 0
 
-  static ADDSUBNETVALIDATORTX:number = 13;
+  static ADDVALIDATORTX: number = 12
 
-  static ADDDELEGATORTX:number = 14;
+  static ADDSUBNETVALIDATORTX: number = 13
 
-  static CREATECHAINTX:number = 15;
+  static ADDDELEGATORTX: number = 14
 
-  static CREATESUBNETTX:number = 16;
+  static CREATECHAINTX: number = 15
 
-  static IMPORTTX:number = 17;
+  static CREATESUBNETTX: number = 16
 
-  static EXPORTTX:number = 18;
+  static IMPORTTX: number = 17
 
-  static ADVANCETIMETX:number = 19;
+  static EXPORTTX: number = 18
 
-  static REWARDVALIDATORTX:number = 20;
+  static ADVANCETIMETX: number = 19
 
-  static SECPCREDENTIAL:number = 9;
+  static REWARDVALIDATORTX: number = 20
 
-  static ASSETIDLEN:number = 32;
+  static SECPCREDENTIAL: number = 9
 
-  static BLOCKCHAINIDLEN:number = 32;
+  static ASSETIDLEN: number = 32
 
-  static SYMBOLMAXLEN:number = 4;
+  static BLOCKCHAINIDLEN: number = 32
 
-  static ASSETNAMELEN:number = 128;
+  static SYMBOLMAXLEN: number = 4
 
-  static ADDRESSLENGTH:number = 20;
+  static ASSETNAMELEN: number = 128
+
+  static ADDRESSLENGTH: number = 20
 }

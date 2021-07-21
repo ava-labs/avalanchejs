@@ -1,7 +1,7 @@
 /**
-* @packageDocumentation
-* @module API-AVM-InitialStates
-*/
+ * @packageDocumentation
+ * @module API-AVM-InitialStates
+ */
 
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
@@ -10,13 +10,13 @@ import { SelectOutputClass } from "./outputs"
 import { AVMConstants } from "./constants"
 import { Serializable, SerializedEncoding } from "../../utils/serialization"
 /**
-* @ignore
-*/
+ * @ignore
+ */
 const bintools: BinTools = BinTools.getInstance()
 
 /**
-* Class for creating initial output states used in asset creation
-*/
+ * Class for creating initial output states used in asset creation
+ */
 export class InitialStates extends Serializable {
   protected _typeName = "InitialStates"
   protected _typeID = undefined
@@ -24,19 +24,21 @@ export class InitialStates extends Serializable {
   serialize(encoding: SerializedEncoding = "hex"): object {
     const fields: object = super.serialize(encoding)
     const flatfxs: object = {}
-    for(let fxid in this.fxs){
-      flatfxs[fxid] = this.fxs[fxid].map((o: Output): object => o.serialize(encoding))
+    for (let fxid in this.fxs) {
+      flatfxs[fxid] = this.fxs[fxid].map((o: Output): object =>
+        o.serialize(encoding)
+      )
     }
     return {
       ...fields,
-      fxs: flatfxs
+      fxs: flatfxs,
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
     const unflat: { [fxid: number]: Output[] } = {}
-    for(let fxid in fields["fxs"]){
-      unflat[fxid] = fields["fxs"][fxid].map((o:object) => {
+    for (let fxid in fields["fxs"]) {
+      unflat[fxid] = fields["fxs"][fxid].map((o: object) => {
         const out: Output = SelectOutputClass(o["_typeID"])
         out.deserialize(o, encoding)
         return out
@@ -48,10 +50,10 @@ export class InitialStates extends Serializable {
   protected fxs: { [fxid: number]: Output[] } = {}
 
   /**
-     *
-     * @param out The output state to add to the collection
-     * @param fxid The FxID that will be used for this output, default AVMConstants.SECPFXID
-     */
+   *
+   * @param out The output state to add to the collection
+   * @param fxid The FxID that will be used for this output, default AVMConstants.SECPFXID
+   */
   addOutput(out: Output, fxid: number = AVMConstants.SECPFXID): void {
     if (!(fxid in this.fxs)) {
       this.fxs[fxid] = []
@@ -73,7 +75,9 @@ export class InitialStates extends Serializable {
       offset += 4
       const statelen: number = statelenbuff.readUInt32BE(0)
       for (let j: number = 0; j < statelen; j++) {
-        const outputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
+        const outputid: number = bintools
+          .copyFrom(bytes, offset, offset + 4)
+          .readUInt32BE(0)
         offset += 4
         const out: Output = SelectOutputClass(outputid)
         offset = out.fromBuffer(bytes, offset)
@@ -84,9 +88,11 @@ export class InitialStates extends Serializable {
     return offset
   }
 
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     const buff: Buffer[] = []
-    const keys: number[] = Object.keys(this.fxs).map((k: string): number => parseInt(k, 10)).sort()
+    const keys: number[] = Object.keys(this.fxs)
+      .map((k: string): number => parseInt(k, 10))
+      .sort()
     const klen: Buffer = Buffer.alloc(4)
     klen.writeUInt32BE(keys.length, 0)
     buff.push(klen)
@@ -109,4 +115,3 @@ export class InitialStates extends Serializable {
     return Buffer.concat(buff)
   }
 }
-  

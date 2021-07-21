@@ -1,7 +1,7 @@
 /**
-* @packageDocumentation
-* @module API-AVM-Constants
-*/
+ * @packageDocumentation
+ * @module API-AVM-Constants
+ */
 
 export class AVMConstants {
   static LATESTCODEC: number = 0
@@ -63,7 +63,7 @@ export class AVMConstants {
   static EXPORTTX_CODECONE: number = 4
 
   static SECPCREDENTIAL: number = 9
-  
+
   static SECPCREDENTIAL_CODECONE: number = 65540
 
   static NFTCREDENTIAL: number = 14

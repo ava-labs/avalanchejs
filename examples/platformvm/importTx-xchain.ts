@@ -1,11 +1,6 @@
-import { 
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
-  PlatformVMAPI, 
+  PlatformVMAPI,
   KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
@@ -16,18 +11,18 @@ import {
   AmountOutput,
   UnsignedTx,
   Tx,
-  ImportTx
+  ImportTx,
 } from "../../src/apis/platformvm"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults, 
+  Defaults,
 } from "../../src/utils"
-    
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345 
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const bintools: BinTools = BinTools.getInstance()
@@ -44,11 +39,16 @@ const inputs: TransferableInput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually Import AVAX to the P-Chain from the X-Chain")
-      
+const memo: Buffer = Buffer.from(
+  "Manually Import AVAX to the P-Chain from the X-Chain"
+)
+
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const platformvmUTXOResponse: any = await pchain.getUTXOs(pAddressStrings, xChainID)
+  const platformvmUTXOResponse: any = await pchain.getUTXOs(
+    pAddressStrings,
+    xChainID
+  )
   const utxoSet: UTXOSet = platformvmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   let amount: BN = new BN(0)
@@ -58,19 +58,32 @@ const main = async (): Promise<any> => {
     const txid: Buffer = utxo.getTxID()
     const outputidx: Buffer = utxo.getOutputIdx()
     const assetID: Buffer = utxo.getAssetID()
-  
-    if(avaxAssetID.toString('hex') === assetID.toString('hex')) {
-    const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-    secpTransferInput.addSignatureIdx(0, pAddresses[0])
-    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
-    importedInputs.push(input)
-    amount = amount.add(amt)
+
+    if (avaxAssetID.toString("hex") === assetID.toString("hex")) {
+      const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
+      secpTransferInput.addSignatureIdx(0, pAddresses[0])
+      const input: TransferableInput = new TransferableInput(
+        txid,
+        outputidx,
+        avaxAssetID,
+        secpTransferInput
+      )
+      importedInputs.push(input)
+      amount = amount.add(amt)
     }
   })
-  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(amount.sub(fee), pAddresses, locktime, threshold)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
+  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+    amount.sub(fee),
+    pAddresses,
+    locktime,
+    threshold
+  )
+  const transferableOutput: TransferableOutput = new TransferableOutput(
+    avaxAssetID,
+    secpTransferOutput
+  )
   outputs.push(transferableOutput)
-  
+
   const importTx: ImportTx = new ImportTx(
     networkID,
     bintools.cb58Decode(pChainID),
@@ -86,6 +99,5 @@ const main = async (): Promise<any> => {
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-    
+
 main()
-    

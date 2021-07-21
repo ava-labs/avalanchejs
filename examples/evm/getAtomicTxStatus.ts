@@ -1,6 +1,4 @@
-import {
-  Avalanche
-} from "../../src"
+import { Avalanche } from "../../src"
 import { EVMAPI } from "../../src/apis/evm"
 
 const ip: string = "localhost"

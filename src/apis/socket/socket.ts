@@ -18,7 +18,7 @@ export class Socket extends WebSocket {
   /**
    * Send a message to the server
    *
-   * @param data 
+   * @param data
    * @param cb Optional
    */
   send(data: any, cb?: any): void {
@@ -28,7 +28,7 @@ export class Socket extends WebSocket {
   /**
    * Terminates the connection completely
    *
-   * @param mcode Optional 
+   * @param mcode Optional
    * @param data Optional
    */
   close(mcode?: number, data?: string): void {
@@ -43,7 +43,8 @@ export class Socket extends WebSocket {
    */
   constructor(
     url: string | import("url").URL = `wss://${MainnetAPI}:443/ext/bc/X/events`,
-    options?: WebSocket.ClientOptions | ClientRequestArgs) {
+    options?: WebSocket.ClientOptions | ClientRequestArgs
+  ) {
     super(url, options)
   }
 }

@@ -10,10 +10,13 @@ const bintools: BinTools = BinTools.getInstance()
 const display: SerializedEncoding = "display"
 
 describe("UTXO", (): void => {
-  const utxohex: string = "000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
+  const utxohex: string =
+    "000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d"
   const outputidx: string = "00000001"
-  const outtxid: string = "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5"
-  const outaid: string = "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558"
+  const outtxid: string =
+    "38d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5"
+  const outaid: string =
+    "3e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558"
   const utxobuff: Buffer = Buffer.from(utxohex, "hex")
 
   // Payment
@@ -69,7 +72,11 @@ describe("UTXO", (): void => {
   })
 })
 
-const setMergeTester = (input: UTXOSet, equal: UTXOSet[], notEqual: UTXOSet[]): boolean => {
+const setMergeTester = (
+  input: UTXOSet,
+  equal: UTXOSet[],
+  notEqual: UTXOSet[]
+): boolean => {
   const instr: string = JSON.stringify(input.getUTXOIDs().sort())
   for (let i: number = 0; i < equal.length; i++) {
     if (JSON.stringify(equal[i].getUTXOIDs().sort()) != instr) {
@@ -87,9 +94,24 @@ const setMergeTester = (input: UTXOSet, equal: UTXOSet[], notEqual: UTXOSet[]): 
 
 describe("UTXOSet", (): void => {
   const utxostrs: string[] = [
-    bintools.cb58Encode(Buffer.from("000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d", "hex")),
-    bintools.cb58Encode(Buffer.from("0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex")),
-    bintools.cb58Encode(Buffer.from("0000f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e", "hex")),
+    bintools.cb58Encode(
+      Buffer.from(
+        "000038d1b9f1138672da6fb6c35125539276a9acc2a668d63bea6ba3c795e2edb0f5000000013e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd3558000000070000000000004dd500000000000000000000000100000001a36fd0c2dbcab311731dde7ef1514bd26fcdc74d",
+        "hex"
+      )
+    ),
+    bintools.cb58Encode(
+      Buffer.from(
+        "0000c3e4823571587fe2bdfc502689f5a8238b9d0ea7f3277124d16af9de0d2d9911000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e",
+        "hex"
+      )
+    ),
+    bintools.cb58Encode(
+      Buffer.from(
+        "0000f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e",
+        "hex"
+      )
+    ),
   ]
   const addrs: Buffer[] = [
     bintools.cb58Decode("FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG"),
@@ -286,7 +308,12 @@ describe("UTXOSet", (): void => {
       let setG: UTXOSet
       let setH: UTXOSet
       // Take-or-Leave
-      const newutxo: string = bintools.cb58Encode(Buffer.from("0000acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626", "hex"))
+      const newutxo: string = bintools.cb58Encode(
+        Buffer.from(
+          "0000acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e1687600000003acf88647b3fbaa9fdf4378f3a0df6a5d15d8efb018ad78f12690390e79e168760000000700000000000186a000000000000000000000000100000001fceda8f90fcb5d30614b99d79fc4baa293077626",
+          "hex"
+        )
+      )
 
       beforeEach((): void => {
         setA = new UTXOSet()
@@ -302,7 +329,7 @@ describe("UTXOSet", (): void => {
         setD.addArray([utxostrs[1]])
 
         setE = new UTXOSet()
-        setE.addArray([])// empty set
+        setE.addArray([]) // empty set
 
         setF = new UTXOSet()
         setF.addArray(utxostrs) // full set, separate from self
@@ -326,19 +353,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "intersection")
-        test = setMergeTester(results, [setA], [setB, setC, setD, setE, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setA],
+          [setB, setC, setD, setE, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "intersection")
-        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH])
+        test = setMergeTester(
+          results,
+          [setF],
+          [setA, setB, setC, setD, setE, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "intersection")
-        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH])
+        test = setMergeTester(
+          results,
+          [setF],
+          [setA, setB, setC, setD, setE, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "intersection")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
       })
 
@@ -347,19 +390,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "differenceSelf")
-        test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setD],
+          [setA, setB, setC, setE, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "differenceSelf")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "differenceSelf")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "differenceSelf")
-        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH])
+        test = setMergeTester(
+          results,
+          [setF],
+          [setA, setB, setC, setD, setE, setG, setH]
+        )
         expect(test).toBe(true)
       })
 
@@ -368,19 +427,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "differenceNew")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "differenceNew")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "differenceNew")
-        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG])
+        test = setMergeTester(
+          results,
+          [setH],
+          [setA, setB, setC, setD, setE, setF, setG]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "differenceNew")
-        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG])
+        test = setMergeTester(
+          results,
+          [setH],
+          [setA, setB, setC, setD, setE, setF, setG]
+        )
         expect(test).toBe(true)
       })
 
@@ -389,19 +464,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "symDifference")
-        test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setD],
+          [setA, setB, setC, setE, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "symDifference")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "symDifference")
-        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG])
+        test = setMergeTester(
+          results,
+          [setH],
+          [setA, setB, setC, setD, setE, setF, setG]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "symDifference")
-        test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH])
+        test = setMergeTester(
+          results,
+          [setG],
+          [setA, setB, setC, setD, setE, setF, setH]
+        )
         expect(test).toBe(true)
       })
 
@@ -410,19 +501,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "union")
-        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH])
+        test = setMergeTester(
+          results,
+          [setF],
+          [setA, setB, setC, setD, setE, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "union")
-        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH])
+        test = setMergeTester(
+          results,
+          [setF],
+          [setA, setB, setC, setD, setE, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "union")
-        test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH])
+        test = setMergeTester(
+          results,
+          [setG],
+          [setA, setB, setC, setD, setE, setF, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "union")
-        test = setMergeTester(results, [setG], [setA, setB, setC, setD, setE, setF, setH])
+        test = setMergeTester(
+          results,
+          [setG],
+          [setA, setB, setC, setD, setE, setF, setH]
+        )
         expect(test).toBe(true)
       })
 
@@ -431,19 +538,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "unionMinusNew")
-        test = setMergeTester(results, [setD], [setA, setB, setC, setE, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setD],
+          [setA, setB, setC, setE, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "unionMinusNew")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "unionMinusNew")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "unionMinusNew")
-        test = setMergeTester(results, [setF], [setA, setB, setC, setD, setE, setG, setH])
+        test = setMergeTester(
+          results,
+          [setF],
+          [setA, setB, setC, setD, setE, setG, setH]
+        )
         expect(test).toBe(true)
       })
 
@@ -452,19 +575,35 @@ describe("UTXOSet", (): void => {
         let test: boolean
 
         results = set.mergeByRule(setA, "unionMinusSelf")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setF, "unionMinusSelf")
-        test = setMergeTester(results, [setE], [setA, setB, setC, setD, setF, setG, setH])
+        test = setMergeTester(
+          results,
+          [setE],
+          [setA, setB, setC, setD, setF, setG, setH]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setG, "unionMinusSelf")
-        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG])
+        test = setMergeTester(
+          results,
+          [setH],
+          [setA, setB, setC, setD, setE, setF, setG]
+        )
         expect(test).toBe(true)
 
         results = set.mergeByRule(setH, "unionMinusSelf")
-        test = setMergeTester(results, [setH], [setA, setB, setC, setD, setE, setF, setG])
+        test = setMergeTester(
+          results,
+          [setH],
+          [setA, setB, setC, setD, setE, setF, setG]
+        )
         expect(test).toBe(true)
       })
     })

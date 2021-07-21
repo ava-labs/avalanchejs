@@ -4,8 +4,13 @@
  */
 
 import { Buffer } from "buffer/"
-import BinTools from '../../utils/bintools'
-import { Serializable, Serialization, SerializedEncoding, SerializedType } from '../../utils/serialization'
+import BinTools from "../../utils/bintools"
+import {
+  Serializable,
+  Serialization,
+  SerializedEncoding,
+  SerializedType,
+} from "../../utils/serialization"
 
 /**
  * @ignore
@@ -18,11 +23,11 @@ const num: SerializedType = "number"
 const buffer: SerializedType = "Buffer"
 
 /**
- * Class for representing a threshold and set of minting addresses in Avalanche. 
- * 
+ * Class for representing a threshold and set of minting addresses in Avalanche.
+ *
  * @typeparam MinterSet including a threshold and array of addresses
  */
-export class MinterSet extends Serializable{
+export class MinterSet extends Serializable {
   protected _typeName = "MinterSet"
   protected _typeID = undefined
 
@@ -30,16 +35,32 @@ export class MinterSet extends Serializable{
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      threshold: serialization.encoder(this.threshold, encoding, num, decimalString, 4),
-      minters: this.minters.map((m) => serialization.encoder(m, encoding, buffer, cb58, 20))
+      threshold: serialization.encoder(
+        this.threshold,
+        encoding,
+        num,
+        decimalString,
+        4
+      ),
+      minters: this.minters.map((m) =>
+        serialization.encoder(m, encoding, buffer, cb58, 20)
+      ),
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.threshold = serialization.decoder(fields["threshold"], encoding, decimalString, num, 4)
-    this.minters = fields["minters"].map((m: string) => serialization.decoder(m, encoding, cb58, buffer, 20))
+    this.threshold = serialization.decoder(
+      fields["threshold"],
+      encoding,
+      decimalString,
+      num,
+      4
+    )
+    this.minters = fields["minters"].map((m: string) =>
+      serialization.decoder(m, encoding, cb58, buffer, 20)
+    )
   }
-  
+
   protected threshold: number
   protected minters: Buffer[] = []
 
