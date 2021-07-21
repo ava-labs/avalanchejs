@@ -6,7 +6,7 @@ import {
   GenesisData,
   GenesisAsset,
   TransferableInput,
-  AVMConstants,
+  AVMConstants
 } from "src/apis/avm"
 import { Serialization, SerializedType } from "src/utils"
 

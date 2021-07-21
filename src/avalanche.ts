@@ -261,13 +261,13 @@ export default class AvalancheCore {
     if (axiosConfig) {
       config = {
         ...axiosConfig,
-        ...this.requestConfig,
+        ...this.requestConfig
       }
     } else {
       config = {
         baseURL: `${this.protocol}://${this.ip}:${this.port}`,
         responseType: "text",
-        ...this.requestConfig,
+        ...this.requestConfig
       }
     }
     config.url = baseurl

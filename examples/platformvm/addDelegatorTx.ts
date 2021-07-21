@@ -13,7 +13,7 @@ import {
   AddDelegatorTx,
   Tx,
   SECPOwnerOutput,
-  ParseableOutput,
+  ParseableOutput
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
 import {
@@ -21,7 +21,7 @@ import {
   DefaultLocalGenesisPrivateKey,
   Defaults,
   NodeIDStringToBuffer,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

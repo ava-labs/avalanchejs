@@ -8,7 +8,7 @@ import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
   AmountOutput,
-  TransferableOutput,
+  TransferableOutput
 } from "src/apis/avm/outputs"
 import { EVMConstants } from "src/apis/evm/constants"
 import { Input } from "src/common/input"

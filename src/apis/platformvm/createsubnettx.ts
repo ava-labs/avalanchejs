@@ -19,7 +19,7 @@ export class CreateSubnetTx extends BaseTx {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      subnetOwners: this.subnetOwners.serialize(encoding),
+      subnetOwners: this.subnetOwners.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -78,7 +78,7 @@ export class CreateSubnetTx extends BaseTx {
     let barr: Buffer[] = [
       super.toBuffer(),
       typeID,
-      this.subnetOwners.toBuffer(),
+      this.subnetOwners.toBuffer()
     ]
     return Buffer.concat(barr)
   }

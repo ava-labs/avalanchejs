@@ -35,11 +35,11 @@ describe("Keystore", (): void => {
     const result: Promise<boolean> = keystore.createUser(username, password)
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -53,11 +53,11 @@ describe("Keystore", (): void => {
     const result: Promise<boolean> = keystore.deleteUser(username, password)
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -73,11 +73,11 @@ describe("Keystore", (): void => {
     const result: Promise<string> = keystore.exportUser(username, password)
     const payload: object = {
       result: {
-        user: data,
-      },
+        user: data
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -95,11 +95,11 @@ describe("Keystore", (): void => {
     )
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -115,11 +115,11 @@ describe("Keystore", (): void => {
     const result: Promise<string[]> = keystore.listUsers()
     const payload: object = {
       result: {
-        users: accounts,
-      },
+        users: accounts
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

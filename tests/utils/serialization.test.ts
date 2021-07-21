@@ -26,7 +26,7 @@ import {
   UnsignedTx,
   UTXO,
   UTXOID,
-  UTXOSet,
+  UTXOSet
 } from "src/apis/avm"
 import { Address, Serialized, Signature } from "src/common"
 import {
@@ -34,7 +34,7 @@ import {
   Defaults,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../src/utils"
 import { getPreferredHRP } from "../../src/utils"
 
@@ -837,7 +837,7 @@ describe("Serialization", (): void => {
         expect(minterset2.getCodecID()).toBeUndefined()
         expect(minterset2.getThreshold()).toBe(threshold)
         expect(minterset2.getMinters()).toStrictEqual([
-          serialization.typeToBuffer(xAddressHex, hex),
+          serialization.typeToBuffer(xAddressHex, hex)
         ])
       })
 

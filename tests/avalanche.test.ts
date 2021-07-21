@@ -104,12 +104,12 @@ describe("Avalanche", (): void => {
     expect(avalanche.getHeaders()).toStrictEqual({
       "X-Custom-Header": "example",
       "X-Foo": "Foo",
-      "X-Bar": "Bar",
+      "X-Bar": "Bar"
     })
     avalanche.removeHeader("X-Foo")
     expect(avalanche.getHeaders()).toStrictEqual({
       "X-Custom-Header": "example",
-      "X-Bar": "Bar",
+      "X-Bar": "Bar"
     })
     avalanche.removeAllHeaders()
     expect(avalanche.getHeaders()).toStrictEqual({})
@@ -123,12 +123,12 @@ describe("Avalanche", (): void => {
     expect(avalanche.getRequestConfig()).toStrictEqual({
       withCredentials: true,
       withFoo: "Foo",
-      withBar: "Bar",
+      withBar: "Bar"
     })
     avalanche.removeRequestConfig("withFoo")
     expect(avalanche.getRequestConfig()).toStrictEqual({
       withCredentials: true,
-      withBar: "Bar",
+      withBar: "Bar"
     })
     avalanche.removeAllRequestConfigs()
     expect(avalanche.getRequestConfig()).toStrictEqual({})
@@ -165,11 +165,11 @@ describe("HTTP Operations", (): void => {
     const result: Promise<object> = api.TestGET(input, `/${input}`)
     const payload: object = {
       result: {
-        output: input,
-      },
+        output: input
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
     mockAxios.mockResponse(responseObj)
     const response: any = await result
@@ -182,7 +182,7 @@ describe("HTTP Operations", (): void => {
     const api: TestAPI = avalanche.api("testingrequests")
     const axiosConfig: AxiosRequestConfig = {
       baseURL: `${protocol}://${host}:${port}`,
-      responseType: "text",
+      responseType: "text"
     }
     const result: Promise<object> = api.TestDELETE(
       input,
@@ -191,11 +191,11 @@ describe("HTTP Operations", (): void => {
     )
     const payload: object = {
       result: {
-        output: input,
-      },
+        output: input
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
     mockAxios.mockResponse(responseObj)
     const response: any = await result
@@ -209,11 +209,11 @@ describe("HTTP Operations", (): void => {
     const result: Promise<object> = api.TestPOST(input, `/${input}`)
     const payload: object = {
       result: {
-        output: input,
-      },
+        output: input
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
     mockAxios.mockResponse(responseObj)
     const response: any = await result
@@ -227,11 +227,11 @@ describe("HTTP Operations", (): void => {
     const result: Promise<object> = api.TestPUT(input, `/${input}`)
     const payload: object = {
       result: {
-        output: input,
-      },
+        output: input
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
     mockAxios.mockResponse(responseObj)
     const response: any = await result
@@ -245,11 +245,11 @@ describe("HTTP Operations", (): void => {
     const result: Promise<object> = api.TestPATCH(input, `/${input}`)
     const payload: object = {
       result: {
-        output: input,
-      },
+        output: input
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
     mockAxios.mockResponse(responseObj)
     const response: any = await result

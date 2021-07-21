@@ -16,7 +16,7 @@ import { SelectTxClass } from "./tx"
 import {
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 import { CodecIdError } from "../../utils/errors"
 

@@ -45,7 +45,7 @@ export abstract class ValidatorTx extends BaseTx {
         encoding,
         "Buffer",
         "decimalString"
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -161,7 +161,7 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
         encoding,
         "Buffer",
         "decimalString"
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -361,7 +361,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     return {
       ...fields,
       stakeOuts: this.stakeOuts.map((s) => s.serialize(encoding)),
-      rewardOwners: this.rewardOwners.serialize(encoding),
+      rewardOwners: this.rewardOwners.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -536,7 +536,7 @@ export class AddValidatorTx extends AddDelegatorTx {
         "Buffer",
         "decimalString",
         4
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

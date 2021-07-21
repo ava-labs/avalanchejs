@@ -12,14 +12,14 @@ import {
   SECPOwnerOutput,
   ParseableOutput,
   StakeableLockOut,
-  SECPTransferOutput,
+  SECPTransferOutput
 } from "./outputs"
 import {
   AmountInput,
   SECPTransferInput,
   StakeableLockIn,
   TransferableInput,
-  ParseableInput,
+  ParseableInput
 } from "./inputs"
 import { UnixNow } from "../../utils/helperfunctions"
 import { StandardUTXO, StandardUTXOSet } from "../../common/utxos"
@@ -31,7 +31,7 @@ import { ImportTx } from "../platformvm/importtx"
 import { BaseTx } from "../platformvm/basetx"
 import {
   StandardAssetAmountDestination,
-  AssetAmount,
+  AssetAmount
 } from "../../common/assetamount"
 import { Output } from "../../common/output"
 import { AddDelegatorTx, AddValidatorTx } from "./validationtx"
@@ -43,7 +43,7 @@ import {
   InsufficientFundsError,
   ThresholdError,
   FeeAssetError,
-  TimeError,
+  TimeError
 } from "../../utils/errors"
 
 /**
@@ -316,7 +316,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         // initialize the outs object correctly.
         outs[assetKey] = {
           lockedStakeable: [],
-          unlocked: [],
+          unlocked: []
         }
       }
 

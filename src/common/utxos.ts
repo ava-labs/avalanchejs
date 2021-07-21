@@ -11,7 +11,7 @@ import { MergeRule } from "../utils/constants"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../utils/serialization"
 import { MergeRuleError } from "../utils/errors"
 
@@ -46,7 +46,7 @@ export abstract class StandardUTXO extends Serializable {
         "decimalString"
       ),
       assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58"),
-      output: this.output.serialize(encoding),
+      output: this.output.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -144,7 +144,7 @@ export abstract class StandardUTXO extends Serializable {
       this.outputidx,
       this.assetID,
       outputidbuffer,
-      outbuff,
+      outbuff
     ]
     return Buffer.concat(
       barr,
@@ -257,7 +257,7 @@ export abstract class StandardUTXOSet<
     return {
       ...fields,
       utxos,
-      addressUTXOs,
+      addressUTXOs
     }
   }
 

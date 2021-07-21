@@ -4,14 +4,14 @@ import {
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
-  Tx,
+  Tx
 } from "../../src/apis/avm"
 import { KeyChain as EVMKeyChain, EVMAPI } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

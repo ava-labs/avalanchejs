@@ -9,7 +9,7 @@ import {
   Serializable,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 
 /**
@@ -44,7 +44,7 @@ export class MinterSet extends Serializable {
       ),
       minters: this.minters.map((m) =>
         serialization.encoder(m, encoding, buffer, cb58, 20)
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

@@ -29,7 +29,7 @@ export class AdminAPI extends JRPCAPI {
   alias = async (endpoint: string, alias: string): Promise<boolean> => {
     const params: any = {
       endpoint,
-      alias,
+      alias
     }
     const response: RequestResponseData = await this.callMethod(
       "admin.alias",
@@ -50,7 +50,7 @@ export class AdminAPI extends JRPCAPI {
   aliasChain = async (chain: string, alias: string): Promise<boolean> => {
     const params: any = {
       chain,
-      alias,
+      alias
     }
     const response: RequestResponseData = await this.callMethod(
       "admin.aliasChain",
@@ -68,7 +68,7 @@ export class AdminAPI extends JRPCAPI {
    */
   getChainAliases = async (chain: string): Promise<string[]> => {
     const params: any = {
-      chain,
+      chain
     }
     const response: RequestResponseData = await this.callMethod(
       "admin.getChainAliases",

@@ -34,15 +34,15 @@ describe("Index", () => {
       bytes,
       timestamp,
       encoding,
-      idx,
+      idx
     }
     const result: Promise<object> = index.getLastAccepted(encoding, baseurl)
 
     const payload: object = {
-      result: respobj,
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -59,7 +59,7 @@ describe("Index", () => {
       bytes,
       timestamp,
       encoding,
-      idx,
+      idx
     }
     const result: Promise<object> = index.getContainerByIndex(
       idx,
@@ -68,10 +68,10 @@ describe("Index", () => {
     )
 
     const payload: object = {
-      result: respobj,
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -88,7 +88,7 @@ describe("Index", () => {
       bytes,
       timestamp,
       encoding,
-      idx,
+      idx
     }
     const result: Promise<object> = index.getContainerByIndex(
       id,
@@ -97,10 +97,10 @@ describe("Index", () => {
     )
 
     const payload: object = {
-      result: respobj,
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -119,7 +119,7 @@ describe("Index", () => {
       bytes,
       timestamp,
       encoding,
-      idx,
+      idx
     }
     const result: Promise<object[]> = index.getContainerRange(
       startIndex,
@@ -129,10 +129,10 @@ describe("Index", () => {
     )
 
     const payload: object = {
-      result: respobj,
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -148,11 +148,11 @@ describe("Index", () => {
 
     const payload: object = {
       result: {
-        index: "0",
-      },
+        index: "0"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -168,10 +168,10 @@ describe("Index", () => {
     const result: Promise<boolean> = index.isAccepted(id, encoding, baseurl)
 
     const payload: object = {
-      result: true,
+      result: true
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

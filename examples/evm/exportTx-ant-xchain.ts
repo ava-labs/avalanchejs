@@ -8,13 +8,13 @@ import {
   EVMInput,
   ExportTx,
   SECPTransferOutput,
-  TransferableOutput,
+  TransferableOutput
 } from "../../src/apis/evm"
 import { RequestResponseData } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

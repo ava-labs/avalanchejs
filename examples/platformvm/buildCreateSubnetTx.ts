@@ -4,12 +4,12 @@ import {
   KeyChain,
   UTXOSet,
   UnsignedTx,
-  Tx,
+  Tx
 } from "../../src/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

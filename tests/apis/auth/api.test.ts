@@ -40,11 +40,11 @@ describe("Auth", (): void => {
     const result: Promise<string> = auth.newToken(password, testEndpoints)
     const payload: object = {
       result: {
-        token: testToken,
-      },
+        token: testToken
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -58,11 +58,11 @@ describe("Auth", (): void => {
     const result: Promise<boolean> = auth.revokeToken(password, testToken)
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -76,11 +76,11 @@ describe("Auth", (): void => {
     const result: Promise<boolean> = auth.changePassword(password, newPassword)
     const payload: object = {
       result: {
-        success: false,
-      },
+        success: false
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

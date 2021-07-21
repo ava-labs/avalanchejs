@@ -15,12 +15,12 @@ import {
   InitialStates,
   AVMConstants,
   MinterSet,
-  NFTMintOutput,
+  NFTMintOutput
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

@@ -12,7 +12,7 @@ import {
   NFTTransferOutput,
   NFTMintOutput,
   SECPMintOutput,
-  SECPTransferOutput,
+  SECPTransferOutput
 } from "./outputs"
 import { AVMConstants } from "./constants"
 import { UnsignedTx } from "./tx"
@@ -21,7 +21,7 @@ import {
   NFTTransferOperation,
   TransferableOperation,
   NFTMintOperation,
-  SECPMintOperation,
+  SECPMintOperation
 } from "./ops"
 import { Output, OutputOwners } from "../../common/output"
 import { UnixNow } from "../../utils/helperfunctions"
@@ -36,7 +36,7 @@ import { ImportTx } from "./importtx"
 import { PlatformChainID } from "../../utils/constants"
 import {
   StandardAssetAmountDestination,
-  AssetAmount,
+  AssetAmount
 } from "../../common/assetamount"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import {
@@ -44,7 +44,7 @@ import {
   AddressError,
   InsufficientFundsError,
   ThresholdError,
-  SECPMintOutputError,
+  SECPMintOutputError
 } from "../../utils/errors"
 
 /**

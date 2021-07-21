@@ -10,12 +10,12 @@ import {
   SECPTransferInput,
   AmountOutput,
   UnsignedTx,
-  Tx,
+  Tx
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

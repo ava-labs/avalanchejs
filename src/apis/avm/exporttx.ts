@@ -13,12 +13,12 @@ import BN from "bn.js"
 import {
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 import {
   CodecIdError,
   ChainIdError,
-  TransferableOutputError,
+  TransferableOutputError
 } from "../../utils/errors"
 
 /**
@@ -48,7 +48,7 @@ export class ExportTx extends BaseTx {
         buffer,
         cb58
       ),
-      exportOuts: this.exportOuts.map((e) => e.serialize(encoding)),
+      exportOuts: this.exportOuts.map((e) => e.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -124,7 +124,7 @@ export class ExportTx extends BaseTx {
   getTotalOuts(): TransferableOutput[] {
     return [
       ...(this.getOuts() as TransferableOutput[]),
-      ...this.getExportOutputs(),
+      ...this.getExportOutputs()
     ]
   }
 

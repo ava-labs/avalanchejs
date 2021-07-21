@@ -9,7 +9,7 @@ import { EVMConstants } from "./constants"
 import {
   Output,
   StandardAmountOutput,
-  StandardTransferableOutput,
+  StandardTransferableOutput
 } from "../../common/output"
 import { SerializedEncoding } from "../../utils/serialization"
 import { EVMInput } from "./inputs"

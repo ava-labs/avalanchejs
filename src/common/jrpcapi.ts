@@ -46,7 +46,7 @@ export class JRPCAPI extends APIBase {
 
     const axConf: AxiosRequestConfig = {
       baseURL: baseURL,
-      responseType: "json",
+      responseType: "json"
     }
 
     const resp: RequestResponseData = await this.core.post(

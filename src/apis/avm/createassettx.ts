@@ -13,7 +13,7 @@ import { DefaultNetworkID } from "../../utils/constants"
 import {
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 import { CodecIdError } from "../../utils/errors"
 
@@ -47,7 +47,7 @@ export class CreateAssetTx extends BaseTx {
         decimalString,
         1
       ),
-      initialState: this.initialState.serialize(encoding),
+      initialState: this.initialState.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -195,7 +195,7 @@ export class CreateAssetTx extends BaseTx {
       symsize,
       symbuff,
       this.denomination,
-      initstatebuff,
+      initstatebuff
     ]
     return Buffer.concat(barr, bsize)
   }

@@ -11,12 +11,12 @@ import {
   AmountOutput,
   UnsignedTx,
   Tx,
-  ExportTx,
+  ExportTx
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

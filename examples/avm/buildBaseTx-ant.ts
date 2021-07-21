@@ -3,7 +3,7 @@ import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
 import { UnixNow } from "../../src/utils"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"

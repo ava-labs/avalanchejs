@@ -31,7 +31,7 @@ export class InitialStates extends Serializable {
     }
     return {
       ...fields,
-      fxs: flatfxs,
+      fxs: flatfxs
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

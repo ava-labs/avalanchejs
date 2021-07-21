@@ -8,7 +8,7 @@ import BinTools from "../utils/bintools"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../utils/serialization"
 import { BufferSizeError } from "../utils/errors"
 
@@ -46,7 +46,7 @@ export abstract class NBytes extends Serializable {
         "Buffer",
         "hex",
         this.bsize
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

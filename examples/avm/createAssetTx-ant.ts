@@ -13,12 +13,12 @@ import {
   Tx,
   CreateAssetTx,
   SECPMintOutput,
-  InitialStates,
+  InitialStates
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

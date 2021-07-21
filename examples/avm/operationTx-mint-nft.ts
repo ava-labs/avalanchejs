@@ -15,13 +15,13 @@ import {
   Tx,
   KeyChain,
   NFTMintOperation,
-  NFTMintOutput,
+  NFTMintOutput
 } from "../../src/apis/avm"
 import { OutputOwners } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const getUTXOIDs = (

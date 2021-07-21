@@ -6,13 +6,13 @@ import {
   UnsignedTx,
   Tx,
   AVMConstants,
-  UTXO,
+  UTXO
 } from "../../src/apis/avm"
 import { OutputOwners } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const getUTXOIDs = (

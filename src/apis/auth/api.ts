@@ -25,7 +25,7 @@ export class AuthAPI extends JRPCAPI {
   newToken = async (password: string, endpoints: string[]): Promise<string> => {
     const params: any = {
       password,
-      endpoints,
+      endpoints
     }
     const response: RequestResponseData = await this.callMethod(
       "auth.newToken",
@@ -45,7 +45,7 @@ export class AuthAPI extends JRPCAPI {
   revokeToken = async (password: string, token: string): Promise<boolean> => {
     const params: any = {
       password,
-      token,
+      token
     }
     const response: RequestResponseData = await this.callMethod(
       "auth.revokeToken",
@@ -68,7 +68,7 @@ export class AuthAPI extends JRPCAPI {
   ): Promise<boolean> => {
     const params: any = {
       oldPassword,
-      newPassword,
+      newPassword
     }
     const response: RequestResponseData = await this.callMethod(
       "auth.changePassword",

@@ -5,7 +5,7 @@ import { UnsignedTx, Tx } from "src/apis/platformvm/tx"
 import { KeyChain } from "src/apis/platformvm/keychain"
 import {
   SECPTransferInput,
-  TransferableInput,
+  TransferableInput
 } from "src/apis/platformvm/inputs"
 import createHash from "create-hash"
 import BinTools from "src/utils/bintools"
@@ -13,7 +13,7 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
-  TransferableOutput,
+  TransferableOutput
 } from "src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "src/apis/platformvm/constants"
 import { Avalanche } from "src/index"
@@ -91,11 +91,11 @@ describe("Transactions", (): void => {
         name,
         symbol,
         assetID: bintools.cb58Encode(assetID),
-        denomination: `${denomination}`,
-      },
+        denomination: `${denomination}`
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

@@ -2,7 +2,7 @@ import { UTXOSet, UTXO } from "src/apis/platformvm/utxos"
 import { KeyChain } from "src/apis/platformvm/keychain"
 import {
   SECPTransferInput,
-  TransferableInput,
+  TransferableInput
 } from "src/apis/platformvm/inputs"
 import createHash from "create-hash"
 import BinTools from "src/utils/bintools"
@@ -11,7 +11,7 @@ import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
   AmountOutput,
-  TransferableOutput,
+  TransferableOutput
 } from "src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "src/apis/platformvm/constants"
 import { Input } from "src/common/input"

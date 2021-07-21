@@ -12,13 +12,13 @@ import {
   UnsignedTx,
   CreateSubnetTx,
   Tx,
-  SECPOwnerOutput,
+  SECPOwnerOutput
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

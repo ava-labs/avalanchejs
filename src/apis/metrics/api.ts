@@ -18,7 +18,7 @@ export class MetricsAPI extends RESTAPI {
   protected axConf = (): AxiosRequestConfig => {
     return {
       baseURL: `${this.core.getProtocol()}://${this.core.getHost()}:${this.core.getPort()}`,
-      responseType: "text",
+      responseType: "text"
     }
   }
 
