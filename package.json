@@ -19,7 +19,8 @@
     "prettier-examples": "prettier --write ./examples",
     "prettier-tests": "prettier --write ./tests",
     "prettier-web": "prettier --write ./web",
-    "prettier": "npm run prettier-src && npm run prettier-examples && npm run prettier-tests && npm run prettier-web"
+    "prettier": "npm run prettier-src && npm run prettier-examples && npm run prettier-tests && npm run prettier-web",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
