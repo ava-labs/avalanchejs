@@ -1,23 +1,18 @@
-import { 
-  Avalanche,
-} from "../../src"
-import { 
-  AVMAPI, 
-  KeyChain as AVMKeyChain 
-} from "../../src/apis/avm"
+import { Avalanche } from "../../src"
+import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
-  EVMAPI, 
+  EVMAPI,
   KeyChain as EVMKeyChain,
-  UnsignedTx, 
+  UnsignedTx,
   Tx,
-  UTXOSet
+  UTXOSet,
 } from "../../src/apis/evm"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults 
+  Defaults,
 } from "../../src/utils"
-          
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -33,11 +28,14 @@ xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const xChainBlockchainId: string = Defaults.network[networkID].X.blockchainID
-          
+
 const main = async (): Promise<any> => {
-  const evmUTXOResponse: any = await cchain.getUTXOs(cAddressStrings, xChainBlockchainId)
+  const evmUTXOResponse: any = await cchain.getUTXOs(
+    cAddressStrings,
+    xChainBlockchainId
+  )
   const utxoSet: UTXOSet = evmUTXOResponse.utxos
-      
+
   const unsignedTx: UnsignedTx = await cchain.buildImportTx(
     utxoSet,
     cHexAddress,
@@ -45,10 +43,10 @@ const main = async (): Promise<any> => {
     xChainBlockchainId,
     cAddressStrings
   )
-  
+
   const tx: Tx = unsignedTx.sign(cKeychain)
   const txid: string = await cchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-        
+
 main()

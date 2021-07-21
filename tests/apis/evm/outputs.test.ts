@@ -1,7 +1,7 @@
-import { EVMOutput } from 'src/apis/evm'
+import { EVMOutput } from "src/apis/evm"
 
-describe('Inputs', () => {
-  test('EVMOutput comparator', () => {
+describe("Inputs", () => {
+  test("EVMOutput comparator", () => {
     let outs: EVMOutput[] = []
     const address1: string = "0x55ee05dF718f1a5C1441e76190EB1a19eE2C9430"
     const address3: string = "0x9632a79656af553F58738B0FB750320158495942"
@@ -16,10 +16,12 @@ describe('Inputs', () => {
     const amount6: number = 6
     const amount7: number = 7
     const amount8: number = 8
-    const assetID1: string = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe" // dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db
+    const assetID1: string =
+      "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe" // dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db
     const assetID2: string = "vvKCjrpggyQ8FhJ2D5EAKPh8x8y4JK93JQiWRpTKpEouydRbG" // 7a6e1e3c9c66ed8f076180f89d01320795628dca633001ff437ac6ab58b455be
     const assetID3: string = "eRo1eb2Yxd87KuMYANBSha3n138wtqRhFz2xjftsXWnmpCxyh" // 54fbd087a8a9c739c2c7926d742ea7b937adbd512b9ff0fd51f460a763d1371a
-    const assetID5: string = "2QqUTT3XTgR6HLbCLGtjN2uDHHqNRaBgtBGJ5KCqW7BUaH1P8X" // b9d16d7c7d2674c3c67c5c26d9d6e39a09a5991c588cdf60c4cca732b66fa749
+    const assetID5: string =
+      "2QqUTT3XTgR6HLbCLGtjN2uDHHqNRaBgtBGJ5KCqW7BUaH1P8X" // b9d16d7c7d2674c3c67c5c26d9d6e39a09a5991c588cdf60c4cca732b66fa749
     const assetID6: string = "ZWXaLcAy1YWS3Vvjcrt2KcVA4VxBsMFt8yNDZABJkgBvgpRti" // 49d0dc67846a20dfea79b7beeba84769efa4a0273575f65ca79f9dee1cd1250e
     const assetID7: string = "FHfS61NfF5XdZU62bcXp9yRfgrZeiQC7VNJWKcpdb9QMLHs4L" // 2070e77e34941439dc7bcf502dcf555c6ef0e3cc46bbac8a03b22e15c84a81f1
     const assetID8: string = "ZL6NeWgcnxR2zhhKDx7h9Kg2mZgScC5N4RG5FCDayWY7W3whZ" // 496849239bb1541e97fa8f89256965bf7e657f3bb530cad820dd41706c5e3836

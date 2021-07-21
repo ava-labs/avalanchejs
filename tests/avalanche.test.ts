@@ -12,13 +12,23 @@ import { AxiosRequestConfig } from "axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 describe("Avalanche", (): void => {
-  const blockchainID: string = "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
+  const blockchainID: string =
+    "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
   const host: string = "127.0.0.1"
   const port: number = 9650
   const protocol = "https"
   let avalanche: Avalanche
   beforeAll((): void => {
-    avalanche = new Avalanche(host, port, protocol, 12345, undefined, undefined, undefined, true)
+    avalanche = new Avalanche(
+      host,
+      port,
+      protocol,
+      12345,
+      undefined,
+      undefined,
+      undefined,
+      true
+    )
     avalanche.addAPI("admin", AdminAPI)
     avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainID)
     avalanche.addAPI("health", HealthAPI)
@@ -49,7 +59,7 @@ describe("Avalanche", (): void => {
   test("Endpoints correct", (): void => {
     expect(avalanche.Admin()).not.toBeInstanceOf(AVMAPI)
     expect(avalanche.Admin()).toBeInstanceOf(AdminAPI)
-        
+
     expect(avalanche.XChain()).not.toBeInstanceOf(AdminAPI)
     expect(avalanche.XChain()).toBeInstanceOf(AVMAPI)
 
@@ -58,7 +68,7 @@ describe("Avalanche", (): void => {
 
     expect(avalanche.Info()).not.toBeInstanceOf(KeystoreAPI)
     expect(avalanche.Info()).toBeInstanceOf(InfoAPI)
-        
+
     expect(avalanche.PChain()).not.toBeInstanceOf(KeystoreAPI)
     expect(avalanche.PChain()).toBeInstanceOf(PlatformVMAPI)
 
@@ -91,35 +101,35 @@ describe("Avalanche", (): void => {
     avalanche.setHeader("X-Custom-Header", "example")
     avalanche.setHeader("X-Foo", "Foo")
     avalanche.setHeader("X-Bar", "Bar")
-      expect(avalanche.getHeaders()).toStrictEqual({
-        "X-Custom-Header": "example",
-        "X-Foo": "Foo",
-        "X-Bar": "Bar",
-      })
+    expect(avalanche.getHeaders()).toStrictEqual({
+      "X-Custom-Header": "example",
+      "X-Foo": "Foo",
+      "X-Bar": "Bar",
+    })
     avalanche.removeHeader("X-Foo")
-      expect(avalanche.getHeaders()).toStrictEqual({
-        "X-Custom-Header": "example",
-        "X-Bar": "Bar",
-      })
+    expect(avalanche.getHeaders()).toStrictEqual({
+      "X-Custom-Header": "example",
+      "X-Bar": "Bar",
+    })
     avalanche.removeAllHeaders()
     expect(avalanche.getHeaders()).toStrictEqual({})
   })
 
   test("Customize request config", (): void => {
     expect(avalanche.getRequestConfig()).toStrictEqual({})
-      avalanche.setRequestConfig("withCredentials", true)
-      avalanche.setRequestConfig("withFoo", "Foo")
-      avalanche.setRequestConfig("withBar", "Bar")
-      expect(avalanche.getRequestConfig()).toStrictEqual({
-        withCredentials: true,
-        withFoo: "Foo",
-        withBar: "Bar"
-      })
+    avalanche.setRequestConfig("withCredentials", true)
+    avalanche.setRequestConfig("withFoo", "Foo")
+    avalanche.setRequestConfig("withBar", "Bar")
+    expect(avalanche.getRequestConfig()).toStrictEqual({
+      withCredentials: true,
+      withFoo: "Foo",
+      withBar: "Bar",
+    })
     avalanche.removeRequestConfig("withFoo")
-      expect(avalanche.getRequestConfig()).toStrictEqual({
-        withCredentials: true,
-        withBar: "Bar"
-      })
+    expect(avalanche.getRequestConfig()).toStrictEqual({
+      withCredentials: true,
+      withBar: "Bar",
+    })
     avalanche.removeAllRequestConfigs()
     expect(avalanche.getRequestConfig()).toStrictEqual({})
   })
@@ -132,7 +142,16 @@ describe("HTTP Operations", (): void => {
   const path: string = "/ext/testingrequests"
   let avalanche: Avalanche
   beforeAll((): void => {
-    avalanche = new Avalanche(host, port, protocol, 12345, undefined, undefined, undefined, true)
+    avalanche = new Avalanche(
+      host,
+      port,
+      protocol,
+      12345,
+      undefined,
+      undefined,
+      undefined,
+      true
+    )
     avalanche.addAPI("testingrequests", TestAPI, path)
   })
 
@@ -144,7 +163,7 @@ describe("HTTP Operations", (): void => {
     const input: string = "TestGET"
     const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestGET(input, `/${input}`)
-    const payload:object = {
+    const payload: object = {
       result: {
         output: input,
       },
@@ -161,12 +180,16 @@ describe("HTTP Operations", (): void => {
   test("DELETE works", async (): Promise<void> => {
     const input: string = "TestDELETE"
     const api: TestAPI = avalanche.api("testingrequests")
-    const axiosConfig:AxiosRequestConfig = {
+    const axiosConfig: AxiosRequestConfig = {
       baseURL: `${protocol}://${host}:${port}`,
       responseType: "text",
     }
-    const result: Promise<object> = api.TestDELETE(input, `/${input}`, axiosConfig)
-    const payload:object = {
+    const result: Promise<object> = api.TestDELETE(
+      input,
+      `/${input}`,
+      axiosConfig
+    )
+    const payload: object = {
       result: {
         output: input,
       },
@@ -184,7 +207,7 @@ describe("HTTP Operations", (): void => {
     const input: string = "TestPOST"
     const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestPOST(input, `/${input}`)
-    const payload:object = {
+    const payload: object = {
       result: {
         output: input,
       },
@@ -202,7 +225,7 @@ describe("HTTP Operations", (): void => {
     const input: string = "TestPUT"
     const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestPUT(input, `/${input}`)
-    const payload:object = {
+    const payload: object = {
       result: {
         output: input,
       },
@@ -220,7 +243,7 @@ describe("HTTP Operations", (): void => {
     const input: string = "TestPATCH"
     const api: TestAPI = avalanche.api("testingrequests")
     const result: Promise<object> = api.TestPATCH(input, `/${input}`)
-    const payload:object = {
+    const payload: object = {
       result: {
         output: input,
       },

@@ -37,13 +37,13 @@ import { Buffer } from "buffer/"
  */
 export default class Avalanche extends AvalancheCore {
   /**
-     * Returns a reference to the Admin RPC.
-     */
+   * Returns a reference to the Admin RPC.
+   */
   Admin = () => this.apis.admin as AdminAPI
 
   /**
-     * Returns a reference to the Auth RPC.
-     */
+   * Returns a reference to the Auth RPC.
+   */
   Auth = () => this.apis.auth as AuthAPI
 
   /**
@@ -52,56 +52,56 @@ export default class Avalanche extends AvalancheCore {
   CChain = () => this.apis.cchain as EVMAPI
 
   /**
-     * Returns a reference to the AVM RPC pointed at the X-Chain.
-     */
+   * Returns a reference to the AVM RPC pointed at the X-Chain.
+   */
   XChain = () => this.apis.xchain as AVMAPI
 
   /**
-     * Returns a reference to the Health RPC for a node.
-     */
+   * Returns a reference to the Health RPC for a node.
+   */
   Health = () => this.apis.health as HealthAPI
 
   /**
-     * Returns a reference to the Index RPC for a node.
-     */
+   * Returns a reference to the Index RPC for a node.
+   */
   Index = () => this.apis.index as IndexAPI
 
   /**
-     * Returns a reference to the Info RPC for a node.
-     */
+   * Returns a reference to the Info RPC for a node.
+   */
   Info = () => this.apis.info as InfoAPI
 
   /**
-     * Returns a reference to the Metrics RPC.
-     */
+   * Returns a reference to the Metrics RPC.
+   */
   Metrics = () => this.apis.metrics as MetricsAPI
 
   /**
-     * Returns a reference to the Keystore RPC for a node. We label it "NodeKeys" to reduce
-     * confusion about what it's accessing.
-     */
+   * Returns a reference to the Keystore RPC for a node. We label it "NodeKeys" to reduce
+   * confusion about what it's accessing.
+   */
   NodeKeys = () => this.apis.keystore as KeystoreAPI
 
   /**
-     * Returns a reference to the PlatformVM RPC pointed at the P-Chain.
-     */
+   * Returns a reference to the PlatformVM RPC pointed at the P-Chain.
+   */
   PChain = () => this.apis.pchain as PlatformVMAPI
 
   /**
-  * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
-  *
-  * @param host The hostname to resolve to reach the Avalanche Client RPC APIs
-  * @param port The port to resolve to reach the Avalanche Client RPC APIs
-  * @param protocol The protocol string to use before a "://" in a request,
-  * ex: "http", "https", "git", "ws", etc ...
-  * @param networkID Sets the NetworkID of the class. Default [[DefaultNetworkID]]
-  * @param XChainID Sets the blockchainID for the AVM. Will try to auto-detect,
-  * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
-  * @param CChainID Sets the blockchainID for the EVM. Will try to auto-detect,
-  * otherwise default "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5"
-  * @param hrp The human-readable part of the bech32 addresses
-  * @param skipinit Skips creating the APIs
-  */
+   * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
+   *
+   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs
+   * @param port The port to resolve to reach the Avalanche Client RPC APIs
+   * @param protocol The protocol string to use before a "://" in a request,
+   * ex: "http", "https", "git", "ws", etc ...
+   * @param networkID Sets the NetworkID of the class. Default [[DefaultNetworkID]]
+   * @param XChainID Sets the blockchainID for the AVM. Will try to auto-detect,
+   * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
+   * @param CChainID Sets the blockchainID for the EVM. Will try to auto-detect,
+   * otherwise default "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5"
+   * @param hrp The human-readable part of the bech32 addresses
+   * @param skipinit Skips creating the APIs
+   */
   constructor(
     host: string,
     port: number,
@@ -116,14 +116,22 @@ export default class Avalanche extends AvalancheCore {
     let xchainid: string = XChainID
     let cchainid: string = CChainID
 
-    if (typeof XChainID === "undefined" || !XChainID || XChainID.toLowerCase() === "x") {
+    if (
+      typeof XChainID === "undefined" ||
+      !XChainID ||
+      XChainID.toLowerCase() === "x"
+    ) {
       if (networkID.toString() in Defaults.network) {
         xchainid = Defaults.network[networkID].X.blockchainID
       } else {
         xchainid = Defaults.network[12345].X.blockchainID
       }
     }
-    if (typeof CChainID === "undefined" || !CChainID || CChainID.toLowerCase() === "c") {
+    if (
+      typeof CChainID === "undefined" ||
+      !CChainID ||
+      CChainID.toLowerCase() === "c"
+    ) {
       if (networkID.toString() in Defaults.network) {
         cchainid = Defaults.network[networkID].C.blockchainID
       } else {
@@ -132,15 +140,15 @@ export default class Avalanche extends AvalancheCore {
     }
     if (typeof networkID === "number" && networkID >= 0) {
       this.networkID = networkID
-    } else if(typeof networkID === "undefined"){
+    } else if (typeof networkID === "undefined") {
       networkID = DefaultNetworkID
     }
-    if(typeof hrp !== "undefined"){
+    if (typeof hrp !== "undefined") {
       this.hrp = hrp
     } else {
       this.hrp = getPreferredHRP(this.networkID)
     }
-    
+
     if (!skipinit) {
       this.addAPI("admin", AdminAPI)
       this.addAPI("auth", AuthAPI)

@@ -6,13 +6,13 @@ import {
   InitialStates,
   KeyChain,
   SECPMintOutput,
-  SECPTransferOutput
+  SECPTransferOutput,
 } from "../../src/apis/avm"
 import {
   DefaultLocalGenesisPrivateKey,
   PrivateKeyPrefix,
   Serialization,
-  SerializedType
+  SerializedType,
 } from "../../src/utils"
 const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"
@@ -28,7 +28,10 @@ const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const cb58: SerializedType = "cb58"
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = serialization.typeToBuffer("2Zc54v4ek37TEwu4LiV3j41PUMRd6acDDU3ZCVSxE7X", cb58)
+const memo: Buffer = serialization.typeToBuffer(
+  "2Zc54v4ek37TEwu4LiV3j41PUMRd6acDDU3ZCVSxE7X",
+  cb58
+)
 let assetAlias: string = "asset1"
 let name: string = "asset1"
 let symbol: string = "MFCA"
@@ -36,7 +39,12 @@ let denomination: number = 1
 
 const main = async (): Promise<any> => {
   const amount: BN = new BN(1000000000000)
-  const vcapSecpOutput = new SECPTransferOutput(amount, xAddresses, locktime, threshold)
+  const vcapSecpOutput = new SECPTransferOutput(
+    amount,
+    xAddresses,
+    locktime,
+    threshold
+  )
   let initialStates: InitialStates = new InitialStates()
   initialStates.addOutput(vcapSecpOutput)
 
@@ -54,7 +62,11 @@ const main = async (): Promise<any> => {
   symbol = "MVCA"
   denomination = 2
   initialStates = new InitialStates()
-  const secpMintOutput: SECPMintOutput = new SECPMintOutput(xAddresses, locktime, threshold)
+  const secpMintOutput: SECPMintOutput = new SECPMintOutput(
+    xAddresses,
+    locktime,
+    threshold
+  )
   initialStates.addOutput(secpMintOutput)
   genesisAsset = new GenesisAsset(
     assetAlias,

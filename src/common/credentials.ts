@@ -5,8 +5,11 @@
 import { NBytes } from "./nbytes"
 import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
-import { Serializable, Serialization, SerializedEncoding } from "../utils/serialization"
-
+import {
+  Serializable,
+  Serialization,
+  SerializedEncoding,
+} from "../utils/serialization"
 
 /**
  * @ignore
@@ -25,12 +28,17 @@ export class SigIdx extends NBytes {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "source": serialization.encoder(this.source, encoding, "Buffer", "hex")
+      source: serialization.encoder(this.source, encoding, "Buffer", "hex"),
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.source = serialization.decoder(fields["source"], encoding, "hex", "Buffer")
+    this.source = serialization.decoder(
+      fields["source"],
+      encoding,
+      "hex",
+      "Buffer"
+    )
   }
 
   protected source: Buffer = Buffer.alloc(20)
@@ -40,7 +48,7 @@ export class SigIdx extends NBytes {
   /**
    * Sets the source address for the signature
    */
-  setSource = (address:Buffer) => {
+  setSource = (address: Buffer) => {
     this.source = address
   }
 
@@ -55,10 +63,9 @@ export class SigIdx extends NBytes {
     return newbase as this
   }
 
-  create(...args:any[]):this {
+  create(...args: any[]): this {
     return new SigIdx() as this
   }
-
 
   /**
    * Type representing a [[Signature]] index used in [[Input]]
@@ -80,7 +87,7 @@ export class Signature extends NBytes {
   protected bytes = Buffer.alloc(65)
   protected bsize = 65
 
-  clone():this {
+  clone(): this {
     let newbase: Signature = new Signature()
     newbase.fromBuffer(this.toBuffer())
     return newbase as this
@@ -98,7 +105,7 @@ export class Signature extends NBytes {
   }
 }
 
-export abstract class Credential extends Serializable{
+export abstract class Credential extends Serializable {
   protected _typeName = "Credential"
   protected _typeID = undefined
 
@@ -106,12 +113,12 @@ export abstract class Credential extends Serializable{
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      sigArray: this.sigArray.map((s) => s.serialize(encoding))
+      sigArray: this.sigArray.map((s) => s.serialize(encoding)),
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.sigArray = fields["sigArray"].map((s:object) => {
+    this.sigArray = fields["sigArray"].map((s: object) => {
       let sig: Signature = new Signature()
       sig.deserialize(s, encoding)
       return sig
@@ -123,22 +130,24 @@ export abstract class Credential extends Serializable{
   abstract getCredentialID(): number
 
   /**
-  * Set the codecID
-  *
-  * @param codecID The codecID to set
-  */
-  setCodecID(codecID: number): void { }
+   * Set the codecID
+   *
+   * @param codecID The codecID to set
+   */
+  setCodecID(codecID: number): void {}
 
   /**
-     * Adds a signature to the credentials and returns the index off the added signature.
-     */
-  addSignature = (sig:Signature):number => {
+   * Adds a signature to the credentials and returns the index off the added signature.
+   */
+  addSignature = (sig: Signature): number => {
     this.sigArray.push(sig)
     return this.sigArray.length - 1
   }
 
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    const siglen: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
+    const siglen: number = bintools
+      .copyFrom(bytes, offset, offset + 4)
+      .readUInt32BE(0)
     offset += 4
     this.sigArray = []
     for (let i: number = 0; i < siglen; i++) {

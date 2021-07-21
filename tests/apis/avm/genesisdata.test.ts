@@ -2,7 +2,12 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import { SECPTransferOutput, TransferableOutput } from "src/apis/avm/outputs"
 import { InitialStates } from "src/apis/avm/initialstates"
-import { GenesisData, GenesisAsset, TransferableInput, AVMConstants } from "src/apis/avm"
+import {
+  GenesisData,
+  GenesisAsset,
+  TransferableInput,
+  AVMConstants,
+} from "src/apis/avm"
 import { Serialization, SerializedType } from "src/utils"
 
 /**
@@ -25,15 +30,29 @@ describe("AVM", (): void => {
     const name: string = "asset1"
     const symbol: string = "MFCA"
     const denomination: number = 1
-    const vcapSecpOutput = new SECPTransferOutput(amount, [addressBuf], locktime, threshold)
+    const vcapSecpOutput = new SECPTransferOutput(
+      amount,
+      [addressBuf],
+      locktime,
+      threshold
+    )
     const initialStates: InitialStates = new InitialStates()
     initialStates.addOutput(vcapSecpOutput)
-    const genesisAsset: GenesisAsset = new GenesisAsset(assetAlias, name, symbol, denomination, initialStates, memo)
+    const genesisAsset: GenesisAsset = new GenesisAsset(
+      assetAlias,
+      name,
+      symbol,
+      denomination,
+      initialStates,
+      memo
+    )
     const genesisAssets: GenesisAsset[] = [genesisAsset]
     const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
     const genesisData2: GenesisData = new GenesisData()
     genesisData2.fromBuffer(genesisData.toBuffer())
-    expect(genesisData.toBuffer().toString("hex")).toBe(genesisData2.toBuffer().toString("hex"))
+    expect(genesisData.toBuffer().toString("hex")).toBe(
+      genesisData2.toBuffer().toString("hex")
+    )
     expect(genesisData.getTypeName()).toBe("GenesisData")
     expect(genesisData.getTypeID()).toBeUndefined()
     expect(genesisData.getCodecID()).toBe(AVMConstants.LATESTCODEC)
