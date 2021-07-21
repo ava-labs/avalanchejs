@@ -14,13 +14,13 @@ import {
   TransferableOutput,
   AmountOutput,
   ParseableOutput,
-  StakeableLockOut,
+  StakeableLockOut
 } from "src/apis/platformvm/outputs"
 import {
   TransferableInput,
   SECPTransferInput,
   AmountInput,
-  StakeableLockIn,
+  StakeableLockIn
 } from "src/apis/platformvm/inputs"
 import { UTXO } from "src/apis/platformvm/utxos"
 import createHash from "create-hash"
@@ -33,7 +33,7 @@ import {
   Serializable,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "src/utils/serialization"
 import { AddValidatorTx } from "src/apis/platformvm/validationtx"
 import { GetRewardUTXOsResponse } from "src/common"
@@ -148,11 +148,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.listAddresses(username, password)
     const payload: object = {
       result: {
-        addresses,
-      },
+        addresses
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -168,11 +168,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string> = api.importKey(username, password, "key")
     const payload: object = {
       result: {
-        address,
-      },
+        address
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -189,16 +189,16 @@ describe("PlatformVMAPI", (): void => {
       utxoIDs: [
         {
           txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
-          outputIndex: 0,
-        },
-      ],
+          outputIndex: 0
+        }
+      ]
     }
     const result: Promise<object> = api.getBalance(addrA)
     const payload: object = {
-      result: respobj,
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -213,11 +213,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<BN> = api.getCurrentSupply()
     const payload: object = {
       result: {
-        supply,
-      },
+        supply
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -232,11 +232,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<BN> = api.getHeight()
     const payload: object = {
       result: {
-        height,
-      },
+        height
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -253,11 +253,11 @@ describe("PlatformVMAPI", (): void => {
     const payload: object = {
       result: {
         minValidatorStake: "2000000000000",
-        minDelegatorStake: "25000000000",
-      },
+        minDelegatorStake: "25000000000"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -279,7 +279,7 @@ describe("PlatformVMAPI", (): void => {
       "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000060bd618000000007000000d18c2e280000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc3714de759",
       "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff000000160000000061340880000000070000000fb750430000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc379b89461",
       "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff00000016000000006134088000000007000000d18c2e280000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc3c7aa35d1",
-      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff00000016000000006134088000000007000001d1a94a200000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc38fd232d8",
+      "0x000021e67317cbc4be2aeb00677ad6462778a8f52274b9d605df2591b23027a87dff00000016000000006134088000000007000001d1a94a200000000000000000000000000100000001e70060b7051a4838ebe8e29bcbe1403db9b88cc38fd232d8"
     ]
     const objs: TransferableOutput[] = stakedOutputs.map(
       (stakedOutput: string): TransferableOutput => {
@@ -293,11 +293,11 @@ describe("PlatformVMAPI", (): void => {
     const payload: object = {
       result: {
         staked,
-        stakedOutputs,
-      },
+        stakedOutputs
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -326,11 +326,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: utx,
-      },
+        txID: utx
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -358,11 +358,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: utx,
-      },
+        txID: utx
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -390,11 +390,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: utx,
-      },
+        txID: utx
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -409,17 +409,17 @@ describe("PlatformVMAPI", (): void => {
       {
         id: "nodeID",
         subnetID: "subnetID",
-        vmID: "vmID",
-      },
+        vmID: "vmID"
+      }
     ]
     const result: Promise<object[]> = api.getBlockchains()
     const payload: object = {
       result: {
-        blockchains: resp,
-      },
+        blockchains: resp
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -434,17 +434,17 @@ describe("PlatformVMAPI", (): void => {
       {
         id: "id",
         controlKeys: ["controlKeys"],
-        threshold: "threshold",
-      },
+        threshold: "threshold"
+      }
     ]
     const result: Promise<object> = api.getSubnets()
     const payload: object = {
       result: {
-        subnets: resp,
-      },
+        subnets: resp
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -459,11 +459,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<object> = api.getCurrentValidators()
     const payload: object = {
       result: {
-        validators,
-      },
+        validators
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -479,11 +479,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<object> = api.getCurrentValidators(subnetID)
     const payload: object = {
       result: {
-        validators,
-      },
+        validators
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -499,11 +499,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<object> = api.getCurrentValidators(subnetID)
     const payload: object = {
       result: {
-        validators,
-      },
+        validators
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -519,11 +519,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string> = api.exportKey(username, password, addrA)
     const payload: object = {
       result: {
-        privateKey: key,
-      },
+        privateKey: key
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -547,11 +547,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -574,11 +574,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -605,11 +605,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: blockchainID,
-      },
+        txID: blockchainID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -624,11 +624,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string> = api.getBlockchainStatus(blockchainID)
     const payload: object = {
       result: {
-        status: "Accepted",
-      },
+        status: "Accepted"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -644,11 +644,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string> = api.createAddress(username, password)
     const payload: object = {
       result: {
-        address: alias,
-      },
+        address: alias
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -670,11 +670,11 @@ describe("PlatformVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: utx,
-      },
+        txID: utx
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -690,11 +690,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
-        validators,
-      },
+        validators
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -710,11 +710,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
-        validators,
-      },
+        validators
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -730,11 +730,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.sampleValidators(10, subnetID)
     const payload: object = {
       result: {
-        validators,
-      },
+        validators
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -750,11 +750,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string> = api.validatedBy(blockchainID)
     const payload: object = {
       result: {
-        subnetID: resp,
-      },
+        subnetID: resp
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -770,11 +770,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
-        blockchainIDs: resp,
-      },
+        blockchainIDs: resp
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -790,11 +790,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
-        blockchainIDs: resp,
-      },
+        blockchainIDs: resp
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -810,11 +810,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string[]> = api.validates(subnetID)
     const payload: object = {
       result: {
-        blockchainIDs: resp,
-      },
+        blockchainIDs: resp
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -831,11 +831,11 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string> = api.getTx(txid)
     const payload: object = {
       result: {
-        tx: "sometx",
-      },
+        tx: "sometx"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -852,10 +852,10 @@ describe("PlatformVMAPI", (): void => {
     const result: Promise<string | { status: string; reason: string }> =
       api.getTxStatus(txid)
     const payload: object = {
-      result: "accepted",
+      result: "accepted"
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -914,11 +914,11 @@ describe("PlatformVMAPI", (): void => {
       result: {
         numFetched: 3,
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
-        stopIndex: { address: "a", utxo: "b" },
-      },
+        stopIndex: { address: "a", utxo: "b" }
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -983,11 +983,11 @@ describe("PlatformVMAPI", (): void => {
           name,
           symbol,
           assetID: bintools.cb58Encode(assetID),
-          denomination: `${denomination}`,
-        },
+          denomination: `${denomination}`
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
@@ -1174,11 +1174,11 @@ describe("PlatformVMAPI", (): void => {
       )
       const payload: object = {
         result: {
-          utxos: [fungutxostr],
-        },
+          utxos: [fungutxostr]
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
@@ -2447,10 +2447,10 @@ describe("PlatformVMAPI", (): void => {
     const txID: string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh"
     const result: Promise<GetRewardUTXOsResponse> = api.getRewardUTXOs(txID)
     const payload: object = {
-      result: { numFetched: "0", utxos: [], encoding: "cb58" },
+      result: { numFetched: "0", utxos: [], encoding: "cb58" }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

@@ -9,7 +9,7 @@ import { SigIdx } from "./credentials"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../utils/serialization"
 
 /**
@@ -26,7 +26,7 @@ export abstract class Input extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      sigIdxs: this.sigIdxs.map((s) => s.serialize(encoding)),
+      sigIdxs: this.sigIdxs.map((s) => s.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -138,7 +138,7 @@ export abstract class StandardParseableInput extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      input: this.input.serialize(encoding),
+      input: this.input.serialize(encoding)
     }
   }
 
@@ -199,7 +199,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput {
         "Buffer",
         "decimalString"
       ),
-      assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58"),
+      assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58")
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -274,7 +274,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput {
       this.txid,
       this.outputidx,
       this.assetID,
-      parseableBuff,
+      parseableBuff
     ]
     const buff: Buffer = Buffer.concat(barr, bsize)
     return buff
@@ -334,7 +334,7 @@ export abstract class StandardAmountInput extends Input {
         "Buffer",
         "decimalString",
         8
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

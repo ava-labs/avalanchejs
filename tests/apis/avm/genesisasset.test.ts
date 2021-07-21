@@ -7,7 +7,7 @@ import {
   DefaultNetworkID,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "src/utils"
 
 /**

@@ -10,7 +10,7 @@ import {
   StandardAmountOutput,
   StandardTransferableOutput,
   StandardParseableOutput,
-  Address,
+  Address
 } from "../../common/output"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import BN from "bn.js"
@@ -154,7 +154,7 @@ export class StakeableLockOut extends AmountOutput {
         "decimalString",
         8
       ),
-      transferableOutput: this.transferableOutput.serialize(encoding),
+      transferableOutput: this.transferableOutput.serialize(encoding)
     }
     delete outobj["addresses"]
     delete outobj["locktime"]

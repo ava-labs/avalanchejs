@@ -59,11 +59,11 @@ describe("EVMAPI", (): void => {
     const result: Promise<string> = api.importKey(username, password, "key")
     const payload: object = {
       result: {
-        address,
-      },
+        address
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -79,11 +79,11 @@ describe("EVMAPI", (): void => {
     const result: Promise<string> = api.exportKey(username, password, addrA)
     const payload: object = {
       result: {
-        privateKey: key,
-      },
+        privateKey: key
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -102,11 +102,11 @@ describe("EVMAPI", (): void => {
     let result: Promise<string> = api.exportAVAX(username, password, to, amount)
     let payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     let responseObj = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -132,11 +132,11 @@ describe("EVMAPI", (): void => {
     )
     let payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     let responseObj = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -159,11 +159,11 @@ describe("EVMAPI", (): void => {
     )
     let payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     let responseObj = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -186,11 +186,11 @@ describe("EVMAPI", (): void => {
     )
     let payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     let responseObj = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -230,10 +230,10 @@ describe("EVMAPI", (): void => {
       assetID
     )
     const payload: object = {
-      result: hexStr,
+      result: hexStr
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -249,11 +249,11 @@ describe("EVMAPI", (): void => {
     const result: Promise<string> = api.getAtomicTxStatus(txID)
     const payload: object = {
       result: {
-        status: "Accepted",
-      },
+        status: "Accepted"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

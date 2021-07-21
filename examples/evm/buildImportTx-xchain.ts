@@ -5,12 +5,12 @@ import {
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx,
-  UTXOSet,
+  UTXOSet
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"

@@ -10,7 +10,7 @@ import {
   AmountOutput,
   SelectOutputClass,
   TransferableOutput,
-  EVMOutput,
+  EVMOutput
 } from "./outputs"
 import { EVMConstants } from "./constants"
 import { EVMInput, SECPTransferInput, TransferableInput } from "./inputs"
@@ -20,7 +20,7 @@ import { StandardUTXO, StandardUTXOSet } from "../../common/utxos"
 import { PlatformChainID } from "../../utils/constants"
 import {
   StandardAssetAmountDestination,
-  AssetAmount,
+  AssetAmount
 } from "../../common/assetamount"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { UnsignedTx } from "./tx"
@@ -30,7 +30,7 @@ import {
   UTXOError,
   AddressError,
   InsufficientFundsError,
-  FeeAssetError,
+  FeeAssetError
 } from "../../utils/errors"
 
 /**

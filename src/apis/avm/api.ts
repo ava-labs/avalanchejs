@@ -28,7 +28,7 @@ import {
   NoAtomicUTXOsError,
   SymbolError,
   NameError,
-  TransactionError,
+  TransactionError
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
 
@@ -311,7 +311,7 @@ export class AVMAPI extends JRPCAPI {
     }
     const params: any = {
       address,
-      assetID,
+      assetID
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getBalance",
@@ -334,7 +334,7 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<string> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.createAddress",
@@ -383,7 +383,7 @@ export class AVMAPI extends JRPCAPI {
       denomination,
       username,
       password,
-      initialHolders,
+      initialHolders
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.createFixedCapAsset",
@@ -438,7 +438,7 @@ export class AVMAPI extends JRPCAPI {
       denomination,
       username,
       password,
-      minterSets,
+      minterSets
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.createVariableCapAsset",
@@ -483,7 +483,7 @@ export class AVMAPI extends JRPCAPI {
       amount: amnt.toString(10),
       assetID: asset,
       to,
-      minters,
+      minters
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.mint",
@@ -513,7 +513,7 @@ export class AVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-      address,
+      address
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.exportKey",
@@ -539,7 +539,7 @@ export class AVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-      privateKey,
+      privateKey
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.importKey",
@@ -573,7 +573,7 @@ export class AVMAPI extends JRPCAPI {
       amount: amount.toString(10),
       username,
       password,
-      assetID,
+      assetID
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.export",
@@ -604,7 +604,7 @@ export class AVMAPI extends JRPCAPI {
       to,
       amount: amount.toString(10),
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.exportAVAX",
@@ -636,7 +636,7 @@ export class AVMAPI extends JRPCAPI {
       to,
       sourceChain,
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.import",
@@ -666,7 +666,7 @@ export class AVMAPI extends JRPCAPI {
       to,
       sourceChain,
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.importAVAX",
@@ -689,7 +689,7 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<string[]> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.listAddresses",
@@ -713,7 +713,7 @@ export class AVMAPI extends JRPCAPI {
       )
     }
     const params: any = {
-      address,
+      address
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getAllBalances",
@@ -744,7 +744,7 @@ export class AVMAPI extends JRPCAPI {
       asset = assetID
     }
     const params: any = {
-      assetID: asset,
+      assetID: asset
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getAssetDescription",
@@ -754,7 +754,7 @@ export class AVMAPI extends JRPCAPI {
       name: response.data.result.name,
       symbol: response.data.result.symbol,
       assetID: bintools.cb58Decode(response.data.result.assetID),
-      denomination: parseInt(response.data.result.denomination, 10),
+      denomination: parseInt(response.data.result.denomination, 10)
     }
   }
 
@@ -767,7 +767,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getTx = async (txid: string): Promise<string> => {
     const params: any = {
-      txID: txid,
+      txID: txid
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTx",
@@ -785,7 +785,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getTxStatus = async (txid: string): Promise<string> => {
     const params: any = {
-      txID: txid,
+      txID: txid
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTxStatus",
@@ -826,7 +826,7 @@ export class AVMAPI extends JRPCAPI {
 
     const params: any = {
       addresses: addresses,
-      limit,
+      limit
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -1580,7 +1580,7 @@ export class AVMAPI extends JRPCAPI {
       )
     }
     const params: any = {
-      tx: Transaction.toString(),
+      tx: Transaction.toString()
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.issueTx",
@@ -1637,7 +1637,7 @@ export class AVMAPI extends JRPCAPI {
       password: password,
       assetID: asset,
       amount: amnt.toString(10),
-      to: to,
+      to: to
     }
 
     from = this._cleanAddressArray(from, "send")
@@ -1720,7 +1720,7 @@ export class AVMAPI extends JRPCAPI {
         sOutputs.push({
           to: output.to,
           assetID: asset,
-          amount: amnt.toString(10),
+          amount: amnt.toString(10)
         })
       }
     )
@@ -1728,7 +1728,7 @@ export class AVMAPI extends JRPCAPI {
     const params: any = {
       username: username,
       password: password,
-      outputs: sOutputs,
+      outputs: sOutputs
     }
 
     from = this._cleanAddressArray(from, "send")
@@ -1767,7 +1767,7 @@ export class AVMAPI extends JRPCAPI {
    */
   buildGenesis = async (genesisData: object): Promise<string> => {
     const params: any = {
-      genesisData,
+      genesisData
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.buildGenesis",

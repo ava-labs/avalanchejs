@@ -33,7 +33,8 @@
   ],
   "author": "Gabriel Cardona <gabriel@avalabs.org>",
   "contributors": [
-    "Evan Richard <evan@avalabs.org>"
+    "Evan Richard <evan@avalabs.org>",
+    "Paul Kim <paul.kim@avalabs.org>"
   ],
   "license": "BSD-3-Clause",
   "bugs": {
@@ -93,6 +94,7 @@
     "useTabs": false,
     "semi": false,
     "singleQuote": false,
-    "jsxBracketSameLine": false
+    "jsxBracketSameLine": false,
+    "trailingComma": "none"
   }
 }

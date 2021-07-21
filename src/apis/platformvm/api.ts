@@ -23,13 +23,13 @@ import {
   GooseEggCheckError,
   TimeError,
   StakeError,
-  DelegationFeeError,
+  DelegationFeeError
 } from "../../utils/errors"
 import {
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
-  GetStakeResponse,
+  GetStakeResponse
 } from "../../common"
 import { TransferableOutput } from "../platformvm/outputs"
 import { Serialization, SerializedType } from "../../utils"
@@ -340,7 +340,7 @@ export class PlatformVMAPI extends JRPCAPI {
       fxIDs,
       vmID,
       name,
-      genesisData: genesis,
+      genesisData: genesis
     }
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
@@ -363,7 +363,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getBlockchainStatus = async (blockchainID: string): Promise<string> => {
     const params: any = {
-      blockchainID,
+      blockchainID
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getBlockchainStatus",
@@ -386,7 +386,7 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<string> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.createAddress",
@@ -410,7 +410,7 @@ export class PlatformVMAPI extends JRPCAPI {
       )
     }
     const params: any = {
-      address,
+      address
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getBalance",
@@ -433,7 +433,7 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<string[]> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.listAddresses",
@@ -507,7 +507,7 @@ export class PlatformVMAPI extends JRPCAPI {
     subnetID: Buffer | string = undefined
   ): Promise<string[]> => {
     const params: any = {
-      size: sampleSize.toString(),
+      size: sampleSize.toString()
     }
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
@@ -557,7 +557,7 @@ export class PlatformVMAPI extends JRPCAPI {
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
       stakeAmount: stakeAmount.toString(10),
-      rewardAddress,
+      rewardAddress
     }
     if (typeof delegationFeeRate !== "undefined") {
       params.delegationFeeRate = delegationFeeRate.toString(10)
@@ -597,7 +597,7 @@ export class PlatformVMAPI extends JRPCAPI {
       nodeID,
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
-      weight,
+      weight
     }
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
@@ -642,7 +642,7 @@ export class PlatformVMAPI extends JRPCAPI {
       startTime: startTime.getTime() / 1000,
       endTime: endTime.getTime() / 1000,
       stakeAmount: stakeAmount.toString(10),
-      rewardAddress,
+      rewardAddress
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.addDelegator",
@@ -673,7 +673,7 @@ export class PlatformVMAPI extends JRPCAPI {
       username,
       password,
       controlKeys,
-      threshold,
+      threshold
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.createSubnet",
@@ -692,7 +692,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   validatedBy = async (blockchainID: string): Promise<string> => {
     const params: any = {
-      blockchainID,
+      blockchainID
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.validatedBy",
@@ -711,7 +711,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   validates = async (subnetID: Buffer | string): Promise<string[]> => {
     const params: any = {
-      subnetID,
+      subnetID
     }
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
@@ -761,7 +761,7 @@ export class PlatformVMAPI extends JRPCAPI {
       username,
       password,
       to,
-      amount: amount.toString(10),
+      amount: amount.toString(10)
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.exportAVAX",
@@ -795,7 +795,7 @@ export class PlatformVMAPI extends JRPCAPI {
       to,
       sourceChain,
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.importAVAX",
@@ -828,7 +828,7 @@ export class PlatformVMAPI extends JRPCAPI {
       )
     }
     const params: any = {
-      tx: Transaction.toString(),
+      tx: Transaction.toString()
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.issueTx",
@@ -872,7 +872,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ) {
       return {
         minValidatorStake: this.minValidatorStake,
-        minDelegatorStake: this.minDelegatorStake,
+        minDelegatorStake: this.minDelegatorStake
       }
     }
     const response: RequestResponseData = await this.callMethod(
@@ -882,7 +882,7 @@ export class PlatformVMAPI extends JRPCAPI {
     this.minDelegatorStake = new BN(response.data.result.minDelegatorStake, 10)
     return {
       minValidatorStake: this.minValidatorStake,
-      minDelegatorStake: this.minDelegatorStake,
+      minDelegatorStake: this.minDelegatorStake
     }
   }
 
@@ -912,7 +912,7 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<GetStakeResponse> => {
     const params: GetStakeParams = {
       addresses,
-      encoding,
+      encoding
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getStake",
@@ -933,7 +933,7 @@ export class PlatformVMAPI extends JRPCAPI {
           transferableOutput.fromBuffer(buf, 2)
           return transferableOutput
         }
-      ),
+      )
     }
   }
 
@@ -974,7 +974,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-      address,
+      address
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.exportKey",
@@ -1000,7 +1000,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const params: any = {
       username,
       password,
-      privateKey,
+      privateKey
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.importKey",
@@ -1018,7 +1018,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getTx = async (txid: string): Promise<string> => {
     const params: any = {
-      txID: txid,
+      txID: txid
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getTx",
@@ -1041,7 +1041,7 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<string | { status: string; reason: string }> => {
     const params: any = {
       txID: txid,
-      includeReason: includeReason,
+      includeReason: includeReason
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getTxStatus",
@@ -1082,7 +1082,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
     const params: any = {
       addresses: addresses,
-      limit,
+      limit
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -1732,7 +1732,7 @@ return builtUnsignedTx
   ): Promise<GetRewardUTXOsResponse> => {
     const params: GetRewardUTXOsParams = {
       txID,
-      encoding,
+      encoding
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getRewardUTXOs",

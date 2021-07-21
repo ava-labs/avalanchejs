@@ -10,7 +10,7 @@ import {
   Output,
   StandardAmountOutput,
   StandardTransferableOutput,
-  BaseNFTOutput,
+  BaseNFTOutput
 } from "../../common/output"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { OutputIdError, CodecIdError } from "../../utils/errors"
@@ -340,7 +340,7 @@ export class NFTTransferOutput extends NFTOutput {
         "Buffer",
         "hex",
         this.payload.length
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -395,7 +395,7 @@ export class NFTTransferOutput extends NFTOutput {
   getPayloadBuffer = (): Buffer =>
     Buffer.concat([
       bintools.copyFrom(this.sizePayload),
-      bintools.copyFrom(this.payload),
+      bintools.copyFrom(this.payload)
     ])
 
   /**
@@ -427,7 +427,7 @@ export class NFTTransferOutput extends NFTOutput {
       this.groupID,
       this.sizePayload,
       this.payload,
-      superbuff,
+      superbuff
     ]
     return Buffer.concat(barr, bsize)
   }

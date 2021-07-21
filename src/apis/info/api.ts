@@ -10,7 +10,7 @@ import {
   GetBlockchainIDParams,
   IsBootstrappedParams,
   PeersParams,
-  PeersResponse,
+  PeersResponse
 } from "../../common/interfaces"
 
 /**
@@ -30,7 +30,7 @@ export class InfoAPI extends JRPCAPI {
    */
   getBlockchainID = async (alias: string): Promise<string> => {
     const params: GetBlockchainIDParams = {
-      alias,
+      alias
     }
 
     const response: RequestResponseData = await this.callMethod(
@@ -97,7 +97,7 @@ export class InfoAPI extends JRPCAPI {
     const response: RequestResponseData = await this.callMethod("info.getTxFee")
     return {
       txFee: new BN(response.data.result.txFee, 10),
-      creationTxFee: new BN(response.data.result.creationTxFee, 10),
+      creationTxFee: new BN(response.data.result.creationTxFee, 10)
     }
   }
 
@@ -109,7 +109,7 @@ export class InfoAPI extends JRPCAPI {
    */
   isBootstrapped = async (chain: string): Promise<boolean> => {
     const params: IsBootstrappedParams = {
-      chain,
+      chain
     }
     const response: RequestResponseData = await this.callMethod(
       "info.isBootstrapped",
@@ -128,7 +128,7 @@ export class InfoAPI extends JRPCAPI {
    */
   peers = async (nodeIDs: string[] = []): Promise<PeersResponse[]> => {
     const params: PeersParams = {
-      nodeIDs,
+      nodeIDs
     }
     const response: RequestResponseData = await this.callMethod(
       "info.peers",

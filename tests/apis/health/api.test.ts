@@ -41,19 +41,19 @@ describe("Health", (): void => {
         checks: {
           "network.validators.heartbeat": {
             message: {
-              heartbeat: 1591041377,
+              heartbeat: 1591041377
             },
             timestamp: "2020-06-01T15:56:18.554202-04:00",
             duration: 23201,
             contiguousFailures: 0,
-            timeOfFirstFailure: null,
-          },
+            timeOfFirstFailure: null
+          }
         },
-        healthy: true,
-      },
+        healthy: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

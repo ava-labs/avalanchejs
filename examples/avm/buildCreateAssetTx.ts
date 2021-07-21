@@ -7,11 +7,11 @@ import {
   Tx,
   InitialStates,
   SECPMintOutput,
-  SECPTransferOutput,
+  SECPTransferOutput
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"

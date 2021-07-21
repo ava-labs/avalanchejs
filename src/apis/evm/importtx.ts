@@ -20,7 +20,7 @@ import {
   ChainIdError,
   TransferableInputError,
   EVMOutputError,
-  EVMFeeError,
+  EVMFeeError
 } from "../../utils/errors"
 
 /**
@@ -46,7 +46,7 @@ export class ImportTx extends EVMBaseTx {
         "Buffer",
         "cb58"
       ),
-      importIns: this.importIns.map((i) => i.serialize(encoding)),
+      importIns: this.importIns.map((i) => i.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

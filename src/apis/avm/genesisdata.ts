@@ -7,7 +7,7 @@ import BinTools from "../../utils/bintools"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../../utils/serialization"
 import { AVMConstants } from "./constants"
 import { GenesisAsset } from "."
@@ -38,7 +38,7 @@ export class GenesisData extends Serializable {
         encoding,
         buffer,
         decimalString
-      ),
+      )
     }
   }
 

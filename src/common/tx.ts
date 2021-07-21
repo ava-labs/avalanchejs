@@ -14,7 +14,7 @@ import {
   Serializable,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../utils/serialization"
 
 /**
@@ -55,7 +55,7 @@ export abstract class StandardBaseTx<
       ),
       outs: this.outs.map((o) => o.serialize(encoding)),
       ins: this.ins.map((i) => i.serialize(encoding)),
-      memo: serialization.encoder(this.memo, encoding, buffer, hex),
+      memo: serialization.encoder(this.memo, encoding, buffer, hex)
     }
   }
 
@@ -231,7 +231,7 @@ export abstract class StandardUnsignedTx<
         "decimalString",
         2
       ),
-      transaction: this.transaction.serialize(encoding),
+      transaction: this.transaction.serialize(encoding)
     }
   }
 
@@ -371,7 +371,7 @@ export abstract class StandardTx<
     return {
       ...fields,
       unsignedTx: this.unsignedTx.serialize(encoding),
-      credentials: this.credentials.map((c) => c.serialize(encoding)),
+      credentials: this.credentials.map((c) => c.serialize(encoding))
     }
   }
 

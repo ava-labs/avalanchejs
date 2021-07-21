@@ -16,7 +16,7 @@ import { TransferableOutput } from "./outputs"
 import {
   ChainIdError,
   EVMInputError,
-  TransferableOutputError,
+  TransferableOutputError
 } from "../../utils/errors"
 
 /**
@@ -39,7 +39,7 @@ export class ExportTx extends EVMBaseTx {
         "Buffer",
         "cb58"
       ),
-      exportedOutputs: this.exportedOutputs.map((i) => i.serialize(encoding)),
+      exportedOutputs: this.exportedOutputs.map((i) => i.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -95,7 +95,7 @@ export class ExportTx extends EVMBaseTx {
     let barr: Buffer[] = [
       super.toBuffer(),
       this.destinationChain,
-      this.numInputs,
+      this.numInputs
     ]
     let bsize: number =
       super.toBuffer().length +

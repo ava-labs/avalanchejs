@@ -33,11 +33,11 @@ describe("Admin", (): void => {
     const result: Promise<boolean> = admin.alias(ep, al)
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -53,11 +53,11 @@ describe("Admin", (): void => {
     const result: Promise<boolean> = admin.aliasChain(ch, al)
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -72,11 +72,11 @@ describe("Admin", (): void => {
     const result: Promise<string[]> = admin.getChainAliases(ch)
     const payload: object = {
       result: {
-        aliases: ["alias1", "alias2"],
-      },
+        aliases: ["alias1", "alias2"]
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -91,11 +91,11 @@ describe("Admin", (): void => {
     const result: Promise<boolean> = admin.lockProfile()
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -109,11 +109,11 @@ describe("Admin", (): void => {
     const result: Promise<boolean> = admin.memoryProfile()
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -127,11 +127,11 @@ describe("Admin", (): void => {
     const result: Promise<boolean> = admin.startCPUProfiler()
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -145,11 +145,11 @@ describe("Admin", (): void => {
     const result: Promise<boolean> = admin.stopCPUProfiler()
     const payload: object = {
       result: {
-        success: true,
-      },
+        success: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

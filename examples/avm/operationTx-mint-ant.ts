@@ -15,12 +15,12 @@ import {
   SECPMintOperation,
   SECPMintOutput,
   TransferableOperation,
-  Tx,
+  Tx
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
+  Defaults
 } from "../../src/utils"
 
 const getUTXOIDs = (

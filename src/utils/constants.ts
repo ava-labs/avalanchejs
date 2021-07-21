@@ -18,7 +18,7 @@ export const NetworkIDToHRP: object = {
   3: "denali",
   4: "everest",
   5: "fuji",
-  12345: "local",
+  12345: "local"
 }
 
 export const HRPToNetworkID: object = {
@@ -28,7 +28,7 @@ export const HRPToNetworkID: object = {
   denali: 3,
   everest: 4,
   fuji: 5,
-  local: 12345,
+  local: 12345
 }
 
 export const NetworkIDToNetworkNames: object = {
@@ -38,7 +38,7 @@ export const NetworkIDToNetworkNames: object = {
   3: ["Denali"],
   4: ["Everest"],
   5: ["Fuji", "Testnet"],
-  12345: ["Local Network"],
+  12345: ["Local Network"]
 }
 
 export const NetworkNameToNetworkID: object = {
@@ -50,7 +50,7 @@ export const NetworkNameToNetworkID: object = {
   Everest: 4,
   Fuji: 5,
   Testnet: 5,
-  "Local Network": 12345,
+  "Local Network": 12345
 }
 
 export const FallbackHRP: string = "custom"
@@ -103,7 +103,7 @@ const n0X: object = {
   alias: XChainAlias,
   vm: XChainVMName,
   fee: MILLIAVAX,
-  creationTxFee: CENTIAVAX,
+  creationTxFee: CENTIAVAX
 }
 
 const n0P: object = {
@@ -120,7 +120,7 @@ const n0P: object = {
   minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX.mul(new BN(25)),
-  minDelegationFee: new BN(2),
+  minDelegationFee: new BN(2)
 }
 
 const n0C: object = {
@@ -129,7 +129,7 @@ const n0C: object = {
   vm: CChainVMName,
   fee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(470)), //equivalent to gas price
-  chainID: 43111,
+  chainID: 43111
 }
 // End Manhattan
 
@@ -141,7 +141,7 @@ const n1X: object = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
-  creationTxFee: CENTIAVAX,
+  creationTxFee: CENTIAVAX
 }
 
 const n1P: object = {
@@ -159,7 +159,7 @@ const n1P: object = {
   minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX.mul(new BN(25)),
-  minDelegationFee: new BN(2),
+  minDelegationFee: new BN(2)
 }
 
 const n1C: object = {
@@ -168,7 +168,7 @@ const n1C: object = {
   vm: CChainVMName,
   txFee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(225)),
-  chainID: 43114,
+  chainID: 43114
 }
 // End Mainnet
 
@@ -178,7 +178,7 @@ const n2X: object = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: 0,
-  creationTxFee: 0,
+  creationTxFee: 0
 }
 
 const n2P: object = {
@@ -195,14 +195,14 @@ const n2P: object = {
   minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX.mul(new BN(25)),
-  minDelegationFee: new BN(2),
+  minDelegationFee: new BN(2)
 }
 
 const n2C: object = {
   blockchainID: "2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i",
   alias: CChainAlias,
   vm: CChainVMName,
-  gasPrice: 0,
+  gasPrice: 0
 }
 // End Cascade
 
@@ -212,7 +212,7 @@ const n3X: object = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: 0,
-  creationTxFee: 0,
+  creationTxFee: 0
 }
 
 const n3P: object = {
@@ -229,14 +229,14 @@ const n3P: object = {
   minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX.mul(new BN(25)),
-  minDelegationFee: new BN(2),
+  minDelegationFee: new BN(2)
 }
 
 const n3C: object = {
   blockchainID: "zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9",
   alias: CChainAlias,
   vm: CChainVMName,
-  gasPrice: 0,
+  gasPrice: 0
 }
 // End Denali
 
@@ -246,7 +246,7 @@ const n4X: object = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
-  creationTxFee: CENTIAVAX,
+  creationTxFee: CENTIAVAX
 }
 
 const n4P: object = {
@@ -263,7 +263,7 @@ const n4P: object = {
   minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX.mul(new BN(25)),
-  minDelegationFee: new BN(2),
+  minDelegationFee: new BN(2)
 }
 
 const n4C: object = {
@@ -271,7 +271,7 @@ const n4C: object = {
   alias: CChainAlias,
   vm: CChainVMName,
   gasPrice: GWEI.mul(new BN(470)),
-  chainID: 43110,
+  chainID: 43110
 }
 // End Everest
 
@@ -283,7 +283,7 @@ const n5X: object = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
-  creationTxFee: CENTIAVAX,
+  creationTxFee: CENTIAVAX
 }
 
 const n5P: object = {
@@ -301,7 +301,7 @@ const n5P: object = {
   minStakeDuration: 24 * 60 * 60, //one day
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX,
-  minDelegationFee: new BN(2),
+  minDelegationFee: new BN(2)
 }
 
 const n5C: object = {
@@ -310,7 +310,7 @@ const n5C: object = {
   vm: CChainVMName,
   txFee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(225)),
-  chainID: 43113,
+  chainID: 43113
 }
 // End Fuji
 
@@ -336,7 +336,7 @@ export class Defaults {
       P: n0P,
       "11111111111111111111111111111111LpoYY": n0P,
       C: n0C,
-      "2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb": n0C,
+      "2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb": n0C
     },
     1: {
       hrp: NetworkIDToHRP[1],
@@ -345,7 +345,7 @@ export class Defaults {
       P: n1P,
       "11111111111111111111111111111111LpoYY": n1P,
       C: n1C,
-      "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5": n1C,
+      "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5": n1C
     },
     2: {
       hrp: NetworkIDToHRP[2],
@@ -354,7 +354,7 @@ export class Defaults {
       P: n2P,
       "11111111111111111111111111111111LpoYY": n2P,
       C: n2C,
-      "2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i": n2C,
+      "2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i": n2C
     },
     3: {
       hrp: NetworkIDToHRP[3],
@@ -363,7 +363,7 @@ export class Defaults {
       P: n3P,
       "11111111111111111111111111111111LpoYY": n3P,
       C: n3C,
-      zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n3C,
+      zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n3C
     },
     4: {
       hrp: NetworkIDToHRP[4],
@@ -372,7 +372,7 @@ export class Defaults {
       P: n4P,
       "11111111111111111111111111111111LpoYY": n4P,
       C: n4C,
-      saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK: n4C,
+      saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK: n4C
     },
     5: {
       hrp: NetworkIDToHRP[5],
@@ -381,7 +381,7 @@ export class Defaults {
       P: n5P,
       "11111111111111111111111111111111LpoYY": n5P,
       C: n5C,
-      yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp: n5C,
+      yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp: n5C
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
@@ -390,8 +390,8 @@ export class Defaults {
       P: n12345P,
       "11111111111111111111111111111111LpoYY": n12345P,
       C: n12345C,
-      "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU": n12345C,
-    },
+      "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU": n12345C
+    }
   }
 }
 

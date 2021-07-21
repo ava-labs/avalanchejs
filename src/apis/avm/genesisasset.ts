@@ -9,7 +9,7 @@ import { DefaultNetworkID } from "../../utils/constants"
 import {
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 import { CreateAssetTx } from "./createassettx"
 import BN from "bn.js"
@@ -45,7 +45,7 @@ export class GenesisAsset extends CreateAssetTx {
         decimalString,
         1
       ),
-      initialState: this.initialState.serialize(encoding),
+      initialState: this.initialState.serialize(encoding)
     }
   }
 

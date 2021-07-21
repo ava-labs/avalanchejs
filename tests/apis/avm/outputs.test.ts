@@ -4,7 +4,7 @@ import BinTools from "src/utils/bintools"
 import {
   SECPTransferOutput,
   SelectOutputClass,
-  NFTMintOutput,
+  NFTMintOutput
 } from "src/apis/avm/outputs"
 import { Output } from "src/common/output"
 import { SECPMintOutput } from "../../../src/apis/avm/outputs"
@@ -19,7 +19,7 @@ describe("Outputs", (): void => {
     const addrs: Buffer[] = [
       bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
       bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
-      bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"),
+      bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
     ].sort()
 
     const locktime: BN = new BN(54321)
@@ -122,7 +122,7 @@ describe("Outputs", (): void => {
     const addrs: Buffer[] = [
       bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
       bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
-      bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"),
+      bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
     ].sort()
 
     const locktime: BN = new BN(54321)

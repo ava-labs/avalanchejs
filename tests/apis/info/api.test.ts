@@ -34,11 +34,11 @@ describe("Info", () => {
     const result: Promise<string> = info.getBlockchainID("X")
     const payload: object = {
       result: {
-        blockchainID: avalanche.XChain().getBlockchainID(),
-      },
+        blockchainID: avalanche.XChain().getBlockchainID()
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -52,11 +52,11 @@ describe("Info", () => {
     const result: Promise<number> = info.getNetworkID()
     const payload: object = {
       result: {
-        networkID: 12345,
-      },
+        networkID: 12345
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -71,11 +71,11 @@ describe("Info", () => {
     const payload: object = {
       result: {
         txFee: "1000000",
-        creationTxFee: "10000000",
-      },
+        creationTxFee: "10000000"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -90,11 +90,11 @@ describe("Info", () => {
     const result: Promise<string> = info.getNetworkName()
     const payload: object = {
       result: {
-        networkName: "denali",
-      },
+        networkName: "denali"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -108,11 +108,11 @@ describe("Info", () => {
     const result: Promise<string> = info.getNodeID()
     const payload: object = {
       result: {
-        nodeID: "abcd",
-      },
+        nodeID: "abcd"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -126,11 +126,11 @@ describe("Info", () => {
     const result: Promise<string> = info.getNodeVersion()
     const payload: object = {
       result: {
-        version: "avalanche/0.5.5",
-      },
+        version: "avalanche/0.5.5"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -144,11 +144,11 @@ describe("Info", () => {
     const result: Promise<boolean> = info.isBootstrapped("X")
     const payload: object = {
       result: {
-        isBootstrapped: false,
-      },
+        isBootstrapped: false
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -162,11 +162,11 @@ describe("Info", () => {
     const result: Promise<boolean> = info.isBootstrapped("P")
     const payload: object = {
       result: {
-        isBootstrapped: true,
-      },
+        isBootstrapped: true
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -177,23 +177,26 @@ describe("Info", () => {
   })
 
   test("peers", async () => {
-    const peers = [{
-      ip: "127.0.0.1:60300",
-      publicIP: "127.0.0.1:9659",
-      nodeID: "NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5",
-      version: "avalanche/1.3.2",
-      lastSent: "2021-04-14T08:15:06-07:00",
-      lastReceived: "2021-04-14T08:15:06-07:00",
-      benched: null
-    }, {
-      ip: "127.0.0.1:60302",
-      publicIP: "127.0.0.1:9655",
-      nodeID: "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN",
-      version: "avalanche/1.3.2",
-      lastSent: "2021-04-14T08:15:06-07:00",
-      lastReceived: "2021-04-14T08:15:06-07:00",
-      benched: null
-      }]
+    const peers = [
+      {
+        ip: "127.0.0.1:60300",
+        publicIP: "127.0.0.1:9659",
+        nodeID: "NodeID-P7oB2McjBGgW2NXXWVYjV8JEDFoW9xDE5",
+        version: "avalanche/1.3.2",
+        lastSent: "2021-04-14T08:15:06-07:00",
+        lastReceived: "2021-04-14T08:15:06-07:00",
+        benched: null
+      },
+      {
+        ip: "127.0.0.1:60302",
+        publicIP: "127.0.0.1:9655",
+        nodeID: "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN",
+        version: "avalanche/1.3.2",
+        lastSent: "2021-04-14T08:15:06-07:00",
+        lastReceived: "2021-04-14T08:15:06-07:00",
+        benched: null
+      }
+    ]
     const result: Promise<PeersResponse[]> = info.peers()
     const payload: object = {
       result: {

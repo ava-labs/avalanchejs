@@ -293,7 +293,7 @@ describe("BinTools", (): void => {
     let addrs: string[] = [
       "X-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd",
       "X-local1ltghj033re64920k786uprcp82p9e36j7hzc5x",
-      "X-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u",
+      "X-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -301,7 +301,7 @@ describe("BinTools", (): void => {
     addrs = [
       "X-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6",
       "X-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3",
-      "X-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t",
+      "X-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -309,7 +309,7 @@ describe("BinTools", (): void => {
     addrs = [
       "X-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9",
       "X-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw",
-      "X-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5",
+      "X-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -317,7 +317,7 @@ describe("BinTools", (): void => {
     addrs = [
       "P-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd",
       "P-local1ltghj033re64920k786uprcp82p9e36j7hzc5x",
-      "P-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u",
+      "P-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -325,7 +325,7 @@ describe("BinTools", (): void => {
     addrs = [
       "P-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6",
       "P-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3",
-      "P-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t",
+      "P-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -333,7 +333,7 @@ describe("BinTools", (): void => {
     addrs = [
       "P-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9",
       "P-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw",
-      "P-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5",
+      "P-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -342,7 +342,7 @@ describe("BinTools", (): void => {
     addrs = [
       "C-local1dcfyuug87xqayl4fpp02z9dvknwhafdstvnucd",
       "C-local1ltghj033re64920k786uprcp82p9e36j7hzc5x",
-      "C-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u",
+      "C-local1dq4q9seql2spxrkd7rl82uck5ej3nvlhrluh4u"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -351,7 +351,7 @@ describe("BinTools", (): void => {
     addrs = [
       "C-fuji1dcfyuug87xqayl4fpp02z9dvknwhafds7d29h6",
       "C-fuji1ltghj033re64920k786uprcp82p9e36jtkmpm3",
-      "C-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t",
+      "C-fuji1dq4q9seql2spxrkd7rl82uck5ej3nvlhk79w6t"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -360,7 +360,7 @@ describe("BinTools", (): void => {
     addrs = [
       "C-avax1dcfyuug87xqayl4fpp02z9dvknwhafdsjlw6m9",
       "C-avax1ltghj033re64920k786uprcp82p9e36j8yl7hw",
-      "C-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5",
+      "C-avax1dq4q9seql2spxrkd7rl82uck5ej3nvlh6vp3k5"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)
@@ -369,7 +369,7 @@ describe("BinTools", (): void => {
     addrs = [
       "X-foo1dcfyuug87xqayl4fpp02z9dvknwhafds4k3km3",
       "X-foo1ltghj033re64920k786uprcp82p9e36jqdqjh6",
-      "X-foo1dq4q9seql2spxrkd7rl82uck5ej3nvlha97akq",
+      "X-foo1dq4q9seql2spxrkd7rl82uck5ej3nvlha97akq"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address, "foo")
@@ -378,7 +378,7 @@ describe("BinTools", (): void => {
     addrs = [
       "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC",
       "0xC1ad78FDd4aEd027EbD5e9eee878f44dc1E29358",
-      "0x5B44bC2622dc5DD66a94cd5f2aDc3a49abb864dE",
+      "0x5B44bC2622dc5DD66a94cd5f2aDc3a49abb864dE"
     ]
     addrs.forEach((address: string): void => {
       bintools.stringToAddress(address)

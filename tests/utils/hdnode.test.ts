@@ -33,7 +33,7 @@ describe("HDNode", (): void => {
     "X-avax1wwtn3gx7ke4ge2c29eg5sun36nyj55u4dle9gn",
     "X-avax13527pvlnxa4wrfgt0h8ya7nkjawqq29sv5s89x",
     "X-avax1gw6agtcsz969ugpqh2zx2lmjchg6npklvp43qq",
-    "X-avax10agjetvj0a0vf6wtlh7s6ctr8ha8ch8km8z567",
+    "X-avax10agjetvj0a0vf6wtlh7s6ctr8ha8ch8km8z567"
   ]
 
   test("derive", (): void => {

@@ -11,7 +11,7 @@ import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
   NFTTransferOutput,
-  TransferableOutput,
+  TransferableOutput
 } from "src/apis/avm/outputs"
 import { AVMConstants } from "src/apis/avm/constants"
 import { TransferableOperation, NFTTransferOperation } from "src/apis/avm/ops"
@@ -109,11 +109,11 @@ describe("Transactions", (): void => {
         name,
         symbol,
         assetID: bintools.cb58Encode(assetID),
-        denomination: `${denomination}`,
-      },
+        denomination: `${denomination}`
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

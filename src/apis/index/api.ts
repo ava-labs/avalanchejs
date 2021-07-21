@@ -15,7 +15,7 @@ import {
   GetContainerRangeParams,
   GetContainerRangeResponse,
   GetIndexParams,
-  GetIsAcceptedParams,
+  GetIsAcceptedParams
 } from "../../common/interfaces"
 
 /**
@@ -40,7 +40,7 @@ export class IndexAPI extends JRPCAPI {
   ): Promise<GetLastAcceptedResponse> => {
     this.setBaseURL(baseurl)
     const params: GetLastAcceptedParams = {
-      encoding,
+      encoding
     }
 
     try {
@@ -71,7 +71,7 @@ export class IndexAPI extends JRPCAPI {
     this.setBaseURL(baseurl)
     const params: GetContainerByIndexParams = {
       index,
-      encoding,
+      encoding
     }
 
     try {
@@ -102,7 +102,7 @@ export class IndexAPI extends JRPCAPI {
     this.setBaseURL(baseurl)
     const params: GetContainerByIDParams = {
       containerID,
-      encoding,
+      encoding
     }
 
     try {
@@ -136,7 +136,7 @@ export class IndexAPI extends JRPCAPI {
     const params: GetContainerRangeParams = {
       startIndex,
       numToFetch,
-      encoding,
+      encoding
     }
 
     try {
@@ -167,7 +167,7 @@ export class IndexAPI extends JRPCAPI {
     this.setBaseURL(baseurl)
     const params: GetIndexParams = {
       containerID,
-      encoding,
+      encoding
     }
 
     try {
@@ -198,7 +198,7 @@ export class IndexAPI extends JRPCAPI {
     this.setBaseURL(baseurl)
     const params: GetIsAcceptedParams = {
       containerID,
-      encoding,
+      encoding
     }
 
     try {

@@ -9,7 +9,7 @@ import {
   Input,
   StandardTransferableInput,
   StandardAmountInput,
-  StandardParseableInput,
+  StandardParseableInput
 } from "../../common/input"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import BN from "bn.js"
@@ -156,7 +156,7 @@ export class StakeableLockIn extends AmountInput {
         "decimalString",
         8
       ),
-      transferableInput: this.transferableInput.serialize(encoding),
+      transferableInput: this.transferableInput.serialize(encoding)
     }
     delete outobj["sigIdxs"]
     delete outobj["sigCount"]

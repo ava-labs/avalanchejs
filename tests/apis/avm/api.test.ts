@@ -15,12 +15,12 @@ import {
   SECPTransferOutput,
   NFTMintOutput,
   NFTTransferOutput,
-  SECPMintOutput,
+  SECPMintOutput
 } from "src/apis/avm/outputs"
 import {
   NFTTransferOperation,
   TransferableOperation,
-  SECPMintOperation,
+  SECPMintOperation
 } from "src/apis/avm/ops"
 import * as bech32 from "bech32"
 import { UTF8Payload } from "src/utils/payload"
@@ -36,7 +36,7 @@ import {
   Serializable,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
@@ -130,11 +130,11 @@ describe("AVMAPI", (): void => {
     const payload: object = {
       result: {
         txID: txId,
-        changeAddr: changeAddr,
-      },
+        changeAddr: changeAddr
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -162,11 +162,11 @@ describe("AVMAPI", (): void => {
     const payload: object = {
       result: {
         txID: txId,
-        changeAddr: changeAddr,
-      },
+        changeAddr: changeAddr
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -192,11 +192,11 @@ describe("AVMAPI", (): void => {
     const payload: object = {
       result: {
         txID: txId,
-        changeAddr: changeAddr,
-      },
+        changeAddr: changeAddr
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -228,11 +228,11 @@ describe("AVMAPI", (): void => {
     const result: Promise<string[]> = api.listAddresses(username, password)
     const payload: object = {
       result: {
-        addresses,
-      },
+        addresses
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -247,11 +247,11 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.importKey(username, password, "key")
     const payload: object = {
       result: {
-        address,
-      },
+        address
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -268,17 +268,17 @@ describe("AVMAPI", (): void => {
       utxoIDs: [
         {
           txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
-          outputIndex: 0,
-        },
-      ],
+          outputIndex: 0
+        }
+      ]
     }
 
     const result: Promise<object> = api.getBalance(addrA, "ATH")
     const payload: object = {
-      result: respobj,
+      result: respobj
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -294,11 +294,11 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.exportKey(username, password, addrA)
     const payload: object = {
       result: {
-        privateKey: key,
-      },
+        privateKey: key
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -324,11 +324,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -352,11 +352,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -379,11 +379,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -406,11 +406,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: txID,
-      },
+        txID: txID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -426,11 +426,11 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.createAddress(username, password)
     const payload: object = {
       result: {
-        address: alias,
-      },
+        address: alias
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -455,12 +455,12 @@ describe("AVMAPI", (): void => {
     const initialHolders: object[] = [
       {
         address: "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
-        amount: "10000",
+        amount: "10000"
       },
       {
         address: "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh",
-        amount: "50000",
-      },
+        amount: "50000"
+      }
     ]
 
     const result: Promise<string> = api.createFixedCapAsset(
@@ -473,11 +473,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        assetID: assetID,
-      },
+        assetID: assetID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -502,16 +502,16 @@ describe("AVMAPI", (): void => {
     const minterSets: object[] = [
       {
         minters: ["4peJsFvhdn7XjhNF4HWAQy6YaJts27s9q"],
-        threshold: 1,
+        threshold: 1
       },
       {
         minters: [
           "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
           "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
-          "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU",
+          "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
         ],
-        threshold: 2,
-      },
+        threshold: 2
+      }
     ]
 
     const result: Promise<string> = api.createVariableCapAsset(
@@ -524,11 +524,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        assetID: assetID,
-      },
+        assetID: assetID
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -548,7 +548,7 @@ describe("AVMAPI", (): void => {
     const minters: string[] = [
       "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
       "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
-      "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU",
+      "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
     ]
     const result: Promise<string> = api.mint(
       username,
@@ -560,11 +560,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: "sometx",
-      },
+        txID: "sometx"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -586,7 +586,7 @@ describe("AVMAPI", (): void => {
     const minters: string[] = [
       "dcJ6z9duLfyQTgbjq2wBCowkvcPZHVDF",
       "2fE6iibqfERz5wenXE6qyvinsxDvFhHZk",
-      "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU",
+      "7ieAJbfrGQbpNZRAQEpZCC1Gs1z5gz4HU"
     ]
     const result: Promise<string> = api.mint(
       username,
@@ -598,11 +598,11 @@ describe("AVMAPI", (): void => {
     )
     const payload: object = {
       result: {
-        txID: "sometx",
-      },
+        txID: "sometx"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -619,11 +619,11 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.getTx(txid)
     const payload: object = {
       result: {
-        tx: "sometx",
-      },
+        tx: "sometx"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -640,11 +640,11 @@ describe("AVMAPI", (): void => {
     const result: Promise<string> = api.getTxStatus(txid)
     const payload: object = {
       result: {
-        status: "accepted",
-      },
+        status: "accepted"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -667,11 +667,11 @@ describe("AVMAPI", (): void => {
         name: "Collin Coin",
         symbol: "CKC",
         assetID: assetidstr,
-        denomination: "10",
-      },
+        denomination: "10"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -702,11 +702,11 @@ describe("AVMAPI", (): void => {
         name: "Collin Coin",
         symbol: "CKC",
         assetID: assetidstr,
-        denomination: "11",
-      },
+        denomination: "11"
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -768,11 +768,11 @@ describe("AVMAPI", (): void => {
       result: {
         numFetched: 3,
         utxos: [OPUTXOstr1, OPUTXOstr2, OPUTXOstr3],
-        stopIndex: { address: "a", utxo: "b" },
-      },
+        stopIndex: { address: "a", utxo: "b" }
+      }
     }
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)
@@ -859,11 +859,11 @@ describe("AVMAPI", (): void => {
           name,
           symbol,
           assetID: bintools.cb58Encode(assetID),
-          denomination: denomination,
-        },
+          denomination: denomination
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
@@ -1248,11 +1248,11 @@ describe("AVMAPI", (): void => {
       const result: Promise<string> = avm.issueTx(tx.toString())
       const payload: object = {
         result: {
-          txID: txid,
-        },
+          txID: txid
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
       mockAxios.mockResponse(responseObj)
       const response: string = await result
@@ -1276,11 +1276,11 @@ describe("AVMAPI", (): void => {
       const result: Promise<string> = avm.issueTx(tx.toBuffer())
       const payload: object = {
         result: {
-          txID: txid,
-        },
+          txID: txid
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
@@ -1305,11 +1305,11 @@ describe("AVMAPI", (): void => {
       const result: Promise<string> = avm.issueTx(tx)
       const payload: object = {
         result: {
-          txID: txid,
-        },
+          txID: txid
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
@@ -1778,11 +1778,11 @@ describe("AVMAPI", (): void => {
       )
       const payload: object = {
         result: {
-          utxos: [fungutxostr],
-        },
+          utxos: [fungutxostr]
+        }
       }
       const responseObj: HttpResponse = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)
@@ -1954,14 +1954,14 @@ describe("AVMAPI", (): void => {
               fixedCap: [
                 {
                   amount: 1000,
-                  address: "A",
+                  address: "A"
                 },
                 {
                   amount: 5000,
-                  address: "B",
-                },
-              ],
-            },
+                  address: "B"
+                }
+              ]
+            }
           },
           assetAliasCanBeAnythingUnique: {
             name: "human readable name",
@@ -1970,29 +1970,29 @@ describe("AVMAPI", (): void => {
               variableCap: [
                 {
                   minters: ["A", "B"],
-                  threshold: 1,
+                  threshold: 1
                 },
                 {
                   minters: ["A", "B", "C"],
-                  threshold: 2,
-                },
-              ],
-            },
-          },
-        },
+                  threshold: 2
+                }
+              ]
+            }
+          }
+        }
       }
       const bytes: string =
         "111TNWzUtHKoSvxohjyfEwE2X228ZDGBngZ4mdMUVMnVnjtnawW1b1zbAhzyAM1v6d7ECNj6DXsT7qDmhSEf3DWgXRj7ECwBX36ZXFc9tWVB2qHURoUfdDvFsBeSRqatCmj76eZQMGZDgBFRNijRhPNKUap7bCeKpHDtuCZc4YpPkd4mR84dLL2AL1b4K46eirWKMaFVjA5btYS4DnyUx5cLpAq3d35kEdNdU5zH3rTU18S4TxYV8voMPcLCTZ3h4zRsM5jW1cUzjWVvKg7uYS2oR9qXRFcgy1gwNTFZGstySuvSF7MZeZF4zSdNgC4rbY9H94RVhqe8rW7MXqMSZB6vBTB2BpgF6tNFehmYxEXwjaKRrimX91utvZe9YjgGbDr8XHsXCnXXg4ZDCjapCy4HmmRUtUoAduGNBdGVMiwE9WvVbpMFFcNfgDXGz9NiatgSnkxQALTHvGXXm8bn4CoLFzKnAtq3KwiWqHmV3GjFYeUm3m8Zee9VDfZAvDsha51acxfto1htstxYu66DWpT36YT18WSbxibZcKXa7gZrrsCwyzid8CCWw79DbaLCUiq9u47VqofG1kgxwuuyHb8NVnTgRTkQASSbj232fyG7YeX4mAvZY7a7K7yfSyzJaXdUdR7aLeCdLP6mbFDqUMrN6YEkU2X8d4Ck3T"
       const result: Promise<string> = api.buildGenesis(genesisData)
       const payload: object = {
         result: {
-          bytes: bytes,
-        },
+          bytes: bytes
+        }
       }
       const responseObj: {
         data: object
       } = {
-        data: payload,
+        data: payload
       }
 
       mockAxios.mockResponse(responseObj)

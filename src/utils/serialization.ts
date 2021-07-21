@@ -5,8 +5,18 @@
 import BinTools from "../utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from "./helperfunctions"
-import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from "../utils/errors"
+import {
+  NodeIDStringToBuffer,
+  privateKeyStringToBuffer,
+  bufferToNodeIDString,
+  bufferToPrivateKeyString
+} from "./helperfunctions"
+import {
+  CodecIdError,
+  TypeIdError,
+  TypeNameError,
+  UnknownTypeError
+} from "../utils/errors"
 import { Serialized } from "../common"
 
 export const SERIALIZATIONVERSION: number = 0
@@ -66,7 +76,7 @@ export abstract class Serializable {
     return {
       _typeName: this._typeName,
       _typeID: typeof this._typeID === "undefined" ? null : this._typeID,
-      _codecID: typeof this._codecID === "undefined" ? null : this._codecID,
+      _codecID: typeof this._codecID === "undefined" ? null : this._codecID
     }
   }
   deserialize(fields: object, encoding?: SerializedEncoding) {
@@ -312,7 +322,7 @@ export class Serialization {
       encoding,
       version: SERIALIZATIONVERSION,
       notes,
-      fields: serialize.serialize(encoding),
+      fields: serialize.serialize(encoding)
     }
   }
 

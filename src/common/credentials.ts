@@ -8,7 +8,7 @@ import BinTools from "../utils/bintools"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../utils/serialization"
 
 /**
@@ -28,7 +28,7 @@ export class SigIdx extends NBytes {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      source: serialization.encoder(this.source, encoding, "Buffer", "hex"),
+      source: serialization.encoder(this.source, encoding, "Buffer", "hex")
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -113,7 +113,7 @@ export abstract class Credential extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      sigArray: this.sigArray.map((s) => s.serialize(encoding)),
+      sigArray: this.sigArray.map((s) => s.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

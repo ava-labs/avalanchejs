@@ -52,7 +52,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
     const sigOpt = {
       r: r,
       s: s,
-      recoveryParam: recoveryParam,
+      recoveryParam: recoveryParam
     }
     return sigOpt
   }

@@ -12,7 +12,7 @@ import {
   PCHAINADDRPayload,
   CCHAINADDRPayload,
   TXIDPayload,
-  JSONPayload,
+  JSONPayload
 } from "src/utils/payload"
 import BinTools from "src/utils/bintools"
 import BN from "bn.js"
@@ -98,14 +98,14 @@ describe("Payload", () => {
     [
       "JSON",
       JSON.stringify(jsonobj),
-      bintools.bufferToB58(Buffer.from(JSON.stringify(jsonobj))),
+      bintools.bufferToB58(Buffer.from(JSON.stringify(jsonobj)))
     ],
     ["YAML", yamlstr, bintools.bufferToB58(Buffer.from(yamlstr))],
     ["EMAIL", emailstr, bintools.bufferToB58(Buffer.from(emailstr))],
     ["URL", urlstr, bintools.bufferToB58(Buffer.from(urlstr))],
     ["IPFS", ipfsstr, ipfsstr],
     ["ONION", onionstr, bintools.bufferToB58(Buffer.from(onionstr))],
-    ["MAGNET", magnetstr, bintools.bufferToB58(Buffer.from(magnetstr))],
+    ["MAGNET", magnetstr, bintools.bufferToB58(Buffer.from(magnetstr))]
   ]
   test.each(testTable)(
     "Basic Payload Test: typestr %s input %s inputbuff %s",

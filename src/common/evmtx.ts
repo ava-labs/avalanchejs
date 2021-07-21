@@ -14,7 +14,7 @@ import { DefaultNetworkID } from "../utils/constants"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../utils/serialization"
 
 /**
@@ -48,7 +48,7 @@ export abstract class EVMStandardBaseTx<
         encoding,
         "Buffer",
         "cb58"
-      ),
+      )
     }
   }
 
@@ -151,7 +151,7 @@ export abstract class EVMStandardUnsignedTx<
         "decimalString",
         2
       ),
-      transaction: this.transaction.serialize(encoding),
+      transaction: this.transaction.serialize(encoding)
     }
   }
 
@@ -291,7 +291,7 @@ export abstract class EVMStandardTx<
     return {
       ...fields,
       unsignedTx: this.unsignedTx.serialize(encoding),
-      credentials: this.credentials.map((c) => c.serialize(encoding)),
+      credentials: this.credentials.map((c) => c.serialize(encoding))
     }
   }
 

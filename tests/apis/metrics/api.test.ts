@@ -42,7 +42,7 @@ describe("Metrics", (): void => {
               gecko_timestamp_handler_get_failed_bucket{le="+Inf"} 0
         `
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

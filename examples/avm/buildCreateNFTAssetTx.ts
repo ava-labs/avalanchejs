@@ -5,12 +5,12 @@ import {
   UTXOSet,
   UnsignedTx,
   Tx,
-  MinterSet,
+  MinterSet
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

@@ -18,7 +18,7 @@ import {
   Asset,
   GetAtomicTxStatusParams,
   Index,
-  UTXOResponse,
+  UTXOResponse
 } from "./../../common/interfaces"
 import { EVMInput } from "./inputs"
 import { SECPTransferOutput, TransferableOutput } from "./outputs"
@@ -27,7 +27,7 @@ import {
   TransactionError,
   ChainIdError,
   NoAtomicUTXOsError,
-  AddressError,
+  AddressError
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
 
@@ -167,7 +167,7 @@ export class EVMAPI extends JRPCAPI {
     const params: {
       assetID: Buffer | string
     } = {
-      assetID: asset,
+      assetID: asset
     }
 
     const tmpBaseURL: string = this.getBaseURL()
@@ -185,7 +185,7 @@ export class EVMAPI extends JRPCAPI {
       name: response.data.result.name,
       symbol: response.data.result.symbol,
       assetID: bintools.cb58Decode(response.data.result.assetID),
-      denomination: parseInt(response.data.result.denomination, 10),
+      denomination: parseInt(response.data.result.denomination, 10)
     }
   }
 
@@ -265,7 +265,7 @@ export class EVMAPI extends JRPCAPI {
    */
   getAtomicTxStatus = async (txID: string): Promise<string> => {
     const params: GetAtomicTxStatusParams = {
-      txID,
+      txID
     }
 
     const response: RequestResponseData = await this.callMethod(
@@ -318,7 +318,7 @@ export class EVMAPI extends JRPCAPI {
       amount: amount.toString(10),
       username,
       password,
-      assetID,
+      assetID
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.export",
@@ -354,7 +354,7 @@ export class EVMAPI extends JRPCAPI {
       to,
       amount: amount.toString(10),
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.exportAVAX",
@@ -390,7 +390,7 @@ export class EVMAPI extends JRPCAPI {
 
     const params: any = {
       addresses: addresses,
-      limit,
+      limit
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -439,7 +439,7 @@ export class EVMAPI extends JRPCAPI {
       to,
       sourceChain,
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.import",
@@ -477,7 +477,7 @@ export class EVMAPI extends JRPCAPI {
       to,
       sourceChain,
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.importAVAX",
@@ -507,7 +507,7 @@ export class EVMAPI extends JRPCAPI {
     } = {
       username,
       password,
-      privateKey,
+      privateKey
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.importKey",
@@ -542,7 +542,7 @@ export class EVMAPI extends JRPCAPI {
     const params: {
       tx: string
     } = {
-      tx: Transaction.toString(),
+      tx: Transaction.toString()
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.issueTx",
@@ -572,7 +572,7 @@ export class EVMAPI extends JRPCAPI {
     } = {
       username,
       password,
-      address,
+      address
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.exportKey",

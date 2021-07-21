@@ -8,7 +8,7 @@ import { AVMConstants } from "./constants"
 import {
   Input,
   StandardTransferableInput,
-  StandardAmountInput,
+  StandardAmountInput
 } from "../../common/input"
 import { SerializedEncoding } from "../../utils/serialization"
 import { InputIdError, CodecIdError } from "../../utils/errors"

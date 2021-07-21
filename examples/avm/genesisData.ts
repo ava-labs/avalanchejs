@@ -6,13 +6,13 @@ import {
   InitialStates,
   KeyChain,
   SECPMintOutput,
-  SECPTransferOutput,
+  SECPTransferOutput
 } from "../../src/apis/avm"
 import {
   DefaultLocalGenesisPrivateKey,
   PrivateKeyPrefix,
   Serialization,
-  SerializedType,
+  SerializedType
 } from "../../src/utils"
 const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"

@@ -6,15 +6,15 @@ export default class PubSub {
     return JSON.stringify({
       newBloom: {
         maxElements: maxElements,
-        collisionProb: collisionProb,
-      },
+        collisionProb: collisionProb
+      }
     })
   }
   addAddresses(addresses: string[]) {
     return JSON.stringify({
       addAddresses: {
-        addresses: addresses,
-      },
+        addresses: addresses
+      }
     })
   }
 }

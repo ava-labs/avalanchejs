@@ -3,7 +3,7 @@ import { PlatformVMAPI, KeyChain } from "../../src/apis/platformvm"
 import { GetStakeResponse } from "../../src/common"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"

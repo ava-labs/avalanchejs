@@ -112,11 +112,11 @@ describe("UTXOSet", (): void => {
         "0000f29dba61fda8d57a911e7f8810f935bde810d3f8d495404685bdb8d9d8545e86000000003e07e38e2f23121be8756412c18db7246a16d26ee9936f3cba28be149cfd355800000007000000000000001900000000000000000000000100000001e1b6b6a4bad94d2e3f20730379b9bcd6f176318e",
         "hex"
       )
-    ),
+    )
   ]
   const addrs: Buffer[] = [
     bintools.cb58Decode("FuB6Lw2D62NuM8zpGLA4Avepq7eGsZRiG"),
-    bintools.cb58Decode("MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8"),
+    bintools.cb58Decode("MaTvKGccbYzCxzBkJpb2zHW7E1WReZqB8")
   ]
   test("Creation", (): void => {
     const set: UTXOSet = new UTXOSet()

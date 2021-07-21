@@ -22,7 +22,7 @@ export class PlatformVMConstants {
 
   static LOCKEDSTAKEABLES: number[] = [
     PlatformVMConstants.STAKEABLELOCKINID,
-    PlatformVMConstants.STAKEABLELOCKOUTID,
+    PlatformVMConstants.STAKEABLELOCKOUTID
   ]
 
   static BASETX: number = 0

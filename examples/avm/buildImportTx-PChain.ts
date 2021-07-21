@@ -4,7 +4,7 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

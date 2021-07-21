@@ -8,12 +8,12 @@ import {
   SECPMintOutput,
   AVMConstants,
   SECPTransferOutput,
-  UTXO,
+  UTXO
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const getUTXOIDs = (

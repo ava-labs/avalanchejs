@@ -8,7 +8,7 @@ import { AVMConstants } from "./constants"
 import {
   NFTTransferOutput,
   SECPMintOutput,
-  SECPTransferOutput,
+  SECPTransferOutput
 } from "./outputs"
 import { NBytes } from "../../common/nbytes"
 import { SigIdx } from "../../common/credentials"
@@ -17,13 +17,13 @@ import {
   Serializable,
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 import {
   InvalidOperationIdError,
   CodecIdError,
   ChecksumError,
-  AddressError,
+  AddressError
 } from "../../utils/errors"
 
 const bintools: BinTools = BinTools.getInstance()
@@ -77,7 +77,7 @@ export abstract class Operation extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      sigIdxs: this.sigIdxs.map((s: SigIdx): object => s.serialize(encoding)),
+      sigIdxs: this.sigIdxs.map((s: SigIdx): object => s.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -192,7 +192,7 @@ export class TransferableOperation extends Serializable {
       ...fields,
       assetID: serialization.encoder(this.assetID, encoding, buffer, cb58, 32),
       utxoIDs: this.utxoIDs.map((u) => u.serialize(encoding)),
-      operation: this.operation.serialize(encoding),
+      operation: this.operation.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -334,7 +334,7 @@ export class SECPMintOperation extends Operation {
     return {
       ...fields,
       mintOutput: this.mintOutput.serialize(encoding),
-      transferOutputs: this.transferOutput.serialize(encoding),
+      transferOutputs: this.transferOutput.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -469,7 +469,7 @@ export class NFTMintOperation extends Operation {
         4
       ),
       payload: serialization.encoder(this.payload, encoding, buffer, hex),
-      outputOwners: this.outputOwners.map((o) => o.serialize(encoding)),
+      outputOwners: this.outputOwners.map((o) => o.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -621,7 +621,7 @@ export class NFTMintOperation extends Operation {
       this.groupID,
       payloadlen,
       this.payload,
-      outputownerslen,
+      outputownerslen
     ]
 
     for (let i: number = 0; i < this.outputOwners.length; i++) {
@@ -680,7 +680,7 @@ export class NFTTransferOperation extends Operation {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      output: this.output.serialize(encoding),
+      output: this.output.serialize(encoding)
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

@@ -11,7 +11,7 @@ import { UnixNow } from "../utils/helperfunctions"
 import {
   Serializable,
   Serialization,
-  SerializedEncoding,
+  SerializedEncoding
 } from "../utils/serialization"
 import { ChecksumError, AddressError, AddressIndexError } from "../utils/errors"
 
@@ -124,7 +124,7 @@ export class OutputOwners extends Serializable {
       ),
       addresses: this.addresses.map((a: Address): object =>
         a.serialize(encoding)
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -403,7 +403,7 @@ export abstract class StandardParseableOutput extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      output: this.output.serialize(encoding),
+      output: this.output.serialize(encoding)
     }
   }
 
@@ -457,7 +457,7 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58"),
+      assetID: serialization.encoder(this.assetID, encoding, "Buffer", "cb58")
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -515,7 +515,7 @@ export abstract class StandardAmountOutput extends Output {
         "Buffer",
         "decimalString",
         8
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -598,7 +598,7 @@ export abstract class BaseNFTOutput extends Output {
         "Buffer",
         "decimalString",
         4
-      ),
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

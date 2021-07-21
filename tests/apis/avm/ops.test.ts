@@ -10,7 +10,7 @@ import {
   Operation,
   TransferableOperation,
   NFTTransferOperation,
-  NFTMintOperation,
+  NFTMintOperation
 } from "src/apis/avm/ops"
 import { OutputOwners } from "src/common/output"
 import { SigIdx } from "src/common/credentials"
@@ -30,7 +30,7 @@ describe("Operations", (): void => {
   const addrs: Buffer[] = [
     bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"),
     bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"),
-    bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"),
+    bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
   ].sort()
 
   const locktime: BN = new BN(54321)

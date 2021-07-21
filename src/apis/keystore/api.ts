@@ -27,7 +27,7 @@ export class KeystoreAPI extends JRPCAPI {
   createUser = async (username: string, password: string): Promise<boolean> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "keystore.createUser",
@@ -47,7 +47,7 @@ export class KeystoreAPI extends JRPCAPI {
   exportUser = async (username: string, password: string): Promise<string> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "keystore.exportUser",
@@ -73,7 +73,7 @@ export class KeystoreAPI extends JRPCAPI {
     const params: any = {
       username,
       user,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "keystore.importUser",
@@ -105,7 +105,7 @@ export class KeystoreAPI extends JRPCAPI {
   deleteUser = async (username: string, password: string): Promise<boolean> => {
     const params: any = {
       username,
-      password,
+      password
     }
     const response: RequestResponseData = await this.callMethod(
       "keystore.deleteUser",

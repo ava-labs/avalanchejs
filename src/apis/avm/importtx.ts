@@ -15,12 +15,12 @@ import { DefaultNetworkID } from "../../utils/constants"
 import {
   Serialization,
   SerializedEncoding,
-  SerializedType,
+  SerializedType
 } from "../../utils/serialization"
 import {
   CodecIdError,
   ChainIdError,
-  TransferableInputError,
+  TransferableInputError
 } from "../../utils/errors"
 
 /**
@@ -50,7 +50,7 @@ export class ImportTx extends BaseTx {
         buffer,
         cb58
       ),
-      importIns: this.importIns.map((i) => i.serialize(encoding)),
+      importIns: this.importIns.map((i) => i.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {

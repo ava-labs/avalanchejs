@@ -4,17 +4,17 @@ import {
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
-  Tx,
+  Tx
 } from "../../src/apis/avm"
 import {
   KeyChain as PlatformVMKeyChain,
-  PlatformVMAPI,
+  PlatformVMAPI
 } from "../../src/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

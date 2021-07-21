@@ -188,7 +188,7 @@ export class PayloadTypes {
       "URL",
       "IPFS",
       "ONION",
-      "MAGNET",
+      "MAGNET"
     ]
   }
 }

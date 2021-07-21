@@ -19,7 +19,7 @@ const main = async (): Promise<any> => {
   } = {
     address: keypair.getAddressString(),
     publicKey: keypair.getPublicKeyString(),
-    privateKey: keypair.getPrivateKeyString(),
+    privateKey: keypair.getPrivateKeyString()
   }
   console.log(response)
 }
