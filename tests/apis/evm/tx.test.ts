@@ -1,7 +1,11 @@
-import { ImportTx, SECPTransferInput, TransferableInput } from "src/apis/evm"
-import { Defaults, MILLIAVAX } from "src/utils/constants"
+import {
+  ImportTx,
+  SECPTransferInput,
+  TransferableInput
+} from "../../../src/apis/evm"
+import { Defaults, MILLIAVAX } from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
-import { EVMOutput } from "src/apis/evm"
+import { EVMOutput } from "../../../src/apis/evm"
 import BN from "bn.js"
 import { BinTools, Buffer } from "src"
 const networkID: number = 12345

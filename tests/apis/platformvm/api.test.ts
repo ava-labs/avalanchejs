@@ -1,42 +1,42 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
-import { PlatformVMAPI } from "src/apis/platformvm/api"
+import { PlatformVMAPI } from "../../../src/apis/platformvm/api"
 import { Buffer } from "buffer/"
 import BN from "bn.js"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
-import { Defaults, PlatformChainID } from "src/utils/constants"
-import { UTXOSet } from "src/apis/platformvm/utxos"
-import { PersistanceOptions } from "src/utils/persistenceoptions"
-import { KeyChain } from "src/apis/platformvm/keychain"
+import { Defaults, PlatformChainID } from "../../../src/utils/constants"
+import { UTXOSet } from "../../../src/apis/platformvm/utxos"
+import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
+import { KeyChain } from "../../../src/apis/platformvm/keychain"
 import {
   SECPTransferOutput,
   TransferableOutput,
   AmountOutput,
   ParseableOutput,
   StakeableLockOut
-} from "src/apis/platformvm/outputs"
+} from "../../../src/apis/platformvm/outputs"
 import {
   TransferableInput,
   SECPTransferInput,
   AmountInput,
   StakeableLockIn
-} from "src/apis/platformvm/inputs"
-import { UTXO } from "src/apis/platformvm/utxos"
+} from "../../../src/apis/platformvm/inputs"
+import { UTXO } from "../../../src/apis/platformvm/utxos"
 import createHash from "create-hash"
-import { UnsignedTx, Tx } from "src/apis/platformvm/tx"
-import { UnixNow } from "src/utils/helperfunctions"
-import { UTF8Payload } from "src/utils/payload"
-import { NodeIDStringToBuffer } from "src/utils/helperfunctions"
-import { ONEAVAX } from "src/utils/constants"
+import { UnsignedTx, Tx } from "../../../src/apis/platformvm/tx"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { UTF8Payload } from "../../../src/utils/payload"
+import { NodeIDStringToBuffer } from "../../../src/utils/helperfunctions"
+import { ONEAVAX } from "../../../src/utils/constants"
 import {
   Serializable,
   Serialization,
   SerializedEncoding,
   SerializedType
-} from "src/utils/serialization"
-import { AddValidatorTx } from "src/apis/platformvm/validationtx"
-import { GetRewardUTXOsResponse } from "src/common"
+} from "../../../src/utils/serialization"
+import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
+import { GetRewardUTXOsResponse } from "../../../src/common"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**
@@ -1341,33 +1341,33 @@ describe("PlatformVMAPI", (): void => {
           const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
           const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
           const amount:BN = new BN(90);
-    
+
           const txu1:UnsignedTx = await platformvm.buildAddSubnetValidatorTx(
-            set,  
-            addrs1, 
-            addrs2, 
-            nodeID, 
+            set,
+            addrs1,
+            addrs2,
+            nodeID,
             startTime,
             endTime,
             PlatformVMConstants.MINSTAKE,
             new UTF8Payload("hello world"), UnixNow()
           );
-    
+
           const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
             networkID, bintools.cb58Decode(blockchainID),
-            addrbuff1,         
-            addrbuff2, 
-            NodeIDStringToBuffer(nodeID), 
+            addrbuff1,
+            addrbuff2,
+            NodeIDStringToBuffer(nodeID),
             startTime,
             endTime,
             PlatformVMConstants.MINSTAKE,
-            platformvm.getFee(), 
+            platformvm.getFee(),
             assetID,
             new UTF8Payload("hello world").getPayload(), UnixNow()
           );
           expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
           expect(txu2.toString()).toBe(txu1.toString());
-    
+
         });
     */
     test("buildAddDelegatorTx 1", async (): Promise<void> => {

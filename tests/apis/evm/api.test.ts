@@ -1,9 +1,9 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche, BN } from "src"
-import { EVMAPI } from "src/apis/evm/api"
-import BinTools from "src/utils/bintools"
+import { EVMAPI } from "../../../src/apis/evm/api"
+import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
-import { Defaults } from "src/utils/constants"
+import { Defaults } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**

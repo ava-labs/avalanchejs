@@ -1,8 +1,8 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
-import { InfoAPI } from "src/apis/info/api"
+import { InfoAPI } from "../../../src/apis/info/api"
 import BN from "bn.js"
-import { PeersParams, PeersResponse } from "src/common"
+import { PeersParams, PeersResponse } from "../../../src/common"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 describe("Info", () => {

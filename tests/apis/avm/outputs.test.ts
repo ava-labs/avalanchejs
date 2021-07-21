@@ -1,14 +1,14 @@
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import {
   SECPTransferOutput,
   SelectOutputClass,
   NFTMintOutput
-} from "src/apis/avm/outputs"
-import { Output } from "src/common/output"
+} from "../../../src/apis/avm/outputs"
+import { Output } from "../../../src/common/output"
 import { SECPMintOutput } from "../../../src/apis/avm/outputs"
-import { AVMConstants } from "src/apis/avm"
+import { AVMConstants } from "../../../src/apis/avm"
 
 const bintools: BinTools = BinTools.getInstance()
 

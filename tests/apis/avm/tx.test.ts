@@ -1,31 +1,37 @@
 import mockAxios from "jest-mock-axios"
-import { UTXOSet, UTXO } from "src/apis/avm/utxos"
-import { AVMAPI } from "src/apis/avm/api"
-import { UnsignedTx, Tx } from "src/apis/avm/tx"
-import { KeyChain } from "src/apis/avm/keychain"
-import { SECPTransferInput, TransferableInput } from "src/apis/avm/inputs"
+import { UTXOSet, UTXO } from "../../../src/apis/avm/utxos"
+import { AVMAPI } from "../../../src/apis/avm/api"
+import { UnsignedTx, Tx } from "../../../src/apis/avm/tx"
+import { KeyChain } from "../../../src/apis/avm/keychain"
+import {
+  SECPTransferInput,
+  TransferableInput
+} from "../../../src/apis/avm/inputs"
 import createHash from "create-hash"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
   NFTTransferOutput,
   TransferableOutput
-} from "src/apis/avm/outputs"
-import { AVMConstants } from "src/apis/avm/constants"
-import { TransferableOperation, NFTTransferOperation } from "src/apis/avm/ops"
-import { Avalanche } from "src/index"
-import { UTF8Payload } from "src/utils/payload"
-import { InitialStates } from "src/apis/avm/initialstates"
-import { UnixNow } from "src/utils/helperfunctions"
-import { BaseTx } from "src/apis/avm/basetx"
-import { CreateAssetTx } from "src/apis/avm/createassettx"
-import { OperationTx } from "src/apis/avm/operationtx"
-import { ImportTx } from "src/apis/avm/importtx"
-import { ExportTx } from "src/apis/avm/exporttx"
-import { PlatformChainID } from "src/utils/constants"
-import { Defaults } from "src/utils/constants"
+} from "../../../src/apis/avm/outputs"
+import { AVMConstants } from "../../../src/apis/avm/constants"
+import {
+  TransferableOperation,
+  NFTTransferOperation
+} from "../../../src/apis/avm/ops"
+import { Avalanche } from "../../../src/index"
+import { UTF8Payload } from "../../../src/utils/payload"
+import { InitialStates } from "../../../src/apis/avm/initialstates"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { BaseTx } from "../../../src/apis/avm/basetx"
+import { CreateAssetTx } from "../../../src/apis/avm/createassettx"
+import { OperationTx } from "../../../src/apis/avm/operationtx"
+import { ImportTx } from "../../../src/apis/avm/importtx"
+import { ExportTx } from "../../../src/apis/avm/exporttx"
+import { PlatformChainID } from "../../../src/utils/constants"
+import { Defaults } from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 

@@ -1,8 +1,8 @@
 import mockAxios from "jest-mock-axios"
 
 import { Avalanche } from "src"
-import BinTools from "src/utils/bintools"
-import { HealthAPI } from "src/apis/health/api"
+import BinTools from "../../../src/utils/bintools"
+import { HealthAPI } from "../../../src/apis/health/api"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**

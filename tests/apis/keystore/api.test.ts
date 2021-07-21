@@ -1,7 +1,7 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
-import { KeystoreAPI } from "src/apis/keystore/api"
+import { KeystoreAPI } from "../../../src/apis/keystore/api"
 
 describe("Keystore", (): void => {
   const ip: string = "127.0.0.1"

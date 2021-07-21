@@ -1,14 +1,17 @@
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { SECPTransferOutput, TransferableOutput } from "src/apis/avm/outputs"
-import { InitialStates } from "src/apis/avm/initialstates"
-import { GenesisAsset, TransferableInput } from "src/apis/avm"
+import {
+  SECPTransferOutput,
+  TransferableOutput
+} from "../../../src/apis/avm/outputs"
+import { InitialStates } from "../../../src/apis/avm/initialstates"
+import { GenesisAsset, TransferableInput } from "../../../src/apis/avm"
 import {
   DefaultNetworkID,
   Serialization,
   SerializedEncoding,
   SerializedType
-} from "src/utils"
+} from "../../../src/utils"
 
 /**
  * @ignore

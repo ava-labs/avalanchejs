@@ -1,8 +1,8 @@
-import { KeyChain, KeyPair } from "src/apis/avm/keychain"
-import { Avalanche } from "src/index"
+import { KeyChain, KeyPair } from "../../../src/apis/avm/keychain"
+import { Avalanche } from "../../../src/index"
 import { Buffer } from "buffer/"
 import createHash from "create-hash"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 
 const bintools: BinTools = BinTools.getInstance()
 const alias: string = "X"
