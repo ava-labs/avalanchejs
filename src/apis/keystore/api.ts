@@ -17,90 +17,110 @@ import { RequestResponseData } from "../../common/apibase"
  */
 export class KeystoreAPI extends JRPCAPI {
   /**
-     * Creates a user in the node's database.
-     *
-     * @param username Name of the user to create
-     * @param password Password for the user
-     *
-     * @returns Promise for a boolean with true on success
-     */
+   * Creates a user in the node's database.
+   *
+   * @param username Name of the user to create
+   * @param password Password for the user
+   *
+   * @returns Promise for a boolean with true on success
+   */
   createUser = async (username: string, password: string): Promise<boolean> => {
     const params: any = {
       username,
       password
     }
-    const response: RequestResponseData = await this.callMethod("keystore.createUser", params)
+    const response: RequestResponseData = await this.callMethod(
+      "keystore.createUser",
+      params
+    )
     return response.data.result.success
   }
 
   /**
-     * Exports a user. The user can be imported to another node with keystore.importUser .
-     *
-     * @param username The name of the user to export
-     * @param password The password of the user to export
-     *
-     * @returns Promise with a string importable using importUser
-     */
+   * Exports a user. The user can be imported to another node with keystore.importUser .
+   *
+   * @param username The name of the user to export
+   * @param password The password of the user to export
+   *
+   * @returns Promise with a string importable using importUser
+   */
   exportUser = async (username: string, password: string): Promise<string> => {
     const params: any = {
       username,
       password
     }
-    const response: RequestResponseData = await this.callMethod("keystore.exportUser", params)
+    const response: RequestResponseData = await this.callMethod(
+      "keystore.exportUser",
+      params
+    )
     return response.data.result.user
   }
 
   /**
-     * Imports a user file into the node's user database and assigns it to a username.
-     *
-     * @param username The name the user file should be imported into
-     * @param user cb58 serialized string represetning a user"s data
-     * @param password The user"s password
-     *
-     * @returns A promise with a true-value on success.
-     */
-  importUser = async (username: string, user: string, password: string): Promise<boolean> => {
+   * Imports a user file into the node's user database and assigns it to a username.
+   *
+   * @param username The name the user file should be imported into
+   * @param user cb58 serialized string represetning a user"s data
+   * @param password The user"s password
+   *
+   * @returns A promise with a true-value on success.
+   */
+  importUser = async (
+    username: string,
+    user: string,
+    password: string
+  ): Promise<boolean> => {
     const params: any = {
       username,
       user,
       password
     }
-    const response: RequestResponseData = await this.callMethod("keystore.importUser", params)
+    const response: RequestResponseData = await this.callMethod(
+      "keystore.importUser",
+      params
+    )
     return response.data.result.success
   }
 
   /**
-     * Lists the names of all users on the node.
-     *
-     * @returns Promise of an array with all user names.
-     */
+   * Lists the names of all users on the node.
+   *
+   * @returns Promise of an array with all user names.
+   */
   listUsers = async (): Promise<string[]> => {
-    const response: RequestResponseData = await this.callMethod("keystore.listUsers")
+    const response: RequestResponseData = await this.callMethod(
+      "keystore.listUsers"
+    )
     return response.data.result.users
   }
 
   /**
-     * Deletes a user in the node's database.
-     *
-     * @param username Name of the user to delete
-     * @param password Password for the user
-     *
-     * @returns Promise for a boolean with true on success
-     */
+   * Deletes a user in the node's database.
+   *
+   * @param username Name of the user to delete
+   * @param password Password for the user
+   *
+   * @returns Promise for a boolean with true on success
+   */
   deleteUser = async (username: string, password: string): Promise<boolean> => {
     const params: any = {
       username,
       password
     }
-    const response: RequestResponseData = await this.callMethod("keystore.deleteUser", params)
+    const response: RequestResponseData = await this.callMethod(
+      "keystore.deleteUser",
+      params
+    )
     return response.data.result.success
   }
 
   /**
-     * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
-     *
-     * @param core A reference to the Avalanche class
-     * @param baseurl Defaults to the string "/ext/keystore" as the path to blockchain"s baseurl
-     */
-  constructor(core: AvalancheCore, baseurl: string = "/ext/keystore") { super(core, baseurl) }
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
+   *
+   * @param core A reference to the Avalanche class
+   * @param baseurl Defaults to the string "/ext/keystore" as the path to blockchain"s baseurl
+   */
+  constructor(core: AvalancheCore, baseurl: string = "/ext/keystore") {
+    super(core, baseurl)
+  }
 }

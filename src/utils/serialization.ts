@@ -5,13 +5,23 @@
 import BinTools from "../utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { NodeIDStringToBuffer, privateKeyStringToBuffer, bufferToNodeIDString, bufferToPrivateKeyString } from "./helperfunctions"
-import { CodecIdError, TypeIdError, TypeNameError, UnknownTypeError } from "../utils/errors"
-import { Serialized } from "src/common"
+import {
+  NodeIDStringToBuffer,
+  privateKeyStringToBuffer,
+  bufferToNodeIDString,
+  bufferToPrivateKeyString
+} from "./helperfunctions"
+import {
+  CodecIdError,
+  TypeIdError,
+  TypeNameError,
+  UnknownTypeError
+} from "../utils/errors"
+import { Serialized } from "../common"
 
 export const SERIALIZATIONVERSION: number = 0
-export type SerializedType = 
-  "hex"
+export type SerializedType =
+  | "hex"
   | "BN"
   | "Buffer"
   | "bech32"
@@ -24,8 +34,8 @@ export type SerializedType =
   | "number"
   | "utf8"
 
-export type SerializedEncoding = 
-  "hex"
+export type SerializedEncoding =
+  | "hex"
   | "cb58"
   | "base58"
   | "base64"
@@ -61,35 +71,65 @@ export abstract class Serializable {
   }
 
   //sometimes the parent class manages the fields
-  //these are so you can say super.serialize(encoding) 
+  //these are so you can say super.serialize(encoding)
   serialize(encoding?: SerializedEncoding): object {
     return {
-      "_typeName": this._typeName,
-      "_typeID": (typeof this._typeID === "undefined" ? null : this._typeID),
-      "_codecID": (typeof this._codecID === "undefined" ? null : this._codecID)
+      _typeName: this._typeName,
+      _typeID: typeof this._typeID === "undefined" ? null : this._typeID,
+      _codecID: typeof this._codecID === "undefined" ? null : this._codecID
     }
   }
   deserialize(fields: object, encoding?: SerializedEncoding) {
     if (typeof fields["_typeName"] !== "string") {
-      throw new TypeNameError("Error - Serializable.deserialize: _typeName must be a string, found: " + typeof fields["_typeName"])
+      throw new TypeNameError(
+        "Error - Serializable.deserialize: _typeName must be a string, found: " +
+          typeof fields["_typeName"]
+      )
     }
     if (fields["_typeName"] !== this._typeName) {
-      throw new TypeNameError("Error - Serializable.deserialize: _typeName mismatch -- expected: " + this._typeName + " -- received: " + fields["_typeName"])
+      throw new TypeNameError(
+        "Error - Serializable.deserialize: _typeName mismatch -- expected: " +
+          this._typeName +
+          " -- received: " +
+          fields["_typeName"]
+      )
     }
-    if (typeof fields["_typeID"] !== "undefined" && fields["_typeID"] !== null) {
+    if (
+      typeof fields["_typeID"] !== "undefined" &&
+      fields["_typeID"] !== null
+    ) {
       if (typeof fields["_typeID"] !== "number") {
-        throw new TypeIdError("Error - Serializable.deserialize: _typeID must be a number, found: " + typeof fields["_typeID"])
+        throw new TypeIdError(
+          "Error - Serializable.deserialize: _typeID must be a number, found: " +
+            typeof fields["_typeID"]
+        )
       }
       if (fields["_typeID"] !== this._typeID) {
-        throw new TypeIdError("Error - Serializable.deserialize: _typeID mismatch -- expected: " + this._typeID + " -- received: " + fields["_typeID"])
+        throw new TypeIdError(
+          "Error - Serializable.deserialize: _typeID mismatch -- expected: " +
+            this._typeID +
+            " -- received: " +
+            fields["_typeID"]
+        )
       }
     }
-    if (typeof fields["_codecID"] !== "undefined" && fields["_codecID"] !== null) {
+    if (
+      typeof fields["_codecID"] !== "undefined" &&
+      fields["_codecID"] !== null
+    ) {
       if (typeof fields["_codecID"] !== "number") {
-        throw new CodecIdError("Error - Serializable.deserialize: _codecID must be a number, found: " + typeof fields["_codecID"])
+        throw new CodecIdError(
+          "Error - Serializable.deserialize: _codecID must be a number, found: " +
+            typeof fields["_codecID"]
+        )
       }
       if (fields["_codecID"] !== this._codecID) {
-        throw new CodecIdError("Error - Serializable.deserialize: _codecID mismatch -- expected: " + this._codecID + " -- received: " + fields["_codecID"])
+        throw new CodecIdError(
+          "Error - Serializable.deserialize: _codecID mismatch -- expected: " +
+            this._codecID +
+            " -- received: " +
+            fields["_codecID"]
+        )
       }
     }
   }
@@ -97,7 +137,7 @@ export abstract class Serializable {
 
 export class Serialization {
   private static instance: Serialization
-  
+
   private constructor() {
     this.bintools = BinTools.getInstance()
   }
@@ -220,9 +260,17 @@ export class Serialization {
    * @param ...args remaining arguments
    * @returns type of [[SerializedType]] or [[SerializedEncoding]]
    */
-  encoder(value: any, encoding: SerializedEncoding, intype: SerializedType, outtype: SerializedType, ...args: any[]): any {
+  encoder(
+    value: any,
+    encoding: SerializedEncoding,
+    intype: SerializedType,
+    outtype: SerializedType,
+    ...args: any[]
+  ): any {
     if (typeof value === "undefined") {
-      throw new UnknownTypeError("Error - Serializable.encoder: value passed is undefined")
+      throw new UnknownTypeError(
+        "Error - Serializable.encoder: value passed is undefined"
+      )
     }
     if (encoding !== "display") {
       outtype = encoding
@@ -241,9 +289,17 @@ export class Serialization {
    * @param ...args remaining arguments
    * @returns type of [[SerializedType]] or [[SerializedEncoding]]
    */
-  decoder(value: string, encoding: SerializedEncoding, intype: SerializedType, outtype: SerializedType, ...args: any[]): any {
+  decoder(
+    value: string,
+    encoding: SerializedEncoding,
+    intype: SerializedType,
+    outtype: SerializedType,
+    ...args: any[]
+  ): any {
     if (typeof value === "undefined") {
-      throw new UnknownTypeError("Error - Serializable.decoder: value passed is undefined")
+      throw new UnknownTypeError(
+        "Error - Serializable.decoder: value passed is undefined"
+      )
     }
     if (encoding !== "display") {
       intype = encoding
@@ -252,7 +308,12 @@ export class Serialization {
     return this.bufferToType(vb, outtype, ...args)
   }
 
-  serialize(serialize: Serializable, vm: string, encoding: SerializedEncoding = "display", notes: string = undefined): Serialized {
+  serialize(
+    serialize: Serializable,
+    vm: string,
+    encoding: SerializedEncoding = "display",
+    notes: string = undefined
+  ): Serialized {
     if (typeof notes === "undefined") {
       notes = serialize.getTypeName()
     }

@@ -1,22 +1,18 @@
-import { 
-  Avalanche,
-  BN,
-  Buffer
-} from "../../src"
+import { Avalanche, BN, Buffer } from "../../src"
 import {
-  PlatformVMAPI, 
+  PlatformVMAPI,
   KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
 } from "../../src/apis/platformvm"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults, 
-  UnixNow 
+  Defaults,
+  UnixNow
 } from "../../src/utils"
-      
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -31,11 +27,16 @@ const xChainBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("PlatformVM utility method buildImportTx to import AVAX to the P-Chain from the X-Chain")
+const memo: Buffer = Buffer.from(
+  "PlatformVM utility method buildImportTx to import AVAX to the P-Chain from the X-Chain"
+)
 const asOf: BN = UnixNow()
-   
+
 const main = async (): Promise<any> => {
-  const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings, pChainBlockchainID)
+  const platformVMUTXOResponse: any = await pchain.getUTXOs(
+    pAddressStrings,
+    pChainBlockchainID
+  )
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const unsignedTx: UnsignedTx = await pchain.buildImportTx(
     utxoSet,
@@ -53,6 +54,5 @@ const main = async (): Promise<any> => {
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-    
+
 main()
-    

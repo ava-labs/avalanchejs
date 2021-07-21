@@ -20,20 +20,20 @@ export const NetworkIDToHRP: object = {
   5: "fuji",
   12345: "local"
 }
-  
+
 export const HRPToNetworkID: object = {
-  "custom": 0,
-  "avax": 1,
-  "cascade": 2,
-  "denali": 3,
-  "everest": 4,
-  "fuji": 5,
-  "local": 12345
+  custom: 0,
+  avax: 1,
+  cascade: 2,
+  denali: 3,
+  everest: 4,
+  fuji: 5,
+  local: 12345
 }
 
 export const NetworkIDToNetworkNames: object = {
   0: ["Manhattan"],
-  1: ["Avalanche","Mainnet"],
+  1: ["Avalanche", "Mainnet"],
   2: ["Cascade"],
   3: ["Denali"],
   4: ["Everest"],
@@ -42,14 +42,14 @@ export const NetworkIDToNetworkNames: object = {
 }
 
 export const NetworkNameToNetworkID: object = {
-  "Manhattan": 0,
-  "Avalanche": 1,
-  "Mainnet": 1,
-  "Cascade": 2,
-  "Denali": 3,
-  "Everest": 4,
-  "Fuji": 5,
-  "Testnet": 5,
+  Manhattan: 0,
+  Avalanche: 1,
+  Mainnet: 1,
+  Cascade: 2,
+  Denali: 3,
+  Everest: 4,
+  Fuji: 5,
+  Testnet: 5,
   "Local Network": 12345
 }
 
@@ -68,10 +68,14 @@ export const XChainVMName: string = "avm"
 export const CChainVMName: string = "evm"
 export const PChainVMName: string = "platformvm"
 
-export const DefaultLocalGenesisPrivateKey: string = "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
-export const DefaultEVMLocalGenesisPrivateKey: string = "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
-export const DefaultEVMLocalGenesisAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
-export const mnemonic: string = "output tooth keep tooth bracket fox city sustain blood raise install pond stem reject long scene clap gloom purpose mean music piece unknown light"
+export const DefaultLocalGenesisPrivateKey: string =
+  "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+export const DefaultEVMLocalGenesisPrivateKey: string =
+  "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
+export const DefaultEVMLocalGenesisAddress: string =
+  "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
+export const mnemonic: string =
+  "output tooth keep tooth bracket fox city sustain blood raise install pond stem reject long scene clap gloom purpose mean music piece unknown light"
 
 export const ONEAVAX: BN = new BN(1000000000)
 
@@ -93,7 +97,7 @@ export const AVAXGWEI: BN = NANOAVAX.clone()
 
 export const AVAXSTAKECAP: BN = ONEAVAX.mul(new BN(3000000))
 
-// Start Manhattan 
+// Start Manhattan
 const n0X: object = {
   blockchainID: "2vrXWHgGxh5n3YsLHMV16YVVJTpT4z45Fmb4y3bL6si8kLCyg9",
   alias: XChainAlias,
@@ -127,11 +131,11 @@ const n0C: object = {
   gasPrice: GWEI.mul(new BN(470)), //equivalent to gas price
   chainID: 43111
 }
-// End Manhattan 
+// End Manhattan
 
 // Start mainnet
 let avaxAssetID: string = "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z"
-const n1X:object = {
+const n1X: object = {
   blockchainID: "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM",
   avaxAssetID: avaxAssetID,
   alias: XChainAlias,
@@ -163,7 +167,7 @@ const n1C: object = {
   alias: CChainAlias,
   vm: CChainVMName,
   txFee: MILLIAVAX,
-  gasPrice: GWEI.mul(new BN(225)), 
+  gasPrice: GWEI.mul(new BN(225)),
   chainID: 43114
 }
 // End Mainnet
@@ -305,7 +309,7 @@ const n5C: object = {
   alias: CChainAlias,
   vm: CChainVMName,
   txFee: MILLIAVAX,
-  gasPrice: GWEI.mul(new BN(225)), 
+  gasPrice: GWEI.mul(new BN(225)),
   chainID: 43113
 }
 // End Fuji
@@ -325,7 +329,7 @@ n12345C.chainID = 43112
 
 export class Defaults {
   static network = {
-    0: { 
+    0: {
       hrp: NetworkIDToHRP[0],
       X: n0X,
       "2vrXWHgGxh5n3YsLHMV16YVVJTpT4z45Fmb4y3bL6si8kLCyg9": n0X,
@@ -333,7 +337,7 @@ export class Defaults {
       "11111111111111111111111111111111LpoYY": n0P,
       C: n0C,
       "2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb": n0C
-    }, 
+    },
     1: {
       hrp: NetworkIDToHRP[1],
       X: n1X,
@@ -342,7 +346,7 @@ export class Defaults {
       "11111111111111111111111111111111LpoYY": n1P,
       C: n1C,
       "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5": n1C
-    }, 
+    },
     2: {
       hrp: NetworkIDToHRP[2],
       X: n2X,
@@ -355,20 +359,20 @@ export class Defaults {
     3: {
       hrp: NetworkIDToHRP[3],
       X: n3X,
-      "rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L": n3X,
+      rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L: n3X,
       P: n3P,
       "11111111111111111111111111111111LpoYY": n3P,
       C: n3C,
-      "zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9": n3C
+      zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9: n3C
     },
-    4: { 
+    4: {
       hrp: NetworkIDToHRP[4],
       X: n4X,
-      "jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC": n4X,
+      jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC: n4X,
       P: n4P,
       "11111111111111111111111111111111LpoYY": n4P,
       C: n4C,
-      "saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK": n4C
+      saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK: n4C
     },
     5: {
       hrp: NetworkIDToHRP[5],
@@ -377,7 +381,7 @@ export class Defaults {
       P: n5P,
       "11111111111111111111111111111111LpoYY": n5P,
       C: n5C,
-      "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp": n5C
+      yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp: n5C
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
@@ -394,7 +398,8 @@ export class Defaults {
 /**
  * Rules used when merging sets
  */
-export type MergeRule = "intersection" // Self INTERSECT New
+export type MergeRule =
+  | "intersection" // Self INTERSECT New
   | "differenceSelf" // Self MINUS New
   | "differenceNew" // New MINUS Self
   | "symDifference" // differenceSelf UNION differenceNew

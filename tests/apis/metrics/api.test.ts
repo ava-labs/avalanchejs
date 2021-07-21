@@ -1,14 +1,23 @@
-import mockAxios from 'jest-mock-axios'
-import { HttpResponse } from 'jest-mock-axios/dist/lib/mock-axios-types'
-import { Avalanche } from 'src'
-import { MetricsAPI } from 'src/apis/metrics/api'
+import mockAxios from "jest-mock-axios"
+import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import { Avalanche } from "src"
+import { MetricsAPI } from "src/apis/metrics/api"
 
-describe('Metrics', (): void => {
-  const ip: string = '127.0.0.1'
+describe("Metrics", (): void => {
+  const ip: string = "127.0.0.1"
   const port: number = 9650
-  const protocol: string = 'https'
+  const protocol: string = "https"
 
-  const avalanche: Avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined, undefined, true)
+  const avalanche: Avalanche = new Avalanche(
+    ip,
+    port,
+    protocol,
+    12345,
+    undefined,
+    undefined,
+    undefined,
+    true
+  )
   let metrics: MetricsAPI
 
   beforeAll((): void => {
@@ -19,9 +28,9 @@ describe('Metrics', (): void => {
     mockAxios.reset()
   })
 
-  test('getMetrics', async (): Promise<void> => {
+  test("getMetrics", async (): Promise<void> => {
     const result: Promise<string> = metrics.getMetrics()
-    const payload:string = `
+    const payload: string = `
               gecko_timestamp_handler_get_failed_bucket{le="100"} 0
               gecko_timestamp_handler_get_failed_bucket{le="1000"} 0
               gecko_timestamp_handler_get_failed_bucket{le="10000"} 0
@@ -33,7 +42,7 @@ describe('Metrics', (): void => {
               gecko_timestamp_handler_get_failed_bucket{le="+Inf"} 0
         `
     const responseObj: HttpResponse = {
-      data: payload,
+      data: payload
     }
 
     mockAxios.mockResponse(responseObj)

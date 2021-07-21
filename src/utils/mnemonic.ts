@@ -3,10 +3,10 @@
  * @module Utils-Mnemonic
  */
 
-import { Buffer } from 'buffer/'
-import { Wordlist } from 'ethers'
-import { InvalidEntropy } from './errors'
-const bip39: any = require('bip39')
+import { Buffer } from "buffer/"
+import { Wordlist } from "ethers"
+import { InvalidEntropy } from "./errors"
+const bip39: any = require("bip39")
 const randomBytes: any = require("randombytes")
 
 /**
@@ -15,7 +15,7 @@ const randomBytes: any = require("randombytes")
  */
 export default class Mnemonic {
   private static instance: Mnemonic
-  private constructor() { }
+  private constructor() {}
   protected wordlists: string[] = bip39.wordlists
 
   /**
@@ -64,7 +64,10 @@ export default class Mnemonic {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer}
    */
-  async mnemonicToSeed(mnemonic: string, password: string = ""): Promise<Buffer> {
+  async mnemonicToSeed(
+    mnemonic: string,
+    password: string = ""
+  ): Promise<Buffer> {
     const seed: Buffer = await bip39.mnemonicToSeed(mnemonic, password)
     return Buffer.from(seed)
   }
@@ -117,7 +120,7 @@ export default class Mnemonic {
 
   /**
    * Returns the language of the default word list
-   * 
+   *
    * @returns A string
    */
   getDefaultWordlist(): string {
@@ -126,19 +129,20 @@ export default class Mnemonic {
 
   /**
    * Generate a random mnemonic (uses crypto.randomBytes under the hood), defaults to 256-bits of entropy
-   * 
+   *
    * @param strength Optional the strength as a number
    * @param rng Optional the random number generator. Defaults to crypto.randomBytes
    * @param wordlist Optional
-   * 
+   *
    */
-  generateMnemonic(strength?: number,
+  generateMnemonic(
+    strength?: number,
     rng?: (size: number) => Buffer,
-    wordlist?: string[],
+    wordlist?: string[]
   ): string {
     strength = strength || 256
     if (strength % 32 !== 0) {
-      throw new InvalidEntropy('Error - Invalid entropy')
+      throw new InvalidEntropy("Error - Invalid entropy")
     }
     rng = rng || randomBytes
     return bip39.generateMnemonic(strength, rng, wordlist)

@@ -27,7 +27,10 @@ const bintools: BinTools = BinTools.getInstance()
 export class OperationTx extends BaseTx {
   protected _typeName = "OperationTx"
   protected _codecID = AVMConstants.LATESTCODEC
-  protected _typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE
+  protected _typeID =
+    this._codecID === 0
+      ? AVMConstants.OPERATIONTX
+      : AVMConstants.OPERATIONTX_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     const fields: object = super.serialize(encoding)
@@ -38,7 +41,7 @@ export class OperationTx extends BaseTx {
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.ops = fields["ops"].map((o:object) => {
+    this.ops = fields["ops"].map((o: object) => {
       let op: TransferableOperation = new TransferableOperation()
       op.deserialize(o, encoding)
       return op
@@ -51,12 +54,17 @@ export class OperationTx extends BaseTx {
   protected ops: TransferableOperation[] = []
 
   setCodecID(codecID: number): void {
-    if(codecID !== 0 && codecID !== 1) {
+    if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-      throw new CodecIdError("Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.")
+      throw new CodecIdError(
+        "Error - OperationTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+      )
     }
     this._codecID = codecID
-    this._typeID = this._codecID === 0 ? AVMConstants.OPERATIONTX : AVMConstants.OPERATIONTX_CODECONE
+    this._typeID =
+      this._codecID === 0
+        ? AVMConstants.OPERATIONTX
+        : AVMConstants.OPERATIONTX_CODECONE
   }
 
   /**
@@ -97,7 +105,7 @@ export class OperationTx extends BaseTx {
     this.ops = this.ops.sort(TransferableOperation.comparator())
     for (let i: number = 0; i < this.ops.length; i++) {
       barr.push(this.ops[i].toBuffer())
-      }
+    }
     return Buffer.concat(barr)
   }
 
@@ -119,7 +127,9 @@ export class OperationTx extends BaseTx {
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.ops.length; i++) {
-      const cred: Credential = SelectCredentialClass(this.ops[i].getOperation().getCredentialID())
+      const cred: Credential = SelectCredentialClass(
+        this.ops[i].getOperation().getCredentialID()
+      )
       const sigidxs: SigIdx[] = this.ops[i].getOperation().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
@@ -154,15 +164,20 @@ export class OperationTx extends BaseTx {
    * @param ops Array of [[Operation]]s used in the transaction
    */
   constructor(
-    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
-    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
-    memo: Buffer = undefined, ops: TransferableOperation[] = undefined
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined,
+    ops: TransferableOperation[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof ops !== "undefined" && Array.isArray(ops)) {
       for (let i: number = 0; i < ops.length; i++) {
         if (!(ops[i] instanceof TransferableOperation)) {
-          throw new OperationError(`Error - OperationTx.constructor: invalid op in array parameter ${ops}`)
+          throw new OperationError(
+            `Error - OperationTx.constructor: invalid op in array parameter ${ops}`
+          )
         }
       }
       this.ops = ops

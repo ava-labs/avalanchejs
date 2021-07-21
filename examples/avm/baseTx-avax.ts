@@ -1,9 +1,4 @@
-import {
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   KeyChain,
@@ -18,10 +13,10 @@ import {
   Tx,
   BaseTx
 } from "../../src/apis/avm"
-import { 
-  Defaults, 
-  PrivateKeyPrefix, 
-  DefaultLocalGenesisPrivateKey 
+import {
+  Defaults,
+  PrivateKeyPrefix,
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -49,12 +44,23 @@ const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX")
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const getBalanceResponse: any = await xchain.getBalance(xAddressStrings[0], avaxAssetID)
-  const balance: BN = new BN(getBalanceResponse['balance'])
-  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
+  const getBalanceResponse: any = await xchain.getBalance(
+    xAddressStrings[0],
+    avaxAssetID
+  )
+  const balance: BN = new BN(getBalanceResponse["balance"])
+  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+    balance.sub(fee),
+    xAddresses,
+    locktime,
+    threshold
+  )
   // Uncomment for codecID 00 01
   // secpTransferOutput.setCodecID(codecID)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
+  const transferableOutput: TransferableOutput = new TransferableOutput(
+    avaxAssetIDBuf,
+    secpTransferOutput
+  )
   outputs.push(transferableOutput)
 
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
@@ -71,7 +77,12 @@ const main = async (): Promise<any> => {
     // secpTransferInput.setCodecID(codecID)
     secpTransferInput.addSignatureIdx(0, xAddresses[0])
 
-    const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetIDBuf, secpTransferInput)
+    const input: TransferableInput = new TransferableInput(
+      txid,
+      outputidx,
+      avaxAssetIDBuf,
+      secpTransferInput
+    )
     inputs.push(input)
   })
 

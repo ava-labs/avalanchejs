@@ -12,9 +12,14 @@ import { SelectCredentialClass } from "./credentials"
 import { Signature, SigIdx, Credential } from "../../common/credentials"
 import { KeyChain, KeyPair } from "./keychain"
 import { DefaultNetworkID } from "../../utils/constants"
-import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
-import { CodecIdError, 
-         ChainIdError, 
+import {
+  Serialization,
+  SerializedEncoding,
+  SerializedType
+} from "../../utils/serialization"
+import {
+  CodecIdError,
+  ChainIdError,
   TransferableInputError
 } from "../../utils/errors"
 
@@ -32,19 +37,31 @@ const buffer: SerializedType = "Buffer"
 export class ImportTx extends BaseTx {
   protected _typeName = "ImportTx"
   protected _codecID = AVMConstants.LATESTCODEC
-  protected _typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE
+  protected _typeID =
+    this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     const fields: object = super.serialize(encoding)
     return {
       ...fields,
-      sourceChain: serialization.encoder(this.sourceChain, encoding, buffer, cb58),
+      sourceChain: serialization.encoder(
+        this.sourceChain,
+        encoding,
+        buffer,
+        cb58
+      ),
       importIns: this.importIns.map((i) => i.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.sourceChain = serialization.decoder(fields["sourceChain"], encoding, cb58, buffer, 32)
+    this.sourceChain = serialization.decoder(
+      fields["sourceChain"],
+      encoding,
+      cb58,
+      buffer,
+      32
+    )
     this.importIns = fields["importIns"].map((i: object): TransferableInput => {
       let ii: TransferableInput = new TransferableInput()
       ii.deserialize(i, encoding)
@@ -59,22 +76,27 @@ export class ImportTx extends BaseTx {
   protected importIns: TransferableInput[] = []
 
   /**
-  * Set the codecID
-  *
-  * @param codecID The codecID to set
-  */
+   * Set the codecID
+   *
+   * @param codecID The codecID to set
+   */
   setCodecID(codecID: number): void {
-    if(codecID !== 0 && codecID !== 1) {
+    if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-      throw new CodecIdError("Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.")
+      throw new CodecIdError(
+        "Error - ImportTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+      )
     }
     this._codecID = codecID
-    this._typeID = this._codecID === 0 ? AVMConstants.IMPORTTX : AVMConstants.IMPORTTX_CODECONE
+    this._typeID =
+      this._codecID === 0
+        ? AVMConstants.IMPORTTX
+        : AVMConstants.IMPORTTX_CODECONE
   }
 
   /**
-     * Returns the id of the [[ImportTx]]
-     */
+   * Returns the id of the [[ImportTx]]
+   */
   getTxType = (): number => {
     return this._typeID
   }
@@ -87,14 +109,14 @@ export class ImportTx extends BaseTx {
   }
 
   /**
-     * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, populates the class, and returns the length of the [[ImportTx]] in bytes.
-     *
-     * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ImportTx]]
-     *
-     * @returns The length of the raw [[ImportTx]]
-     *
-     * @remarks assume not-checksummed
-     */
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ImportTx]], parses it, populates the class, and returns the length of the [[ImportTx]] in bytes.
+   *
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ImportTx]]
+   *
+   * @returns The length of the raw [[ImportTx]]
+   *
+   * @remarks assume not-checksummed
+   */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
     this.sourceChain = bintools.copyFrom(bytes, offset, offset + 32)
@@ -114,8 +136,10 @@ export class ImportTx extends BaseTx {
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ImportTx]].
    */
   toBuffer(): Buffer {
-    if(typeof this.sourceChain === "undefined") {
-      throw new ChainIdError("ImportTx.toBuffer -- this.sourceChain is undefined")
+    if (typeof this.sourceChain === "undefined") {
+      throw new ChainIdError(
+        "ImportTx.toBuffer -- this.sourceChain is undefined"
+      )
     }
     this.numIns.writeUInt32BE(this.importIns.length, 0)
     let barr: Buffer[] = [super.toBuffer(), this.sourceChain, this.numIns]
@@ -126,8 +150,8 @@ export class ImportTx extends BaseTx {
     return Buffer.concat(barr)
   }
   /**
-     * Returns an array of [[TransferableInput]]s in this transaction.
-     */
+   * Returns an array of [[TransferableInput]]s in this transaction.
+   */
   getImportInputs(): TransferableInput[] {
     return this.importIns
   }
@@ -143,17 +167,19 @@ export class ImportTx extends BaseTx {
   }
 
   /**
-     * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
-     *
-     * @param msg A Buffer for the [[UnsignedTx]]
-     * @param kc An [[KeyChain]] used in signing
-     *
-     * @returns An array of [[Credential]]s
-     */
+   * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+   *
+   * @param msg A Buffer for the [[UnsignedTx]]
+   * @param kc An [[KeyChain]] used in signing
+   *
+   * @returns An array of [[Credential]]s
+   */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.importIns.length; i++) {
-      const cred: Credential = SelectCredentialClass(this.importIns[i].getInput().getCredentialID())
+      const cred: Credential = SelectCredentialClass(
+        this.importIns[i].getInput().getCredentialID()
+      )
       const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
@@ -179,16 +205,22 @@ export class ImportTx extends BaseTx {
    * @param importIns Array of [[TransferableInput]]s used in the transaction
    */
   constructor(
-    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
-    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
-    memo: Buffer = undefined, sourceChain: Buffer = undefined, importIns: TransferableInput[] = undefined
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined,
+    sourceChain: Buffer = undefined,
+    importIns: TransferableInput[] = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     this.sourceChain = sourceChain // do not correct, if it's wrong it'll bomb on toBuffer
     if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
       for (let i: number = 0; i < importIns.length; i++) {
         if (!(importIns[i] instanceof TransferableInput)) {
-          throw new TransferableInputError(`Error - ImportTx.constructor: invalid TransferableInput in array parameter ${importIns}`)
+          throw new TransferableInputError(
+            `Error - ImportTx.constructor: invalid TransferableInput in array parameter ${importIns}`
+          )
         }
       }
       this.importIns = importIns

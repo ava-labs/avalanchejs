@@ -2,12 +2,16 @@
  * @packageDocumentation
  * @module API-AVM-Inputs
  */
-import { Buffer } from 'buffer/'
-import BinTools from '../../utils/bintools'
-import { AVMConstants } from './constants'
-import { Input, StandardTransferableInput, StandardAmountInput } from '../../common/input'
-import { SerializedEncoding } from '../../utils/serialization'
-import { InputIdError, CodecIdError } from '../../utils/errors'
+import { Buffer } from "buffer/"
+import BinTools from "../../utils/bintools"
+import { AVMConstants } from "./constants"
+import {
+  Input,
+  StandardTransferableInput,
+  StandardAmountInput
+} from "../../common/input"
+import { SerializedEncoding } from "../../utils/serialization"
+import { InputIdError, CodecIdError } from "../../utils/errors"
 
 /**
  * @ignore
@@ -22,7 +26,10 @@ const bintools: BinTools = BinTools.getInstance()
  * @returns An instance of an [[Input]]-extended class.
  */
 export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
-  if (inputid === AVMConstants.SECPINPUTID || inputid === AVMConstants.SECPINPUTID_CODECONE) {
+  if (
+    inputid === AVMConstants.SECPINPUTID ||
+    inputid === AVMConstants.SECPINPUTID_CODECONE
+  ) {
     return new SECPTransferInput(...args)
   }
   /* istanbul ignore next */
@@ -53,14 +60,19 @@ export class TransferableInput extends StandardTransferableInput {
     offset += 32
     this.outputidx = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
-    this.assetID = bintools.copyFrom(bytes, offset, offset + AVMConstants.ASSETIDLEN)
+    this.assetID = bintools.copyFrom(
+      bytes,
+      offset,
+      offset + AVMConstants.ASSETIDLEN
+    )
     offset += 32
-    const inputid: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
+    const inputid: number = bintools
+      .copyFrom(bytes, offset, offset + 4)
+      .readUInt32BE(0)
     offset += 4
     this.input = SelectInputClass(inputid)
     return this.input.fromBuffer(bytes, offset)
   }
-  
 }
 
 export abstract class AmountInput extends StandardAmountInput {
@@ -77,33 +89,41 @@ export abstract class AmountInput extends StandardAmountInput {
 export class SECPTransferInput extends AmountInput {
   protected _typeName = "SECPTransferInput"
   protected _codecID = AVMConstants.LATESTCODEC
-  protected _typeID = this._codecID === 0 ? AVMConstants.SECPINPUTID : AVMConstants.SECPINPUTID_CODECONE
+  protected _typeID =
+    this._codecID === 0
+      ? AVMConstants.SECPINPUTID
+      : AVMConstants.SECPINPUTID_CODECONE
 
   //serialize and deserialize both are inherited
 
   /**
-  * Set the codecID
-  *
-  * @param codecID The codecID to set
-  */
+   * Set the codecID
+   *
+   * @param codecID The codecID to set
+   */
   setCodecID(codecID: number): void {
-    if(codecID !== 0 && codecID !== 1) {
+    if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-      throw new CodecIdError("Error - SECPTransferInput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.")
+      throw new CodecIdError(
+        "Error - SECPTransferInput.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+      )
     }
     this._codecID = codecID
-    this._typeID = this._codecID === 0 ? AVMConstants.SECPINPUTID : AVMConstants.SECPINPUTID_CODECONE
+    this._typeID =
+      this._codecID === 0
+        ? AVMConstants.SECPINPUTID
+        : AVMConstants.SECPINPUTID_CODECONE
   }
 
   /**
-     * Returns the inputID for this input
-     */
+   * Returns the inputID for this input
+   */
   getInputID(): number {
     return this._typeID
   }
 
   getCredentialID(): number {
-    if(this._codecID === 0) {
+    if (this._codecID === 0) {
       return AVMConstants.SECPCREDENTIAL
     } else if (this._codecID === 1) {
       return AVMConstants.SECPCREDENTIAL_CODECONE

@@ -1,23 +1,12 @@
-import { 
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
 import {
-  AVMAPI, 
-  KeyChain,
-  UTXOSet,
-  UnsignedTx,
-  Tx
-} from "../../src/apis/avm"
-import { 
-  PrivateKeyPrefix, 
-  DefaultLocalGenesisPrivateKey, 
-  Defaults, 
-  UnixNow 
+  PrivateKeyPrefix,
+  DefaultLocalGenesisPrivateKey,
+  Defaults,
+  UnixNow
 } from "../../src/utils"
-        
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -33,12 +22,17 @@ const cChainBlockchainID: string = Defaults.network[networkID].C.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = Buffer.from("AVM utility method buildImportTx to import AVAX to the X-Chain from the C-Chain")
-        
+const memo: Buffer = Buffer.from(
+  "AVM utility method buildImportTx to import AVAX to the X-Chain from the C-Chain"
+)
+
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings, cChainBlockchainID)
+  const avmUTXOResponse: any = await xchain.getUTXOs(
+    xAddressStrings,
+    cChainBlockchainID
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-    
+
   const unsignedTx: UnsignedTx = await xchain.buildImportTx(
     utxoSet,
     xAddressStrings,
@@ -55,6 +49,5 @@ const main = async (): Promise<any> => {
   const txid: string = await xchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-      
+
 main()
-      

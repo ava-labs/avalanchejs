@@ -13,7 +13,11 @@ import { StandardBaseTx } from "../../common/tx"
 import { Signature, SigIdx, Credential } from "../../common/credentials"
 import { DefaultNetworkID } from "../../utils/constants"
 import { SelectTxClass } from "./tx"
-import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import {
+  Serialization,
+  SerializedEncoding,
+  SerializedType
+} from "../../utils/serialization"
 import { CodecIdError } from "../../utils/errors"
 
 /**
@@ -31,24 +35,37 @@ const display: SerializedEncoding = "display"
 export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   protected _typeName = "BaseTx"
   protected _codecID = AVMConstants.LATESTCODEC
-  protected _typeID = this._codecID === 0 ? AVMConstants.BASETX : AVMConstants.BASETX_CODECONE
+  protected _typeID =
+    this._codecID === 0 ? AVMConstants.BASETX : AVMConstants.BASETX_CODECONE
 
   //serialize is inherited
 
-  deserialize(fields:object, encoding:SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.outs = fields["outs"].map((o:TransferableOutput) => {
+    this.outs = fields["outs"].map((o: TransferableOutput) => {
       let newOut: TransferableOutput = new TransferableOutput()
       newOut.deserialize(o, encoding)
       return newOut
     })
-    this.ins = fields["ins"].map((i:TransferableInput) => {
+    this.ins = fields["ins"].map((i: TransferableInput) => {
       let newIn: TransferableInput = new TransferableInput()
       newIn.deserialize(i, encoding)
       return newIn
     })
-    this.numouts = serialization.decoder(this.outs.length.toString(), display, decimalString, buffer, 4)
-    this.numins = serialization.decoder(this.ins.length.toString(), display, decimalString, buffer, 4)
+    this.numouts = serialization.decoder(
+      this.outs.length.toString(),
+      display,
+      decimalString,
+      buffer,
+      4
+    )
+    this.numins = serialization.decoder(
+      this.ins.length.toString(),
+      display,
+      decimalString,
+      buffer,
+      4
+    )
   }
 
   getOuts(): TransferableOutput[] {
@@ -64,23 +81,26 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   }
 
   /**
-  * Set the codecID
-  *
-  * @param codecID The codecID to set
-  */
+   * Set the codecID
+   *
+   * @param codecID The codecID to set
+   */
   setCodecID(codecID: number): void {
-    if(codecID !== 0 && codecID !== 1) {
+    if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-      throw new CodecIdError("Error - BaseTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.")
+      throw new CodecIdError(
+        "Error - BaseTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+      )
     }
     this._codecID = codecID
-    this._typeID = this._codecID === 0 ? AVMConstants.BASETX : AVMConstants.BASETX_CODECONE
+    this._typeID =
+      this._codecID === 0 ? AVMConstants.BASETX : AVMConstants.BASETX_CODECONE
   }
 
   /**
    * Returns the id of the [[BaseTx]]
    */
-  getTxType = ():number => {
+  getTxType = (): number => {
     return this._typeID
   }
 
@@ -117,7 +137,9 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
       offset = xferin.fromBuffer(bytes, offset)
       this.ins.push(xferin)
     }
-    let memolen: number = bintools.copyFrom(bytes, offset, offset + 4).readUInt32BE(0)
+    let memolen: number = bintools
+      .copyFrom(bytes, offset, offset + 4)
+      .readUInt32BE(0)
     offset += 4
     this.memo = bintools.copyFrom(bytes, offset, offset + memolen)
     offset += memolen
@@ -135,7 +157,9 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = []
     for (let i: number = 0; i < this.ins.length; i++) {
-      const cred: Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID())
+      const cred: Credential = SelectCredentialClass(
+        this.ins[i].getInput().getCredentialID()
+      )
       const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
         const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
@@ -173,7 +197,13 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
    * @param ins Optional array of the [[TransferableInput]]s
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    */
-  constructor(networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16), outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined, memo: Buffer = undefined) {
+  constructor(
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined
+  ) {
     super(networkID, blockchainID, outs, ins, memo)
   }
 }

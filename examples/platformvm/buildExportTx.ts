@@ -1,26 +1,19 @@
-import { 
-  Avalanche,
-  BN,
-  Buffer
-} from "../../src"
-import { 
-  AVMAPI,
-  KeyChain as AVMKeyChain
-} from "../../src/apis/avm"
+import { Avalanche, BN, Buffer } from "../../src"
+import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
-  PlatformVMAPI, 
+  PlatformVMAPI,
   KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
 } from "../../src/apis/platformvm"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults, 
-  UnixNow 
+  Defaults,
+  UnixNow
 } from "../../src/utils"
-      
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -39,9 +32,11 @@ const xChainBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("PlatformVM utility method buildExportTx to export AVAX from the P-Chain to the X-Chain")
+const memo: Buffer = Buffer.from(
+  "PlatformVM utility method buildExportTx to export AVAX from the P-Chain to the X-Chain"
+)
 const asOf: BN = UnixNow()
-   
+
 const main = async (): Promise<any> => {
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
@@ -63,6 +58,5 @@ const main = async (): Promise<any> => {
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-    
+
 main()
-    

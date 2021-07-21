@@ -1,23 +1,18 @@
-import { 
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
-  AVMAPI, 
+  AVMAPI,
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
   Tx,
   MinterSet
 } from "../../src/apis/avm"
-import { 
-  PrivateKeyPrefix, 
-  DefaultLocalGenesisPrivateKey ,
+import {
+  PrivateKeyPrefix,
+  DefaultLocalGenesisPrivateKey,
   UnixNow
 } from "../../src/utils"
-      
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -32,10 +27,12 @@ const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
-const memo: Buffer = Buffer.from("AVM utility method buildCreateNFTAssetTx to create an NFT")
-const name: string = "non fungible token" 
-const symbol: string = "NFT" 
-      
+const memo: Buffer = Buffer.from(
+  "AVM utility method buildCreateNFTAssetTx to create an NFT"
+)
+const name: string = "non fungible token"
+const symbol: string = "NFT"
+
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
@@ -51,11 +48,10 @@ const main = async (): Promise<any> => {
     asOf,
     locktime
   )
-  
+
   const tx: Tx = unsignedTx.sign(xKeychain)
   const txid: string = await xchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-    
+
 main()
-    

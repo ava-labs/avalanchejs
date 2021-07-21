@@ -6,7 +6,11 @@ import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { InitialStates } from "./initialstates"
 import { DefaultNetworkID } from "../../utils/constants"
-import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import {
+  Serialization,
+  SerializedEncoding,
+  SerializedType
+} from "../../utils/serialization"
 import { CreateAssetTx } from "./createassettx"
 import BN from "bn.js"
 
@@ -34,7 +38,13 @@ export class GenesisAsset extends CreateAssetTx {
       assetAlias: serialization.encoder(this.assetAlias, encoding, utf8, utf8),
       name: serialization.encoder(this.name, encoding, utf8, utf8),
       symbol: serialization.encoder(this.symbol, encoding, utf8, utf8),
-      denomination: serialization.encoder(this.denomination, encoding, buffer, decimalString, 1),
+      denomination: serialization.encoder(
+        this.denomination,
+        encoding,
+        buffer,
+        decimalString,
+        1
+      ),
       initialState: this.initialState.serialize(encoding)
     }
   }
@@ -44,10 +54,21 @@ export class GenesisAsset extends CreateAssetTx {
     fields["outs"] = []
     fields["ins"] = []
     super.deserialize(fields, encoding)
-    this.assetAlias = serialization.decoder(fields["assetAlias"], encoding, utf8, utf8)
+    this.assetAlias = serialization.decoder(
+      fields["assetAlias"],
+      encoding,
+      utf8,
+      utf8
+    )
     this.name = serialization.decoder(fields["name"], encoding, utf8, utf8)
     this.symbol = serialization.decoder(fields["symbol"], encoding, utf8, utf8)
-    this.denomination = serialization.decoder(fields["denomination"], encoding, decimalString, buffer, 1)
+    this.denomination = serialization.decoder(
+      fields["denomination"],
+      encoding,
+      decimalString,
+      buffer,
+      1
+    )
     this.initialState = new InitialStates()
     this.initialState.deserialize(fields["initialState"], encoding)
   }
@@ -69,9 +90,13 @@ export class GenesisAsset extends CreateAssetTx {
    * @remarks assume not-checksummed
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    const assetAliasSize: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
+    const assetAliasSize: number = bintools
+      .copyFrom(bytes, offset, offset + 2)
+      .readUInt16BE(0)
     offset += 2
-    this.assetAlias = bintools.copyFrom(bytes, offset, offset + assetAliasSize).toString("utf8")
+    this.assetAlias = bintools
+      .copyFrom(bytes, offset, offset + assetAliasSize)
+      .toString("utf8")
     offset += assetAliasSize
     offset += super.fromBuffer(bytes, offset)
     return offset
@@ -155,7 +180,7 @@ export class GenesisAsset extends CreateAssetTx {
   }
 
   /**
-  * Class representing a GenesisAsset
+   * Class representing a GenesisAsset
    *
    * @param assetAlias Optional String for the asset alias
    * @param name Optional String for the descriptive name of the asset
@@ -174,9 +199,13 @@ export class GenesisAsset extends CreateAssetTx {
   ) {
     super(DefaultNetworkID, Buffer.alloc(32), [], [], memo)
     if (
-      typeof assetAlias === "string" && typeof name === "string" &&
-      typeof symbol === "string" && typeof denomination === "number" &&
-      denomination >= 0 && denomination <= 32 && typeof initialState !== "undefined"
+      typeof assetAlias === "string" &&
+      typeof name === "string" &&
+      typeof symbol === "string" &&
+      typeof denomination === "number" &&
+      denomination >= 0 &&
+      denomination <= 32 &&
+      typeof initialState !== "undefined"
     ) {
       this.assetAlias = assetAlias
       this.name = name

@@ -1,29 +1,21 @@
-import { 
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
-import { 
-  AVMAPI, 
-  KeyChain as AVMKeyChain 
-} from "../../src/apis/avm"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
-  EVMAPI, 
+  EVMAPI,
   KeyChain as EVMKeyChain,
-  UnsignedTx, 
+  UnsignedTx,
   Tx,
   EVMInput,
   ExportTx,
   SECPTransferOutput,
   TransferableOutput
 } from "../../src/apis/evm"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults 
+  Defaults
 } from "../../src/utils"
-        
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -48,11 +40,11 @@ const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const evmInputs: EVMInput[] = []
 const exportedOuts: TransferableOutput[] = []
-const Web3 = require('web3')
-const path: string = '/ext/bc/C/rpc'
+const Web3 = require("web3")
+const path: string = "/ext/bc/C/rpc"
 const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
-        
+
 const main = async (): Promise<any> => {
   let balance: BN = await web3.eth.getBalance(cHexAddress)
   balance = new BN(balance.toString().substring(0, 17))
@@ -60,15 +52,28 @@ const main = async (): Promise<any> => {
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount
   const locktime: BN = new BN(0)
-    
-  const evmInput: EVMInput = new EVMInput(cHexAddress, balance, avaxAssetID, nonce)
+
+  const evmInput: EVMInput = new EVMInput(
+    cHexAddress,
+    balance,
+    avaxAssetID,
+    nonce
+  )
   evmInput.addSignatureIdx(0, cAddresses[0])
   evmInputs.push(evmInput)
-    
-  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(balance.sub(fee), xAddresses, locktime, threshold)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
+
+  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+    balance.sub(fee),
+    xAddresses,
+    locktime,
+    threshold
+  )
+  const transferableOutput: TransferableOutput = new TransferableOutput(
+    avaxAssetIDBuf,
+    secpTransferOutput
+  )
   exportedOuts.push(transferableOutput)
-    
+
   const exportTx: ExportTx = new ExportTx(
     networkID,
     cChainBlockchainIdBuf,
@@ -76,11 +81,11 @@ const main = async (): Promise<any> => {
     evmInputs,
     exportedOuts
   )
-      
+
   const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
   const tx: Tx = unsignedTx.sign(cKeychain)
   const txid: string = await cchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-      
+
 main()

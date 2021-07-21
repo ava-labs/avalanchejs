@@ -1,11 +1,6 @@
-import { 
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
-  PlatformVMAPI, 
+  PlatformVMAPI,
   KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
@@ -21,14 +16,14 @@ import {
   ParseableOutput
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults, 
-  NodeIDStringToBuffer, 
-  UnixNow 
+  Defaults,
+  NodeIDStringToBuffer,
+  UnixNow
 } from "../../src/utils"
-      
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -48,46 +43,73 @@ const stakeOuts: TransferableOutput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually add a delegator to the primary subnet")
+const memo: Buffer = Buffer.from(
+  "Manually add a delegator to the primary subnet"
+)
 const nodeID: string = "NodeID-DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
 const startTime: BN = UnixNow().add(new BN(60 * 1))
 const endTime: BN = startTime.add(new BN(2630000))
-   
+
 const main = async (): Promise<any> => {
   const stakeAmount: any = await pchain.getMinStake()
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
-  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(unlocked.sub(fee).sub(stakeAmount.minValidatorStake), pAddresses, locktime, threshold)
-  const transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetID, secpTransferOutput)
+  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+    unlocked.sub(fee).sub(stakeAmount.minValidatorStake),
+    pAddresses,
+    locktime,
+    threshold
+  )
+  const transferableOutput: TransferableOutput = new TransferableOutput(
+    avaxAssetID,
+    secpTransferOutput
+  )
   outputs.push(transferableOutput)
-  
-  const stakeSECPTransferOutput: SECPTransferOutput = new SECPTransferOutput(stakeAmount.minValidatorStake, pAddresses, locktime, threshold)
-  const stakeTransferableOutput: TransferableOutput =  new TransferableOutput(avaxAssetID, stakeSECPTransferOutput)
+
+  const stakeSECPTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+    stakeAmount.minValidatorStake,
+    pAddresses,
+    locktime,
+    threshold
+  )
+  const stakeTransferableOutput: TransferableOutput = new TransferableOutput(
+    avaxAssetID,
+    stakeSECPTransferOutput
+  )
   stakeOuts.push(stakeTransferableOutput)
-  
-  const rewardOutputOwners: SECPOwnerOutput = new SECPOwnerOutput(pAddresses, locktime, threshold)
+
+  const rewardOutputOwners: SECPOwnerOutput = new SECPOwnerOutput(
+    pAddresses,
+    locktime,
+    threshold
+  )
   const rewardOwners: ParseableOutput = new ParseableOutput(rewardOutputOwners)
-  
+
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO) => {
     const output: Output = utxo.getOutput()
-    if(output.getOutputID() === 7) {
+    if (output.getOutputID() === 7) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
       const txid: Buffer = utxo.getTxID()
       const outputidx: Buffer = utxo.getOutputIdx()
-  
+
       const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
       secpTransferInput.addSignatureIdx(0, pAddresses[0])
-  
-      const input: TransferableInput = new TransferableInput(txid, outputidx, avaxAssetID, secpTransferInput)
+
+      const input: TransferableInput = new TransferableInput(
+        txid,
+        outputidx,
+        avaxAssetID,
+        secpTransferInput
+      )
       inputs.push(input)
     }
   })
-  
+
   const addDelegatorTx: AddDelegatorTx = new AddDelegatorTx(
     networkID,
     bintools.cb58Decode(pChainBlockchainID),
@@ -107,6 +129,5 @@ const main = async (): Promise<any> => {
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-    
+
 main()
-    

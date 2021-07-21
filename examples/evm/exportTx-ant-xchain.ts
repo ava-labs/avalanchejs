@@ -1,17 +1,9 @@
-import { 
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer
-} from "../../src"
-import { 
-  AVMAPI, 
-  KeyChain as AVMKeyChain 
-} from "../../src/apis/avm"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
-  EVMAPI, 
+  EVMAPI,
   KeyChain as EVMKeyChain,
-  UnsignedTx, 
+  UnsignedTx,
   Tx,
   EVMInput,
   ExportTx,
@@ -19,12 +11,12 @@ import {
   TransferableOutput
 } from "../../src/apis/evm"
 import { RequestResponseData } from "../../src/common"
-import { 
-  PrivateKeyPrefix, 
+import {
+  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults 
+  Defaults
 } from "../../src/utils"
-          
+
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -49,44 +41,66 @@ const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const evmInputs: EVMInput[] = []
 let exportedOuts: TransferableOutput[] = []
-const Web3 = require('web3')
-const path: string = '/ext/bc/C/rpc'
+const Web3 = require("web3")
+const path: string = "/ext/bc/C/rpc"
 const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
-        
+
 const main = async (): Promise<any> => {
-  const antAssetIDStr: string = "verma4Pa9biWKbjDGNsTXU47cYCyDSNGSU1iBkxucfVSFVXdv"
+  const antAssetIDStr: string =
+    "verma4Pa9biWKbjDGNsTXU47cYCyDSNGSU1iBkxucfVSFVXdv"
   const antAssetIDBuf: Buffer = bintools.cb58Decode(antAssetIDStr)
-  const antAssetBalanceResponse: RequestResponseData = await cchain.callMethod("eth_getAssetBalance", [
-    cHexAddress,
-    "latest",
-    antAssetIDStr
-  ], "ext/bc/C/rpc")
-  const antAssetBalance: number = parseInt(antAssetBalanceResponse.data.result, 16)
+  const antAssetBalanceResponse: RequestResponseData = await cchain.callMethod(
+    "eth_getAssetBalance",
+    [cHexAddress, "latest", antAssetIDStr],
+    "ext/bc/C/rpc"
+  )
+  const antAssetBalance: number = parseInt(
+    antAssetBalanceResponse.data.result,
+    16
+  )
   let avaxBalance: BN = await web3.eth.getBalance(cHexAddress)
   avaxBalance = new BN(avaxBalance.toString().substring(0, 17))
   const fee: BN = cchain.getDefaultTxFee()
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount
   const locktime: BN = new BN(0)
-    
-  let evmInput: EVMInput = new EVMInput(cHexAddress, avaxBalance, avaxAssetID, nonce)
+
+  let evmInput: EVMInput = new EVMInput(
+    cHexAddress,
+    avaxBalance,
+    avaxAssetID,
+    nonce
+  )
   evmInput.addSignatureIdx(0, cAddresses[0])
   evmInputs.push(evmInput)
-    
+
   evmInput = new EVMInput(cHexAddress, antAssetBalance, antAssetIDStr, nonce)
   evmInput.addSignatureIdx(0, cAddresses[0])
   evmInputs.push(evmInput)
-    
-  let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(avaxBalance.sub(fee), xAddresses, locktime, threshold)
-  let transferableOutput: TransferableOutput = new TransferableOutput(avaxAssetIDBuf, secpTransferOutput)
+
+  let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+    avaxBalance.sub(fee),
+    xAddresses,
+    locktime,
+    threshold
+  )
+  let transferableOutput: TransferableOutput = new TransferableOutput(
+    avaxAssetIDBuf,
+    secpTransferOutput
+  )
   exportedOuts.push(transferableOutput)
 
-  secpTransferOutput = new SECPTransferOutput(new BN(antAssetBalance), xAddresses, locktime, threshold)
+  secpTransferOutput = new SECPTransferOutput(
+    new BN(antAssetBalance),
+    xAddresses,
+    locktime,
+    threshold
+  )
   transferableOutput = new TransferableOutput(antAssetIDBuf, secpTransferOutput)
   exportedOuts.push(transferableOutput)
   exportedOuts = exportedOuts.sort(TransferableOutput.comparator())
-    
+
   const exportTx: ExportTx = new ExportTx(
     networkID,
     cChainBlockchainIdBuf,
@@ -94,11 +108,11 @@ const main = async (): Promise<any> => {
     evmInputs,
     exportedOuts
   )
-      
+
   const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
   const tx: Tx = unsignedTx.sign(cKeychain)
   const txid: string = await cchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
-      
+
 main()

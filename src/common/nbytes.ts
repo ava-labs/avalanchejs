@@ -3,10 +3,14 @@
  * @module Common-NBytes
  */
 
-import { Buffer } from 'buffer/'
-import BinTools from '../utils/bintools'
-import { Serializable, Serialization, SerializedEncoding } from '../utils/serialization'
-import { BufferSizeError } from '../utils/errors'
+import { Buffer } from "buffer/"
+import BinTools from "../utils/bintools"
+import {
+  Serializable,
+  Serialization,
+  SerializedEncoding
+} from "../utils/serialization"
+import { BufferSizeError } from "../utils/errors"
 
 /**
  * @ignore
@@ -29,14 +33,38 @@ export abstract class NBytes extends Serializable {
     let fields: object = super.serialize(encoding)
     return {
       ...fields,
-      "bsize": serialization.encoder(this.bsize, encoding, "number", "decimalString", 4),
-      "bytes": serialization.encoder(this.bytes, encoding, "Buffer", "hex", this.bsize)
+      bsize: serialization.encoder(
+        this.bsize,
+        encoding,
+        "number",
+        "decimalString",
+        4
+      ),
+      bytes: serialization.encoder(
+        this.bytes,
+        encoding,
+        "Buffer",
+        "hex",
+        this.bsize
+      )
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    this.bsize = serialization.decoder(fields["bsize"], encoding, "decimalString", "number", 4)
-    this.bytes = serialization.decoder(fields["bytes"], encoding, "hex", "Buffer", this.bsize)
+    this.bsize = serialization.decoder(
+      fields["bsize"],
+      encoding,
+      "decimalString",
+      "number",
+      4
+    )
+    this.bytes = serialization.decoder(
+      fields["bytes"],
+      encoding,
+      "hex",
+      "Buffer",
+      this.bsize
+    )
   }
 
   protected bytes: Buffer
@@ -75,7 +103,9 @@ export abstract class NBytes extends Serializable {
     try {
       if (buff.length - offset < this.bsize) {
         /* istanbul ignore next */
-        throw new BufferSizeError("Error - NBytes.fromBuffer: not enough space available in buffer.")
+        throw new BufferSizeError(
+          "Error - NBytes.fromBuffer: not enough space available in buffer."
+        )
       }
 
       this.bytes = bintools.copyFrom(buff, offset, offset + this.bsize)
@@ -91,14 +121,14 @@ export abstract class NBytes extends Serializable {
   /**
    * @returns A reference to the stored {@link https://github.com/feross/buffer|Buffer}
    */
-  toBuffer():Buffer {
+  toBuffer(): Buffer {
     return this.bytes
   }
 
   /**
    * @returns A base-58 string of the stored {@link https://github.com/feross/buffer|Buffer}
    */
-  toString():string {
+  toString(): string {
     return bintools.bufferToB58(this.toBuffer())
   }
 

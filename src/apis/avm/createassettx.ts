@@ -10,7 +10,11 @@ import { TransferableInput } from "./inputs"
 import { InitialStates } from "./initialstates"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
-import { Serialization, SerializedEncoding, SerializedType } from "../../utils/serialization"
+import {
+  Serialization,
+  SerializedEncoding,
+  SerializedType
+} from "../../utils/serialization"
 import { CodecIdError } from "../../utils/errors"
 
 /**
@@ -25,7 +29,10 @@ const buffer: SerializedType = "Buffer"
 export class CreateAssetTx extends BaseTx {
   protected _typeName = "CreateAssetTx"
   protected _codecID = AVMConstants.LATESTCODEC
-  protected _typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE
+  protected _typeID =
+    this._codecID === 0
+      ? AVMConstants.CREATEASSETTX
+      : AVMConstants.CREATEASSETTX_CODECONE
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     const fields: object = super.serialize(encoding)
@@ -33,7 +40,13 @@ export class CreateAssetTx extends BaseTx {
       ...fields,
       name: serialization.encoder(this.name, encoding, utf8, utf8),
       symbol: serialization.encoder(this.symbol, encoding, utf8, utf8),
-      denomination: serialization.encoder(this.denomination, encoding, buffer, decimalString, 1),
+      denomination: serialization.encoder(
+        this.denomination,
+        encoding,
+        buffer,
+        decimalString,
+        1
+      ),
       initialState: this.initialState.serialize(encoding)
     }
   }
@@ -41,7 +54,13 @@ export class CreateAssetTx extends BaseTx {
     super.deserialize(fields, encoding)
     this.name = serialization.decoder(fields["name"], encoding, utf8, utf8)
     this.symbol = serialization.decoder(fields["symbol"], encoding, utf8, utf8)
-    this.denomination = serialization.decoder(fields["denomination"], encoding, decimalString, buffer, 1)
+    this.denomination = serialization.decoder(
+      fields["denomination"],
+      encoding,
+      decimalString,
+      buffer,
+      1
+    )
     this.initialState = new InitialStates()
     this.initialState.deserialize(fields["initialState"], encoding)
   }
@@ -52,17 +71,22 @@ export class CreateAssetTx extends BaseTx {
   protected initialState: InitialStates = new InitialStates()
 
   /**
-  * Set the codecID
-  *
-  * @param codecID The codecID to set
-  */
+   * Set the codecID
+   *
+   * @param codecID The codecID to set
+   */
   setCodecID(codecID: number): void {
-    if(codecID !== 0 && codecID !== 1) {
+    if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
-      throw new CodecIdError("Error - CreateAssetTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1.")
+      throw new CodecIdError(
+        "Error - CreateAssetTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+      )
     }
     this._codecID = codecID
-    this._typeID = this._codecID === 0 ? AVMConstants.CREATEASSETTX : AVMConstants.CREATEASSETTX_CODECONE
+    this._typeID =
+      this._codecID === 0
+        ? AVMConstants.CREATEASSETTX
+        : AVMConstants.CREATEASSETTX_CODECONE
   }
 
   /**
@@ -111,14 +135,22 @@ export class CreateAssetTx extends BaseTx {
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
 
-    const namesize: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
+    const namesize: number = bintools
+      .copyFrom(bytes, offset, offset + 2)
+      .readUInt16BE(0)
     offset += 2
-    this.name = bintools.copyFrom(bytes, offset, offset + namesize).toString("utf8")
+    this.name = bintools
+      .copyFrom(bytes, offset, offset + namesize)
+      .toString("utf8")
     offset += namesize
 
-    const symsize: number = bintools.copyFrom(bytes, offset, offset + 2).readUInt16BE(0)
+    const symsize: number = bintools
+      .copyFrom(bytes, offset, offset + 2)
+      .readUInt16BE(0)
     offset += 2
-    this.symbol = bintools.copyFrom(bytes, offset, offset + symsize).toString("utf8")
+    this.symbol = bintools
+      .copyFrom(bytes, offset, offset + symsize)
+      .toString("utf8")
     offset += symsize
 
     this.denomination = bintools.copyFrom(bytes, offset, offset + 1)
@@ -132,8 +164,8 @@ export class CreateAssetTx extends BaseTx {
   }
 
   /**
-     * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateAssetTx]].
-     */
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateAssetTx]].
+   */
   toBuffer(): Buffer {
     const superbuff: Buffer = super.toBuffer()
     const initstatebuff: Buffer = this.initialState.toBuffer()
@@ -148,8 +180,23 @@ export class CreateAssetTx extends BaseTx {
     const symsize: Buffer = Buffer.alloc(2)
     symsize.writeUInt16BE(this.symbol.length, 0)
 
-    const bsize: number = superbuff.length + namesize.length + namebuff.length + symsize.length + symbuff.length + this.denomination.length + initstatebuff.length
-    const barr: Buffer[] = [superbuff, namesize, namebuff, symsize, symbuff, this.denomination, initstatebuff]
+    const bsize: number =
+      superbuff.length +
+      namesize.length +
+      namebuff.length +
+      symsize.length +
+      symbuff.length +
+      this.denomination.length +
+      initstatebuff.length
+    const barr: Buffer[] = [
+      superbuff,
+      namesize,
+      namebuff,
+      symsize,
+      symbuff,
+      this.denomination,
+      initstatebuff
+    ]
     return Buffer.concat(barr, bsize)
   }
 
@@ -177,15 +224,24 @@ export class CreateAssetTx extends BaseTx {
    * @param initialState Optional [[InitialStates]] that represent the intial state of a created asset
    */
   constructor(
-    networkID: number = DefaultNetworkID, blockchainID: Buffer = Buffer.alloc(32, 16),
-    outs: TransferableOutput[] = undefined, ins: TransferableInput[] = undefined,
-    memo: Buffer = undefined, name: string = undefined, symbol: string = undefined, denomination: number = undefined,
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined,
+    name: string = undefined,
+    symbol: string = undefined,
+    denomination: number = undefined,
     initialState: InitialStates = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (
-      typeof name === "string" && typeof symbol === "string" && typeof denomination === "number"
-      && denomination >= 0 && denomination <= 32 && typeof initialState !== "undefined"
+      typeof name === "string" &&
+      typeof symbol === "string" &&
+      typeof denomination === "number" &&
+      denomination >= 0 &&
+      denomination <= 32 &&
+      typeof initialState !== "undefined"
     ) {
       this.initialState = initialState
       this.name = name

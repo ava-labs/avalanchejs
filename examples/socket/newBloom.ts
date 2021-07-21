@@ -1,7 +1,4 @@
-import {
-  PubSub,
-  Socket
-} from "../../src"
+import { PubSub, Socket } from "../../src"
 
 const protocol: string = "ws"
 const host: string = "localhost"
@@ -12,7 +9,9 @@ const main = async (): Promise<any> => {
   const pubsub: PubSub = new PubSub()
   const newBloom: string = pubsub.newBloom()
   const addAddresses: string = pubsub.addAddresses(addresses)
-  const socket: Socket = new Socket(`${protocol}://${host}:${port}/ext/bc/X/events`)
+  const socket: Socket = new Socket(
+    `${protocol}://${host}:${port}/ext/bc/X/events`
+  )
   socket.onopen = () => {
     console.log("Socket Connected")
     socket.send(newBloom)
