@@ -116,6 +116,74 @@ describe("AVMAPI", (): void => {
     mockAxios.reset()
   })
 
+  test("fails to send with incorrect username", async (): Promise<void> => {
+    const memo: string = "hello world"
+    const incorrectUserName: string = "asdfasdfsa"
+    const message: string = `problem retrieving user: incorrect password for user "${incorrectUserName}"`
+    const result: Promise<object> = api.send(
+      incorrectUserName,
+      password,
+      "assetId",
+      10,
+      addrA,
+      [addrB],
+      addrA,
+      memo
+    )
+
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: object = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
+  })
+
+  test("fails to send with incorrect Password", async (): Promise<void> => {
+    const memo: string = "hello world"
+    const incorrectPassword: string = "asdfasdfsa"
+    const message: string = `problem retrieving user: incorrect password for user "${incorrectPassword}"`
+    const result: Promise<object> = api.send(
+      username,
+      incorrectPassword,
+      "assetId",
+      10,
+      addrA,
+      [addrB],
+      addrA,
+      memo
+    )
+
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: object = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
+  })
+
   test("can Send 1", async (): Promise<void> => {
     const txId: string = "asdfhvl234"
     const memo: string = "hello world"
