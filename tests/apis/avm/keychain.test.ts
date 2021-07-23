@@ -26,6 +26,7 @@ describe("AVMKeyPair", (): void => {
 
   test("human readable part", (): void => {
     let hrp: string = avalanche.getHRP()
+
     let networkID: number = avalanche.getNetworkID()
     expect(hrp).toBe("local")
     expect(networkID).toBe(12345)
@@ -90,6 +91,13 @@ describe("AVMKeyPair", (): void => {
     expect(kp.recover(msg, sig).toString("hex")).toBe(
       kp.getPublicKey().toString("hex")
     )
+  })
+
+  test("bad private key", (): void => {
+    const kp: KeyPair = new KeyPair("badnetworkid", alias)
+    const badPrivateKey: string = "safasaf"
+    const result: boolean = kp.importKey(Buffer.from(badPrivateKey, "hex"))
+    expect(result).toBe(false)
   })
 
   test("repeatable 2", (): void => {
