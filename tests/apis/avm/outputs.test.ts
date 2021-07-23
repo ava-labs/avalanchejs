@@ -59,6 +59,7 @@ describe("Outputs", (): void => {
         fallLocktime,
         1
       )
+
       expect(nftMintOutput.getCodecID()).toBe(codecID_zero)
       expect(nftMintOutput.getOutputID()).toBe(AVMConstants.NFTMINTOUTPUTID)
       nftMintOutput.setCodecID(codecID_one)
@@ -252,22 +253,17 @@ describe("Outputs", (): void => {
       expect(JSON.stringify(out.getAddresses().sort())).toStrictEqual(
         JSON.stringify(addrs.sort())
       )
-
       expect(out.getThreshold()).toBe(3)
       expect(out.getLocktime().toNumber()).toBe(locktime.toNumber())
-
       const r: number = out.getAddressIdx(addrs[2])
       expect(out.getAddress(r)).toStrictEqual(addrs[2])
       expect(() => {
         out.getAddress(400)
       }).toThrow()
-
       const b: Buffer = out.toBuffer()
       expect(out.toString()).toBe(bintools.bufferToB58(b))
-
       const s: Buffer[] = out.getSpenders(addrs)
       expect(JSON.stringify(s.sort())).toBe(JSON.stringify(addrs.sort()))
-
       const m1: boolean = out.meetsThreshold([addrs[0]])
       expect(m1).toBe(false)
       const m2: boolean = out.meetsThreshold(addrs, new BN(100))
@@ -276,6 +272,16 @@ describe("Outputs", (): void => {
       expect(m3).toBe(true)
       const m4: boolean = out.meetsThreshold(addrs, locktime.add(new BN(100)))
       expect(m4).toBe(true)
+    })
+
+    test("SECPMintOutput bad address", (): void => {
+      const badAddress = Buffer.from("adfasdfsas", "hex")
+
+      expect((): void => {
+        new SECPMintOutput([badAddress], locktime, 3)
+      }).toThrow(
+        "Error - NBytes.fromBuffer: Error: Error - NBytes.fromBuffer: not enough space available in buffer."
+      )
     })
 
     test("SECPMintOutput codecIDs", (): void => {
