@@ -381,6 +381,31 @@ describe("Transactions", (): void => {
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true)
   })
 
+  test("Create small BaseTx with bad txid", async (): Promise<void> => {
+    const outs: TransferableOutput[] = []
+    const outputAmt: BN = new BN("266")
+    const output: SECPTransferOutput = new SECPTransferOutput(
+      outputAmt,
+      addrs1,
+      new BN(0),
+      1
+    )
+    const transferableOutput: TransferableOutput = new TransferableOutput(
+      avaxAssetID,
+      output
+    )
+    outs.push(transferableOutput)
+    const inputAmt: BN = new BN("400")
+    const input: SECPTransferInput = new SECPTransferInput(inputAmt)
+    input.addSignatureIdx(0, addrs1[0])
+
+    expect((): void => {
+      const txid: Buffer = bintools.cb58Decode(
+        "n8XHaaaa5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL"
+      )
+    }).toThrow("Error - BinTools.cb58Decode: invalid checksum")
+  })
+
   test("confirm inputTotal, outputTotal and fee are correct", async (): Promise<void> => {
     // AVAX assetID
     const assetID: Buffer = bintools.cb58Decode(
@@ -532,6 +557,14 @@ describe("Transactions", (): void => {
     const baseTx: BaseTx = new BaseTx(netid, blockchainID, outs, ins)
     const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true)
+  })
+
+  test("bad asset ID", async (): Promise<void> => {
+    expect((): void => {
+      const assetID: Buffer = bintools.cb58Decode(
+        "badaaaan8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL"
+      )
+    }).toThrow()
   })
 
   test("Creation UnsignedTx", (): void => {
