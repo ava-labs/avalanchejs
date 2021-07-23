@@ -84,15 +84,19 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
   importKey = (privk: Buffer): boolean => {
     this.keypair = ec.keyFromPrivate(privk.toString("hex"), "hex")
     // doing hex translation to get Buffer class
-    this.privk = Buffer.from(
-      this.keypair.getPrivate("hex").padStart(64, "0"),
-      "hex"
-    )
-    this.pubk = Buffer.from(
-      this.keypair.getPublic(true, "hex").padStart(66, "0"),
-      "hex"
-    )
-    return true // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
+    try {
+      this.privk = Buffer.from(
+        this.keypair.getPrivate("hex").padStart(64, "0"),
+        "hex"
+      )
+      this.pubk = Buffer.from(
+        this.keypair.getPublic(true, "hex").padStart(66, "0"),
+        "hex"
+      )
+      return true // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
+    } catch (error) {
+      return false
+    }
   }
 
   /**
