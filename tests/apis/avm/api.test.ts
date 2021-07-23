@@ -42,6 +42,8 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import {BaseTx} from "../../../src/apis/avm";
+import {Credential} from "../../../src/common";
 
 /**
  * @ignore
@@ -1156,6 +1158,38 @@ describe("AVMAPI", (): void => {
         tx1.toBuffer().toString("hex")
       )
       expect(tx2.toString()).toBe(tx1.toString())
+    })
+
+    test("signTxPartially and composeSignatures", async (): Promise<void> => {
+      const a = addrs1.map(a => api.parseAddress(a));
+
+      const txu: UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
+      
+      const tx1 = avm.signTxPartially(txu, a[0])
+      const tx1Creds: Credential[] = tx1.getCredentials()
+      expect(tx1Creds.length).toBe(txu.getTransaction().getIns().length)
+      expect(tx1Creds[0].getSignatures().length).toBe(1)
+
+      const tx2 = avm.signTxPartially(txu, a[1])
+      const tx2Creds: Credential[] = tx2.getCredentials();
+      expect(tx2Creds.length).toBe(txu.getTransaction().getIns().length)
+      expect(tx2Creds[0].getSignatures().length).toBe(1)
+
+      const tx3 = avm.signTxPartially(txu, a[2])
+      const tx3Creds: Credential[] = tx3.getCredentials();
+      expect(tx3Creds.length).toBe(txu.getTransaction().getIns().length)
+      expect(tx3Creds[0].getSignatures().length).toBe(1)
+      
+      const txs: Tx[] = [tx1, tx2, tx3];
+      
+      const finalTx: Tx = avm.composeSignature(txs);
+      const finalTxCreds: Credential[] = finalTx.getCredentials()
+      expect(finalTxCreds.length).toBe(txu.getTransaction().getIns().length)
+      expect(finalTxCreds[0].getSignatures().length).toBe(3)
+
+      const tx: Tx = avm.signTx(txu)
+      expect(finalTx.getCredentials().map(cred => cred.serialize())).toStrictEqual(tx.getCredentials().map((cred => cred.serialize())))
+
     })
 
     test("buildBaseTx1", async (): Promise<void> => {

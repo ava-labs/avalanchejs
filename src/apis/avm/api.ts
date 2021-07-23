@@ -43,6 +43,7 @@ import {
   ImportKeyInterface,
   MintInterface
 } from "src/common/interfaces"
+import {Credential} from "../../common"
 
 /**
  * @ignore
@@ -1564,6 +1565,34 @@ export class AVMAPI extends JRPCAPI {
    * @returns A signed transaction of type [[Tx]]
    */
   signTx = (utx: UnsignedTx): Tx => utx.sign(this.keychain)
+
+  /**
+   *
+   * @param utx The unsigned transaction of type [[UnsignedTx]]
+   * @param address
+   *
+   * @returns A partially signed transaction of type [[Tx]]
+   */
+  signTxPartially = (utx: UnsignedTx, address: Buffer): Tx => utx.signPartially(this.keychain, address)
+
+  composeSignature = (txs: Tx[]): Tx => {
+    if (!txs.length) {
+      return null;
+    }
+    const result: Credential[] = [];
+    for (let i: number = 0; i < txs.length; i++) {
+      const creds = txs[i].getCredentials()
+      for (let j: number = 0; j < creds.length; j++) {
+        if (!result[j]) {
+          result[j] = creds[j];
+        } else {
+          result[j].addSignature(creds[j].getSignatures()[0])
+        }
+      }
+    }
+
+    return new Tx(txs[0].getUnsignedTx(), result)
+  }
 
   /**
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
