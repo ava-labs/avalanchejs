@@ -126,6 +126,17 @@ describe("UTXOSet", (): void => {
     expect(utxo.toString()).toBe(setArray[0].toString())
   })
 
+  test("bad creation", (): void => {
+    const set: UTXOSet = new UTXOSet()
+    const bad: string = bintools.cb58Encode(Buffer.from("aasdfasd", "hex"))
+    set.add(bad)
+    const utxo: UTXO = new UTXO()
+
+    expect((): void => {
+      utxo.fromString(bad)
+    }).toThrow()
+  })
+
   test("Mutliple add", (): void => {
     const set: UTXOSet = new UTXOSet()
     // first add
@@ -345,7 +356,6 @@ describe("UTXOSet", (): void => {
         expect((): void => {
           set.mergeByRule(setA, "ERROR")
         }).toThrow()
-        const setArray: UTXO[] = setG.getAllUTXOs()
       })
 
       test("intersection", (): void => {
