@@ -73,6 +73,30 @@ describe("EVMAPI", (): void => {
     expect(response).toBe(address)
   })
 
+  test("fail to import because no user created", async (): Promise<void> => {
+    const badUserName = "zzzzzzzzzzzzzz"
+    const message: string = `problem retrieving data: rpc error: code = Unknown desc = incorrect password for user "${badUserName}`
+
+    const result: Promise<string> = api.importKey(badUserName, password, "key")
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
+  })
+
   test("exportKey", async (): Promise<void> => {
     const key: string = "sdfglvlj2h3v45"
 

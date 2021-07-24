@@ -513,7 +513,11 @@ export class EVMAPI extends JRPCAPI {
       "avax.importKey",
       params
     )
-    return response.data.result.address
+    if (response.data.result.address) {
+      return response.data.result.address
+    } else {
+      return response.data.result
+    }
   }
 
   /**
