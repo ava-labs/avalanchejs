@@ -32,6 +32,8 @@ export class AuthAPI extends JRPCAPI {
       params
     )
     return response.data.result.token
+      ? response.data.result.token
+      : response.data.result
   }
 
   /**
@@ -52,6 +54,8 @@ export class AuthAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -75,6 +79,8 @@ export class AuthAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   constructor(core: AvalancheCore, baseurl: string = "/ext/auth") {
