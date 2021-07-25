@@ -49,6 +49,28 @@ describe("Keystore", (): void => {
     expect(response).toBe(true)
   })
 
+  test("createUser with weak password", async (): Promise<void> => {
+    const result: Promise<boolean> = keystore.createUser(username, "aaa")
+    const message: string = "password is too weak"
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
+  })
+
   test("deleteUser", async (): Promise<void> => {
     const result: Promise<boolean> = keystore.deleteUser(username, password)
     const payload: object = {
