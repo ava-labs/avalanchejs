@@ -273,6 +273,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.status
+      ? response.data.result.status
+      : response.data.result
   }
 
   /**
@@ -325,6 +327,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -361,6 +365,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -446,6 +452,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -484,6 +492,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -513,11 +523,9 @@ export class EVMAPI extends JRPCAPI {
       "avax.importKey",
       params
     )
-    if (response.data.result.address) {
-      return response.data.result.address
-    } else {
-      return response.data.result
-    }
+    return response.data.result.address
+      ? response.data.result.address
+      : response.data.result
   }
 
   /**
@@ -553,6 +561,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -583,6 +593,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.privateKey
+      ? response.data.result.privateKey
+      : response.data.result
   }
 
   /**
