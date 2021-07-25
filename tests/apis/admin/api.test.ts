@@ -84,7 +84,7 @@ describe("Admin", (): void => {
     const response: boolean = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(false)
+    expect(response["success"]).toBe(false)
   })
 
   test("getChainAliases", async (): Promise<void> => {
