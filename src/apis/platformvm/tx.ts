@@ -90,6 +90,13 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
     const sigs: Credential[] = this.transaction.sign(msg, kc)
     return new Tx(this, sigs)
   }
+
+  signPartially(kc: KeyChain, address: Buffer): Tx {
+    const txbuff = this.toBuffer()
+    const msg: Buffer = Buffer.from(createHash('sha256').update(txbuff).digest())
+    const sigs: Credential[] = this.transaction.signPartially(msg, kc, address)
+    return new Tx(this, sigs)
+  }
 }
 
 export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
