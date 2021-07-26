@@ -987,14 +987,14 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     if (rewardThreshold > rewardAddresses.length) {
       /* istanbul ignore next */
       throw new ThresholdError(
-          "Error - UTXOSet.buildAddDelegatorTx: reward threshold is greater than number of addresses"
+        "Error - UTXOSet.buildAddDelegatorTx: reward threshold is greater than number of addresses"
       )
     }
-    
+
     if (typeof changeAddresses === "undefined") {
       changeAddresses = toAddresses
     }
-    
+
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
     let stakeOuts: TransferableOutput[] = []
