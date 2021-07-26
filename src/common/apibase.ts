@@ -19,6 +19,12 @@ export class RequestResponseData {
   request: ClientRequest | XMLHttpRequest
 }
 
+export type ErrorResponseObject = {
+  code: number
+  message: string
+  data?: null
+}
+
 /**
  * Abstract class defining a generic endpoint that all endpoints must implement (extend).
  */
