@@ -4,7 +4,7 @@
  */
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
-import { RequestResponseData } from "../../common/apibase"
+import { RequestResponseData, ErrorResponseObject } from "../../common/apibase"
 
 /**
  * Class for interacting with a node's AuthAPI.
@@ -22,7 +22,10 @@ export class AuthAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the authorization token.
    */
-  newToken = async (password: string, endpoints: string[]): Promise<string> => {
+  newToken = async (
+    password: string,
+    endpoints: string[]
+  ): Promise<string | ErrorResponseObject> => {
     const params: any = {
       password,
       endpoints
@@ -54,8 +57,6 @@ export class AuthAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
-      ? response.data.result.success
-      : response.data.result
   }
 
   /**
@@ -79,8 +80,6 @@ export class AuthAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
-      ? response.data.result.success
-      : response.data.result
   }
 
   constructor(core: AvalancheCore, baseurl: string = "/ext/auth") {

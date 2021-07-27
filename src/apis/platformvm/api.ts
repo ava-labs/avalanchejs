@@ -6,7 +6,7 @@ import { Buffer } from "buffer/"
 import BN from "bn.js"
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
-import { RequestResponseData } from "../../common/apibase"
+import { RequestResponseData, ErrorResponseObject } from "../../common/apibase"
 import BinTools from "../../utils/bintools"
 import { KeyChain } from "./keychain"
 import { Defaults, PlatformChainID, ONEAVAX } from "../../utils/constants"
@@ -668,7 +668,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     controlKeys: string[],
     threshold: number
-  ): Promise<string> => {
+  ): Promise<string | ErrorResponseObject> => {
     const params: any = {
       username,
       password,
@@ -680,6 +680,8 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -756,7 +758,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     amount: BN,
     to: string
-  ): Promise<string> => {
+  ): Promise<string | ErrorResponseObject> => {
     const params: any = {
       username,
       password,
@@ -768,6 +770,8 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -790,7 +794,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     to: string,
     sourceChain: string
-  ): Promise<string> => {
+  ): Promise<string | ErrorResponseObject> => {
     const params: any = {
       to,
       sourceChain,
@@ -802,6 +806,8 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -970,7 +976,7 @@ export class PlatformVMAPI extends JRPCAPI {
     username: string,
     password: string,
     address: string
-  ): Promise<string> => {
+  ): Promise<string | ErrorResponseObject> => {
     const params: any = {
       username,
       password,
@@ -981,6 +987,8 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.privateKey
+      ? response.data.result.privateKey
+      : response.data.result
   }
 
   /**
@@ -996,7 +1004,7 @@ export class PlatformVMAPI extends JRPCAPI {
     username: string,
     password: string,
     privateKey: string
-  ): Promise<string> => {
+  ): Promise<string | ErrorResponseObject> => {
     const params: any = {
       username,
       password,
@@ -1006,7 +1014,10 @@ export class PlatformVMAPI extends JRPCAPI {
       "platform.importKey",
       params
     )
+
     return response.data.result.address
+      ? response.data.result.address
+      : response.data.result
   }
 
   /**
@@ -1014,9 +1025,9 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param txid The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   * @returns Returns a Promise<string | ErrorResponseObject> containing the bytes retrieved from the node
    */
-  getTx = async (txid: string): Promise<string> => {
+  getTx = async (txid: string): Promise<string | ErrorResponseObject> => {
     const params: any = {
       txID: txid
     }
@@ -1025,6 +1036,8 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.tx
+      ? response.data.result.tx
+      : response.data.result
   }
 
   /**
