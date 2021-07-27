@@ -38,8 +38,6 @@ export class InfoAPI extends JRPCAPI {
       params
     )
     return response.data.result.blockchainID
-      ? response.data.result.blockchainID
-      : response.data.result
   }
 
   /**
@@ -52,8 +50,6 @@ export class InfoAPI extends JRPCAPI {
       "info.getNetworkID"
     )
     return response.data.result.networkID
-      ? response.data.result.networkID
-      : response.data.result
   }
 
   /**
@@ -66,8 +62,6 @@ export class InfoAPI extends JRPCAPI {
       "info.getNetworkName"
     )
     return response.data.result.networkName
-      ? response.data.result.networkName
-      : response.data.result
   }
 
   /**
@@ -80,8 +74,6 @@ export class InfoAPI extends JRPCAPI {
       "info.getNodeID"
     )
     return response.data.result.nodeID
-      ? response.data.result.nodeID
-      : response.data.result
   }
 
   /**
@@ -94,8 +86,6 @@ export class InfoAPI extends JRPCAPI {
       "info.getNodeVersion"
     )
     return response.data.result.version
-      ? response.data.result.version
-      : response.data.result
   }
 
   /**
@@ -126,8 +116,6 @@ export class InfoAPI extends JRPCAPI {
       params
     )
     return response.data.result.isBootstrapped
-      ? response.data.result.isBootstrapped
-      : response.data.result
   }
 
   /**
@@ -147,8 +135,6 @@ export class InfoAPI extends JRPCAPI {
       params
     )
     return response.data.result.peers
-      ? response.data.result.peers
-      : response.data.result
   }
 
   constructor(core: AvalancheCore, baseurl: string = "/ext/info") {
