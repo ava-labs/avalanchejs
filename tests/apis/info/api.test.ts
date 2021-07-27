@@ -155,7 +155,7 @@ describe("Info", () => {
     const response: boolean = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response["isBootstrapped"]).toBe(false)
+    expect(response).toBe(false)
   })
 
   test("isBootstrapped true", async () => {
