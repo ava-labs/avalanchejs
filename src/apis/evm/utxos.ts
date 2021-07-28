@@ -128,9 +128,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
   //serialize is inherited
 
-  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+  deserialize(fields: object, encoding: SerializedEncoding = "hex"): void {
     super.deserialize(fields, encoding)
-    let utxos = {}
+    const utxos: {} = {}
     for (let utxoid in fields["utxos"]) {
       let utxoidCleaned: string = serializer.decoder(
         utxoid,
@@ -141,7 +141,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       utxos[utxoidCleaned] = new UTXO()
       utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding)
     }
-    let addressUTXOs = {}
+    let addressUTXOs: {} = {}
     for (let address in fields["addressUTXOs"]) {
       let addressCleaned: string = serializer.decoder(
         address,
@@ -149,7 +149,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "cb58",
         "hex"
       )
-      let utxobalance = {}
+      let utxobalance: {} = {}
       for (let utxoid in fields["addressUTXOs"][address]) {
         let utxoidCleaned: string = serializer.decoder(
           utxoid,
@@ -186,7 +186,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     return utxovar
   }
 
-  create(...args: any[]): this {
+  create(): this {
     return new UTXOSet() as this
   }
 
@@ -346,7 +346,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
     let feepaid: BN = new BN(0)
     const map: Map<string, string> = new Map()
-    atomics.forEach((atomic: UTXO) => {
+    atomics.forEach((atomic: UTXO): void => {
       const assetIDBuf: Buffer = atomic.getAssetID()
       const assetID: string = bintools.cb58Encode(atomic.getAssetID())
       const output: AmountOutput = atomic.getOutput() as AmountOutput
@@ -379,7 +379,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       )
       const from: Buffer[] = output.getAddresses()
       const spenders: Buffer[] = output.getSpenders(from)
-      spenders.forEach((spender: Buffer) => {
+      spenders.forEach((spender: Buffer): void => {
         const idx: number = output.getAddressIdx(spender)
         if (idx === -1) {
           /* istanbul ignore next */

@@ -43,8 +43,8 @@ import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance()
-const serializer = Serialization.getInstance()
+const bintools: BinTools = BinTools.getInstance()
+const serializer: Serialization = Serialization.getInstance()
 const display: SerializedEncoding = "display"
 const dumpSerialization: boolean = false
 

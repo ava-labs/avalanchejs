@@ -65,7 +65,7 @@ export class KeyPair extends SECP256k1KeyPair {
   }
 
   clone(): this {
-    let newkp: KeyPair = new KeyPair(this.hrp, this.chainID)
+    const newkp: KeyPair = new KeyPair(this.hrp, this.chainID)
     newkp.importKey(bintools.copyFrom(this.getPrivateKey()))
     return newkp as this
   }
@@ -100,7 +100,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
    * @returns The new key pair
    */
   makeKey = (): KeyPair => {
-    let keypair: KeyPair = new KeyPair(this.hrp, this.chainID)
+    const keypair: KeyPair = new KeyPair(this.hrp, this.chainID)
     this.addKey(keypair)
     return keypair
   }
@@ -119,7 +119,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
    * @returns The new key pair
    */
   importKey = (privk: Buffer | string): KeyPair => {
-    let keypair: KeyPair = new KeyPair(this.hrp, this.chainID)
+    const keypair: KeyPair = new KeyPair(this.hrp, this.chainID)
     let pk: Buffer
     if (typeof privk === "string") {
       pk = bintools.cb58Decode(privk.split("-")[1])
@@ -149,7 +149,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   }
 
   union(kc: this): this {
-    let newkc: KeyChain = kc.clone()
+    const newkc: KeyChain = kc.clone()
     for (let k in this.keys) {
       newkc.addKey(this.keys[k].clone())
     }

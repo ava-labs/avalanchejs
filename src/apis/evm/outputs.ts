@@ -208,7 +208,7 @@ export class EVMOutput {
     ) {
       if (typeof address === "string") {
         // if present then remove `0x` prefix
-        let prefix: string = address.substring(0, 2)
+        const prefix: string = address.substring(0, 2)
         if (prefix === "0x") {
           address = address.split("x")[1]
         }

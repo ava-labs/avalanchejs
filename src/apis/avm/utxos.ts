@@ -163,7 +163,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "cb58",
         "hex"
       )
-      let utxobalance = {}
+      let utxobalance: {} = {}
       for (let utxoid in fields["addressUTXOs"][address]) {
         let utxoidCleaned: string = serialization.decoder(
           utxoid,

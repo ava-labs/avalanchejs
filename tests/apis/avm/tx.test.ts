@@ -59,7 +59,6 @@ describe("Transactions", (): void => {
   let api: AVMAPI
   const amnt: number = 10000
   const netid: number = 12345
-  const memo: Buffer = Buffer.from("AvalancheJS")
   const bID: string = Defaults.network[netid].X.blockchainID
   const alias: string = "X"
   const assetID: Buffer = Buffer.from(
@@ -86,9 +85,9 @@ describe("Transactions", (): void => {
   let threshold: number
   let fallThreshold: number
   const nftutxoids: string[] = []
-  const ip = "127.0.0.1"
-  const port = 8080
-  const protocol = "http"
+  const ip: string = "127.0.0.1"
+  const port: number = 8080
+  const protocol: string = "http"
   let avalanche: Avalanche
   const blockchainID: Buffer = bintools.cb58Decode(bID)
   const name: string = "Mortycoin is the dumb as a sack of hammers."

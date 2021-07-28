@@ -276,7 +276,9 @@ export abstract class StandardUnsignedTx<
         ins[i].getInput() instanceof StandardAmountInput &&
         aIDHex === ins[i].getAssetID().toString("hex")
       ) {
-        const input = ins[i].getInput() as StandardAmountInput
+        const input: StandardAmountInput = ins[
+          i
+        ].getInput() as StandardAmountInput
         total = total.add(input.getAmount())
       }
     }
@@ -398,7 +400,8 @@ export abstract class StandardTx<
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardTx]].
    */
   toBuffer(): Buffer {
-    const tx = this.unsignedTx.getTransaction()
+    const tx: StandardBaseTx<KPClass, KCClass> =
+      this.unsignedTx.getTransaction()
     const codecID: number = tx.getCodecID()
     const txbuff: Buffer = this.unsignedTx.toBuffer()
     let bsize: number = txbuff.length
