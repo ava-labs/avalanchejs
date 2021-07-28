@@ -7,6 +7,7 @@ import { Buffer } from "buffer/"
 import BN from "bn.js"
 import { TransferableOutput } from "../apis/platformvm"
 import { SerializedEncoding } from "../utils"
+import { ClientRequest } from "http"
 
 export interface Index {
   address: string
@@ -143,4 +144,22 @@ export interface Serialized {
   version: number
   notes: string
   fields: object
+}
+
+/**
+ * Response data for HTTP requests.
+ */
+
+export interface RequestResponseData {
+  data: any
+  headers: any
+  status: number
+  statusText: string
+  request: ClientRequest | XMLHttpRequest
+}
+
+export interface ErrorResponseObject {
+  code: number
+  message: string
+  data?: null
 }
