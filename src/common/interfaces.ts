@@ -161,17 +161,17 @@ export interface GetChainAliasesInterface {
 }
 
 export interface NewTokenInterface {
-  password: string,
+  password: string
   endpoints: string[]
 }
 
 export interface RevokeTokenInterface {
-  password: string,
+  password: string
   token: string
 }
 
 export interface ChangePasswordInterface {
-  oldPassword: string,
+  oldPassword: string
   newPassword: string
 }
 

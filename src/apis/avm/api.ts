@@ -31,7 +31,18 @@ import {
   TransactionError
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
-import { CreateAddressInterface, CreateFixedCapAssetInterface, CreateVariableCapAssetInterface, ExportAVAXInterface, ExportInterface, ExportKeyInterface, GetAVAXAssetIDInterface, GetBalanceInterface, ImportKeyInterface, MintInterface } from "src/common/interfaces"
+import {
+  CreateAddressInterface,
+  CreateFixedCapAssetInterface,
+  CreateVariableCapAssetInterface,
+  ExportAVAXInterface,
+  ExportInterface,
+  ExportKeyInterface,
+  GetAVAXAssetIDInterface,
+  GetBalanceInterface,
+  ImportKeyInterface,
+  MintInterface
+} from "src/common/interfaces"
 
 /**
  * @ignore
@@ -159,7 +170,9 @@ export class AVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
-      const asset: GetAVAXAssetIDInterface = await this.getAssetDescription(PrimaryAssetAlias)
+      const asset: GetAVAXAssetIDInterface = await this.getAssetDescription(
+        PrimaryAssetAlias
+      )
       this.AVAXAssetID = asset.assetID
     }
     return this.AVAXAssetID
@@ -373,7 +386,6 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     initialHolders: object[]
   ): Promise<string> => {
-
     const params: CreateFixedCapAssetInterface = {
       name,
       symbol,
@@ -429,7 +441,6 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     minterSets: object[]
   ): Promise<string> => {
-
     const params: CreateVariableCapAssetInterface = {
       name,
       symbol,
@@ -534,7 +545,6 @@ export class AVMAPI extends JRPCAPI {
     password: string,
     privateKey: string
   ): Promise<string> => {
-
     const params: ImportKeyInterface = {
       username,
       password,
@@ -567,7 +577,6 @@ export class AVMAPI extends JRPCAPI {
     amount: BN,
     assetID: string
   ): Promise<string> => {
-
     const params: ExportInterface = {
       username,
       password,
@@ -600,7 +609,6 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     amount: BN
   ): Promise<string> => {
-
     const params: ExportAVAXInterface = {
       to,
       amount: amount,
