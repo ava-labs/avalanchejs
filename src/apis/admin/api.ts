@@ -5,6 +5,7 @@
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
+import { AliasChainInterface, AliasInterface, GetChainAliasesInterface } from "src/common/interfaces"
 
 /**
  * Class for interacting with a node's AdminAPI.
@@ -27,7 +28,7 @@ export class AdminAPI extends JRPCAPI {
    * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
    */
   alias = async (endpoint: string, alias: string): Promise<boolean> => {
-    const params: any = {
+    const params: AliasInterface = {
       endpoint,
       alias
     }
@@ -44,13 +45,13 @@ export class AdminAPI extends JRPCAPI {
    * Give a blockchain an alias, a different name that can be used any place the blockchain’s
    * ID is used.
    *
-   * @param endpoint The blockchain’s ID
+   * @param chain The blockchain’s ID
    * @param alias Can now be used in place of the blockchain’s ID (in API endpoints, for example)
    *
    * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
    */
   aliasChain = async (chain: string, alias: string): Promise<boolean> => {
-    const params: any = {
+    const params: AliasChainInterface = {
       chain,
       alias
     }
@@ -71,7 +72,7 @@ export class AdminAPI extends JRPCAPI {
    * @returns Returns a Promise<string[]> containing aliases of the blockchain.
    */
   getChainAliases = async (chain: string): Promise<string[]> => {
-    const params: any = {
+    const params: GetChainAliasesInterface = {
       chain
     }
     const response: RequestResponseData = await this.callMethod(

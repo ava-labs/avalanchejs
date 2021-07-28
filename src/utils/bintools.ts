@@ -24,7 +24,7 @@ import { utils } from "ethers"
  *
  * ```js
  * const bintools: BinTools = BinTools.getInstance();
- * let b58str = bintools.bufferToB58(Buffer.from("Wubalubadubdub!"));
+ * const b58str:  = bintools.bufferToB58(Buffer.from("Wubalubadubdub!"));
  * ```
  */
 export default class BinTools {

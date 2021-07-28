@@ -31,6 +31,7 @@ import {
   TransactionError
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
+import { CreateAddressInterface, CreateFixedCapAssetInterface, CreateVariableCapAssetInterface, ExportAVAXInterface, ExportInterface, ExportKeyInterface, GetAVAXAssetIDInterface, GetBalanceInterface, ImportKeyInterface, MintInterface } from "src/common/interfaces"
 
 /**
  * @ignore
@@ -84,7 +85,7 @@ export class AVMAPI extends JRPCAPI {
    * @param alias The alias for the blockchainID.
    *
    */
-  setBlockchainAlias = (alias: string): string => {
+  setBlockchainAlias = (alias: string): undefined => {
     this.blockchainAlias = alias
     /* istanbul ignore next */
     return undefined
@@ -158,12 +159,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
-      const asset: {
-        name: string
-        symbol: string
-        assetID: Buffer
-        denomination: number
-      } = await this.getAssetDescription(PrimaryAssetAlias)
+      const asset: GetAVAXAssetIDInterface = await this.getAssetDescription(PrimaryAssetAlias)
       this.AVAXAssetID = asset.assetID
     }
     return this.AVAXAssetID
@@ -211,7 +207,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
-  setTxFee = (fee: BN) => {
+  setTxFee = (fee: BN): void => {
     this.txFee = fee
   }
 
@@ -243,7 +239,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
    */
-  setCreationTxFee = (fee: BN) => {
+  setCreationTxFee = (fee: BN): void => {
     this.creationTxFee = fee
   }
 
@@ -259,7 +255,7 @@ export class AVMAPI extends JRPCAPI {
    */
   newKeyChain = (): KeyChain => {
     // warning, overwrites the old keychain
-    const alias = this.getBlockchainAlias()
+    const alias: string = this.getBlockchainAlias()
     if (alias) {
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
@@ -283,7 +279,7 @@ export class AVMAPI extends JRPCAPI {
     outTotal: BN = new BN(0)
   ): Promise<boolean> => {
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
-    let outputTotal: BN = outTotal.gt(new BN(0))
+    const outputTotal: BN = outTotal.gt(new BN(0))
       ? outTotal
       : utx.getOutputTotal(avaxAssetID)
     const fee: BN = utx.getBurn(avaxAssetID)
@@ -309,7 +305,7 @@ export class AVMAPI extends JRPCAPI {
         "Error - AVMAPI.getBalance: Invalid address format"
       )
     }
-    const params: any = {
+    const params: GetBalanceInterface = {
       address,
       assetID
     }
@@ -332,7 +328,7 @@ export class AVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string> => {
-    const params: any = {
+    const params: CreateAddressInterface = {
       username,
       password
     }
@@ -356,14 +352,14 @@ export class AVMAPI extends JRPCAPI {
    * ```js
    * Example initialHolders:
    * [
-   *     {
-   *         "address": "X-avax1kj06lhgx84h39snsljcey3tpc046ze68mek3g5",
-   *         "amount": 10000
-   *     },
-   *     {
-   *         "address": "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr",
-   *         "amount": 50000
-   *     }
+   *   {
+   *     "address": "X-avax1kj06lhgx84h39snsljcey3tpc046ze68mek3g5",
+   *     "amount": 10000
+   *   },
+   *   {
+   *     "address": "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr",
+   *     "amount": 50000
+   *   }
    * ]
    * ```
    *
@@ -377,7 +373,8 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     initialHolders: object[]
   ): Promise<string> => {
-    const params: any = {
+
+    const params: CreateFixedCapAssetInterface = {
       name,
       symbol,
       denomination,
@@ -405,20 +402,20 @@ export class AVMAPI extends JRPCAPI {
    * ```js
    * Example minterSets:
    * [
-   *      {
-   *          "minters":[
-   *              "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr"
-   *          ],
-   *          "threshold": 1
-   *      },
-   *      {
-   *          "minters": [
-   *              "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr",
-   *              "X-avax1kj06lhgx84h39snsljcey3tpc046ze68mek3g5",
-   *              "X-avax1yell3e4nln0m39cfpdhgqprsd87jkh4qnakklx"
-   *          ],
-   *          "threshold": 2
-   *      }
+   *    {
+   *      "minters":[
+   *        "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr"
+   *      ],
+   *      "threshold": 1
+   *     },
+   *     {
+   *      "minters": [
+   *        "X-avax1am4w6hfrvmh3akduzkjthrtgtqafalce6an8cr",
+   *        "X-avax1kj06lhgx84h39snsljcey3tpc046ze68mek3g5",
+   *        "X-avax1yell3e4nln0m39cfpdhgqprsd87jkh4qnakklx"
+   *      ],
+   *      "threshold": 2
+   *     }
    * ]
    * ```
    *
@@ -432,7 +429,8 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     minterSets: object[]
   ): Promise<string> => {
-    const params: any = {
+
+    const params: CreateVariableCapAssetInterface = {
       name,
       symbol,
       denomination,
@@ -477,10 +475,10 @@ export class AVMAPI extends JRPCAPI {
     } else {
       amnt = amount
     }
-    const params: any = {
+    const params: MintInterface = {
       username: username,
       password: password,
-      amount: amnt.toString(10),
+      amount: amnt,
       assetID: asset,
       to,
       minters
@@ -510,7 +508,7 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new AddressError("Error - AVMAPI.exportKey: Invalid address format")
     }
-    const params: any = {
+    const params: ExportKeyInterface = {
       username,
       password,
       address
@@ -536,7 +534,8 @@ export class AVMAPI extends JRPCAPI {
     password: string,
     privateKey: string
   ): Promise<string> => {
-    const params: any = {
+
+    const params: ImportKeyInterface = {
       username,
       password,
       privateKey
@@ -568,11 +567,12 @@ export class AVMAPI extends JRPCAPI {
     amount: BN,
     assetID: string
   ): Promise<string> => {
-    const params: any = {
-      to,
-      amount: amount.toString(10),
+
+    const params: ExportInterface = {
       username,
       password,
+      to,
+      amount: amount,
       assetID
     }
     const response: RequestResponseData = await this.callMethod(
@@ -600,9 +600,10 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     amount: BN
   ): Promise<string> => {
-    const params: any = {
+
+    const params: ExportAVAXInterface = {
       to,
-      amount: amount.toString(10),
+      amount: amount,
       username,
       password
     }
