@@ -7,6 +7,7 @@ import { Buffer } from "buffer/"
 import BN from "bn.js"
 import { TransferableOutput } from "../apis/platformvm"
 import { SerializedEncoding } from "../utils"
+import { ClientRequest } from "http"
 
 export interface Index {
   address: string

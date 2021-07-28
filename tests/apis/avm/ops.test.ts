@@ -1,20 +1,20 @@
-import { UTXO } from "src/apis/avm/utxos"
+import { UTXO } from "../../../src/apis/avm/utxos"
 import createHash from "create-hash"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { NFTTransferOutput } from "src/apis/avm/outputs"
-import { AVMConstants } from "src/apis/avm/constants"
+import { NFTTransferOutput } from "../../../src/apis/avm/outputs"
+import { AVMConstants } from "../../../src/apis/avm/constants"
 import {
   SelectOperationClass,
   Operation,
   TransferableOperation,
   NFTTransferOperation,
   NFTMintOperation
-} from "src/apis/avm/ops"
-import { OutputOwners } from "src/common/output"
-import { SigIdx } from "src/common/credentials"
-import { UTXOID } from "src/apis/avm/ops"
+} from "../../../src/apis/avm/ops"
+import { OutputOwners } from "../../../src/common/output"
+import { SigIdx } from "../../../src/common/credentials"
+import { UTXOID } from "../../../src/apis/avm/ops"
 
 /**
  * @ignore

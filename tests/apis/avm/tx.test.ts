@@ -1,31 +1,37 @@
 import mockAxios from "jest-mock-axios"
-import { UTXOSet, UTXO } from "src/apis/avm/utxos"
-import { AVMAPI } from "src/apis/avm/api"
-import { UnsignedTx, Tx } from "src/apis/avm/tx"
-import { KeyChain } from "src/apis/avm/keychain"
-import { SECPTransferInput, TransferableInput } from "src/apis/avm/inputs"
+import { UTXOSet, UTXO } from "../../../src/apis/avm/utxos"
+import { AVMAPI } from "../../../src/apis/avm/api"
+import { UnsignedTx, Tx } from "../../../src/apis/avm/tx"
+import { KeyChain } from "../../../src/apis/avm/keychain"
+import {
+  SECPTransferInput,
+  TransferableInput
+} from "../../../src/apis/avm/inputs"
 import createHash from "create-hash"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
   NFTTransferOutput,
   TransferableOutput
-} from "src/apis/avm/outputs"
-import { AVMConstants } from "src/apis/avm/constants"
-import { TransferableOperation, NFTTransferOperation } from "src/apis/avm/ops"
-import { Avalanche } from "src/index"
-import { UTF8Payload } from "src/utils/payload"
-import { InitialStates } from "src/apis/avm/initialstates"
-import { UnixNow } from "src/utils/helperfunctions"
-import { BaseTx } from "src/apis/avm/basetx"
-import { CreateAssetTx } from "src/apis/avm/createassettx"
-import { OperationTx } from "src/apis/avm/operationtx"
-import { ImportTx } from "src/apis/avm/importtx"
-import { ExportTx } from "src/apis/avm/exporttx"
-import { PlatformChainID } from "src/utils/constants"
-import { Defaults } from "src/utils/constants"
+} from "../../../src/apis/avm/outputs"
+import { AVMConstants } from "../../../src/apis/avm/constants"
+import {
+  TransferableOperation,
+  NFTTransferOperation
+} from "../../../src/apis/avm/ops"
+import { Avalanche } from "../../../src/index"
+import { UTF8Payload } from "../../../src/utils/payload"
+import { InitialStates } from "../../../src/apis/avm/initialstates"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { BaseTx } from "../../../src/apis/avm/basetx"
+import { CreateAssetTx } from "../../../src/apis/avm/createassettx"
+import { OperationTx } from "../../../src/apis/avm/operationtx"
+import { ImportTx } from "../../../src/apis/avm/importtx"
+import { ExportTx } from "../../../src/apis/avm/exporttx"
+import { PlatformChainID } from "../../../src/utils/constants"
+import { Defaults } from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
@@ -375,6 +381,31 @@ describe("Transactions", (): void => {
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true)
   })
 
+  test("Create small BaseTx with bad txid", async (): Promise<void> => {
+    const outs: TransferableOutput[] = []
+    const outputAmt: BN = new BN("266")
+    const output: SECPTransferOutput = new SECPTransferOutput(
+      outputAmt,
+      addrs1,
+      new BN(0),
+      1
+    )
+    const transferableOutput: TransferableOutput = new TransferableOutput(
+      avaxAssetID,
+      output
+    )
+    outs.push(transferableOutput)
+    const inputAmt: BN = new BN("400")
+    const input: SECPTransferInput = new SECPTransferInput(inputAmt)
+    input.addSignatureIdx(0, addrs1[0])
+
+    expect((): void => {
+      const txid: Buffer = bintools.cb58Decode(
+        "n8XHaaaa5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL"
+      )
+    }).toThrow("Error - BinTools.cb58Decode: invalid checksum")
+  })
+
   test("confirm inputTotal, outputTotal and fee are correct", async (): Promise<void> => {
     // AVAX assetID
     const assetID: Buffer = bintools.cb58Decode(
@@ -526,6 +557,14 @@ describe("Transactions", (): void => {
     const baseTx: BaseTx = new BaseTx(netid, blockchainID, outs, ins)
     const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
     expect(await api.checkGooseEgg(unsignedTx)).toBe(true)
+  })
+
+  test("bad asset ID", async (): Promise<void> => {
+    expect((): void => {
+      const assetID: Buffer = bintools.cb58Decode(
+        "badaaaan8XH5JY1EX5VYqDeAhB4Zd4GKxi9UNQy6oPpMsCAj1Q6xkiiL"
+      )
+    }).toThrow()
   })
 
   test("Creation UnsignedTx", (): void => {

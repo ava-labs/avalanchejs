@@ -1,7 +1,8 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
-import { AuthAPI } from "src/apis/auth/api"
+import { AuthAPI } from "../../../src/apis/auth/api"
+import { ErrorResponseObject } from "../../../src/utils/errors"
 
 describe("Auth", (): void => {
   const ip: string = "127.0.0.1"
@@ -37,7 +38,10 @@ describe("Auth", (): void => {
   })
 
   test("newToken", async (): Promise<void> => {
-    const result: Promise<string> = auth.newToken(password, testEndpoints)
+    const result: Promise<string | ErrorResponseObject> = auth.newToken(
+      password,
+      testEndpoints
+    )
     const payload: object = {
       result: {
         token: testToken
@@ -48,7 +52,7 @@ describe("Auth", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(testToken)

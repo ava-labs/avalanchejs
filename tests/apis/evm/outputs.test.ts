@@ -1,4 +1,4 @@
-import { EVMOutput } from "src/apis/evm"
+import { EVMOutput } from "../../../src/apis/evm"
 
 describe("Inputs", () => {
   test("EVMOutput comparator", () => {

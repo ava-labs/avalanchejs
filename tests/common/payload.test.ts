@@ -13,8 +13,8 @@ import {
   CCHAINADDRPayload,
   TXIDPayload,
   JSONPayload
-} from "src/utils/payload"
-import BinTools from "src/utils/bintools"
+} from "../../src/utils/payload"
+import BinTools from "../../src/utils/bintools"
 import BN from "bn.js"
 import * as bech32 from "bech32"
 let payloadTypes: PayloadTypes = PayloadTypes.getInstance()

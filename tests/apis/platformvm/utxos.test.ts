@@ -1,10 +1,10 @@
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import BinTools from "src/utils/bintools"
-import { UTXO, UTXOSet } from "src/apis/platformvm/utxos"
-import { AmountOutput } from "src/apis/platformvm/outputs"
-import { UnixNow } from "src/utils/helperfunctions"
-import { SerializedEncoding } from "src/utils"
+import BinTools from "../../../src/utils/bintools"
+import { UTXO, UTXOSet } from "../../../src/apis/platformvm/utxos"
+import { AmountOutput } from "../../../src/apis/platformvm/outputs"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { SerializedEncoding } from "../../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const display: SerializedEncoding = "display"

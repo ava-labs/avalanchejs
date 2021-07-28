@@ -36,6 +36,8 @@ export class AdminAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -57,6 +59,8 @@ export class AdminAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -75,6 +79,8 @@ export class AdminAPI extends JRPCAPI {
       params
     )
     return response.data.result.aliases
+      ? response.data.result.aliases
+      : response.data.result
   }
 
   /**
@@ -87,6 +93,8 @@ export class AdminAPI extends JRPCAPI {
       "admin.lockProfile"
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -99,6 +107,8 @@ export class AdminAPI extends JRPCAPI {
       "admin.memoryProfile"
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -112,6 +122,8 @@ export class AdminAPI extends JRPCAPI {
       "admin.startCPUProfiler"
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -124,6 +136,8 @@ export class AdminAPI extends JRPCAPI {
       "admin.stopCPUProfiler"
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**

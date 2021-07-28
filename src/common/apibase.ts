@@ -12,11 +12,13 @@ import AvalancheCore from "../avalanche"
  * Response data for HTTP requests.
  */
 export class RequestResponseData {
-  data: any
-  headers: any
-  status: number
-  statusText: string
-  request: ClientRequest | XMLHttpRequest
+  constructor(
+    public data: any,
+    public headers: any,
+    public status: number,
+    public statusText: string,
+    public request: ClientRequest | XMLHttpRequest
+  ) {}
 }
 
 /**
