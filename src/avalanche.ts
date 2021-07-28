@@ -277,12 +277,13 @@ export default class AvalancheCore {
     config.params = getdata
     const resp: AxiosResponse<any> = await axios.request(config)
     // purging all that is axios
-    const xhrdata: RequestResponseData = new RequestResponseData()
-    xhrdata.data = resp.data
-    xhrdata.headers = resp.headers
-    xhrdata.request = resp.request
-    xhrdata.status = resp.status
-    xhrdata.statusText = resp.statusText
+    const xhrdata: RequestResponseData = new RequestResponseData(
+      resp.data,
+      resp.headers,
+      resp.status,
+      resp.statusText,
+      resp.request
+    )
     return xhrdata
   }
 

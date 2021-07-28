@@ -4,8 +4,22 @@
  */
 
 import { StoreAPI } from "store2"
+import { ClientRequest } from "http"
 import DB from "../utils/db"
 import AvalancheCore from "../avalanche"
+
+/**
+ * Response data for HTTP requests.
+ */
+export class RequestResponseData {
+  constructor(
+    public data: any,
+    public headers: any,
+    public status: number,
+    public statusText: string,
+    public request: ClientRequest | XMLHttpRequest
+  ) {}
+}
 
 /**
  * Abstract class defining a generic endpoint that all endpoints must implement (extend).

@@ -4,7 +4,8 @@
  */
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
-import { RequestResponseData, ErrorResponseObject } from "../../common/apibase"
+import { RequestResponseData } from "../../common/apibase"
+import { ErrorResponseObject } from "../../utils/errors"
 
 /**
  * Class for interacting with a node's AuthAPI.

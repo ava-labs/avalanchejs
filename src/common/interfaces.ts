@@ -145,21 +145,3 @@ export interface Serialized {
   notes: string
   fields: object
 }
-
-/**
- * Response data for HTTP requests.
- */
-
-export interface RequestResponseData {
-  data: any
-  headers: any
-  status: number
-  statusText: string
-  request: ClientRequest | XMLHttpRequest
-}
-
-export interface ErrorResponseObject {
-  code: number
-  message: string
-  data?: null
-}
