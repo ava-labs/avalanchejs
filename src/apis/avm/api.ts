@@ -38,9 +38,13 @@ import {
   ExportAVAXInterface,
   ExportInterface,
   ExportKeyInterface,
+  GetAllBalancesInterface,
   GetAVAXAssetIDInterface,
   GetBalanceInterface,
+  ImportAVAXInterface,
+  ImportInterface,
   ImportKeyInterface,
+  ListAddressesInterface,
   MintInterface
 } from "src/common/interfaces"
 
@@ -641,11 +645,12 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-    const params: any = {
-      to,
-      sourceChain,
+
+    const params: ImportInterface = {
       username,
-      password
+      password,
+      to,
+      sourceChain
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.import",
@@ -671,7 +676,8 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-    const params: any = {
+
+    const params: ImportAVAXInterface = {
       to,
       sourceChain,
       username,
@@ -696,7 +702,8 @@ export class AVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string[]> => {
-    const params: any = {
+
+    const params: ListAddressesInterface = {
       username,
       password
     }
@@ -721,7 +728,7 @@ export class AVMAPI extends JRPCAPI {
         "Error - AVMAPI.getAllBalances: Invalid address format"
       )
     }
-    const params: any = {
+    const params: GetAllBalancesInterface = {
       address
     }
     const response: RequestResponseData = await this.callMethod(

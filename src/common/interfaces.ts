@@ -245,3 +245,34 @@ export interface ExportAVAXInterface {
   to: string
   amount: BN
 }
+
+export interface ImportInterface {
+  username: string
+  password: string
+  to: string
+  sourceChain: string
+}
+
+export interface ImportAVAXInterface {
+  username: string
+  password: string
+  to: string
+  sourceChain: string
+}
+
+export interface ListAddressesInterface {
+  username: string
+  password: string
+}
+
+export interface GetAllBalancesInterface {
+  address: string
+}
+
+export interface GetAllBalancesInterface {
+  address: string
+}
+
+export interface GetAssetDescriptionInterface {
+  assetID: Buffer | string
+}
