@@ -36,7 +36,11 @@ export default class AvalancheCore {
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", "git", "ws", etc. Defaults to https
    */
-  setAddress = (host: string = "api.avax.network", port: number = 443, protocol: string = "https") => {
+  setAddress = (
+    host: string = "api.avax.network",
+    port: number = 443,
+    protocol: string = "https"
+  ) => {
     this.host = host
     this.port = port
     this.protocol = protocol
@@ -422,7 +426,11 @@ export default class AvalancheCore {
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", "git", "ws", etc. Defaults to https
    */
-  constructor(host: string = "api.avax.network", port: number = 443, protocol: string = "https") {
+  constructor(
+    host: string = "api.avax.network",
+    port: number = 443,
+    protocol: string = "https"
+  ) {
     this.setAddress(host, port, protocol)
   }
 }

@@ -5,7 +5,11 @@
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
-import { AliasChainInterface, AliasInterface, GetChainAliasesInterface } from "src/common/interfaces"
+import {
+  AliasChainInterface,
+  AliasInterface,
+  GetChainAliasesInterface
+} from "src/common/interfaces"
 
 /**
  * Class for interacting with a node's AdminAPI.

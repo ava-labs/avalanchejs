@@ -6,7 +6,11 @@ import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
 import { ErrorResponseObject } from "../../utils/errors"
-import { ChangePasswordInterface, NewTokenInterface, RevokeTokenInterface } from "src/common"
+import {
+  ChangePasswordInterface,
+  NewTokenInterface,
+  RevokeTokenInterface
+} from "src/common"
 
 /**
  * Class for interacting with a node's AuthAPI.
