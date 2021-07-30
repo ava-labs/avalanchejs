@@ -197,12 +197,12 @@ export class ImportTx extends BaseTx {
     const sigs: Credential[] = super.signPartially(msg, kc, address)
     for (let i: number = 0; i < this.importIns.length; i++) {
       const cred: Credential = SelectCredentialClass(
-          this.importIns[i].getInput().getCredentialID()
+        this.importIns[i].getInput().getCredentialID()
       )
       const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
         if (!address.equals(sigidxs[j].getSource())) {
-          continue;
+          continue
         }
         const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
         const signval: Buffer = keypair.sign(msg)
