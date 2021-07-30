@@ -27,7 +27,8 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
-  Address, Credential,
+  Address,
+  Credential,
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
@@ -35,8 +36,8 @@ import {
 } from "../../common"
 import { TransferableOutput } from "../platformvm/outputs"
 import { Serialization, SerializedType } from "../../utils"
-import createHash from "create-hash";
-import {KeyPair} from "../avm";
+import createHash from "create-hash"
+import { KeyPair } from "../avm"
 
 /**
  * @ignore
@@ -817,56 +818,55 @@ export class PlatformVMAPI extends JRPCAPI {
   composeSignature = (txs: Tx[]): Tx => {
     if (!txs.length) {
       throw new TransactionError(
-          "Error - composeSignature: provided tx list is empty"
+        "Error - composeSignature: provided tx list is empty"
       )
     }
 
-    const unsignedTx = txs[0].getUnsignedTx();
+    const unsignedTx = txs[0].getUnsignedTx()
 
     const txbuff = unsignedTx.toBuffer()
     const msg: Buffer = Buffer.from(
-        createHash("sha256").update(txbuff).digest()
+      createHash("sha256").update(txbuff).digest()
     )
 
     const deriveAddressFromTx = (tx: Tx): Address => {
       const creds = tx.getCredentials()
       if (!creds.length) {
         throw new TransactionError(
-            "Error - composeSignature: tx doesn't have Credentials"
+          "Error - composeSignature: tx doesn't have Credentials"
         )
       }
-      const sigs = creds[0].getSignatures();
+      const sigs = creds[0].getSignatures()
       if (!sigs.length) {
         throw new TransactionError(
-            "Error - composeSignature: tx doesn't have Signature"
+          "Error - composeSignature: tx doesn't have Signature"
         )
       }
       const sigA = creds[0].getSignatures()[0]
 
       const kp: KeyPair = new KeyPair(this.keychain.hrp, this.keychain.chainid)
       const pubKey = kp.recover(msg, sigA.toBuffer())
-      const addressBuf = kp.addressFromPublicKey(pubKey);
+      const addressBuf = kp.addressFromPublicKey(pubKey)
 
-      const address = new Address();
-      address.fromBuffer(addressBuf);
+      const address = new Address()
+      address.fromBuffer(addressBuf)
 
-      return address;
+      return address
     }
 
     txs = txs.sort((a: Tx, b: Tx): 1 | -1 | 0 => {
-      const addressA = deriveAddressFromTx(a);
-      const addressB = deriveAddressFromTx(b);
+      const addressA = deriveAddressFromTx(a)
+      const addressB = deriveAddressFromTx(b)
 
-      return Address.comparator()(addressA, addressB);
-    });
+      return Address.comparator()(addressA, addressB)
+    })
 
-
-    const result: Credential[] = [];
+    const result: Credential[] = []
     for (let i: number = 0; i < txs.length; i++) {
       const creds = txs[i].getCredentials()
       for (let j: number = 0; j < creds.length; j++) {
         if (!result[j]) {
-          result[j] = creds[j].clone();
+          result[j] = creds[j].clone()
         } else {
           result[j].addSignature(creds[j].getSignatures()[0])
         }

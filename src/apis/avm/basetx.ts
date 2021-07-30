@@ -176,11 +176,13 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   signPartially(msg: Buffer, kc: KeyChain, address: Buffer): Credential[] {
     const sigs: Credential[] = []
     for (let i: number = 0; i < this.ins.length; i++) {
-      const cred: Credential = SelectCredentialClass(this.ins[i].getInput().getCredentialID())
+      const cred: Credential = SelectCredentialClass(
+        this.ins[i].getInput().getCredentialID()
+      )
       const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
         if (!address.equals(sigidxs[j].getSource())) {
-          continue;
+          continue
         }
         const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
         const signval: Buffer = keypair.sign(msg)

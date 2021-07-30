@@ -42,8 +42,8 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import {BaseTx} from "../../../src/apis/avm";
-import {Credential} from "../../../src/common";
+import { BaseTx } from "../../../src/apis/avm"
+import { Credential } from "../../../src/common"
 
 /**
  * @ignore
@@ -1161,43 +1161,58 @@ describe("AVMAPI", (): void => {
     })
 
     test("signTxPartially and composeSignatures", async (): Promise<void> => {
-      const a = addrs1.map(a => api.parseAddress(a));
+      const a = addrs1.map((a) => api.parseAddress(a))
 
-      const txu: UnsignedTx = await avm.buildBaseTx(set, new BN(amnt), bintools.cb58Encode(assetID), addrs3, addrs1, addrs1);
-      
+      const txu: UnsignedTx = await avm.buildBaseTx(
+        set,
+        new BN(amnt),
+        bintools.cb58Encode(assetID),
+        addrs3,
+        addrs1,
+        addrs1
+      )
+
       const tx1 = avm.signTxPartially(txu, a[0])
       const tx1Creds: Credential[] = tx1.getCredentials()
       expect(tx1Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(tx1Creds[0].getSignatures().length).toBe(1)
 
       const tx2 = avm.signTxPartially(txu, a[1])
-      const tx2Creds: Credential[] = tx2.getCredentials();
+      const tx2Creds: Credential[] = tx2.getCredentials()
       expect(tx2Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(tx2Creds[0].getSignatures().length).toBe(1)
 
       const tx3 = avm.signTxPartially(txu, a[2])
-      const tx3Creds: Credential[] = tx3.getCredentials();
+      const tx3Creds: Credential[] = tx3.getCredentials()
       expect(tx3Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(tx3Creds[0].getSignatures().length).toBe(1)
-      
-      const txs1: Tx[] = [tx1, tx2, tx3];
-      
-      const finalTx1: Tx = avm.composeSignature(txs1);
+
+      const txs1: Tx[] = [tx1, tx2, tx3]
+
+      const finalTx1: Tx = avm.composeSignature(txs1)
       const finalTx1Creds: Credential[] = finalTx1.getCredentials()
       expect(finalTx1Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(finalTx1Creds[0].getSignatures().length).toBe(3)
 
       const txSingleSigned: Tx = avm.signTx(txu)
-      expect(finalTx1.getCredentials().map(cred => cred.serialize())).toStrictEqual(txSingleSigned.getCredentials().map((cred => cred.serialize())))
+      expect(
+        finalTx1.getCredentials().map((cred) => cred.serialize())
+      ).toStrictEqual(
+        txSingleSigned.getCredentials().map((cred) => cred.serialize())
+      )
 
       // change order of transactions
-      const txs2: Tx[] = [tx2, tx3, tx1];
-      const finalTx2: Tx = avm.composeSignature(txs2);
+      const txs2: Tx[] = [tx2, tx3, tx1]
+      const finalTx2: Tx = avm.composeSignature(txs2)
       const finalTx2Creds: Credential[] = finalTx2.getCredentials()
       expect(finalTx2Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(finalTx2Creds[0].getSignatures().length).toBe(3)
 
-      expect(finalTx2.getCredentials().map(cred => cred.serialize())).toStrictEqual(txSingleSigned.getCredentials().map((cred => cred.serialize())))
+      expect(
+        finalTx2.getCredentials().map((cred) => cred.serialize())
+      ).toStrictEqual(
+        txSingleSigned.getCredentials().map((cred) => cred.serialize())
+      )
     })
 
     test("buildBaseTx1", async (): Promise<void> => {
