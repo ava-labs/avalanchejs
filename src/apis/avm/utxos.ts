@@ -937,7 +937,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         input
       )
       const from: Buffer[] = output.getAddresses()
-      const spenders: Buffer[] = output.getSpenders(from, asOf)
+      const spenders: Buffer[] = output.getSpenders(fromAddresses, asOf)
       for (let j: number = 0; j < spenders.length; j++) {
         const idx: number = output.getAddressIdx(spenders[j])
         if (idx === -1) {
