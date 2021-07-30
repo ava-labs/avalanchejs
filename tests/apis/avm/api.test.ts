@@ -359,6 +359,47 @@ describe("AVMAPI", (): void => {
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
   })
 
+  test("getBalance includePartial", async (): Promise<void> => {
+    const balance: BN = new BN("100", 10)
+    const respobj = {
+      balance,
+      utxoIDs: [
+        {
+          txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
+          outputIndex: 0
+        }
+      ]
+    }
+
+    const result: Promise<object> = api.getBalance(addrA, "ATH", true)
+    const payload: object = {
+      result: respobj
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    const expectedRequestPayload = {
+      id: 1,
+      method: "avm.getBalance",
+      params: {
+        address: addrA,
+        assetID: "ATH",
+        includePartial: true
+      },
+      jsonrpc: "2.0"
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: object = await result
+
+    expect(mockAxios.request).toBeCalledWith(
+      expect.objectContaining({ data: JSON.stringify(expectedRequestPayload) })
+    )
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
+  })
+
   test("exportKey", async (): Promise<void> => {
     const key: string = "sdfglvlj2h3v45"
 

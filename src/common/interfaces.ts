@@ -185,6 +185,7 @@ export interface GetAVAXAssetIDInterface {
 export interface GetBalanceInterface {
   address: string
   assetID: string
+  includePartial: boolean
 }
 
 export interface CreateAddressInterface {
