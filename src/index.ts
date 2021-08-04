@@ -90,10 +90,10 @@ export default class Avalanche extends AvalancheCore {
   /**
    * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
    *
-   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs. Defaults to the Ava Labs RPC nodes
-   * @param port The port to resolve to reach the Avalanche Client RPC APIs. Defaults to 443 for SSL
+   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs
+   * @param port The port to resolve to reach the Avalanche Client RPC APIs
    * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc. Defaults to https
+   * ex: "http", "https", "git", "ws", etc. Defaults to http
    * @param networkID Sets the NetworkID of the class. Default [[DefaultNetworkID]]
    * @param XChainID Sets the blockchainID for the AVM. Will try to auto-detect,
    * otherwise default "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed"
@@ -103,9 +103,9 @@ export default class Avalanche extends AvalancheCore {
    * @param skipinit Skips creating the APIs. Defaults to false
    */
   constructor(
-    host: string = "api.avax.network",
-    port: number = 443,
-    protocol: string = "https",
+    host: string,
+    port: number,
+    protocol: string = "http",
     networkID: number = DefaultNetworkID,
     XChainID: string = undefined,
     CChainID: string = undefined,
