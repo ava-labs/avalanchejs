@@ -1,11 +1,11 @@
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import {
   SECPTransferOutput,
   SelectOutputClass
-} from "src/apis/platformvm/outputs"
-import { Output } from "src/common/output"
+} from "../../../src/apis/platformvm/outputs"
+import { Output } from "../../../src/common/output"
 
 const bintools: BinTools = BinTools.getInstance()
 

@@ -1,10 +1,10 @@
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import BinTools from "src/utils/bintools"
-import { UTXO, UTXOSet } from "src/apis/avm/utxos"
-import { AmountOutput } from "src/apis/avm/outputs"
-import { UnixNow } from "src/utils/helperfunctions"
-import { SerializedEncoding } from "src/utils"
+import BinTools from "../../../src/utils/bintools"
+import { UTXO, UTXOSet } from "../../../src/apis/avm/utxos"
+import { AmountOutput } from "../../../src/apis/avm/outputs"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { SerializedEncoding } from "../../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const display: SerializedEncoding = "display"
@@ -124,6 +124,17 @@ describe("UTXOSet", (): void => {
     utxo.fromString(utxostrs[0])
     const setArray: UTXO[] = set.getAllUTXOs()
     expect(utxo.toString()).toBe(setArray[0].toString())
+  })
+
+  test("bad creation", (): void => {
+    const set: UTXOSet = new UTXOSet()
+    const bad: string = bintools.cb58Encode(Buffer.from("aasdfasd", "hex"))
+    set.add(bad)
+    const utxo: UTXO = new UTXO()
+
+    expect((): void => {
+      utxo.fromString(bad)
+    }).toThrow()
   })
 
   test("Mutliple add", (): void => {
@@ -345,7 +356,6 @@ describe("UTXOSet", (): void => {
         expect((): void => {
           set.mergeByRule(setA, "ERROR")
         }).toThrow()
-        const setArray: UTXO[] = setG.getAllUTXOs()
       })
 
       test("intersection", (): void => {

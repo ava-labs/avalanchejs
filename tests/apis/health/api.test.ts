@@ -1,14 +1,8 @@
 import mockAxios from "jest-mock-axios"
 
 import { Avalanche } from "src"
-import BinTools from "src/utils/bintools"
-import { HealthAPI } from "src/apis/health/api"
+import { HealthAPI } from "../../../src/apis/health/api"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-
-/**
- * @ignore
- */
-const bintools: BinTools = BinTools.getInstance()
 
 describe("Health", (): void => {
   const ip: string = "127.0.0.1"

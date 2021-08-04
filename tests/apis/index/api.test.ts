@@ -1,8 +1,7 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
-import { IndexAPI } from "src/apis/index/api"
-import { GetLastAcceptedResponse } from "src/common/interfaces"
+import { IndexAPI } from "../../../src/apis/index/api"
 
 describe("Index", () => {
   const ip: string = "127.0.0.1"

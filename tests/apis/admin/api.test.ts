@@ -1,7 +1,7 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
-import { AdminAPI } from "src/apis/admin/api"
+import { AdminAPI } from "../../../src/apis/admin/api"
 
 describe("Admin", (): void => {
   const ip: string = "127.0.0.1"
@@ -65,6 +65,26 @@ describe("Admin", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(true)
+  })
+
+  test("badAliasChain", async (): Promise<void> => {
+    const ch: any = 2
+    const al: string = "myChasdfasdfasain"
+    const result: Promise<boolean> = admin.aliasChain(ch, al)
+    const payload: object = {
+      result: {
+        success: false
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["success"]).toBe(false)
   })
 
   test("getChainAliases", async (): Promise<void> => {

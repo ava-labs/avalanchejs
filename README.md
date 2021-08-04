@@ -37,13 +37,13 @@ AvalancheJS requires Node.js LTS version 14.16.0 or higher to compile.
 
 ### Installation
 
-Avalanche is available for install via `npm`:
+Avalanche is available for install via `yarn`:
 
-`npm install --save avalanche`
+`yarn add avalanche`
 
 You can also pull the repo down directly and build it from scratch:
 
-`npm run build`
+`yarn build`
 
 This will generate a pure Javascript library and place it in a folder named "web" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.
 

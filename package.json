@@ -5,21 +5,22 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",
-    "prebundle": "npm run build",
+    "prebundle": "yarn build",
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
-    "prepublish": "npm run build",
-    "release:prepare": "rm -rf ./dist ./node_modules ./package-lock.json && npm install && npm run build && npm run bundle && npm test && git status",
+    "prepublish": "yarn build",
+    "release:prepare": "rm -rf ./dist ./node_modules ./package-lock.json && yarn install && yarn build && yarn bundle && yarn test && git status",
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
     "docsmd": "npx typedoc --readme none --plugin typedoc-plugin-markdown,typedoc-plugin-external-module-name --theme markdown --out docsMD src",
-    "docs": "npm run docshtml && npm run docsmd",
+    "docs": "yarn docshtml && yarn docsmd",
     "prettier-src": "prettier --write ./src",
     "prettier-examples": "prettier --write ./examples",
     "prettier-tests": "prettier --write ./tests",
     "prettier-web": "prettier --write ./web",
-    "prettier": "npm run prettier-src && npm run prettier-examples && npm run prettier-tests && npm run prettier-web",
+    "prettier-mocks": "prettier --write ./__mocks__",
+    "prettier": "yarn prettier-src && yarn prettier-examples && yarn prettier-tests && yarn prettier-web && yarn prettier-mocks",
     "prepare": "husky install"
   },
   "repository": {
@@ -72,8 +73,7 @@
     "husky": "^7.0.0"
   },
   "engines": {
-    "node": ">=14.17.0",
-    "npm": ">=6.14.11"
+    "node": ">=14.17.0"
   },
   "dependencies": {
     "axios": "0.21.1",

@@ -1,43 +1,46 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
-import { AVMAPI } from "src/apis/avm/api"
-import { KeyPair, KeyChain } from "src/apis/avm/keychain"
+import { AVMAPI } from "../../../src/apis/avm/api"
+import { KeyPair, KeyChain } from "../../../src/apis/avm/keychain"
 import { Buffer } from "buffer/"
 import BN from "bn.js"
-import BinTools from "src/utils/bintools"
-import { UTXOSet, UTXO } from "src/apis/avm/utxos"
-import { TransferableInput, SECPTransferInput } from "src/apis/avm/inputs"
+import BinTools from "../../../src/utils/bintools"
+import { UTXOSet, UTXO } from "../../../src/apis/avm/utxos"
+import {
+  TransferableInput,
+  SECPTransferInput
+} from "../../../src/apis/avm/inputs"
 import createHash from "create-hash"
-import { UnsignedTx, Tx } from "src/apis/avm/tx"
-import { AVMConstants } from "src/apis/avm/constants"
+import { UnsignedTx, Tx } from "../../../src/apis/avm/tx"
+import { AVMConstants } from "../../../src/apis/avm/constants"
 import {
   TransferableOutput,
   SECPTransferOutput,
   NFTMintOutput,
   NFTTransferOutput,
   SECPMintOutput
-} from "src/apis/avm/outputs"
+} from "../../../src/apis/avm/outputs"
 import {
   NFTTransferOperation,
   TransferableOperation,
   SECPMintOperation
-} from "src/apis/avm/ops"
+} from "../../../src/apis/avm/ops"
 import * as bech32 from "bech32"
-import { UTF8Payload } from "src/utils/payload"
-import { InitialStates } from "src/apis/avm/initialstates"
-import { Defaults } from "src/utils/constants"
-import { UnixNow } from "src/utils/helperfunctions"
-import { OutputOwners } from "src/common/output"
-import { MinterSet } from "src/apis/avm/minterset"
-import { PlatformChainID } from "src/utils/constants"
-import { PersistanceOptions } from "src/utils/persistenceoptions"
-import { ONEAVAX } from "src/utils/constants"
+import { UTF8Payload } from "../../../src/utils/payload"
+import { InitialStates } from "../../../src/apis/avm/initialstates"
+import { Defaults } from "../../../src/utils/constants"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { OutputOwners } from "../../../src/common/output"
+import { MinterSet } from "../../../src/apis/avm/minterset"
+import { PlatformChainID } from "../../../src/utils/constants"
+import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
+import { ONEAVAX } from "../../../src/utils/constants"
 import {
   Serializable,
   Serialization,
   SerializedEncoding,
   SerializedType
-} from "src/utils/serialization"
+} from "../../../src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**
@@ -111,6 +114,74 @@ describe("AVMAPI", (): void => {
 
   afterEach((): void => {
     mockAxios.reset()
+  })
+
+  test("fails to send with incorrect username", async (): Promise<void> => {
+    const memo: string = "hello world"
+    const incorrectUserName: string = "asdfasdfsa"
+    const message: string = `problem retrieving user: incorrect password for user "${incorrectUserName}"`
+    const result: Promise<object> = api.send(
+      incorrectUserName,
+      password,
+      "assetId",
+      10,
+      addrA,
+      [addrB],
+      addrA,
+      memo
+    )
+
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: object = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
+  })
+
+  test("fails to send with incorrect Password", async (): Promise<void> => {
+    const memo: string = "hello world"
+    const incorrectPassword: string = "asdfasdfsa"
+    const message: string = `problem retrieving user: incorrect password for user "${incorrectPassword}"`
+    const result: Promise<object> = api.send(
+      username,
+      incorrectPassword,
+      "assetId",
+      10,
+      addrA,
+      [addrB],
+      addrA,
+      memo
+    )
+
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: object = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
   })
 
   test("can Send 1", async (): Promise<void> => {

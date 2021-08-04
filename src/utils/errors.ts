@@ -339,3 +339,9 @@ export class InvalidEntropy extends AvalancheError {
     Object.setPrototypeOf(this, InvalidEntropy.prototype)
   }
 }
+
+export interface ErrorResponseObject {
+  code: number
+  message: string
+  data?: null
+}

@@ -23,8 +23,8 @@ import { utils } from "ethers"
  * the {@link https://github.com/feross/buffer|feross's Buffer class}.
  *
  * ```js
- * const bintools = BinTools.getInstance();
- * let b58str = bintools.bufferToB58(Buffer.from("Wubalubadubdub!"));
+ * const bintools: BinTools = BinTools.getInstance();
+ * const b58str:  = bintools.bufferToB58(Buffer.from("Wubalubadubdub!"));
  * ```
  */
 export default class BinTools {

@@ -237,13 +237,13 @@ export class EVMAPI extends JRPCAPI {
    * @param blockHeight The block height
    * @param assetID The asset ID
    *
-   * @returns Returns a Promise<string> containing the balance
+   * @returns Returns a Promise<object> containing the balance
    */
   getAssetBalance = async (
     hexAddress: string,
     blockHeight: string,
     assetID: string
-  ): Promise<string> => {
+  ): Promise<object> => {
     const params: string[] = [hexAddress, blockHeight, assetID]
 
     const method: string = "eth_getAssetBalance"
@@ -253,7 +253,7 @@ export class EVMAPI extends JRPCAPI {
       params,
       path
     )
-    return response.data.result
+    return response.data
   }
 
   /**
@@ -273,6 +273,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.status
+      ? response.data.result.status
+      : response.data.result
   }
 
   /**
@@ -325,6 +327,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -361,6 +365,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -446,6 +452,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -484,6 +492,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -514,6 +524,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.address
+      ? response.data.result.address
+      : response.data.result
   }
 
   /**
@@ -549,6 +561,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.txID
+      ? response.data.result.txID
+      : response.data.result
   }
 
   /**
@@ -579,6 +593,8 @@ export class EVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.privateKey
+      ? response.data.result.privateKey
+      : response.data.result
   }
 
   /**

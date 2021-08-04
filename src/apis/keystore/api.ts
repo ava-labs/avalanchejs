@@ -34,6 +34,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -54,6 +56,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.user
+      ? response.data.result.user
+      : response.data.result
   }
 
   /**
@@ -80,6 +84,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -112,6 +118,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**

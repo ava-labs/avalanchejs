@@ -1,7 +1,7 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
-import { KeystoreAPI } from "src/apis/keystore/api"
+import { KeystoreAPI } from "../../../src/apis/keystore/api"
 
 describe("Keystore", (): void => {
   const ip: string = "127.0.0.1"
@@ -47,6 +47,28 @@ describe("Keystore", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(true)
+  })
+
+  test("createUser with weak password", async (): Promise<void> => {
+    const result: Promise<boolean> = keystore.createUser(username, "aaa")
+    const message: string = "password is too weak"
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: boolean = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
   })
 
   test("deleteUser", async (): Promise<void> => {

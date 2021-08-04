@@ -1,28 +1,28 @@
 import mockAxios from "jest-mock-axios"
-import { UTXOSet, UTXO } from "src/apis/platformvm/utxos"
-import { PlatformVMAPI } from "src/apis/platformvm/api"
-import { UnsignedTx, Tx } from "src/apis/platformvm/tx"
-import { KeyChain } from "src/apis/platformvm/keychain"
+import { UTXOSet, UTXO } from "../../../src/apis/platformvm/utxos"
+import { PlatformVMAPI } from "../../../src/apis/platformvm/api"
+import { UnsignedTx, Tx } from "../../../src/apis/platformvm/tx"
+import { KeyChain } from "../../../src/apis/platformvm/keychain"
 import {
   SECPTransferInput,
   TransferableInput
-} from "src/apis/platformvm/inputs"
+} from "../../../src/apis/platformvm/inputs"
 import createHash from "create-hash"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
 import {
   SECPTransferOutput,
   TransferableOutput
-} from "src/apis/platformvm/outputs"
-import { PlatformVMConstants } from "src/apis/platformvm/constants"
-import { Avalanche } from "src/index"
-import { UTF8Payload } from "src/utils/payload"
-import { UnixNow } from "src/utils/helperfunctions"
-import { BaseTx } from "src/apis/platformvm/basetx"
-import { ImportTx } from "src/apis/platformvm/importtx"
-import { ExportTx } from "src/apis/platformvm/exporttx"
-import { PlatformChainID } from "src/utils/constants"
+} from "../../../src/apis/platformvm/outputs"
+import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
+import { Avalanche } from "../../../src/index"
+import { UTF8Payload } from "../../../src/utils/payload"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { BaseTx } from "../../../src/apis/platformvm/basetx"
+import { ImportTx } from "../../../src/apis/platformvm/importtx"
+import { ExportTx } from "../../../src/apis/platformvm/exporttx"
+import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**

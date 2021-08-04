@@ -8,6 +8,7 @@ import createHash from "create-hash"
 import BinTools from "../utils/bintools"
 import { StandardKeyPair, StandardKeyChain } from "./keychain"
 import { PublicKeyError } from "../utils/errors"
+import { BNInput } from "elliptic"
 
 /**
  * @ignore
@@ -22,12 +23,12 @@ const ec: elliptic.ec = new EC("secp256k1")
 /**
  * @ignore
  */
-const ecparams = ec.curve
+const ecparams: any = ec.curve
 
 /**
  * @ignore
  */
-const BN = ecparams.n.constructor
+const BN: any = ecparams.n.constructor
 
 /**
  * @ignore
@@ -44,8 +45,8 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    * @ignore
    */
   protected _sigFromSigBuffer = (sig: Buffer): elliptic.ec.SignatureOptions => {
-    const r = new BN(bintools.copyFrom(sig, 0, 32))
-    const s = new BN(bintools.copyFrom(sig, 32, 64))
+    const r: BNInput = new BN(bintools.copyFrom(sig, 0, 32))
+    const s: BNInput = new BN(bintools.copyFrom(sig, 32, 64))
     const recoveryParam: number = bintools
       .copyFrom(sig, 64, 65)
       .readUIntBE(0, 1)
@@ -84,15 +85,19 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
   importKey = (privk: Buffer): boolean => {
     this.keypair = ec.keyFromPrivate(privk.toString("hex"), "hex")
     // doing hex translation to get Buffer class
-    this.privk = Buffer.from(
-      this.keypair.getPrivate("hex").padStart(64, "0"),
-      "hex"
-    )
-    this.pubk = Buffer.from(
-      this.keypair.getPublic(true, "hex").padStart(66, "0"),
-      "hex"
-    )
-    return true // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
+    try {
+      this.privk = Buffer.from(
+        this.keypair.getPrivate("hex").padStart(64, "0"),
+        "hex"
+      )
+      this.pubk = Buffer.from(
+        this.keypair.getPublic(true, "hex").padStart(66, "0"),
+        "hex"
+      )
+      return true // silly I know, but the interface requires so it returns true on success, so if Buffer fails validation...
+    } catch (error) {
+      return false
+    }
   }
 
   /**
@@ -145,7 +150,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    * @returns A cb58 serialized string representation of the private key
    */
   getPrivateKeyString = (): string => {
-    return "PrivateKey-" + bintools.cb58Encode(this.privk)
+    return `PrivateKey-${bintools.cb58Encode(this.privk)}`
   }
 
   /**
@@ -165,7 +170,9 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
    */
   sign = (msg: Buffer): Buffer => {
-    const sigObj = this.keypair.sign(msg, undefined, { canonical: true })
+    const sigObj: elliptic.ec.Signature = this.keypair.sign(msg, undefined, {
+      canonical: true
+    })
     const recovery: Buffer = Buffer.alloc(1)
     recovery.writeUInt8(sigObj.recoveryParam, 0)
     const r: Buffer = Buffer.from(sigObj.r.toArray("be", 32)) //we have to skip native Buffer class, so this is the way
@@ -224,7 +231,7 @@ export abstract class SECP256k1KeyChain<
    */
   makeKey: () => SECPKPClass
 
-  addKey(newKey: SECPKPClass) {
+  addKey(newKey: SECPKPClass): void {
     super.addKey(newKey)
   }
 
