@@ -24,7 +24,7 @@ const main = async (): Promise<any> => {
   const cAddresses: Buffer[] = cchain.keyChain().getAddresses()
 
   for (const each of cAddresses) {
-    let hexAddress = bintools.cb58Encode(each)
+    const hexAddress: string = bintools.cb58Encode(each)
     console.log("hexAddress", hexAddress)
     console.log(bintools.isHex(`0x${hexAddress}`))
   }
