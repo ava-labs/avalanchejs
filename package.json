@@ -61,7 +61,7 @@
     "jest": "^26.2.2",
     "jest-mock-axios": "^3.2.0",
     "prettier": "^2.3.2",
-    "terser-webpack-plugin": "5.1.2",
+    "terser-webpack-plugin": "5.1.4",
     "ts-jest": "^26.1.4",
     "ts-loader": "^6.2.2",
     "typedoc": "^0.21.2",
