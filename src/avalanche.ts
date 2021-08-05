@@ -31,16 +31,12 @@ export default class AvalancheCore {
   /**
    * Sets the address and port of the main Avalanche Client.
    *
-   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs. Defaults to the Ava Labs RPC nodes
-   * @param port The port to resolve to reach the Avalanche Client RPC APIs. Defaults to 443 for SSL
+   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs.
+   * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", "git", "ws", etc. Defaults to https
    */
-  setAddress = (
-    host: string = "api.avax.network",
-    port: number = 443,
-    protocol: string = "https"
-  ) => {
+  setAddress = (host: string, port: number, protocol: string = "http") => {
     this.host = host
     this.port = port
     this.protocol = protocol
@@ -421,16 +417,11 @@ export default class AvalancheCore {
   /**
    * Creates a new Avalanche instance. Sets the address and port of the main Avalanche Client.
    *
-   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs. Defaults to the Ava Labs RPC nodes
-   * @param port The port to resolve to reach the Avalanche Client RPC APIs. Defaults to 443 for SSL
-   * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc. Defaults to https
+   * @param host The hostname to resolve to reach the Avalanche Client APIs
+   * @param port The port to resolve to reach the Avalanche Client APIs
+   * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
    */
-  constructor(
-    host: string = "api.avax.network",
-    port: number = 443,
-    protocol: string = "https"
-  ) {
+  constructor(host: string, port: number, protocol: string = "http") {
     this.setAddress(host, port, protocol)
   }
 }
