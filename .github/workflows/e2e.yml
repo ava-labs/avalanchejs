@@ -6,8 +6,24 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+        with:
+          path: avalanchejs
+      - uses: actions/checkout@v2
+        with:
+          repository: ava-labs/avalanchego
+          path: avalanchego
+          ref: master
       - uses: actions/setup-node@v2
         with:
           cache: yarn
           node-version: '14'
-      - run: yarn install --frozen-lockfile
+      - uses: actions/setup-go@v1
+        with:
+          go-version: '1.15'
+      - run: |
+          cd avalanchejs
+          yarn install --frozen-lockfile
+      - run: |
+          cd avalanchego
+          ./scripts/build.sh
+      - run: pwd
