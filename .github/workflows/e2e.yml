@@ -15,4 +15,4 @@ jobs:
         env: 
           DOCKER_USERNAME: ${{ secrets.docker_username }}
           DOCKER_PASS: ${{ secrets.docker_pass }}
-        run: .github/workflows/e2e.sh ${{ github.head_ref }}
+        run: .github/workflows/e2e.sh ${GITHUB_REF##*/} 
