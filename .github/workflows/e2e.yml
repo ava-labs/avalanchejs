@@ -6,27 +6,13 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-        with:
-          path: avalanchejs
-      - uses: actions/checkout@v2
-        with:
-          repository: ava-labs/avalanchego
-          path: avalanchego
-          ref: master
       - uses: actions/setup-node@v2
         with:
           cache: yarn
-          cache-dependency-path: avalanchejs
           node-version: '14'
-      - uses: actions/setup-go@v1
-        with:
-          go-version: '1.15'
-      - run: |
-          cd avalanchejs
-          yarn install --frozen-lockfile
-      - run: |
-          cd avalanchego
-          ./scripts/build.sh
-      - run: |
-          pwd
-          ls
+      - run: yarn install --frozen-lockfile
+      - name: avalanchejs e2e test
+        env: 
+          DOCKER_USERNAME: ${{ secrets.docker_username }}
+          DOCKER_PASS: ${{ secrets.docker_pass }}
+        run: .github/workflows/e2e.sh
