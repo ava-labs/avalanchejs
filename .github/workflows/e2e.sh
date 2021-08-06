@@ -1,5 +1,10 @@
-mount_spec=/home/runner/work/avalanchejs/avalanchejs/:/avalanchejs/
+
+branch=$1
+
+mount_spec=$(pwd):/avalanchejs/
 image=avaplatform/avalanche-testing:chaos-4 
+
+echo avalanchejs branch: $branch
 
 echo "$DOCKER_PASS" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
