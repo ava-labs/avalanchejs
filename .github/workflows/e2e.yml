@@ -15,6 +15,7 @@ jobs:
           ref: master
       - uses: actions/setup-node@v2
         with:
+          path: avalanchejs
           cache: yarn
           node-version: '14'
       - uses: actions/setup-go@v1
@@ -26,4 +27,6 @@ jobs:
       - run: |
           cd avalanchego
           ./scripts/build.sh
-      - run: pwd
+      - run: |
+          pwd
+          ls
