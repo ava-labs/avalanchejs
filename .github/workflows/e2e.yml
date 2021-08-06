@@ -15,8 +15,8 @@ jobs:
           ref: master
       - uses: actions/setup-node@v2
         with:
-          path: avalanchejs
           cache: yarn
+          cache-dependency-path: avalanchejs
           node-version: '14'
       - uses: actions/setup-go@v1
         with:
