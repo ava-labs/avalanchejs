@@ -2,7 +2,7 @@
 branch=$1
 
 mount_spec=$(pwd):/avalanchejs/
-image=avaplatform/avalanche-testing:chaos-4 
+image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
 
 echo avalanchejs branch: $branch
 
