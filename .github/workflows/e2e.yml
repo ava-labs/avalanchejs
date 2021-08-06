@@ -11,8 +11,8 @@ jobs:
           cache: yarn
           node-version: '14'
       - run: yarn install --frozen-lockfile
-      - run: .github/workflows/e2e.sh
-      #- name: avalanchejs e2e test
-      #  env: 
-      #    DOCKER_USERNAME: ${{ secrets.docker_username }}
-      #    DOCKER_PASS: ${{ secrets.docker_pass }}
+      - name: avalanchejs e2e test
+        env: 
+          DOCKER_USERNAME: ${{ secrets.docker_username }}
+          DOCKER_PASS: ${{ secrets.docker_pass }}
+        run: .github/workflows/e2e.sh
