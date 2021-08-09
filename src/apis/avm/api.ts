@@ -645,7 +645,6 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-
     const params: ImportInterface = {
       username,
       password,
@@ -676,7 +675,6 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-
     const params: ImportAVAXInterface = {
       to,
       sourceChain,
@@ -702,7 +700,6 @@ export class AVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string[]> => {
-
     const params: ListAddressesInterface = {
       username,
       password
