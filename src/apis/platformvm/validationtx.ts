@@ -23,7 +23,7 @@ const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 /**
- * Abstract class representing an transactions with validation information.
+ * Abstract class representing a transaction with validation information.
  */
 export abstract class ValidatorTx extends BaseTx {
   protected _typeName = "ValidatorTx"
@@ -131,6 +131,7 @@ export abstract class ValidatorTx extends BaseTx {
     )
   }
 
+
   constructor(
     networkID: number,
     blockchainID: Buffer,
@@ -236,118 +237,116 @@ export abstract class WeightedValidatorTx extends ValidatorTx {
     }
   }
 }
-/* Must implement later, the signing process isn't friendly to AvalancheJS
 
 export class AddSubnetValidatorTx extends WeightedValidatorTx {
-    protected subnetID:Buffer = Buffer.alloc(32);
-    protected subnetAddrs:Buffer[] = [];
-    protected subnetAuthIdxs:Buffer[] = [];
+  protected subnetID: Buffer = Buffer.alloc(32)
+  protected subnetAddrs: Buffer[] = []
+  protected subnetAuthIdxs: Buffer[] = []
 
 
-    getTxType = ():number => {
-        return PlatformVMConstants.ADDSUBNETVALIDATORTX;
+  getTxType = (): number => {
+    return PlatformVMConstants.ADDSUBNETVALIDATORTX
+  }
+
+
+  getSubnetID = (): Buffer => {
+    return this.subnetID
+  }
+
+
+  getSubnetIDString = (): string => {
+    return bintools.cb58Encode(this.subnetID)
+  }
+
+
+  getSubnetAuthAddresses = (): Buffer[] => {
+    return this.subnetAddrs
+  }
+
+
+  setSubnetAuthAddresses = (addrs: Buffer[]): void => {
+    this.subnetAddrs = addrs
+  }
+
+  // calcSubnetAuthIdxs = (addrs: Buffer[]): Buffer[] => {
+  //   let idxs: Buffer[] = []
+  //   addrs = addrs.sort()
+  //   for (let i: number = 0; i < addrs.length; i++) {
+  //     let idx: Buffer = Buffer.alloc(4)
+  //     idx.writeUInt32BE(i, 0)
+  //     idxs.push(idx)
+  //   }
+  // }
+
+
+  getSubnetAuthIdxs = (): Buffer[] => {
+    return this.subnetAuthIdxs
+  }
+
+  // fromBuffer(bytes: Buffer, offset: number = 0): number {
+  //   offset = super.fromBuffer(bytes, offset)
+  //   this.subnetID = bintools.copyFrom(bytes, offset, offset + 32)
+  //   offset += 32
+  //   let sublenbuff: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+  //   offset += 4
+  //   let sublen: number = sublenbuff.readUInt32BE(0)
+  //   for (let i: number = 0; i < sublen; i++) {
+
+  //   }
+  //   offset = this.subnetAuth.fromBuffer(bytes, offset)
+  //   return offset
+  // }
+
+
+  // toBuffer(): Buffer {
+  //   const superbuff: Buffer = super.toBuffer();
+
+  //   return Buffer.concat([superbuff, this.subnetID, subAuth], superbuff.length + this.subnetID.length + subAuth.length)
+  // }
+
+
+  // sign(msg: Buffer, kc: KeyChain): Credential[] {
+  //   let creds: SECPCredential[] = super.sign(msg, kc)
+  //   const cred: SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential
+  //   for (let i: number = 0; i < this.subnetAuth.length; i++) {
+  //     if (!kc.hasKey(this.subnetAuth[i])) {
+  //       throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.")
+  //     }
+
+  //     let kp: KeyPair = kc.getKey(this.subnetAuth[i])
+  //     const signval: Buffer = kp.sign(msg)
+  //     const sig: Signature = new Signature()
+  //     sig.fromBuffer(signval)
+  //     cred.addSignature(sig)
+  //   }
+  //   creds.push(cred)
+  //   return creds
+  // }
+
+
+  constructor(
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined,
+    nodeID: Buffer = undefined,
+    startTime: BN = undefined,
+    endTime: BN = undefined,
+    weight: BN = undefined,
+    subnetID: Buffer = undefined,
+    // subnetAuth: Buffer[] = undefined
+  ) {
+    super(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight)
+    if (typeof subnetID !== undefined) {
+      this.subnetID = subnetID
     }
-
-
-    getSubnetID = ():Buffer => {
-        return this.subnetID;
-    }
-
-
-    getSubnetIDString = ():string => {
-        return bintools.cb58Encode(this.subnetID);
-    }
-
-
-    getSubnetAuthAddresses = ():Buffer[] => {
-        return this.subnetAddrs;
-    }
-
-
-    setSubnetAuthAddresses = (addrs:Buffer[]):void => {
-        this.subnetAddrs = addrs;
-    }
-
-    calcSubnetAuthIdxs = (addrs:Buffer[]):Buffer[] => {
-        let idxs:Buffer[] = [];
-        addrs = addrs.sort();
-        for(let i: number = 0; i < addrs.length; i++){
-            let idx:Buffer = Buffer.alloc(4);
-            idx.writeUInt32BE(i,0);
-            idxs.push(idx);
-        }
-    }
-
-
-    getSubnetAuthIdxs = ():Buffer[] => {
-        return this.subnetAddrs;
-    }
-
-    fromBuffer(bytes:Buffer, offset:number = 0):number {
-        offset = super.fromBuffer(bytes, offset);
-        this.subnetID = bintools.copyFrom(bytes, offset, offset + 32);
-        offset += 32;
-        let sublenbuff:Buffer = bintools.copyFrom(bytes, offset, offset + 4);
-        offset += 4;
-        let sublen:number = sublenbuff.readUInt32BE(0);
-        for(let i: number = 0; i < sublen; i++){
-
-        }
-        offset = this.subnetAuth.fromBuffer(bytes, offset);
-        return offset;
-    }
-
-
-    toBuffer():Buffer {
-        const superbuff:Buffer = super.toBuffer();
-
-        return Buffer.concat([superbuff, this.subnetID, subAuth], superbuff.length + this.subnetID.length + subAuth.length);
-    }
-
-
-    sign(msg:Buffer, kc:KeyChain):Credential[] {
-        let creds:SECPCredential[] = super.sign(msg, kc);
-        const cred:SECPCredential = SelectCredentialClass(PlatformVMConstants.SECPCREDENTIAL) as SECPCredential;
-        for(let i: number = 0; i  < this.subnetAuth.length ; i++) {
-            if(!kc.hasKey(this.subnetAuth[i])) {
-                throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.");
-            }
-            
-            let kp:KeyPair = kc.getKey(this.subnetAuth[i]);
-            const signval:Buffer = kp.sign(msg);
-            const sig:Signature = new Signature();
-            sig.fromBuffer(signval);
-            cred.addSignature(sig);
-        }
-        creds.push(cred);
-        return creds;
-    }
-
-
-    constructor(
-        networkID:number = DefaultNetworkID,
-        blockchainID:Buffer = Buffer.alloc(32, 16),
-        outs:TransferableOutput[] = undefined,
-        ins:TransferableInput[] = undefined,
-        memo:Buffer = undefined, 
-        nodeID:Buffer = undefined, 
-        startTime:BN = undefined, 
-        endTime:BN = undefined,
-        weight:BN = undefined,
-        subnetID:Buffer = undefined,
-        subnetAuth:Buffer[] = undefined
-    ) {
-        super(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight);
-        if(typeof subnetID !== undefined){
-            this.subnetID = subnetID;
-        }
-        if(typeof subnetAuth !== undefined) {
-            this.subnetAuth = subnetAuth;
-        }
-    }
+    // if (typeof subnetAuth !== undefined) {
+    //   this.subnetAuth = subnetAuth
+    // }
+  }
 
 }
-*/
 
 /**
  * Class representing an unsigned AddDelegatorTx transaction.
