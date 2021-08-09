@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Common-Interfaces
+ * @module AVM-Interfaces
  */
 
 import { Buffer } from "buffer/"
@@ -101,5 +101,48 @@ export interface GetAllBalancesInterface {
 }
 
 export interface GetAssetDescriptionInterface {
-  assetID: Buffer | string
+  assetID: string
+}
+
+export interface GetTxInterface {
+  txID: string
+}
+
+export interface GetTxStatusInterface {
+  txID: string
+}
+
+export interface StartIndexInterface {
+  address: string
+  utxo: string
+}
+
+export interface GetUTXOsInterface {
+  addresses: string[] | string
+  limit: number
+  sourceChain?: string
+  startIndex?: StartIndexInterface
+}
+
+export interface IssueTxInterface {
+  tx: string
+}
+
+export interface SOutputsInterface {
+  assetID: string
+  amount: string
+  to: string
+}
+
+export interface SendMultipleInterface {
+  username: string
+  password: string
+  outputs: SOutputsInterface[]
+  from?: string[] | Buffer[]
+  changeAddr?: string
+  memo?: string | Buffer
+}
+
+export interface BuildGenesisInterface {
+  genesisData: object
 }

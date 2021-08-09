@@ -32,6 +32,7 @@ import {
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
 import {
+  BuildGenesisInterface,
   CreateAddressInterface,
   CreateFixedCapAssetInterface,
   CreateVariableCapAssetInterface,
@@ -39,13 +40,20 @@ import {
   ExportInterface,
   ExportKeyInterface,
   GetAllBalancesInterface,
+  GetAssetDescriptionInterface,
   GetAVAXAssetIDInterface,
   GetBalanceInterface,
+  GetTxInterface,
+  GetTxStatusInterface,
+  GetUTXOsInterface,
   ImportAVAXInterface,
   ImportInterface,
   ImportKeyInterface,
+  IssueTxInterface,
   ListAddressesInterface,
-  MintInterface
+  MintInterface,
+  SendMultipleInterface,
+  SOutputsInterface
 } from "./interfaces"
 
 /**
@@ -756,7 +764,7 @@ export class AVMAPI extends JRPCAPI {
     } else {
       asset = assetID
     }
-    const params: any = {
+    const params: GetAssetDescriptionInterface = {
       assetID: asset
     }
     const response: RequestResponseData = await this.callMethod(
@@ -779,7 +787,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns Returns a Promise<string> containing the bytes retrieved from the node
    */
   getTx = async (txID: string): Promise<string> => {
-    const params: any = {
+    const params: GetTxInterface = {
       txID
     }
     const response: RequestResponseData = await this.callMethod(
@@ -797,7 +805,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns Returns a Promise<string> containing the status retrieved from the node
    */
   getTxStatus = async (txID: string): Promise<string> => {
-    const params: any = {
+    const params: GetTxStatusInterface = {
       txID
     }
     const response: RequestResponseData = await this.callMethod(
@@ -837,7 +845,7 @@ export class AVMAPI extends JRPCAPI {
       addresses = [addresses]
     }
 
-    const params: any = {
+    const params: GetUTXOsInterface = {
       addresses: addresses,
       limit
     }
@@ -1593,7 +1601,7 @@ export class AVMAPI extends JRPCAPI {
         "Error - AVMAPI.issueTx: provided tx is not expected type of string, Buffer, or Tx"
       )
     }
-    const params: any = {
+    const params: IssueTxInterface = {
       tx: Transaction.toString()
     }
     const response: RequestResponseData = await this.callMethod(
@@ -1707,7 +1715,7 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<{ txID: string; changeAddr: string }> => {
     let asset: string
     let amnt: BN
-    const sOutputs: { assetID: string; amount: string; to: string }[] = []
+    const sOutputs: SOutputsInterface[] = []
 
     sendOutputs.forEach(
       (output: {
@@ -1739,7 +1747,7 @@ export class AVMAPI extends JRPCAPI {
       }
     )
 
-    const params: any = {
+    const params: SendMultipleInterface = {
       username: username,
       password: password,
       outputs: sOutputs
@@ -1747,7 +1755,7 @@ export class AVMAPI extends JRPCAPI {
 
     from = this._cleanAddressArray(from, "send")
     if (typeof from !== "undefined") {
-      params["from"] = from
+      params.from = from
     }
 
     if (typeof changeAddr !== "undefined") {
@@ -1755,14 +1763,14 @@ export class AVMAPI extends JRPCAPI {
         /* istanbul ignore next */
         throw new AddressError("Error - AVMAPI.send: Invalid address format")
       }
-      params["changeAddr"] = changeAddr
+      params.changeAddr = changeAddr
     }
 
     if (typeof memo !== "undefined") {
       if (typeof memo !== "string") {
-        params["memo"] = bintools.cb58Encode(memo)
+        params.memo = bintools.cb58Encode(memo)
       } else {
-        params["memo"] = memo
+        params.memo = memo
       }
     }
     const response: RequestResponseData = await this.callMethod(
@@ -1780,7 +1788,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns Promise of a string of bytes
    */
   buildGenesis = async (genesisData: object): Promise<string> => {
-    const params: any = {
+    const params: BuildGenesisInterface = {
       genesisData
     }
     const response: RequestResponseData = await this.callMethod(
