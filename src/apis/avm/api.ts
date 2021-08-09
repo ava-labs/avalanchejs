@@ -46,7 +46,7 @@ import {
   ImportKeyInterface,
   ListAddressesInterface,
   MintInterface
-} from "src/common/interfaces"
+} from "./interfaces"
 
 /**
  * @ignore
@@ -774,13 +774,13 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
    *
-   * @param txid The string representation of the transaction ID
+   * @param txID The string representation of the transaction ID
    *
    * @returns Returns a Promise<string> containing the bytes retrieved from the node
    */
-  getTx = async (txid: string): Promise<string> => {
+  getTx = async (txID: string): Promise<string> => {
     const params: any = {
-      txID: txid
+      txID
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTx",
@@ -792,13 +792,13 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
    *
-   * @param txid The string representation of the transaction ID
+   * @param txID The string representation of the transaction ID
    *
    * @returns Returns a Promise<string> containing the status retrieved from the node
    */
-  getTxStatus = async (txid: string): Promise<string> => {
+  getTxStatus = async (txID: string): Promise<string> => {
     const params: any = {
-      txID: txid
+      txID
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTxStatus",
@@ -860,10 +860,10 @@ export class AVMAPI extends JRPCAPI {
         const selfArray: string[] = this.db.get(persistOpts.getName())
         if (Array.isArray(selfArray)) {
           utxos.addArray(data)
-          const self: UTXOSet = new UTXOSet()
-          self.addArray(selfArray)
-          self.mergeByRule(utxos, persistOpts.getMergeRule())
-          data = self.getAllUTXOStrings()
+          const utxoSet: UTXOSet = new UTXOSet()
+          utxoSet.addArray(selfArray)
+          utxoSet.mergeByRule(utxos, persistOpts.getMergeRule())
+          data = utxoSet.getAllUTXOStrings()
         }
       }
       this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
@@ -1171,7 +1171,7 @@ export class AVMAPI extends JRPCAPI {
     threshold: number = 1,
     assetID: string = undefined
   ): Promise<UnsignedTx> => {
-    let prefixes: object = {}
+    const prefixes: object = {}
     toAddresses.map((a: string): void => {
       prefixes[a.split("-")[0]] = true
     })
@@ -1199,7 +1199,7 @@ export class AVMAPI extends JRPCAPI {
       )
     }
 
-    let to: Buffer[] = []
+    const to: Buffer[] = []
     toAddresses.map((a: string): void => {
       to.push(bintools.stringToAddress(a))
     })
@@ -1208,6 +1208,7 @@ export class AVMAPI extends JRPCAPI {
       fromAddresses,
       "buildExportTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
+
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildExportTx"
@@ -1279,11 +1280,11 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateAssetTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildCreateNFTAssetTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
@@ -1346,11 +1347,11 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<any> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildSECPMintTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildSECPMintTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
@@ -1359,7 +1360,7 @@ export class AVMAPI extends JRPCAPI {
       memo = memo.getPayload()
     }
 
-    let avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildSECPMintTx(
       this.core.getNetworkID(),
@@ -1431,11 +1432,11 @@ export class AVMAPI extends JRPCAPI {
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0)
   ): Promise<UnsignedTx> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateNFTAssetTx"
     ).map((a) => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildCreateNFTAssetTx"
     ).map((a) => bintools.stringToAddress(a))
@@ -1510,11 +1511,11 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<any> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateNFTMintTx"
     ).map((a) => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildCreateNFTMintTx"
     ).map((a) => bintools.stringToAddress(a))
@@ -1706,7 +1707,7 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<{ txID: string; changeAddr: string }> => {
     let asset: string
     let amnt: BN
-    let sOutputs: { assetID: string; amount: string; to: string }[] = []
+    const sOutputs: { assetID: string; amount: string; to: string }[] = []
 
     sendOutputs.forEach(
       (output: {
@@ -1797,7 +1798,7 @@ export class AVMAPI extends JRPCAPI {
     caller: string
   ): string[] {
     const addrs: string[] = []
-    const chainid: string = this.getBlockchainAlias()
+    const chainID: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
@@ -1819,7 +1820,7 @@ export class AVMAPI extends JRPCAPI {
               addresses[i] as Buffer,
               type,
               this.core.getHRP(),
-              chainid
+              chainID
             )
           )
         }
@@ -1842,9 +1843,9 @@ export class AVMAPI extends JRPCAPI {
   ) {
     super(core, baseurl)
     this.blockchainID = blockchainID
-    const netid: number = core.getNetworkID()
-    if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
-      const { alias } = Defaults.network[netid][blockchainID]
+    const netID: number = core.getNetworkID()
+    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
+      const { alias } = Defaults.network[netID][blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
