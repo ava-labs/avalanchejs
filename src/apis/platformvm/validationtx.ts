@@ -131,7 +131,6 @@ export abstract class ValidatorTx extends BaseTx {
     )
   }
 
-
   constructor(
     networkID: number,
     blockchainID: Buffer,
@@ -243,26 +242,21 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
   protected subnetAddrs: Buffer[] = []
   protected subnetAuthIdxs: Buffer[] = []
 
-
   getTxType = (): number => {
     return PlatformVMConstants.ADDSUBNETVALIDATORTX
   }
-
 
   getSubnetID = (): Buffer => {
     return this.subnetID
   }
 
-
   getSubnetIDString = (): string => {
     return bintools.cb58Encode(this.subnetID)
   }
 
-
   getSubnetAuthAddresses = (): Buffer[] => {
     return this.subnetAddrs
   }
-
 
   setSubnetAuthAddresses = (addrs: Buffer[]): void => {
     this.subnetAddrs = addrs
@@ -277,7 +271,6 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
   //     idxs.push(idx)
   //   }
   // }
-
 
   getSubnetAuthIdxs = (): Buffer[] => {
     return this.subnetAuthIdxs
@@ -297,13 +290,11 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
   //   return offset
   // }
 
-
   // toBuffer(): Buffer {
   //   const superbuff: Buffer = super.toBuffer();
 
   //   return Buffer.concat([superbuff, this.subnetID, subAuth], superbuff.length + this.subnetID.length + subAuth.length)
   // }
-
 
   // sign(msg: Buffer, kc: KeyChain): Credential[] {
   //   let creds: SECPCredential[] = super.sign(msg, kc)
@@ -323,7 +314,6 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
   //   return creds
   // }
 
-
   constructor(
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer = Buffer.alloc(32, 16),
@@ -334,10 +324,20 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     startTime: BN = undefined,
     endTime: BN = undefined,
     weight: BN = undefined,
-    subnetID: Buffer = undefined,
+    subnetID: Buffer = undefined
     // subnetAuth: Buffer[] = undefined
   ) {
-    super(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight)
+    super(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      nodeID,
+      startTime,
+      endTime,
+      weight
+    )
     if (typeof subnetID !== undefined) {
       this.subnetID = subnetID
     }
@@ -345,7 +345,6 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
     //   this.subnetAuth = subnetAuth
     // }
   }
-
 }
 
 /**

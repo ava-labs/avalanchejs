@@ -115,7 +115,7 @@ const main = async (): Promise<any> => {
     startTime,
     endTime,
     stakeAmount.minValidatorStake,
-    bintools.cb58Decode(subnetID),
+    bintools.cb58Decode(subnetID)
   )
   console.log(addSubnetValidatorTx)
   // const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
