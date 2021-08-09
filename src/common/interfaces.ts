@@ -269,10 +269,6 @@ export interface GetAllBalancesInterface {
   address: string
 }
 
-export interface GetAllBalancesInterface {
-  address: string
-}
-
 export interface GetAssetDescriptionInterface {
   assetID: Buffer | string
 }
