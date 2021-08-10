@@ -4018,12 +4018,12 @@ jest-message-util@^26.6.2:
     slash "^3.0.0"
     stack-utils "^2.0.2"
 
-jest-mock-axios@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/jest-mock-axios/-/jest-mock-axios-3.2.0.tgz#e68f0360b8c6a04da4da9010b28ddd9c10ac5395"
-  integrity sha512-aRzSxGwjVQ54rhRG3wH3+guubJdlc5bFoUhE5Ic3pjHiaMlfRracADJ8mKQqptyqT5YGqXGKqRULxEQhiXOGoA==
+jest-mock-axios@4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/jest-mock-axios/-/jest-mock-axios-4.4.0.tgz#de0d7cd1219ab780472f774160f9e004245db0f1"
+  integrity sha512-MF5MbjIZcv2KCtO6oH/Fmy1sML1LxQoaGyIPRGArDdd9pcsfjWoCmFFUD12GgOTeJw8ChjuVYHN0s8QnhGriQA==
   dependencies:
-    synchronous-promise "^2.0.10"
+    synchronous-promise "^2.0.15"
 
 jest-mock@^26.6.2:
   version "26.6.2"
@@ -5730,7 +5730,7 @@ symbol-tree@^3.2.4:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synchronous-promise@^2.0.10:
+synchronous-promise@^2.0.15:
   version "2.0.15"
   resolved "https://registry.yarnpkg.com/synchronous-promise/-/synchronous-promise-2.0.15.tgz#07ca1822b9de0001f5ff73595f3d08c4f720eb8e"
   integrity sha512-k8uzYIkIVwmT+TcglpdN50pS2y1BDcUnBPK9iJeGu0Pl1lOI8pD6wtzgw91Pjpe+RxtTncw32tLxs/R0yNL2Mg==
