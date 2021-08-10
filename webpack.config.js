@@ -2,9 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 const gitRevisionPlugin = new GitRevisionPlugin();
 const TerserPlugin = require('terser-webpack-plugin');
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -24,7 +25,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
+    extensions: ['.tsx', '.ts', '.js']
   },
   output: {
     //filename: '[name]-[git-revision-version].js',
@@ -35,6 +36,7 @@ module.exports = {
     umdNamedDefine: true,
   },
   plugins: [
+    new NodePolyfillPlugin(),
     gitRevisionPlugin,
     new CleanWebpackPlugin(),
     new webpack.DefinePlugin({
