@@ -209,7 +209,6 @@ describe("PlatformVMAPI", (): void => {
 
     mockAxios.mockResponse(responseObj)
     const response: string | ErrorResponseObject = await result
-    console.log("response", response)
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
 
