@@ -9,7 +9,7 @@
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
     "prepublish": "yarn build",
-    "release:prepare": "rm -rf ./dist ./node_modules ./package-lock.json && yarn install && yarn build && yarn bundle && yarn test && git status",
+    "release:prepare": "rm -rf ./dist ./node_modules ./yarn.lock && yarn install && yarn build && yarn bundle && yarn test && git status",
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
@@ -62,7 +62,6 @@
     "husky": "7.0.0",
     "jest": "26.2.2",
     "jest-mock-axios": "4.4.0",
-    "node-polyfill-webpack-plugin": "1.1.4",
     "prettier": "2.3.2",
     "terser-webpack-plugin": "5.1.4",
     "ts-jest": "26.1.4",
@@ -78,17 +77,20 @@
     "node": ">=14.17.0"
   },
   "dependencies": {
+    "assert": "2.0.0",
     "axios": "0.21.1",
     "bech32": "1.1.4",
     "bip39": "3.0.4",
     "bn.js": "5.2.0",
     "buffer": "5.5.0",
     "create-hash": "1.2.0",
+    "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
     "ethers": "5.3.0",
     "hdkey": "2.0.1",
     "isomorphic-ws": "4.0.1",
     "store2": "2.11.0",
+    "stream-browserify": "3.0.0",
     "ws": "7.4.6"
   },
   "prettier": {
