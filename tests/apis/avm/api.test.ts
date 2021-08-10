@@ -392,9 +392,20 @@ describe("AVMAPI", (): void => {
 
     mockAxios.mockResponse(responseObj)
     const response: object = await result
+    const calledWith: object = {
+      baseURL: "https://127.0.0.1:9650",
+      data: JSON.stringify(expectedRequestPayload),
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8",
+      },
+      method: "POST",
+      params: {},
+      responseType: "json",
+      url: "/ext/bc/X",
+    }
 
     expect(mockAxios.request).toBeCalledWith(
-      expect.objectContaining({ data: JSON.stringify(expectedRequestPayload) })
+      calledWith
     )
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
