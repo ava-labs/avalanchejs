@@ -32,17 +32,29 @@ import {
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
 import {
-  CreateAddressInterface,
-  CreateFixedCapAssetInterface,
-  CreateVariableCapAssetInterface,
-  ExportAVAXInterface,
-  ExportInterface,
-  ExportKeyInterface,
-  GetAVAXAssetIDInterface,
-  GetBalanceInterface,
-  ImportKeyInterface,
-  MintInterface
-} from "src/common/interfaces"
+  BuildGenesisParams,
+  CreateAddressParams,
+  CreateFixedCapAssetParams,
+  CreateVariableCapAssetParams,
+  ExportAVAXParams,
+  ExportParams,
+  ExportKeyParams,
+  GetAllBalancesParams,
+  GetAssetDescriptionParams,
+  GetAVAXAssetIDParams,
+  GetBalanceParams,
+  GetTxParams,
+  GetTxStatusParams,
+  GetUTXOsParams,
+  ImportAVAXParams,
+  ImportParams,
+  ImportKeyParams,
+  ListAddressesParams,
+  MintParams,
+  SendMultipleParams,
+  SOutputsParams
+} from "./interfaces"
+import { IssueTxParams } from "../../common"
 
 /**
  * @ignore
@@ -170,7 +182,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
-      const asset: GetAVAXAssetIDInterface = await this.getAssetDescription(
+      const asset: GetAVAXAssetIDParams = await this.getAssetDescription(
         PrimaryAssetAlias
       )
       this.AVAXAssetID = asset.assetID
@@ -323,7 +335,7 @@ export class AVMAPI extends JRPCAPI {
         "Error - AVMAPI.getBalance: Invalid address format"
       )
     }
-    const params: GetBalanceInterface = {
+    const params: GetBalanceParams = {
       address,
       assetID,
       includePartial
@@ -347,7 +359,7 @@ export class AVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string> => {
-    const params: CreateAddressInterface = {
+    const params: CreateAddressParams = {
       username,
       password
     }
@@ -392,7 +404,7 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     initialHolders: object[]
   ): Promise<string> => {
-    const params: CreateFixedCapAssetInterface = {
+    const params: CreateFixedCapAssetParams = {
       name,
       symbol,
       denomination,
@@ -447,7 +459,7 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     minterSets: object[]
   ): Promise<string> => {
-    const params: CreateVariableCapAssetInterface = {
+    const params: CreateVariableCapAssetParams = {
       name,
       symbol,
       denomination,
@@ -492,7 +504,7 @@ export class AVMAPI extends JRPCAPI {
     } else {
       amnt = amount
     }
-    const params: MintInterface = {
+    const params: MintParams = {
       username: username,
       password: password,
       amount: amnt,
@@ -525,7 +537,7 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new AddressError("Error - AVMAPI.exportKey: Invalid address format")
     }
-    const params: ExportKeyInterface = {
+    const params: ExportKeyParams = {
       username,
       password,
       address
@@ -551,7 +563,7 @@ export class AVMAPI extends JRPCAPI {
     password: string,
     privateKey: string
   ): Promise<string> => {
-    const params: ImportKeyInterface = {
+    const params: ImportKeyParams = {
       username,
       password,
       privateKey
@@ -583,7 +595,7 @@ export class AVMAPI extends JRPCAPI {
     amount: BN,
     assetID: string
   ): Promise<string> => {
-    const params: ExportInterface = {
+    const params: ExportParams = {
       username,
       password,
       to,
@@ -615,7 +627,7 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     amount: BN
   ): Promise<string> => {
-    const params: ExportAVAXInterface = {
+    const params: ExportAVAXParams = {
       to,
       amount: amount,
       username,
@@ -647,11 +659,11 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-    const params: any = {
-      to,
-      sourceChain,
+    const params: ImportParams = {
       username,
-      password
+      password,
+      to,
+      sourceChain
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.import",
@@ -677,7 +689,7 @@ export class AVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-    const params: any = {
+    const params: ImportAVAXParams = {
       to,
       sourceChain,
       username,
@@ -702,7 +714,7 @@ export class AVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string[]> => {
-    const params: any = {
+    const params: ListAddressesParams = {
       username,
       password
     }
@@ -727,7 +739,7 @@ export class AVMAPI extends JRPCAPI {
         "Error - AVMAPI.getAllBalances: Invalid address format"
       )
     }
-    const params: any = {
+    const params: GetAllBalancesParams = {
       address
     }
     const response: RequestResponseData = await this.callMethod(
@@ -758,7 +770,7 @@ export class AVMAPI extends JRPCAPI {
     } else {
       asset = assetID
     }
-    const params: any = {
+    const params: GetAssetDescriptionParams = {
       assetID: asset
     }
     const response: RequestResponseData = await this.callMethod(
@@ -776,13 +788,13 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
    *
-   * @param txid The string representation of the transaction ID
+   * @param txID The string representation of the transaction ID
    *
    * @returns Returns a Promise<string> containing the bytes retrieved from the node
    */
-  getTx = async (txid: string): Promise<string> => {
-    const params: any = {
-      txID: txid
+  getTx = async (txID: string): Promise<string> => {
+    const params: GetTxParams = {
+      txID
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTx",
@@ -794,13 +806,13 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Returns the status of a provided transaction ID by calling the node's `getTxStatus` method.
    *
-   * @param txid The string representation of the transaction ID
+   * @param txID The string representation of the transaction ID
    *
    * @returns Returns a Promise<string> containing the status retrieved from the node
    */
-  getTxStatus = async (txid: string): Promise<string> => {
-    const params: any = {
-      txID: txid
+  getTxStatus = async (txID: string): Promise<string> => {
+    const params: GetTxStatusParams = {
+      txID
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTxStatus",
@@ -839,7 +851,7 @@ export class AVMAPI extends JRPCAPI {
       addresses = [addresses]
     }
 
-    const params: any = {
+    const params: GetUTXOsParams = {
       addresses: addresses,
       limit
     }
@@ -862,10 +874,10 @@ export class AVMAPI extends JRPCAPI {
         const selfArray: string[] = this.db.get(persistOpts.getName())
         if (Array.isArray(selfArray)) {
           utxos.addArray(data)
-          const self: UTXOSet = new UTXOSet()
-          self.addArray(selfArray)
-          self.mergeByRule(utxos, persistOpts.getMergeRule())
-          data = self.getAllUTXOStrings()
+          const utxoSet: UTXOSet = new UTXOSet()
+          utxoSet.addArray(selfArray)
+          utxoSet.mergeByRule(utxos, persistOpts.getMergeRule())
+          data = utxoSet.getAllUTXOStrings()
         }
       }
       this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
@@ -1173,7 +1185,7 @@ export class AVMAPI extends JRPCAPI {
     threshold: number = 1,
     assetID: string = undefined
   ): Promise<UnsignedTx> => {
-    let prefixes: object = {}
+    const prefixes: object = {}
     toAddresses.map((a: string): void => {
       prefixes[a.split("-")[0]] = true
     })
@@ -1201,7 +1213,7 @@ export class AVMAPI extends JRPCAPI {
       )
     }
 
-    let to: Buffer[] = []
+    const to: Buffer[] = []
     toAddresses.map((a: string): void => {
       to.push(bintools.stringToAddress(a))
     })
@@ -1210,6 +1222,7 @@ export class AVMAPI extends JRPCAPI {
       fromAddresses,
       "buildExportTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
+
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildExportTx"
@@ -1281,11 +1294,11 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateAssetTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildCreateNFTAssetTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
@@ -1348,11 +1361,11 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<any> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildSECPMintTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildSECPMintTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
@@ -1361,7 +1374,7 @@ export class AVMAPI extends JRPCAPI {
       memo = memo.getPayload()
     }
 
-    let avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildSECPMintTx(
       this.core.getNetworkID(),
@@ -1433,11 +1446,11 @@ export class AVMAPI extends JRPCAPI {
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0)
   ): Promise<UnsignedTx> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateNFTAssetTx"
     ).map((a) => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildCreateNFTAssetTx"
     ).map((a) => bintools.stringToAddress(a))
@@ -1512,11 +1525,11 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<any> => {
-    let from: Buffer[] = this._cleanAddressArray(
+    const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateNFTMintTx"
     ).map((a) => bintools.stringToAddress(a))
-    let change: Buffer[] = this._cleanAddressArray(
+    const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildCreateNFTMintTx"
     ).map((a) => bintools.stringToAddress(a))
@@ -1594,7 +1607,7 @@ export class AVMAPI extends JRPCAPI {
         "Error - AVMAPI.issueTx: provided tx is not expected type of string, Buffer, or Tx"
       )
     }
-    const params: any = {
+    const params: IssueTxParams = {
       tx: Transaction.toString()
     }
     const response: RequestResponseData = await this.callMethod(
@@ -1708,7 +1721,7 @@ export class AVMAPI extends JRPCAPI {
   ): Promise<{ txID: string; changeAddr: string }> => {
     let asset: string
     let amnt: BN
-    let sOutputs: { assetID: string; amount: string; to: string }[] = []
+    const sOutputs: SOutputsParams[] = []
 
     sendOutputs.forEach(
       (output: {
@@ -1740,7 +1753,7 @@ export class AVMAPI extends JRPCAPI {
       }
     )
 
-    const params: any = {
+    const params: SendMultipleParams = {
       username: username,
       password: password,
       outputs: sOutputs
@@ -1748,7 +1761,7 @@ export class AVMAPI extends JRPCAPI {
 
     from = this._cleanAddressArray(from, "send")
     if (typeof from !== "undefined") {
-      params["from"] = from
+      params.from = from
     }
 
     if (typeof changeAddr !== "undefined") {
@@ -1756,14 +1769,14 @@ export class AVMAPI extends JRPCAPI {
         /* istanbul ignore next */
         throw new AddressError("Error - AVMAPI.send: Invalid address format")
       }
-      params["changeAddr"] = changeAddr
+      params.changeAddr = changeAddr
     }
 
     if (typeof memo !== "undefined") {
       if (typeof memo !== "string") {
-        params["memo"] = bintools.cb58Encode(memo)
+        params.memo = bintools.cb58Encode(memo)
       } else {
-        params["memo"] = memo
+        params.memo = memo
       }
     }
     const response: RequestResponseData = await this.callMethod(
@@ -1776,12 +1789,12 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Given a JSON representation of this Virtual Machine’s genesis state, create the byte representation of that state.
    *
-   * @param genesisData The blockchain"s genesis data object
+   * @param genesisData The blockchain's genesis data object
    *
    * @returns Promise of a string of bytes
    */
   buildGenesis = async (genesisData: object): Promise<string> => {
-    const params: any = {
+    const params: BuildGenesisParams = {
       genesisData
     }
     const response: RequestResponseData = await this.callMethod(
@@ -1799,7 +1812,7 @@ export class AVMAPI extends JRPCAPI {
     caller: string
   ): string[] {
     const addrs: string[] = []
-    const chainid: string = this.getBlockchainAlias()
+    const chainID: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
@@ -1821,7 +1834,7 @@ export class AVMAPI extends JRPCAPI {
               addresses[i] as Buffer,
               type,
               this.core.getHRP(),
-              chainid
+              chainID
             )
           )
         }
@@ -1834,19 +1847,19 @@ export class AVMAPI extends JRPCAPI {
    * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/bc/X" as the path to blockchain"s baseurl
+   * @param baseURL Defaults to the string "/ext/bc/X" as the path to blockchain's baseURL
    * @param blockchainID The Blockchain"s ID. Defaults to an empty string: ""
    */
   constructor(
     core: AvalancheCore,
-    baseurl: string = "/ext/bc/X",
+    baseURL: string = "/ext/bc/X",
     blockchainID: string = ""
   ) {
-    super(core, baseurl)
+    super(core, baseURL)
     this.blockchainID = blockchainID
-    const netid: number = core.getNetworkID()
-    if (netid in Defaults.network && blockchainID in Defaults.network[netid]) {
-      const { alias } = Defaults.network[netid][blockchainID]
+    const netID: number = core.getNetworkID()
+    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
+      const { alias } = Defaults.network[netID][blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
