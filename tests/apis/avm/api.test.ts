@@ -394,7 +394,7 @@ describe("AVMAPI", (): void => {
     const response: object = await result
     const calledWith: object = {
       baseURL: "https://127.0.0.1:9650",
-      data: "{\"id\":9,\"method\":\"avm.getBalance\",\"params\":{\"address\":\"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4\",\"assetID\":\"ATH\",\"includePartial\":true},\"jsonrpc\":\"2.0\"}",
+      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
       headers: {
         "Content-Type": "application/json;charset=UTF-8"
       },
