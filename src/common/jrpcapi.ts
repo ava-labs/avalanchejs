@@ -17,7 +17,6 @@ export class JRPCAPI extends APIBase {
     baseURL?: string,
     headers?: object
   ): Promise<RequestResponseData> => {
-    // TODO - confirm this isn't broken
     const ep: string = baseURL || this.baseURL
     const rpc: any = {}
     rpc.id = this.rpcID
