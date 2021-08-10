@@ -778,6 +778,21 @@ export class EVMAPI extends JRPCAPI {
   keyChain = (): KeyChain => this.keychain
 
   /**
+   *
+   * @returns new instance of [[KeyChain]]
+   */
+  newKeyChain = (): KeyChain => {
+    // warning, overwrites the old keychain
+    const alias = this.getBlockchainAlias()
+    if (alias) {
+      this.keychain = new KeyChain(this.core.getHRP(), alias)
+    } else {
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
+    }
+    return this.keychain
+  }
+
+  /**
    * @ignore
    */
   protected _cleanAddressArray(
