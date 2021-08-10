@@ -38,11 +38,11 @@ export class RESTAPI extends APIBase {
   }
 
   get = async (
-    baseurl?: string,
+    baseURL?: string,
     contentType?: string,
     acceptType?: string
   ): Promise<RequestResponseData> => {
-    const ep: string = baseurl || this.baseurl
+    const ep: string = baseURL || this.baseURL
     const headers: object = this.prepHeaders(contentType, acceptType)
     const resp: RequestResponseData = await this.core.get(
       ep,
@@ -56,11 +56,11 @@ export class RESTAPI extends APIBase {
   post = async (
     method: string,
     params?: object[] | object,
-    baseurl?: string,
+    baseURL?: string,
     contentType?: string,
     acceptType?: string
   ): Promise<RequestResponseData> => {
-    const ep: string = baseurl || this.baseurl
+    const ep: string = baseURL || this.baseURL
     const rpc: any = {}
     rpc.method = method
 
@@ -83,11 +83,11 @@ export class RESTAPI extends APIBase {
   put = async (
     method: string,
     params?: object[] | object,
-    baseurl?: string,
+    baseURL?: string,
     contentType?: string,
     acceptType?: string
   ): Promise<RequestResponseData> => {
-    const ep: string = baseurl || this.baseurl
+    const ep: string = baseURL || this.baseURL
     const rpc: any = {}
     rpc.method = method
 
@@ -110,11 +110,11 @@ export class RESTAPI extends APIBase {
   delete = async (
     method: string,
     params?: object[] | object,
-    baseurl?: string,
+    baseURL?: string,
     contentType?: string,
     acceptType?: string
   ): Promise<RequestResponseData> => {
-    const ep: string = baseurl || this.baseurl
+    const ep: string = baseURL || this.baseURL
     const rpc: any = {}
     rpc.method = method
 
@@ -136,11 +136,11 @@ export class RESTAPI extends APIBase {
   patch = async (
     method: string,
     params?: object[] | object,
-    baseurl?: string,
+    baseURL?: string,
     contentType?: string,
     acceptType?: string
   ): Promise<RequestResponseData> => {
-    const ep: string = baseurl || this.baseurl
+    const ep: string = baseURL || this.baseURL
     const rpc: any = {}
     rpc.method = method
 
@@ -173,7 +173,7 @@ export class RESTAPI extends APIBase {
   /**
    *
    * @param core Reference to the Avalanche instance using this endpoint
-   * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
+   * @param baseURL Path of the APIs baseURL - ex: "/ext/bc/avm"
    * @param contentType Optional Determines the type of the entity attached to the
    * incoming request
    * @param acceptType Optional Determines the type of representation which is
@@ -181,11 +181,11 @@ export class RESTAPI extends APIBase {
    */
   constructor(
     core: AvalancheCore,
-    baseurl: string,
+    baseURL: string,
     contentType: string = "application/json;charset=UTF-8",
     acceptType: string = undefined
   ) {
-    super(core, baseurl)
+    super(core, baseURL)
     this.contentType = contentType
     this.acceptType = acceptType
   }

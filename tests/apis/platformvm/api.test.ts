@@ -36,7 +36,7 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
-import { GetRewardUTXOsResponse } from "../../../src/common"
+import { GetRewardUTXOsResponse } from "../../../src/apis/platformvm/interfaces"
 import { ErrorResponseObject } from "../../../src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 

@@ -5,110 +5,87 @@
 
 import { Buffer } from "buffer/"
 import BN from "bn.js"
+import { CredsInterface } from "../../common"
 
-export interface GetAVAXAssetIDInterface {
+export interface GetAVAXAssetIDParams {
   name: string
   symbol: string
   assetID: Buffer
   denomination: number
 }
 
-export interface GetBalanceInterface {
+export interface GetBalanceParams {
   address: string
   assetID: string
 }
 
-export interface CreateAddressInterface {
-  username: string
-  password: string
-}
+export interface CreateAddressParams extends CredsInterface {}
 
-export interface CreateFixedCapAssetInterface {
-  username: string
-  password: string
+export interface CreateFixedCapAssetParams extends CredsInterface {
   name: string
   symbol: string
   denomination: number
   initialHolders: object[]
 }
 
-export interface CreateVariableCapAssetInterface {
-  username: string
-  password: string
+export interface CreateVariableCapAssetParams extends CredsInterface {
   name: string
   symbol: string
   denomination: number
   minterSets: object[]
 }
 
-export interface MintInterface {
-  username: string
-  password: string
+export interface MintParams extends CredsInterface {
   amount: number | BN
   assetID: Buffer | string
   to: string
   minters: string[]
 }
 
-export interface ExportKeyInterface {
-  username: string
-  password: string
+export interface ExportKeyParams extends CredsInterface {
   address: string
 }
 
-export interface ImportKeyInterface {
-  username: string
-  password: string
+export interface ImportKeyParams extends CredsInterface {
   privateKey: string
 }
 
-export interface ExportInterface {
-  username: string
-  password: string
+export interface ExportParams extends CredsInterface {
   to: string
   amount: BN
   assetID: string
 }
 
-export interface ExportAVAXInterface {
-  username: string
-  password: string
+export interface ExportAVAXParams extends CredsInterface {
   to: string
   amount: BN
 }
 
-export interface ImportInterface {
-  username: string
-  password: string
+export interface ImportParams extends CredsInterface {
   to: string
   sourceChain: string
 }
 
-export interface ImportAVAXInterface {
-  username: string
-  password: string
+export interface ImportAVAXParams extends CredsInterface {
   to: string
   sourceChain: string
 }
 
-export interface ListAddressesInterface {
-  username: string
-  password: string
-}
+export interface ListAddressesParams extends CredsInterface {}
 
-export interface GetAllBalancesInterface {
+export interface GetAllBalancesParams {
   address: string
 }
 
-export interface GetAssetDescriptionInterface {
+export interface GetAssetDescriptionParams {
   assetID: string
 }
 
-export interface GetTxInterface {
+export interface GetTxParams {
   txID: string
 }
 
-export interface GetTxStatusInterface {
+export interface GetTxStatusParams {
   txID: string
 }
 
@@ -117,32 +94,26 @@ export interface StartIndexInterface {
   utxo: string
 }
 
-export interface GetUTXOsInterface {
+export interface GetUTXOsParams {
   addresses: string[] | string
   limit: number
   sourceChain?: string
   startIndex?: StartIndexInterface
 }
 
-export interface IssueTxInterface {
-  tx: string
-}
-
-export interface SOutputsInterface {
+export interface SOutputsParams {
   assetID: string
   amount: string
   to: string
 }
 
-export interface SendMultipleInterface {
-  username: string
-  password: string
-  outputs: SOutputsInterface[]
+export interface SendMultipleParams extends CredsInterface {
+  outputs: SOutputsParams[]
   from?: string[] | Buffer[]
   changeAddr?: string
   memo?: string | Buffer
 }
 
-export interface BuildGenesisInterface {
+export interface BuildGenesisParams {
   genesisData: object
 }
