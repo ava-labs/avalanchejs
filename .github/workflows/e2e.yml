@@ -1,0 +1,18 @@
+name: E2E
+on: [push]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          cache: yarn
+          node-version: '14'
+      - run: yarn install --frozen-lockfile
+      - name: avalanchejs e2e test
+        env: 
+          DOCKER_USERNAME: ${{ secrets.docker_username }}
+          DOCKER_PASS: ${{ secrets.docker_pass }}
+        run: .github/workflows/e2e.sh ${GITHUB_REF##*/} 
