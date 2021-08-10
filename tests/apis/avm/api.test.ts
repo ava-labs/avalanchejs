@@ -396,17 +396,15 @@ describe("AVMAPI", (): void => {
       baseURL: "https://127.0.0.1:9650",
       data: JSON.stringify(expectedRequestPayload),
       headers: {
-        "Content-Type": "application/json;charset=UTF-8",
+        "Content-Type": "application/json;charset=UTF-8"
       },
       method: "POST",
       params: {},
       responseType: "json",
-      url: "/ext/bc/X",
+      url: "/ext/bc/X"
     }
 
-    expect(mockAxios.request).toBeCalledWith(
-      calledWith
-    )
+    expect(mockAxios.request).toBeCalledWith(calledWith)
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
   })
