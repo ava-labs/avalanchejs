@@ -13,7 +13,7 @@ then
 else
     sed -i 's/ldflags \"/ldflags \"-extldflags \\\"-static\\\" -linkmode external /' scripts/*sh
     export CC=musl-gcc
-    sudo apt install musl-tools
+    sudo apt-get install musl-tools
     ./scripts/build.sh
 fi
 
