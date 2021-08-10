@@ -17,6 +17,7 @@ export interface GetAVAXAssetIDParams {
 export interface GetBalanceParams {
   address: string
   assetID: string
+  includePartial: boolean
 }
 
 export interface CreateAddressParams extends CredsInterface {}
