@@ -10,7 +10,7 @@ describe("Info", () => {
   if (process.env.AVALANCHEGO_PORT == undefined) {
     throw "undefined environment variable: AVALANCHEGO_PORT"
   }
-  
+
   const avalanche = new Avalanche(
     process.env.AVALANCHEGO_IP,
     parseInt(process.env.AVALANCHEGO_PORT),
