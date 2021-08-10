@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module Index-Auth
+ * @module API-Index
  */
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
@@ -16,7 +16,7 @@ import {
   GetContainerRangeResponse,
   GetIndexParams,
   GetIsAcceptedParams
-} from "../../common/interfaces"
+} from "./interfaces"
 
 /**
  * Class for interacting with a node's IndexAPI.
@@ -30,15 +30,15 @@ export class IndexAPI extends JRPCAPI {
    * Get last accepted tx, vtx or block
    *
    * @param encoding
-   * @param baseurl
+   * @param baseURL
    *
    * @returns Returns a Promise<GetLastAcceptedResponse>.
    */
   getLastAccepted = async (
     encoding: string = "cb58",
-    baseurl: string = this.getBaseURL()
+    baseURL: string = this.getBaseURL()
   ): Promise<GetLastAcceptedResponse> => {
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
     const params: GetLastAcceptedParams = {
       encoding
     }
@@ -48,7 +48,7 @@ export class IndexAPI extends JRPCAPI {
         "index.getLastAccepted",
         params
       )
-      return response["data"]["result"]
+      return response.data.result
     } catch (error) {
       console.log(error)
     }
@@ -59,16 +59,16 @@ export class IndexAPI extends JRPCAPI {
    *
    * @param index
    * @param encoding
-   * @param baseurl
+   * @param baseURL
    *
    * @returns Returns a Promise<GetContainerByIndexResponse>.
    */
   getContainerByIndex = async (
     index: string = "0",
     encoding: string = "cb58",
-    baseurl: string = this.getBaseURL()
+    baseURL: string = this.getBaseURL()
   ): Promise<GetContainerByIndexResponse> => {
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
     const params: GetContainerByIndexParams = {
       index,
       encoding
@@ -79,7 +79,7 @@ export class IndexAPI extends JRPCAPI {
         "index.getContainerByIndex",
         params
       )
-      return response["data"]["result"]
+      return response.data.result
     } catch (error) {
       console.log(error)
     }
@@ -90,16 +90,16 @@ export class IndexAPI extends JRPCAPI {
    *
    * @param containerID
    * @param encoding
-   * @param baseurl
+   * @param baseURL
    *
    * @returns Returns a Promise<GetContainerByIDResponse>.
    */
   getContainerByID = async (
     containerID: string = "0",
     encoding: string = "cb58",
-    baseurl: string = this.getBaseURL()
+    baseURL: string = this.getBaseURL()
   ): Promise<GetContainerByIDResponse> => {
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
     const params: GetContainerByIDParams = {
       containerID,
       encoding
@@ -110,7 +110,7 @@ export class IndexAPI extends JRPCAPI {
         "index.getContainerByID",
         params
       )
-      return response["data"]["result"]
+      return response.data.result
     } catch (error) {
       console.log(error)
     }
@@ -122,7 +122,7 @@ export class IndexAPI extends JRPCAPI {
    * @param startIndex
    * @param numToFetch
    * @param encoding
-   * @param baseurl
+   * @param baseURL
    *
    * @returns Returns a Promise<GetContainerRangeResponse>.
    */
@@ -130,9 +130,9 @@ export class IndexAPI extends JRPCAPI {
     startIndex: number = 0,
     numToFetch: number = 100,
     encoding: string = "cb58",
-    baseurl: string = this.getBaseURL()
+    baseURL: string = this.getBaseURL()
   ): Promise<GetContainerRangeResponse[]> => {
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
     const params: GetContainerRangeParams = {
       startIndex,
       numToFetch,
@@ -144,7 +144,7 @@ export class IndexAPI extends JRPCAPI {
         "index.getContainerRange",
         params
       )
-      return response["data"]["result"]
+      return response.data.result
     } catch (error) {
       console.log(error)
     }
@@ -155,16 +155,16 @@ export class IndexAPI extends JRPCAPI {
    *
    * @param containerID
    * @param encoding
-   * @param baseurl
+   * @param baseURL
    *
    * @returns Returns a Promise<GetIndexResponse>.
    */
   getIndex = async (
     containerID: string = "",
     encoding: string = "cb58",
-    baseurl: string = this.getBaseURL()
+    baseURL: string = this.getBaseURL()
   ): Promise<string> => {
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
     const params: GetIndexParams = {
       containerID,
       encoding
@@ -175,7 +175,7 @@ export class IndexAPI extends JRPCAPI {
         "index.getIndex",
         params
       )
-      return response["data"]["result"]["index"]
+      return response.data.result.index
     } catch (error) {
       console.log(error)
     }
@@ -186,16 +186,16 @@ export class IndexAPI extends JRPCAPI {
    *
    * @param containerID
    * @param encoding
-   * @param baseurl
+   * @param baseURL
    *
    * @returns Returns a Promise<GetIsAcceptedResponse>.
    */
   isAccepted = async (
     containerID: string = "",
     encoding: string = "cb58",
-    baseurl: string = this.getBaseURL()
+    baseURL: string = this.getBaseURL()
   ): Promise<boolean> => {
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
     const params: GetIsAcceptedParams = {
       containerID,
       encoding
@@ -206,13 +206,19 @@ export class IndexAPI extends JRPCAPI {
         "index.isAccepted",
         params
       )
-      return response["data"]["result"]
+      return response.data.result
     } catch (error) {
       console.log(error)
     }
   }
 
-  constructor(core: AvalancheCore, baseurl: string = "/ext/index/X/tx") {
-    super(core, baseurl)
+  /**
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
+   *
+   * @param core A reference to the Avalanche class
+   * @param baseURL Defaults to the string "/ext/index/X/tx" as the path to rpc's baseURL
+   */
+  constructor(core: AvalancheCore, baseURL: string = "/ext/index/X/tx") {
+    super(core, baseURL)
   }
 }

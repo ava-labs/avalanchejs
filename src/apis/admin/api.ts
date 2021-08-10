@@ -6,10 +6,10 @@ import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
 import {
-  AliasChainInterface,
-  AliasInterface,
-  GetChainAliasesInterface
-} from "src/common/interfaces"
+  AliasChainParams,
+  AliasParams,
+  GetChainAliasesParams
+} from "./interfaces"
 
 /**
  * Class for interacting with a node's AdminAPI.
@@ -32,7 +32,7 @@ export class AdminAPI extends JRPCAPI {
    * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
    */
   alias = async (endpoint: string, alias: string): Promise<boolean> => {
-    const params: AliasInterface = {
+    const params: AliasParams = {
       endpoint,
       alias
     }
@@ -55,7 +55,7 @@ export class AdminAPI extends JRPCAPI {
    * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
    */
   aliasChain = async (chain: string, alias: string): Promise<boolean> => {
-    const params: AliasChainInterface = {
+    const params: AliasChainParams = {
       chain,
       alias
     }
@@ -76,7 +76,7 @@ export class AdminAPI extends JRPCAPI {
    * @returns Returns a Promise<string[]> containing aliases of the blockchain.
    */
   getChainAliases = async (chain: string): Promise<string[]> => {
-    const params: GetChainAliasesInterface = {
+    const params: GetChainAliasesParams = {
       chain
     }
     const response: RequestResponseData = await this.callMethod(
@@ -150,9 +150,9 @@ export class AdminAPI extends JRPCAPI {
    * method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/admin" as the path to rpc's baseurl
+   * @param baseURL Defaults to the string "/ext/admin" as the path to rpc's baseURL
    */
-  constructor(core: AvalancheCore, baseurl: string = "/ext/admin") {
-    super(core, baseurl)
+  constructor(core: AvalancheCore, baseURL: string = "/ext/admin") {
+    super(core, baseURL)
   }
 }

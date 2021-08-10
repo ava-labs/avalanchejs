@@ -11,7 +11,7 @@ import {
   IsBootstrappedParams,
   PeersParams,
   PeersResponse
-} from "../../common/interfaces"
+} from "./interfaces"
 
 /**
  * Class for interacting with a node's InfoAPI.
@@ -137,7 +137,13 @@ export class InfoAPI extends JRPCAPI {
     return response.data.result.peers
   }
 
-  constructor(core: AvalancheCore, baseurl: string = "/ext/info") {
-    super(core, baseurl)
+  /**
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
+   *
+   * @param core A reference to the Avalanche class
+   * @param baseURL Defaults to the string "/ext/info" as the path to rpc's baseURL
+   */
+  constructor(core: AvalancheCore, baseURL: string = "/ext/info") {
+    super(core, baseURL)
   }
 }
