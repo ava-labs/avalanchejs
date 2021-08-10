@@ -9,17 +9,17 @@ import { APIBase, RequestResponseData } from "./apibase"
 
 export class JRPCAPI extends APIBase {
   protected jrpcVersion: string = "2.0"
-  protected rpcid = 1
+  protected rpcID = 1
 
   callMethod = async (
     method: string,
     params?: object[] | object,
-    baseurl?: string,
+    baseURL?: string,
     headers?: object
   ): Promise<RequestResponseData> => {
-    const ep: string = baseurl || this.baseurl
+    const ep: string = baseURL || this.baseURL
     const rpc: any = {}
-    rpc.id = this.rpcid
+    rpc.id = this.rpcID
     rpc.method = method
 
     // Set parameters if exists
@@ -38,7 +38,7 @@ export class JRPCAPI extends APIBase {
       headrs = { ...headrs, ...headers }
     }
 
-    let baseURL: string = `${this.core.getProtocol()}://${this.core.getHost()}`
+    baseURL = `${this.core.getProtocol()}://${this.core.getHost()}`
     const port: number = this.core.getPort()
     if (port != undefined && typeof port === "number" && port >= 0) {
       baseURL = `${baseURL}:${port}`
@@ -57,7 +57,7 @@ export class JRPCAPI extends APIBase {
       axConf
     )
     if (resp.status >= 200 && resp.status < 300) {
-      this.rpcid += 1
+      this.rpcID += 1
       if (typeof resp.data === "string") {
         resp.data = JSON.parse(resp.data)
       }
@@ -75,21 +75,21 @@ export class JRPCAPI extends APIBase {
    * Returns the rpcid, a strictly-increasing number, starting from 1, indicating the next
    * request ID that will be sent.
    */
-  getRPCID = (): number => this.rpcid
+  getRPCID = (): number => this.rpcID
 
   /**
    *
    * @param core Reference to the Avalanche instance using this endpoint
-   * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/avm"
+   * @param baseURL Path of the APIs baseURL - ex: "/ext/bc/avm"
    * @param jrpcVersion The jrpc version to use, default "2.0".
    */
   constructor(
     core: AvalancheCore,
-    baseurl: string,
+    baseURL: string,
     jrpcVersion: string = "2.0"
   ) {
-    super(core, baseurl)
+    super(core, baseURL)
     this.jrpcVersion = jrpcVersion
-    this.rpcid = 1
+    this.rpcID = 1
   }
 }
