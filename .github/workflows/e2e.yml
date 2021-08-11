@@ -9,8 +9,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: 'ava-labs/avalanchego'
-          ref: 'dev'
+          ref: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
           path: 'avalanchego'
+      - run: echo ${{ github.ref }}
       - uses: actions/setup-node@v2
         with:
           cache: yarn
