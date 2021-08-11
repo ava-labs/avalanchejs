@@ -1,0 +1,30 @@
+name: E2E
+on: [push]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: 'ava-labs/avalanchego'
+          ref: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
+          path: 'avalanchego'
+      - uses: actions/setup-node@v2
+        with:
+          cache: yarn
+          node-version: '14'
+      - run: yarn install --frozen-lockfile
+      - uses: actions/setup-go@v1
+        with:
+          go-version: '1.15'
+      - name: static compilation of avalanchego
+        run: |
+          cd avalanchego
+          ../.github/workflows/avalanchego_static_build.sh
+      - name: avalanchejs e2e test
+        env: 
+          DOCKER_USERNAME: ${{ secrets.docker_username }}
+          DOCKER_PASS: ${{ secrets.docker_pass }}
+        run: .github/workflows/e2e.sh
