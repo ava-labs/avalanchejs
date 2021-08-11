@@ -35,9 +35,9 @@ export class MetricsAPI extends RESTAPI {
    * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/metrics" as the path to blockchain's baseurl
+   * @param baseURL Defaults to the string "/ext/metrics" as the path to rpc's baseurl
    */
-  constructor(core: AvalancheCore, baseurl: string = "/ext/metrics") {
-    super(core, baseurl)
+  constructor(core: AvalancheCore, baseURL: string = "/ext/metrics") {
+    super(core, baseURL)
   }
 }
