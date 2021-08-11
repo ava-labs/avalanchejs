@@ -1,13 +1,14 @@
 
-branch=$1
-
 mount_spec=$(pwd):/avalanchejs/
-image=avaplatform/avalanche-testing:chaos-4 
-
-echo avalanchejs branch: $branch
+image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
 
 echo "$DOCKER_PASS" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
-docker run -v $mount_spec $image \
-    scripts/executions/local-e2e-tests.sh --jsdir=/avalanchejs/ --tests="\"AvalancheJS\"" --runlocal=/run/local-e2e-tests.bin \
-    --branch=master --repo=public
+custom_params_json="{
+    \"avalanchegoImage\":\"/avalanchejs/avalanchego/build/\",
+    \"avalancheJsDir\":\"/avalanchejs/\",
+    \"executeTests\":[\"AvalancheJS\"]
+}"
+
+docker run -v $mount_spec $image ./local-e2e-tests.bin --custom-params-json="${custom_params_json}"
+
