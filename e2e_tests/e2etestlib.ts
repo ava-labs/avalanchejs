@@ -20,6 +20,7 @@ export enum Matcher {
     toEqual,
     toMatch,
     toThrow,
+    toGet,
 }
 
 export function createTests(tests_spec) {
@@ -36,6 +37,10 @@ export function createTests(tests_spec) {
       }
       if (matcher == Matcher.toThrow) {
         await expect(preprocess(promise())).rejects.toThrow(expected)
+      }
+      if (matcher == Matcher.toGet) {
+        expected.value = await preprocess(promise())
+        expect(true).toBe(true)
       }
     })
   }
