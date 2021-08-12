@@ -20,7 +20,7 @@ describe("Keystore", (): void => {
     ["createRepeatedUser", ()=>keystore.createUser(username1, password),  (x)=>x,  Matcher.toThrow,   "user already exists: " + username1],
     ["listUsers",          ()=>keystore.listUsers(),                      (x)=>x,  Matcher.toContain, [username1]],
     ["exportUser",         ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.toMatch,   /\w{78}/],
-    ["getExportedUser",    ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.toGet,     exportedUser],
+    ["getExportedUser",    ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.Get,     exportedUser],
     ["importUser",         ()=>keystore.importUser(username2, exportedUser.value, password),
                                                                           (x)=>x,  Matcher.toBe,      true],
     ["exportImportUser",   ()=>(async () => {
