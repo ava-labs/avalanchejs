@@ -18,6 +18,7 @@ export function getAvalanche() {
 export enum Matcher {
     toBe,
     toEqual,
+    toContain,
     toMatch,
     toThrow,
     toGet,
@@ -31,6 +32,9 @@ export function createTests(tests_spec) {
       }
       if (matcher == Matcher.toEqual) {
         expect(preprocess(await promise())).toEqual(expected)
+      }
+      if (matcher == Matcher.toContain) {
+        expect(preprocess(await promise())).toEqual(expect.arrayContaining(expected))
       }
       if (matcher == Matcher.toMatch) {
         expect(preprocess(await promise())).toMatch(expected)

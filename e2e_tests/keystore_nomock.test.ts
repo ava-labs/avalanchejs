@@ -15,22 +15,22 @@ describe("Keystore", (): void => {
 
   // test_name             response_promise                              resp_fn  matcher           expected_value/obtained_value
   const tests_spec: any = [
-    ["createUserWeakPass", ()=>keystore.createUser(username1, "weak"),    (x)=>x,  Matcher.toThrow,  "password is too weak"],
-    ["createUser",         ()=>keystore.createUser(username1, password),  (x)=>x,  Matcher.toBe,     true],
-    ["createRepeatedUser", ()=>keystore.createUser(username1, password),  (x)=>x,  Matcher.toThrow,  "user already exists: " + username1],
-    ["listUsers",          ()=>keystore.listUsers(),                      (x)=>x,  Matcher.toEqual,  [username1]],
-    ["exportUser",         ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.toMatch,  /\w{78}/],
-    ["getExportedUser",    ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.toGet,    exportedUser],
+    ["createUserWeakPass", ()=>keystore.createUser(username1, "weak"),    (x)=>x,  Matcher.toThrow,   "password is too weak"],
+    ["createUser",         ()=>keystore.createUser(username1, password),  (x)=>x,  Matcher.toBe,      true],
+    ["createRepeatedUser", ()=>keystore.createUser(username1, password),  (x)=>x,  Matcher.toThrow,   "user already exists: " + username1],
+    ["listUsers",          ()=>keystore.listUsers(),                      (x)=>x,  Matcher.toContain, [username1]],
+    ["exportUser",         ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.toMatch,   /\w{78}/],
+    ["getExportedUser",    ()=>keystore.exportUser(username1, password),  (x)=>x,  Matcher.toGet,     exportedUser],
     ["importUser",         ()=>keystore.importUser(username2, exportedUser.value, password),
-                                                                          (x)=>x,  Matcher.toBe,     true],
+                                                                          (x)=>x,  Matcher.toBe,      true],
     ["exportImportUser",   ()=>(async () => {
                              let exported = await keystore.exportUser(username1, password);
                              return await keystore.importUser(username3, exported, password);
-                           })(),                                          (x)=>x,  Matcher.toBe,     true],
-    ["listUsers2",         ()=>keystore.listUsers(),                      (x)=>x,  Matcher.toEqual,  [username1,username2,username3]],
-    ["deleteUser1",        ()=>keystore.deleteUser(username1, password),  (x)=>x,  Matcher.toBe,     true],
-    ["deleteUser2",        ()=>keystore.deleteUser(username2, password),  (x)=>x,  Matcher.toBe,     true],
-    ["deleteUser3",        ()=>keystore.deleteUser(username3, password),  (x)=>x,  Matcher.toBe,     true],
+                           })(),                                          (x)=>x,  Matcher.toBe,      true],
+    ["listUsers2",         ()=>keystore.listUsers(),                      (x)=>x,  Matcher.toContain, [username1,username2,username3]],
+    ["deleteUser1",        ()=>keystore.deleteUser(username1, password),  (x)=>x,  Matcher.toBe,      true],
+    ["deleteUser2",        ()=>keystore.deleteUser(username2, password),  (x)=>x,  Matcher.toBe,      true],
+    ["deleteUser3",        ()=>keystore.deleteUser(username3, password),  (x)=>x,  Matcher.toBe,      true],
   ]
 
   createTests(tests_spec)
