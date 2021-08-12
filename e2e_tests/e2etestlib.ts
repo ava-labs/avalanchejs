@@ -28,22 +28,22 @@ export function createTests(tests_spec) {
   for (const [testName, promise, preprocess, matcher, expected] of tests_spec) {
     test(testName, async () => {
       if (matcher == Matcher.toBe) {
-        expect(preprocess(await promise())).toBe(expected)
+        expect(preprocess(await promise())).toBe(expected())
       }
       if (matcher == Matcher.toEqual) {
-        expect(preprocess(await promise())).toEqual(expected)
+        expect(preprocess(await promise())).toEqual(expected())
       }
       if (matcher == Matcher.toContain) {
-        expect(preprocess(await promise())).toEqual(expect.arrayContaining(expected))
+        expect(preprocess(await promise())).toEqual(expect.arrayContaining(expected()))
       }
       if (matcher == Matcher.toMatch) {
-        expect(preprocess(await promise())).toMatch(expected)
+        expect(preprocess(await promise())).toMatch(expected())
       }
       if (matcher == Matcher.toThrow) {
-        await expect(preprocess(promise())).rejects.toThrow(expected)
+        await expect(preprocess(promise())).rejects.toThrow(expected())
       }
       if (matcher == Matcher.Get) {
-        expected.value = await preprocess(promise())
+        expected().value = await preprocess(promise())
         expect(true).toBe(true)
       }
     })
