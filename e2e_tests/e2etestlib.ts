@@ -43,7 +43,7 @@ export function createTests(tests_spec) {
         await expect(preprocess(promise())).rejects.toThrow(expected())
       }
       if (matcher == Matcher.Get) {
-        expected().value = await preprocess(promise())
+        expected().value = preprocess(await promise())
         expect(true).toBe(true)
       }
     })
