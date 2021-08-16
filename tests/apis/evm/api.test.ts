@@ -34,15 +34,15 @@ describe("EVMAPI", (): void => {
 
   const addrA: string =
     "C-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"))
+      bech32.bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"))
     )
   const addrC: string =
     "C-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))
+      bech32.bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))
     )
 
   beforeAll((): void => {
