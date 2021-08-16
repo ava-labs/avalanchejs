@@ -7,7 +7,6 @@ import { Buffer } from "buffer/"
 import createHash from "create-hash"
 import * as bech32 from "bech32"
 import { Base58 } from "./base58"
-import { Defaults } from "./constants"
 import { Bech32Error, ChecksumError, HexError } from "../utils/errors"
 import { utils } from "ethers"
 
