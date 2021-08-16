@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",
+    "rollup": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist && rollup --config rollup.config.ts --configPlugin typescript",
     "prebundle": "yarn build",
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
@@ -44,6 +45,7 @@
   },
   "homepage": "https://github.com/ava-labs/avalanchejs#readme",
   "devDependencies": {
+    "@rollup/plugin-typescript": "^8.2.5",
     "@types/bech32": "1.1.2",
     "@types/bn.js": "5.1.0",
     "@types/create-hash": "1.2.2",
