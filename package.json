@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "3.8.3",
+  "version": "3.8.4",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
@@ -67,7 +67,7 @@
     "ts-jest": "26.1.4",
     "ts-loader": "6.2.2",
     "typedoc": "0.21.2",
-    "typedoc-plugin-external-module-name": "4.0.3",
+    "typedoc-plugin-external-module-name": "4.0.6",
     "typedoc-plugin-markdown": "2.4.0",
     "typescript": "3.9.7",
     "webpack": "5.50.0",
