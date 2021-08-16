@@ -359,7 +359,9 @@ export default class BinTools {
       throw new Bech32Error("Error - Invalid HRP")
     }
 
-    return Buffer.from(bech32.bech32.fromWords(bech32.bech32.decode(parts[1]).words))
+    return Buffer.from(
+      bech32.bech32.fromWords(bech32.bech32.decode(parts[1]).words)
+    )
   }
 
   /**
