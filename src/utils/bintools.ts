@@ -127,7 +127,7 @@ export default class BinTools {
       return false
     }
     try {
-      bech32.fromWords(bech32.decode(parts[1]).words)
+      bech32.bech32.fromWords(bech32.bech32.decode(parts[1]).words)
     } catch (err) {
       return false
     }
@@ -317,7 +317,7 @@ export default class BinTools {
   }
 
   addressToString = (hrp: string, chainid: string, bytes: Buffer): string =>
-    `${chainid}-${bech32.encode(hrp, bech32.toWords(bytes))}`
+    `${chainid}-${bech32.bech32.encode(hrp, bech32.bech32.toWords(bytes))}`
 
   stringToAddress = (address: string, hrp?: string): Buffer => {
     if (address.substring(0, 2) === "0x") {
@@ -358,7 +358,9 @@ export default class BinTools {
       throw new Bech32Error("Error - Invalid HRP")
     }
 
-    return Buffer.from(bech32.fromWords(bech32.decode(parts[1]).words))
+    return Buffer.from(
+      bech32.bech32.fromWords(bech32.bech32.decode(parts[1]).words)
+    )
   }
 
   /**
