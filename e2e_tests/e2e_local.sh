@@ -13,7 +13,14 @@ dockerfile_contents=$(cat <<EOF
     RUN wget --quiet https://dl.google.com/go/go1.15.15.linux-amd64.tar.gz
     RUN tar -C /usr/local/ -xf go1.15.15.linux-amd64.tar.gz
     ENV GOROOT=/usr/local/go
-    ENV PATH=\$PATH:\$GOROOT/bin
+    ENV PATH=\$GOROOT/bin:\$PATH
+    # nvm/node14 install (solves M1 issue)
+    ENV NVM_DIR=/usr/local/nvm
+    ENV NODE_VERSION=14.17.5
+    RUN mkdir -p \$NVM_DIR
+    RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+    ENV NODE_PATH \$NVM_DIR/versions/node/v\$NODE_VERSION/lib/node_modules
+    ENV PATH      \$NVM_DIR/versions/node/v\$NODE_VERSION/bin:\$PATH
     # avalanchego download and compilation into /avalanchego/
     ARG avalanchego_branch
     RUN git clone https://github.com/ava-labs/avalanchego /avalanchego/
