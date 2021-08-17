@@ -81,7 +81,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    * @returns A signed [[StandardTx]]
    */
   sign(kc: KeyChain): Tx {
-    const txbuff = this.toBuffer()
+    const txbuff: Buffer = this.toBuffer()
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
     )
@@ -90,7 +90,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   }
 
   signPartially(kc: KeyChain, address: Buffer): Tx {
-    const txbuff = this.toBuffer()
+    const txbuff: Buffer = this.toBuffer()
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
     )

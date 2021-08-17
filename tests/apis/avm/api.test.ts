@@ -1217,7 +1217,7 @@ describe("AVMAPI", (): void => {
     })
 
     test("signTxPartially and composeSignatures", async (): Promise<void> => {
-      const a = addrs1.map((a) => api.parseAddress(a))
+      const a: Buffer[] = addrs1.map((a) => api.parseAddress(a))
 
       const txu: UnsignedTx = await avm.buildBaseTx(
         set,
@@ -1228,17 +1228,17 @@ describe("AVMAPI", (): void => {
         addrs1
       )
 
-      const tx1 = avm.signTxPartially(txu, a[0])
+      const tx1: Tx = avm.signTxPartially(txu, a[0])
       const tx1Creds: Credential[] = tx1.getCredentials()
       expect(tx1Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(tx1Creds[0].getSignatures().length).toBe(1)
 
-      const tx2 = avm.signTxPartially(txu, a[1])
+      const tx2: Tx = avm.signTxPartially(txu, a[1])
       const tx2Creds: Credential[] = tx2.getCredentials()
       expect(tx2Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(tx2Creds[0].getSignatures().length).toBe(1)
 
-      const tx3 = avm.signTxPartially(txu, a[2])
+      const tx3: Tx = avm.signTxPartially(txu, a[2])
       const tx3Creds: Credential[] = tx3.getCredentials()
       expect(tx3Creds.length).toBe(txu.getTransaction().getIns().length)
       expect(tx3Creds[0].getSignatures().length).toBe(1)
