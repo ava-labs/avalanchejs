@@ -13,8 +13,8 @@ import {
   CCHAINADDRPayload,
   TXIDPayload,
   JSONPayload
-} from "src/utils/payload"
-import BinTools from "src/utils/bintools"
+} from "../../src/utils/payload"
+import BinTools from "../../src/utils/bintools"
 import BN from "bn.js"
 import * as bech32 from "bech32"
 let payloadTypes: PayloadTypes = PayloadTypes.getInstance()
@@ -25,9 +25,9 @@ describe("Payload", () => {
 
   let cb58str: string = "MBcQpm1PsdfBKYscN3AYP56MusRDMZGF9"
   let cb58buf: string = bintools.bufferToB58(bintools.cb58Decode(cb58str))
-  let bech: string = bech32.encode(
+  let bech: string = bech32.bech32.encode(
     hrp,
-    bech32.toWords(bintools.b58ToBuffer(cb58buf))
+    bech32.bech32.toWords(bintools.b58ToBuffer(cb58buf))
   )
   let binstr: string = "Bx4v7ytutz3"
   let utf8str: string = "I am the very model of a modern Major-General."

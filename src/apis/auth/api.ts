@@ -5,6 +5,12 @@
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
+import { ErrorResponseObject } from "../../utils/errors"
+import {
+  ChangePasswordInterface,
+  NewTokenInterface,
+  RevokeTokenInterface
+} from "./interfaces"
 
 /**
  * Class for interacting with a node's AuthAPI.
@@ -22,8 +28,11 @@ export class AuthAPI extends JRPCAPI {
    *
    * @returns Returns a Promise<string> containing the authorization token.
    */
-  newToken = async (password: string, endpoints: string[]): Promise<string> => {
-    const params: any = {
+  newToken = async (
+    password: string,
+    endpoints: string[]
+  ): Promise<string | ErrorResponseObject> => {
+    const params: NewTokenInterface = {
       password,
       endpoints
     }
@@ -32,6 +41,8 @@ export class AuthAPI extends JRPCAPI {
       params
     )
     return response.data.result.token
+      ? response.data.result.token
+      : response.data.result
   }
 
   /**
@@ -43,7 +54,7 @@ export class AuthAPI extends JRPCAPI {
    * @returns Returns a Promise<boolean> indicating if a token was successfully revoked.
    */
   revokeToken = async (password: string, token: string): Promise<boolean> => {
-    const params: any = {
+    const params: RevokeTokenInterface = {
       password,
       token
     }
@@ -66,7 +77,7 @@ export class AuthAPI extends JRPCAPI {
     oldPassword: string,
     newPassword: string
   ): Promise<boolean> => {
-    const params: any = {
+    const params: ChangePasswordInterface = {
       oldPassword,
       newPassword
     }
@@ -77,7 +88,14 @@ export class AuthAPI extends JRPCAPI {
     return response.data.result.success
   }
 
-  constructor(core: AvalancheCore, baseurl: string = "/ext/auth") {
-    super(core, baseurl)
+  /**
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]]
+   * method.
+   *
+   * @param core A reference to the Avalanche class
+   * @param baseURL Defaults to the string "/ext/auth" as the path to rpc's baseURL
+   */
+  constructor(core: AvalancheCore, baseURL: string = "/ext/auth") {
+    super(core, baseURL)
   }
 }

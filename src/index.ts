@@ -31,7 +31,7 @@ import { Buffer } from "buffer/"
  *
  * Example usage:
  * ```js
- * let avalanche = new Avalanche("127.0.0.1", 9650, "https")
+ * const avalanche: Avalanche = new Avalanche("127.0.0.1", 9650, "https")
  * ```
  *
  */
@@ -93,14 +93,14 @@ export default class Avalanche extends AvalancheCore {
    * @param host The hostname to resolve to reach the Avalanche Client RPC APIs
    * @param port The port to resolve to reach the Avalanche Client RPC APIs
    * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc ...
+   * ex: "http", "https", "git", "ws", etc. Defaults to http
    * @param networkID Sets the NetworkID of the class. Default [[DefaultNetworkID]]
    * @param XChainID Sets the blockchainID for the AVM. Will try to auto-detect,
-   * otherwise default "4R5p2RXDGLqaifZE4hHWH9owe34pfoBULn1DrQTWivjg8o4aH"
+   * otherwise default "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed"
    * @param CChainID Sets the blockchainID for the EVM. Will try to auto-detect,
-   * otherwise default "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5"
+   * otherwise default "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU"
    * @param hrp The human-readable part of the bech32 addresses
-   * @param skipinit Skips creating the APIs
+   * @param skipinit Skips creating the APIs. Defaults to false
    */
   constructor(
     host: string,

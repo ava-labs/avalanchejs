@@ -1,49 +1,50 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
-import { PlatformVMAPI } from "src/apis/platformvm/api"
+import { PlatformVMAPI } from "../../../src/apis/platformvm/api"
 import { Buffer } from "buffer/"
 import BN from "bn.js"
-import BinTools from "src/utils/bintools"
+import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
-import { Defaults, PlatformChainID } from "src/utils/constants"
-import { UTXOSet } from "src/apis/platformvm/utxos"
-import { PersistanceOptions } from "src/utils/persistenceoptions"
-import { KeyChain } from "src/apis/platformvm/keychain"
+import { Defaults, PlatformChainID } from "../../../src/utils/constants"
+import { UTXOSet } from "../../../src/apis/platformvm/utxos"
+import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
+import { KeyChain } from "../../../src/apis/platformvm/keychain"
 import {
   SECPTransferOutput,
   TransferableOutput,
   AmountOutput,
   ParseableOutput,
   StakeableLockOut
-} from "src/apis/platformvm/outputs"
+} from "../../../src/apis/platformvm/outputs"
 import {
   TransferableInput,
   SECPTransferInput,
   AmountInput,
   StakeableLockIn
-} from "src/apis/platformvm/inputs"
-import { UTXO } from "src/apis/platformvm/utxos"
+} from "../../../src/apis/platformvm/inputs"
+import { UTXO } from "../../../src/apis/platformvm/utxos"
 import createHash from "create-hash"
-import { UnsignedTx, Tx } from "src/apis/platformvm/tx"
-import { UnixNow } from "src/utils/helperfunctions"
-import { UTF8Payload } from "src/utils/payload"
-import { NodeIDStringToBuffer } from "src/utils/helperfunctions"
-import { ONEAVAX } from "src/utils/constants"
+import { UnsignedTx, Tx } from "../../../src/apis/platformvm/tx"
+import { UnixNow } from "../../../src/utils/helperfunctions"
+import { UTF8Payload } from "../../../src/utils/payload"
+import { NodeIDStringToBuffer } from "../../../src/utils/helperfunctions"
+import { ONEAVAX } from "../../../src/utils/constants"
 import {
   Serializable,
   Serialization,
   SerializedEncoding,
   SerializedType
-} from "src/utils/serialization"
-import { AddValidatorTx } from "src/apis/platformvm/validationtx"
-import { GetRewardUTXOsResponse } from "src/common"
+} from "../../../src/utils/serialization"
+import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
+import { GetRewardUTXOsResponse } from "../../../src/apis/platformvm/interfaces"
+import { ErrorResponseObject } from "../../../src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**
  * @ignore
  */
-const bintools = BinTools.getInstance()
-const serializer = Serialization.getInstance()
+const bintools: BinTools = BinTools.getInstance()
+const serializer: Serialization = Serialization.getInstance()
 const display: SerializedEncoding = "display"
 const dumpSerialization: boolean = false
 
@@ -101,21 +102,27 @@ describe("PlatformVMAPI", (): void => {
 
   const addrA: string =
     "P-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")
+      )
     )
   const addrB: string =
     "P-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")
+      )
     )
   const addrC: string =
     "P-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
+      )
     )
 
   beforeAll((): void => {
@@ -165,7 +172,11 @@ describe("PlatformVMAPI", (): void => {
   test("importKey", async (): Promise<void> => {
     const address: string = addrC
 
-    const result: Promise<string> = api.importKey(username, password, "key")
+    const result: Promise<string | ErrorResponseObject> = api.importKey(
+      username,
+      password,
+      "key"
+    )
     const payload: object = {
       result: {
         address
@@ -176,10 +187,39 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(address)
+  })
+
+  test("import bad key", async (): Promise<void> => {
+    const address: string = addrC
+    const message: string =
+      'problem retrieving data: incorrect password for user "test"'
+    const result: Promise<string | ErrorResponseObject> = api.importKey(
+      username,
+      "badpassword",
+      "key"
+    )
+    const payload: object = {
+      result: {
+        code: -32000,
+        message,
+        data: null
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string | ErrorResponseObject = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+
+    expect(response["code"]).toBe(-32000)
+    expect(response["message"]).toBe(message)
   })
 
   test("getBalance", async (): Promise<void> => {
@@ -315,15 +355,16 @@ describe("PlatformVMAPI", (): void => {
     const endTime: Date = new Date(1982, 3, 1, 12, 58, 33, 7)
     const weight: number = 13
     const utx: string = "valid"
-    const result: Promise<string> = api.addSubnetValidator(
-      username,
-      password,
-      nodeID,
-      subnetID,
-      startTime,
-      endTime,
-      weight
-    )
+    const result: Promise<string | ErrorResponseObject> =
+      api.addSubnetValidator(
+        username,
+        password,
+        nodeID,
+        subnetID,
+        startTime,
+        endTime,
+        weight
+      )
     const payload: object = {
       result: {
         txID: utx
@@ -334,7 +375,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(utx)
@@ -347,15 +388,16 @@ describe("PlatformVMAPI", (): void => {
     const endTime: Date = new Date(1982, 3, 1, 12, 58, 33, 7)
     const weight: number = 13
     const utx: string = "valid"
-    const result: Promise<string> = api.addSubnetValidator(
-      username,
-      password,
-      nodeID,
-      subnetID,
-      startTime,
-      endTime,
-      weight
-    )
+    const result: Promise<string | ErrorResponseObject> =
+      api.addSubnetValidator(
+        username,
+        password,
+        nodeID,
+        subnetID,
+        startTime,
+        endTime,
+        weight
+      )
     const payload: object = {
       result: {
         txID: utx
@@ -366,7 +408,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(utx)
@@ -516,7 +558,11 @@ describe("PlatformVMAPI", (): void => {
   test("exportKey", async (): Promise<void> => {
     const key: string = "sdfglvlj2h3v45"
 
-    const result: Promise<string> = api.exportKey(username, password, addrA)
+    const result: Promise<string | ErrorResponseObject> = api.exportKey(
+      username,
+      password,
+      addrA
+    )
     const payload: object = {
       result: {
         privateKey: key
@@ -527,7 +573,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(key)
@@ -539,7 +585,7 @@ describe("PlatformVMAPI", (): void => {
     const username: string = "Robert"
     const password: string = "Paulson"
     const txID: string = "valid"
-    const result: Promise<string> = api.exportAVAX(
+    const result: Promise<string | ErrorResponseObject> = api.exportAVAX(
       username,
       password,
       amount,
@@ -555,7 +601,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
@@ -566,7 +612,7 @@ describe("PlatformVMAPI", (): void => {
     const username: string = "Robert"
     const password = "Paulson"
     const txID = "valid"
-    const result: Promise<string> = api.importAVAX(
+    const result: Promise<string | ErrorResponseObject> = api.importAVAX(
       username,
       password,
       to,
@@ -582,7 +628,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
@@ -594,7 +640,7 @@ describe("PlatformVMAPI", (): void => {
     const name: string = "Some Blockchain"
     const genesis: string = '{ruh:"roh"}'
     const subnetID: Buffer = Buffer.from("abcdef", "hex")
-    const result: Promise<string> = api.createBlockchain(
+    const result: Promise<string | ErrorResponseObject> = api.createBlockchain(
       username,
       password,
       subnetID,
@@ -613,7 +659,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(blockchainID)
@@ -662,7 +708,7 @@ describe("PlatformVMAPI", (): void => {
     const controlKeys: string[] = ["abcdef"]
     const threshold: number = 13
     const utx: string = "valid"
-    const result: Promise<string> = api.createSubnet(
+    const result: Promise<string | ErrorResponseObject> = api.createSubnet(
       username,
       password,
       controlKeys,
@@ -678,7 +724,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(utx)
@@ -828,7 +874,7 @@ describe("PlatformVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string> = api.getTx(txid)
+    const result: Promise<string | ErrorResponseObject> = api.getTx(txid)
     const payload: object = {
       result: {
         tx: "sometx"
@@ -839,7 +885,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | ErrorResponseObject = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("sometx")
@@ -1341,33 +1387,33 @@ describe("PlatformVMAPI", (): void => {
           const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
           const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
           const amount:BN = new BN(90);
-    
+
           const txu1:UnsignedTx = await platformvm.buildAddSubnetValidatorTx(
-            set,  
-            addrs1, 
-            addrs2, 
-            nodeID, 
+            set,
+            addrs1,
+            addrs2,
+            nodeID,
             startTime,
             endTime,
             PlatformVMConstants.MINSTAKE,
             new UTF8Payload("hello world"), UnixNow()
           );
-    
+
           const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
             networkID, bintools.cb58Decode(blockchainID),
-            addrbuff1,         
-            addrbuff2, 
-            NodeIDStringToBuffer(nodeID), 
+            addrbuff1,
+            addrbuff2,
+            NodeIDStringToBuffer(nodeID),
             startTime,
             endTime,
             PlatformVMConstants.MINSTAKE,
-            platformvm.getFee(), 
+            platformvm.getFee(),
             assetID,
             new UTF8Payload("hello world").getPayload(), UnixNow()
           );
           expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
           expect(txu2.toString()).toBe(txu1.toString());
-    
+
         });
     */
     test("buildAddDelegatorTx 1", async (): Promise<void> => {

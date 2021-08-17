@@ -5,6 +5,8 @@
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
+import { ImportUserParams } from "./interfaces"
+import { CredsInterface } from "../../common/interfaces"
 
 /**
  * Class for interacting with a node API that is using the node's KeystoreAPI.
@@ -25,7 +27,7 @@ export class KeystoreAPI extends JRPCAPI {
    * @returns Promise for a boolean with true on success
    */
   createUser = async (username: string, password: string): Promise<boolean> => {
-    const params: any = {
+    const params: CredsInterface = {
       username,
       password
     }
@@ -34,6 +36,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -45,7 +49,7 @@ export class KeystoreAPI extends JRPCAPI {
    * @returns Promise with a string importable using importUser
    */
   exportUser = async (username: string, password: string): Promise<string> => {
-    const params: any = {
+    const params: CredsInterface = {
       username,
       password
     }
@@ -54,6 +58,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.user
+      ? response.data.result.user
+      : response.data.result
   }
 
   /**
@@ -70,7 +76,7 @@ export class KeystoreAPI extends JRPCAPI {
     user: string,
     password: string
   ): Promise<boolean> => {
-    const params: any = {
+    const params: ImportUserParams = {
       username,
       user,
       password
@@ -80,6 +86,8 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
@@ -103,7 +111,7 @@ export class KeystoreAPI extends JRPCAPI {
    * @returns Promise for a boolean with true on success
    */
   deleteUser = async (username: string, password: string): Promise<boolean> => {
-    const params: any = {
+    const params: CredsInterface = {
       username,
       password
     }
@@ -112,15 +120,17 @@ export class KeystoreAPI extends JRPCAPI {
       params
     )
     return response.data.result.success
+      ? response.data.result.success
+      : response.data.result
   }
 
   /**
    * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/keystore" as the path to blockchain"s baseurl
+   * @param baseURL Defaults to the string "/ext/keystore" as the path to rpc's baseURL
    */
-  constructor(core: AvalancheCore, baseurl: string = "/ext/keystore") {
-    super(core, baseurl)
+  constructor(core: AvalancheCore, baseURL: string = "/ext/keystore") {
+    super(core, baseURL)
   }
 }

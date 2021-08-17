@@ -1,11 +1,11 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
-import { InfoAPI } from "src/apis/info/api"
+import { InfoAPI } from "../../../src/apis/info/api"
 import BN from "bn.js"
-import { PeersParams, PeersResponse } from "src/common"
+import { PeersResponse } from "../../../src/apis/info/interfaces"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
-describe("Info", () => {
+describe("Info", (): void => {
   const ip: string = "127.0.0.1"
   const port: number = 9650
   const protocol: string = "https"
@@ -22,15 +22,15 @@ describe("Info", () => {
   )
   let info: InfoAPI
 
-  beforeAll(() => {
+  beforeAll((): void => {
     info = avalanche.Info()
   })
 
-  afterEach(() => {
+  afterEach((): void => {
     mockAxios.reset()
   })
 
-  test("getBlockchainID", async () => {
+  test("getBlockchainID", async (): Promise<void> => {
     const result: Promise<string> = info.getBlockchainID("X")
     const payload: object = {
       result: {
@@ -48,7 +48,7 @@ describe("Info", () => {
     expect(response).toBe("What is my purpose? You pass butter. Oh my god.")
   })
 
-  test("getNetworkID", async () => {
+  test("getNetworkID", async (): Promise<void> => {
     const result: Promise<number> = info.getNetworkID()
     const payload: object = {
       result: {
@@ -66,7 +66,7 @@ describe("Info", () => {
     expect(response).toBe(12345)
   })
 
-  test("getTxFee", async () => {
+  test("getTxFee", async (): Promise<void> => {
     const result: Promise<{ txFee: BN; creationTxFee: BN }> = info.getTxFee()
     const payload: object = {
       result: {
@@ -86,7 +86,7 @@ describe("Info", () => {
     expect(response.creationTxFee.eq(new BN("10000000"))).toBe(true)
   })
 
-  test("getNetworkName", async () => {
+  test("getNetworkName", async (): Promise<void> => {
     const result: Promise<string> = info.getNetworkName()
     const payload: object = {
       result: {
@@ -104,7 +104,7 @@ describe("Info", () => {
     expect(response).toBe("denali")
   })
 
-  test("getNodeID", async () => {
+  test("getNodeID", async (): Promise<void> => {
     const result: Promise<string> = info.getNodeID()
     const payload: object = {
       result: {
@@ -122,7 +122,7 @@ describe("Info", () => {
     expect(response).toBe("abcd")
   })
 
-  test("getNodeVersion", async () => {
+  test("getNodeVersion", async (): Promise<void> => {
     const result: Promise<string> = info.getNodeVersion()
     const payload: object = {
       result: {
@@ -140,7 +140,7 @@ describe("Info", () => {
     expect(response).toBe("avalanche/0.5.5")
   })
 
-  test("isBootstrapped false", async () => {
+  test("isBootstrapped false", async (): Promise<void> => {
     const result: Promise<boolean> = info.isBootstrapped("X")
     const payload: object = {
       result: {
@@ -158,7 +158,7 @@ describe("Info", () => {
     expect(response).toBe(false)
   })
 
-  test("isBootstrapped true", async () => {
+  test("isBootstrapped true", async (): Promise<void> => {
     const result: Promise<boolean> = info.isBootstrapped("P")
     const payload: object = {
       result: {
@@ -176,7 +176,7 @@ describe("Info", () => {
     expect(response).toBe(true)
   })
 
-  test("peers", async () => {
+  test("peers", async (): Promise<void> => {
     const peers = [
       {
         ip: "127.0.0.1:60300",

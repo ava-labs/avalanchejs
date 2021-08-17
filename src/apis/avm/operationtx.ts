@@ -144,7 +144,7 @@ export class OperationTx extends BaseTx {
   }
 
   clone(): this {
-    let newbase: OperationTx = new OperationTx()
+    const newbase: OperationTx = new OperationTx()
     newbase.fromBuffer(this.toBuffer())
     return newbase as this
   }

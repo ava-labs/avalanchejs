@@ -17,34 +17,24 @@ import { getPreferredHRP } from "./utils/helperfunctions"
  */
 export default class AvalancheCore {
   protected networkID: number = 0
-
   protected hrp: string = ""
-
   protected protocol: string
-
   protected ip: string
-
   protected host: string
-
   protected port: number
-
   protected url: string
-
   protected auth: string = undefined
-
   protected headers: { [k: string]: string } = {}
-
   protected requestConfig: AxiosRequestConfig = {}
-
   protected apis: { [k: string]: APIBase } = {}
 
   /**
    * Sets the address and port of the main Avalanche Client.
    *
-   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs
-   * @param port The port to resolve to reach the Avalanche Client RPC APIs
+   * @param host The hostname to resolve to reach the Avalanche Client RPC APIs.
+   * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc ...
+   * ex: "http", "https", "git", "ws", etc. Defaults to https
    */
   setAddress = (host: string, port: number, protocol: string = "http") => {
     this.host = host
@@ -100,8 +90,8 @@ export default class AvalancheCore {
   /**
    * Sets the networkID
    */
-  setNetworkID = (netid: number) => {
-    this.networkID = netid
+  setNetworkID = (netID: number): void => {
+    this.networkID = netID
     this.hrp = getPreferredHRP(this.networkID)
   }
 
@@ -265,7 +255,7 @@ export default class AvalancheCore {
       }
     } else {
       config = {
-        baseURL: `${this.protocol}://${this.ip}:${this.port}`,
+        baseURL: `${this.protocol}://${this.host}:${this.port}`,
         responseType: "text",
         ...this.requestConfig
       }
@@ -277,12 +267,13 @@ export default class AvalancheCore {
     config.params = getdata
     const resp: AxiosResponse<any> = await axios.request(config)
     // purging all that is axios
-    const xhrdata: RequestResponseData = new RequestResponseData()
-    xhrdata.data = resp.data
-    xhrdata.headers = resp.headers
-    xhrdata.request = resp.request
-    xhrdata.status = resp.status
-    xhrdata.statusText = resp.statusText
+    const xhrdata: RequestResponseData = new RequestResponseData(
+      resp.data,
+      resp.headers,
+      resp.status,
+      resp.statusText,
+      resp.request
+    )
     return xhrdata
   }
 
@@ -291,7 +282,6 @@ export default class AvalancheCore {
    *
    * @param baseurl Path to the api
    * @param getdata Object containing the key value pairs sent in GET
-   * @param parameters Object containing the parameters of the API call
    * @param headers An array HTTP Request Headers
    * @param axiosConfig Configuration for the axios javascript library that will be the
    * foundation for the rest of the parameters
@@ -318,7 +308,6 @@ export default class AvalancheCore {
    *
    * @param baseurl Path to the API
    * @param getdata Object containing the key value pairs sent in DELETE
-   * @param parameters Object containing the parameters of the API call
    * @param headers An array HTTP Request Headers
    * @param axiosConfig Configuration for the axios javascript library that will be the
    * foundation for the rest of the parameters
@@ -346,7 +335,6 @@ export default class AvalancheCore {
    * @param baseurl Path to the API
    * @param getdata Object containing the key value pairs sent in POST
    * @param postdata Object containing the key value pairs sent in POST
-   * @param parameters Object containing the parameters of the API call
    * @param headers An array HTTP Request Headers
    * @param axiosConfig Configuration for the axios javascript library that will be the
    * foundation for the rest of the parameters
@@ -375,7 +363,6 @@ export default class AvalancheCore {
    * @param baseurl Path to the baseurl
    * @param getdata Object containing the key value pairs sent in PUT
    * @param postdata Object containing the key value pairs sent in PUT
-   * @param parameters Object containing the parameters of the API call
    * @param headers An array HTTP Request Headers
    * @param axiosConfig Configuration for the axios javascript library that will be the
    * foundation for the rest of the parameters

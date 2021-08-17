@@ -1,4 +1,4 @@
-import AvalancheCore from "src/avalanche"
+import AvalancheCore from "../src/avalanche"
 import { AxiosRequestConfig } from "axios"
 import { APIBase, RequestResponseData } from "../src/common/apibase"
 
@@ -51,7 +51,7 @@ export class TestAPI extends APIBase {
   ): Promise<object> => {
     if (postdata === undefined) {
       const res: RequestResponseData = await this.core[method](
-        this.baseurl + path,
+        this.baseURL + path,
         getdata,
         {},
         axiosConfig
@@ -59,7 +59,7 @@ export class TestAPI extends APIBase {
       return this._respFn(res)
     }
     const res: RequestResponseData = await this.core[method](
-      this.baseurl + path,
+      this.baseURL + path,
       getdata,
       postdata,
       {},

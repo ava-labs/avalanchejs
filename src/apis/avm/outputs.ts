@@ -302,9 +302,10 @@ export class NFTMintOutput extends NFTOutput {
    * An [[Output]] class which contains an NFT mint for an assetID.
    *
    * @param groupID A number specifies the group this NFT is issued to
+   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing  addresses
    * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
    * @param threshold A number representing the the threshold number of signers required to sign the transaction
-   * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
+
    */
   constructor(
     groupID: number = undefined,
@@ -446,7 +447,7 @@ export class NFTTransferOutput extends NFTOutput {
      * An [[Output]] class which contains an NFT on an assetID.
      *
      * @param groupID A number representing the amount in the output
-     * @param payload A {@link https://github.com/feross/buffer|Buffer} of max length 1024 
+     * @param payload A {@link https://github.com/feross/buffer|Buffer} of max length 1024
      * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
      * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
      * @param threshold A number representing the the threshold number of signers required to sign the transaction
