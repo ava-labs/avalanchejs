@@ -36,7 +36,7 @@ if [ $? != 0 ]
 then
     echo Image does not exists: building
     echo "$DOCKER_PASS" | docker login --username "$DOCKER_USERNAME" --password-stdin
-    docker build -t $avalanchejs_local_image --build-arg avalanchego_branch=$avalanchego_branch - <<< $dockerfile_contents
+    docker build -t $avalanchejs_local_image --build-arg avalanchego_branch=$avalanchego_branch - <<< "$dockerfile_contents"
 else
     echo Using previously built image
 fi
