@@ -20,7 +20,7 @@ Execute the script from avalanchejs dir: `./e2e_tests/e2e_local.sh`
 ### Docker image
 
 The script adds the last version of avalanchego to the docker image used in CI. The new image is called
-`avaplatform/avalanche-testing:avalanchejs_local_e2e_${AVALANCHEGO_BRANCH}` where AVALANCHEGO_BRANCH 
+`avaplatform/avalanche-testing:avalanchejs_local_e2e_${AVALANCHEGO_BRANCH}` where `AVALANCHEGO_BRANCH` 
 depends on current avalanchejs branch (master => master, other => dev).
 
 It creates the corresponding image only the first time it is called. In order to rebuild the image,
