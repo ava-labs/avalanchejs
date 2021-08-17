@@ -20,6 +20,7 @@ import { Defaults, PrimaryAssetAlias, ONEAVAX } from "../../utils/constants"
 import { MinterSet } from "./minterset"
 import { PersistanceOptions } from "../../utils/persistenceoptions"
 import { Address, OutputOwners } from "../../common/output"
+import createHash from "create-hash"
 import { SECPTransferOutput } from "./outputs"
 import {
   AddressError,
@@ -55,6 +56,7 @@ import {
   SOutputsParams
 } from "./interfaces"
 import { IssueTxParams } from "../../common"
+import { Credential } from "../../common"
 
 /**
  * @ignore
@@ -1609,7 +1611,7 @@ export class AVMAPI extends JRPCAPI {
     )
 
     const deriveAddressFromTx = (tx: Tx): Address => {
-      const creds = tx.getCredentials()
+      const creds: Credential[] = tx.getCredentials()
       if (!creds.length) {
         throw new TransactionError(
           "Error - composeSignature: tx doesn't have Credentials"

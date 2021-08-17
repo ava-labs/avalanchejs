@@ -27,13 +27,15 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
-  Address,
-  Credential,
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse
 } from "./interfaces"
+import {
+  Address,
+  Credential
+} from "../../common"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
 import createHash from "create-hash"

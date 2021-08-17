@@ -381,7 +381,7 @@ export abstract class StandardTx<
   protected credentials: Credential[] = []
 
   /**
-   * Returns the [[Credential[]]]
+   * Returns the [Credential[]]
    */
   getCredentials = (): Credential[] => {
     return this.credentials
