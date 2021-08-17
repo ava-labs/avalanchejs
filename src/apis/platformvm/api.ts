@@ -33,8 +33,8 @@ import {
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse
-} from "../../common"
-import { TransferableOutput } from "../platformvm/outputs"
+} from "./interfaces"
+import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
 import createHash from "create-hash"
 import { KeyPair } from "../avm"
@@ -1783,17 +1783,17 @@ return builtUnsignedTx
    * Instead use the [[Avalanche.addAPI]] method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/P" as the path to blockchain"s baseurl
+   * @param baseURL Defaults to the string "/ext/P" as the path to blockchain's baseURL
    */
-  constructor(core: AvalancheCore, baseurl: string = "/ext/bc/P") {
-    super(core, baseurl)
+  constructor(core: AvalancheCore, baseURL: string = "/ext/bc/P") {
+    super(core, baseURL)
     this.blockchainID = PlatformChainID
-    const netid: number = core.getNetworkID()
+    const netID: number = core.getNetworkID()
     if (
-      netid in Defaults.network &&
-      this.blockchainID in Defaults.network[netid]
+      netID in Defaults.network &&
+      this.blockchainID in Defaults.network[netID]
     ) {
-      const { alias } = Defaults.network[netid][this.blockchainID]
+      const { alias } = Defaults.network[netID][this.blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
@@ -1802,8 +1802,6 @@ return builtUnsignedTx
 
   /**
    * @returns the UTXOs that were rewarded after the provided transaction"s staking or delegation period ended.
-   *
-   * @returns the number fetched, an array of UTXOs and the encoding.
    */
   getRewardUTXOs = async (
     txID: string,
