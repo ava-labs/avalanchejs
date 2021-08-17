@@ -1104,7 +1104,7 @@ export class AVMAPI extends JRPCAPI {
       srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - AVMAPI.buildImportTx: Invalid destinationChain type: " +
-        typeof sourceChain
+          typeof sourceChain
       )
     }
 
@@ -1117,9 +1117,9 @@ export class AVMAPI extends JRPCAPI {
     if (atomics.length === 0) {
       throw new NoAtomicUTXOsError(
         "Error - AVMAPI.buildImportTx: No atomic UTXOs to import from " +
-        srcChain +
-        " using addresses: " +
-        ownerAddresses.join(", ")
+          srcChain +
+          " using addresses: " +
+          ownerAddresses.join(", ")
       )
     }
 
@@ -1204,7 +1204,7 @@ export class AVMAPI extends JRPCAPI {
     } else if (!(destinationChain instanceof Buffer)) {
       throw new ChainIdError(
         "Error - AVMAPI.buildExportTx: Invalid destinationChain type: " +
-        typeof destinationChain
+          typeof destinationChain
       )
     }
     if (destinationChain.length !== 32) {
@@ -1312,7 +1312,7 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new SymbolError(
         "Error - AVMAPI.buildCreateAssetTx: Symbols may not exceed length of " +
-        AVMConstants.SYMBOLMAXLEN
+          AVMConstants.SYMBOLMAXLEN
       )
     }
     /* istanbul ignore next */
@@ -1320,7 +1320,7 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new NameError(
         "Error - AVMAPI.buildCreateAssetTx: Names may not exceed length of " +
-        AVMConstants.ASSETNAMELEN
+          AVMConstants.ASSETNAMELEN
       )
     }
 
@@ -1463,14 +1463,14 @@ export class AVMAPI extends JRPCAPI {
       /* istanbul ignore next */
       throw new NameError(
         "Error - AVMAPI.buildCreateNFTAssetTx: Names may not exceed length of " +
-        AVMConstants.ASSETNAMELEN
+          AVMConstants.ASSETNAMELEN
       )
     }
     if (symbol.length > AVMConstants.SYMBOLMAXLEN) {
       /* istanbul ignore next */
       throw new SymbolError(
         "Error - AVMAPI.buildCreateNFTAssetTx: Symbols may not exceed length of " +
-        AVMConstants.SYMBOLMAXLEN
+          AVMConstants.SYMBOLMAXLEN
       )
     }
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
