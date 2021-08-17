@@ -55,8 +55,7 @@ import {
   SendMultipleParams,
   SOutputsParams
 } from "./interfaces"
-import { IssueTxParams } from "../../common"
-import { Credential } from "../../common"
+import { IssueTxParams, Credential, Signature } from "../../common"
 
 /**
  * @ignore
@@ -1603,9 +1602,9 @@ export class AVMAPI extends JRPCAPI {
       )
     }
 
-    const unsignedTx = txs[0].getUnsignedTx()
+    const unsignedTx: UnsignedTx = txs[0].getUnsignedTx()
 
-    const txbuff = unsignedTx.toBuffer()
+    const txbuff: Buffer = unsignedTx.toBuffer()
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
     )
@@ -1617,27 +1616,27 @@ export class AVMAPI extends JRPCAPI {
           "Error - composeSignature: tx doesn't have Credentials"
         )
       }
-      const sigs = creds[0].getSignatures()
+      const sigs: Signature[] = creds[0].getSignatures()
       if (!sigs.length) {
         throw new TransactionError(
           "Error - composeSignature: tx doesn't have Signature"
         )
       }
-      const sigA = creds[0].getSignatures()[0]
+      const sigA: Signature = creds[0].getSignatures()[0]
 
       const kp: KeyPair = new KeyPair(this.keychain.hrp, this.keychain.chainid)
-      const pubKey = kp.recover(msg, sigA.toBuffer())
-      const addressBuf = kp.addressFromPublicKey(pubKey)
+      const pubKey: Buffer = kp.recover(msg, sigA.toBuffer())
+      const addressBuf: Buffer = kp.addressFromPublicKey(pubKey)
 
-      const address = new Address()
+      const address: Address = new Address()
       address.fromBuffer(addressBuf)
 
       return address
     }
 
     txs = txs.sort((a: Tx, b: Tx): 1 | -1 | 0 => {
-      const addressA = deriveAddressFromTx(a)
-      const addressB = deriveAddressFromTx(b)
+      const addressA: Address = deriveAddressFromTx(a)
+      const addressB: Address = deriveAddressFromTx(b)
 
       return Address.comparator()(addressA, addressB)
     })
