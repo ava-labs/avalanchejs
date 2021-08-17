@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 avalanche_testing_image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
 
