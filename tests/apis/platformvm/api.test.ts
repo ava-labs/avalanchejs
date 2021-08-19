@@ -102,21 +102,27 @@ describe("PlatformVMAPI", (): void => {
 
   const addrA: string =
     "P-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")
+      )
     )
   const addrB: string =
     "P-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")
+      )
     )
   const addrC: string =
     "P-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
+      )
     )
 
   beforeAll((): void => {
