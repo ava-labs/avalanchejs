@@ -9,7 +9,7 @@
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
     "prepublish": "yarn build",
-    "release:prepare": "rm -rf ./dist ./node_modules ./yarn.lock && yarn install && yarn build && yarn bundle && yarn test && git status",
+    "release:prepare": "rm -rf ./dist ./node_modules && yarn install && yarn build && yarn bundle && yarn test && git status",
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
