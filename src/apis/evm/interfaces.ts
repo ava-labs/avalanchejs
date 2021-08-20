@@ -14,6 +14,10 @@ export interface GetAtomicTxStatusParams {
   txID: string
 }
 
+export interface GetAtomicTxParams {
+  txID: string
+}
+
 export interface ExportAVAXParams extends CredsInterface {
   to: string
   amount: string
