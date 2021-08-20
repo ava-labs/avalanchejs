@@ -286,7 +286,7 @@ export class EVMAPI extends JRPCAPI {
       ? response.data.result.status
       : response.data.result
   }
-  
+
   /**
    * Returns the transaction data of a provided transaction ID by calling the node's `getAtomicTx` method.
    *
