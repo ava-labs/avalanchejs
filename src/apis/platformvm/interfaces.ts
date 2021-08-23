@@ -26,3 +26,37 @@ export interface GetRewardUTXOsResponse {
   utxos: string[]
   encoding: string
 }
+
+export interface CurrentValidatorsResponse {
+  validators: ValidatorInterface[]
+}
+
+export interface ValidatorInterface {
+  txID: string
+  startTime: string
+  endTime: string
+  stakeAmount: string
+  nodeID: string
+  rewardOwner: RewardOwnerInterface
+  potentialReward: string
+  delegationFee: string
+  uptime: string
+  connected: boolean
+  delegators: DelegatorInterface[]
+}
+
+export interface DelegatorInterface {
+  txID: string
+  startTime: string
+  endTime: string
+  stakeAmount: string
+  nodeID: string
+  rewardOwner: RewardOwnerInterface
+  potentialReward: string
+}
+
+export interface RewardOwnerInterface {
+  locktime: string
+  threshold: string
+  addresses: string[]
+}

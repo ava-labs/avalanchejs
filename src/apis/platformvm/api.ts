@@ -1467,19 +1467,21 @@ return builtUnsignedTx
    * Helper function which creates an unsigned [[AddDelegatorTx]]. For more granular control, you may create your own
    * [[UnsignedTx]] manually and import the [[AddDelegatorTx]] class directly.
    *
-   * @param utxoset A set of UTXOs that the transaction is built on
-   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who received the staked tokens at the end of the staking period
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
-   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+   * @param utxoset A set of UTXOs that the transaction is built on.
+   * @param toAddresses An array of addresses who received the staked tokens at the end of the staking period.
+   * @param fromAddresses An array of addresses being used to send the funds from the UTXOs provided.
+   * @param changeAddresses An array of addresses who gets the change leftover from the fee payment.
    * @param nodeID The node ID of the validator being added.
-   * @param startTime The Unix time when the validator starts validating the Primary Network.
-   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
-   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param startTime The Unix time when the validator starts validating the Primary Network as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned) as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}.
    * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
-   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs
+   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs as a {@link https://github.com/indutny/bn.js/|BN}.
    * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes.
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param changeLocktime Optional. The locktime field created in the resulting change outputs as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO. Default 1.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1496,7 +1498,9 @@ return builtUnsignedTx
     rewardLocktime: BN = new BN(0),
     rewardThreshold: number = 1,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeLocktime: BN = new BN(0),
+    changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
@@ -1512,7 +1516,7 @@ return builtUnsignedTx
     ).map((a: string): Buffer => bintools.stringToAddress(a))
     const rewards: Buffer[] = this._cleanAddressArray(
       rewardAddresses,
-      "buildAddValidatorTx"
+      "buildAddDelegatorTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
@@ -1528,11 +1532,15 @@ return builtUnsignedTx
     }
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
-
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new TimeError(
         "PlatformVMAPI.buildAddDelegatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
+    }
+    if (changeLocktime.lt(now)) {
+      throw new TimeError(
+        "PlatformVMAPI.buildAddValidatorTx -- changeLocktime must be in the future"
       )
     }
 
@@ -1553,7 +1561,9 @@ return builtUnsignedTx
       new BN(0),
       avaxAssetID,
       memo,
-      asOf
+      asOf,
+      changeLocktime,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
@@ -1568,20 +1578,22 @@ return builtUnsignedTx
    * Helper function which creates an unsigned [[AddValidatorTx]]. For more granular control, you may create your own
    * [[UnsignedTx]] manually and import the [[AddValidatorTx]] class directly.
    *
-   * @param utxoset A set of UTXOs that the transaction is built on
-   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who received the staked tokens at the end of the staking period
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
-   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+   * @param utxoset A set of UTXOs that the transaction is built on.
+   * @param toAddresses An array of addresses who received the staked tokens at the end of the staking period.
+   * @param fromAddresses An array of addresses who own the staking UTXOs the fees in AVAX.
+   * @param changeAddresses An array of addresses who gets the change leftover from the fee payment.
    * @param nodeID The node ID of the validator being added.
-   * @param startTime The Unix time when the validator starts validating the Primary Network.
-   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
-   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param startTime The Unix time when the validator starts validating the Primary Network as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned) as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}.
    * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
    * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100.
-   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs
+   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs as a {@link https://github.com/indutny/bn.js/|BN}.
    * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes.
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param changeLocktime Optional. The locktime field created in the resulting change outputs as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO. Default 1.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1599,7 +1611,9 @@ return builtUnsignedTx
     rewardLocktime: BN = new BN(0),
     rewardThreshold: number = 1,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeLocktime: BN = new BN(0),
+    changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
@@ -1641,11 +1655,15 @@ return builtUnsignedTx
     }
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
-
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new TimeError(
         "PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
+    }
+    if (changeLocktime.lt(now)) {
+      throw new TimeError(
+        "PlatformVMAPI.buildAddValidatorTx -- changeLocktime must be in the future"
       )
     }
 
@@ -1667,7 +1685,9 @@ return builtUnsignedTx
       new BN(0),
       avaxAssetID,
       memo,
-      asOf
+      asOf,
+      changeLocktime,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {

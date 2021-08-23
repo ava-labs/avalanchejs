@@ -493,6 +493,12 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       // to the sender
       const unlockedChange: BN = isStakeableLockChange ? zero.clone() : change
       if (unlockedChange.gt(zero)) {
+        if (threshold > aad.getChangeAddresses().length) {
+          /* istanbul ignore next */
+          throw new ThresholdError(
+            "Error - UTXOSet.getMinimumSpendable: change threshold is greater than number of addresses"
+          )
+        }
         const newChangeOutput: AmountOutput = new SECPTransferOutput(
           unlockedChange,
           aad.getChangeAddresses(),
@@ -512,7 +518,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       const stakeableLockedAmount: BN = assetAmount.getStakeableLockSpent()
       // totalUnlockedSpent is the total amount of unlocked tokens consumed.
       const totalUnlockedSpent: BN = totalAmountSpent.sub(stakeableLockedAmount)
-      // amountBurnt is the amount of unlocked tokens that must be burn.
+      // amountBurnt is the amount of unlocked tokens that must be burned.
       const amountBurnt: BN = assetAmount.getBurn()
       // totalUnlockedAvailable is the total amount of unlocked tokens available
       // to be produced.
@@ -960,6 +966,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @param feeAssetID Optional. The assetID of the fees being burned.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeLocktime Optional. The locktime field created in the resulting change outputs
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -980,7 +988,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeLocktime: BN = new BN(0),
+    changeThreshold: number = 1
   ): UnsignedTx => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
@@ -1011,8 +1021,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     const minSpendableErr: Error = this.getMinimumSpendable(
       aad,
       asOf,
-      undefined,
-      undefined,
+      changeLocktime,
+      changeThreshold,
       true
     )
     if (typeof minSpendableErr === "undefined") {
@@ -1048,25 +1058,27 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
   /**
    * Class representing an unsigned [[AddValidatorTx]] transaction.
    *
-   * @param networkID NetworkID, [[DefaultNetworkID]]
-   * @param blockchainID BlockchainID, default undefined
-   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
-   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
-   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
+   * @param networkID NetworkID, [[DefaultNetworkID]].
+   * @param blockchainID BlockchainID as a {@link https://github.com/feross/buffer|Buffer}, default undefined.
+   * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX.
+   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the stake at the end of the staking period.
+   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake.
+   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment.
    * @param nodeID The node ID of the validator being added.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
    * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
    * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
-   * @param rewardLocktime The locktime field created in the resulting reward outputs
-   * @param rewardThreshold The number of signatures required to spend the funds in the resultant reward UTXO
+   * @param rewardLocktime The locktime field created in the resulting reward outputs.
+   * @param rewardThreshold The number of signatures required to spend the funds in the resultant reward UTXO.
    * @param rewardAddresses The addresses the validator reward goes.
    * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100.
    * @param minStake A {@link https://github.com/indutny/bn.js/|BN} representing the minimum stake required to validate on this network.
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
-   * @param feeAssetID Optional. The assetID of the fees being burned.
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned as a {@link https://github.com/feross/buffer|Buffer}.
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes.
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param changeLocktime Optional. The locktime field created in the resulting change outputs.
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1088,8 +1100,16 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeLocktime: BN,
+    changeThreshold: number
   ): UnsignedTx => {
+    if (rewardThreshold > rewardAddresses.length) {
+      /* istanbul ignore next */
+      throw new ThresholdError(
+        "Error - UTXOSet.buildAddValidatorTx: reward threshold is greater than number of addresses"
+      )
+    }
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
     let stakeOuts: TransferableOutput[] = []
@@ -1125,8 +1145,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     const minSpendableErr: Error = this.getMinimumSpendable(
       aad,
       asOf,
-      undefined,
-      undefined,
+      changeLocktime,
+      changeThreshold,
       true
     )
     if (typeof minSpendableErr === "undefined") {
