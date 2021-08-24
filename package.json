@@ -49,7 +49,7 @@
     "@types/create-hash": "1.2.2",
     "@types/hdkey": "2.0.0",
     "@types/jest": "24.9.1",
-    "@types/node": "12.12.62",
+    "@types/node": "16.7.1",
     "@typescript-eslint/eslint-plugin": "3.8.0",
     "@typescript-eslint/parser": "4.29.2",
     "clean-webpack-plugin": "3.0.0",
@@ -70,7 +70,7 @@
     "typedoc-plugin-external-module-name": "4.0.6",
     "typedoc-plugin-markdown": "3.10.4",
     "typescript": "3.9.10",
-    "webpack": "5.50.0",
+    "webpack": "5.51.1",
     "webpack-cli": "4.2.0"
   },
   "engines": {
@@ -82,7 +82,7 @@
     "bech32": "2.0.0",
     "bip39": "3.0.4",
     "bn.js": "5.2.0",
-    "buffer": "5.5.0",
+    "buffer": "6.0.3",
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
