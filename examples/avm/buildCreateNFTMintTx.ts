@@ -15,6 +15,9 @@ import {
   UnixNow
 } from "../../src/utils"
 
+// run ts-node examples/avm/buildCreateNFTMintTx.ts
+// before you run this example buildCreateNFTAssetTx.ts
+
 const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
