@@ -56,34 +56,27 @@ export class PlatformVMAPI extends JRPCAPI {
    * @ignore
    */
   protected keychain: KeyChain = new KeyChain("", "")
-
   protected blockchainID: string = PlatformChainID
-
   protected blockchainAlias: string = undefined
-
   protected AVAXAssetID: Buffer = undefined
-
   protected txFee: BN = undefined
-
   protected creationTxFee: BN = undefined
-
   protected minValidatorStake: BN = undefined
-
   protected minDelegatorStake: BN = undefined
 
   /**
    * Gets the alias for the blockchainID if it exists, otherwise returns `undefined`.
    *
-   * @returns The alias for the blockchainID
+   * @returns The alias for the blockchainID as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    */
   getBlockchainAlias = (): string => {
     if (typeof this.blockchainAlias === "undefined") {
-      const netid: number = this.core.getNetworkID()
+      const netID: number = this.core.getNetworkID()
       if (
-        netid in Defaults.network &&
-        this.blockchainID in Defaults.network[netid]
+        netID in Defaults.network &&
+        this.blockchainID in Defaults.network[netID]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        this.blockchainAlias = Defaults.network[netID][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -96,8 +89,9 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Sets the alias for the blockchainID.
    *
-   * @param alias The alias for the blockchainID.
+   * @param alias The alias for the blockchainID as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    *
+   * @returns {void}
    */
   setBlockchainAlias = (alias: string): string => {
     this.blockchainAlias = alias
@@ -108,22 +102,22 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the blockchainID and returns it.
    *
-   * @returns The blockchainID
+   * @returns The blockchainID as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    */
   getBlockchainID = (): string => this.blockchainID
 
   /**
    * Refresh blockchainID, and if a blockchainID is passed in, use that.
    *
-   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
+   * @param blockchainID Optional. BlockchainID to assign as a  as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String), if none, uses the default based on networkID.
    *
-   * @returns The blockchainID
+   * @returns The blockchainID as a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
   refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netid: number = this.core.getNetworkID()
+    const netID: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netid] !== "undefined"
+      typeof Defaults.network[netID] !== "undefined"
     ) {
       this.blockchainID = PlatformChainID //default to P-Chain
       return true
@@ -136,21 +130,30 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
+   * Takes an address as a string and returns its [Buffer](https://github.com/feross/buffer) representation if valid.
    *
-   * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid, undefined if not valid.
+   * @param address The address to parse as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @returns A [Buffer](https://github.com/feross/buffer) for the address if valid, undefined if not valid.
    */
-  parseAddress = (addr: string): Buffer => {
+  parseAddress = (address: string): Buffer => {
     const alias: string = this.getBlockchainAlias()
     const blockchainID: string = this.getBlockchainID()
     return bintools.parseAddress(
-      addr,
+      address,
       blockchainID,
       alias,
       PlatformVMConstants.ADDRESSLENGTH
     )
   }
 
+  /**
+   * Takes an address as a [Buffer](https://github.com/feross/buffer) and returns a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @param address The address as a [Buffer](https://github.com/feross/buffer).
+   *
+   * @returns The address as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   */
   addressFromBuffer = (address: Buffer): string => {
     const chainid: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
@@ -196,18 +199,18 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the default tx fee for this chain.
    *
-   * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The default tx fee as a [BN](https://github.com/indutny/bn.js)
    */
   getDefaultTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["txFee"])
+      ? new BN(Defaults.network[this.core.getNetworkID()].P.txFee)
       : new BN(0)
   }
 
   /**
    * Gets the tx fee for this chain.
    *
-   * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The tx fee as a [BN](https://github.com/indutny/bn.js)
    */
   getTxFee = (): BN => {
     if (typeof this.txFee === "undefined") {
@@ -219,7 +222,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Sets the tx fee for this chain.
    *
-   * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   * @param fee The tx fee amount to set as [BN](https://github.com/indutny/bn.js)
    */
   setTxFee = (fee: BN) => {
     this.txFee = fee
@@ -228,7 +231,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the default creation fee for this chain.
    *
-   * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The default creation fee as a [BN](https://github.com/indutny/bn.js)
    */
   getDefaultCreationTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
@@ -239,7 +242,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the creation fee for this chain.
    *
-   * @returns The creation fee as a {@link https://github.com/indutny/bn.js/|BN}
+   * @returns The creation fee as a [BN](https://github.com/indutny/bn.js)
    */
   getCreationTxFee = (): BN => {
     if (typeof this.creationTxFee === "undefined") {
@@ -251,7 +254,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Sets the creation fee for this chain.
    *
-   * @param fee The creation fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
+   * @param fee The creation fee amount to set as [BN](https://github.com/indutny/bn.js)
    */
   setCreationTxFee = (fee: BN) => {
     this.creationTxFee = fee
@@ -321,7 +324,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param username The username of the Keystore user that controls the new account
    * @param password The password of the Keystore user that controls the new account
-   * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an cb58 serialized string for the SubnetID or its alias.
+   * @param subnetID Optional. Either a [Buffer](https://github.com/feross/buffer) or an cb58 serialized string for the SubnetID or its alias.
    * @param vmID The ID of the Virtual Machine the blockchain runs. Can also be an alias of the Virtual Machine.
    * @param FXIDs The ids of the FXs the VM is running.
    * @param name A human-readable name for the new blockchain
@@ -404,7 +407,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param address The address to pull the asset balance from
    *
-   * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
+   * @returns Promise with the balance as a [BN](https://github.com/indutny/bn.js) on the provided address.
    */
   getBalance = async (address: string): Promise<object> => {
     if (typeof this.parseAddress(address) === "undefined") {
@@ -449,7 +452,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Lists the set of current validators.
    *
-   * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
+   * @param subnetID Optional. Either a [Buffer](https://github.com/feross/buffer) or an
    * cb58 serialized string for the SubnetID or its alias.
    *
    * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
@@ -474,7 +477,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Lists the set of pending validators.
    *
-   * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer}
+   * @param subnetID Optional. Either a [Buffer](https://github.com/feross/buffer)
    * or a cb58 serialized string for the SubnetID or its alias.
    *
    * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
@@ -501,7 +504,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * Samples `Size` validators from the current validator set.
    *
    * @param sampleSize Of the total universe of validators, select this many at random
-   * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
+   * @param subnetID Optional. Either a [Buffer](https://github.com/feross/buffer) or an
    * cb58 serialized string for the SubnetID or its alias.
    *
    * @returns Promise for an array of validator"s stakingIDs.
@@ -534,9 +537,9 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param startTime Javascript Date object for the start time to validate
    * @param endTime Javascript Date object for the end time to validate
    * @param stakeAmount The amount of nAVAX the validator is staking as
-   * a {@link https://github.com/indutny/bn.js/|BN}
+   * a [BN](https://github.com/indutny/bn.js)
    * @param rewardAddress The address the validator reward will go to, if there is one.
-   * @param delegationFeeRate Optional. A {@link https://github.com/indutny/bn.js/|BN} for the percent fee this validator
+   * @param delegationFeeRate Optional. A [BN](https://github.com/indutny/bn.js) for the percent fee this validator
    * charges when others delegate stake to them. Up to 4 decimal places allowed additional decimal places are ignored.
    * Must be between 0 and 100, inclusive. For example, if delegationFeeRate is 1.2345 and someone delegates to this
    * validator, then when the delegation period is over, 1.2345% of the reward goes to the validator and the rest goes
@@ -579,7 +582,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param username The username of the Keystore user
    * @param password The password of the Keystore user
    * @param nodeID The node ID of the validator
-   * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58 serialized string for the SubnetID or its alias.
+   * @param subnetID Either a [Buffer](https://github.com/feross/buffer) or a cb58 serialized string for the SubnetID or its alias.
    * @param startTime Javascript Date object for the start time to validate
    * @param endTime Javascript Date object for the end time to validate
    * @param weight The validator’s weight used for sampling
@@ -624,7 +627,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param startTime Javascript Date object for when the delegator starts delegating
    * @param endTime Javascript Date object for when the delegator starts delegating
    * @param stakeAmount The amount of nAVAX the delegator is staking as
-   * a {@link https://github.com/indutny/bn.js/|BN}
+   * a [BN](https://github.com/indutny/bn.js)
    * @param rewardAddress The address of the account the staked AVAX and validation reward
    * (if applicable) are sent to at endTime
    *
@@ -691,7 +694,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Get the Subnet that validates a given blockchain.
    *
-   * @param blockchainID Either a {@link https://github.com/feross/buffer|Buffer} or a cb58
+   * @param blockchainID Either a [Buffer](https://github.com/feross/buffer) or a cb58
    * encoded string for the blockchainID or its alias.
    *
    * @returns Promise for a string of the subnetID that validates the blockchain.
@@ -710,7 +713,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Get the IDs of the blockchains a Subnet validates.
    *
-   * @param subnetID Either a {@link https://github.com/feross/buffer|Buffer} or an AVAX
+   * @param subnetID Either a [Buffer](https://github.com/feross/buffer) or an AVAX
    * serialized string for the SubnetID or its alias.
    *
    * @returns Promise for an array of blockchainIDs the subnet validates.
@@ -752,7 +755,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param username The Keystore user that controls the account specified in `to`
    * @param password The password of the Keystore user
    * @param to The address on the X-Chain to send the AVAX to. Do not include X- in the address
-   * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param amount Amount of AVAX to export as a [BN](https://github.com/indutny/bn.js)
    *
    * @returns Promise for an unsigned transaction to be signed by the account the the AVAX is
    * sent from and pays the transaction fee.
@@ -878,7 +881,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Calls the node's issueTx method from the API and returns the resulting transaction ID as a string.
    *
-   * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
+   * @param tx A string, [Buffer](https://github.com/feross/buffer), or [[Tx]] representing a transaction
    *
    * @returns A Promise<string> representing the transaction ID of the posted transaction.
    */
@@ -959,8 +962,8 @@ export class PlatformVMAPI extends JRPCAPI {
 
   /**
    * Sets the minimum stake cached in this class.
-   * @param minValidatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
-   * @param minDelegatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum delegation amount cached in this class.
+   * @param minValidatorStake A [BN](https://github.com/indutny/bn.js) to set the minimum stake amount cached in this class.
+   * @param minDelegatorStake A [BN](https://github.com/indutny/bn.js) to set the minimum delegation amount cached in this class.
    */
   setMinStake = (
     minValidatorStake: BN = undefined,
@@ -1131,7 +1134,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Retrieves the UTXOs related to the addresses provided from the node's `getUTXOs` method.
    *
-   * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param addresses An array of addresses as cb58 strings or addresses as [Buffer](https://github.com/feross/buffer)s
    * @param sourceChain A string for the chain to look for the UTXO"s. Default is to use this chain, but if exported UTXOs exist from other chains, this can used to pull them instead.
    * @param limit Optional. Returns at most [limit] addresses. If [limit] == 0 or > [maxUTXOsToFetch], fetches up to [maxUTXOsToFetch].
    * @param startIndex Optional. [StartIndex] defines where to start fetching UTXOs (for pagination.)
@@ -1207,7 +1210,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param asOf Optional. The timestamp to verify the transaction against as a [BN](https://github.com/indutny/bn.js)
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
    *
@@ -1297,13 +1300,13 @@ export class PlatformVMAPI extends JRPCAPI {
    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
    *
    * @param utxoset A set of UTXOs that the transaction is built on
-   * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param amount The amount being exported as a [BN](https://github.com/indutny/bn.js)
    * @param destinationChain The chainid for where the assets will be sent.
    * @param toAddresses The addresses to send the funds
    * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param asOf Optional. The timestamp to verify the transaction against as a [BN](https://github.com/indutny/bn.js)
    * @param locktime Optional. The locktime field created in the resulting outputs
    * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
    *
@@ -1402,14 +1405,14 @@ export class PlatformVMAPI extends JRPCAPI {
    * [[UnsignedTx]] manually and import the [[AddSubnetValidatorTx]] class directly.
    *
    * @param utxoset A set of UTXOs that the transaction is built on.
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
-   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+   * @param fromAddresses An array of addresses as [Buffer](https://github.com/feross/buffer) who pays the fees in AVAX
+   * @param changeAddresses An array of addresses as [Buffer](https://github.com/feross/buffer) who gets the change leftover from the fee payment
    * @param nodeID The node ID of the validator being added.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
    * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
    * @param weight The amount of weight for this subnet validator.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param asOf Optional. The timestamp to verify the transaction against as a [BN](https://github.com/indutny/bn.js)
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1472,15 +1475,15 @@ return builtUnsignedTx
    * @param fromAddresses An array of addresses being used to send the funds from the UTXOs provided.
    * @param changeAddresses An array of addresses who gets the change leftover from the fee payment.
    * @param nodeID The node ID of the validator being added.
-   * @param startTime The Unix time when the validator starts validating the Primary Network as a {@link https://github.com/indutny/bn.js/|BN}.
-   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned) as a {@link https://github.com/indutny/bn.js/|BN}.
-   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param startTime The Unix time when the validator starts validating the Primary Network as a [BN](https://github.com/indutny/bn.js).
+   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned) as a [BN](https://github.com/indutny/bn.js).
+   * @param stakeAmount The amount being delegated as a [BN](https://github.com/indutny/bn.js).
    * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
-   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs as a [BN](https://github.com/indutny/bn.js).
    * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes.
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}.
-   * @param changeLocktime Optional. The locktime field created in the resulting change outputs as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param asOf Optional. The timestamp to verify the transaction against as a [BN](https://github.com/indutny/bn.js).
+   * @param changeLocktime Optional. The locktime field created in the resulting change outputs as a [BN](https://github.com/indutny/bn.js).
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO. Default 1.
    *
    * @returns An unsigned transaction created from the passed in parameters.
@@ -1583,16 +1586,16 @@ return builtUnsignedTx
    * @param fromAddresses An array of addresses who own the staking UTXOs the fees in AVAX.
    * @param changeAddresses An array of addresses who gets the change leftover from the fee payment.
    * @param nodeID The node ID of the validator being added.
-   * @param startTime The Unix time when the validator starts validating the Primary Network as a {@link https://github.com/indutny/bn.js/|BN}.
-   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned) as a {@link https://github.com/indutny/bn.js/|BN}.
-   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param startTime The Unix time when the validator starts validating the Primary Network as a [BN](https://github.com/indutny/bn.js).
+   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned) as a [BN](https://github.com/indutny/bn.js).
+   * @param stakeAmount The amount being delegated as a [BN](https://github.com/indutny/bn.js).
    * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
    * @param delegationFee A number for the percentage of reward to be given to the validator when someone delegates to them. Must be between 0 and 100.
-   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs as a [BN](https://github.com/indutny/bn.js).
    * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes.
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}.
-   * @param changeLocktime Optional. The locktime field created in the resulting change outputs as a {@link https://github.com/indutny/bn.js/|BN}.
+   * @param memo {string}[blockchainID=undefined] Optional contains arbitrary bytes, up to 256 bytes.
+   * @param asOf Optional. The timestamp to verify the transaction against as a [BN](https://github.com/indutny/bn.js).
+   * @param changeLocktime Optional. The locktime field created in the resulting change outputs as a [BN](https://github.com/indutny/bn.js).
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO. Default 1.
    *
    * @returns An unsigned transaction created from the passed in parameters.
@@ -1701,18 +1704,18 @@ return builtUnsignedTx
   /**
    * Class representing an unsigned [[CreateSubnetTx]] transaction.
    *
-   * @param utxoset A set of UTXOs that the transaction is built on
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
-   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param subnetOwnerAddresses An array of addresses for owners of the new subnet
-   * @param subnetOwnerThreshold A number indicating the amount of signatures required to add validators to a subnet
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param utxoSet A set of UTXOs that the transaction is built on.
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs as [strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs as [strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   * @param subnetOwnerAddresses An array of addresses for owners of the new subnet as [strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   * @param subnetOwnerThreshold A number indicating the amount of signatures required to add validators to a subnet as a [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number).
+   * @param memo Optional. contains arbitrary bytes, up to 256 bytes.
+   * @param asOf Optional. The timestamp to verify the transaction against as a [BN](https://github.com/indutny/bn.js).
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
   buildCreateSubnetTx = async (
-    utxoset: UTXOSet,
+    utxoSet: UTXOSet,
     fromAddresses: string[],
     changeAddresses: string[],
     subnetOwnerAddresses: string[],
@@ -1739,7 +1742,7 @@ return builtUnsignedTx
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
-    const builtUnsignedTx: UnsignedTx = utxoset.buildCreateSubnetTx(
+    const builtUnsignedTx: UnsignedTx = utxoSet.buildCreateSubnetTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
       from,
@@ -1761,38 +1764,43 @@ return builtUnsignedTx
   }
 
   /**
-   * @ignore
+   * Takes an array of addresses and confirms they're the correct format.
+   *
+   * @param addresses Addresses to clean as an array of [strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) or [Buffers](https://github.com/feross/buffer).
+   * @param caller The calling method as a [strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @returns An array of [strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    */
   protected _cleanAddressArray(
     addresses: string[] | Buffer[],
     caller: string
   ): string[] {
     const addrs: string[] = []
-    const chainid: string = this.getBlockchainAlias()
+    const chainID: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
-      for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === "string") {
-          if (
-            typeof this.parseAddress(addresses[i] as string) === "undefined"
-          ) {
+      addresses.forEach((address: string | Buffer) => {
+        if (typeof address === "string") {
+          if (typeof this.parseAddress(address as string) === "undefined") {
             /* istanbul ignore next */
-            throw new AddressError("Error - Invalid address format")
+            throw new AddressError(
+              `Error - PlatformVMAPI.${caller}: Invalid address format`
+            )
           }
-          addrs.push(addresses[i] as string)
+          addrs.push(address as string)
         } else {
           const bech32: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
-              addresses[i] as Buffer,
+              address as Buffer,
               bech32,
               this.core.getHRP(),
-              chainid
+              chainID
             )
           )
         }
-      }
+      })
     }
     return addrs
   }

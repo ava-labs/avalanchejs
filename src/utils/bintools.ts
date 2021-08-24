@@ -18,8 +18,7 @@ import { utils } from "ethers"
  * invoke the "BinTools.getInstance()" static * function to grab the singleton
  * instance of the tools.
  *
- * Everything in this library uses
- * the {@link https://github.com/feross/buffer|feross's Buffer class}.
+ * Everything in this library uses the [Buffer](https://github.com/feross/buffer) class.
  *
  * ```js
  * const bintools: BinTools = BinTools.getInstance();
@@ -37,6 +36,8 @@ export default class BinTools {
 
   /**
    * Retrieves the BinTools singleton.
+   *
+   * @returns An instance of BinTools.
    */
   static getInstance(): BinTools {
     if (!BinTools.instance) {
@@ -46,15 +47,18 @@ export default class BinTools {
   }
 
   /**
-   * Returns true if base64, otherwise false
-   * @param str the string to verify is Base64
+   * Returns true if base64, otherwise false.
+   *
+   * @param str the [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to verify is Base64.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
-  isBase64(str: string) {
+  isBase64(str: string): boolean {
     if (str === "" || str.trim() === "") {
       return false
     }
     try {
-      let b64: Buffer = Buffer.from(str, "base64")
+      const b64: Buffer = Buffer.from(str, "base64")
       return b64.toString("base64") === str
     } catch (err) {
       return false
@@ -62,16 +66,22 @@ export default class BinTools {
   }
 
   /**
-   * Returns true if cb58, otherwise false
-   * @param cb58 the string to verify is cb58
+   * Returns true if cb58, otherwise false.
+   *
+   * @param cb58 the [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to verify is cb58.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
   isCB58(cb58: string): boolean {
     return this.isBase58(cb58)
   }
 
   /**
-   * Returns true if base58, otherwise false
-   * @param base58 the string to verify is base58
+   * Returns true if base58, otherwise false.
+   *
+   * @param base58 the [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to verify is base58.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
   isBase58(base58: string): boolean {
     if (base58 === "" || base58.trim() === "") {
@@ -85,8 +95,11 @@ export default class BinTools {
   }
 
   /**
-   * Returns true if hexidecimal, otherwise false
-   * @param hex the string to verify is hexidecimal
+   * Returns true if hexidecimal, otherwise false.
+   *
+   * @param hex the [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to verify is hexidecimal.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
   isHex(hex: string): boolean {
     if (hex === "" || hex.trim() === "") {
@@ -103,10 +116,13 @@ export default class BinTools {
   }
 
   /**
-   * Returns true if decimal, otherwise false
-   * @param str the string to verify is hexidecimal
+   * Returns true if decimal, otherwise false.
+   *
+   * @param str the [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to verify is hexidecimal.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
-  isDecimal(str: string) {
+  isDecimal(str: string): boolean {
     if (str === "" || str.trim() === "") {
       return false
     }
@@ -118,8 +134,11 @@ export default class BinTools {
   }
 
   /**
-   * Returns true if meets requirements to parse as an address as Bech32 on X-Chain or P-Chain, otherwise false
-   * @param address the string to verify is address
+   * Returns true if meets requirements to parse as an address as Bech32 on X-Chain or P-Chain, otherwise false.
+   *
+   * @param address The [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to verify is address.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
   isPrimaryBechAddress = (address: string): boolean => {
     const parts: string[] = address.trim().split("-")
@@ -135,18 +154,21 @@ export default class BinTools {
   }
 
   /**
-   * Produces a string from a {@link https://github.com/feross/buffer|Buffer}
-   * representing a string. ONLY USED IN TRANSACTION FORMATTING, ASSUMED LENGTH IS PREPENDED.
+   * Produces a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) from a [Buffer](https://github.com/feross/buffer). ONLY USED IN TRANSACTION FORMATTING, ASSUMED LENGTH IS PREPENDED.
    *
-   * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to a string
+   * @param buff The [Buffer](https://github.com/feross/buffer) to convert to a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @returns a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    */
   bufferToString = (buff: Buffer): string =>
     this.copyFrom(buff, 2).toString("utf8")
 
   /**
-   * Produces a {@link https://github.com/feross/buffer|Buffer} from a string. ONLY USED IN TRANSACTION FORMATTING, LENGTH IS PREPENDED.
+   * Produces a [Buffer](https://github.com/feross/buffer) from a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String). ONLY USED IN TRANSACTION FORMATTING, LENGTH IS PREPENDED.
    *
-   * @param str The string to convert to a {@link https://github.com/feross/buffer|Buffer}
+   * @param str The [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to convert to a [Buffer](https://github.com/feross/buffer)
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   stringToBuffer = (str: string): Buffer => {
     const buff: Buffer = Buffer.alloc(2 + str.length)
@@ -156,12 +178,13 @@ export default class BinTools {
   }
 
   /**
-   * Makes a copy (no reference) of a {@link https://github.com/feross/buffer|Buffer}
-   * over provided indecies.
+   * Makes a copy (no reference) of a [Buffer](https://github.com/feross/buffer) over provided indices.
    *
-   * @param buff The {@link https://github.com/feross/buffer|Buffer} to copy
-   * @param start The index to start the copy
-   * @param end The index to end the copy
+   * @param buff The [Buffer](https://github.com/feross/buffer) to copy.
+   * @param start The index to start the copy as a [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number). Defaults to 0.
+   * @param end The index to end the copy as a [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number). Defaults to `undefined`.
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   copyFrom = (
     buff: Buffer,
@@ -175,30 +198,33 @@ export default class BinTools {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string of
-   * the {@link https://github.com/feross/buffer|Buffer}.
+   * Takes a [Buffer](https://github.com/feross/buffer) and returns a base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    *
-   * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert to base-58
+   * @param buff The [Buffer](https://github.com/feross/buffer) to convert to base-58.
+   *
+   * @returns a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
    */
   bufferToB58 = (buff: Buffer): string => this.b58.encode(buff)
 
   /**
-   * Takes a base-58 string and returns a {@link https://github.com/feross/buffer|Buffer}.
+   * Takes a base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) and returns a [Buffer](https://github.com/feross/buffer).
    *
-   * @param b58str The base-58 string to convert
-   * to a {@link https://github.com/feross/buffer|Buffer}
+   * @param b58str The base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) to convert to a [Buffer](https://github.com/feross/buffer).
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   b58ToBuffer = (b58str: string): Buffer => this.b58.decode(b58str)
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} and returns an ArrayBuffer.
+   * Takes a [Buffer](https://github.com/feross/buffer) and returns an [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer).
    *
-   * @param buff The {@link https://github.com/feross/buffer|Buffer} to
-   * convert to an ArrayBuffer
+   * @param buff The [Buffer](https://github.com/feross/buffer) to convert to an [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer).
+   *
+   * @returns a [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer).
    */
   fromBufferToArrayBuffer = (buff: Buffer): ArrayBuffer => {
-    const ab = new ArrayBuffer(buff.length)
-    const view = new Uint8Array(ab)
+    const ab: ArrayBuffer = new ArrayBuffer(buff.length)
+    const view: Uint8Array = new Uint8Array(ab)
     for (let i: number = 0; i < buff.length; ++i) {
       view[i] = buff[i]
     }
@@ -206,12 +232,14 @@ export default class BinTools {
   }
 
   /**
-   * Takes an ArrayBuffer and converts it to a {@link https://github.com/feross/buffer|Buffer}.
+   * Takes an [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) and converts it to a [Buffer](https://github.com/feross/buffer).
    *
-   * @param ab The ArrayBuffer to convert to a {@link https://github.com/feross/buffer|Buffer}
+   * @param ab The [ArrayBuffer](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer) to convert to a [Buffer](https://github.com/feross/buffer).
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   fromArrayBufferToBuffer = (ab: ArrayBuffer): Buffer => {
-    const buf = Buffer.alloc(ab.byteLength)
+    const buf: Buffer = Buffer.alloc(ab.byteLength)
     for (let i: number = 0; i < ab.byteLength; ++i) {
       buf[i] = ab[i]
     }
@@ -219,11 +247,11 @@ export default class BinTools {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} and converts it
-   * to a {@link https://github.com/indutny/bn.js/|BN}.
+   * Takes a [Buffer](https://github.com/feross/buffer) and converts it to a [BN](https://github.com/indutny/bn.js).
    *
-   * @param buff The {@link https://github.com/feross/buffer|Buffer} to convert
-   * to a {@link https://github.com/indutny/bn.js/|BN}
+   * @param buff The [Buffer](https://github.com/feross/buffer) to convert to a [BN](https://github.com/indutny/bn.js).
+   *
+   * @returns a [BN](https://github.com/indutny/bn.js).
    */
   fromBufferToBN = (buff: Buffer): BN => {
     if (typeof buff === "undefined") {
@@ -232,36 +260,38 @@ export default class BinTools {
     return new BN(buff.toString("hex"), 16, "be")
   }
   /**
-   * Takes a {@link https://github.com/indutny/bn.js/|BN} and converts it
-   * to a {@link https://github.com/feross/buffer|Buffer}.
+   * Takes a [BN](https://github.com/indutny/bn.js) and converts it to a [Buffer](https://github.com/feross/buffer).
    *
-   * @param bn The {@link https://github.com/indutny/bn.js/|BN} to convert
-   * to a {@link https://github.com/feross/buffer|Buffer}
-   * @param length The zero-padded length of the {@link https://github.com/feross/buffer|Buffer}
+   * @param bn The [BN](https://github.com/indutny/bn.js) to convert to a [Buffer](https://github.com/feross/buffer).
+   * @param length Optional. The zero-padded length of the [Buffer](https://github.com/feross/buffer) as a [number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number).
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   fromBNToBuffer = (bn: BN, length?: number): Buffer => {
     if (typeof bn === "undefined") {
       return undefined
     }
-    const newarr = bn.toArray("be")
+    const newArr: number[] = bn.toArray("be")
     /**
      * CKC: Still unsure why bn.toArray with a "be" and a length do not work right. Bug?
+     * TODO - address this comment.
      */
     if (length) {
       // bn toArray with the length parameter doesn't work correctly, need this.
-      const x = length - newarr.length
+      const x: number = length - newArr.length
       for (let i: number = 0; i < x; i++) {
-        newarr.unshift(0)
+        newArr.unshift(0)
       }
     }
-    return Buffer.from(newarr)
+    return Buffer.from(newArr)
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} and adds a checksum, returning
-   * a {@link https://github.com/feross/buffer|Buffer} with the 4-byte checksum appended.
+   * Takes a [Buffer](https://github.com/feross/buffer) and adds a checksum, returning a [Buffer](https://github.com/feross/buffer) with the 4-byte checksum appended.
    *
-   * @param buff The {@link https://github.com/feross/buffer|Buffer} to append a checksum
+   * @param buff The [Buffer](https://github.com/feross/buffer) to append a checksum.
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   addChecksum = (buff: Buffer): Buffer => {
     const hashslice: Buffer = Buffer.from(
@@ -271,10 +301,12 @@ export default class BinTools {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} with an appended 4-byte checksum
+   * Takes a [Buffer](https://github.com/feross/buffer) with an appended 4-byte checksum
    * and returns true if the checksum is valid, otherwise false.
    *
-   * @param b The {@link https://github.com/feross/buffer|Buffer} to validate the checksum
+   * @param buff The [Buffer](https://github.com/feross/buffer) to validate the checksum.
+   *
+   * @returns a [boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean).
    */
   validateChecksum = (buff: Buffer): boolean => {
     const checkslice: Buffer = buff.slice(buff.length - 4)
@@ -288,12 +320,12 @@ export default class BinTools {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} and returns a base-58 string with
+   * Takes a [Buffer](https://github.com/feross/buffer) and returns a base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) with
    * checksum as per the cb58 standard.
    *
-   * @param bytes A {@link https://github.com/feross/buffer|Buffer} to serialize
+   * @param bytes A [Buffer](https://github.com/feross/buffer) to serialize
    *
-   * @returns A serialized base-58 string of the Buffer.
+   * @returns A serialized base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) of the [Buffer](https://github.com/feross/buffer).
    */
   cb58Encode = (bytes: Buffer): string => {
     const x: Buffer = this.addChecksum(bytes)
@@ -301,10 +333,12 @@ export default class BinTools {
   }
 
   /**
-   * Takes a cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
-   * and returns a {@link https://github.com/feross/buffer|Buffer} of the original data. Throws on error.
+   * Takes a cb58 serialized [Buffer](https://github.com/feross/buffer) or base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)
+   * and returns a [Buffer](https://github.com/feross/buffer) of the original data. Throws on error.
    *
-   * @param bytes A cb58 serialized {@link https://github.com/feross/buffer|Buffer} or base-58 string
+   * @param bytes A cb58 serialized [Buffer](https://github.com/feross/buffer) or base-58 [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
    */
   cb58Decode = (bytes: Buffer | string): Buffer => {
     if (typeof bytes === "string") {
@@ -316,9 +350,26 @@ export default class BinTools {
     throw new ChecksumError("Error - BinTools.cb58Decode: invalid checksum")
   }
 
-  addressToString = (hrp: string, chainid: string, bytes: Buffer): string =>
-    `${chainid}-${bech32.bech32.encode(hrp, bech32.bech32.toWords(bytes))}`
+  /**
+   * Takes a human-readable-part, chainID and address bytes and returns the address as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @param hrp The human-readable-part of the address as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   * @param chainID as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   * @param bytes as a [Buffer](https://github.com/feross/buffer).
+   *
+   * @returns a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   */
+  addressToString = (hrp: string, chainID: string, bytes: Buffer): string =>
+    `${chainID}-${bech32.bech32.encode(hrp, bech32.bech32.toWords(bytes))}`
 
+  /**
+   * Takes a human-readable-part, chainID and address bytes and returns the address as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @param address as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   * @param hrp Optional. The human-readable-part of the address as a [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String).
+   *
+   * @returns a [Buffer](https://github.com/feross/buffer).
+   */
   stringToAddress = (address: string, hrp?: string): Buffer => {
     if (address.substring(0, 2) === "0x") {
       // ETH-style address
@@ -364,31 +415,34 @@ export default class BinTools {
   }
 
   /**
-   * Takes an address and returns its {@link https://github.com/feross/buffer|Buffer}
-   * representation if valid. A more strict version of stringToAddress.
+   * Takes an address and returns its [Buffer](https://github.com/feross/buffer)
+   * representation if valid. A more strict version of `stringToAddress`.
    *
-   * @param addr A string representation of the address
-   * @param blockchainID A cb58 encoded string representation of the blockchainID
+   * @param address A [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) representation of the address.
+   * @param blockchainID A cb58 encoded [string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String) representation of the blockchainID.
    * @param alias A chainID alias, if any, that the address can also parse from.
-   * @param addrlen VMs can use any addressing scheme that they like, so this is the appropriate number of address bytes. Default 20.
+   * @param addressLength VMs can use any addressing scheme that they like, so this is the appropriate number of address bytes. Default 20.
    *
-   * @returns A {@link https://github.com/feross/buffer|Buffer} for the address if valid,
+   * @returns A [Buffer](https://github.com/feross/buffer) for the address if valid,
    * undefined if not valid.
    */
   parseAddress = (
-    addr: string,
+    address: string,
     blockchainID: string,
     alias: string = undefined,
-    addrlen: number = 20
+    addressLength: number = 20
   ): Buffer => {
-    const abc: string[] = addr.split("-")
+    const abc: string[] = address.split("-")
     if (
       abc.length === 2 &&
       ((alias && abc[0] === alias) || (blockchainID && abc[0] === blockchainID))
     ) {
-      const addrbuff = this.stringToAddress(addr)
-      if ((addrlen && addrbuff.length === addrlen) || !addrlen) {
-        return addrbuff
+      const addressBuff: Buffer = this.stringToAddress(address)
+      if (
+        (addressLength && addressBuff.length === addressLength) ||
+        !addressLength
+      ) {
+        return addressBuff
       }
     }
     return undefined
