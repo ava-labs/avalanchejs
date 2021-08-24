@@ -6,7 +6,10 @@ import {
   UnsignedTx,
   Tx
 } from "../../src/apis/platformvm"
-import { CurrentValidatorsResponse, ValidatorInterface } from "../../src/apis/platformvm/interfaces"
+import {
+  CurrentValidatorsResponse,
+  ValidatorInterface
+} from "../../src/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
@@ -35,7 +38,8 @@ const asOf: BN = UnixNow()
 const changeThreshold: number = 2
 
 const main = async (): Promise<any> => {
-  const currentValidators = await pchain.getCurrentValidators() as CurrentValidatorsResponse
+  const currentValidators =
+    (await pchain.getCurrentValidators()) as CurrentValidatorsResponse
   const validator: ValidatorInterface = currentValidators.validators[0]
   // console.log(validator.delegators[0])
   const stakeAmount: any = await pchain.getMinStake()
