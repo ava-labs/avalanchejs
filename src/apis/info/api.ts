@@ -30,7 +30,7 @@ export class InfoAPI extends JRPCAPI {
    */
   getBlockchainID = async (alias: string): Promise<string> => {
     const params: GetBlockchainIDParams = {
-      alias
+      alias,
     }
 
     const response: RequestResponseData = await this.callMethod(
