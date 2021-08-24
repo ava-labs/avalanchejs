@@ -16,6 +16,10 @@ import {
   UnixNow
 } from "../../src/utils"
 
+// assetID is generated from running
+// ts-node examples/avm/buildCreateAssetTx.ts
+// if you run the avm.getAllBalances method you will see the asset alongside AVAX, and a balance of 507
+
 const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
