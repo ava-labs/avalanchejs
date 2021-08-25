@@ -1,6 +1,7 @@
 #!/bin/bash
 
-avalanche_testing_image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
+#avalanche_testing_image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
+avalanche_testing_image=avaplatform/avalanche-testing:chaos-4-github-action-compilation-fix
 
 dockerfile_contents=$(cat <<EOF
     ####################################################
@@ -35,13 +36,13 @@ EOF
 
 avalanchejs_branch=$(git branch --show-current)
 [ $avalanchejs_branch = master ] && avalanchego_branch=master || avalanchego_branch=dev
-echo Avalanchego branch to use: $avalanchego_branch 
+echo Avalanchego branch to use: $avalanchego_branch
 
 avalanchejs_local_image=avaplatform/avalanche-testing:avalanchejs_local_e2e_$avalanchego_branch
 echo Local docker image: $avalanchejs_local_image
 
 docker image inspect $avalanchejs_local_image > /dev/null 2>&1
-if [ $? != 0 ] 
+if [ $? != 0 ]
 then
     echo Image does not exists: building
     echo "$DOCKER_PASS" | docker login --username "$DOCKER_USERNAME" --password-stdin

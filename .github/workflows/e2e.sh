@@ -1,6 +1,7 @@
 
 mount_spec=$(pwd):/avalanchejs/
-image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
+#image=avaplatform/avalanche-testing:chaos-4-github-action-compilation
+image=avaplatform/avalanche-testing:chaos-4-github-action-compilation-fix
 
 echo "$DOCKER_PASS" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
