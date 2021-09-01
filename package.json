@@ -69,7 +69,7 @@
     "typedoc": "0.21.2",
     "typedoc-plugin-external-module-name": "4.0.6",
     "typedoc-plugin-markdown": "3.10.4",
-    "typescript": "3.9.10",
+    "typescript": "4.4.2",
     "webpack": "5.51.1",
     "webpack-cli": "4.2.0"
   },
