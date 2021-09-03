@@ -321,4 +321,36 @@ describe("EVMAPI", (): void => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("Accepted")
   })
+
+  test("getBaseFee", async (): Promise<void> => {
+    const result: Promise<string> = api.getBaseFee()
+    const payload: object = {
+      result: "0x34630b8a00"
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe("0x34630b8a00")
+  })
+
+  test("getMaxPriorityFeePerGas", async (): Promise<void> => {
+    const result: Promise<string> = api.getMaxPriorityFeePerGas()
+    const payload: object = {
+      result: "0x2540be400"
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe("0x2540be400")
+  })
 })

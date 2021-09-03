@@ -25,4 +25,3 @@ depends on current avalanchejs branch (master => master, other => dev).
 
 It creates the corresponding image only the first time it is called. In order to rebuild the image,
 for example for checking against an new version of avalanchego, the image must be locally removed.
-
