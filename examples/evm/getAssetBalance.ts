@@ -12,7 +12,7 @@ const main = async (): Promise<any> => {
   const address: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
   const blockHeight: string = "0x0"
   const assetID: string = "FCry2Z1Su9KZqK1XRMhxQS6XuPorxDm3C3RBT7hw32ojiqyvP"
-  const balance: string = await cchain.getAssetBalance(
+  const balance: object = await cchain.getAssetBalance(
     address,
     blockHeight,
     assetID

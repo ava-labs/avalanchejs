@@ -850,4 +850,40 @@ export class EVMAPI extends JRPCAPI {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
     }
   }
+
+  /**
+   * returns the base fee for the next block.
+   *
+   * @returns Returns a Promise<string> containing the base fee for the next block.
+   */
+  getBaseFee = async (): Promise<string> => {
+    const params: string[] = []
+
+    const method: string = "eth_baseFee"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(
+      method,
+      params,
+      path
+    )
+    return response.data.result
+  }
+
+  /**
+   * returns the priority fee needed to be included in a block.
+   *
+   * @returns Returns a Promise<string> containing the priority fee needed to be included in a block.
+   */
+  getMaxPriorityFeePerGas = async (): Promise<string> => {
+    const params: string[] = []
+
+    const method: string = "eth_maxPriorityFeePerGas"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(
+      method,
+      params,
+      path
+    )
+    return response.data.result
+  }
 }
