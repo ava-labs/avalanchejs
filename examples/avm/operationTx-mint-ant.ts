@@ -185,7 +185,6 @@ const main = async (): Promise<any> => {
     memo,
     operations
   )
-  console.log("operationTx", operationTx)
 
   // Uncomment for codecID 00 01
   // operationTx.setCodecID(codecID)
