@@ -786,7 +786,7 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
+   * Returns the transaction data of a provided transaction ID by calling the node's `getTx` method.
    *
    * @param txID The string representation of the transaction ID
    *
