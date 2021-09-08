@@ -36,7 +36,10 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
-import { GetRewardUTXOsResponse, GetValidatorsAtResponse } from "../../../src/apis/platformvm/interfaces"
+import {
+  GetRewardUTXOsResponse,
+  GetValidatorsAtResponse
+} from "../../../src/apis/platformvm/interfaces"
 import { ErrorResponseObject } from "../../../src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
@@ -270,10 +273,13 @@ describe("PlatformVMAPI", (): void => {
   test("getValidatorsAt", async (): Promise<void> => {
     const height: number = 0
     const subnetID: string = "11111111111111111111111111111111LpoYY"
-    const result: Promise<GetValidatorsAtResponse> = api.getValidatorsAt(height, subnetID)
+    const result: Promise<GetValidatorsAtResponse> = api.getValidatorsAt(
+      height,
+      subnetID
+    )
     const payload: object = {
       result: {
-        "validators": {
+        validators: {
           "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg": 2000000000000000,
           "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu": 2000000000000000,
           "NodeID-MFrZFVCXPv5iCn6M9K6XduxGTYp891xXZ": 2000000000000000,

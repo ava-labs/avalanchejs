@@ -383,7 +383,10 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise<GetValidatorsAtResponse>
    */
-  getValidatorsAt = async (height: number, subnetID?: string): Promise<GetValidatorsAtResponse> => {
+  getValidatorsAt = async (
+    height: number,
+    subnetID?: string
+  ): Promise<GetValidatorsAtResponse> => {
     const params: GetValidatorsAtParams = {
       height
     }
