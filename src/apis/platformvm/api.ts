@@ -30,7 +30,9 @@ import {
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
-  GetStakeResponse
+  GetStakeResponse,
+  GetValidatorsAtParams,
+  GetValidatorsAtResponse
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
@@ -371,6 +373,28 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.status
+  }
+
+  /**
+   * Get the validators and their weights of a subnet or the Primary Network at a given P-Chain height.
+   *
+   * @param height The P-Chain height to get the validator set at.
+   * @param subnetID Optional. A cb58 serialized string for the SubnetID or its alias.
+   *
+   * @returns Promise<GetValidatorsAtResponse>
+   */
+  getValidatorsAt = async (height: number, subnetID?: string): Promise<GetValidatorsAtResponse> => {
+    const params: GetValidatorsAtParams = {
+      height
+    }
+    if (typeof subnetID !== "undefined") {
+      params.subnetID = subnetID
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getValidatorsAt",
+      params
+    )
+    return response.data.result
   }
 
   /**
