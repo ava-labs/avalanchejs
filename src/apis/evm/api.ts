@@ -34,6 +34,7 @@ import {
   ExportAVAXParams,
   ExportKeyParams,
   ExportParams,
+  GetAtomicTxParams,
   GetAssetDescriptionParams,
   GetAtomicTxStatusParams,
   GetUTXOsParams,
@@ -284,6 +285,25 @@ export class EVMAPI extends JRPCAPI {
     return response.data.result.status
       ? response.data.result.status
       : response.data.result
+  }
+
+  /**
+   * Returns the transaction data of a provided transaction ID by calling the node's `getAtomicTx` method.
+   *
+   * @param txID The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   */
+  getAtomicTx = async (txID: string): Promise<string> => {
+    const params: GetAtomicTxParams = {
+      txID
+    }
+
+    const response: RequestResponseData = await this.callMethod(
+      "avax.getAtomicTx",
+      params
+    )
+    return response.data.result.tx
   }
 
   /**

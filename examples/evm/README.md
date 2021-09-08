@@ -11,5 +11,6 @@ Tests for the Avalanche [EVM](https://docs.avax.network/build/avalanchego-apis/c
 * [getAssetBalance.ts](./getAssetBalance.ts)
 * [getBaseFee.ts](./getBaseFee.ts)
 * [getMaxPriorityFeePerGas.ts](./getMaxPriorityFeePerGas.ts)
+* [getAtomicTx.ts](./getAtomicTx.ts)
 * [getAtomicTxStatus.ts](./getAtomicTxStatus.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)

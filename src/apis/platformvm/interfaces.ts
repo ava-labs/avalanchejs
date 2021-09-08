@@ -26,3 +26,12 @@ export interface GetRewardUTXOsResponse {
   utxos: string[]
   encoding: string
 }
+
+export interface GetValidatorsAtParams {
+  height: number
+  subnetID?: string
+}
+
+export interface GetValidatorsAtResponse {
+  validators: object
+}
