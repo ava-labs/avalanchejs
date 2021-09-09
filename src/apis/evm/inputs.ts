@@ -50,9 +50,9 @@ export class TransferableInput extends StandardTransferableInput {
   }
 
   /**
-   * 
+   *
    * Assesses the amount to be paid based on the number of signatures required
-   * @returns the amount to be paid 
+   * @returns the amount to be paid
    */
   getCost = (): number => {
     const numSigs: number = this.getInput().getSigIdxs().length

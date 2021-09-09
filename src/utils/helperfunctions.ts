@@ -3,7 +3,12 @@
  * @module Utils-HelperFunctions
  */
 
-import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP, Defaults } from "./constants"
+import {
+  NetworkIDToHRP,
+  DefaultNetworkID,
+  FallbackHRP,
+  Defaults
+} from "./constants"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
