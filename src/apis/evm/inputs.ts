@@ -15,6 +15,7 @@ import { EVMOutput } from "./outputs"
 import BN from "bn.js"
 import { SigIdx } from "../../common/credentials"
 import { InputIdError } from "../../utils/errors"
+import { Defaults } from "../../utils"
 
 /**
  * @ignore
@@ -46,6 +47,16 @@ export class TransferableInput extends StandardTransferableInput {
     super.deserialize(fields, encoding)
     this.input = SelectInputClass(fields["input"]["_typeID"])
     this.input.deserialize(fields["input"], encoding)
+  }
+
+  /**
+   * 
+   * Assesses the amount to be paid based on the number of signatures required
+   * @returns the amount to be paid 
+   */
+  getCost = (): number => {
+    const numSigs: number = this.getInput().getSigIdxs().length
+    return numSigs * Defaults.network[1].C["costPerSignature"]
   }
 
   /**
