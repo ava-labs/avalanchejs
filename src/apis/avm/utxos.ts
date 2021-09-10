@@ -578,7 +578,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     }
 
     let transferableOperation: TransferableOperation =
-      new TransferableOperation(utxo.getAssetID(), [mint`${UTXOID}`], mintOp)
+      new TransferableOperation(utxo.getAssetID(), [`${mintUTXOID}`], mintOp)
     ops.push(transferableOperation)
 
     let operationTx: OperationTx = new OperationTx(
