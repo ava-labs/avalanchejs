@@ -118,11 +118,11 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
     const sigs: Credential[] = []
     for (let i: number = 0; i < this.ins.length; i++) {
       const cred: Credential = SelectCredentialClass(
-        this.ins[i].getInput().getCredentialID()
+        this.ins[`${i}`].getInput().getCredentialID()
       )
-      const sigidxs: SigIdx[] = this.ins[i].getInput().getSigIdxs()
+      const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
+        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
         const signval: Buffer = keypair.sign(msg)
         const sig: Signature = new Signature()
         sig.fromBuffer(signval)

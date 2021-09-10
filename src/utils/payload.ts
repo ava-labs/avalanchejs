@@ -62,7 +62,7 @@ export class PayloadTypes {
    * Given a TypeID returns a string describing the payload type.
    */
   lookupType(value: number): string {
-    return this.types[value]
+    return this.types[`${value}`]
   }
 
   /**

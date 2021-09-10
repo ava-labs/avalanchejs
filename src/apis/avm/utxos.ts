@@ -152,8 +152,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "base58",
         "base58"
       )
-      utxos[utxoidCleaned] = new UTXO()
-      utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding)
+      utxos[`${utxoidCleaned}`] = new UTXO()
+      utxos[`${utxoidCleaned}`].deserialize(
+        fields["utxos"][`${utxoid}`],
+        encoding
+      )
     }
     let addressUTXOs = {}
     for (let address in fields["addressUTXOs"]) {
@@ -164,21 +167,21 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "hex"
       )
       let utxobalance: {} = {}
-      for (let utxoid in fields["addressUTXOs"][address]) {
+      for (let utxoid in fields["addressUTXOs"][`${address}`]) {
         let utxoidCleaned: string = serialization.decoder(
           utxoid,
           encoding,
           "base58",
           "base58"
         )
-        utxobalance[utxoidCleaned] = serialization.decoder(
-          fields["addressUTXOs"][address][utxoid],
+        utxobalance[`${utxoidCleaned}`] = serialization.decoder(
+          fields["addressUTXOs"][`${address}`][`${utxoid}`],
           encoding,
           "decimalString",
           "BN"
         )
       }
-      addressUTXOs[addressCleaned] = utxobalance
+      addressUTXOs[`${addressCleaned}`] = utxobalance
     }
     this.utxos = utxos
     this.addressUTXOs = addressUTXOs
@@ -229,7 +232,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     const utxoArray: UTXO[] = this.getAllUTXOs()
     const outids: object = {}
     for (let i: number = 0; i < utxoArray.length && !aad.canComplete(); i++) {
-      const u: UTXO = utxoArray[i]
+      const u: UTXO = utxoArray[`${i}`]
       const assetKey: string = u.getAssetID().toString("hex")
       const fromAddresses: Buffer[] = aad.getSenders()
       if (
@@ -240,7 +243,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         const am: AssetAmount = aad.getAssetAmount(assetKey)
         if (!am.isFinished()) {
           const uout: AmountOutput = u.getOutput() as AmountOutput
-          outids[assetKey] = uout.getOutputID()
+          outids[`${assetKey}`] = uout.getOutputID()
           const amount = uout.getAmount()
           am.spendAmount(amount)
           const txid: Buffer = u.getTxID()
@@ -254,15 +257,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
           )
           const spenders: Buffer[] = uout.getSpenders(fromAddresses, asOf)
           for (let j: number = 0; j < spenders.length; j++) {
-            const idx: number = uout.getAddressIdx(spenders[j])
+            const idx: number = uout.getAddressIdx(spenders[`${j}`])
             if (idx === -1) {
               /* istanbul ignore next */
               throw new AddressError(
                 "Error - UTXOSet.getMinimumSpendable: no such " +
-                  `address in output: ${spenders[j]}`
+                  `address in output: ${spenders[`${j}`]}`
               )
             }
-            xferin.getInput().addSignatureIdx(idx, spenders[j])
+            xferin.getInput().addSignatureIdx(idx, spenders[`${j}`])
           }
           aad.addInput(xferin)
         } else if (
@@ -291,31 +294,31 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     const amounts: AssetAmount[] = aad.getAmounts()
     const zero: BN = new BN(0)
     for (let i: number = 0; i < amounts.length; i++) {
-      const assetKey: string = amounts[i].getAssetIDString()
-      const amount: BN = amounts[i].getAmount()
+      const assetKey: string = amounts[`${i}`].getAssetIDString()
+      const amount: BN = amounts[`${i}`].getAmount()
       if (amount.gt(zero)) {
         const spendout: AmountOutput = SelectOutputClass(
-          outids[assetKey],
+          outids[`${assetKey}`],
           amount,
           aad.getDestinations(),
           locktime,
           threshold
         ) as AmountOutput
         const xferout: TransferableOutput = new TransferableOutput(
-          amounts[i].getAssetID(),
+          amounts[`${i}`].getAssetID(),
           spendout
         )
         aad.addOutput(xferout)
       }
-      const change: BN = amounts[i].getChange()
+      const change: BN = amounts[`${i}`].getChange()
       if (change.gt(zero)) {
         const changeout: AmountOutput = SelectOutputClass(
-          outids[assetKey],
+          outids[`${assetKey}`],
           change,
           aad.getChangeAddresses()
         ) as AmountOutput
         const chgxferout: TransferableOutput = new TransferableOutput(
-          amounts[i].getAssetID(),
+          amounts[`${i}`].getAssetID(),
           changeout
         )
         aad.addChange(chgxferout)
@@ -472,8 +475,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     }
     if (typeof mintOutputs !== "undefined") {
       for (let i: number = 0; i < mintOutputs.length; i++) {
-        if (mintOutputs[i] instanceof SECPMintOutput) {
-          initialState.addOutput(mintOutputs[i])
+        if (mintOutputs[`${i}`] instanceof SECPMintOutput) {
+          initialState.addOutput(mintOutputs[`${i}`])
         } else {
           throw new SECPMintOutputError(
             "Error - UTXOSet.buildCreateAssetTx: A submitted mintOutput was not of type SECPMintOutput"
@@ -564,18 +567,18 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     let spenders: Buffer[] = out.getSpenders(fromAddresses, asOf)
 
     for (let j: number = 0; j < spenders.length; j++) {
-      let idx: number = out.getAddressIdx(spenders[j])
+      let idx: number = out.getAddressIdx(spenders[`${j}`])
       if (idx == -1) {
         /* istanbul ignore next */
         throw new Error(
           "Error - UTXOSet.buildSECPMintTx: no such address in output"
         )
       }
-      mintOp.addSignatureIdx(idx, spenders[j])
+      mintOp.addSignatureIdx(idx, spenders[`${j}`])
     }
 
     let transferableOperation: TransferableOperation =
-      new TransferableOperation(utxo.getAssetID(), [mintUTXOID], mintOp)
+      new TransferableOperation(utxo.getAssetID(), [mint`${UTXOID}`], mintOp)
     ops.push(transferableOperation)
 
     let operationTx: OperationTx = new OperationTx(
@@ -646,9 +649,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     for (let i: number = 0; i < minterSets.length; i++) {
       let nftMintOutput: NFTMintOutput = new NFTMintOutput(
         i,
-        minterSets[i].getMinters(),
+        minterSets[`${i}`].getMinters(),
         locktime,
-        minterSets[i].getThreshold()
+        minterSets[`${i}`].getThreshold()
       )
       initialState.addOutput(nftMintOutput, AVMConstants.NFTFXID)
     }
@@ -729,20 +732,20 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     )
 
     for (let i: number = 0; i < utxoids.length; i++) {
-      let utxo: UTXO = this.getUTXO(utxoids[i])
+      let utxo: UTXO = this.getUTXO(utxoids[`${i}`])
       let out: NFTTransferOutput = utxo.getOutput() as NFTTransferOutput
       let spenders: Buffer[] = out.getSpenders(fromAddresses, asOf)
 
       for (let j: number = 0; j < spenders.length; j++) {
         let idx: number
-        idx = out.getAddressIdx(spenders[j])
+        idx = out.getAddressIdx(spenders[`${j}`])
         if (idx == -1) {
           /* istanbul ignore next */
           throw new AddressError(
             "Error - UTXOSet.buildCreateNFTMintTx: no such address in output"
           )
         }
-        nftMintOperation.addSignatureIdx(idx, spenders[j])
+        nftMintOperation.addSignatureIdx(idx, spenders[`${j}`])
       }
 
       let transferableOperation: TransferableOperation =
@@ -816,7 +819,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     }
     const ops: TransferableOperation[] = []
     for (let i: number = 0; i < utxoids.length; i++) {
-      const utxo: UTXO = this.getUTXO(utxoids[i])
+      const utxo: UTXO = this.getUTXO(utxoids[`${i}`])
 
       const out: NFTTransferOutput = utxo.getOutput() as NFTTransferOutput
       const spenders: Buffer[] = out.getSpenders(fromAddresses, asOf)
@@ -831,20 +834,20 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       const op: NFTTransferOperation = new NFTTransferOperation(outbound)
 
       for (let j: number = 0; j < spenders.length; j++) {
-        const idx: number = out.getAddressIdx(spenders[j])
+        const idx: number = out.getAddressIdx(spenders[`${j}`])
         if (idx === -1) {
           /* istanbul ignore next */
           throw new AddressError(
             "Error - UTXOSet.buildNFTTransferTx: " +
-              `no such address in output: ${spenders[j]}`
+              `no such address in output: ${spenders[`${j}`]}`
           )
         }
-        op.addSignatureIdx(idx, spenders[j])
+        op.addSignatureIdx(idx, spenders[`${j}`])
       }
 
       const xferop: TransferableOperation = new TransferableOperation(
         utxo.getAssetID(),
-        [utxoids[i]],
+        [utxoids[`${i}`]],
         op
       )
       ops.push(xferop)
@@ -905,7 +908,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     let feepaid: BN = new BN(0)
     let feeAssetStr: string = feeAssetID.toString("hex")
     for (let i: number = 0; i < atomics.length; i++) {
-      const utxo: UTXO = atomics[i]
+      const utxo: UTXO = atomics[`${i}`]
       const assetID: Buffer = utxo.getAssetID()
       const output: AmountOutput = utxo.getOutput() as AmountOutput
       let amt: BN = output.getAmount().clone()
@@ -939,15 +942,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       const from: Buffer[] = output.getAddresses()
       const spenders: Buffer[] = output.getSpenders(from, asOf)
       for (let j: number = 0; j < spenders.length; j++) {
-        const idx: number = output.getAddressIdx(spenders[j])
+        const idx: number = output.getAddressIdx(spenders[`${j}`])
         if (idx === -1) {
           /* istanbul ignore next */
           throw new AddressError(
             "Error - UTXOSet.buildImportTx: no such " +
-              `address in output: ${spenders[j]}`
+              `address in output: ${spenders[`${j}`]}`
           )
         }
-        xferin.getInput().addSignatureIdx(idx, spenders[j])
+        xferin.getInput().addSignatureIdx(idx, spenders[`${j}`])
       }
       importIns.push(xferin)
 

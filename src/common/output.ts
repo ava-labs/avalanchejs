@@ -173,7 +173,7 @@ export class OutputOwners extends Serializable {
   getAddresses = (): Buffer[] => {
     const result: Buffer[] = []
     for (let i: number = 0; i < this.addresses.length; i++) {
-      result.push(this.addresses[i].toBuffer())
+      result.push(this.addresses[`${i}`].toBuffer())
     }
     return result
   }
@@ -188,7 +188,8 @@ export class OutputOwners extends Serializable {
   getAddressIdx = (address: Buffer): number => {
     for (let i: number = 0; i < this.addresses.length; i++) {
       if (
-        this.addresses[i].toBuffer().toString("hex") === address.toString("hex")
+        this.addresses[`${i}`].toBuffer().toString("hex") ===
+        address.toString("hex")
       ) {
         return i
       }
@@ -206,7 +207,7 @@ export class OutputOwners extends Serializable {
    */
   getAddress = (idx: number): Buffer => {
     if (idx < this.addresses.length) {
-      return this.addresses[idx].toBuffer()
+      return this.addresses[`${idx}`].toBuffer()
     }
     throw new AddressIndexError("Error - Output.getAddress: idx out of range")
   }
@@ -259,10 +260,10 @@ export class OutputOwners extends Serializable {
         j++
       ) {
         if (
-          addresses[j].toString("hex") ===
-          this.addresses[i].toBuffer().toString("hex")
+          addresses[`${j}`].toString("hex") ===
+          this.addresses[`${i}`].toBuffer().toString("hex")
         ) {
-          qualified.push(addresses[j])
+          qualified.push(addresses[`${j}`])
         }
       }
     }
@@ -301,7 +302,7 @@ export class OutputOwners extends Serializable {
       this.locktime.length + this.threshold.length + this.numaddrs.length
     const barr: Buffer[] = [this.locktime, this.threshold, this.numaddrs]
     for (let i: number = 0; i < this.addresses.length; i++) {
-      const b: Buffer = this.addresses[i].toBuffer()
+      const b: Buffer = this.addresses[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
@@ -353,8 +354,8 @@ export class OutputOwners extends Serializable {
     if (typeof addresses !== "undefined" && addresses.length) {
       const addrs: Address[] = []
       for (let i: number = 0; i < addresses.length; i++) {
-        addrs[i] = new Address()
-        addrs[i].fromBuffer(addresses[i])
+        addrs[`${i}`] = new Address()
+        addrs[`${i}`].fromBuffer(addresses[`${i}`])
       }
       this.addresses = addrs
       this.addresses.sort(Address.comparator())

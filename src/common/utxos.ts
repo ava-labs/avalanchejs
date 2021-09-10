@@ -227,7 +227,7 @@ export abstract class StandardUTXOSet<
         "base58",
         "base58"
       )
-      utxos[utxoidCleaned] = this.utxos[utxoid].serialize(encoding)
+      utxos[`${utxoidCleaned}`] = this.utxos[`${utxoid}`].serialize(encoding)
     }
     let addressUTXOs = {}
     for (let address in this.addressUTXOs) {
@@ -238,21 +238,21 @@ export abstract class StandardUTXOSet<
         "cb58"
       )
       let utxobalance = {}
-      for (let utxoid in this.addressUTXOs[address]) {
+      for (let utxoid in this.addressUTXOs[`${address}`]) {
         let utxoidCleaned: string = serialization.encoder(
           utxoid,
           encoding,
           "base58",
           "base58"
         )
-        utxobalance[utxoidCleaned] = serialization.encoder(
-          this.addressUTXOs[address][utxoid],
+        utxobalance[`${utxoidCleaned}`] = serialization.encoder(
+          this.addressUTXOs[`${address}`][`${utxoid}`],
           encoding,
           "BN",
           "decimalString"
         )
       }
-      addressUTXOs[addressCleaned] = utxobalance
+      addressUTXOs[`${addressCleaned}`] = utxobalance
     }
     return {
       ...fields,
@@ -311,15 +311,15 @@ export abstract class StandardUTXOSet<
 
     const utxoid: string = utxovar.getUTXOID()
     if (!(utxoid in this.utxos) || overwrite === true) {
-      this.utxos[utxoid] = utxovar
+      this.utxos[`${utxoid}`] = utxovar
       const addresses: Buffer[] = utxovar.getOutput().getAddresses()
       const locktime: BN = utxovar.getOutput().getLocktime()
       for (let i: number = 0; i < addresses.length; i++) {
-        const address: string = addresses[i].toString("hex")
+        const address: string = addresses[`${i}`].toString("hex")
         if (!(address in this.addressUTXOs)) {
-          this.addressUTXOs[address] = {}
+          this.addressUTXOs[`${address}`] = {}
         }
-        this.addressUTXOs[address][utxoid] = locktime
+        this.addressUTXOs[`${address}`][`${utxoid}`] = locktime
       }
       return utxovar
     }
@@ -340,7 +340,7 @@ export abstract class StandardUTXOSet<
   ): StandardUTXO[] {
     const added: UTXOClass[] = []
     for (let i: number = 0; i < utxos.length; i++) {
-      let result: UTXOClass = this.add(utxos[i], overwrite)
+      let result: UTXOClass = this.add(utxos[`${i}`], overwrite)
       if (typeof result !== "undefined") {
         added.push(result)
       }
@@ -372,11 +372,11 @@ export abstract class StandardUTXOSet<
     if (!(utxoid in this.utxos)) {
       return undefined
     }
-    delete this.utxos[utxoid]
+    delete this.utxos[`${utxoid}`]
     const addresses = Object.keys(this.addressUTXOs)
     for (let i: number = 0; i < addresses.length; i++) {
-      if (utxoid in this.addressUTXOs[addresses[i]]) {
-        delete this.addressUTXOs[addresses[i]][utxoid]
+      if (utxoid in this.addressUTXOs[addresses[`${i}`]]) {
+        delete this.addressUTXOs[addresses[`${i}`]][`${utxoid}`]
       }
     }
     return utxovar
@@ -393,7 +393,7 @@ export abstract class StandardUTXOSet<
   removeArray = (utxos: string[] | UTXOClass[]): UTXOClass[] => {
     const removed: UTXOClass[] = []
     for (let i: number = 0; i < utxos.length; i++) {
-      const result: UTXOClass = this.remove(utxos[i])
+      const result: UTXOClass = this.remove(utxos[`${i}`])
       if (typeof result !== "undefined") {
         removed.push(result)
       }
@@ -408,7 +408,7 @@ export abstract class StandardUTXOSet<
    *
    * @returns A [[StandardUTXO]] if it exists in the set.
    */
-  getUTXO = (utxoid: string): UTXOClass => this.utxos[utxoid]
+  getUTXO = (utxoid: string): UTXOClass => this.utxos[`${utxoid}`]
 
   /**
    * Gets all the [[StandardUTXO]]s, optionally that match with UTXOIDs in an array
@@ -421,8 +421,8 @@ export abstract class StandardUTXOSet<
     let results: UTXOClass[] = []
     if (typeof utxoids !== "undefined" && Array.isArray(utxoids)) {
       for (let i: number = 0; i < utxoids.length; i++) {
-        if (utxoids[i] in this.utxos && !(utxoids[i] in results)) {
-          results.push(this.utxos[utxoids[i]])
+        if (utxoids[`${i}`] in this.utxos && !(utxoids[`${i}`] in results)) {
+          results.push(this.utxos[utxoids[`${i}`]])
         }
       }
     } else {
@@ -443,13 +443,13 @@ export abstract class StandardUTXOSet<
     const utxos = Object.keys(this.utxos)
     if (typeof utxoids !== "undefined" && Array.isArray(utxoids)) {
       for (let i: number = 0; i < utxoids.length; i++) {
-        if (utxoids[i] in this.utxos) {
-          results.push(this.utxos[utxoids[i]].toString())
+        if (utxoids[`${i}`] in this.utxos) {
+          results.push(this.utxos[utxoids[`${i}`]].toString())
         }
       }
     } else {
       for (const u of utxos) {
-        results.push(this.utxos[u].toString())
+        results.push(this.utxos[`${u}`].toString())
       }
     }
     return results
@@ -471,9 +471,9 @@ export abstract class StandardUTXOSet<
       const results: string[] = []
       const now: BN = UnixNow()
       for (let i: number = 0; i < addresses.length; i++) {
-        if (addresses[i].toString("hex") in this.addressUTXOs) {
+        if (addresses[`${i}`].toString("hex") in this.addressUTXOs) {
           const entries = Object.entries(
-            this.addressUTXOs[addresses[i].toString("hex")]
+            this.addressUTXOs[addresses[`${i}`].toString("hex")]
           )
           for (const [utxoid, locktime] of entries) {
             if (
@@ -523,12 +523,12 @@ export abstract class StandardUTXOSet<
     }
     for (let i: number = 0; i < utxos.length; i++) {
       if (
-        utxos[i].getOutput() instanceof StandardAmountOutput &&
-        utxos[i].getAssetID().toString("hex") === asset.toString("hex") &&
-        utxos[i].getOutput().meetsThreshold(addresses, asOf)
+        utxos[`${i}`].getOutput() instanceof StandardAmountOutput &&
+        utxos[`${i}`].getAssetID().toString("hex") === asset.toString("hex") &&
+        utxos[`${i}`].getOutput().meetsThreshold(addresses, asOf)
       ) {
         spend = spend.add(
-          (utxos[i].getOutput() as StandardAmountOutput).getAmount()
+          (utxos[`${i}`].getOutput() as StandardAmountOutput).getAmount()
         )
       }
     }
@@ -552,8 +552,8 @@ export abstract class StandardUTXOSet<
     }
 
     for (let i: number = 0; i < utxoids.length; i++) {
-      if (utxoids[i] in this.utxos && !(utxoids[i] in results)) {
-        results.add(this.utxos[utxoids[i]].getAssetID())
+      if (utxoids[`${i}`] in this.utxos && !(utxoids[`${i}`] in results)) {
+        results.add(this.utxos[utxoids[`${i}`]].getAssetID())
       }
     }
 
@@ -571,8 +571,8 @@ export abstract class StandardUTXOSet<
     let newset: this = this.clone()
     let utxos: UTXOClass[] = this.getAllUTXOs()
     for (let i: number = 0; i < utxos.length; i++) {
-      if (lambda(utxos[i], ...args) === false) {
-        newset.remove(utxos[i])
+      if (lambda(utxos[`${i}`], ...args) === false) {
+        newset.remove(utxos[`${i}`])
       }
     }
     return newset
