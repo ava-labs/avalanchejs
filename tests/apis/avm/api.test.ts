@@ -94,17 +94,23 @@ describe("AVMAPI", (): void => {
   let api: AVMAPI
   let alias: string
 
-  const addrA: string = `X-${bech32.encode(
+  const addrA: string = `X-${bech32.bech32.encode(
     avalanche.getHRP(),
-    bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"))
+    bech32.bech32.toWords(
+      bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")
+    )
   )}`
-  const addrB: string = `X-${bech32.encode(
+  const addrB: string = `X-${bech32.bech32.encode(
     avalanche.getHRP(),
-    bech32.toWords(bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF"))
+    bech32.bech32.toWords(
+      bintools.cb58Decode("P5wdRuZeaDt28eHMP5S3w9ZdoBfo7wuzF")
+    )
   )}`
-  const addrC: string = `X-${bech32.encode(
+  const addrC: string = `X-${bech32.bech32.encode(
     avalanche.getHRP(),
-    bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))
+    bech32.bech32.toWords(
+      bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
+    )
   )}`
 
   beforeAll((): void => {
@@ -355,6 +361,56 @@ describe("AVMAPI", (): void => {
     mockAxios.mockResponse(responseObj)
     const response: object = await result
 
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
+  })
+
+  test("getBalance includePartial", async (): Promise<void> => {
+    const balance: BN = new BN("100", 10)
+    const respobj = {
+      balance,
+      utxoIDs: [
+        {
+          txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
+          outputIndex: 0
+        }
+      ]
+    }
+
+    const result: Promise<object> = api.getBalance(addrA, "ATH", true)
+    const payload: object = {
+      result: respobj
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    const expectedRequestPayload = {
+      id: 1,
+      method: "avm.getBalance",
+      params: {
+        address: addrA,
+        assetID: "ATH",
+        includePartial: true
+      },
+      jsonrpc: "2.0"
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: object = await result
+    const calledWith: object = {
+      baseURL: "https://127.0.0.1:9650",
+      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8"
+      },
+      method: "POST",
+      params: {},
+      responseType: "json",
+      url: "/ext/bc/X"
+    }
+
+    expect(mockAxios.request).toBeCalledWith(calledWith)
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
   })

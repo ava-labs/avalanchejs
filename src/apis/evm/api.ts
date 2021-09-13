@@ -16,8 +16,8 @@ import { Tx, UnsignedTx } from "./tx"
 import { EVMConstants } from "./constants"
 import {
   Asset,
-  GetAtomicTxStatusParams,
   Index,
+  IssueTxParams,
   UTXOResponse
 } from "./../../common/interfaces"
 import { EVMInput } from "./inputs"
@@ -30,6 +30,18 @@ import {
   AddressError
 } from "../../utils/errors"
 import { Serialization, SerializedType } from "../../utils"
+import {
+  ExportAVAXParams,
+  ExportKeyParams,
+  ExportParams,
+  GetAtomicTxParams,
+  GetAssetDescriptionParams,
+  GetAtomicTxStatusParams,
+  GetUTXOsParams,
+  ImportAVAXParams,
+  ImportKeyParams,
+  ImportParams
+} from "./interfaces"
 
 /**
  * @ignore
@@ -164,9 +176,7 @@ export class EVMAPI extends JRPCAPI {
       asset = assetID
     }
 
-    const params: {
-      assetID: Buffer | string
-    } = {
+    const params: GetAssetDescriptionParams = {
       assetID: asset
     }
 
@@ -278,6 +288,25 @@ export class EVMAPI extends JRPCAPI {
   }
 
   /**
+   * Returns the transaction data of a provided transaction ID by calling the node's `getAtomicTx` method.
+   *
+   * @param txID The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   */
+  getAtomicTx = async (txID: string): Promise<string> => {
+    const params: GetAtomicTxParams = {
+      txID
+    }
+
+    const response: RequestResponseData = await this.callMethod(
+      "avax.getAtomicTx",
+      params
+    )
+    return response.data.result.tx
+  }
+
+  /**
    * Gets the tx fee for this chain.
    *
    * @returns The tx fee as a {@link https://github.com/indutny/bn.js/|BN}
@@ -309,13 +338,7 @@ export class EVMAPI extends JRPCAPI {
     amount: BN,
     assetID: string
   ): Promise<string> => {
-    const params: {
-      username: string
-      password: string
-      to: string
-      amount: string
-      assetID: string
-    } = {
+    const params: ExportParams = {
       to,
       amount: amount.toString(10),
       username,
@@ -349,12 +372,7 @@ export class EVMAPI extends JRPCAPI {
     to: string,
     amount: BN
   ): Promise<string> => {
-    const params: {
-      username: string
-      password: string
-      to: string
-      amount: string
-    } = {
+    const params: ExportAVAXParams = {
       to,
       amount: amount.toString(10),
       username,
@@ -394,7 +412,7 @@ export class EVMAPI extends JRPCAPI {
       addresses = [addresses]
     }
 
-    const params: any = {
+    const params: GetUTXOsParams = {
       addresses: addresses,
       limit
     }
@@ -436,12 +454,7 @@ export class EVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-    const params: {
-      username: string
-      password: string
-      to: string
-      sourceChain: string
-    } = {
+    const params: ImportParams = {
       to,
       sourceChain,
       username,
@@ -476,12 +489,7 @@ export class EVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string> => {
-    const params: {
-      username: string
-      password: string
-      to: string
-      sourceChain: string
-    } = {
+    const params: ImportAVAXParams = {
       to,
       sourceChain,
       username,
@@ -510,11 +518,7 @@ export class EVMAPI extends JRPCAPI {
     password: string,
     privateKey: string
   ): Promise<string> => {
-    const params: {
-      username: string
-      password: string
-      privateKey: string
-    } = {
+    const params: ImportKeyParams = {
       username,
       password,
       privateKey
@@ -551,9 +555,7 @@ export class EVMAPI extends JRPCAPI {
         "Error - avax.issueTx: provided tx is not expected type of string, Buffer, or Tx"
       )
     }
-    const params: {
-      tx: string
-    } = {
+    const params: IssueTxParams = {
       tx: Transaction.toString()
     }
     const response: RequestResponseData = await this.callMethod(
@@ -579,11 +581,7 @@ export class EVMAPI extends JRPCAPI {
     password: string,
     address: string
   ): Promise<string> => {
-    const params: {
-      username: string
-      password: string
-      address: string
-    } = {
+    const params: ExportKeyParams = {
       username,
       password,
       address
@@ -698,7 +696,7 @@ export class EVMAPI extends JRPCAPI {
     locktime: BN = new BN(0),
     threshold: number = 1
   ): Promise<UnsignedTx> => {
-    let prefixes: object = {}
+    const prefixes: object = {}
     toAddresses.map((address: string) => {
       prefixes[address.split("-")[0]] = true
     })
@@ -725,7 +723,6 @@ export class EVMAPI extends JRPCAPI {
       )
     }
     const fee: BN = this.getTxFee()
-
     const assetDescription: any = await this.getAssetDescription("AVAX")
     const evmInputs: EVMInput[] = []
     if (bintools.cb58Encode(assetDescription.assetID) === assetID) {
@@ -761,7 +758,7 @@ export class EVMAPI extends JRPCAPI {
     }
 
     const to: Buffer[] = []
-    toAddresses.map((address: string) => {
+    toAddresses.map((address: string): void => {
       to.push(bintools.stringToAddress(address))
     })
 
@@ -799,6 +796,21 @@ export class EVMAPI extends JRPCAPI {
    * @returns The instance of [[KeyChain]] for this class
    */
   keyChain = (): KeyChain => this.keychain
+
+  /**
+   *
+   * @returns new instance of [[KeyChain]]
+   */
+  newKeyChain = (): KeyChain => {
+    // warning, overwrites the old keychain
+    const alias = this.getBlockchainAlias()
+    if (alias) {
+      this.keychain = new KeyChain(this.core.getHRP(), alias)
+    } else {
+      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
+    }
+    return this.keychain
+  }
 
   /**
    * @ignore
@@ -840,15 +852,15 @@ export class EVMAPI extends JRPCAPI {
    * Instead use the [[Avalanche.addAPI]] method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/bc/C/avax" as the path to blockchain's baseurl
+   * @param baseURL Defaults to the string "/ext/bc/C/avax" as the path to blockchain's baseURL
    * @param blockchainID The Blockchain's ID. Defaults to an empty string: ""
    */
   constructor(
     core: AvalancheCore,
-    baseurl: string = "/ext/bc/C/avax",
+    baseURL: string = "/ext/bc/C/avax",
     blockchainID: string = ""
   ) {
-    super(core, baseurl)
+    super(core, baseURL)
     this.blockchainID = blockchainID
     const netID: number = core.getNetworkID()
     if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
@@ -857,5 +869,41 @@ export class EVMAPI extends JRPCAPI {
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
     }
+  }
+
+  /**
+   * returns the base fee for the next block.
+   *
+   * @returns Returns a Promise<string> containing the base fee for the next block.
+   */
+  getBaseFee = async (): Promise<string> => {
+    const params: string[] = []
+
+    const method: string = "eth_baseFee"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(
+      method,
+      params,
+      path
+    )
+    return response.data.result
+  }
+
+  /**
+   * returns the priority fee needed to be included in a block.
+   *
+   * @returns Returns a Promise<string> containing the priority fee needed to be included in a block.
+   */
+  getMaxPriorityFeePerGas = async (): Promise<string> => {
+    const params: string[] = []
+
+    const method: string = "eth_maxPriorityFeePerGas"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(
+      method,
+      params,
+      path
+    )
+    return response.data.result
   }
 }

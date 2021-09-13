@@ -26,46 +26,44 @@ export class RequestResponseData {
  */
 export abstract class APIBase {
   protected core: AvalancheCore
-
-  protected baseurl: string
-
+  protected baseURL: string
   protected db: StoreAPI
 
   /**
-   * Sets the path of the APIs baseurl.
+   * Sets the path of the APIs baseURL.
    *
-   * @param baseurl Path of the APIs baseurl - ex: "/ext/bc/X"
+   * @param baseURL Path of the APIs baseURL - ex: "/ext/bc/X"
    */
-  setBaseURL = (baseurl: string) => {
-    if (this.db && this.baseurl !== baseurl) {
+  setBaseURL = (baseURL: string) => {
+    if (this.db && this.baseURL !== baseURL) {
       const backup = this.db.getAll()
       this.db.clearAll()
-      this.baseurl = baseurl
-      this.db = DB.getNamespace(baseurl)
+      this.baseURL = baseURL
+      this.db = DB.getNamespace(baseURL)
       this.db.setAll(backup, true)
     } else {
-      this.baseurl = baseurl
-      this.db = DB.getNamespace(baseurl)
+      this.baseURL = baseURL
+      this.db = DB.getNamespace(baseURL)
     }
   }
 
   /**
-   * Returns the baseurl's path.
+   * Returns the baseURL's path.
    */
-  getBaseURL = (): string => this.baseurl
+  getBaseURL = (): string => this.baseURL
 
   /**
-   * Returns the baseurl's database.
+   * Returns the baseURL's database.
    */
   getDB = (): StoreAPI => this.db
 
   /**
    *
-   * @param core Reference to the Avalanche instance using this baseurl
-   * @param baseurl Path to the baseurl - ex: "/ext/bc/X"
+   * @param core Reference to the Avalanche instance using this baseURL
+   * @param baseURL Path to the baseURL
    */
-  constructor(core: AvalancheCore, baseurl: string) {
+  constructor(core: AvalancheCore, baseURL: string) {
     this.core = core
-    this.setBaseURL(baseurl)
+    this.setBaseURL(baseURL)
   }
 }

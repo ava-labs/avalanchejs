@@ -30,9 +30,11 @@ import {
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
-  GetStakeResponse
-} from "../../common"
-import { TransferableOutput } from "../platformvm/outputs"
+  GetStakeResponse,
+  GetValidatorsAtParams,
+  GetValidatorsAtResponse
+} from "./interfaces"
+import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
 
 /**
@@ -371,6 +373,31 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.status
+  }
+
+  /**
+   * Get the validators and their weights of a subnet or the Primary Network at a given P-Chain height.
+   *
+   * @param height The P-Chain height to get the validator set at.
+   * @param subnetID Optional. A cb58 serialized string for the SubnetID or its alias.
+   *
+   * @returns Promise<GetValidatorsAtResponse>
+   */
+  getValidatorsAt = async (
+    height: number,
+    subnetID?: string
+  ): Promise<GetValidatorsAtResponse> => {
+    const params: GetValidatorsAtParams = {
+      height
+    }
+    if (typeof subnetID !== "undefined") {
+      params.subnetID = subnetID
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getValidatorsAt",
+      params
+    )
+    return response.data.result
   }
 
   /**
@@ -1718,17 +1745,17 @@ return builtUnsignedTx
    * Instead use the [[Avalanche.addAPI]] method.
    *
    * @param core A reference to the Avalanche class
-   * @param baseurl Defaults to the string "/ext/P" as the path to blockchain"s baseurl
+   * @param baseURL Defaults to the string "/ext/P" as the path to blockchain's baseURL
    */
-  constructor(core: AvalancheCore, baseurl: string = "/ext/bc/P") {
-    super(core, baseurl)
+  constructor(core: AvalancheCore, baseURL: string = "/ext/bc/P") {
+    super(core, baseURL)
     this.blockchainID = PlatformChainID
-    const netid: number = core.getNetworkID()
+    const netID: number = core.getNetworkID()
     if (
-      netid in Defaults.network &&
-      this.blockchainID in Defaults.network[netid]
+      netID in Defaults.network &&
+      this.blockchainID in Defaults.network[netID]
     ) {
-      const { alias } = Defaults.network[netid][this.blockchainID]
+      const { alias } = Defaults.network[netID][this.blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
@@ -1737,8 +1764,6 @@ return builtUnsignedTx
 
   /**
    * @returns the UTXOs that were rewarded after the provided transaction"s staking or delegation period ended.
-   *
-   * @returns the number fetched, an array of UTXOs and the encoding.
    */
   getRewardUTXOs = async (
     txID: string,

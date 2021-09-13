@@ -168,6 +168,9 @@ const n1C: object = {
   blockchainID: "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5",
   alias: CChainAlias,
   vm: CChainVMName,
+  txBytesGas: 1,
+  costPerSignature: 1000,
+  // TODO - deprecate txFee and gasPrice?
   txFee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(225)),
   chainID: 43114
@@ -310,6 +313,9 @@ const n5C: object = {
   blockchainID: "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp",
   alias: CChainAlias,
   vm: CChainVMName,
+  txBytesGas: 1,
+  costPerSignature: 1000,
+  // TODO - deprecate txFee and gasPrice?
   txFee: MILLIAVAX,
   gasPrice: GWEI.mul(new BN(225)),
   chainID: 43113

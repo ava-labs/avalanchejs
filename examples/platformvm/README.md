@@ -14,4 +14,5 @@ Tests for the Avalanche [PlatformVM RPC](https://docs.avax.network/build/avalanc
 * [exportTx-xchain.ts](./exportTx-xchain.ts)
 * [getRewardUTXOs.ts](./getRewardUTXOs.ts)
 * [getStake.ts](./getStake.ts)
+* [getValidatorsAt.ts](./getValidatorsAt.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
