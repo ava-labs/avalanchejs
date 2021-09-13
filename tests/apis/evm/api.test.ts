@@ -34,15 +34,19 @@ describe("EVMAPI", (): void => {
 
   const addrA: string =
     "C-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("B6D4v1VtPYLbiUvYXtW4Px8oE9imC2vGW")
+      )
     )
   const addrC: string =
     "C-" +
-    bech32.encode(
+    bech32.bech32.encode(
       avalanche.getHRP(),
-      bech32.toWords(bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV"))
+      bech32.bech32.toWords(
+        bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
+      )
     )
 
   beforeAll((): void => {
@@ -316,5 +320,61 @@ describe("EVMAPI", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("Accepted")
+  })
+
+  test("getBaseFee", async (): Promise<void> => {
+    const result: Promise<string> = api.getBaseFee()
+    const payload: object = {
+      result: "0x34630b8a00"
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe("0x34630b8a00")
+  })
+
+  test("getMaxPriorityFeePerGas", async (): Promise<void> => {
+    const result: Promise<string> = api.getMaxPriorityFeePerGas()
+    const payload: object = {
+      result: "0x2540be400"
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe("0x2540be400")
+  })
+
+  test("getAtomicTx", async (): Promise<void> => {
+    const txID: string = "FCry2Z1Su9KZqK1XRMhxQS6XuPorxDm3C3RBT7hw32ojiqyvP"
+    const tx =
+      "111119TRhWSj932BnTyhskYtn4j7dY9Nqq8wi3mmmFvHvDEoAfifMnRcUuTFqRxhsqWyXMTHmFBcSrMS6u9F6LRA1G3DmKWoA3Yb27JbhUV7ismLkiEsWJ187q2AwgE2RCVG7eZ9zL89ZBmaVA1bkzsx324LjU9NiYgkceJxm5d3L9ATiLgWt4mWMDR4YKpSv4qKqjfD2fRzYm7gX2C2F1auCvVN6Hd15J3jRUB7vKEEcBZJexdYdqnCX7vFdwoGpJM7tUiFRDgAAPpMoxz6QF7gwKbkkXK5Vg4LG2szScX9qL5BegNwUeNQYB42kF3M3w5tnVekhmHQdZSEYU8NjSnSZnqAFPcHc4StM3yZem3MTFRYJqNc7RAvoMGi8am3Hx4GVpwYqjiqev3XiqfyuTssn4bR1XaJbjQTyC"
+
+    const result: Promise<string> = api.getAtomicTx(txID)
+    const payload: object = {
+      result: {
+        tx,
+        encoding: "cb58",
+        blockHeight: 8
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(tx)
   })
 })

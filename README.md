@@ -397,3 +397,20 @@ When you merge the PR and the latest and greatest are on the `master` branch the
 For this we use the [`np` lib](https://www.npmjs.com/package/np) to push a new build to npm. `np` will prompt you to answer if this is a PATCH, MINOR or MAJOR release and it will handle bumping the version in `package.json` for you. You will be prompted for your `OTP` which stands for "one time password." This is your 2fa code which you will get from having enabled 2fa on your npm account.
 
 After this is successful you can confirm that the version number was bumped for the npm [`avalanche` npm package](https://www.npmjs.com/package/avalanche). Once you confirm that then the final step is to merge `master` in to the `development` branch. This ensures that the newly bumped version gets added to any future dev work which branches off of `development`.
+
+### Repo Dependency Updates
+
+Dependabot will make pull requests against the development branch. If all tests pass, it is safe to merge into development, but for redundancy you want to try to build it locally.
+
+```zsh
+git fetch origin
+git checkout -b <branchName>
+git merge development
+yarn build && yarn test
+```
+
+If the E2E check does not pass, go into the 'checks' section of the PR.
+`https://github.com/ava-labs/avalanchejs/pull/<PR number>/checks`
+
+* Click on the `> E2E` tab on the left
+* Click 'Re-run jobs' on the right

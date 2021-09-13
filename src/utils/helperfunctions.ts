@@ -3,11 +3,17 @@
  * @module Utils-HelperFunctions
  */
 
-import { NetworkIDToHRP, DefaultNetworkID, FallbackHRP } from "./constants"
+import {
+  NetworkIDToHRP,
+  DefaultNetworkID,
+  FallbackHRP,
+  Defaults
+} from "./constants"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
 import { PrivateKeyError, NodeIdError } from "../utils/errors"
+import { ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
 
 /**
  * @ignore
@@ -80,4 +86,18 @@ export function NodeIDStringToBuffer(pk: string): Buffer {
   }
   let pksplit: string[] = pk.split("-")
   return bintools.cb58Decode(pksplit[pksplit.length - 1])
+}
+
+export function costImportTx(tx: UnsignedTx): number {
+  let cost: number = calcBytesCost(tx.toBuffer().byteLength)
+  const importTx = tx.getTransaction() as ImportTx
+  importTx.getImportInputs().forEach((input: TransferableInput) => {
+    const inCost = input.getCost()
+    cost += inCost
+  })
+  return cost
+}
+
+export function calcBytesCost(len: number): number {
+  return len * Defaults.network[1].C["txBytesGas"]
 }
