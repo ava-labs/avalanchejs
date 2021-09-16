@@ -455,7 +455,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     threshold: number = 1
   ): UnsignedTx => {
     let ins: EVMInput[] = []
-    let outs: TransferableOutput[] = []
     let exportouts: TransferableOutput[] = []
 
     if (typeof changeAddresses === "undefined") {
@@ -501,7 +500,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       threshold
     )
     if (typeof success === "undefined") {
-      outs = aad.getChangeOutputs()
       exportouts = aad.getOutputs()
     } else {
       throw success
