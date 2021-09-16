@@ -43,8 +43,6 @@ export class PayloadTypes {
    */
   getTypeID(payload: Buffer): number {
     let offset: number = 0
-    const size: number = bintools.copyFrom(payload, offset, 4).readUInt32BE(0)
-    offset += 4
     const typeid: number = bintools
       .copyFrom(payload, offset, offset + 1)
       .readUInt8(0)
