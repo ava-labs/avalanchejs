@@ -37,6 +37,9 @@ export default class AvalancheCore {
    * ex: "http", "https", "git", "ws", etc. Defaults to https
    */
   setAddress = (host: string, port: number, protocol: string = "http") => {
+    protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
+    host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
+
     this.host = host
     this.port = port
     this.protocol = protocol
