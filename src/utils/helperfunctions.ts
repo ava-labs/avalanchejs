@@ -22,9 +22,9 @@ const bintools: BinTools = BinTools.getInstance()
 
 export function getPreferredHRP(networkID: number = undefined) {
   if (networkID in NetworkIDToHRP) {
-    return NetworkIDToHRP[networkID]
+    return NetworkIDToHRP[`${networkID}`]
   } else if (typeof networkID === "undefined") {
-    return NetworkIDToHRP[DefaultNetworkID]
+    return NetworkIDToHRP[`${DefaultNetworkID}`]
   }
   return FallbackHRP
 }

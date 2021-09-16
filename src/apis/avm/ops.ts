@@ -163,7 +163,7 @@ export abstract class Operation extends Serializable {
     let bsize: number = this.sigCount.length
     const barr: Buffer[] = [this.sigCount]
     for (let i: number = 0; i < this.sigIdxs.length; i++) {
-      const b: Buffer = this.sigIdxs[i].toBuffer()
+      const b: Buffer = this.sigIdxs[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
@@ -274,7 +274,7 @@ export class TransferableOperation extends Serializable {
     const barr: Buffer[] = [this.assetID, numutxoIDs]
     this.utxoIDs = this.utxoIDs.sort(UTXOID.comparator())
     for (let i: number = 0; i < this.utxoIDs.length; i++) {
-      const b: Buffer = this.utxoIDs[i].toBuffer()
+      const b: Buffer = this.utxoIDs[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
@@ -305,12 +305,12 @@ export class TransferableOperation extends Serializable {
       this.operation = operation
       for (let i: number = 0; i < utxoids.length; i++) {
         const utxoid: UTXOID = new UTXOID()
-        if (typeof utxoids[i] === "string") {
-          utxoid.fromString(utxoids[i] as string)
-        } else if (utxoids[i] instanceof Buffer) {
-          utxoid.fromBuffer(utxoids[i] as Buffer)
-        } else if (utxoids[i] instanceof UTXOID) {
-          utxoid.fromString(utxoids[i].toString()) // clone
+        if (typeof utxoids[`${i}`] === "string") {
+          utxoid.fromString(utxoids[`${i}`] as string)
+        } else if (utxoids[`${i}`] instanceof Buffer) {
+          utxoid.fromBuffer(utxoids[`${i}`] as Buffer)
+        } else if (utxoids[`${i}`] instanceof UTXOID) {
+          utxoid.fromString(utxoids[`${i}`].toString()) // clone
         }
         this.utxoIDs.push(utxoid)
       }
@@ -625,7 +625,7 @@ export class NFTMintOperation extends Operation {
     ]
 
     for (let i: number = 0; i < this.outputOwners.length; i++) {
-      let b: Buffer = this.outputOwners[i].toBuffer()
+      let b: Buffer = this.outputOwners[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }

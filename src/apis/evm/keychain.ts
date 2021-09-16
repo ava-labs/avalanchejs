@@ -143,7 +143,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   clone(): this {
     const newkc: KeyChain = new KeyChain(this.hrp, this.chainID)
     for (let k in this.keys) {
-      newkc.addKey(this.keys[k].clone())
+      newkc.addKey(this.keys[`${k}`].clone())
     }
     return newkc as this
   }
@@ -151,7 +151,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   union(kc: this): this {
     const newkc: KeyChain = kc.clone()
     for (let k in this.keys) {
-      newkc.addKey(this.keys[k].clone())
+      newkc.addKey(this.keys[`${k}`].clone())
     }
     return newkc as this
   }

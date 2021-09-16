@@ -122,7 +122,7 @@ export default class Avalanche extends AvalancheCore {
       XChainID.toLowerCase() === "x"
     ) {
       if (networkID.toString() in Defaults.network) {
-        xchainid = Defaults.network[networkID].X.blockchainID
+        xchainid = Defaults.network[`${networkID}`].X.blockchainID
       } else {
         xchainid = Defaults.network[12345].X.blockchainID
       }
@@ -133,7 +133,7 @@ export default class Avalanche extends AvalancheCore {
       CChainID.toLowerCase() === "c"
     ) {
       if (networkID.toString() in Defaults.network) {
-        cchainid = Defaults.network[networkID].C.blockchainID
+        cchainid = Defaults.network[`${networkID}`].C.blockchainID
       } else {
         cchainid = Defaults.network[12345].C.blockchainID
       }
