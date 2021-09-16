@@ -67,7 +67,7 @@ const serialization: Serialization = Serialization.getInstance()
  *
  * @category RPCAPIs
  *
- * @remarks This extends the [[JRPCAP`${I}`]] class. This class should not be directly called. Instead, use the [[Avalanche.addAP`${I}`]] function to register this interface with Avalanche.
+ * @remarks This extends the [[JRPCAPI]] class. This class should not be directly called. Instead, use the [[Avalanche.addAPI]] function to register this interface with Avalanche.
  */
 export class AVMAPI extends JRPCAPI {
   /**
