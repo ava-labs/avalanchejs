@@ -1214,7 +1214,6 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = sourceChain
       sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
