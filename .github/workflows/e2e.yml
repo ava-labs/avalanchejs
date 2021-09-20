@@ -18,11 +18,12 @@ jobs:
       - run: yarn install --frozen-lockfile
       - uses: actions/setup-go@v1
         with:
-          go-version: '1.15'
+          go-version: '1.16.8'
       - name: static compilation of avalanchego
         run: |
+          sudo apt-get install musl-tools
           cd avalanchego
-          ../.github/workflows/avalanchego_static_build.sh
+          STATIC_COMPILATION=1 ./scripts/build.sh
       - name: avalanchejs e2e test
         env: 
           DOCKER_USERNAME: ${{ secrets.docker_username }}
