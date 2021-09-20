@@ -1,6 +1,6 @@
 #!/bin/bash
 
-avalanche_testing_image=avaplatform/avalanche-testing:chaos-4-github-action-compilation-fix
+avalanche_testing_image=avaplatform/avalanche-testing:master
 
 dockerfile_contents=$(cat <<EOF
     ####################################################
