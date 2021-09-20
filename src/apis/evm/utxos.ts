@@ -138,8 +138,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "base58",
         "base58"
       )
-      utxos[utxoidCleaned] = new UTXO()
-      utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding)
+      utxos[`${utxoidCleaned}`] = new UTXO()
+      utxos[`${utxoidCleaned}`].deserialize(
+        fields["utxos"][`${utxoid}`],
+        encoding
+      )
     }
     let addressUTXOs: {} = {}
     for (let address in fields["addressUTXOs"]) {
@@ -150,21 +153,21 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "hex"
       )
       let utxobalance: {} = {}
-      for (let utxoid in fields["addressUTXOs"][address]) {
+      for (let utxoid in fields["addressUTXOs"][`${address}`]) {
         let utxoidCleaned: string = serializer.decoder(
           utxoid,
           encoding,
           "base58",
           "base58"
         )
-        utxobalance[utxoidCleaned] = serializer.decoder(
-          fields["addressUTXOs"][address][utxoid],
+        utxobalance[`${utxoidCleaned}`] = serializer.decoder(
+          fields["addressUTXOs"][`${address}`][`${utxoid}`],
           encoding,
           "decimalString",
           "BN"
         )
       }
-      addressUTXOs[addressCleaned] = utxobalance
+      addressUTXOs[`${addressCleaned}`] = utxobalance
     }
     this.utxos = utxos
     this.addressUTXOs = addressUTXOs
@@ -215,7 +218,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     const utxoArray: UTXO[] = this.getAllUTXOs()
     const outids: object = {}
     for (let i: number = 0; i < utxoArray.length && !aad.canComplete(); i++) {
-      const u: UTXO = utxoArray[i]
+      const u: UTXO = utxoArray[`${i}`]
       const assetKey: string = u.getAssetID().toString("hex")
       const fromAddresses: Buffer[] = aad.getSenders()
       if (
@@ -226,7 +229,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         const am: AssetAmount = aad.getAssetAmount(assetKey)
         if (!am.isFinished()) {
           const uout: AmountOutput = u.getOutput() as AmountOutput
-          outids[assetKey] = uout.getOutputID()
+          outids[`${assetKey}`] = uout.getOutputID()
           const amount = uout.getAmount()
           am.spendAmount(amount)
           const txid: Buffer = u.getTxID()
@@ -275,31 +278,31 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     const amounts: AssetAmount[] = aad.getAmounts()
     const zero: BN = new BN(0)
     for (let i: number = 0; i < amounts.length; i++) {
-      const assetKey: string = amounts[i].getAssetIDString()
-      const amount: BN = amounts[i].getAmount()
+      const assetKey: string = amounts[`${i}`].getAssetIDString()
+      const amount: BN = amounts[`${i}`].getAmount()
       if (amount.gt(zero)) {
         const spendout: AmountOutput = SelectOutputClass(
-          outids[assetKey],
+          outids[`${assetKey}`],
           amount,
           aad.getDestinations(),
           locktime,
           threshold
         ) as AmountOutput
         const xferout: TransferableOutput = new TransferableOutput(
-          amounts[i].getAssetID(),
+          amounts[`${i}`].getAssetID(),
           spendout
         )
         aad.addOutput(xferout)
       }
-      const change: BN = amounts[i].getChange()
+      const change: BN = amounts[`${i}`].getChange()
       if (change.gt(zero)) {
         const changeout: AmountOutput = SelectOutputClass(
-          outids[assetKey],
+          outids[`${assetKey}`],
           change,
           aad.getChangeAddresses()
         ) as AmountOutput
         const chgxferout: TransferableOutput = new TransferableOutput(
-          amounts[i].getAssetID(),
+          amounts[`${i}`].getAssetID(),
           changeout
         )
         aad.addChange(chgxferout)

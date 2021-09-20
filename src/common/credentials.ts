@@ -164,7 +164,7 @@ export abstract class Credential extends Serializable {
     const barr: Buffer[] = [siglen]
     let bsize: number = siglen.length
     for (let i: number = 0; i < this.sigArray.length; i++) {
-      const sigbuff: Buffer = this.sigArray[i].toBuffer()
+      const sigbuff: Buffer = this.sigArray[`${i}`].toBuffer()
       bsize += sigbuff.length
       barr.push(sigbuff)
     }
