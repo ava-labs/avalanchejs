@@ -76,9 +76,10 @@ export class EVMAPI extends JRPCAPI {
       const netID: number = this.core.getNetworkID()
       if (
         netID in Defaults.network &&
-        this.blockchainID in Defaults.network[netID]
+        this.blockchainID in Defaults.network[`${netID}`]
       ) {
-        this.blockchainAlias = Defaults.network[netID][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netID}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -118,9 +119,9 @@ export class EVMAPI extends JRPCAPI {
     const netID: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netID] !== "undefined"
+      typeof Defaults.network[`${netID}`] !== "undefined"
     ) {
-      this.blockchainID = Defaults.network[netID].C.blockchainID //default to C-Chain
+      this.blockchainID = Defaults.network[`${netID}`].C.blockchainID //default to C-Chain
       return true
     }
 
@@ -645,7 +646,7 @@ export class EVMAPI extends JRPCAPI {
     )
     const atomicUTXOs: UTXOSet = utxoResponse.utxos
     const networkID: number = this.core.getNetworkID()
-    const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+    const avaxAssetID: string = Defaults.network[`${networkID}`].X.avaxAssetID
     const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs()
 
@@ -863,8 +864,11 @@ export class EVMAPI extends JRPCAPI {
     super(core, baseURL)
     this.blockchainID = blockchainID
     const netID: number = core.getNetworkID()
-    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
-      const { alias } = Defaults.network[netID][blockchainID]
+    if (
+      netID in Defaults.network &&
+      blockchainID in Defaults.network[`${netID}`]
+    ) {
+      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)

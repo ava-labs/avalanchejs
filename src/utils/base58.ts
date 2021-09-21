@@ -120,7 +120,7 @@ export class Base58 {
     const tmpval: Buffer = Buffer.from(anshex, "hex")
     let numZeros: number
     for (numZeros = 0; numZeros < b.length; numZeros++) {
-      if (b[numZeros] !== this.alphabetIdx0) {
+      if (b[`${numZeros}`] !== this.alphabetIdx0) {
         break
       }
     }

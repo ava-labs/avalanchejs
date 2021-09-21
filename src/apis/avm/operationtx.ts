@@ -104,7 +104,7 @@ export class OperationTx extends BaseTx {
     let barr: Buffer[] = [super.toBuffer(), this.numOps]
     this.ops = this.ops.sort(TransferableOperation.comparator())
     for (let i: number = 0; i < this.ops.length; i++) {
-      barr.push(this.ops[i].toBuffer())
+      barr.push(this.ops[`${i}`].toBuffer())
     }
     return Buffer.concat(barr)
   }
@@ -128,11 +128,11 @@ export class OperationTx extends BaseTx {
     const sigs: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.ops.length; i++) {
       const cred: Credential = SelectCredentialClass(
-        this.ops[i].getOperation().getCredentialID()
+        this.ops[`${i}`].getOperation().getCredentialID()
       )
-      const sigidxs: SigIdx[] = this.ops[i].getOperation().getSigIdxs()
+      const sigidxs: SigIdx[] = this.ops[`${i}`].getOperation().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
+        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
         const signval: Buffer = keypair.sign(msg)
         const sig: Signature = new Signature()
         sig.fromBuffer(signval)
@@ -174,7 +174,7 @@ export class OperationTx extends BaseTx {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof ops !== "undefined" && Array.isArray(ops)) {
       for (let i: number = 0; i < ops.length; i++) {
-        if (!(ops[i] instanceof TransferableOperation)) {
+        if (!(ops[`${i}`] instanceof TransferableOperation)) {
           throw new OperationError(
             `Error - OperationTx.constructor: invalid op in array parameter ${ops}`
           )

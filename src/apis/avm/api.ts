@@ -90,9 +90,10 @@ export class AVMAPI extends JRPCAPI {
       const netid: number = this.core.getNetworkID()
       if (
         netid in Defaults.network &&
-        this.blockchainID in Defaults.network[netid]
+        this.blockchainID in Defaults.network[`${netid}`]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netid}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -132,9 +133,9 @@ export class AVMAPI extends JRPCAPI {
     const netid: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netid] !== "undefined"
+      typeof Defaults.network[`${netid}`] !== "undefined"
     ) {
-      this.blockchainID = Defaults.network[netid].X.blockchainID //default to X-Chain
+      this.blockchainID = Defaults.network[`${netid}`].X.blockchainID //default to X-Chain
       return true
     }
     if (typeof blockchainID === "string") {
@@ -1816,21 +1817,22 @@ export class AVMAPI extends JRPCAPI {
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
       for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === "string") {
+        if (typeof addresses[`${i}`] === "string") {
           if (
-            typeof this.parseAddress(addresses[i] as string) === "undefined"
+            typeof this.parseAddress(addresses[`${i}`] as string) ===
+            "undefined"
           ) {
             /* istanbul ignore next */
             throw new AddressError(
               "Error - AVMAPI.${caller}: Invalid address format"
             )
           }
-          addrs.push(addresses[i] as string)
+          addrs.push(addresses[`${i}`] as string)
         } else {
           const type: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
-              addresses[i] as Buffer,
+              addresses[`${i}`] as Buffer,
               type,
               this.core.getHRP(),
               chainID
@@ -1843,7 +1845,7 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAP`${I}`]] method.
    *
    * @param core A reference to the Avalanche class
    * @param baseURL Defaults to the string "/ext/bc/X" as the path to blockchain's baseURL
@@ -1857,8 +1859,11 @@ export class AVMAPI extends JRPCAPI {
     super(core, baseURL)
     this.blockchainID = blockchainID
     const netID: number = core.getNetworkID()
-    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
-      const { alias } = Defaults.network[netID][blockchainID]
+    if (
+      netID in Defaults.network &&
+      blockchainID in Defaults.network[`${netID}`]
+    ) {
+      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
