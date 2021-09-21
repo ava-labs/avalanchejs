@@ -66,8 +66,8 @@ export class PayloadTypes {
   /**
    * Given a TypeID returns the proper [[PayloadBase]].
    */
-  select(typeid: number, ...args: any[]): PayloadBase {
-    switch (typeid) {
+  select(typeID: number, ...args: any[]): PayloadBase {
+    switch (typeID) {
       case 0:
         return new BINPayload(...args)
       case 1:
@@ -131,9 +131,7 @@ export class PayloadTypes {
       case 30:
         return new MAGNETPayload(...args)
     }
-    throw new TypeIdError(
-      "Error - PayloadTypes.select: unknown typeid " + typeid
-    )
+    throw new TypeIdError(`Error - PayloadTypes.select: unknown typeid ${typeID}`)
   }
 
   /**
