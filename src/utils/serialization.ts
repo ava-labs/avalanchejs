@@ -74,14 +74,12 @@ export abstract class Serializable {
   /**
    * Sanitize to prevent cross scripting attacks.
    */
-  sanitizeObject(obj) {
-    for (var k in obj) {
+  sanitizeObject(obj: object): object {
+    for (const k in obj) {
       if (typeof obj[`${k}`] === "object" && obj[`${k}`] !== null) {
         this.sanitizeObject(obj[`${k}`])
-      } else {
-        if (typeof obj[`${k}`] === "string") {
-          obj[`${k}`] = DOMPurify.sanitize(obj[`${k}`])
-        }
+      } else if (typeof obj[`${k}`] === "string") {
+        obj[`${k}`] = DOMPurify.sanitize(obj[`${k}`])
       }
     }
     return obj
