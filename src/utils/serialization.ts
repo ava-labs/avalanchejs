@@ -94,7 +94,7 @@ export abstract class Serializable {
       _codecID: typeof this._codecID === "undefined" ? null : this._codecID
     }
   }
-  deserialize(fields: object, encoding?: SerializedEncoding) {
+  deserialize(fields: object, encoding?: SerializedEncoding): void {
     fields = this.sanitizeObject(fields)
     if (typeof fields["_typeName"] !== "string") {
       throw new TypeNameError(
