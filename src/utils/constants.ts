@@ -170,9 +170,14 @@ const n1C: object = {
   vm: CChainVMName,
   txBytesGas: 1,
   costPerSignature: 1000,
-  // TODO - deprecate txFee and gasPrice?
+  // DEPRECATED - txFee 
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   txFee: MILLIAVAX,
+  // DEPRECATED - gasPrice
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   gasPrice: GWEI.mul(new BN(225)),
+  minGasPrice: GWEI.mul(new BN(25)),
+  maxGasPrice: GWEI.mul(new BN(1000)),
   chainID: 43114
 }
 // End Mainnet
@@ -315,9 +320,14 @@ const n5C: object = {
   vm: CChainVMName,
   txBytesGas: 1,
   costPerSignature: 1000,
-  // TODO - deprecate txFee and gasPrice?
+  // DEPRECATED - txFee 
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   txFee: MILLIAVAX,
+  // DEPRECATED - gasPrice
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   gasPrice: GWEI.mul(new BN(225)),
+  minGasPrice: GWEI.mul(new BN(25)),
+  maxGasPrice: GWEI.mul(new BN(1000)),
   chainID: 43113
 }
 // End Fuji
