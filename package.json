@@ -65,7 +65,7 @@
     "prettier": "2.3.2",
     "terser-webpack-plugin": "5.1.4",
     "ts-jest": "26.5.6",
-    "ts-loader": "9.2.5",
+    "ts-loader": "9.2.6",
     "typedoc": "0.22.4",
     "typedoc-plugin-external-module-name": "4.0.6",
     "typedoc-plugin-markdown": "3.10.4",
