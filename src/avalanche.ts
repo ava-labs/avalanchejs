@@ -34,12 +34,13 @@ export default class AvalancheCore {
    * @param host The hostname to resolve to reach the Avalanche Client RPC APIs.
    * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc. Defaults to https
+   * ex: "http", "https", "git", "ws", etc. Defaults to http
+   * The following special characters are removed from host and protocol
+   * &#,@+()$~%'":*?<>{}
    */
   setAddress = (host: string, port: number, protocol: string = "http") => {
-    protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
-
+    protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     this.host = host
     this.port = port
     this.protocol = protocol

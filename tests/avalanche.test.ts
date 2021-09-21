@@ -1,5 +1,5 @@
 import mockAxios from "jest-mock-axios"
-import { Avalanche } from "../src"
+import { Avalanche, AvalancheCore } from "../src"
 import { AVMAPI } from "../src/apis/avm/api"
 import { AdminAPI } from "../src/apis/admin/api"
 import { HealthAPI } from "../src/apis/health/api"
@@ -14,20 +14,26 @@ import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 describe("Avalanche", (): void => {
   const blockchainID: string =
     "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
-  const host: string = "127.0.0.1"
+  let host: string = "127.0.0.1"
   const port: number = 9650
-  const protocol = "https"
+  const networkID: number = 12345
+  let protocol: string = "https"
   let avalanche: Avalanche
+  let avalancheCore: AvalancheCore
+  const api: string = "api.avax.network"
+  const url: string = "https://api.avax.network:9650"
+  const encrypted: string = "https"
+  const skipinit: boolean = true
   beforeAll((): void => {
     avalanche = new Avalanche(
       host,
       port,
       protocol,
-      12345,
+      networkID,
       undefined,
       undefined,
       undefined,
-      true
+      skipinit
     )
     avalanche.addAPI("admin", AdminAPI)
     avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainID)
@@ -37,12 +43,31 @@ describe("Avalanche", (): void => {
     avalanche.addAPI("metrics", MetricsAPI)
     avalanche.addAPI("pchain", PlatformVMAPI)
   })
+  test("Remove special characters", (): void => {
+    host = "a&p#i,.@a+v(a)x$.~n%e't:w*o?r<k>"
+    protocol = "h@t&t#p+s()$"
+    avalanche = new Avalanche(host, port, protocol, networkID)
+    expect(avalanche.getHost()).toBe(api)
+    expect(avalanche.getProtocol()).toBe(encrypted)
+    expect(avalanche.getURL()).toBe(url)
+    avalancheCore = new AvalancheCore(host, port, protocol)
+    expect(avalancheCore.getHost()).toBe(api)
+    expect(avalancheCore.getProtocol()).toBe(encrypted)
+    expect(avalancheCore.getURL()).toBe(url)
+  })
   test("Can initialize without port", (): void => {
-    const a = new Avalanche(host, undefined, protocol, 12345)
-    expect(a.getPort()).toBe(undefined)
-    expect(a.getURL()).toBe(`${protocol}://${host}`)
+    protocol = encrypted
+    host = api
+    avalanche = new Avalanche(host, undefined, protocol, networkID)
+    expect(avalanche.getPort()).toBe(undefined)
+    expect(avalanche.getURL()).toBe(`${protocol}://${api}`)
+    avalancheCore = new AvalancheCore(host, undefined, protocol)
+    expect(avalancheCore.getPort()).toBe(undefined)
+    expect(avalancheCore.getURL()).toBe(`${protocol}://${api}`)
   })
   test("Can initialize with port", (): void => {
+    protocol = encrypted
+    avalanche = new Avalanche(host, port, protocol, networkID)
     expect(avalanche.getIP()).toBe(host)
     expect(avalanche.getHost()).toBe(host)
     expect(avalanche.getPort()).toBe(port)
