@@ -42,13 +42,11 @@ export class PayloadTypes {
    * Given a payload buffer returns the proper TypeID.
    */
   getTypeID(payload: Buffer): number {
-    let offset: number = 0
-    const size: number = bintools.copyFrom(payload, offset, 4).readUInt32BE(0)
-    offset += 4
-    const typeid: number = bintools
+    const offset: number = 4
+    const typeID: number = bintools
       .copyFrom(payload, offset, offset + 1)
       .readUInt8(0)
-    return typeid
+    return typeID
   }
 
   /**
@@ -68,8 +66,8 @@ export class PayloadTypes {
   /**
    * Given a TypeID returns the proper [[PayloadBase]].
    */
-  select(typeid: number, ...args: any[]): PayloadBase {
-    switch (typeid) {
+  select(typeID: number, ...args: any[]): PayloadBase {
+    switch (typeID) {
       case 0:
         return new BINPayload(...args)
       case 1:
@@ -134,7 +132,7 @@ export class PayloadTypes {
         return new MAGNETPayload(...args)
     }
     throw new TypeIdError(
-      "Error - PayloadTypes.select: unknown typeid " + typeid
+      `Error - PayloadTypes.select: unknown typeid ${typeID}`
     )
   }
 
@@ -226,9 +224,9 @@ export abstract class PayloadBase {
    * Returns the payload (with typeID).
    */
   getPayload(): Buffer {
-    let typeid: Buffer = Buffer.alloc(1)
-    typeid.writeUInt8(this.typeid, 0)
-    const pl: Buffer = Buffer.concat([typeid, bintools.copyFrom(this.payload)])
+    const typeID: Buffer = Buffer.alloc(1)
+    typeID.writeUInt8(this.typeid, 0)
+    const pl: Buffer = Buffer.concat([typeID, bintools.copyFrom(this.payload)])
     return pl
   }
 
@@ -236,7 +234,7 @@ export abstract class PayloadBase {
    * Decodes the payload as a {@link https://github.com/feross/buffer|Buffer} including 4 bytes for the length and TypeID.
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
-    let size: number = bintools
+    const size: number = bintools
       .copyFrom(bytes, offset, offset + 4)
       .readUInt32BE(0)
     offset += 4
@@ -251,9 +249,9 @@ export abstract class PayloadBase {
    * Encodes the payload as a {@link https://github.com/feross/buffer|Buffer} including 4 bytes for the length and TypeID.
    */
   toBuffer(): Buffer {
-    let sizebuff: Buffer = Buffer.alloc(4)
+    const sizebuff: Buffer = Buffer.alloc(4)
     sizebuff.writeUInt32BE(this.payload.length + 1, 0)
-    let typebuff: Buffer = Buffer.alloc(1)
+    const typebuff: Buffer = Buffer.alloc(1)
     typebuff.writeUInt8(this.typeid, 0)
     return Buffer.concat([sizebuff, typebuff, this.payload])
   }
