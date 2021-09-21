@@ -80,9 +80,10 @@ export class PlatformVMAPI extends JRPCAPI {
       const netid: number = this.core.getNetworkID()
       if (
         netid in Defaults.network &&
-        this.blockchainID in Defaults.network[netid]
+        this.blockchainID in Defaults.network[`${netid}`]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netid}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -122,7 +123,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const netid: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netid] !== "undefined"
+      typeof Defaults.network[`${netid}`] !== "undefined"
     ) {
       this.blockchainID = PlatformChainID //default to P-Chain
       return true
@@ -1214,7 +1215,6 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = sourceChain
       sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
@@ -1716,19 +1716,20 @@ return builtUnsignedTx
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
       for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === "string") {
+        if (typeof addresses[`${i}`] === "string") {
           if (
-            typeof this.parseAddress(addresses[i] as string) === "undefined"
+            typeof this.parseAddress(addresses[`${i}`] as string) ===
+            "undefined"
           ) {
             /* istanbul ignore next */
             throw new AddressError("Error - Invalid address format")
           }
-          addrs.push(addresses[i] as string)
+          addrs.push(addresses[`${i}`] as string)
         } else {
           const bech32: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
-              addresses[i] as Buffer,
+              addresses[`${i}`] as Buffer,
               bech32,
               this.core.getHRP(),
               chainid
@@ -1753,9 +1754,9 @@ return builtUnsignedTx
     const netID: number = core.getNetworkID()
     if (
       netID in Defaults.network &&
-      this.blockchainID in Defaults.network[netID]
+      this.blockchainID in Defaults.network[`${netID}`]
     ) {
-      const { alias } = Defaults.network[netID][this.blockchainID]
+      const { alias } = Defaults.network[`${netID}`][this.blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)

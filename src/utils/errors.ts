@@ -39,6 +39,7 @@ const UNKNOWN_TYPE_ERROR_CODE: string = "1036"
 const BECH32_ERROR_CODE: string = "1037"
 const EVM_FEE_ERROR_CODE: string = "1038"
 const INVALID_ENTROPY: string = "1039"
+const PROTOCOL_ERROR_CODE: string = "1040"
 
 class AvalancheError extends Error {
   errorCode: string
@@ -337,6 +338,13 @@ export class InvalidEntropy extends AvalancheError {
   constructor(m: string) {
     super(m, INVALID_ENTROPY)
     Object.setPrototypeOf(this, InvalidEntropy.prototype)
+  }
+}
+
+export class ProtocolError extends AvalancheError {
+  constructor(m: string) {
+    super(m, PROTOCOL_ERROR_CODE)
+    Object.setPrototypeOf(this, ProtocolError.prototype)
   }
 }
 

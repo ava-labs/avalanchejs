@@ -175,7 +175,7 @@ export abstract class StandardKeyChain<KPClass extends StandardKeyPair> {
       kaddr = key.getAddress().toString("hex")
     }
     if (kaddr in this.keys) {
-      delete this.keys[kaddr]
+      delete this.keys[`${kaddr}`]
       return true
     }
     return false

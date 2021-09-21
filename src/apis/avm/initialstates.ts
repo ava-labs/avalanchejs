@@ -25,7 +25,7 @@ export class InitialStates extends Serializable {
     const fields: object = super.serialize(encoding)
     const flatfxs: object = {}
     for (let fxid in this.fxs) {
-      flatfxs[fxid] = this.fxs[fxid].map((o: Output): object =>
+      flatfxs[`${fxid}`] = this.fxs[`${fxid}`].map((o: Output): object =>
         o.serialize(encoding)
       )
     }
@@ -38,7 +38,7 @@ export class InitialStates extends Serializable {
     super.deserialize(fields, encoding)
     const unflat: { [fxid: number]: Output[] } = {}
     for (let fxid in fields["fxs"]) {
-      unflat[fxid] = fields["fxs"][fxid].map((o: object) => {
+      unflat[`${fxid}`] = fields["fxs"][`${fxid}`].map((o: object) => {
         const out: Output = SelectOutputClass(o["_typeID"])
         out.deserialize(o, encoding)
         return out
@@ -56,9 +56,9 @@ export class InitialStates extends Serializable {
    */
   addOutput(out: Output, fxid: number = AVMConstants.SECPFXID): void {
     if (!(fxid in this.fxs)) {
-      this.fxs[fxid] = []
+      this.fxs[`${fxid}`] = []
     }
-    this.fxs[fxid].push(out)
+    this.fxs[`${fxid}`].push(out)
   }
 
   fromBuffer(bytes: Buffer, offset: number = 0): number {
@@ -70,7 +70,7 @@ export class InitialStates extends Serializable {
       const fxidbuff: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
       offset += 4
       const fxid: number = fxidbuff.readUInt32BE(0)
-      result[fxid] = []
+      result[`${fxid}`] = []
       const statelenbuff: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
       offset += 4
       const statelen: number = statelenbuff.readUInt32BE(0)
@@ -81,7 +81,7 @@ export class InitialStates extends Serializable {
         offset += 4
         const out: Output = SelectOutputClass(outputid)
         offset = out.fromBuffer(bytes, offset)
-        result[fxid].push(out)
+        result[`${fxid}`].push(out)
       }
     }
     this.fxs = result
@@ -97,19 +97,19 @@ export class InitialStates extends Serializable {
     klen.writeUInt32BE(keys.length, 0)
     buff.push(klen)
     for (let i: number = 0; i < keys.length; i++) {
-      const fxid: number = keys[i]
+      const fxid: number = keys[`${i}`]
       const fxidbuff: Buffer = Buffer.alloc(4)
       fxidbuff.writeUInt32BE(fxid, 0)
       buff.push(fxidbuff)
-      const initialState = this.fxs[fxid].sort(Output.comparator())
+      const initialState = this.fxs[`${fxid}`].sort(Output.comparator())
       const statelen: Buffer = Buffer.alloc(4)
       statelen.writeUInt32BE(initialState.length, 0)
       buff.push(statelen)
       for (let j: number = 0; j < initialState.length; j++) {
         const outputid: Buffer = Buffer.alloc(4)
-        outputid.writeInt32BE(initialState[j].getOutputID(), 0)
+        outputid.writeInt32BE(initialState[`${j}`].getOutputID(), 0)
         buff.push(outputid)
-        buff.push(initialState[j].toBuffer())
+        buff.push(initialState[`${j}`].toBuffer())
       }
     }
     return Buffer.concat(buff)

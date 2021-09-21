@@ -133,14 +133,14 @@ export abstract class StandardBaseTx<
       this.networkID.length + this.blockchainID.length + this.numouts.length
     const barr: Buffer[] = [this.networkID, this.blockchainID, this.numouts]
     for (let i: number = 0; i < this.outs.length; i++) {
-      const b: Buffer = this.outs[i].toBuffer()
+      const b: Buffer = this.outs[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
     barr.push(this.numins)
     bsize += this.numins.length
     for (let i: number = 0; i < this.ins.length; i++) {
-      const b: Buffer = this.ins[i].toBuffer()
+      const b: Buffer = this.ins[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
@@ -273,11 +273,11 @@ export abstract class StandardUnsignedTx<
     for (let i: number = 0; i < ins.length; i++) {
       // only check StandardAmountInputs
       if (
-        ins[i].getInput() instanceof StandardAmountInput &&
-        aIDHex === ins[i].getAssetID().toString("hex")
+        ins[`${i}`].getInput() instanceof StandardAmountInput &&
+        aIDHex === ins[`${i}`].getAssetID().toString("hex")
       ) {
         const input: StandardAmountInput = ins[
-          i
+          `${i}`
         ].getInput() as StandardAmountInput
         total = total.add(input.getAmount())
       }
@@ -297,11 +297,11 @@ export abstract class StandardUnsignedTx<
     for (let i: number = 0; i < outs.length; i++) {
       // only check StandardAmountOutput
       if (
-        outs[i].getOutput() instanceof StandardAmountOutput &&
-        aIDHex === outs[i].getAssetID().toString("hex")
+        outs[`${i}`].getOutput() instanceof StandardAmountOutput &&
+        aIDHex === outs[`${i}`].getAssetID().toString("hex")
       ) {
         const output: StandardAmountOutput = outs[
-          i
+          `${i}`
         ].getOutput() as StandardAmountOutput
         total = total.add(output.getAmount())
       }
@@ -410,12 +410,12 @@ export abstract class StandardTx<
     const barr: Buffer[] = [txbuff, credlen]
     bsize += credlen.length
     for (let i: number = 0; i < this.credentials.length; i++) {
-      this.credentials[i].setCodecID(codecID)
+      this.credentials[`${i}`].setCodecID(codecID)
       const credID: Buffer = Buffer.alloc(4)
-      credID.writeUInt32BE(this.credentials[i].getCredentialID(), 0)
+      credID.writeUInt32BE(this.credentials[`${i}`].getCredentialID(), 0)
       barr.push(credID)
       bsize += credID.length
-      const credbuff: Buffer = this.credentials[i].toBuffer()
+      const credbuff: Buffer = this.credentials[`${i}`].toBuffer()
       bsize += credbuff.length
       barr.push(credbuff)
     }

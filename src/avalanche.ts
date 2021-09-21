@@ -4,6 +4,7 @@
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios"
 import { APIBase, RequestResponseData } from "./common/apibase"
+import { ProtocolError } from "./utils/errors"
 import { getPreferredHRP } from "./utils/helperfunctions"
 
 /**
@@ -34,9 +35,25 @@ export default class AvalancheCore {
    * @param host The hostname to resolve to reach the Avalanche Client RPC APIs.
    * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc. Defaults to https
+   * ex: "http", "https", etc. Defaults to http
+   * The following special characters are removed from host and protocol
+   * &#,@+()$~%'":*?<>{}
    */
-  setAddress = (host: string, port: number, protocol: string = "http") => {
+  setAddress = (
+    host: string,
+    port: number,
+    protocol: string = "http"
+  ): void => {
+    host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
+    protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
+    const protocols: string[] = ["http", "https"]
+    if (!protocols.includes(protocol)) {
+      /* istanbul ignore next */
+      throw new ProtocolError(
+        "Error - AvalancheCore.setAddress: Invalid protocol"
+      )
+    }
+
     this.host = host
     this.port = port
     this.protocol = protocol
@@ -118,7 +135,7 @@ export default class AvalancheCore {
    * @param value Header value
    */
   setHeader = (key: string, value: string): void => {
-    this.headers[key] = value
+    this.headers[`${key}`] = value
   }
 
   /**
@@ -127,7 +144,7 @@ export default class AvalancheCore {
    * @param key Header name
    */
   removeHeader = (key: string): void => {
-    delete this.headers[key]
+    delete this.headers[`${key}`]
   }
 
   /**
@@ -136,7 +153,7 @@ export default class AvalancheCore {
   removeAllHeaders = (): void => {
     for (const prop in this.headers) {
       if (Object.prototype.hasOwnProperty.call(this.headers, prop)) {
-        delete this.headers[prop]
+        delete this.headers[`${prop}`]
       }
     }
   }
@@ -148,7 +165,7 @@ export default class AvalancheCore {
    * @param value Config value
    */
   setRequestConfig = (key: string, value: string | boolean): void => {
-    this.requestConfig[key] = value
+    this.requestConfig[`${key}`] = value
   }
 
   /**
@@ -157,7 +174,7 @@ export default class AvalancheCore {
    * @param key Header name
    */
   removeRequestConfig = (key: string): void => {
-    delete this.requestConfig[key]
+    delete this.requestConfig[`${key}`]
   }
 
   /**
@@ -166,7 +183,7 @@ export default class AvalancheCore {
   removeAllRequestConfigs = (): void => {
     for (const prop in this.requestConfig) {
       if (Object.prototype.hasOwnProperty.call(this.requestConfig, prop)) {
-        delete this.requestConfig[prop]
+        delete this.requestConfig[`${prop}`]
       }
     }
   }
@@ -183,7 +200,7 @@ export default class AvalancheCore {
   protected _setHeaders = (headers: any): object => {
     if (typeof this.headers === "object") {
       for (const [key, value] of Object.entries(this.headers)) {
-        headers[key] = value
+        headers[`${key}`] = value
       }
     }
 
@@ -223,9 +240,9 @@ export default class AvalancheCore {
     ...args: any[]
   ) => {
     if (typeof baseurl === "undefined") {
-      this.apis[apiName] = new ConstructorFN(this, undefined, ...args)
+      this.apis[`${apiName}`] = new ConstructorFN(this, undefined, ...args)
     } else {
-      this.apis[apiName] = new ConstructorFN(this, baseurl, ...args)
+      this.apis[`${apiName}`] = new ConstructorFN(this, baseurl, ...args)
     }
   }
 
@@ -234,7 +251,8 @@ export default class AvalancheCore {
    *
    * @param apiName Name of the API to return
    */
-  api = <GA extends APIBase>(apiName: string): GA => this.apis[apiName] as GA
+  api = <GA extends APIBase>(apiName: string): GA =>
+    this.apis[`${apiName}`] as GA
 
   /**
    * @ignore
