@@ -3,7 +3,7 @@ import { Defaults } from "../../../src/utils/constants"
 import { Networks, Network } from "../../../src/apis/evm/constants"
 
 describe("EVMConstants", (): void => {
-  describe("compare min and max gas prices", (): void => {
+  describe("Compare min and max gas prices", (): void => {
     const networks: Networks = Defaults.network
     const minNum: number = 25000000000
     const maxNum: number = 1000000000000
