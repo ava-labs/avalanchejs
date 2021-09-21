@@ -12,7 +12,8 @@ import {
   PCHAINADDRPayload,
   CCHAINADDRPayload,
   TXIDPayload,
-  JSONPayload
+  JSONPayload,
+  EMAILPayload
 } from "../../src/utils/payload"
 import BinTools from "../../src/utils/bintools"
 import BN from "bn.js"
@@ -55,18 +56,24 @@ describe("Payload", () => {
 
     expect(payloadTypes.lookupID("BIN")).toBe(0)
 
-    let pl: BINPayload = payloadTypes.select(0, binstr) as BINPayload
+    let binpayload = payloadTypes.select(0, binstr) as BINPayload
+    let utf8payload = payloadTypes.select(1, utf8str) as UTF8Payload
+    let hexstrpayload = payloadTypes.select(2, bnhex) as HEXSTRPayload
+    let emailpayload = payloadTypes.select(26, emailstr) as EMAILPayload
 
-    expect(payloadTypes.getTypeID(pl.toBuffer())).toBe(0)
+    expect(payloadTypes.getTypeID(binpayload.toBuffer())).toBe(0)
+    expect(payloadTypes.getTypeID(utf8payload.toBuffer())).toBe(1)
+    expect(payloadTypes.getTypeID(hexstrpayload.toBuffer())).toBe(2)
+    expect(payloadTypes.getTypeID(emailpayload.toBuffer())).toBe(26)
 
-    let pp: Buffer = payloadTypes.getContent(pl.toBuffer())
+    let pp: Buffer = payloadTypes.getContent(binpayload.toBuffer())
 
     expect(bintools.b58ToBuffer(binstr).toString("hex")).toBe(
       pp.toString("hex")
     )
     expect(payloadTypes.lookupType(0)).toBe("BIN")
-    expect(payloadTypes.recast(pl).toBuffer().toString("hex")).toBe(
-      pl.toBuffer().toString("hex")
+    expect(payloadTypes.recast(binpayload).toBuffer().toString("hex")).toBe(
+      binpayload.toBuffer().toString("hex")
     )
   })
 

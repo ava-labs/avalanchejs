@@ -1102,7 +1102,6 @@ export class AVMAPI extends JRPCAPI {
       srcChain = sourceChain
       sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - AVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
