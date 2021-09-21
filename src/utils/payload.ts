@@ -42,11 +42,11 @@ export class PayloadTypes {
    * Given a payload buffer returns the proper TypeID.
    */
   getTypeID(payload: Buffer): number {
-    let offset: number = 0
-    const typeid: number = bintools
+    const offset: number = 4
+    const typeID: number = bintools
       .copyFrom(payload, offset, offset + 1)
       .readUInt8(0)
-    return typeid
+    return typeID
   }
 
   /**
