@@ -4,6 +4,7 @@
  */
 import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios"
 import { APIBase, RequestResponseData } from "./common/apibase"
+import { ProtocolError } from "./utils/errors"
 import { getPreferredHRP } from "./utils/helperfunctions"
 
 /**
@@ -34,9 +35,25 @@ export default class AvalancheCore {
    * @param host The hostname to resolve to reach the Avalanche Client RPC APIs.
    * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
-   * ex: "http", "https", "git", "ws", etc. Defaults to https
+   * ex: "http", "https", etc. Defaults to http
+   * The following special characters are removed from host and protocol
+   * &#,@+()$~%'":*?<>{}
    */
-  setAddress = (host: string, port: number, protocol: string = "http") => {
+  setAddress = (
+    host: string,
+    port: number,
+    protocol: string = "http"
+  ): void => {
+    host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
+    protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
+    const protocols: string[] = ["http", "https"]
+    if (!protocols.includes(protocol)) {
+      /* istanbul ignore next */
+      throw new ProtocolError(
+        "Error - AvalancheCore.setAddress: Invalid protocol"
+      )
+    }
+
     this.host = host
     this.port = port
     this.protocol = protocol
