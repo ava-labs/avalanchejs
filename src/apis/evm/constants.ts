@@ -21,7 +21,6 @@ export class EVMConstants {
   static LATESTCODEC: number = 0
 
   static ADDRESSLENGTH: number = 20
-
 }
 
 export interface C {

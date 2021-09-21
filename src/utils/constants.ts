@@ -170,7 +170,7 @@ const n1C: object = {
   vm: CChainVMName,
   txBytesGas: 1,
   costPerSignature: 1000,
-  // DEPRECATED - txFee 
+  // DEPRECATED - txFee
   // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   txFee: MILLIAVAX,
   // DEPRECATED - gasPrice
@@ -320,7 +320,7 @@ const n5C: object = {
   vm: CChainVMName,
   txBytesGas: 1,
   costPerSignature: 1000,
-  // DEPRECATED - txFee 
+  // DEPRECATED - txFee
   // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   txFee: MILLIAVAX,
   // DEPRECATED - gasPrice
