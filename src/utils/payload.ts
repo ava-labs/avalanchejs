@@ -131,7 +131,9 @@ export class PayloadTypes {
       case 30:
         return new MAGNETPayload(...args)
     }
-    throw new TypeIdError(`Error - PayloadTypes.select: unknown typeid ${typeID}`)
+    throw new TypeIdError(
+      `Error - PayloadTypes.select: unknown typeid ${typeID}`
+    )
   }
 
   /**
