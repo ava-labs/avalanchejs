@@ -8,5 +8,4 @@ custom_params_json="{
     \"executeTests\":[\"AvalancheJS\"]
 }"
 
-
 docker run -v $mount_spec $image ./local-e2e-tests.bin --custom-params-json="${custom_params_json}"
