@@ -28,26 +28,31 @@ export interface C {
   alias?: string
   vm?: string
   fee?: BN
-  gasPrice?: BN
-  chainID?: BN
+  gasPrice?: BN | number
+  chainID?: number
   minGasPrice?: BN
   maxGasPrice?: BN
+  txBytesGas?: number
+  costPerSignature?: number
+  txFee?: BN
+  avaxAssetID?: string
 }
 export interface X {
   blockchainID?: string
   avaxAssetID?: string
   alias?: string
   vm?: string
-  txFee?: BN
-  creationTxFee?: BN
+  txFee?: BN | number
+  creationTxFee?: BN | number
+  fee?: BN
 }
 export interface P {
   blockchainID?: string
   avaxAssetID?: string
   alias?: string
   vm?: string
-  txFee?: BN
-  creationTxFee?: BN
+  txFee?: BN | number
+  creationTxFee?: BN | number
   minConsumption?: number
   maxConsumption?: number
   maxStakingDuration?: BN
@@ -57,6 +62,7 @@ export interface P {
   maxStakeDuration?: number
   minDelegationStake?: BN
   minDelegationFee?: BN
+  fee?: BN
 }
 export interface Network {
   C: C
