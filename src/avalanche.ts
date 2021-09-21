@@ -38,7 +38,7 @@ export default class AvalancheCore {
    * The following special characters are removed from host and protocol
    * &#,@+()$~%'":*?<>{}
    */
-  setAddress = (host: string, port: number, protocol: string = "http") => {
+  setAddress = (host: string, port: number, protocol: string = "http"): void => {
     host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     this.host = host

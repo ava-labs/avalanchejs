@@ -44,8 +44,8 @@ describe("Avalanche", (): void => {
     avalanche.addAPI("pchain", PlatformVMAPI)
   })
   test("Remove special characters", (): void => {
-    host = "a&p#i,.@a+v(a)x$.~n%e't:w*o?r<k>"
-    protocol = "h@t&t#p+s()$"
+    host = "a&&&&p#i,.@a+v(a)x$.~n%e't:w*o?r<k>"
+    protocol = "h@t&@&@t#p+s()$"
     avalanche = new Avalanche(host, port, protocol, networkID)
     expect(avalanche.getHost()).toBe(api)
     expect(avalanche.getProtocol()).toBe(encrypted)
