@@ -157,7 +157,7 @@ export abstract class StandardAssetAmountDestination<
   }
 
   getAssetAmount = (assetHexStr: string): AssetAmount => {
-    return this.amountkey[assetHexStr]
+    return this.amountkey[`${assetHexStr}`]
   }
 
   assetExists = (assetHexStr: string): boolean => {
@@ -182,7 +182,7 @@ export abstract class StandardAssetAmountDestination<
 
   canComplete = (): boolean => {
     for (let i: number = 0; i < this.amounts.length; i++) {
-      if (!this.amounts[i].isFinished()) {
+      if (!this.amounts[`${i}`].isFinished()) {
         return false
       }
     }

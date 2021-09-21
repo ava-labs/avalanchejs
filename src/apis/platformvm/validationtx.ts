@@ -312,7 +312,7 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
             if(!kc.hasKey(this.subnetAuth[i])) {
                 throw new Error("AddSubnetValidatorTx.sign -- specified address in subnetAuth not existent in provided keychain.");
             }
-            
+
             let kp:KeyPair = kc.getKey(this.subnetAuth[i]);
             const signval:Buffer = kp.sign(msg);
             const sig:Signature = new Signature();
@@ -329,9 +329,9 @@ export class AddSubnetValidatorTx extends WeightedValidatorTx {
         blockchainID:Buffer = Buffer.alloc(32, 16),
         outs:TransferableOutput[] = undefined,
         ins:TransferableInput[] = undefined,
-        memo:Buffer = undefined, 
-        nodeID:Buffer = undefined, 
-        startTime:BN = undefined, 
+        memo:Buffer = undefined,
+        nodeID:Buffer = undefined,
+        startTime:BN = undefined,
         endTime:BN = undefined,
         weight:BN = undefined,
         subnetID:Buffer = undefined,
@@ -412,7 +412,9 @@ export class AddDelegatorTx extends WeightedValidatorTx {
   getStakeOutsTotal(): BN {
     let val: BN = new BN(0)
     for (let i: number = 0; i < this.stakeOuts.length; i++) {
-      val = val.add((this.stakeOuts[i].getOutput() as AmountOutput).getAmount())
+      val = val.add(
+        (this.stakeOuts[`${i}`].getOutput() as AmountOutput).getAmount()
+      )
     }
     return val
   }
@@ -456,7 +458,7 @@ export class AddDelegatorTx extends WeightedValidatorTx {
     bsize += numouts.length
     this.stakeOuts = this.stakeOuts.sort(TransferableOutput.comparator())
     for (let i: number = 0; i < this.stakeOuts.length; i++) {
-      let out: Buffer = this.stakeOuts[i].toBuffer()
+      let out: Buffer = this.stakeOuts[`${i}`].toBuffer()
       barr.push(out)
       bsize += out.length
     }
