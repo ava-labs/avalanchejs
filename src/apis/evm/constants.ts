@@ -24,11 +24,11 @@ export class EVMConstants {
 }
 
 export interface C {
-  blockchainID?: string
-  alias?: string
-  vm?: string
+  blockchainID: string
+  alias: string
+  vm: string
   fee?: BN
-  gasPrice?: BN | number
+  gasPrice: BN | number
   chainID?: number
   minGasPrice?: BN
   maxGasPrice?: BN
@@ -38,30 +38,30 @@ export interface C {
   avaxAssetID?: string
 }
 export interface X {
-  blockchainID?: string
+  blockchainID: string
+  alias: string
+  vm: string
+  creationTxFee: BN | number
   avaxAssetID?: string
-  alias?: string
-  vm?: string
   txFee?: BN | number
-  creationTxFee?: BN | number
   fee?: BN
 }
 export interface P {
-  blockchainID?: string
+  blockchainID: string
+  alias: string
+  vm: string
+  creationTxFee: BN | number
+  minConsumption: number
+  maxConsumption: number
+  maxStakingDuration: BN
+  maxSupply: BN
+  minStake: BN
+  minStakeDuration: number
+  maxStakeDuration: number
+  minDelegationStake: BN
+  minDelegationFee: BN
   avaxAssetID?: string
-  alias?: string
-  vm?: string
   txFee?: BN | number
-  creationTxFee?: BN | number
-  minConsumption?: number
-  maxConsumption?: number
-  maxStakingDuration?: BN
-  maxSupply?: BN
-  minStake?: BN
-  minStakeDuration?: number
-  maxStakeDuration?: number
-  minDelegationStake?: BN
-  minDelegationFee?: BN
   fee?: BN
 }
 export interface Network {
