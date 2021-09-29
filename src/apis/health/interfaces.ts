@@ -18,7 +18,6 @@ export interface Checks {
   isBootstrapped: Entity
   network: Entity
   router: Entity
-
 }
 export interface HealthResponse {
   checks: Checks

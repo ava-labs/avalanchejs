@@ -10,7 +10,7 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const health: HealthAPI = avalanche.Health()
 
 const main = async (): Promise<any> => {
-  const healthResponse = await health.health() as HealthResponse
+  const healthResponse = (await health.health()) as HealthResponse
   console.log(healthResponse)
 }
 

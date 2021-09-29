@@ -20,9 +20,7 @@ export class HealthAPI extends JRPCAPI {
    * @returns Promise for a [[HealthResponse]]
    */
   health = async (): Promise<HealthResponse> => {
-    const response: RequestResponseData = await this.callMethod(
-      "health.health"
-    )
+    const response: RequestResponseData = await this.callMethod("health.health")
     return response.data.result
   }
 
