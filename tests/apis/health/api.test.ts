@@ -36,41 +36,41 @@ describe("Health", (): void => {
         checks: {
           C: {
             message: [Object],
-            timestamp: '2021-09-29T15:31:20.274427-07:00',
+            timestamp: "2021-09-29T15:31:20.274427-07:00",
             duration: 275539,
             contiguousFailures: 0,
             timeOfFirstFailure: null
           },
           P: {
             message: [Object],
-            timestamp: '2021-09-29T15:31:20.274508-07:00',
+            timestamp: "2021-09-29T15:31:20.274508-07:00",
             duration: 14576,
             contiguousFailures: 0,
             timeOfFirstFailure: null
           },
           X: {
             message: [Object],
-            timestamp: '2021-09-29T15:31:20.274529-07:00',
+            timestamp: "2021-09-29T15:31:20.274529-07:00",
             duration: 4563,
             contiguousFailures: 0,
             timeOfFirstFailure: null
           },
           isBootstrapped: {
-            timestamp: '2021-09-29T15:31:19.448314-07:00',
+            timestamp: "2021-09-29T15:31:19.448314-07:00",
             duration: 392,
             contiguousFailures: 0,
             timeOfFirstFailure: null
           },
           network: {
             message: [Object],
-            timestamp: '2021-09-29T15:31:19.448311-07:00',
+            timestamp: "2021-09-29T15:31:19.448311-07:00",
             duration: 4866,
             contiguousFailures: 0,
             timeOfFirstFailure: null
           },
           router: {
             message: [Object],
-            timestamp: '2021-09-29T15:31:19.448452-07:00',
+            timestamp: "2021-09-29T15:31:19.448452-07:00",
             duration: 3932,
             contiguousFailures: 0,
             timeOfFirstFailure: null
