@@ -19,6 +19,7 @@ export interface Checks {
   network: Entity
   router: Entity
 }
+
 export interface HealthResponse {
   checks: Checks
   healthy: boolean
