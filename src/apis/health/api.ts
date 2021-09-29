@@ -5,6 +5,7 @@
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
+import { HealthResponse } from "./interfaces"
 
 /**
  * Class for interacting with a node API that is using the node's HealthApi.
@@ -16,11 +17,11 @@ import { RequestResponseData } from "../../common/apibase"
 export class HealthAPI extends JRPCAPI {
   /**
    *
-   * @returns Promise for an object containing the health check response
+   * @returns Promise for a [[HealthResponse]]
    */
-  getLiveness = async (): Promise<object> => {
+  health = async (): Promise<HealthResponse> => {
     const response: RequestResponseData = await this.callMethod(
-      "health.getLiveness"
+      "health.health"
     )
     return response.data.result
   }
