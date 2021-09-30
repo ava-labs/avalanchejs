@@ -611,37 +611,6 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * Send AVAX from the X-Chain to an account on the P-Chain or C-Chain.
-   *
-   * After calling this method, you must call the P-Chain’s or C-Chain's importAVAX method to complete the transfer.
-   *
-   * @param username The Keystore user that controls the P-Chain account specified in `to`
-   * @param password The password of the Keystore user
-   * @param to The account on the P-Chain or C-Chain to send the AVAX to.
-   * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
-   *
-   * @returns String representing the transaction id
-   */
-  exportAVAX = async (
-    username: string,
-    password: string,
-    to: string,
-    amount: BN
-  ): Promise<string> => {
-    const params: ExportAVAXParams = {
-      to,
-      amount: amount,
-      username,
-      password
-    }
-    const response: RequestResponseData = await this.callMethod(
-      "avm.exportAVAX",
-      params
-    )
-    return response.data.result.txID
-  }
-
-  /**
    * Send ANT (Avalanche Native Token) assets including AVAX from an account on the P-Chain or C-Chain to an address on the X-Chain. This transaction
    * must be signed with the key of the account that the asset is sent from and which pays
    * the transaction fee.
