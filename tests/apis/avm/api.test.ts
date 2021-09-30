@@ -492,33 +492,6 @@ describe("AVMAPI", (): void => {
     expect(response).toBe(txID)
   })
 
-  test("importAVAX", async (): Promise<void> => {
-    const to: string = "abcdef"
-    const username: string = "Robert"
-    const password: string = "Paulson"
-    const txID: string = "valid"
-    const result: Promise<string> = api.importAVAX(
-      username,
-      password,
-      to,
-      blockchainID
-    )
-    const payload: object = {
-      result: {
-        txID: txID
-      }
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(txID)
-  })
-
   test("createAddress", async (): Promise<void> => {
     const alias: string = "randomalias"
 
