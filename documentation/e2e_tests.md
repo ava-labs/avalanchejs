@@ -6,7 +6,7 @@ To run E2E tests locally, run the `avash_avalanchejs_e2e.sh` script and pass in 
 
 For example,
 
-`./avash_avalanchejs_e2e.sh "/Users/paool/web/avash/" "/User/paool/web/avalanchejs/"`
+`./avash_avalanchejs_e2e.sh "/path/to/avash/" "/path/to/avalanchejs/"`
 
 
 - New E2E tests go in the /e2e_tests/ directory.
