@@ -6,7 +6,7 @@ This option does not require executing a docker container, but it may not lead t
 
 * Launch `avash`
 * Set env vars `AVALANCHEGO_IP`, `AVALANCHEGO_PORT` to point to one of the nodes of avash
-* from avalanchejs dir execute: `yarn test -i --roots e2e_tests`
+* From avalanchejs dir execute: `yarn test -i --roots e2e_tests`
 
 Example workflow
 
