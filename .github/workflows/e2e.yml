@@ -48,4 +48,4 @@ jobs:
         env: 
           AVALANCHEGO_IP: localhost
           AVALANCHEGO_PORT: 9650
-        run: yarn test -i --roots e2e_tests
+        run: timeout 30 && yarn test -i --roots e2e_tests
