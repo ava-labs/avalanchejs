@@ -42,7 +42,7 @@ jobs:
           cd avash
           STATIC_COMPILATION=1 go get && 
           go build && 
-          sudo echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego" >> /home/runner/.avash.yaml &&
+          sudo echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego/build/avalanchego" >> /home/runner/.avash.yaml &&
           cat /home/runner/.avash.yaml &&
           pwd && 
           ./avash runscript scripts/five_node_staking.lua
