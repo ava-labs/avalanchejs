@@ -34,8 +34,8 @@ or
 
 If you are running VSCode, you can use these snippets to automate the repetive tasks.
 
-- highlight the variable that ESlint warns about
-- press shift+`
+* highlight the variable that ESlint warns about
+* press shift+`
 
 To get this to work you'll need to add this code snippet
 
