@@ -8,9 +8,9 @@ to run the linter against the repo.
 
 ### Common warnings
 
-- [Generic Object Injection Sink](https://github.com/nodesecurity/eslint-plugin-security/blob/master/docs/the-dangers-of-square-bracket-notation.md)
-- Function Call Object Injection Sink
-- Variable Assigned to Object Injection Sink
+* [Generic Object Injection Sink](https://github.com/nodesecurity/eslint-plugin-security/blob/master/docs/the-dangers-of-square-bracket-notation.md)
+* Function Call Object Injection Sink
+* Variable Assigned to Object Injection Sink
 
 To resolve these warnings,
 
