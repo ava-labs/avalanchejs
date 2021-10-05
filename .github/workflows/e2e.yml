@@ -36,15 +36,13 @@ jobs:
         run: |
           sudo apt-get install musl-tools
           cd avalanchego
-          STATIC_COMPILATION=1 ./scripts/build.sh && pwd
+          STATIC_COMPILATION=1 ./scripts/build.sh
       - name: Static compilation of avash
         run: |
           cd avash
           STATIC_COMPILATION=1 go get && 
           go build && 
-          pwd &&
-          echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego" >> /home/runner/.avash.yaml &&
-          /home/runner/.avash.yaml &&
+          sudo echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego" >> /home/runner/.avash.yaml &&
           ./avash runscript scripts/five_node_staking.lua
       - name: AvalancheJS E2E Test
         env: 
