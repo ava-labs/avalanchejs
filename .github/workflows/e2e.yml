@@ -5,14 +5,16 @@ jobs:
   e2e:
     runs-on: ubuntu-18.04
     steps:
-      - name: My first step
+      - name: Checkout AvalancheJS
         # Uses the major version of a release of a public repository
         uses: actions/checkout@v2
-      # - uses: actions/checkout@v2
-      #   with:
-      #     repository: 'ava-labs/avalanchego'
-      #     ref: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
-      #     path: 'avalanchego'
+        # with ava-labs/avalanchejs
+      - name: Checkout AvalancheGo
+        uses: actions/checkout@v2
+        with:
+          repository: 'ava-labs/avalanchego'
+          ref: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
+          path: 'avalanchego'
       # - uses: actions/setup-node@v2
       #   with:
       #     cache: yarn
