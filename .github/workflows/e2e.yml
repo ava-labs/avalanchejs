@@ -26,7 +26,8 @@ jobs:
         with:
           cache: yarn
           node-version: '14'
-      - run: yarn install --frozen-lockfile
+      - name: Install NodeJS dependencies
+        run: yarn install --frozen-lockfile
       - name: Setup Golang Version
         uses: actions/setup-go@v1
         with:
@@ -39,7 +40,7 @@ jobs:
       - name: Static compilation of avash
         run: |
           cd avash
-          STATIC_COMPILATION=1 go get && go build
+          STATIC_COMPILATION=1 go get && go build && ./avash runscript scripts/five_node_staking.lua
       - name: AvalancheJS E2E Test
         env: 
           AVALANCHEGO_IP: localhost
