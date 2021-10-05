@@ -17,7 +17,7 @@ describe("Info", (): void => {
     ["getNetworkID", () => info.getNetworkID(), (networkID: string) => networkID, Matcher.toBe, () => "12345"],
     ["getNetworkName", () => info.getNetworkName(), (networkName: string) => networkName, Matcher.toBe, () => "local"],
     ["getNodeId", () => info.getNodeID(), (nodeID: string) => nodeID, Matcher.toBe, () => "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"],
-    ["getNodeVersion", () => info.getNodeVersion(), (x: string) => { console.log(x); return x }, Matcher.toMatch, () => /^avalanche\/\d*\.\d*\.\d*$/],
+    ["getNodeVersion", () => info.getNodeVersion(), (x: string) => x, Matcher.toMatch, () => /^avalanche\/\d*\.\d*\.\d*$/],
     ["isBootstrapped", () => info.isBootstrapped("X"), (isBootstrapped: boolean) => isBootstrapped, Matcher.toBe, () => true],
     ["isBootstrapped", () => info.isBootstrapped("P"), (isBootstrapped: boolean) => isBootstrapped, Matcher.toBe, () => true],
     ["isBootstrapped", () => info.isBootstrapped("C"), (isBootstrapped: boolean) => isBootstrapped, Matcher.toBe, () => true],

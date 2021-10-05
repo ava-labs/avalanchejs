@@ -36,18 +36,24 @@ jobs:
         run: |
           sudo apt-get install musl-tools
           cd avalanchego
-          STATIC_COMPILATION=1 ./scripts/build.sh && pwd
+          STATIC_COMPILATION=1 ./scripts/build.sh
       - name: Static compilation of avash
         run: |
           cd avash
           STATIC_COMPILATION=1 go get && 
           go build && 
           sudo echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego/build/avalanchego" >> /home/runner/.avash.yaml &&
-          cat /home/runner/.avash.yaml &&
-          pwd && 
           ./avash runscript scripts/five_node_staking.lua
+          sleep 30
+          curl --location --request POST 'http://localhost:9650/ext/health' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "jsonrpc":"2.0",
+              "id"     :1,
+              "method" :"health.health"
+          }'
       - name: AvalancheJS E2E Test
         env: 
           AVALANCHEGO_IP: localhost
           AVALANCHEGO_PORT: 9650
-        run: sleep 30 && yarn test -i --roots e2e_tests
+        run: yarn test -i --roots e2e_tests
