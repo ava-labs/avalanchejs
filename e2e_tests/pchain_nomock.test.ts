@@ -130,7 +130,7 @@ describe("PChain", (): void => {
         return x.minDelegatorStake.toString()
       },
       Matcher.toBe,
-      () => "25000000000"
+      () => "5000000"
     ],
     [
       "importKey",
