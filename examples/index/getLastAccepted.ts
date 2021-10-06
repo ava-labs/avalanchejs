@@ -1,6 +1,6 @@
 import { Avalanche } from "../../src"
 import { IndexAPI } from "../../src/apis/index"
-import { GetLastAcceptedResponse } from "../../src/common/interfaces"
+import { GetLastAcceptedResponse } from "../../src/apis/index/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
