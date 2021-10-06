@@ -44,16 +44,8 @@ jobs:
           go build && 
           sudo echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego/build/avalanchego" >> /home/runner/.avash.yaml &&
           ./avash runscript scripts/five_node_staking.lua
-          sleep 30
-          curl --location --request POST 'http://localhost:9650/ext/health' \
-          --header 'Content-Type: application/json' \
-          --data-raw '{
-              "jsonrpc":"2.0",
-              "id"     :1,
-              "method" :"health.health"
-          }'
       - name: AvalancheJS E2E Test
         env: 
           AVALANCHEGO_IP: localhost
           AVALANCHEGO_PORT: 9650
-        run: yarn test -i --roots e2e_tests
+        run: sleep 60 && yarn test -i --roots e2e_tests
