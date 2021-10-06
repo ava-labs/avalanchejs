@@ -2,12 +2,23 @@
 
 ## Avash
 
-This option does not require executing a docker container, but it may not lead to the same results of CI,
-depending on the branch, version, and configuration options of the nodes executed by avash.
+This option does not require executing a docker container, but it may not lead to the same results of CI, depending on the branch, version, and configuration options of the nodes executed by avash.
 
-- launch `avash`
-- set env vars `AVALANCHEGO_IP`, `AVALANCHEGO_PORT` to point to one of the nodes of avash
-- from avalanchejs dir execute: `yarn test -i --roots e2e_tests`
+* Launch `avash`
+* Set env vars `AVALANCHEGO_IP`, `AVALANCHEGO_PORT` to point to one of the nodes of avash
+* From avalanchejs dir execute: `yarn test -i --roots e2e_tests`
+
+Example workflow
+
+```zsh
+cd /path/to/avash
+ ./avash
+avash> runscript scripts/five_node_staking.lua
+
+# Open another terminal tab/window
+cd /path/to/avalanchejs
+AVALANCHEGO_IP=localhost AVALANCHEGO_PORT=9650 yarn test -i --roots e2e_tests
+```
 
 ## Container
 
