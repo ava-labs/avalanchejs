@@ -8,9 +8,11 @@ For example,
 
 `./avash_avalanchejs_e2e.sh "/path/to/avash/" "/path/to/avalanchejs/"`
 
+This script runs the five node script by default.
 
 - New E2E tests go in the /e2e_tests/ directory.
 
+Follow the steps below if you do not wish to use the five node script, but instead test against one of the nodes. You provide the PORT of the specified node.
 
 ## Avash
 
