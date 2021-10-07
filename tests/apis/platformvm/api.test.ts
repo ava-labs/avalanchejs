@@ -2524,7 +2524,7 @@ describe("PlatformVMAPI", (): void => {
     const txID: string = "7sik3Pr6r1FeLrvK1oWwECBS8iJ5VPuSh"
     const result: Promise<GetRewardUTXOsResponse> = api.getRewardUTXOs(txID)
     const payload: object = {
-      result: { numFetched: "0", utxos: [], encoding: "cb58" }
+      result: { numFetched: "0", utxos: [], encoding: "hex" }
     }
     const responseObj: HttpResponse = {
       data: payload
