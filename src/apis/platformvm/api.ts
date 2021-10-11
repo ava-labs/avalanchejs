@@ -30,7 +30,9 @@ import {
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
-  GetStakeResponse
+  GetStakeResponse,
+  GetValidatorsAtParams,
+  GetValidatorsAtResponse
 } from "./interfaces"
 import { Address, Credential, Signature } from "../../common"
 import { TransferableOutput } from "./outputs"
@@ -74,9 +76,10 @@ export class PlatformVMAPI extends JRPCAPI {
       const netID: number = this.core.getNetworkID()
       if (
         netID in Defaults.network &&
-        this.blockchainID in Defaults.network[netID]
+        this.blockchainID in Defaults.network[`${netID}`]
       ) {
-        this.blockchainAlias = Defaults.network[netID][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netID}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -117,7 +120,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const netID: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netID] !== "undefined"
+      typeof Defaults.network[`${netID}`] !== "undefined"
     ) {
       this.blockchainID = PlatformChainID //default to P-Chain
       return true
@@ -377,6 +380,31 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.status
+  }
+
+  /**
+   * Get the validators and their weights of a subnet or the Primary Network at a given P-Chain height.
+   *
+   * @param height The P-Chain height to get the validator set at.
+   * @param subnetID Optional. A cb58 serialized string for the SubnetID or its alias.
+   *
+   * @returns Promise<GetValidatorsAtResponse>
+   */
+  getValidatorsAt = async (
+    height: number,
+    subnetID?: string
+  ): Promise<GetValidatorsAtResponse> => {
+    const params: GetValidatorsAtParams = {
+      height
+    }
+    if (typeof subnetID !== "undefined") {
+      params.subnetID = subnetID
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getValidatorsAt",
+      params
+    )
+    return response.data.result
   }
 
   /**
@@ -865,12 +893,12 @@ export class PlatformVMAPI extends JRPCAPI {
 
     const result: Credential[] = []
     for (let i: number = 0; i < txs.length; i++) {
-      const creds = txs[i].getCredentials()
+      const creds = txs[`${i}`].getCredentials()
       for (let j: number = 0; j < creds.length; j++) {
-        if (!result[j]) {
-          result[j] = creds[j].clone()
+        if (!result[`${j}`]) {
+          result[`${j}`] = creds[`${j}`].clone()
         } else {
-          result[j].addSignature(creds[j].getSignatures()[0])
+          result[`${j}`].addSignature(creds[`${j}`].getSignatures()[0])
         }
       }
     }
@@ -1254,7 +1282,6 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = sourceChain
       sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
@@ -1780,27 +1807,30 @@ return builtUnsignedTx
       ? this.getBlockchainAlias()
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
-      addresses.forEach((address: string | Buffer) => {
-        if (typeof address === "string") {
-          if (typeof this.parseAddress(address as string) === "undefined") {
+      for (let i: number = 0; i < addresses.length; i++) {
+        if (typeof addresses[`${i}`] === "string") {
+          if (
+            typeof this.parseAddress(addresses[`${i}`] as string) ===
+            "undefined"
+          ) {
             /* istanbul ignore next */
             throw new AddressError(
               `Error - PlatformVMAPI.${caller}: Invalid address format`
             )
           }
-          addrs.push(address as string)
+          addrs.push(addresses[`${i}`] as string)
         } else {
           const bech32: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
-              address as Buffer,
+              addresses[`${i}`] as Buffer,
               bech32,
               this.core.getHRP(),
               chainID
             )
           )
         }
-      })
+      }
     }
     return addrs
   }
@@ -1818,9 +1848,9 @@ return builtUnsignedTx
     const netID: number = core.getNetworkID()
     if (
       netID in Defaults.network &&
-      this.blockchainID in Defaults.network[netID]
+      this.blockchainID in Defaults.network[`${netID}`]
     ) {
-      const { alias } = Defaults.network[netID][this.blockchainID]
+      const { alias } = Defaults.network[`${netID}`][this.blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)

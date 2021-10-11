@@ -23,6 +23,8 @@ import {
   Defaults
 } from "../../src/utils"
 
+// before you run this example buildCreateNFTAssetTx.ts
+
 const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
@@ -183,6 +185,7 @@ const main = async (): Promise<any> => {
     memo,
     operations
   )
+
   // Uncomment for codecID 00 01
   // operationTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(operationTx)

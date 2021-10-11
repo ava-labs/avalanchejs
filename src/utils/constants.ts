@@ -4,6 +4,7 @@
  */
 
 import BN from "bn.js"
+import { X, P, C, Network, Networks } from "../apis/evm"
 
 export const PrivateKeyPrefix: string = "PrivateKey-"
 export const NodeIDPrefix: string = "NodeID-"
@@ -100,7 +101,7 @@ export const AVAXGWEI: BN = NANOAVAX.clone()
 export const AVAXSTAKECAP: BN = ONEAVAX.mul(new BN(3000000))
 
 // Start Manhattan
-const n0X: object = {
+const n0X: X = {
   blockchainID: "2vrXWHgGxh5n3YsLHMV16YVVJTpT4z45Fmb4y3bL6si8kLCyg9",
   alias: XChainAlias,
   vm: XChainVMName,
@@ -108,7 +109,7 @@ const n0X: object = {
   creationTxFee: CENTIAVAX
 }
 
-const n0P: object = {
+const n0P: P = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
@@ -125,7 +126,7 @@ const n0P: object = {
   minDelegationFee: new BN(2)
 }
 
-const n0C: object = {
+const n0C: C = {
   blockchainID: "2fFZQibQXcd6LTE4rpBPBAkLVXFE91Kit8pgxaBG1mRnh5xqbb",
   alias: CChainAlias,
   vm: CChainVMName,
@@ -137,7 +138,7 @@ const n0C: object = {
 
 // Start mainnet
 let avaxAssetID: string = "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z"
-const n1X: object = {
+const n1X: X = {
   blockchainID: "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM",
   avaxAssetID: avaxAssetID,
   alias: XChainAlias,
@@ -146,7 +147,7 @@ const n1X: object = {
   creationTxFee: CENTIAVAX
 }
 
-const n1P: object = {
+const n1P: P = {
   blockchainID: PlatformChainID,
   avaxAssetID: avaxAssetID,
   alias: PChainAlias,
@@ -164,18 +165,26 @@ const n1P: object = {
   minDelegationFee: new BN(2)
 }
 
-const n1C: object = {
+const n1C: C = {
   blockchainID: "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5",
   alias: CChainAlias,
   vm: CChainVMName,
+  txBytesGas: 1,
+  costPerSignature: 1000,
+  // DEPRECATED - txFee
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   txFee: MILLIAVAX,
+  // DEPRECATED - gasPrice
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   gasPrice: GWEI.mul(new BN(225)),
+  minGasPrice: GWEI.mul(new BN(25)),
+  maxGasPrice: GWEI.mul(new BN(1000)),
   chainID: 43114
 }
 // End Mainnet
 
 // Start Cascade
-const n2X: object = {
+const n2X: X = {
   blockchainID: "4ktRjsAKxgMr2aEzv9SWmrU7Xk5FniHUrVCX4P1TZSfTLZWFM",
   alias: XChainAlias,
   vm: XChainVMName,
@@ -183,7 +192,7 @@ const n2X: object = {
   creationTxFee: 0
 }
 
-const n2P: object = {
+const n2P: P = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
@@ -200,7 +209,7 @@ const n2P: object = {
   minDelegationFee: new BN(2)
 }
 
-const n2C: object = {
+const n2C: C = {
   blockchainID: "2mUYSXfLrDtigwbzj1LxKVsHwELghc5sisoXrzJwLqAAQHF4i",
   alias: CChainAlias,
   vm: CChainVMName,
@@ -209,7 +218,7 @@ const n2C: object = {
 // End Cascade
 
 // Start Denali
-const n3X: object = {
+const n3X: X = {
   blockchainID: "rrEWX7gc7D9mwcdrdBxBTdqh1a7WDVsMuadhTZgyXfFcRz45L",
   alias: XChainAlias,
   vm: XChainVMName,
@@ -217,7 +226,7 @@ const n3X: object = {
   creationTxFee: 0
 }
 
-const n3P: object = {
+const n3P: P = {
   blockchainID: "",
   alias: PChainAlias,
   vm: PChainVMName,
@@ -234,7 +243,7 @@ const n3P: object = {
   minDelegationFee: new BN(2)
 }
 
-const n3C: object = {
+const n3C: C = {
   blockchainID: "zJytnh96Pc8rM337bBrtMvJDbEdDNjcXG3WkTNCiLp18ergm9",
   alias: CChainAlias,
   vm: CChainVMName,
@@ -243,7 +252,7 @@ const n3C: object = {
 // End Denali
 
 // Start Everest
-const n4X: object = {
+const n4X: X = {
   blockchainID: "jnUjZSRt16TcRnZzmh5aMhavwVHz3zBrSN8GfFMTQkzUnoBxC",
   alias: XChainAlias,
   vm: XChainVMName,
@@ -251,7 +260,7 @@ const n4X: object = {
   creationTxFee: CENTIAVAX
 }
 
-const n4P: object = {
+const n4P: P = {
   blockchainID: PlatformChainID,
   alias: PChainAlias,
   vm: PChainVMName,
@@ -268,7 +277,7 @@ const n4P: object = {
   minDelegationFee: new BN(2)
 }
 
-const n4C: object = {
+const n4C: C = {
   blockchainID: "saMG5YgNsFxzjz4NMkEkt3bAH6hVxWdZkWcEnGB3Z15pcAmsK",
   alias: CChainAlias,
   vm: CChainVMName,
@@ -279,7 +288,7 @@ const n4C: object = {
 
 // Start Fuji
 avaxAssetID = "U8iRqJoiJm8xZHAacmvYyZVwqQx6uDNtQeP3CQ6fcgQk3JqnK"
-const n5X: object = {
+const n5X: X = {
   blockchainID: "2JVSBoinj9C2J33VntvzYtVJNZdN2NKiwwKjcumHUWEb5DbBrm",
   avaxAssetID: avaxAssetID,
   alias: XChainAlias,
@@ -288,7 +297,7 @@ const n5X: object = {
   creationTxFee: CENTIAVAX
 }
 
-const n5P: object = {
+const n5P: P = {
   blockchainID: PlatformChainID,
   avaxAssetID: avaxAssetID,
   alias: PChainAlias,
@@ -306,31 +315,39 @@ const n5P: object = {
   minDelegationFee: new BN(2)
 }
 
-const n5C: object = {
+const n5C: C = {
   blockchainID: "yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp",
   alias: CChainAlias,
   vm: CChainVMName,
+  txBytesGas: 1,
+  costPerSignature: 1000,
+  // DEPRECATED - txFee
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   txFee: MILLIAVAX,
+  // DEPRECATED - gasPrice
+  // WILL BE REMOVED IN NEXT MAJOR VERSION BUMP
   gasPrice: GWEI.mul(new BN(225)),
+  minGasPrice: GWEI.mul(new BN(25)),
+  maxGasPrice: GWEI.mul(new BN(1000)),
   chainID: 43113
 }
 // End Fuji
 
 // Start local network
 avaxAssetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
-const n12345X: any = { ...n5X }
+const n12345X: X = { ...n5X }
 n12345X.blockchainID = "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed"
 n12345X.avaxAssetID = avaxAssetID
-const n12345P: any = { ...n5P }
+const n12345P: P = { ...n5P }
 n12345P.blockchainID = PlatformChainID
-const n12345C: any = { ...n5C }
+const n12345C: C = { ...n5C }
 n12345C.blockchainID = "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU"
 n12345C.avaxAssetID = avaxAssetID
 n12345C.chainID = 43112
 // End local network
 
 export class Defaults {
-  static network = {
+  static network: Networks = {
     0: {
       hrp: NetworkIDToHRP[0],
       X: n0X,

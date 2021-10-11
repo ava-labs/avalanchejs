@@ -226,7 +226,7 @@ export default class BinTools {
     const ab: ArrayBuffer = new ArrayBuffer(buff.length)
     const view: Uint8Array = new Uint8Array(ab)
     for (let i: number = 0; i < buff.length; ++i) {
-      view[i] = buff[i]
+      view[`${i}`] = buff[`${i}`]
     }
     return view
   }
@@ -241,7 +241,7 @@ export default class BinTools {
   fromArrayBufferToBuffer = (ab: ArrayBuffer): Buffer => {
     const buf: Buffer = Buffer.alloc(ab.byteLength)
     for (let i: number = 0; i < ab.byteLength; ++i) {
-      buf[i] = ab[i]
+      buf[`${i}`] = ab[`${i}`]
     }
     return buf
   }

@@ -34,6 +34,7 @@ import {
   ExportAVAXParams,
   ExportKeyParams,
   ExportParams,
+  GetAtomicTxParams,
   GetAssetDescriptionParams,
   GetAtomicTxStatusParams,
   GetUTXOsParams,
@@ -75,9 +76,10 @@ export class EVMAPI extends JRPCAPI {
       const netID: number = this.core.getNetworkID()
       if (
         netID in Defaults.network &&
-        this.blockchainID in Defaults.network[netID]
+        this.blockchainID in Defaults.network[`${netID}`]
       ) {
-        this.blockchainAlias = Defaults.network[netID][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netID}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -117,9 +119,9 @@ export class EVMAPI extends JRPCAPI {
     const netID: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netID] !== "undefined"
+      typeof Defaults.network[`${netID}`] !== "undefined"
     ) {
-      this.blockchainID = Defaults.network[netID].C.blockchainID //default to C-Chain
+      this.blockchainID = Defaults.network[`${netID}`].C.blockchainID //default to C-Chain
       return true
     }
 
@@ -284,6 +286,25 @@ export class EVMAPI extends JRPCAPI {
     return response.data.result.status
       ? response.data.result.status
       : response.data.result
+  }
+
+  /**
+   * Returns the transaction data of a provided transaction ID by calling the node's `getAtomicTx` method.
+   *
+   * @param txID The string representation of the transaction ID
+   *
+   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   */
+  getAtomicTx = async (txID: string): Promise<string> => {
+    const params: GetAtomicTxParams = {
+      txID
+    }
+
+    const response: RequestResponseData = await this.callMethod(
+      "avax.getAtomicTx",
+      params
+    )
+    return response.data.result.tx
   }
 
   /**
@@ -625,7 +646,7 @@ export class EVMAPI extends JRPCAPI {
     )
     const atomicUTXOs: UTXOSet = utxoResponse.utxos
     const networkID: number = this.core.getNetworkID()
-    const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+    const avaxAssetID: string = Defaults.network[`${networkID}`].X.avaxAssetID
     const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs()
 
@@ -843,11 +864,50 @@ export class EVMAPI extends JRPCAPI {
     super(core, baseURL)
     this.blockchainID = blockchainID
     const netID: number = core.getNetworkID()
-    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
-      const { alias } = Defaults.network[netID][blockchainID]
+    if (
+      netID in Defaults.network &&
+      blockchainID in Defaults.network[`${netID}`]
+    ) {
+      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
     }
+  }
+
+  /**
+   * returns the base fee for the next block.
+   *
+   * @returns Returns a Promise<string> containing the base fee for the next block.
+   */
+  getBaseFee = async (): Promise<string> => {
+    const params: string[] = []
+
+    const method: string = "eth_baseFee"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(
+      method,
+      params,
+      path
+    )
+    return response.data.result
+  }
+
+  /**
+   * returns the priority fee needed to be included in a block.
+   *
+   * @returns Returns a Promise<string> containing the priority fee needed to be included in a block.
+   */
+  getMaxPriorityFeePerGas = async (): Promise<string> => {
+    const params: string[] = []
+
+    const method: string = "eth_maxPriorityFeePerGas"
+    const path: string = "ext/bc/C/rpc"
+    const response: RequestResponseData = await this.callMethod(
+      method,
+      params,
+      path
+    )
+    return response.data.result
   }
 }

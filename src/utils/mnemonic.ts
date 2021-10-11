@@ -37,7 +37,7 @@ export default class Mnemonic {
    */
   getWordlists(language?: string): string[] | Wordlist {
     if (language !== undefined) {
-      return this.wordlists[language]
+      return this.wordlists[`${language}`]
     } else {
       return this.wordlists
     }

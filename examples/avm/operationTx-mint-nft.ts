@@ -24,6 +24,8 @@ import {
   Defaults
 } from "../../src/utils"
 
+// before you run this example buildCreateNFTAssetTx.ts
+
 const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,

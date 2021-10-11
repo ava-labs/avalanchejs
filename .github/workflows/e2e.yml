@@ -1,30 +1,51 @@
 name: E2E
-on: [push]
+on: push
 
 jobs:
   e2e:
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
+      - name: Checkout AvalancheJS
+        # Uses the major version of a release of a public repository
+        uses: actions/checkout@v2
+        # with ava-labs/avalanchejs
+      - name: Checkout AvalancheGo
+        uses: actions/checkout@v2
         with:
           repository: 'ava-labs/avalanchego'
           ref: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
           path: 'avalanchego'
-      - uses: actions/setup-node@v2
+      - name: Checkout Avash
+        uses: actions/checkout@v2
+        with:
+          repository: 'ava-labs/avash'
+          ref: ${{ github.ref == 'refs/heads/master' && 'master' || 'dev' }}
+          path: 'avash'
+      - name: Setup Node Version and Cache
+        uses: actions/setup-node@v2
         with:
           cache: yarn
           node-version: '14'
-      - run: yarn install --frozen-lockfile
-      - uses: actions/setup-go@v1
+      - name: Install NodeJS dependencies
+        run: yarn install --frozen-lockfile
+      - name: Setup Golang Version
+        uses: actions/setup-go@v1
         with:
-          go-version: '1.15'
-      - name: static compilation of avalanchego
+          go-version: '1.16.8'
+      - name: Static compilation of AvalancheGo
         run: |
+          sudo apt-get install musl-tools
           cd avalanchego
-          ../.github/workflows/avalanchego_static_build.sh
-      - name: avalanchejs e2e test
+          STATIC_COMPILATION=1 ./scripts/build.sh
+      - name: Static compilation of avash
+        run: |
+          cd avash
+          STATIC_COMPILATION=1 go get && 
+          go build && 
+          sudo echo "avalancheLocation: /home/runner/work/avalanchejs/avalanchejs/avalanchego/build/avalanchego" >> /home/runner/.avash.yaml &&
+          ./avash runscript scripts/five_node_staking.lua
+      - name: AvalancheJS E2E Test
         env: 
-          DOCKER_USERNAME: ${{ secrets.docker_username }}
-          DOCKER_PASS: ${{ secrets.docker_pass }}
-        run: .github/workflows/e2e.sh
+          AVALANCHEGO_IP: localhost
+          AVALANCHEGO_PORT: 9650
+        run: sleep 60 && yarn test -i --roots e2e_tests

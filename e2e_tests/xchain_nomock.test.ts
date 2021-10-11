@@ -1,17 +1,22 @@
 import { getAvalanche, createTests, Matcher } from "./e2etestlib"
 import { KeystoreAPI } from "src/apis/keystore/api"
 import BN from "bn.js"
+import { AVMAPI } from "../src/apis/avm"
+import Avalanche from "../src"
 
 describe("XChain", (): void => {
+  interface Value {
+    value: string
+  }
 
-  let tx = {value: ""}
-  let asset = {value: ""}
-  let addrB = {value: ""}
-  let addrC = {value: ""}
+  const tx: Value = { value: "" }
+  const asset: Value = { value: "" }
+  const addrB: Value = { value: "" }
+  const addrC: Value = { value: "" }
 
-  const avalanche = getAvalanche()
-  const xchain = avalanche.XChain()
-  const keystore = new KeystoreAPI(avalanche)
+  const avalanche: Avalanche = getAvalanche()
+  const xchain: AVMAPI = avalanche.XChain()
+  const keystore: KeystoreAPI = new KeystoreAPI(avalanche)
 
   const user: string = "avalancheJsXChainUser"
   const passwd: string = "avalancheJsP1ssw4rd"
