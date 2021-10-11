@@ -2080,7 +2080,9 @@ describe("PlatformVMAPI", (): void => {
         new BN(0),
         assetID,
         new UTF8Payload("hello world").getPayload(),
-        UnixNow()
+        UnixNow(),
+        new BN(0),
+        1
       )
       expect(txu2.toBuffer().toString("hex")).toBe(
         txu1.toBuffer().toString("hex")
@@ -2234,7 +2236,9 @@ describe("PlatformVMAPI", (): void => {
         new BN(0),
         assetID,
         new UTF8Payload("hello world").getPayload(),
-        UnixNow()
+        UnixNow(),
+        new BN(0),
+        1
       )
       expect(txu2.toBuffer().toString("hex")).toBe(
         txu1.toBuffer().toString("hex")
