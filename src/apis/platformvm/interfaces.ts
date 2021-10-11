@@ -27,7 +27,6 @@ export interface GetRewardUTXOsResponse {
   encoding: string
 }
 
-
 export interface CurrentValidatorsResponse {
   validators: ValidatorInterface[]
 }
@@ -69,5 +68,4 @@ export interface GetValidatorsAtParams {
 
 export interface GetValidatorsAtResponse {
   validators: object
-  
 }
