@@ -81,10 +81,10 @@ export class MinterSet extends Serializable {
   protected _cleanAddresses = (addresses: string[] | Buffer[]): Buffer[] => {
     let addrs: Buffer[] = []
     for (let i: number = 0; i < addresses.length; i++) {
-      if (typeof addresses[i] === "string") {
-        addrs.push(bintools.stringToAddress(addresses[i] as string))
-      } else if (addresses[i] instanceof Buffer) {
-        addrs.push(addresses[i] as Buffer)
+      if (typeof addresses[`${i}`] === "string") {
+        addrs.push(bintools.stringToAddress(addresses[`${i}`] as string))
+      } else if (addresses[`${i}`] instanceof Buffer) {
+        addrs.push(addresses[`${i}`] as Buffer)
       }
     }
     return addrs

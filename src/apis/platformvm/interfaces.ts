@@ -27,6 +27,7 @@ export interface GetRewardUTXOsResponse {
   encoding: string
 }
 
+
 export interface CurrentValidatorsResponse {
   validators: ValidatorInterface[]
 }
@@ -59,4 +60,14 @@ export interface RewardOwnerInterface {
   locktime: string
   threshold: string
   addresses: string[]
+}
+
+export interface GetValidatorsAtParams {
+  height: number
+  subnetID?: string
+}
+
+export interface GetValidatorsAtResponse {
+  validators: object
+  
 }

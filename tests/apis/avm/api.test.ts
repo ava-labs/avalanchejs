@@ -1330,6 +1330,45 @@ describe("AVMAPI", (): void => {
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
     })
 
+    test("DOMPurifyCleanObject", async (): Promise<void> => {
+      const txu1: UnsignedTx = await avm.buildBaseTx(
+        set,
+        new BN(amnt),
+        bintools.cb58Encode(assetID),
+        addrs3,
+        addrs1,
+        addrs1
+      )
+
+      const tx1: Tx = avm.signTx(txu1)
+      const tx1obj: object = tx1.serialize("hex")
+      const sanitized: object = tx1.sanitizeObject(tx1obj)
+      expect(tx1obj).toStrictEqual(sanitized)
+    })
+
+    test("DOMPurifyDirtyObject", async (): Promise<void> => {
+      const dirtyDom: string = "<img src=x onerror=alert(1)//>"
+      const sanitizedString: string = `<img src="x">`
+
+      const txu1: UnsignedTx = await avm.buildBaseTx(
+        set,
+        new BN(amnt),
+        bintools.cb58Encode(assetID),
+        addrs3,
+        addrs1,
+        addrs1
+      )
+
+      const tx1: Tx = avm.signTx(txu1)
+      const tx1obj: object = tx1.serialize("hex")
+      const dirtyObj: object = {
+        ...tx1obj,
+        dirtyDom: dirtyDom
+      }
+      const sanitizedObj: any = tx1.sanitizeObject(dirtyObj)
+      expect(sanitizedString).toBe(sanitizedObj.dirtyDom)
+    })
+
     test("buildBaseTx2", async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(
         set,

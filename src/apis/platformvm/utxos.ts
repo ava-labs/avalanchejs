@@ -151,8 +151,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "base58",
         "base58"
       )
-      utxos[utxoidCleaned] = new UTXO()
-      utxos[utxoidCleaned].deserialize(fields["utxos"][utxoid], encoding)
+      utxos[`${utxoidCleaned}`] = new UTXO()
+      utxos[`${utxoidCleaned}`].deserialize(
+        fields["utxos"][`${utxoid}`],
+        encoding
+      )
     }
     let addressUTXOs = {}
     for (let address in fields["addressUTXOs"]) {
@@ -163,21 +166,21 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "hex"
       )
       let utxobalance = {}
-      for (let utxoid in fields["addressUTXOs"][address]) {
+      for (let utxoid in fields["addressUTXOs"][`${address}`]) {
         let utxoidCleaned: string = serialization.decoder(
           utxoid,
           encoding,
           "base58",
           "base58"
         )
-        utxobalance[utxoidCleaned] = serialization.decoder(
-          fields["addressUTXOs"][address][utxoid],
+        utxobalance[`${utxoidCleaned}`] = serialization.decoder(
+          fields["addressUTXOs"][`${address}`][`${utxoid}`],
           encoding,
           "decimalString",
           "BN"
         )
       }
-      addressUTXOs[addressCleaned] = utxobalance
+      addressUTXOs[`${addressCleaned}`] = utxobalance
     }
     this.utxos = utxos
     this.addressUTXOs = addressUTXOs
@@ -314,7 +317,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       if (!(assetKey in outs)) {
         // If this is the first time spending this assetID, we need to
         // initialize the outs object correctly.
-        outs[assetKey] = {
+        outs[`${assetKey}`] = {
           lockedStakeable: [],
           unlocked: []
         }
@@ -349,10 +352,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       assetAmount.spendAmount(amount, locked)
       if (locked) {
         // Track the UTXO as locked.
-        outs[assetKey].lockedStakeable.push(amountOutput)
+        outs[`${assetKey}`].lockedStakeable.push(amountOutput)
       } else {
         // Track the UTXO as unlocked.
-        outs[assetKey].unlocked.push(amountOutput)
+        outs[`${assetKey}`].unlocked.push(amountOutput)
       }
 
       // Get the indices of the outputs that should be used to authorize the
@@ -419,7 +422,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
       const assetID: Buffer = assetAmount.getAssetID()
       const assetKey: string = assetAmount.getAssetIDString()
-      const lockedOutputs: StakeableLockOut[] = outs[assetKey].lockedStakeable
+      const lockedOutputs: StakeableLockOut[] =
+        outs[`${assetKey}`].lockedStakeable
       lockedOutputs.forEach((lockedOutput: StakeableLockOut, i: number) => {
         const stakeableLocktime: BN = lockedOutput.getStakeableLocktime()
         const parseableOutput: ParseableOutput =
@@ -678,7 +682,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     let feepaid: BN = new BN(0)
     let feeAssetStr: string = feeAssetID.toString("hex")
     for (let i: number = 0; i < atomics.length; i++) {
-      const utxo: UTXO = atomics[i]
+      const utxo: UTXO = atomics[`${i}`]
       const assetID: Buffer = utxo.getAssetID()
       const output: AmountOutput = utxo.getOutput() as AmountOutput
       let amt: BN = output.getAmount().clone()
@@ -712,15 +716,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       const from: Buffer[] = output.getAddresses()
       const spenders: Buffer[] = output.getSpenders(from, asOf)
       for (let j: number = 0; j < spenders.length; j++) {
-        const idx: number = output.getAddressIdx(spenders[j])
+        const idx: number = output.getAddressIdx(spenders[`${j}`])
         if (idx === -1) {
           /* istanbul ignore next */
           throw new AddressError(
             "Error - UTXOSet.buildImportTx: no such " +
-              `address in output: ${spenders[j]}`
+              `address in output: ${spenders[`${j}`]}`
           )
         }
-        xferin.getInput().addSignatureIdx(idx, spenders[j])
+        xferin.getInput().addSignatureIdx(idx, spenders[`${j}`])
       }
       importIns.push(xferin)
       //add extra outputs for each amount (calculated from the imported inputs), minus fees
@@ -837,7 +841,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
     if (typeof destinationChain === "undefined") {
       destinationChain = bintools.cb58Decode(
-        Defaults.network[networkID].X["blockchainID"]
+        Defaults.network[`${networkID}`].X["blockchainID"]
       )
     }
 
@@ -909,25 +913,25 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     blockchainID:Buffer,
     fromAddresses:Buffer[],
     changeAddresses:Buffer[],
-    nodeID:Buffer, 
-    startTime:BN, 
+    nodeID:Buffer,
+    startTime:BN,
     endTime:BN,
     weight:BN,
     fee:BN = undefined,
-    feeAssetID:Buffer = undefined, 
-    memo:Buffer = undefined, 
+    feeAssetID:Buffer = undefined,
+    memo:Buffer = undefined,
     asOf:BN = UnixNow()
   ):UnsignedTx => {
     let ins:TransferableInput[] = [];
     let outs:TransferableOutput[] = [];
     //let stakeOuts:TransferableOutput[] = [];
-    
+
     const zero:BN = new BN(0);
     const now:BN = UnixNow();
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new Error("UTXOSet.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime");
     }
-   
+
     // Not implemented: Fees can be paid from importIns
     if(this._feeCheck(fee, feeAssetID)) {
       const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
@@ -940,7 +944,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         throw success;
       }
     }
-   
+
     const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight);
     return new UnsignedTx(UTx);
   }
