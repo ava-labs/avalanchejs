@@ -57,17 +57,7 @@ export interface ExportParams extends CredsInterface {
   assetID: string
 }
 
-export interface ExportAVAXParams extends CredsInterface {
-  to: string
-  amount: BN
-}
-
 export interface ImportParams extends CredsInterface {
-  to: string
-  sourceChain: string
-}
-
-export interface ImportAVAXParams extends CredsInterface {
   to: string
   sourceChain: string
 }
