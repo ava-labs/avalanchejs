@@ -69,9 +69,9 @@
     "ts-loader": "9.2.6",
     "typedoc": "0.22.4",
     "typedoc-plugin-external-module-name": "4.0.6",
-    "typedoc-plugin-markdown": "3.11.3",
-    "typescript": "4.4.4",
-    "webpack": "5.51.1",
+    "typedoc-plugin-markdown": "3.11.3", 
+    "webpack": "5.58.2", 
+    "typescript": "4.4.4",  
     "webpack-cli": "4.9.1"
   },
   "engines": {
