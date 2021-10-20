@@ -1,6 +1,6 @@
 import { Avalanche } from "../../src"
 import { PlatformVMAPI, KeyChain } from "../../src/apis/platformvm"
-import { GetStakeResponse } from "../../src/common"
+import { GetStakeResponse } from "../../src/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
