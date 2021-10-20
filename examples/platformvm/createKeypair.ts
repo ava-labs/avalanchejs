@@ -10,7 +10,7 @@ const pchain: PlatformVMAPI = avalanche.PChain()
 
 const main = async (): Promise<any> => {
   const keychain: KeyChain = pchain.keyChain()
-  const keypair: KeyPair = keychain.getKey(xAddresses[0])
+  const keypair: KeyPair = keychain.makeKey()
   const response: {
     address: string
     publicKey: string
