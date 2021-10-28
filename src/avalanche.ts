@@ -202,7 +202,7 @@ export default class AvalancheCore {
     this.auth = auth
   }
 
-  protected _setHeaders = (headers: any): object => {
+  protected _setHeaders = (headers: any): AxiosRequestHeaders => {
     if (typeof this.headers === "object") {
       for (const [key, value] of Object.entries(this.headers)) {
         headers[`${key}`] = value
