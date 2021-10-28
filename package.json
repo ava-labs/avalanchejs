@@ -59,7 +59,7 @@
     "eslint-plugin-security": "1.4.0",
     "git-revision-webpack-plugin": "5.0.0",
     "html-webpack-plugin": "5.5.0",
-    "husky": "7.0.2",
+    "husky": "7.0.4",
     "isomorphic-dompurify": "^0.15.0",
     "jest": "26.6.3",
     "jest-mock-axios": "4.4.1",
@@ -75,11 +75,11 @@
     "webpack-cli": "4.9.1"
   },
   "engines": {
-    "node": ">=14.17.0"
+    "node": ">=16.13.0"
   },
   "dependencies": {
     "assert": "2.0.0",
-    "axios": "0.21.4",
+    "axios": "0.24.0",
     "bech32": "2.0.0",
     "bip39": "3.0.4",
     "bn.js": "5.2.0",
@@ -87,7 +87,7 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.4.7",
+    "ethers": "5.5.1",
     "hdkey": "2.0.1",
     "isomorphic-ws": "4.0.1",
     "store2": "2.12.0",
