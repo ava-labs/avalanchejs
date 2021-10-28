@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           cache: yarn
-          node-version: '14'
+          node-version: '16'
       - name: Install NodeJS dependencies
         run: yarn install --frozen-lockfile
       - name: Setup Golang Version
