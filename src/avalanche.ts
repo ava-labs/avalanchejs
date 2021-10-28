@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module AvalancheCore
  */
-import axios, { AxiosRequestConfig, AxiosResponse, Method } from "axios"
+import axios, { AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse, Method } from "axios"
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
 import { getPreferredHRP } from "./utils/helperfunctions"
@@ -262,7 +262,7 @@ export default class AvalancheCore {
     baseurl: string,
     getdata: object,
     postdata: string | object | ArrayBuffer | ArrayBufferView,
-    headers: object = {},
+    headers: AxiosRequestHeaders = {},
     axiosConfig: AxiosRequestConfig = undefined
   ): Promise<RequestResponseData> => {
     let config: AxiosRequestConfig
