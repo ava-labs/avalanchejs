@@ -75,7 +75,7 @@
     "webpack-cli": "4.9.1"
   },
   "engines": {
-    "node": ">=14.17.0"
+    "node": ">=16.13.0"
   },
   "dependencies": {
     "assert": "2.0.0",
@@ -87,7 +87,7 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.4.7",
+    "ethers": "5.5.1",
     "hdkey": "2.0.1",
     "isomorphic-ws": "4.0.1",
     "store2": "2.12.0",
