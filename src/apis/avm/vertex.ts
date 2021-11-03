@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module API-AVM-BaseTx
+ * @module API-AVM-Vertex
  */
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
@@ -40,37 +40,36 @@ export class Vertex extends Serializable {
 
   //serialize is inherited
 
-  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
-    super.deserialize(fields, encoding)
-    this.outs = fields["outs"].map((o: TransferableOutput) => {
-      let newOut: TransferableOutput = new TransferableOutput()
-      newOut.deserialize(o, encoding)
-      return newOut
-    })
-    this.ins = fields["ins"].map((i: TransferableInput) => {
-      let newIn: TransferableInput = new TransferableInput()
-      newIn.deserialize(i, encoding)
-      return newIn
-    })
-    this.numouts = serialization.decoder(
-      this.outs.length.toString(),
-      display,
-      decimalString,
-      buffer,
-      4
-    )
-    this.numins = serialization.decoder(
-      this.ins.length.toString(),
-      display,
-      decimalString,
-      buffer,
-      4
-    )
-  }
-
+  // TODO - implement deserialize
+  // deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+  //   super.deserialize(fields, encoding)
+  //   this.outs = fields["outs"].map((o: TransferableOutput) => {
+  //     let newOut: TransferableOutput = new TransferableOutput()
+  //     newOut.deserialize(o, encoding)
+  //     return newOut
+  //   })
+  //   this.ins = fields["ins"].map((i: TransferableInput) => {
+  //     let newIn: TransferableInput = new TransferableInput()
+  //     newIn.deserialize(i, encoding)
+  //     return newIn
+  //   })
+  //   this.numouts = serialization.decoder(
+  //     this.outs.length.toString(),
+  //     display,
+  //     decimalString,
+  //     buffer,
+  //     4
+  //   )
+  //   this.numins = serialization.decoder(
+  //     this.ins.length.toString(),
+  //     display,
+  //     decimalString,
+  //     buffer,
+  //     4
+  //   )
+  // }
 
   protected chainID: Buffer = Buffer.alloc(32)
-  protected blockchainID: Buffer = Buffer.alloc(32)
   protected height: Buffer = Buffer.alloc(8)
   protected epoch: Buffer = Buffer.alloc(4)
   protected numAddresses: Buffer = Buffer.alloc(4)
@@ -85,11 +84,6 @@ export class Vertex extends Serializable {
    * Returns the ChainID as a number
    */
   getChainID = (): number => this.chainID.readUInt32BE(0)
-
-  /**
-   * Returns the BlockchainID as a number
-   */
-  getBlockchainID = (): number => this.blockchainID.readUInt32BE(0)
 
   /**
    * Returns the height as a {@link https://github.com/indutny/bn.js/|BN}.
@@ -163,8 +157,6 @@ export class Vertex extends Serializable {
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     this.chainID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
-    this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32)
-    offset += 32
     this.height = bintools.copyFrom(bytes, offset, offset + 8)
     offset += 8
     this.epoch = bintools.copyFrom(bytes, offset, offset + 4)
@@ -200,23 +192,6 @@ export class Vertex extends Serializable {
       offset = address.fromBuffer(bytes, offset)
       this.restrictions.push(address)
     }
-
-
-    this.numins = bintools.copyFrom(bytes, offset, offset + 4)
-    offset += 4
-    const incount: number = this.numins.readUInt32BE(0)
-    this.ins = []
-    for (let i: number = 0; i < incount; i++) {
-      const xferin: TransferableInput = new TransferableInput()
-      offset = xferin.fromBuffer(bytes, offset)
-      this.ins.push(xferin)
-    }
-    let memolen: number = bintools
-      .copyFrom(bytes, offset, offset + 4)
-      .readUInt32BE(0)
-    offset += 4
-    this.memo = bintools.copyFrom(bytes, offset, offset + memolen)
-    offset += memolen
     return offset
   }
 
@@ -228,56 +203,59 @@ export class Vertex extends Serializable {
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = []
-    for (let i: number = 0; i < this.ins.length; i++) {
-      const cred: Credential = SelectCredentialClass(
-        this.ins[`${i}`].getInput().getCredentialID()
-      )
-      const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
-      for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
-        const signval: Buffer = keypair.sign(msg)
-        const sig: Signature = new Signature()
-        sig.fromBuffer(signval)
-        cred.addSignature(sig)
-      }
-      sigs.push(cred)
-    }
-    return sigs
-  }
+  // sign(msg: Buffer, kc: KeyChain): Credential[] {
+  //   const sigs: Credential[] = []
+  //   for (let i: number = 0; i < this.ins.length; i++) {
+  //     const cred: Credential = SelectCredentialClass(
+  //       this.ins[`${i}`].getInput().getCredentialID()
+  //     )
+  //     const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
+  //     for (let j: number = 0; j < sigidxs.length; j++) {
+  //       const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
+  //       const signval: Buffer = keypair.sign(msg)
+  //       const sig: Signature = new Signature()
+  //       sig.fromBuffer(signval)
+  //       cred.addSignature(sig)
+  //     }
+  //     sigs.push(cred)
+  //   }
+  //   return sigs
+  // }
 
-  clone(): this {
-    let newbase: BaseTx = new BaseTx()
-    newbase.fromBuffer(this.toBuffer())
-    return newbase as this
-  }
+  // clone(): this {
+  //   let newbase: BaseTx = new BaseTx()
+  //   newbase.fromBuffer(this.toBuffer())
+  //   return newbase as this
+  // }
 
-  create(...args: any[]): this {
-    return new BaseTx(...args) as this
-  }
+  // create(...args: any[]): this {
+  //   return new BaseTx(...args) as this
+  // }
 
-  select(id: number, ...args: any[]): this {
-    let newbasetx: BaseTx = SelectTxClass(id, ...args)
-    return newbasetx as this
-  }
+  // select(id: number, ...args: any[]): this {
+  //   let newbasetx: BaseTx = SelectTxClass(id, ...args)
+  //   return newbasetx as this
+  // }
 
   /**
    * Class representing a BaseTx which is the foundation for all transactions.
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
-   * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
-   * @param outs Optional array of the [[TransferableOutput]]s
-   * @param ins Optional array of the [[TransferableInput]]s
-   * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
+   * @param chainID Optional chainID, default Buffer.alloc(32, 16)
    */
   constructor(
     networkID: number = DefaultNetworkID,
-    blockchainID: Buffer = Buffer.alloc(32, 16),
-    outs: TransferableOutput[] = undefined,
-    ins: TransferableInput[] = undefined,
-    memo: Buffer = undefined
+    chainID: Buffer = Buffer.alloc(32),
+    height: Buffer = Buffer.alloc(8),
+    epoch: Buffer = Buffer.alloc(4),
+    numAddresses: Buffer = Buffer.alloc(4),
+    addresses: Address[] = [],
+    numParentIDs: Buffer = Buffer.alloc(4),
+    parentIDs: Address[] = [],
+    txs: Buffer = Buffer.alloc(4),
+    numRestrictions: Buffer = Buffer.alloc(4),
+    restrictions: Address[] = []
   ) {
-    super(networkID, blockchainID, outs, ins, memo)
+    super()
   }
 }
