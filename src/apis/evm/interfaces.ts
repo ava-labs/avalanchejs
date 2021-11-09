@@ -34,6 +34,19 @@ export interface GetUTXOsParams {
   startIndex?: Index
 }
 
+export type BlockParameterString = "latest" | "earliest" | "pending"
+
+export type BlockParameter = BlockParameterString | number
+
+export interface TransactionParams {
+  to: string
+  from?: string
+  gas?: string
+  gasPrice?: string
+  value?: string
+  data?: string
+}
+
 export interface ImportAVAXParams extends CredsInterface {
   to: string
   sourceChain: string
