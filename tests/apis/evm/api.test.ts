@@ -5,7 +5,6 @@ import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
 import { Defaults } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { BlockParameter } from "src/apis/evm/interfaces"
 
 /**
  * @ignore
@@ -20,10 +19,6 @@ describe("EVMAPI", (): void => {
   const protocol: string = "https"
   const username: string = "AvaLabs"
   const password: string = "password"
-
-  const to: string = "0x197E90f9FAD81970bA7976f33CbD77088E5D7cf7"
-  const tag: BlockParameter = "latest"
-  const data: string = "0xc92aecc4"
 
   const avalanche: Avalanche = new Avalanche(
     ip,
@@ -107,17 +102,12 @@ describe("EVMAPI", (): void => {
   })
 
   test("exportKey", async (): Promise<void> => {
-    const key: string =
-      "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
-    const privateKeyHex: string =
-      "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
-    const object: object = { privateKey: key, privateKeyHex }
+    const key: string = "sdfglvlj2h3v45"
 
-    const result: Promise<object> = api.exportKey(username, password, addrA)
+    const result: Promise<string> = api.exportKey(username, password, addrA)
     const payload: object = {
       result: {
-        privateKey: key,
-        privateKeyHex
+        privateKey: key
       }
     }
     const responseObj: HttpResponse = {
@@ -125,10 +115,10 @@ describe("EVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: object = await result
+    const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toEqual(object)
+    expect(response).toBe(key)
   })
 
   test("exportAVAX", async (): Promise<void> => {
@@ -280,84 +270,6 @@ describe("EVMAPI", (): void => {
     expect(response["result"]).toBe(hexStr)
   })
 
-  test("getAvaxBalance", async (): Promise<void> => {
-    const address: string = "0x9632a79656af553F58738B0FB750320158495942"
-    const tag: BlockParameter = "latest"
-    const hexStr: string = "0x0"
-
-    const result: Promise<string> = api.getAvaxBalance(address, tag)
-    const payload: object = {
-      result: hexStr
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(hexStr)
-  })
-
-  test("getBlockByHash", async (): Promise<void> => {
-    const address: string =
-      "0x14d9c2aeec20254d966a947e23eb3172ae5067e66fd4e69aecc3c9d6ff24443a"
-    const bool: boolean = true
-
-    const result: Promise<string> = api.getBlockByHash(address, bool)
-    const payload: object = {
-      result: null
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(null)
-  })
-
-  test("sendRawTransaction", async (): Promise<void> => {
-    const rawTx: string =
-      "0xf86f018534630b8a0082520894197e90f9fad81970ba7976f33cbd77088e5d7cf7880de0b6b3a764000080830150f3a076b648783e587efc207974021eb90ac96a96d28a12605688c288fd540e3dec06a0560e83ac70bafc901caa67d2e36677212ff2163451f23209c61949a6788faaa6"
-
-    const result: Promise<string> = api.sendRawTransaction(rawTx)
-    const payload: object = {
-      result:
-        "0xf72d312e9ed3f48bc84a56ea9fe39cc48bebede5be01d2c40a108a2b3360de2f"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(
-      "0xf72d312e9ed3f48bc84a56ea9fe39cc48bebede5be01d2c40a108a2b3360de2f"
-    )
-  })
-
-  test("getTransactionCount", async (): Promise<void> => {
-    const address: string = "0x9632a79656af553F58738B0FB750320158495942"
-    const tag: BlockParameter = "latest"
-    const hexStr: string = "0x0"
-
-    const result: Promise<string> = api.getTransactionCount(address, tag)
-    const payload: object = {
-      result: hexStr
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(hexStr)
-  })
-
   test("getAssetBalance with bad assetID", async (): Promise<void> => {
     const address: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
     const hexStr: string = "0x0"
@@ -440,105 +352,6 @@ describe("EVMAPI", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("0x2540be400")
-  })
-
-  test("getBlockNumber", async (): Promise<void> => {
-    const result: Promise<string> = api.getBlockNumber()
-    const payload: object = {
-      result: "0x0"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe("0x0")
-  })
-
-  test("getEthCall", async (): Promise<void> => {
-    const result: Promise<string> = api.getEthCall({ to, data }, tag)
-    const payload: object = {
-      result: "0x0"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe("0x0")
-  })
-
-  test("getEthChainID", async (): Promise<void> => {
-    const result: Promise<string> = api.getEthChainID()
-    const payload: object = {
-      result: "0xa868"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe("0xa868")
-  })
-
-  test("web3Sha3", async (): Promise<void> => {
-    const result: Promise<string> = api.web3Sha3(data)
-    const payload: object = {
-      result:
-        "0x627119bb8286874a15d562d32829613311a678da26ca7a6a785ec4ad85937d06"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(
-      "0x627119bb8286874a15d562d32829613311a678da26ca7a6a785ec4ad85937d06"
-    )
-  })
-
-  test("web3ClientVersion", async (): Promise<void> => {
-    const result: Promise<string> = api.web3ClientVersion()
-    const payload: object = {
-      result: "v0.6.3"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe("v0.6.3")
-  })
-
-  test("netVersion", async (): Promise<void> => {
-    const result: Promise<string> = api.netVersion()
-    const payload: object = {
-      result: "1"
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    const response: string = await result
-
-    expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe("1")
   })
 
   test("getAtomicTx", async (): Promise<void> => {
