@@ -238,7 +238,7 @@ describe("PChain", (): void => {
       (x) => x,
       Matcher.toThrow,
       () =>
-        "failed semanticVerifySpend: failed to read consumed UTXO 11111111111111111111111111111111LpoYY:0 due to: not found"
+        "failed semanticVerifySpend: failed to read consumed UTXO 11111111111111111111111111111111LpoYY:1 due to: not found"
     ],
     [
       "getTx",
