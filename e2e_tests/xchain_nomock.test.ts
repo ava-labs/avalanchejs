@@ -164,7 +164,7 @@ describe("XChain", (): void => {
     ],
     [
       "import",
-      () => xchain.import(user, passwd, addrB.value, "C"),
+      () => xchain.import(user, passwd, addrB.value, "P"),
       (x) => x,
       Matcher.toThrow,
       () => "problem issuing transaction: no import inputs"
