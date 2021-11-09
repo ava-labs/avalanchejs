@@ -40,9 +40,7 @@ import {
   GetUTXOsParams,
   ImportAVAXParams,
   ImportKeyParams,
-  ImportParams,
-  TransactionParams,
-  BlockParameter
+  ImportParams
 } from "./interfaces"
 
 /**
@@ -121,9 +119,9 @@ export class EVMAPI extends JRPCAPI {
     const netID: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netID] !== "undefined"
+      typeof Defaults.network[`${netID}`] !== "undefined"
     ) {
-      this.blockchainID = Defaults.network[netID].C.blockchainID //default to C-Chain
+      this.blockchainID = Defaults.network[`${netID}`].C.blockchainID //default to C-Chain
       return true
     }
 
@@ -577,13 +575,13 @@ export class EVMAPI extends JRPCAPI {
    * @param password The password used to decrypt the private key
    * @param address The address whose private key should be exported
    *
-   * @returns Promise with the decrypted private key and private key hex as store in the database
+   * @returns Promise with the decrypted private key as store in the database
    */
   exportKey = async (
     username: string,
     password: string,
     address: string
-  ): Promise<object> => {
+  ): Promise<string> => {
     const params: ExportKeyParams = {
       username,
       password,
@@ -593,7 +591,9 @@ export class EVMAPI extends JRPCAPI {
       "avax.exportKey",
       params
     )
-    return response.data.result
+    return response.data.result.privateKey
+      ? response.data.result.privateKey
+      : response.data.result
   }
 
   /**
@@ -902,195 +902,6 @@ export class EVMAPI extends JRPCAPI {
     const params: string[] = []
 
     const method: string = "eth_maxPriorityFeePerGas"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * returns the block number.
-   *
-   * @returns Returns a Promise<string> containing the current block number.
-   */
-  getBlockNumber = async (): Promise<string> => {
-    const params: string[] = []
-
-    const method: string = "eth_blockNumber"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * Executes a new message call without creating a transaction.
-   *
-   * @returns Returns a Promise<string> containing the value of the executed contract.
-   */
-  getEthCall = async (
-    txParams: TransactionParams,
-    tag: BlockParameter
-  ): Promise<string> => {
-    const params = [txParams, tag]
-
-    const method: string = "eth_call"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * get native asset balance.
-   *
-   * @returns Returns a Promise<string> containing the current balance in wei.
-   */
-  getAvaxBalance = async (
-    address: string,
-    tag: BlockParameter
-  ): Promise<string> => {
-    const params = [address, tag]
-
-    const method: string = "eth_getBalance"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * get number of transactions made. Typically used for nonce calculation.
-   *
-   * @returns Returns a Promise<string> containing the number of transactions made.
-   */
-  getTransactionCount = async (
-    address: string,
-    tag: BlockParameter
-  ): Promise<string> => {
-    const params = [address, tag]
-
-    const method: string = "eth_getTransactionCount"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * get chain ID.
-   *
-   * @returns Returns a Promise<string> containing the EIP155 Chain ID.
-   */
-  getEthChainID = async (): Promise<string> => {
-    const params = []
-
-    const method: string = "eth_chainId"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * Broadcast an already signed transaction.
-   *
-   * @returns Returns a Promise<string> containing the resulting transaction hash.
-   */
-  sendRawTransaction = async (rawTx: string): Promise<string> => {
-    const params = [rawTx]
-
-    const method: string = "eth_sendRawTransaction"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * Submit a hash to get the block it's in.
-   *
-   * @returns Returns a Promise<string> containing the Block of the transaction.
-   */
-  getBlockByHash = async (hash: string, boolean: boolean): Promise<string> => {
-    const params = [hash, boolean]
-
-    const method: string = "eth_getBlockByHash"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * Hashes data using Keccak-256.
-   *
-   * @returns Returns a Promise<string> Kecca-256 hash of the given data.
-   */
-  web3Sha3 = async (data: string): Promise<string> => {
-    const params = [data]
-
-    const method: string = "web3_sha3"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * Returns the current client version.
-   *
-   * @returns Returns a Promise<string> with the client version.
-   */
-  web3ClientVersion = async (): Promise<string> => {
-    const params = []
-
-    const method: string = "web3_clientVersion"
-    const path: string = "ext/bc/C/rpc"
-    const response: RequestResponseData = await this.callMethod(
-      method,
-      params,
-      path
-    )
-    return response.data.result
-  }
-
-  /**
-   * Returns the current network id.
-   *
-   * @returns Returns a Promise<string> with the network id.
-   */
-  netVersion = async (): Promise<string> => {
-    const params = []
-
-    const method: string = "net_version"
     const path: string = "ext/bc/C/rpc"
     const response: RequestResponseData = await this.callMethod(
       method,
