@@ -163,28 +163,8 @@ describe("XChain", (): void => {
       () => "couldn't unmarshal an argument"
     ],
     [
-      "exportAVAX",
-      () =>
-        xchain.exportAVAX(
-          user,
-          passwd,
-          "C" + addrB.value.substring(1),
-          new BN(10)
-        ),
-      (x) => x,
-      Matcher.toThrow,
-      () => "couldn't unmarshal an argument"
-    ],
-    [
       "import",
       () => xchain.import(user, passwd, addrB.value, "C"),
-      (x) => x,
-      Matcher.toMatch,
-      () => /\w+/
-    ],
-    [
-      "importAVAX",
-      () => xchain.importAVAX(user, passwd, addrB.value, "P"),
       (x) => x,
       Matcher.toThrow,
       () => "problem issuing transaction: no import inputs"

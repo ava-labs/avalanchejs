@@ -68,4 +68,3 @@ echo killall avalanchego
 
 # cleanup
 rm -f $fifo_fname
-

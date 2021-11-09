@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "3.9.1",
+  "version": "3.9.3",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
@@ -49,7 +49,7 @@
     "@types/create-hash": "1.2.2",
     "@types/hdkey": "2.0.0",
     "@types/jest": "27.0.2",
-    "@types/node": "16.10.2",
+    "@types/node": "16.11.6",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "clean-webpack-plugin": "4.0.0",
@@ -58,28 +58,27 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-security": "1.4.0",
     "git-revision-webpack-plugin": "5.0.0",
-    "html-webpack-plugin": "5.3.2",
-    "husky": "7.0.2",
-    "isomorphic-dompurify": "^0.15.0",
+    "html-webpack-plugin": "5.5.0",
+    "husky": "7.0.4",
     "jest": "26.6.3",
     "jest-mock-axios": "4.4.1",
     "prettier": "2.4.1",
-    "terser-webpack-plugin": "5.1.4",
+    "terser-webpack-plugin": "5.2.4",
     "ts-jest": "26.5.6",
     "ts-loader": "9.2.6",
     "typedoc": "0.22.4",
     "typedoc-plugin-external-module-name": "4.0.6",
-    "typedoc-plugin-markdown": "3.11.2",
-    "typescript": "4.4.3",
-    "webpack": "5.51.1",
-    "webpack-cli": "4.8.0"
+    "typedoc-plugin-markdown": "3.11.3",
+    "typescript": "4.4.4",
+    "webpack": "5.58.2",
+    "webpack-cli": "4.9.1"
   },
   "engines": {
-    "node": ">=14.17.0"
+    "node": ">=16.13.0"
   },
   "dependencies": {
     "assert": "2.0.0",
-    "axios": "0.21.4",
+    "axios": "0.24.0",
     "bech32": "2.0.0",
     "bip39": "3.0.4",
     "bn.js": "5.2.0",
@@ -87,12 +86,13 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.4.7",
+    "ethers": "5.5.1",
     "hdkey": "2.0.1",
+    "isomorphic-dompurify": "^0.15.0",
     "isomorphic-ws": "4.0.1",
     "store2": "2.12.0",
     "stream-browserify": "3.0.0",
-    "ws": "8.2.2"
+    "ws": "8.2.3"
   },
   "prettier": {
     "tabWidth": 2,
