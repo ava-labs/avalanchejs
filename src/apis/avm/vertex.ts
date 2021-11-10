@@ -11,7 +11,7 @@ import { SelectCredentialClass } from "./credentials"
 import { KeyChain, KeyPair } from "./keychain"
 import { Signature, SigIdx, Credential } from "../../common/credentials"
 import { DefaultNetworkID } from "../../utils/constants"
-import { SelectTxClass } from "./tx"
+import { SelectTxClass, UnsignedTx } from "./tx"
 import {
   Serializable,
   Serialization,
@@ -21,6 +21,7 @@ import {
 import { CodecIdError } from "../../utils/errors"
 import { Address } from "../../common"
 import BN from "bn.js"
+import { BaseTx } from "."
 
 /**
  * @ignore
@@ -72,13 +73,12 @@ export class Vertex extends Serializable {
   protected chainID: Buffer = Buffer.alloc(32)
   protected height: Buffer = Buffer.alloc(8)
   protected epoch: Buffer = Buffer.alloc(4)
-  protected numAddresses: Buffer = Buffer.alloc(4)
-  protected addresses: Address[] = []
   protected numParentIDs: Buffer = Buffer.alloc(4)
-  protected parentIDs: Address[] = []
-  protected txs: Buffer = Buffer.alloc(4)
+  protected parentIDs: Buffer[] = []
+  protected numTxs: Buffer = Buffer.alloc(4)
+  protected txs: BaseTx[] = []
   protected numRestrictions: Buffer = Buffer.alloc(4)
-  protected restrictions: Address[] = []
+  protected restrictions: Buffer[] = []
 
   /**
    * Returns the ChainID as a number
@@ -96,28 +96,23 @@ export class Vertex extends Serializable {
   getEpoch = (): number => this.epoch.readUInt32BE(0)
 
   /**
-   * @returns An array of Addresses
+   * @returns An array of Buffers
    */
-  getAddresses = (): Address[] => {
-    return this.addresses
-  }
-
-  /**
-   * @returns An array of Addresses
-   */
-  getParentIDs = (): Address[] => {
+  getParentIDs = (): Buffer[] => {
     return this.parentIDs
   }
 
   /**
-   * Returns the TX count as a number.
+   * Returns array of UnsignedTxs.
    */
-  getTxs = (): number => this.txs.readUInt32BE(0)
+  getTxs = (): BaseTx[] => {
+    return this.txs
+  }
 
   /**
-   * @returns An array of Addresses
+   * @returns An array of Buffers
    */
-  getRestrictions = (): Address[] => {
+  getRestrictions = (): Buffer[] => {
     return this.restrictions
   }
 
@@ -139,13 +134,6 @@ export class Vertex extends Serializable {
   }
 
   /**
-   * Returns the id of the [[BaseTx]]
-   */
-  getTxType = (): number => {
-    return this._typeID
-  }
-
-  /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[BaseTx]], parses it, populates the class, and returns the length of the BaseTx in bytes.
    *
    * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[BaseTx]]
@@ -155,42 +143,40 @@ export class Vertex extends Serializable {
    * @remarks assume not-checksummed
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
+    offset += 2
     this.chainID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
     this.height = bintools.copyFrom(bytes, offset, offset + 8)
     offset += 8
     this.epoch = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
-    this.numAddresses = bintools.copyFrom(bytes, offset, offset + 4)
-    offset += 4
-    const addressCount: number = this.numAddresses.readUInt32BE(0)
-    this.addresses = []
-    for (let i: number = 0; i < addressCount; i++) {
-      const address: Address = new Address()
-      offset = address.fromBuffer(bytes, offset)
-      this.addresses.push(address)
-    }
     this.numParentIDs = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
     const parentIDsCount: number = this.numParentIDs.readUInt32BE(0)
-    this.parentIDs = []
     for (let i: number = 0; i < parentIDsCount; i++) {
-      const address: Address = new Address()
-      offset = address.fromBuffer(bytes, offset)
-      this.parentIDs.push(address)
+      const parentID: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
+      offset += 32
+      this.parentIDs.push(parentID)
     }
 
-    this.txs = bintools.copyFrom(bytes, offset, offset + 4)
+    this.numTxs = bintools.copyFrom(bytes, offset, offset + 4)
+    const txsCount: number = this.numTxs.readUInt32BE(0)
     offset += 4
+    // TODO - why do we have these 4 mystery bytes?
+    offset += 4
+    for (let i: number = 0; i < txsCount; i++) {
+      const unsignedTx: UnsignedTx = new UnsignedTx()
+      offset += unsignedTx.fromBuffer(bintools.copyFrom(bytes, offset))
+      this.txs.push(unsignedTx.getTransaction())
+    }
 
     this.numRestrictions = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
     const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
-    this.restrictions = []
     for (let i: number = 0; i < restrictionsCount; i++) {
-      const address: Address = new Address()
-      offset = address.fromBuffer(bytes, offset)
-      this.restrictions.push(address)
+      const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
+      offset += 32
+      this.restrictions.push(tx)
     }
     return offset
   }
@@ -248,9 +234,6 @@ export class Vertex extends Serializable {
     chainID: Buffer = Buffer.alloc(32),
     height: Buffer = Buffer.alloc(8),
     epoch: Buffer = Buffer.alloc(4),
-    numAddresses: Buffer = Buffer.alloc(4),
-    addresses: Address[] = [],
-    numParentIDs: Buffer = Buffer.alloc(4),
     parentIDs: Address[] = [],
     txs: Buffer = Buffer.alloc(4),
     numRestrictions: Buffer = Buffer.alloc(4),
