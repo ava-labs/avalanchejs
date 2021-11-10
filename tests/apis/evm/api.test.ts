@@ -102,12 +102,17 @@ describe("EVMAPI", (): void => {
   })
 
   test("exportKey", async (): Promise<void> => {
-    const key: string = "sdfglvlj2h3v45"
+    const key: string =
+      "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+    const privateKeyHex: string =
+      "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
+    const object: object = { privateKey: key, privateKeyHex }
 
-    const result: Promise<string> = api.exportKey(username, password, addrA)
+    const result: Promise<object> = api.exportKey(username, password, addrA)
     const payload: object = {
       result: {
-        privateKey: key
+        privateKey: key,
+        privateKeyHex
       }
     }
     const responseObj: HttpResponse = {
@@ -115,10 +120,10 @@ describe("EVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(key)
+    expect(response).toEqual(object)
   })
 
   test("exportAVAX", async (): Promise<void> => {
