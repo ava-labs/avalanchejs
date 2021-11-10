@@ -575,13 +575,13 @@ export class EVMAPI extends JRPCAPI {
    * @param password The password used to decrypt the private key
    * @param address The address whose private key should be exported
    *
-   * @returns Promise with the decrypted private key as store in the database
+   * @returns Promise with the decrypted private key and private key hex as store in the database
    */
   exportKey = async (
     username: string,
     password: string,
     address: string
-  ): Promise<string> => {
+  ): Promise<object> => {
     const params: ExportKeyParams = {
       username,
       password,
@@ -591,9 +591,7 @@ export class EVMAPI extends JRPCAPI {
       "avax.exportKey",
       params
     )
-    return response.data.result.privateKey
-      ? response.data.result.privateKey
-      : response.data.result
+    return response.data.result
   }
 
   /**
