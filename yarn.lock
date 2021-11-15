@@ -4423,7 +4423,7 @@ lodash.truncate@^4.4.2:
   resolved "https://registry.yarnpkg.com/lodash.truncate/-/lodash.truncate-4.4.2.tgz#5a350da0b1113b837ecfffd5812cbe58d6eae193"
   integrity sha1-WjUNoLERO4N+z//VgSy+WNbq4ZM=
 
-lodash@4.x, lodash@^4.1.2, lodash@^4.17.15, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0:
+lodash@4.x, lodash@^4.1.2, lodash@^4.17.20, lodash@^4.17.21, lodash@^4.7.0:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -4442,7 +4442,7 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lunr@^2.3.8:
+lunr@^2.3.9:
   version "2.3.9"
   resolved "https://registry.yarnpkg.com/lunr/-/lunr-2.3.9.tgz#18b123142832337dd6e964df1a5a7707b25d35e1"
   integrity sha512-zTU3DaZaF3Rt9rhN3uBMGQD3dD2/vFQqnvZCDv4dl5iOzq2IZQqTxu90r4E5J+nP70J3ilqVCrbho2eWaeW8Ow==
@@ -5965,12 +5965,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typedoc-default-themes@^0.10.2:
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/typedoc-default-themes/-/typedoc-default-themes-0.10.2.tgz#743380a80afe62c5ef92ca1bd4abe2ac596be4d2"
-  integrity sha512-zo09yRj+xwLFE3hyhJeVHWRSPuKEIAsFK5r2u47KL/HBKqpwdUSanoaz5L34IKiSATFrjG5ywmIu98hPVMfxZg==
-  dependencies:
-    lunr "^2.3.8"
+typedoc-default-themes@^0.11.1:
+  version "0.11.4"
+  resolved "https://registry.yarnpkg.com/typedoc-default-themes/-/typedoc-default-themes-0.11.4.tgz#1bc55b7c8d1132844616ff6f570e1e2cd0eb7343"
+  integrity sha512-Y4Lf+qIb9NTydrexlazAM46SSLrmrQRqWiD52593g53SsmUFioAsMWt8m834J6qsp+7wHRjxCXSZeiiW5cMUdw==
 
 typedoc-plugin-external-module-name@^4.0.3:
   version "4.0.6"
@@ -5988,21 +5986,21 @@ typedoc-plugin-markdown@^2.4.0:
     fs-extra "^9.0.1"
     handlebars "^4.7.6"
 
-typedoc@^0.18.0:
-  version "0.18.0"
-  resolved "https://registry.yarnpkg.com/typedoc/-/typedoc-0.18.0.tgz#8bf53ddd7df5b8966b52c946929a09549d78682b"
-  integrity sha512-UgDQwapCGQCCdYhEQzQ+kGutmcedklilgUGf62Vw6RdI29u6FcfAXFQfRTiJEbf16aK3YnkB20ctQK1JusCRbA==
+typedoc@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/typedoc/-/typedoc-0.19.0.tgz#438ae5a8e631322e3fc21f6068f2729ff15b18b9"
+  integrity sha512-Rn68JwgDDYyIWl3HXeSsLZcsvxd2anISjhKu64PvID7RETeS2Iwnc4cH60yqc8/N50Xo1d3MHPGYinCPhMMliQ==
   dependencies:
     fs-extra "^9.0.1"
     handlebars "^4.7.6"
     highlight.js "^10.0.0"
-    lodash "^4.17.15"
-    lunr "^2.3.8"
+    lodash "^4.17.20"
+    lunr "^2.3.9"
     marked "^1.1.1"
     minimatch "^3.0.0"
     progress "^2.0.3"
     shelljs "^0.8.4"
-    typedoc-default-themes "^0.10.2"
+    typedoc-default-themes "^0.11.1"
 
 typescript@4.4.4:
   version "4.4.4"
