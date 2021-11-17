@@ -65,6 +65,13 @@ describe("Info", (): void => {
       (x) => x.creationTxFee,
       Matcher.toEqual,
       () => new BN(1000000)
+    // ],
+    // [
+    //   "uptime",
+    //   () => info.uptime(),
+    //   (x) => new bn(x.rewardingstakepercentage),
+    //   matcher.greaterthan,
+    //   () => new bn("100.0000")
     ]
   ]
 

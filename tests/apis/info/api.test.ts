@@ -2,7 +2,7 @@ import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
 import { InfoAPI } from "../../../src/apis/info/api"
 import BN from "bn.js"
-import { PeersResponse } from "../../../src/apis/info/interfaces"
+import { PeersResponse, UptimeResponse } from "../../../src/apis/info/interfaces"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 describe("Info", (): void => {
@@ -212,5 +212,28 @@ describe("Info", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(peers)
+  })
+
+  test("uptime", async (): Promise<void> => {
+    const result: Promise<UptimeResponse> = info.uptime()
+    const uptime: {
+      rewardingStakePercentage: string
+      weightedAveragePercentage: string
+    } = {
+      rewardingStakePercentage: '100.0000',
+      weightedAveragePercentage: '99.2000'
+    }
+    const payload: object = {
+      result: uptime
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: UptimeResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toEqual(uptime)
   })
 })
