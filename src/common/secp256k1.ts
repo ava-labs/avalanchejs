@@ -106,7 +106,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    * @returns A {@link https://github.com/feross/buffer|Buffer} representation of the address
    */
   getAddress = (): Buffer => {
-    return this.addressFromPublicKey(this.pubk)
+    return SECP256k1KeyPair.addressFromPublicKey(this.pubk)
   }
 
   /**
@@ -123,7 +123,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address of the public key.
    */
-  addressFromPublicKey = (pubk: Buffer): Buffer => {
+  static addressFromPublicKey = (pubk: Buffer): Buffer => {
     if (pubk.length === 65) {
       /* istanbul ignore next */
       pubk = Buffer.from(

@@ -27,7 +27,7 @@ export class KeyPair extends SECP256k1KeyPair {
    * @returns A string representation of the address
    */
   getAddressString = (): string => {
-    const addr: Buffer = this.addressFromPublicKey(this.pubk)
+    const addr: Buffer = KeyPair.addressFromPublicKey(this.pubk)
     const type: SerializedType = "bech32"
     return serialization.bufferToType(addr, type, this.hrp, this.chainID)
   }
