@@ -2,7 +2,10 @@ import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
 import { InfoAPI } from "../../../src/apis/info/api"
 import BN from "bn.js"
-import { PeersResponse, UptimeResponse } from "../../../src/apis/info/interfaces"
+import {
+  PeersResponse,
+  UptimeResponse
+} from "../../../src/apis/info/interfaces"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 describe("Info", (): void => {
@@ -220,8 +223,8 @@ describe("Info", (): void => {
       rewardingStakePercentage: string
       weightedAveragePercentage: string
     } = {
-      rewardingStakePercentage: '100.0000',
-      weightedAveragePercentage: '99.2000'
+      rewardingStakePercentage: "100.0000",
+      weightedAveragePercentage: "99.2000"
     }
     const payload: object = {
       result: uptime

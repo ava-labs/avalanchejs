@@ -142,12 +142,10 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Returns the network's observed uptime of this node.
    *
-   * @returns Returns a Promise<UptimeResponse> which contains rewardingStakePercentage and weightedAveragePercentage. 
+   * @returns Returns a Promise<UptimeResponse> which contains rewardingStakePercentage and weightedAveragePercentage.
    */
   uptime = async (): Promise<UptimeResponse> => {
-    const response: RequestResponseData = await this.callMethod(
-      "info.uptime"
-    )
+    const response: RequestResponseData = await this.callMethod("info.uptime")
     return response.data.result
   }
 
