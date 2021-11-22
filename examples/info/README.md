@@ -11,3 +11,4 @@ Tests for the Avalanche [Info RPC](https://docs.avax.network/build/avalanchego-a
 * [getTxFee.ts](./getTxFee.ts)
 * [isBootstrapped.ts](./isBootstrapped.ts)
 * [peers.ts](./peers.ts)
+* [uptime.ts](./uptime.ts)
