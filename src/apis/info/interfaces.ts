@@ -35,7 +35,3 @@ export interface UptimeResponse {
   rewardingStakePercentage: string
   weightedAveragePercentage: string
 }
-export interface Uptime {
-  rewardingStakePercentage: string
-  weightedAveragePercentage: string
-}
