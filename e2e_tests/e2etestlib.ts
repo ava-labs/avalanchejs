@@ -15,7 +15,6 @@ export const getAvalanche = (): Avalanche => {
 }
 
 export enum Matcher {
-  // GreaterThan,
   toBe,
   toEqual,
   toContain,
@@ -27,9 +26,6 @@ export enum Matcher {
 export const createTests = (tests_spec: any[]): void => {
   for (const [testName, promise, preprocess, matcher, expected] of tests_spec) {
     test(testName, async (): Promise<void> => {
-      // if (matcher == Matcher.GreaterThan) {
-      //   expect(preprocess(await promise())).toBeGreaterThan(expected())
-      // }
       if (matcher == Matcher.toBe) {
         expect(preprocess(await promise())).toBe(expected())
       }
