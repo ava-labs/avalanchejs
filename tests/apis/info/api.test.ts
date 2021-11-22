@@ -4,6 +4,7 @@ import { InfoAPI } from "../../../src/apis/info/api"
 import BN from "bn.js"
 import {
   PeersResponse,
+  Uptime,
   UptimeResponse
 } from "../../../src/apis/info/interfaces"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
@@ -219,10 +220,7 @@ describe("Info", (): void => {
 
   test("uptime", async (): Promise<void> => {
     const result: Promise<UptimeResponse> = info.uptime()
-    const uptime: {
-      rewardingStakePercentage: string
-      weightedAveragePercentage: string
-    } = {
+    const uptime: Uptime = {
       rewardingStakePercentage: "100.0000",
       weightedAveragePercentage: "99.2000"
     }
