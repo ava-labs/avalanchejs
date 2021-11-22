@@ -15,12 +15,12 @@ export const getAvalanche = (): Avalanche => {
 }
 
 export enum Matcher {
-    toBe,
-    toEqual,
-    toContain,
-    toMatch,
-    toThrow,
-    Get,
+  toBe,
+  toEqual,
+  toContain,
+  toMatch,
+  toThrow,
+  Get
 }
 
 export const createTests = (tests_spec: any[]): void => {
