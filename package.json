@@ -74,7 +74,7 @@
     "webpack-cli": "4.9.1"
   },
   "engines": {
-    "node": ">=16.13.0"
+    "node": ">=14.18.0"
   },
   "dependencies": {
     "assert": "2.0.0",

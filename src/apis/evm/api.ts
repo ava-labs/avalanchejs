@@ -734,7 +734,7 @@ export class EVMAPI extends JRPCAPI {
       evmInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech))
       evmInputs.push(evmInput)
     } else {
-      // if asset id isn"t AVAX asset id then create 2 inputs
+      // if asset id isn't AVAX asset id then create 2 inputs
       // first input will be AVAX and will be for the amount of the fee
       // second input will be the ANT
       const evmAVAXInput: EVMInput = new EVMInput(
@@ -880,7 +880,6 @@ export class EVMAPI extends JRPCAPI {
    */
   getBaseFee = async (): Promise<string> => {
     const params: string[] = []
-
     const method: string = "eth_baseFee"
     const path: string = "ext/bc/C/rpc"
     const response: RequestResponseData = await this.callMethod(
