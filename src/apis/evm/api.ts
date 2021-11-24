@@ -874,9 +874,7 @@ export class EVMAPI extends JRPCAPI {
   }
 
   /**
-   * returns the base fee for the next block.
-   *
-   * @returns Returns a Promise<string> containing the base fee for the next block.
+   * @returns a Promise<string> containing the base fee for the next block.
    */
   getBaseFee = async (): Promise<string> => {
     const params: string[] = []
