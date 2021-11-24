@@ -33,7 +33,7 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
-  "PlatformVM utility method buildExportTx to export AVAX from the P-Chain to the X-Chain"
+  "PlatformVM utility method buildExportTx to export AVAX from the P-Chain to the C-Chain"
 )
 const asOf: BN = UnixNow()
 
