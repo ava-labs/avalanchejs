@@ -1,5 +1,8 @@
 import { Avalanche, BN } from "../../src"
-import { PlatformVMAPI, KeyChain as PlatformKeyChain } from "../../src/apis/platformvm"
+import {
+  PlatformVMAPI,
+  KeyChain as PlatformKeyChain
+} from "../../src/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,

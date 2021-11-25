@@ -1,16 +1,18 @@
-import { Avalanche } from "../../src"
+import { Avalanche, BN } from "../../src"
 import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx,
-  UTXOSet
+  UTXOSet,
+  // AmountOutput
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults
+  Defaults,
+  // costImportTx
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -30,12 +32,14 @@ const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const xChainBlockchainId: string = Defaults.network[networkID].X.blockchainID
 
 const main = async (): Promise<any> => {
+  // const baseFeeResponse: string = await cchain.getBaseFee()
+  // const baseFee = new BN(parseInt(baseFeeResponse, 16))
+  // TODO - how to use baseFee in this importTx flow?
   const evmUTXOResponse: any = await cchain.getUTXOs(
     cAddressStrings,
     xChainBlockchainId
   )
   const utxoSet: UTXOSet = evmUTXOResponse.utxos
-
   const unsignedTx: UnsignedTx = await cchain.buildImportTx(
     utxoSet,
     cHexAddress,
@@ -43,6 +47,10 @@ const main = async (): Promise<any> => {
     xChainBlockchainId,
     cAddressStrings
   )
+  // const importCost: number = costImportTx(unsignedTx)
+  // avaxAmount = balance.sub(baseFee.mul(new BN(importCost)))
+  // fee = baseFee.mul(new BN(exportCost))
+  // TODO - how to use the importCost in this workflow?
 
   const tx: Tx = unsignedTx.sign(cKeychain)
   const txid: string = await cchain.issueTx(tx)

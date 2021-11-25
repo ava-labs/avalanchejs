@@ -4,7 +4,7 @@ import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
-  Tx,
+  Tx
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
