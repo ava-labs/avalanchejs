@@ -11,7 +11,8 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  UnixNow
+  UnixNow,
+  ONEAVAX
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -44,7 +45,7 @@ const main = async (): Promise<any> => {
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const unsignedTx: UnsignedTx = await pchain.buildExportTx(
     utxoSet,
-    unlocked.sub(fee),
+    unlocked.sub(fee).sub(ONEAVAX),
     cChainBlockchainID,
     xAddressStrings,
     pAddressStrings,

@@ -14,7 +14,8 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  UnixNow
+  UnixNow,
+  ONEAVAX
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -48,7 +49,7 @@ const main = async (): Promise<any> => {
     avaxAssetID
   )
   const balance: BN = new BN(getBalanceResponse.balance)
-  const amount: BN = balance.sub(fee)
+  const amount: BN = balance.sub(fee).sub(ONEAVAX)
 
   const unsignedTx: UnsignedTx = await xchain.buildExportTx(
     utxoSet,

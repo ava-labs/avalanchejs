@@ -614,7 +614,8 @@ export class EVMAPI extends JRPCAPI {
     toAddress: string,
     ownerAddresses: string[],
     sourceChain: Buffer | string,
-    fromAddresses: string[]
+    fromAddresses: string[],
+    fee: BN = new BN(0)
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
@@ -661,7 +662,7 @@ export class EVMAPI extends JRPCAPI {
       from,
       atomics,
       sourceChain,
-      this.getTxFee(),
+      fee,
       avaxAssetIDBuf
     )
 

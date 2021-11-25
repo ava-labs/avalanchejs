@@ -13,7 +13,8 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  costExportTx
+  costExportTx,
+  ONEAVAX
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -62,7 +63,7 @@ const main = async (): Promise<any> => {
     fee
   )
   const exportCost: number = costExportTx(unsignedTx)
-  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost)))
+  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost))).sub(ONEAVAX)
   fee = baseFee.mul(new BN(exportCost))
   unsignedTx = await cchain.buildExportTx(
     avaxAmount,

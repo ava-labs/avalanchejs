@@ -5,14 +5,13 @@ import {
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx,
-  UTXOSet,
-  // AmountOutput
+  UTXOSet
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  // costImportTx
+  costImportTx
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -32,25 +31,33 @@ const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const xChainBlockchainId: string = Defaults.network[networkID].X.blockchainID
 
 const main = async (): Promise<any> => {
-  // const baseFeeResponse: string = await cchain.getBaseFee()
-  // const baseFee = new BN(parseInt(baseFeeResponse, 16))
-  // TODO - how to use baseFee in this importTx flow?
+  const baseFeeResponse: string = await cchain.getBaseFee()
+  const baseFee = new BN(parseInt(baseFeeResponse, 16))
+  let fee: BN = baseFee
   const evmUTXOResponse: any = await cchain.getUTXOs(
     cAddressStrings,
     xChainBlockchainId
   )
   const utxoSet: UTXOSet = evmUTXOResponse.utxos
-  const unsignedTx: UnsignedTx = await cchain.buildImportTx(
+  let unsignedTx: UnsignedTx = await cchain.buildImportTx(
     utxoSet,
     cHexAddress,
     cAddressStrings,
     xChainBlockchainId,
-    cAddressStrings
+    cAddressStrings,
+    fee
   )
-  // const importCost: number = costImportTx(unsignedTx)
-  // avaxAmount = balance.sub(baseFee.mul(new BN(importCost)))
-  // fee = baseFee.mul(new BN(exportCost))
-  // TODO - how to use the importCost in this workflow?
+  const importCost: number = costImportTx(unsignedTx)
+  fee = baseFee.mul(new BN(importCost))
+
+  unsignedTx = await cchain.buildImportTx(
+    utxoSet,
+    cHexAddress,
+    cAddressStrings,
+    xChainBlockchainId,
+    cAddressStrings,
+    fee
+  )
 
   const tx: Tx = unsignedTx.sign(cKeychain)
   const txid: string = await cchain.issueTx(tx)
