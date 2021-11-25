@@ -4,12 +4,13 @@ import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
-  Tx
+  Tx,
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults
+  Defaults,
+  costExportTx
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -19,8 +20,8 @@ const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
-const xKeychain: AVMKeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+const xKeychain: AVMKeyChain = xchain.keyChain()
 const cKeychain: EVMKeyChain = cchain.keyChain()
 xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
@@ -36,14 +37,16 @@ const threshold: number = 1
 
 const main = async (): Promise<any> => {
   let balance: BN = await web3.eth.getBalance(cHexAddress)
-  const fee: BN = cchain.getDefaultTxFee()
   balance = new BN(balance.toString().substring(0, 17))
+  const baseFeeResponse: string = await cchain.getBaseFee()
+  const baseFee = new BN(parseInt(baseFeeResponse, 16))
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount
   const locktime: BN = new BN(0)
-  const avaxAmount: BN = balance.sub(fee)
+  let avaxAmount: BN = balance.sub(baseFee)
+  let fee: BN = baseFee
 
-  const unsignedTx: UnsignedTx = await cchain.buildExportTx(
+  let unsignedTx: UnsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
     xChainBlockchainIdStr,
@@ -52,7 +55,23 @@ const main = async (): Promise<any> => {
     xAddressStrings,
     nonce,
     locktime,
-    threshold
+    threshold,
+    fee
+  )
+  const exportCost: number = costExportTx(unsignedTx)
+  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost)))
+  fee = baseFee.mul(new BN(exportCost))
+  unsignedTx = await cchain.buildExportTx(
+    avaxAmount,
+    avaxAssetID,
+    xChainBlockchainIdStr,
+    cHexAddress,
+    cAddressStrings[0],
+    xAddressStrings,
+    nonce,
+    locktime,
+    threshold,
+    fee
   )
 
   const tx: Tx = unsignedTx.sign(cKeychain)

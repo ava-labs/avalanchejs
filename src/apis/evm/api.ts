@@ -693,7 +693,8 @@ export class EVMAPI extends JRPCAPI {
     toAddresses: string[],
     nonce: number = 0,
     locktime: BN = new BN(0),
-    threshold: number = 1
+    threshold: number = 1,
+    fee: BN = new BN(0)
   ): Promise<UnsignedTx> => {
     const prefixes: object = {}
     toAddresses.map((address: string) => {
@@ -721,7 +722,6 @@ export class EVMAPI extends JRPCAPI {
         "Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length."
       )
     }
-    const fee: BN = this.getTxFee()
     const assetDescription: any = await this.getAssetDescription("AVAX")
     const evmInputs: EVMInput[] = []
     if (bintools.cb58Encode(assetDescription.assetID) === assetID) {
