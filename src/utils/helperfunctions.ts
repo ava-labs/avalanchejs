@@ -106,8 +106,6 @@ export function costExportTx(tx: UnsignedTx): number {
   let bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
   const exportTx = tx.getTransaction() as ExportTx
   const numSigs: number = exportTx.getInputs().length
-  // TODO - Don't hardcode costPerSignature
-  const costPerSignature: number = 1000
-  const sigCost: number = numSigs * costPerSignature
+  const sigCost: number = numSigs * Defaults.network[1].C.costPerSignature
   return bytesCost + sigCost
 }
