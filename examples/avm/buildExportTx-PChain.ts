@@ -14,8 +14,7 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  UnixNow,
-  ONEAVAX
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"

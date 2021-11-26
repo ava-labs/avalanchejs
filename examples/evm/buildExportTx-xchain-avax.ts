@@ -10,8 +10,7 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
-  costExportTx,
-  ONEAVAX
+  costExportTx
 } from "../../src/utils"
 
 const ip: string = "localhost"
