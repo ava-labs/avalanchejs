@@ -9,7 +9,7 @@ describe("HelperFunctions", (): void => {
     let bytesCost: number = calcBytesCost(importTx.toBuffer().byteLength)
     expect(bytesCost).toEqual(cost)
 
-    // the byteCost should always be 1 nAVAX per byte
+    // the byteCost should always be 1 unit of gas per byte
     let size: number = 100
     cost = 100
     bytesCost = calcBytesCost(size)
