@@ -46,7 +46,7 @@ const main = async (): Promise<any> => {
     avaxAssetID
   )
   const balance: BN = new BN(getBalanceResponse.balance)
-  const amount: BN = balance.sub(fee).sub(ONEAVAX)
+  const amount: BN = balance.sub(fee)
 
   const unsignedTx: UnsignedTx = await xchain.buildExportTx(
     utxoSet,

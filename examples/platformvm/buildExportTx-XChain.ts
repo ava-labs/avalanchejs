@@ -45,7 +45,7 @@ const main = async (): Promise<any> => {
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const unsignedTx: UnsignedTx = await pchain.buildExportTx(
     utxoSet,
-    unlocked.sub(fee).sub(ONEAVAX),
+    unlocked.sub(fee),
     xChainBlockchainID,
     xAddressStrings,
     pAddressStrings,

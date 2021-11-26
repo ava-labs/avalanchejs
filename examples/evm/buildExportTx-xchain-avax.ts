@@ -60,7 +60,7 @@ const main = async (): Promise<any> => {
     fee
   )
   const exportCost: number = costExportTx(unsignedTx)
-  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost))).sub(ONEAVAX)
+  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost)))
   fee = baseFee.mul(new BN(exportCost))
   unsignedTx = await cchain.buildExportTx(
     avaxAmount,
