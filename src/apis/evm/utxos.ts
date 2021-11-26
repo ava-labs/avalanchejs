@@ -418,7 +418,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       blockchainID,
       sourceChain,
       ins,
-      outs
+      outs,
+      fee
     )
     return new UnsignedTx(importTx)
   }
