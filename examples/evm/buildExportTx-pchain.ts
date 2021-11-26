@@ -35,7 +35,7 @@ const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const Web3 = require("web3")
 const path: string = "/ext/bc/C/rpc"
-const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
+const web3: any = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
 
 const main = async (): Promise<any> => {
@@ -62,8 +62,8 @@ const main = async (): Promise<any> => {
     fee
   )
   const exportCost: number = costExportTx(unsignedTx)
-  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost)))
   fee = baseFee.mul(new BN(exportCost))
+  avaxAmount = balance.sub(fee)
   unsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
