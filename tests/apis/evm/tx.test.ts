@@ -174,16 +174,18 @@ describe("EVM Transactions", () => {
         antAssetID
       )
       evmOutputs.push(evmOutput)
+      const baseFee: BN = new BN(25000000000)
       expect((): void => {
         new ImportTx(
           networkID,
           bintools.cb58Decode(blockchainID),
           bintools.cb58Decode(sourcechainID),
           importedIns,
-          evmOutputs
+          evmOutputs,
+          baseFee
         )
       }).toThrow(
-        "Error - 1000000 AVAX required for fee and only 0 AVAX provided"
+        "Error - 25000000000 nAVAX required for fee and only 0 nAVAX provided"
       )
     })
 
@@ -230,16 +232,18 @@ describe("EVM Transactions", () => {
         avaxAssetID
       )
       evmOutputs.push(evmOutput)
+      const baseFee: BN = new BN(25000000000)
       expect((): void => {
         new ImportTx(
           networkID,
           bintools.cb58Decode(blockchainID),
           bintools.cb58Decode(sourcechainID),
           importedIns,
-          evmOutputs
+          evmOutputs,
+          baseFee
         )
       }).toThrow(
-        "Error - 1000000 AVAX required for fee and only 507 AVAX provided"
+        "Error - 25000000000 nAVAX required for fee and only 507 nAVAX provided"
       )
     })
 
