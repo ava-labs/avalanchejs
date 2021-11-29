@@ -89,13 +89,14 @@ export function NodeIDStringToBuffer(pk: string): Buffer {
 }
 
 export function costImportTx(tx: UnsignedTx): number {
-  let cost: number = calcBytesCost(tx.toBuffer().byteLength)
+  let bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
   const importTx = tx.getTransaction() as ImportTx
   importTx.getImportInputs().forEach((input: TransferableInput): void => {
     const inCost: number = input.getCost()
-    cost += inCost
+    bytesCost += inCost
   })
-  return cost
+  const fixedFee: number = 10000
+  return bytesCost + fixedFee
 }
 
 export function calcBytesCost(len: number): number {
