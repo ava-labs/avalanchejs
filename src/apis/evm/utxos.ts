@@ -341,7 +341,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
   ): UnsignedTx => {
     const zero: BN = new BN(0)
     let ins: TransferableInput[] = []
-    const outs: EVMOutput[] = []
+    let outs: EVMOutput[] = []
 
     if (typeof fee === "undefined") {
       fee = zero.clone()
@@ -394,9 +394,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       })
       ins.push(xferin)
 
-      // lexicographically sort array
-      ins = ins.sort(TransferableInput.comparator())
-
       if (map.has(assetID)) {
         infeeamount = infeeamount.add(new BN(map.get(assetID)))
       }
@@ -412,6 +409,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       )
       outs.push(evmOutput)
     }
+
+    // lexicographically sort array
+    ins = ins.sort(TransferableInput.comparator())
+    outs = outs.sort(EVMOutput.comparator())
 
     const importTx: ImportTx = new ImportTx(
       networkID,

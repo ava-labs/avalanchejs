@@ -724,7 +724,7 @@ export class EVMAPI extends JRPCAPI {
       )
     }
     const assetDescription: any = await this.getAssetDescription("AVAX")
-    const evmInputs: EVMInput[] = []
+    let evmInputs: EVMInput[] = []
     if (bintools.cb58Encode(assetDescription.assetID) === assetID) {
       const evmInput: EVMInput = new EVMInput(
         fromAddressHex,
@@ -775,7 +775,8 @@ export class EVMAPI extends JRPCAPI {
     )
     exportedOuts.push(transferableOutput)
 
-    // lexicographically sort array
+    // lexicographically sort ins and outs
+    evmInputs = evmInputs.sort(EVMInput.comparator())
     exportedOuts = exportedOuts.sort(TransferableOutput.comparator())
 
     const exportTx: ExportTx = new ExportTx(
