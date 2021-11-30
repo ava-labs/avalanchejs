@@ -38,22 +38,4 @@ describe("HelperFunctions", (): void => {
     bytesCost = 10082
     expect(cost).toEqual(bytesCost)
   })
-
-  test("getCost", (): void => {
-    const txHex: string =
-      "0x000000000000000030399d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19d891ad56056d9c01f18f43f58b5c784ad07a4a49cf3d1f11623804b5cba2c6bf000000012b845c6ab4405c7e379971199cde5367fe7591cbe6e3e81bd5925cea9afa859e00000000dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db00000005007ba5886cf8f1400000000100000000000000018db97c7cece249c2b98bdc0226cc4c2a57bf52fc007aa63138f3a540dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db"
-    console.log(new Buffer(txHex).toString("hex"))
-    const unsignedTx: UnsignedTx = new UnsignedTx()
-    unsignedTx.fromBuffer(new Buffer(txHex, "hex"))
-    console.log(unsignedTx)
-    // TODO - flesh out these tests
-    // const importTx: ImportTx = new ImportTx()
-    let cost: number = 0
-    let numIns: number = 0
-    // importTx.getImportInputs().forEach((input: TransferableInput) => {
-    //   const inCost = input.getCost()
-    //   cost += inCost
-    // })
-    expect(numIns).toEqual(cost)
-  })
 })
