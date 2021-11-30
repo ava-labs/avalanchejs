@@ -9,7 +9,9 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const cchain: EVMAPI = avalanche.CChain()
 
 const main = async (): Promise<any> => {
-  const baseFee: string = await cchain.getBaseFee()
+  const baseFeeResponse: string = await cchain.getBaseFee()
+  const baseFee: BN = new BN(parseInt(baseFeeResponse))
+  console.log(`BaseFee: ${baseFee.toString()}`)
 }
 
 main()
