@@ -614,7 +614,8 @@ export class EVMAPI extends JRPCAPI {
     toAddress: string,
     ownerAddresses: string[],
     sourceChain: Buffer | string,
-    fromAddresses: string[]
+    fromAddresses: string[],
+    fee: BN = new BN(0)
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
@@ -658,10 +659,9 @@ export class EVMAPI extends JRPCAPI {
       networkID,
       bintools.cb58Decode(this.blockchainID),
       toAddress,
-      from,
       atomics,
       sourceChain,
-      this.getTxFee(),
+      fee,
       avaxAssetIDBuf
     )
 
@@ -693,7 +693,8 @@ export class EVMAPI extends JRPCAPI {
     toAddresses: string[],
     nonce: number = 0,
     locktime: BN = new BN(0),
-    threshold: number = 1
+    threshold: number = 1,
+    fee: BN = new BN(0)
   ): Promise<UnsignedTx> => {
     const prefixes: object = {}
     toAddresses.map((address: string) => {
@@ -721,9 +722,8 @@ export class EVMAPI extends JRPCAPI {
         "Error - EVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length."
       )
     }
-    const fee: BN = this.getTxFee()
     const assetDescription: any = await this.getAssetDescription("AVAX")
-    const evmInputs: EVMInput[] = []
+    let evmInputs: EVMInput[] = []
     if (bintools.cb58Encode(assetDescription.assetID) === assetID) {
       const evmInput: EVMInput = new EVMInput(
         fromAddressHex,
@@ -734,7 +734,7 @@ export class EVMAPI extends JRPCAPI {
       evmInput.addSignatureIdx(0, bintools.stringToAddress(fromAddressBech))
       evmInputs.push(evmInput)
     } else {
-      // if asset id isn"t AVAX asset id then create 2 inputs
+      // if asset id isn't AVAX asset id then create 2 inputs
       // first input will be AVAX and will be for the amount of the fee
       // second input will be the ANT
       const evmAVAXInput: EVMInput = new EVMInput(
@@ -774,7 +774,8 @@ export class EVMAPI extends JRPCAPI {
     )
     exportedOuts.push(transferableOutput)
 
-    // lexicographically sort array
+    // lexicographically sort ins and outs
+    evmInputs = evmInputs.sort(EVMInput.comparator())
     exportedOuts = exportedOuts.sort(TransferableOutput.comparator())
 
     const exportTx: ExportTx = new ExportTx(
@@ -874,13 +875,10 @@ export class EVMAPI extends JRPCAPI {
   }
 
   /**
-   * returns the base fee for the next block.
-   *
-   * @returns Returns a Promise<string> containing the base fee for the next block.
+   * @returns a Promise<string> containing the base fee for the next block.
    */
   getBaseFee = async (): Promise<string> => {
     const params: string[] = []
-
     const method: string = "eth_baseFee"
     const path: string = "ext/bc/C/rpc"
     const response: RequestResponseData = await this.callMethod(
