@@ -659,7 +659,6 @@ export class EVMAPI extends JRPCAPI {
       networkID,
       bintools.cb58Decode(this.blockchainID),
       toAddress,
-      from,
       atomics,
       sourceChain,
       fee,

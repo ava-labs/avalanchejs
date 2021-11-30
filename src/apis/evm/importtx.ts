@@ -205,9 +205,10 @@ export class ImportTx extends EVMBaseTx {
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
-   * @param sourceChainID Optional chainID for the source inputs to import. Default platform chainid.
-   * @param importIns Array of [[TransferableInput]]s used in the transaction
+   * @param sourceChainID Optional chainID for the source inputs to import. Default Buffer.alloc(32, 16)
+   * @param importIns Optional array of [[TransferableInput]]s used in the transaction
    * @param outs Optional array of the [[EVMOutput]]s
+   * @param fee Optional the fee as a BN
    */
   constructor(
     networkID: number = DefaultNetworkID,

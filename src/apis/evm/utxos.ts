@@ -317,15 +317,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @param networkID The number representing NetworkID of the node
    * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
    * @param toAddress The address to send the funds
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param importIns An array of [[TransferableInput]]s being imported
    * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}. Fee will come from the inputs first, if they can.
    * @param feeAssetID Optional. The assetID of the fees being burned.
-   * @param memo Optional contains arbitrary bytes, up to 256 bytes
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
    * @returns An unsigned transaction created from the passed in parameters.
    *
    */
@@ -333,29 +328,30 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     networkID: number,
     blockchainID: Buffer,
     toAddress: string,
-    fromAddresses: Buffer[],
     atomics: UTXO[],
     sourceChain: Buffer = undefined,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined
   ): UnsignedTx => {
     const zero: BN = new BN(0)
+    const map: Map<string, string> = new Map()
+
     let ins: TransferableInput[] = []
     let outs: EVMOutput[] = []
+    let feepaid: BN = new BN(0)
 
     if (typeof fee === "undefined") {
       fee = zero.clone()
     }
 
-    let feepaid: BN = new BN(0)
-    const map: Map<string, string> = new Map()
+    // build a set of inputs which covers the fee
     atomics.forEach((atomic: UTXO): void => {
       const assetIDBuf: Buffer = atomic.getAssetID()
       const assetID: string = bintools.cb58Encode(atomic.getAssetID())
       const output: AmountOutput = atomic.getOutput() as AmountOutput
-      const amt: BN = output.getAmount().clone()
+      const amount: BN = output.getAmount().clone()
+      let infeeamount: BN = amount.clone()
 
-      let infeeamount: BN = amt.clone()
       if (
         typeof feeAssetID !== "undefined" &&
         fee.gt(zero) &&
@@ -373,7 +369,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
       const txid: Buffer = atomic.getTxID()
       const outputidx: Buffer = atomic.getOutputIdx()
-      const input: SECPTransferInput = new SECPTransferInput(amt)
+      const input: SECPTransferInput = new SECPTransferInput(amount)
       const xferin: TransferableInput = new TransferableInput(
         txid,
         outputidx,
