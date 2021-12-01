@@ -747,7 +747,9 @@ describe("Transactions", (): void => {
     txunew.fromBuffer(importbuff)
 
     expect(importTx).toBeInstanceOf(ImportTx)
-    expect(importTx.getSourceChain().toString("hex")).toBe(bintools.cb58Decode(PlatformChainID).toString("hex"))
+    expect(importTx.getSourceChain().toString("hex")).toBe(
+      bintools.cb58Decode(PlatformChainID).toString("hex")
+    )
     expect(txunew.toBuffer().toString("hex")).toBe(importbuff.toString("hex"))
     expect(txunew.toString()).toBe(importTx.toString())
     expect(importTx.getImportInputs().length).toBe(importIns.length)
@@ -782,7 +784,9 @@ describe("Transactions", (): void => {
     txunew.fromBuffer(exportbuff)
 
     expect(exportTx).toBeInstanceOf(ExportTx)
-    expect(exportTx.getDestinationChain().toString("hex")).toBe(bintools.cb58Decode(PlatformChainID).toString("hex"))
+    expect(exportTx.getDestinationChain().toString("hex")).toBe(
+      bintools.cb58Decode(PlatformChainID).toString("hex")
+    )
     expect(txunew.toBuffer().toString("hex")).toBe(exportbuff.toString("hex"))
     expect(txunew.toString()).toBe(exportTx.toString())
     expect(exportTx.getExportOutputs().length).toBe(exportOuts.length)

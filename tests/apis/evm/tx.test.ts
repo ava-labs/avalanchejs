@@ -4,7 +4,11 @@ import {
   SECPTransferInput,
   TransferableInput
 } from "../../../src/apis/evm"
-import { Defaults, MILLIAVAX, PlatformChainID } from "../../../src/utils/constants"
+import {
+  Defaults,
+  MILLIAVAX,
+  PlatformChainID
+} from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
 import { EVMOutput } from "../../../src/apis/evm"
 import BN from "bn.js"
@@ -94,7 +98,9 @@ describe("EVM Transactions", () => {
         evmOutputs
       )
       expect(importTx).toBeInstanceOf(ImportTx)
-      expect(importTx.getSourceChain().toString("hex")).toBe(bintools.cb58Decode(sourcechainID).toString("hex"))
+      expect(importTx.getSourceChain().toString("hex")).toBe(
+        bintools.cb58Decode(sourcechainID).toString("hex")
+      )
     })
 
     test("Multiple ANT EVMOutput fail", (): void => {
@@ -283,7 +289,9 @@ describe("EVM Transactions", () => {
         bintools.cb58Decode(PlatformChainID)
       )
       expect(exportTx).toBeInstanceOf(ExportTx)
-      expect(exportTx.getDestinationChain().toString("hex")).toBe(bintools.cb58Decode(PlatformChainID).toString("hex"))
+      expect(exportTx.getDestinationChain().toString("hex")).toBe(
+        bintools.cb58Decode(PlatformChainID).toString("hex")
+      )
     })
   })
 })
