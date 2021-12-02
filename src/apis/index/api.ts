@@ -32,7 +32,7 @@ export class IndexAPI extends JRPCAPI {
    * @param encoding
    * @param baseURL
    *
-   * @returns Returns a Promise<GetLastAcceptedResponse>.
+   * @returns Returns a Promise GetLastAcceptedResponse.
    */
   getLastAccepted = async (
     encoding: string = "cb58",
@@ -61,7 +61,7 @@ export class IndexAPI extends JRPCAPI {
    * @param encoding
    * @param baseURL
    *
-   * @returns Returns a Promise<GetContainerByIndexResponse>.
+   * @returns Returns a Promise GetContainerByIndexResponse.
    */
   getContainerByIndex = async (
     index: string = "0",
@@ -92,7 +92,7 @@ export class IndexAPI extends JRPCAPI {
    * @param encoding
    * @param baseURL
    *
-   * @returns Returns a Promise<GetContainerByIDResponse>.
+   * @returns Returns a Promise GetContainerByIDResponse.
    */
   getContainerByID = async (
     containerID: string = "0",
@@ -124,7 +124,7 @@ export class IndexAPI extends JRPCAPI {
    * @param encoding
    * @param baseURL
    *
-   * @returns Returns a Promise<GetContainerRangeResponse>.
+   * @returns Returns a Promise GetContainerRangeResponse.
    */
   getContainerRange = async (
     startIndex: number = 0,
@@ -157,7 +157,7 @@ export class IndexAPI extends JRPCAPI {
    * @param encoding
    * @param baseURL
    *
-   * @returns Returns a Promise<GetIndexResponse>.
+   * @returns Returns a Promise GetIndexResponse.
    */
   getIndex = async (
     containerID: string = "",
@@ -188,7 +188,7 @@ export class IndexAPI extends JRPCAPI {
    * @param encoding
    * @param baseURL
    *
-   * @returns Returns a Promise<GetIsAcceptedResponse>.
+   * @returns Returns a Promise GetIsAcceptedResponse.
    */
   isAccepted = async (
     containerID: string = "",
