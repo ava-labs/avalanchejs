@@ -97,6 +97,11 @@ export class ExportTx extends BaseTx {
   }
 
   /**
+   * Returns the destinationChain as a {@link https://github.com/feross/buffer|Buffer}
+   */
+  getDestinationChain = (): Buffer => this.destinationChain
+
+  /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.
    *
    * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ExportTx]]

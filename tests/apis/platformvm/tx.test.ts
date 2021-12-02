@@ -458,7 +458,7 @@ describe("Transactions", (): void => {
       bombtx.toBuffer()
     }).toThrow()
 
-    const importtx: ImportTx = new ImportTx(
+    const importTx: ImportTx = new ImportTx(
       netid,
       blockchainID,
       outputs,
@@ -468,12 +468,16 @@ describe("Transactions", (): void => {
       importIns
     )
     const txunew: ImportTx = new ImportTx()
-    const importbuff: Buffer = importtx.toBuffer()
+    const importbuff: Buffer = importTx.toBuffer()
     txunew.fromBuffer(importbuff)
 
+    expect(importTx).toBeInstanceOf(ImportTx)
+    expect(importTx.getSourceChain().toString("hex")).toBe(
+      bintools.cb58Decode(PlatformChainID).toString("hex")
+    )
     expect(txunew.toBuffer().toString("hex")).toBe(importbuff.toString("hex"))
-    expect(txunew.toString()).toBe(importtx.toString())
-    expect(importtx.getImportInputs().length).toBe(importIns.length)
+    expect(txunew.toString()).toBe(importTx.toString())
+    expect(importTx.getImportInputs().length).toBe(importIns.length)
   })
 
   test("Creation ExportTx", (): void => {
@@ -491,7 +495,7 @@ describe("Transactions", (): void => {
       bombtx.toBuffer()
     }).toThrow()
 
-    const exporttx: ExportTx = new ExportTx(
+    const exportTx: ExportTx = new ExportTx(
       netid,
       blockchainID,
       outputs,
@@ -501,12 +505,16 @@ describe("Transactions", (): void => {
       exportOuts
     )
     const txunew: ExportTx = new ExportTx()
-    const exportbuff: Buffer = exporttx.toBuffer()
+    const exportbuff: Buffer = exportTx.toBuffer()
     txunew.fromBuffer(exportbuff)
 
+    expect(exportTx).toBeInstanceOf(ExportTx)
+    expect(exportTx.getDestinationChain().toString("hex")).toBe(
+      bintools.cb58Decode(PlatformChainID).toString("hex")
+    )
     expect(txunew.toBuffer().toString("hex")).toBe(exportbuff.toString("hex"))
-    expect(txunew.toString()).toBe(exporttx.toString())
-    expect(exporttx.getExportOutputs().length).toBe(exportOuts.length)
+    expect(txunew.toString()).toBe(exportTx.toString())
+    expect(exportTx.getExportOutputs().length).toBe(exportOuts.length)
   })
 
   test("Creation Tx1 with asof, locktime, threshold", (): void => {

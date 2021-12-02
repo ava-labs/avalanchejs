@@ -67,7 +67,7 @@ export class ExportTx extends EVMBaseTx {
   protected exportedOutputs: TransferableOutput[] = []
 
   /**
-   * Returns the destinationChain of the input as {@link https://github.com/feross/buffer|Buffer}
+   * Returns the destinationChain as a {@link https://github.com/feross/buffer|Buffer}
    */
   getDestinationChain = (): Buffer => this.destinationChain
 
