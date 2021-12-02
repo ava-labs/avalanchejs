@@ -119,6 +119,13 @@ export class ImportTx extends BaseTx {
   }
 
   /**
+   * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
+   */
+  getSourceChain = (): Buffer => {
+    return this.sourceChain
+  }
+
+  /**
    * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
    *
    * @param msg A Buffer for the [[UnsignedTx]]
