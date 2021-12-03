@@ -20,6 +20,7 @@ import { getPreferredHRP } from "./utils/helperfunctions"
  * let avalanche = new AvalancheCore("127.0.0.1", 9650, "https")
  * ```
  *
+ *
  */
 export default class AvalancheCore {
   protected networkID: number = 0
@@ -42,7 +43,7 @@ export default class AvalancheCore {
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", etc. Defaults to http
    * The following special characters are removed from host and protocol
-   * &#,@+()$~%'":*?<>{}
+   * &#,@+()$~%'":*?{} also less than and greater than signs
    */
   setAddress = (
     host: string,

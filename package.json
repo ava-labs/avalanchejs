@@ -13,7 +13,7 @@
     "test": "jest",
     "test-watch": "jest --watch",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
-    "docsmd": "npx typedoc --readme none --plugin typedoc-plugin-markdown,typedoc-plugin-external-module-name --theme markdown --out docsMD src",
+    "docsmd": "rm -rf docsMD && yarn build && npx typedoc --readme none --plugin typedoc-plugin-markdown,typedoc-plugin-external-module-name --theme markdown --out docsMD src",
     "docs": "yarn docshtml && yarn docsmd",
     "prettier-src": "prettier --write ./src",
     "prettier-examples": "prettier --write ./examples",

@@ -307,7 +307,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Retrieves an assetID for a subnet"s staking assset.
    *
-   * @returns Returns a Promise<string> with cb58 encoded value of the assetID.
+   * @returns Returns a Promise string with cb58 encoded value of the assetID.
    */
   getStakingAssetID = async (): Promise<string> => {
     const response: RequestResponseData = await this.callMethod(
@@ -382,7 +382,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param height The P-Chain height to get the validator set at.
    * @param subnetID Optional. A cb58 serialized string for the SubnetID or its alias.
    *
-   * @returns Promise<GetValidatorsAtResponse>
+   * @returns Promise GetValidatorsAtResponse
    */
   getValidatorsAt = async (
     height: number,
@@ -844,7 +844,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
    *
-   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   * @returns A Promise string representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
     let Transaction = ""
@@ -1054,7 +1054,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param txid The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string | ErrorResponseObject> containing the bytes retrieved from the node
+   * @returns Returns a Promise string or ErrorResponseObject containing the bytes retrieved from the node
    */
   getTx = async (txid: string): Promise<string | ErrorResponseObject> => {
     const params: any = {
@@ -1075,7 +1075,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param txid The string representation of the transaction ID
    * @param includeReason Return the reason tx was dropped, if applicable. Defaults to true
    *
-   * @returns Returns a Promise<string> containing the status retrieved from the node and the reason a tx was dropped, if applicable.
+   * @returns Returns a Promise string containing the status retrieved from the node and the reason a tx was dropped, if applicable.
    */
   getTxStatus = async (
     txid: string,
