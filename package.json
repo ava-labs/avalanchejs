@@ -88,7 +88,7 @@
     "elliptic": "6.5.4",
     "ethers": "5.5.1",
     "hdkey": "2.0.1",
-    "isomorphic-dompurify": "^0.16.0",
+    "isomorphic-dompurify": "^0.17.0",
     "isomorphic-ws": "4.0.1",
     "store2": "2.12.0",
     "stream-browserify": "3.0.0",
