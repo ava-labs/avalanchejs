@@ -1,9 +1,14 @@
 import {
+  ExportTx,
   ImportTx,
   SECPTransferInput,
   TransferableInput
 } from "../../../src/apis/evm"
-import { Defaults, MILLIAVAX } from "../../../src/utils/constants"
+import {
+  Defaults,
+  MILLIAVAX,
+  PlatformChainID
+} from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
 import { EVMOutput } from "../../../src/apis/evm"
 import BN from "bn.js"
@@ -93,6 +98,9 @@ describe("EVM Transactions", () => {
         evmOutputs
       )
       expect(importTx).toBeInstanceOf(ImportTx)
+      expect(importTx.getSourceChain().toString("hex")).toBe(
+        bintools.cb58Decode(sourcechainID).toString("hex")
+      )
     })
 
     test("Multiple ANT EVMOutput fail", (): void => {
@@ -174,16 +182,18 @@ describe("EVM Transactions", () => {
         antAssetID
       )
       evmOutputs.push(evmOutput)
+      const baseFee: BN = new BN(25000000000)
       expect((): void => {
         new ImportTx(
           networkID,
           bintools.cb58Decode(blockchainID),
           bintools.cb58Decode(sourcechainID),
           importedIns,
-          evmOutputs
+          evmOutputs,
+          baseFee
         )
       }).toThrow(
-        "Error - 1000000 AVAX required for fee and only 0 AVAX provided"
+        "Error - 25000000000 nAVAX required for fee and only 0 nAVAX provided"
       )
     })
 
@@ -230,16 +240,18 @@ describe("EVM Transactions", () => {
         avaxAssetID
       )
       evmOutputs.push(evmOutput)
+      const baseFee: BN = new BN(25000000000)
       expect((): void => {
         new ImportTx(
           networkID,
           bintools.cb58Decode(blockchainID),
           bintools.cb58Decode(sourcechainID),
           importedIns,
-          evmOutputs
+          evmOutputs,
+          baseFee
         )
       }).toThrow(
-        "Error - 1000000 AVAX required for fee and only 507 AVAX provided"
+        "Error - 25000000000 nAVAX required for fee and only 507 nAVAX provided"
       )
     })
 
@@ -267,6 +279,19 @@ describe("EVM Transactions", () => {
         evmOutputs
       )
       expect(importTx).toBeInstanceOf(ImportTx)
+    })
+  })
+  describe("ExportTx", () => {
+    test("getDestinationChain", (): void => {
+      const exportTx: ExportTx = new ExportTx(
+        networkID,
+        bintools.cb58Decode(blockchainID),
+        bintools.cb58Decode(PlatformChainID)
+      )
+      expect(exportTx).toBeInstanceOf(ExportTx)
+      expect(exportTx.getDestinationChain().toString("hex")).toBe(
+        bintools.cb58Decode(PlatformChainID).toString("hex")
+      )
     })
   })
 })

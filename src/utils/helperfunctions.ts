@@ -13,7 +13,7 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
 import { PrivateKeyError, NodeIdError } from "../utils/errors"
-import { ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
+import { ExportTx, ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
 
 /**
  * @ignore
@@ -89,15 +89,25 @@ export function NodeIDStringToBuffer(pk: string): Buffer {
 }
 
 export function costImportTx(tx: UnsignedTx): number {
-  let cost: number = calcBytesCost(tx.toBuffer().byteLength)
+  let bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
   const importTx = tx.getTransaction() as ImportTx
-  importTx.getImportInputs().forEach((input: TransferableInput) => {
-    const inCost = input.getCost()
-    cost += inCost
+  importTx.getImportInputs().forEach((input: TransferableInput): void => {
+    const inCost: number = input.getCost()
+    bytesCost += inCost
   })
-  return cost
+  const fixedFee: number = 10000
+  return bytesCost + fixedFee
 }
 
 export function calcBytesCost(len: number): number {
-  return len * Defaults.network[1].C["txBytesGas"]
+  return len * Defaults.network[1].C.txBytesGas
+}
+
+export function costExportTx(tx: UnsignedTx): number {
+  const bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
+  const exportTx = tx.getTransaction() as ExportTx
+  const numSigs: number = exportTx.getInputs().length
+  const sigCost: number = numSigs * Defaults.network[1].C.costPerSignature
+  const fixedFee: number = 10000
+  return bytesCost + sigCost + fixedFee
 }

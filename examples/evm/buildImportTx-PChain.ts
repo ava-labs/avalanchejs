@@ -1,5 +1,8 @@
 import { Avalanche, BN } from "../../src"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
+import {
+  PlatformVMAPI,
+  KeyChain as PlatformVMKeyChain
+} from "../../src/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -19,16 +22,16 @@ const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
+const pchain: PlatformVMAPI = avalanche.PChain()
 const cchain: EVMAPI = avalanche.CChain()
-const xKeychain: AVMKeyChain = xchain.keyChain()
+const pKeychain: PlatformVMKeyChain = pchain.keyChain()
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 const cKeychain: EVMKeyChain = cchain.keyChain()
-xKeychain.importKey(privKey)
+pKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const xChainBlockchainId: string = Defaults.network[networkID].X.blockchainID
+const pChainBlockchainId: string = Defaults.network[networkID].P.blockchainID
 
 const main = async (): Promise<any> => {
   const baseFeeResponse: string = await cchain.getBaseFee()
@@ -36,14 +39,14 @@ const main = async (): Promise<any> => {
   let fee: BN = baseFee
   const evmUTXOResponse: any = await cchain.getUTXOs(
     cAddressStrings,
-    xChainBlockchainId
+    pChainBlockchainId
   )
   const utxoSet: UTXOSet = evmUTXOResponse.utxos
   let unsignedTx: UnsignedTx = await cchain.buildImportTx(
     utxoSet,
     cHexAddress,
     cAddressStrings,
-    xChainBlockchainId,
+    pChainBlockchainId,
     cAddressStrings,
     fee
   )
@@ -54,7 +57,7 @@ const main = async (): Promise<any> => {
     utxoSet,
     cHexAddress,
     cAddressStrings,
-    xChainBlockchainId,
+    pChainBlockchainId,
     cAddressStrings,
     fee
   )

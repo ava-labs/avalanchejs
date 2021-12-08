@@ -1,5 +1,8 @@
 import { Avalanche, BN } from "../../src"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
+import {
+  PlatformVMAPI,
+  KeyChain as PlatformKeyChain
+} from "../../src/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -18,21 +21,21 @@ const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
+const pchain: PlatformVMAPI = avalanche.PChain()
 const cchain: EVMAPI = avalanche.CChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-const xKeychain: AVMKeyChain = xchain.keyChain()
+const pKeychain: PlatformKeyChain = pchain.keyChain()
 const cKeychain: EVMKeyChain = cchain.keyChain()
-xKeychain.importKey(privKey)
+pKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
+const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const xChainBlockchainIdStr: string = Defaults.network[networkID].X.blockchainID
+const pChainBlockchainIdStr: string = Defaults.network[networkID].P.blockchainID
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const Web3 = require("web3")
 const path: string = "/ext/bc/C/rpc"
-const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
+const web3: any = new Web3(`${protocol}://${ip}:${port}${path}`)
 const threshold: number = 1
 
 const main = async (): Promise<any> => {
@@ -49,25 +52,25 @@ const main = async (): Promise<any> => {
   let unsignedTx: UnsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
-    xChainBlockchainIdStr,
+    pChainBlockchainIdStr,
     cHexAddress,
     cAddressStrings[0],
-    xAddressStrings,
+    pAddressStrings,
     nonce,
     locktime,
     threshold,
     fee
   )
   const exportCost: number = costExportTx(unsignedTx)
-  avaxAmount = balance.sub(baseFee.mul(new BN(exportCost)))
   fee = baseFee.mul(new BN(exportCost))
+  avaxAmount = balance.sub(fee)
   unsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
-    xChainBlockchainIdStr,
+    pChainBlockchainIdStr,
     cHexAddress,
     cAddressStrings[0],
-    xAddressStrings,
+    pAddressStrings,
     nonce,
     locktime,
     threshold,

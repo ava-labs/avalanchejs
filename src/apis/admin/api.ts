@@ -29,7 +29,7 @@ export class AdminAPI extends JRPCAPI {
    * the endpoint after /ext/
    * @param alias The API being aliased can now be called at ext/alias
    *
-   * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
+   * @returns Returns a Promise boolean containing success, true for success, false for failure.
    */
   alias = async (endpoint: string, alias: string): Promise<boolean> => {
     const params: AliasParams = {
@@ -52,7 +52,7 @@ export class AdminAPI extends JRPCAPI {
    * @param chain The blockchain’s ID
    * @param alias Can now be used in place of the blockchain’s ID (in API endpoints, for example)
    *
-   * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
+   * @returns Returns a Promise boolean containing success, true for success, false for failure.
    */
   aliasChain = async (chain: string, alias: string): Promise<boolean> => {
     const params: AliasChainParams = {
@@ -73,7 +73,7 @@ export class AdminAPI extends JRPCAPI {
    *
    * @param chain The blockchain’s ID
    *
-   * @returns Returns a Promise<string[]> containing aliases of the blockchain.
+   * @returns Returns a Promise string[] containing aliases of the blockchain.
    */
   getChainAliases = async (chain: string): Promise<string[]> => {
     const params: GetChainAliasesParams = {

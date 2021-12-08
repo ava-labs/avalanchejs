@@ -56,7 +56,7 @@ export class TransferableInput extends StandardTransferableInput {
    */
   getCost = (): number => {
     const numSigs: number = this.getInput().getSigIdxs().length
-    return numSigs * Defaults.network[1].C["costPerSignature"]
+    return numSigs * Defaults.network[1].C.costPerSignature
   }
 
   /**
