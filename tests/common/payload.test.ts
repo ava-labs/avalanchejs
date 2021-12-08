@@ -50,7 +50,7 @@ describe("Payload", (): void => {
     "magnet:?xt=urn:btih:c12fe1c06bba254a9dc9f519b335aa7c1367a88a"
 
   test("PayloadTypes", (): void => {
-    expect(() => {
+    expect((): void => {
       payloadTypes.select(867309)
     }).toThrow()
 
@@ -174,21 +174,21 @@ describe("Payload", (): void => {
   })
 
   test("XCHAINADDRPayload special cases", (): void => {
-    const addr: string = "X-" + bech
+    const addr: string = `X-${bech}`
     const pl: XCHAINADDRPayload = new XCHAINADDRPayload(addr, hrp)
     expect(pl.returnType(hrp)).toBe(addr)
     expect(pl.returnChainID()).toBe("X")
   })
 
   test("PCHAINADDRPayload special cases", (): void => {
-    const addr: string = "P-" + bech
+    const addr: string = `P-${bech}`
     const pl: PCHAINADDRPayload = new PCHAINADDRPayload(addr, hrp)
     expect(pl.returnType(hrp)).toBe(addr)
     expect(pl.returnChainID()).toBe("P")
   })
 
   test("CCHAINADDRPayload special cases", (): void => {
-    const addr: string = "C-" + bech
+    const addr: string = `C-${bech}`
     const pl: CCHAINADDRPayload = new CCHAINADDRPayload(addr, hrp)
     expect(pl.returnType(hrp)).toBe(addr)
     expect(pl.returnChainID()).toBe("C")
