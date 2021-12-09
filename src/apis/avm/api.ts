@@ -393,7 +393,7 @@ export class AVMAPI extends JRPCAPI {
    * ]
    * ```
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
+   * @returns Returns a Promise string containing the base 58 string representation of the ID of the newly created asset.
    */
   createFixedCapAsset = async (
     username: string,
@@ -448,7 +448,7 @@ export class AVMAPI extends JRPCAPI {
    * ]
    * ```
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
+   * @returns Returns a Promise string containing the base 58 string representation of the ID of the newly created asset.
    */
   createVariableCapAsset = async (
     username: string,
@@ -481,7 +481,7 @@ export class AVMAPI extends JRPCAPI {
    * @param to The address to assign the units of the minted asset
    * @param minters Addresses of the minters responsible for signing the transaction
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
+   * @returns Returns a Promise string containing the base 58 string representation of the unsigned transaction.
    */
   mint = async (
     username: string,
@@ -692,7 +692,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an b58 serialized string for the AssetID or its alias.
    *
-   * @returns Returns a Promise<object> with keys "name" and "symbol".
+   * @returns Returns a Promise object with keys "name" and "symbol".
    */
   getAssetDescription = async (
     assetID: Buffer | string
@@ -728,7 +728,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   * @returns Returns a Promise string containing the bytes retrieved from the node
    */
   getTx = async (txID: string): Promise<string> => {
     const params: GetTxParams = {
@@ -746,7 +746,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the status retrieved from the node
+   * @returns Returns a Promise string containing the status retrieved from the node
    */
   getTxStatus = async (txID: string): Promise<string> => {
     const params: GetTxStatusParams = {
@@ -1526,7 +1526,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
    *
-   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   * @returns A Promise string representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
     let Transaction = ""
