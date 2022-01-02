@@ -1,4 +1,5 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer, GenesisAsset, GenesisData } from "../../src"
+import { InitialStates } from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -18,8 +19,12 @@ import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults
+  Defaults,
+  Serialization
 } from "../../src/utils"
+
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 const ip: string = "localhost"
 const port: number = 61300
@@ -27,7 +32,6 @@ const protocol: string = "http"
 const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
-const bintools: BinTools = BinTools.getInstance()
 const pKeychain: KeyChain = pchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 pKeychain.importKey(privKey)
@@ -39,9 +43,32 @@ const inputs: TransferableInput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually create a blockchain")
 
 const main = async (): Promise<any> => {
+  const assetAlias: string = "AssetAliasTest"
+  const name: string = "Test Asset"
+  const symbol: string = "TEST"
+  const denomination: number = 0
+  const amount: BN = new BN(507)
+  const vcapSecpOutput = new SECPTransferOutput(
+    amount,
+    pAddresses,
+    locktime,
+    threshold
+  )
+  const initialStates: InitialStates = new InitialStates()
+  initialStates.addOutput(vcapSecpOutput)
+  const memoStr: string = "from snowflake to avalanche"
+  const memo: Buffer = Buffer.from(memoStr, "utf8")
+  const genesisAsset = new GenesisAsset(assetAlias, name, symbol, denomination, initialStates, memo)
+  const genesisAssets: GenesisAsset[] = []
+  genesisAssets.push(genesisAsset)
+  const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
+  const c: string = serialization.bufferToType(genesisData.toBuffer(), "cb58")
+  console.log(c)
+  console.log(genesisData.toBuffer().toString('hex'))
+
+  // return false
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
   console.log(getBalanceResponse)
@@ -93,22 +120,22 @@ const main = async (): Promise<any> => {
   const chainName: string = "My new avm 4"
   const vmID: string = "avm"
   const fxIDs: Buffer[] = []
-  const genesisData: Buffer = bintools.cb58Decode(
-    "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
-  )
-  const createChainTx: CreateChainTx = new CreateChainTx(
-    networkID,
-    bintools.cb58Decode(pChainBlockchainID),
-    outputs,
-    inputs,
-    memo,
-    subnetID,
-    chainName,
-    vmID,
-    fxIDs,
-    genesisData
-  )
-  console.log(createChainTx)
+  // const genesisData: Buffer = bintools.cb58Decode(
+  //   "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
+  // )
+  // const createChainTx: CreateChainTx = new CreateChainTx(
+  //   networkID,
+  //   bintools.cb58Decode(pChainBlockchainID),
+  //   outputs,
+  //   inputs,
+  //   memo,
+  //   subnetID,
+  //   chainName,
+  //   vmID,
+  //   fxIDs,
+  //   genesisData
+  // )
+  // console.log(createChainTx.toBuffer().toString("hex"))
 
   // const unsignedTx: UnsignedTx = new UnsignedTx(createChainTx)
   // const tx: Tx = unsignedTx.sign(pKeychain)
