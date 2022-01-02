@@ -37,7 +37,7 @@ export class CreateChainTx extends BaseTx {
         "Buffer",
         "cb58"
       ),
-      exportOuts: this.exportOuts.map((e) => e.serialize(encoding))
+      // exportOuts: this.exportOuts.map((e) => e.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -115,7 +115,8 @@ export class CreateChainTx extends BaseTx {
       )
     }
     // this.numOuts.writeUInt32BE(this.exportOuts.length, 0)
-    let barr: Buffer[] = [super.toBuffer(), this.subnetID, this.numOuts]
+    let barr: Buffer[] = []
+    // let barr: Buffer[] = [super.toBuffer(), this.subnetID, this.numOuts]
     // this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator())
     // for (let i: number = 0; i < this.exportOuts.length; i++) {
     //   barr.push(this.exportOuts[`${i}`].toBuffer())
@@ -143,6 +144,9 @@ export class CreateChainTx extends BaseTx {
    * @param memo Optional {@link https://github.com/feross/buffer|Buffer} for the memo field
    * @param subnetID Optional ID of the Subnet that validates this blockchain.
    * @param chainName Optional A human readable name for the chain; need not be unique
+   * @param vmID Optional ID of the VM running on the new chain
+   * @param fxIDs Optional IDs of the feature extensions running on the new chain
+   * @param genesisData Optional Byte representation of genesis state of the new chain
    */
   constructor(
     networkID: number = DefaultNetworkID,
@@ -157,10 +161,20 @@ export class CreateChainTx extends BaseTx {
     genesisData: Buffer = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
-    this.subnetID = subnetID
-    this.chainName = chainName
-    this.vmID = vmID
-    this.fxIDs = fxIDs
-    this.genesisData = genesisData
+    if (typeof subnetID != "undefined") {
+      this.subnetID = subnetID
+    }
+    if (typeof chainName != "undefined") {
+      this.chainName = chainName
+    }
+    if (typeof vmID != "undefined") {
+      this.vmID = vmID
+    }
+    if (typeof fxIDs != "undefined") {
+      this.fxIDs = fxIDs
+    }
+    if (typeof genesisData != "undefined") {
+      this.genesisData = genesisData
+    }
   }
 }

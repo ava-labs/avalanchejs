@@ -40,6 +40,7 @@ const BECH32_ERROR_CODE: string = "1037"
 const EVM_FEE_ERROR_CODE: string = "1038"
 const INVALID_ENTROPY: string = "1039"
 const PROTOCOL_ERROR_CODE: string = "1040"
+const SUBNET_ID_ERROR_CODE: string = "1041"
 
 class AvalancheError extends Error {
   errorCode: string
@@ -345,6 +346,13 @@ export class ProtocolError extends AvalancheError {
   constructor(m: string) {
     super(m, PROTOCOL_ERROR_CODE)
     Object.setPrototypeOf(this, ProtocolError.prototype)
+  }
+}
+
+export class SubnetIdError extends AvalancheError {
+  constructor(m: string) {
+    super(m, SUBNET_ID_ERROR_CODE)
+    Object.setPrototypeOf(this, SubnetIdError.prototype)
   }
 }
 
