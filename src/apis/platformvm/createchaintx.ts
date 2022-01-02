@@ -58,10 +58,10 @@ export class CreateChainTx extends BaseTx {
   protected genesisData: Buffer = Buffer.alloc(32)
 
   /**
-   * Returns the id of the [[ExportTx]]
+   * Returns the id of the [[CreateChainTx]]
    */
   getTxType = (): number => {
-    return PlatformVMConstants.EXPORTTX
+    return PlatformVMConstants.CREATECHAINTX
   }
 
   /**
@@ -72,9 +72,9 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Returns the subnetID as a {@link https://github.com/feross/buffer|Buffer}
+   * Returns the subnetID as a string
    */
-  getSubnetID = (): Buffer => this.subnetID
+  getSubnetID = (): string => bintools.cb58Encode(this.subnetID)
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.
@@ -101,7 +101,7 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateChainTx]].
    */
   toBuffer(): Buffer {
     if (typeof this.subnetID === "undefined") {
@@ -109,14 +109,41 @@ export class CreateChainTx extends BaseTx {
         "CreateChainTx.toBuffer -- this.subnetID is undefined"
       )
     }
-    // this.numOuts.writeUInt32BE(this.exportOuts.length, 0)
-    let barr: Buffer[] = []
+    const superbuff: Buffer = super.toBuffer()
+
+    const chainNameBuff: Buffer = Buffer.alloc(this.chainName.length)
+    chainNameBuff.write(this.chainName, 0, this.chainName.length, "utf8")
+    const chainNameSize: Buffer = Buffer.alloc(2)
+    chainNameSize.writeUInt16BE(this.chainName.length, 0)
+
+    const vmIDBuff: Buffer = Buffer.alloc(this.vmID.length)
+    vmIDBuff.write(this.vmID, 0, this.vmID.length, "utf8")
+
+    const bsize: number =
+      superbuff.length +
+      this.subnetID.length +
+      chainNameSize.length +
+      chainNameBuff.length +
+      vmIDBuff.length
+
+    const barr: Buffer[] = [
+      superbuff,
+      this.subnetID,
+      chainNameSize,
+      chainNameBuff,
+      vmIDBuff
+    ]
+    // let barr: Buffer[] = [superbuff]
     // let barr: Buffer[] = [super.toBuffer(), this.subnetID, this.numOuts]
+
+    // this.numOuts.writeUInt32BE(this.exportOuts.length, 0)
+    // let barr: Buffer[] = []
     // this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator())
     // for (let i: number = 0; i < this.exportOuts.length; i++) {
     //   barr.push(this.exportOuts[`${i}`].toBuffer())
     // }
-    return Buffer.concat(barr)
+    return Buffer.concat(barr, bsize)
+    // return Buffer.concat(barr)
   }
 
   clone(): this {
@@ -149,15 +176,19 @@ export class CreateChainTx extends BaseTx {
     outs: TransferableOutput[] = undefined,
     ins: TransferableInput[] = undefined,
     memo: Buffer = undefined,
-    subnetID: Buffer = undefined,
+    subnetID: string | Buffer = undefined,
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: Buffer[] = undefined,
-    genesisData: Buffer = undefined
+    genesisData: string | Buffer = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof subnetID != "undefined") {
-      this.subnetID = subnetID
+      if (typeof subnetID === "string") {
+        this.subnetID = bintools.cb58Decode(subnetID)
+      } else {
+        this.subnetID = subnetID
+      }
     }
     if (typeof chainName != "undefined") {
       this.chainName = chainName
@@ -169,7 +200,11 @@ export class CreateChainTx extends BaseTx {
       this.fxIDs = fxIDs
     }
     if (typeof genesisData != "undefined") {
-      this.genesisData = genesisData
+      if (typeof genesisData === "string") {
+        this.genesisData = bintools.cb58Decode(genesisData)
+      } else {
+        this.genesisData = genesisData
+      }
     }
   }
 }
