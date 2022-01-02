@@ -1,4 +1,11 @@
-import { Avalanche, BinTools, BN, Buffer, GenesisAsset, GenesisData } from "../../src"
+import {
+  Avalanche,
+  BinTools,
+  BN,
+  Buffer,
+  GenesisAsset,
+  GenesisData
+} from "../../src"
 import { InitialStates } from "../../src/apis/avm"
 import {
   PlatformVMAPI,
@@ -60,13 +67,20 @@ const main = async (): Promise<any> => {
   initialStates.addOutput(vcapSecpOutput)
   const memoStr: string = "from snowflake to avalanche"
   const memo: Buffer = Buffer.from(memoStr, "utf8")
-  const genesisAsset = new GenesisAsset(assetAlias, name, symbol, denomination, initialStates, memo)
+  const genesisAsset = new GenesisAsset(
+    assetAlias,
+    name,
+    symbol,
+    denomination,
+    initialStates,
+    memo
+  )
   const genesisAssets: GenesisAsset[] = []
   genesisAssets.push(genesisAsset)
   const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
   const c: string = serialization.bufferToType(genesisData.toBuffer(), "cb58")
   console.log(c)
-  console.log(genesisData.toBuffer().toString('hex'))
+  console.log(genesisData.toBuffer().toString("hex"))
 
   // return false
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
