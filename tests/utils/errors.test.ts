@@ -46,16 +46,11 @@ import {
   SubnetIdError
 } from "src/utils"
 
-/**
- * @ignore
- */
-const bintools: BinTools = BinTools.getInstance()
-
 describe("Errors", (): void => {
   test("AvalancheError", (): void => {
     try {
       throw new AvalancheError("Testing AvalancheError", "0")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("0")
     }
     expect((): void => {
@@ -69,7 +64,7 @@ describe("Errors", (): void => {
   test("AddressError", (): void => {
     try {
       throw new AddressError("Testing AddressError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1000")
     }
     expect((): void => {
@@ -83,7 +78,7 @@ describe("Errors", (): void => {
   test("GooseEggCheckError", (): void => {
     try {
       throw new GooseEggCheckError("Testing GooseEggCheckError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1001")
     }
     expect((): void => {
@@ -97,7 +92,7 @@ describe("Errors", (): void => {
   test("ChainIdError", (): void => {
     try {
       throw new ChainIdError("Testing ChainIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1002")
     }
     expect((): void => {
@@ -111,7 +106,7 @@ describe("Errors", (): void => {
   test("NoAtomicUTXOsError", (): void => {
     try {
       throw new NoAtomicUTXOsError("Testing NoAtomicUTXOsError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1003")
     }
     expect((): void => {
@@ -125,7 +120,7 @@ describe("Errors", (): void => {
   test("SymbolError", (): void => {
     try {
       throw new SymbolError("Testing SymbolError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1004")
     }
     expect((): void => {
@@ -139,7 +134,7 @@ describe("Errors", (): void => {
   test("NameError", (): void => {
     try {
       throw new NameError("Testing NameError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1005")
     }
     expect((): void => {
@@ -153,7 +148,7 @@ describe("Errors", (): void => {
   test("TransactionError", (): void => {
     try {
       throw new TransactionError("Testing TransactionError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1006")
     }
     expect((): void => {
@@ -167,7 +162,7 @@ describe("Errors", (): void => {
   test("CodecIdError", (): void => {
     try {
       throw new CodecIdError("Testing CodecIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1007")
     }
     expect((): void => {
@@ -181,7 +176,7 @@ describe("Errors", (): void => {
   test("CredIdError", (): void => {
     try {
       throw new CredIdError("Testing CredIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1008")
     }
     expect((): void => {
@@ -195,7 +190,7 @@ describe("Errors", (): void => {
   test("TransferableOutputError", (): void => {
     try {
       throw new TransferableOutputError("Testing TransferableOutputError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1009")
     }
     expect((): void => {
@@ -209,7 +204,7 @@ describe("Errors", (): void => {
   test("TransferableInputError", (): void => {
     try {
       throw new TransferableInputError("Testing TransferableInputError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1010")
     }
     expect((): void => {
@@ -223,7 +218,7 @@ describe("Errors", (): void => {
   test("InputIdError", (): void => {
     try {
       throw new InputIdError("Testing InputIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1011")
     }
     expect((): void => {
@@ -237,7 +232,7 @@ describe("Errors", (): void => {
   test("OperationError", (): void => {
     try {
       throw new OperationError("Testing OperationError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1012")
     }
     expect((): void => {
@@ -251,7 +246,7 @@ describe("Errors", (): void => {
   test("InvalidOperationIdError", (): void => {
     try {
       throw new InvalidOperationIdError("Testing InvalidOperationIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1013")
     }
     expect((): void => {
@@ -265,7 +260,7 @@ describe("Errors", (): void => {
   test("ChecksumError", (): void => {
     try {
       throw new ChecksumError("Testing ChecksumError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1014")
     }
     expect((): void => {
@@ -279,7 +274,7 @@ describe("Errors", (): void => {
   test("OutputIdError", (): void => {
     try {
       throw new OutputIdError("Testing OutputIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1015")
     }
     expect((): void => {
@@ -293,7 +288,7 @@ describe("Errors", (): void => {
   test("UTXOError", (): void => {
     try {
       throw new UTXOError("Testing UTXOError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1016")
     }
     expect((): void => {
@@ -307,7 +302,7 @@ describe("Errors", (): void => {
   test("InsufficientFundsError", (): void => {
     try {
       throw new InsufficientFundsError("Testing InsufficientFundsError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1017")
     }
     expect((): void => {
@@ -321,7 +316,7 @@ describe("Errors", (): void => {
   test("ThresholdError", (): void => {
     try {
       throw new ThresholdError("Testing ThresholdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1018")
     }
     expect((): void => {
@@ -335,7 +330,7 @@ describe("Errors", (): void => {
   test("SECPMintOutputError", (): void => {
     try {
       throw new SECPMintOutputError("Testing SECPMintOutputError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1019")
     }
     expect((): void => {
@@ -349,7 +344,7 @@ describe("Errors", (): void => {
   test("EVMInputError", (): void => {
     try {
       throw new EVMInputError("Testing EVMInputError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1020")
     }
     expect((): void => {
@@ -363,7 +358,7 @@ describe("Errors", (): void => {
   test("EVMOutputError", (): void => {
     try {
       throw new EVMOutputError("Testing EVMOutputError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1021")
     }
     expect((): void => {
@@ -377,7 +372,7 @@ describe("Errors", (): void => {
   test("FeeAssetError", (): void => {
     try {
       throw new FeeAssetError("Testing FeeAssetError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1022")
     }
     expect((): void => {
@@ -391,7 +386,7 @@ describe("Errors", (): void => {
   test("StakeError", (): void => {
     try {
       throw new StakeError("Testing StakeError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1023")
     }
     expect((): void => {
@@ -405,7 +400,7 @@ describe("Errors", (): void => {
   test("TimeError", (): void => {
     try {
       throw new TimeError("Testing TimeError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1024")
     }
     expect((): void => {
@@ -419,7 +414,7 @@ describe("Errors", (): void => {
   test("DelegationFeeError", (): void => {
     try {
       throw new DelegationFeeError("Testing DelegationFeeError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1025")
     }
     expect((): void => {
@@ -433,7 +428,7 @@ describe("Errors", (): void => {
   test("SubnetOwnerError", (): void => {
     try {
       throw new SubnetOwnerError("Testing SubnetOwnerError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1026")
     }
     expect((): void => {
@@ -447,7 +442,7 @@ describe("Errors", (): void => {
   test("BufferSizeError", (): void => {
     try {
       throw new BufferSizeError("Testing BufferSizeError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1027")
     }
     expect((): void => {
@@ -461,7 +456,7 @@ describe("Errors", (): void => {
   test("AddressIndexError", (): void => {
     try {
       throw new AddressIndexError("Testing AddressIndexError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1028")
     }
     expect((): void => {
@@ -475,7 +470,7 @@ describe("Errors", (): void => {
   test("PublicKeyError", (): void => {
     try {
       throw new PublicKeyError("Testing PublicKeyError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1029")
     }
     expect((): void => {
@@ -489,7 +484,7 @@ describe("Errors", (): void => {
   test("MergeRuleError", (): void => {
     try {
       throw new MergeRuleError("Testing MergeRuleError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1030")
     }
     expect((): void => {
@@ -503,7 +498,7 @@ describe("Errors", (): void => {
   test("Base58Error", (): void => {
     try {
       throw new Base58Error("Testing Base58Error")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1031")
     }
     expect((): void => {
@@ -517,7 +512,7 @@ describe("Errors", (): void => {
   test("PrivateKeyError", (): void => {
     try {
       throw new PrivateKeyError("Testing PrivateKeyError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1032")
     }
     expect((): void => {
@@ -531,7 +526,7 @@ describe("Errors", (): void => {
   test("NodeIdError", (): void => {
     try {
       throw new NodeIdError("Testing NodeIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1033")
     }
     expect((): void => {
@@ -545,7 +540,7 @@ describe("Errors", (): void => {
   test("HexError", (): void => {
     try {
       throw new HexError("Testing HexError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1034")
     }
     expect((): void => {
@@ -559,7 +554,7 @@ describe("Errors", (): void => {
   test("TypeIdError", (): void => {
     try {
       throw new TypeIdError("Testing TypeIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1035")
     }
     expect((): void => {
@@ -573,7 +568,7 @@ describe("Errors", (): void => {
   test("TypeNameError", (): void => {
     try {
       throw new TypeNameError("Testing TypeNameError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1042")
     }
     expect((): void => {
@@ -587,7 +582,7 @@ describe("Errors", (): void => {
   test("UnknownTypeError", (): void => {
     try {
       throw new UnknownTypeError("Testing UnknownTypeError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1036")
     }
     expect((): void => {
@@ -601,7 +596,7 @@ describe("Errors", (): void => {
   test("Bech32Error", (): void => {
     try {
       throw new Bech32Error("Testing Bech32Error")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1037")
     }
     expect((): void => {
@@ -615,7 +610,7 @@ describe("Errors", (): void => {
   test("EVMFeeError", (): void => {
     try {
       throw new EVMFeeError("Testing EVMFeeError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1038")
     }
     expect((): void => {
@@ -629,7 +624,7 @@ describe("Errors", (): void => {
   test("InvalidEntropy", (): void => {
     try {
       throw new InvalidEntropy("Testing InvalidEntropy")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1039")
     }
     expect((): void => {
@@ -643,7 +638,7 @@ describe("Errors", (): void => {
   test("ProtocolError", (): void => {
     try {
       throw new ProtocolError("Testing ProtocolError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1040")
     }
     expect((): void => {
@@ -657,7 +652,7 @@ describe("Errors", (): void => {
   test("SubnetIdError", (): void => {
     try {
       throw new SubnetIdError("Testing SubnetIdError")
-    } catch (error) {
+    } catch (error: any) {
       expect(error.getCode()).toBe("1041")
     }
     expect((): void => {
