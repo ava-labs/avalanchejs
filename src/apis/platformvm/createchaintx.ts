@@ -1,6 +1,6 @@
 /**
  * @packageDocumentation
- * @module API-PlatformVM-ExportTx
+ * @module API-PlatformVM-CreateChainTx
  */
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
@@ -65,6 +65,11 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
+   * Returns the subnetID as a string
+   */
+  getSubnetID = (): string => bintools.cb58Encode(this.subnetID)
+
+  /**
    * Returns a string of the chainName
    */
   getChainName(): string {
@@ -72,16 +77,32 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Returns the subnetID as a string
+   * Returns a string of the vmID
    */
-  getSubnetID = (): string => bintools.cb58Encode(this.subnetID)
+  getVMID(): string {
+    return this.vmID
+  }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.
+   * Returns an array of fxIDs as Buffers
+   */
+  getFXIDs(): Buffer[] {
+    return this.fxIDs
+  }
+
+  /**
+   * Returns a string of the genesisData
+   */
+  getGenesisData(): string {
+    return bintools.cb58Encode(this.genesisData)
+  }
+
+  /**
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[CreateChainTx]], parses it, populates the class, and returns the length of the [[CreateChainTx]] in bytes.
    *
-   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[ExportTx]]
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[CreateChainTx]]
    *
-   * @returns The length of the raw [[ExportTx]]
+   * @returns The length of the raw [[CreateChainTx]]
    *
    * @remarks assume not-checksummed
    */
@@ -157,7 +178,7 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Class representing an unsigned Export transaction.
+   * Class representing an unsigned CreateChain transaction.
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)

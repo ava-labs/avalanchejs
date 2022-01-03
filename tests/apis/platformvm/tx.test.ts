@@ -24,12 +24,16 @@ import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import { CreateChainTx } from "src/apis/platformvm"
+import exp from "constants"
 
-/**
- * @ignore
- */
-const bintools: BinTools = BinTools.getInstance()
 describe("Transactions", (): void => {
+  /**
+   * @ignore
+   */
+  const bintools: BinTools = BinTools.getInstance()
+
+  const networkID: number = 12345
   let set: UTXOSet
   let keymgr1: KeyChain
   let keymgr2: KeyChain
@@ -187,9 +191,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
-
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("266")
@@ -227,7 +228,6 @@ describe("Transactions", (): void => {
 
   test("confirm inputTotal, outputTotal and fee are correct", async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     // AVAX assetID
     const assetID: Buffer = bintools.cb58Decode(
@@ -274,8 +274,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create small BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network X Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -313,8 +311,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create large BaseTx that is Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -352,8 +348,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create large BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -596,5 +590,52 @@ describe("Transactions", (): void => {
     const tx2: Tx = new Tx()
     tx2.fromBuffer(tx.toBuffer())
     expect(tx.toBuffer().toString("hex")).toBe(tx2.toBuffer().toString("hex"))
+  })
+
+  describe("CreateChainTx", (): void => {
+    const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
+    const memoStr: string = "from snowflake to avalanche"
+    const memo: Buffer = Buffer.from(memoStr, "utf8")
+    const subnetID: Buffer = bintools.cb58Decode(
+      "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
+    )
+    const chainName: string = "My new avm 4"
+    const vmID: string = "avm"
+    const fxIDs: Buffer[] = []
+    const genesisData: Buffer = bintools.cb58Decode(
+      "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
+    )
+    const createChainTx: CreateChainTx = new CreateChainTx(
+      networkID,
+      bintools.cb58Decode(pChainBlockchainID),
+      outputs,
+      inputs,
+      memo,
+      subnetID,
+      chainName,
+      vmID,
+      fxIDs,
+      genesisData
+    )
+    test("getTxType", (): void => {
+      const txType: number = createChainTx.getTxType()
+      expect(txType).toBe(PlatformVMConstants.CREATECHAINTX)
+    })
+    test("getSubnetID", (): void => {
+      const subnetID: string = createChainTx.getSubnetID()
+      expect(subnetID).toBe("24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1")
+    })
+    test("getVMID", (): void => {
+      const vmID: string = createChainTx.getVMID()
+      expect(vmID).toBe("avm")
+    })
+    test("getFXIDs", (): void => {
+      // const fxIDs: Buffer[] = createChainTx.getFXIDs()
+      // expect(fxIDs).toBe([])
+    })
+    test("getGenesisData", (): void => {
+      const genesisData: string = createChainTx.getGenesisData()
+      expect(genesisData).toBe("111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi")
+    })
   })
 })
