@@ -10,7 +10,6 @@ import { TransferableInput } from "./inputs"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import BN from "bn.js"
-import { AmountOutput } from "../platformvm/outputs"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { SubnetIdError, TransferableOutputError } from "../../utils/errors"
 
@@ -125,11 +124,6 @@ export class CreateChainTx extends BaseTx {
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateChainTx]].
    */
   toBuffer(): Buffer {
-    if (typeof this.subnetID === "undefined") {
-      throw new SubnetIdError(
-        "CreateChainTx.toBuffer -- this.subnetID is undefined"
-      )
-    }
     const superbuff: Buffer = super.toBuffer()
 
     const chainNameBuff: Buffer = Buffer.alloc(this.chainName.length)
@@ -168,9 +162,9 @@ export class CreateChainTx extends BaseTx {
   }
 
   clone(): this {
-    let newbase: CreateChainTx = new CreateChainTx()
-    newbase.fromBuffer(this.toBuffer())
-    return newbase as this
+    const newCreateChainTx: CreateChainTx = new CreateChainTx()
+    newCreateChainTx.fromBuffer(this.toBuffer())
+    return newCreateChainTx as this
   }
 
   create(...args: any[]): this {

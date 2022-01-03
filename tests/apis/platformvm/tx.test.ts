@@ -594,17 +594,15 @@ describe("Transactions", (): void => {
 
   describe("CreateChainTx", (): void => {
     const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
+    const genesisDataStr: string = "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
+    const subnetIDStr: string = "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
     const memoStr: string = "from snowflake to avalanche"
     const memo: Buffer = Buffer.from(memoStr, "utf8")
-    const subnetID: Buffer = bintools.cb58Decode(
-      "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
-    )
-    const chainName: string = "My new avm 4"
-    const vmID: string = "avm"
+    const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
+    const chainNameStr: string = "My new avm 4"
+    const vmIDStr: string = "avm"
     const fxIDs: Buffer[] = []
-    const genesisData: Buffer = bintools.cb58Decode(
-      "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
-    )
+    const genesisData: Buffer = bintools.cb58Decode(genesisDataStr)
     const createChainTx: CreateChainTx = new CreateChainTx(
       networkID,
       bintools.cb58Decode(pChainBlockchainID),
@@ -612,8 +610,8 @@ describe("Transactions", (): void => {
       inputs,
       memo,
       subnetID,
-      chainName,
-      vmID,
+      chainNameStr,
+      vmIDStr,
       fxIDs,
       genesisData
     )
@@ -623,13 +621,15 @@ describe("Transactions", (): void => {
     })
     test("getSubnetID", (): void => {
       const subnetID: string = createChainTx.getSubnetID()
-      expect(subnetID).toBe(
-        "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
-      )
+      expect(subnetID).toBe(subnetIDStr)
     })
     test("getVMID", (): void => {
       const vmID: string = createChainTx.getVMID()
-      expect(vmID).toBe("avm")
+      expect(vmID).toBe(vmIDStr)
+    })
+    test("getChainName", (): void => {
+      const chainName: string = createChainTx.getChainName()
+      expect(chainName).toBe(chainNameStr)
     })
     test("getFXIDs", (): void => {
       // const fxIDs: Buffer[] = createChainTx.getFXIDs()
@@ -637,9 +637,7 @@ describe("Transactions", (): void => {
     })
     test("getGenesisData", (): void => {
       const genesisData: string = createChainTx.getGenesisData()
-      expect(genesisData).toBe(
-        "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
-      )
+      expect(genesisData).toBe(genesisDataStr)
     })
   })
 })
