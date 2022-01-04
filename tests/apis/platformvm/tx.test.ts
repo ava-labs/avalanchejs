@@ -16,7 +16,7 @@ import {
   TransferableOutput
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
-import { Avalanche } from "../../../src/index"
+import { Avalanche, GenesisData } from "../../../src/index"
 import { UTF8Payload } from "../../../src/utils/payload"
 import { UnixNow } from "../../../src/utils/helperfunctions"
 import { BaseTx } from "../../../src/apis/platformvm/basetx"
@@ -603,8 +603,9 @@ describe("Transactions", (): void => {
     const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
     const chainNameStr: string = "My new avm 4"
     const vmIDStr: string = "avm"
-    const fxIDs: Buffer[] = []
-    const genesisData: Buffer = bintools.cb58Decode(genesisDataStr)
+    const fxIDs: string[] = ["secp256k1fx"]
+    const gd: GenesisData = new GenesisData()
+    gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
     const createChainTx: CreateChainTx = new CreateChainTx(
       networkID,
       bintools.cb58Decode(pChainBlockchainID),
@@ -615,7 +616,7 @@ describe("Transactions", (): void => {
       chainNameStr,
       vmIDStr,
       fxIDs,
-      genesisData
+      gd
     )
     test("getTxType", (): void => {
       const txType: number = createChainTx.getTxType()
@@ -626,7 +627,7 @@ describe("Transactions", (): void => {
       expect(subnetID).toBe(subnetIDStr)
     })
     test("getVMID", (): void => {
-      const vmID: string = createChainTx.getVMID()
+      const vmID: Buffer = createChainTx.getVMID()
       expect(vmID).toBe(vmIDStr)
     })
     test("getChainName", (): void => {

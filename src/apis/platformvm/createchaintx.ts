@@ -12,6 +12,7 @@ import { DefaultNetworkID } from "../../utils/constants"
 import BN from "bn.js"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { SubnetIdError, TransferableOutputError } from "../../utils/errors"
+import { GenesisData } from "../avm"
 
 /**
  * @ignore
@@ -52,7 +53,8 @@ export class CreateChainTx extends BaseTx {
 
   protected subnetID: Buffer = Buffer.alloc(32)
   protected chainName: string = ""
-  protected vmID: string = ""
+  protected vmID: Buffer = Buffer.alloc(32)
+  protected numFXIDs: Buffer = Buffer.alloc(4)
   protected fxIDs: Buffer[] = []
   protected genesisData: Buffer = Buffer.alloc(32)
 
@@ -76,9 +78,9 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Returns a string of the vmID
+   * Returns a Buffer of the vmID
    */
-  getVMID(): string {
+  getVMID(): Buffer {
     return this.vmID
   }
 
@@ -131,32 +133,37 @@ export class CreateChainTx extends BaseTx {
     const chainNameSize: Buffer = Buffer.alloc(2)
     chainNameSize.writeUInt16BE(this.chainName.length, 0)
 
-    const vmIDBuff: Buffer = Buffer.alloc(this.vmID.length)
-    vmIDBuff.write(this.vmID, 0, this.vmID.length, "utf8")
-
-    const bsize: number =
+    let bsize: number =
       superbuff.length +
       this.subnetID.length +
       chainNameSize.length +
       chainNameBuff.length +
-      vmIDBuff.length
+      this.vmID.length +
+      this.numFXIDs.length
 
     const barr: Buffer[] = [
       superbuff,
       this.subnetID,
       chainNameSize,
       chainNameBuff,
-      vmIDBuff
+      this.vmID,
+      this.numFXIDs
     ]
-    // let barr: Buffer[] = [superbuff]
-    // let barr: Buffer[] = [super.toBuffer(), this.subnetID, this.numOuts]
 
-    // this.numOuts.writeUInt32BE(this.exportOuts.length, 0)
-    // let barr: Buffer[] = []
-    // this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator())
-    // for (let i: number = 0; i < this.exportOuts.length; i++) {
-    //   barr.push(this.exportOuts[`${i}`].toBuffer())
-    // }
+    this.fxIDs.forEach((fxID: Buffer): void => {
+      bsize += fxID.length
+      barr.push(fxID)
+    })
+
+    bsize += 4
+    console.log(this.genesisData.length)
+    bsize += this.genesisData.length
+    const gdLength: Buffer = Buffer.alloc(4)
+    gdLength.writeUInt32BE(this.genesisData.length, 0)
+    console.log(gdLength)
+    barr.push(gdLength)
+    console.log(this.genesisData)
+    barr.push(this.genesisData)
     return Buffer.concat(barr, bsize)
     // return Buffer.concat(barr)
   }
@@ -194,8 +201,8 @@ export class CreateChainTx extends BaseTx {
     subnetID: string | Buffer = undefined,
     chainName: string = undefined,
     vmID: string = undefined,
-    fxIDs: Buffer[] = undefined,
-    genesisData: string | Buffer = undefined
+    fxIDs: string[] = undefined,
+    genesisData: GenesisData = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof subnetID != "undefined") {
@@ -209,16 +216,28 @@ export class CreateChainTx extends BaseTx {
       this.chainName = chainName
     }
     if (typeof vmID != "undefined") {
-      this.vmID = vmID
+      const buf: Buffer = Buffer.alloc(32)
+      buf.write(vmID, 0, vmID.length)
+      this.vmID = buf
     }
     if (typeof fxIDs != "undefined") {
-      this.fxIDs = fxIDs
+      this.numFXIDs.writeUInt32BE(fxIDs.length, 0)
+      const fxIDBufs: Buffer[] = []
+      fxIDs.forEach(((fxID: string): void => {
+        if (fxID === "secp256k1fx") {
+          const buf: Buffer = Buffer.alloc(32)
+          buf.write(fxID, 0, fxID.length, "utf8")
+          fxIDBufs.push(buf)
+        }
+        // TODO - support NFT, Property and any future feature extensions
+      }))
+      this.fxIDs = fxIDBufs
     }
     if (typeof genesisData != "undefined") {
       if (typeof genesisData === "string") {
         this.genesisData = bintools.cb58Decode(genesisData)
       } else {
-        this.genesisData = genesisData
+        this.genesisData = genesisData.toBuffer()
       }
     }
   }
