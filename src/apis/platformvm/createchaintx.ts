@@ -117,7 +117,8 @@ export class CreateChainTx extends BaseTx {
       .readUInt16BE(0)
     offset += 2
 
-    this.chainName = bintools.copyFrom(bytes, offset, offset + chainNameSize)
+    this.chainName = bintools
+      .copyFrom(bytes, offset, offset + chainNameSize)
       .toString("utf8")
     offset += chainNameSize
 
@@ -139,7 +140,11 @@ export class CreateChainTx extends BaseTx {
       .readUInt32BE(0)
     offset += 4
 
-    this.genesisData = bintools.copyFrom(bytes, offset, offset + genesisDataSize)
+    this.genesisData = bintools.copyFrom(
+      bytes,
+      offset,
+      offset + genesisDataSize
+    )
     offset += genesisDataSize
 
     // TODO - Add SubnetAuth
