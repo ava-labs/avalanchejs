@@ -111,14 +111,39 @@ export class CreateChainTx extends BaseTx {
     offset = super.fromBuffer(bytes, offset)
     this.subnetID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
-    // this.numOuts = bintools.copyFrom(bytes, offset, offset + 4)
-    // offset += 4
-    // const numOuts: number = this.numOuts.readUInt32BE(0)
-    // for (let i: number = 0; i < numOuts; i++) {
-    //   const anOut: TransferableOutput = new TransferableOutput()
-    //   offset = anOut.fromBuffer(bytes, offset)
-    //   this.exportOuts.push(anOut)
-    // }
+
+    const chainNameSize: number = bintools
+      .copyFrom(bytes, offset, offset + 2)
+      .readUInt16BE(0)
+    offset += 2
+
+    this.chainName = bintools.copyFrom(bytes, offset, offset + chainNameSize)
+      .toString("utf8")
+    offset += chainNameSize
+
+    this.vmID = bintools.copyFrom(bytes, offset, offset + 32)
+    offset += 32
+
+    this.numFXIDs = bintools.copyFrom(bytes, offset, offset + 4)
+    offset += 4
+
+    const nfxids: number = parseInt(this.numFXIDs.toString("hex"), 10)
+
+    for (let i: number = 0; i < nfxids; i++) {
+      this.fxIDs.push(bintools.copyFrom(bytes, offset, offset + 32))
+      offset += 32
+    }
+
+    const genesisDataSize: number = bintools
+      .copyFrom(bytes, offset, offset + 4)
+      .readUInt32BE(0)
+    offset += 4
+
+    this.genesisData = bintools.copyFrom(bytes, offset, offset + genesisDataSize)
+    offset += genesisDataSize
+
+    // TODO - Add SubnetAuth
+
     return offset
   }
 
@@ -161,6 +186,9 @@ export class CreateChainTx extends BaseTx {
     gdLength.writeUIntBE(this.genesisData.length, 0, 4)
     barr.push(gdLength)
     barr.push(this.genesisData)
+
+    // TODO - Add SubnetAuth
+
     return Buffer.concat(barr, bsize)
   }
 
