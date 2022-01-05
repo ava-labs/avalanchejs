@@ -131,7 +131,7 @@ export class CreateChainTx extends BaseTx {
     const chainNameBuff: Buffer = Buffer.alloc(this.chainName.length)
     chainNameBuff.write(this.chainName, 0, this.chainName.length, "utf8")
     const chainNameSize: Buffer = Buffer.alloc(2)
-    chainNameSize.writeUInt16BE(this.chainName.length, 0)
+    chainNameSize.writeUIntBE(this.chainName.length, 0, 2)
 
     let bsize: number =
       superbuff.length +
@@ -156,16 +156,12 @@ export class CreateChainTx extends BaseTx {
     })
 
     bsize += 4
-    console.log(this.genesisData.length)
     bsize += this.genesisData.length
     const gdLength: Buffer = Buffer.alloc(4)
-    gdLength.writeUInt32BE(this.genesisData.length, 0)
-    console.log(gdLength)
+    gdLength.writeUIntBE(this.genesisData.length, 0, 4)
     barr.push(gdLength)
-    console.log(this.genesisData)
     barr.push(this.genesisData)
     return Buffer.concat(barr, bsize)
-    // return Buffer.concat(barr)
   }
 
   clone(): this {
