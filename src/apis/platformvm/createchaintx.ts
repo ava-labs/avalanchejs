@@ -223,22 +223,15 @@ export class CreateChainTx extends BaseTx {
     if (typeof fxIDs != "undefined") {
       this.numFXIDs.writeUInt32BE(fxIDs.length, 0)
       const fxIDBufs: Buffer[] = []
-      fxIDs.forEach(((fxID: string): void => {
-        if (fxID === "secp256k1fx") {
-          const buf: Buffer = Buffer.alloc(32)
-          buf.write(fxID, 0, fxID.length, "utf8")
-          fxIDBufs.push(buf)
-        }
-        // TODO - support NFT, Property and any future feature extensions
-      }))
+      fxIDs.forEach((fxID: string): void => {
+        const buf: Buffer = Buffer.alloc(32)
+        buf.write(fxID, 0, fxID.length, "utf8")
+        fxIDBufs.push(buf)
+      })
       this.fxIDs = fxIDBufs
     }
     if (typeof genesisData != "undefined") {
-      if (typeof genesisData === "string") {
-        this.genesisData = bintools.cb58Decode(genesisData)
-      } else {
-        this.genesisData = genesisData.toBuffer()
-      }
+      this.genesisData = genesisData.toBuffer()
     }
   }
 }
