@@ -199,10 +199,12 @@ export class CreateChainTx extends BaseTx {
     bsize += 4
     barr.push(numIndicesBuf)
 
-    this.subnetAuth.getAddressIndices().forEach((addressIndex: Buffer): void => {
-      bsize += 4
-      barr.push(addressIndex)
-    })
+    this.subnetAuth
+      .getAddressIndices()
+      .forEach((addressIndex: Buffer): void => {
+        bsize += 4
+        barr.push(addressIndex)
+      })
 
     return Buffer.concat(barr, bsize)
   }
