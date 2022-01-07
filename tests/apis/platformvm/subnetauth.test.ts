@@ -8,14 +8,13 @@ describe("SubnetAuth", (): void => {
   const addresses: Buffer[] = [address1, address2]
   const subnetAuth1: SubnetAuth = new SubnetAuth(addresses)
   const subnetAuth2: SubnetAuth = new SubnetAuth()
-  console.log(subnetAuth1)
 
   test("getters", (): void => {
     const typeName: string = subnetAuth1.getTypeName()
     const typeID: number = subnetAuth1.getTypeID()
     const numAddressIndices: number = subnetAuth1.getNumAddressIndices()
     expect(typeName).toBe("SubnetAuth")
-    // expect(numAddressIndices).toBe(2)
+    expect(numAddressIndices).toBe(2)
     expect(typeID).toBe(10)
   })
 
