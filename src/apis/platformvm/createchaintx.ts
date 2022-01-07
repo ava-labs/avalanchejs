@@ -13,6 +13,7 @@ import BN from "bn.js"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { SubnetIdError, TransferableOutputError } from "../../utils/errors"
 import { GenesisData } from "../avm"
+import { SubnetAuth } from "."
 
 /**
  * @ignore
@@ -57,6 +58,7 @@ export class CreateChainTx extends BaseTx {
   protected numFXIDs: Buffer = Buffer.alloc(4)
   protected fxIDs: Buffer[] = []
   protected genesisData: Buffer = Buffer.alloc(32)
+  protected subnetAuth: SubnetAuth
 
   /**
    * Returns the id of the [[CreateChainTx]]
@@ -192,7 +194,15 @@ export class CreateChainTx extends BaseTx {
     barr.push(gdLength)
     barr.push(this.genesisData)
 
-    // TODO - Add SubnetAuth
+    const numIndicesBuf: Buffer = Buffer.alloc(4)
+    numIndicesBuf.writeUIntBE(this.subnetAuth.getNumAddressIndices(), 0, 4)
+    bsize += 4
+    barr.push(numIndicesBuf)
+
+    this.subnetAuth.getAddressIndices().forEach((addressIndex: Buffer): void => {
+      bsize += 4
+      barr.push(addressIndex)
+    })
 
     return Buffer.concat(barr, bsize)
   }
@@ -220,6 +230,7 @@ export class CreateChainTx extends BaseTx {
    * @param vmID Optional ID of the VM running on the new chain
    * @param fxIDs Optional IDs of the feature extensions running on the new chain
    * @param genesisData Optional Byte representation of genesis state of the new chain
+   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something.
    */
   constructor(
     networkID: number = DefaultNetworkID,
@@ -231,7 +242,8 @@ export class CreateChainTx extends BaseTx {
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: string[] = undefined,
-    genesisData: GenesisData = undefined
+    genesisData: GenesisData = undefined,
+    subnetAuth: SubnetAuth = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof subnetID != "undefined") {
@@ -260,6 +272,10 @@ export class CreateChainTx extends BaseTx {
       this.fxIDs = fxIDBufs
     }
     if (typeof genesisData != "undefined") {
+      this.genesisData = genesisData.toBuffer()
+    }
+
+    if (typeof subnetAuth != "undefined") {
       this.genesisData = genesisData.toBuffer()
     }
   }

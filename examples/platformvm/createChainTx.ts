@@ -6,7 +6,11 @@ import {
   GenesisAsset,
   GenesisData
 } from "../../src"
-import { InitialStates } from "../../src/apis/avm"
+import {
+  AVMAPI,
+  InitialStates,
+  KeyChain as AVMKeyChain
+} from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -20,7 +24,8 @@ import {
   UnsignedTx,
   CreateChainTx,
   Tx,
-  SECPOwnerOutput
+  SECPOwnerOutput,
+  SubnetAuth
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
 import {
@@ -34,7 +39,7 @@ const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 const ip: string = "localhost"
-const port: number = 54570
+const port: number = 60319
 const protocol: string = "http"
 const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
@@ -80,9 +85,9 @@ const main = async (): Promise<any> => {
   const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
   const c: string = serialization.bufferToType(genesisData.toBuffer(), "cb58")
   // console.log(c)
+  // return false
   // console.log(genesisData.toBuffer().toString("hex"))
 
-  // return false
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
   // console.log(getBalanceResponse)
@@ -123,20 +128,15 @@ const main = async (): Promise<any> => {
     }
   })
 
-  const subnetOwner: SECPOwnerOutput = new SECPOwnerOutput(
-    pAddresses,
-    locktime,
-    threshold
-  )
   const subnetID: Buffer = bintools.cb58Decode(
     "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
   )
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
   const fxIDs: string[] = ["secp256k1fx"]
-  // const genesisData: Buffer = bintools.cb58Decode(
-  //   "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
-  // )
+  const addressIndex: Buffer = Buffer.alloc(4)
+  addressIndex.writeUIntBE(0x0, 0, 4)
+  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
   const createChainTx: CreateChainTx = new CreateChainTx(
     networkID,
     bintools.cb58Decode(pChainBlockchainID),
@@ -147,15 +147,14 @@ const main = async (): Promise<any> => {
     chainName,
     vmID,
     fxIDs,
-    genesisData
+    genesisData,
+    subnetAuth
   )
-  // console.log(createChainTx.toBuffer().toString("hex"))
-
   const unsignedTx: UnsignedTx = new UnsignedTx(createChainTx)
   console.log(unsignedTx.toBuffer().toString("hex"))
-  // const tx: Tx = unsignedTx.sign(pKeychain)
-  // const txid: string = await pchain.issueTx(tx)
-  // console.log(`Success! TXID: ${txid}`)
+  const tx: Tx = unsignedTx.sign(pKeychain)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
 
 main()
