@@ -17,3 +17,4 @@ Example scripts for the Avalanche [PlatformVM RPC](https://docs.avax.network/bui
 * [getStake.ts](./getStake.ts)
 * [getValidatorsAt.ts](./getValidatorsAt.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
+* [subnetAuth.ts](./subnetAuth.ts)
