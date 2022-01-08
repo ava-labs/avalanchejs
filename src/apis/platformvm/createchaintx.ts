@@ -194,17 +194,8 @@ export class CreateChainTx extends BaseTx {
     barr.push(gdLength)
     barr.push(this.genesisData)
 
-    const numIndicesBuf: Buffer = Buffer.alloc(4)
-    numIndicesBuf.writeUIntBE(this.subnetAuth.getNumAddressIndices(), 0, 4)
-    bsize += 4
-    barr.push(numIndicesBuf)
-
-    this.subnetAuth
-      .getAddressIndices()
-      .forEach((addressIndex: Buffer): void => {
-        bsize += 4
-        barr.push(addressIndex)
-      })
+    bsize += this.subnetAuth.toBuffer().length
+    barr.push(this.subnetAuth.toBuffer())
 
     return Buffer.concat(barr, bsize)
   }
@@ -278,7 +269,7 @@ export class CreateChainTx extends BaseTx {
     }
 
     if (typeof subnetAuth != "undefined") {
-      this.genesisData = genesisData.toBuffer()
+      this.subnetAuth = subnetAuth
     }
   }
 }
