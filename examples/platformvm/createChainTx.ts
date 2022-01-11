@@ -24,7 +24,6 @@ import {
   UnsignedTx,
   CreateChainTx,
   Tx,
-  SECPOwnerOutput,
   SubnetAuth
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
@@ -39,9 +38,9 @@ const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 const ip: string = "localhost"
-const port: number = 60319
+const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
@@ -85,12 +84,10 @@ const main = async (): Promise<any> => {
   const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
   const c: string = serialization.bufferToType(genesisData.toBuffer(), "cb58")
   // console.log(c)
-  // return false
   // console.log(genesisData.toBuffer().toString("hex"))
 
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
-  // console.log(getBalanceResponse)
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
@@ -129,7 +126,7 @@ const main = async (): Promise<any> => {
   })
 
   const subnetID: Buffer = bintools.cb58Decode(
-    "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
+    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
   )
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
@@ -151,7 +148,6 @@ const main = async (): Promise<any> => {
     subnetAuth
   )
   const unsignedTx: UnsignedTx = new UnsignedTx(createChainTx)
-  console.log(unsignedTx.toBuffer().toString("hex"))
   const tx: Tx = unsignedTx.sign(pKeychain)
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)

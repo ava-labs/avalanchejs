@@ -7,13 +7,15 @@ import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
+import { Credential, SigIdx, Signature } from "../../common/credentials"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import BN from "bn.js"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { SubnetIdError, TransferableOutputError } from "../../utils/errors"
 import { GenesisData } from "../avm"
-import { SubnetAuth } from "."
+import { SelectCredentialClass, SubnetAuth } from "."
+import { KeyChain, KeyPair } from "./keychain"
 
 /**
  * @ignore
@@ -208,6 +210,33 @@ export class CreateChainTx extends BaseTx {
 
   create(...args: any[]): this {
     return new CreateChainTx(...args) as this
+  }
+
+  /**
+   * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
+   *
+   * @param msg A Buffer for the [[UnsignedTx]]
+   * @param kc An [[KeyChain]] used in signing
+   *
+   * @returns An array of [[Credential]]s
+   */
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const sigs: Credential[] = super.sign(msg, kc)
+    for (let i: number = 0; i < this.ins.length; i++) {
+      const cred: Credential = SelectCredentialClass(
+        this.ins[`${i}`].getInput().getCredentialID()
+      )
+      const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
+      for (let j: number = 0; j < sigidxs.length; j++) {
+        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
+      }
+      sigs.push(cred)
+    }
+    return sigs
   }
 
   /**
