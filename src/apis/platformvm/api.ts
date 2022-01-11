@@ -223,7 +223,9 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getCreateSubnetTxFee = (): BN => {
     return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["createSubnetTx"])
+      ? new BN(
+          Defaults.network[this.core.getNetworkID()]["P"]["createSubnetTx"]
+        )
       : new BN(0)
   }
 
