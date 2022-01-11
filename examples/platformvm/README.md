@@ -13,6 +13,7 @@ Example scripts for the Avalanche [PlatformVM RPC](https://docs.avax.network/bui
 * [createChainTx.ts](./createChainTx.ts)
 * [createSubnetTx.ts](./createSubnetTx.ts)
 * [exportTx-xchain.ts](./exportTx-xchain.ts)
+* [getBalance.ts](./getBalance.ts)
 * [getRewardUTXOs.ts](./getRewardUTXOs.ts)
 * [getStake.ts](./getStake.ts)
 * [getValidatorsAt.ts](./getValidatorsAt.ts)
