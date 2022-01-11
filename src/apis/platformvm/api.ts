@@ -217,6 +217,28 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * Gets the CreateSubnetTx fee.
+   *
+   * @returns The CreateSubnetTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateSubnetTxFee = (): BN => {
+    return this.core.getNetworkID() in Defaults.network
+      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["createSubnetTx"])
+      : new BN(0)
+  }
+
+  /**
+   * Gets the CreateChainTx fee.
+   *
+   * @returns The CreateChainTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateChainTxFee = (): BN => {
+    return this.core.getNetworkID() in Defaults.network
+      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["createChainTx"])
+      : new BN(0)
+  }
+
+  /**
    * Sets the tx fee for this chain.
    *
    * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
