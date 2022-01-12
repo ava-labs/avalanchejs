@@ -656,6 +656,8 @@ describe("Transactions", (): void => {
     const createChainTxBuf: Buffer = createChainTx.toBuffer()
     const createChainTx2: CreateChainTx = new CreateChainTx()
     createChainTx2.fromBuffer(createChainTxBuf)
-    expect(createChainTxBuf.toString("hex")).toMatch(createChainTx2.toBuffer().toString("hex"))
+    expect(createChainTxBuf.toString("hex")).toMatch(
+      createChainTx2.toBuffer().toString("hex")
+    )
   })
 })

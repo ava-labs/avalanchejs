@@ -68,7 +68,7 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Returns the subnetAuth 
+   * Returns the subnetAuth
    */
   getSubnetAuth = (): SubnetAuth => this.subnetAuth
 
@@ -155,10 +155,7 @@ export class CreateChainTx extends BaseTx {
     offset += genesisDataSize
 
     const sa: SubnetAuth = new SubnetAuth()
-    offset += sa.fromBuffer(bintools.copyFrom(
-      bytes,
-      offset
-    ))
+    offset += sa.fromBuffer(bintools.copyFrom(bytes, offset))
 
     this.subnetAuth = sa
 
