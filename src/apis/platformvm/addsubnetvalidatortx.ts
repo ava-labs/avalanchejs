@@ -15,6 +15,7 @@ import { GenesisData } from "../avm"
 import { SelectCredentialClass, SubnetAuth } from "."
 import { KeyChain, KeyPair } from "./keychain"
 import BN from "bn.js"
+import { bufferToNodeIDString } from "src/utils"
 
 /**
  * @ignore
@@ -68,9 +69,32 @@ export class AddSubnetValidatorTx extends BaseTx {
   }
 
   /**
-   * Returns the subnetAuth
+   * Returns a {@link https://github.com/feross/buffer|Buffer} for the stake amount.
    */
-  getSubnetAuth = (): SubnetAuth => this.subnetAuth
+  getNodeID(): Buffer {
+    return this.nodeID
+  }
+
+  /**
+   * Returns a string for the nodeID amount.
+   */
+  getNodeIDString(): string {
+    return bufferToNodeIDString(this.nodeID)
+  }
+
+  /**
+   * Returns a {@link https://github.com/indutny/bn.js/|BN} for the startTime.
+   */
+  getStartTime() {
+    return bintools.fromBufferToBN(this.startTime)
+  }
+
+  /**
+   * Returns a {@link https://github.com/indutny/bn.js/|BN} for the endTime.
+   */
+  getEndTime() {
+    return bintools.fromBufferToBN(this.endTime)
+  }
 
   /**
    * Returns the subnetID as a string
@@ -78,18 +102,9 @@ export class AddSubnetValidatorTx extends BaseTx {
   getSubnetID = (): string => bintools.cb58Encode(this.subnetID)
 
   /**
-   * Returns a Buffer of the startTime
+   * Returns the subnetAuth
    */
-  getStartTime(): Buffer {
-    return this.startTime
-  }
-
-  /**
-   * Returns a Buffer of the endTime
-   */
-  getEndTime(): Buffer {
-    return this.endTime
-  }
+  getSubnetAuth = (): SubnetAuth => this.subnetAuth
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[AddSubnetValidatorTx]], parses it, populates the class, and returns the length of the [[CreateChainTx]] in bytes.
