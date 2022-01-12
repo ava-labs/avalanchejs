@@ -10,9 +10,7 @@ import { TransferableInput } from "./inputs"
 import { Credential, SigIdx, Signature } from "../../common/credentials"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
-import BN from "bn.js"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
-import { SubnetIdError, TransferableOutputError } from "../../utils/errors"
 import { GenesisData } from "../avm"
 import { SelectCredentialClass, SubnetAuth } from "."
 import { KeyChain, KeyPair } from "./keychain"
@@ -68,6 +66,11 @@ export class CreateChainTx extends BaseTx {
   getTxType = (): number => {
     return PlatformVMConstants.CREATECHAINTX
   }
+
+  /**
+   * Returns the subnetAuth 
+   */
+  getSubnetAuth = (): SubnetAuth => this.subnetAuth
 
   /**
    * Returns the subnetID as a string
@@ -151,7 +154,13 @@ export class CreateChainTx extends BaseTx {
     )
     offset += genesisDataSize
 
-    // TODO - Add SubnetAuth
+    const sa: SubnetAuth = new SubnetAuth()
+    offset += sa.fromBuffer(bintools.copyFrom(
+      bytes,
+      offset
+    ))
+
+    this.subnetAuth = sa
 
     return offset
   }

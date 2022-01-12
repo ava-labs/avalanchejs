@@ -24,7 +24,7 @@ import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { CreateChainTx } from "src/apis/platformvm"
+import { CreateChainTx, SubnetAuth } from "src/apis/platformvm"
 import exp from "constants"
 
 describe("Transactions", (): void => {
@@ -76,6 +76,23 @@ describe("Transactions", (): void => {
   const symbol: string = "morT"
   const denomination: number = 8
   let avaxAssetID: Buffer
+  const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
+  const genesisDataStr: string =
+    "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
+  const subnetIDStr: string =
+    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
+  const memoStr: string = "from snowflake to avalanche"
+  const memo: Buffer = Buffer.from(memoStr, "utf8")
+  const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
+  const chainNameStr: string = "EPIC AVM"
+  const vmIDStr: string = "avm"
+  const fxIDsStr: string[] = ["secp256k1fx"]
+  const gd: GenesisData = new GenesisData()
+  gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
+  const addressIndex: Buffer = Buffer.alloc(4)
+  addressIndex.writeUIntBE(0x0, 0, 4)
+  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  let createChainTx: CreateChainTx = new CreateChainTx()
 
   beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(
@@ -188,6 +205,19 @@ describe("Transactions", (): void => {
       exportUTXOIDS.push(fungutxos[i].getUTXOID())
     }
     set.addArray(utxos)
+    createChainTx = new CreateChainTx(
+      networkID,
+      bintools.cb58Decode(pChainBlockchainID),
+      outputs,
+      inputs,
+      memo,
+      subnetID,
+      chainNameStr,
+      vmIDStr,
+      fxIDsStr,
+      gd,
+      subnetAuth
+    )
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {
@@ -592,55 +622,40 @@ describe("Transactions", (): void => {
     expect(tx.toBuffer().toString("hex")).toBe(tx2.toBuffer().toString("hex"))
   })
 
-  describe("CreateChainTx", (): void => {
-    const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
-    const genesisDataStr: string =
-      "111115LHK2ZCYttSKPmmhsTDSuKiCkmHz65nUS1YqybvjirwGLLt376k1RwnTt72WobPqrG7rmgrKVqSq6VxDsKXYGnRmfhdLCEhsYjMegZmu5L5wEQ6k1BHu1QN6jk8kfoLQfAnKAxv8t5PmGJUwmTyoHz9aoDpfwJfkzjLut3TSSHzVLzH5bPoc5fYMwKGA1Zaps4Byo6rPpAZgiDG1jokzLuVXFDMxiFSDGHHA7uB5Nx2qaywtUXtyTi7JMYMKQMcB2UQEZbpPB9QcHg88mA8uzT2i5YYSiT9uZpAUjd6cfNiPedBJqi5AdjtcAmHvhszCS7YurbVmB4sHEP3PMxyKAHMnQ8dyxefQCDPUpSGMFp6qzomuXQSQeTi"
-    const subnetIDStr: string =
-      "24tZhrm8j8GCJRE9PomW8FaeqbgGS4UAQjJnqqn8pq5NwYSYV1"
-    const memoStr: string = "from snowflake to avalanche"
-    const memo: Buffer = Buffer.from(memoStr, "utf8")
-    const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
-    const chainNameStr: string = "My new avm 4"
-    const vmIDStr: string = "avm"
-    const fxIDs: string[] = ["secp256k1fx"]
-    const gd: GenesisData = new GenesisData()
-    gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
-    const createChainTx: CreateChainTx = new CreateChainTx(
-      networkID,
-      bintools.cb58Decode(pChainBlockchainID),
-      outputs,
-      inputs,
-      memo,
-      subnetID,
-      chainNameStr,
-      vmIDStr,
-      fxIDs,
-      gd
-    )
-    test("getTxType", (): void => {
-      const txType: number = createChainTx.getTxType()
-      expect(txType).toBe(PlatformVMConstants.CREATECHAINTX)
+  test("getTxType", (): void => {
+    const txType: number = createChainTx.getTxType()
+    expect(txType).toBe(PlatformVMConstants.CREATECHAINTX)
+  })
+  test("getSubnetAuth", (): void => {
+    const sa: SubnetAuth = createChainTx.getSubnetAuth()
+    expect(subnetAuth).toBe(sa)
+  })
+  test("getSubnetID", (): void => {
+    const subnetID: string = createChainTx.getSubnetID()
+    expect(subnetID).toBe(subnetIDStr)
+  })
+  test("getVMID", (): void => {
+    const vmID: Buffer = createChainTx.getVMID()
+    expect(vmID.toString("utf8")).toMatch(vmIDStr)
+  })
+  test("getChainName", (): void => {
+    const chainName: string = createChainTx.getChainName()
+    expect(chainName).toBe(chainNameStr)
+  })
+  test("getFXIDs", (): void => {
+    const fxIDs: Buffer[] = createChainTx.getFXIDs()
+    fxIDs.forEach((fxID: Buffer): void => {
+      expect(fxID.toString("utf8")).toMatch(fxIDsStr[0])
     })
-    test("getSubnetID", (): void => {
-      const subnetID: string = createChainTx.getSubnetID()
-      expect(subnetID).toBe(subnetIDStr)
-    })
-    test("getVMID", (): void => {
-      const vmID: Buffer = createChainTx.getVMID()
-      expect(vmID).toBe(vmIDStr)
-    })
-    test("getChainName", (): void => {
-      const chainName: string = createChainTx.getChainName()
-      expect(chainName).toBe(chainNameStr)
-    })
-    test("getFXIDs", (): void => {
-      // const fxIDs: Buffer[] = createChainTx.getFXIDs()
-      // expect(fxIDs).toBe([])
-    })
-    test("getGenesisData", (): void => {
-      const genesisData: string = createChainTx.getGenesisData()
-      expect(genesisData).toBe(genesisDataStr)
-    })
+  })
+  test("getGenesisData", (): void => {
+    const genesisData: string = createChainTx.getGenesisData()
+    expect(genesisData).toBe(genesisDataStr)
+  })
+  test("fromBuffer", (): void => {
+    const createChainTxBuf: Buffer = createChainTx.toBuffer()
+    const createChainTx2: CreateChainTx = new CreateChainTx()
+    createChainTx2.fromBuffer(createChainTxBuf)
+    expect(createChainTxBuf.toString("hex")).toMatch(createChainTx2.toBuffer().toString("hex"))
   })
 })
