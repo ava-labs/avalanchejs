@@ -27,6 +27,8 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
+  GetCurrentValidatorsParams,
+  GetPendingValidatorsParams,
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
@@ -500,18 +502,23 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
    * cb58 serialized string for the SubnetID or its alias.
+   * @param nodeIDs Optional. An array of strings
    *
    * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
    *
    */
   getCurrentValidators = async (
-    subnetID: Buffer | string = undefined
+    subnetID: Buffer | string = undefined,
+    nodeIDs: string[] = undefined
   ): Promise<object> => {
-    const params: any = {}
+    const params: GetCurrentValidatorsParams = {}
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
     } else if (typeof subnetID !== "undefined") {
       params.subnetID = bintools.cb58Encode(subnetID)
+    }
+    if (typeof nodeIDs != "undefined" && nodeIDs.length > 0) {
+      params.nodeIDs = nodeIDs
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getCurrentValidators",
@@ -525,18 +532,23 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer}
    * or a cb58 serialized string for the SubnetID or its alias.
+   * @param nodeIDs Optional. An array of strings
    *
    * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
    *
    */
   getPendingValidators = async (
-    subnetID: Buffer | string = undefined
+    subnetID: Buffer | string = undefined,
+    nodeIDs: string[] = undefined
   ): Promise<object> => {
-    const params: any = {}
+    const params: GetPendingValidatorsParams = {}
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
     } else if (typeof subnetID !== "undefined") {
       params.subnetID = bintools.cb58Encode(subnetID)
+    }
+    if (typeof nodeIDs != "undefined" && nodeIDs.length > 0) {
+      params.nodeIDs = nodeIDs
     }
 
     const response: RequestResponseData = await this.callMethod(
