@@ -124,13 +124,7 @@ export class AddSubnetValidatorTx extends BaseTx {
   toBuffer(): Buffer {
     const superbuff: Buffer = super.toBuffer()
     const bsize: number =
-      superbuff.length +
-      20 +
-      8 +
-      8 +
-      8 +
-      32 +
-      this.subnetAuth.toBuffer().length
+      superbuff.length + 20 + 8 + 8 + 8 + 32 + this.subnetAuth.toBuffer().length
 
     const barr: Buffer[] = [
       superbuff,
@@ -145,7 +139,8 @@ export class AddSubnetValidatorTx extends BaseTx {
   }
 
   clone(): this {
-    const newAddSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
+    const newAddSubnetValidatorTx: AddSubnetValidatorTx =
+      new AddSubnetValidatorTx()
     newAddSubnetValidatorTx.fromBuffer(this.toBuffer())
     return newAddSubnetValidatorTx as this
   }
