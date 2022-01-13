@@ -1,5 +1,12 @@
+import BN from "bn.js"
 import { Buffer } from "buffer/"
 import { SubnetAuth } from "src/apis/platformvm"
+import BinTools from "src/utils/bintools"
+
+/**
+ * @ignore
+ */
+const bintools: BinTools = BinTools.getInstance()
 
 describe("SubnetAuth", (): void => {
   const address1: Buffer = Buffer.alloc(4)
@@ -11,11 +18,18 @@ describe("SubnetAuth", (): void => {
 
   test("getters", (): void => {
     const typeName: string = subnetAuth1.getTypeName()
-    const typeID: number = subnetAuth1.getTypeID()
-    const numAddressIndices: number = subnetAuth1.getNumAddressIndices()
     expect(typeName).toBe("SubnetAuth")
-    expect(numAddressIndices).toBe(2)
+
+    const typeID: number = subnetAuth1.getTypeID()
     expect(typeID).toBe(10)
+
+    const numAddressIndices: number = subnetAuth1.getNumAddressIndices()
+    expect(numAddressIndices).toBe(2)
+
+    const addressIndices: Buffer[] = subnetAuth1.getAddressIndices()
+    expect(Buffer.isBuffer(addressIndices[0])).toBeTruthy()
+    expect(bintools.fromBufferToBN(addressIndices[0]).toNumber()).toBe(0)
+    expect(bintools.fromBufferToBN(addressIndices[1]).toNumber()).toBe(1)
   })
 
   test("toBuffer", (): void => {

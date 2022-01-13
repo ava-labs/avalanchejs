@@ -65,10 +65,10 @@ export class SubnetAuth extends Serializable {
     numAddressIndices.writeIntBE(this.addressIndices.length, 0, 4)
     const barr: Buffer[] = [typeIDBuf, numAddressIndices]
     let bsize: number = typeIDBuf.length + numAddressIndices.length
-    for (let i: number = 0; i < this.addressIndices.length; i++) {
+    this.addressIndices.forEach((addressIndex: Buffer, i: number): void => {
       bsize += 4
       barr.push(this.addressIndices[`${i}`])
-    }
+    })
     return Buffer.concat(barr, bsize)
   }
 
@@ -76,7 +76,6 @@ export class SubnetAuth extends Serializable {
     super()
     if (typeof addressIndices !== "undefined") {
       this.numAddressIndices.writeUIntBE(addressIndices.length, 0, 4)
-      /* istanbul ignore next */
       this.addressIndices = addressIndices
     }
   }
