@@ -16,7 +16,7 @@ import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
 import { CreateChainTx, SubnetAuth } from "src/apis/platformvm"
 
-describe("FOOBARCreateChainTx", (): void => {
+describe("CreateChainTx", (): void => {
   /**
    * @ignore
    */

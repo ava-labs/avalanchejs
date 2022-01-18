@@ -14,7 +14,7 @@ import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { SelectCredentialClass, SubnetAuth } from "."
 import { KeyChain, KeyPair } from "./keychain"
 import BN from "bn.js"
-import { bufferToNodeIDString } from "src/utils"
+import { bufferToNodeIDString } from "../../utils"
 
 /**
  * @ignore
