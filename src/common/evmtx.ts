@@ -78,7 +78,6 @@ export abstract class EVMStandardBaseTx<
    */
   abstract getTxType(): number
 
-
   /**
    * Returns the NetworkID as a number
    */

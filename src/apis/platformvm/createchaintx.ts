@@ -72,7 +72,7 @@ export class CreateChainTx extends BaseTx {
    */
   getSubnetAuth(): SubnetAuth {
     return this.subnetAuth
-  } 
+  }
 
   /**
    * Returns the subnetID as a string

@@ -18,7 +18,10 @@ import {
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
 import { UTF8Payload } from "../../../src/utils/payload"
-import { NodeIDStringToBuffer, UnixNow } from "../../../src/utils/helperfunctions"
+import {
+  NodeIDStringToBuffer,
+  UnixNow
+} from "../../../src/utils/helperfunctions"
 import { BaseTx } from "../../../src/apis/platformvm/basetx"
 import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
@@ -71,7 +74,9 @@ describe("Transactions", (): void => {
   const port: number = 8080
   const protocol: string = "http"
   const nodeIDStr: string = "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
-  const nodeID: Buffer = NodeIDStringToBuffer("NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu")
+  const nodeID: Buffer = NodeIDStringToBuffer(
+    "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
+  )
   const startTime: BN = new BN(1641961736)
   const endTime: BN = new BN(1662307000)
   const weight: BN = new BN(20)

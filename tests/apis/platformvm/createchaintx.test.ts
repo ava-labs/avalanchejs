@@ -48,12 +48,7 @@ describe("FOOBARCreateChainTx", (): void => {
   const port: number = 8080
   const protocol: string = "http"
   const networkID: number = 12345
-  const avalanche: Avalanche = new Avalanche(
-    ip,
-    port,
-    protocol,
-    networkID
-  )
+  const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
   const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
   const genesisDataStr: string =
     "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
@@ -93,9 +88,7 @@ describe("FOOBARCreateChainTx", (): void => {
     const bn: BN = new BN(i)
     let length: number = 32
     let txid: Buffer = Buffer.from(
-      createHash("sha256")
-        .update(bintools.fromBNToBuffer(bn, length))
-        .digest()
+      createHash("sha256").update(bintools.fromBNToBuffer(bn, length)).digest()
     )
     length = 4
     let txidx: Buffer = Buffer.from(bintools.fromBNToBuffer(bn, length))
