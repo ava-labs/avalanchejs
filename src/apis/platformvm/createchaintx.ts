@@ -63,19 +63,23 @@ export class CreateChainTx extends BaseTx {
   /**
    * Returns the id of the [[CreateChainTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return PlatformVMConstants.CREATECHAINTX
   }
 
   /**
    * Returns the subnetAuth
    */
-  getSubnetAuth = (): SubnetAuth => this.subnetAuth
+  getSubnetAuth(): SubnetAuth {
+    return this.subnetAuth
+  } 
 
   /**
    * Returns the subnetID as a string
    */
-  getSubnetID = (): string => bintools.cb58Encode(this.subnetID)
+  getSubnetID(): string {
+    return bintools.cb58Encode(this.subnetID)
+  }
 
   /**
    * Returns a string of the chainName

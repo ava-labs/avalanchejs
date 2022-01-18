@@ -1,4 +1,3 @@
-import BN from "bn.js"
 import { Buffer } from "buffer/"
 import { SubnetAuth } from "src/apis/platformvm"
 import BinTools from "src/utils/bintools"

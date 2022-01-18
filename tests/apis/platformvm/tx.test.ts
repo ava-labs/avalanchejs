@@ -18,14 +18,13 @@ import {
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
 import { UTF8Payload } from "../../../src/utils/payload"
-import { UnixNow } from "../../../src/utils/helperfunctions"
+import { NodeIDStringToBuffer, UnixNow } from "../../../src/utils/helperfunctions"
 import { BaseTx } from "../../../src/apis/platformvm/basetx"
 import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { CreateChainTx, SubnetAuth } from "src/apis/platformvm"
-import exp from "constants"
+import { AddSubnetValidatorTx, SubnetAuth } from "src/apis/platformvm"
 
 describe("Transactions", (): void => {
   /**
@@ -71,6 +70,11 @@ describe("Transactions", (): void => {
   const ip: string = "127.0.0.1"
   const port: number = 8080
   const protocol: string = "http"
+  const nodeIDStr: string = "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
+  const nodeID: Buffer = NodeIDStringToBuffer("NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu")
+  const startTime: BN = new BN(1641961736)
+  const endTime: BN = new BN(1662307000)
+  const weight: BN = new BN(20)
   let avalanche: Avalanche
   const name: string = "Mortycoin is the dumb as a sack of hammers."
   const symbol: string = "morT"
@@ -92,7 +96,7 @@ describe("Transactions", (): void => {
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
-  let createChainTx: CreateChainTx = new CreateChainTx()
+  let addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
 
   beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(
@@ -205,17 +209,18 @@ describe("Transactions", (): void => {
       exportUTXOIDS.push(fungutxos[i].getUTXOID())
     }
     set.addArray(utxos)
-    createChainTx = new CreateChainTx(
+
+    addSubnetValidatorTx = new AddSubnetValidatorTx(
       networkID,
       bintools.cb58Decode(pChainBlockchainID),
       outputs,
       inputs,
       memo,
+      nodeID,
+      startTime,
+      endTime,
+      weight,
       subnetID,
-      chainNameStr,
-      vmIDStr,
-      fxIDsStr,
-      gd,
       subnetAuth
     )
   })
@@ -621,43 +626,30 @@ describe("Transactions", (): void => {
     tx2.fromBuffer(tx.toBuffer())
     expect(tx.toBuffer().toString("hex")).toBe(tx2.toBuffer().toString("hex"))
   })
-
-  test("getTxType", (): void => {
-    const txType: number = createChainTx.getTxType()
-    expect(txType).toBe(PlatformVMConstants.CREATECHAINTX)
+  test("addSubnetValidatorTx getBlockchainID", (): void => {
+    const blockchainIDBuf: Buffer = addSubnetValidatorTx.getBlockchainID()
+    const blockchainIDStr: string = bintools.cb58Encode(blockchainIDBuf)
+    expect(blockchainIDStr).toBe(pChainBlockchainID)
   })
-  test("getSubnetAuth", (): void => {
-    const sa: SubnetAuth = createChainTx.getSubnetAuth()
-    expect(subnetAuth).toBe(sa)
+  test("addSubnetValidatorTx getNodeID", (): void => {
+    const nodeIDBuf: Buffer = addSubnetValidatorTx.getNodeID()
+    const nIDStr: string = bintools.cb58Encode(nodeIDBuf)
+    expect(`NodeID-${nIDStr}`).toBe(nodeIDStr)
   })
-  test("getSubnetID", (): void => {
-    const subnetID: string = createChainTx.getSubnetID()
-    expect(subnetID).toBe(subnetIDStr)
+  test("addSubnetValidatorTx getStartTime", (): void => {
+    const startTimeBN: BN = addSubnetValidatorTx.getStartTime()
+    expect(startTimeBN.toNumber()).toEqual(startTime.toNumber())
   })
-  test("getVMID", (): void => {
-    const vmID: Buffer = createChainTx.getVMID()
-    expect(vmID.toString("utf8")).toMatch(vmIDStr)
+  test("addSubnetValidatorTx getEndTime", (): void => {
+    const endTimeBN: BN = addSubnetValidatorTx.getEndTime()
+    expect(endTimeBN.toNumber()).toEqual(endTime.toNumber())
   })
-  test("getChainName", (): void => {
-    const chainName: string = createChainTx.getChainName()
-    expect(chainName).toBe(chainNameStr)
+  test("addSubnetValidatorTx getWeight", (): void => {
+    const weightBN: BN = addSubnetValidatorTx.getWeight()
+    expect(weightBN.toNumber()).toEqual(weight.toNumber())
   })
-  test("getFXIDs", (): void => {
-    const fxIDs: Buffer[] = createChainTx.getFXIDs()
-    fxIDs.forEach((fxID: Buffer): void => {
-      expect(fxID.toString("utf8")).toMatch(fxIDsStr[0])
-    })
-  })
-  test("getGenesisData", (): void => {
-    const genesisData: string = createChainTx.getGenesisData()
-    expect(genesisData).toBe(genesisDataStr)
-  })
-  test("fromBuffer", (): void => {
-    const createChainTxBuf: Buffer = createChainTx.toBuffer()
-    const createChainTx2: CreateChainTx = new CreateChainTx()
-    createChainTx2.fromBuffer(createChainTxBuf)
-    expect(createChainTxBuf.toString("hex")).toMatch(
-      createChainTx2.toBuffer().toString("hex")
-    )
+  test("addSubnetValidatorTx getSubnetID", (): void => {
+    const sIDStr: string = addSubnetValidatorTx.getSubnetID()
+    expect(sIDStr).toBe(subnetIDStr)
   })
 })

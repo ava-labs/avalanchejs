@@ -63,7 +63,7 @@ export class AddSubnetValidatorTx extends BaseTx {
   /**
    * Returns the id of the [[AddSubnetValidatorTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return PlatformVMConstants.ADDSUBNETVALIDATORTX
   }
 
@@ -84,26 +84,36 @@ export class AddSubnetValidatorTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/indutny/bn.js/|BN} for the startTime.
    */
-  getStartTime() {
+  getStartTime(): BN {
     return bintools.fromBufferToBN(this.startTime)
   }
 
   /**
    * Returns a {@link https://github.com/indutny/bn.js/|BN} for the endTime.
    */
-  getEndTime() {
+  getEndTime(): BN {
     return bintools.fromBufferToBN(this.endTime)
+  }
+
+  /**
+   * Returns a {@link https://github.com/indutny/bn.js/|BN} for the weight
+   */
+  getWeight(): BN {
+    return bintools.fromBufferToBN(this.weight)
   }
 
   /**
    * Returns the subnetID as a string
    */
-  getSubnetID = (): string => bintools.cb58Encode(this.subnetID)
-
+  getSubnetID(): string {
+    return bintools.cb58Encode(this.subnetID)
+  }
   /**
    * Returns the subnetAuth
    */
-  getSubnetAuth = (): SubnetAuth => this.subnetAuth
+  getSubnetAuth(): SubnetAuth {
+    return this.subnetAuth
+  }
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[AddSubnetValidatorTx]], parses it, populates the class, and returns the length of the [[CreateChainTx]] in bytes.
