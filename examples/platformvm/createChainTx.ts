@@ -83,8 +83,6 @@ const main = async (): Promise<any> => {
   genesisAssets.push(genesisAsset)
   const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
   const c: string = serialization.bufferToType(genesisData.toBuffer(), "cb58")
-  // console.log(c)
-  // console.log(genesisData.toBuffer().toString("hex"))
 
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])

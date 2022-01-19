@@ -1292,7 +1292,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       }
     }
 
-
     const createChainTx: CreateChainTx = new CreateChainTx(
       networkID,
       blockchainID,
