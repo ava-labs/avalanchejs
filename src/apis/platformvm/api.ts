@@ -38,6 +38,8 @@ import {
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
+import { SubnetAuth } from "."
+import { GenesisData } from "../avm"
 
 /**
  * @ignore
@@ -1726,6 +1728,76 @@ return builtUnsignedTx
       owners,
       subnetOwnerThreshold,
       this.getCreationTxFee(),
+      avaxAssetID,
+      memo,
+      asOf
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  /**
+   * Build an unsigned [[CreateChainTx]].
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param subnetID Optional ID of the Subnet that validates this blockchain
+   * @param chainName Optional A human readable name for the chain; need not be unique
+   * @param vmID Optional ID of the VM running on the new chain
+   * @param fxIDs Optional IDs of the feature extensions running on the new chain
+   * @param genesisData Optional Byte representation of genesis state of the new chain
+   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildCreateChainTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    subnetID: string | Buffer = undefined,
+    chainName: string = undefined,
+    vmID: string = undefined,
+    fxIDs: string[] = undefined,
+    genesisData: GenesisData = undefined,
+    subnetAuth: SubnetAuth = undefined,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = UnixNow()
+  ): Promise<UnsignedTx> => {
+    const from: Buffer[] = this._cleanAddressArray(
+      fromAddresses,
+      "buildCreateChainTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(
+      changeAddresses,
+      "buildCreateChainTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+
+    const builtUnsignedTx: UnsignedTx = utxoset.buildCreateChainTx(
+      this.core.getNetworkID(),
+      bintools.cb58Decode(this.blockchainID),
+      from,
+      change,
+      subnetID,
+      chainName,
+      vmID,
+      fxIDs,
+      genesisData,
+      subnetAuth,
+      this.getCreateChainTxFee(),
       avaxAssetID,
       memo,
       asOf

@@ -45,6 +45,8 @@ import {
   FeeAssetError,
   TimeError
 } from "../../utils/errors"
+import { CreateChainTx, SubnetAuth } from "."
+import { GenesisData } from "../avm"
 
 /**
  * @ignore
@@ -1227,5 +1229,83 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       new SECPOwnerOutput(subnetOwnerAddresses, locktime, subnetOwnerThreshold)
     )
     return new UnsignedTx(UTx)
+  }
+
+  /**
+   * Build an unsigned [[CreateChainTx]].
+   *
+   * @param networkID Networkid, [[DefaultNetworkID]]
+   * @param blockchainID Blockchainid, default undefined
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+   * @param subnetID Optional ID of the Subnet that validates this blockchain
+   * @param chainName Optional A human readable name for the chain; need not be unique
+   * @param vmID Optional ID of the VM running on the new chain
+   * @param fxIDs Optional IDs of the feature extensions running on the new chain
+   * @param genesisData Optional Byte representation of genesis state of the new chain
+   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something
+   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   *
+   * @returns An unsigned CreateChainTx created from the passed in parameters.
+   */
+  buildCreateChainTx = (
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
+    subnetID: string | Buffer = undefined,
+    chainName: string = undefined,
+    vmID: string = undefined,
+    fxIDs: string[] = undefined,
+    genesisData: GenesisData = undefined,
+    subnetAuth: SubnetAuth = undefined,
+    fee: BN = undefined,
+    feeAssetID: Buffer = undefined,
+    memo: Buffer = undefined,
+    asOf: BN = UnixNow()
+  ): UnsignedTx => {
+    const zero: BN = new BN(0)
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+
+    if (this._feeCheck(fee, feeAssetID)) {
+      const aad: AssetAmountDestination = new AssetAmountDestination(
+        fromAddresses,
+        fromAddresses,
+        changeAddresses
+      )
+      aad.addAssetAmount(feeAssetID, zero, fee)
+      const minSpendableErr: Error = this.getMinimumSpendable(
+        aad,
+        asOf,
+        undefined,
+        undefined
+      )
+      if (typeof minSpendableErr === "undefined") {
+        ins = aad.getInputs()
+        outs = aad.getAllOutputs()
+      } else {
+        throw minSpendableErr
+      }
+    }
+
+
+    const createChainTx: CreateChainTx = new CreateChainTx(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      subnetID,
+      chainName,
+      vmID,
+      fxIDs,
+      genesisData,
+      subnetAuth
+    )
+    return new UnsignedTx(createChainTx)
   }
 }
