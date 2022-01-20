@@ -27,6 +27,8 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
+  GetCurrentValidatorsParams,
+  GetPendingValidatorsParams,
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
@@ -36,6 +38,8 @@ import {
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
+import { SubnetAuth } from "."
+import { GenesisData } from "../avm"
 
 /**
  * @ignore
@@ -214,6 +218,30 @@ export class PlatformVMAPI extends JRPCAPI {
       this.txFee = this.getDefaultTxFee()
     }
     return this.txFee
+  }
+
+  /**
+   * Gets the CreateSubnetTx fee.
+   *
+   * @returns The CreateSubnetTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateSubnetTxFee = (): BN => {
+    return this.core.getNetworkID() in Defaults.network
+      ? new BN(
+          Defaults.network[this.core.getNetworkID()]["P"]["createSubnetTx"]
+        )
+      : new BN(0)
+  }
+
+  /**
+   * Gets the CreateChainTx fee.
+   *
+   * @returns The CreateChainTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateChainTxFee = (): BN => {
+    return this.core.getNetworkID() in Defaults.network
+      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["createChainTx"])
+      : new BN(0)
   }
 
   /**
@@ -476,18 +504,23 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
    * cb58 serialized string for the SubnetID or its alias.
+   * @param nodeIDs Optional. An array of strings
    *
    * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
    *
    */
   getCurrentValidators = async (
-    subnetID: Buffer | string = undefined
+    subnetID: Buffer | string = undefined,
+    nodeIDs: string[] = undefined
   ): Promise<object> => {
-    const params: any = {}
+    const params: GetCurrentValidatorsParams = {}
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
     } else if (typeof subnetID !== "undefined") {
       params.subnetID = bintools.cb58Encode(subnetID)
+    }
+    if (typeof nodeIDs != "undefined" && nodeIDs.length > 0) {
+      params.nodeIDs = nodeIDs
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getCurrentValidators",
@@ -501,18 +534,23 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer}
    * or a cb58 serialized string for the SubnetID or its alias.
+   * @param nodeIDs Optional. An array of strings
    *
    * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
    *
    */
   getPendingValidators = async (
-    subnetID: Buffer | string = undefined
+    subnetID: Buffer | string = undefined,
+    nodeIDs: string[] = undefined
   ): Promise<object> => {
-    const params: any = {}
+    const params: GetPendingValidatorsParams = {}
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
     } else if (typeof subnetID !== "undefined") {
       params.subnetID = bintools.cb58Encode(subnetID)
+    }
+    if (typeof nodeIDs != "undefined" && nodeIDs.length > 0) {
+      params.nodeIDs = nodeIDs
     }
 
     const response: RequestResponseData = await this.callMethod(
@@ -1690,6 +1728,76 @@ return builtUnsignedTx
       owners,
       subnetOwnerThreshold,
       this.getCreationTxFee(),
+      avaxAssetID,
+      memo,
+      asOf
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  /**
+   * Build an unsigned [[CreateChainTx]].
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param subnetID Optional ID of the Subnet that validates this blockchain
+   * @param chainName Optional A human readable name for the chain; need not be unique
+   * @param vmID Optional ID of the VM running on the new chain
+   * @param fxIDs Optional IDs of the feature extensions running on the new chain
+   * @param genesisData Optional Byte representation of genesis state of the new chain
+   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildCreateChainTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    subnetID: string | Buffer = undefined,
+    chainName: string = undefined,
+    vmID: string = undefined,
+    fxIDs: string[] = undefined,
+    genesisData: GenesisData = undefined,
+    subnetAuth: SubnetAuth = undefined,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = UnixNow()
+  ): Promise<UnsignedTx> => {
+    const from: Buffer[] = this._cleanAddressArray(
+      fromAddresses,
+      "buildCreateChainTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(
+      changeAddresses,
+      "buildCreateChainTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+
+    const builtUnsignedTx: UnsignedTx = utxoset.buildCreateChainTx(
+      this.core.getNetworkID(),
+      bintools.cb58Decode(this.blockchainID),
+      from,
+      change,
+      subnetID,
+      chainName,
+      vmID,
+      fxIDs,
+      genesisData,
+      subnetAuth,
+      this.getCreateChainTxFee(),
       avaxAssetID,
       memo,
       asOf
