@@ -14,7 +14,8 @@ import {
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
-import { CreateChainTx, SubnetAuth } from "src/apis/platformvm"
+import { CreateChainTx, SubnetAuth, PlatformVMAPI } from "src/apis/platformvm"
+import { UTXOSet } from "src/apis/evm"
 
 describe("CreateChainTx", (): void => {
   /**
@@ -22,17 +23,8 @@ describe("CreateChainTx", (): void => {
    */
   const bintools: BinTools = BinTools.getInstance()
 
-  let keymgr1: KeyChain
-  let keymgr2: KeyChain
-  let keymgr3: KeyChain
-  let addrs1: Buffer[]
-  let addrs2: Buffer[]
-  let addrs3: Buffer[]
-  let utxos: UTXO[]
-  let inputs: TransferableInput[]
-  let outputs: TransferableOutput[]
-  const amnt: number = 10000
   const alias: string = "X"
+  const amnt: number = 10000
   const assetID: Buffer = Buffer.from(
     createHash("sha256")
       .update(
@@ -49,6 +41,7 @@ describe("CreateChainTx", (): void => {
   const protocol: string = "http"
   const networkID: number = 12345
   const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
+  const pchain: PlatformVMAPI = avalanche.PChain()
   const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
   const genesisDataStr: string =
     "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
@@ -65,15 +58,16 @@ describe("CreateChainTx", (): void => {
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
-  keymgr1 = new KeyChain(avalanche.getHRP(), alias)
-  keymgr2 = new KeyChain(avalanche.getHRP(), alias)
-  keymgr3 = new KeyChain(avalanche.getHRP(), alias)
-  addrs1 = []
-  addrs2 = []
-  addrs3 = []
-  utxos = []
-  inputs = []
-  outputs = []
+  let keymgr1: KeyChain = new KeyChain(avalanche.getHRP(), alias)
+  let keymgr2: KeyChain = new KeyChain(avalanche.getHRP(), alias)
+  let keymgr3: KeyChain = new KeyChain(avalanche.getHRP(), alias)
+  let addrs1: Buffer[] = []
+  let addrs2: Buffer[] = []
+  let addrs3: Buffer[] = []
+  let utxos: UTXO[] = []
+  let set: UTXOSet = new UTXOSet()
+  let inputs: TransferableInput[] = []
+  let outputs: TransferableOutput[] = []
   for (let i: number = 0; i < 3; i++) {
     addrs1.push(keymgr1.makeKey().getAddress())
     addrs2.push(keymgr2.makeKey().getAddress())
@@ -121,6 +115,7 @@ describe("CreateChainTx", (): void => {
     )
     inputs.push(xferin)
   }
+  // set.addArray(utxos)
 
   const createChainTx = new CreateChainTx(
     networkID,
@@ -135,6 +130,8 @@ describe("CreateChainTx", (): void => {
     gd,
     subnetAuth
   )
+
+  // const unsignedCreateChainTx = pchain.buildCreateChainTx()
 
   test("createChainTx getTxType", (): void => {
     const txType: number = createChainTx.getTxType()
