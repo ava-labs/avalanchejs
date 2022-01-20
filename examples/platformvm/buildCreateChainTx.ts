@@ -14,8 +14,8 @@ import {
 } from "../../src/utils"
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
@@ -53,15 +53,6 @@ const main = async (): Promise<any> => {
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
-  // console.log("------")
-  // console.log(subnetID)
-  // console.log(chainName)
-  // console.log(vmID)
-  // console.log(fxIDs)
-  // console.log(genesisData)
-  // console.log(subnetAuth)
-  // console.log(memo)
-  // console.log("------")
   const unsignedTx: UnsignedTx = await pchain.buildCreateChainTx(
     utxoSet,
     pAddressStrings,
