@@ -216,19 +216,19 @@ describe("Transactions", (): void => {
     }
     set.addArray(utxos)
 
-  //   addSubnetValidatorTx = new AddSubnetValidatorTx(
-  //     networkID,
-  //     bintools.cb58Decode(pChainBlockchainID),
-  //     outputs,
-  //     inputs,
-  //     memo,
-  //     nodeID,
-  //     startTime,
-  //     endTime,
-  //     weight,
-  //     subnetID,
-  //     subnetAuth
-  //   )
+    //   addSubnetValidatorTx = new AddSubnetValidatorTx(
+    //     networkID,
+    //     bintools.cb58Decode(pChainBlockchainID),
+    //     outputs,
+    //     inputs,
+    //     memo,
+    //     nodeID,
+    //     startTime,
+    //     endTime,
+    //     weight,
+    //     subnetID,
+    //     subnetAuth
+    //   )
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {
