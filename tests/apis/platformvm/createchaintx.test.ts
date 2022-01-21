@@ -1,3 +1,4 @@
+import mockAxios from "jest-mock-axios"
 import { UTXO } from "../../../src/apis/platformvm/utxos"
 import { KeyChain } from "../../../src/apis/platformvm/keychain"
 import {
@@ -14,10 +15,12 @@ import {
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
-import { CreateChainTx, SubnetAuth, PlatformVMAPI } from "src/apis/platformvm"
-import { UTXOSet } from "src/apis/evm"
+import { CreateChainTx, SubnetAuth, PlatformVMAPI, UnsignedTx } from "src/apis/platformvm"
+import { UTXOSet } from "src/apis/platformvm"
+import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import { Defaults } from "src/utils"
 
-describe("CreateChainTx", (): void => {
+describe("CreateChainTx", () => {
   /**
    * @ignore
    */
@@ -48,11 +51,12 @@ describe("CreateChainTx", (): void => {
   const subnetIDStr: string =
     "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
   const memoStr: string = "from snowflake to avalanche"
+  const blockchainID: string = Defaults.network[avalanche.getNetworkID()].X["blockchainID"]
   const memo: Buffer = Buffer.from(memoStr, "utf8")
   const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
   const chainNameStr: string = "EPIC AVM"
   const vmIDStr: string = "avm"
-  const fxIDsStr: string[] = ["secp256k1fx"]
+  const fxIDsStr: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
   const gd: GenesisData = new GenesisData()
   gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
   const addressIndex: Buffer = Buffer.alloc(4)
@@ -115,7 +119,7 @@ describe("CreateChainTx", (): void => {
     )
     inputs.push(xferin)
   }
-  // set.addArray(utxos)
+  set.addArray(utxos)
 
   const createChainTx = new CreateChainTx(
     networkID,
@@ -130,8 +134,50 @@ describe("CreateChainTx", (): void => {
     gd,
     subnetAuth
   )
+  test("buildCreateChainTx", async (): Promise<void> => {
+    const addrs1Strs: string[] = addrs1.map((a): string => bintools.addressToString("local", "P", a))
+    const result: Promise<UnsignedTx> = pchain.buildCreateChainTx(
+      set,
+      addrs1Strs,
+      addrs1Strs,
+      subnetID,
+      chainNameStr,
+      vmIDStr,
+      fxIDsStr,
+      gd,
+      subnetAuth,
+      memo
+    )
+    const payload: object = {
+      result: {
+        assetID: '2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe'
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
 
-  // const unsignedCreateChainTx = pchain.buildCreateChainTx()
+    mockAxios.mockResponse(responseObj)
+    const txu1: UnsignedTx = await result
+
+    const txu2: UnsignedTx = set.buildCreateChainTx(
+      networkID,
+      bintools.cb58Decode(blockchainID),
+      addrs1,
+      addrs1,
+      subnetID,
+      chainNameStr,
+      vmIDStr,
+      fxIDsStr,
+      gd,
+      subnetAuth
+    )
+
+    expect(txu2.toBuffer().toString("hex")).toBe(
+      txu1.toBuffer().toString("hex")
+    )
+    expect(txu2.toString()).toBe(txu1.toString())
+  })
 
   test("createChainTx getTxType", (): void => {
     const txType: number = createChainTx.getTxType()
@@ -139,7 +185,7 @@ describe("CreateChainTx", (): void => {
   })
   test("createChainTx getSubnetAuth", (): void => {
     const sa: SubnetAuth = createChainTx.getSubnetAuth()
-    expect(subnetAuth).toBe(sa)
+    expect(sa).toBe(subnetAuth)
   })
   test("createChainTx getSubnetID", (): void => {
     const subnetID: string = createChainTx.getSubnetID()
@@ -147,7 +193,7 @@ describe("CreateChainTx", (): void => {
   })
   test("createChainTx getVMID", (): void => {
     const vmID: Buffer = createChainTx.getVMID()
-    expect(vmID.toString("utf8")).toMatch(vmIDStr)
+    expect(vmID.toString()).toMatch(vmIDStr)
   })
   test("createChainTx getChainName", (): void => {
     const chainName: string = createChainTx.getChainName()
@@ -155,8 +201,9 @@ describe("CreateChainTx", (): void => {
   })
   test("createChainTx getFXIDs", (): void => {
     const fxIDs: Buffer[] = createChainTx.getFXIDs()
-    fxIDs.forEach((fxID: Buffer): void => {
-      expect(fxID.toString("utf8")).toMatch(fxIDsStr[0])
+    expect(fxIDs.length).toBe(3)
+    fxIDs.forEach((fxID: Buffer, index: number): void => {
+      expect(fxID.toString()).toMatch(fxIDsStr[index])
     })
   })
   test("createChainTx getGenesisData", (): void => {

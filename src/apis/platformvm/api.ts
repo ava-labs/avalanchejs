@@ -1727,7 +1727,7 @@ return builtUnsignedTx
       change,
       owners,
       subnetOwnerThreshold,
-      this.getCreationTxFee(),
+      this.getCreateSubnetTxFee(),
       avaxAssetID,
       memo,
       asOf
@@ -1785,6 +1785,7 @@ return builtUnsignedTx
     }
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    fxIDs = fxIDs.sort()
 
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateChainTx(
       this.core.getNetworkID(),
