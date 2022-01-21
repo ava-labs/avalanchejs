@@ -15,7 +15,12 @@ import {
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
-import { CreateChainTx, SubnetAuth, PlatformVMAPI, UnsignedTx } from "src/apis/platformvm"
+import {
+  CreateChainTx,
+  SubnetAuth,
+  PlatformVMAPI,
+  UnsignedTx
+} from "src/apis/platformvm"
 import { UTXOSet } from "src/apis/platformvm"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Defaults } from "src/utils"
@@ -51,7 +56,8 @@ describe("CreateChainTx", () => {
   const subnetIDStr: string =
     "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
   const memoStr: string = "from snowflake to avalanche"
-  const blockchainID: string = Defaults.network[avalanche.getNetworkID()].X["blockchainID"]
+  const blockchainID: string =
+    Defaults.network[avalanche.getNetworkID()].P["blockchainID"]
   const memo: Buffer = Buffer.from(memoStr, "utf8")
   const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
   const chainNameStr: string = "EPIC AVM"
@@ -135,7 +141,9 @@ describe("CreateChainTx", () => {
     subnetAuth
   )
   test("buildCreateChainTx", async (): Promise<void> => {
-    const addrs1Strs: string[] = addrs1.map((a): string => bintools.addressToString("local", "P", a))
+    const addrs1Strs: string[] = addrs1.map((a): string =>
+      bintools.addressToString("local", "P", a)
+    )
     const result: Promise<UnsignedTx> = pchain.buildCreateChainTx(
       set,
       addrs1Strs,
@@ -150,7 +158,7 @@ describe("CreateChainTx", () => {
     )
     const payload: object = {
       result: {
-        assetID: '2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe'
+        assetID: "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
       }
     }
     const responseObj: HttpResponse = {
