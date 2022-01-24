@@ -76,14 +76,14 @@ export class ImportTx extends EVMBaseTx {
   /**
    * Returns the id of the [[ImportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
    */
-  getSourceChain = (): Buffer => {
+  getSourceChain(): Buffer {
     return this.sourceChain
   }
 

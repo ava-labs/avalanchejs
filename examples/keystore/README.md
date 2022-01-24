@@ -1,6 +1,6 @@
 # Keystore RPC
 
-Tests for the Avalanche [Keystore RPC](https://docs.avax.network/build/avalanchego-apis/keystore-api)
+Example scripts for the Avalanche [Keystore RPC](https://docs.avax.network/build/avalanchego-apis/keystore-api)
 
 * [createUser.ts](./createUser.ts)
 * [deleteUser.ts](./deleteUser.ts)
