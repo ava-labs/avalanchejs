@@ -35,3 +35,13 @@ export interface GetValidatorsAtParams {
 export interface GetValidatorsAtResponse {
   validators: object
 }
+
+export interface GetCurrentValidatorsParams {
+  subnetID?: Buffer | string
+  nodeIDs?: string[]
+}
+
+export interface GetPendingValidatorsParams {
+  subnetID?: Buffer | string
+  nodeIDs?: string[]
+}

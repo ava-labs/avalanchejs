@@ -70,7 +70,7 @@ export class OperationTx extends BaseTx {
   /**
    * Returns the id of the [[OperationTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
