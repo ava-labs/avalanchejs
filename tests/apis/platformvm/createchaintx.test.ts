@@ -62,7 +62,7 @@ describe("CreateChainTx", () => {
   const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
   const chainNameStr: string = "EPIC AVM"
   const vmIDStr: string = "avm"
-  const fxIDsStr: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
+  const fxIDsStr: string[] = ["nftfx", "propertyfx", "secp256k1fx"]
   const gd: GenesisData = new GenesisData()
   gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
   const addressIndex: Buffer = Buffer.alloc(4)
