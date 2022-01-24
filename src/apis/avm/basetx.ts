@@ -100,7 +100,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   /**
    * Returns the id of the [[BaseTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
