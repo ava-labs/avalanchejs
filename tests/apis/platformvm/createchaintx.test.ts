@@ -33,7 +33,9 @@ describe("CreateChainTx", () => {
 
   const alias: string = "X"
   const amnt: number = ONEAVAX.toNumber()
-  const assetID: Buffer = bintools.cb58Decode("2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe")
+  const assetID: Buffer = bintools.cb58Decode(
+    "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
+  )
   let amount: BN
   let addresses: Buffer[]
   let locktime: BN
