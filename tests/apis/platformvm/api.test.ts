@@ -2467,7 +2467,7 @@ describe("PlatformVMAPI", (): void => {
         addrbuff2,
         addrbuff3,
         1,
-        platformvm.getCreationTxFee(),
+        platformvm.getCreateSubnetTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()
@@ -2524,7 +2524,7 @@ describe("PlatformVMAPI", (): void => {
         addrbuff2,
         addrbuff3,
         1,
-        platformvm.getCreationTxFee(),
+        platformvm.getCreateSubnetTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()
