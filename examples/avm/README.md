@@ -1,6 +1,6 @@
 # AVM
 
-Tests for the [Avalanche Virtual Machine](https://docs.avax.network/build/references/avm-transaction-serialization)
+Example scripts for the [Avalanche Virtual Machine](https://docs.avax.network/build/references/avm-transaction-serialization)
 
 * [addressFromBuffer.ts](./addressFromBuffer.ts)
 * [baseTx-ant.ts](./baseTx-ant.ts)

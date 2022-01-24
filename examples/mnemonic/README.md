@@ -1,6 +1,6 @@
 # Mnemonic
 
-Scripts for creating and validating mnemonics in multiple languages.
+Example scripts for creating and validating mnemonics in multiple languages.
 
 * [entropyToMnemonic.ts](./entropyToMnemonic.ts)
 * [generateMnemonic.ts](./generateMnemonic.ts)

@@ -62,7 +62,7 @@ describe("PChain", (): void => {
       (x) => x,
       Matcher.toThrow,
       () =>
-        `problem retrieving user '${badUser}': incorrect password for user "${badUser}"`
+        `problem retrieving user "${badUser}": incorrect password for user "${badUser}"`
     ],
     [
       "incorrectPass",
@@ -70,7 +70,7 @@ describe("PChain", (): void => {
       (x) => x,
       Matcher.toThrow,
       () =>
-        `problem retrieving user '${user}': incorrect password for user "${user}"`
+        `problem retrieving user "${user}": incorrect password for user "${user}"`
     ],
     [
       "getBalance",
