@@ -33,7 +33,7 @@ export class CreateSubnetTx extends BaseTx {
   /**
    * Returns the id of the [[CreateSubnetTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
