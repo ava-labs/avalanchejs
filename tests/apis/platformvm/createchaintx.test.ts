@@ -23,7 +23,7 @@ import {
 } from "src/apis/platformvm"
 import { UTXOSet } from "src/apis/platformvm"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { Defaults } from "src/utils"
+import { Defaults, ONEAVAX } from "src/utils"
 
 describe("CreateChainTx", () => {
   /**
@@ -32,14 +32,8 @@ describe("CreateChainTx", () => {
   const bintools: BinTools = BinTools.getInstance()
 
   const alias: string = "X"
-  const amnt: number = 10000
-  const assetID: Buffer = Buffer.from(
-    createHash("sha256")
-      .update(
-        "Well, now, don't you tell me to smile, you stick around I'll make it worth your while."
-      )
-      .digest()
-  )
+  const amnt: number = ONEAVAX.toNumber()
+  const assetID: Buffer = bintools.cb58Decode("2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe")
   let amount: BN
   let addresses: Buffer[]
   let locktime: BN
@@ -178,13 +172,45 @@ describe("CreateChainTx", () => {
       vmIDStr,
       fxIDsStr,
       gd,
-      subnetAuth
+      subnetAuth,
+      pchain.getCreateChainTxFee(),
+      assetID,
+      memo
     )
 
     expect(txu2.toBuffer().toString("hex")).toBe(
       txu1.toBuffer().toString("hex")
     )
     expect(txu2.toString()).toBe(txu1.toString())
+
+    const tx = txu1.getTransaction() as CreateChainTx
+    const txType: number = tx.getTxType()
+    expect(txType).toBe(PlatformVMConstants.CREATECHAINTX)
+
+    const sa: SubnetAuth = tx.getSubnetAuth()
+    expect(sa).toBe(subnetAuth)
+
+    const sID: string = tx.getSubnetID()
+    expect(sID).toBe(subnetIDStr)
+
+    const vID: Buffer = tx.getVMID()
+    expect(vID.toString()).toMatch(vmIDStr)
+
+    const cName: string = tx.getChainName()
+    expect(cName).toBe(chainNameStr)
+
+    const fIDs: Buffer[] = tx.getFXIDs()
+    expect(fIDs.length).toBe(3)
+    fIDs.forEach((fxID: Buffer, index: number): void => {
+      expect(fxID.toString()).toMatch(fxIDsStr[index])
+    })
+
+    const gData: string = tx.getGenesisData()
+    expect(gData).toBe(genesisDataStr)
+  })
+  test("createChainTx getChainName", (): void => {
+    const chainName: string = createChainTx.getChainName()
+    expect(chainName).toBe(chainNameStr)
   })
 
   test("createChainTx getTxType", (): void => {
