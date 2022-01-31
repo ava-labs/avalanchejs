@@ -134,7 +134,7 @@ export interface SendParams {
 }
 
 export interface SendResponse {
-  txID: string,
+  txID: string
   changeAddr: string
 }
 

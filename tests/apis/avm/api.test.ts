@@ -42,7 +42,11 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { GetBalanceResponse, SendMultipleResponse, SendResponse } from "src/apis/avm/interfaces"
+import {
+  GetBalanceResponse,
+  SendMultipleResponse,
+  SendResponse
+} from "src/apis/avm/interfaces"
 import { SendMultipleParams } from "dist/apis/avm/interfaces"
 
 /**
@@ -379,7 +383,11 @@ describe("AVMAPI", (): void => {
       ]
     }
 
-    const result: Promise<GetBalanceResponse> = api.getBalance(addrA, "ATH", true)
+    const result: Promise<GetBalanceResponse> = api.getBalance(
+      addrA,
+      "ATH",
+      true
+    )
     const payload: object = {
       result: respobj
     }

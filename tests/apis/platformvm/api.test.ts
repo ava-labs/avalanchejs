@@ -46,7 +46,10 @@ import {
 } from "../../../src/apis/platformvm/interfaces"
 import { ErrorResponseObject } from "../../../src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { GetBalanceResponse, GetUTXOsResponse } from "src/apis/platformvm/interfaces"
+import {
+  GetBalanceResponse,
+  GetUTXOsResponse
+} from "src/apis/platformvm/interfaces"
 
 /**
  * @ignore
@@ -945,8 +948,7 @@ describe("PlatformVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string | GetTxStatusResponse> =
-      api.getTxStatus(txid)
+    const result: Promise<string | GetTxStatusResponse> = api.getTxStatus(txid)
     const payload: object = {
       result: "accepted"
     }

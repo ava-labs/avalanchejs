@@ -6,7 +6,7 @@
 import BN from "bn.js"
 import { PersistanceOptions } from "src/utils/persistenceoptions"
 import { TransferableOutput } from "."
-import { UTXOSet } from "../platformvm/utxos";
+import { UTXOSet } from "../platformvm/utxos"
 
 export interface GetStakeParams {
   addresses: string[]
@@ -54,7 +54,7 @@ export interface SampleValidatorsParams {
 }
 
 export interface AddValidatorParams {
-  username: string,
+  username: string
   password: string
   nodeID: string
   startTime: number
@@ -65,7 +65,7 @@ export interface AddValidatorParams {
 }
 
 export interface AddDelegatorParams {
-  username: string,
+  username: string
   password: string
   nodeID: string
   startTime: number
@@ -122,18 +122,20 @@ export interface CreateAddressParams {
 }
 
 export interface ListAddressesParams {
-  username: string,
+  username: string
   password: string
 }
 
 export interface GetUTXOsParams {
-  addresses: string[] | string,
-  sourceChain?: string | undefined,
-  limit: number | 0,
-  startIndex?: {
-    address: string
-    utxo: string
-  } | undefined,
+  addresses: string[] | string
+  sourceChain?: string | undefined
+  limit: number | 0
+  startIndex?:
+    | {
+        address: string
+        utxo: string
+      }
+    | undefined
   persistOpts?: PersistanceOptions | undefined
 }
 
