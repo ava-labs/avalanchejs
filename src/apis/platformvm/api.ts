@@ -33,8 +33,27 @@ import {
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse,
+  GetSubnetsResponse,
   GetValidatorsAtParams,
-  GetValidatorsAtResponse
+  GetValidatorsAtResponse,
+  CreateAddressParams,
+  GetUTXOsParams,
+  GetBalanceResponse,
+  GetUTXOsResponse,
+  ListAddressesParams,
+  SampleValidatorsParams,
+  AddValidatorParams,
+  AddDelegatorParams,
+  CreateSubnetParams,
+  ExportAVAXParams,
+  ExportKeyParams,
+  ImportKeyParams,
+  ImportAVAXParams,
+  CreateBlockchainParams,
+  GetBlockchainsResponse,
+  GetTxStatusParams,
+  GetTxStatusResponse,
+  GetMinStakeResponse
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
@@ -366,7 +385,7 @@ export class PlatformVMAPI extends JRPCAPI {
     name: string,
     genesis: string
   ): Promise<string> => {
-    const params: any = {
+    const params: CreateBlockchainParams = {
       username,
       password,
       fxIDs,
@@ -441,7 +460,7 @@ export class PlatformVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string> => {
-    const params: any = {
+    const params: CreateAddressParams = {
       username,
       password
     }
@@ -459,7 +478,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
-  getBalance = async (address: string): Promise<object> => {
+  getBalance = async (address: string): Promise<GetBalanceResponse> => {
     if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new AddressError(
@@ -488,7 +507,7 @@ export class PlatformVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string[]> => {
-    const params: any = {
+    const params: ListAddressesParams = {
       username,
       password
     }
@@ -573,7 +592,7 @@ export class PlatformVMAPI extends JRPCAPI {
     sampleSize: number,
     subnetID: Buffer | string = undefined
   ): Promise<string[]> => {
-    const params: any = {
+    const params: SampleValidatorsParams = {
       size: sampleSize.toString()
     }
     if (typeof subnetID === "string") {
@@ -617,7 +636,7 @@ export class PlatformVMAPI extends JRPCAPI {
     rewardAddress: string,
     delegationFeeRate: BN = undefined
   ): Promise<string> => {
-    const params: any = {
+    const params: AddValidatorParams = {
       username,
       password,
       nodeID,
@@ -702,7 +721,7 @@ export class PlatformVMAPI extends JRPCAPI {
     stakeAmount: BN,
     rewardAddress: string
   ): Promise<string> => {
-    const params: any = {
+    const params: AddDelegatorParams = {
       username,
       password,
       nodeID,
@@ -736,7 +755,7 @@ export class PlatformVMAPI extends JRPCAPI {
     controlKeys: string[],
     threshold: number
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: CreateSubnetParams = {
       username,
       password,
       controlKeys,
@@ -799,7 +818,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of objects containing fields "id", "subnetID", and "vmID".
    */
-  getBlockchains = async (): Promise<object[]> => {
+  getBlockchains = async (): Promise<GetBlockchainsResponse> => {
     const response: RequestResponseData = await this.callMethod(
       "platform.getBlockchains"
     )
@@ -826,7 +845,7 @@ export class PlatformVMAPI extends JRPCAPI {
     amount: BN,
     to: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ExportAVAXParams = {
       username,
       password,
       to,
@@ -862,7 +881,7 @@ export class PlatformVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ImportAVAXParams = {
       to,
       sourceChain,
       username,
@@ -937,7 +956,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getMinStake = async (
     refresh: boolean = false
-  ): Promise<{ minValidatorStake: BN; minDelegatorStake: BN }> => {
+  ): Promise<GetMinStakeResponse> => {
     if (
       refresh !== true &&
       typeof this.minValidatorStake !== "undefined" &&
@@ -1018,7 +1037,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of objects containing fields "id",
    * "controlKeys", and "threshold".
    */
-  getSubnets = async (ids: string[] = undefined): Promise<object[]> => {
+  getSubnets = async (ids: string[] = undefined): Promise<GetSubnetsResponse> => {
     const params: any = {}
     if (typeof ids !== undefined) {
       params.ids = ids
@@ -1044,7 +1063,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     address: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ExportKeyParams = {
       username,
       password,
       address
@@ -1072,7 +1091,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     privateKey: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ImportKeyParams = {
       username,
       password,
       privateKey
@@ -1118,8 +1137,8 @@ export class PlatformVMAPI extends JRPCAPI {
   getTxStatus = async (
     txid: string,
     includeReason: boolean = true
-  ): Promise<string | { status: string; reason: string }> => {
-    const params: any = {
+  ): Promise<string | GetTxStatusResponse> => {
+    const params: GetTxStatusParams = {
       txID: txid,
       includeReason: includeReason
     }
@@ -1151,16 +1170,12 @@ export class PlatformVMAPI extends JRPCAPI {
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
     persistOpts: PersistanceOptions = undefined
-  ): Promise<{
-    numFetched: number
-    utxos: UTXOSet
-    endIndex: { address: string; utxo: string }
-  }> => {
+  ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
     }
 
-    const params: any = {
+    const params: GetUTXOsParams = {
       addresses: addresses,
       limit
     }

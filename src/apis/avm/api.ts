@@ -50,7 +50,13 @@ import {
   ListAddressesParams,
   MintParams,
   SendMultipleParams,
-  SOutputsParams
+  SOutputsParams,
+  GetUTXOsResponse,
+  GetAssetDescriptionResponse,
+  GetBalanceResponse,
+  SendParams,
+  SendResponse,
+  SendMultipleResponse
 } from "./interfaces"
 import { IssueTxParams } from "../../common"
 
@@ -327,7 +333,7 @@ export class AVMAPI extends JRPCAPI {
     address: string,
     assetID: string,
     includePartial: boolean = false
-  ): Promise<object> => {
+  ): Promise<GetBalanceResponse> => {
     if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new AddressError(
@@ -696,12 +702,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getAssetDescription = async (
     assetID: Buffer | string
-  ): Promise<{
-    name: string
-    symbol: string
-    assetID: Buffer
-    denomination: number
-  }> => {
+  ): Promise<GetAssetDescriptionResponse> => {
     let asset: string
     if (typeof assetID !== "string") {
       asset = bintools.cb58Encode(assetID)
@@ -780,11 +781,7 @@ export class AVMAPI extends JRPCAPI {
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
     persistOpts: PersistanceOptions = undefined
-  ): Promise<{
-    numFetched: number
-    utxos: UTXOSet
-    endIndex: { address: string; utxo: string }
-  }> => {
+  ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
     }
@@ -1577,7 +1574,7 @@ export class AVMAPI extends JRPCAPI {
     from: string[] | Buffer[] = undefined,
     changeAddr: string = undefined,
     memo: string | Buffer = undefined
-  ): Promise<{ txID: string; changeAddr: string }> => {
+  ): Promise<SendResponse> => {
     let asset: string
     let amnt: BN
 
@@ -1597,7 +1594,7 @@ export class AVMAPI extends JRPCAPI {
       amnt = amount
     }
 
-    const params: any = {
+    const params: SendParams = {
       username: username,
       password: password,
       assetID: asset,
@@ -1655,7 +1652,7 @@ export class AVMAPI extends JRPCAPI {
     from: string[] | Buffer[] = undefined,
     changeAddr: string = undefined,
     memo: string | Buffer = undefined
-  ): Promise<{ txID: string; changeAddr: string }> => {
+  ): Promise<SendMultipleResponse> => {
     let asset: string
     let amnt: BN
     const sOutputs: SOutputsParams[] = []

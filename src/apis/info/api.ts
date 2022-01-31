@@ -8,6 +8,7 @@ import { RequestResponseData } from "../../common/apibase"
 import BN from "bn.js"
 import {
   GetBlockchainIDParams,
+  GetTxFeeResponse,
   IsBootstrappedParams,
   PeersParams,
   PeersResponse,
@@ -94,7 +95,7 @@ export class InfoAPI extends JRPCAPI {
    *
    * @returns Returns a Promise object of the transaction fee in nAVAX.
    */
-  getTxFee = async (): Promise<{ txFee: BN; creationTxFee: BN }> => {
+  getTxFee = async (): Promise<GetTxFeeResponse> => {
     // TODO - Add `GetTxFee` response interface
     const response: RequestResponseData = await this.callMethod("info.getTxFee")
     return {

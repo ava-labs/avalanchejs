@@ -42,6 +42,8 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import { GetBalanceResponse, SendMultipleResponse, SendResponse } from "src/apis/avm/interfaces"
+import { SendMultipleParams } from "dist/apis/avm/interfaces"
 
 /**
  * @ignore
@@ -126,7 +128,7 @@ describe("AVMAPI", (): void => {
     const memo: string = "hello world"
     const incorrectUserName: string = "asdfasdfsa"
     const message: string = `problem retrieving user: incorrect password for user "${incorrectUserName}"`
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       incorrectUserName,
       password,
       "assetId",
@@ -160,7 +162,7 @@ describe("AVMAPI", (): void => {
     const memo: string = "hello world"
     const incorrectPassword: string = "asdfasdfsa"
     const message: string = `problem retrieving user: incorrect password for user "${incorrectPassword}"`
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       username,
       incorrectPassword,
       "assetId",
@@ -194,7 +196,7 @@ describe("AVMAPI", (): void => {
     const txId: string = "asdfhvl234"
     const memo: string = "hello world"
     const changeAddr: string = "X-local1"
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       username,
       password,
       "assetId",
@@ -226,7 +228,7 @@ describe("AVMAPI", (): void => {
     const txId: string = "asdfhvl234"
     const memo: Buffer = Buffer.from("hello world")
     const changeAddr: string = "X-local1"
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       username,
       password,
       bintools.b58ToBuffer("6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"),
@@ -258,7 +260,7 @@ describe("AVMAPI", (): void => {
     const txId: string = "asdfhvl234"
     const memo: string = "hello world"
     const changeAddr: string = "X-local1"
-    const result: Promise<object> = api.sendMultiple(
+    const result: Promise<SendMultipleResponse> = api.sendMultiple(
       username,
       password,
       [{ assetID: "assetId", amount: 10, to: addrA }],
@@ -277,7 +279,7 @@ describe("AVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: object = await result
+    const response: SendMultipleResponse = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response["txID"]).toBe(txId)
@@ -340,7 +342,7 @@ describe("AVMAPI", (): void => {
 
   test("getBalance", async (): Promise<void> => {
     const balance: BN = new BN("100", 10)
-    const respobj = {
+    const respobj: GetBalanceResponse = {
       balance,
       utxoIDs: [
         {
@@ -350,7 +352,7 @@ describe("AVMAPI", (): void => {
       ]
     }
 
-    const result: Promise<object> = api.getBalance(addrA, "ATH")
+    const result: Promise<GetBalanceResponse> = api.getBalance(addrA, "ATH")
     const payload: object = {
       result: respobj
     }
@@ -377,7 +379,7 @@ describe("AVMAPI", (): void => {
       ]
     }
 
-    const result: Promise<object> = api.getBalance(addrA, "ATH", true)
+    const result: Promise<GetBalanceResponse> = api.getBalance(addrA, "ATH", true)
     const payload: object = {
       result: respobj
     }
