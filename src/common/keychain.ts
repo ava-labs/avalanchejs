@@ -18,7 +18,7 @@ export abstract class StandardKeyPair {
    *
    * @param entropy Optional parameter that may be necessary to produce secure keys
    */
-  generateKey: (entropy?: Buffer) => void
+  abstract generateKey(entropy?: Buffer): void
 
   /**
    * Imports a private key and generates the appropriate public key.
@@ -27,7 +27,7 @@ export abstract class StandardKeyPair {
    *
    * @returns true on success, false on failure
    */
-  importKey: (privk: Buffer) => boolean
+  abstract importKey(privk: Buffer): boolean
 
   /**
    * Takes a message, signs it, and returns the signature.
@@ -36,7 +36,7 @@ export abstract class StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
    */
-  sign: (msg: Buffer) => Buffer
+  abstract sign(msg: Buffer): Buffer
 
   /**
    * Recovers the public key of a message signer from a message and its associated signature.
@@ -47,7 +47,7 @@ export abstract class StandardKeyPair {
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public
    * key of the signer
    */
-  recover: (msg: Buffer, sig: Buffer) => Buffer
+  abstract recover(msg: Buffer, sig: Buffer): Buffer
 
   /**
    * Verifies that the private key associated with the provided public key produces the
@@ -59,49 +59,49 @@ export abstract class StandardKeyPair {
    *
    * @returns True on success, false on failure
    */
-  verify: (msg: Buffer, sig: Buffer, pubk: Buffer) => boolean
+  abstract verify(msg: Buffer, sig: Buffer, pubk: Buffer): boolean
 
   /**
    * Returns a reference to the private key.
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the private key
    */
-  getPrivateKey = (): Buffer => this.privk
+  getPrivateKey(): Buffer { return this.privk }
 
   /**
    * Returns a reference to the public key.
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public key
    */
-  getPublicKey = (): Buffer => this.pubk
+  getPublicKey(): Buffer { return this.pubk }
 
   /**
    * Returns a string representation of the private key.
    *
    * @returns A string representation of the public key
    */
-  getPrivateKeyString: () => string
+  abstract getPrivateKeyString(): string
 
   /**
    * Returns the public key.
    *
    * @returns A string representation of the public key
    */
-  getPublicKeyString: () => string
+  abstract getPublicKeyString(): string
 
   /**
    * Returns the address.
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer}  representation of the address
    */
-  getAddress: () => Buffer
+  abstract getAddress(): Buffer
 
   /**
    * Returns the address's string representation.
    *
    * @returns A string representation of the address
    */
-  getAddressString: () => string
+  abstract getAddressString(): string
 
   abstract create(...args: any[]): this
 

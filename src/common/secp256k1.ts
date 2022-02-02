@@ -48,7 +48,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
   /**
    * @ignore
    */
-  protected _sigFromSigBuffer = (sig: Buffer): elliptic.ec.SignatureOptions => {
+  protected _sigFromSigBuffer(sig: Buffer): elliptic.ec.SignatureOptions {
     const r: BNInput = new BN(bintools.copyFrom(sig, 0, 32))
     const s: BNInput = new BN(bintools.copyFrom(sig, 32, 64))
     const recoveryParam: number = bintools
@@ -65,7 +65,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
   /**
    * Generates a new keypair.
    */
-  generateKey = () => {
+  generateKey() {
     this.keypair = ec.genKeyPair()
 
     // doing hex translation to get Buffer class
@@ -86,7 +86,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns true on success, false on failure
    */
-  importKey = (privk: Buffer): boolean => {
+  importKey(privk: Buffer): boolean {
     this.keypair = ec.keyFromPrivate(privk.toString("hex"), "hex")
     // doing hex translation to get Buffer class
     try {
@@ -109,7 +109,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} representation of the address
    */
-  getAddress = (): Buffer => {
+  getAddress(): Buffer {
     return SECP256k1KeyPair.addressFromPublicKey(this.pubk)
   }
 
@@ -118,7 +118,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A string representation of the address
    */
-  getAddressString = (): string => {
+  getAddressString(): string {
     const addr: Buffer = SECP256k1KeyPair.addressFromPublicKey(this.pubk)
     const type: SerializedType = "bech32"
     return serialization.bufferToType(addr, type, this.hrp, this.chainID)
@@ -131,7 +131,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} for the address of the public key.
    */
-  static addressFromPublicKey = (pubk: Buffer): Buffer => {
+  static addressFromPublicKey(pubk: Buffer): Buffer {
     if (pubk.length === 65) {
       /* istanbul ignore next */
       pubk = Buffer.from(
@@ -157,7 +157,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A cb58 serialized string representation of the private key
    */
-  getPrivateKeyString = (): string => {
+  getPrivateKeyString(): string {
     return `PrivateKey-${bintools.cb58Encode(this.privk)}`
   }
 
@@ -166,7 +166,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A cb58 serialized string representation of the public key
    */
-  getPublicKeyString = (): string => {
+  getPublicKeyString(): string {
     return bintools.cb58Encode(this.pubk)
   }
 
@@ -177,7 +177,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the signature
    */
-  sign = (msg: Buffer): Buffer => {
+  sign(msg: Buffer): Buffer {
     const sigObj: elliptic.ec.Signature = this.keypair.sign(msg, undefined, {
       canonical: true
     })
@@ -197,7 +197,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns True on success, false on failure
    */
-  verify = (msg: Buffer, sig: Buffer): boolean => {
+  verify(msg: Buffer, sig: Buffer): boolean {
     const sigObj: elliptic.ec.SignatureOptions = this._sigFromSigBuffer(sig)
     return ec.verify(msg, sigObj, this.keypair)
   }
@@ -210,7 +210,7 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public key of the signer
    */
-  recover = (msg: Buffer, sig: Buffer): Buffer => {
+  recover(msg: Buffer, sig: Buffer): Buffer {
     const sigObj: elliptic.ec.SignatureOptions = this._sigFromSigBuffer(sig)
     const pubk = ec.recoverPubKey(msg, sigObj, sigObj.recoveryParam)
     return Buffer.from(pubk.encodeCompressed())
@@ -221,14 +221,14 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns The [[KeyPair]]'s chainID
    */
-  getChainID = (): string => this.chainID
+  getChainID(): string { return this.chainID }
 
   /**
    * Sets the the chainID associated with this key.
    *
    * @param chainID String for the chainID
    */
-  setChainID = (chainID: string): void => {
+  setChainID(chainID: string): void {
     this.chainID = chainID
   }
 
@@ -237,14 +237,14 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
    */
-  getHRP = (): string => this.hrp
+  getHRP(): string { return this.hrp }
 
   /**
    * Sets the the Human-Readable-Part of the network associated with this key.
    *
    * @param hrp String for the Human-Readable-Part of Bech32 addresses
    */
-  setHRP = (hrp: string): void => {
+  setHRP(hrp: string): void {
     this.hrp = hrp
   }
 
