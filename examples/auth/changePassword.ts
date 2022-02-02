@@ -1,10 +1,10 @@
 // This file read secrets from a separate file called "secrets.json"
-// which you can create based on "secrets.example" which is in the 
+// which you can create based on "secrets.example" which is in the
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
 import { Avalanche } from "../../dist"
 import { AuthAPI } from "../../dist/apis/auth"
-import { readFile } from 'fs'
+import { readFile } from "fs"
 
 const ip: string = "localhost"
 const port: number = 16996

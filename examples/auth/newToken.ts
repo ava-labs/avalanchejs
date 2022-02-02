@@ -1,5 +1,5 @@
 // This file read secrets from a separate file called "secrets.json"
-// which you can create based on "secrets.example" which is in the 
+// which you can create based on "secrets.example" which is in the
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
 import { readFile } from "fs"
@@ -22,7 +22,10 @@ const main = async (): Promise<any> => {
     const jsonData: any = JSON.parse(data)
     const password: string = jsonData.password
     const endpoints: string[] = ["*"]
-    const token: string | ErrorResponseObject = await auth.newToken(password, endpoints)
+    const token: string | ErrorResponseObject = await auth.newToken(
+      password,
+      endpoints
+    )
     console.log(token)
   }
   readFile(path, encoding, cb)
