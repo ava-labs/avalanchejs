@@ -1,11 +1,5 @@
 import { Avalanche, BN, Buffer } from "../../src"
-import {
-  AVMAPI,
-  KeyChain,
-  UTXOSet,
-  UnsignedTx,
-  Tx
-} from "../../src/apis/avm"
+import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
 import {} from "../../src/utils"
 import {
   PrivateKeyPrefix,
