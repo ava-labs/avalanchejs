@@ -137,6 +137,20 @@ describe("PlatformVMAPI", (): void => {
     mockAxios.reset()
   })
 
+  test("getCreateSubnetTxFee", async (): Promise<void> => {
+    let pchain: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
+    const feeResponse: string = "1000000000"
+    const fee: BN = pchain.getCreateSubnetTxFee()
+    expect(fee.toString()).toBe(feeResponse)
+  })
+
+  test("getCreateChainTxFee", async (): Promise<void> => {
+    let pchain: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
+    const feeResponse: string = "1000000000"
+    const fee: BN = pchain.getCreateChainTxFee()
+    expect(fee.toString()).toBe(feeResponse)
+  })
+
   test("refreshBlockchainID", async (): Promise<void> => {
     let n3bcID: string = Defaults.network[3].P["blockchainID"]
     let testAPI: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
@@ -2453,7 +2467,7 @@ describe("PlatformVMAPI", (): void => {
         addrbuff2,
         addrbuff3,
         1,
-        platformvm.getCreationTxFee(),
+        platformvm.getCreateSubnetTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()
@@ -2510,7 +2524,7 @@ describe("PlatformVMAPI", (): void => {
         addrbuff2,
         addrbuff3,
         1,
-        platformvm.getCreationTxFee(),
+        platformvm.getCreateSubnetTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()

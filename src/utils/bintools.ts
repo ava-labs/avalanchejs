@@ -353,6 +353,7 @@ export default class BinTools {
       humanReadablePart !== "avax" &&
       humanReadablePart !== "fuji" &&
       humanReadablePart != "local" &&
+      humanReadablePart != "custom" &&
       humanReadablePart != hrp
     ) {
       throw new Bech32Error("Error - Invalid HRP")

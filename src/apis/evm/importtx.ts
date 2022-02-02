@@ -76,14 +76,14 @@ export class ImportTx extends EVMBaseTx {
   /**
    * Returns the id of the [[ImportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
    */
-  getSourceChain = (): Buffer => {
+  getSourceChain(): Buffer {
     return this.sourceChain
   }
 
@@ -205,16 +205,18 @@ export class ImportTx extends EVMBaseTx {
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
-   * @param sourceChainID Optional chainID for the source inputs to import. Default platform chainid.
-   * @param importIns Array of [[TransferableInput]]s used in the transaction
+   * @param sourceChainID Optional chainID for the source inputs to import. Default Buffer.alloc(32, 16)
+   * @param importIns Optional array of [[TransferableInput]]s used in the transaction
    * @param outs Optional array of the [[EVMOutput]]s
+   * @param fee Optional the fee as a BN
    */
   constructor(
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer = Buffer.alloc(32, 16),
     sourceChainID: Buffer = Buffer.alloc(32, 16),
     importIns: TransferableInput[] = undefined,
-    outs: EVMOutput[] = undefined
+    outs: EVMOutput[] = undefined,
+    fee: BN = new BN(0)
   ) {
     super(networkID, blockchainID)
     this.sourceChain = sourceChainID
@@ -250,11 +252,11 @@ export class ImportTx extends EVMBaseTx {
       this.outs = outs
     }
     if (inputsPassed && outputsPassed) {
-      this.validateOuts()
+      this.validateOuts(fee)
     }
   }
 
-  private validateOuts(): void {
+  private validateOuts(fee: BN): void {
     // This Map enforces uniqueness of pair(address, assetId) for each EVMOutput.
     // For each imported assetID, each ETH-style C-Chain address can
     // have exactly 1 EVMOutput.
@@ -286,7 +288,6 @@ export class ImportTx extends EVMBaseTx {
     })
     // make sure this transaction pays the required avax fee
     const selectedNetwork: number = this.getNetworkID()
-    const requiredFee: BN = Defaults.network[`${selectedNetwork}`].C.txFee
     const feeDiff: BN = new BN(0)
     const avaxAssetID: string =
       Defaults.network[`${selectedNetwork}`].X.avaxAssetID
@@ -308,8 +309,8 @@ export class ImportTx extends EVMBaseTx {
         feeDiff.isub(evmOutput.getAmount())
       }
     })
-    if (feeDiff.lt(requiredFee)) {
-      const errorMessage: string = `Error - ${requiredFee} AVAX required for fee and only ${feeDiff} AVAX provided`
+    if (feeDiff.lt(fee)) {
+      const errorMessage: string = `Error - ${fee} nAVAX required for fee and only ${feeDiff} nAVAX provided`
       throw new EVMFeeError(errorMessage)
     }
   }

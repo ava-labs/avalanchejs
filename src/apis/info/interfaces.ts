@@ -30,3 +30,8 @@ export interface GetTxFee {
   txFee: BN
   creationTxFee: BN
 }
+
+export interface UptimeResponse {
+  rewardingStakePercentage: string
+  weightedAveragePercentage: string
+}

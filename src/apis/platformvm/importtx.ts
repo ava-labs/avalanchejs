@@ -66,7 +66,7 @@ export class ImportTx extends BaseTx {
   /**
    * Returns the id of the [[ImportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
@@ -116,6 +116,13 @@ export class ImportTx extends BaseTx {
    */
   getImportInputs(): TransferableInput[] {
     return this.importIns
+  }
+
+  /**
+   * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
+   */
+  getSourceChain(): Buffer {
+    return this.sourceChain
   }
 
   /**
