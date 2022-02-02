@@ -66,14 +66,18 @@ export abstract class StandardKeyPair {
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the private key
    */
-  getPrivateKey(): Buffer { return this.privk }
+  getPrivateKey(): Buffer {
+    return this.privk
+  }
 
   /**
    * Returns a reference to the public key.
    *
    * @returns A {@link https://github.com/feross/buffer|Buffer} containing the public key
    */
-  getPublicKey(): Buffer { return this.pubk }
+  getPublicKey(): Buffer {
+    return this.pubk
+  }
 
   /**
    * Returns a string representation of the private key.

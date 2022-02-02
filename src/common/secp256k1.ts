@@ -221,7 +221,9 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns The [[KeyPair]]'s chainID
    */
-  getChainID(): string { return this.chainID }
+  getChainID(): string {
+    return this.chainID
+  }
 
   /**
    * Sets the the chainID associated with this key.
@@ -237,7 +239,9 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
    */
-  getHRP(): string { return this.hrp }
+  getHRP(): string {
+    return this.hrp
+  }
 
   /**
    * Sets the the Human-Readable-Part of the network associated with this key.
