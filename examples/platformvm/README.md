@@ -1,6 +1,6 @@
 # PlatformVM
 
-Tests for the Avalanche [PlatformVM RPC](https://docs.avax.network/build/avalanchego-apis/platform-chain-p-chain-api)
+Example scripts for the Avalanche [PlatformVM RPC](https://docs.avax.network/build/avalanchego-apis/platform-chain-p-chain-api)
 
 * [addDelegatorTx.ts](./addDelegatorTx.ts)
 * [addValidatorTx.ts](./addValidatorTx.ts)
@@ -10,9 +10,19 @@ Tests for the Avalanche [PlatformVM RPC](https://docs.avax.network/build/avalanc
 * [buildExportTx.ts](./buildExportTx.ts)
 * [buildImportTx.ts](./buildImportTx.ts)
 * [createKeypair.ts](./createKeypair.ts)
+* [createChainTx.ts](./createChainTx.ts)
 * [createSubnetTx.ts](./createSubnetTx.ts)
 * [exportTx-xchain.ts](./exportTx-xchain.ts)
+* [getBalance.ts](./getBalance.ts)
+* [getBlockchains.ts](./getBlockchains.ts)
+* [getBlockchainStatus.ts](./getBlockchainStatus.ts)
+* [getCurrentSupply.ts](./getCurrentSupply.ts)
+* [getCurrentValidators.ts](./getCurrentValidators.ts)
+* [getPendingValidators.ts](./getPendingValidators.ts)
 * [getRewardUTXOs.ts](./getRewardUTXOs.ts)
 * [getStake.ts](./getStake.ts)
+* [getStakingAssetID.ts](./getStakingAssetID.ts)
+* [getSubnets.ts](./getSubnets.ts)
 * [getValidatorsAt.ts](./getValidatorsAt.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
+* [subnetAuth.ts](./subnetAuth.ts)

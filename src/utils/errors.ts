@@ -34,13 +34,15 @@ const PRIVATE_KEY_ERROR_CODE: string = "1032"
 const NODE_ID_ERROR_CODE: string = "1033"
 const HEX_ERROR_CODE: string = "1034"
 const TYPE_ID_ERROR_CODE: string = "1035"
-const TYPE_NAME_ERROR_CODE: string = "1035"
 const UNKNOWN_TYPE_ERROR_CODE: string = "1036"
 const BECH32_ERROR_CODE: string = "1037"
 const EVM_FEE_ERROR_CODE: string = "1038"
 const INVALID_ENTROPY: string = "1039"
+const PROTOCOL_ERROR_CODE: string = "1040"
+const SUBNET_ID_ERROR_CODE: string = "1041"
+const TYPE_NAME_ERROR_CODE: string = "1042"
 
-class AvalancheError extends Error {
+export class AvalancheError extends Error {
   errorCode: string
   constructor(m: string, code: string) {
     super(m)
@@ -337,6 +339,20 @@ export class InvalidEntropy extends AvalancheError {
   constructor(m: string) {
     super(m, INVALID_ENTROPY)
     Object.setPrototypeOf(this, InvalidEntropy.prototype)
+  }
+}
+
+export class ProtocolError extends AvalancheError {
+  constructor(m: string) {
+    super(m, PROTOCOL_ERROR_CODE)
+    Object.setPrototypeOf(this, ProtocolError.prototype)
+  }
+}
+
+export class SubnetIdError extends AvalancheError {
+  constructor(m: string) {
+    super(m, SUBNET_ID_ERROR_CODE)
+    Object.setPrototypeOf(this, SubnetIdError.prototype)
   }
 }
 

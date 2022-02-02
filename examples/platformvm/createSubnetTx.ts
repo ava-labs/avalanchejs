@@ -18,7 +18,8 @@ import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults
+  Defaults,
+  ONEAVAX
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -36,7 +37,7 @@ const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = pchain.getDefaultTxFee()
+const fee: BN = pchain.getCreateSubnetTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("Manually create a subnet")
@@ -62,23 +63,21 @@ const main = async (): Promise<any> => {
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO) => {
     const output: Output = utxo.getOutput()
-    if (output.getOutputID() === 7) {
-      const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-      const amt: BN = amountOutput.getAmount().clone()
-      const txid: Buffer = utxo.getTxID()
-      const outputidx: Buffer = utxo.getOutputIdx()
+    const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
+    const amt: BN = amountOutput.getAmount().clone()
+    const txid: Buffer = utxo.getTxID()
+    const outputidx: Buffer = utxo.getOutputIdx()
 
-      const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-      secpTransferInput.addSignatureIdx(0, pAddresses[0])
+    const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
+    secpTransferInput.addSignatureIdx(0, pAddresses[0])
 
-      const input: TransferableInput = new TransferableInput(
-        txid,
-        outputidx,
-        avaxAssetID,
-        secpTransferInput
-      )
-      inputs.push(input)
-    }
+    const input: TransferableInput = new TransferableInput(
+      txid,
+      outputidx,
+      avaxAssetID,
+      secpTransferInput
+    )
+    inputs.push(input)
   })
 
   const subnetOwner: SECPOwnerOutput = new SECPOwnerOutput(

@@ -26,7 +26,7 @@ describe("Index", () => {
   })
 
   test("getLastAccepted", async () => {
-    const encoding: string = "cb58"
+    const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
     const respobj = {
       id,
@@ -51,7 +51,7 @@ describe("Index", () => {
   })
 
   test("getContainerByIndex", async () => {
-    const encoding: string = "cb58"
+    const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
     const respobj = {
       id,
@@ -80,7 +80,7 @@ describe("Index", () => {
   })
 
   test("getContainerByID", async () => {
-    const encoding: string = "cb58"
+    const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
     const respobj = {
       id,

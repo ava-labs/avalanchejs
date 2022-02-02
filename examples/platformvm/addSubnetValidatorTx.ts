@@ -1,4 +1,16 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import {
+  Avalanche,
+  BinTools,
+  BN,
+  Buffer,
+  GenesisAsset,
+  GenesisData
+} from "../../src"
+import {
+  AVMAPI,
+  InitialStates,
+  KeyChain as AVMKeyChain
+} from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -10,19 +22,23 @@ import {
   UTXO,
   AmountOutput,
   UnsignedTx,
-  AddSubnetValidatorTx,
+  CreateChainTx,
   Tx,
-  SECPOwnerOutput,
-  ParseableOutput
+  SubnetAuth,
+  AddSubnetValidatorTx
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
+  Serialization,
   NodeIDStringToBuffer,
   UnixNow
 } from "../../src/utils"
+
+const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -30,35 +46,29 @@ const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
-const bintools: BinTools = BinTools.getInstance()
 const pKeychain: KeyChain = pchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
+const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const stakeOuts: TransferableOutput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from(
-  "Manually add a validator to the primary subnet"
-)
-const nodeID: string = "NodeID-DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
-const startTime: BN = UnixNow().add(new BN(60 * 1))
-const endTime: BN = startTime.add(new BN(26300000))
-const delegationFee: number = 10
+const nodeID: string = "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
+const startTime: BN = new BN(1641961736)
+const endTime: BN = new BN(1662307000)
 
 const main = async (): Promise<any> => {
-  const stakeAmount: any = await pchain.getMinStake()
+  const memoStr: string = "from snowflake to avalanche"
+  const memo: Buffer = Buffer.from(memoStr, "utf8")
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
-  const subnetID: string = "AcFPM2HLuRDzPwcQHz4KPmJH9pSB1YxFiVCBHFJ46JePZfXDx"
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
-    unlocked.sub(fee).sub(stakeAmount.minValidatorStake),
+    unlocked.sub(fee),
     pAddresses,
     locktime,
     threshold
@@ -68,18 +78,6 @@ const main = async (): Promise<any> => {
     secpTransferOutput
   )
   outputs.push(transferableOutput)
-
-  const stakeSECPTransferOutput: SECPTransferOutput = new SECPTransferOutput(
-    stakeAmount.minValidatorStake,
-    pAddresses,
-    locktime,
-    threshold
-  )
-  const stakeTransferableOutput: TransferableOutput = new TransferableOutput(
-    avaxAssetID,
-    stakeSECPTransferOutput
-  )
-  stakeOuts.push(stakeTransferableOutput)
 
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
@@ -105,6 +103,13 @@ const main = async (): Promise<any> => {
     }
   })
 
+  const weight: BN = new BN(20)
+  const subnetID: Buffer = bintools.cb58Decode(
+    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
+  )
+  const addressIndex: Buffer = Buffer.alloc(4)
+  addressIndex.writeUIntBE(0x0, 0, 4)
+  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
   const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
     networkID,
     bintools.cb58Decode(pChainBlockchainID),
@@ -114,14 +119,14 @@ const main = async (): Promise<any> => {
     NodeIDStringToBuffer(nodeID),
     startTime,
     endTime,
-    stakeAmount.minValidatorStake,
-    bintools.cb58Decode(subnetID)
+    weight,
+    subnetID,
+    subnetAuth
   )
-  console.log(addSubnetValidatorTx)
-  // const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
-  // const tx: Tx = unsignedTx.sign(pKeychain)
-  // const txid: string = await pchain.issueTx(tx)
-  // console.log(`Success! TXID: ${txid}`)
+  const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
+  const tx: Tx = unsignedTx.sign(pKeychain)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
 
 main()

@@ -89,17 +89,21 @@ export abstract class StandardBaseTx<
   /**
    * Returns the id of the [[StandardBaseTx]]
    */
-  abstract getTxType: () => number
+  abstract getTxType(): number
 
   /**
    * Returns the NetworkID as a number
    */
-  getNetworkID = (): number => this.networkID.readUInt32BE(0)
+  getNetworkID(): number {
+    return this.networkID.readUInt32BE(0)
+  }
 
   /**
    * Returns the Buffer representation of the BlockchainID
    */
-  getBlockchainID = (): Buffer => this.blockchainID
+  getBlockchainID(): Buffer {
+    return this.blockchainID
+  }
 
   /**
    * Returns the array of [[StandardTransferableInput]]s
@@ -119,7 +123,9 @@ export abstract class StandardBaseTx<
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the memo
    */
-  getMemo = (): Buffer => this.memo
+  getMemo(): Buffer {
+    return this.memo
+  }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[StandardBaseTx]].
@@ -133,14 +139,14 @@ export abstract class StandardBaseTx<
       this.networkID.length + this.blockchainID.length + this.numouts.length
     const barr: Buffer[] = [this.networkID, this.blockchainID, this.numouts]
     for (let i: number = 0; i < this.outs.length; i++) {
-      const b: Buffer = this.outs[i].toBuffer()
+      const b: Buffer = this.outs[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
     barr.push(this.numins)
     bsize += this.numins.length
     for (let i: number = 0; i < this.ins.length; i++) {
-      const b: Buffer = this.ins[i].toBuffer()
+      const b: Buffer = this.ins[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }
@@ -251,12 +257,14 @@ export abstract class StandardUnsignedTx<
   /**
    * Returns the CodecID as a number
    */
-  getCodecID = (): number => this.codecID
+  getCodecID(): number {
+    return this.codecID
+  }
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the CodecID
    */
-  getCodecIDBuffer = (): Buffer => {
+  getCodecIDBuffer(): Buffer {
     let codecBuf: Buffer = Buffer.alloc(2)
     codecBuf.writeUInt16BE(this.codecID, 0)
     return codecBuf
@@ -265,7 +273,7 @@ export abstract class StandardUnsignedTx<
   /**
    * Returns the inputTotal as a BN
    */
-  getInputTotal = (assetID: Buffer): BN => {
+  getInputTotal(assetID: Buffer): BN {
     const ins: StandardTransferableInput[] = this.getTransaction().getIns()
     const aIDHex: string = assetID.toString("hex")
     let total: BN = new BN(0)
@@ -273,11 +281,11 @@ export abstract class StandardUnsignedTx<
     for (let i: number = 0; i < ins.length; i++) {
       // only check StandardAmountInputs
       if (
-        ins[i].getInput() instanceof StandardAmountInput &&
-        aIDHex === ins[i].getAssetID().toString("hex")
+        ins[`${i}`].getInput() instanceof StandardAmountInput &&
+        aIDHex === ins[`${i}`].getAssetID().toString("hex")
       ) {
         const input: StandardAmountInput = ins[
-          i
+          `${i}`
         ].getInput() as StandardAmountInput
         total = total.add(input.getAmount())
       }
@@ -288,7 +296,7 @@ export abstract class StandardUnsignedTx<
   /**
    * Returns the outputTotal as a BN
    */
-  getOutputTotal = (assetID: Buffer): BN => {
+  getOutputTotal(assetID: Buffer): BN {
     const outs: StandardTransferableOutput[] =
       this.getTransaction().getTotalOuts()
     const aIDHex: string = assetID.toString("hex")
@@ -297,11 +305,11 @@ export abstract class StandardUnsignedTx<
     for (let i: number = 0; i < outs.length; i++) {
       // only check StandardAmountOutput
       if (
-        outs[i].getOutput() instanceof StandardAmountOutput &&
-        aIDHex === outs[i].getAssetID().toString("hex")
+        outs[`${i}`].getOutput() instanceof StandardAmountOutput &&
+        aIDHex === outs[`${i}`].getAssetID().toString("hex")
       ) {
         const output: StandardAmountOutput = outs[
-          i
+          `${i}`
         ].getOutput() as StandardAmountOutput
         total = total.add(output.getAmount())
       }
@@ -312,7 +320,7 @@ export abstract class StandardUnsignedTx<
   /**
    * Returns the number of burned tokens as a BN
    */
-  getBurn = (assetID: Buffer): BN => {
+  getBurn(assetID: Buffer): BN {
     return this.getInputTotal(assetID).sub(this.getOutputTotal(assetID))
   }
 
@@ -383,14 +391,14 @@ export abstract class StandardTx<
   /**
    * Returns the [[Credential[]]]
    */
-  getCredentials = (): Credential[] => {
+  getCredentials(): Credential[] {
     return this.credentials
   }
 
   /**
    * Returns the [[StandardUnsignedTx]]
    */
-  getUnsignedTx = (): SUBTx => {
+  getUnsignedTx(): SUBTx {
     return this.unsignedTx
   }
 
@@ -410,12 +418,12 @@ export abstract class StandardTx<
     const barr: Buffer[] = [txbuff, credlen]
     bsize += credlen.length
     for (let i: number = 0; i < this.credentials.length; i++) {
-      this.credentials[i].setCodecID(codecID)
+      this.credentials[`${i}`].setCodecID(codecID)
       const credID: Buffer = Buffer.alloc(4)
-      credID.writeUInt32BE(this.credentials[i].getCredentialID(), 0)
+      credID.writeUInt32BE(this.credentials[`${i}`].getCredentialID(), 0)
       barr.push(credID)
       bsize += credID.length
-      const credbuff: Buffer = this.credentials[i].toBuffer()
+      const credbuff: Buffer = this.credentials[`${i}`].toBuffer()
       bsize += credbuff.length
       barr.push(credbuff)
     }

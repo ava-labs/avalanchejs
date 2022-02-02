@@ -1,32 +1,31 @@
 import { Avalanche } from "src"
 
-export function getAvalanche() {
-  if (process.env.AVALANCHEGO_IP == undefined) {
-    throw "undefined environment variable: AVALANCHEGO_IP"
+export const getAvalanche = (): Avalanche => {
+  if (typeof process.env.AVALANCHEGO_IP === "undefined") {
+    throw "Undefined environment variable: AVALANCHEGO_IP"
   }
-  if (process.env.AVALANCHEGO_PORT == undefined) {
-    throw "undefined environment variable: AVALANCHEGO_PORT"
+  if (typeof process.env.AVALANCHEGO_PORT === "undefined") {
+    throw "Undefined environment variable: AVALANCHEGO_PORT"
   }
-  const avalanche = new Avalanche(
+  const avalanche: Avalanche = new Avalanche(
     process.env.AVALANCHEGO_IP,
-    parseInt(process.env.AVALANCHEGO_PORT),
-    "http"
+    parseInt(process.env.AVALANCHEGO_PORT)
   )
   return avalanche
 }
 
 export enum Matcher {
-    toBe,
-    toEqual,
-    toContain,
-    toMatch,
-    toThrow,
-    Get,
+  toBe,
+  toEqual,
+  toContain,
+  toMatch,
+  toThrow,
+  Get
 }
 
-export function createTests(tests_spec) {
+export const createTests = (tests_spec: any[]): void => {
   for (const [testName, promise, preprocess, matcher, expected] of tests_spec) {
-    test(testName, async () => {
+    test(testName, async (): Promise<void> => {
       if (matcher == Matcher.toBe) {
         expect(preprocess(await promise())).toBe(expected())
       }

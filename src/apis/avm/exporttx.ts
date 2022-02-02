@@ -97,7 +97,7 @@ export class ExportTx extends BaseTx {
   /**
    * Returns the id of the [[ExportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
@@ -115,7 +115,7 @@ export class ExportTx extends BaseTx {
     let val: BN = new BN(0)
     for (let i: number = 0; i < this.exportOuts.length; i++) {
       val = val.add(
-        (this.exportOuts[i].getOutput() as AmountOutput).getAmount()
+        (this.exportOuts[`${i}`].getOutput() as AmountOutput).getAmount()
       )
     }
     return val
@@ -131,7 +131,7 @@ export class ExportTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the destination chainid.
    */
-  getDestinationChain = (): Buffer => {
+  getDestinationChain(): Buffer {
     return this.destinationChain
   }
 
@@ -172,7 +172,7 @@ export class ExportTx extends BaseTx {
     let barr: Buffer[] = [super.toBuffer(), this.destinationChain, this.numOuts]
     this.exportOuts = this.exportOuts.sort(TransferableOutput.comparator())
     for (let i: number = 0; i < this.exportOuts.length; i++) {
-      barr.push(this.exportOuts[i].toBuffer())
+      barr.push(this.exportOuts[`${i}`].toBuffer())
     }
     return Buffer.concat(barr)
   }
@@ -211,7 +211,7 @@ export class ExportTx extends BaseTx {
     this.destinationChain = destinationChain // no correction, if they don"t pass a chainid here, it will BOMB on toBuffer
     if (typeof exportOuts !== "undefined" && Array.isArray(exportOuts)) {
       for (let i: number = 0; i < exportOuts.length; i++) {
-        if (!(exportOuts[i] instanceof TransferableOutput)) {
+        if (!(exportOuts[`${i}`] instanceof TransferableOutput)) {
           throw new TransferableOutputError(
             `Error - ExportTx.constructor: invalid TransferableOutput in array parameter ${exportOuts}`
           )

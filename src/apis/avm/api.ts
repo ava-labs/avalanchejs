@@ -36,7 +36,6 @@ import {
   CreateAddressParams,
   CreateFixedCapAssetParams,
   CreateVariableCapAssetParams,
-  ExportAVAXParams,
   ExportParams,
   ExportKeyParams,
   GetAllBalancesParams,
@@ -46,7 +45,6 @@ import {
   GetTxParams,
   GetTxStatusParams,
   GetUTXOsParams,
-  ImportAVAXParams,
   ImportParams,
   ImportKeyParams,
   ListAddressesParams,
@@ -90,9 +88,10 @@ export class AVMAPI extends JRPCAPI {
       const netid: number = this.core.getNetworkID()
       if (
         netid in Defaults.network &&
-        this.blockchainID in Defaults.network[netid]
+        this.blockchainID in Defaults.network[`${netid}`]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netid}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -132,9 +131,9 @@ export class AVMAPI extends JRPCAPI {
     const netid: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netid] !== "undefined"
+      typeof Defaults.network[`${netid}`] !== "undefined"
     ) {
-      this.blockchainID = Defaults.network[netid].X.blockchainID //default to X-Chain
+      this.blockchainID = Defaults.network[`${netid}`].X.blockchainID //default to X-Chain
       return true
     }
     if (typeof blockchainID === "string") {
@@ -394,7 +393,7 @@ export class AVMAPI extends JRPCAPI {
    * ]
    * ```
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
+   * @returns Returns a Promise string containing the base 58 string representation of the ID of the newly created asset.
    */
   createFixedCapAsset = async (
     username: string,
@@ -449,7 +448,7 @@ export class AVMAPI extends JRPCAPI {
    * ]
    * ```
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the ID of the newly created asset.
+   * @returns Returns a Promise string containing the base 58 string representation of the ID of the newly created asset.
    */
   createVariableCapAsset = async (
     username: string,
@@ -482,7 +481,7 @@ export class AVMAPI extends JRPCAPI {
    * @param to The address to assign the units of the minted asset
    * @param minters Addresses of the minters responsible for signing the transaction
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the unsigned transaction.
+   * @returns Returns a Promise string containing the base 58 string representation of the unsigned transaction.
    */
   mint = async (
     username: string,
@@ -578,7 +577,7 @@ export class AVMAPI extends JRPCAPI {
   /**
    * Send ANT (Avalanche Native Token) assets including AVAX from the X-Chain to an account on the P-Chain or C-Chain.
    *
-   * After calling this method, you must call the P-Chain's `importAVAX` or the C-Chain’s `import` method to complete the transfer.
+   * After calling this method, you must call the P-Chain's `import` or the C-Chain’s `import` method to complete the transfer.
    *
    * @param username The Keystore user that controls the P-Chain or C-Chain account specified in `to`
    * @param password The password of the Keystore user
@@ -604,37 +603,6 @@ export class AVMAPI extends JRPCAPI {
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.export",
-      params
-    )
-    return response.data.result.txID
-  }
-
-  /**
-   * Send AVAX from the X-Chain to an account on the P-Chain or C-Chain.
-   *
-   * After calling this method, you must call the P-Chain’s or C-Chain's importAVAX method to complete the transfer.
-   *
-   * @param username The Keystore user that controls the P-Chain account specified in `to`
-   * @param password The password of the Keystore user
-   * @param to The account on the P-Chain or C-Chain to send the AVAX to.
-   * @param amount Amount of AVAX to export as a {@link https://github.com/indutny/bn.js/|BN}
-   *
-   * @returns String representing the transaction id
-   */
-  exportAVAX = async (
-    username: string,
-    password: string,
-    to: string,
-    amount: BN
-  ): Promise<string> => {
-    const params: ExportAVAXParams = {
-      to,
-      amount: amount,
-      username,
-      password
-    }
-    const response: RequestResponseData = await this.callMethod(
-      "avm.exportAVAX",
       params
     )
     return response.data.result.txID
@@ -667,36 +635,6 @@ export class AVMAPI extends JRPCAPI {
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.import",
-      params
-    )
-    return response.data.result.txID
-  }
-
-  /**
-   * Finalize a transfer of AVAX from the P-Chain to the X-Chain.
-   *
-   * Before this method is called, you must call the P-Chain’s `exportAVAX` method to initiate the transfer.
-   * @param username The Keystore user that controls the address specified in `to`
-   * @param password The password of the Keystore user
-   * @param to The address the AVAX is sent to. This must be the same as the to argument in the corresponding call to the P-Chain’s exportAVAX, except that the prepended X- should be included in this argument
-   * @param sourceChain Chain the funds are coming from.
-   *
-   * @returns String representing the transaction id
-   */
-  importAVAX = async (
-    username: string,
-    password: string,
-    to: string,
-    sourceChain: string
-  ): Promise<string> => {
-    const params: ImportAVAXParams = {
-      to,
-      sourceChain,
-      username,
-      password
-    }
-    const response: RequestResponseData = await this.callMethod(
-      "avm.importAVAX",
       params
     )
     return response.data.result.txID
@@ -754,7 +692,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an b58 serialized string for the AssetID or its alias.
    *
-   * @returns Returns a Promise<object> with keys "name" and "symbol".
+   * @returns Returns a Promise object with keys "name" and "symbol".
    */
   getAssetDescription = async (
     assetID: Buffer | string
@@ -790,7 +728,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   * @returns Returns a Promise string containing the bytes retrieved from the node
    */
   getTx = async (txID: string): Promise<string> => {
     const params: GetTxParams = {
@@ -808,7 +746,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the status retrieved from the node
+   * @returns Returns a Promise string containing the status retrieved from the node
    */
   getTxStatus = async (txID: string): Promise<string> => {
     const params: GetTxStatusParams = {
@@ -1101,7 +1039,6 @@ export class AVMAPI extends JRPCAPI {
       srcChain = sourceChain
       sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - AVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
@@ -1589,7 +1526,7 @@ export class AVMAPI extends JRPCAPI {
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
    *
-   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   * @returns A Promise string representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
     let Transaction = ""
@@ -1817,21 +1754,22 @@ export class AVMAPI extends JRPCAPI {
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
       for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === "string") {
+        if (typeof addresses[`${i}`] === "string") {
           if (
-            typeof this.parseAddress(addresses[i] as string) === "undefined"
+            typeof this.parseAddress(addresses[`${i}`] as string) ===
+            "undefined"
           ) {
             /* istanbul ignore next */
             throw new AddressError(
               "Error - AVMAPI.${caller}: Invalid address format"
             )
           }
-          addrs.push(addresses[i] as string)
+          addrs.push(addresses[`${i}`] as string)
         } else {
           const type: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
-              addresses[i] as Buffer,
+              addresses[`${i}`] as Buffer,
               type,
               this.core.getHRP(),
               chainID
@@ -1844,7 +1782,7 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * This class should not be instantiated directly. Instead use the [[Avalanche.addAPI]] method.
+   * This class should not be instantiated directly. Instead use the [[Avalanche.addAP`${I}`]] method.
    *
    * @param core A reference to the Avalanche class
    * @param baseURL Defaults to the string "/ext/bc/X" as the path to blockchain's baseURL
@@ -1858,8 +1796,11 @@ export class AVMAPI extends JRPCAPI {
     super(core, baseURL)
     this.blockchainID = blockchainID
     const netID: number = core.getNetworkID()
-    if (netID in Defaults.network && blockchainID in Defaults.network[netID]) {
-      const { alias } = Defaults.network[netID][blockchainID]
+    if (
+      netID in Defaults.network &&
+      blockchainID in Defaults.network[`${netID}`]
+    ) {
+      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)

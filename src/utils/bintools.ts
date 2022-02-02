@@ -200,7 +200,7 @@ export default class BinTools {
     const ab = new ArrayBuffer(buff.length)
     const view = new Uint8Array(ab)
     for (let i: number = 0; i < buff.length; ++i) {
-      view[i] = buff[i]
+      view[`${i}`] = buff[`${i}`]
     }
     return view
   }
@@ -213,7 +213,7 @@ export default class BinTools {
   fromArrayBufferToBuffer = (ab: ArrayBuffer): Buffer => {
     const buf = Buffer.alloc(ab.byteLength)
     for (let i: number = 0; i < ab.byteLength; ++i) {
-      buf[i] = ab[i]
+      buf[`${i}`] = ab[`${i}`]
     }
     return buf
   }
@@ -353,6 +353,7 @@ export default class BinTools {
       humanReadablePart !== "avax" &&
       humanReadablePart !== "fuji" &&
       humanReadablePart != "local" &&
+      humanReadablePart != "custom" &&
       humanReadablePart != hrp
     ) {
       throw new Bech32Error("Error - Invalid HRP")

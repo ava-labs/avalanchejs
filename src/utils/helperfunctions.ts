@@ -13,18 +13,18 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
 import { PrivateKeyError, NodeIdError } from "../utils/errors"
-import { ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
+import { ExportTx, ImportTx, TransferableInput, UnsignedTx } from "../apis/evm"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
 
-export function getPreferredHRP(networkID: number = undefined) {
+export function getPreferredHRP(networkID: number = undefined): string {
   if (networkID in NetworkIDToHRP) {
-    return NetworkIDToHRP[networkID]
+    return NetworkIDToHRP[`${networkID}`]
   } else if (typeof networkID === "undefined") {
-    return NetworkIDToHRP[DefaultNetworkID]
+    return NetworkIDToHRP[`${DefaultNetworkID}`]
   }
   return FallbackHRP
 }
@@ -46,7 +46,7 @@ export function UnixNow(): BN {
  * @param pk A {@link https://github.com/feross/buffer|Buffer} for the private key.
  */
 export function bufferToPrivateKeyString(pk: Buffer): string {
-  return "PrivateKey-" + bintools.cb58Encode(pk)
+  return `PrivateKey-${bintools.cb58Encode(pk)}`
 }
 
 /**
@@ -60,7 +60,7 @@ export function privateKeyStringToBuffer(pk: string): Buffer {
       "Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'"
     )
   }
-  let pksplit: string[] = pk.split("-")
+  const pksplit: string[] = pk.split("-")
   return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }
 
@@ -70,7 +70,7 @@ export function privateKeyStringToBuffer(pk: string): Buffer {
  * @param pk A {@link https://github.com/feross/buffer|Buffer} for the nodeID.
  */
 export function bufferToNodeIDString(pk: Buffer): string {
-  return "NodeID-" + bintools.cb58Encode(pk)
+  return `NodeID-${bintools.cb58Encode(pk)}`
 }
 
 /**
@@ -84,20 +84,30 @@ export function NodeIDStringToBuffer(pk: string): Buffer {
       "Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'"
     )
   }
-  let pksplit: string[] = pk.split("-")
+  const pksplit: string[] = pk.split("-")
   return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }
 
 export function costImportTx(tx: UnsignedTx): number {
-  let cost: number = calcBytesCost(tx.toBuffer().byteLength)
+  let bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
   const importTx = tx.getTransaction() as ImportTx
-  importTx.getImportInputs().forEach((input: TransferableInput) => {
-    const inCost = input.getCost()
-    cost += inCost
+  importTx.getImportInputs().forEach((input: TransferableInput): void => {
+    const inCost: number = input.getCost()
+    bytesCost += inCost
   })
-  return cost
+  const fixedFee: number = 10000
+  return bytesCost + fixedFee
 }
 
 export function calcBytesCost(len: number): number {
-  return len * Defaults.network[1].C["txBytesGas"]
+  return len * Defaults.network[1].C.txBytesGas
+}
+
+export function costExportTx(tx: UnsignedTx): number {
+  const bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
+  const exportTx = tx.getTransaction() as ExportTx
+  const numSigs: number = exportTx.getInputs().length
+  const sigCost: number = numSigs * Defaults.network[1].C.costPerSignature
+  const fixedFee: number = 10000
+  return bytesCost + sigCost + fixedFee
 }

@@ -100,9 +100,9 @@ export class Tx extends EVMStandardTx<KeyPair, KeyChain, UnsignedTx> {
     this.credentials = []
     for (let i: number = 0; i < fields["credentials"].length; i++) {
       const cred: Credential = SelectCredentialClass(
-        fields["credentials"][i]["_typeID"]
+        fields["credentials"][`${i}`]["_typeID"]
       )
-      cred.deserialize(fields["credentials"][i], encoding)
+      cred.deserialize(fields["credentials"][`${i}`], encoding)
       this.credentials.push(cred)
     }
   }
