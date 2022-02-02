@@ -16,20 +16,26 @@ import {
   TransferableOutput
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
-import { Avalanche } from "../../../src/index"
+import { Avalanche, GenesisData } from "../../../src/index"
 import { UTF8Payload } from "../../../src/utils/payload"
-import { UnixNow } from "../../../src/utils/helperfunctions"
+import {
+  NodeIDStringToBuffer,
+  UnixNow
+} from "../../../src/utils/helperfunctions"
 import { BaseTx } from "../../../src/apis/platformvm/basetx"
 import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import { AddSubnetValidatorTx, SubnetAuth } from "src/apis/platformvm"
 
-/**
- * @ignore
- */
-const bintools: BinTools = BinTools.getInstance()
 describe("Transactions", (): void => {
+  /**
+   * @ignore
+   */
+  const bintools: BinTools = BinTools.getInstance()
+
+  const networkID: number = 12345
   let set: UTXOSet
   let keymgr1: KeyChain
   let keymgr2: KeyChain
@@ -67,11 +73,35 @@ describe("Transactions", (): void => {
   const ip: string = "127.0.0.1"
   const port: number = 8080
   const protocol: string = "http"
+  const nodeIDStr: string = "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
+  const nodeID: Buffer = NodeIDStringToBuffer(
+    "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
+  )
+  const startTime: BN = new BN(1641961736)
+  const endTime: BN = new BN(1662307000)
+  const weight: BN = new BN(20)
   let avalanche: Avalanche
   const name: string = "Mortycoin is the dumb as a sack of hammers."
   const symbol: string = "morT"
   const denomination: number = 8
   let avaxAssetID: Buffer
+  const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
+  const genesisDataStr: string =
+    "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
+  const subnetIDStr: string =
+    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
+  const memoStr: string = "from snowflake to avalanche"
+  const memo: Buffer = Buffer.from(memoStr, "utf8")
+  const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
+  const chainNameStr: string = "EPIC AVM"
+  const vmIDStr: string = "avm"
+  const fxIDsStr: string[] = ["secp256k1fx"]
+  const gd: GenesisData = new GenesisData()
+  gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
+  const addressIndex: Buffer = Buffer.alloc(4)
+  addressIndex.writeUIntBE(0x0, 0, 4)
+  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  let addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
 
   beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(
@@ -184,12 +214,23 @@ describe("Transactions", (): void => {
       exportUTXOIDS.push(fungutxos[i].getUTXOID())
     }
     set.addArray(utxos)
+
+    addSubnetValidatorTx = new AddSubnetValidatorTx(
+      networkID,
+      bintools.cb58Decode(pChainBlockchainID),
+      outputs,
+      inputs,
+      memo,
+      nodeID,
+      startTime,
+      endTime,
+      weight,
+      subnetID,
+      subnetAuth
+    )
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
-
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("266")
@@ -227,7 +268,6 @@ describe("Transactions", (): void => {
 
   test("confirm inputTotal, outputTotal and fee are correct", async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     // AVAX assetID
     const assetID: Buffer = bintools.cb58Decode(
@@ -274,8 +314,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create small BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network X Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -313,8 +351,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create large BaseTx that is Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -352,8 +388,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create large BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -458,7 +492,7 @@ describe("Transactions", (): void => {
       bombtx.toBuffer()
     }).toThrow()
 
-    const importtx: ImportTx = new ImportTx(
+    const importTx: ImportTx = new ImportTx(
       netid,
       blockchainID,
       outputs,
@@ -468,12 +502,16 @@ describe("Transactions", (): void => {
       importIns
     )
     const txunew: ImportTx = new ImportTx()
-    const importbuff: Buffer = importtx.toBuffer()
+    const importbuff: Buffer = importTx.toBuffer()
     txunew.fromBuffer(importbuff)
 
+    expect(importTx).toBeInstanceOf(ImportTx)
+    expect(importTx.getSourceChain().toString("hex")).toBe(
+      bintools.cb58Decode(PlatformChainID).toString("hex")
+    )
     expect(txunew.toBuffer().toString("hex")).toBe(importbuff.toString("hex"))
-    expect(txunew.toString()).toBe(importtx.toString())
-    expect(importtx.getImportInputs().length).toBe(importIns.length)
+    expect(txunew.toString()).toBe(importTx.toString())
+    expect(importTx.getImportInputs().length).toBe(importIns.length)
   })
 
   test("Creation ExportTx", (): void => {
@@ -491,7 +529,7 @@ describe("Transactions", (): void => {
       bombtx.toBuffer()
     }).toThrow()
 
-    const exporttx: ExportTx = new ExportTx(
+    const exportTx: ExportTx = new ExportTx(
       netid,
       blockchainID,
       outputs,
@@ -501,12 +539,16 @@ describe("Transactions", (): void => {
       exportOuts
     )
     const txunew: ExportTx = new ExportTx()
-    const exportbuff: Buffer = exporttx.toBuffer()
+    const exportbuff: Buffer = exportTx.toBuffer()
     txunew.fromBuffer(exportbuff)
 
+    expect(exportTx).toBeInstanceOf(ExportTx)
+    expect(exportTx.getDestinationChain().toString("hex")).toBe(
+      bintools.cb58Decode(PlatformChainID).toString("hex")
+    )
     expect(txunew.toBuffer().toString("hex")).toBe(exportbuff.toString("hex"))
-    expect(txunew.toString()).toBe(exporttx.toString())
-    expect(exporttx.getExportOutputs().length).toBe(exportOuts.length)
+    expect(txunew.toString()).toBe(exportTx.toString())
+    expect(exportTx.getExportOutputs().length).toBe(exportOuts.length)
   })
 
   test("Creation Tx1 with asof, locktime, threshold", (): void => {
@@ -588,5 +630,31 @@ describe("Transactions", (): void => {
     const tx2: Tx = new Tx()
     tx2.fromBuffer(tx.toBuffer())
     expect(tx.toBuffer().toString("hex")).toBe(tx2.toBuffer().toString("hex"))
+  })
+  test("addSubnetValidatorTx getBlockchainID", (): void => {
+    const blockchainIDBuf: Buffer = addSubnetValidatorTx.getBlockchainID()
+    const blockchainIDStr: string = bintools.cb58Encode(blockchainIDBuf)
+    expect(blockchainIDStr).toBe(pChainBlockchainID)
+  })
+  test("addSubnetValidatorTx getNodeID", (): void => {
+    const nodeIDBuf: Buffer = addSubnetValidatorTx.getNodeID()
+    const nIDStr: string = bintools.cb58Encode(nodeIDBuf)
+    expect(`NodeID-${nIDStr}`).toBe(nodeIDStr)
+  })
+  test("addSubnetValidatorTx getStartTime", (): void => {
+    const startTimeBN: BN = addSubnetValidatorTx.getStartTime()
+    expect(startTimeBN.toNumber()).toEqual(startTime.toNumber())
+  })
+  test("addSubnetValidatorTx getEndTime", (): void => {
+    const endTimeBN: BN = addSubnetValidatorTx.getEndTime()
+    expect(endTimeBN.toNumber()).toEqual(endTime.toNumber())
+  })
+  test("addSubnetValidatorTx getWeight", (): void => {
+    const weightBN: BN = addSubnetValidatorTx.getWeight()
+    expect(weightBN.toNumber()).toEqual(weight.toNumber())
+  })
+  test("addSubnetValidatorTx getSubnetID", (): void => {
+    const sIDStr: string = addSubnetValidatorTx.getSubnetID()
+    expect(sIDStr).toBe(subnetIDStr)
   })
 })

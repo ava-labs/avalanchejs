@@ -109,7 +109,7 @@ export abstract class Input extends Serializable {
     let bsize: number = this.sigCount.length
     const barr: Buffer[] = [this.sigCount]
     for (let i: number = 0; i < this.sigIdxs.length; i++) {
-      const b: Buffer = this.sigIdxs[i].toBuffer()
+      const b: Buffer = this.sigIdxs[`${i}`].toBuffer()
       barr.push(b)
       bsize += b.length
     }

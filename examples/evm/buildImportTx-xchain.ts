@@ -1,4 +1,4 @@
-import { Avalanche } from "../../src"
+import { Avalanche, BN } from "../../src"
 import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
   EVMAPI,
@@ -10,7 +10,8 @@ import {
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults
+  Defaults,
+  costImportTx
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -30,18 +31,32 @@ const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
 const xChainBlockchainId: string = Defaults.network[networkID].X.blockchainID
 
 const main = async (): Promise<any> => {
+  const baseFeeResponse: string = await cchain.getBaseFee()
+  const baseFee = new BN(parseInt(baseFeeResponse, 16))
+  let fee: BN = baseFee
   const evmUTXOResponse: any = await cchain.getUTXOs(
     cAddressStrings,
     xChainBlockchainId
   )
   const utxoSet: UTXOSet = evmUTXOResponse.utxos
-
-  const unsignedTx: UnsignedTx = await cchain.buildImportTx(
+  let unsignedTx: UnsignedTx = await cchain.buildImportTx(
     utxoSet,
     cHexAddress,
     cAddressStrings,
     xChainBlockchainId,
-    cAddressStrings
+    cAddressStrings,
+    fee
+  )
+  const importCost: number = costImportTx(unsignedTx)
+  fee = baseFee.mul(new BN(importCost))
+
+  unsignedTx = await cchain.buildImportTx(
+    utxoSet,
+    cHexAddress,
+    cAddressStrings,
+    xChainBlockchainId,
+    cAddressStrings,
+    fee
   )
 
   const tx: Tx = unsignedTx.sign(cKeychain)

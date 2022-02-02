@@ -92,34 +92,42 @@ export class CreateAssetTx extends BaseTx {
   /**
    * Returns the id of the [[CreateAssetTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
   /**
    * Returns the array of array of [[Output]]s for the initial state
    */
-  getInitialStates = (): InitialStates => this.initialState
+  getInitialStates(): InitialStates {
+    return this.initialState
+  }
 
   /**
    * Returns the string representation of the name
    */
-  getName = (): string => this.name
+  getName(): string {
+    return this.name
+  }
 
   /**
    * Returns the string representation of the symbol
    */
-  getSymbol = (): string => this.symbol
+  getSymbol(): string {
+    return this.symbol
+  }
 
   /**
    * Returns the numeric representation of the denomination
    */
-  getDenomination = (): number => this.denomination.readUInt8(0)
+  getDenomination(): number {
+    return this.denomination.readUInt8(0)
+  }
 
   /**
    * Returns the {@link https://github.com/feross/buffer|Buffer} representation of the denomination
    */
-  getDenominationBuffer = (): Buffer => {
+  getDenominationBuffer(): Buffer {
     return this.denomination
   }
 

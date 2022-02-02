@@ -97,14 +97,14 @@ export class ImportTx extends BaseTx {
   /**
    * Returns the id of the [[ImportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
    */
-  getSourceChain = (): Buffer => {
+  getSourceChain(): Buffer {
     return this.sourceChain
   }
 
@@ -145,7 +145,7 @@ export class ImportTx extends BaseTx {
     let barr: Buffer[] = [super.toBuffer(), this.sourceChain, this.numIns]
     this.importIns = this.importIns.sort(TransferableInput.comparator())
     for (let i: number = 0; i < this.importIns.length; i++) {
-      barr.push(this.importIns[i].toBuffer())
+      barr.push(this.importIns[`${i}`].toBuffer())
     }
     return Buffer.concat(barr)
   }
@@ -178,11 +178,11 @@ export class ImportTx extends BaseTx {
     const sigs: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.importIns.length; i++) {
       const cred: Credential = SelectCredentialClass(
-        this.importIns[i].getInput().getCredentialID()
+        this.importIns[`${i}`].getInput().getCredentialID()
       )
-      const sigidxs: SigIdx[] = this.importIns[i].getInput().getSigIdxs()
+      const sigidxs: SigIdx[] = this.importIns[`${i}`].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[j].getSource())
+        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
         const signval: Buffer = keypair.sign(msg)
         const sig: Signature = new Signature()
         sig.fromBuffer(signval)
@@ -217,7 +217,7 @@ export class ImportTx extends BaseTx {
     this.sourceChain = sourceChain // do not correct, if it's wrong it'll bomb on toBuffer
     if (typeof importIns !== "undefined" && Array.isArray(importIns)) {
       for (let i: number = 0; i < importIns.length; i++) {
-        if (!(importIns[i] instanceof TransferableInput)) {
+        if (!(importIns[`${i}`] instanceof TransferableInput)) {
           throw new TransferableInputError(
             `Error - ImportTx.constructor: invalid TransferableInput in array parameter ${importIns}`
           )

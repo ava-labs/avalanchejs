@@ -27,6 +27,8 @@ export class PlatformVMConstants {
 
   static BASETX: number = 0
 
+  static SUBNETAUTH: number = 10
+
   static ADDVALIDATORTX: number = 12
 
   static ADDSUBNETVALIDATORTX: number = 13

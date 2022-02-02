@@ -27,6 +27,8 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
+  GetCurrentValidatorsParams,
+  GetPendingValidatorsParams,
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
   GetStakeParams,
@@ -36,6 +38,8 @@ import {
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
+import { SubnetAuth } from "."
+import { GenesisData } from "../avm"
 
 /**
  * @ignore
@@ -80,9 +84,10 @@ export class PlatformVMAPI extends JRPCAPI {
       const netid: number = this.core.getNetworkID()
       if (
         netid in Defaults.network &&
-        this.blockchainID in Defaults.network[netid]
+        this.blockchainID in Defaults.network[`${netid}`]
       ) {
-        this.blockchainAlias = Defaults.network[netid][this.blockchainID].alias
+        this.blockchainAlias =
+          Defaults.network[`${netid}`][this.blockchainID].alias
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -122,7 +127,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const netid: number = this.core.getNetworkID()
     if (
       typeof blockchainID === "undefined" &&
-      typeof Defaults.network[netid] !== "undefined"
+      typeof Defaults.network[`${netid}`] !== "undefined"
     ) {
       this.blockchainID = PlatformChainID //default to P-Chain
       return true
@@ -216,6 +221,30 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * Gets the CreateSubnetTx fee.
+   *
+   * @returns The CreateSubnetTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateSubnetTxFee = (): BN => {
+    return this.core.getNetworkID() in Defaults.network
+      ? new BN(
+          Defaults.network[this.core.getNetworkID()]["P"]["createSubnetTx"]
+        )
+      : new BN(0)
+  }
+
+  /**
+   * Gets the CreateChainTx fee.
+   *
+   * @returns The CreateChainTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateChainTxFee = (): BN => {
+    return this.core.getNetworkID() in Defaults.network
+      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["createChainTx"])
+      : new BN(0)
+  }
+
+  /**
    * Sets the tx fee for this chain.
    *
    * @param fee The tx fee amount to set as {@link https://github.com/indutny/bn.js/|BN}
@@ -306,7 +335,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Retrieves an assetID for a subnet"s staking assset.
    *
-   * @returns Returns a Promise<string> with cb58 encoded value of the assetID.
+   * @returns Returns a Promise string with cb58 encoded value of the assetID.
    */
   getStakingAssetID = async (): Promise<string> => {
     const response: RequestResponseData = await this.callMethod(
@@ -381,7 +410,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param height The P-Chain height to get the validator set at.
    * @param subnetID Optional. A cb58 serialized string for the SubnetID or its alias.
    *
-   * @returns Promise<GetValidatorsAtResponse>
+   * @returns Promise GetValidatorsAtResponse
    */
   getValidatorsAt = async (
     height: number,
@@ -475,18 +504,23 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an
    * cb58 serialized string for the SubnetID or its alias.
+   * @param nodeIDs Optional. An array of strings
    *
    * @returns Promise for an array of validators that are currently staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetcurrentvalidators|platform.getCurrentValidators documentation}.
    *
    */
   getCurrentValidators = async (
-    subnetID: Buffer | string = undefined
+    subnetID: Buffer | string = undefined,
+    nodeIDs: string[] = undefined
   ): Promise<object> => {
-    const params: any = {}
+    const params: GetCurrentValidatorsParams = {}
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
     } else if (typeof subnetID !== "undefined") {
       params.subnetID = bintools.cb58Encode(subnetID)
+    }
+    if (typeof nodeIDs != "undefined" && nodeIDs.length > 0) {
+      params.nodeIDs = nodeIDs
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getCurrentValidators",
@@ -500,18 +534,23 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer}
    * or a cb58 serialized string for the SubnetID or its alias.
+   * @param nodeIDs Optional. An array of strings
    *
    * @returns Promise for an array of validators that are pending staking, see: {@link https://docs.avax.network/v1.0/en/api/platform/#platformgetpendingvalidators|platform.getPendingValidators documentation}.
    *
    */
   getPendingValidators = async (
-    subnetID: Buffer | string = undefined
+    subnetID: Buffer | string = undefined,
+    nodeIDs: string[] = undefined
   ): Promise<object> => {
-    const params: any = {}
+    const params: GetPendingValidatorsParams = {}
     if (typeof subnetID === "string") {
       params.subnetID = subnetID
     } else if (typeof subnetID !== "undefined") {
       params.subnetID = bintools.cb58Encode(subnetID)
+    }
+    if (typeof nodeIDs != "undefined" && nodeIDs.length > 0) {
+      params.nodeIDs = nodeIDs
     }
 
     const response: RequestResponseData = await this.callMethod(
@@ -843,7 +882,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
    *
-   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   * @returns A Promise string representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
     let Transaction = ""
@@ -1053,7 +1092,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @param txid The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string | ErrorResponseObject> containing the bytes retrieved from the node
+   * @returns Returns a Promise string or ErrorResponseObject containing the bytes retrieved from the node
    */
   getTx = async (txid: string): Promise<string | ErrorResponseObject> => {
     const params: any = {
@@ -1074,7 +1113,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param txid The string representation of the transaction ID
    * @param includeReason Return the reason tx was dropped, if applicable. Defaults to true
    *
-   * @returns Returns a Promise<string> containing the status retrieved from the node and the reason a tx was dropped, if applicable.
+   * @returns Returns a Promise string containing the status retrieved from the node and the reason a tx was dropped, if applicable.
    */
   getTxStatus = async (
     txid: string,
@@ -1214,7 +1253,6 @@ export class PlatformVMAPI extends JRPCAPI {
       srcChain = sourceChain
       sourceChain = bintools.cb58Decode(sourceChain)
     } else if (!(sourceChain instanceof Buffer)) {
-      srcChain = bintools.cb58Encode(sourceChain)
       throw new ChainIdError(
         "Error - PlatformVMAPI.buildImportTx: Invalid destinationChain type: " +
           typeof sourceChain
@@ -1689,7 +1727,78 @@ return builtUnsignedTx
       change,
       owners,
       subnetOwnerThreshold,
-      this.getCreationTxFee(),
+      this.getCreateSubnetTxFee(),
+      avaxAssetID,
+      memo,
+      asOf
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  /**
+   * Build an unsigned [[CreateChainTx]].
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param subnetID Optional ID of the Subnet that validates this blockchain
+   * @param chainName Optional A human readable name for the chain; need not be unique
+   * @param vmID Optional ID of the VM running on the new chain
+   * @param fxIDs Optional IDs of the feature extensions running on the new chain
+   * @param genesisData Optional Byte representation of genesis state of the new chain
+   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildCreateChainTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    subnetID: string | Buffer = undefined,
+    chainName: string = undefined,
+    vmID: string = undefined,
+    fxIDs: string[] = undefined,
+    genesisData: GenesisData = undefined,
+    subnetAuth: SubnetAuth = undefined,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = UnixNow()
+  ): Promise<UnsignedTx> => {
+    const from: Buffer[] = this._cleanAddressArray(
+      fromAddresses,
+      "buildCreateChainTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(
+      changeAddresses,
+      "buildCreateChainTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    fxIDs = fxIDs.sort()
+
+    const builtUnsignedTx: UnsignedTx = utxoset.buildCreateChainTx(
+      this.core.getNetworkID(),
+      bintools.cb58Decode(this.blockchainID),
+      from,
+      change,
+      subnetID,
+      chainName,
+      vmID,
+      fxIDs,
+      genesisData,
+      subnetAuth,
+      this.getCreateChainTxFee(),
       avaxAssetID,
       memo,
       asOf
@@ -1716,19 +1825,20 @@ return builtUnsignedTx
       : this.getBlockchainID()
     if (addresses && addresses.length > 0) {
       for (let i: number = 0; i < addresses.length; i++) {
-        if (typeof addresses[i] === "string") {
+        if (typeof addresses[`${i}`] === "string") {
           if (
-            typeof this.parseAddress(addresses[i] as string) === "undefined"
+            typeof this.parseAddress(addresses[`${i}`] as string) ===
+            "undefined"
           ) {
             /* istanbul ignore next */
             throw new AddressError("Error - Invalid address format")
           }
-          addrs.push(addresses[i] as string)
+          addrs.push(addresses[`${i}`] as string)
         } else {
           const bech32: SerializedType = "bech32"
           addrs.push(
             serialization.bufferToType(
-              addresses[i] as Buffer,
+              addresses[`${i}`] as Buffer,
               bech32,
               this.core.getHRP(),
               chainid
@@ -1753,9 +1863,9 @@ return builtUnsignedTx
     const netID: number = core.getNetworkID()
     if (
       netID in Defaults.network &&
-      this.blockchainID in Defaults.network[netID]
+      this.blockchainID in Defaults.network[`${netID}`]
     ) {
-      const { alias } = Defaults.network[netID][this.blockchainID]
+      const { alias } = Defaults.network[`${netID}`][this.blockchainID]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)

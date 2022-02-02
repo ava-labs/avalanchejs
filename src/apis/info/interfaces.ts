@@ -3,6 +3,8 @@
  * @module Info-Interfaces
  */
 
+import BN from "bn.js"
+
 export interface GetBlockchainIDParams {
   alias: string
 }
@@ -22,4 +24,14 @@ export interface PeersResponse {
   version: string
   lastSent: string
   lastReceived: string
+}
+
+export interface GetTxFee {
+  txFee: BN
+  creationTxFee: BN
+}
+
+export interface UptimeResponse {
+  rewardingStakePercentage: string
+  weightedAveragePercentage: string
 }
