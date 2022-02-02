@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "3.10.2",
+  "version": "3.11.0",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
@@ -69,7 +69,7 @@
     "typedoc": "^0.18.0",
     "typedoc-plugin-external-module-name": "^4.0.3",
     "typedoc-plugin-markdown": "^2.4.0",
-    "typescript": "4.5.4",
+    "typescript": "4.5.5",
     "webpack": "5.66.0",
     "webpack-cli": "4.9.1"
   },
@@ -86,7 +86,7 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.5.2",
+    "ethers": "5.5.4",
     "hdkey": "2.0.1",
     "isomorphic-dompurify": "^0.17.0",
     "isomorphic-ws": "4.0.1",
