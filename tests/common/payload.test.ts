@@ -19,7 +19,7 @@ import BinTools from "../../src/utils/bintools"
 import BN from "bn.js"
 import * as bech32 from "bech32"
 const payloadTypes: PayloadTypes = PayloadTypes.getInstance()
-const bintools = BinTools.getInstance()
+const bintools: BinTools = BinTools.getInstance()
 
 describe("Payload", (): void => {
   const hrp: string = "tests"
