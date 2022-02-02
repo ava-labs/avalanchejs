@@ -18,7 +18,7 @@ const main = async (): Promise<any> => {
   const createKeypairResponse: CreateKeyPairResponse = {
     address: address,
     publicKey: publicKey,
-    privateKey: privateKey 
+    privateKey: privateKey
   }
   console.log(createKeypairResponse)
 }
