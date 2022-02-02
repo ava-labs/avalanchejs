@@ -29,25 +29,24 @@ pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const threshold: number = 1
 const memo: Buffer = Buffer.from(
-  "PlatformVM utility method buildCreateSubnetTx to create a new subnet"
+  "PlatformVM utility method buildCreateChainTx to create a new blockchain"
 )
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  console.log("build create chain tx")
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
 
   const genesisDataStr: string =
     "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
   const subnetIDStr: string =
-    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
+    "yu392h3wYrxQHHPKMMctdHuTGj7ZLtxsQF253sFgR8nXVf9Ks"
   const memoStr: string = "from snowflake to avalanche"
   const memo: Buffer = Buffer.from(memoStr, "utf8")
   const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
-  const fxIDs: string[] = ["secp256k1fx"]
+  const fxIDs: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
   const genesisData: GenesisData = new GenesisData()
   genesisData.fromBuffer(bintools.cb58Decode(genesisDataStr))
   const addressIndex: Buffer = Buffer.alloc(4)

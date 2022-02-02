@@ -368,7 +368,7 @@ describe("EVMAPI", (): void => {
     const payload: object = {
       result: {
         tx,
-        encoding: "cb58",
+        encoding: "hex",
         blockHeight: 8
       }
     }
