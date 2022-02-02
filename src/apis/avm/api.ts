@@ -486,7 +486,7 @@ export class AVMAPI extends JRPCAPI {
 
   /**
    * Creates a family of NFT Asset. No units of the asset exist at initialization. Minters can mint units of this asset using createMintTx, signMintTx and sendMintTx.
-   * 
+   *
    * @param username The user paying the transaction fee (in $AVAX) for asset creation
    * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
    * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
@@ -505,10 +505,10 @@ export class AVMAPI extends JRPCAPI {
     name: string,
     symbol: string,
     minterSet: {
-      threshold: number,
+      threshold: number
       minters: string[]
     }
-  ) : Promise<string> => {
+  ): Promise<string> => {
     const params: CreateNFTAssetParams = {
       username,
       password,
@@ -584,18 +584,18 @@ export class AVMAPI extends JRPCAPI {
 
   /**
    * Send NFT from one account to another on X-Chain
-   * 
+   *
    * @param username The user paying the transaction fee (in $AVAX) for asset creation
    * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
    * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-   * @param changeAddr Optional. An address to send the change 
+   * @param changeAddr Optional. An address to send the change
    * @param assetID The asset id which is being sent
    * @param groupID The group this NFT is issued to.
    * @param to Address on X-Chain of the account to which this NFT is being sent
-   * 
+   *
    * @returns ID of the transaction
    */
-   mintNFT = async (
+  mintNFT = async (
     username: string,
     password: string,
     from: string[] | Buffer[] = undefined,
@@ -603,7 +603,7 @@ export class AVMAPI extends JRPCAPI {
     payload: string,
     assetID: string | Buffer,
     to: string
-  ) : Promise<string> => {
+  ): Promise<string> => {
     let asset: string
 
     if (typeof this.parseAddress(to) === "undefined") {
@@ -647,15 +647,15 @@ export class AVMAPI extends JRPCAPI {
 
   /**
    * Send NFT from one account to another on X-Chain
-   * 
+   *
    * @param username The user paying the transaction fee (in $AVAX) for asset creation
    * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
    * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
-   * @param changeAddr Optional. An address to send the change 
+   * @param changeAddr Optional. An address to send the change
    * @param assetID The asset id which is being sent
    * @param groupID The group this NFT is issued to.
    * @param to Address on X-Chain of the account to which this NFT is being sent
-   * 
+   *
    * @returns ID of the transaction
    */
   sendNFT = async (
@@ -666,7 +666,7 @@ export class AVMAPI extends JRPCAPI {
     assetID: string | Buffer,
     groupID: number,
     to: string
-  ) : Promise<string> => {
+  ): Promise<string> => {
     let asset: string
 
     if (typeof this.parseAddress(to) === "undefined") {
@@ -1737,20 +1737,20 @@ export class AVMAPI extends JRPCAPI {
 
   /**
    * Calls the node's getAddressTxs method from the API and returns transactions coressponding to the provided address and assetID
-   * 
+   *
    * @param address A string, representing the address whose transactinos are required
    * @param cursor A number, denoting the index of a transaction as an offset for pagination
    * @param pageSize A number, denoting at max [pageSize] number of transactions per page. If [pageSize] == 0 or [pageSize] > [maxPageSize], then it fetches at max [maxPageSize] transactions
    * @param assetID A string or buffer, representing asset ID
-   * 
-   * @returns A promise object representing the array of transaction IDs and page offset 
+   *
+   * @returns A promise object representing the array of transaction IDs and page offset
    */
   getAddressTxs = async (
     address: string,
     cursor: number,
     pageSize: number | undefined,
     assetID: string | Buffer
-  ) : Promise<GetAddressTxsResponse> => {
+  ): Promise<GetAddressTxsResponse> => {
     let _asset: string
     let _pageSize: number
 

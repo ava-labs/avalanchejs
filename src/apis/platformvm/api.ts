@@ -981,10 +981,10 @@ export class PlatformVMAPI extends JRPCAPI {
 
   /**
    * getTotalStake() returns the total amount staked on the Primary Network
-   * 
+   *
    * @returns A big number representing total staked by validators on the primary network
    */
-  getTotalStake = async () : Promise<BN> => {
+  getTotalStake = async (): Promise<BN> => {
     const response: RequestResponseData = await this.callMethod(
       "platform.getTotalStake"
     )
@@ -993,7 +993,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
   /**
    * getMaxStakeAmount() returns the maximum amount of nAVAX staking to the named node during the time period.
-   * 
+   *
    * @param subnetID A Buffer or cb58 string representing subnet
    * @param nodeID A string representing ID of the node whose stake amount is required during the given duration
    * @param startTime A big number denoting start time of the duration during which stake amount of the node is required.
@@ -1005,7 +1005,7 @@ export class PlatformVMAPI extends JRPCAPI {
     nodeID: string,
     startTime: BN,
     endTime: BN
-  ) : Promise<BN> => {
+  ): Promise<BN> => {
     const now: BN = UnixNow()
     if (startTime.gt(now) || endTime.lte(startTime)) {
       throw new TimeError(
@@ -1946,12 +1946,12 @@ return builtUnsignedTx
   /**
    * @returns the current timestamp on chain.
    */
-   getTimestamp = async (): Promise<number> => {
+  getTimestamp = async (): Promise<number> => {
     const response: RequestResponseData = await this.callMethod(
       "platform.getTimestamp"
     )
     return response.data.result.timestamp
-  }  
+  }
 
   /**
    * @returns the UTXOs that were rewarded after the provided transaction"s staking or delegation period ended.

@@ -198,8 +198,8 @@ export interface GetMinStakeResponse {
 }
 
 export interface GetMaxStakeAmountParams {
-  subnetID?: string,
-  nodeID: string,
-  startTime: BN,
+  subnetID?: string
+  nodeID: string
+  startTime: BN
   endTime: BN
 }
