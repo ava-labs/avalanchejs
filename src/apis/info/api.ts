@@ -43,6 +43,18 @@ export class InfoAPI extends JRPCAPI {
   }
 
   /**
+   * Fetches the IP address from the node.
+   *
+   * @returns Returns a Promise string of the node IP address.
+   */
+  getNodeIP = async (): Promise<string> => {
+    const response: RequestResponseData = await this.callMethod(
+      "info.getBlockchainID"
+    )
+    return response.data.result.ip
+  }
+
+  /**
    * Fetches the networkID from the node.
    *
    * @returns Returns a Promise number of the networkID.

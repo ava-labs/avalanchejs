@@ -53,7 +53,8 @@ import {
   GetBlockchainsResponse,
   GetTxStatusParams,
   GetTxStatusResponse,
-  GetMinStakeResponse
+  GetMinStakeResponse,
+  GetMaxStakeAmountParams
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
@@ -979,6 +980,59 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * getTotalStake() returns the total amount staked on the Primary Network
+   * 
+   * @returns A big number representing total staked by validators on the primary network
+   */
+  getTotalStake = async () : Promise<BN> => {
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getTotalStake"
+    )
+    return new BN(response.data.result.stake, 10)
+  }
+
+  /**
+   * getMaxStakeAmount() returns the maximum amount of nAVAX staking to the named node during the time period.
+   * 
+   * @param subnetID A Buffer or cb58 string representing subnet
+   * @param nodeID A string representing ID of the node whose stake amount is required during the given duration
+   * @param startTime A big number denoting start time of the duration during which stake amount of the node is required.
+   * @param endTime A big number denoting end time of the duration during which stake amount of the node is required.
+   * @returns A big number representing total staked by validators on the primary network
+   */
+  getMaxStakeAmount = async (
+    subnetID: string | Buffer,
+    nodeID: string,
+    startTime: BN,
+    endTime: BN
+  ) : Promise<BN> => {
+    const now: BN = UnixNow()
+    if (startTime.gt(now) || endTime.lte(startTime)) {
+      throw new TimeError(
+        "PlatformVMAPI.getMaxStakeAmount -- startTime must be in the past and endTime must come after startTime"
+      )
+    }
+
+    const params: GetMaxStakeAmountParams = {
+      nodeID,
+      startTime,
+      endTime
+    }
+
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
+    }
+
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getMaxStakeAmount",
+      params
+    )
+    return new BN(response.data.result.amount, 10)
+  }
+
+  /**
    * Sets the minimum stake cached in this class.
    * @param minValidatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum stake amount cached in this class.
    * @param minDelegatorStake A {@link https://github.com/indutny/bn.js/|BN} to set the minimum delegation amount cached in this class.
@@ -1888,6 +1942,16 @@ return builtUnsignedTx
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
     }
   }
+
+  /**
+   * @returns the current timestamp on chain.
+   */
+   getTimestamp = async (): Promise<number> => {
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getTimestamp"
+    )
+    return response.data.result.timestamp
+  }  
 
   /**
    * @returns the UTXOs that were rewarded after the provided transaction"s staking or delegation period ended.

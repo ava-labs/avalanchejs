@@ -196,3 +196,10 @@ export interface GetMinStakeResponse {
   minValidatorStake: BN
   minDelegatorStake: BN
 }
+
+export interface GetMaxStakeAmountParams {
+  subnetID?: string,
+  nodeID: string,
+  startTime: BN,
+  endTime: BN
+}

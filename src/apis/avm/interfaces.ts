@@ -153,3 +153,48 @@ export interface SendMultipleResponse {
 export interface BuildGenesisParams {
   genesisData: object
 }
+
+export interface GetAddressTxsParams {
+  address: string
+  cursor: number
+  pageSize: number
+  assetID: string
+}
+
+export interface GetAddressTxsResponse {
+  txIDs: string[]
+  cursor: number
+}
+
+export interface CreateNFTAssetParams {
+  username: string
+  password: string
+  from?: string[]
+  changeAddr?: string
+  name: string
+  symbol: string
+  minterSet: {
+    threshold: number
+    minters: string[]
+  }
+}
+
+export interface SendNFTParams {
+  username: string
+  password: string
+  from?: string[]
+  changeAddr?: string
+  assetID: string
+  groupID: number
+  to: string
+}
+
+export interface MintNFTParams {
+  username: string
+  password: string
+  from?: string[]
+  changeAddr?: string
+  assetID: string
+  payload: string
+  to: string
+}
