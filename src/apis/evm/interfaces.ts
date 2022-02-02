@@ -49,7 +49,7 @@ export interface ExportKeyParams extends CredsInterface {
   address: string
 }
 
-export interface CreateKeypairResponse {
+export interface CreateKeyPairResponse {
   address: string
   publicKey: string
   privateKey: string
