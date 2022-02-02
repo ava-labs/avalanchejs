@@ -97,7 +97,7 @@ export class ExportTx extends BaseTx {
   /**
    * Returns the id of the [[ExportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
@@ -131,7 +131,7 @@ export class ExportTx extends BaseTx {
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the destination chainid.
    */
-  getDestinationChain = (): Buffer => {
+  getDestinationChain(): Buffer {
     return this.destinationChain
   }
 
