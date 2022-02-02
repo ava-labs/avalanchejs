@@ -47,7 +47,6 @@ import {
   SendMultipleResponse,
   SendResponse
 } from "src/apis/avm/interfaces"
-import { SendMultipleParams } from "dist/apis/avm/interfaces"
 
 /**
  * @ignore
