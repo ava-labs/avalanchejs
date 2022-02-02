@@ -35,7 +35,7 @@ export class IndexAPI extends JRPCAPI {
    * @returns Returns a Promise GetLastAcceptedResponse.
    */
   getLastAccepted = async (
-    encoding: string = "cb58",
+    encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<GetLastAcceptedResponse> => {
     this.setBaseURL(baseURL)
@@ -65,7 +65,7 @@ export class IndexAPI extends JRPCAPI {
    */
   getContainerByIndex = async (
     index: string = "0",
-    encoding: string = "cb58",
+    encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<GetContainerByIndexResponse> => {
     this.setBaseURL(baseURL)
@@ -96,7 +96,7 @@ export class IndexAPI extends JRPCAPI {
    */
   getContainerByID = async (
     containerID: string = "0",
-    encoding: string = "cb58",
+    encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<GetContainerByIDResponse> => {
     this.setBaseURL(baseURL)
@@ -129,7 +129,7 @@ export class IndexAPI extends JRPCAPI {
   getContainerRange = async (
     startIndex: number = 0,
     numToFetch: number = 100,
-    encoding: string = "cb58",
+    encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<GetContainerRangeResponse[]> => {
     this.setBaseURL(baseURL)
@@ -161,7 +161,7 @@ export class IndexAPI extends JRPCAPI {
    */
   getIndex = async (
     containerID: string = "",
-    encoding: string = "cb58",
+    encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<string> => {
     this.setBaseURL(baseURL)
@@ -192,7 +192,7 @@ export class IndexAPI extends JRPCAPI {
    */
   isAccepted = async (
     containerID: string = "",
-    encoding: string = "cb58",
+    encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<boolean> => {
     this.setBaseURL(baseURL)
