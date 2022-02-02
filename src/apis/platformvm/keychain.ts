@@ -17,54 +17,8 @@ const serialization: Serialization = Serialization.getInstance()
  * Class for representing a private and public keypair on the Platform Chain.
  */
 export class KeyPair extends SECP256k1KeyPair {
-  protected chainid: string = ""
-  protected hrp: string = ""
-
-  /**
-   * Returns the address's string representation.
-   *
-   * @returns A string representation of the address
-   */
-  getAddressString = (): string => {
-    const addr: Buffer = KeyPair.addressFromPublicKey(this.pubk)
-    const type: SerializedType = "bech32"
-    return serialization.bufferToType(addr, type, this.hrp, this.chainid)
-  }
-
-  /**
-   * Returns the chainID associated with this key.
-   *
-   * @returns The [[KeyPair]]'s chainID
-   */
-  getChainID = (): string => this.chainid
-
-  /**
-   * Sets the the chainID associated with this key.
-   *
-   * @param chainid String for the chainID
-   */
-  setChainID = (chainid: string): void => {
-    this.chainid = chainid
-  }
-
-  /**
-   * Returns the Human-Readable-Part of the network associated with this key.
-   *
-   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
-   */
-  getHRP = (): string => this.hrp
-
-  /**
-   * Sets the the Human-Readable-Part of the network associated with this key.
-   *
-   * @param hrp String for the Human-Readable-Part of Bech32 addresses
-   */
-  setHRP = (hrp: string): void => {
-    this.hrp = hrp
-  }
-
   clone(): this {
-    let newkp: KeyPair = new KeyPair(this.hrp, this.chainid)
+    let newkp: KeyPair = new KeyPair(this.hrp, this.chainID)
     newkp.importKey(bintools.copyFrom(this.getPrivateKey()))
     return newkp as this
   }
@@ -73,14 +27,7 @@ export class KeyPair extends SECP256k1KeyPair {
     if (args.length == 2) {
       return new KeyPair(args[0], args[1]) as this
     }
-    return new KeyPair(this.hrp, this.chainid) as this
-  }
-
-  constructor(hrp: string, chainid: string) {
-    super()
-    this.chainid = chainid
-    this.hrp = hrp
-    this.generateKey()
+    return new KeyPair(this.hrp, this.chainID) as this
   }
 }
 
@@ -91,7 +38,7 @@ export class KeyPair extends SECP256k1KeyPair {
  */
 export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   hrp: string = ""
-  chainid: string = ""
+  chainID: string = ""
 
   /**
    * Makes a new key pair, returns the address.
@@ -99,13 +46,13 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
    * @returns The new key pair
    */
   makeKey = (): KeyPair => {
-    let keypair: KeyPair = new KeyPair(this.hrp, this.chainid)
+    let keypair: KeyPair = new KeyPair(this.hrp, this.chainID)
     this.addKey(keypair)
     return keypair
   }
 
   addKey = (newKey: KeyPair) => {
-    newKey.setChainID(this.chainid)
+    newKey.setChainID(this.chainID)
     super.addKey(newKey)
   }
 
@@ -117,7 +64,7 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
    * @returns The new key pair
    */
   importKey = (privk: Buffer | string): KeyPair => {
-    let keypair: KeyPair = new KeyPair(this.hrp, this.chainid)
+    let keypair: KeyPair = new KeyPair(this.hrp, this.chainID)
     let pk: Buffer
     if (typeof privk === "string") {
       pk = bintools.cb58Decode(privk.split("-")[1])
@@ -135,11 +82,11 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
     if (args.length == 2) {
       return new KeyChain(args[0], args[1]) as this
     }
-    return new KeyChain(this.hrp, this.chainid) as this
+    return new KeyChain(this.hrp, this.chainID) as this
   }
 
   clone(): this {
-    const newkc: KeyChain = new KeyChain(this.hrp, this.chainid)
+    const newkc: KeyChain = new KeyChain(this.hrp, this.chainID)
     for (let k in this.keys) {
       newkc.addKey(this.keys[`${k}`].clone())
     }
@@ -157,9 +104,9 @@ export class KeyChain extends SECP256k1KeyChain<KeyPair> {
   /**
    * Returns instance of KeyChain.
    */
-  constructor(hrp: string, chainid: string) {
+  constructor(hrp: string, chainID: string) {
     super()
     this.hrp = hrp
-    this.chainid = chainid
+    this.chainID = chainID
   }
 }

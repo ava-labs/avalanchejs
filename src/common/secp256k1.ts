@@ -9,6 +9,7 @@ import BinTools from "../utils/bintools"
 import { StandardKeyPair, StandardKeyChain } from "./keychain"
 import { PublicKeyError } from "../utils/errors"
 import { BNInput } from "elliptic"
+import { Serialization, SerializedType } from "../utils"
 
 /**
  * @ignore
@@ -34,12 +35,15 @@ const BN: any = ecparams.n.constructor
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
+const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for representing a private and public keypair on the Platform Chain.
  */
 export abstract class SECP256k1KeyPair extends StandardKeyPair {
   protected keypair: elliptic.ec.KeyPair
+  protected chainID: string = ""
+  protected hrp: string = ""
 
   /**
    * @ignore
@@ -114,7 +118,11 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
    *
    * @returns A string representation of the address
    */
-  getAddressString: () => string
+  getAddressString = (): string => {
+    const addr: Buffer = SECP256k1KeyPair.addressFromPublicKey(this.pubk)
+    const type: SerializedType = "bech32"
+    return serialization.bufferToType(addr, type, this.hrp, this.chainID)
+  }
 
   /**
    * Returns an address given a public key.
@@ -209,10 +217,42 @@ export abstract class SECP256k1KeyPair extends StandardKeyPair {
   }
 
   /**
-   * Class for representing a private and public keypair in Avalanche PlatformVM.
+   * Returns the chainID associated with this key.
+   *
+   * @returns The [[KeyPair]]'s chainID
    */
-  constructor() {
+  getChainID = (): string => this.chainID
+
+  /**
+   * Sets the the chainID associated with this key.
+   *
+   * @param chainID String for the chainID
+   */
+  setChainID = (chainID: string): void => {
+    this.chainID = chainID
+  }
+
+  /**
+   * Returns the Human-Readable-Part of the network associated with this key.
+   *
+   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
+   */
+  getHRP = (): string => this.hrp
+
+  /**
+   * Sets the the Human-Readable-Part of the network associated with this key.
+   *
+   * @param hrp String for the Human-Readable-Part of Bech32 addresses
+   */
+  setHRP = (hrp: string): void => {
+    this.hrp = hrp
+  }
+
+  constructor(hrp: string, chainID: string) {
     super()
+    this.chainID = chainID
+    this.hrp = hrp
+    this.generateKey()
   }
 }
 
