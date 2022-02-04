@@ -26,7 +26,7 @@ export interface PeersResponse {
   lastReceived: string
 }
 
-export interface GetTxFee {
+export interface GetTxFeeResponse {
   txFee: BN
   creationTxFee: BN
 }
