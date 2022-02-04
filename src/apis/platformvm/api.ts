@@ -33,8 +33,28 @@ import {
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse,
+  Subnet,
   GetValidatorsAtParams,
-  GetValidatorsAtResponse
+  GetValidatorsAtResponse,
+  CreateAddressParams,
+  GetUTXOsParams,
+  GetBalanceResponse,
+  GetUTXOsResponse,
+  ListAddressesParams,
+  SampleValidatorsParams,
+  AddValidatorParams,
+  AddDelegatorParams,
+  CreateSubnetParams,
+  ExportAVAXParams,
+  ExportKeyParams,
+  ImportKeyParams,
+  ImportAVAXParams,
+  CreateBlockchainParams,
+  Blockchain,
+  GetTxStatusParams,
+  GetTxStatusResponse,
+  GetMinStakeResponse,
+  GetMaxStakeAmountParams
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
@@ -366,7 +386,7 @@ export class PlatformVMAPI extends JRPCAPI {
     name: string,
     genesis: string
   ): Promise<string> => {
-    const params: any = {
+    const params: CreateBlockchainParams = {
       username,
       password,
       fxIDs,
@@ -441,7 +461,7 @@ export class PlatformVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string> => {
-    const params: any = {
+    const params: CreateAddressParams = {
       username,
       password
     }
@@ -459,7 +479,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
-  getBalance = async (address: string): Promise<object> => {
+  getBalance = async (address: string): Promise<GetBalanceResponse> => {
     if (typeof this.parseAddress(address) === "undefined") {
       /* istanbul ignore next */
       throw new AddressError(
@@ -488,7 +508,7 @@ export class PlatformVMAPI extends JRPCAPI {
     username: string,
     password: string
   ): Promise<string[]> => {
-    const params: any = {
+    const params: ListAddressesParams = {
       username,
       password
     }
@@ -573,7 +593,7 @@ export class PlatformVMAPI extends JRPCAPI {
     sampleSize: number,
     subnetID: Buffer | string = undefined
   ): Promise<string[]> => {
-    const params: any = {
+    const params: SampleValidatorsParams = {
       size: sampleSize.toString()
     }
     if (typeof subnetID === "string") {
@@ -617,7 +637,7 @@ export class PlatformVMAPI extends JRPCAPI {
     rewardAddress: string,
     delegationFeeRate: BN = undefined
   ): Promise<string> => {
-    const params: any = {
+    const params: AddValidatorParams = {
       username,
       password,
       nodeID,
@@ -702,7 +722,7 @@ export class PlatformVMAPI extends JRPCAPI {
     stakeAmount: BN,
     rewardAddress: string
   ): Promise<string> => {
-    const params: any = {
+    const params: AddDelegatorParams = {
       username,
       password,
       nodeID,
@@ -736,7 +756,7 @@ export class PlatformVMAPI extends JRPCAPI {
     controlKeys: string[],
     threshold: number
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: CreateSubnetParams = {
       username,
       password,
       controlKeys,
@@ -799,7 +819,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of objects containing fields "id", "subnetID", and "vmID".
    */
-  getBlockchains = async (): Promise<object[]> => {
+  getBlockchains = async (): Promise<Blockchain[]> => {
     const response: RequestResponseData = await this.callMethod(
       "platform.getBlockchains"
     )
@@ -826,7 +846,7 @@ export class PlatformVMAPI extends JRPCAPI {
     amount: BN,
     to: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ExportAVAXParams = {
       username,
       password,
       to,
@@ -862,7 +882,7 @@ export class PlatformVMAPI extends JRPCAPI {
     to: string,
     sourceChain: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ImportAVAXParams = {
       to,
       sourceChain,
       username,
@@ -937,7 +957,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getMinStake = async (
     refresh: boolean = false
-  ): Promise<{ minValidatorStake: BN; minDelegatorStake: BN }> => {
+  ): Promise<GetMinStakeResponse> => {
     if (
       refresh !== true &&
       typeof this.minValidatorStake !== "undefined" &&
@@ -957,6 +977,59 @@ export class PlatformVMAPI extends JRPCAPI {
       minValidatorStake: this.minValidatorStake,
       minDelegatorStake: this.minDelegatorStake
     }
+  }
+
+  /**
+   * getTotalStake() returns the total amount staked on the Primary Network
+   *
+   * @returns A big number representing total staked by validators on the primary network
+   */
+  getTotalStake = async (): Promise<BN> => {
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getTotalStake"
+    )
+    return new BN(response.data.result.stake, 10)
+  }
+
+  /**
+   * getMaxStakeAmount() returns the maximum amount of nAVAX staking to the named node during the time period.
+   *
+   * @param subnetID A Buffer or cb58 string representing subnet
+   * @param nodeID A string representing ID of the node whose stake amount is required during the given duration
+   * @param startTime A big number denoting start time of the duration during which stake amount of the node is required.
+   * @param endTime A big number denoting end time of the duration during which stake amount of the node is required.
+   * @returns A big number representing total staked by validators on the primary network
+   */
+  getMaxStakeAmount = async (
+    subnetID: string | Buffer,
+    nodeID: string,
+    startTime: BN,
+    endTime: BN
+  ): Promise<BN> => {
+    const now: BN = UnixNow()
+    if (startTime.gt(now) || endTime.lte(startTime)) {
+      throw new TimeError(
+        "PlatformVMAPI.getMaxStakeAmount -- startTime must be in the past and endTime must come after startTime"
+      )
+    }
+
+    const params: GetMaxStakeAmountParams = {
+      nodeID,
+      startTime,
+      endTime
+    }
+
+    if (typeof subnetID === "string") {
+      params.subnetID = subnetID
+    } else if (typeof subnetID !== "undefined") {
+      params.subnetID = bintools.cb58Encode(subnetID)
+    }
+
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getMaxStakeAmount",
+      params
+    )
+    return new BN(response.data.result.amount, 10)
   }
 
   /**
@@ -1018,7 +1091,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of objects containing fields "id",
    * "controlKeys", and "threshold".
    */
-  getSubnets = async (ids: string[] = undefined): Promise<object[]> => {
+  getSubnets = async (ids: string[] = undefined): Promise<Subnet[]> => {
     const params: any = {}
     if (typeof ids !== undefined) {
       params.ids = ids
@@ -1044,7 +1117,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     address: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ExportKeyParams = {
       username,
       password,
       address
@@ -1072,7 +1145,7 @@ export class PlatformVMAPI extends JRPCAPI {
     password: string,
     privateKey: string
   ): Promise<string | ErrorResponseObject> => {
-    const params: any = {
+    const params: ImportKeyParams = {
       username,
       password,
       privateKey
@@ -1118,8 +1191,8 @@ export class PlatformVMAPI extends JRPCAPI {
   getTxStatus = async (
     txid: string,
     includeReason: boolean = true
-  ): Promise<string | { status: string; reason: string }> => {
-    const params: any = {
+  ): Promise<string | GetTxStatusResponse> => {
+    const params: GetTxStatusParams = {
       txID: txid,
       includeReason: includeReason
     }
@@ -1140,6 +1213,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
    * @param persistOpts Options available to persist these UTXOs in local storage
+   * @param encoding Optional.  is the encoding format to use for the payload argument. Can be either "cb58" or "hex". Defaults to "hex".
    *
    * @remarks
    * persistOpts is optional and must be of type [[PersistanceOptions]]
@@ -1150,19 +1224,17 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain: string = undefined,
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
-    persistOpts: PersistanceOptions = undefined
-  ): Promise<{
-    numFetched: number
-    utxos: UTXOSet
-    endIndex: { address: string; utxo: string }
-  }> => {
+    persistOpts: PersistanceOptions = undefined,
+    encoding: string = "cb58"
+  ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
     }
 
-    const params: any = {
+    const params: GetUTXOsParams = {
       addresses: addresses,
-      limit
+      limit,
+      encoding
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -1870,6 +1942,16 @@ return builtUnsignedTx
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
     }
+  }
+
+  /**
+   * @returns the current timestamp on chain.
+   */
+  getTimestamp = async (): Promise<number> => {
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getTimestamp"
+    )
+    return response.data.result.timestamp
   }
 
   /**

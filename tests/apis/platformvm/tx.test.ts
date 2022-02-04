@@ -27,8 +27,8 @@ import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { SubnetAuth } from "src/apis/platformvm"
 // import { AddSubnetValidatorTx, SubnetAuth } from "src/apis/platformvm"
+import { SubnetAuth } from "src/apis/platformvm"
 
 describe("Transactions", (): void => {
   /**
@@ -216,19 +216,19 @@ describe("Transactions", (): void => {
     }
     set.addArray(utxos)
 
-    //   addSubnetValidatorTx = new AddSubnetValidatorTx(
-    //     networkID,
-    //     bintools.cb58Decode(pChainBlockchainID),
-    //     outputs,
-    //     inputs,
-    //     memo,
-    //     nodeID,
-    //     startTime,
-    //     endTime,
-    //     weight,
-    //     subnetID,
-    //     subnetAuth
-    //   )
+    // addSubnetValidatorTx = new AddSubnetValidatorTx(
+    //   networkID,
+    //   bintools.cb58Decode(pChainBlockchainID),
+    //   outputs,
+    //   inputs,
+    //   memo,
+    //   nodeID,
+    //   startTime,
+    //   endTime,
+    //   weight,
+    //   subnetID,
+    //   subnetAuth
+    // )
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {

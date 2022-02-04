@@ -1,30 +1,30 @@
-/**
- * @packageDocumentation
- * @module API-PlatformVM-AddSubnetValidatorTx
- */
-import { Buffer } from "buffer/"
-import BinTools from "../../utils/bintools"
-import { PlatformVMConstants } from "./constants"
-import { TransferableOutput } from "./outputs"
-import { TransferableInput } from "./inputs"
-import { Credential, SigIdx, Signature } from "../../common/credentials"
-import { BaseTx } from "./basetx"
-import { DefaultNetworkID } from "../../utils/constants"
-import { Serialization, SerializedEncoding } from "../../utils/serialization"
-import { SelectCredentialClass, SubnetAuth } from "."
-import { KeyChain, KeyPair } from "./keychain"
-import BN from "bn.js"
-import { bufferToNodeIDString } from "../../utils"
+// /**
+//  * @packageDocumentation
+//  * @module API-PlatformVM-AddSubnetValidatorTx
+//  */
+// import { Buffer } from "buffer/"
+// import BinTools from "../../utils/bintools"
+// import { PlatformVMConstants } from "./constants"
+// import { TransferableOutput } from "./outputs"
+// import { TransferableInput } from "./inputs"
+// import { Credential, SigIdx, Signature } from "../../common/credentials"
+// import { BaseTx } from "./basetx"
+// import { DefaultNetworkID } from "../../utils/constants"
+// import { Serialization, SerializedEncoding } from "../../utils/serialization"
+// import { SelectCredentialClass, SubnetAuth } from "."
+// import { KeyChain, KeyPair } from "./keychain"
+// import BN from "bn.js"
+// import { bufferToNodeIDString } from "../../utils"
 
-/**
- * @ignore
- */
-const bintools: BinTools = BinTools.getInstance()
-const serialization: Serialization = Serialization.getInstance()
+// /**
+//  * @ignore
+//  */
+// const bintools: BinTools = BinTools.getInstance()
+// const serialization: Serialization = Serialization.getInstance()
 
-/**
- * Class representing an unsigned AddSubnetValidatorTx transaction.
- */
+// /**
+//  * Class representing an unsigned AddSubnetValidatorTx transaction.
+//  */
 // export class AddSubnetValidatorTx extends BaseTx {
 //   protected _typeName = "AddSubnetValidatorTx"
 //   protected _typeID = PlatformVMConstants.ADDSUBNETVALIDATORTX

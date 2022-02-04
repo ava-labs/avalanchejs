@@ -10,7 +10,7 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 
 const main = async (): Promise<any> => {
-  const encoding: string = "cb58"
+  const encoding: string = "hex"
   const baseurl: string = "/ext/index/X/tx"
   const lastAccepted: GetLastAcceptedResponse = await index.getLastAccepted(
     encoding,
