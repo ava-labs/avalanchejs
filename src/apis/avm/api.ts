@@ -61,7 +61,8 @@ import {
   GetAddressTxsResponse,
   CreateNFTAssetParams,
   SendNFTParams,
-  MintNFTParams
+  MintNFTParams,
+  IMinterSet
 } from "./interfaces"
 import { IssueTxParams } from "../../common"
 
@@ -504,10 +505,7 @@ export class AVMAPI extends JRPCAPI {
     changeAddr: string,
     name: string,
     symbol: string,
-    minterSet: {
-      threshold: number
-      minters: string[]
-    }
+    minterSet: IMinterSet
   ): Promise<string> => {
     const params: CreateNFTAssetParams = {
       username,
@@ -517,7 +515,7 @@ export class AVMAPI extends JRPCAPI {
       minterSet
     }
 
-    from = this._cleanAddressArray(from, "send")
+    from = this._cleanAddressArray(from, "AVMAPI.createNFTAsset")
     if (typeof from !== "undefined") {
       params["from"] = from
     }
@@ -525,7 +523,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== "undefined") {
       if (typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
-        throw new AddressError("Error - AVMAPI.send: Invalid address format")
+        throw new AddressError("Error - AVMAPI.createNFTAsset: Invalid address format")
       }
       params["changeAddr"] = changeAddr
     }
@@ -608,7 +606,7 @@ export class AVMAPI extends JRPCAPI {
 
     if (typeof this.parseAddress(to) === "undefined") {
       /* istanbul ignore next */
-      throw new AddressError("Error - AVMAPI.send: Invalid address format")
+      throw new AddressError("Error - AVMAPI.mintNFT: Invalid address format")
     }
 
     if (typeof assetID !== "string") {
@@ -625,7 +623,7 @@ export class AVMAPI extends JRPCAPI {
       to
     }
 
-    from = this._cleanAddressArray(from, "mintNFT")
+    from = this._cleanAddressArray(from, "AVMAPI.mintNFT")
     if (typeof from !== "undefined") {
       params["from"] = from
     }
@@ -633,7 +631,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== "undefined") {
       if (typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
-        throw new AddressError("Error - AVMAPI.send: Invalid address format")
+        throw new AddressError("Error - AVMAPI.mintNFT: Invalid address format")
       }
       params["changeAddr"] = changeAddr
     }
@@ -655,6 +653,7 @@ export class AVMAPI extends JRPCAPI {
    * @param assetID The asset id which is being sent
    * @param groupID The group this NFT is issued to.
    * @param to Address on X-Chain of the account to which this NFT is being sent
+   * @param encoding Optional.  is the encoding format to use for the payload argument. Can be either "cb58" or "hex". Defaults to "hex".
    *
    * @returns ID of the transaction
    */
@@ -665,13 +664,14 @@ export class AVMAPI extends JRPCAPI {
     changeAddr: string = undefined,
     assetID: string | Buffer,
     groupID: number,
-    to: string
+    to: string,
+    encoding: string = "hex"
   ): Promise<string> => {
     let asset: string
 
     if (typeof this.parseAddress(to) === "undefined") {
       /* istanbul ignore next */
-      throw new AddressError("Error - AVMAPI.send: Invalid address format")
+      throw new AddressError("Error - AVMAPI.sendNFT: Invalid address format")
     }
 
     if (typeof assetID !== "string") {
@@ -685,10 +685,11 @@ export class AVMAPI extends JRPCAPI {
       password,
       assetID: asset,
       groupID,
-      to
+      to,
+      encoding
     }
 
-    from = this._cleanAddressArray(from, "sendNFT")
+    from = this._cleanAddressArray(from, "AVMAPI.sendNFT")
     if (typeof from !== "undefined") {
       params["from"] = from
     }
@@ -696,7 +697,7 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== "undefined") {
       if (typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
-        throw new AddressError("Error - AVMAPI.send: Invalid address format")
+        throw new AddressError("Error - AVMAPI.sendNFT: Invalid address format")
       }
       params["changeAddr"] = changeAddr
     }
@@ -1751,26 +1752,26 @@ export class AVMAPI extends JRPCAPI {
     pageSize: number | undefined,
     assetID: string | Buffer
   ): Promise<GetAddressTxsResponse> => {
-    let _asset: string
-    let _pageSize: number
+    let asset: string
+    let pageSizeNum: number
 
     if (typeof assetID !== "string") {
-      _asset = bintools.cb58Encode(assetID)
+      asset = bintools.cb58Encode(assetID)
     } else {
-      _asset = assetID
+      asset = assetID
     }
 
     if (typeof pageSize !== "number") {
-      _pageSize = 0
+      pageSizeNum = 0
     } else {
-      _pageSize = pageSize
+      pageSizeNum = pageSize
     }
 
     const params: GetAddressTxsParams = {
-      address: address,
-      cursor: cursor,
-      pageSize: pageSize,
-      assetID: _asset
+      address,
+      cursor,
+      pageSize: pageSizeNum,
+      assetID: asset
     }
 
     const response: RequestResponseData = await this.callMethod(

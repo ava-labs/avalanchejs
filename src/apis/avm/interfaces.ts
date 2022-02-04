@@ -23,13 +23,15 @@ export interface GetBalanceParams {
 
 export interface GetBalanceResponse {
   balance: number | BN
-  utxoIDs: [
-    {
-      txID: string
-      outputIndex: number
-    }
-  ]
+  utxoIDs: UTXOID[]
 }
+
+export interface UTXOID {
+  txID: string
+  outputIndex: number
+}
+
+
 
 export interface CreateAddressParams extends CredsInterface {}
 
@@ -110,10 +112,12 @@ export interface GetUTXOsParams {
   startIndex?: StartIndexInterface
 }
 
+export interface EndIndex { address: string; utxo: string }
+
 export interface GetUTXOsResponse {
   numFetched: number
   utxos: UTXOSet
-  endIndex: { address: string; utxo: string }
+  endIndex: EndIndex
 }
 
 export interface SOutputsParams {
@@ -173,10 +177,7 @@ export interface CreateNFTAssetParams {
   changeAddr?: string
   name: string
   symbol: string
-  minterSet: {
-    threshold: number
-    minters: string[]
-  }
+  minterSet: IMinterSet
 }
 
 export interface SendNFTParams {
@@ -186,7 +187,8 @@ export interface SendNFTParams {
   changeAddr?: string
   assetID: string
   groupID: number
-  to: string
+  to: string,
+  encoding: string
 }
 
 export interface MintNFTParams {
@@ -197,4 +199,9 @@ export interface MintNFTParams {
   assetID: string
   payload: string
   to: string
+}
+
+export interface IMinterSet {
+  threshold: number
+  minters: string[]
 }
