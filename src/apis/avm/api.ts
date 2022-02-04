@@ -523,7 +523,9 @@ export class AVMAPI extends JRPCAPI {
     if (typeof changeAddr !== "undefined") {
       if (typeof this.parseAddress(changeAddr) === "undefined") {
         /* istanbul ignore next */
-        throw new AddressError("Error - AVMAPI.createNFTAsset: Invalid address format")
+        throw new AddressError(
+          "Error - AVMAPI.createNFTAsset: Invalid address format"
+        )
       }
       params["changeAddr"] = changeAddr
     }

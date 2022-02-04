@@ -31,8 +31,6 @@ export interface UTXOID {
   outputIndex: number
 }
 
-
-
 export interface CreateAddressParams extends CredsInterface {}
 
 export interface CreateFixedCapAssetParams extends CredsInterface {
@@ -112,7 +110,10 @@ export interface GetUTXOsParams {
   startIndex?: StartIndexInterface
 }
 
-export interface EndIndex { address: string; utxo: string }
+export interface EndIndex {
+  address: string
+  utxo: string
+}
 
 export interface GetUTXOsResponse {
   numFetched: number
@@ -187,7 +188,7 @@ export interface SendNFTParams {
   changeAddr?: string
   assetID: string
   groupID: number
-  to: string,
+  to: string
   encoding: string
 }
 
