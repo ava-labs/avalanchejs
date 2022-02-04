@@ -136,7 +136,7 @@ export interface GetUTXOsParams {
   sourceChain?: string | undefined
   limit: number | 0
   startIndex?: StartIndex | undefined
-  persistOpts?: PersistanceOptions | undefined,
+  persistOpts?: PersistanceOptions | undefined
   encoding?: string
 }
 

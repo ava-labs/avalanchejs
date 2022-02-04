@@ -1091,9 +1091,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns Promise for an array of objects containing fields "id",
    * "controlKeys", and "threshold".
    */
-  getSubnets = async (
-    ids: string[] = undefined
-  ): Promise<Subnet[]> => {
+  getSubnets = async (ids: string[] = undefined): Promise<Subnet[]> => {
     const params: any = {}
     if (typeof ids !== undefined) {
       params.ids = ids
