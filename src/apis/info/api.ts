@@ -108,7 +108,6 @@ export class InfoAPI extends JRPCAPI {
    * @returns Returns a Promise object of the transaction fee in nAVAX.
    */
   getTxFee = async (): Promise<GetTxFeeResponse> => {
-    // TODO - Add `GetTxFee` response interface
     const response: RequestResponseData = await this.callMethod("info.getTxFee")
     return {
       txFee: new BN(response.data.result.txFee, 10),

@@ -37,10 +37,10 @@ import {
 } from "../../../src/utils/serialization"
 import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
 import {
-  GetBlockchainsResponse,
+  Blockchain,
   GetMinStakeResponse,
   GetRewardUTXOsResponse,
-  GetSubnetsResponse,
+  Subnet,
   GetTxStatusResponse,
   GetValidatorsAtResponse
 } from "../../../src/apis/platformvm/interfaces"
@@ -249,8 +249,14 @@ describe("PlatformVMAPI", (): void => {
 
   test("getBalance", async (): Promise<void> => {
     const balance: BN = new BN("100", 10)
+    const unlocked: BN = new BN("100", 10)
+    const lockedStakeable: BN = new BN("100", 10)
+    const lockedNotStakeable: BN = new BN("100", 10)
     const respobj: GetBalanceResponse = {
       balance,
+      unlocked,
+      lockedStakeable,
+      lockedNotStakeable,
       utxoIDs: [
         {
           txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
@@ -507,7 +513,7 @@ describe("PlatformVMAPI", (): void => {
         vmID: "vmID"
       }
     ]
-    const result: Promise<GetBlockchainsResponse> = api.getBlockchains()
+    const result: Promise<Blockchain[]> = api.getBlockchains()
     const payload: object = {
       result: {
         blockchains: resp
@@ -518,7 +524,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: GetBlockchainsResponse = await result
+    const response: Blockchain[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
@@ -532,7 +538,7 @@ describe("PlatformVMAPI", (): void => {
         threshold: "threshold"
       }
     ]
-    const result: Promise<GetSubnetsResponse> = api.getSubnets()
+    const result: Promise<Subnet[]> = api.getSubnets()
     const payload: object = {
       result: {
         subnets: resp

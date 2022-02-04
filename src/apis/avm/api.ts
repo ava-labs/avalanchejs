@@ -583,15 +583,15 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * Send NFT from one account to another on X-Chain
+   * Mint non-fungible tokens which were created with AVMAPI.createNFTAsset
    *
    * @param username The user paying the transaction fee (in $AVAX) for asset creation
    * @param password The password for the user paying the transaction fee (in $AVAX) for asset creation
    * @param from Optional. An array of addresses managed by the node's keystore for this blockchain which will fund this transaction
    * @param changeAddr Optional. An address to send the change
    * @param assetID The asset id which is being sent
-   * @param groupID The group this NFT is issued to.
    * @param to Address on X-Chain of the account to which this NFT is being sent
+   * @param encoding Optional.  is the encoding format to use for the payload argument. Can be either "cb58" or "hex". Defaults to "hex".
    *
    * @returns ID of the transaction
    */
@@ -602,7 +602,8 @@ export class AVMAPI extends JRPCAPI {
     changeAddr: string = undefined,
     payload: string,
     assetID: string | Buffer,
-    to: string
+    to: string,
+    encoding: string = "hex"
   ): Promise<string> => {
     let asset: string
 
@@ -622,7 +623,8 @@ export class AVMAPI extends JRPCAPI {
       password,
       assetID: asset,
       payload,
-      to
+      to,
+      encoding
     }
 
     from = this._cleanAddressArray(from, "AVMAPI.mintNFT")
@@ -655,7 +657,6 @@ export class AVMAPI extends JRPCAPI {
    * @param assetID The asset id which is being sent
    * @param groupID The group this NFT is issued to.
    * @param to Address on X-Chain of the account to which this NFT is being sent
-   * @param encoding Optional.  is the encoding format to use for the payload argument. Can be either "cb58" or "hex". Defaults to "hex".
    *
    * @returns ID of the transaction
    */
@@ -666,8 +667,7 @@ export class AVMAPI extends JRPCAPI {
     changeAddr: string = undefined,
     assetID: string | Buffer,
     groupID: number,
-    to: string,
-    encoding: string = "hex"
+    to: string
   ): Promise<string> => {
     let asset: string
 
@@ -687,8 +687,7 @@ export class AVMAPI extends JRPCAPI {
       password,
       assetID: asset,
       groupID,
-      to,
-      encoding
+      to
     }
 
     from = this._cleanAddressArray(from, "AVMAPI.sendNFT")
@@ -1739,12 +1738,12 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
-   * Calls the node's getAddressTxs method from the API and returns transactions coressponding to the provided address and assetID
+   * Calls the node's getAddressTxs method from the API and returns transactions corresponding to the provided address and assetID
    *
-   * @param address A string, representing the address whose transactinos are required
-   * @param cursor A number, denoting the index of a transaction as an offset for pagination
-   * @param pageSize A number, denoting at max [pageSize] number of transactions per page. If [pageSize] == 0 or [pageSize] > [maxPageSize], then it fetches at max [maxPageSize] transactions
-   * @param assetID A string or buffer, representing asset ID
+   * @param address The address for which we're fetching related transactions.
+   * @param cursor Page number or offset.
+   * @param pageSize  Number of items to return per page. Optional. Defaults to 1024. If [pageSize] == 0 or [pageSize] > [maxPageSize], then it fetches at max [maxPageSize] transactions
+   * @param assetID Only return transactions that changed the balance of this asset. Must be an ID or an alias for an asset.
    *
    * @returns A promise object representing the array of transaction IDs and page offset
    */

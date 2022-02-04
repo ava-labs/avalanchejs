@@ -107,9 +107,9 @@ export interface ImportKeyParams {
 
 export interface GetBalanceResponse {
   balance: BN | number
-  // unlocked: BN | number
-  // lockedStakeable: BN | number
-  // lockedNotStakeable: BN | number
+  unlocked: BN | number
+  lockedStakeable: BN | number
+  lockedNotStakeable: BN | number
   utxoIDs: {
     txID: string
     outputIndex: number
@@ -126,26 +126,29 @@ export interface ListAddressesParams {
   password: string
 }
 
+export interface StartIndex {
+  address: string
+  utxo: string
+}
+
 export interface GetUTXOsParams {
   addresses: string[] | string
   sourceChain?: string | undefined
   limit: number | 0
-  startIndex?:
-    | {
-        address: string
-        utxo: string
-      }
-    | undefined
-  persistOpts?: PersistanceOptions | undefined
+  startIndex?: StartIndex | undefined
+  persistOpts?: PersistanceOptions | undefined,
+  encoding?: string
+}
+
+export interface EndIndex {
+  address: string
+  utxo: string
 }
 
 export interface GetUTXOsResponse {
   numFetched: number
   utxos: UTXOSet
-  endIndex: {
-    address: string
-    utxo: string
-  }
+  endIndex: EndIndex
 }
 
 export interface CreateSubnetParams {
@@ -155,12 +158,10 @@ export interface CreateSubnetParams {
   threshold: number
 }
 
-export interface GetSubnetsResponse {
-  subnets: {
-    ids: string
-    controlKeys: string[]
-    threshold: number
-  }[]
+export interface Subnet {
+  ids: string
+  controlKeys: string[]
+  threshold: number
 }
 
 export interface CreateBlockchainParams {
@@ -173,13 +174,11 @@ export interface CreateBlockchainParams {
   genesisData: string
 }
 
-export interface GetBlockchainsResponse {
-  blockchains: {
-    id: string
-    name: string
-    subnetID: string
-    vmID: string
-  }[]
+export interface Blockchain {
+  id: string
+  name: string
+  subnetID: string
+  vmID: string
 }
 
 export interface GetTxStatusParams {

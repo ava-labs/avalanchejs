@@ -189,7 +189,6 @@ export interface SendNFTParams {
   assetID: string
   groupID: number
   to: string
-  encoding: string
 }
 
 export interface MintNFTParams {
@@ -200,6 +199,7 @@ export interface MintNFTParams {
   assetID: string
   payload: string
   to: string
+  encoding: string
 }
 
 export interface IMinterSet {

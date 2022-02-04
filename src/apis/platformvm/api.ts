@@ -33,7 +33,7 @@ import {
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse,
-  GetSubnetsResponse,
+  Subnet,
   GetValidatorsAtParams,
   GetValidatorsAtResponse,
   CreateAddressParams,
@@ -50,7 +50,7 @@ import {
   ImportKeyParams,
   ImportAVAXParams,
   CreateBlockchainParams,
-  GetBlockchainsResponse,
+  Blockchain,
   GetTxStatusParams,
   GetTxStatusResponse,
   GetMinStakeResponse,
@@ -819,7 +819,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an array of objects containing fields "id", "subnetID", and "vmID".
    */
-  getBlockchains = async (): Promise<GetBlockchainsResponse> => {
+  getBlockchains = async (): Promise<Blockchain[]> => {
     const response: RequestResponseData = await this.callMethod(
       "platform.getBlockchains"
     )
@@ -1093,7 +1093,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getSubnets = async (
     ids: string[] = undefined
-  ): Promise<GetSubnetsResponse> => {
+  ): Promise<Subnet[]> => {
     const params: any = {}
     if (typeof ids !== undefined) {
       params.ids = ids
@@ -1215,6 +1215,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * UTXOs fetched are from addresses equal to or greater than [StartIndex.Address]
    * For address [StartIndex.Address], only UTXOs with IDs greater than [StartIndex.Utxo] will be returned.
    * @param persistOpts Options available to persist these UTXOs in local storage
+   * @param encoding Optional.  is the encoding format to use for the payload argument. Can be either "cb58" or "hex". Defaults to "hex".
    *
    * @remarks
    * persistOpts is optional and must be of type [[PersistanceOptions]]
@@ -1225,7 +1226,8 @@ export class PlatformVMAPI extends JRPCAPI {
     sourceChain: string = undefined,
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
-    persistOpts: PersistanceOptions = undefined
+    persistOpts: PersistanceOptions = undefined,
+    encoding: string = "cb58"
   ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
@@ -1233,7 +1235,8 @@ export class PlatformVMAPI extends JRPCAPI {
 
     const params: GetUTXOsParams = {
       addresses: addresses,
-      limit
+      limit,
+      encoding
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
