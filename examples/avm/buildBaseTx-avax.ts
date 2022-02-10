@@ -1,22 +1,19 @@
-import { Avalanche, BN, Buffer, BinTools } from "../../src"
+import { Avalanche, BN, Buffer } from "../../src"
 import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
 import { MILLIAVAX } from "../../src/utils"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  UnixNow,
+  UnixNow
 } from "../../src/utils"
 
-const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
 const xBlockchainID: string =
   "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
-const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
 const avaxAssetID: string = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(
   ip,
   port,
@@ -43,7 +40,7 @@ const main = async (): Promise<any> => {
   const balance: BN = new BN(getBalanceResponse.balance)
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const amount: BN = balance.sub(fee) 
+  const amount: BN = balance.sub(fee)
 
   const unsignedTx: UnsignedTx = await xchain.buildBaseTx(
     utxoSet,

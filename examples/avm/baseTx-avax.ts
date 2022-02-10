@@ -105,9 +105,6 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  // console.log(tx.toBuffer().toString("hex"))
-  // const serialized: any = baseTx.serialize("display")
-  // console.log(JSON.stringify(serialized))
   const txid: string = await xchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
