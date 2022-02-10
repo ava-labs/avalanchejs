@@ -433,11 +433,11 @@ export class Defaults {
     1337: {
       hrp: NetworkIDToHRP[1337],
       X: n1337X,
-      "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7": n1337X,
+      qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7: n1337X,
       P: n1337P,
       "11111111111111111111111111111111LpoYY": n1337P,
       C: n1337C,
-      "BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88": n1337C
+      BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88: n1337C
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
