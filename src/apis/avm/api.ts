@@ -172,15 +172,16 @@ export class AVMAPI extends JRPCAPI {
   }
 
   addressFromBuffer = (address: Buffer): string => {
-    const chainid: string = this.getBlockchainAlias()
+    const chainID: string = this.getBlockchainAlias()
       ? this.getBlockchainAlias()
       : this.getBlockchainID()
     const type: SerializedType = "bech32"
+    const hrp: string = this.core.getHRP()
     return serialization.bufferToType(
       address,
       type,
-      this.core.getHRP(),
-      chainid
+      hrp,
+      chainID
     )
   }
 
