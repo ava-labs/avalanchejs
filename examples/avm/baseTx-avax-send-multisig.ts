@@ -29,7 +29,13 @@ const xBlockchainID: string =
 const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
 const avaxAssetID: string = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID, xBlockchainID)
+const avalanche: Avalanche = new Avalanche(
+  ip,
+  port,
+  protocol,
+  networkID,
+  xBlockchainID
+)
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
