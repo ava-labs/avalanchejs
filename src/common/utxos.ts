@@ -421,8 +421,10 @@ export abstract class StandardUTXOSet<
     let results: UTXOClass[] = []
     if (typeof utxoids !== "undefined" && Array.isArray(utxoids)) {
       for (let i: number = 0; i < utxoids.length; i++) {
-        if (utxoids[`${i}`] in this.utxos && !(utxoids[`${i}`] in results)) {
-          results.push(this.utxos[utxoids[`${i}`]])
+        const utxoid = utxoids[`${i}`]
+        const utxo = this.utxos[`${utxoid}`]
+        if (!utxo && !(utxo in results)) {
+          results.push(utxo)
         }
       }
     } else {
