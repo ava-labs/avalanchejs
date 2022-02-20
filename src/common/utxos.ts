@@ -420,17 +420,9 @@ export abstract class StandardUTXOSet<
   getAllUTXOs = (utxoids: string[] = undefined): UTXOClass[] => {
     let results: UTXOClass[] = []
     if (typeof utxoids !== "undefined" && Array.isArray(utxoids)) {
-      for (let i: number = 0; i < utxoids.length; i++) {
-        const utxoid = utxoids[`${i}`]
-        const utxo = this.utxos[`${utxoid}`]
-        if (utxo && !(utxo in results)) {
-          results.push(utxo)
-        }
-      }
-      // A recommendation from @vutr (https://github.com/vutran1710) with complexity is O(n)
-      // results = utxoids
-      //   .filter(utxoid => this.utxos[`${utxoid}`])
-      //   .map(utxoid => this.utxos[`${utxoid}`])
+      results = utxoids
+        .filter(utxoid => this.utxos[`${utxoid}`])
+        .map(utxoid => this.utxos[`${utxoid}`])
     } else {
       results = Object.values(this.utxos)
     }
