@@ -300,7 +300,7 @@ describe("UTXOSet", (): void => {
       for (let i: number = 0; i < utxos.length; i++) {
         const assetID = bintools.cb58Encode(utxos[i].getAssetID())
         balance1 = balance1.add(set.getBalance(addrs, assetID, now))
-        balance1 = balance2.add((utxos[i].getOutput() as AmountOutput).getAmount())
+        balance2 = balance2.add((utxos[i].getOutput() as AmountOutput).getAmount())
       }
       expect(balance1.gt(new BN(0))).toBe(true)
       expect(balance2.gt(new BN(0))).toBe(true)
