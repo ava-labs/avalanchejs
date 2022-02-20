@@ -423,10 +423,14 @@ export abstract class StandardUTXOSet<
       for (let i: number = 0; i < utxoids.length; i++) {
         const utxoid = utxoids[`${i}`]
         const utxo = this.utxos[`${utxoid}`]
-        if (!utxo && !(utxo in results)) {
+        if (utxo && !(utxo in results)) {
           results.push(utxo)
         }
       }
+      // A recommendation from @vutr (https://github.com/vutran1710) with complexity is O(n)
+      // results = utxoids
+      //   .filter(utxoid => this.utxos[`${utxoid}`])
+      //   .map(utxoid => this.utxos[`${utxoid}`])
     } else {
       results = Object.values(this.utxos)
     }
