@@ -424,7 +424,6 @@ export abstract class StandardUTXOSet<
         .filter(utxoid => this.utxos[`${utxoid}`])
         .map(utxoid => this.utxos[`${utxoid}`])
     } else {
-      console.log("made it here =----------------")
       results = Object.values(this.utxos)
     }
     return results

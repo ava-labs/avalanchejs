@@ -16,25 +16,24 @@ import {
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  MILLIAVAX
+  MILLIAVAX,
+  Defaults
 } from "../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
-const port: number = 17136
+const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
-const xBlockchainID: string =
-  "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
-const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
-const avaxAssetID: string = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
+
+const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(
   ip,
   port,
   protocol,
-  networkID,
-  xBlockchainID
+  networkID
 )
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
@@ -56,7 +55,7 @@ const main = async (): Promise<any> => {
     xAddressStrings[0],
     avaxAssetID
   )
-  const balance: BN = new BN(getBalanceResponse["balance"])
+  const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     balance.sub(fee),
     xAddresses,
@@ -96,7 +95,7 @@ const main = async (): Promise<any> => {
 
   const baseTx: BaseTx = new BaseTx(
     networkID,
-    xBlockchainIDBuf,
+    bintools.cb58Decode(xBlockchainID),
     outputs,
     inputs,
     memo
@@ -105,8 +104,8 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  // const txid: string = await xchain.issueTx(tx)
-  // console.log(`Success! TXID: ${txid}`)
+  const txid: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
 
 main()

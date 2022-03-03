@@ -1,6 +1,5 @@
 import { BN } from "src"
-import { Defaults } from "../../../src/utils/constants"
-import { Networks, Network } from "../../../src/apis/evm/constants"
+import { Defaults, Networks, Network } from "../../../src/utils/constants"
 
 describe("EVMConstants", (): void => {
   describe("Compare min and max gas prices", (): void => {

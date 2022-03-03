@@ -24,7 +24,7 @@ const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
   outputType: number = AVMConstants.SECPXFEROUTPUTID_CODECONE,
-  assetID = "8eqonZUiJZ655TLQdhFDCqY8oV4SPDMPzqfoVMVsSNE4wSMWu"
+  assetID = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
 ): string[] => {
   const utxoids: string[] = utxoSet.getUTXOIDs()
   let result: string[] = []
@@ -44,8 +44,13 @@ const getUTXOIDs = (
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
+const networkID: number = 1337
+const avalanche: Avalanche = new Avalanche(
+  ip,
+  port,
+  protocol,
+  networkID
+)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
 const xKeychain: KeyChain = xchain.keyChain()

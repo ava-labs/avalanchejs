@@ -934,6 +934,7 @@ describe("AVMAPI", (): void => {
 
     beforeEach(async (): Promise<void> => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainID)
+
       const result: Promise<Buffer> = avm.getAVAXAssetID(true)
       const payload: object = {
         result: {
@@ -1132,6 +1133,10 @@ describe("AVMAPI", (): void => {
         [secpMintUTXO.getUTXOID()],
         secpMintOp
       )
+    })
+
+    test("getDefaultMintTxFee", async (): Promise<void> => {
+      expect(avm.getDefaultMintTxFee()).toBe("0f4240")
     })
 
     test("signTx", async (): Promise<void> => {
