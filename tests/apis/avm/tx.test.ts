@@ -103,7 +103,7 @@ describe("Transactions", (): void => {
       netid,
       undefined,
       undefined,
-      null,
+      undefined,
       true
     )
     api = new AVMAPI(avalanche, "/ext/bc/avm", bID)
