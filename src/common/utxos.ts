@@ -426,6 +426,7 @@ export abstract class StandardUTXOSet<
         }
       }
     } else {
+      console.log("made it here =----------------")
       results = Object.values(this.utxos)
     }
     return results

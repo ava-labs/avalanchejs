@@ -21,7 +21,7 @@ import {
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
-const port: number = 9650
+const port: number = 17136
 const protocol: string = "http"
 const networkID: number = 1337
 const xBlockchainID: string =
@@ -105,8 +105,8 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+  // const txid: string = await xchain.issueTx(tx)
+  // console.log(`Success! TXID: ${txid}`)
 }
 
 main()
