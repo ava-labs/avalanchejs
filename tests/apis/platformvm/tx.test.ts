@@ -112,7 +112,7 @@ describe("Transactions", (): void => {
       12345,
       undefined,
       undefined,
-      null,
+      undefined,
       true
     )
     api = new PlatformVMAPI(avalanche, "/ext/bc/P")
