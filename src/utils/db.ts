@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module Utils-DB
  */
-import store from "store2"
+import store, { StoreAPI } from "store2"
 
 /**
  * A class for interacting with the {@link https://github.com/nbubna/store| store2 module}
@@ -37,7 +37,7 @@ export default class DB {
    *
    * @param ns Namespace to retrieve.
    */
-  static getNamespace(ns: string): store.StoreAPI {
+  static getNamespace(ns: string): StoreAPI {
     return this.store.namespace(ns)
   }
 }

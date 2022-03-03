@@ -90,9 +90,9 @@
     "hdkey": "2.0.1",
     "isomorphic-dompurify": "^0.18.0",
     "isomorphic-ws": "4.0.1",
-    "store2": "2.12.0",
+    "store2": "2.13.1",
     "stream-browserify": "3.0.0",
-    "ws": "8.4.2"
+    "ws": "8.5.0"
   },
   "prettier": {
     "tabWidth": 2,
