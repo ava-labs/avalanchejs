@@ -29,12 +29,7 @@ const networkID: number = 1337
 const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
-const avalanche: Avalanche = new Avalanche(
-  ip,
-  port,
-  protocol,
-  networkID
-)
+const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`

@@ -1073,14 +1073,12 @@ export class AVMAPI extends JRPCAPI {
     threshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildBaseTx"
-    const to: Buffer[] = this._cleanAddressArray(
-      toAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller
@@ -1155,14 +1153,12 @@ export class AVMAPI extends JRPCAPI {
     threshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildNFTTransferTx"
-    const to: Buffer[] = this._cleanAddressArray(
-      toAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller
@@ -1238,14 +1234,12 @@ export class AVMAPI extends JRPCAPI {
     threshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildImportTx"
-    const to: Buffer[] = this._cleanAddressArray(
-      toAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const to: Buffer[] = this._cleanAddressArray(toAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller
@@ -1378,10 +1372,9 @@ export class AVMAPI extends JRPCAPI {
     })
 
     const caller: string = "buildExportTx"
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
 
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
@@ -1459,10 +1452,9 @@ export class AVMAPI extends JRPCAPI {
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
     const caller: string = "buildCreateAssetTx"
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller
@@ -1526,10 +1518,9 @@ export class AVMAPI extends JRPCAPI {
     asOf: BN = UnixNow()
   ): Promise<any> => {
     const caller: string = "buildSECPMintTx"
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller
@@ -1614,10 +1605,9 @@ export class AVMAPI extends JRPCAPI {
     locktime: BN = new BN(0)
   ): Promise<UnsignedTx> => {
     const caller: string = "buildCreateNFTAssetTx"
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller
@@ -1697,10 +1687,9 @@ export class AVMAPI extends JRPCAPI {
     asOf: BN = UnixNow()
   ): Promise<any> => {
     const caller: string = "buildCreateNFTMintTx"
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      caller
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
+      (a: string): Buffer => bintools.stringToAddress(a)
+    )
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       caller

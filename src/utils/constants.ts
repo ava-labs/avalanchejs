@@ -30,7 +30,7 @@ export interface X {
   alias: string
   vm: string
   creationTxFee: BN | number
-  mintTxFee: BN,
+  mintTxFee: BN
   avaxAssetID?: string
   txFee?: BN | number
   fee?: BN
@@ -65,7 +65,6 @@ export interface Network {
 export interface Networks {
   [key: number]: Network
 }
-
 
 export const NetworkIDToHRP: object = {
   1: "avax",
