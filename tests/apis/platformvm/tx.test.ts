@@ -27,7 +27,8 @@ import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { PlatformChainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { AddSubnetValidatorTx, SubnetAuth } from "src/apis/platformvm"
+// import { AddSubnetValidatorTx, SubnetAuth } from "src/apis/platformvm"
+import { SubnetAuth } from "src/apis/platformvm"
 
 describe("Transactions", (): void => {
   /**
@@ -101,7 +102,7 @@ describe("Transactions", (): void => {
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
-  let addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
+  // let addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
 
   beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(
@@ -215,19 +216,19 @@ describe("Transactions", (): void => {
     }
     set.addArray(utxos)
 
-    addSubnetValidatorTx = new AddSubnetValidatorTx(
-      networkID,
-      bintools.cb58Decode(pChainBlockchainID),
-      outputs,
-      inputs,
-      memo,
-      nodeID,
-      startTime,
-      endTime,
-      weight,
-      subnetID,
-      subnetAuth
-    )
+    // addSubnetValidatorTx = new AddSubnetValidatorTx(
+    //   networkID,
+    //   bintools.cb58Decode(pChainBlockchainID),
+    //   outputs,
+    //   inputs,
+    //   memo,
+    //   nodeID,
+    //   startTime,
+    //   endTime,
+    //   weight,
+    //   subnetID,
+    //   subnetAuth
+    // )
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {
@@ -631,30 +632,30 @@ describe("Transactions", (): void => {
     tx2.fromBuffer(tx.toBuffer())
     expect(tx.toBuffer().toString("hex")).toBe(tx2.toBuffer().toString("hex"))
   })
-  test("addSubnetValidatorTx getBlockchainID", (): void => {
-    const blockchainIDBuf: Buffer = addSubnetValidatorTx.getBlockchainID()
-    const blockchainIDStr: string = bintools.cb58Encode(blockchainIDBuf)
-    expect(blockchainIDStr).toBe(pChainBlockchainID)
-  })
-  test("addSubnetValidatorTx getNodeID", (): void => {
-    const nodeIDBuf: Buffer = addSubnetValidatorTx.getNodeID()
-    const nIDStr: string = bintools.cb58Encode(nodeIDBuf)
-    expect(`NodeID-${nIDStr}`).toBe(nodeIDStr)
-  })
-  test("addSubnetValidatorTx getStartTime", (): void => {
-    const startTimeBN: BN = addSubnetValidatorTx.getStartTime()
-    expect(startTimeBN.toNumber()).toEqual(startTime.toNumber())
-  })
-  test("addSubnetValidatorTx getEndTime", (): void => {
-    const endTimeBN: BN = addSubnetValidatorTx.getEndTime()
-    expect(endTimeBN.toNumber()).toEqual(endTime.toNumber())
-  })
-  test("addSubnetValidatorTx getWeight", (): void => {
-    const weightBN: BN = addSubnetValidatorTx.getWeight()
-    expect(weightBN.toNumber()).toEqual(weight.toNumber())
-  })
-  test("addSubnetValidatorTx getSubnetID", (): void => {
-    const sIDStr: string = addSubnetValidatorTx.getSubnetID()
-    expect(sIDStr).toBe(subnetIDStr)
-  })
+  // test("addSubnetValidatorTx getBlockchainID", (): void => {
+  //   const blockchainIDBuf: Buffer = addSubnetValidatorTx.getBlockchainID()
+  //   const blockchainIDStr: string = bintools.cb58Encode(blockchainIDBuf)
+  //   expect(blockchainIDStr).toBe(pChainBlockchainID)
+  // })
+  // test("addSubnetValidatorTx getNodeID", (): void => {
+  //   const nodeIDBuf: Buffer = addSubnetValidatorTx.getNodeID()
+  //   const nIDStr: string = bintools.cb58Encode(nodeIDBuf)
+  //   expect(`NodeID-${nIDStr}`).toBe(nodeIDStr)
+  // })
+  // test("addSubnetValidatorTx getStartTime", (): void => {
+  //   const startTimeBN: BN = addSubnetValidatorTx.getStartTime()
+  //   expect(startTimeBN.toNumber()).toEqual(startTime.toNumber())
+  // })
+  // test("addSubnetValidatorTx getEndTime", (): void => {
+  //   const endTimeBN: BN = addSubnetValidatorTx.getEndTime()
+  //   expect(endTimeBN.toNumber()).toEqual(endTime.toNumber())
+  // })
+  // test("addSubnetValidatorTx getWeight", (): void => {
+  //   const weightBN: BN = addSubnetValidatorTx.getWeight()
+  //   expect(weightBN.toNumber()).toEqual(weight.toNumber())
+  // })
+  // test("addSubnetValidatorTx getSubnetID", (): void => {
+  //   const sIDStr: string = addSubnetValidatorTx.getSubnetID()
+  //   expect(sIDStr).toBe(subnetIDStr)
+  // })
 })

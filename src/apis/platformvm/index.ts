@@ -1,5 +1,5 @@
 export * from "./api"
-export * from "./addsubnetvalidatortx"
+// export * from "./addsubnetvalidatortx"
 export * from "./basetx"
 export * from "./constants"
 export * from "./createchaintx"
