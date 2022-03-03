@@ -1135,8 +1135,8 @@ describe("AVMAPI", (): void => {
       )
     })
 
-    test("getDefaultMintTxFee", async (): Promise<void> => {
-      expect(avm.getDefaultMintTxFee()).toBe("0f4240")
+    test("getDefaultMintTxFee", (): void => {
+      expect(avm.getDefaultMintTxFee().toString()).toBe("1000000")
     })
 
     test("signTx", async (): Promise<void> => {

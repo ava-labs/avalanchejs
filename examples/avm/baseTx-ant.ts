@@ -33,8 +33,7 @@ const avalanche: Avalanche = new Avalanche(
   ip,
   port,
   protocol,
-  networkID,
-  xBlockchainID
+  networkID
 )
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
