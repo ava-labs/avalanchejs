@@ -371,7 +371,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param password The password of the Keystore user that controls the new account
    * @param subnetID Optional. Either a {@link https://github.com/feross/buffer|Buffer} or an cb58 serialized string for the SubnetID or its alias.
    * @param vmID The ID of the Virtual Machine the blockchain runs. Can also be an alias of the Virtual Machine.
-   * @param FXIDs The ids of the FXs the VM is running.
+   * @param fxIDs The ids of the FXs the VM is running.
    * @param name A human-readable name for the new blockchain
    * @param genesis The base 58 (with checksum) representation of the genesis state of the new blockchain. Virtual Machines should have a static API method named buildGenesis that can be used to generate genesisData.
    *

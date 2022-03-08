@@ -11,7 +11,9 @@ const admin: AdminAPI = avalanche.Admin()
 
 const main = async (): Promise<any> => {
   const loggerName: string = "C"
-  const loggerLevel: GetLoggerLevelResponse = await admin.getLoggerLevel(loggerName)
+  const loggerLevel: GetLoggerLevelResponse = await admin.getLoggerLevel(
+    loggerName
+  )
   console.log(loggerLevel)
 }
 

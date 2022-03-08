@@ -100,7 +100,9 @@ export class AdminAPI extends JRPCAPI {
    *
    * @returns Returns a Promise containing logger levels
    */
-  getLoggerLevel = async (loggerName?: string): Promise<GetLoggerLevelResponse> => {
+  getLoggerLevel = async (
+    loggerName?: string
+  ): Promise<GetLoggerLevelResponse> => {
     const params: GetLoggerLevelParams = {}
     if (typeof loggerName !== "undefined") {
       params.loggerName = loggerName
@@ -118,9 +120,7 @@ export class AdminAPI extends JRPCAPI {
    * @returns Returns a Promise containing new VMs and failed VMs
    */
   loadVMs = async (): Promise<LoadVMsResponse> => {
-    const response: RequestResponseData = await this.callMethod(
-      "admin.loadVMs"
-    )
+    const response: RequestResponseData = await this.callMethod("admin.loadVMs")
     return response.data.result.aliases
       ? response.data.result.aliases
       : response.data.result
@@ -163,7 +163,11 @@ export class AdminAPI extends JRPCAPI {
    *
    * @returns Returns a Promise containing logger levels
    */
-  setLoggerLevel = async (loggerName?: string, logLevel?: string, displayLevel?: string): Promise<SetLoggerLevelResponse> => {
+  setLoggerLevel = async (
+    loggerName?: string,
+    logLevel?: string,
+    displayLevel?: string
+  ): Promise<SetLoggerLevelResponse> => {
     const params: SetLoggerLevelParams = {}
     if (typeof loggerName !== "undefined") {
       params.loggerName = loggerName

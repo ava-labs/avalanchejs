@@ -13,7 +13,11 @@ const main = async (): Promise<any> => {
   const loggerName: string = "C"
   const logLevel: string = "DEBUG"
   const displayLevel: string = "INFO"
-  const loggerLevel: GetLoggerLevelResponse = await admin.setLoggerLevel(loggerName, logLevel, displayLevel)
+  const loggerLevel: GetLoggerLevelResponse = await admin.setLoggerLevel(
+    loggerName,
+    logLevel,
+    displayLevel
+  )
   console.log(loggerLevel)
 }
 
