@@ -5,7 +5,7 @@
 import BinTools from "../utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import DOMPurify from "isomorphic-dompurify"
+import xss from 'xss';
 import {
   NodeIDStringToBuffer,
   privateKeyStringToBuffer,
@@ -79,7 +79,7 @@ export abstract class Serializable {
       if (typeof obj[`${k}`] === "object" && obj[`${k}`] !== null) {
         this.sanitizeObject(obj[`${k}`])
       } else if (typeof obj[`${k}`] === "string") {
-        obj[`${k}`] = DOMPurify.sanitize(obj[`${k}`])
+        obj[`${k}`] = xss(obj[`${k}`])
       }
     }
     return obj
@@ -89,7 +89,7 @@ export abstract class Serializable {
   //these are so you can say super.serialize(encoding)
   serialize(encoding?: SerializedEncoding): object {
     return {
-      _typeName: DOMPurify.sanitize(this._typeName),
+      _typeName: xss(this._typeName),
       _typeID: typeof this._typeID === "undefined" ? null : this._typeID,
       _codecID: typeof this._codecID === "undefined" ? null : this._codecID
     }

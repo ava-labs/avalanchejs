@@ -11,6 +11,7 @@ import axios, {
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
 import { getPreferredHRP } from "./utils/helperfunctions"
+const fetchAdapter = require('@vespaiach/axios-fetch-adapter').default;
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
@@ -289,6 +290,8 @@ export default class AvalancheCore {
     config.headers = headers
     config.data = postdata
     config.params = getdata
+    config.adapter = fetchAdapter
+    console.log('config', config)
     const resp: AxiosResponse<any> = await axios.request(config)
     // purging all that is axios
     const xhrdata: RequestResponseData = new RequestResponseData(
