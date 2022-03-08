@@ -1,10 +1,11 @@
-import { Avalanche, BN, Buffer } from "../../src"
-import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
-import { UnixNow } from "../../src/utils"
+import { GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
+import { Avalanche, BN, Buffer } from "../../dist"
+import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../dist/apis/avm"
+import { UnixNow } from "../../dist/utils"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -33,9 +34,9 @@ const memo: Buffer = Buffer.from(
 
 const main = async (): Promise<any> => {
   const amount: BN = new BN(5)
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const assetID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
+  const assetID: string = "2VopdncaHrtX1jSbUtSXCeWHSMhqNVF7uENMMR8gfEFanWYsZQ"
   const toAddresses: string[] = [xAddressStrings[0]]
 
   const unsignedTx: UnsignedTx = await xchain.buildBaseTx(

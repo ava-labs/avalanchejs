@@ -1,19 +1,19 @@
-import { Avalanche, BN, Buffer } from "../../src"
-import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
-import { MILLIAVAX } from "../../src/utils"
+import { Avalanche, BN, Buffer } from "../../dist"
+import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../dist/apis/avm"
+import { GetBalanceResponse, GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
+import { Defaults, MILLIAVAX } from "../../dist/utils"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
-const xBlockchainID: string =
-  "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
-const avaxAssetID: string = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
+const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avalanche: Avalanche = new Avalanche(
   ip,
   port,
@@ -33,12 +33,12 @@ const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX")
 const fee: BN = MILLIAVAX
 
 const main = async (): Promise<any> => {
-  const getBalanceResponse: any = await xchain.getBalance(
+  const getBalanceResponse: GetBalanceResponse = await xchain.getBalance(
     xAddressStrings[0],
     avaxAssetID
   )
   const balance: BN = new BN(getBalanceResponse.balance)
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const amount: BN = balance.sub(fee)
 

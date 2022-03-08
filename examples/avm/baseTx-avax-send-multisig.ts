@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../dist"
 import {
   AVMAPI,
   KeyChain,
@@ -12,22 +12,22 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "../../src/apis/avm"
+} from "../../dist/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  MILLIAVAX
-} from "../../src/utils"
+  MILLIAVAX,
+  Defaults
+} from "../../dist/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
-const xBlockchainID: string =
-  "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
+const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
-const avaxAssetID: string = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(
   ip,
@@ -39,13 +39,13 @@ const avalanche: Avalanche = new Avalanche(
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+// X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
 xKeychain.importKey(privKey)
 privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+// X-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
 xKeychain.importKey(privKey)
 privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
-// qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7-custom1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
+// X-custom1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
@@ -65,7 +65,7 @@ const main = async (): Promise<any> => {
     xAddressStrings[0],
     avaxAssetID
   )
-  const balance: BN = new BN(getBalanceResponse["balance"])
+  const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     balance.sub(fee),
     [xAddresses[0]],
