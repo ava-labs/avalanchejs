@@ -61,7 +61,9 @@ const payload: Buffer = Buffer.from("NFT Payload")
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const outputOwners: OutputOwners = new OutputOwners(
     xAddresses,

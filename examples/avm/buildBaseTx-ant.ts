@@ -34,7 +34,9 @@ const memo: Buffer = Buffer.from(
 
 const main = async (): Promise<any> => {
   const amount: BN = new BN(5)
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const assetID: string = "2VopdncaHrtX1jSbUtSXCeWHSMhqNVF7uENMMR8gfEFanWYsZQ"
   const toAddresses: string[] = [xAddressStrings[0]]

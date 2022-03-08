@@ -6,7 +6,10 @@ import {
   UnsignedTx,
   Tx
 } from "../../dist/apis/avm"
-import { GetBalanceResponse, GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
+import {
+  GetBalanceResponse,
+  GetUTXOsResponse
+} from "../../dist/apis/avm/interfaces"
 import { KeyChain as EVMKeyChain, EVMAPI } from "../../dist/apis/evm"
 import {
   PrivateKeyPrefix,
@@ -39,7 +42,9 @@ const memo: Buffer = Buffer.from(
 const fee: BN = xchain.getDefaultTxFee()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const getBalanceResponse: GetBalanceResponse = await xchain.getBalance(
     xAddressStrings[0],

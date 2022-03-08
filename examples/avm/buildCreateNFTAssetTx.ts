@@ -35,7 +35,9 @@ const name: string = "non fungible token"
 const symbol: string = "NFT"
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const minterSets: MinterSet[] = [new MinterSet(threshold, xAddresses)]
   const unsignedTx: UnsignedTx = await xchain.buildCreateNFTAssetTx(

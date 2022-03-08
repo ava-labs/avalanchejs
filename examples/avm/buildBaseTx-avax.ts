@@ -1,6 +1,9 @@
 import { Avalanche, BN, Buffer } from "../../dist"
 import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../dist/apis/avm"
-import { GetBalanceResponse, GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
+import {
+  GetBalanceResponse,
+  GetUTXOsResponse
+} from "../../dist/apis/avm/interfaces"
 import { Defaults, MILLIAVAX } from "../../dist/utils"
 import {
   PrivateKeyPrefix,
@@ -38,7 +41,9 @@ const main = async (): Promise<any> => {
     avaxAssetID
   )
   const balance: BN = new BN(getBalanceResponse.balance)
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const amount: BN = balance.sub(fee)
 

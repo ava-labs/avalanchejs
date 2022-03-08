@@ -45,7 +45,9 @@ const symbol: string = "TEST"
 const denomination: number = 3
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
 
   const amount: BN = new BN(507)
