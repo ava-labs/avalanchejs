@@ -946,12 +946,14 @@ export class AVMAPI extends JRPCAPI {
    * Returns the transaction data of a provided transaction ID by calling the node's `getTx` method.
    *
    * @param txID The string representation of the transaction ID
+   * @param encoding sets the format of the returned transaction. Can be, "cb58", "hex" or "json". Defaults to "cb58".
    *
-   * @returns Returns a Promise string containing the bytes retrieved from the node
+   * @returns Returns a Promise string or object containing the bytes retrieved from the node
    */
-  getTx = async (txID: string): Promise<string> => {
+  getTx = async (txID: string, encoding: string = "cb58"): Promise<string | object> => {
     const params: GetTxParams = {
-      txID
+      txID,
+      encoding
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.getTx",

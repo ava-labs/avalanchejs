@@ -698,7 +698,7 @@ describe("AVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string> = api.getTx(txid)
+    const result: Promise<string | object> = api.getTx(txid)
     const payload: object = {
       result: {
         tx: "sometx"
@@ -709,7 +709,7 @@ describe("AVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("sometx")

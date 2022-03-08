@@ -1163,13 +1163,15 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Returns the treansaction data of a provided transaction ID by calling the node's `getTx` method.
    *
-   * @param txid The string representation of the transaction ID
+   * @param txID The string representation of the transaction ID
+   * @param encoding sets the format of the returned transaction. Can be, "cb58", "hex" or "json". Defaults to "cb58".
    *
-   * @returns Returns a Promise string or ErrorResponseObject containing the bytes retrieved from the node
+   * @returns Returns a Promise string or object containing the bytes retrieved from the node
    */
-  getTx = async (txid: string): Promise<string | ErrorResponseObject> => {
+  getTx = async (txID: string, encoding: string = "cb58"): Promise<string | string> => {
     const params: any = {
-      txID: txid
+      txID,
+      encoding
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getTx",
