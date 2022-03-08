@@ -47,6 +47,7 @@ import {
   SendMultipleResponse,
   SendResponse
 } from "src/apis/avm/interfaces"
+import { CENTIAVAX } from "src/utils"
 
 /**
  * @ignore
@@ -1464,7 +1465,7 @@ describe("AVMAPI", (): void => {
         symbol,
         denomination,
         undefined,
-        avm.getCreationTxFee(),
+        CENTIAVAX,
         assetID
       )
 
