@@ -1,6 +1,7 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
+import { GetLoggerLevelResponse } from "src/apis/admin/interfaces"
 import { AdminAPI } from "../../../src/apis/admin/api"
 
 describe("Admin", (): void => {
@@ -105,6 +106,25 @@ describe("Admin", (): void => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     // @ts-ignore
     expect(response).toBe(payload.result.aliases)
+  })
+
+  test("getLoggerLevel", async (): Promise<void> => {
+    const result: Promise<GetLoggerLevelResponse> = admin.getLoggerLevel()
+    const payload: object = {
+      result: {
+        loggerLevels: { C: { logLevel: 'DEBUG', displayLevel: 'ERROR' } }
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: GetLoggerLevelResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    // @ts-ignore
+    expect(response).toBe(payload.result)
   })
 
   test("lockProfile", async () => {
