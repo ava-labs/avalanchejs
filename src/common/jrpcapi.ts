@@ -6,7 +6,7 @@
 import { AxiosRequestConfig } from "axios"
 import AvalancheCore from "../avalanche"
 import { APIBase, RequestResponseData } from "./apibase"
-const fetchAdapter = require('@vespaiach/axios-fetch-adapter').default;
+const fetchAdapter = require("@vespaiach/axios-fetch-adapter").default
 
 export class JRPCAPI extends APIBase {
   protected jrpcVersion: string = "2.0"

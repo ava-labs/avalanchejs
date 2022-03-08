@@ -5,7 +5,7 @@
 import BinTools from "../utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import xss from 'xss';
+import xss from "xss"
 import {
   NodeIDStringToBuffer,
   privateKeyStringToBuffer,
