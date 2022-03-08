@@ -30,7 +30,9 @@ const memo: Buffer = Buffer.from(
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const platformVMUTXOResponse: GetUTXOsResponse = await pchain.getUTXOs(pAddressStrings)
+  const platformVMUTXOResponse: GetUTXOsResponse = await pchain.getUTXOs(
+    pAddressStrings
+  )
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
 
   const unsignedTx: UnsignedTx = await pchain.buildCreateSubnetTx(

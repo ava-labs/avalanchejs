@@ -1168,7 +1168,10 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise string or object containing the bytes retrieved from the node
    */
-  getTx = async (txID: string, encoding: string = "cb58"): Promise<string | string> => {
+  getTx = async (
+    txID: string,
+    encoding: string = "cb58"
+  ): Promise<string | string> => {
     const params: any = {
       txID,
       encoding

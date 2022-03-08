@@ -950,7 +950,10 @@ export class AVMAPI extends JRPCAPI {
    *
    * @returns Returns a Promise string or object containing the bytes retrieved from the node
    */
-  getTx = async (txID: string, encoding: string = "cb58"): Promise<string | object> => {
+  getTx = async (
+    txID: string,
+    encoding: string = "cb58"
+  ): Promise<string | object> => {
     const params: GetTxParams = {
       txID,
       encoding
