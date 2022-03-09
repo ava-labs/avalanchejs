@@ -126,19 +126,26 @@ export class AddSubnetValidatorTx extends BaseTx {
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
+    
     this.nodeID = bintools.copyFrom(bytes, offset, offset + 20)
     offset += 20
+    
     this.startTime = bintools.copyFrom(bytes, offset, offset + 8)
     offset += 8
+    
     this.endTime = bintools.copyFrom(bytes, offset, offset + 8)
     offset += 8
+    
     this.weight = bintools.copyFrom(bytes, offset, offset + 8)
     offset += 8
+    
     this.subnetID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
+    
     const sa: SubnetAuth = new SubnetAuth()
     offset += sa.fromBuffer(bintools.copyFrom(bytes, offset))
     this.subnetAuth = sa
+    
     return offset
   }
 
@@ -147,8 +154,15 @@ export class AddSubnetValidatorTx extends BaseTx {
    */
   toBuffer(): Buffer {
     const superbuff: Buffer = super.toBuffer()
-    const bsize: number =
-      superbuff.length + 20 + 8 + 8 + 8 + 32 + this.subnetAuth.toBuffer().length
+    
+    const bsize: number = 
+        superbuff.length +
+        this.nodeID.length +
+        this.startTime.length +
+        this.endTime.length +
+        this.weight.length +
+        this.subnetID.length +
+        this.subnetAuth.toBuffer().length
 
     const barr: Buffer[] = [
       superbuff,
