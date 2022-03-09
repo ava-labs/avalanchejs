@@ -40,10 +40,10 @@ import {
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
-const ip: string = "localhost"
+const ip: string = "0.0.0.0"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
@@ -58,8 +58,8 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const nodeID: string = "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
-const startTime: BN = new BN(1641961736)
-const endTime: BN = new BN(1662307000)
+const startTime: BN = new BN(1646812672)
+const endTime: BN = new BN(1646912672)
 
 const main = async (): Promise<any> => {
   const memoStr: string = "from snowflake to avalanche"
@@ -105,7 +105,7 @@ const main = async (): Promise<any> => {
 
   const weight: BN = new BN(20)
   const subnetID: Buffer = bintools.cb58Decode(
-    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
+    "2T7F1AzTLPzZrUcw22JLcC8yZ8o2muhjrM5zoQ3TBuENbAUvZd"
   )
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)

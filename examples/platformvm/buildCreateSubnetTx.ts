@@ -13,7 +13,7 @@ import {
   UnixNow
 } from "../../dist/utils"
 
-const ip: string = "localhost"
+const ip: string = "0.0.0.0"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
