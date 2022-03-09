@@ -537,7 +537,9 @@ export abstract class StandardAmountOutput extends Output {
   /**
    * Returns the amount as a {@link https://github.com/indutny/bn.js/|BN}.
    */
-  getAmount = (): BN => this.amountValue.clone()
+  getAmount(): BN {
+    return this.amountValue.clone()
+  }
 
   /**
    * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StandardAmountOutput]] and returns the size of the output.
