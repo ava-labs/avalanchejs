@@ -92,6 +92,7 @@ export interface GetAssetDescriptionResponse {
 
 export interface GetTxParams {
   txID: string
+  encoding: string
 }
 
 export interface GetTxStatusParams {

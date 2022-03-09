@@ -8,7 +8,12 @@ import { RequestResponseData } from "../../common/apibase"
 import {
   AliasChainParams,
   AliasParams,
-  GetChainAliasesParams
+  GetChainAliasesParams,
+  GetLoggerLevelParams,
+  GetLoggerLevelResponse,
+  LoadVMsResponse,
+  SetLoggerLevelParams,
+  SetLoggerLevelResponse
 } from "./interfaces"
 
 /**
@@ -89,6 +94,39 @@ export class AdminAPI extends JRPCAPI {
   }
 
   /**
+   * Returns log and display levels of loggers
+   *
+   * @param loggerName the name of the logger to be returned. This is an optional argument. If not specified, it returns all possible loggers.
+   *
+   * @returns Returns a Promise containing logger levels
+   */
+  getLoggerLevel = async (
+    loggerName?: string
+  ): Promise<GetLoggerLevelResponse> => {
+    const params: GetLoggerLevelParams = {}
+    if (typeof loggerName !== "undefined") {
+      params.loggerName = loggerName
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "admin.getLoggerLevel",
+      params
+    )
+    return response.data.result
+  }
+
+  /**
+   * Dynamically loads any virtual machines installed on the node as plugins
+   *
+   * @returns Returns a Promise containing new VMs and failed VMs
+   */
+  loadVMs = async (): Promise<LoadVMsResponse> => {
+    const response: RequestResponseData = await this.callMethod("admin.loadVMs")
+    return response.data.result.aliases
+      ? response.data.result.aliases
+      : response.data.result
+  }
+
+  /**
    * Dump the mutex statistics of the node to the specified file.
    *
    * @returns Promise for a boolean that is true on success.
@@ -114,6 +152,37 @@ export class AdminAPI extends JRPCAPI {
     return response.data.result.success
       ? response.data.result.success
       : response.data.result
+  }
+
+  /**
+   * Sets log and display levels of loggers.
+   *
+   * @param loggerName the name of the logger to be changed. This is an optional parameter.
+   * @param logLevel the log level of written logs, can be omitted.
+   * @param displayLevel the log level of displayed logs, can be omitted.
+   *
+   * @returns Returns a Promise containing logger levels
+   */
+  setLoggerLevel = async (
+    loggerName?: string,
+    logLevel?: string,
+    displayLevel?: string
+  ): Promise<SetLoggerLevelResponse> => {
+    const params: SetLoggerLevelParams = {}
+    if (typeof loggerName !== "undefined") {
+      params.loggerName = loggerName
+    }
+    if (typeof logLevel !== "undefined") {
+      params.logLevel = logLevel
+    }
+    if (typeof displayLevel !== "undefined") {
+      params.displayLevel = displayLevel
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "admin.setLoggerLevel",
+      params
+    )
+    return response.data.result
   }
 
   /**
