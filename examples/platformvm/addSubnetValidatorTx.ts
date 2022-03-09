@@ -57,9 +57,9 @@ const inputs: TransferableInput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const nodeID: string = "NodeID-GWPcbFJZFfZreETSoWjPimr846mXEKCtu"
-const startTime: BN = new BN(1646812672)
-const endTime: BN = new BN(1646912672)
+const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
+const startTime: BN = new BN(1646850602)
+const endTime: BN = new BN(1648146489)
 
 const main = async (): Promise<any> => {
   const memoStr: string = "from snowflake to avalanche"
@@ -105,7 +105,7 @@ const main = async (): Promise<any> => {
 
   const weight: BN = new BN(20)
   const subnetID: Buffer = bintools.cb58Decode(
-    "2JGETxsiME8x4hcvUaNi8CJbcWsiZ47tq2uVgwSqiiWbuYhGgA"
+    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
   )
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
