@@ -11,14 +11,11 @@ const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
-const xBlockchainID: string =
-  "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
 const avalanche: Avalanche = new Avalanche(
   ip,
   port,
   protocol,
-  networkID,
-  xBlockchainID
+  networkID
 )
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
@@ -38,7 +35,7 @@ const main = async (): Promise<any> => {
     xAddressStrings
   )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const assetID: string = "2VopdncaHrtX1jSbUtSXCeWHSMhqNVF7uENMMR8gfEFanWYsZQ"
+  const assetID: string = "KD4byR998qmVivF2zmrhLb6gjwKGSB5xCerV2nYXb4XNXVGEP"
   const toAddresses: string[] = [xAddressStrings[0]]
 
   const unsignedTx: UnsignedTx = await xchain.buildBaseTx(

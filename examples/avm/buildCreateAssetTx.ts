@@ -12,21 +12,18 @@ import {
 import { GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
-const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const avalanche: Avalanche = new Avalanche(
   ip,
   port,
   protocol,
-  networkID,
-  xBlockchainID
+  networkID
 )
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()

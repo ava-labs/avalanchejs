@@ -1171,7 +1171,7 @@ export class PlatformVMAPI extends JRPCAPI {
   getTx = async (
     txID: string,
     encoding: string = "cb58"
-  ): Promise<string | string> => {
+  ): Promise<string | object> => {
     const params: any = {
       txID,
       encoding

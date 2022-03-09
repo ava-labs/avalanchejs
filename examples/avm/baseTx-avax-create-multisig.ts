@@ -17,7 +17,6 @@ import { GetBalanceResponse } from "../../dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  MILLIAVAX,
   Defaults
 } from "../../dist/utils"
 
@@ -34,8 +33,7 @@ const avalanche: Avalanche = new Avalanche(
   ip,
   port,
   protocol,
-  networkID,
-  xBlockchainID
+  networkID
 )
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()
@@ -52,7 +50,7 @@ const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = MILLIAVAX
+const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 3
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(

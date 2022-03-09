@@ -421,8 +421,8 @@ export abstract class StandardUTXOSet<
     let results: UTXOClass[] = []
     if (typeof utxoids !== "undefined" && Array.isArray(utxoids)) {
       results = utxoids
-        .filter((utxoid) => this.utxos[`${utxoid}`])
-        .map((utxoid) => this.utxos[`${utxoid}`])
+        .filter(utxoid => this.utxos[`${utxoid}`])
+        .map(utxoid => this.utxos[`${utxoid}`])
     } else {
       results = Object.values(this.utxos)
     }
