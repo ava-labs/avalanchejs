@@ -165,7 +165,11 @@ describe("Index", () => {
   test("isAccepted", async () => {
     const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
-    const result: Promise<IsAcceptedResponse> = index.isAccepted(id, encoding, baseurl)
+    const result: Promise<IsAcceptedResponse> = index.isAccepted(
+      id,
+      encoding,
+      baseurl
+    )
 
     const payload: object = {
       result: true
