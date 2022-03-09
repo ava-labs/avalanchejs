@@ -184,7 +184,7 @@ export class AddSubnetValidatorTx extends BaseTx {
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const sigs: Credential[] = []
     for (let i: number = 0; i <= this.ins.length; i++) {
-      const k = i < this.ins.length ? i : i-1;
+      const k = i < this.ins.length ? i : i - 1
       const cred: Credential = SelectCredentialClass(
         this.ins[k].getInput().getCredentialID()
       )

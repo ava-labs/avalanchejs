@@ -105,7 +105,7 @@ const main = async (): Promise<any> => {
 
   const weight: BN = new BN(20)
   const subnetID: Buffer = bintools.cb58Decode(
-    "2T7F1AzTLPzZrUcw22JLcC8yZ8o2muhjrM5zoQ3TBuENbAUvZd"
+    "2JGETxsiME8x4hcvUaNi8CJbcWsiZ47tq2uVgwSqiiWbuYhGgA"
   )
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
@@ -125,6 +125,8 @@ const main = async (): Promise<any> => {
   )
   const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
+  console.log("Total inputs: ", tx.getUnsignedTx().getTransaction().getIns().length)
+  console.log("Total credentials: ", tx.getCredentials().length)
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
