@@ -48,6 +48,7 @@ import {
   SendResponse
 } from "src/apis/avm/interfaces"
 import { CENTIAVAX } from "src/utils"
+import { MILLIAVAX } from "src/utils"
 
 /**
  * @ignore
@@ -1588,7 +1589,7 @@ describe("AVMAPI", (): void => {
         addrs1.map((a) => avm.parseAddress(a)),
         addrs2.map((a) => avm.parseAddress(a)),
         secpMintUTXO.getUTXOID(),
-        avm.getTxFee(),
+        MILLIAVAX,
         assetID
       )
 

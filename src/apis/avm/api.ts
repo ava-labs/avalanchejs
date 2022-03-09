@@ -1538,7 +1538,7 @@ export class AVMAPI extends JRPCAPI {
     const networkID: number = this.core.getNetworkID()
     const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
-    const fee: BN = this.getCreationTxFee()
+    const fee: BN = this.getMintTxFee()
     const builtUnsignedTx: UnsignedTx = utxoset.buildSECPMintTx(
       networkID,
       blockchainID,
