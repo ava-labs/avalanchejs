@@ -125,7 +125,10 @@ const main = async (): Promise<any> => {
   )
   const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
-  console.log("Total inputs: ", tx.getUnsignedTx().getTransaction().getIns().length)
+  console.log(
+    "Total inputs: ",
+    tx.getUnsignedTx().getTransaction().getIns().length
+  )
   console.log("Total credentials: ", tx.getCredentials().length)
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
