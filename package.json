@@ -90,7 +90,7 @@
     "hdkey": "2.0.1",
     "isomorphic-dompurify": "^0.18.0",
     "isomorphic-ws": "4.0.1",
-    "store2": "2.13.1",
+    "store2": "2.13.2",
     "stream-browserify": "3.0.0",
     "ws": "8.5.0"
   },
