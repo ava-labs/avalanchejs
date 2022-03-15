@@ -22,7 +22,6 @@ import { bufferToNodeIDString } from "../../utils"
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
-
 /**
  * Class representing an unsigned AddSubnetValidatorTx transaction.
  */
