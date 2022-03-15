@@ -1843,7 +1843,7 @@ return builtUnsignedTx
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: string[] = undefined,
-    genesisData: GenesisData = undefined,
+    genesisData: string | GenesisData = undefined,
     subnetAuth: SubnetAuth = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
