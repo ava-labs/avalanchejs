@@ -40,7 +40,7 @@ import {
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
-const ip: string = "0.0.0.0"
+const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
@@ -58,8 +58,8 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
-const startTime: BN = new BN(1646850602)
-const endTime: BN = new BN(1648146489)
+const startTime: BN = new BN(1647352001)
+const endTime: BN = new BN(1648647883)
 
 const main = async (): Promise<any> => {
   const memoStr: string = "from snowflake to avalanche"
