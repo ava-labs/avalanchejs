@@ -3,14 +3,7 @@ import {
   BinTools,
   BN,
   Buffer,
-  GenesisAsset,
-  GenesisData
 } from "../../src"
-import {
-  AVMAPI,
-  InitialStates,
-  KeyChain as AVMKeyChain
-} from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -22,7 +15,6 @@ import {
   UTXO,
   AmountOutput,
   UnsignedTx,
-  CreateChainTx,
   Tx,
   SubnetAuth,
   AddSubnetValidatorTx
@@ -31,14 +23,11 @@ import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
-  Serialization,
   NodeIDStringToBuffer,
-  UnixNow
+  ONEAVAX
 } from "../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
-const serialization: Serialization = Serialization.getInstance()
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -58,15 +47,16 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
-const startTime: BN = new BN(1647352001)
-const endTime: BN = new BN(1648647883)
+const startTime: BN = new BN(1647479949)
+const endTime: BN = new BN(1648775830)
 
 const main = async (): Promise<any> => {
   const memoStr: string = "from snowflake to avalanche"
   const memo: Buffer = Buffer.from(memoStr, "utf8")
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
-  const unlocked: BN = new BN(getBalanceResponse.unlocked)
+  // const unlocked: BN = new BN(getBalanceResponse.unlocked)
+  const unlocked: BN = new BN(ONEAVAX.mul(new BN(10000)))
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
     pAddresses,
@@ -82,9 +72,9 @@ const main = async (): Promise<any> => {
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
+  utxos.forEach((utxo: UTXO, index: number): void => {
     const output: Output = utxo.getOutput()
-    if (output.getOutputID() === 7) {
+    if (output.getOutputID() === 7 && index === 1) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
       const txid: Buffer = utxo.getTxID()
@@ -105,7 +95,7 @@ const main = async (): Promise<any> => {
 
   const weight: BN = new BN(20)
   const subnetID: Buffer = bintools.cb58Decode(
-    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
+    "2T7F1AzTLPzZrUcw22JLcC8yZ8o2muhjrM5zoQ3TBuENbAUvZd"
   )
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
@@ -125,11 +115,6 @@ const main = async (): Promise<any> => {
   )
   const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
-  console.log(
-    "Total inputs: ",
-    tx.getUnsignedTx().getTransaction().getIns().length
-  )
-  console.log("Total credentials: ", tx.getCredentials().length)
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }

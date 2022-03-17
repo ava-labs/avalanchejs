@@ -7,7 +7,7 @@ import BN from "bn.js"
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
-import { ErrorResponseObject } from "../../utils/errors"
+import { ErrorResponseObject, SubnetThresholdError } from "../../utils/errors"
 import BinTools from "../../utils/bintools"
 import { KeyChain } from "./keychain"
 import { Defaults, PlatformChainID, ONEAVAX } from "../../utils/constants"
@@ -1778,6 +1778,12 @@ return builtUnsignedTx
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
+
+    if (subnetOwnerThreshold > 1) {
+      /* istanbul ignore next */
+      throw new SubnetThresholdError("Subnet threshold cannot be greater than 1 currently. This will be resolved in a future release of AvalancheJS.")
+    }
+
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateSubnetTx"

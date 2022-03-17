@@ -41,6 +41,7 @@ const INVALID_ENTROPY: string = "1039"
 const PROTOCOL_ERROR_CODE: string = "1040"
 const SUBNET_ID_ERROR_CODE: string = "1041"
 const TYPE_NAME_ERROR_CODE: string = "1042"
+const SUBNET_THRESHOLD_ERROR_CODE: string = "1043"
 
 export class AvalancheError extends Error {
   errorCode: string
@@ -352,6 +353,13 @@ export class ProtocolError extends AvalancheError {
 export class SubnetIdError extends AvalancheError {
   constructor(m: string) {
     super(m, SUBNET_ID_ERROR_CODE)
+    Object.setPrototypeOf(this, SubnetIdError.prototype)
+  }
+}
+
+export class SubnetThresholdError extends AvalancheError {
+  constructor(m: string) {
+    super(m, SUBNET_THRESHOLD_ERROR_CODE)
     Object.setPrototypeOf(this, SubnetIdError.prototype)
   }
 }
