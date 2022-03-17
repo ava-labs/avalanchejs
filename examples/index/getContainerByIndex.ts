@@ -12,7 +12,7 @@ const index: IndexAPI = avalanche.Index()
 const main = async (): Promise<any> => {
   const idx: string = "0"
   const encoding: string = "hex"
-  const baseurl: string = "/ext/index/C/block"
+  const baseurl: string = "/ext/index/X/tx"
   const containerByIndex: GetContainerByIndexResponse =
     await index.getContainerByIndex(idx, encoding, baseurl)
   console.log(containerByIndex)

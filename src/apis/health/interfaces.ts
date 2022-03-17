@@ -7,15 +7,15 @@ export interface Entity {
   message?: Object[]
   timestamp: string
   duration: number
-  contiguousFailures: number
-  timeOfFirstFailure: string
+  contiguousFailures?: number
+  timeOfFirstFailure?: string
 }
 
 export interface Checks {
   C: Entity
   P: Entity
   X: Entity
-  isBootstrapped: Entity
+  bootstrapped: Entity
   network: Entity
   router: Entity
 }
