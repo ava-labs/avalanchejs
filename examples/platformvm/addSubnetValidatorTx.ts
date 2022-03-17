@@ -1,9 +1,4 @@
-import {
-  Avalanche,
-  BinTools,
-  BN,
-  Buffer,
-} from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   PlatformVMAPI,
   KeyChain,
