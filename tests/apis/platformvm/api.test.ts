@@ -85,7 +85,7 @@ const serialzeit = (aThing: Serializable, name: string): void => {
 }
 
 describe("PlatformVMAPI", (): void => {
-  const networkID: number = 12345
+  const networkID: number = 1337
   const blockchainID: string = PlatformChainID
   const ip: string = "127.0.0.1"
   const port: number = 9650

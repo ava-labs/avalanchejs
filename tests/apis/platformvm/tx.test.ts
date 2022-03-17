@@ -36,7 +36,7 @@ describe("Transactions", (): void => {
    */
   const bintools: BinTools = BinTools.getInstance()
 
-  const networkID: number = 12345
+  const networkID: number = 1337
   let set: UTXOSet
   let keymgr1: KeyChain
   let keymgr2: KeyChain
