@@ -4,13 +4,67 @@
  */
 
 import BN from "bn.js"
-import { X, P, C, Network, Networks } from "../apis/evm"
 
 export const PrivateKeyPrefix: string = "PrivateKey-"
 export const NodeIDPrefix: string = "NodeID-"
 export const PrimaryAssetAlias: string = "AVAX"
 export const MainnetAPI: string = "api.avax.network"
 export const FujiAPI: string = "api.avax-test.network"
+
+export interface C {
+  blockchainID: string
+  alias: string
+  vm: string
+  fee?: BN
+  gasPrice: BN | number
+  chainID?: number
+  minGasPrice?: BN
+  maxGasPrice?: BN
+  txBytesGas?: number
+  costPerSignature?: number
+  txFee?: BN
+  avaxAssetID?: string
+}
+export interface X {
+  blockchainID: string
+  alias: string
+  vm: string
+  creationTxFee: BN | number
+  mintTxFee: BN
+  avaxAssetID?: string
+  txFee?: BN | number
+  fee?: BN
+}
+export interface P {
+  blockchainID: string
+  alias: string
+  vm: string
+  creationTxFee: BN | number
+  createSubnetTx: BN | number
+  createChainTx: BN | number
+  minConsumption: number
+  maxConsumption: number
+  maxStakingDuration: BN
+  maxSupply: BN
+  minStake: BN
+  minStakeDuration: number
+  maxStakeDuration: number
+  minDelegationStake: BN
+  minDelegationFee: BN
+  avaxAssetID?: string
+  txFee?: BN | number
+  fee?: BN
+}
+export interface Network {
+  C: C
+  hrp: string
+  X: X
+  P: P
+  [key: string]: C | X | P | string
+}
+export interface Networks {
+  [key: number]: Network
+}
 
 export const NetworkIDToHRP: object = {
   0: "custom",
@@ -19,16 +73,18 @@ export const NetworkIDToHRP: object = {
   3: "denali",
   4: "everest",
   5: "fuji",
+  1337: "custom",
   12345: "local"
 }
 
 export const HRPToNetworkID: object = {
-  custom: 0,
+  manhattan: 0,
   avax: 1,
   cascade: 2,
   denali: 3,
   everest: 4,
   fuji: 5,
+  custom: 1337,
   local: 12345
 }
 
@@ -39,6 +95,7 @@ export const NetworkIDToNetworkNames: object = {
   3: ["Denali"],
   4: ["Everest"],
   5: ["Fuji", "Testnet"],
+  1337: ["Custom Network"],
   12345: ["Local Network"]
 }
 
@@ -51,6 +108,9 @@ export const NetworkNameToNetworkID: object = {
   Everest: 4,
   Fuji: 5,
   Testnet: 5,
+  Custom: 1337,
+  "Custom Network": 1337,
+  Local: 12345,
   "Local Network": 12345
 }
 
@@ -106,7 +166,8 @@ const n0X: X = {
   alias: XChainAlias,
   vm: XChainVMName,
   fee: MILLIAVAX,
-  creationTxFee: CENTIAVAX
+  creationTxFee: CENTIAVAX,
+  mintTxFee: MILLIAVAX
 }
 
 const n0P: P = {
@@ -146,7 +207,8 @@ const n1X: X = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
-  creationTxFee: CENTIAVAX
+  creationTxFee: CENTIAVAX,
+  mintTxFee: MILLIAVAX
 }
 
 const n1P: P = {
@@ -193,7 +255,8 @@ const n2X: X = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: 0,
-  creationTxFee: 0
+  creationTxFee: 0,
+  mintTxFee: new BN(0)
 }
 
 const n2P: P = {
@@ -229,7 +292,8 @@ const n3X: X = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: 0,
-  creationTxFee: 0
+  creationTxFee: 0,
+  mintTxFee: new BN(0)
 }
 
 const n3P: P = {
@@ -265,7 +329,8 @@ const n4X: X = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
-  creationTxFee: CENTIAVAX
+  creationTxFee: CENTIAVAX,
+  mintTxFee: MILLIAVAX
 }
 
 const n4P: P = {
@@ -304,7 +369,8 @@ const n5X: X = {
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
-  creationTxFee: CENTIAVAX
+  creationTxFee: CENTIAVAX,
+  mintTxFee: MILLIAVAX
 }
 
 const n5P: P = {
@@ -344,6 +410,19 @@ const n5C: C = {
   chainID: 43113
 }
 // End Fuji
+
+// Start custom network
+avaxAssetID = "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
+const n1337X: X = { ...n5X }
+n1337X.blockchainID = "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
+n1337X.avaxAssetID = avaxAssetID
+const n1337P: P = { ...n5P }
+n1337P.blockchainID = PlatformChainID
+const n1337C: C = { ...n5C }
+n1337C.blockchainID = "BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88"
+n1337C.avaxAssetID = avaxAssetID
+n1337C.chainID = 43112
+// End custom network
 
 // Start local network
 avaxAssetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
@@ -413,6 +492,15 @@ export class Defaults {
       "11111111111111111111111111111111LpoYY": n5P,
       C: n5C,
       yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp: n5C
+    },
+    1337: {
+      hrp: NetworkIDToHRP[1337],
+      X: n1337X,
+      qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7: n1337X,
+      P: n1337P,
+      "11111111111111111111111111111111LpoYY": n1337P,
+      C: n1337C,
+      BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88: n1337C
     },
     12345: {
       hrp: NetworkIDToHRP[12345],

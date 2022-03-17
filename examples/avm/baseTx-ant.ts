@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../dist"
 import {
   AVMAPI,
   KeyChain,
@@ -12,17 +12,18 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "../../src/apis/avm"
+} from "../../dist/apis/avm"
 import {
   Defaults,
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+  DefaultLocalGenesisPrivateKey,
+  MILLIAVAX
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
@@ -47,12 +48,13 @@ const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
-    if (utxo.getOutput().getTypeID() != 6) {
+  utxos.forEach((utxo: UTXO): void => {
+    const typeID: number = utxo.getOutput().getTypeID()
+    if (typeID != 6) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
-      const txid: Buffer = utxo.getTxID()
-      const outputidx: Buffer = utxo.getOutputIdx()
+      const txID: Buffer = utxo.getTxID()
+      const outputIDX: Buffer = utxo.getOutputIdx()
       const assetID: Buffer = utxo.getAssetID()
 
       if (assetID.toString("hex") === avaxAssetIDBuf.toString("hex")) {
@@ -75,8 +77,8 @@ const main = async (): Promise<any> => {
         // secpTransferInput.setCodecID(codecID)
         secpTransferInput.addSignatureIdx(0, xAddresses[0])
         const input: TransferableInput = new TransferableInput(
-          txid,
-          outputidx,
+          txID,
+          outputIDX,
           avaxAssetIDBuf,
           secpTransferInput
         )
@@ -101,8 +103,8 @@ const main = async (): Promise<any> => {
         // secpTransferInput.setCodecID(codecID)
         secpTransferInput.addSignatureIdx(0, xAddresses[0])
         const input: TransferableInput = new TransferableInput(
-          txid,
-          outputidx,
+          txID,
+          outputIDX,
           assetID,
           secpTransferInput
         )

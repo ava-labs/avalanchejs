@@ -1,23 +1,27 @@
-import { Avalanche, BN, Buffer } from "../../src"
+import { Avalanche, BN, Buffer } from "../../dist"
 import {
   AVMAPI,
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "../../src/apis/avm"
-import { KeyChain as EVMKeyChain, EVMAPI } from "../../src/apis/evm"
+} from "../../dist/apis/avm"
+import {
+  GetBalanceResponse,
+  GetUTXOsResponse
+} from "../../dist/apis/avm/interfaces"
+import { KeyChain as EVMKeyChain, EVMAPI } from "../../dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   UnixNow
-} from "../../src/utils"
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()
@@ -38,9 +42,11 @@ const memo: Buffer = Buffer.from(
 const fee: BN = xchain.getDefaultTxFee()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const getBalanceResponse: any = await xchain.getBalance(
+  const getBalanceResponse: GetBalanceResponse = await xchain.getBalance(
     xAddressStrings[0],
     avaxAssetID
   )

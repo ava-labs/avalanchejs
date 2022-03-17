@@ -47,6 +47,8 @@ import {
   SendMultipleResponse,
   SendResponse
 } from "src/apis/avm/interfaces"
+import { CENTIAVAX } from "src/utils"
+import { MILLIAVAX } from "src/utils"
 
 /**
  * @ignore
@@ -697,7 +699,7 @@ describe("AVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string> = api.getTx(txid)
+    const result: Promise<string | object> = api.getTx(txid)
     const payload: object = {
       result: {
         tx: "sometx"
@@ -708,7 +710,7 @@ describe("AVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("sometx")
@@ -934,6 +936,7 @@ describe("AVMAPI", (): void => {
 
     beforeEach(async (): Promise<void> => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainID)
+
       const result: Promise<Buffer> = avm.getAVAXAssetID(true)
       const payload: object = {
         result: {
@@ -1132,6 +1135,10 @@ describe("AVMAPI", (): void => {
         [secpMintUTXO.getUTXOID()],
         secpMintOp
       )
+    })
+
+    test("getDefaultMintTxFee", (): void => {
+      expect(avm.getDefaultMintTxFee().toString()).toBe("1000000")
     })
 
     test("signTx", async (): Promise<void> => {
@@ -1459,7 +1466,7 @@ describe("AVMAPI", (): void => {
         symbol,
         denomination,
         undefined,
-        avm.getCreationTxFee(),
+        CENTIAVAX,
         assetID
       )
 
@@ -1582,7 +1589,7 @@ describe("AVMAPI", (): void => {
         addrs1.map((a) => avm.parseAddress(a)),
         addrs2.map((a) => avm.parseAddress(a)),
         secpMintUTXO.getUTXOID(),
-        avm.getTxFee(),
+        MILLIAVAX,
         assetID
       )
 

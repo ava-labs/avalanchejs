@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "../../dist"
 import {
   AVMAPI,
   KeyChain,
@@ -12,28 +12,29 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "../../src/apis/avm"
+} from "../../dist/apis/avm"
 import {
-  Defaults,
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+  DefaultLocalGenesisPrivateKey,
+  Defaults
+} from "../../dist/utils"
 
+const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
+
+const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
+const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
-const bintools: BinTools = BinTools.getInstance()
 const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainID: string = Defaults.network[networkID].X.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const fee: BN = xchain.getDefaultTxFee()
@@ -48,7 +49,7 @@ const main = async (): Promise<any> => {
     xAddressStrings[0],
     avaxAssetID
   )
-  const balance: BN = new BN(getBalanceResponse["balance"])
+  const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     balance.sub(fee),
     xAddresses,
@@ -88,7 +89,7 @@ const main = async (): Promise<any> => {
 
   const baseTx: BaseTx = new BaseTx(
     networkID,
-    bintools.cb58Decode(blockchainID),
+    bintools.cb58Decode(xBlockchainID),
     outputs,
     inputs,
     memo
@@ -97,9 +98,6 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  // console.log(tx.toBuffer().toString("hex"))
-  // const serialized: any = baseTx.serialize("display")
-  // console.log(JSON.stringify(serialized))
   const txid: string = await xchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
