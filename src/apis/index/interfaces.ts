@@ -36,7 +36,13 @@ export interface GetContainerRangeParams extends BaseIndexParams {
   numToFetch: number
 }
 
-export interface GetContainerRangeResponse extends BaseIndexResponse {}
+export interface IsAcceptedResponse {
+  isAccepted: boolean
+}
+
+export interface GetContainerRangeResponse {
+  constainer: BaseIndexParams[]
+}
 
 export interface GetIndexParams extends BaseIndexParams {
   containerID: string

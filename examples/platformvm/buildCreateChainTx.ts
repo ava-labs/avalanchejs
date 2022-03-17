@@ -20,17 +20,13 @@ const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const threshold: number = 1
-const memo: Buffer = Buffer.from(
-  "PlatformVM utility method buildCreateChainTx to create a new blockchain"
-)
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {

@@ -13,7 +13,7 @@ import { ONEAVAX } from "../../../src/utils/constants"
 import { EVMOutput } from "../../../src/apis/evm"
 import BN from "bn.js"
 import { BinTools, Buffer } from "src"
-const networkID: number = 12345
+const networkID: number = 1337
 const cHexAddress1: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const bintools: BinTools = BinTools.getInstance()
 const cHexAddress2: string = "0xecC3B2968B277b837a81A7181e0b94EB1Ca54EdE"
@@ -62,7 +62,7 @@ describe("EVM Transactions", () => {
           evmOutputs
         )
       }).toThrow(
-        "Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, 2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe)"
+        "Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC)"
       )
     })
 

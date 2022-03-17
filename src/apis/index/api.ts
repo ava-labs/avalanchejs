@@ -15,7 +15,8 @@ import {
   GetContainerRangeParams,
   GetContainerRangeResponse,
   GetIndexParams,
-  GetIsAcceptedParams
+  GetIsAcceptedParams,
+  IsAcceptedResponse
 } from "./interfaces"
 
 /**
@@ -194,7 +195,7 @@ export class IndexAPI extends JRPCAPI {
     containerID: string = "",
     encoding: string = "hex",
     baseURL: string = this.getBaseURL()
-  ): Promise<boolean> => {
+  ): Promise<IsAcceptedResponse> => {
     this.setBaseURL(baseURL)
     const params: GetIsAcceptedParams = {
       containerID,

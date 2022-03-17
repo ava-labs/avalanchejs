@@ -8,7 +8,7 @@ const bintools: BinTools = BinTools.getInstance()
 const alias: string = "P"
 const hrp: string = "tests"
 describe("PlatformVMKeyPair", (): void => {
-  const networkID: number = 12345
+  const networkID: number = 1337
   const ip: string = "127.0.0.1"
   const port: number = 9650
   const protocol: string = "https"
@@ -26,8 +26,8 @@ describe("PlatformVMKeyPair", (): void => {
   test("human readable part", (): void => {
     let hrp: string = avalanche.getHRP()
     let networkID: number = avalanche.getNetworkID()
-    expect(hrp).toBe("local")
-    expect(networkID).toBe(12345)
+    expect(hrp).toBe("custom")
+    expect(networkID).toBe(1337)
 
     avalanche.setNetworkID(2)
     hrp = avalanche.getHRP()
