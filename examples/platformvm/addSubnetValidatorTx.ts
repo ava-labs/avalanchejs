@@ -42,8 +42,8 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
-const startTime: BN = new BN(1647479949)
-const endTime: BN = new BN(1648775830)
+const startTime: BN = new BN(1647645892)
+const endTime: BN = new BN(1648941774)
 
 const main = async (): Promise<any> => {
   const memoStr: string = "from snowflake to avalanche"
@@ -95,13 +95,15 @@ const main = async (): Promise<any> => {
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
+  const nodeIDBuf: Buffer = NodeIDStringToBuffer(nodeID)
   const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
     networkID,
-    bintools.cb58Decode(pChainBlockchainID),
+    blockchainID,
     outputs,
     inputs,
     memo,
-    NodeIDStringToBuffer(nodeID),
+    nodeIDBuf,
     startTime,
     endTime,
     weight,
