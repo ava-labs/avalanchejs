@@ -7,7 +7,11 @@ import BN from "bn.js"
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
-import { ErrorResponseObject, SubnetOwnerError, SubnetThresholdError } from "../../utils/errors"
+import {
+  ErrorResponseObject,
+  SubnetOwnerError,
+  SubnetThresholdError
+} from "../../utils/errors"
 import BinTools from "../../utils/bintools"
 import { KeyChain } from "./keychain"
 import { Defaults, PlatformChainID, ONEAVAX } from "../../utils/constants"
