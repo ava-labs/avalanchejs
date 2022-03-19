@@ -43,8 +43,14 @@ const main = async (): Promise<any> => {
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
   const fxIDs: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
+
+  // Only for AVM serialization. For other VMs comment these 2 lines
   const genesisData: GenesisData = new GenesisData()
   genesisData.fromBuffer(bintools.cb58Decode(genesisDataStr))
+
+  // For VMs other than AVM. For AVM comment this line
+  // const genesisData = genesisDataStr
+
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])

@@ -124,13 +124,15 @@ const main = async (): Promise<any> => {
   )
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
-  const fxIDs: string[] = ["secp256k1fx"]
+  const fxIDs: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
+  fxIDs.sort()
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
   const createChainTx: CreateChainTx = new CreateChainTx(
     networkID,
-    bintools.cb58Decode(pChainBlockchainID),
+    blockchainID,
     outputs,
     inputs,
     memo,

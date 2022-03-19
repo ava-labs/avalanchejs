@@ -7,7 +7,11 @@ import BN from "bn.js"
 import AvalancheCore from "../../avalanche"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
-import { ErrorResponseObject, SubnetThresholdError } from "../../utils/errors"
+import {
+  ErrorResponseObject,
+  SubnetOwnerError,
+  SubnetThresholdError
+} from "../../utils/errors"
 import BinTools from "../../utils/bintools"
 import { KeyChain } from "./keychain"
 import { Defaults, PlatformChainID, ONEAVAX } from "../../utils/constants"
@@ -1785,6 +1789,20 @@ return builtUnsignedTx
       )
     }
 
+    if (subnetOwnerAddresses.length > 1) {
+      /* istanbul ignore next */
+      throw new SubnetOwnerError(
+        "Subnet owners are limited to 1 currently. This will be resolved in a future release of AvalancheJS."
+      )
+    }
+
+    if (fromAddresses[0] != subnetOwnerAddresses[0]) {
+      /* istanbul ignore next */
+      throw new SubnetThresholdError(
+        "Subnet owners must match the from addresses currently. This will be resolved in a future release of AvalancheJS."
+      )
+    }
+
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateSubnetTx"
@@ -1803,15 +1821,17 @@ return builtUnsignedTx
     }
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
-
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getCreateSubnetTxFee()
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateSubnetTx(
-      this.core.getNetworkID(),
-      bintools.cb58Decode(this.blockchainID),
+      networkID,
+      blockchainID,
       from,
       change,
       owners,
       subnetOwnerThreshold,
-      this.getCreateSubnetTxFee(),
+      fee,
       avaxAssetID,
       memo,
       asOf
@@ -1850,7 +1870,7 @@ return builtUnsignedTx
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: string[] = undefined,
-    genesisData: GenesisData = undefined,
+    genesisData: string | GenesisData = undefined,
     subnetAuth: SubnetAuth = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()

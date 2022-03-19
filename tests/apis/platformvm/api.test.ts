@@ -2463,7 +2463,7 @@ describe("PlatformVMAPI", (): void => {
         set,
         addrs1,
         addrs2,
-        addrs3,
+        [addrs1[0]],
         1,
         new UTF8Payload("hello world"),
         UnixNow()
@@ -2474,7 +2474,7 @@ describe("PlatformVMAPI", (): void => {
         bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
-        addrbuff3,
+        [addrbuff1[0]],
         1,
         platformvm.getCreateSubnetTxFee(),
         assetID,
@@ -2510,17 +2510,23 @@ describe("PlatformVMAPI", (): void => {
       serialzeit(tx1, "CreateSubnetTx")
     })
 
-    test("buildCreateSubnetTx 2", async (): Promise<void> => {
+    test("buildCreateSubnetTx2", async (): Promise<void> => {
       platformvm.setCreationTxFee(new BN(10))
-      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
-      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
-      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
+      const addrbuff1: Buffer[] = addrs1.map((a: string) =>
+        platformvm.parseAddress(a)
+      )
+      const addrbuff2: Buffer[] = addrs2.map((a: string) =>
+        platformvm.parseAddress(a)
+      )
+      const addrbuff3: Buffer[] = addrs3.map((a: string) =>
+        platformvm.parseAddress(a)
+      )
 
       const txu1: UnsignedTx = await platformvm.buildCreateSubnetTx(
         lset,
         addrs1,
         addrs2,
-        addrs3,
+        [addrs1[0]],
         1,
         new UTF8Payload("hello world"),
         UnixNow()
@@ -2531,7 +2537,7 @@ describe("PlatformVMAPI", (): void => {
         bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
-        addrbuff3,
+        [addrbuff1[0]],
         1,
         platformvm.getCreateSubnetTxFee(),
         assetID,

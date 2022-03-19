@@ -274,7 +274,7 @@ export class CreateChainTx extends BaseTx {
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: string[] = undefined,
-    genesisData: GenesisData = undefined,
+    genesisData: string | GenesisData = undefined,
     subnetAuth: SubnetAuth = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
@@ -303,7 +303,7 @@ export class CreateChainTx extends BaseTx {
       })
       this.fxIDs = fxIDBufs
     }
-    if (typeof genesisData != "undefined") {
+    if (typeof genesisData != "undefined" && typeof genesisData != "string") {
       this.genesisData = genesisData.toBuffer()
     }
 

@@ -42,15 +42,13 @@ const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
-const startTime: BN = new BN(1647479949)
-const endTime: BN = new BN(1648775830)
+const startTime: BN = new BN(1647654984)
+const endTime: BN = new BN(1648950865)
 
 const main = async (): Promise<any> => {
   const memoStr: string = "from snowflake to avalanche"
   const memo: Buffer = Buffer.from(memoStr, "utf8")
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
-  // const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const unlocked: BN = new BN(ONEAVAX.mul(new BN(10000)))
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
@@ -69,7 +67,7 @@ const main = async (): Promise<any> => {
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO, index: number): void => {
     const output: Output = utxo.getOutput()
-    if (output.getOutputID() === 7 && index === 1) {
+    if (output.getOutputID() === 7 && index === 0) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
       const txid: Buffer = utxo.getTxID()
@@ -90,18 +88,20 @@ const main = async (): Promise<any> => {
 
   const weight: BN = new BN(20)
   const subnetID: Buffer = bintools.cb58Decode(
-    "2T7F1AzTLPzZrUcw22JLcC8yZ8o2muhjrM5zoQ3TBuENbAUvZd"
+    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
   )
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
+  const nodeIDBuf: Buffer = NodeIDStringToBuffer(nodeID)
   const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
     networkID,
-    bintools.cb58Decode(pChainBlockchainID),
+    blockchainID,
     outputs,
     inputs,
     memo,
-    NodeIDStringToBuffer(nodeID),
+    nodeIDBuf,
     startTime,
     endTime,
     weight,
