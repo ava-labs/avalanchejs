@@ -129,7 +129,7 @@ const main = async (): Promise<any> => {
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
-  const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID) 
+  const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
   const createChainTx: CreateChainTx = new CreateChainTx(
     networkID,
     blockchainID,
