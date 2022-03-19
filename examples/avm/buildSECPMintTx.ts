@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   KeyChain,
@@ -9,13 +9,13 @@ import {
   AVMConstants,
   SECPTransferOutput,
   UTXO
-} from "../../dist/apis/avm"
-import { GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
+} from "../../src/apis/avm"
+import { GetUTXOsResponse } from "../../src/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../dist/utils"
+} from "../../src/utils"
 
 // assetID is generated from running
 // ts-node examples/avm/buildCreateAssetTx.ts

@@ -14,18 +14,16 @@ import {
   Tx,
   SECPOwnerOutput
 } from "../../src/apis/platformvm"
-import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
-  ONEAVAX
+  Defaults
 } from "../../src/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const bintools: BinTools = BinTools.getInstance()
@@ -61,9 +59,8 @@ const main = async (): Promise<any> => {
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
-    const output: Output = utxo.getOutput()
-    const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
+  utxos.forEach((utxo: UTXO): void => {
+    const amountOutput = utxo.getOutput() as AmountOutput
     const amt: BN = amountOutput.getAmount().clone()
     const txid: Buffer = utxo.getTxID()
     const outputidx: Buffer = utxo.getOutputIdx()

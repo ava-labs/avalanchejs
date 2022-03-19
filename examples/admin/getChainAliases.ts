@@ -1,6 +1,6 @@
-import { Avalanche } from "../../dist"
-import { AdminAPI } from "../../dist/apis/admin"
-import { Defaults } from "../../dist/utils"
+import { Avalanche } from "../../src"
+import { AdminAPI } from "../../src/apis/admin"
+import { Defaults } from "../../src/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

@@ -1260,7 +1260,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: string[] = undefined,
-    genesisData: GenesisData = undefined,
+    genesisData: string | GenesisData = undefined,
     subnetAuth: SubnetAuth = undefined,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,

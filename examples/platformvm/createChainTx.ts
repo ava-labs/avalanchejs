@@ -6,11 +6,7 @@ import {
   GenesisAsset,
   GenesisData
 } from "../../src"
-import {
-  AVMAPI,
-  InitialStates,
-  KeyChain as AVMKeyChain
-} from "../../src/apis/avm"
+import { InitialStates } from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -30,8 +26,8 @@ import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
-  Serialization
+  Serialization,
+  ONEAVAX
 } from "../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
@@ -40,7 +36,7 @@ const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
@@ -51,7 +47,7 @@ const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = pchain.getDefaultTxFee()
+const fee: BN = ONEAVAX
 const threshold: number = 1
 const locktime: BN = new BN(0)
 
@@ -124,17 +120,19 @@ const main = async (): Promise<any> => {
   })
 
   const subnetID: Buffer = bintools.cb58Decode(
-    "LtYUqdbbLzTmHMXPPVhAHMeDr6riEmt2pjtfEiqAqAce9MxCg"
+    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
   )
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
-  const fxIDs: string[] = ["secp256k1fx"]
+  const fxIDs: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
+  fxIDs.sort()
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
   const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
   const createChainTx: CreateChainTx = new CreateChainTx(
     networkID,
-    bintools.cb58Decode(pChainBlockchainID),
+    blockchainID,
     outputs,
     inputs,
     memo,

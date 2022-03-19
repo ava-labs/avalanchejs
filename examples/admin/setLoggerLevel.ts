@@ -1,6 +1,6 @@
-import { Avalanche } from "../../dist"
-import { AdminAPI } from "../../dist/apis/admin"
-import { GetLoggerLevelResponse } from "../../dist/apis/admin/interfaces"
+import { Avalanche } from "../../src"
+import { AdminAPI } from "../../src/apis/admin"
+import { SetLoggerLevelResponse } from "../../src/apis/admin/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -13,7 +13,7 @@ const main = async (): Promise<any> => {
   const loggerName: string = "C"
   const logLevel: string = "DEBUG"
   const displayLevel: string = "INFO"
-  const loggerLevel: GetLoggerLevelResponse = await admin.setLoggerLevel(
+  const loggerLevel: SetLoggerLevelResponse = await admin.setLoggerLevel(
     loggerName,
     logLevel,
     displayLevel
