@@ -15,9 +15,7 @@ import {
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
-import {
-  CreateSubnetTx
-} from "src/apis/platformvm"
+import { CreateSubnetTx } from "src/apis/platformvm"
 import { UTXOSet } from "src/apis/platformvm"
 import { ONEAVAX } from "src/utils"
 
