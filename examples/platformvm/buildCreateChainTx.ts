@@ -36,7 +36,7 @@ const main = async (): Promise<any> => {
   const genesisDataStr: string =
     "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
   const subnetIDStr: string =
-    "x7yYzXka9VX376QvWuzXYCvX6mJV6BKvddGLpYHi3UnJ7veDY"
+    "2T7F1AzTLPzZrUcw22JLcC8yZ8o2muhjrM5zoQ3TBuENbAUvZd"
   const memoStr: string = "from snowflake to avalanche"
   const memo: Buffer = Buffer.from(memoStr, "utf8")
   const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)

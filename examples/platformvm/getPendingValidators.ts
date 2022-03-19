@@ -11,7 +11,7 @@ const pchain: PlatformVMAPI = avalanche.PChain()
 const main = async (): Promise<any> => {
   const subnetID: string = "11111111111111111111111111111111LpoYY"
   const nodeIDs: string[] = []
-  const pendingValidators: object = await pchain.getPendingValidators()
+  const pendingValidators: object = await pchain.getPendingValidators(subnetID)
   console.log(pendingValidators)
 }
 
