@@ -12,7 +12,7 @@ import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 const bintools: BinTools = BinTools.getInstance()
 
 describe("EVMAPI", (): void => {
-  const networkID: number = 12345
+  const networkID: number = 1337
   const blockchainID: string = Defaults.network[networkID].C.blockchainID
   const ip: string = "127.0.0.1"
   const port: number = 9650
@@ -235,7 +235,7 @@ describe("EVMAPI", (): void => {
 
   test("refreshBlockchainID", async (): Promise<void> => {
     const n5bcID: string = Defaults.network[5].C["blockchainID"]
-    const n12345bcID: string = Defaults.network[12345].C["blockchainID"]
+    const n1337bcID: string = Defaults.network[1337].C["blockchainID"]
     const testAPI: EVMAPI = new EVMAPI(avalanche, "/ext/bc/C/avax", n5bcID)
     const bc1: string = testAPI.getBlockchainID()
     expect(bc1).toBe(n5bcID)
@@ -243,7 +243,7 @@ describe("EVMAPI", (): void => {
     let res: boolean = testAPI.refreshBlockchainID()
     expect(res).toBeTruthy()
     const bc2: string = testAPI.getBlockchainID()
-    expect(bc2).toBe(n12345bcID)
+    expect(bc2).toBe(n1337bcID)
 
     res = testAPI.refreshBlockchainID(n5bcID)
     expect(res).toBeTruthy()

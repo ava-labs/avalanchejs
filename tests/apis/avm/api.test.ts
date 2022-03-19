@@ -79,7 +79,7 @@ const serialzeit = (aThing: Serializable, name: string): void => {
 }
 
 describe("AVMAPI", (): void => {
-  const networkID: number = 12345
+  const networkID: number = 1337
   const blockchainID: string = Defaults.network[networkID].X.blockchainID
   const ip: string = "127.0.0.1"
   const port: number = 9650
@@ -293,14 +293,14 @@ describe("AVMAPI", (): void => {
 
   test("refreshBlockchainID", async (): Promise<void> => {
     const n3bcID: string = Defaults.network[3].X["blockchainID"]
-    const n12345bcID: string = Defaults.network[12345].X["blockchainID"]
+    const n1337bcID: string = Defaults.network[1337].X["blockchainID"]
     const testAPI: AVMAPI = new AVMAPI(avalanche, "/ext/bc/avm", n3bcID)
     const bc1: string = testAPI.getBlockchainID()
     expect(bc1).toBe(n3bcID)
 
     testAPI.refreshBlockchainID()
     const bc2: string = testAPI.getBlockchainID()
-    expect(bc2).toBe(n12345bcID)
+    expect(bc2).toBe(n1337bcID)
 
     testAPI.refreshBlockchainID(n3bcID)
     const bc3: string = testAPI.getBlockchainID()
@@ -411,7 +411,7 @@ describe("AVMAPI", (): void => {
     const response: object = await result
     const calledWith: object = {
       baseURL: "https://127.0.0.1:9650",
-      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
+      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-custom1d6kkj0qh4wcmus3tk59npwt3rluc6en755a58g","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
       headers: {
         "Content-Type": "application/json;charset=UTF-8"
       },

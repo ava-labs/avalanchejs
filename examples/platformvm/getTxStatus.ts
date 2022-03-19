@@ -9,10 +9,10 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 
 const main = async (): Promise<any> => {
-  const subnetID: string = "11111111111111111111111111111111LpoYY"
-  const nodeIDs: string[] = []
-  const currentValidators: object = await pchain.getCurrentValidators(subnetID)
-  console.log(currentValidators)
+  const txID: string = "x1NLb9JaHkKTXvSRReVSsFwQ38mY7bfD1Ky1BPv721VhrpuSE"
+  const includeReason: boolean = true
+  const tx: string | object = await pchain.getTxStatus(txID, includeReason)
+  console.log(tx)
 }
 
 main()

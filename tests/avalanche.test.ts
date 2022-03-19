@@ -16,7 +16,7 @@ describe("Avalanche", (): void => {
     "6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"
   let host: string = "127.0.0.1"
   const port: number = 9650
-  const networkID: number = 12345
+  const networkID: number = 1337
   let protocol: string = "https"
   let avalanche: Avalanche
   let avalancheCore: AvalancheCore
@@ -73,7 +73,7 @@ describe("Avalanche", (): void => {
     expect(avalanche.getPort()).toBe(port)
     expect(avalanche.getProtocol()).toBe(protocol)
     expect(avalanche.getURL()).toBe(`${protocol}://${host}:${port}`)
-    expect(avalanche.getNetworkID()).toBe(12345)
+    expect(avalanche.getNetworkID()).toBe(1337)
     expect(avalanche.getHeaders()).toStrictEqual({})
     avalanche.setNetworkID(50)
     expect(avalanche.getNetworkID()).toBe(50)
