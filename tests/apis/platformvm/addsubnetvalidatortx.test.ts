@@ -23,7 +23,8 @@ describe("AddSubnetValidatorTx", (): void => {
   const endTime: BN = new BN(1648950865)
   const weight: BN = new BN(20)
 
-  const subnetIDStr: string = "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
+  const subnetIDStr: string =
+    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
   const subnetID: string | Buffer = bintools.cb58Decode(subnetIDStr)
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)

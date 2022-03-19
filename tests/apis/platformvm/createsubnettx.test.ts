@@ -1,9 +1,7 @@
 import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import {
-  SECPOwnerOutput
-} from "../../../src/apis/platformvm/outputs"
+import { SECPOwnerOutput } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { CreateSubnetTx } from "src/apis/platformvm"
 
