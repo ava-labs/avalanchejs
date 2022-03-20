@@ -4,7 +4,7 @@
  */
 
 import BN from "bn.js"
-import { PersistanceOptions } from "src/utils/persistenceoptions"
+import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
 import { TransferableOutput } from "."
 import { UTXOSet } from "../platformvm/utxos"
 
