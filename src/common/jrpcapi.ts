@@ -4,7 +4,7 @@
  */
 
 import { AxiosRequestConfig } from "axios"
-import fetchAdapter from "src/utils/fetchadapter"
+import { fetchAdapter } from "../utils"
 import AvalancheCore from "../avalanche"
 import { APIBase, RequestResponseData } from "./apibase"
 

@@ -82,7 +82,7 @@ async function getResponse(request, config): Promise<AxiosResponse> {
   return Promise.resolve(response)
 }
 
-export default async function fetchAdapter(
+export async function fetchAdapter(
   config: AxiosRequestConfig
 ): Promise<AxiosResponse> {
   const request = createRequest(config)

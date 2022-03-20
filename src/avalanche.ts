@@ -10,7 +10,7 @@ import axios, {
 } from "axios"
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
-import fetchAdapter from "./utils/fetchadapter"
+import { fetchAdapter } from "./utils/fetchadapter"
 import { getPreferredHRP } from "./utils/helperfunctions"
 
 /**

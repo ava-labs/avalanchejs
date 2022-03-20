@@ -49,7 +49,7 @@ import {
 } from "src/apis/avm/interfaces"
 import { CENTIAVAX } from "src/utils"
 import { MILLIAVAX } from "src/utils"
-import fetchAdapter from "src/utils/fetchadapter"
+import { fetchAdapter } from "src/utils/fetchadapter"
 
 /**
  * @ignore
