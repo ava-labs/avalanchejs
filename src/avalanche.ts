@@ -10,8 +10,8 @@ import axios, {
 } from "axios"
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
+import fetchAdapter from "./utils/fetchadapter"
 import { getPreferredHRP } from "./utils/helperfunctions"
-const fetchAdapter = require("@vespaiach/axios-fetch-adapter").default
 
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.

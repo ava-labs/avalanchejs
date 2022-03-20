@@ -77,9 +77,8 @@
     "node": ">=14.18.0"
   },
   "dependencies": {
-    "@vespaiach/axios-fetch-adapter": "^0.1.1",
     "assert": "2.0.0",
-    "axios": "0.26.0",
+    "axios": "0.26.1",
     "bech32": "2.0.0",
     "bip39": "3.0.4",
     "bn.js": "5.2.0",

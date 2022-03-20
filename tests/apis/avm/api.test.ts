@@ -49,6 +49,7 @@ import {
 } from "src/apis/avm/interfaces"
 import { CENTIAVAX } from "src/utils"
 import { MILLIAVAX } from "src/utils"
+import fetchAdapter from "src/utils/fetchadapter"
 
 /**
  * @ignore
@@ -418,7 +419,8 @@ describe("AVMAPI", (): void => {
       method: "POST",
       params: {},
       responseType: "json",
-      url: "/ext/bc/X"
+      url: "/ext/bc/X",
+      adapter: fetchAdapter
     }
 
     expect(mockAxios.request).toBeCalledWith(calledWith)
@@ -1234,7 +1236,7 @@ describe("AVMAPI", (): void => {
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
     })
 
-    test("DOMPurifyCleanObject", async (): Promise<void> => {
+    test("xssPreventionObject", async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(
         set,
         new BN(amnt),
@@ -1250,9 +1252,9 @@ describe("AVMAPI", (): void => {
       expect(tx1obj).toStrictEqual(sanitized)
     })
 
-    test("DOMPurifyDirtyObject", async (): Promise<void> => {
-      const dirtyDom: string = "<img src=x onerror=alert(1)//>"
-      const sanitizedString: string = `<img src="x">`
+    test("xssPreventionHTML", async (): Promise<void> => {
+      const dirtyDom: string = "<img src='https://x' onerror=alert(1)//>"
+      const sanitizedString: string = `<img src="https://x" />`
 
       const txu1: UnsignedTx = await avm.buildBaseTx(
         set,
@@ -1270,7 +1272,7 @@ describe("AVMAPI", (): void => {
         dirtyDom: dirtyDom
       }
       const sanitizedObj: any = tx1.sanitizeObject(dirtyObj)
-      expect(sanitizedString).toBe(sanitizedObj.dirtyDom)
+      expect(sanitizedObj.dirtyDom).toBe(sanitizedString)
     })
 
     test("buildBaseTx2", async (): Promise<void> => {
