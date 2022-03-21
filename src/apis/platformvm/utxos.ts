@@ -47,6 +47,7 @@ import {
 } from "../../utils/errors"
 import { CreateChainTx, SubnetAuth } from "."
 import { GenesisData } from "../avm"
+import { AddSubnetValidatorTx } from "../platformvm/addsubnetvalidatortx"
 
 /**
  * @ignore
@@ -903,7 +904,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @returns An unsigned transaction created from the passed in parameters.
    */
 
-  /* must implement later once the transaction format signing process is clearer
+  // must implement later once the transaction format signing process is clearer
   buildAddSubnetValidatorTx = (
     networkID:number = DefaultNetworkID,
     blockchainID:Buffer,
@@ -913,6 +914,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     startTime:BN,
     endTime:BN,
     weight:BN,
+    subnetID,
+    subnetAuth,
     fee:BN = undefined,
     feeAssetID:Buffer = undefined,
     memo:Buffer = undefined,
@@ -941,10 +944,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       }
     }
 
-    const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight);
+    const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight, subnetID, subnetAuth);
     return new UnsignedTx(UTx);
   }
-  */
 
   /**
    * Class representing an unsigned [[AddDelegatorTx]] transaction.

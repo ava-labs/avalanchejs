@@ -1496,7 +1496,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns An unsigned transaction created from the passed in parameters.
    */
 
-  /* Re-implement when subnetValidator signing process is clearer
+  // Re-implement when subnetValidator signing process is clearer
   buildAddSubnetValidatorTx = async (
     utxoset:UTXOSet,
     fromAddresses:string[],
@@ -1505,8 +1505,10 @@ export class PlatformVMAPI extends JRPCAPI {
     startTime:BN,
     endTime:BN,
     weight:BN,
+    subnetID,
+    subnetAuth,
     memo:PayloadBase|Buffer = undefined,
-    asOf:BN = UnixNow()
+    asOf:BN = UnixNow(),
   ):Promise<UnsignedTx> => {
     const from:Buffer[] = this._cleanAddressArray(fromAddresses, "buildAddSubnetValidatorTx").map((a): Buffer => bintools.stringToAddress(a))
     const change:Buffer[] = this._cleanAddressArray(changeAddresses, "buildAddSubnetValidatorTx").map((a): Buffer => bintools.stringToAddress(a))
@@ -1530,20 +1532,20 @@ export class PlatformVMAPI extends JRPCAPI {
       NodeIDStringToBuffer(nodeID),
       startTime, endTime,
       weight,
-      this.getFee(),
+      subnetID,
+      subnetAuth,
+      this.getDefaultTxFee(),
       avaxAssetID,
       memo, asOf
     )
 
     if(! await this.checkGooseEgg(builtUnsignedTx)) {
-      /* istanbul ignore next */ /*
-throw new Error("Failed Goose Egg Check")
-}
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check")
+    }
 
 return builtUnsignedTx
 }
-
-*/
 
   /**
    * Helper function which creates an unsigned [[AddDelegatorTx]]. For more granular control, you may create your own
