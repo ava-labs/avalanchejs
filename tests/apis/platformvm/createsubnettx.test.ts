@@ -27,7 +27,6 @@ describe("CreateSubnetTx", (): void => {
     memo,
     subnetOwners
   )
-  console.log(createSubnetTx)
 
   test("getTypeID", async (): Promise<void> => {
     expect(createSubnetTx.getTypeID()).toBe(PlatformVMConstants.CREATESUBNETTX)
