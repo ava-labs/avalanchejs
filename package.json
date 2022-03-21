@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",
+    "build-win": "del /S /Q dist\\ && npx tsc -b && xcopy /S typings\\src .\\dist",
     "prebundle": "yarn build",
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",

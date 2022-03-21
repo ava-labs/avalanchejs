@@ -11,7 +11,7 @@ import { RequestResponseData } from "../../common/apibase"
 import BinTools from "../../utils/bintools"
 import { UTXOSet, UTXO } from "./utxos"
 import { KeyChain } from "./keychain"
-import { Defaults, PrimaryAssetAlias } from "../../utils/constants"
+import { Defaults } from "../../utils/constants"
 import { Tx, UnsignedTx } from "./tx"
 import { EVMConstants } from "./constants"
 import {
@@ -209,7 +209,9 @@ export class EVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
-      const asset: Asset = await this.getAssetDescription(PrimaryAssetAlias)
+      const asset: Asset = await this.getAssetDescription(
+        this.core.getPrimaryAssetAlias()
+      )
       this.AVAXAssetID = asset.assetID
     }
     return this.AVAXAssetID

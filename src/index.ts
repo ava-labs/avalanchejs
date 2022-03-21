@@ -139,9 +139,9 @@ export default class Avalanche extends AvalancheCore {
       }
     }
     if (typeof networkID === "number" && networkID >= 0) {
-      this.networkID = networkID
+      this.setNetworkID(networkID)
     } else if (typeof networkID === "undefined") {
-      networkID = DefaultNetworkID
+      this.setNetworkID(DefaultNetworkID)
     }
     if (typeof hrp !== "undefined") {
       this.hrp = hrp

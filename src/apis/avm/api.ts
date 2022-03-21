@@ -16,7 +16,7 @@ import { InitialStates } from "./initialstates"
 import { UnixNow } from "../../utils/helperfunctions"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
-import { Defaults, PrimaryAssetAlias, ONEAVAX } from "../../utils/constants"
+import { Defaults, ONEAVAX } from "../../utils/constants"
 import { MinterSet } from "./minterset"
 import { PersistanceOptions } from "../../utils/persistenceoptions"
 import { OutputOwners } from "../../common/output"
@@ -182,7 +182,7 @@ export class AVMAPI extends JRPCAPI {
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
       const asset: GetAVAXAssetIDParams = await this.getAssetDescription(
-        PrimaryAssetAlias
+        this.core.getPrimaryAssetAlias()
       )
       this.AVAXAssetID = asset.assetID
     }

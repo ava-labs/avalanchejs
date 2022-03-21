@@ -24,6 +24,7 @@ import { getPreferredHRP } from "./utils/helperfunctions"
 export default class AvalancheCore {
   protected networkID: number = 0
   protected hrp: string = ""
+  protected primaryAssetAlias: string
   protected protocol: string
   protected ip: string
   protected host: string
@@ -115,6 +116,7 @@ export default class AvalancheCore {
   setNetworkID = (netID: number): void => {
     this.networkID = netID
     this.hrp = getPreferredHRP(this.networkID)
+    this.primaryAssetAlias = netID === 1000 ? "CAM" : "AVAX"
   }
 
   /**
@@ -213,6 +215,13 @@ export default class AvalancheCore {
       headers.Authorization = `Bearer ${this.auth}`
     }
     return headers
+  }
+
+  /**
+   * Returns the primary asset alias.
+   */
+  getPrimaryAssetAlias = (): string => {
+    return this.primaryAssetAlias
   }
 
   /**

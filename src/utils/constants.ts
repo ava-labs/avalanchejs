@@ -8,7 +8,6 @@ import { X, P, C, Network, Networks } from "../apis/evm"
 
 export const PrivateKeyPrefix: string = "PrivateKey-"
 export const NodeIDPrefix: string = "NodeID-"
-export const PrimaryAssetAlias: string = "AVAX"
 export const MainnetAPI: string = "api.avax.network"
 export const FujiAPI: string = "api.avax-test.network"
 
@@ -19,6 +18,7 @@ export const NetworkIDToHRP: object = {
   3: "denali",
   4: "everest",
   5: "fuji",
+  1000: "columbus",
   12345: "local"
 }
 
@@ -29,6 +29,7 @@ export const HRPToNetworkID: object = {
   denali: 3,
   everest: 4,
   fuji: 5,
+  columbus: 1000,
   local: 12345
 }
 
@@ -39,6 +40,7 @@ export const NetworkIDToNetworkNames: object = {
   3: ["Denali"],
   4: ["Everest"],
   5: ["Fuji", "Testnet"],
+  1000: ["Columbus"],
   12345: ["Local Network"]
 }
 
@@ -51,6 +53,7 @@ export const NetworkNameToNetworkID: object = {
   Everest: 4,
   Fuji: 5,
   Testnet: 5,
+  Columbus: 1000,
   "Local Network": 12345
 }
 
