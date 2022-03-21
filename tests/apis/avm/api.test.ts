@@ -49,7 +49,6 @@ import {
 } from "src/apis/avm/interfaces"
 import { CENTIAVAX } from "src/utils"
 import { MILLIAVAX } from "src/utils"
-import { fetchAdapter } from "src/utils/fetchadapter"
 
 /**
  * @ignore
@@ -419,8 +418,7 @@ describe("AVMAPI", (): void => {
       method: "POST",
       params: {},
       responseType: "json",
-      url: "/ext/bc/X",
-      adapter: fetchAdapter
+      url: "/ext/bc/X"
     }
 
     expect(mockAxios.request).toBeCalledWith(calledWith)

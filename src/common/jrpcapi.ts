@@ -48,7 +48,8 @@ export class JRPCAPI extends APIBase {
     const axConf: AxiosRequestConfig = {
       baseURL: baseURL,
       responseType: "json",
-      adapter: fetchAdapter
+      // use the fetch adapter if fetch is available e.g. non Node<17 env
+      adapter: typeof fetch !== 'undefined' ? fetchAdapter : undefined
     }
 
     const resp: RequestResponseData = await this.core.post(
