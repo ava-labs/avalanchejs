@@ -291,7 +291,7 @@ export default class AvalancheCore {
     config.data = postdata
     config.params = getdata
     // use the fetch adapter if fetch is available e.g. non Node<17 env
-    if (typeof fetch !== 'undefined'){
+    if (typeof fetch !== "undefined") {
       config.adapter = fetchAdapter
     }
     const resp: AxiosResponse<any> = await axios.request(config)

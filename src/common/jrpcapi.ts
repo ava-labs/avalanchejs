@@ -49,7 +49,7 @@ export class JRPCAPI extends APIBase {
       baseURL: baseURL,
       responseType: "json",
       // use the fetch adapter if fetch is available e.g. non Node<17 env
-      adapter: typeof fetch !== 'undefined' ? fetchAdapter : undefined
+      adapter: typeof fetch !== "undefined" ? fetchAdapter : undefined
     }
 
     const resp: RequestResponseData = await this.core.post(
