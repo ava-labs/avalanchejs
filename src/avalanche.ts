@@ -10,6 +10,7 @@ import axios, {
 } from "axios"
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
+import { fetchAdapter } from "./utils/fetchadapter"
 import { getPreferredHRP } from "./utils/helperfunctions"
 
 /**
@@ -289,6 +290,10 @@ export default class AvalancheCore {
     config.headers = headers
     config.data = postdata
     config.params = getdata
+    // use the fetch adapter if fetch is available e.g. non Node<17 env
+    if (typeof fetch !== "undefined") {
+      config.adapter = fetchAdapter
+    }
     const resp: AxiosResponse<any> = await axios.request(config)
     // purging all that is axios
     const xhrdata: RequestResponseData = new RequestResponseData(
