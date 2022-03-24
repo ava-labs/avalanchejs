@@ -336,6 +336,50 @@ const n5C: C = {
 }
 // End Fuji
 
+// Start Columbus
+let columbusAssetID: string =
+  "23YabNt6vhLZYh3P4u8k97maNPx7JX44dE5ea9AHqVGCJhBf3P"
+const n1000X: X = {
+  blockchainID: "N5SYDM4Lyei9bhpNaCrr59P9u89Z77Hbe7AZ1NVZNGm9L5Tw4",
+  avaxAssetID: columbusAssetID,
+  alias: XChainAlias,
+  vm: XChainVMName,
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX
+}
+
+const n1000P: P = {
+  blockchainID: PlatformChainID,
+  avaxAssetID: columbusAssetID,
+  alias: PChainAlias,
+  vm: PChainVMName,
+  txFee: MILLIAVAX,
+  creationTxFee: CENTIAVAX,
+  minConsumption: 0.1,
+  maxConsumption: 0.12,
+  maxStakingDuration: new BN(31536000),
+  maxSupply: new BN(1000000000).mul(ONEAVAX),
+  minStake: ONEAVAX.mul(new BN(2000)),
+  minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
+  maxStakeDuration: 365 * 24 * 60 * 60, // one year
+  minDelegationStake: ONEAVAX.mul(new BN(25)),
+  minDelegationFee: new BN(2)
+}
+
+const n1000C: C = {
+  blockchainID: "2vH69gebDnY6uSbbB7vLCnPEyPmWjS2bQD9Z2v2EmeJLpZ9W9S",
+  alias: CChainAlias,
+  vm: CChainVMName,
+  txBytesGas: 1,
+  costPerSignature: 1000,
+  txFee: MILLIAVAX,
+  gasPrice: GWEI.mul(new BN(225)),
+  minGasPrice: GWEI.mul(new BN(25)),
+  maxGasPrice: GWEI.mul(new BN(1000)),
+  chainID: 502
+}
+// End Columbus
+
 // Start local network
 avaxAssetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
 const n12345X: X = { ...n5X }
@@ -404,6 +448,15 @@ export class Defaults {
       "11111111111111111111111111111111LpoYY": n5P,
       C: n5C,
       yH8D7ThNJkxmtkuv2jgBa4P1Rn3Qpr4pPr7QYNfcdoS6k6HWp: n5C
+    },
+    1000: {
+      hrp: NetworkIDToHRP[1000],
+      X: n1000X,
+      N5SYDM4Lyei9bhpNaCrr59P9u89Z77Hbe7AZ1NVZNGm9L5Tw4: n1000X,
+      P: n1000P,
+      "11111111111111111111111111111111LpoYY": n1000P,
+      C: n1000C,
+      "2vH69gebDnY6uSbbB7vLCnPEyPmWjS2bQD9Z2v2EmeJLpZ9W9S": n1000C
     },
     12345: {
       hrp: NetworkIDToHRP[12345],
