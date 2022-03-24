@@ -1496,54 +1496,66 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns An unsigned transaction created from the passed in parameters.
    */
 
-  /* Re-implement when subnetValidator signing process is clearer
+  // Re-implement when subnetValidator signing process is clearer
   buildAddSubnetValidatorTx = async (
-    utxoset:UTXOSet,
-    fromAddresses:string[],
-    changeAddresses:string[],
-    nodeID:string,
-    startTime:BN,
-    endTime:BN,
-    weight:BN,
-    memo:PayloadBase|Buffer = undefined,
-    asOf:BN = UnixNow()
-  ):Promise<UnsignedTx> => {
-    const from:Buffer[] = this._cleanAddressArray(fromAddresses, "buildAddSubnetValidatorTx").map((a): Buffer => bintools.stringToAddress(a))
-    const change:Buffer[] = this._cleanAddressArray(changeAddresses, "buildAddSubnetValidatorTx").map((a): Buffer => bintools.stringToAddress(a))
+    utxoset: UTXOSet,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    nodeID: string,
+    startTime: BN,
+    endTime: BN,
+    weight: BN,
+    subnetID,
+    subnetAuth,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = UnixNow()
+  ): Promise<UnsignedTx> => {
+    const from: Buffer[] = this._cleanAddressArray(
+      fromAddresses,
+      "buildAddSubnetValidatorTx"
+    ).map((a): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(
+      changeAddresses,
+      "buildAddSubnetValidatorTx"
+    ).map((a): Buffer => bintools.stringToAddress(a))
 
-    if( memo instanceof PayloadBase) {
+    if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
     }
 
-    const avaxAssetID:Buffer = await this.getAVAXAssetID()
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
 
-    const now:BN = UnixNow()
+    const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("PlatformVMAPI.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime")
+      throw new Error(
+        "PlatformVMAPI.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
     }
 
-    const builtUnsignedTx:UnsignedTx = utxoset.buildAddSubnetValidatorTx(
+    const builtUnsignedTx: UnsignedTx = utxoset.buildAddSubnetValidatorTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
       from,
       change,
       NodeIDStringToBuffer(nodeID),
-      startTime, endTime,
+      startTime,
+      endTime,
       weight,
-      this.getFee(),
+      subnetID,
+      subnetAuth,
+      this.getDefaultTxFee(),
       avaxAssetID,
-      memo, asOf
+      memo,
+      asOf
     )
 
-    if(! await this.checkGooseEgg(builtUnsignedTx)) {
-      /* istanbul ignore next */ /*
-throw new Error("Failed Goose Egg Check")
-}
+    if (!(await this.checkGooseEgg(builtUnsignedTx))) {
+      /* istanbul ignore next */
+      throw new Error("Failed Goose Egg Check")
+    }
 
-return builtUnsignedTx
-}
-
-*/
+    return builtUnsignedTx
+  }
 
   /**
    * Helper function which creates an unsigned [[AddDelegatorTx]]. For more granular control, you may create your own

@@ -47,6 +47,7 @@ import {
 } from "../../utils/errors"
 import { CreateChainTx, SubnetAuth } from "."
 import { GenesisData } from "../avm"
+import { AddSubnetValidatorTx } from "../platformvm/addsubnetvalidatortx"
 
 /**
  * @ignore
@@ -903,48 +904,67 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @returns An unsigned transaction created from the passed in parameters.
    */
 
-  /* must implement later once the transaction format signing process is clearer
+  // must implement later once the transaction format signing process is clearer
   buildAddSubnetValidatorTx = (
-    networkID:number = DefaultNetworkID,
-    blockchainID:Buffer,
-    fromAddresses:Buffer[],
-    changeAddresses:Buffer[],
-    nodeID:Buffer,
-    startTime:BN,
-    endTime:BN,
-    weight:BN,
-    fee:BN = undefined,
-    feeAssetID:Buffer = undefined,
-    memo:Buffer = undefined,
-    asOf:BN = UnixNow()
-  ):UnsignedTx => {
-    let ins:TransferableInput[] = [];
-    let outs:TransferableOutput[] = [];
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
+    nodeID: Buffer,
+    startTime: BN,
+    endTime: BN,
+    weight: BN,
+    subnetID,
+    subnetAuth,
+    fee: BN = undefined,
+    feeAssetID: Buffer = undefined,
+    memo: Buffer = undefined,
+    asOf: BN = UnixNow()
+  ): UnsignedTx => {
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
     //let stakeOuts:TransferableOutput[] = [];
 
-    const zero:BN = new BN(0);
-    const now:BN = UnixNow();
+    const zero: BN = new BN(0)
+    const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
-      throw new Error("UTXOSet.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime");
+      throw new Error(
+        "UTXOSet.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
     }
 
     // Not implemented: Fees can be paid from importIns
-    if(this._feeCheck(fee, feeAssetID)) {
-      const aad:AssetAmountDestination = new AssetAmountDestination(fromAddresses, fromAddresses, changeAddresses);
-      aad.addAssetAmount(feeAssetID, zero, fee);
-      const success:Error = this.getMinimumSpendable(aad, asOf);
-      if(typeof success === "undefined") {
-        ins = aad.getInputs();
-        outs = aad.getAllOutputs();
+    if (this._feeCheck(fee, feeAssetID)) {
+      const aad: AssetAmountDestination = new AssetAmountDestination(
+        fromAddresses,
+        fromAddresses,
+        changeAddresses
+      )
+      aad.addAssetAmount(feeAssetID, zero, fee)
+      const success: Error = this.getMinimumSpendable(aad, asOf)
+      if (typeof success === "undefined") {
+        ins = aad.getInputs()
+        outs = aad.getAllOutputs()
       } else {
-        throw success;
+        throw success
       }
     }
 
-    const UTx:AddSubnetValidatorTx = new AddSubnetValidatorTx(networkID, blockchainID, outs, ins, memo, nodeID, startTime, endTime, weight);
-    return new UnsignedTx(UTx);
+    const UTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      nodeID,
+      startTime,
+      endTime,
+      weight,
+      subnetID,
+      subnetAuth
+    )
+    return new UnsignedTx(UTx)
   }
-  */
 
   /**
    * Class representing an unsigned [[AddDelegatorTx]] transaction.
