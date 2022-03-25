@@ -18,7 +18,8 @@ export const NetworkIDToHRP: object = {
   3: "denali",
   4: "everest",
   5: "fuji",
-  1000: "columbus",
+  1000: "camino",
+  1001: "columbus",
   12345: "local"
 }
 
@@ -29,7 +30,8 @@ export const HRPToNetworkID: object = {
   denali: 3,
   everest: 4,
   fuji: 5,
-  columbus: 1000,
+  camino: 1000,
+  columbus: 1001,
   local: 12345
 }
 
@@ -40,7 +42,8 @@ export const NetworkIDToNetworkNames: object = {
   3: ["Denali"],
   4: ["Everest"],
   5: ["Fuji", "Testnet"],
-  1000: ["Columbus"],
+  1000: ["Camino"],
+  1001: ["Columbus"],
   12345: ["Local Network"]
 }
 
@@ -53,7 +56,8 @@ export const NetworkNameToNetworkID: object = {
   Everest: 4,
   Fuji: 5,
   Testnet: 5,
-  Columbus: 1000,
+  Camino: 1000,
+  Columbus: 1001,
   "Local Network": 12345
 }
 
@@ -336,12 +340,11 @@ const n5C: C = {
 }
 // End Fuji
 
-// Start Columbus
-let columbusAssetID: string =
-  "23YabNt6vhLZYh3P4u8k97maNPx7JX44dE5ea9AHqVGCJhBf3P"
+// Start Camino
+let caminoAssetID: string = "23YabNt6vhLZYh3P4u8k97maNPx7JX44dE5ea9AHqVGCJhBf3P"
 const n1000X: X = {
-  blockchainID: "N5SYDM4Lyei9bhpNaCrr59P9u89Z77Hbe7AZ1NVZNGm9L5Tw4",
-  avaxAssetID: columbusAssetID,
+  blockchainID: "28Pp3JZJBABUmFQcC9ZXPjuDS6WVX8LeQP9y3DvpCXGiNiTQFV",
+  avaxAssetID: caminoAssetID,
   alias: XChainAlias,
   vm: XChainVMName,
   txFee: MILLIAVAX,
@@ -350,7 +353,7 @@ const n1000X: X = {
 
 const n1000P: P = {
   blockchainID: PlatformChainID,
-  avaxAssetID: columbusAssetID,
+  avaxAssetID: caminoAssetID,
   alias: PChainAlias,
   vm: PChainVMName,
   txFee: MILLIAVAX,
@@ -360,14 +363,14 @@ const n1000P: P = {
   maxStakingDuration: new BN(31536000),
   maxSupply: new BN(1000000000).mul(ONEAVAX),
   minStake: ONEAVAX.mul(new BN(2000)),
-  minStakeDuration: 2 * 7 * 24 * 60 * 60, //two weeks
+  minStakeDuration: 1 * 60 * 60, //two weeks
   maxStakeDuration: 365 * 24 * 60 * 60, // one year
   minDelegationStake: ONEAVAX.mul(new BN(25)),
   minDelegationFee: new BN(2)
 }
 
 const n1000C: C = {
-  blockchainID: "2vH69gebDnY6uSbbB7vLCnPEyPmWjS2bQD9Z2v2EmeJLpZ9W9S",
+  blockchainID: "fnVV12Px5y6FGM5Ua8moqmTPCQT2im18SZEW2xgMDGurimFZg",
   alias: CChainAlias,
   vm: CChainVMName,
   txBytesGas: 1,
@@ -378,7 +381,7 @@ const n1000C: C = {
   maxGasPrice: GWEI.mul(new BN(1000)),
   chainID: 502
 }
-// End Columbus
+// End Camino
 
 // Start local network
 avaxAssetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
@@ -457,6 +460,15 @@ export class Defaults {
       "11111111111111111111111111111111LpoYY": n1000P,
       C: n1000C,
       "2vH69gebDnY6uSbbB7vLCnPEyPmWjS2bQD9Z2v2EmeJLpZ9W9S": n1000C
+    },
+    1001: {
+      hrp: NetworkIDToHRP[1001],
+      X: n1000X,
+      28Pp3JZJBABUmFQcC9ZXPjuDS6WVX8LeQP9y3DvpCXGiNiTQFV: n1000X,
+      P: n1000P,
+      "11111111111111111111111111111111LpoYY": n1000P,
+      C: n1000C,
+      "fnVV12Px5y6FGM5Ua8moqmTPCQT2im18SZEW2xgMDGurimFZg": n1000C
     },
     12345: {
       hrp: NetworkIDToHRP[12345],

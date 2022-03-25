@@ -116,7 +116,7 @@ export default class AvalancheCore {
   setNetworkID = (netID: number): void => {
     this.networkID = netID
     this.hrp = getPreferredHRP(this.networkID)
-    this.primaryAssetAlias = netID === 1000 ? "CAM" : "AVAX"
+    this.primaryAssetAlias = netID === 1000 || netID === 1001 ? "CAM" : "AVAX"
   }
 
   /**
