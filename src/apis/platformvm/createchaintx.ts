@@ -305,7 +305,7 @@ export class CreateChainTx extends BaseTx {
     }
     if (typeof genesisData != "undefined" && typeof genesisData != "string") {
       this.genesisData = genesisData.toBuffer()
-    } else {
+    } else if (typeof genesisData == "string") {
       this.genesisData = Buffer.from(genesisData)
     }
 
