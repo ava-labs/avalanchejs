@@ -3,7 +3,10 @@ import { Avalanche, BN } from "src"
 import { EVMAPI } from "../../../src/apis/evm/api"
 import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
-import { Defaults } from "../../../src/utils/constants"
+import {
+  DummyBlockchainID,
+  TestCBlockchainID
+} from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**
@@ -13,7 +16,7 @@ const bintools: BinTools = BinTools.getInstance()
 
 describe("EVMAPI", (): void => {
   const networkID: number = 12345
-  const blockchainID: string = Defaults.network[networkID].C.blockchainID
+  const blockchainID: string = TestCBlockchainID
   const ip: string = "127.0.0.1"
   const port: number = 9650
   const protocol: string = "https"
@@ -25,7 +28,6 @@ describe("EVMAPI", (): void => {
     port,
     protocol,
     networkID,
-    undefined,
     undefined,
     undefined,
     true
@@ -231,24 +233,6 @@ describe("EVMAPI", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(txID)
-  })
-
-  test("refreshBlockchainID", async (): Promise<void> => {
-    const n5bcID: string = Defaults.network[5].C["blockchainID"]
-    const n12345bcID: string = Defaults.network[12345].C["blockchainID"]
-    const testAPI: EVMAPI = new EVMAPI(avalanche, "/ext/bc/C/avax", n5bcID)
-    const bc1: string = testAPI.getBlockchainID()
-    expect(bc1).toBe(n5bcID)
-
-    let res: boolean = testAPI.refreshBlockchainID()
-    expect(res).toBeTruthy()
-    const bc2: string = testAPI.getBlockchainID()
-    expect(bc2).toBe(n12345bcID)
-
-    res = testAPI.refreshBlockchainID(n5bcID)
-    expect(res).toBeTruthy()
-    const bc3: string = testAPI.getBlockchainID()
-    expect(bc3).toBe(n5bcID)
   })
 
   test("getAssetBalance", async (): Promise<void> => {

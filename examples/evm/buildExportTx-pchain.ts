@@ -12,7 +12,6 @@ import {
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
   costExportTx
 } from "../../src/utils"
 
@@ -30,8 +29,8 @@ pKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const pChainBlockchainIdStr: string = Defaults.network[networkID].P.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const pChainBlockchainIdStr: string = avalanche.getNetwork().P.blockchainID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const Web3 = require("web3")
 const path: string = "/ext/bc/C/rpc"
@@ -61,7 +60,7 @@ const main = async (): Promise<any> => {
     threshold,
     fee
   )
-  const exportCost: number = costExportTx(unsignedTx)
+  const exportCost: number = costExportTx(avalanche.getNetwork().C, unsignedTx)
   fee = baseFee.mul(new BN(exportCost))
   avaxAmount = balance.sub(fee)
   unsignedTx = await cchain.buildExportTx(

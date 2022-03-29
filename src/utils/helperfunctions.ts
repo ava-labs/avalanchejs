@@ -3,14 +3,9 @@
  * @module Utils-HelperFunctions
  */
 
-import {
-  NetworkIDToHRP,
-  DefaultNetworkID,
-  FallbackHRP,
-  Defaults
-} from "./constants"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
+import { C } from "./networks"
 import BinTools from "../utils/bintools"
 import { PrivateKeyError, NodeIdError } from "../utils/errors"
 import { ExportTx, ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
@@ -19,15 +14,6 @@ import { ExportTx, ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
-
-export function getPreferredHRP(networkID: number = undefined) {
-  if (networkID in NetworkIDToHRP) {
-    return NetworkIDToHRP[`${networkID}`]
-  } else if (typeof networkID === "undefined") {
-    return NetworkIDToHRP[`${DefaultNetworkID}`]
-  }
-  return FallbackHRP
-}
 
 export function MaxWeightFormula(staked: BN, cap: BN): BN {
   return BN.min(staked.mul(new BN(5)), cap)
@@ -88,26 +74,26 @@ export function NodeIDStringToBuffer(pk: string): Buffer {
   return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }
 
-export function costImportTx(tx: UnsignedTx): number {
-  let bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
+export function costImportTx(c: C, tx: UnsignedTx): number {
+  let bytesCost: number = calcBytesCost(c, tx.toBuffer().byteLength)
   const importTx = tx.getTransaction() as ImportTx
   importTx.getImportInputs().forEach((input: TransferableInput): void => {
-    const inCost: number = input.getCost()
+    const inCost: number = input.getCost(c)
     bytesCost += inCost
   })
   const fixedFee: number = 10000
   return bytesCost + fixedFee
 }
 
-export function calcBytesCost(len: number): number {
-  return len * Defaults.network[1].C.txBytesGas
+export function calcBytesCost(c: C, len: number): number {
+  return len * c.txBytesGas
 }
 
-export function costExportTx(tx: UnsignedTx): number {
-  const bytesCost: number = calcBytesCost(tx.toBuffer().byteLength)
+export function costExportTx(c: C, tx: UnsignedTx): number {
+  const bytesCost: number = calcBytesCost(c, tx.toBuffer().byteLength)
   const exportTx = tx.getTransaction() as ExportTx
   const numSigs: number = exportTx.getInputs().length
-  const sigCost: number = numSigs * Defaults.network[1].C.costPerSignature
+  const sigCost: number = numSigs * c.costPerSignature
   const fixedFee: number = 10000
   return bytesCost + sigCost + fixedFee
 }

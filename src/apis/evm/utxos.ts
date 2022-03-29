@@ -17,7 +17,7 @@ import { EVMInput, SECPTransferInput, TransferableInput } from "./inputs"
 import { Output } from "../../common/output"
 import { UnixNow } from "../../utils/helperfunctions"
 import { StandardUTXO, StandardUTXOSet } from "../../common/utxos"
-import { PlatformChainID } from "../../utils/constants"
+import { DefaultPlatformChainID } from "../../utils/constants"
 import {
   StandardAssetAmountDestination,
   AssetAmount
@@ -478,7 +478,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     }
 
     if (typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(PlatformChainID)
+      destinationChain = bintools.cb58Decode(DefaultPlatformChainID)
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(

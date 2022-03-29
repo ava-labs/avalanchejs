@@ -1,24 +1,26 @@
 import { ExportTx, ImportTx, UnsignedTx } from "src/apis/evm"
 import { calcBytesCost, costExportTx, costImportTx } from "src/utils"
 import { Buffer } from "buffer/"
+import networks from "src/utils/networks"
 
 describe("HelperFunctions", (): void => {
   test("calcBytesCost", (): void => {
+    const c = networks.getNetwork(12345).C
     const importTx: ImportTx = new ImportTx()
     // an empty EVM ImportTx is 76 bytes
     let cost: number = 76
-    let bytesCost: number = calcBytesCost(importTx.toBuffer().byteLength)
+    let bytesCost: number = calcBytesCost(c, importTx.toBuffer().byteLength)
     expect(cost).toEqual(bytesCost)
 
     // the byteCost should always be 1 unit of gas per byte
     let size: number = 100
     cost = 100
-    bytesCost = calcBytesCost(size)
+    bytesCost = calcBytesCost(c, size)
     expect(cost).toEqual(bytesCost)
 
     size = 507
     cost = 507
-    bytesCost = calcBytesCost(size)
+    bytesCost = calcBytesCost(c, size)
     expect(cost).toEqual(bytesCost)
 
     let hex: string =
@@ -26,7 +28,7 @@ describe("HelperFunctions", (): void => {
     const exportTx: ExportTx = new ExportTx()
     let unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
     exportTx.fromBuffer(new Buffer(hex, "hex"))
-    cost = costExportTx(unsignedTx)
+    cost = costExportTx(c, unsignedTx)
     bytesCost = 11230
     expect(cost).toEqual(bytesCost)
 
@@ -34,7 +36,7 @@ describe("HelperFunctions", (): void => {
       "000030399d0775f450604bd2fbc49ce0c5c1c6dfeb2dc2acb8c92c26eeae6e6df4502b19d891ad56056d9c01f18f43f58b5c784ad07a4a49cf3d1f11623804b5cba2c6bf0000000000000000"
     importTx.fromBuffer(new Buffer(hex, "hex"))
     unsignedTx = new UnsignedTx(importTx)
-    cost = costImportTx(unsignedTx)
+    cost = costImportTx(c, unsignedTx)
     bytesCost = 10082
     expect(cost).toEqual(bytesCost)
   })

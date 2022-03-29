@@ -13,7 +13,6 @@ import {
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
   UnixNow
 } from "../../src/utils"
 
@@ -31,8 +30,8 @@ xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const pChainBlockchainID: string = avalanche.getNetwork().P.blockchainID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from(

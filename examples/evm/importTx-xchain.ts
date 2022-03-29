@@ -14,8 +14,7 @@ import {
 } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -31,9 +30,9 @@ const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 cKeychain.importKey(privKey)
 const cAddresses: Buffer[] = cchain.keyChain().getAddresses()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const cChainBlockchainIdStr: string = Defaults.network[networkID].C.blockchainID
+const cChainBlockchainIdStr: string = avalanche.getNetwork().C.blockchainID
 const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
-const xChainBlockchainIdStr: string = Defaults.network[networkID].X.blockchainID
+const xChainBlockchainIdStr: string = avalanche.getNetwork().X.blockchainID
 const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
 const importedIns: TransferableInput[] = []
 const evmOutputs: EVMOutput[] = []

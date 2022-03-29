@@ -33,7 +33,7 @@ import { OperationTx } from "./operationtx"
 import { BaseTx } from "./basetx"
 import { ExportTx } from "./exporttx"
 import { ImportTx } from "./importtx"
-import { PlatformChainID } from "../../utils/constants"
+import { DefaultPlatformChainID } from "../../utils/constants"
 import {
   StandardAssetAmountDestination,
   AssetAmount
@@ -1061,7 +1061,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     }
 
     if (typeof destinationChain === "undefined") {
-      destinationChain = bintools.cb58Decode(PlatformChainID)
+      destinationChain = bintools.cb58Decode(DefaultPlatformChainID)
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(

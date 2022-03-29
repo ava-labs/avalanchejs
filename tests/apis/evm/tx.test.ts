@@ -5,26 +5,29 @@ import {
   TransferableInput
 } from "../../../src/apis/evm"
 import {
-  Defaults,
   MILLIAVAX,
-  PlatformChainID
+  TestAvaxAssetID,
+  TestCBlockchainID,
+  DefaultPlatformChainID,
+  TestXBlockchainID
 } from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
 import { EVMOutput } from "../../../src/apis/evm"
 import BN from "bn.js"
 import { BinTools, Buffer } from "src"
+import networks from "src/utils/networks"
 const networkID: number = 12345
 const cHexAddress1: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const bintools: BinTools = BinTools.getInstance()
 const cHexAddress2: string = "0xecC3B2968B277b837a81A7181e0b94EB1Ca54EdE"
 const antAssetID: string = "F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38"
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const avaxAssetID: string = TestAvaxAssetID
 const txID: string = "QVb7DtKjcwVYLFWHgnGSdzQtQSc29KeRBYFNCBnbFu6dFqX7z"
-const blockchainID: string = Defaults.network[networkID].C.blockchainID
-const sourcechainID: string = Defaults.network[networkID].X.blockchainID
+const blockchainID: string = TestCBlockchainID
+const sourcechainID: string = TestXBlockchainID
 let evmOutputs: EVMOutput[]
 let importedIns: TransferableInput[]
-const fee: BN = Defaults.network[networkID].C.txFee
+const fee: BN = networks.getNetwork(networkID).C.txFee
 
 beforeEach((): void => {
   evmOutputs = []
@@ -286,11 +289,11 @@ describe("EVM Transactions", () => {
       const exportTx: ExportTx = new ExportTx(
         networkID,
         bintools.cb58Decode(blockchainID),
-        bintools.cb58Decode(PlatformChainID)
+        bintools.cb58Decode(DefaultPlatformChainID)
       )
       expect(exportTx).toBeInstanceOf(ExportTx)
       expect(exportTx.getDestinationChain().toString("hex")).toBe(
-        bintools.cb58Decode(PlatformChainID).toString("hex")
+        bintools.cb58Decode(DefaultPlatformChainID).toString("hex")
       )
     })
   })

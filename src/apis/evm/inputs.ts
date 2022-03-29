@@ -15,7 +15,7 @@ import { EVMOutput } from "./outputs"
 import BN from "bn.js"
 import { SigIdx } from "../../common/credentials"
 import { InputIdError } from "../../utils/errors"
-import { Defaults } from "../../utils"
+import { C } from "../../utils/networks"
 
 /**
  * @ignore
@@ -54,9 +54,9 @@ export class TransferableInput extends StandardTransferableInput {
    * Assesses the amount to be paid based on the number of signatures required
    * @returns the amount to be paid
    */
-  getCost = (): number => {
+  getCost = (c: C): number => {
     const numSigs: number = this.getInput().getSigIdxs().length
-    return numSigs * Defaults.network[1].C.costPerSignature
+    return numSigs * c.costPerSignature
   }
 
   /**

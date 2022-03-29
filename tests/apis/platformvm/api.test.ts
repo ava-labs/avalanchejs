@@ -5,7 +5,10 @@ import { Buffer } from "buffer/"
 import BN from "bn.js"
 import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
-import { Defaults, PlatformChainID } from "../../../src/utils/constants"
+import {
+  DefaultPlatformChainID,
+  TestXBlockchainID
+} from "../../../src/utils/constants"
 import { UTXOSet } from "../../../src/apis/platformvm/utxos"
 import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
 import { KeyChain } from "../../../src/apis/platformvm/keychain"
@@ -78,7 +81,7 @@ const serialzeit = (aThing: Serializable, name: string): void => {
 
 describe("PlatformVMAPI", (): void => {
   const networkID: number = 12345
-  const blockchainID: string = PlatformChainID
+  const blockchainID: string = DefaultPlatformChainID
   const ip: string = "127.0.0.1"
   const port: number = 9650
   const protocol: string = "https"
@@ -95,7 +98,6 @@ describe("PlatformVMAPI", (): void => {
     port,
     protocol,
     networkID,
-    undefined,
     undefined,
     undefined,
     true
@@ -135,21 +137,6 @@ describe("PlatformVMAPI", (): void => {
 
   afterEach((): void => {
     mockAxios.reset()
-  })
-
-  test("refreshBlockchainID", async (): Promise<void> => {
-    let n3bcID: string = Defaults.network[3].P["blockchainID"]
-    let testAPI: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
-    let bc1: string = testAPI.getBlockchainID()
-    expect(bc1).toBe(PlatformChainID)
-
-    testAPI.refreshBlockchainID()
-    let bc2: string = testAPI.getBlockchainID()
-    expect(bc2).toBe(PlatformChainID)
-
-    testAPI.refreshBlockchainID(n3bcID)
-    let bc3: string = testAPI.getBlockchainID()
-    expect(bc3).toBe(n3bcID)
   })
 
   test("listAddresses", async (): Promise<void> => {
@@ -1240,7 +1227,7 @@ describe("PlatformVMAPI", (): void => {
       const result: Promise<UnsignedTx> = platformvm.buildImportTx(
         set,
         addrs1,
-        PlatformChainID,
+        DefaultPlatformChainID,
         addrs3,
         addrs1,
         addrs2,
@@ -1268,7 +1255,7 @@ describe("PlatformVMAPI", (): void => {
         addrbuff1,
         addrbuff2,
         [fungutxo],
-        bintools.cb58Decode(PlatformChainID),
+        bintools.cb58Decode(DefaultPlatformChainID),
         platformvm.getTxFee(),
         await platformvm.getAVAXAssetID(),
         new UTF8Payload("hello world").getPayload(),
@@ -1316,9 +1303,7 @@ describe("PlatformVMAPI", (): void => {
       const txu1: UnsignedTx = await platformvm.buildExportTx(
         set,
         amount,
-        bintools.cb58Decode(
-          Defaults.network[avalanche.getNetworkID()].X["blockchainID"]
-        ),
+        bintools.cb58Decode(TestXBlockchainID),
         addrbuff3.map((a) =>
           serializer.bufferToType(a, type, avalanche.getHRP(), "P")
         ),
@@ -1336,9 +1321,7 @@ describe("PlatformVMAPI", (): void => {
         addrbuff3,
         addrbuff1,
         addrbuff2,
-        bintools.cb58Decode(
-          Defaults.network[avalanche.getNetworkID()].X["blockchainID"]
-        ),
+        bintools.cb58Decode(TestXBlockchainID),
         platformvm.getTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
@@ -1353,9 +1336,7 @@ describe("PlatformVMAPI", (): void => {
       const txu3: UnsignedTx = await platformvm.buildExportTx(
         set,
         amount,
-        bintools.cb58Decode(
-          Defaults.network[avalanche.getNetworkID()].X["blockchainID"]
-        ),
+        bintools.cb58Decode(TestXBlockchainID),
         addrs3,
         addrs1,
         addrs2,
@@ -1451,14 +1432,14 @@ describe("PlatformVMAPI", (): void => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkID]["P"].minDelegationStake
+      const amount: BN = avalanche.getNetwork().P.minDelegationStake
 
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
       platformvm.setMinStake(
-        Defaults.network[networkID]["P"].minStake,
-        Defaults.network[networkID]["P"].minDelegationStake
+        avalanche.getNetwork().P.minStake,
+        avalanche.getNetwork().P.minDelegationStake
       )
 
       const txu1: UnsignedTx = await platformvm.buildAddDelegatorTx(
@@ -1571,10 +1552,10 @@ describe("PlatformVMAPI", (): void => {
         parseableOutput2
       )
       const nodeID: string = "NodeID-36giFye5epwBTpGqPk7b4CCYe3hfyoFr1"
-      const stakeAmount: BN = Defaults.network[networkID]["P"].minStake
+      const stakeAmount: BN = avalanche.getNetwork().P.minStake
       platformvm.setMinStake(
         stakeAmount,
-        Defaults.network[networkID]["P"].minDelegationStake
+        avalanche.getNetwork().P.minDelegationStake
       )
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
@@ -1750,7 +1731,7 @@ describe("PlatformVMAPI", (): void => {
       const stakeAmount: BN = new BN("10000003000000000")
       platformvm.setMinStake(
         stakeAmount,
-        Defaults.network[networkID]["P"].minDelegationStake
+        avalanche.getNetwork().P.minDelegationStake
       )
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
@@ -1931,7 +1912,7 @@ describe("PlatformVMAPI", (): void => {
       const stakeAmount: BN = new BN("10000003000000000")
       platformvm.setMinStake(
         stakeAmount,
-        Defaults.network[networkID]["P"].minDelegationStake
+        avalanche.getNetwork().P.minDelegationStake
       )
       const delegationFeeRate: number = new BN(2).toNumber()
       const codecID: number = 0
@@ -2066,16 +2047,14 @@ describe("PlatformVMAPI", (): void => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkID]["P"].minStake.add(
-        new BN(fee)
-      )
+      const amount: BN = avalanche.getNetwork().P.minStake.add(new BN(fee))
 
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
       platformvm.setMinStake(
-        Defaults.network[networkID]["P"].minStake,
-        Defaults.network[networkID]["P"].minDelegationStake
+        avalanche.getNetwork().P.minStake,
+        avalanche.getNetwork().P.minDelegationStake
       )
 
       const txu1: UnsignedTx = await platformvm.buildAddValidatorTx(
@@ -2148,13 +2127,13 @@ describe("PlatformVMAPI", (): void => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
       const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
-      const amount: BN = Defaults.network[networkID]["P"].minDelegationStake
+      const amount: BN = avalanche.getNetwork().P.minDelegationStake
       const locktime: BN = new BN(54321)
       const threshold: number = 2
 
       platformvm.setMinStake(
-        Defaults.network[networkID]["P"].minStake,
-        Defaults.network[networkID]["P"].minDelegationStake
+        avalanche.getNetwork().P.minStake,
+        avalanche.getNetwork().P.minDelegationStake
       )
 
       const txu1: UnsignedTx = await platformvm.buildAddDelegatorTx(

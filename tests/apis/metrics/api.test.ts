@@ -15,7 +15,6 @@ describe("Metrics", (): void => {
     12345,
     undefined,
     undefined,
-    undefined,
     true
   )
   let metrics: MetricsAPI

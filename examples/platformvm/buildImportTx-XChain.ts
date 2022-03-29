@@ -9,7 +9,6 @@ import {
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
   UnixNow
 } from "../../src/utils"
 
@@ -23,8 +22,8 @@ const pKeychain: KeyChain = pchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const xChainBlockchainID: string = Defaults.network[networkID].X.blockchainID
-const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
+const xChainBlockchainID: string = avalanche.getNetwork().X.blockchainID
+const pChainBlockchainID: string = avalanche.getNetwork().P.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(

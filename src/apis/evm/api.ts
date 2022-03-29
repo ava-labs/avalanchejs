@@ -11,7 +11,6 @@ import { RequestResponseData } from "../../common/apibase"
 import BinTools from "../../utils/bintools"
 import { UTXOSet, UTXO } from "./utxos"
 import { KeyChain } from "./keychain"
-import { Defaults } from "../../utils/constants"
 import { Tx, UnsignedTx } from "./tx"
 import { EVMConstants } from "./constants"
 import {
@@ -73,32 +72,9 @@ export class EVMAPI extends JRPCAPI {
    */
   getBlockchainAlias = (): string => {
     if (typeof this.blockchainAlias === "undefined") {
-      const netID: number = this.core.getNetworkID()
-      if (
-        netID in Defaults.network &&
-        this.blockchainID in Defaults.network[`${netID}`]
-      ) {
-        this.blockchainAlias =
-          Defaults.network[`${netID}`][this.blockchainID].alias
-        return this.blockchainAlias
-      } else {
-        /* istanbul ignore next */
-        return undefined
-      }
+      this.blockchainAlias = this.core.getNetwork().C.alias
     }
     return this.blockchainAlias
-  }
-
-  /**
-   * Sets the alias for the blockchainID.
-   *
-   * @param alias The alias for the blockchainID.
-   *
-   */
-  setBlockchainAlias = (alias: string): string => {
-    this.blockchainAlias = alias
-    /* istanbul ignore next */
-    return undefined
   }
 
   /**
@@ -107,31 +83,6 @@ export class EVMAPI extends JRPCAPI {
    * @returns The blockchainID
    */
   getBlockchainID = (): string => this.blockchainID
-
-  /**
-   * Refresh blockchainID, and if a blockchainID is passed in, use that.
-   *
-   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
-   *
-   * @returns A boolean if the blockchainID was successfully refreshed.
-   */
-  refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netID: number = this.core.getNetworkID()
-    if (
-      typeof blockchainID === "undefined" &&
-      typeof Defaults.network[`${netID}`] !== "undefined"
-    ) {
-      this.blockchainID = Defaults.network[`${netID}`].C.blockchainID //default to C-Chain
-      return true
-    }
-
-    if (typeof blockchainID === "string") {
-      this.blockchainID = blockchainID
-      return true
-    }
-
-    return false
-  }
 
   /**
    * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
@@ -237,9 +188,7 @@ export class EVMAPI extends JRPCAPI {
    * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultTxFee = (): BN => {
-    return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["C"]["txFee"])
-      : new BN(0)
+    return new BN(this.core.getNetwork().C.txFee)
   }
 
   /**
@@ -647,7 +596,7 @@ export class EVMAPI extends JRPCAPI {
     )
     const atomicUTXOs: UTXOSet = utxoResponse.utxos
     const networkID: number = this.core.getNetworkID()
-    const avaxAssetID: string = Defaults.network[`${networkID}`].X.avaxAssetID
+    const avaxAssetID: string = this.core.getNetwork().X.avaxAssetID
     const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
     const atomics: UTXO[] = atomicUTXOs.getAllUTXOs()
 
@@ -863,16 +812,16 @@ export class EVMAPI extends JRPCAPI {
     blockchainID: string = ""
   ) {
     super(core, baseURL)
-    this.blockchainID = blockchainID
-    const netID: number = core.getNetworkID()
-    if (
-      netID in Defaults.network &&
-      blockchainID in Defaults.network[`${netID}`]
-    ) {
-      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
-      this.keychain = new KeyChain(this.core.getHRP(), alias)
-    } else {
+    this.blockchainID = core.getNetwork().C.blockchainID
+
+    if (blockchainID !== "" && blockchainID !== this.blockchainID) {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
+      this.blockchainID = blockchainID
+    } else {
+      this.keychain = new KeyChain(
+        this.core.getHRP(),
+        core.getNetwork().C.alias
+      )
     }
   }
 

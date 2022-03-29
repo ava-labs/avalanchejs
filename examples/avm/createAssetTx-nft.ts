@@ -19,8 +19,7 @@ import {
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -35,8 +34,8 @@ const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainID: string = Defaults.network[networkID].X.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const blockchainID: string = avalanche.getNetwork().X.blockchainID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []

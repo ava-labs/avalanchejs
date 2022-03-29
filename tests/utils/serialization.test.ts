@@ -9,7 +9,6 @@ import {
   InitialStates,
   MinterSet,
   NFTCredential,
-  NFTMintOperation,
   NFTMintOutput,
   NFTTransferOperation,
   NFTTransferOutput,
@@ -31,17 +30,17 @@ import {
 import { Address, Serialized, Signature } from "src/common"
 import {
   DefaultNetworkID,
-  Defaults,
   Serialization,
   SerializedEncoding,
-  SerializedType
+  SerializedType,
+  TestHRP,
+  TestXBlockchainID
 } from "../../src/utils"
-import { getPreferredHRP } from "../../src/utils"
 
 const serialization: Serialization = Serialization.getInstance()
 
 describe("Serialization", (): void => {
-  const address: string = "X-avax1wst8jt3z3fm9ce0z6akj3266zmgccdp03hjlaj"
+  const address: string = "X-local1wst8jt3z3fm9ce0z6akj3266zmgccdp0gy0e76"
   const nodeID: string = "NodeID-MFrZFVCXPv5iCn6M9K6XduxGTYp891xXZ"
   const privateKey: string =
     "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
@@ -55,7 +54,7 @@ describe("Serialization", (): void => {
   const name: string = "BaseTx"
   const denomination: Buffer = Buffer.alloc(1)
   const chainID: string = "X"
-  const hrp: any = getPreferredHRP(1)
+  const hrp: any = TestHRP
 
   test("instance of", (): void => {
     expect(serialization).toBeInstanceOf(Serialization)
@@ -348,7 +347,7 @@ describe("Serialization", (): void => {
 
     describe("AVM", (): void => {
       const blockchainIDCB58: Buffer = serialization.typeToBuffer(
-        Defaults.network[12345]["X"].blockchainID,
+        TestXBlockchainID,
         cb58
       )
       const blockchainIDHex: string =

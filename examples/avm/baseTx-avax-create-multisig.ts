@@ -14,7 +14,6 @@ import {
   BaseTx
 } from "../../src/apis/avm"
 import {
-  Defaults,
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
@@ -38,8 +37,8 @@ privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainID: string = Defaults.network[networkID].X.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const blockchainID: string = avalanche.getNetwork().X.blockchainID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []

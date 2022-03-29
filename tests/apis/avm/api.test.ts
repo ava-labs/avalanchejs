@@ -28,11 +28,13 @@ import {
 import * as bech32 from "bech32"
 import { UTF8Payload } from "../../../src/utils/payload"
 import { InitialStates } from "../../../src/apis/avm/initialstates"
-import { Defaults } from "../../../src/utils/constants"
+import {
+  DefaultPlatformChainID,
+  TestXBlockchainID
+} from "../../../src/utils/constants"
 import { UnixNow } from "../../../src/utils/helperfunctions"
 import { OutputOwners } from "../../../src/common/output"
 import { MinterSet } from "../../../src/apis/avm/minterset"
-import { PlatformChainID } from "../../../src/utils/constants"
 import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
 import { ONEAVAX } from "../../../src/utils/constants"
 import {
@@ -73,7 +75,7 @@ const serialzeit = (aThing: Serializable, name: string): void => {
 
 describe("AVMAPI", (): void => {
   const networkID: number = 12345
-  const blockchainID: string = Defaults.network[networkID].X.blockchainID
+  const blockchainID: string = TestXBlockchainID
   const ip: string = "127.0.0.1"
   const port: number = 9650
   const protocol: string = "https"
@@ -86,7 +88,6 @@ describe("AVMAPI", (): void => {
     port,
     protocol,
     networkID,
-    undefined,
     undefined,
     undefined,
     true
@@ -282,22 +283,6 @@ describe("AVMAPI", (): void => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response["txID"]).toBe(txId)
     expect(response["changeAddr"]).toBe(changeAddr)
-  })
-
-  test("refreshBlockchainID", async (): Promise<void> => {
-    const n3bcID: string = Defaults.network[3].X["blockchainID"]
-    const n12345bcID: string = Defaults.network[12345].X["blockchainID"]
-    const testAPI: AVMAPI = new AVMAPI(avalanche, "/ext/bc/avm", n3bcID)
-    const bc1: string = testAPI.getBlockchainID()
-    expect(bc1).toBe(n3bcID)
-
-    testAPI.refreshBlockchainID()
-    const bc2: string = testAPI.getBlockchainID()
-    expect(bc2).toBe(n12345bcID)
-
-    testAPI.refreshBlockchainID(n3bcID)
-    const bc3: string = testAPI.getBlockchainID()
-    expect(bc3).toBe(n3bcID)
   })
 
   test("listAddresses", async (): Promise<void> => {
@@ -1489,7 +1474,7 @@ describe("AVMAPI", (): void => {
     })
 
     test("buildCreateAssetTx - Variable Cap", async (): Promise<void> => {
-      avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]))
+      avm.setCreationTxFee(new BN(avalanche.getNetwork().P["creationTxFee"]))
       const mintOutputs: SECPMintOutput[] = [secpMintOut1, secpMintOut2]
       const txu1: UnsignedTx = await avm.buildCreateAssetTx(
         set,
@@ -1612,7 +1597,7 @@ describe("AVMAPI", (): void => {
     })
 
     test("buildCreateNFTAssetTx", async (): Promise<void> => {
-      avm.setCreationTxFee(new BN(Defaults.network[12345].P["creationTxFee"]))
+      avm.setCreationTxFee(new BN(avalanche.getNetwork().P["creationTxFee"]))
       const minterSets: MinterSet[] = [new MinterSet(1, addrs1)]
       const locktime: BN = new BN(0)
 
@@ -1878,7 +1863,7 @@ describe("AVMAPI", (): void => {
       const result: Promise<UnsignedTx> = avm.buildImportTx(
         set,
         addrs1,
-        PlatformChainID,
+        DefaultPlatformChainID,
         addrs3,
         addrs1,
         addrs2,
@@ -1906,7 +1891,7 @@ describe("AVMAPI", (): void => {
         addrbuff1,
         addrbuff2,
         [fungutxo],
-        bintools.cb58Decode(PlatformChainID),
+        bintools.cb58Decode(DefaultPlatformChainID),
         avm.getTxFee(),
         await avm.getAVAXAssetID(),
         new UTF8Payload("hello world").getPayload(),
@@ -1965,7 +1950,7 @@ describe("AVMAPI", (): void => {
       const txu1: UnsignedTx = await avm.buildExportTx(
         set,
         amount,
-        bintools.cb58Decode(PlatformChainID),
+        bintools.cb58Decode(DefaultPlatformChainID),
         addrbuff3.map((a: Buffer): any =>
           serialization.bufferToType(a, type, avalanche.getHRP(), "P")
         ),
@@ -1983,7 +1968,7 @@ describe("AVMAPI", (): void => {
         addrbuff3,
         addrbuff1,
         addrbuff2,
-        bintools.cb58Decode(PlatformChainID),
+        bintools.cb58Decode(DefaultPlatformChainID),
         avm.getTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
@@ -1998,7 +1983,7 @@ describe("AVMAPI", (): void => {
       const txu3: UnsignedTx = await avm.buildExportTx(
         set,
         amount,
-        PlatformChainID,
+        DefaultPlatformChainID,
         addrs3,
         addrs1,
         addrs2,

@@ -16,7 +16,6 @@ describe("Health", (): void => {
     12345,
     undefined,
     undefined,
-    undefined,
     true
   )
   let health: HealthAPI

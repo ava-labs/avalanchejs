@@ -10,7 +10,7 @@ import { RequestResponseData } from "../../common/apibase"
 import { ErrorResponseObject } from "../../utils/errors"
 import BinTools from "../../utils/bintools"
 import { KeyChain } from "./keychain"
-import { Defaults, PlatformChainID, ONEAVAX } from "../../utils/constants"
+import { ONEAVAX } from "../../utils/constants"
 import { PlatformVMConstants } from "./constants"
 import { UnsignedTx, Tx } from "./tx"
 import { PayloadBase } from "../../utils/payload"
@@ -32,7 +32,8 @@ import {
   GetStakeParams,
   GetStakeResponse,
   GetValidatorsAtParams,
-  GetValidatorsAtResponse
+  GetValidatorsAtResponse,
+  GetConfigurationResponse
 } from "./interfaces"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
@@ -42,6 +43,9 @@ import { Serialization, SerializedType } from "../../utils"
  */
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
+
+const NanoBN = new BN(1000000000)
+const rewardPercentDenom = 1000000
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -56,7 +60,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   protected keychain: KeyChain = new KeyChain("", "")
 
-  protected blockchainID: string = PlatformChainID
+  protected blockchainID: string = ""
 
   protected blockchainAlias: string = undefined
 
@@ -76,33 +80,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The alias for the blockchainID
    */
   getBlockchainAlias = (): string => {
-    if (typeof this.blockchainAlias === "undefined") {
-      const netid: number = this.core.getNetworkID()
-      if (
-        netid in Defaults.network &&
-        this.blockchainID in Defaults.network[`${netid}`]
-      ) {
-        this.blockchainAlias =
-          Defaults.network[`${netid}`][this.blockchainID].alias
-        return this.blockchainAlias
-      } else {
-        /* istanbul ignore next */
-        return undefined
-      }
-    }
-    return this.blockchainAlias
-  }
-
-  /**
-   * Sets the alias for the blockchainID.
-   *
-   * @param alias The alias for the blockchainID.
-   *
-   */
-  setBlockchainAlias = (alias: string): string => {
-    this.blockchainAlias = alias
-    /* istanbul ignore next */
-    return undefined
+    return this.core.getNetwork().P.alias
   }
 
   /**
@@ -111,29 +89,6 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The blockchainID
    */
   getBlockchainID = (): string => this.blockchainID
-
-  /**
-   * Refresh blockchainID, and if a blockchainID is passed in, use that.
-   *
-   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
-   *
-   * @returns The blockchainID
-   */
-  refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netid: number = this.core.getNetworkID()
-    if (
-      typeof blockchainID === "undefined" &&
-      typeof Defaults.network[`${netid}`] !== "undefined"
-    ) {
-      this.blockchainID = PlatformChainID //default to P-Chain
-      return true
-    }
-    if (typeof blockchainID === "string") {
-      this.blockchainID = blockchainID
-      return true
-    }
-    return false
-  }
 
   /**
    * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
@@ -199,9 +154,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultTxFee = (): BN => {
-    return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["txFee"])
-      : new BN(0)
+    return new BN(this.core.getNetwork().P.txFee)
   }
 
   /**
@@ -231,9 +184,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultCreationTxFee = (): BN => {
-    return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["P"]["creationTxFee"])
-      : new BN(0)
+    return new BN(this.core.getNetwork().P.creationTxFee)
   }
 
   /**
@@ -1311,10 +1262,6 @@ export class PlatformVMAPI extends JRPCAPI {
         "Error - PlatformVMAPI.buildExportTx: Destination ChainID must be 32 bytes in length."
       )
     }
-    /*
-    if(bintools.cb58Encode(destinationChain) !== Defaults.network[this.core.getNetworkID()].X["blockchainID"]) {
-      throw new Error("Error - PlatformVMAPI.buildExportTx: Destination ChainID must The X-Chain ID in the current version of AvalancheJS.")
-    }*/
 
     let to: Buffer[] = []
     toAddresses.map((a: string): void => {
@@ -1750,16 +1697,9 @@ return builtUnsignedTx
    */
   constructor(core: AvalancheCore, baseURL: string = "/ext/bc/P") {
     super(core, baseURL)
-    this.blockchainID = PlatformChainID
-    const netID: number = core.getNetworkID()
-    if (
-      netID in Defaults.network &&
-      this.blockchainID in Defaults.network[`${netID}`]
-    ) {
-      const { alias } = Defaults.network[`${netID}`][this.blockchainID]
-      this.keychain = new KeyChain(this.core.getHRP(), alias)
-    } else {
-      this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
+    if (core.getNetwork()) {
+      this.blockchainID = core.getNetwork().P.blockchainID
+      this.keychain = new KeyChain(core.getHRP(), core.getNetwork().P.alias)
     }
   }
 
@@ -1779,5 +1719,33 @@ return builtUnsignedTx
       params
     )
     return response.data.result
+  }
+
+  /**
+   * Get blockchains configuration (genesis)
+   *
+   * @returns Promise for an GetConfigurationResponse
+   */
+  getConfiguration = async (): Promise<GetConfigurationResponse> => {
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getConfiguration"
+    )
+    const r = response.data.result
+    return {
+      networkID: parseInt(r.networkID),
+      assetID: r.assetID,
+      assetSymbol: r.assetSymbol,
+      hrp: r.hrp,
+      blockchains: r.blockchains,
+      minStakeDuration: new BN(r.minStakeDuration).div(NanoBN).toNumber(),
+      maxStakeDuration: new BN(r.maxStakeDuration).div(NanoBN).toNumber(),
+      minValidatorStake: new BN(r.minValidatorStake),
+      maxValidatorStake: new BN(r.maxValidatorStake),
+      minDelegationFee: new BN(r.minDelegationFee),
+      minDelegatorStake: new BN(r.minDelegatorStake),
+      minConsumptionRate: parseInt(r.minConsumptionRate) / rewardPercentDenom,
+      maxConsumptionRate: parseInt(r.maxConsumptionRate) / rewardPercentDenom,
+      supplyCap: new BN(r.supplyCap)
+    }
   }
 }

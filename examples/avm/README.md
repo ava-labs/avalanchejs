@@ -48,8 +48,6 @@ Tests for the [Avalanche Virtual Machine](https://docs.avax.network/build/refere
 * [operationTx-mint-ant.ts](./operationTx-mint-ant.ts)
 * [operationTx-mint-avax.ts](./operationTx-mint-avax.ts)
 * [parseAddress.ts](./parseAddress.ts)
-* [refreshBlockchainID.ts](./refreshBlockchainID.ts)
 * [setAVAXAssetID.ts](./setAVAXAssetID.ts)
-* [setBlockchainAlias.ts](./setBlockchainAlias.ts)
 * [setCreationTxFee.ts](./setCreationTxFee.ts)
 * [setTxFee.ts](./setTxFee.ts)

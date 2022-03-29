@@ -15,8 +15,7 @@ import {
 } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -31,10 +30,10 @@ const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainID: string = Defaults.network[networkID].X.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const blockchainID: string = avalanche.getNetwork().X.blockchainID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
-const cChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
+const pChainBlockchainID: string = avalanche.getNetwork().P.blockchainID
 const importedInputs: TransferableInput[] = []
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
@@ -50,7 +49,7 @@ const memo: Buffer = Buffer.from(
 const main = async (): Promise<any> => {
   const avmUTXOResponse: any = await xchain.getUTXOs(
     xAddressStrings,
-    cChainBlockchainID
+    pChainBlockchainID
   )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxo: UTXO = utxoSet.getAllUTXOs()[0]
@@ -92,7 +91,7 @@ const main = async (): Promise<any> => {
     outputs,
     inputs,
     memo,
-    bintools.cb58Decode(cChainBlockchainID),
+    bintools.cb58Decode(pChainBlockchainID),
     importedInputs
   )
   // Uncomment for codecID 00 01

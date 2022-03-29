@@ -10,7 +10,6 @@ import { KeyChain as EVMKeyChain, EVMAPI } from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
   UnixNow
 } from "../../src/utils"
 
@@ -28,8 +27,8 @@ xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const cChainBlockchainID: string = Defaults.network[networkID].C.blockchainID
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const cChainBlockchainID: string = avalanche.getNetwork().C.blockchainID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from(

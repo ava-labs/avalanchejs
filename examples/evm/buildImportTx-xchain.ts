@@ -10,7 +10,6 @@ import {
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
   costImportTx
 } from "../../src/utils"
 
@@ -28,7 +27,7 @@ const cKeychain: EVMKeyChain = cchain.keyChain()
 xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const xChainBlockchainId: string = Defaults.network[networkID].X.blockchainID
+const xChainBlockchainId: string = avalanche.getNetwork().X.blockchainID
 
 const main = async (): Promise<any> => {
   const baseFeeResponse: string = await cchain.getBaseFee()
@@ -47,7 +46,7 @@ const main = async (): Promise<any> => {
     cAddressStrings,
     fee
   )
-  const importCost: number = costImportTx(unsignedTx)
+  const importCost: number = costImportTx(avalanche.getNetwork().C, unsignedTx)
   fee = baseFee.mul(new BN(importCost))
 
   unsignedTx = await cchain.buildImportTx(

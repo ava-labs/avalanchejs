@@ -14,14 +14,15 @@ import { SelectCredentialClass } from "./credentials"
 import { Signature, SigIdx, Credential } from "../../common/credentials"
 import { StandardAmountInput } from "../../common/input"
 import { KeyChain, KeyPair } from "./keychain"
-import { DefaultNetworkID, Defaults } from "../../utils/constants"
-import { Serialization, SerializedEncoding } from "../../utils/serialization"
+import { DefaultNetworkID } from "../../utils/constants"
 import {
   ChainIdError,
   TransferableInputError,
   EVMOutputError,
   EVMFeeError
 } from "../../utils/errors"
+import Networks from "../../utils/networks"
+import { Serialization, SerializedEncoding } from "../../utils/serialization"
 
 /**
  * @ignore
@@ -290,7 +291,8 @@ export class ImportTx extends EVMBaseTx {
     const selectedNetwork: number = this.getNetworkID()
     const feeDiff: BN = new BN(0)
     const avaxAssetID: string =
-      Defaults.network[`${selectedNetwork}`].X.avaxAssetID
+      Networks.getNetwork(selectedNetwork).X.avaxAssetID
+
     // sum incoming AVAX
     this.importIns.forEach((input: TransferableInput): void => {
       // only check StandardAmountInputs

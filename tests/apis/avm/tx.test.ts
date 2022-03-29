@@ -30,8 +30,10 @@ import { CreateAssetTx } from "../../../src/apis/avm/createassettx"
 import { OperationTx } from "../../../src/apis/avm/operationtx"
 import { ImportTx } from "../../../src/apis/avm/importtx"
 import { ExportTx } from "../../../src/apis/avm/exporttx"
-import { PlatformChainID } from "../../../src/utils/constants"
-import { Defaults } from "../../../src/utils/constants"
+import {
+  DefaultPlatformChainID,
+  TestXBlockchainID
+} from "../../../src/utils/constants"
 import { ONEAVAX } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
@@ -59,7 +61,7 @@ describe("Transactions", (): void => {
   let api: AVMAPI
   const amnt: number = 10000
   const netid: number = 12345
-  const bID: string = Defaults.network[netid].X.blockchainID
+  const bID: string = TestXBlockchainID
   const alias: string = "X"
   const assetID: Buffer = Buffer.from(
     createHash("sha256")
@@ -103,7 +105,6 @@ describe("Transactions", (): void => {
       netid,
       undefined,
       undefined,
-      null,
       true
     )
     api = new AVMAPI(avalanche, "/ext/bc/avm", bID)
@@ -739,7 +740,7 @@ describe("Transactions", (): void => {
       outputs,
       inputs,
       new UTF8Payload("hello world").getPayload(),
-      bintools.cb58Decode(PlatformChainID),
+      bintools.cb58Decode(DefaultPlatformChainID),
       importIns
     )
     const txunew: ImportTx = new ImportTx()
@@ -748,7 +749,7 @@ describe("Transactions", (): void => {
 
     expect(importTx).toBeInstanceOf(ImportTx)
     expect(importTx.getSourceChain().toString("hex")).toBe(
-      bintools.cb58Decode(PlatformChainID).toString("hex")
+      bintools.cb58Decode(DefaultPlatformChainID).toString("hex")
     )
     expect(txunew.toBuffer().toString("hex")).toBe(importbuff.toString("hex"))
     expect(txunew.toString()).toBe(importTx.toString())
@@ -776,7 +777,7 @@ describe("Transactions", (): void => {
       outputs,
       inputs,
       undefined,
-      bintools.cb58Decode(PlatformChainID),
+      bintools.cb58Decode(DefaultPlatformChainID),
       exportOuts
     )
     const txunew: ExportTx = new ExportTx()
@@ -785,7 +786,7 @@ describe("Transactions", (): void => {
 
     expect(exportTx).toBeInstanceOf(ExportTx)
     expect(exportTx.getDestinationChain().toString("hex")).toBe(
-      bintools.cb58Decode(PlatformChainID).toString("hex")
+      bintools.cb58Decode(DefaultPlatformChainID).toString("hex")
     )
     expect(txunew.toBuffer().toString("hex")).toBe(exportbuff.toString("hex"))
     expect(txunew.toString()).toBe(exportTx.toString())
@@ -861,7 +862,7 @@ describe("Transactions", (): void => {
       addrs1,
       addrs2,
       importUTXOs,
-      bintools.cb58Decode(PlatformChainID),
+      bintools.cb58Decode(DefaultPlatformChainID),
       new BN(90),
       assetID,
       new UTF8Payload("hello world").getPayload(),
@@ -882,7 +883,7 @@ describe("Transactions", (): void => {
       addrs3,
       addrs1,
       addrs2,
-      bintools.cb58Decode(PlatformChainID),
+      bintools.cb58Decode(DefaultPlatformChainID),
       undefined,
       undefined,
       new UTF8Payload("hello world").getPayload(),

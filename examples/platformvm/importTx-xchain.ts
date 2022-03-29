@@ -15,8 +15,7 @@ import {
 } from "../../src/apis/platformvm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -31,8 +30,8 @@ const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const xChainID: string = Defaults.network[networkID].X.blockchainID
-const pChainID: string = Defaults.network[networkID].P.blockchainID
+const xChainID: string = avalanche.getNetwork().X.blockchainID
+const pChainID: string = avalanche.getNetwork().P.blockchainID
 const importedInputs: TransferableInput[] = []
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []

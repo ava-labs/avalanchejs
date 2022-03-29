@@ -1,11 +1,9 @@
 import { Avalanche, BN, Buffer, BinTools } from "../../src"
 import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
-import {} from "../../src/utils"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  UnixNow,
-  Defaults
+  UnixNow
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -18,7 +16,7 @@ const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const avaxAssetID: string = Defaults.network[networkID].X["avaxAssetID"]
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)

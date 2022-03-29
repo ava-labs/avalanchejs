@@ -16,8 +16,6 @@ import { KeystoreAPI } from "./apis/keystore/api"
 import { MetricsAPI } from "./apis/metrics/api"
 import { PlatformVMAPI } from "./apis/platformvm/api"
 import { Socket } from "./apis/socket/socket"
-import { DefaultNetworkID, Defaults } from "./utils/constants"
-import { getPreferredHRP } from "./utils/helperfunctions"
 import BinTools from "./utils/bintools"
 import DB from "./utils/db"
 import Mnemonic from "./utils/mnemonic"
@@ -25,6 +23,18 @@ import PubSub from "./utils/pubsub"
 import HDNode from "./utils/hdnode"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
+import networks from "./utils/networks"
+import {
+  CChainAlias,
+  CChainVMName,
+  GWEI,
+  MILLIAVAX,
+  PChainAlias,
+  PChainVMName,
+  XChainAlias,
+  XChainVMName
+} from "./utils/constants"
+import { DefaultPlatformChainID } from "./utils"
 
 /**
  * AvalancheJS is middleware for interacting with Avalanche node RPC APIs.
@@ -105,62 +115,118 @@ export default class Avalanche extends AvalancheCore {
   constructor(
     host: string,
     port: number,
-    protocol: string = "http",
-    networkID: number = DefaultNetworkID,
+    protocol: string,
+    networkID: number = undefined,
     XChainID: string = undefined,
     CChainID: string = undefined,
-    hrp: string = undefined,
     skipinit: boolean = false
   ) {
-    super(host, port, protocol)
-    let xchainid: string = XChainID
-    let cchainid: string = CChainID
-
-    if (
-      typeof XChainID === "undefined" ||
-      !XChainID ||
-      XChainID.toLowerCase() === "x"
-    ) {
-      if (networkID.toString() in Defaults.network) {
-        xchainid = Defaults.network[`${networkID}`].X.blockchainID
-      } else {
-        xchainid = Defaults.network[12345].X.blockchainID
-      }
-    }
-    if (
-      typeof CChainID === "undefined" ||
-      !CChainID ||
-      CChainID.toLowerCase() === "c"
-    ) {
-      if (networkID.toString() in Defaults.network) {
-        cchainid = Defaults.network[`${networkID}`].C.blockchainID
-      } else {
-        cchainid = Defaults.network[12345].C.blockchainID
-      }
-    }
-    if (typeof networkID === "number" && networkID >= 0) {
-      this.setNetworkID(networkID)
-    } else if (typeof networkID === "undefined") {
-      this.setNetworkID(DefaultNetworkID)
-    }
-    if (typeof hrp !== "undefined") {
-      this.hrp = hrp
-    } else {
-      this.hrp = getPreferredHRP(this.networkID)
-    }
-
+    super(host, port, protocol, networkID)
     if (!skipinit) {
       this.addAPI("admin", AdminAPI)
       this.addAPI("auth", AuthAPI)
-      this.addAPI("xchain", AVMAPI, "/ext/bc/X", xchainid)
-      this.addAPI("cchain", EVMAPI, "/ext/bc/C/avax", cchainid)
       this.addAPI("health", HealthAPI)
       this.addAPI("info", InfoAPI)
       this.addAPI("index", IndexAPI)
       this.addAPI("keystore", KeystoreAPI)
       this.addAPI("metrics", MetricsAPI)
-      this.addAPI("pchain", PlatformVMAPI)
     }
+
+    // Static initializing
+    if (networkID && (this.network = networks.getNetwork(networkID))) {
+      this.networkID = networkID
+      if (!skipinit) {
+        this.addAPI("pchain", PlatformVMAPI)
+        this.addAPI(
+          "xchain",
+          AVMAPI,
+          "/ext/bc/X",
+          XChainID ? XChainID : this.network.X.blockchainID
+        )
+        this.addAPI(
+          "cchain",
+          EVMAPI,
+          "/ext/bc/C/avax",
+          CChainID ? CChainID : this.network.C.blockchainID
+        )
+      }
+    }
+  }
+
+  fetchNetworkSettings = async (): Promise<boolean> => {
+    // Nothing to do if network is known
+    if (this.network) return true
+    // We need this be able to make next call
+    this.addAPI("pchain", PlatformVMAPI)
+    //Get platform configuration
+    const response = await this.PChain().getConfiguration()
+
+    this.networkID = response.networkID
+    if ((this.network = networks.getNetwork(this.networkID)))
+      return this.refreshAPI()
+
+    const xchain = response.blockchains.find((b) => b["name"] === "X-Chain")
+    const cchain = response.blockchains.find((b) => b["name"] === "C-Chain")
+
+    const fees = await this.Info().getTxFee()
+
+    this.network = {
+      hrp: response.hrp,
+      X: {
+        alias: XChainAlias,
+        avaxAssetID: response.assetID,
+        avaxAssetAlias: response.assetSymbol,
+        blockchainID: xchain["id"],
+        vm: XChainVMName,
+        creationTxFee: fees.creationTxFee,
+        txFee: fees.txFee
+      },
+      P: {
+        alias: PChainAlias,
+        blockchainID: DefaultPlatformChainID,
+        creationTxFee: fees.creationTxFee,
+        createSubnetTx: fees.createSubnetTxFee,
+        createChainTx: fees.createBlockchainTxFee,
+        maxConsumption: response.maxConsumptionRate,
+        maxStakeDuration: response.maxStakeDuration,
+        maxStakingDuration: new BN(response.maxStakeDuration),
+        maxSupply: response.supplyCap,
+        minConsumption: response.minConsumptionRate,
+        minDelegationFee: response.minDelegationFee,
+        minDelegationStake: response.minDelegatorStake,
+        minStake: response.minValidatorStake,
+        minStakeDuration: response.minStakeDuration,
+        vm: PChainVMName,
+        txFee: fees.txFee
+      },
+      C: {
+        alias: CChainAlias,
+        blockchainID: cchain["id"],
+        chainID: 43112,
+        costPerSignature: 1000,
+        gasPrice: GWEI.mul(new BN(225)),
+        maxGasPrice: GWEI.mul(new BN(1000)),
+        minGasPrice: GWEI.mul(new BN(25)),
+        txBytesGas: 1,
+        txFee: MILLIAVAX,
+        vm: CChainVMName
+      }
+    }
+
+    networks.registerNetwork(this.networkID, this.network)
+
+    return this.refreshAPI()
+  }
+
+  protected refreshAPI = (): boolean => {
+    // Re-apply pchain which creates the correct keychain
+    this.addAPI("pchain", PlatformVMAPI)
+
+    // Finally register x and c chains
+    this.addAPI("xchain", AVMAPI, "/ext/bc/X", this.network.X.blockchainID)
+    this.addAPI("cchain", EVMAPI, "/ext/bc/C/avax", this.network.X.blockchainID)
+
+    return true
   }
 }
 

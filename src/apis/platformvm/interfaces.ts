@@ -35,3 +35,20 @@ export interface GetValidatorsAtParams {
 export interface GetValidatorsAtResponse {
   validators: object
 }
+
+export interface GetConfigurationResponse {
+  networkID: number
+  assetID: string
+  assetSymbol: string
+  hrp: string
+  blockchains: object[]
+  minStakeDuration: number
+  maxStakeDuration: number
+  minValidatorStake: BN
+  maxValidatorStake: BN
+  minDelegationFee: BN
+  minDelegatorStake: BN
+  minConsumptionRate: number
+  maxConsumptionRate: number
+  supplyCap: BN
+}

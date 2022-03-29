@@ -9,7 +9,9 @@ export const getAvalanche = (): Avalanche => {
   }
   const avalanche: Avalanche = new Avalanche(
     process.env.AVALANCHEGO_IP,
-    parseInt(process.env.AVALANCHEGO_PORT)
+    parseInt(process.env.AVALANCHEGO_PORT),
+    'http',
+    12345
   )
   return avalanche
 }

@@ -13,8 +13,7 @@ import {
 import { RequestResponseData } from "../../src/common"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "../../src/utils"
 
 const ip: string = "localhost"
@@ -32,12 +31,12 @@ xKeychain.importKey(privKey)
 cKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const cAddresses: Buffer[] = cchain.keyChain().getAddresses()
-const xChainBlockchainIdStr: string = Defaults.network[networkID].X.blockchainID
+const xChainBlockchainIdStr: string = avalanche.getNetwork().X.blockchainID
 const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
-const cChainBlockchainIdStr: string = Defaults.network[networkID].C.blockchainID
+const cChainBlockchainIdStr: string = avalanche.getNetwork().C.blockchainID
 const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const evmInputs: EVMInput[] = []
 let exportedOuts: TransferableOutput[] = []

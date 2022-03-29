@@ -4,7 +4,6 @@
  */
 import { ClientRequestArgs } from "http"
 import WebSocket from "isomorphic-ws"
-import { MainnetAPI } from "../../utils"
 export class Socket extends WebSocket {
   // Fires once the connection has been established between the client and the server
   onopen: any
@@ -42,7 +41,7 @@ export class Socket extends WebSocket {
    * @param options Optional
    */
   constructor(
-    url: string | import("url").URL = `wss://${MainnetAPI}:443/ext/bc/X/events`,
+    url: string,
     options?: WebSocket.ClientOptions | ClientRequestArgs
   ) {
     super(url, options)

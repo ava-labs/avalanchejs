@@ -3,7 +3,6 @@ import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults,
   UnixNow
 } from "../../src/utils"
 
@@ -18,7 +17,7 @@ const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const cChainBlockchainID: string = Defaults.network[networkID].C.blockchainID
+const cChainBlockchainID: string = avalanche.getNetwork().C.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()

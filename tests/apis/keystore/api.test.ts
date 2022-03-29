@@ -18,7 +18,6 @@ describe("Keystore", (): void => {
     12345,
     undefined,
     undefined,
-    undefined,
     true
   )
   let keystore: KeystoreAPI

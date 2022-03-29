@@ -8,10 +8,10 @@ import axios, {
   AxiosResponse,
   Method
 } from "axios"
+
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
-import { getPreferredHRP } from "./utils/helperfunctions"
-
+import { Network } from "./utils/networks"
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
  *
@@ -23,8 +23,6 @@ import { getPreferredHRP } from "./utils/helperfunctions"
  */
 export default class AvalancheCore {
   protected networkID: number = 0
-  protected hrp: string = ""
-  protected primaryAssetAlias: string
   protected protocol: string
   protected ip: string
   protected host: string
@@ -34,6 +32,7 @@ export default class AvalancheCore {
   protected headers: { [k: string]: string } = {}
   protected requestConfig: AxiosRequestConfig = {}
   protected apis: { [k: string]: APIBase } = {}
+  protected network: Network = undefined
 
   /**
    * Sets the address and port of the main Avalanche Client.
@@ -45,10 +44,11 @@ export default class AvalancheCore {
    * The following special characters are removed from host and protocol
    * &#,@+()$~%'":*?<>{}
    */
-  setAddress = (
+  setNetwork = (
     host: string,
     port: number,
-    protocol: string = "http"
+    protocol: string,
+    networkID: number
   ): void => {
     host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
@@ -68,7 +68,17 @@ export default class AvalancheCore {
       url = `${url}:${port}`
     }
     this.url = url
+
+    // Reset network specific
+    if (this.networkID != networkID) this.network = undefined
+
+    this.networkID = networkID
   }
+
+  /**
+   * Returns the network configuration.
+   */
+  getNetwork = (): Network => this.network
 
   /**
    * Returns the protocol such as "http", "https", "git", "ws", etc.
@@ -111,29 +121,11 @@ export default class AvalancheCore {
   getNetworkID = (): number => this.networkID
 
   /**
-   * Sets the networkID
-   */
-  setNetworkID = (netID: number): void => {
-    this.networkID = netID
-    this.hrp = getPreferredHRP(this.networkID)
-    this.primaryAssetAlias = netID === 1000 || netID === 1001 ? "CAM" : "AVAX"
-  }
-
-  /**
    * Returns the Human-Readable-Part of the network associated with this key.
    *
    * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
    */
-  getHRP = (): string => this.hrp
-
-  /**
-   * Sets the the Human-Readable-Part of the network associated with this key.
-   *
-   * @param hrp String for the Human-Readable-Part of Bech32 addresses
-   */
-  setHRP = (hrp: string): void => {
-    this.hrp = hrp
-  }
+  getHRP = (): string => this.network.hrp
 
   /**
    * Adds a new custom header to be included with all requests.
@@ -221,7 +213,7 @@ export default class AvalancheCore {
    * Returns the primary asset alias.
    */
   getPrimaryAssetAlias = (): string => {
-    return this.primaryAssetAlias
+    return this.network.X.avaxAssetAlias
   }
 
   /**
@@ -452,8 +444,9 @@ export default class AvalancheCore {
    * @param host The hostname to resolve to reach the Avalanche Client APIs
    * @param port The port to resolve to reach the Avalanche Client APIs
    * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
+   * @param networkID The networkID of the network URL belongs to
    */
-  constructor(host: string, port: number, protocol: string = "http") {
-    this.setAddress(host, port, protocol)
+  constructor(host: string, port: number, protocol: string, networkID: number) {
+    this.setNetwork(host, port, protocol, networkID)
   }
 }

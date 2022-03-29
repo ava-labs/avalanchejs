@@ -32,7 +32,6 @@ describe("Avalanche", (): void => {
       networkID,
       undefined,
       undefined,
-      undefined,
       skipinit
     )
     avalanche.addAPI("admin", AdminAPI)
@@ -50,7 +49,7 @@ describe("Avalanche", (): void => {
     expect(avalanche.getHost()).toBe(api)
     expect(avalanche.getProtocol()).toBe(encrypted)
     expect(avalanche.getURL()).toBe(url)
-    avalancheCore = new AvalancheCore(host, port, protocol)
+    avalancheCore = new AvalancheCore(host, port, protocol, networkID)
     expect(avalancheCore.getHost()).toBe(api)
     expect(avalancheCore.getProtocol()).toBe(encrypted)
     expect(avalancheCore.getURL()).toBe(url)
@@ -61,7 +60,7 @@ describe("Avalanche", (): void => {
     avalanche = new Avalanche(host, undefined, protocol, networkID)
     expect(avalanche.getPort()).toBe(undefined)
     expect(avalanche.getURL()).toBe(`${protocol}://${api}`)
-    avalancheCore = new AvalancheCore(host, undefined, protocol)
+    avalancheCore = new AvalancheCore(host, undefined, protocol, networkID)
     expect(avalancheCore.getPort()).toBe(undefined)
     expect(avalancheCore.getURL()).toBe(`${protocol}://${api}`)
   })
@@ -75,10 +74,7 @@ describe("Avalanche", (): void => {
     expect(avalanche.getURL()).toBe(`${protocol}://${host}:${port}`)
     expect(avalanche.getNetworkID()).toBe(12345)
     expect(avalanche.getHeaders()).toStrictEqual({})
-    avalanche.setNetworkID(50)
-    expect(avalanche.getNetworkID()).toBe(50)
-    avalanche.setNetworkID(12345)
-    expect(avalanche.getNetworkID()).toBe(12345)
+    expect(avalanche.getNetworkID()).toBe(networkID)
   })
 
   test("Endpoints correct", (): void => {
@@ -172,7 +168,6 @@ describe("HTTP Operations", (): void => {
       port,
       protocol,
       12345,
-      undefined,
       undefined,
       undefined,
       true

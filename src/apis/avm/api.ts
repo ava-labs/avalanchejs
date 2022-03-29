@@ -16,7 +16,7 @@ import { InitialStates } from "./initialstates"
 import { UnixNow } from "../../utils/helperfunctions"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
-import { Defaults, ONEAVAX } from "../../utils/constants"
+import { ONEAVAX } from "../../utils/constants"
 import { MinterSet } from "./minterset"
 import { PersistanceOptions } from "../../utils/persistenceoptions"
 import { OutputOwners } from "../../common/output"
@@ -72,8 +72,8 @@ export class AVMAPI extends JRPCAPI {
    * @ignore
    */
   protected keychain: KeyChain = new KeyChain("", "")
-  protected blockchainID: string = ""
   protected blockchainAlias: string = undefined
+  protected blockchainID: string = undefined
   protected AVAXAssetID: Buffer = undefined
   protected txFee: BN = undefined
   protected creationTxFee: BN = undefined
@@ -85,32 +85,9 @@ export class AVMAPI extends JRPCAPI {
    */
   getBlockchainAlias = (): string => {
     if (typeof this.blockchainAlias === "undefined") {
-      const netid: number = this.core.getNetworkID()
-      if (
-        netid in Defaults.network &&
-        this.blockchainID in Defaults.network[`${netid}`]
-      ) {
-        this.blockchainAlias =
-          Defaults.network[`${netid}`][this.blockchainID].alias
-        return this.blockchainAlias
-      } else {
-        /* istanbul ignore next */
-        return undefined
-      }
+      this.blockchainAlias = this.core.getNetwork().X.alias
     }
     return this.blockchainAlias
-  }
-
-  /**
-   * Sets the alias for the blockchainID.
-   *
-   * @param alias The alias for the blockchainID.
-   *
-   */
-  setBlockchainAlias = (alias: string): undefined => {
-    this.blockchainAlias = alias
-    /* istanbul ignore next */
-    return undefined
   }
 
   /**
@@ -119,29 +96,6 @@ export class AVMAPI extends JRPCAPI {
    * @returns The blockchainID
    */
   getBlockchainID = (): string => this.blockchainID
-
-  /**
-   * Refresh blockchainID, and if a blockchainID is passed in, use that.
-   *
-   * @param Optional. BlockchainID to assign, if none, uses the default based on networkID.
-   *
-   * @returns The blockchainID
-   */
-  refreshBlockchainID = (blockchainID: string = undefined): boolean => {
-    const netid: number = this.core.getNetworkID()
-    if (
-      typeof blockchainID === "undefined" &&
-      typeof Defaults.network[`${netid}`] !== "undefined"
-    ) {
-      this.blockchainID = Defaults.network[`${netid}`].X.blockchainID //default to X-Chain
-      return true
-    }
-    if (typeof blockchainID === "string") {
-      this.blockchainID = blockchainID
-      return true
-    }
-    return false
-  }
 
   /**
    * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
@@ -209,9 +163,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns The default tx fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultTxFee = (): BN => {
-    return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["txFee"])
-      : new BN(0)
+    return new BN(this.core.getNetwork().X.txFee)
   }
 
   /**
@@ -241,9 +193,7 @@ export class AVMAPI extends JRPCAPI {
    * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultCreationTxFee = (): BN => {
-    return this.core.getNetworkID() in Defaults.network
-      ? new BN(Defaults.network[this.core.getNetworkID()]["X"]["creationTxFee"])
-      : new BN(0)
+    return new BN(this.core.getNetwork().X.creationTxFee)
   }
 
   /**
@@ -1794,16 +1744,17 @@ export class AVMAPI extends JRPCAPI {
     blockchainID: string = ""
   ) {
     super(core, baseURL)
-    this.blockchainID = blockchainID
-    const netID: number = core.getNetworkID()
-    if (
-      netID in Defaults.network &&
-      blockchainID in Defaults.network[`${netID}`]
-    ) {
-      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
-      this.keychain = new KeyChain(this.core.getHRP(), alias)
-    } else {
+
+    this.blockchainID = core.getNetwork().X.blockchainID
+
+    if (blockchainID !== "" && blockchainID !== this.blockchainID) {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
+      this.blockchainID = blockchainID
+    } else {
+      this.keychain = new KeyChain(
+        this.core.getHRP(),
+        core.getNetwork().X.alias
+      )
     }
   }
 }

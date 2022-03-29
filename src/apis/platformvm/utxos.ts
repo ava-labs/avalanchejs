@@ -26,7 +26,6 @@ import { StandardUTXO, StandardUTXOSet } from "../../common/utxos"
 import { PlatformVMConstants } from "./constants"
 import { UnsignedTx } from "./tx"
 import { ExportTx } from "../platformvm/exporttx"
-import { DefaultNetworkID, Defaults } from "../../utils/constants"
 import { ImportTx } from "../platformvm/importtx"
 import { BaseTx } from "../platformvm/basetx"
 import {
@@ -45,6 +44,8 @@ import {
   FeeAssetError,
   TimeError
 } from "../../utils/errors"
+import { DefaultNetworkID } from "../../utils/constants"
+import Networks from "../../utils/networks"
 
 /**
  * @ignore
@@ -835,7 +836,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
     if (typeof destinationChain === "undefined") {
       destinationChain = bintools.cb58Decode(
-        Defaults.network[`${networkID}`].X["blockchainID"]
+        Networks.getNetwork(networkID).X.blockchainID
       )
     }
 
