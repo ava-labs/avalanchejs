@@ -305,6 +305,8 @@ export class CreateChainTx extends BaseTx {
     }
     if (typeof genesisData != "undefined" && typeof genesisData != "string") {
       this.genesisData = genesisData.toBuffer()
+    } else if (typeof genesisData == "string") {
+      this.genesisData = Buffer.from(genesisData)
     }
 
     if (typeof subnetAuth != "undefined") {
