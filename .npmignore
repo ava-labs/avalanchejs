@@ -3,6 +3,11 @@ docs
 docsMD
 tsconfig.json
 .*
+./*.tar
+./*.tgz
+e2eSequencer.js
+jest.config.js
+yarn.lock
 __mocks__
 e2e_tests
 tests

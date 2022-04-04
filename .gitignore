@@ -72,6 +72,7 @@ docsHTML/
 
 # Output of 'npm pack'
 *.tgz
+*.tar
 
 # Yarn Integrity file
 .yarn-integrity
@@ -113,3 +114,7 @@ public/
 # End of https://www.gitignore.io/api/node.idea/*
 
 .markdownlint.json
+
+web
+package
+.vscode
