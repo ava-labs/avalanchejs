@@ -224,7 +224,7 @@ export default class Avalanche extends AvalancheCore {
 
     // Finally register x and c chains
     this.addAPI("xchain", AVMAPI, "/ext/bc/X", this.network.X.blockchainID)
-    this.addAPI("cchain", EVMAPI, "/ext/bc/C/avax", this.network.X.blockchainID)
+    this.addAPI("cchain", EVMAPI, "/ext/bc/C/avax", this.network.C.blockchainID)
 
     return true
   }
