@@ -86,7 +86,7 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.6.0",
+    "ethers": "5.6.4",
     "hdkey": "2.0.1",
     "isomorphic-ws": "4.0.1",
     "store2": "2.13.2",
