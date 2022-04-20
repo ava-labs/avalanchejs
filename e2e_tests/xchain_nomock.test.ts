@@ -17,7 +17,7 @@ describe("XChain", (): void => {
   const badUser: string = "asdfasdfsa"
   const badPass: string = "pass"
   const memo: string = "hello world"
-  const whaleAddr: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
+  const whaleAddr: string = "X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
   const key: string =
     "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 
@@ -90,7 +90,7 @@ describe("XChain", (): void => {
       () => xchain.getBalance(whaleAddr, "AVAX"),
       (x) => x.utxoIDs[0].txID,
       Matcher.toBe,
-      () => "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
+      () => "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
     ],
     [
       "importKey",
