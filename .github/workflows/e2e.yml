@@ -13,6 +13,13 @@ jobs:
         # Uses the major version of a release of a public repository
         uses: actions/checkout@v2
         # with ava-labs/avalanchejs
+      - name: Setup Node Version and Cache
+        uses: actions/setup-node@v2
+        with:
+          cache: yarn
+          node-version: '16'
+      - name: Install NodeJS dependencies
+        run: yarn install --frozen-lockfile
       - name: Setup GoLang Version
         uses: actions/setup-go@v1
         with:
@@ -21,17 +28,6 @@ jobs:
         run : |
           mkdir -p $GOPATH
           mkdir -p $GOPATH/$AVAPATH
-      - name: Setup Node Version and Cache
-        uses: actions/setup-node@v2
-        with:
-          cache: yarn
-          node-version: '16'
-      - name: Install NodeJS dependencies
-        run: yarn install --frozen-lockfile
-      - name: Setup Golang Version
-        uses: actions/setup-go@v1
-        with:
-          go-version: '1.16.8'
       - name: Clone and Build AvalancheGo
         run : |
           cd $GOPATH
