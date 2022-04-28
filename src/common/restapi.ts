@@ -32,7 +32,7 @@ export class RESTAPI extends APIBase {
 
   protected axConf = (): AxiosRequestConfig => {
     return {
-      baseURL: `${this.core.getProtocol()}://${this.core.getHost()}:${this.core.getPort()}`,
+      baseURL: this.core.getURL(),
       responseType: "json"
     }
   }
