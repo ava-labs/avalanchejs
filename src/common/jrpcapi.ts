@@ -39,7 +39,7 @@ export class JRPCAPI extends APIBase {
       headrs = { ...headrs, ...headers }
     }
 
-    baseURL = this.core.getURL();
+    baseURL = this.core.getURL()
 
     const axConf: AxiosRequestConfig = {
       baseURL: baseURL,
