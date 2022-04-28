@@ -44,6 +44,8 @@ export default class AvalancheCore {
    * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", etc. Defaults to http
+   * @param baseEndpoint the base endpoint to reach the Avalanche Client RPC APIs,
+   * ex: "/rpc". Defaults to "/"
    * The following special characters are removed from host and protocol
    * &#,@+()$~%'":*?{} also less than and greater than signs
    */
@@ -71,11 +73,15 @@ export default class AvalancheCore {
     if (port != undefined && typeof port === "number" && port >= 0) {
       url = `${url}:${port}`
     }
-    if (baseEndpoint != undefined && typeof baseEndpoint == "string" && baseEndpoint.length > 0) {
-      if (baseEndpoint[0] != '/') {
-        baseEndpoint = `/${baseEndpoint}`;
+    if (
+      baseEndpoint != undefined &&
+      typeof baseEndpoint == "string" &&
+      baseEndpoint.length > 0
+    ) {
+      if (baseEndpoint[0] != "/") {
+        baseEndpoint = `/${baseEndpoint}`
       }
-      url = `${url}${baseEndpoint}`;
+      url = `${url}${baseEndpoint}`
     }
     this.url = url
   }
