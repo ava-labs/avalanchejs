@@ -60,18 +60,23 @@ export default class AvalancheCore {
       )
     }
 
+    // Reset network specific
+    if (
+      this.networkID !== networkID ||
+      this.host !== host ||
+      this.port !== port
+    ) {
+      this.network = undefined
+    }
+
     this.host = host
     this.port = port
     this.protocol = protocol
     let url: string = `${protocol}://${host}`
-    if (port != undefined && typeof port === "number" && port >= 0) {
+    if (port !== undefined && typeof port === "number" && port >= 0) {
       url = `${url}:${port}`
     }
     this.url = url
-
-    // Reset network specific
-    if (this.networkID != networkID) this.network = undefined
-
     this.networkID = networkID
   }
 
