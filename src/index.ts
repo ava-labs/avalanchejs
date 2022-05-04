@@ -103,8 +103,8 @@ export default class Avalanche extends AvalancheCore {
    * @param skipinit Skips creating the APIs. Defaults to false
    */
   constructor(
-    host: string,
-    port: number,
+    host?: string,
+    port?: number,
     protocol: string = "http",
     networkID: number = DefaultNetworkID,
     XChainID: string = undefined,
