@@ -14,21 +14,21 @@ describe("Info", (): void => {
       () => info.getBlockchainID("X"),
       (x) => x,
       Matcher.toBe,
-      () => "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed"
+      () => "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
     ],
     [
       "getNetworkID",
       () => info.getNetworkID(),
       (x) => x,
       Matcher.toBe,
-      () => "12345"
+      () => "1337"
     ],
     [
       "getNetworkName",
       () => info.getNetworkName(),
       (x) => x,
       Matcher.toBe,
-      () => "local"
+      () => "network-1337"
     ],
     [
       "getNodeId",
