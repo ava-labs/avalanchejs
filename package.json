@@ -36,6 +36,8 @@
   "contributors": [
     "Evan Richard <evan@avalabs.org>",
     "Paul Kim <paul.kim@avalabs.org>",
+    "Raj Ranjan <raj.ranjan@avalabs.org>",
+    "Gergely Lovas <gergely.lovas@avalabs.org>",
     "Dhruba Basu <dhruba@avalabs.org>"
   ],
   "license": "BSD-3-Clause",
@@ -74,7 +76,7 @@
     "webpack-cli": "4.9.2"
   },
   "engines": {
-    "node": ">=14.18.0"
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "assert": "2.0.0",
