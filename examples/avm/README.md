@@ -37,6 +37,7 @@ Example scripts for the [Avalanche Virtual Machine](https://docs.avax.network/bu
 * [getCreationTxFee.ts](./getCreationTxFee.ts)
 * [getDefaultCreationTxFee.ts](./getDefaultCreationTxFee.ts)
 * [getDefaultTxFee.ts](./getDefaultTxFee.ts)
+* [getInterfaces.ts](./getInterfaces.ts)
 * [getTx.ts](./getTx.ts)
 * [getTxFee.ts](./getTxFee.ts)
 * [getTxStatus.ts](./getTxStatus.ts)
