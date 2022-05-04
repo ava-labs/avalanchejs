@@ -30,6 +30,7 @@ export default class AvalancheCore {
   protected ip: string
   protected host: string
   protected port: number
+  protected baseEndpoint: string
   protected url: string
   protected auth: string = undefined
   protected headers: { [k: string]: string } = {}
@@ -43,13 +44,16 @@ export default class AvalancheCore {
    * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", etc. Defaults to http
+   * @param baseEndpoint the base endpoint to reach the Avalanche Client RPC APIs,
+   * ex: "/rpc". Defaults to "/"
    * The following special characters are removed from host and protocol
    * &#,@+()$~%'":*?{} also less than and greater than signs
    */
   setAddress = (
     host: string,
     port: number,
-    protocol: string = "http"
+    protocol: string = "http",
+    baseEndpoint: string = ""
   ): void => {
     host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
@@ -64,9 +68,20 @@ export default class AvalancheCore {
     this.host = host
     this.port = port
     this.protocol = protocol
+    this.baseEndpoint = baseEndpoint
     let url: string = `${protocol}://${host}`
     if (port != undefined && typeof port === "number" && port >= 0) {
       url = `${url}:${port}`
+    }
+    if (
+      baseEndpoint != undefined &&
+      typeof baseEndpoint == "string" &&
+      baseEndpoint.length > 0
+    ) {
+      if (baseEndpoint[0] != "/") {
+        baseEndpoint = `/${baseEndpoint}`
+      }
+      url = `${url}${baseEndpoint}`
     }
     this.url = url
   }
@@ -90,6 +105,11 @@ export default class AvalancheCore {
    * Returns the port for the Avalanche node.
    */
   getPort = (): number => this.port
+
+  /**
+   * Returns the base endpoint for the Avalanche node.
+   */
+  getBaseEndpoint = (): string => this.baseEndpoint
 
   /**
    * Returns the URL of the Avalanche node (ip + port)
@@ -280,7 +300,7 @@ export default class AvalancheCore {
       }
     } else {
       config = {
-        baseURL: `${this.protocol}://${this.host}:${this.port}`,
+        baseURL: this.url,
         responseType: "text",
         ...this.requestConfig
       }
@@ -450,7 +470,9 @@ export default class AvalancheCore {
    * @param port The port to resolve to reach the Avalanche Client APIs
    * @param protocol The protocol string to use before a "://" in a request, ex: "http", "https", "git", "ws", etc ...
    */
-  constructor(host: string, port: number, protocol: string = "http") {
-    this.setAddress(host, port, protocol)
+  constructor(host?: string, port?: number, protocol: string = "http") {
+    if (host != undefined) {
+      this.setAddress(host, port, protocol)
+    }
   }
 }
