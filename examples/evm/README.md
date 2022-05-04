@@ -13,4 +13,5 @@ Example scripts for the Avalanche [EVM](https://docs.avax.network/build/avalanch
 * [getMaxPriorityFeePerGas.ts](./getMaxPriorityFeePerGas.ts)
 * [getAtomicTx.ts](./getAtomicTx.ts)
 * [getAtomicTxStatus.ts](./getAtomicTxStatus.ts)
+* [getInterfaces.ts](./getInterfaces.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
