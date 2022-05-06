@@ -63,7 +63,7 @@ describe("CreateChainTx", () => {
   gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
-  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  const subnetAuth: SubnetAuth = new SubnetAuth()
   let keymgr1: KeyChain = new KeyChain(avalanche.getHRP(), alias)
   let keymgr2: KeyChain = new KeyChain(avalanche.getHRP(), alias)
   let keymgr3: KeyChain = new KeyChain(avalanche.getHRP(), alias)
@@ -133,8 +133,7 @@ describe("CreateChainTx", () => {
     chainNameStr,
     vmIDStr,
     fxIDsStr,
-    gd,
-    subnetAuth
+    gd
   )
   test("buildCreateChainTx", async (): Promise<void> => {
     const addrs1Strs: string[] = addrs1.map((a): string =>
@@ -149,7 +148,6 @@ describe("CreateChainTx", () => {
       vmIDStr,
       fxIDsStr,
       gd,
-      subnetAuth,
       memo
     )
     const payload: object = {
@@ -174,7 +172,6 @@ describe("CreateChainTx", () => {
       vmIDStr,
       fxIDsStr,
       gd,
-      subnetAuth,
       pchain.getCreateChainTxFee(),
       assetID,
       memo
@@ -190,7 +187,7 @@ describe("CreateChainTx", () => {
     expect(txType).toBe(PlatformVMConstants.CREATECHAINTX)
 
     const sa: SubnetAuth = tx.getSubnetAuth()
-    expect(sa).toBe(subnetAuth)
+    expect(sa).toStrictEqual(subnetAuth)
 
     const sID: string = tx.getSubnetID()
     expect(sID).toBe(subnetIDStr)
@@ -221,7 +218,7 @@ describe("CreateChainTx", () => {
   })
   test("createChainTx getSubnetAuth", (): void => {
     const sa: SubnetAuth = createChainTx.getSubnetAuth()
-    expect(sa).toBe(subnetAuth)
+    expect(sa).toStrictEqual(subnetAuth)
   })
   test("createChainTx getSubnetID", (): void => {
     const subnetID: string = createChainTx.getSubnetID()

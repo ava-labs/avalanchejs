@@ -28,7 +28,7 @@ export class SubnetAuth extends Serializable {
 
   /**
    * Add an address index for Subnet Auth signing
-   * 
+   *
    * @param index the Buffer of the address index to add
    */
   addAddressIndex(index: Buffer): void {
