@@ -162,7 +162,7 @@ export class ExportTx extends EVMBaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc)
+    const creds: Credential[] = super.sign(msg, kc)
     this.inputs.forEach((input: EVMInput) => {
       const cred: Credential = SelectCredentialClass(input.getCredentialID())
       const sigidxs: SigIdx[] = input.getSigIdxs()
@@ -173,9 +173,9 @@ export class ExportTx extends EVMBaseTx {
         sig.fromBuffer(signval)
         cred.addSignature(sig)
       })
-      sigs.push(cred)
+      creds.push(cred)
     })
-    return sigs
+    return creds
   }
 
   /**

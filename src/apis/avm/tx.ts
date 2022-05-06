@@ -85,8 +85,8 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
     )
-    const sigs: Credential[] = this.transaction.sign(msg, kc)
-    return new Tx(this, sigs)
+    const creds: Credential[] = this.transaction.sign(msg, kc)
+    return new Tx(this, creds)
   }
 }
 

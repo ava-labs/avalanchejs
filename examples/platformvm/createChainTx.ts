@@ -19,8 +19,7 @@ import {
   AmountOutput,
   UnsignedTx,
   CreateChainTx,
-  Tx,
-  SubnetAuth
+  Tx
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
 import {
@@ -40,7 +39,11 @@ const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
-const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+pKeychain.importKey(privKey)
+privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
+pKeychain.importKey(privKey)
+privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
@@ -120,15 +123,12 @@ const main = async (): Promise<any> => {
   })
 
   const subnetID: Buffer = bintools.cb58Decode(
-    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
+    "2giH3n6ZEVuomNypEVPqEUn2kPJxbCAJerh1PuM7LsFqExheXY"
   )
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
   const fxIDs: string[] = ["secp256k1fx", "nftfx", "propertyfx"]
   fxIDs.sort()
-  const addressIndex: Buffer = Buffer.alloc(4)
-  addressIndex.writeUIntBE(0x0, 0, 4)
-  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
   const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
   const createChainTx: CreateChainTx = new CreateChainTx(
     networkID,
@@ -140,9 +140,11 @@ const main = async (): Promise<any> => {
     chainName,
     vmID,
     fxIDs,
-    genesisData,
-    subnetAuth
+    genesisData
   )
+
+  createChainTx.addSignatureIdx(0, pAddresses[0])
+  createChainTx.addSignatureIdx(1, pAddresses[1])
   const unsignedTx: UnsignedTx = new UnsignedTx(createChainTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
   const txid: string = await pchain.issueTx(tx)

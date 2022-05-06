@@ -28,7 +28,9 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const bintools: BinTools = BinTools.getInstance()
 const pKeychain: KeyChain = pchain.keyChain()
-const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+pKeychain.importKey(privKey)
+privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
@@ -37,6 +39,7 @@ const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const fee: BN = pchain.getCreateSubnetTxFee()
 const threshold: number = 1
+const threshold2: number = 2
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("Manually create a subnet")
 
@@ -46,7 +49,7 @@ const main = async (): Promise<any> => {
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
-    pAddresses,
+    [pAddresses[0]],
     locktime,
     threshold
   )
@@ -80,7 +83,7 @@ const main = async (): Promise<any> => {
   const subnetOwner: SECPOwnerOutput = new SECPOwnerOutput(
     pAddresses,
     locktime,
-    threshold
+    threshold2
   )
   const createSubnetTx: CreateSubnetTx = new CreateSubnetTx(
     networkID,

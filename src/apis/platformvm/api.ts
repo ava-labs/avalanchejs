@@ -1913,7 +1913,6 @@ export class PlatformVMAPI extends JRPCAPI {
       vmID,
       fxIDs,
       genesisData,
-      subnetAuth,
       this.getCreateChainTxFee(),
       avaxAssetID,
       memo,

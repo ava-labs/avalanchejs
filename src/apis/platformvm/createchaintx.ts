@@ -59,6 +59,8 @@ export class CreateChainTx extends BaseTx {
   protected fxIDs: Buffer[] = []
   protected genesisData: Buffer = Buffer.alloc(32)
   protected subnetAuth: SubnetAuth
+  protected sigCount: Buffer = Buffer.alloc(4)
+  protected sigIdxs: SigIdx[] = [] // idxs of subnet auth signers
 
   /**
    * Returns the id of the [[CreateChainTx]]
@@ -223,6 +225,37 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
+   * Creates and adds a [[SigIdx]] to the [[AddSubnetValidatorTx]].
+   *
+   * @param addressIdx The index of the address to reference in the signatures
+   * @param address The address of the source of the signature
+   */
+  addSignatureIdx(addressIdx: number, address: Buffer): void {
+    const addressIndex: Buffer = Buffer.alloc(4)
+    addressIndex.writeUIntBE(addressIdx, 0, 4)
+    this.subnetAuth.addAddressIndex(addressIndex)
+
+    const sigidx: SigIdx = new SigIdx()
+    const b: Buffer = Buffer.alloc(4)
+    b.writeUInt32BE(addressIdx, 0)
+    sigidx.fromBuffer(b)
+    sigidx.setSource(address)
+    this.sigIdxs.push(sigidx)
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
+  }
+
+  /**
+   * Returns the array of [[SigIdx]] for this [[Input]]
+   */
+  getSigIdxs(): SigIdx[] {
+    return this.sigIdxs
+  }
+
+  getCredentialID(): number {
+    return PlatformVMConstants.SECPCREDENTIAL
+  }
+
+  /**
    * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
    *
    * @param msg A Buffer for the [[UnsignedTx]]
@@ -231,22 +264,18 @@ export class CreateChainTx extends BaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc)
-    for (let i: number = 0; i < this.ins.length; i++) {
-      const cred: Credential = SelectCredentialClass(
-        this.ins[`${i}`].getInput().getCredentialID()
-      )
-      const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
-      for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
-        const signval: Buffer = keypair.sign(msg)
-        const sig: Signature = new Signature()
-        sig.fromBuffer(signval)
-        cred.addSignature(sig)
-      }
-      sigs.push(cred)
+    const creds: Credential[] = super.sign(msg, kc)
+    const sigidxs: SigIdx[] = this.getSigIdxs()
+    const cred: Credential = SelectCredentialClass(this.getCredentialID())
+    for (let i: number = 0; i < sigidxs.length; i++) {
+      const keypair: KeyPair = kc.getKey(sigidxs[`${i}`].getSource())
+      const signval: Buffer = keypair.sign(msg)
+      const sig: Signature = new Signature()
+      sig.fromBuffer(signval)
+      cred.addSignature(sig)
     }
-    return sigs
+    creds.push(cred)
+    return creds
   }
 
   /**
@@ -262,7 +291,6 @@ export class CreateChainTx extends BaseTx {
    * @param vmID Optional ID of the VM running on the new chain
    * @param fxIDs Optional IDs of the feature extensions running on the new chain
    * @param genesisData Optional Byte representation of genesis state of the new chain
-   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something.
    */
   constructor(
     networkID: number = DefaultNetworkID,
@@ -274,8 +302,7 @@ export class CreateChainTx extends BaseTx {
     chainName: string = undefined,
     vmID: string = undefined,
     fxIDs: string[] = undefined,
-    genesisData: string | GenesisData = undefined,
-    subnetAuth: SubnetAuth = undefined
+    genesisData: string | GenesisData = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof subnetID != "undefined") {
@@ -309,8 +336,7 @@ export class CreateChainTx extends BaseTx {
       this.genesisData = Buffer.from(genesisData)
     }
 
-    if (typeof subnetAuth != "undefined") {
-      this.subnetAuth = subnetAuth
-    }
+    const subnetAuth: SubnetAuth = new SubnetAuth()
+    this.subnetAuth = subnetAuth
   }
 }

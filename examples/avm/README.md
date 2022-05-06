@@ -3,6 +3,7 @@
 Example scripts for the [Avalanche Virtual Machine](https://docs.avax.network/build/references/avm-transaction-serialization)
 
 * [addressFromBuffer.ts](./addressFromBuffer.ts)
+* [baseEndpoint.ts](./baseEndpoint.ts)
 * [baseTx-ant.ts](./baseTx-ant.ts)
 * [baseTx-avax-create-multisig.ts](./baseTx-avax-create-multisig.ts)
 * [baseTx-avax-send-multisig.ts](./baseTx-avax-send-multisig.ts)
