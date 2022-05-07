@@ -60,7 +60,7 @@ const main = async (): Promise<any> => {
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
-    [pAddresses[0]], 
+    [pAddresses[0]],
     locktime,
     threshold
   )
@@ -107,7 +107,7 @@ const main = async (): Promise<any> => {
     startTime,
     endTime,
     weight,
-    subnetID,
+    subnetID
   )
   addSubnetValidatorTx.addSignatureIdx(0, pAddresses[0])
   addSubnetValidatorTx.addSignatureIdx(1, pAddresses[1])
