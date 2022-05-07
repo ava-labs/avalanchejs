@@ -1868,7 +1868,6 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param vmID Optional ID of the VM running on the new chain
    * @param fxIDs Optional IDs of the feature extensions running on the new chain
    * @param genesisData Optional Byte representation of genesis state of the new chain
-   * @param subnetAuth Optional Specifies the addresses whose signatures will be provided to demonstrate that the owners of a subnet approve something
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    *
@@ -1883,7 +1882,6 @@ export class PlatformVMAPI extends JRPCAPI {
     vmID: string = undefined,
     fxIDs: string[] = undefined,
     genesisData: string | GenesisData = undefined,
-    subnetAuth: SubnetAuth = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
@@ -1913,7 +1911,6 @@ export class PlatformVMAPI extends JRPCAPI {
       vmID,
       fxIDs,
       genesisData,
-      subnetAuth,
       this.getCreateChainTxFee(),
       avaxAssetID,
       memo,
