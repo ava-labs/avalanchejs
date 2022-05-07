@@ -52,7 +52,9 @@ const fee: BN = pchain.getCreateSubnetTxFee()
 const threshold: number = 1
 const threshold2: number = 2
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually create a CreateSubnetTx which creates a 1-of-1 AVAX utxo and a 2-of-2 SubnetAuth")
+const memo: Buffer = Buffer.from(
+  "Manually create a CreateSubnetTx which creates a 1-of-1 AVAX utxo and a 2-of-2 SubnetAuth"
+)
 
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()

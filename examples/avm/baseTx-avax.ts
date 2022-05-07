@@ -101,17 +101,19 @@ const main = async (): Promise<any> => {
   const tx: Tx = unsignedTx.sign(xKeychain)
   const txBuf: Buffer = tx.toBuffer()
 
-  // Start example script for generating the TxID in 
+  // Start example script for generating the TxID in
   // advance of issuing the tx to a full node
 
   // Create sha256 hash of the tx buffer
-  const sha256Hash: Buffer = Buffer.from(createHash("sha256").update(txBuf).digest().buffer)
+  const sha256Hash: Buffer = Buffer.from(
+    createHash("sha256").update(txBuf).digest().buffer
+  )
 
   // cb58 the sha256 hash
   const generatedTxID: string = bintools.cb58Encode(sha256Hash)
   console.log(`Generated TXID: ${generatedTxID}`)
 
-  // End example script for generating the TxID in 
+  // End example script for generating the TxID in
   // advance of issuing the tx to a full node
 
   // get the actual txID from the full node
