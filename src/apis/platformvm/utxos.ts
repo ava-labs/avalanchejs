@@ -914,8 +914,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     startTime: BN,
     endTime: BN,
     weight: BN,
-    subnetID,
-    subnetAuth,
+    subnetID: string,
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
@@ -960,8 +959,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       startTime,
       endTime,
       weight,
-      subnetID,
-      subnetAuth
+      subnetID
     )
     return new UnsignedTx(UTx)
   }

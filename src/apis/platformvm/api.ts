@@ -1496,7 +1496,6 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns An unsigned transaction created from the passed in parameters.
    */
 
-  // Re-implement when subnetValidator signing process is clearer
   buildAddSubnetValidatorTx = async (
     utxoset: UTXOSet,
     fromAddresses: string[],
@@ -1505,19 +1504,18 @@ export class PlatformVMAPI extends JRPCAPI {
     startTime: BN,
     endTime: BN,
     weight: BN,
-    subnetID,
-    subnetAuth,
+    subnetID: string,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildAddSubnetValidatorTx"
-    ).map((a): Buffer => bintools.stringToAddress(a))
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
       "buildAddSubnetValidatorTx"
-    ).map((a): Buffer => bintools.stringToAddress(a))
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1542,7 +1540,6 @@ export class PlatformVMAPI extends JRPCAPI {
       endTime,
       weight,
       subnetID,
-      subnetAuth,
       this.getDefaultTxFee(),
       avaxAssetID,
       memo,
