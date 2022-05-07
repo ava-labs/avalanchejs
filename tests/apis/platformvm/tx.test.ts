@@ -101,7 +101,6 @@ describe("Transactions", (): void => {
   gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
-  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
   // let addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
 
   beforeAll(async (): Promise<void> => {

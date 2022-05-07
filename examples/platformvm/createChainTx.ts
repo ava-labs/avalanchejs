@@ -40,10 +40,15 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+// 'P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p',
 pKeychain.importKey(privKey)
-privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
-pKeychain.importKey(privKey)
+
 privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
+// 'P-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj'
+pKeychain.importKey(privKey)
+
+privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
+// 'P-custom1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45',
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
@@ -123,7 +128,7 @@ const main = async (): Promise<any> => {
   })
 
   const subnetID: Buffer = bintools.cb58Decode(
-    "2giH3n6ZEVuomNypEVPqEUn2kPJxbCAJerh1PuM7LsFqExheXY"
+    "2aChGx4MubmgrpRqaNjcsN1JnBZ98bUmushPmyP5s1sc1dJz3n"
   )
   const chainName: string = "EPIC AVM"
   const vmID: string = "avm"
