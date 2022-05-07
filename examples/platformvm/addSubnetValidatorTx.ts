@@ -108,6 +108,7 @@ const main = async (): Promise<any> => {
     subnetID,
     subnetAuth
   )
+  addSubnetValidatorTx.addSignatureIdx(0, pAddresses[0])
   const unsignedTx: UnsignedTx = new UnsignedTx(addSubnetValidatorTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
   const txid: string = await pchain.issueTx(tx)

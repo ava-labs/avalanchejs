@@ -28,7 +28,7 @@ describe("AddSubnetValidatorTx", (): void => {
   const subnetID: string | Buffer = bintools.cb58Decode(subnetIDStr)
   const addressIndex: Buffer = Buffer.alloc(4)
   addressIndex.writeUIntBE(0x0, 0, 4)
-  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
+  const subnetAuth: SubnetAuth = new SubnetAuth()
 
   const addSubnetValidatorTx = new AddSubnetValidatorTx(
     networkID,

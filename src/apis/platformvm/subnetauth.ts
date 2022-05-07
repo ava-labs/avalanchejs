@@ -27,6 +27,17 @@ export class SubnetAuth extends Serializable {
   }
 
   /**
+   * Add an address index for Subnet Auth signing
+   *
+   * @param index the Buffer of the address index to add
+   */
+  addAddressIndex(index: Buffer): void {
+    const numAddrIndices: number = this.getNumAddressIndices()
+    this.numAddressIndices.writeUIntBE(numAddrIndices + 1, 0, 4)
+    this.addressIndices.push(index)
+  }
+
+  /**
    * Returns the number of address indices as a number
    */
   getNumAddressIndices(): number {
@@ -70,13 +81,5 @@ export class SubnetAuth extends Serializable {
       barr.push(this.addressIndices[`${i}`])
     })
     return Buffer.concat(barr, bsize)
-  }
-
-  constructor(addressIndices: Buffer[] = undefined) {
-    super()
-    if (typeof addressIndices !== "undefined") {
-      this.numAddressIndices.writeUIntBE(addressIndices.length, 0, 4)
-      this.addressIndices = addressIndices
-    }
   }
 }

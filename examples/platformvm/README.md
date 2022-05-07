@@ -18,6 +18,7 @@ Example scripts for the Avalanche [PlatformVM RPC](https://docs.avax.network/bui
 * [getBlockchainStatus.ts](./getBlockchainStatus.ts)
 * [getCurrentSupply.ts](./getCurrentSupply.ts)
 * [getCurrentValidators.ts](./getCurrentValidators.ts)
+* [getInterfaces.ts](./getInterfaces.ts)
 * [getPendingValidators.ts](./getPendingValidators.ts)
 * [getRewardUTXOs.ts](./getRewardUTXOs.ts)
 * [getStake.ts](./getStake.ts)
