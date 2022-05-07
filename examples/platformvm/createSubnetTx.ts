@@ -27,15 +27,19 @@ const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const bintools: BinTools = BinTools.getInstance()
+// Keychain with 3 keys-A, B and C
 const pKeychain: KeyChain = pchain.keyChain()
+// Keypair A
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 // 'P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p'
 pKeychain.importKey(privKey)
 
+// Keypair B
 privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
 // 'P-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj'
 pKeychain.importKey(privKey)
 
+// Keypair C
 privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
 // 'P-custom1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45'
 pKeychain.importKey(privKey)
@@ -48,7 +52,7 @@ const fee: BN = pchain.getCreateSubnetTxFee()
 const threshold: number = 1
 const threshold2: number = 2
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually create a subnet")
+const memo: Buffer = Buffer.from("Manually create a CreateSubnetTx which creates a 1-of-1 AVAX utxo and a 2-of-2 SubnetAuth")
 
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()

@@ -49,8 +49,8 @@ const inputs: TransferableInput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const nodeID: string = "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN"
-const startTime: BN = new BN(1651894150)
+const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
+const startTime: BN = new BN(1651898467)
 const endTime: BN = new BN(1653189723)
 const memo: Buffer = Buffer.from("Manually add subnet validator")
 
@@ -92,9 +92,9 @@ const main = async (): Promise<any> => {
     inputs.push(input)
   })
 
-  const weight: BN = new BN(20)
+  const weight: BN = new BN(1)
   const subnetID: Buffer = bintools.cb58Decode(
-    "2aChGx4MubmgrpRqaNjcsN1JnBZ98bUmushPmyP5s1sc1dJz3n"
+    "2pmPxAUXAA86fdifotJnobQcZ7jD999gCuJheiYjvCDczNqj61"
   )
   const nodeIDBuf: Buffer = NodeIDStringToBuffer(nodeID)
   const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
