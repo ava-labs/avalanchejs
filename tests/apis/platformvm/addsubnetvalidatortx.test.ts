@@ -1,7 +1,7 @@
 import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { AddSubnetValidatorTx, SubnetAuth } from "src/apis/platformvm"
+import { AddSubnetValidatorTx } from "src/apis/platformvm"
 import { bufferToNodeIDString, NodeIDStringToBuffer } from "src/utils"
 
 describe("AddSubnetValidatorTx", (): void => {
@@ -26,9 +26,6 @@ describe("AddSubnetValidatorTx", (): void => {
   const subnetIDStr: string =
     "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
   const subnetID: string | Buffer = bintools.cb58Decode(subnetIDStr)
-  const addressIndex: Buffer = Buffer.alloc(4)
-  addressIndex.writeUIntBE(0x0, 0, 4)
-  const subnetAuth: SubnetAuth = new SubnetAuth([addressIndex])
 
   const addSubnetValidatorTx = new AddSubnetValidatorTx(
     networkID,
@@ -40,8 +37,7 @@ describe("AddSubnetValidatorTx", (): void => {
     startTime,
     endTime,
     weight,
-    subnetID,
-    subnetAuth
+    subnetID
   )
   test("getNodeID", async (): Promise<void> => {
     const nodeIDBuf: Buffer = addSubnetValidatorTx.getNodeID()
