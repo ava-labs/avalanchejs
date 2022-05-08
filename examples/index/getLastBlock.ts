@@ -4,7 +4,6 @@ import { GetLastAcceptedResponse } from "../../src/apis/index/interfaces"
 import { Tx, UnsignedTx, Vertex } from "../../src/apis/avm"
 import Web3 from "Web3"
 
-
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
@@ -21,22 +20,23 @@ const main = async (): Promise<any> => {
   //   baseurl
   // )
   // console.log({ lastVertex })
-var web3 = new Web3("https://api.avax-test.network/ext/bc/C/rpc")
-const blockNum = await web3.eth.getBlockNumber()
-const blockHash = await web3.eth.getBlock(blockNum)
+  var web3 = new Web3("https://api.avax-test.network/ext/bc/C/rpc")
+  const blockNum = await web3.eth.getBlockNumber()
+  const block = await web3.eth.getBlock(blockNum)
 
-console.log({BlockNumber:blockNum})
-console.log({BlockHash:blockHash})
+  console.log({ BlockNumber: blockNum })
+  console.log({ BlockHash: block })
 
-const txnHashes = blockHash.transactions
-const txnCount = txnHashes.length
-// for(let i = 0; i > txnCount; i++ ){
+  const txnHashes = block.transactions
+  const txnCount = txnHashes.length
+  const blockHash = block.hash
+  // for(let i = 0; i > txnCount; i++ ){
   // console.log(`${txnHashes[i]}`)
 
   // console.log(txnCount, txnHashes)
+  console.log({ BlockHash: blockHash })
   console.log("txns: " + txnCount, txnHashes)
-  // console.log("txns: " + txnCount, txnHashes, txnArray)  
-
+  // console.log("txns: " + txnCount, txnHashes, txnArray)
 
   // const vertex: Vertex = new Vertex()
   // const byteLength = vertex.fromBuffer(bintools.cb58Decode(lastVertex.bytes))
