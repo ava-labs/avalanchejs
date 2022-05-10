@@ -59,6 +59,8 @@ export class AddSubnetValidatorTx extends BaseTx {
   protected weight: Buffer = Buffer.alloc(8)
   protected subnetID: Buffer = Buffer.alloc(32)
   protected subnetAuth: SubnetAuth
+  protected sigCount: Buffer = Buffer.alloc(4)
+  protected sigIdxs: SigIdx[] = [] // idxs of subnet auth signers
 
   /**
    * Returns the id of the [[AddSubnetValidatorTx]]
@@ -188,6 +190,37 @@ export class AddSubnetValidatorTx extends BaseTx {
   }
 
   /**
+   * Creates and adds a [[SigIdx]] to the [[AddSubnetValidatorTx]].
+   *
+   * @param addressIdx The index of the address to reference in the signatures
+   * @param address The address of the source of the signature
+   */
+  addSignatureIdx(addressIdx: number, address: Buffer): void {
+    const addressIndex: Buffer = Buffer.alloc(4)
+    addressIndex.writeUIntBE(addressIdx, 0, 4)
+    this.subnetAuth.addAddressIndex(addressIndex)
+
+    const sigidx: SigIdx = new SigIdx()
+    const b: Buffer = Buffer.alloc(4)
+    b.writeUInt32BE(addressIdx, 0)
+    sigidx.fromBuffer(b)
+    sigidx.setSource(address)
+    this.sigIdxs.push(sigidx)
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
+  }
+
+  /**
+   * Returns the array of [[SigIdx]] for this [[Input]]
+   */
+  getSigIdxs(): SigIdx[] {
+    return this.sigIdxs
+  }
+
+  getCredentialID(): number {
+    return PlatformVMConstants.SECPCREDENTIAL
+  }
+
+  /**
    * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
    *
    * @param msg A Buffer for the [[UnsignedTx]]
@@ -196,22 +229,18 @@ export class AddSubnetValidatorTx extends BaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc)
-    for (let i: number = 0; i < this.ins.length; i++) {
-      const cred: Credential = SelectCredentialClass(
-        this.ins[`${i}`].getInput().getCredentialID()
-      )
-      const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
-      for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
-        const signval: Buffer = keypair.sign(msg)
-        const sig: Signature = new Signature()
-        sig.fromBuffer(signval)
-        cred.addSignature(sig)
-      }
-      sigs.push(cred)
+    const creds: Credential[] = super.sign(msg, kc)
+    const sigidxs: SigIdx[] = this.getSigIdxs()
+    const cred: Credential = SelectCredentialClass(this.getCredentialID())
+    for (let i: number = 0; i < sigidxs.length; i++) {
+      const keypair: KeyPair = kc.getKey(sigidxs[`${i}`].getSource())
+      const signval: Buffer = keypair.sign(msg)
+      const sig: Signature = new Signature()
+      sig.fromBuffer(signval)
+      cred.addSignature(sig)
     }
-    return sigs
+    creds.push(cred)
+    return creds
   }
 
   /**
@@ -227,7 +256,6 @@ export class AddSubnetValidatorTx extends BaseTx {
    * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
    * @param weight Optional. Weight of this validator used when sampling
    * @param subnetID Optional. ID of the subnet this validator is validating
-   * @param subnetAuth Optional. Auth that will be allowing this validator into the network
    */
   constructor(
     networkID: number = DefaultNetworkID,
@@ -239,8 +267,7 @@ export class AddSubnetValidatorTx extends BaseTx {
     startTime: BN = undefined,
     endTime: BN = undefined,
     weight: BN = undefined,
-    subnetID: string | Buffer = undefined,
-    subnetAuth: SubnetAuth = undefined
+    subnetID: string | Buffer = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof subnetID != "undefined") {
@@ -262,8 +289,8 @@ export class AddSubnetValidatorTx extends BaseTx {
     if (typeof weight != "undefined") {
       this.weight = bintools.fromBNToBuffer(weight, 8)
     }
-    if (typeof subnetAuth != "undefined") {
-      this.subnetAuth = subnetAuth
-    }
+
+    const subnetAuth: SubnetAuth = new SubnetAuth()
+    this.subnetAuth = subnetAuth
   }
 }

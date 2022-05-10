@@ -8,11 +8,7 @@ import BinTools from "src/utils/bintools"
 const bintools: BinTools = BinTools.getInstance()
 
 describe("SubnetAuth", (): void => {
-  const address1: Buffer = Buffer.alloc(4)
-  const address2: Buffer = Buffer.alloc(4)
-  address2.writeUIntBE(0x01, 0, 4)
-  const addresses: Buffer[] = [address1, address2]
-  const subnetAuth1: SubnetAuth = new SubnetAuth(addresses)
+  const subnetAuth1: SubnetAuth = new SubnetAuth()
   const subnetAuth2: SubnetAuth = new SubnetAuth()
 
   test("getters", (): void => {
@@ -21,6 +17,13 @@ describe("SubnetAuth", (): void => {
 
     const typeID: number = subnetAuth1.getTypeID()
     expect(typeID).toBe(10)
+
+    let addressIndex: Buffer = Buffer.alloc(4)
+    addressIndex.writeUIntBE(0, 0, 4)
+    subnetAuth1.addAddressIndex(addressIndex)
+    addressIndex = Buffer.alloc(4)
+    addressIndex.writeUIntBE(1, 0, 4)
+    subnetAuth1.addAddressIndex(addressIndex)
 
     const numAddressIndices: number = subnetAuth1.getNumAddressIndices()
     expect(numAddressIndices).toBe(2)

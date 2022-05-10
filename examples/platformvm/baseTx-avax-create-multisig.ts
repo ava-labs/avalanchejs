@@ -1,7 +1,6 @@
-import createHash from "create-hash"
 import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
-  AVMAPI,
+  PlatformVMAPI,
   KeyChain,
   SECPTransferOutput,
   SECPTransferInput,
@@ -13,7 +12,8 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "../../src/apis/avm"
+} from "../../src/apis/platformvm"
+import { GetBalanceResponse } from "../../src/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
@@ -25,30 +25,40 @@ const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
-
 const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
+const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const xKeychain: KeyChain = xchain.keyChain()
-const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
+const pchain: PlatformVMAPI = avalanche.PChain()
+const pKeychain: KeyChain = pchain.keyChain()
+let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+// X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+pKeychain.importKey(privKey)
+
+privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
+// X-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+pKeychain.importKey(privKey)
+
+privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
+// X-custom1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
+pKeychain.importKey(privKey)
+const xAddresses: Buffer[] = pchain.keyChain().getAddresses()
+const xAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = xchain.getDefaultTxFee()
-const threshold: number = 1
+const fee: BN = pchain.getDefaultTxFee()
+const threshold: number = 3
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX")
+const memo: Buffer = Buffer.from(
+  "AVM manual create multisig BaseTx to send AVAX"
+)
 // Uncomment for codecID 00 01
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const getBalanceResponse: any = await xchain.getBalance(
-    xAddressStrings[0],
-    avaxAssetID
+  const getBalanceResponse: GetBalanceResponse = await pchain.getBalance(
+    xAddressStrings[0]
   )
   const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
@@ -58,17 +68,17 @@ const main = async (): Promise<any> => {
     threshold
   )
   // Uncomment for codecID 00 01
-  // secpTransferOutput.setCodecID(codecID)
+  //   secpTransferOutput.setCodecID(codecID)
   const transferableOutput: TransferableOutput = new TransferableOutput(
     avaxAssetIDBuf,
     secpTransferOutput
   )
   outputs.push(transferableOutput)
 
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: any = await pchain.getUTXOs(xAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
+  utxos.forEach((utxo: UTXO): void => {
     const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
     const amt: BN = amountOutput.getAmount().clone()
     const txid: Buffer = utxo.getTxID()
@@ -90,7 +100,7 @@ const main = async (): Promise<any> => {
 
   const baseTx: BaseTx = new BaseTx(
     networkID,
-    bintools.cb58Decode(xBlockchainID),
+    xBlockchainIDBuf,
     outputs,
     inputs,
     memo
@@ -98,27 +108,8 @@ const main = async (): Promise<any> => {
   // Uncomment for codecID 00 01
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txBuf: Buffer = tx.toBuffer()
-
-  // Start example script for generating the TxID in
-  // advance of issuing the tx to a full node
-
-  // Create sha256 hash of the tx buffer
-  const sha256Hash: Buffer = Buffer.from(
-    createHash("sha256").update(txBuf).digest().buffer
-  )
-
-  // cb58 the sha256 hash
-  const generatedTxID: string = bintools.cb58Encode(sha256Hash)
-  console.log(`Generated TXID: ${generatedTxID}`)
-
-  // End example script for generating the TxID in
-  // advance of issuing the tx to a full node
-
-  // get the actual txID from the full node
-  const actualTxID: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${actualTxID}`)
+  const tx: Tx = unsignedTx.sign(pKeychain)
+  const txid: string = await pchain.issueTx(tx)
+  console.log(`Success! TXID: ${txid}`)
 }
-
 main()

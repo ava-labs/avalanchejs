@@ -23,10 +23,10 @@ export interface GetBalanceParams {
 
 export interface GetBalanceResponse {
   balance: number | BN
-  utxoIDs: UTXOID[]
+  utxoIDs: iUTXOID[]
 }
 
-export interface UTXOID {
+export interface iUTXOID {
   txID: string
   outputIndex: number
 }
