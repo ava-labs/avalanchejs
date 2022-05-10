@@ -21,6 +21,14 @@ describe("CreateSubnetTx", (): void => {
     expect(createSubnetTxTypeID).toBe(PlatformVMConstants.CREATESUBNETTX)
   })
 
+  test("toBuffer and fromBuffer", async (): Promise<void> => {
+    const buf: Buffer = createSubnetTx.toBuffer()
+    const csTx: CreateSubnetTx = new CreateSubnetTx()
+    csTx.fromBuffer(buf)
+    const buf2: Buffer = csTx.toBuffer()
+    expect(buf.toString("hex")).toBe(buf2.toString("hex"))
+  })
+
   describe("SubnetOwners", (): void => {
     const subnetOwners: SECPOwnerOutput = createSubnetTx.getSubnetOwners()
 
