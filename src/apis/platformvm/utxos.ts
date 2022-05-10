@@ -898,13 +898,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @param feeAssetID Optional. The assetID of the fees being burned.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
-
-  // must implement later once the transaction format signing process is clearer
   buildAddSubnetValidatorTx = (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
@@ -918,11 +915,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    subnetAuthCredentials: [number, Buffer][] = []
   ): UnsignedTx => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
-    //let stakeOuts:TransferableOutput[] = [];
 
     const zero: BN = new BN(0)
     const now: BN = UnixNow()
@@ -932,7 +929,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       )
     }
 
-    // Not implemented: Fees can be paid from importIns
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         fromAddresses,
@@ -949,7 +945,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       }
     }
 
-    const UTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
+    const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
       networkID,
       blockchainID,
       outs,
@@ -961,7 +957,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       weight,
       subnetID
     )
-    return new UnsignedTx(UTx)
+    subnetAuthCredentials.forEach((subnetAuthCredential: [number, Buffer]) => {
+      addSubnetValidatorTx.addSignatureIdx(subnetAuthCredential[0], subnetAuthCredential[1])
+    })
+    return new UnsignedTx(addSubnetValidatorTx)
   }
 
   /**
@@ -1265,6 +1264,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @param feeAssetID Optional. The assetID of the fees being burned
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
    *
    * @returns An unsigned CreateChainTx created from the passed in parameters.
    */
@@ -1281,7 +1281,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    subnetAuthCredentials: [number, Buffer][] = []
   ): UnsignedTx => {
     const zero: BN = new BN(0)
     let ins: TransferableInput[] = []
@@ -1320,6 +1321,9 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       fxIDs,
       genesisData
     )
+    subnetAuthCredentials.forEach((subnetAuthCredential: [number, Buffer]) => {
+      createChainTx.addSignatureIdx(subnetAuthCredential[0], subnetAuthCredential[1])
+    })
     return new UnsignedTx(createChainTx)
   }
 }

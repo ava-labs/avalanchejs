@@ -1492,6 +1492,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param weight The amount of weight for this subnet validator.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1506,7 +1507,8 @@ export class PlatformVMAPI extends JRPCAPI {
     weight: BN,
     subnetID: string,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    subnetAuthCredentials: [number, Buffer][] = []
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
@@ -1543,7 +1545,8 @@ export class PlatformVMAPI extends JRPCAPI {
       this.getDefaultTxFee(),
       avaxAssetID,
       memo,
-      asOf
+      asOf,
+      subnetAuthCredentials
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
@@ -1791,27 +1794,6 @@ export class PlatformVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow()
   ): Promise<UnsignedTx> => {
-    if (subnetOwnerThreshold > 1) {
-      /* istanbul ignore next */
-      throw new SubnetThresholdError(
-        "Subnet threshold cannot be greater than 1 currently. This will be resolved in a future release of AvalancheJS."
-      )
-    }
-
-    if (subnetOwnerAddresses.length > 1) {
-      /* istanbul ignore next */
-      throw new SubnetOwnerError(
-        "Subnet owners are limited to 1 currently. This will be resolved in a future release of AvalancheJS."
-      )
-    }
-
-    if (fromAddresses[0] != subnetOwnerAddresses[0]) {
-      /* istanbul ignore next */
-      throw new SubnetThresholdError(
-        "Subnet owners must match the from addresses currently. This will be resolved in a future release of AvalancheJS."
-      )
-    }
-
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
       "buildCreateSubnetTx"
@@ -1867,6 +1849,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param genesisData Optional Byte representation of genesis state of the new chain
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1880,7 +1863,8 @@ export class PlatformVMAPI extends JRPCAPI {
     fxIDs: string[] = undefined,
     genesisData: string | GenesisData = undefined,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    subnetAuthCredentials: [number, Buffer][] = []
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
@@ -1898,9 +1882,12 @@ export class PlatformVMAPI extends JRPCAPI {
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
     fxIDs = fxIDs.sort()
 
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getCreateChainTxFee()
     const builtUnsignedTx: UnsignedTx = utxoset.buildCreateChainTx(
-      this.core.getNetworkID(),
-      bintools.cb58Decode(this.blockchainID),
+      networkID,
+      blockchainID,
       from,
       change,
       subnetID,
@@ -1908,10 +1895,11 @@ export class PlatformVMAPI extends JRPCAPI {
       vmID,
       fxIDs,
       genesisData,
-      this.getCreateChainTxFee(),
+      fee,
       avaxAssetID,
       memo,
-      asOf
+      asOf,
+      subnetAuthCredentials
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
