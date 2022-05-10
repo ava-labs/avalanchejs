@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BN, Buffer } from "../../src"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -12,8 +12,6 @@ import {
   DefaultLocalGenesisPrivateKey,
   UnixNow
 } from "../../src/utils"
-
-const bintools: BinTools = BinTools.getInstance()
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -44,7 +42,7 @@ privKey = "PrivateKey-2uWuEQbY5t7NPzgqzDrXSgGPhi3uyKj2FeAvPUHYo6CmENHJfn"
 pKeychain.importKey(privKey)
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const nodeID: string = "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN"
-const startTime: BN = new BN(1652215170)
+const startTime: BN = new BN(1652217329)
 const endTime: BN = new BN(1653511017)
 const asOf: BN = UnixNow()
 
@@ -55,8 +53,8 @@ const main = async (): Promise<any> => {
   const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
 
-  const weight: BN = new BN(20)
-  const subnetID: string = "2cXEvbdDaP6q6srB6x1T14raebpJaM4s2t9NE5kiXzLqLXQDWm"
+  const weight: BN = new BN(1)
+  const subnetID: string = "2tFRAeosSsgd1XV9Bn2y9VEHKPkeuk41RdnAZh9PuZJDWWkR5"
   const memo: Buffer = Buffer.from(
     "Utility function to create a AddSubnetValidatorTx transaction"
   )
