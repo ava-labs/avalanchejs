@@ -62,7 +62,11 @@ const memo: Buffer = Buffer.from(
   "Manually create a CreateSubnetTx which creates a 1-of-2 AVAX utxo and a 2-of-3 SubnetAuth"
 )
 const avaxUTXOKeychain: Buffer[] = [pAddresses[0], pAddresses[1]]
-const subnetAuthKeychain: Buffer[] = [pAddresses[1], pAddresses[2], pAddresses[3]]
+const subnetAuthKeychain: Buffer[] = [
+  pAddresses[1],
+  pAddresses[2],
+  pAddresses[3]
+]
 
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()

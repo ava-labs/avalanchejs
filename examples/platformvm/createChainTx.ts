@@ -65,7 +65,10 @@ const fee: BN = ONEAVAX
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const avaxUTXOKeychain: Buffer[] = [pAddresses[0], pAddresses[1]]
-const avaxUTXOKeychainStrings: string[] = [pAddressStrings[0], pAddressStrings[1]]
+const avaxUTXOKeychainStrings: string[] = [
+  pAddressStrings[0],
+  pAddressStrings[1]
+]
 
 const main = async (): Promise<any> => {
   const assetAlias: string = "AssetAliasTest"
@@ -81,7 +84,9 @@ const main = async (): Promise<any> => {
   )
   const initialStates: InitialStates = new InitialStates()
   initialStates.addOutput(vcapSecpOutput)
-  const memo: Buffer = Buffer.from("Manually create a CreateChainTx which creates a 1-of-2 AVAX utxo and instantiates a VM into a blockchain by correctly signing the 2-of-3 SubnetAuth")
+  const memo: Buffer = Buffer.from(
+    "Manually create a CreateChainTx which creates a 1-of-2 AVAX utxo and instantiates a VM into a blockchain by correctly signing the 2-of-3 SubnetAuth"
+  )
   const genesisAsset = new GenesisAsset(
     assetAlias,
     name,
@@ -108,7 +113,9 @@ const main = async (): Promise<any> => {
   )
   outputs.push(transferableOutput)
 
-  const platformVMUTXOResponse: any = await pchain.getUTXOs(avaxUTXOKeychainStrings)
+  const platformVMUTXOResponse: any = await pchain.getUTXOs(
+    avaxUTXOKeychainStrings
+  )
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO) => {

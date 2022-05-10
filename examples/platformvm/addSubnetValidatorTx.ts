@@ -60,7 +60,9 @@ const locktime: BN = new BN(0)
 const nodeID: string = "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN"
 const startTime: BN = new BN(1652146558)
 const endTime: BN = new BN(1653442362)
-const memo: Buffer = Buffer.from("Manually create a AddSubnetValidatorTx which creates a 1-of-2 AVAX utxo and adds a validator to a subnet by correctly signing the 2-of-3 SubnetAuth")
+const memo: Buffer = Buffer.from(
+  "Manually create a AddSubnetValidatorTx which creates a 1-of-2 AVAX utxo and adds a validator to a subnet by correctly signing the 2-of-3 SubnetAuth"
+)
 const avaxUTXOKeychain: Buffer[] = [pAddresses[0], pAddresses[1]]
 
 const main = async (): Promise<any> => {
