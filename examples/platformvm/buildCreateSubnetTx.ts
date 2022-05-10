@@ -13,7 +13,6 @@ import {
   UnixNow
 } from "../../src/utils"
 
-
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"

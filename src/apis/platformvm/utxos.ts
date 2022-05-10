@@ -958,7 +958,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       subnetID
     )
     subnetAuthCredentials.forEach((subnetAuthCredential: [number, Buffer]) => {
-      addSubnetValidatorTx.addSignatureIdx(subnetAuthCredential[0], subnetAuthCredential[1])
+      addSubnetValidatorTx.addSignatureIdx(
+        subnetAuthCredential[0],
+        subnetAuthCredential[1]
+      )
     })
     return new UnsignedTx(addSubnetValidatorTx)
   }
@@ -1322,7 +1325,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       genesisData
     )
     subnetAuthCredentials.forEach((subnetAuthCredential: [number, Buffer]) => {
-      createChainTx.addSignatureIdx(subnetAuthCredential[0], subnetAuthCredential[1])
+      createChainTx.addSignatureIdx(
+        subnetAuthCredential[0],
+        subnetAuthCredential[1]
+      )
     })
     return new UnsignedTx(createChainTx)
   }

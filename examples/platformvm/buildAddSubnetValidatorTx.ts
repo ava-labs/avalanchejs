@@ -58,11 +58,11 @@ const main = async (): Promise<any> => {
   const weight: BN = new BN(20)
   const subnetID: string = "2cXEvbdDaP6q6srB6x1T14raebpJaM4s2t9NE5kiXzLqLXQDWm"
   const memo: Buffer = Buffer.from(
-    "buildCreateChainTx"
+    "Utility function to create a AddSubnetValidatorTx transaction"
   )
   const subnetAuthCredentials: [number, Buffer][] = [
     [0, pAddresses[3]],
-    [1, pAddresses[1]],
+    [1, pAddresses[1]]
   ]
   const unsignedTx: UnsignedTx = await pchain.buildAddSubnetValidatorTx(
     utxoSet,

@@ -4,7 +4,7 @@ import {
   KeyChain,
   UTXOSet,
   UnsignedTx,
-  Tx,
+  Tx
 } from "../../src/apis/platformvm"
 import {
   PrivateKeyPrefix,
@@ -56,7 +56,7 @@ const main = async (): Promise<any> => {
   const subnetIDStr: string =
     "2cXEvbdDaP6q6srB6x1T14raebpJaM4s2t9NE5kiXzLqLXQDWm"
   const memo: Buffer = Buffer.from(
-    "buildCreateChainTx"
+    "Utility function to create a CreateChainTx transaction"
   )
   const subnetID: Buffer = bintools.cb58Decode(subnetIDStr)
   const chainName: string = "EPIC AVM"
@@ -71,7 +71,7 @@ const main = async (): Promise<any> => {
   // const genesisData = genesisDataStr
   const subnetAuthCredentials: [number, Buffer][] = [
     [0, pAddresses[3]],
-    [1, pAddresses[1]],
+    [1, pAddresses[1]]
   ]
 
   const unsignedTx: UnsignedTx = await pchain.buildCreateChainTx(
