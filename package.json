@@ -2,6 +2,7 @@
   "name": "avalanchejs-v2",
   "type": "module",
   "version": "0.0.1",
+  "packageManager": "pnpm@6.32.7",
   "scripts": {
     "lint": "xo",
     "lint:fix": "xo --fix",
