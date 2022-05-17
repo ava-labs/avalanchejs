@@ -5,6 +5,7 @@
   "scripts": {
     "lint": "xo",
     "lint:fix": "xo --fix",
+    "check": "tsc --noEmit",
     "test": "NODE_OPTIONS=\"--no-warnings\" uvu -r tsm tests -i setup",
     "test:coverage": "c8 --include=src pnpm test"
   },
