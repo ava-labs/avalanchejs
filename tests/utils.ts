@@ -1,5 +1,6 @@
 import * as assert from 'uvu/assert';
 import {base58, base58check} from '../src/utils/base58';
+import {bufferToNumber} from '../src/utils/buffer';
 import {describe} from './setup/env';
 
 describe('base58', (it) => {
@@ -48,6 +49,31 @@ describe('base58', (it) => {
       assert.equal(base58.decode(string), buffer);
       assert.equal(base58check.encode(buffer), checksum);
       assert.equal(base58check.decode(checksum), buffer);
+    }
+  });
+});
+
+describe('bufferToNumber', (it) => {
+  it('converts Uint8Arrays correctly', async () => {
+    const tests = [
+      {
+        buffer: new Uint8Array([0x00, 0x00]),
+        number: 0,
+      },
+      {
+        buffer: new Uint8Array([0x00, 0x00, 0x00, 0x07]),
+        number: 7,
+      },
+      {
+        buffer: new Uint8Array([
+          0x00, 0x00, 0x00, 0x00, 0x77, 0x35, 0x94, 0x00,
+        ]),
+        number: 2_000_000_000,
+      },
+    ];
+
+    for (const {buffer, number} of tests) {
+      assert.equal(bufferToNumber(buffer), number);
     }
   });
 });
