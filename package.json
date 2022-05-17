@@ -4,13 +4,18 @@
   "version": "0.0.1",
   "scripts": {
     "lint": "xo",
-    "lint:fix": "xo --fix"
+    "lint:fix": "xo --fix",
+    "test": "NODE_OPTIONS=\"--no-warnings\" uvu -r tsm tests -i setup",
+    "test:coverage": "c8 --include=src pnpm test"
   },
   "dependencies": {},
   "devDependencies": {
     "@types/node": "17.0.34",
+    "c8": "7.11.3",
     "node-fetch": "3.2.4",
+    "tsm": "2.2.1",
     "typescript": "4.6.4",
+    "uvu": "0.5.3",
     "xo": "0.48.0"
   },
   "engines": {
