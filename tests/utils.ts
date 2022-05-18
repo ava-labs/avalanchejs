@@ -58,17 +58,17 @@ describe('bufferToNumber', (it) => {
     const tests = [
       {
         buffer: new Uint8Array([0x00, 0x00]),
-        number: 0,
+        number: 0n,
       },
       {
         buffer: new Uint8Array([0x00, 0x00, 0x00, 0x07]),
-        number: 7,
+        number: 7n,
       },
       {
         buffer: new Uint8Array([
           0x00, 0x00, 0x00, 0x00, 0x77, 0x35, 0x94, 0x00,
         ]),
-        number: 2_000_000_000,
+        number: 2_000_000_000n,
       },
     ];
 
