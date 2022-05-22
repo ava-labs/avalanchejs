@@ -12,7 +12,7 @@ import { SerializedEncoding } from "../../utils/serialization"
 import { SubnetOwnerError } from "../../utils/errors"
 
 export class CreateSubnetTx extends BaseTx {
-  protected _typeName = "SECPCredential"
+  protected _typeName = "CreateSubnetTx"
   protected _typeID = PlatformVMConstants.CREATESUBNETTX
 
   serialize(encoding: SerializedEncoding = "hex"): object {
@@ -56,6 +56,7 @@ export class CreateSubnetTx extends BaseTx {
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset = super.fromBuffer(bytes, offset)
+    offset += 4
     this.subnetOwners = new SECPOwnerOutput()
     offset = this.subnetOwners.fromBuffer(bytes, offset)
     return offset

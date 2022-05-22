@@ -60,7 +60,7 @@ export class AddSubnetValidatorTx extends BaseTx {
   protected subnetID: Buffer = Buffer.alloc(32)
   protected subnetAuth: SubnetAuth
   protected sigCount: Buffer = Buffer.alloc(4)
-  protected sigIdxs: SigIdx[] = [] // idxs of signers from utxo
+  protected sigIdxs: SigIdx[] = [] // idxs of subnet auth signers
 
   /**
    * Returns the id of the [[AddSubnetValidatorTx]]
@@ -195,7 +195,11 @@ export class AddSubnetValidatorTx extends BaseTx {
    * @param addressIdx The index of the address to reference in the signatures
    * @param address The address of the source of the signature
    */
-  addSignatureIdx = (addressIdx: number, address: Buffer) => {
+  addSignatureIdx(addressIdx: number, address: Buffer): void {
+    const addressIndex: Buffer = Buffer.alloc(4)
+    addressIndex.writeUIntBE(addressIdx, 0, 4)
+    this.subnetAuth.addAddressIndex(addressIndex)
+
     const sigidx: SigIdx = new SigIdx()
     const b: Buffer = Buffer.alloc(4)
     b.writeUInt32BE(addressIdx, 0)
@@ -208,7 +212,9 @@ export class AddSubnetValidatorTx extends BaseTx {
   /**
    * Returns the array of [[SigIdx]] for this [[Input]]
    */
-  getSigIdxs = (): SigIdx[] => this.sigIdxs
+  getSigIdxs(): SigIdx[] {
+    return this.sigIdxs
+  }
 
   getCredentialID(): number {
     return PlatformVMConstants.SECPCREDENTIAL
@@ -225,20 +231,20 @@ export class AddSubnetValidatorTx extends BaseTx {
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const creds: Credential[] = super.sign(msg, kc)
     const sigidxs: SigIdx[] = this.getSigIdxs()
+    const cred: Credential = SelectCredentialClass(this.getCredentialID())
     for (let i: number = 0; i < sigidxs.length; i++) {
-      const cred: Credential = SelectCredentialClass(this.getCredentialID())
       const keypair: KeyPair = kc.getKey(sigidxs[`${i}`].getSource())
       const signval: Buffer = keypair.sign(msg)
       const sig: Signature = new Signature()
       sig.fromBuffer(signval)
       cred.addSignature(sig)
-      creds.push(cred)
     }
+    creds.push(cred)
     return creds
   }
 
   /**
-   * Class representing an unsigned CreateChain transaction.
+   * Class representing an unsigned AddSubnetValidator transaction.
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
@@ -250,7 +256,6 @@ export class AddSubnetValidatorTx extends BaseTx {
    * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
    * @param weight Optional. Weight of this validator used when sampling
    * @param subnetID Optional. ID of the subnet this validator is validating
-   * @param subnetAuth Optional. Auth that will be allowing this validator into the network
    */
   constructor(
     networkID: number = DefaultNetworkID,
@@ -262,8 +267,7 @@ export class AddSubnetValidatorTx extends BaseTx {
     startTime: BN = undefined,
     endTime: BN = undefined,
     weight: BN = undefined,
-    subnetID: string | Buffer = undefined,
-    subnetAuth: SubnetAuth = undefined
+    subnetID: string | Buffer = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     if (typeof subnetID != "undefined") {
@@ -285,8 +289,8 @@ export class AddSubnetValidatorTx extends BaseTx {
     if (typeof weight != "undefined") {
       this.weight = bintools.fromBNToBuffer(weight, 8)
     }
-    if (typeof subnetAuth != "undefined") {
-      this.subnetAuth = subnetAuth
-    }
+
+    const subnetAuth: SubnetAuth = new SubnetAuth()
+    this.subnetAuth = subnetAuth
   }
 }
