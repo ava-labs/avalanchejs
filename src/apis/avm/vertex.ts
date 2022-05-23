@@ -5,33 +5,20 @@
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { AVMConstants } from "./constants"
-import { TransferableOutput } from "./outputs"
-import { TransferableInput } from "./inputs"
-import { SelectCredentialClass } from "./credentials"
-import { KeyChain, KeyPair } from "./keychain"
-import { Signature, SigIdx, Credential } from "../../common/credentials"
 import { DefaultNetworkID } from "../../utils/constants"
-import { SelectTxClass, UnsignedTx } from "./tx"
+import { UnsignedTx } from "./tx"
 import {
-  Serializable,
-  Serialization,
-  SerializedEncoding,
-  SerializedType
+  Serializable
 } from "../../utils/serialization"
 import { CodecIdError } from "../../utils/errors"
 import { Address } from "../../common"
 import BN from "bn.js"
 import { BaseTx } from "."
-import { Output, OutputOwners } from "../../common/output"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
-const serialization: Serialization = Serialization.getInstance()
-const decimalString: SerializedType = "decimalString"
-const buffer: SerializedType = "Buffer"
-const display: SerializedEncoding = "display"
 
 /**
  * Class representing a Vertex
@@ -39,41 +26,8 @@ const display: SerializedEncoding = "display"
 export class Vertex extends Serializable {
   protected _typeName = "Vertex"
   protected _codecID = AVMConstants.LATESTCODEC
-  protected out: TransferableOutput = new TransferableOutput()
-  protected ins: TransferableInput = new TransferableInput()
-  protected numouts: TransferableOutput = new TransferableOutput()
-  protected numins: TransferableInput = new TransferableInput()
-
   // serialize is inherited
-
-  // TODO - implement deserialize
-  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
-    super.deserialize(fields, encoding)
-    this.out = fields["outs"].map((o: TransferableOutput) => {
-      let newOut: TransferableOutput = new TransferableOutput()
-      newOut.deserialize(o, encoding)
-      return newOut
-    })
-    this.ins = fields["ins"].map((i: TransferableInput) => {
-      let newIn: TransferableInput = new TransferableInput()
-      newIn.deserialize(i, encoding)
-      return newIn
-    })
-    // this.numouts = serialization.decoder(
-    //   this.out.length.toString(),
-    //   display,
-    //   decimalString,
-    //   buffer,
-    //   4
-    // )
-    // this.numins = serialization.decoder(
-    //   this.ins.length.toString(),
-    //   display,
-    //   decimalString,
-    //   buffer,
-    //   4
-    // )
-  }
+  // deserialize is inherited
   protected chainID: Buffer = Buffer.alloc(32)
   protected height: Buffer = Buffer.alloc(8)
   protected epoch: Buffer = Buffer.alloc(4)
@@ -87,36 +41,36 @@ export class Vertex extends Serializable {
   /**
    * Returns the ChainID as a number
    */
-  getChainID = (): number => this.chainID.readUInt32BE(0)
+  getChainID(): number { return this.chainID.readUInt32BE(0) }
 
   /**
    * Returns the height as a {@link https://github.com/indutny/bn.js/|BN}.
    */
-  getHeight = (): BN => bintools.fromBufferToBN(this.height)
+  getHeight(): BN { return bintools.fromBufferToBN(this.height) }
 
   /**
    * Returns the epoch as a number.
    */
-  getEpoch = (): number => this.epoch.readUInt32BE(0)
+  getEpoch(): number { return this.epoch.readUInt32BE(0) }
 
   /**
    * @returns An array of Buffers
    */
-  getParentIDs = (): Buffer[] => {
+  getParentIDs(): Buffer[] {
     return this.parentIDs
   }
 
   /**
    * Returns array of UnsignedTxs.
    */
-  getTxs = (): BaseTx[] => {
+  getTxs(): BaseTx[] {
     return this.txs
   }
 
   /**
    * @returns An array of Buffers
    */
-  getRestrictions = (): Buffer[] => {
+  getRestrictions(): Buffer[] {
     return this.restrictions
   }
 
@@ -134,15 +88,15 @@ export class Vertex extends Serializable {
     }
     this._codecID = codecID
     this._typeID =
-      this._codecID === 0 ? AVMConstants.BASETX : AVMConstants.BASETX_CODECONE
+      this._codecID === 0 ? AVMConstants.VERTEX : AVMConstants.VERTEX_CODECONE
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[BaseTx]], parses it, populates the class, and returns the length of the BaseTx in bytes.
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[Vertex]], parses it, populates the class, and returns the length of the Vertex in bytes.
    *
-   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[BaseTx]]
+   * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[Vertex]]
    *
-   * @returns The length of the raw [[BaseTx]]
+   * @returns The length of the raw [[Vertex]]
    *
    * @remarks assume not-checksummed
    */
@@ -165,9 +119,10 @@ export class Vertex extends Serializable {
 
     this.numTxs = bintools.copyFrom(bytes, offset, offset + 4)
     const txsCount: number = this.numTxs.readUInt32BE(0)
-    offset += 4
+    offset += 8
     // TODO - why do we have these 4 mystery bytes?
-    offset += 4
+    // first int is tx-size
+    // second int is ?
     for (let i: number = 0; i < txsCount; i++) {
       const unsignedTx: UnsignedTx = new UnsignedTx()
       offset += unsignedTx.fromBuffer(bintools.copyFrom(bytes, offset))
@@ -186,49 +141,56 @@ export class Vertex extends Serializable {
   }
 
   /**
-   * Takes the bytes of an [[UnsignedTx]] and returns an array of [[Credential]]s
-   *
-   * @param msg A Buffer for the [[UnsignedTx]]
-   * @param kc An [[KeyChain]] used in signing
-   *
-   * @returns An array of [[Credential]]s
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[Vertex]].
    */
-  // sign(msg: Buffer, kc: KeyChain): Credential[] {
-  //   const sigs: Credential[] = []
-  //   for (let i: number = 0; i < this.ins.length; i++) {
-  //     const cred: Credential = SelectCredentialClass(
-  //       this.ins[`${i}`].getInput().getCredentialID()
-  //     )
-  //     const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
-  //     for (let j: number = 0; j < sigidxs.length; j++) {
-  //       const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
-  //       const signval: Buffer = keypair.sign(msg)
-  //       const sig: Signature = new Signature()
-  //       sig.fromBuffer(signval)
-  //       cred.addSignature(sig)
-  //     }
-  //     sigs.push(cred)
-  //   }
-  //   return sigs
-  // }
+  toBuffer(): Buffer {
+    const codec: number = this.getCodecID()
+    const codecBuf: Buffer = Buffer.alloc(2)
+    codecBuf.writeUInt16BE(codec, 0)
+    let barr: Buffer[] = [
+      codecBuf,
+      this.chainID,
+      this.height,
+      this.epoch,
+      this.numParentIDs
+    ]
+    this.parentIDs.forEach((parentID: Buffer): void => {
+      barr.push(parentID)
+    })
 
-  // clone(): this {
-  //   let newbase: BaseTx = new BaseTx()
-  //   newbase.fromBuffer(this.toBuffer())
-  //   return newbase as this
-  // }
+    const txs: BaseTx[] = this.getTxs()
+    const numTxs: Buffer = Buffer.alloc(4)
+    numTxs.writeUInt32BE(txs.length, 0)
+    barr.push(numTxs)
 
-  // create(...args: any[]): this {
-  //   return new BaseTx(...args) as this
-  // }
+    let size: number = 0
+    const txSize: Buffer = Buffer.alloc(4)
+    txs.forEach((tx: BaseTx): void => {
+      const b: Buffer = tx.toBuffer()
+      size += b.byteLength
+    })
+    txSize.writeUInt32BE(size, 0)
+    barr.push(txSize)
 
-  // select(id: number, ...args: any[]): this {
-  //   let newbasetx: BaseTx = SelectTxClass(id, ...args)
-  //   return newbasetx as this
-  // }
+    const mysteryBytes: Buffer = Buffer.from("00000000", "hex")
+    barr.push(mysteryBytes)
+    txs.forEach((tx: BaseTx): void => {
+      const b: Buffer = tx.toBuffer()
+      barr.push(b)
+    })
 
+    // barr.push(tx.toBuffer())
+    // this.txs.length
+    return Buffer.concat(barr)
+  }
+
+  clone(): this {
+    let vertex: Vertex = new Vertex()
+    vertex.fromBuffer(this.toBuffer())
+    return vertex as this
+  }
   /**
-   * Class representing a BaseTx which is the foundation for all transactions.
+   * Class representing a Vertex which is a container for AVM Transactions.
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param chainID Optional chainID, default Buffer.alloc(32, 16)
