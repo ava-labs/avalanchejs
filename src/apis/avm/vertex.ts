@@ -7,9 +7,7 @@ import BinTools from "../../utils/bintools"
 import { AVMConstants } from "./constants"
 import { DefaultNetworkID } from "../../utils/constants"
 import { UnsignedTx } from "./tx"
-import {
-  Serializable
-} from "../../utils/serialization"
+import { Serializable } from "../../utils/serialization"
 import { CodecIdError } from "../../utils/errors"
 import { Address } from "../../common"
 import BN from "bn.js"
@@ -41,17 +39,23 @@ export class Vertex extends Serializable {
   /**
    * Returns the ChainID as a number
    */
-  getChainID(): number { return this.chainID.readUInt32BE(0) }
+  getChainID(): number {
+    return this.chainID.readUInt32BE(0)
+  }
 
   /**
    * Returns the height as a {@link https://github.com/indutny/bn.js/|BN}.
    */
-  getHeight(): BN { return bintools.fromBufferToBN(this.height) }
+  getHeight(): BN {
+    return bintools.fromBufferToBN(this.height)
+  }
 
   /**
    * Returns the epoch as a number.
    */
-  getEpoch(): number { return this.epoch.readUInt32BE(0) }
+  getEpoch(): number {
+    return this.epoch.readUInt32BE(0)
+  }
 
   /**
    * @returns An array of Buffers
