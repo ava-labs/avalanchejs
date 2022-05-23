@@ -24,13 +24,14 @@ const main = async (): Promise<any> => {
   const byteLength = vertex.fromBuffer(bintools.cb58Decode(lastVertex.bytes))
   console.log({ byteLength })
 
-  const buffer = Buffer.from(lastVertex.bytes)
-  console.log(JSON.stringify({ buffer }))
-  // const newVert2 = vertex.fromBuffer(bintools.cb58Decode(lastAccepted.bytes), 32)
+  // // TODO Clean up Vertex Retun Data
+  //   const buffer = Buffer.from(lastVertex.bytes)
+  //   console.log(JSON.stringify({ buffer }))
+  //   const newVert2 = vertex.fromBuffer(bintools.cb58Decode(lastAccepted.bytes), 32)
 
-  // const unsignedTx: UnsignedTx = new UnsignedTx()
-  // unsignedTx.fromBuffer(bintools.cb58Decode(lastAccepted.bytes))
-  // console.log(unsignedTx)
+  //   const unsignedTx: UnsignedTx = new UnsignedTx()
+  //   unsignedTx.fromBuffer(bintools.cb58Decode(lastAccepted.bytes))
+  //   console.log(unsignedTx)
 }
 
 main()
