@@ -32,7 +32,7 @@ export class Vertex extends Serializable {
   protected txs: BaseTx[]
   protected numTxs: number
   protected restrictions: Buffer[]
-  protected numRestrictions: number 
+  protected numRestrictions: number
 
   /**
    * Returns the NetworkID as a number
@@ -162,11 +162,11 @@ export class Vertex extends Serializable {
       // const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
       // console.log(restrictionsCount)
       for (let i: number = 0; i < this.numRestrictions; i++) {
-      const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
-      // console.log(tx)
-      offset += 32
-      this.restrictions.push(tx)
-    }
+        const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
+        // console.log(tx)
+        offset += 32
+        this.restrictions.push(tx)
+      }
     }
 
     return offset
@@ -248,8 +248,7 @@ export class Vertex extends Serializable {
     parentIDs: Buffer[] = [],
     txs: BaseTx[] = [],
     restrictions: Buffer[] = []
-  ) { 
-
+  ) {
     super()
     this.networkID = networkID
     this.blockchainID = bintools.cb58Decode(blockchainID)
