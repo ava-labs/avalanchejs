@@ -11,10 +11,12 @@ The APIs currently supported by default are:
 * AVM API (X-Chain)
 * EVM API (C-Chain)
 * Health API
+* Index API
 * Info API
 * Keystore API
 * Metrics API
 * PlatformVM API (P-Chain)
+* Socket
 
 We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network).
 

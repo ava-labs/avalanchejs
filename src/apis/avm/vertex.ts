@@ -5,11 +5,8 @@
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { AVMConstants } from "./constants"
-import { DefaultNetworkID } from "../../utils/constants"
-import { UnsignedTx } from "./tx"
-import { Serializable } from "../../utils/serialization"
-import { CodecIdError } from "../../utils/errors"
-import { Address } from "../../common"
+import { Tx, UnsignedTx } from "./tx"
+import { Serializable, CodecIdError, DefaultNetworkID } from "../../utils"
 import BN from "bn.js"
 import { BaseTx } from "."
 
@@ -26,35 +23,42 @@ export class Vertex extends Serializable {
   protected _codecID = AVMConstants.LATESTCODEC
   // serialize is inherited
   // deserialize is inherited
-  protected chainID: Buffer = Buffer.alloc(32)
-  protected height: Buffer = Buffer.alloc(8)
-  protected epoch: Buffer = Buffer.alloc(4)
-  protected numParentIDs: Buffer = Buffer.alloc(4)
-  protected parentIDs: Buffer[] = []
-  protected numTxs: Buffer = Buffer.alloc(4)
-  protected txs: BaseTx[] = []
-  protected numRestrictions: Buffer = Buffer.alloc(4)
-  protected restrictions: Buffer[] = []
+  protected networkID: number
+  protected blockchainID: Buffer
+  protected height: BN
+  protected epoch: number
+  protected parentIDs: Buffer[]
+  protected numParentIDs: number
+  protected txs: BaseTx[]
+  protected numTxs: number
+  protected restrictions: Buffer[]
+  protected numRestrictions: number 
 
   /**
-   * Returns the ChainID as a number
+   * Returns the NetworkID as a number
    */
-  getChainID(): number {
-    return this.chainID.readUInt32BE(0)
+  getNetworkID(): number {
+    return this.networkID
+  }
+  /**
+   * Returns the BlockchainID as a CB58 string
+   */
+  getBlockchainID(): string {
+    return bintools.cb58Encode(this.blockchainID)
   }
 
   /**
-   * Returns the height as a {@link https://github.com/indutny/bn.js/|BN}.
+   * Returns the Height as a {@link https://github.com/indutny/bn.js/|BN}.
    */
   getHeight(): BN {
-    return bintools.fromBufferToBN(this.height)
+    return this.height
   }
 
   /**
-   * Returns the epoch as a number.
+   * Returns the Epoch as a number.
    */
   getEpoch(): number {
-    return this.epoch.readUInt32BE(0)
+    return this.epoch
   }
 
   /**
@@ -87,7 +91,7 @@ export class Vertex extends Serializable {
     if (codecID !== 0 && codecID !== 1) {
       /* istanbul ignore next */
       throw new CodecIdError(
-        "Error - BaseTx.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
+        "Error - Vertex.setCodecID: invalid codecID. Valid codecIDs are 0 and 1."
       )
     }
     this._codecID = codecID
@@ -106,41 +110,65 @@ export class Vertex extends Serializable {
    */
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset += 2
-    this.chainID = bintools.copyFrom(bytes, offset, offset + 32)
+    this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32)
+
     offset += 32
-    this.height = bintools.copyFrom(bytes, offset, offset + 8)
+    const h: Buffer = bintools.copyFrom(bytes, offset, offset + 8)
+    this.height = bintools.fromBufferToBN(h)
+
     offset += 8
-    this.epoch = bintools.copyFrom(bytes, offset, offset + 4)
+    const e: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+    this.epoch = e.readInt32BE(0)
+
     offset += 4
-    this.numParentIDs = bintools.copyFrom(bytes, offset, offset + 4)
+    const nPIDs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+    this.numParentIDs = nPIDs.readInt32BE(0)
+
     offset += 4
-    const parentIDsCount: number = this.numParentIDs.readUInt32BE(0)
-    for (let i: number = 0; i < parentIDsCount; i++) {
+    for (let i: number = 0; i < this.numParentIDs; i++) {
       const parentID: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
       offset += 32
       this.parentIDs.push(parentID)
     }
 
-    this.numTxs = bintools.copyFrom(bytes, offset, offset + 4)
-    const txsCount: number = this.numTxs.readUInt32BE(0)
+    const nTxs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+    this.numTxs = nTxs.readInt32BE(0)
+    // const txsCount: number = this.numTxs.readUInt32BE(0)
+    // account for tx-size bytes
     offset += 8
-    // TODO - why do we have these 4 mystery bytes?
-    // first int is tx-size
-    // second int is ?
-    for (let i: number = 0; i < txsCount; i++) {
+    for (let i: number = 0; i < this.numTxs; i++) {
       const unsignedTx: UnsignedTx = new UnsignedTx()
       offset += unsignedTx.fromBuffer(bintools.copyFrom(bytes, offset))
       this.txs.push(unsignedTx.getTransaction())
-    }
 
-    this.numRestrictions = bintools.copyFrom(bytes, offset, offset + 4)
-    offset += 4
-    const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
-    for (let i: number = 0; i < restrictionsCount; i++) {
+      // //////////////////////////////
+
+      const tx: Tx = new Tx()
+      // console.log(tx)
+      // offset += tx.fromBuffer(bintools.copyFrom(bytes, offset))
+      // console.log("credentials", tx.getCredentials()[0].getCredentialID())
+      // this.txs.push(tx.getUnsignedTx().getTransaction())
+    }
+    // console.log("---------------------")
+    // console.log(this.getTxs()[0])
+    // console.log("---------------------")
+
+    // console.log(bytes.byteLength, offset)
+    if (bytes.byteLength >= offset) {
+      const nRs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+      this.numRestrictions = nRs.readInt32BE(0)
+      // console.log(this.numRestrictions.toString("hex"))
+      offset += 4
+      // const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
+      // console.log(restrictionsCount)
+      for (let i: number = 0; i < this.numRestrictions; i++) {
       const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
+      // console.log(tx)
       offset += 32
       this.restrictions.push(tx)
     }
+    }
+
     return offset
   }
 
@@ -151,12 +179,18 @@ export class Vertex extends Serializable {
     const codec: number = this.getCodecID()
     const codecBuf: Buffer = Buffer.alloc(2)
     codecBuf.writeUInt16BE(codec, 0)
+
+    const epochBuf: Buffer = Buffer.alloc(4)
+    epochBuf.writeInt32BE(this.epoch, 0)
+
+    const numParentIDsBuf: Buffer = Buffer.alloc(4)
+    numParentIDsBuf.writeInt32BE(this.numParentIDs, 0)
     let barr: Buffer[] = [
       codecBuf,
-      this.chainID,
-      this.height,
-      this.epoch,
-      this.numParentIDs
+      this.blockchainID,
+      bintools.fromBNToBuffer(this.height),
+      epochBuf,
+      numParentIDsBuf
     ]
     this.parentIDs.forEach((parentID: Buffer): void => {
       barr.push(parentID)
@@ -175,6 +209,8 @@ export class Vertex extends Serializable {
     })
     txSize.writeUInt32BE(size, 0)
     barr.push(txSize)
+    // const m: Buffer = Buffer.from("99999999", "hex")
+    // barr.push(m)
 
     const mysteryBytes: Buffer = Buffer.from("00000000", "hex")
     barr.push(mysteryBytes)
@@ -196,19 +232,34 @@ export class Vertex extends Serializable {
   /**
    * Class representing a Vertex which is a container for AVM Transactions.
    *
-   * @param networkID Optional networkID, [[DefaultNetworkID]]
-   * @param chainID Optional chainID, default Buffer.alloc(32, 16)
+   * @param networkID Optional, [[DefaultNetworkID]]
+   * @param blockchainID Optional, default "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM"
+   * @param height Optional, default new BN(0)
+   * @param epoch Optional, default new BN(0)
+   * @param parentIDs Optional, default []
+   * @param txs Optional, default []
+   * @param restrictions Optional, default []
    */
   constructor(
     networkID: number = DefaultNetworkID,
-    chainID: Buffer = Buffer.alloc(32),
-    height: Buffer = Buffer.alloc(8),
-    epoch: Buffer = Buffer.alloc(4),
-    parentIDs: Address[] = [],
-    txs: Buffer = Buffer.alloc(4),
-    numRestrictions: Buffer = Buffer.alloc(4),
-    restrictions: Address[] = []
-  ) {
+    blockchainID: string = "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM",
+    height: BN = new BN(0),
+    epoch: number = 0,
+    parentIDs: Buffer[] = [],
+    txs: BaseTx[] = [],
+    restrictions: Buffer[] = []
+  ) { 
+
     super()
+    this.networkID = networkID
+    this.blockchainID = bintools.cb58Decode(blockchainID)
+    this.height = height
+    this.epoch = epoch
+    this.parentIDs = parentIDs
+    this.numParentIDs = parentIDs.length
+    this.txs = txs
+    this.numTxs = txs.length
+    this.restrictions = restrictions
+    this.numRestrictions = restrictions.length
   }
 }
