@@ -1,3 +1,4 @@
+import createHash from "create-hash"
 import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   AVMAPI,
@@ -98,8 +99,26 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+  const txBuf: Buffer = tx.toBuffer()
+
+  // Start example script for generating the TxID in
+  // advance of issuing the tx to a full node
+
+  // Create sha256 hash of the tx buffer
+  const sha256Hash: Buffer = Buffer.from(
+    createHash("sha256").update(txBuf).digest().buffer
+  )
+
+  // cb58 the sha256 hash
+  const generatedTxID: string = bintools.cb58Encode(sha256Hash)
+  console.log(`Generated TXID: ${generatedTxID}`)
+
+  // End example script for generating the TxID in
+  // advance of issuing the tx to a full node
+
+  // get the actual txID from the full node
+  const actualTxID: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${actualTxID}`)
 }
 
 main()

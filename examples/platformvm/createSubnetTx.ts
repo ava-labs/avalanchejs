@@ -27,28 +27,46 @@ const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const bintools: BinTools = BinTools.getInstance()
+// Keychain with 4 keys-A, B, C, and D
 const pKeychain: KeyChain = pchain.keyChain()
+// Keypair A
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// 'P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p'
+// P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
 pKeychain.importKey(privKey)
 
+// Keypair B
 privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// 'P-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj'
+// P-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
 pKeychain.importKey(privKey)
 
+// Keypair C
 privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
-// 'P-custom1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45'
+// P-custom1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
+pKeychain.importKey(privKey)
+
+// Keypair D
+privKey = "PrivateKey-2uWuEQbY5t7NPzgqzDrXSgGPhi3uyKj2FeAvPUHYo6CmENHJfn"
+// P-custom1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
+const pChainBlockchainIDBuf: Buffer = bintools.cb58Decode(pChainBlockchainID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const fee: BN = pchain.getCreateSubnetTxFee()
 const threshold: number = 1
 const threshold2: number = 2
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually create a subnet")
+const memo: Buffer = Buffer.from(
+  "Manually create a CreateSubnetTx which creates a 1-of-2 AVAX utxo and a 2-of-3 SubnetAuth"
+)
+const avaxUTXOKeychain: Buffer[] = [pAddresses[0], pAddresses[1]]
+const subnetAuthKeychain: Buffer[] = [
+  pAddresses[1],
+  pAddresses[2],
+  pAddresses[3]
+]
 
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
@@ -56,7 +74,7 @@ const main = async (): Promise<any> => {
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
-    [pAddresses[0]],
+    avaxUTXOKeychain,
     locktime,
     threshold
   )
@@ -88,13 +106,13 @@ const main = async (): Promise<any> => {
   })
 
   const subnetOwner: SECPOwnerOutput = new SECPOwnerOutput(
-    pAddresses,
+    subnetAuthKeychain,
     locktime,
     threshold2
   )
   const createSubnetTx: CreateSubnetTx = new CreateSubnetTx(
     networkID,
-    bintools.cb58Decode(pChainBlockchainID),
+    pChainBlockchainIDBuf,
     outputs,
     inputs,
     memo,
