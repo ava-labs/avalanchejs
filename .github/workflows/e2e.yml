@@ -26,26 +26,22 @@ jobs:
           go-version: '1.17.9'
       - name: Setup GOPATH and AVAPATH
         run : |
-          mkdir -p $GOPATH
           mkdir -p $GOPATH/$AVAPATH
       - name: Install autoremove
         run: sudo apt-get autoremove -y
       - name: Clone and Build AvalancheGo
         run : |
-          cd $GOPATH
-          cd $AVAPATH
+          cd $GOPATH/$AVAPATH
           git clone https://github.com/ava-labs/avalanchego
           cd avalanchego
           ./scripts/build.sh
       - name: Checkout ANR
         run : |
-          cd $GOPATH
-          cd $AVAPATH
+          cd $GOPATH/$AVAPATH
           git clone https://github.com/ava-labs/avalanche-network-runner
       - name: Starting ANR
         run: |
-          cd $GOPATH
-          cd $AVAPATH
+          cd $GOPATH/$AVAPATH
           cd avalanche-network-runner
           git checkout v1.0.12
           go run ./examples/local/fivenodenetwork/main.go &
