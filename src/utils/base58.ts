@@ -4,9 +4,11 @@ import {sha256} from '@noble/hashes/sha256';
 
 export const base58check: BytesCoder = {
   encode(data) {
-    return base58.encode(
-      new Uint8Array([...data, ...sha256(data).subarray(-4)]),
-    );
+    const merged = new Uint8Array(data.length + 4);
+    merged.set(data);
+    merged.set(sha256(data).subarray(-4), data.length);
+
+    return base58.encode(merged);
   },
   decode(string) {
     return base58.decode(string).subarray(0, -4);
