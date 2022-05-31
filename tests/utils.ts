@@ -1,6 +1,6 @@
 import * as assert from 'uvu/assert';
 import {base58, base58check} from '../src/utils/base58';
-import {bufferToNumber} from '../src/utils/buffer';
+import {bufferToBigInt, bufferToNumber} from '../src/utils/buffer';
 import {describe} from './setup/env';
 
 describe('base58', (it) => {
@@ -53,7 +53,7 @@ describe('base58', (it) => {
   });
 });
 
-describe('bufferToNumber', (it) => {
+describe('bufferToBigInt', (it) => {
   it('converts Uint8Arrays correctly', async () => {
     const tests = [
       {
@@ -69,6 +69,31 @@ describe('bufferToNumber', (it) => {
           0x00, 0x00, 0x00, 0x00, 0x77, 0x35, 0x94, 0x00,
         ]),
         number: 2_000_000_000n,
+      },
+    ];
+
+    for (const {buffer, number} of tests) {
+      assert.equal(bufferToBigInt(buffer), number);
+    }
+  });
+});
+
+describe('bufferToNumber', (it) => {
+  it('converts Uint8Arrays correctly', async () => {
+    const tests = [
+      {
+        buffer: new Uint8Array([0x00, 0x00]),
+        number: 0,
+      },
+      {
+        buffer: new Uint8Array([0x00, 0x00, 0x00, 0x07]),
+        number: 7,
+      },
+      {
+        buffer: new Uint8Array([
+          0x00, 0x00, 0x00, 0x00, 0x77, 0x35, 0x94, 0x00,
+        ]),
+        number: 2_000_000_000,
       },
     ];
 
