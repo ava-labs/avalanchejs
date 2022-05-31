@@ -11,13 +11,12 @@
     "test:coverage": "c8 --include=src pnpm test"
   },
   "dependencies": {
+    "@noble/hashes": "1.0.0",
     "@scure/base": "1.0.0",
-    "sha.js": "2.4.11",
     "worktop": "0.8.0-next.14"
   },
   "devDependencies": {
     "@types/node": "17.0.36",
-    "@types/sha.js": "2.4.0",
     "c8": "7.11.3",
     "node-fetch": "3.2.4",
     "tsm": "2.2.1",
