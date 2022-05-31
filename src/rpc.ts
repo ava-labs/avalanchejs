@@ -1,6 +1,3 @@
-// TODO: Should we use a different lib?
-import fetch from 'node-fetch';
-
 export async function rpcCall<T>(url: string, body: string): Promise<T> {
   return fetch(url, {
     method: 'POST',
