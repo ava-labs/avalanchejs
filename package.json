@@ -7,7 +7,7 @@
     "lint": "xo",
     "lint:fix": "xo --fix",
     "check": "tsc --noEmit",
-    "test": "NODE_OPTIONS=\"--no-warnings\" uvu -r tsm tests -i setup",
+    "test": "uvu -r tsm tests -i setup --experimental fetch",
     "test:coverage": "c8 --include=src pnpm test"
   },
   "dependencies": {
