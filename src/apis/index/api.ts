@@ -89,20 +89,20 @@ export class IndexAPI extends JRPCAPI {
   /**
    * Get contrainer by ID
    *
-   * @param containerID
+   * @param id
    * @param encoding
    * @param baseURL
    *
    * @returns Returns a Promise GetContainerByIDResponse.
    */
   getContainerByID = async (
-    containerID: string = "0",
+    id: string = "0",
     encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<GetContainerByIDResponse> => {
     this.setBaseURL(baseURL)
     const params: GetContainerByIDParams = {
-      containerID,
+      id,
       encoding
     }
 
@@ -154,20 +154,20 @@ export class IndexAPI extends JRPCAPI {
   /**
    * Get index by containerID
    *
-   * @param containerID
+   * @param id
    * @param encoding
    * @param baseURL
    *
    * @returns Returns a Promise GetIndexResponse.
    */
   getIndex = async (
-    containerID: string = "",
+    id: string = "",
     encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<string> => {
     this.setBaseURL(baseURL)
     const params: GetIndexParams = {
-      containerID,
+      id,
       encoding
     }
 
@@ -185,20 +185,20 @@ export class IndexAPI extends JRPCAPI {
   /**
    * Check if container is accepted
    *
-   * @param containerID
+   * @param id
    * @param encoding
    * @param baseURL
    *
    * @returns Returns a Promise GetIsAcceptedResponse.
    */
   isAccepted = async (
-    containerID: string = "",
+    id: string = "",
     encoding: string = "hex",
     baseURL: string = this.getBaseURL()
   ): Promise<IsAcceptedResponse> => {
     this.setBaseURL(baseURL)
     const params: GetIsAcceptedParams = {
-      containerID,
+      id,
       encoding
     }
 
