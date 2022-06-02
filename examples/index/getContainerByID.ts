@@ -10,12 +10,12 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 
 const main = async (): Promise<any> => {
-  const containerID: string =
+  const id: string =
     "eLXEKFFMgGmK7ZLokCFjppdBfGy5hDuRqh5uJVyXXPaRErpAX"
   const encoding: string = "hex"
   const baseurl: string = "/ext/index/X/tx"
   const containerByIndex: GetContainerByIDResponse =
-    await index.getContainerByID(containerID, encoding, baseurl)
+    await index.getContainerByID(id, encoding, baseurl)
   console.log(containerByIndex)
 }
 
