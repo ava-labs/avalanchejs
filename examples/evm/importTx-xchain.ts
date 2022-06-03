@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
 import {
   EVMAPI,
   EVMOutput,
@@ -11,12 +11,12 @@ import {
   AmountOutput,
   UnsignedTx,
   Tx
-} from "../../src/apis/evm"
+} from "avalanche/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
