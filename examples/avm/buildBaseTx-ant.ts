@@ -1,6 +1,12 @@
 import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
 import { Avalanche, BN, Buffer } from "avalanche/dist"
-import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "avalanche/dist/apis/avm"
+import {
+  AVMAPI,
+  KeyChain,
+  UTXOSet,
+  UnsignedTx,
+  Tx
+} from "avalanche/dist/apis/avm"
 import { UnixNow } from "avalanche/dist/utils"
 import {
   PrivateKeyPrefix,

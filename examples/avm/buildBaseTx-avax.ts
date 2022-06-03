@@ -1,5 +1,11 @@
 import { Avalanche, BN, Buffer } from "avalanche/dist"
-import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "avalanche/dist/apis/avm"
+import {
+  AVMAPI,
+  KeyChain,
+  UTXOSet,
+  UnsignedTx,
+  Tx
+} from "avalanche/dist/apis/avm"
 import {
   GetBalanceResponse,
   GetUTXOsResponse
