@@ -28,6 +28,12 @@ const typeMapping = {
       return [bufferToBigInt(buf.slice(0, 8)), buf.slice(8)];
     },
   },
+  c: {
+    // Codec
+    unpack(buf: Uint8Array) {
+      return [bufferToNumber(buf.slice(0, 2)), buf.slice(2)];
+    },
+  },
   r: {
     // Array
     unpack(buf: Uint8Array, length: number, type: 'i' | 'n' | 'b' | 'u' | 'a') {
@@ -58,12 +64,16 @@ export function unpack(format: string, buf: Uint8Array) {
       case 'b':
       case 'u':
       case 'a':
+      case 'c':
+        // eslint-disable-next-line no-case-declarations, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         const [temporary1, ibuf1] = typeMapping[format[i]].unpack(buf);
         array.push(temporary1);
-        buf = ibuf1;
+        buf = ibuf1; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         continue;
       case 'r':
-        const [length, ibuf2] = typeMapping.n.unpack(buf);
+        // TODO: cleanup
+        const [length, ibuf2] = typeMapping.n.unpack(buf); // eslint-disable-line no-case-declarations
+        // eslint-disable-next-line no-case-declarations
         const [temporary2, ibuf3] = typeMapping.r.unpack(
           ibuf2 as Uint8Array, // TODO: type
           length as number, // TODO: type
@@ -81,5 +91,5 @@ export function unpack(format: string, buf: Uint8Array) {
     array.push(buf);
   }
 
-  return array;
+  return array; // eslint-disable-line @typescript-eslint/no-unsafe-return
 }
