@@ -1,4 +1,4 @@
-import { Avalanche, BN, Buffer, BinTools } from "../../src"
+import { Avalanche, BN, Buffer } from "../../src"
 import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
@@ -11,19 +11,31 @@ const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const asOf: BN = UnixNow()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX")
-const fee: BN = xchain.getDefaultTxFee()
+
+var xchain: AVMAPI
+var xKeychain: KeyChain
+var xAddressStrings: string[]
+var avaxAssetID: string
+var fee: BN
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = xchain.getDefaultTxFee()
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const getBalanceResponse: any = await xchain.getBalance(
     xAddressStrings[0],
     avaxAssetID
@@ -34,7 +46,7 @@ const main = async (): Promise<any> => {
 
   const unsignedTx: UnsignedTx = await xchain.buildBaseTx(
     utxoSet,
-    balance.sub(fee),
+    balance.sub(fee).sub(new BN("500000000000")),
     avaxAssetID,
     xAddressStrings,
     xAddressStrings,
@@ -45,9 +57,11 @@ const main = async (): Promise<any> => {
     threshold
   )
 
+  console.log(JSON.stringify(unsignedTx))
+
   const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+  //const txid: string = await xchain.issueTx(tx)
+  //console.log(`Success! TXID: ${txid}`)
 }
 
 main()

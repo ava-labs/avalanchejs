@@ -35,6 +35,7 @@ import {
   XChainVMName
 } from "./utils/constants"
 import { DefaultPlatformChainID } from "./utils"
+import { GetConfigurationResponse } from "./apis/platformvm/interfaces"
 
 /**
  * AvalancheJS is middleware for interacting with Avalanche node RPC APIs.
@@ -159,11 +160,21 @@ export default class Avalanche extends AvalancheCore {
     // We need this be able to make next call
     this.addAPI("pchain", PlatformVMAPI)
     //Get platform configuration
-    const response = await this.PChain().getConfiguration()
+    let response: GetConfigurationResponse
 
-    this.networkID = response.networkID
+    try {
+      response = await this.PChain().getConfiguration()
+      this.networkID = response.networkID
+    } catch (error) {
+      this.networkID = await this.Info().getNetworkID()
+    }
+
     if ((this.network = networks.getNetwork(this.networkID)))
       return this.refreshAPI()
+
+    if (!response) {
+      throw new Error("Configuration required")
+    }
 
     const xchain = response.blockchains.find((b) => b["name"] === "X-Chain")
     const cchain = response.blockchains.find((b) => b["name"] === "C-Chain")

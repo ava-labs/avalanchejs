@@ -23,33 +23,49 @@ const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const blockchainID: string = avalanche.getNetwork().X.blockchainID
-const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX")
 // Uncomment for codecID 00 01
 // const codecID: number = 1
 
+var xchain: AVMAPI
+var xKeychain: KeyChain
+var xAddresses: Buffer[]
+var xAddressStrings: string[]
+var avaxAssetID: string
+var fee: BN
+var blockchainID: string
+var avaxAssetIDBuf: Buffer
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddresses = xchain.keyChain().getAddresses()
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = xchain.getDefaultTxFee()
+
+  blockchainID = avalanche.getNetwork().X.blockchainID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const getBalanceResponse: any = await xchain.getBalance(
     xAddressStrings[0],
     avaxAssetID
   )
   const balance: BN = new BN(getBalanceResponse["balance"])
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
-    balance.sub(fee),
+    balance.sub(fee).sub(new BN("500000000000")),
     xAddresses,
     locktime,
     threshold
@@ -97,8 +113,8 @@ const main = async (): Promise<any> => {
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
   // console.log(tx.toBuffer().toString("hex"))
-  // const serialized: any = baseTx.serialize("display")
-  // console.log(JSON.stringify(serialized))
+  //const serialized: any = baseTx.serialize("display")
+  //console.log(JSON.stringify(serialized))
   const txid: string = await xchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)
 }
