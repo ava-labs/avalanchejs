@@ -36,9 +36,10 @@ const typeMapping = {
   },
   r: {
     // Array
-    unpack(buf: Uint8Array, length: number, type: 'i' | 'n' | 'b' | 'u' | 'a') {
+    unpack(buf: Uint8Array, length: number, type: string) {
       const array = [];
       for (let i = 0; i < length; i++) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
         const [temporary, ibuf] = typeMapping[type].unpack(buf);
         array.push(temporary);
         buf = ibuf as Uint8Array; // TODO: type
@@ -77,7 +78,7 @@ export function unpack(format: string, buf: Uint8Array) {
         const [temporary2, ibuf3] = typeMapping.r.unpack(
           ibuf2 as Uint8Array, // TODO: type
           length as number, // TODO: type
-          typeMapping[format[(i += 1)]],
+          format[(i += 1)],
         );
         array.push(temporary2);
         buf = ibuf3 as Uint8Array; // TODO: type

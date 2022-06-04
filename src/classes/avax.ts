@@ -1,4 +1,3 @@
-import {bufferToNumber} from '../utils/buffer';
 import * as struct from '../struct';
 
 export class Output {
@@ -40,16 +39,11 @@ export class OutputOwners {
   addresses: ArrayBuffer[];
 
   constructor(buffer: Uint8Array) {
-    [this.locktime, this.threshold, buffer] = struct.unpack('un', buffer); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-
-    // TODO: replace with struct unpack
-    let offset = 0;
-    const numberAddresses = bufferToNumber(buffer.slice(offset, (offset += 4)));
-
-    this.addresses = [];
-    for (let i = 0; i < numberAddresses; i++) {
-      this.addresses.push(buffer.slice(offset, (offset += 20)));
-    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    [this.locktime, this.threshold, this.addresses, buffer] = struct.unpack(
+      'unra',
+      buffer,
+    );
   }
 }
 
