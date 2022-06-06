@@ -11,13 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.2
       - uses: actions/setup-node@v3
         with:
-          cache: pnpm
-      - run: pnpm install
-      - run: pnpm lint
-      - run: pnpm check
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint
+      - run: yarn check
   Test:
     runs-on: ubuntu-latest
     strategy:
@@ -25,10 +24,9 @@ jobs:
         node-version: [16, 18]
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.2
       - uses: actions/setup-node@v3
         with:
+          cache: yarn
           node-version: ${{ matrix.node-version }}
-          cache: pnpm
-      - run: pnpm install
-      - run: pnpm test:coverage
+      - run: yarn install --frozen-lockfile
+      - run: yarn test:coverage

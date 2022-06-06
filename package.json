@@ -2,13 +2,13 @@
   "name": "avalanchejs-v2",
   "type": "module",
   "version": "0.0.1",
-  "packageManager": "pnpm@7.1.7",
+  "packageManager": "yarn@1.22.18",
   "scripts": {
     "lint": "xo",
     "lint:fix": "xo --fix",
     "check": "tsc --noEmit",
     "test": "uvu -r tsm tests -i setup --experimental fetch",
-    "test:coverage": "c8 --include=src pnpm test"
+    "test:coverage": "c8 --include=src yarn test"
   },
   "dependencies": {
     "@noble/hashes": "1.0.0",
@@ -24,7 +24,9 @@
     "xo": "0.49.0"
   },
   "engines": {
-    "node": "^16.13 || ^18",
-    "pnpm": ">=7"
-  }
+    "node": "^16.13 || ^18"
+  },
+  "repository": "git@github.com:ava-labs/avalanchejs-v2.git",
+  "author": "Oliver Wang <oliver.wang@avalabs.org>",
+  "license": "MIT"
 }
