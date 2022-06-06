@@ -1,4 +1,4 @@
-import { BinTools } from "../../src"
+import { BinTools } from "avalanche/dist"
 const bintools: BinTools = BinTools.getInstance()
 const validHex1: string =
   "0x95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d01612940bd5"
