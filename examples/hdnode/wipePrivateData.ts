@@ -1,4 +1,4 @@
-import HDNode from "avalanche/dist/utils/hdnode"
+import HDNode from "../../src/utils/hdnode"
 
 const main = async (): Promise<any> => {
   const seed: string =

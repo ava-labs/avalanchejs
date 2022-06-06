@@ -1,4 +1,4 @@
-import Avalanche, { BN, Buffer } from "avalanche/dist"
+import Avalanche, { BN, Buffer } from "../../src"
 import {
   AVMAPI,
   GenesisAsset,
@@ -7,13 +7,13 @@ import {
   KeyChain,
   SECPMintOutput,
   SECPTransferOutput
-} from "avalanche/dist/apis/avm"
+} from "../../src/apis/avm"
 import {
   DefaultLocalGenesisPrivateKey,
   PrivateKeyPrefix,
   Serialization,
   SerializedType
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"
 const port: number = 9650

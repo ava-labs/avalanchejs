@@ -1,24 +1,24 @@
 import createHash from "create-hash"
-import { Avalanche, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "avalanche/dist/apis/avm"
+} from "../../src/apis/avm"
 import {
   KeyChain as PlatformVMKeyChain,
   PlatformVMAPI
-} from "avalanche/dist/apis/platformvm"
+} from "../../src/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   UnixNow,
   SerializedType
-} from "avalanche/dist/utils"
-import { Serialization } from "avalanche/dist/utils"
+} from "../../src/utils"
+import { Serialization } from "../../src/utils"
 
 const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"

@@ -3,9 +3,9 @@
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
 import { readFile } from "fs"
-import { Avalanche } from "avalanche/dist"
-import { AuthAPI } from "avalanche/dist/apis/auth"
-import { ErrorResponseObject } from "avalanche/dist/utils"
+import { Avalanche } from "../../src"
+import { AuthAPI } from "../../src/apis/auth"
+import { ErrorResponseObject } from "../../src/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

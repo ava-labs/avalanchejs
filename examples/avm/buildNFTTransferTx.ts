@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   KeyChain,
@@ -7,13 +7,13 @@ import {
   Tx,
   AVMConstants,
   UTXO
-} from "avalanche/dist/apis/avm"
-import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
+} from "../../src/apis/avm"
+import { GetUTXOsResponse } from "../../src/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 
 const getUTXOIDs = (
   utxoSet: UTXOSet,

@@ -1,4 +1,4 @@
-import { PubSub, Socket } from "avalanche/dist"
+import { PubSub, Socket } from "../../src"
 
 const protocol: string = "ws"
 const host: string = "localhost"
