@@ -1,20 +1,20 @@
-import { Avalanche, BN } from "avalanche/dist"
+import { Avalanche, BN } from "../../src"
 import {
   PlatformVMAPI,
   KeyChain as PlatformKeyChain
-} from "avalanche/dist/apis/platformvm"
+} from "../../src/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx
-} from "avalanche/dist/apis/evm"
+} from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   costExportTx
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
