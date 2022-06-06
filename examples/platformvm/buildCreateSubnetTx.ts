@@ -1,17 +1,17 @@
-import { Avalanche, BN, Buffer } from "../../src"
+import { Avalanche, BN, Buffer } from "avalanche/dist"
 import {
   PlatformVMAPI,
   KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "../../src/apis/platformvm"
-import { GetUTXOsResponse } from "../../src/apis/platformvm/interfaces"
+} from "avalanche/dist/apis/platformvm"
+import { GetUTXOsResponse } from "avalanche/dist/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
