@@ -1,8 +1,8 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   PlatformVMAPI,
   KeyChain as PlatformVMKeyChain
-} from "avalanche/dist/apis/platformvm"
+} from "../../src/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -12,13 +12,13 @@ import {
   ExportTx,
   SECPTransferOutput,
   TransferableOutput
-} from "avalanche/dist/apis/evm"
+} from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   ONEAVAX
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 const Web3 = require("web3")
 
 const ip: string = "localhost"

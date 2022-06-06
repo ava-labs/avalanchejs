@@ -1,4 +1,4 @@
-import { GetAtomicTxParams } from "avalanche/dist/apis/evm"
+import { GetAtomicTxParams } from "../../src/apis/evm"
 
 const main = async (): Promise<any> => {
   const getAtomicTxParams: GetAtomicTxParams = {

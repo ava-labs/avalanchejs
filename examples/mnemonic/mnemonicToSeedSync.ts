@@ -1,5 +1,5 @@
-import Mnemonic from "avalanche/dist/utils/mnemonic"
-import { Buffer } from "avalanche/dist"
+import Mnemonic from "../../src/utils/mnemonic"
+import { Buffer } from "../../src"
 const mnemonic: Mnemonic = Mnemonic.getInstance()
 
 const main = async (): Promise<any> => {
