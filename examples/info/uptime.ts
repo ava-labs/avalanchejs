@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { InfoAPI } from "avalanche/dist/apis/info"
-import { UptimeResponse } from "avalanche/dist/apis/info/interfaces"
+import { Avalanche } from "../../dist"
+import { InfoAPI } from "../../dist/apis/info"
+import { UptimeResponse } from "../../dist/apis/info/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650

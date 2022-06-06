@@ -1,20 +1,20 @@
-import { Avalanche, BN } from "avalanche/dist"
+import { Avalanche, BN } from "../../src"
 import {
   PlatformVMAPI,
   KeyChain as PlatformKeyChain
-} from "avalanche/dist/apis/platformvm"
+} from "../../src/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx
-} from "avalanche/dist/apis/evm"
+} from "../../src/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   costExportTx
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -46,11 +46,25 @@ const main = async (): Promise<any> => {
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount
   const locktime: BN = new BN(0)
-  let avaxAmount: BN = new BN(1e7)
-  let fee: BN = baseFee.div(new BN(1e9))
-  fee = fee.add(new BN(1e6))
+  let avaxAmount: BN = balance.sub(baseFee)
+  let fee: BN = baseFee
 
   let unsignedTx: UnsignedTx = await cchain.buildExportTx(
+    avaxAmount,
+    avaxAssetID,
+    pChainBlockchainIdStr,
+    cHexAddress,
+    cAddressStrings[0],
+    pAddressStrings,
+    nonce,
+    locktime,
+    threshold,
+    fee
+  )
+  const exportCost: number = costExportTx(unsignedTx)
+  fee = baseFee.mul(new BN(exportCost))
+  avaxAmount = balance.sub(fee)
+  unsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
     pChainBlockchainIdStr,
