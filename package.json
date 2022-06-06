@@ -7,7 +7,7 @@
     "lint": "xo",
     "lint:fix": "xo --fix",
     "check": "tsc --noEmit",
-    "test": "uvu -r tsm tests -i setup --experimental fetch",
+    "test": "uvu -r tsm tests -i setup",
     "test:coverage": "c8 --include=src yarn test"
   },
   "dependencies": {
