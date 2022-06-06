@@ -1,5 +1,5 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { AVMAPI, KeyChain as AVMKeyChain } from "avalanche/dist/apis/avm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -9,13 +9,13 @@ import {
   ExportTx,
   SECPTransferOutput,
   TransferableOutput
-} from "../../src/apis/evm"
-import { RequestResponseData } from "../../src/common"
+} from "avalanche/dist/apis/evm"
+import { RequestResponseData } from "avalanche/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
