@@ -46,25 +46,11 @@ const main = async (): Promise<any> => {
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount
   const locktime: BN = new BN(0)
-  let avaxAmount: BN = balance.sub(baseFee)
-  let fee: BN = baseFee
+  let avaxAmount: BN = new BN(1e7)
+  let fee: BN = baseFee.div(new BN(1e9))
+  fee = fee.add(new BN(1e6))
 
   let unsignedTx: UnsignedTx = await cchain.buildExportTx(
-    avaxAmount,
-    avaxAssetID,
-    pChainBlockchainIdStr,
-    cHexAddress,
-    cAddressStrings[0],
-    pAddressStrings,
-    nonce,
-    locktime,
-    threshold,
-    fee
-  )
-  const exportCost: number = costExportTx(unsignedTx)
-  fee = baseFee.mul(new BN(exportCost))
-  avaxAmount = balance.sub(fee)
-  unsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
     pChainBlockchainIdStr,

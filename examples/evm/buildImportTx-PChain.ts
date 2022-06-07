@@ -35,7 +35,7 @@ const pChainBlockchainId: string = Defaults.network[networkID].P.blockchainID
 
 const main = async (): Promise<any> => {
   const baseFeeResponse: string = await cchain.getBaseFee()
-  const baseFee = new BN(parseInt(baseFeeResponse, 16))
+  const baseFee = new BN(parseInt(baseFeeResponse, 16) / 1e9)
   let fee: BN = baseFee
   const evmUTXOResponse: any = await cchain.getUTXOs(
     cAddressStrings,
