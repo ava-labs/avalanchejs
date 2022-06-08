@@ -12,7 +12,7 @@ export class Output {
   output: SecpTransferOutput;
 
   constructor(buffer: Uint8Array) {
-    [this.outputId, buffer] = struct.unpack('n', buffer); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+    [this.outputId, buffer] = struct.unpack('n', buffer);
 
     switch (this.outputId) {
       case 7: // TODO: don't hardcode this

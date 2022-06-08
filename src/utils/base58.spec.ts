@@ -1,9 +1,7 @@
-import * as assert from 'uvu/assert';
-import {base58, base58check} from '../src/utils/base58';
-import {bufferToBigInt, bufferToNumber} from '../src/utils/buffer';
-import {describe} from './setup/env';
+import { base58, base58check } from './base58';
+import { bufferToBigInt, bufferToNumber } from './buffer';
 
-describe('base58', (it) => {
+describe('base58', () => {
   it('encodes and decodes correctly', async () => {
     const tests = [
       {
@@ -44,16 +42,16 @@ describe('base58', (it) => {
       },
     ];
 
-    for (const {buffer, string, checksum} of tests) {
-      assert.equal(base58.encode(buffer), string);
-      assert.equal(base58.decode(string), buffer);
-      assert.equal(base58check.encode(buffer), checksum);
-      assert.equal(base58check.decode(checksum), buffer);
+    for (const { buffer, string, checksum } of tests) {
+      expect(base58.encode(buffer)).toEqual(string);
+      expect(base58.decode(string)).toEqual(buffer);
+      expect(base58check.encode(buffer)).toEqual(checksum);
+      expect(base58check.decode(checksum)).toEqual(buffer);
     }
   });
 });
 
-describe('bufferToBigInt', (it) => {
+describe('bufferToBigInt', () => {
   it('converts Uint8Arrays correctly', async () => {
     const tests = [
       {
@@ -72,13 +70,13 @@ describe('bufferToBigInt', (it) => {
       },
     ];
 
-    for (const {buffer, number} of tests) {
-      assert.equal(bufferToBigInt(buffer), number);
+    for (const { buffer, number } of tests) {
+      expect(bufferToBigInt(buffer)).toEqual(number);
     }
   });
 });
 
-describe('bufferToNumber', (it) => {
+describe('bufferToNumber', () => {
   it('converts Uint8Arrays correctly', async () => {
     const tests = [
       {
@@ -97,8 +95,8 @@ describe('bufferToNumber', (it) => {
       },
     ];
 
-    for (const {buffer, number} of tests) {
-      assert.equal(bufferToNumber(buffer), number);
+    for (const { buffer, number } of tests) {
+      expect(bufferToNumber(buffer)).toEqual(number);
     }
   });
 });

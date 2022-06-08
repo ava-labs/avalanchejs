@@ -1,7 +1,7 @@
 // Inspired by https://github.com/lyngklip/structjs/blob/master/struct.mjs
 // TODO: Cleanup
 
-import {bufferToBigInt, bufferToNumber} from './utils/buffer';
+import { bufferToBigInt, bufferToNumber } from './utils/buffer';
 
 const typeMapping = {
   i: {

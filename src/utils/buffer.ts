@@ -1,11 +1,15 @@
-import {toHEX} from 'worktop/buffer';
+import { toHEX } from 'worktop/buffer';
 
 export function bufferToBigInt(buf: Uint8Array) {
-  return BigInt(`0x${toHEX(buf)}`);
+  return BigInt(bufferToHex(buf));
 }
 
 export function bufferToNumber(buf: Uint8Array) {
   return Number.parseInt(toHEX(buf), 16);
+}
+
+export function bufferToHex(buf: Uint8Array) {
+  return `0x${toHEX(buf)}`;
 }
 
 export function merge(buf1: Uint8Array, buf2: Uint8Array) {

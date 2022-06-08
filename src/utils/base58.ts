@@ -1,7 +1,7 @@
-import {base58} from '@scure/base';
-import type {BytesCoder} from '@scure/base';
-import {sha256} from '@noble/hashes/sha256';
-import {merge} from './buffer';
+import { base58 } from '@scure/base';
+import type { BytesCoder } from '@scure/base';
+import { sha256 } from '@noble/hashes/sha256';
+import { merge } from './buffer';
 
 export const base58check: BytesCoder = {
   encode(data) {
@@ -12,4 +12,4 @@ export const base58check: BytesCoder = {
   },
 };
 
-export {base58} from '@scure/base';
+export { base58 } from '@scure/base';
