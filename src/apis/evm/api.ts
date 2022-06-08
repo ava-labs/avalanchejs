@@ -79,7 +79,7 @@ export class EVMAPI extends JRPCAPI {
         this.blockchainID in Defaults.network[`${netID}`]
       ) {
         this.blockchainAlias =
-          Defaults.network[`${netID}`][this.blockchainID].alias
+          Defaults.network[`${netID}`][this.blockchainID]["alias"]
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -867,7 +867,7 @@ export class EVMAPI extends JRPCAPI {
       netID in Defaults.network &&
       blockchainID in Defaults.network[`${netID}`]
     ) {
-      const { alias } = Defaults.network[`${netID}`][`${blockchainID}`]
+      const alias: string = Defaults.network[`${netID}`][`${blockchainID}`]["alias"]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)
