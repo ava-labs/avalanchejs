@@ -2079,7 +2079,8 @@ export class AVMAPI extends JRPCAPI {
       netID in Defaults.network &&
       blockchainID in Defaults.network[`${netID}`]
     ) {
-      const alias: string = Defaults.network[`${netID}`][`${blockchainID}`]["alias"]
+      const alias: string =
+        Defaults.network[`${netID}`][`${blockchainID}`]["alias"]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), blockchainID)

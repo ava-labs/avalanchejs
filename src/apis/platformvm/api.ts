@@ -1963,7 +1963,8 @@ export class PlatformVMAPI extends JRPCAPI {
       netID in Defaults.network &&
       this.blockchainID in Defaults.network[`${netID}`]
     ) {
-      const alias: string = Defaults.network[`${netID}`][this.blockchainID]["alias"]
+      const alias: string =
+        Defaults.network[`${netID}`][this.blockchainID]["alias"]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
