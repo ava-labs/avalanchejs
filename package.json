@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "3.14.1",
+  "version": "3.14.2",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
@@ -91,10 +91,11 @@
     "ethers": "5.6.4",
     "hdkey": "2.0.1",
     "isomorphic-ws": "4.0.1",
+    "randombytes": "^2.1.0",
     "store2": "2.13.2",
     "stream-browserify": "3.0.0",
     "ws": "8.5.0",
-    "xss": "1.0.11"
+    "xss": "1.0.13"
   },
   "prettier": {
     "tabWidth": 2,
