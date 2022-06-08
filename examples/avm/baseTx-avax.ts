@@ -1,5 +1,5 @@
 import createHash from "create-hash"
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -13,12 +13,12 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "../../src/apis/avm"
+} from "avalanche/dist/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
