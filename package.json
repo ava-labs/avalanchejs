@@ -91,6 +91,7 @@
     "ethers": "5.6.4",
     "hdkey": "2.0.1",
     "isomorphic-ws": "4.0.1",
+    "randombytes": "^2.1.0",
     "store2": "2.13.2",
     "stream-browserify": "3.0.0",
     "ws": "8.5.0",
