@@ -1,16 +1,16 @@
-import { Avalanche, BinTools, BN, Buffer, GenesisData } from "../../src"
+import { Avalanche, BinTools, BN, Buffer, GenesisData } from "avalanche/dist"
 import {
   PlatformVMAPI,
   KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "../../src/apis/platformvm"
+} from "avalanche/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 /**
  * @ignore

@@ -4,45 +4,46 @@ on: push
 env:
   GOPATH: /home/runner/go
   AVAPATH: src/github.com/ava-labs
+  ACTIONS_RUNTIME_URL: 
+  ACTIONS_RUNTIME_TOKEN: 
+  ACTIONS_CACHE_URL: 
 
 jobs:
   e2e:
     runs-on: ubuntu-18.04
     steps:
       - name: Checkout AvalancheJS
-        # Uses the major version of a release of a public repository
         uses: actions/checkout@v2
-        # with ava-labs/avalanchejs
-      - name: Setup Node Version and Cache
-        uses: actions/setup-node@v2
-        with:
-          cache: yarn
-          node-version: '16'
+        with: 
+          repository: 'ava-labs/avalanchejs'
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install zstd git build-essential nodejs -y
       - name: Install NodeJS dependencies
         run: yarn install --frozen-lockfile
       - name: Setup GoLang Version
         uses: actions/setup-go@v1
         with:
-          go-version: '1.18.0'
+          go-version: '1.17.9'
       - name: Setup GOPATH and AVAPATH
         run : |
-          mkdir -p $GOPATH
           mkdir -p $GOPATH/$AVAPATH
+      - name: Install autoremove
+        run: sudo apt-get autoremove -y
       - name: Clone and Build AvalancheGo
         run : |
-          cd $GOPATH
-          cd $AVAPATH
+          cd $GOPATH/$AVAPATH
           git clone https://github.com/ava-labs/avalanchego
           cd avalanchego
           ./scripts/build.sh
       - name: Checkout ANR
-        uses: actions/checkout@v2
-        with:
-          repository: 'ava-labs/avalanche-network-runner'
-          path: 'avalanche-network-runner'
+        run : |
+          cd $GOPATH/$AVAPATH
+          git clone https://github.com/ava-labs/avalanche-network-runner
       - name: Starting ANR
         run: |
+          cd $GOPATH/$AVAPATH
           cd avalanche-network-runner
+          git checkout v1.0.12
           go run ./examples/local/fivenodenetwork/main.go &
       - name: AvalancheJS E2E Test
         env: 

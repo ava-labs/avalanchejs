@@ -111,7 +111,7 @@ export class PlatformVMAPI extends JRPCAPI {
         this.blockchainID in Defaults.network[`${netid}`]
       ) {
         this.blockchainAlias =
-          Defaults.network[`${netid}`][this.blockchainID].alias
+          Defaults.network[`${netid}`][this.blockchainID]["alias"]
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -1963,7 +1963,8 @@ export class PlatformVMAPI extends JRPCAPI {
       netID in Defaults.network &&
       this.blockchainID in Defaults.network[`${netID}`]
     ) {
-      const { alias } = Defaults.network[`${netID}`][this.blockchainID]
+      const alias: string =
+        Defaults.network[`${netID}`][this.blockchainID]["alias"]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)
