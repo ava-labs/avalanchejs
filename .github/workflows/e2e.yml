@@ -17,7 +17,11 @@ jobs:
         with: 
           repository: 'ava-labs/avalanchejs'
       - name: Install dependencies
+<<<<<<< HEAD
         run: apt update && apt install zstd git build-essential nodejs -y
+=======
+        run: sudo apt update && sudo apt install zstd git build-essential nodejs -y
+>>>>>>> development
       - name: Install NodeJS dependencies
         run: yarn install --frozen-lockfile
       - name: Setup GoLang Version
@@ -29,7 +33,11 @@ jobs:
           mkdir -p $GOPATH
           mkdir -p $GOPATH/$AVAPATH
       - name: Install autoremove
+<<<<<<< HEAD
         run: apt-get autoremove -y
+=======
+        run: sudo apt-get autoremove -y
+>>>>>>> development
       - name: Clone and Build AvalancheGo
         run : |
           cd $GOPATH
