@@ -43,6 +43,11 @@ const addressList: Configs = {
   unpackItem: (buff: Uint8Array) => unpackv2<[string]>(buff, [address]),
 };
 
+const byteList: Configs = {
+  lengthConfig: int,
+  unpackItem: (buff: Uint8Array) => [buff.slice(0, 1), buff.slice(1)],
+};
+
 export const configs: Record<string, Configs> = {
   address,
   id,

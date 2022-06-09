@@ -12,7 +12,7 @@ export class Output {
   output: SecpTransferOutput;
 
   constructor(buffer: Uint8Array) {
-    [this.outputId, buffer] = struct.unpack('n', buffer);
+    [this.outputId, buffer] = struct.unpackv2('n', buffer);
 
     switch (this.outputId) {
       case 7: // TODO: don't hardcode this
@@ -40,37 +40,12 @@ export class OutputOwners {
 
   constructor(buffer: Uint8Array) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    [this.locktime, this.threshold, this.addresses, buffer] = struct.unpack(
-      'unra',
-      buffer,
-    );
+    [this.locktime, this.threshold, this.addresses, buffer] = struct.unpackv2<
+      [bigint, number, string[]]
+    >('unra', buffer);
   }
 }
 
-/**
- * A [SecpTransferOutput] for sending a quantity of an asset to
- * a collection of addresses after a specified unix time.
- *
- * @see https://docs.avax.network/specs/coreth-atomic-transaction-serialization/#secp256k1-transfer-output
- * @see https://docs.avax.network/specs/avm-transaction-serialization/#secp256k1-transfer-output
- * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-transfer-output
- */
-export class SecpTransferOutput {
-  // +-----------+--------------+-------------------------+
-  // | amount    : long         |                 8 bytes |
-  // +-----------+--------------+-------------------------+
-  // | owners    : OutputOwners |      size(owners) bytes |
-  // +-----------+--------------+-------------------------+
-  //                            | 8 +  size(owners) bytes |
-  //                            +-------------------------+
-  amount: bigint;
-  owners: OutputOwners;
-
-  constructor(buffer: Uint8Array) {
-    [this.amount, buffer] = struct.unpack('u', buffer); // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-    this.owners = new OutputOwners(buffer);
-  }
-}
 
 /**
  * [Utxo] is a standalone representation of a transaction output.
