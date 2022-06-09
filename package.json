@@ -4,8 +4,8 @@
   "packageManager": "yarn@1.22.18",
   "scripts": {
     "test": "jest",
-    "test:cov": "jest --collect-coverage=true --verbose",
-    "test:watch": "jest test --watch",
+    "test:cov": "jest --collect-coverage=true",
+    "test:watch": "jest --watch",
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
     "check": "tsc --noEmit"
   },

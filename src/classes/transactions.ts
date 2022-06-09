@@ -1,4 +1,4 @@
-import * as struct from '../struct';
+import * as struct from '../utils/struct';
 
 export class Output {
   // +----------+------+------------------------+
