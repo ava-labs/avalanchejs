@@ -5,7 +5,7 @@ import { merge } from './buffer';
 
 export const base58check: BytesCoder = {
   encode(data) {
-    return base58.encode(merge(data, sha256(data).subarray(-4)));
+    return base58.encode(merge([data, sha256(data).subarray(-4)]));
   },
   decode(string) {
     return base58.decode(string).subarray(0, -4);

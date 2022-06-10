@@ -1,5 +1,6 @@
 import { NewableStatic, Newable } from '../common/types';
 import { bufferToNumber, merge } from '../utils/buffer';
+import { configs, pack } from '../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/codec/linearcodec/codec.go
@@ -22,10 +23,9 @@ export class Codec {
       throw new Error("can't marshal unregistered type");
     }
 
-    const view = new DataView(new ArrayBuffer(4));
-    view.setUint32(0, id, false);
+    const idBuff = pack([[id, configs.int]]);
 
-    return merge(new Uint8Array(view.buffer), type.toBytes());
+    return merge([idBuff, type.toBytes()]);
   }
 
   UnpackPrefix(buf: Uint8Array) {

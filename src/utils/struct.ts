@@ -1,8 +1,17 @@
 // Inspired by https://github.com/lyngklip/structjs/blob/master/struct.mjs
 // TODO: Cleanup
 
-import { bufferToBigInt, bufferToHex, bufferToNumber } from './buffer';
+import {
+  bufferToBigInt,
+  bufferToHex,
+  bufferToNumber,
+  hexToBuffer,
+  merge,
+  padLeft,
+} from './buffer';
 import { UnpackReturn } from './models';
+
+type ValueConfigTuple = [UnpackReturn, Configs];
 
 export type Configs = {
   lengthConfig?: Configs;
@@ -14,36 +23,57 @@ export type Configs = {
   ) => [UnpackReturn, Uint8Array];
   unpackCustom?: (buff: Uint8Array) => [UnpackReturn, Uint8Array];
   offset?: number;
+  pack(value: UnpackReturn): Uint8Array;
 };
 
 const address: Configs = {
   offset: 20,
   unpack: bufferToHex,
+  pack: (value: string) => {
+    return padLeft(hexToBuffer(value), 20);
+  },
 };
 
 const id: Configs = {
   offset: 32,
   unpack: bufferToHex,
+  pack: (value: string) => {
+    return padLeft(hexToBuffer(value), 32);
+  },
 };
 
 const int: Configs = {
   offset: 4,
   unpack: bufferToNumber,
+  pack: (value: number) => {
+    return padLeft(hexToBuffer(value.toString(16)), 4);
+  },
 };
 
 const bigInt: Configs = {
   offset: 8,
   unpack: bufferToBigInt,
+  pack: (value: bigint) => {
+    return padLeft(hexToBuffer(value.toString(16)), 8);
+  },
 };
 
 const codec: Configs = {
   offset: 2,
   unpack: bufferToNumber,
+  pack: (value: number) => {
+    return padLeft(hexToBuffer(value.toString(16)), 2);
+  },
 };
 
 const addressList: Configs = {
   lengthConfig: int,
   unpackItem: (buff: Uint8Array) => unpack<[string]>(buff, [address]),
+  pack: (addresses: string[]) => {
+    const addrsSize = padLeft(hexToBuffer(addresses.length.toString(16)), 4);
+    const addrs = addresses.map(hexToBuffer);
+    return merge([addrsSize, merge(addrs)]);
+  },
 };
 
 const byteList: Configs = {
@@ -52,6 +82,9 @@ const byteList: Configs = {
     buff.slice(0, length),
     buff.slice(length),
   ],
+  pack: (array: Uint8Array) => {
+    return array;
+  },
 };
 
 export const configs: Record<string, Configs> = {
@@ -116,3 +149,14 @@ export const unpack = <O extends UnpackReturn[]>(
   // not sure how to make these types
   return result as [...O, Uint8Array];
 };
+
+/**
+ * Pack the given values into a single buffer.
+ * @param values An array of values to pack.
+ */
+export function pack(values: ValueConfigTuple[]) {
+  const buffs = values.map((val) => {
+    return val[1].pack(val[0]);
+  });
+  return merge(buffs);
+}

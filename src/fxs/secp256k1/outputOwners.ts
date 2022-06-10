@@ -1,4 +1,4 @@
-import { configs, unpack } from '../../utils/struct';
+import { configs, pack, unpack } from '../../utils/struct';
 import { NewableStatic, staticImplements } from '../../common/types';
 
 /**
@@ -28,7 +28,10 @@ export class OutputOwners {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return pack([
+      [this.locktime, configs.bigInt],
+      [this.threshold, configs.int],
+      [this.addrs, configs.addressList],
+    ]);
   }
 }
