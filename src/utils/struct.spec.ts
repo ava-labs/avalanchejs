@@ -1,4 +1,4 @@
-import { configs, unpackv2 } from './struct';
+import { configs, unpack } from './struct';
 
 describe('struct', () => {
   it('unpacks simple items correctly', () => {
@@ -23,17 +23,14 @@ describe('struct', () => {
     ]);
 
     const [typeID, address, amount, assetID, payload, nonce, remaining] =
-      unpackv2<[number, string, bigint, string, Uint8Array, bigint]>(
-        exampleTx,
-        [
-          configs.int,
-          configs.address,
-          configs.bigInt,
-          configs.id,
-          configs.byteList,
-          configs.bigInt,
-        ],
-      );
+      unpack<[number, string, bigint, string, Uint8Array, bigint]>(exampleTx, [
+        configs.int,
+        configs.address,
+        configs.bigInt,
+        configs.id,
+        configs.byteList,
+        configs.bigInt,
+      ]);
 
     expect(typeID).toEqual(13);
     expect(payload).toEqual(new Uint8Array([0x43, 0x11, 0x00]));
@@ -62,7 +59,7 @@ describe('struct', () => {
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     ]);
 
-    const [addresses, remaining] = unpackv2<[string[]]>(exampleTx, [
+    const [addresses, remaining] = unpack<[string[]]>(exampleTx, [
       configs.addressList,
     ]);
 

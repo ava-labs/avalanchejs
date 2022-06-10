@@ -22,7 +22,7 @@
                          +-------------------------------+
  */
 
-import { configs, unpackv2 } from '../utils/struct';
+import { configs, unpack } from '../utils/struct';
 
 export class NftTransferOutput {
   constructor(
@@ -36,22 +36,16 @@ export class NftTransferOutput {
 
   static fromBytes(buff: Uint8Array): NftTransferOutput {
     const { int, bigInt, addressList, byteList } = configs;
-    const [typeID, groupId, payload, locktime, threashold, addresses] =
-      unpackv2<[number, number, Uint8Array, bigint, number, string[]]>(buff, [
-        int,
-        int,
-        byteList,
-        bigInt,
-        int,
-        addressList,
-      ]);
+    const [typeID, groupId, payload, locktime, threshold, addresses] = unpack<
+      [number, number, Uint8Array, bigint, number, string[]]
+    >(buff, [int, int, byteList, bigInt, int, addressList]);
 
     return new NftTransferOutput(
       typeID,
       groupId,
       payload,
       locktime,
-      threashold,
+      threshold,
       addresses,
     );
   }

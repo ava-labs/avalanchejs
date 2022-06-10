@@ -1,4 +1,4 @@
-import { Configs, configs, unpackv2 } from '../utils/struct';
+import { Configs, configs, unpack } from '../utils/struct';
 
 export class OutputOwner {
   constructor(
@@ -13,7 +13,7 @@ export class OutputOwner {
   }
 
   private static unpackBytes(buff: Uint8Array): [OutputOwner, Uint8Array] {
-    const [locktime, threshold, addresses, remaining] = unpackv2<
+    const [locktime, threshold, addresses, remaining] = unpack<
       [bigint, number, string[]]
     >(buff, [configs.bigInt, configs.int, configs.addressList]);
     return [new OutputOwner(locktime, threshold, addresses), remaining];

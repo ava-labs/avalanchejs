@@ -43,7 +43,7 @@ const codec: Configs = {
 
 const addressList: Configs = {
   lengthConfig: int,
-  unpackItem: (buff: Uint8Array) => unpackv2<[string]>(buff, [address]),
+  unpackItem: (buff: Uint8Array) => unpack<[string]>(buff, [address]),
 };
 
 const byteList: Configs = {
@@ -64,7 +64,7 @@ export const configs: Record<string, Configs> = {
   byteList,
 };
 
-export const unpackv2 = <O extends UnpackReturn[]>(
+export const unpack = <O extends UnpackReturn[]>(
   buffer: Uint8Array,
   configs: Configs[],
 ): [...O, Uint8Array] => {
@@ -90,7 +90,7 @@ export const unpackv2 = <O extends UnpackReturn[]>(
 
     let length: number;
     //length is always int https://docs.avax.network/specs/serialization-primitives/#variable-length-array
-    [length, buffer] = unpackv2<[number]>(buffer, [config.lengthConfig]);
+    [length, buffer] = unpack<[number]>(buffer, [config.lengthConfig]);
     if (config.unpackChunk) {
       let res;
       [res, buffer] = config.unpackChunk(buffer, length);

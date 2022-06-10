@@ -5,7 +5,7 @@
  *
  */
 
-import { configs, unpackv2 } from '../utils/struct';
+import { configs, unpack } from '../utils/struct';
 import { OutputOwner } from './outputOwner';
 
 export class SecpMintOutput {
@@ -13,7 +13,7 @@ export class SecpMintOutput {
 
   static fromBytes(buff: Uint8Array): SecpMintOutput {
     const { int } = configs;
-    const [typeID, outputOwner] = unpackv2<[number, OutputOwner]>(buff, [
+    const [typeID, outputOwner] = unpack<[number, OutputOwner]>(buff, [
       int,
       OutputOwner.unpackerConfig(),
     ]);

@@ -1,4 +1,4 @@
-import { configs, unpackv2 } from '../utils/struct';
+import { configs, unpack } from '../utils/struct';
 
 /**
  * A [SecpTransferOutput] for sending a quantity of an asset to
@@ -29,13 +29,13 @@ export class SecpTransferOutput {
     private typeID: number,
     private amount: bigint,
     private locktime: bigint,
-    private threashold: number,
+    private threshold: number,
     private addresses: string[],
   ) {}
 
   static fromBytes(buff: Uint8Array): SecpTransferOutput {
     const { int, bigInt, addressList } = configs;
-    const [typeID, amount, locktime, threashold, addresses] = unpackv2<
+    const [typeID, amount, locktime, threshold, addresses] = unpack<
       [number, bigint, bigint, number, string[]]
     >(buff, [int, bigInt, bigInt, int, addressList]);
 
@@ -43,7 +43,7 @@ export class SecpTransferOutput {
       typeID,
       amount,
       locktime,
-      threashold,
+      threshold,
       addresses,
     );
   }
