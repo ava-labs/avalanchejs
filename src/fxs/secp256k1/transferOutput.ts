@@ -1,6 +1,7 @@
-import { configs, unpack } from '../../utils/struct';
+import { configs, pack, unpack } from '../../utils/struct';
 import { OutputOwners } from './outputOwners';
 import { NewableStatic, staticImplements } from '../../common/types';
+import { merge } from '../../utils/buffer';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/transfer_output.go
@@ -25,7 +26,9 @@ export class TransferOutput {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return merge([
+      pack([[this.amt, configs.bigInt]]),
+      this.outputOwners.toBytes(),
+    ]);
   }
 }
