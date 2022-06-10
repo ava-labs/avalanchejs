@@ -1,10 +1,12 @@
-import { NftTransferOutput } from './nftTransferOutput';
+import { OutputOwners } from '../secp256k1';
+import { TransferOutput } from '.';
 
-describe('NftTransferOutput', () => {
+describe('TransferOutput', () => {
+  /**
+   * @see https://docs.avax.network/specs/avm-transaction-serialization/#nft-transfer-output-example
+   */
   it('deserializes correctly', () => {
-    const input = new Uint8Array([
-      // TypeID:
-      0x00, 0x00, 0x00, 0x0b,
+    const bytes = new Uint8Array([
       // groupID:
       0x00, 0x00, 0x30, 0x39,
       // length of payload:
@@ -25,20 +27,19 @@ describe('NftTransferOutput', () => {
       0x4a, 0x46, 0x1c, 0x89, 0x43, 0xab, 0x08, 0x59,
     ]);
 
-    const output = NftTransferOutput.fromBytes(input);
+    const [output, remainder] = TransferOutput.fromBytes(bytes);
 
-    const expectedOutput = new NftTransferOutput(
-      11,
-      12345,
-      new Uint8Array([0x43, 0x11, 0x00]),
-      54321n,
-      1,
-      [
-        '0x51025c61fbcfc078f69334f834be6dd26d55a955',
-        '0xc3344128e060128ede3523a24a461c8943ab0859',
-      ],
+    expect(output).toStrictEqual(
+      new TransferOutput(
+        12345,
+        new Uint8Array([0x43, 0x11, 0x00]),
+        new OutputOwners(54321n, 1, [
+          '0x51025c61fbcfc078f69334f834be6dd26d55a955',
+          '0xc3344128e060128ede3523a24a461c8943ab0859',
+        ]),
+      ),
     );
 
-    expect(output).toEqual(expectedOutput);
+    expect(remainder).toStrictEqual(new Uint8Array());
   });
 });
