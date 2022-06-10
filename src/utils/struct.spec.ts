@@ -14,21 +14,29 @@ describe('struct', () => {
       0xdb, 0xcf, 0x89, 0x0f, 0x77, 0xf4, 0x9b, 0x96, 0x85, 0x76, 0x48, 0xb7,
       0x2b, 0x77, 0xf9, 0xf8, 0x29, 0x37, 0xf2, 0x8a, 0x68, 0x70, 0x4a, 0xf0,
       0x5d, 0xa0, 0xdc, 0x12, 0xba, 0x53, 0xf2, 0xdb,
+      // length of payload:
+      0x00, 0x00, 0x00, 0x03,
+      // payload:
+      0x43, 0x11, 0x00,
       // Nonce:
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     ]);
 
-    const [typeID, address, amount, assetID, nonce, remaining] = unpackv2<
-      [number, string, bigint, string, bigint]
-    >(exampleTx, [
-      configs.int,
-      configs.address,
-      configs.bigInt,
-      configs.id,
-      configs.bigInt,
-    ]);
+    const [typeID, address, amount, assetID, payload, nonce, remaining] =
+      unpackv2<[number, string, bigint, string, Uint8Array, bigint]>(
+        exampleTx,
+        [
+          configs.int,
+          configs.address,
+          configs.bigInt,
+          configs.id,
+          configs.byteList,
+          configs.bigInt,
+        ],
+      );
 
     expect(typeID).toEqual(13);
+    expect(payload).toEqual(new Uint8Array([0x43, 0x11, 0x00]));
     expect(address).toEqual('0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc');
     expect(amount).toEqual(2000000n);
 

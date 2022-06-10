@@ -24,26 +24,27 @@ import { configs, unpackv2 } from '../utils/struct';
                            +--------------------------------+ 
  */
 
-export interface SecpTransferOutput {
-  typeID: number;
-  amount: bigint;
-  locktime: bigint;
-  threashold: number;
-  addresses: string[];
-}
+export class SecpTransferOutput {
+  constructor(
+    private typeID: number,
+    private amount: bigint,
+    private locktime: bigint,
+    private threashold: number,
+    private addresses: string[],
+  ) {}
 
-export const secpTransferOutputFromBytes = (
-  buff: Uint8Array,
-): SecpTransferOutput => {
-  const { int, bigInt, addressList } = configs;
-  const [typeID, amount, locktime, threashold, addresses] = unpackv2<
-    [number, bigint, bigint, number, string[]]
-  >(buff, [int, bigInt, bigInt, int, addressList]);
-  return {
-    typeID,
-    amount,
-    locktime,
-    threashold,
-    addresses,
-  };
-};
+  static fromBytes(buff: Uint8Array): SecpTransferOutput {
+    const { int, bigInt, addressList } = configs;
+    const [typeID, amount, locktime, threashold, addresses] = unpackv2<
+      [number, bigint, bigint, number, string[]]
+    >(buff, [int, bigInt, bigInt, int, addressList]);
+
+    return new SecpTransferOutput(
+      typeID,
+      amount,
+      locktime,
+      threashold,
+      addresses,
+    );
+  }
+}

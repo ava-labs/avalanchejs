@@ -1,11 +1,16 @@
-import { OutputOwner } from './outputOwner';
-import { SecpMintOutput } from './secpMintOutput';
+import { NftTransferOutput } from './nftTransferOutput';
 
-describe('SecpMintOutput', () => {
+describe('NftTransferOutput', () => {
   it('deserializes correctly', () => {
     const input = new Uint8Array([
-      // typeID:
-      0x00, 0x00, 0x00, 0x06,
+      // TypeID:
+      0x00, 0x00, 0x00, 0x0b,
+      // groupID:
+      0x00, 0x00, 0x30, 0x39,
+      // length of payload:
+      0x00, 0x00, 0x00, 0x03,
+      // payload:
+      0x43, 0x11, 0x00,
       // locktime:
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd4, 0x31,
       // threshold:
@@ -20,14 +25,18 @@ describe('SecpMintOutput', () => {
       0x4a, 0x46, 0x1c, 0x89, 0x43, 0xab, 0x08, 0x59,
     ]);
 
-    const output = SecpMintOutput.fromBytes(input);
+    const output = NftTransferOutput.fromBytes(input);
 
-    const expectedOutput = new SecpMintOutput(
-      6,
-      new OutputOwner(54321n, 1, [
+    const expectedOutput = new NftTransferOutput(
+      11,
+      12345,
+      new Uint8Array([0x43, 0x11, 0x00]),
+      54321n,
+      1,
+      [
         '0x51025c61fbcfc078f69334f834be6dd26d55a955',
         '0xc3344128e060128ede3523a24a461c8943ab0859',
-      ]),
+      ],
     );
 
     expect(output).toEqual(expectedOutput);

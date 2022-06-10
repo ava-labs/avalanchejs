@@ -1,7 +1,4 @@
-import {
-  SecpTransferOutput,
-  secpTransferOutputFromBytes,
-} from './secpTransferOutput';
+import { SecpTransferOutput } from './secpTransferOutput';
 
 describe('SecpTransferOutput', () => {
   it('deserializes correctly', () => {
@@ -21,15 +18,11 @@ describe('SecpTransferOutput', () => {
       0xf2, 0xbc, 0x50, 0x79, 0x56, 0xda, 0xe5, 0x63,
     ]);
 
-    const output = secpTransferOutputFromBytes(input);
+    const output = SecpTransferOutput.fromBytes(input);
 
-    const expectedOutput: SecpTransferOutput = {
-      typeID: 7,
-      amount: 1000000n,
-      locktime: 0n,
-      threashold: 1,
-      addresses: ['0x66f90db6137a78f76b3693f7f2bc507956dae563'],
-    };
+    const expectedOutput = new SecpTransferOutput(7, 1000000n, 0n, 1, [
+      '0x66f90db6137a78f76b3693f7f2bc507956dae563',
+    ]);
 
     expect(output).toEqual(expectedOutput);
   });
