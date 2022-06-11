@@ -2,7 +2,7 @@ import { Codec, Manager } from '../codec';
 import * as NftFx from '../fxs/nft';
 import * as Secp256k1Fx from '../fxs/secp256k1';
 
-// Check for circular imports in the fx type 
+// Check for circular imports in the fx type
 // registries if tests are throwing errors
 export const testCodec = () =>
   new Codec([
