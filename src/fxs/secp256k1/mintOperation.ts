@@ -1,6 +1,6 @@
-import { merge } from '../../utils/buffer';
 import { Input, MintOutput, TransferOutput } from '.';
 import { NewableStatic, staticImplements } from '../../common/types';
+import { merge } from '../../utils/buffer';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/mint_operation.go

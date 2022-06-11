@@ -9,7 +9,7 @@ describe('TransferableOutput', () => {
   it('deserializes correctly', () => {
     const [output, remainder] = TransferableOutput.fromBytes(
       transferableOutputBytes(),
-      testCodec,
+      testCodec(),
     );
 
     expect(output).toStrictEqual(transferableOutput());
@@ -18,7 +18,7 @@ describe('TransferableOutput', () => {
   });
 
   it('serializes correctly', () => {
-    expect(transferableOutput().toBytes(testCodec)).toStrictEqual(
+    expect(transferableOutput().toBytes(testCodec())).toStrictEqual(
       transferableOutputBytes(),
     );
   });
