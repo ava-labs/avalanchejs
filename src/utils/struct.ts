@@ -87,6 +87,16 @@ const byteList: Configs = {
   },
 };
 
+const intList: Configs = {
+  lengthConfig: int,
+  unpackItem: (buff: Uint8Array) => unpack<[number]>(buff, [int]),
+  pack: (list: number[]) => {
+    const size = padLeft(hexToBuffer(list.length.toString(16)), 4);
+    const nums = list.map((x) => x.toString(16)).map(hexToBuffer);
+    return merge([size, merge(nums)]);
+  },
+};
+
 export const configs: Record<string, Configs> = {
   address,
   id,
@@ -95,6 +105,7 @@ export const configs: Record<string, Configs> = {
   codec,
   addressList,
   byteList,
+  intList,
 };
 
 export const unpack = <O extends UnpackReturn[]>(

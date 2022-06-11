@@ -1,4 +1,4 @@
-import { OutputOwners } from './outputOwners';
+import { OutputOwners } from '.';
 import { NewableStatic, staticImplements } from '../../common/types';
 
 /**

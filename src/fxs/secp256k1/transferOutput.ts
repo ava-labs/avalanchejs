@@ -1,5 +1,5 @@
 import { configs, pack, unpack } from '../../utils/struct';
-import { OutputOwners } from './outputOwners';
+import { OutputOwners } from '.';
 import { NewableStatic, staticImplements } from '../../common/types';
 import { merge } from '../../utils/buffer';
 
