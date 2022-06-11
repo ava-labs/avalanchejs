@@ -1,25 +1,13 @@
-import { TransferableOutput } from '.';
 import {
   transferableOutput,
   transferableOutputBytes,
 } from '../../fixtures/avax';
-import { testCodec } from '../../fixtures/codec';
+import { testSerialization } from '../../fixtures/utils/serializable';
+import { TransferableOutput } from './transferableOutput';
 
-describe('TransferableOutput', () => {
-  it('deserializes correctly', () => {
-    const [output, remainder] = TransferableOutput.fromBytes(
-      transferableOutputBytes(),
-      testCodec(),
-    );
-
-    expect(output).toStrictEqual(transferableOutput());
-
-    expect(remainder).toStrictEqual(new Uint8Array());
-  });
-
-  it('serializes correctly', () => {
-    expect(transferableOutput().toBytes(testCodec())).toStrictEqual(
-      transferableOutputBytes(),
-    );
-  });
-});
+testSerialization(
+  'TransferableInput',
+  TransferableOutput,
+  transferableOutput,
+  transferableOutputBytes,
+);
