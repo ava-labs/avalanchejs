@@ -1,49 +1,25 @@
+import {
+  transferableOutput,
+  transferableOutputBytes,
+} from '../../fixtures/avax';
 import { TransferableOutput } from '.';
 import { codec0 } from '../../codec/codec';
-import { OutputOwners, TransferOutput } from '../../fxs/secp256k1';
 
 describe('TransferableOutput', () => {
   it('deserializes correctly', () => {
-    const bytes = new Uint8Array([
-      // assetID:
-      0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,
-      0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-      0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-      // typeID:
-      0x00, 0x00, 0x00, 0x07,
-      // amount:
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x39,
-      // locktime:
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd4, 0x31,
-      // threshold:
-      0x00, 0x00, 0x00, 0x01,
-      // number of addresses:
-      0x00, 0x00, 0x00, 0x02,
-      // addrs[0]:
-      0x51, 0x02, 0x5c, 0x61, 0xfb, 0xcf, 0xc0, 0x78, 0xf6, 0x93, 0x34, 0xf8,
-      0x34, 0xbe, 0x6d, 0xd2, 0x6d, 0x55, 0xa9, 0x55,
-      // addrs[1]:
-      0xc3, 0x34, 0x41, 0x28, 0xe0, 0x60, 0x12, 0x8e, 0xde, 0x35, 0x23, 0xa2,
-      0x4a, 0x46, 0x1c, 0x89, 0x43, 0xab, 0x08, 0x59,
-    ]);
-
-    const [output, remainder] = TransferableOutput.fromBytes(bytes, codec0);
-
-    const transferExpectedOutput = new TransferOutput(
-      12345n,
-      new OutputOwners(54321n, 1, [
-        '0x51025c61fbcfc078f69334f834be6dd26d55a955',
-        '0xc3344128e060128ede3523a24a461c8943ab0859',
-      ]),
+    const [output, remainder] = TransferableOutput.fromBytes(
+      transferableOutputBytes(),
+      codec0,
     );
 
-    expect(output).toStrictEqual(
-      new TransferableOutput(
-        '0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f',
-        transferExpectedOutput,
-      ),
-    );
+    expect(output).toStrictEqual(transferableOutput());
 
     expect(remainder).toStrictEqual(new Uint8Array());
+  });
+
+  it('serializes correctly', () => {
+    expect(transferableOutput().toBytes(codec0)).toStrictEqual(
+      transferableOutputBytes(),
+    );
   });
 });

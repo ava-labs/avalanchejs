@@ -1,8 +1,9 @@
 import type { Codec } from 'src/codec';
 
 export interface Newable {
-  toBytes(): Uint8Array;
   id: string;
+
+  toBytes(codec?: Codec): Uint8Array;
 }
 
 export interface NewableStatic {

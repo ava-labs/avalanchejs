@@ -1,6 +1,7 @@
+import { merge } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { Newable, NewableStatic, staticImplements } from '../../common/types';
-import { configs, unpack } from '../../utils/struct';
+import { configs, pack, unpack } from '../../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
@@ -12,7 +13,7 @@ import { configs, unpack } from '../../utils/struct';
 export class TransferableOutput {
   id = 'avax.TransferableOutput';
 
-  constructor(private amt: string, private output: Newable) {}
+  constructor(private assetId: string, private output: Newable) {}
 
   static fromBytes(
     bytes: Uint8Array,
@@ -27,8 +28,10 @@ export class TransferableOutput {
     return [new TransferableOutput(assetId, output), bytes];
   }
 
-  toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+  toBytes(codec: Codec) {
+    return merge([
+      pack([[this.assetId, configs.id]]),
+      codec.PackPrefix(this.output),
+    ]);
   }
 }
