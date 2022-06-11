@@ -1,4 +1,4 @@
-import { OutputOwners } from '../secp256k1/outputOwners';
+import { OutputOwners } from '../secp256k1';
 import { NewableStatic, staticImplements } from '../../common/types';
 import { unpack, configs } from '../../utils/struct';
 

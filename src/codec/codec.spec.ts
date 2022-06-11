@@ -55,7 +55,6 @@ describe('Codec', () => {
     expect(remainder).toStrictEqual(new Uint8Array());
   });
 
-  // TODO: check rest of the bytes once pack functionality is complete
   it('packs types correctly', () => {
     const owners = new OutputOwners(0n, 1, [
       '0xda2bee01be82ecc00c34f361eda8eb30fb5a715c',
