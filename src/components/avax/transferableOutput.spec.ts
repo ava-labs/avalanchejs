@@ -1,15 +1,15 @@
+import { TransferableOutput } from '.';
 import {
   transferableOutput,
   transferableOutputBytes,
 } from '../../fixtures/avax';
-import { TransferableOutput } from '.';
-import { codec0 } from '../../codec/codec';
+import { testCodec } from '../../fixtures/codec';
 
 describe('TransferableOutput', () => {
   it('deserializes correctly', () => {
     const [output, remainder] = TransferableOutput.fromBytes(
       transferableOutputBytes(),
-      codec0,
+      testCodec,
     );
 
     expect(output).toStrictEqual(transferableOutput());
@@ -18,7 +18,7 @@ describe('TransferableOutput', () => {
   });
 
   it('serializes correctly', () => {
-    expect(transferableOutput().toBytes(codec0)).toStrictEqual(
+    expect(transferableOutput().toBytes(testCodec)).toStrictEqual(
       transferableOutputBytes(),
     );
   });

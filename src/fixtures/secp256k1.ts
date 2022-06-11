@@ -1,10 +1,10 @@
 import {
+  Input,
+  MintOperation,
   MintOutput,
   OutputOwners,
-  TransferOutput,
-  Input,
   TransferInput,
-  MintOperation,
+  TransferOutput,
 } from '../fxs/secp256k1';
 
 // https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-mint-output-example
