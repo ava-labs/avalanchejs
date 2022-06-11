@@ -92,7 +92,10 @@ const intList: Configs = {
   unpackItem: (buff: Uint8Array) => unpack<[number]>(buff, [int]),
   pack: (list: number[]) => {
     const size = padLeft(hexToBuffer(list.length.toString(16)), 4);
-    const nums = list.map((x) => x.toString(16)).map(hexToBuffer);
+    const nums = list
+      .map((x) => x.toString(16))
+      .map(hexToBuffer)
+      .map((x) => padLeft(x, 4));
     return merge([size, merge(nums)]);
   },
 };

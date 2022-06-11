@@ -1,4 +1,4 @@
-import { configs, unpack } from '../../utils/struct';
+import { configs, unpack, pack } from '../../utils/struct';
 import { NewableStatic, staticImplements } from '../../common/types';
 
 /**
@@ -21,7 +21,6 @@ export class Input {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return pack([[this.sigIndices, configs.intList]]);
   }
 }

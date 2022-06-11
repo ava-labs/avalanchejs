@@ -1,3 +1,4 @@
+import { merge } from '../../utils/buffer';
 import { Input, MintOutput, TransferOutput } from '.';
 import { NewableStatic, staticImplements } from '../../common/types';
 
@@ -29,7 +30,10 @@ export class MintOperation {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return merge([
+      this.input.toBytes(),
+      this.mintOutput.toBytes(),
+      this.transferOutput.toBytes(),
+    ]);
   }
 }

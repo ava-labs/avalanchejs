@@ -1,4 +1,5 @@
-import { configs, unpack } from '../../utils/struct';
+import { configs, unpack, pack } from '../../utils/struct';
+import { merge } from '../../utils/buffer';
 import { Input } from '.';
 import { NewableStatic, staticImplements } from '../../common/types';
 
@@ -25,7 +26,6 @@ export class TransferInput {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return merge([pack([[this.amt, configs.bigInt]]), this.input.toBytes()]);
   }
 }

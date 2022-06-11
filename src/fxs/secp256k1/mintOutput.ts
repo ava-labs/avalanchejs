@@ -19,7 +19,6 @@ export class MintOutput {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return this.outputOwners.toBytes();
   }
 }
