@@ -1,6 +1,6 @@
+import { TransferableOutput } from '.';
 import { codec0 } from '../../codec/codec';
 import { OutputOwners, TransferOutput } from '../../fxs/secp256k1';
-import { TransferableOutput } from '.';
 
 describe('TransferableOutput', () => {
   it('deserializes correctly', () => {
