@@ -6,6 +6,7 @@ import {
 import {
   MintOutput as SecpMintOutput,
   TransferOutput as SecpTransferOutput,
+  TransferInput as SecpTransferInput,
 } from '../fxs/secp256k1';
 import { bufferToNumber, merge } from '../utils/buffer';
 import { configs, pack } from '../utils/struct';
@@ -62,6 +63,7 @@ export class Codec {
 
 export const codec0 = new Codec(
   new Map<number, NewableStatic>([
+    [5, SecpTransferInput],
     [6, SecpMintOutput],
     [7, SecpTransferOutput],
     [10, NFTMintOutput],
