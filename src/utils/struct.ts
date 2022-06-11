@@ -109,6 +109,7 @@ export const unpack = <O extends UnpackReturn[]>(
     }
 
     if (!config.lengthConfig) {
+      if (!buffer.length) throw new Error('not enough bytes');
       const offset = config.offset;
       const unpacker = config.unpack;
       if (!unpacker) {

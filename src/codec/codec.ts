@@ -1,4 +1,12 @@
-import { NewableStatic, Newable } from '../common/types';
+import { Newable, NewableStatic } from '../common/types';
+import {
+  MintOutput as NFTMintOutput,
+  TransferOutput as NFTTransferOutput,
+} from '../fxs/nft';
+import {
+  MintOutput as SecpMintOutput,
+  TransferOutput as SecpTransferOutput,
+} from '../fxs/secp256k1';
 import { bufferToNumber, merge } from '../utils/buffer';
 import { configs, pack } from '../utils/struct';
 
@@ -9,6 +17,16 @@ export class Codec {
   typeIdToType = new Map<number, NewableStatic>();
   typeToTypeID = new Map<string, number>();
   nextTypeID = 0;
+
+  constructor(types: Map<number, NewableStatic> = new Map()) {
+    this.typeIdToType = types;
+    this.typeToTypeID = new Map<string, number>(
+      Array.from(types.entries()).map(([id, newable]) => [
+        new newable().id,
+        id,
+      ]),
+    );
+  }
 
   RegisterType(type: NewableStatic) {
     this.typeIdToType.set(this.nextTypeID, type);
@@ -41,3 +59,12 @@ export class Codec {
     return type.fromBytes(buf.slice(4));
   }
 }
+
+export const codec0 = new Codec(
+  new Map<number, NewableStatic>([
+    [6, SecpMintOutput],
+    [7, SecpTransferOutput],
+    [10, NFTMintOutput],
+    [11, NFTTransferOutput],
+  ]),
+);

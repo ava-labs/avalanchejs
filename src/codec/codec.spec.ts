@@ -1,5 +1,5 @@
-import { MintOutput, OutputOwners } from '../fxs/secp256k1';
 import { Codec } from '.';
+import { MintOutput, OutputOwners } from '../fxs/secp256k1';
 
 describe('Codec', () => {
   it('registers types', () => {
