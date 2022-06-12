@@ -2,6 +2,7 @@ import { merge } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { Newable, NewableStatic, staticImplements } from '../../common/types';
 import { configs, pack, unpack } from '../../utils/struct';
+import { UTXOID } from '.';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
@@ -14,8 +15,7 @@ export class TransferableInput {
   id = 'avax.TransferableInput';
 
   constructor(
-    private txId: string,
-    private utxoIdx: number,
+    private utxoID: UTXOID,
     private assetId: string,
     private input: Newable,
   ) {}
@@ -24,28 +24,22 @@ export class TransferableInput {
     bytes: Uint8Array,
     codec: Codec,
   ): [TransferableInput, Uint8Array] {
-    let txId: string;
-    let utxoIdx: number;
+    let utxoID: UTXOID;
+    [utxoID, bytes] = UTXOID.fromBytes(bytes);
+
     let assetId: string;
-    [txId, utxoIdx, assetId, bytes] = unpack<[string, number, string]>(bytes, [
-      configs.id,
-      configs.int,
-      configs.id,
-    ]);
+    [assetId, bytes] = unpack<[string]>(bytes, [configs.id]);
 
     let input: Newable;
     [input, bytes] = codec.UnpackPrefix(bytes);
 
-    return [new TransferableInput(txId, utxoIdx, assetId, input), bytes];
+    return [new TransferableInput(utxoID, assetId, input), bytes];
   }
 
   toBytes(codec: Codec) {
     return merge([
-      pack([
-        [this.txId, configs.id],
-        [this.utxoIdx, configs.int],
-        [this.assetId, configs.id],
-      ]),
+      this.utxoID.toBytes(),
+      pack([[this.assetId, configs.id]]),
       codec.PackPrefix(this.input),
     ]);
   }
