@@ -1,16 +1,5 @@
 import { Input } from '.';
 import { input, inputBytes } from '../../fixtures/secp256k1';
+import { testSerialization } from '../../fixtures/utils/serializable';
 
-describe('Input', () => {
-  it('deserializes correctly', () => {
-    const [output, remainder] = Input.fromBytes(inputBytes());
-
-    expect(output).toStrictEqual(input());
-
-    expect(remainder).toStrictEqual(new Uint8Array());
-  });
-
-  it('serializes correctly', () => {
-    expect(input().toBytes()).toStrictEqual(inputBytes());
-  });
-});
+testSerialization('Input', Input, input, inputBytes);
