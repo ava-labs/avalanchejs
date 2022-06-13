@@ -142,21 +142,16 @@ export class Vertex extends Serializable {
       this.txs.push(tx)
     }
 
-    // console.log(bytes.byteLength, offset)
-    // if (bytes.byteLength >= offset) {
-    //   const nRs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
-    //   this.numRestrictions = nRs.readInt32BE(0)
-    // //   // console.log(this.numRestrictions.toString("hex"))
-    //   offset += 4
-    //   // const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
-    //   // console.log(restrictionsCount)
-    //   for (let i: number = 0; i < this.numRestrictions; i++) {
-    //     const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
-    //     // console.log(tx)
-    //     offset += 32
-    //     this.restrictions.push(tx)
-    //   }
-    // }
+    if (bytes.byteLength > offset && (bytes.byteLength - offset > 4)) {
+      const nRs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+      this.numRestrictions = nRs.readInt32BE(0)
+      offset += 4
+      for (let i: number = 0; i < this.numRestrictions; i++) {
+        const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
+        offset += 32
+        this.restrictions.push(tx)
+      }
+    }
 
     return offset
   }
@@ -177,7 +172,7 @@ export class Vertex extends Serializable {
     let barr: Buffer[] = [
       codecBuf,
       this.blockchainID,
-      bintools.fromBNToBuffer(this.height),
+      bintools.fromBNToBuffer(this.height, 8),
       epochBuf,
       numParentIDsBuf
     ]
@@ -199,8 +194,6 @@ export class Vertex extends Serializable {
     txSize.writeUInt32BE(size, 0)
     barr.push(txSize)
 
-    // const mysteryBytes: Buffer = Buffer.from("00000000", "hex")
-    // barr.push(mysteryBytes)
     txs.forEach((tx: Tx): void => {
       const b: Buffer = tx.toBuffer()
       barr.push(b)
