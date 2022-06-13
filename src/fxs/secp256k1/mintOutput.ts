@@ -1,11 +1,11 @@
 import { OutputOwners } from '.';
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/mint_output.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#secp256k1-mint-output
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class MintOutput {
   id = 'secp256k1fx.MintOutput';
 

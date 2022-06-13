@@ -1,6 +1,7 @@
 import { merge } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
-import { Newable, NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
+import type { Serializable } from '../../common/types';
 import { configs, pack, unpack } from '../../utils/struct';
 
 /**
@@ -9,11 +10,11 @@ import { configs, pack, unpack } from '../../utils/struct';
  * @see https://docs.avax.network/specs/avm-transaction-serialization#transferable-output
  * @see https://docs.avax.network/specs/platform-transaction-serialization#transferable-output
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class TransferableOutput {
   id = 'avax.TransferableOutput';
 
-  constructor(private assetId: string, private output: Newable) {}
+  constructor(private assetId: string, private output: Serializable) {}
 
   static fromBytes(
     bytes: Uint8Array,
@@ -22,7 +23,7 @@ export class TransferableOutput {
     let assetId: string;
     [assetId, bytes] = unpack<[string]>(bytes, [configs.id]);
 
-    let output: Newable;
+    let output: Serializable;
     [output, bytes] = codec.UnpackPrefix(bytes);
 
     return [new TransferableOutput(assetId, output), bytes];

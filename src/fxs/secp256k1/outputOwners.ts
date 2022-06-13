@@ -1,11 +1,11 @@
 import { configs, pack, unpack } from '../../utils/struct';
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/output_owners.go
  * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-output-owners-output
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class OutputOwners {
   id = 'secp256k1fx.OutputOwners';
 

@@ -1,19 +1,23 @@
 import type { Codec } from '../codec';
 
-export interface Newable {
+export interface Serializable {
   id: string;
 
   toBytes(codec?: Codec): Uint8Array;
 }
 
-export interface NewableStatic {
-  new (...args: any[]): Newable;
+export interface SerializableStatic {
+  new (...args: any[]): Serializable;
 
-  fromBytes(bytes: Uint8Array, codec?: Codec): [Newable, Uint8Array];
+  fromBytes(bytes: Uint8Array, codec?: Codec): [Serializable, Uint8Array];
 }
 
 export function staticImplements<T>() {
   return <U extends T>(constructor: U) => {
     constructor;
   };
+}
+
+export function serializable() {
+  return staticImplements<SerializableStatic>();
 }

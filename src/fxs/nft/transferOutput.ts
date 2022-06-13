@@ -1,4 +1,4 @@
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 import { configs, unpack } from '../../utils/struct';
 import { OutputOwners } from '../secp256k1';
 
@@ -6,7 +6,7 @@ import { OutputOwners } from '../secp256k1';
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/nftfx/transfer_output.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#nft-transfer-output
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class TransferOutput {
   id = 'nftfx.TransferOutput';
 

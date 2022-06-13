@@ -1,12 +1,12 @@
-import { Newable, NewableStatic } from '../../common/types';
+import type { Serializable, SerializableStatic } from '../../common/types';
 import { TransferOutput } from '../../fxs/nft';
 import { testCodec } from '../codec';
 import { outputOwner, outputOwnerBytes } from '../secp256k1';
 
 export const testSerialization = (
   name: string,
-  entity: NewableStatic,
-  entityFixture: () => Newable,
+  entity: SerializableStatic,
+  entityFixture: () => Serializable,
   bytesFixture: () => Uint8Array,
   options?: {
     //in case its not implemented

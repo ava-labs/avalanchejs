@@ -1,6 +1,7 @@
 import { merge } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
-import { Newable, NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
+import type { Serializable } from '../../common/types';
 import { configs, pack, unpack } from '../../utils/struct';
 import { UTXOID } from '.';
 
@@ -10,14 +11,14 @@ import { UTXOID } from '.';
  * @see https://docs.avax.network/specs/avm-transaction-serialization#transferable-input
  * @see https://docs.avax.network/specs/platform-transaction-serialization#transferable-input
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class TransferableInput {
   id = 'avax.TransferableInput';
 
   constructor(
     private utxoID: UTXOID,
     private assetId: string,
-    private input: Newable,
+    private input: Serializable,
   ) {}
 
   static fromBytes(
@@ -30,7 +31,7 @@ export class TransferableInput {
     let assetId: string;
     [assetId, bytes] = unpack<[string]>(bytes, [configs.id]);
 
-    let input: Newable;
+    let input: Serializable;
     [input, bytes] = codec.UnpackPrefix(bytes);
 
     return [new TransferableInput(utxoID, assetId, input), bytes];

@@ -1,10 +1,10 @@
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 import { configs, pack, unpack } from '../../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/utxo_id.go
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class UTXOID {
   id = 'avax.UTXOID';
 

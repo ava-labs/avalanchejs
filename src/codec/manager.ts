@@ -1,4 +1,4 @@
-import { Codec } from './codec';
+import type { Codec } from './codec';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/codec/manager.go

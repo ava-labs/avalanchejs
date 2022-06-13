@@ -1,5 +1,5 @@
 import { configs, unpack, pack } from '../../utils/struct';
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/input.go
@@ -7,7 +7,7 @@ import { NewableStatic, staticImplements } from '../../common/types';
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#secp256k1-transfer-input
  * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-transfer-input
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class Input {
   id = 'secp256k1fx.Input';
 

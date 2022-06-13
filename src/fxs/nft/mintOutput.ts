@@ -1,12 +1,12 @@
 import { OutputOwners } from '../secp256k1';
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 import { unpack, configs } from '../../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/nftfx/mint_output.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#nft-mint-output
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class MintOutput {
   id = 'nftfx.MintOutput';
 

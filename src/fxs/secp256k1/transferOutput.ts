@@ -1,6 +1,6 @@
 import { configs, pack, unpack } from '../../utils/struct';
 import { OutputOwners } from '.';
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 import { merge } from '../../utils/buffer';
 
 /**
@@ -9,7 +9,7 @@ import { merge } from '../../utils/buffer';
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#secp256k1-transfer-output
  * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-transfer-output
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class TransferOutput {
   id = 'secp256k1fx.TransferOutput';
 

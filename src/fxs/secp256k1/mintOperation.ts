@@ -1,12 +1,12 @@
 import { Input, MintOutput, TransferOutput } from '.';
-import { NewableStatic, staticImplements } from '../../common/types';
+import { serializable } from '../../common/types';
 import { merge } from '../../utils/buffer';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/mint_operation.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-mint-operation
  */
-@staticImplements<NewableStatic>()
+@serializable()
 export class MintOperation {
   id = 'secp256k1fx.MintOperation';
 
