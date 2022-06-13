@@ -952,7 +952,7 @@ export class AVMAPI extends JRPCAPI {
    */
   getTx = async (
     txID: string,
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<string | object> => {
     const params: GetTxParams = {
       txID,

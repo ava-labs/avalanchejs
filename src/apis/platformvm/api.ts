@@ -1058,7 +1058,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getStake = async (
     addresses: string[],
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<GetStakeResponse> => {
     const params: GetStakeParams = {
       addresses,
@@ -1174,7 +1174,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getTx = async (
     txID: string,
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<string | object> => {
     const params: any = {
       txID,
@@ -1234,7 +1234,7 @@ export class PlatformVMAPI extends JRPCAPI {
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
     persistOpts: PersistanceOptions = undefined,
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
