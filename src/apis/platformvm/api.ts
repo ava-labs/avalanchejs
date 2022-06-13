@@ -111,7 +111,7 @@ export class PlatformVMAPI extends JRPCAPI {
         this.blockchainID in Defaults.network[`${netid}`]
       ) {
         this.blockchainAlias =
-          Defaults.network[`${netid}`][this.blockchainID].alias
+          Defaults.network[`${netid}`][this.blockchainID]["alias"]
         return this.blockchainAlias
       } else {
         /* istanbul ignore next */
@@ -1058,7 +1058,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getStake = async (
     addresses: string[],
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<GetStakeResponse> => {
     const params: GetStakeParams = {
       addresses,
@@ -1174,7 +1174,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getTx = async (
     txID: string,
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<string | object> => {
     const params: any = {
       txID,
@@ -1234,7 +1234,7 @@ export class PlatformVMAPI extends JRPCAPI {
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
     persistOpts: PersistanceOptions = undefined,
-    encoding: string = "cb58"
+    encoding: string = "hex"
   ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
@@ -1963,7 +1963,8 @@ export class PlatformVMAPI extends JRPCAPI {
       netID in Defaults.network &&
       this.blockchainID in Defaults.network[`${netID}`]
     ) {
-      const { alias } = Defaults.network[`${netID}`][this.blockchainID]
+      const alias: string =
+        Defaults.network[`${netID}`][this.blockchainID]["alias"]
       this.keychain = new KeyChain(this.core.getHRP(), alias)
     } else {
       this.keychain = new KeyChain(this.core.getHRP(), this.blockchainID)

@@ -2,8 +2,8 @@
 // which you can create based on "secrets.example" which is in the
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
-import { Avalanche } from "../../src"
-import { AuthAPI } from "../../src/apis/auth"
+import { Avalanche } from "avalanche/dist"
+import { AuthAPI } from "avalanche/dist/apis/auth"
 import { readFile } from "fs"
 
 const ip: string = "localhost"
