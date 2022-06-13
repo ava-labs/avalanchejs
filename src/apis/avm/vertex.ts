@@ -29,7 +29,7 @@ export class Vertex extends Serializable {
   protected epoch: number
   protected parentIDs: Buffer[]
   protected numParentIDs: number
-  protected txs: BaseTx[]
+  protected txs: Tx[]
   protected numTxs: number
   protected restrictions: Buffer[]
   protected numRestrictions: number
@@ -71,7 +71,7 @@ export class Vertex extends Serializable {
   /**
    * Returns array of UnsignedTxs.
    */
-  getTxs(): BaseTx[] {
+  getTxs(): Tx[] {
     return this.txs
   }
 
@@ -111,20 +111,20 @@ export class Vertex extends Serializable {
   fromBuffer(bytes: Buffer, offset: number = 0): number {
     offset += 2
     this.blockchainID = bintools.copyFrom(bytes, offset, offset + 32)
-
     offset += 32
+
     const h: Buffer = bintools.copyFrom(bytes, offset, offset + 8)
     this.height = bintools.fromBufferToBN(h)
-
     offset += 8
+
     const e: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
     this.epoch = e.readInt32BE(0)
-
     offset += 4
+
     const nPIDs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
     this.numParentIDs = nPIDs.readInt32BE(0)
-
     offset += 4
+
     for (let i: number = 0; i < this.numParentIDs; i++) {
       const parentID: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
       offset += 32
@@ -133,41 +133,30 @@ export class Vertex extends Serializable {
 
     const nTxs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
     this.numTxs = nTxs.readInt32BE(0)
-    // const txsCount: number = this.numTxs.readUInt32BE(0)
     // account for tx-size bytes
     offset += 8
+
     for (let i: number = 0; i < this.numTxs; i++) {
-      const unsignedTx: UnsignedTx = new UnsignedTx()
-      offset += unsignedTx.fromBuffer(bintools.copyFrom(bytes, offset))
-      this.txs.push(unsignedTx.getTransaction())
-
-      // //////////////////////////////
-
       const tx: Tx = new Tx()
-      // console.log(tx)
-      // offset += tx.fromBuffer(bintools.copyFrom(bytes, offset))
-      // console.log("credentials", tx.getCredentials()[0].getCredentialID())
-      // this.txs.push(tx.getUnsignedTx().getTransaction())
+      offset += tx.fromBuffer(bintools.copyFrom(bytes, offset))
+      this.txs.push(tx)
     }
-    // console.log("---------------------")
-    // console.log(this.getTxs()[0])
-    // console.log("---------------------")
 
     // console.log(bytes.byteLength, offset)
-    if (bytes.byteLength >= offset) {
-      const nRs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
-      this.numRestrictions = nRs.readInt32BE(0)
-      // console.log(this.numRestrictions.toString("hex"))
-      offset += 4
-      // const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
-      // console.log(restrictionsCount)
-      for (let i: number = 0; i < this.numRestrictions; i++) {
-        const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
-        // console.log(tx)
-        offset += 32
-        this.restrictions.push(tx)
-      }
-    }
+    // if (bytes.byteLength >= offset) {
+    //   const nRs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
+    //   this.numRestrictions = nRs.readInt32BE(0)
+    // //   // console.log(this.numRestrictions.toString("hex"))
+    //   offset += 4
+    //   // const restrictionsCount: number = this.numRestrictions.readUInt32BE(0)
+    //   // console.log(restrictionsCount)
+    //   for (let i: number = 0; i < this.numRestrictions; i++) {
+    //     const tx: Buffer = bintools.copyFrom(bytes, offset, offset + 32)
+    //     // console.log(tx)
+    //     offset += 32
+    //     this.restrictions.push(tx)
+    //   }
+    // }
 
     return offset
   }
@@ -196,31 +185,27 @@ export class Vertex extends Serializable {
       barr.push(parentID)
     })
 
-    const txs: BaseTx[] = this.getTxs()
+    const txs: Tx[] = this.getTxs()
     const numTxs: Buffer = Buffer.alloc(4)
     numTxs.writeUInt32BE(txs.length, 0)
     barr.push(numTxs)
 
     let size: number = 0
     const txSize: Buffer = Buffer.alloc(4)
-    txs.forEach((tx: BaseTx): void => {
+    txs.forEach((tx: Tx): void => {
       const b: Buffer = tx.toBuffer()
       size += b.byteLength
     })
     txSize.writeUInt32BE(size, 0)
     barr.push(txSize)
-    // const m: Buffer = Buffer.from("99999999", "hex")
-    // barr.push(m)
 
-    const mysteryBytes: Buffer = Buffer.from("00000000", "hex")
-    barr.push(mysteryBytes)
-    txs.forEach((tx: BaseTx): void => {
+    // const mysteryBytes: Buffer = Buffer.from("00000000", "hex")
+    // barr.push(mysteryBytes)
+    txs.forEach((tx: Tx): void => {
       const b: Buffer = tx.toBuffer()
       barr.push(b)
     })
 
-    // barr.push(tx.toBuffer())
-    // this.txs.length
     return Buffer.concat(barr)
   }
 
@@ -246,7 +231,7 @@ export class Vertex extends Serializable {
     height: BN = new BN(0),
     epoch: number = 0,
     parentIDs: Buffer[] = [],
-    txs: BaseTx[] = [],
+    txs: Tx[] = [],
     restrictions: Buffer[] = []
   ) {
     super()

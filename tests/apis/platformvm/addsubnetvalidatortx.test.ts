@@ -1,48 +1,21 @@
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { BinTools } from "src"
 import {
   AddSubnetValidatorTx,
   PlatformVMConstants,
   SubnetAuth
 } from "src/apis/platformvm"
-import { bufferToNodeIDString, NodeIDStringToBuffer } from "src/utils"
+import { bufferToNodeIDString } from "src/utils"
 
 describe("AddSubnetValidatorTx", (): void => {
-  /**
-   * @ignore
-   */
-  const bintools: BinTools = BinTools.getInstance()
-
-  const networkID: number = 1337
-  const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
-  const memoStr: string = "from snowflake to avalanche"
-  const memo: Buffer = Buffer.from(memoStr, "utf8")
-
-  const bID: Buffer = bintools.cb58Decode(pChainBlockchainID)
-
-  const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
-  const nodeIDBuf: Buffer = NodeIDStringToBuffer(nodeID)
-  const startTime: BN = new BN(1647654984)
-  const endTime: BN = new BN(1648950865)
-  const weight: BN = new BN(20)
-
-  const subnetIDStr: string =
-    "WYziRrZeZVftQ56QizLxmSfwofLyJM8u3uYbRHA1Yc7YtMmbN"
-  const subnetID: string | Buffer = bintools.cb58Decode(subnetIDStr)
-
-  const addSubnetValidatorTx = new AddSubnetValidatorTx(
-    networkID,
-    bID,
-    [],
-    [],
-    memo,
-    nodeIDBuf,
-    startTime,
-    endTime,
-    weight,
-    subnetID
+  const addSubnetValidatorTxHex: string =
+    "0000053900000000000000000000000000000000000000000000000000000000000000000000000117cc8b1578ba383544d163958822d8abd3849bb9dfabe39fcbc3e7ee8811fe2f00000007006a94d71389b180000000000000000000000001000000023cb7d3842e8cee6a0ebd09f1fe884f6861e1b29ca43c1f6ecdcb1fcec86d78446b9cf619c64c604b00000001f7fc296b05e7a960e9d2739c1cabdb58f22e5c582e1a7b0877fb10e78cf4e7ec0000000017cc8b1578ba383544d163958822d8abd3849bb9dfabe39fcbc3e7ee8811fe2f00000005006a94d71398f3c00000000100000000000000934d616e75616c6c79206372656174652061204164645375626e657456616c696461746f7254782077686963682063726561746573206120312d6f662d322041564158207574786f20616e64206164647320612076616c696461746f7220746f2061207375626e657420627920636f72726563746c79207369676e696e672074686520322d6f662d33205375626e657441757468de31b4d8b22991d51aa6aa1fc733f23a851a8c94000000006279e79c00000000628d873a00000000000000017fe044f9e97347c0a5ffe5a0f5773b42398c0e2b85948616da681585d460e1a80000000a000000020000000000000001"
+  const addSubnetValidatorTxBuf: Buffer = Buffer.from(
+    addSubnetValidatorTxHex,
+    "hex"
   )
+  const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx()
+  addSubnetValidatorTx.fromBuffer(addSubnetValidatorTxBuf)
 
   test("getTypeName", async (): Promise<void> => {
     const addSubnetValidatorTxTypeName: string =

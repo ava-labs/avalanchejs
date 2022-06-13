@@ -1,7 +1,7 @@
 import BinTools from "../../../src/utils/bintools"
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import { BaseTx, Vertex } from "src/apis/avm"
+import { Vertex, Tx } from "src/apis/avm"
 
 /**
  * @ignore
@@ -25,7 +25,7 @@ describe("Vertex", (): void => {
       "2HCoR1WzY3TEFipaxeyXhnKa4MYTjfUc4zN5SFhZHoTJGquVfp"
     )
     const parentIDs: Buffer[] = [parentIDBuf]
-    const txs: BaseTx[] = []
+    const txs: Tx[] = []
     const restrictionsBuf: Buffer = bintools.cb58Decode(
       "2kFgG4yE9S9wtAjoKJttuRtKvhFXxC3AoK9V6VssN18JqCL6YV"
     )
@@ -67,7 +67,7 @@ describe("Vertex", (): void => {
     })
 
     test("getTxs", (): void => {
-      const t: BaseTx[] = vertex.getTxs()
+      const t: Tx[] = vertex.getTxs()
       expect(t).toBe(txs)
     })
 
