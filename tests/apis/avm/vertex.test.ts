@@ -65,7 +65,9 @@ describe("Vertex", (): void => {
       const b: Buffer = vertex.toBuffer()
       const v: Vertex = new Vertex()
       v.fromBuffer(b)
-      expect(v.toBuffer().toString('hex')).toEqual(vertex.toBuffer().toString('hex'))
+      expect(v.toBuffer().toString("hex")).toEqual(
+        vertex.toBuffer().toString("hex")
+      )
     })
   })
 })

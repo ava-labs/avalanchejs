@@ -142,7 +142,7 @@ export class Vertex extends Serializable {
       this.txs.push(tx)
     }
 
-    if (bytes.byteLength > offset && (bytes.byteLength - offset > 4)) {
+    if (bytes.byteLength > offset && bytes.byteLength - offset > 4) {
       const nRs: Buffer = bintools.copyFrom(bytes, offset, offset + 4)
       this.numRestrictions = nRs.readInt32BE(0)
       offset += 4

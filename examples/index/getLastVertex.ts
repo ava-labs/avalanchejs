@@ -23,13 +23,12 @@ const main = async (): Promise<any> => {
   const vertex: Vertex = new Vertex()
   vertex.fromBuffer(bintools.cb58Decode(lastVertex.bytes))
   console.log(vertex)
-  console.log('--------')
+  console.log("--------")
 
   const buf: Buffer = vertex.toBuffer()
   const v: Vertex = new Vertex()
   v.fromBuffer(buf)
   console.log(v)
-
 }
 
 main()
