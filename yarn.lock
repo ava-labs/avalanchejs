@@ -562,10 +562,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@noble/hashes@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.0.0.tgz#d5e38bfbdaba174805a4e649f13be9a9ed3351ae"
-  integrity sha512-DZVbtY62kc3kkBtMHqwCOfXrT/hnoORy5BJ4+HU1IR59X0KWAOqsfzQPcUl/lQLlG7qXbe/fZ3r/emxtAl+sqg==
+"@noble/hashes@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.1.tgz#c056d9b7166c1e7387a7453c2aff199bf7d88e5f"
+  integrity sha512-Lkp9+NijmV7eSVZqiUvt3UCuuHeJpUVmRrvh430gyJjJiuJMqkeHf6/A9lQ/smmbWV/0spDeJscscPzyB4waZg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
