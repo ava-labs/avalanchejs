@@ -83,7 +83,8 @@ const byteList: Configs = {
     buff.slice(length),
   ],
   pack: (array: Uint8Array) => {
-    return array;
+    const len = padLeft(hexToBuffer(array.length.toString(16)), 4);
+    return merge([len, array]);
   },
 };
 

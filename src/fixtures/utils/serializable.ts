@@ -1,7 +1,5 @@
 import type { Serializable, SerializableStatic } from '../../common/types';
-import { TransferOutput } from '../../fxs/nft';
 import { testCodec } from '../codec';
-import { outputOwner, outputOwnerBytes } from '../secp256k1';
 
 export const testSerialization = (
   name: string,
@@ -9,7 +7,6 @@ export const testSerialization = (
   entityFixture: () => Serializable,
   bytesFixture: () => Uint8Array,
   options?: {
-    //in case its not implemented
     skipToBytes: boolean;
   },
 ) => {
@@ -20,7 +17,9 @@ export const testSerialization = (
       expect(remainder).toStrictEqual(new Uint8Array());
     });
   });
+
   if (options?.skipToBytes) return;
+
   describe(name, () => {
     it('serializes correctly', () => {
       expect(entityFixture().toBytes(testCodec())).toStrictEqual(

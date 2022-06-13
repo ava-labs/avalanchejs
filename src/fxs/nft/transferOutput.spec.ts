@@ -7,5 +7,4 @@ testSerialization(
   TransferOutput,
   transferOutput,
   transferOutputBytes,
-  { skipToBytes: true },
 );

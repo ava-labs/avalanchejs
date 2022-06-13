@@ -1,6 +1,7 @@
 import { OutputOwners } from '../secp256k1';
 import { serializable } from '../../common/types';
-import { unpack, configs } from '../../utils/struct';
+import { unpack, configs, pack } from '../../utils/struct';
+import { merge } from '../../utils/buffer';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/nftfx/mint_output.go
@@ -23,7 +24,9 @@ export class MintOutput {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return merge([
+      pack([[this.groupId, configs.int]]),
+      this.outputOwners.toBytes(),
+    ]);
   }
 }

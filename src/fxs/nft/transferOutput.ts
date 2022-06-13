@@ -1,5 +1,6 @@
 import { serializable } from '../../common/types';
-import { configs, unpack } from '../../utils/struct';
+import { configs, unpack, pack } from '../../utils/struct';
+import { merge } from '../../utils/buffer';
 import { OutputOwners } from '../secp256k1';
 
 /**
@@ -31,7 +32,12 @@ export class TransferOutput {
   }
 
   toBytes(): Uint8Array {
-    // TODO
-    return new Uint8Array();
+    return merge([
+      pack([
+        [this.groupId, configs.int],
+        [this.payload, configs.byteList],
+      ]),
+      this.outputOwners.toBytes(),
+    ]);
   }
 }
