@@ -5,6 +5,7 @@ import { OutputOwners } from './outputOwners';
 import { TransferInput } from './transferInput';
 import { TransferOutput } from './transferOutput';
 
+// https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/fx.go
 const TypeRegistry = Object.freeze([
   TransferInput,
   MintOutput,
