@@ -1,4 +1,4 @@
-import type { Codec } from 'src/codec';
+import type { Codec } from '../codec';
 
 export interface Newable {
   id: string;
