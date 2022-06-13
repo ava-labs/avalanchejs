@@ -1,6 +1,6 @@
 import { Newable, NewableStatic } from '../common/types';
-import { bufferToNumber, merge } from '../utils/buffer';
-import { configs, pack } from '../utils/struct';
+import { merge } from '../utils/buffer';
+import { configs, pack, unpack } from '../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/codec/linearcodec/codec.go
@@ -27,7 +27,8 @@ export class Codec {
   }
 
   UnpackPrefix(buf: Uint8Array) {
-    const typeId = bufferToNumber(buf.slice(0, 4));
+    let typeId: number;
+    [typeId, buf] = unpack<[number]>(buf, [configs.int]);
 
     const type = this.typeIdToType[typeId];
     if (type === undefined) {
@@ -36,6 +37,6 @@ export class Codec {
       );
     }
 
-    return type.fromBytes(buf.slice(4));
+    return type.fromBytes(buf);
   }
 }
