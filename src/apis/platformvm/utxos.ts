@@ -957,12 +957,14 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       weight,
       subnetID
     )
-    subnetAuthCredentials.forEach((subnetAuthCredential: [number, Buffer]) => {
-      addSubnetValidatorTx.addSignatureIdx(
-        subnetAuthCredential[0],
-        subnetAuthCredential[1]
-      )
-    })
+    subnetAuthCredentials.forEach(
+      (subnetAuthCredential: [number, Buffer]): void => {
+        addSubnetValidatorTx.addSignatureIdx(
+          subnetAuthCredential[0],
+          subnetAuthCredential[1]
+        )
+      }
+    )
     return new UnsignedTx(addSubnetValidatorTx)
   }
 
@@ -1240,15 +1242,21 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     }
 
     const locktime: BN = new BN(0)
-    const UTx: CreateSubnetTx = new CreateSubnetTx(
+    const subnetOwners: SECPOwnerOutput = new SECPOwnerOutput(
+      subnetOwnerAddresses,
+      locktime,
+      subnetOwnerThreshold
+    )
+    const createSubnetTx: CreateSubnetTx = new CreateSubnetTx(
       networkID,
       blockchainID,
       outs,
       ins,
       memo,
-      new SECPOwnerOutput(subnetOwnerAddresses, locktime, subnetOwnerThreshold)
+      subnetOwners
     )
-    return new UnsignedTx(UTx)
+
+    return new UnsignedTx(createSubnetTx)
   }
 
   /**
@@ -1324,12 +1332,15 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       fxIDs,
       genesisData
     )
-    subnetAuthCredentials.forEach((subnetAuthCredential: [number, Buffer]) => {
-      createChainTx.addSignatureIdx(
-        subnetAuthCredential[0],
-        subnetAuthCredential[1]
-      )
-    })
+    subnetAuthCredentials.forEach(
+      (subnetAuthCredential: [number, Buffer]): void => {
+        createChainTx.addSignatureIdx(
+          subnetAuthCredential[0],
+          subnetAuthCredential[1]
+        )
+      }
+    )
+
     return new UnsignedTx(createChainTx)
   }
 }

@@ -244,7 +244,7 @@ export class AddSubnetValidatorTx extends BaseTx {
   }
 
   /**
-   * Class representing an unsigned CreateChain transaction.
+   * Class representing an unsigned AddSubnetValidator transaction.
    *
    * @param networkID Optional networkID, [[DefaultNetworkID]]
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
