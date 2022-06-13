@@ -1,7 +1,10 @@
 import { Avalanche, Buffer } from "../../src"
 import { Vertex } from "../../src/apis/avm"
 import { IndexAPI } from "../../src/apis/index"
-import { GetContainerByIndexResponse, GetLastAcceptedResponse } from "../../src/apis/index/interfaces"
+import {
+  GetContainerByIndexResponse,
+  GetLastAcceptedResponse
+} from "../../src/apis/index/interfaces"
 
 const ip: string = "indexer-demo.avax.network"
 const port: number = 443
@@ -11,7 +14,7 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 
 const sleep = (ms: number): Promise<unknown> => {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 const mstimeout: number = 1000
 
