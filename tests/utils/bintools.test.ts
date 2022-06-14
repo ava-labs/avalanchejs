@@ -187,7 +187,9 @@ describe("BinTools", (): void => {
 
   test("cb58DecodeWithChecksum", (): void => {
     const serbuff: Buffer = bintools.b58ToBuffer(longSerializedChecksum)
-    const dsr1: string = bintools.cb58DecodeWithChecksum(longSerializedChecksum).toString()
+    const dsr1: string = bintools
+      .cb58DecodeWithChecksum(longSerializedChecksum)
+      .toString()
     const dsr2: string = bintools.cb58DecodeWithChecksum(serbuff).toString()
     const serbufffaulty: Buffer = bintools.copyFrom(serbuff)
     serbufffaulty[serbufffaulty.length - 1] =
