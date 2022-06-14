@@ -1,6 +1,6 @@
 {
   "name": "avalanche",
-  "version": "3.15.0",
+  "version": "3.15.1",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
