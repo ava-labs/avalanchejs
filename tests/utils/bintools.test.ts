@@ -19,6 +19,10 @@ describe("BinTools", (): void => {
   const buff3: Buffer = Buffer.from(hexstr3, "hex")
   const checksum: string = "323e6811"
   const serializedChecksum: string = "148vjpuxYXixb8DcbaWyeDE2fEG" // serialized hexstr + checksum
+  const longSerializedChecksum: string =
+    "111Bit5JNASbJyTLrd2kWkYRoc96swEWoWdmEhuGAFK3rCAyTnTzomuFwgx1SCUdUE71KbtXPnqj93KGr3CeftpPN37kVyqBaAQ5xaDjr7wVBTUYi9iV7kYJnHF61yovViJF74mJJy7WWQKeRMDRTiPuii5gsd11gtNahCCsKbm9seJtk2h1wAPZn9M1eL84CGVPnLUiLP" // serialized hexstr + checksum
+  const checksummedHexStr =
+    "0x00000009de31b4d8b22991d51aa6aa1fc733f23a851a8c9400000000000186a0000000005f041280000000005f9ca900000030390000000000000001fceda8f90fcb5d30614b99d79fc4baa29307762668f16eb0259a57c2d3b78c875c86ec2045792d4df2d926c40f829196e0bb97ee697af71f5b0a966dabff749634c8b729855e937715b0e44303fd1014daedc752006011b730"
   test("copyFrom conducts a true copy", (): void => {
     const buff: Buffer = Buffer.from(hexstr, "hex")
     const newbuff: Buffer = bintools.copyFrom(buff, 0, 10)
@@ -176,6 +180,20 @@ describe("BinTools", (): void => {
       serbufffaulty[serbufffaulty.length - 1] - 1
     expect(dsr1.toString("hex")).toBe(hexstr)
     expect(dsr2.toString("hex")).toBe(hexstr)
+    expect((): void => {
+      bintools.cb58Decode(serbufffaulty)
+    }).toThrow("Error - BinTools.cb58Decode: invalid checksum")
+  })
+
+  test("cb58DecodeWithChecksum", (): void => {
+    const serbuff: Buffer = bintools.b58ToBuffer(longSerializedChecksum)
+    const dsr1: string = bintools.cb58DecodeWithChecksum(longSerializedChecksum)
+    const dsr2: string = bintools.cb58DecodeWithChecksum(serbuff)
+    const serbufffaulty: Buffer = bintools.copyFrom(serbuff)
+    serbufffaulty[serbufffaulty.length - 1] =
+      serbufffaulty[serbufffaulty.length - 1] - 1
+    expect(dsr1).toBe(checksummedHexStr)
+    expect(dsr2).toBe(checksummedHexStr)
     expect((): void => {
       bintools.cb58Decode(serbufffaulty)
     }).toThrow("Error - BinTools.cb58Decode: invalid checksum")

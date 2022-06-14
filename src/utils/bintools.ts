@@ -316,6 +316,16 @@ export default class BinTools {
     throw new ChecksumError("Error - BinTools.cb58Decode: invalid checksum")
   }
 
+  cb58DecodeWithChecksum = (bytes: Buffer | string): string => {
+    if (typeof bytes === "string") {
+      bytes = this.b58ToBuffer(bytes)
+    }
+    if (this.validateChecksum(bytes)) {
+      return `0x${this.copyFrom(bytes, 0, bytes.length).toString("hex")}`
+    }
+    throw new ChecksumError("Error - BinTools.cb58Decode: invalid checksum")
+  }
+
   addressToString = (hrp: string, chainid: string, bytes: Buffer): string =>
     `${chainid}-${bech32.bech32.encode(hrp, bech32.bech32.toWords(bytes))}`
 

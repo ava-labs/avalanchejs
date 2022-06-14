@@ -1273,7 +1273,17 @@ export class PlatformVMAPI extends JRPCAPI {
       }
       this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
     }
-    utxos.addArray(data, false)
+
+    if (data.length > 0 && data[0].substring(0, 2) === "0x") {
+      const cb58Strs: string[] = []
+      data.forEach((str: string): void => {
+        cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
+      })
+
+      utxos.addArray(cb58Strs, false)
+    } else {
+      utxos.addArray(data, false)
+    }
     response.data.result.utxos = utxos
     response.data.result.numFetched = parseInt(response.data.result.numFetched)
     return response.data.result
