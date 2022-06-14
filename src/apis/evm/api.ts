@@ -403,7 +403,8 @@ export class EVMAPI extends JRPCAPI {
     addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
-    startIndex: Index = undefined
+    startIndex: Index = undefined,
+    encoding: string = "hex"
   ): Promise<{
     numFetched: number
     utxos
@@ -415,7 +416,8 @@ export class EVMAPI extends JRPCAPI {
 
     const params: GetUTXOsParams = {
       addresses: addresses,
-      limit
+      limit,
+      encoding
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -431,7 +433,16 @@ export class EVMAPI extends JRPCAPI {
     )
     const utxos: UTXOSet = new UTXOSet()
     const data: any = response.data.result.utxos
-    utxos.addArray(data, false)
+    if (data.length > 0 && data[0].substring(0, 2) === "0x") {
+      const cb58Strs: string[] = []
+      data.forEach((str: string): void => {
+        cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
+      })
+
+      utxos.addArray(cb58Strs, false)
+    } else {
+      utxos.addArray(data, false)
+    }
     response.data.result.utxos = utxos
     return response.data.result
   }
