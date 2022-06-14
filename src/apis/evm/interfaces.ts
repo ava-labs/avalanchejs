@@ -32,6 +32,7 @@ export interface GetUTXOsParams {
   limit: number
   sourceChain?: string
   startIndex?: Index
+  encoding?: string
 }
 
 export interface ImportAVAXParams extends CredsInterface {
