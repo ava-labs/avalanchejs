@@ -108,7 +108,8 @@ export interface GetUTXOsParams {
   addresses: string[] | string
   limit: number
   sourceChain?: string
-  startIndex?: StartIndexInterface
+  startIndex?: StartIndexInterface,
+  encoding?: string
 }
 
 export interface EndIndex {

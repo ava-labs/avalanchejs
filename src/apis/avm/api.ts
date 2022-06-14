@@ -1003,7 +1003,8 @@ export class AVMAPI extends JRPCAPI {
     sourceChain: string = undefined,
     limit: number = 0,
     startIndex: { address: string; utxo: string } = undefined,
-    persistOpts: PersistanceOptions = undefined
+    persistOpts: PersistanceOptions = undefined,
+    encoding: string = "hex"
   ): Promise<GetUTXOsResponse> => {
     if (typeof addresses === "string") {
       addresses = [addresses]
@@ -1011,7 +1012,8 @@ export class AVMAPI extends JRPCAPI {
 
     const params: GetUTXOsParams = {
       addresses: addresses,
-      limit
+      limit,
+      encoding
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -1040,7 +1042,12 @@ export class AVMAPI extends JRPCAPI {
       }
       this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
     }
-    utxos.addArray(data, false)
+    const cb58Strs: string[] = []
+    data.forEach((str: string) => {
+      cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
+    })
+
+    utxos.addArray(cb58Strs, false)
     response.data.result.utxos = utxos
     return response.data.result
   }
