@@ -1273,7 +1273,13 @@ export class PlatformVMAPI extends JRPCAPI {
       }
       this.db.set(persistOpts.getName(), data, persistOpts.getOverwrite())
     }
-    utxos.addArray(data, false)
+
+    const cb58Strs: string[] = []
+    data.forEach((str: string) => {
+      cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
+    })
+
+    utxos.addArray(cb58Strs, false)
     response.data.result.utxos = utxos
     response.data.result.numFetched = parseInt(response.data.result.numFetched)
     return response.data.result
