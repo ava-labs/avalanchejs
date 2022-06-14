@@ -433,12 +433,16 @@ export class EVMAPI extends JRPCAPI {
     )
     const utxos: UTXOSet = new UTXOSet()
     const data: any = response.data.result.utxos
-    const cb58Strs: string[] = []
-    data.forEach((str: string) => {
-      cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
-    })
+    if (data.length > 0 && data[0].substring(0, 2) === "0x") {
+      const cb58Strs: string[] = []
+      data.forEach((str: string): void => {
+        cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
+      })
 
-    utxos.addArray(cb58Strs, false)
+      utxos.addArray(cb58Strs, false)
+    } else {
+      utxos.addArray(data, false)
+    }
     response.data.result.utxos = utxos
     return response.data.result
   }
