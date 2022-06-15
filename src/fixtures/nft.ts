@@ -1,6 +1,14 @@
+import { MintOperation, MintOutput, TransferOutput } from '../fxs/nft';
 import { merge } from '../utils/buffer';
-import { MintOutput, TransferOutput } from '../fxs/nft';
-import { outputOwner, outputOwnerBytes } from './secp256k1';
+import { bytes, bytesBytes, int, intBytes } from './primatives';
+import {
+  input,
+  inputBytes,
+  outputOwner,
+  outputOwnerBytes,
+  outputOwnersList,
+  outputOwnersListBytes,
+} from './secp256k1';
 
 // https://docs.avax.network/specs/avm-transaction-serialization/#nft-mint-output-example
 export const mintOutputBytes = () =>
@@ -30,3 +38,8 @@ export const transferOutputBytes = () =>
 
 export const transferOutput = () =>
   new TransferOutput(12345, new Uint8Array([0x43, 0x11, 0x00]), outputOwner());
+
+export const mintOperationBytes = () =>
+  merge([inputBytes(), intBytes(), bytesBytes(), outputOwnersListBytes()]);
+export const mintOperation = () =>
+  new MintOperation(input(), int(), bytes(), outputOwnersList());

@@ -2,6 +2,7 @@ import { Input } from './input';
 import { MintOperation } from './mintOperation';
 import { MintOutput } from './mintOutput';
 import { OutputOwners } from './outputOwners';
+import { OutputOwnersList } from './outputOwnersList';
 import { TransferInput } from './transferInput';
 import { TransferOutput } from './transferOutput';
 
@@ -19,6 +20,7 @@ export {
   MintOperation,
   MintOutput,
   OutputOwners,
+  OutputOwnersList,
   TransferInput,
   TransferOutput,
   TypeRegistry,

@@ -1,4 +1,3 @@
-import { merge } from '../utils/buffer';
 import {
   Input,
   MintOperation,
@@ -7,6 +6,9 @@ import {
   TransferInput,
   TransferOutput,
 } from '../fxs/secp256k1';
+import { OutputOwnersList } from '../fxs/secp256k1/outputOwnersList';
+import { Int } from '../primatives/int';
+import { merge } from '../utils/buffer';
 
 // https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-mint-output-example
 export const mintOutputBytes = () => outputOwnerBytes();
@@ -81,3 +83,9 @@ export const mintOperation = () =>
     new MintOutput(outputOwner()),
     new TransferOutput(12345n, outputOwner()),
   );
+
+export const outputOwnersListBytes = () =>
+  merge([new Int(2).toBytes(), outputOwnerBytes(), outputOwnerBytes()]);
+
+export const outputOwnersList = () =>
+  new OutputOwnersList([outputOwner(), outputOwner()]);
