@@ -9,7 +9,7 @@ import {
   merge,
   padLeft,
 } from './buffer';
-import { UnpackReturn } from './models';
+import type { UnpackReturn } from './models';
 
 type ValueConfigTuple = [UnpackReturn, Configs];
 
