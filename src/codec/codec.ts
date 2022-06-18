@@ -1,6 +1,8 @@
-import { merge } from '../utils/buffer';
-import { configs, pack, unpack } from '../utils/struct';
 import type { Serializable, SerializableStatic } from '../common/types';
+import { bytesForInt } from '../fixtures/utils/bytesFor';
+import { Int } from '../primatives';
+import { merge } from '../utils/buffer';
+import { unpack } from '../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/codec/linearcodec/codec.go
@@ -21,16 +23,14 @@ export class Codec {
       throw new Error("can't marshal unregistered type");
     }
 
-    const idBuff = pack([[id, configs.int]]);
-
-    return merge([idBuff, type.toBytes()]);
+    return merge([bytesForInt(id), type.toBytes()]);
   }
 
   UnpackPrefix(buf: Uint8Array) {
-    let typeId: number;
-    [typeId, buf] = unpack<[number]>(buf, [configs.int]);
+    let typeId: Int;
+    [typeId, buf] = unpack(buf, [Int]);
 
-    const type = this.typeIdToType[typeId];
+    const type = this.typeIdToType[typeId.value()];
     if (type === undefined) {
       throw new Error(
         `couldn't unmarshal interface: unknown type ID ${typeId}`,

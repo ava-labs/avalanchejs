@@ -1,5 +1,8 @@
-import { configs, pack, unpack } from '../../utils/struct';
 import { serializable } from '../../common/types';
+import { BigIntPr } from '../../primatives/bigintpr';
+import { Int } from '../../primatives/int';
+import { packSimple, unpack } from '../../utils/struct';
+import { Addresses } from '../common/addresses';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/output_owners.go
@@ -10,28 +13,22 @@ export class OutputOwners {
   id = 'secp256k1fx.OutputOwners';
 
   constructor(
-    private locktime: bigint,
-    private threshold: number,
-    private addrs: string[],
+    private locktime: BigIntPr,
+    private threshold: Int,
+    private addrs: Addresses,
   ) {}
 
   static fromBytes(bytes: Uint8Array): [OutputOwners, Uint8Array] {
-    let locktime: bigint;
-    let threshold: number;
-    let addrs: string[];
-    [locktime, threshold, addrs, bytes] = unpack<[bigint, number, string[]]>(
-      bytes,
-      [configs.bigInt, configs.int, configs.addressList],
-    );
+    const [locktime, threshold, addresses, remaining] = unpack(bytes, [
+      BigIntPr,
+      Int,
+      Addresses,
+    ]);
 
-    return [new OutputOwners(locktime, threshold, addrs), bytes];
+    return [new OutputOwners(locktime, threshold, addresses), remaining];
   }
 
   toBytes(): Uint8Array {
-    return pack([
-      [this.locktime, configs.bigInt],
-      [this.threshold, configs.int],
-      [this.addrs, configs.addressList],
-    ]);
+    return packSimple(this.locktime, this.threshold, this.addrs);
   }
 }

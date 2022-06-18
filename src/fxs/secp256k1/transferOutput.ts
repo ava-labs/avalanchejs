@@ -1,7 +1,7 @@
-import { configs, pack, unpack } from '../../utils/struct';
 import { OutputOwners } from '.';
 import { serializable } from '../../common/types';
-import { merge } from '../../utils/buffer';
+import { BigIntPr } from '../../primatives/bigintpr';
+import { packSimple, unpack } from '../../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/transfer_output.go
@@ -13,22 +13,15 @@ import { merge } from '../../utils/buffer';
 export class TransferOutput {
   id = 'secp256k1fx.TransferOutput';
 
-  constructor(private amt: bigint, private outputOwners: OutputOwners) {}
+  constructor(private amt: BigIntPr, private outputOwners: OutputOwners) {}
 
   static fromBytes(bytes: Uint8Array): [TransferOutput, Uint8Array] {
-    let amt: bigint;
-    [amt, bytes] = unpack<[bigint]>(bytes, [configs.bigInt]);
+    const [amt, owners, remaining] = unpack(bytes, [BigIntPr, OutputOwners]);
 
-    let owners: OutputOwners;
-    [owners, bytes] = OutputOwners.fromBytes(bytes);
-
-    return [new TransferOutput(amt, owners), bytes];
+    return [new TransferOutput(amt, owners), remaining];
   }
 
   toBytes(): Uint8Array {
-    return merge([
-      pack([[this.amt, configs.bigInt]]),
-      this.outputOwners.toBytes(),
-    ]);
+    return packSimple(this.amt, this.outputOwners);
   }
 }

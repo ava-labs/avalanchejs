@@ -1,72 +1,21 @@
-import { configs, unpack } from './struct';
+import {
+  mintOutput,
+  mintOutputBytes,
+  transferOutput,
+  transferOutputBytes,
+} from '../fixtures/secp256k1';
+import { MintOutput, TransferOutput } from '../fxs/secp256k1';
+import { merge } from './buffer';
+import { unpack } from './struct';
 
-describe('struct', () => {
-  it('unpacks simple items correctly', () => {
-    const exampleTx = new Uint8Array([
-      //typeID:
-      0x00, 0x00, 0x00, 0x0d,
-      // Address:
-      0x8d, 0xb9, 0x7c, 0x7c, 0xec, 0xe2, 0x49, 0xc2, 0xb9, 0x8b, 0xdc, 0x02,
-      0x26, 0xcc, 0x4c, 0x2a, 0x57, 0xbf, 0x52, 0xfc,
-      // Amount:
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x1e, 0x84, 0x80,
-      // AssetID:
-      0xdb, 0xcf, 0x89, 0x0f, 0x77, 0xf4, 0x9b, 0x96, 0x85, 0x76, 0x48, 0xb7,
-      0x2b, 0x77, 0xf9, 0xf8, 0x29, 0x37, 0xf2, 0x8a, 0x68, 0x70, 0x4a, 0xf0,
-      0x5d, 0xa0, 0xdc, 0x12, 0xba, 0x53, 0xf2, 0xdb,
-      // length of payload:
-      0x00, 0x00, 0x00, 0x03,
-      // payload:
-      0x43, 0x11, 0x00,
-      // Nonce:
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    ]);
+describe('structSimple', () => {
+  it('unpackSimple', () => {
+    const input: Uint8Array = merge([transferOutputBytes(), mintOutputBytes()]);
 
-    const [typeID, address, amount, assetID, payload, nonce, remaining] =
-      unpack<[number, string, bigint, string, Uint8Array, bigint]>(exampleTx, [
-        configs.int,
-        configs.address,
-        configs.bigInt,
-        configs.id,
-        configs.byteList,
-        configs.bigInt,
-      ]);
-
-    expect(typeID).toEqual(13);
-    expect(payload).toEqual(new Uint8Array([0x43, 0x11, 0x00]));
-    expect(address).toEqual('0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc');
-    expect(amount).toEqual(2000000n);
-
-    expect(assetID).toEqual(
-      '0xdbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db',
-    );
-    expect(nonce).toEqual(0n);
-
-    expect(remaining).toHaveLength(0);
-  });
-
-  it('unpacks arrays of simple objects correctly', () => {
-    const exampleTx = new Uint8Array([
-      // number of address indices:
-      0x00, 0x00, 0x00, 0x02,
-      // address index 0:
-      0x8d, 0xb9, 0x7c, 0x7c, 0xec, 0xe2, 0x49, 0xc2, 0xb9, 0x8b, 0xdc, 0x02,
-      0x26, 0xcc, 0x4c, 0x2a, 0x57, 0xbf, 0x52, 0xfc,
-      // address index 1:
-      0x8d, 0xb9, 0x7c, 0x7c, 0xec, 0xe2, 0x49, 0xc2, 0xb9, 0x8b, 0xdc, 0x02,
-      0x26, 0xcc, 0x4c, 0x2a, 0x57, 0xbf, 0x52, 0xfc,
-      // Nonce:
-      0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    ]);
-
-    const [addresses, remaining] = unpack<[string[]]>(exampleTx, [
-      configs.addressList,
-    ]);
-
-    expect(addresses).toEqual([
-      '0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc',
-      '0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc',
-    ]);
-    expect(remaining).toHaveLength(8);
+    const outputArray = [TransferOutput, MintOutput] as const;
+    const [tsOutput, mntOutput, remaining] = unpack(input, outputArray);
+    expect(tsOutput).toEqual(transferOutput());
+    expect(mntOutput).toEqual(mintOutput());
+    expect(remaining).toEqual(new Uint8Array());
   });
 });

@@ -1,6 +1,7 @@
 import { Input, MintOutput, TransferOutput } from '.';
 import { serializable } from '../../common/types';
 import { merge } from '../../utils/buffer';
+import { unpack } from '../../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/mint_operation.go
@@ -17,16 +18,13 @@ export class MintOperation {
   ) {}
 
   static fromBytes(bytes: Uint8Array): [MintOperation, Uint8Array] {
-    let input: Input;
-    [input, bytes] = Input.fromBytes(bytes);
+    const [input, mintOutput, transferOutput, remaining] = unpack(bytes, [
+      Input,
+      MintOutput,
+      TransferOutput,
+    ] as const);
 
-    let mintOutput: MintOutput;
-    [mintOutput, bytes] = MintOutput.fromBytes(bytes);
-
-    let transferOutput: TransferOutput;
-    [transferOutput, bytes] = TransferOutput.fromBytes(bytes);
-
-    return [new MintOperation(input, mintOutput, transferOutput), bytes];
+    return [new MintOperation(input, mintOutput, transferOutput), remaining];
   }
 
   toBytes(): Uint8Array {

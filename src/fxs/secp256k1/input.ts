@@ -1,5 +1,6 @@
-import { configs, unpack, pack } from '../../utils/struct';
 import { serializable } from '../../common/types';
+import { Ints } from '../../primatives/ints';
+import { packSimple, unpack } from '../../utils/struct';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/input.go
@@ -11,16 +12,14 @@ import { serializable } from '../../common/types';
 export class Input {
   id = 'secp256k1fx.Input';
 
-  constructor(private sigIndices: number[]) {}
+  constructor(private sigIndices: Ints) {}
 
   static fromBytes(bytes: Uint8Array): [Input, Uint8Array] {
-    let sigIndices: number[];
-    [sigIndices, bytes] = unpack<[number[]]>(bytes, [configs.intList]);
-
-    return [new Input(sigIndices), bytes];
+    const [sigIndices, remaining] = unpack(bytes, [Ints] as const);
+    return [new Input(sigIndices), remaining];
   }
 
   toBytes(): Uint8Array {
-    return pack([[this.sigIndices, configs.intList]]);
+    return packSimple(this.sigIndices);
   }
 }

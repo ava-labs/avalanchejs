@@ -1,178 +1,53 @@
-// Inspired by https://github.com/lyngklip/structjs/blob/master/struct.mjs
-// TODO: Cleanup
+import type { Codec } from '../codec';
+import type { Serializable, SerializableStatic } from '../common/types';
+import { merge } from './buffer';
 
-import {
-  bufferToBigInt,
-  bufferToHex,
-  bufferToNumber,
-  hexToBuffer,
-  merge,
-  padLeft,
-} from './buffer';
-import type { UnpackReturn } from './models';
+type FuncsForOutput<T> = T extends {
+  fromBytes: (buff: Uint8Array, codec?: Codec) => [infer rType, Uint8Array];
+}
+  ? rType
+  : never;
 
-type ValueConfigTuple = [UnpackReturn, Configs];
+type ConstructorReturnType<T> = T extends {
+  new (...args: any[]): infer rType;
+}
+  ? rType
+  : never;
 
-export type Configs = {
-  lengthConfig?: Configs;
-  unpack?: (buff: Uint8Array) => UnpackReturn;
-  unpackItem?: (buff: Uint8Array) => [UnpackReturn, Uint8Array];
-  unpackChunk?: (
-    buff: Uint8Array,
-    length: number,
-  ) => [UnpackReturn, Uint8Array];
-  unpackCustom?: (buff: Uint8Array) => [UnpackReturn, Uint8Array];
-  offset?: number;
-  pack(value: UnpackReturn): Uint8Array;
+export type ReturnTypes<T extends readonly any[]> = {
+  [i in keyof T]: FuncsForOutput<T[i]>;
 };
 
-const address: Configs = {
-  offset: 20,
-  unpack: bufferToHex,
-  pack: (value: string) => {
-    return padLeft(hexToBuffer(value), 20);
-  },
-};
-
-const id: Configs = {
-  offset: 32,
-  unpack: bufferToHex,
-  pack: (value: string) => {
-    return padLeft(hexToBuffer(value), 32);
-  },
-};
-
-const int: Configs = {
-  offset: 4,
-  unpack: bufferToNumber,
-  pack: (value: number) => {
-    return padLeft(hexToBuffer(value.toString(16)), 4);
-  },
-};
-
-const bigInt: Configs = {
-  offset: 8,
-  unpack: bufferToBigInt,
-  pack: (value: bigint) => {
-    return padLeft(hexToBuffer(value.toString(16)), 8);
-  },
-};
-
-const codec: Configs = {
-  offset: 2,
-  unpack: bufferToNumber,
-  pack: (value: number) => {
-    return padLeft(hexToBuffer(value.toString(16)), 2);
-  },
-};
-
-const addressList: Configs = {
-  lengthConfig: int,
-  unpackItem: (buff: Uint8Array) => unpack<[string]>(buff, [address]),
-  pack: (addresses: string[]) => {
-    const addrsSize = padLeft(hexToBuffer(addresses.length.toString(16)), 4);
-    const addrs = addresses.map(hexToBuffer);
-    return merge([addrsSize, merge(addrs)]);
-  },
-};
-
-const byteList: Configs = {
-  lengthConfig: int,
-  unpackChunk: (buff: Uint8Array, length: number) => [
-    buff.slice(0, length),
-    buff.slice(length),
-  ],
-  pack: (array: Uint8Array) => {
-    const len = padLeft(hexToBuffer(array.length.toString(16)), 4);
-    return merge([len, array]);
-  },
-};
-
-const intList: Configs = {
-  lengthConfig: int,
-  unpackItem: (buff: Uint8Array) => unpack<[number]>(buff, [int]),
-  pack: (list: number[]) => {
-    const size = padLeft(hexToBuffer(list.length.toString(16)), 4);
-    const nums = list
-      .map((x) => x.toString(16))
-      .map(hexToBuffer)
-      .map((x) => padLeft(x, 4));
-    return merge([size, merge(nums)]);
-  },
-};
-
-export const configs: Record<string, Configs> = {
-  address,
-  id,
-  int,
-  bigInt,
-  codec,
-  addressList,
-  byteList,
-  intList,
-};
-
-export const unpack = <O extends UnpackReturn[]>(
+export function unpack<O extends readonly any[]>(
   buffer: Uint8Array,
-  configs: Configs[],
-): [...O, Uint8Array] => {
-  const result = configs.map((config): UnpackReturn => {
-    if (config.unpackCustom) {
-      let res;
-      [res, buffer] = config.unpackCustom(buffer);
-      return res;
-    }
-
-    if (!config.lengthConfig) {
-      if (!buffer.length) throw new Error('not enough bytes');
-      const offset = config.offset;
-      const unpacker = config.unpack;
-      if (!unpacker) {
-        throw new Error(
-          'config must have either lengthConfig or unpack method',
-        );
-      }
-      const unpackerInput = buffer.slice(0, offset);
-      buffer = buffer.slice(offset);
-      return unpacker(unpackerInput);
-    }
-
-    let length: number;
-    //length is always int https://docs.avax.network/specs/serialization-primitives/#variable-length-array
-    [length, buffer] = unpack<[number]>(buffer, [config.lengthConfig]);
-    if (config.unpackChunk) {
-      let res;
-      [res, buffer] = config.unpackChunk(buffer, length);
-      return res;
-    }
-    // TODO(hiimoliverwng): if there's a way to not any this, fix it
-    const listResult: any[] = [];
-    for (let j = 0; j < length; j++) {
-      let res;
-      const unpackItem = config.unpackItem;
-      if (!unpackItem) {
-        throw new Error('unpackConfig not found for list type');
-      }
-      [res, buffer] = unpackItem(buffer);
-      listResult.push(res);
-    }
-    return listResult;
+  sers: O,
+  codec?: Codec,
+): [...ReturnTypes<O>, Uint8Array] {
+  const unpacked = sers.map((ser) => {
+    let res: ReturnType<typeof ser.fromBytes>[0];
+    [res, buffer] = ser.fromBytes(buffer, codec);
+    return res;
   });
-  if (!result.length) {
-    throw new Error('incorrect result length');
-  }
-  result.push(buffer);
-  // not sure how to make these types
-  return result as [...O, Uint8Array];
-};
 
-/**
- * Pack the given values into a single buffer.
- * @param values An array of values to pack.
- */
-export function pack(values: ValueConfigTuple[]) {
-  const buffs = values.map((val) => {
-    return val[1].pack(val[0]);
-  });
-  return merge(buffs);
+  return [...unpacked, buffer] as unknown as [...ReturnTypes<O>, Uint8Array];
+}
+
+export function packSimple(...serializables: Serializable[]) {
+  return merge(serializables.map((ser) => ser.toBytes()));
+}
+
+export function unpackV2<
+  O extends readonly any[],
+  T extends SerializableStatic,
+>(
+  buf: Uint8Array,
+  sers: O,
+  outerClass: T,
+  codec?: Codec,
+): [ConstructorReturnType<T>, Uint8Array] {
+  const results = unpack(buf, sers, codec);
+  return [
+    new outerClass(...results.slice(0, -1)),
+    results[results.length - 1],
+  ] as unknown as [ConstructorReturnType<T>, Uint8Array];
 }

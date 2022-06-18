@@ -1,7 +1,11 @@
 import { serializable } from '../../common/types';
 import { Bytes } from '../../primatives/bytes';
 import { Int } from '../../primatives/int';
-import { packSimple, unpackSimple } from '../../utils/structSimple';
+import { packSimple, unpack } from '../../utils/struct';
+import { Input } from '../secp256k1';
+import { OutputOwnersList } from '../secp256k1/outputOwnersList';
+
+/**
 import { Input, OutputOwnersList } from '../secp256k1';
 
 /**
@@ -19,7 +23,7 @@ export class MintOperation {
   ) {}
 
   static fromBytes(bytes: Uint8Array): [MintOperation, Uint8Array] {
-    const [input, groupId, payload, outputOwnerList, remaining] = unpackSimple(
+    const [input, groupId, payload, outputOwnerList, remaining] = unpack(
       bytes,
       [Input, Int, Bytes, OutputOwnersList] as const,
     );

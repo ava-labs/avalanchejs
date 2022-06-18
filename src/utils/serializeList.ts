@@ -11,6 +11,9 @@ export const unpackList = <T extends SerializableStatic>(
   [len, buf] = Int.fromBytes(buf);
   const result: ReturnType<T['fromBytes']>[0][] = [];
   for (let i = 0; i < len.value(); i++) {
+    if (buf.length === 0) {
+      throw new Error('not enough bytes');
+    }
     let res: any;
     [res, buf] = serializable.fromBytes(buf);
     result.push(res);

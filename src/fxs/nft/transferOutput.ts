@@ -1,6 +1,7 @@
 import { serializable } from '../../common/types';
-import { configs, unpack, pack } from '../../utils/struct';
-import { merge } from '../../utils/buffer';
+import { Bytes } from '../../primatives/bytes';
+import { Int } from '../../primatives/int';
+import { packSimple, unpack } from '../../utils/struct';
 import { OutputOwners } from '../secp256k1';
 
 /**
@@ -12,32 +13,22 @@ export class TransferOutput {
   id = 'nftfx.TransferOutput';
 
   constructor(
-    private groupId: number,
-    private payload: Uint8Array,
+    private groupId: Int,
+    private payload: Bytes,
     private outputOwners: OutputOwners,
   ) {}
 
   static fromBytes(bytes: Uint8Array): [TransferOutput, Uint8Array] {
-    let groupId: number;
-    let payload: Uint8Array;
-    [groupId, payload, bytes] = unpack<[number, Uint8Array]>(bytes, [
-      configs.int,
-      configs.byteList,
-    ]);
+    const [groupId, payload, outputOwners, remaining] = unpack(bytes, [
+      Int,
+      Bytes,
+      OutputOwners,
+    ] as const);
 
-    let owners: OutputOwners;
-    [owners, bytes] = OutputOwners.fromBytes(bytes);
-
-    return [new TransferOutput(groupId, payload, owners), bytes];
+    return [new TransferOutput(groupId, payload, outputOwners), remaining];
   }
 
   toBytes(): Uint8Array {
-    return merge([
-      pack([
-        [this.groupId, configs.int],
-        [this.payload, configs.byteList],
-      ]),
-      this.outputOwners.toBytes(),
-    ]);
+    return packSimple(this.groupId, this.payload, this.outputOwners);
   }
 }
