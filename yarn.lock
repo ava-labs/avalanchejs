@@ -588,10 +588,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@scure/base@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.0.tgz#f57b24ea3b69fc37ba96906358fb29806415aaa0"
-  integrity sha512-fJM8qIUzIDvZsWAj8psBGnR7hcTunIYsXI5Ulmj7I/jv9j9oqan/mg/UwB+ucYsA5ppIkBazFmsWdoi0+9qPtA==
+"@scure/base@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
+  integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
 
 "@sinclair/typebox@^0.23.3":
   version "0.23.5"
