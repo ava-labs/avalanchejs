@@ -19,7 +19,7 @@
     "@types/benchmark": "2.1.1",
     "@types/jest": "28.1.2",
     "@types/node": "18.0.0",
-    "@typescript-eslint/eslint-plugin": "5.27.1",
+    "@typescript-eslint/eslint-plugin": "5.29.0",
     "@typescript-eslint/parser": "5.29.0",
     "benchmark": "2.1.4",
     "eslint": "8.18.0",
