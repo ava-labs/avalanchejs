@@ -2,7 +2,7 @@ import type { Codec } from '../../codec/codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
-import { merge } from '../../utils/buffer';
+import { concatBytes } from '../../utils/buffer';
 import { packSimple, unpack } from '../../utils/struct';
 
 /**
@@ -27,6 +27,6 @@ export class TransferableOutput {
   }
 
   toBytes(codec: Codec) {
-    return merge([packSimple(this.assetId), codec.PackPrefix(this.output)]);
+    return concatBytes(packSimple(this.assetId), codec.PackPrefix(this.output));
   }
 }

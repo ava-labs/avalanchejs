@@ -3,7 +3,7 @@ import type { Codec } from '../../codec/codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
-import { merge } from '../../utils/buffer';
+import { concatBytes } from '../../utils/buffer';
 import { packSimple, unpack } from '../../utils/struct';
 
 /**
@@ -35,9 +35,9 @@ export class TransferableInput {
   }
 
   toBytes(codec: Codec) {
-    return merge([
+    return concatBytes(
       packSimple(this.utxoID, this.assetId),
       codec.PackPrefix(this.input),
-    ]);
+    );
   }
 }

@@ -1,6 +1,6 @@
 import type { Codec } from '../codec';
 import type { Serializable, SerializableStatic } from '../common/types';
-import { merge } from './buffer';
+import { concatBytes } from './buffer';
 
 type FuncsForOutput<T> = T extends {
   fromBytes: (buff: Uint8Array, codec?: Codec) => [infer rType, Uint8Array];
@@ -33,7 +33,7 @@ export function unpack<O extends readonly any[]>(
 }
 
 export function packSimple(...serializables: Serializable[]) {
-  return merge(serializables.map((ser) => ser.toBytes()));
+  return concatBytes(...serializables.map((ser) => ser.toBytes()));
 }
 
 export function unpackV2<

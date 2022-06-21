@@ -1,6 +1,6 @@
 import { Input, MintOutput, TransferOutput } from '.';
 import { serializable } from '../../common/types';
-import { merge } from '../../utils/buffer';
+import { concatBytes } from '../../utils/buffer';
 import { unpack } from '../../utils/struct';
 
 /**
@@ -28,10 +28,10 @@ export class MintOperation {
   }
 
   toBytes(): Uint8Array {
-    return merge([
+    return concatBytes(
       this.input.toBytes(),
       this.mintOutput.toBytes(),
       this.transferOutput.toBytes(),
-    ]);
+    );
   }
 }

@@ -1,7 +1,7 @@
 import type { Codec } from '../codec';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { Int } from '../primatives/int';
-import { merge } from './buffer';
+import { concatBytes } from './buffer';
 
 export const unpackList = <T extends SerializableStatic>(
   buf: Uint8Array,
@@ -25,8 +25,8 @@ export const packList = (
   serializables: Serializable[],
   codec?: Codec,
 ): Uint8Array => {
-  return merge([
+  return concatBytes(
     new Int(serializables.length).toBytes(),
     ...serializables.map((ser) => ser.toBytes(codec)),
-  ]);
+  );
 };

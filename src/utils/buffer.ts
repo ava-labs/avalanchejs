@@ -34,24 +34,6 @@ export function padLeft(bytes: Uint8Array, length: number) {
   return out;
 }
 
-/**
- * Merges [buffers] into a single Uint8Array.
- * @param buffers Uint8Array[]
- */
-export function merge(buffers: Uint8Array[]) {
-  const size = buffers.reduce((acc, val) => {
-    return acc + val.length;
-  }, 0);
-
-  const merged = new Uint8Array(size);
-
-  let offset = 0;
-  for (let i = 0; i < buffers.length; i++) {
-    merged.set(buffers[i], offset);
-    offset += buffers[i].length;
-  }
-
-  return merged;
-}
+export { concatBytes } from '@noble/hashes/utils';
 
 export * as buffer from 'worktop/buffer';

@@ -2,7 +2,7 @@ import { Codec } from '.';
 import { outputOwner, outputOwnerBytes } from '../fixtures/secp256k1';
 import { bytesForInt } from '../fixtures/utils/bytesFor';
 import { MintOutput, OutputOwners } from '../fxs/secp256k1';
-import { merge } from '../utils/buffer';
+import { concatBytes } from '../utils/buffer';
 
 describe('Codec', () => {
   let testCodec: Codec;
@@ -11,7 +11,7 @@ describe('Codec', () => {
   });
 
   it('unpacks types correctly', () => {
-    const bytes = merge([bytesForInt(1), outputOwnerBytes()]);
+    const bytes = concatBytes(bytesForInt(1), outputOwnerBytes());
 
     const [out, remainder] = testCodec.UnpackPrefix(bytes);
 
@@ -22,7 +22,7 @@ describe('Codec', () => {
 
   it('packs types correctly', () => {
     const owners = outputOwner();
-    const bytes = merge([bytesForInt(1), outputOwnerBytes()]);
+    const bytes = concatBytes(bytesForInt(1), outputOwnerBytes());
 
     expect(testCodec.PackPrefix(owners)).toStrictEqual(bytes);
   });

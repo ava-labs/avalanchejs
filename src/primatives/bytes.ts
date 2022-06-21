@@ -1,5 +1,5 @@
 import { serializable } from '../common/types';
-import { merge } from '../utils/buffer';
+import { concatBytes } from '../utils/buffer';
 import { Int } from './int';
 
 @serializable()
@@ -17,6 +17,6 @@ export class Bytes {
   }
 
   toBytes() {
-    return merge([new Int(this.bytes.length).toBytes(), this.bytes]);
+    return concatBytes(new Int(this.bytes.length).toBytes(), this.bytes);
   }
 }

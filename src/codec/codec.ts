@@ -1,7 +1,7 @@
 import type { Serializable, SerializableStatic } from '../common/types';
 import { bytesForInt } from '../fixtures/utils/bytesFor';
 import { Int } from '../primatives';
-import { merge } from '../utils/buffer';
+import { concatBytes } from '../utils/buffer';
 import { unpack } from '../utils/struct';
 
 /**
@@ -23,7 +23,7 @@ export class Codec {
       throw new Error("can't marshal unregistered type");
     }
 
-    return merge([bytesForInt(id), type.toBytes()]);
+    return concatBytes(bytesForInt(id), type.toBytes());
   }
 
   UnpackPrefix(buf: Uint8Array) {
