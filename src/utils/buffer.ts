@@ -1,6 +1,11 @@
 import { strip0x } from './strip0x';
 import { prepend0x } from './prepend0x';
-import { bytesToHex, hexToBytes, concatBytes } from '@noble/hashes/utils';
+import {
+  bytesToHex,
+  hexToBytes,
+  concatBytes,
+  utf8ToBytes,
+} from '@noble/hashes/utils';
 
 export function bufferToBigInt(buf: Uint8Array) {
   return BigInt(bufferToHex(buf));
@@ -34,4 +39,4 @@ export function padLeft(bytes: Uint8Array, length: number) {
   return out;
 }
 
-export { concatBytes };
+export { concatBytes, utf8ToBytes };

@@ -10,6 +10,7 @@ export interface SerializableStatic {
   new (...args: any[]): Serializable;
 
   fromBytes(bytes: Uint8Array, codec?: Codec): [Serializable, Uint8Array];
+  fromBytes(bytes: Uint8Array, codec: Codec): [Serializable, Uint8Array];
 }
 
 export function staticImplements<T>() {

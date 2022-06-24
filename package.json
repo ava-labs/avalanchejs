@@ -8,7 +8,8 @@
     "test:watch": "jest --watch",
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
     "check": "tsc --noEmit",
-    "bench": "NODE_OPTIONS=\"--no-warnings\" tsm ./scripts/bench.ts"
+    "bench": "NODE_OPTIONS=\"--no-warnings\" tsm ./scripts/bench.ts",
+    "debug": "ts-node --esm src/debug.ts"
   },
   "dependencies": {
     "@noble/hashes": "1.1.2",
@@ -27,7 +28,7 @@
     "jest": "28.1.1",
     "prettier": "2.7.1",
     "ts-jest": "28.0.5",
-    "tsm": "2.2.1",
+    "ts-node": "^10.8.1",
     "typescript": "4.7.4"
   },
   "engines": {

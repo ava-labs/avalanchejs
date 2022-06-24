@@ -2,9 +2,13 @@ import type { Codec } from '../codec';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { concatBytes } from './buffer';
 
-type FuncsForOutput<T> = T extends {
+export type FromBytesReturn<T> = T extends {
   fromBytes: (buff: Uint8Array, codec?: Codec) => [infer rType, Uint8Array];
 }
+  ? rType
+  : T extends {
+      fromBytes: (buff: Uint8Array, codec: Codec) => [infer rType, Uint8Array];
+    }
   ? rType
   : never;
 
@@ -15,7 +19,7 @@ type ConstructorReturnType<T> = T extends {
   : never;
 
 export type ReturnTypes<T extends readonly any[]> = {
-  [i in keyof T]: FuncsForOutput<T[i]>;
+  [i in keyof T]: FromBytesReturn<T[i]>;
 };
 
 export function unpack<O extends readonly any[]>(
@@ -25,7 +29,11 @@ export function unpack<O extends readonly any[]>(
 ): [...ReturnTypes<O>, Uint8Array] {
   const unpacked = sers.map((ser) => {
     let res: ReturnType<typeof ser.fromBytes>[0];
+    if (!buffer.length) {
+      throw new Error('not enough bytes');
+    }
     [res, buffer] = ser.fromBytes(buffer, codec);
+
     return res;
   });
 
@@ -34,6 +42,13 @@ export function unpack<O extends readonly any[]>(
 
 export function packSimple(...serializables: Serializable[]) {
   return concatBytes(...serializables.map((ser) => ser.toBytes()));
+}
+
+export function packSimpleWithCodec(
+  serializables: Serializable[],
+  codec?: Codec,
+) {
+  return concatBytes(...serializables.map((ser) => ser.toBytes(codec)));
 }
 
 export function unpackV2<

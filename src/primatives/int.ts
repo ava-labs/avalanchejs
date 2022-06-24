@@ -1,3 +1,4 @@
+import type { Codec } from '../codec';
 import { serializable } from '../common/types';
 import { bufferToNumber, hexToBuffer, padLeft } from '../utils/buffer';
 
@@ -10,7 +11,12 @@ export class Int {
     return [new Int(bufferToNumber(buf.slice(0, 4))), buf.slice(4)];
   }
 
-  toBytes() {
+  toBytes(_codec: Codec) {
+    return this.toBytesNoCodec();
+  }
+
+  // used when we just need quick bytes for a number
+  toBytesNoCodec() {
     return padLeft(hexToBuffer(this.int.toString(16)), 4);
   }
 

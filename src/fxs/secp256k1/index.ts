@@ -1,3 +1,4 @@
+import { Credential } from './credential';
 import { Input } from './input';
 import { MintOperation } from './mintOperation';
 import { MintOutput } from './mintOutput';
@@ -12,7 +13,7 @@ const TypeRegistry = Object.freeze([
   MintOutput,
   TransferOutput,
   MintOperation,
-  undefined, // TODO: Credential
+  Credential,
 ]);
 
 export {
@@ -23,5 +24,6 @@ export {
   OutputOwnersList,
   TransferInput,
   TransferOutput,
+  Credential,
   TypeRegistry,
 };
