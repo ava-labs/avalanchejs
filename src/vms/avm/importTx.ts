@@ -1,4 +1,4 @@
-import { concatBytes } from '@noble/hashes/utils';
+import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { BaseTx, TransferableInput } from '../../components/avax';

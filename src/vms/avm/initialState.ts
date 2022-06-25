@@ -1,4 +1,4 @@
-import { concatBytes } from '@noble/hashes/utils';
+import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';

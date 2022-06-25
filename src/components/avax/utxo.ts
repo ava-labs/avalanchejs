@@ -1,6 +1,6 @@
-import { concatBytes } from '@noble/hashes/utils';
-import type { Serializable } from 'child_process';
+import { concatBytes } from '../../utils/buffer';
 import { Codec } from '../../codec/codec';
+import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { UTXOID } from '../../components/avax';
 import { Id } from '../../fxs/common';

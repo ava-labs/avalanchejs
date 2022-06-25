@@ -1,4 +1,4 @@
-import { concatBytes } from '@noble/hashes/utils';
+import { concatBytes } from '../../utils/buffer';
 import { address, addressBytes } from '../common';
 import { bytesForInt } from './bytesFor';
 import { makeList, makeListBytes } from './makeList';

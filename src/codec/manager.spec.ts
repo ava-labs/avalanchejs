@@ -1,4 +1,4 @@
-import { concatBytes } from '@noble/hashes/utils';
+import { concatBytes } from '../utils/buffer';
 import { Codec, Manager } from '.';
 import { createAssetTx, createAssetTxBytes } from '../fixtures/avax';
 import { Bytes, Short, Stringpr } from '../primatives';

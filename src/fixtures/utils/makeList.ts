@@ -1,5 +1,5 @@
-import { concatBytes } from '@noble/hashes/utils';
-import type { Serializable } from 'child_process';
+import { concatBytes } from '../../utils/buffer';
+import type { Serializable } from '../../common/types';
 import { bytesForInt } from './bytesFor';
 
 export const makeList =

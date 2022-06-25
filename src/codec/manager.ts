@@ -1,4 +1,4 @@
-import { concatBytes } from '@noble/hashes/utils';
+import { concatBytes } from '../utils/buffer';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { Short } from '../primatives';
 import type { FromBytesReturn } from '../utils/struct';
