@@ -8,7 +8,6 @@ export type getUTXOsInput = {
     utxo: string;
   };
   sourceChain?: string;
-  encoding?: string;
 };
 
 export type getUTXOsResp = {
