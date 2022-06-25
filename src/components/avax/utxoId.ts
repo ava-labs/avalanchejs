@@ -4,7 +4,7 @@ import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
 import { packSimple, unpack } from '../../utils/struct';
 import { sha256 } from '@noble/hashes/sha256';
-import { BigIntPr, Int } from '../../primatives';
+import { BigIntPr, Int } from '../../primitives';
 
 const _symbol = Symbol('avax.UTXOID');
 

@@ -3,7 +3,7 @@ import { bytesForInt } from '../fixtures/utils/bytesFor';
 import { concatBytes } from '../utils/buffer';
 import { Int } from './int';
 
-const _symbol = Symbol('primatives.Bytes');
+const _symbol = Symbol('primitives.Bytes');
 
 @serializable()
 export class Bytes {

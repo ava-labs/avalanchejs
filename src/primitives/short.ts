@@ -1,7 +1,7 @@
 import { serializable } from '../common/types';
 import { bufferToNumber, hexToBuffer, padLeft } from '../utils/buffer';
 
-const _symbol = Symbol('primatives.Short');
+const _symbol = Symbol('primitives.Short');
 
 @serializable()
 export class Short {

@@ -1,7 +1,7 @@
 import { serializable } from '../common/types';
 import { bufferToBigInt, hexToBuffer, padLeft } from '../utils/buffer';
 
-const _symbol = Symbol('primatives.BigInt');
+const _symbol = Symbol('primitives.BigInt');
 
 // typescript doesn't like BigInt as a class name
 @serializable()

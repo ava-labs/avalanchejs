@@ -1,7 +1,7 @@
 import { concatBytes } from '../utils/buffer';
 import { Codec, Manager } from '.';
 import { createAssetTx, createAssetTxBytes } from '../fixtures/avax';
-import { Bytes, Short, Stringpr } from '../primatives';
+import { Bytes, Short, Stringpr } from '../primitives';
 import { CreateAssetTx } from '../vms/avm/createAssetTx';
 
 // jest.mock('../vms/avm/createAssetTx');

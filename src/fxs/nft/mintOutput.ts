@@ -1,5 +1,5 @@
 import { serializable } from '../../common/types';
-import { Int } from '../../primatives/int';
+import { Int } from '../../primitives';
 import { packSimple, unpack } from '../../utils/struct';
 import { OutputOwners } from '../secp256k1';
 

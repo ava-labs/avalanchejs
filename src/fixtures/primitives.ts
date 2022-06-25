@@ -1,9 +1,4 @@
-import { BigIntPr } from '../primatives/bigintpr';
-import { Bytes } from '../primatives/bytes';
-import { Int } from '../primatives/int';
-import { Ints } from '../primatives/ints';
-import { Short } from '../primatives/short';
-import { Stringpr } from '../primatives/stringpr';
+import { BigIntPr, Bytes, Int, Ints, Short, Stringpr } from '../primitives';
 import { concatBytes } from '../utils/buffer';
 import { bytesForInt } from './utils/bytesFor';
 

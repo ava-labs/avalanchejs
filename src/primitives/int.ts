@@ -2,7 +2,7 @@ import type { Codec } from '../codec';
 import { serializable } from '../common/types';
 import { bufferToNumber, hexToBuffer, padLeft } from '../utils/buffer';
 
-const _symbol = Symbol('primatives.Int');
+const _symbol = Symbol('primitives.Int');
 
 @serializable()
 export class Int {

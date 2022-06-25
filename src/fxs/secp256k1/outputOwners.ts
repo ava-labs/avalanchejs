@@ -1,6 +1,5 @@
 import { serializable } from '../../common/types';
-import { BigIntPr } from '../../primatives/bigintpr';
-import { Int } from '../../primatives/int';
+import { BigIntPr, Int } from '../../primitives';
 import { packSimple, unpack } from '../../utils/struct';
 import { Addresses } from '../common/addresses';
 

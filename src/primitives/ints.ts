@@ -2,7 +2,7 @@ import { serializable } from '../common/types';
 import { packList, unpackList } from '../utils/serializeList';
 import { Int } from './int';
 
-const _symbol = Symbol('primatives.Ints');
+const _symbol = Symbol('primitives.Ints');
 
 @serializable()
 export class Ints {

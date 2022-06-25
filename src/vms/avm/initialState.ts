@@ -2,7 +2,7 @@ import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
-import { Int } from '../../primatives';
+import { Int } from '../../primitives';
 import { unpackCodecList } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 

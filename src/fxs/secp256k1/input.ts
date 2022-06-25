@@ -1,5 +1,5 @@
 import { serializable } from '../../common/types';
-import { Ints } from '../../primatives/ints';
+import { Ints } from '../../primitives';
 import { packSimple, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('secp256k1fx.Input');

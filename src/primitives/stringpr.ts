@@ -2,7 +2,7 @@ import { serializable } from '../common/types';
 import { concatBytes, hexToBuffer, padLeft } from '../utils/buffer';
 import { Short } from './short';
 
-const _symbol = Symbol('primatives.String');
+const _symbol = Symbol('primitives.String');
 
 @serializable()
 export class Stringpr {

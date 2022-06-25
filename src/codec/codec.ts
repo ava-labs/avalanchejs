@@ -2,7 +2,7 @@ import { concatBytes } from '../utils/buffer';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { serializable } from '../common/types';
 import { bytesForInt } from '../fixtures/utils/bytesFor';
-import { Int } from '../primatives';
+import { Int } from '../primitives';
 import { unpack } from '../utils/struct';
 
 const _symbol = Symbol('codec');

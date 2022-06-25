@@ -1,6 +1,6 @@
 import { concatBytes } from '../utils/buffer';
 import type { Serializable, SerializableStatic } from '../common/types';
-import { Short } from '../primatives';
+import { Short } from '../primitives';
 import type { FromBytesReturn } from '../utils/struct';
 import { unpack } from '../utils/struct';
 import { DEFAULT_CODEC_VERSION } from '../vms/avm/codec';

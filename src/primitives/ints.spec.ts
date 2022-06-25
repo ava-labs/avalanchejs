@@ -1,4 +1,4 @@
-import { ints, intsBytes } from '../fixtures/primatives';
+import { ints, intsBytes } from '../fixtures/primitives';
 import { testSerialization } from '../fixtures/utils/serializable';
 import { Ints } from '.';
 

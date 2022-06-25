@@ -1,4 +1,4 @@
-import { Short } from '../primatives';
+import { Short } from '../primitives';
 import { getManager } from '../vms/avm/codec';
 
 // Check for circular imports in the fx type

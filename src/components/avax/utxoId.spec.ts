@@ -1,5 +1,5 @@
 import { Id } from '../../fxs/common';
-import { Int } from '../../primatives';
+import { Int } from '../../primitives';
 import { UTXOID } from '.';
 import { utxoId, utxoIdBytes } from '../../fixtures/avax';
 import { testSerialization } from '../../fixtures/utils/serializable';

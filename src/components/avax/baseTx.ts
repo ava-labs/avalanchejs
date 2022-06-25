@@ -3,7 +3,7 @@ import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { TransferableInput, TransferableOutput } from '../../components/avax';
 import { Id } from '../../fxs/common/id';
-import { Bytes, Int } from '../../primatives';
+import { Bytes, Int } from '../../primitives';
 import { convertListStruct, packList } from '../../utils/serializeList';
 import { packSimple, unpack } from '../../utils/struct';
 

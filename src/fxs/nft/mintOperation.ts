@@ -1,9 +1,7 @@
 import { serializable } from '../../common/types';
-import { Bytes } from '../../primatives/bytes';
-import { Int } from '../../primatives/int';
+import { Bytes, Int } from '../../primitives';
+import { Input, OutputOwnersList } from '../secp256k1';
 import { packSimple, unpack } from '../../utils/struct';
-import { Input } from '../secp256k1';
-import { OutputOwnersList } from '../secp256k1/outputOwnersList';
 
 const _symbol = Symbol('nftfx.MintOperation');
 

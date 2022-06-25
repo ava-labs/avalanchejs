@@ -18,7 +18,7 @@ import {
   intBytes,
   ints,
   intsBytes,
-} from './primatives';
+} from './primitives';
 import { bytesForInt } from './utils/bytesFor';
 
 // https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-mint-output-example

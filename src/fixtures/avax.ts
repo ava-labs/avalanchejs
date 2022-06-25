@@ -6,8 +6,7 @@ import {
 } from '../components/avax';
 import { TransferableOp } from '../components/avax/transferableOp';
 import { Utxo } from '../components/avax/utxo';
-import { Byte } from '../primatives';
-import { Int } from '../primatives/int';
+import { Byte, Int } from '../primitives';
 import { concatBytes } from '../utils/buffer';
 import { CreateAssetTx } from '../vms/avm/createAssetTx';
 import { ExportTx } from '../vms/avm/exportTx';
@@ -24,7 +23,7 @@ import {
   intBytes,
   stringPr,
   stringPrBytes,
-} from './primatives';
+} from './primitives';
 import {
   credential,
   credentialBytes,

@@ -1,6 +1,6 @@
 import { OutputOwners } from '.';
 import { serializable } from '../../common/types';
-import { BigIntPr } from '../../primatives/bigintpr';
+import { BigIntPr } from '../../primitives';
 import { packSimple, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('secp256k1fx.TransferOutput');

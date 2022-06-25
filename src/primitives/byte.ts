@@ -1,6 +1,6 @@
 import { serializable } from '../common/types';
 
-const _symbol = Symbol('primatives.Byte');
+const _symbol = Symbol('primitives.Byte');
 
 @serializable()
 export class Byte {

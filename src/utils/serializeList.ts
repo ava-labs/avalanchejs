@@ -1,7 +1,7 @@
 import type { Codec } from '../codec';
 import type { Serializable, SerializableStatic } from '../common/types';
+import { Int } from '../primitives';
 import { bytesForInt } from '../fixtures/utils/bytesFor';
-import { Int } from '../primatives/int';
 import { concatBytes } from './buffer';
 
 type unpackFunc = (buf: Uint8Array, codec?: Codec) => [any, Uint8Array];

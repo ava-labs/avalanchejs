@@ -1,7 +1,7 @@
 import { MintOperation, MintOutput, TransferOutput } from '../fxs/nft';
+import { bytes, bytesBytes, int, intBytes } from './primitives';
 import { TransferOperation } from '../fxs/nft/transferOperation';
 import { concatBytes } from '../utils/buffer';
-import { bytes, bytesBytes, int, intBytes } from './primatives';
 import {
   input,
   inputBytes,
