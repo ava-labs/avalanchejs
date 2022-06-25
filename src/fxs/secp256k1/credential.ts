@@ -17,7 +17,7 @@ export class Credential {
     return [new Credential(sigs), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packList(this.signatures);
   }
 }

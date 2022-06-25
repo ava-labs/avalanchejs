@@ -11,7 +11,7 @@ export class BigIntPr {
     return [new BigIntPr(bufferToBigInt(buf.slice(0, 8))), buf.slice(8)];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return padLeft(hexToBuffer(this.bigint.toString(16)), 8);
   }
 

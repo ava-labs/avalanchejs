@@ -28,7 +28,7 @@ export class OutputOwners {
     return [new OutputOwners(locktime, threshold, addresses), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packSimple(this.locktime, this.threshold, this.addrs);
   }
 }

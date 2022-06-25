@@ -18,7 +18,7 @@ export class MintOutput {
     return [new MintOutput(owners), bytes];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return this.outputOwners.toBytes();
   }
 }

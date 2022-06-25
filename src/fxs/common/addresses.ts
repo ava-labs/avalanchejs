@@ -12,7 +12,7 @@ export class Addresses {
     return [new Addresses(addresses), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packList(this.addresses);
   }
 }

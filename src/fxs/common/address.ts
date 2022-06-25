@@ -10,7 +10,7 @@ export class Address {
     return [new Address(bufferToHex(buf.slice(0, 20))), buf.slice(20)];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return padLeft(hexToBuffer(this.address), 20);
   }
 }

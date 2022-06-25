@@ -28,7 +28,7 @@ export class TransferOutput {
     return [new TransferOutput(groupId, payload, outputOwners), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packSimple(this.groupId, this.payload, this.outputOwners);
   }
 }

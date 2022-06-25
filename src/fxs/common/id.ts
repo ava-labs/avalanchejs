@@ -10,7 +10,7 @@ export class Id {
     return [new Id(bufferToHex(buf.slice(0, 32))), buf.slice(32)];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return padLeft(hexToBuffer(this.idVal), 32);
   }
 }

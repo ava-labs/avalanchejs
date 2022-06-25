@@ -20,7 +20,7 @@ export class TransferInput {
     return [new TransferInput(amt, input), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packSimple(this.amt, this.input);
   }
 }

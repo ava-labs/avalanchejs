@@ -20,7 +20,7 @@ export class Signature {
     ];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return padLeft(hexToBuffer(this.sig), SepkSignatureLength);
   }
 }

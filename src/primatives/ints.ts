@@ -12,7 +12,7 @@ export class Ints {
     return [new Ints(ints), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packList(this.ints);
   }
 }

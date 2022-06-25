@@ -22,7 +22,7 @@ export class MintOutput {
     return [new MintOutput(groupId, owners), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packSimple(this.groupId, this.outputOwners);
   }
 }

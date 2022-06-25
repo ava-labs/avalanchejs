@@ -19,7 +19,7 @@ export class TransferOperation {
     return [new TransferOperation(input, output), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packSimple(this.input, this.output);
   }
 }

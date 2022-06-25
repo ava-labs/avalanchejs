@@ -19,7 +19,7 @@ export class Input {
     return [new Input(sigIndices), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return packSimple(this.sigIndices);
   }
 }

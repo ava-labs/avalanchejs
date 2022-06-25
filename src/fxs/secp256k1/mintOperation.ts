@@ -27,7 +27,7 @@ export class MintOperation {
     return [new MintOperation(input, mintOutput, transferOutput), remaining];
   }
 
-  toBytes(): Uint8Array {
+  toBytes() {
     return concatBytes(
       this.input.toBytes(),
       this.mintOutput.toBytes(),
