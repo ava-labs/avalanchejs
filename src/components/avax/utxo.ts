@@ -34,4 +34,8 @@ export class Utxo {
       codec.PackPrefix(this.output),
     );
   }
+
+  ID() {
+    return this.utxoId.ID();
+  }
 }
