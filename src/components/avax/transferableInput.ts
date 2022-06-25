@@ -6,6 +6,8 @@ import { Id } from '../../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
 import { packSimple, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avax.TransferableInput');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
  * @see https://docs.avax.network/specs/coreth-atomic-transaction-serialization#transferable-input
@@ -14,7 +16,7 @@ import { packSimple, unpack } from '../../utils/struct';
  */
 @serializable()
 export class TransferableInput {
-  id = 'avax.TransferableInput';
+  _type = _symbol;
 
   constructor(
     private utxoID: UTXOID,

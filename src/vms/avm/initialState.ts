@@ -6,12 +6,14 @@ import { Int } from '../../primatives';
 import { unpackCodecList } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avm.InitialState');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#initial-state
  */
 @serializable()
 export class InitialState {
-  id = 'avax.InitialState';
+  _type = _symbol;
 
   constructor(private fxId: Int, private outputs: Serializable[]) {}
 

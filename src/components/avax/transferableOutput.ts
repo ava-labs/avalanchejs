@@ -5,6 +5,8 @@ import { Id } from '../../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
 import { packSimple, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avax.TransferableOutput');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
  * @see https://docs.avax.network/specs/coreth-atomic-transaction-serialization#transferable-output
@@ -13,7 +15,7 @@ import { packSimple, unpack } from '../../utils/struct';
  */
 @serializable()
 export class TransferableOutput {
-  id = 'avax.TransferableOutput';
+  _type = _symbol;
 
   constructor(private assetId: Id, private output: Serializable) {}
 

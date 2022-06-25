@@ -1,9 +1,11 @@
 import { serializable } from '../common/types';
 import { bufferToNumber, hexToBuffer, padLeft } from '../utils/buffer';
 
+const _symbol = Symbol('primatives.Short');
+
 @serializable()
 export class Short {
-  id = 'primatives.short';
+  _type = _symbol;
   constructor(private short: number) {}
 
   static fromBytes(buf: Uint8Array): [Short, Uint8Array] {

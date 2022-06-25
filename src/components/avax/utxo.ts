@@ -6,12 +6,14 @@ import { UTXOID } from '../../components/avax';
 import { Id } from '../../fxs/common';
 import { packSimpleWithCodec, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avax.Utxo');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-Exporttx
  */
 @serializable()
 export class Utxo {
-  id = 'avax.Utxo';
+  _type = _symbol;
 
   constructor(
     private utxoId: UTXOID,

@@ -3,13 +3,15 @@ import { packSimple, unpack } from '../../utils/struct';
 import { Input } from '../secp256k1';
 import { TransferOutput } from './transferOutput';
 
+const _symbol = Symbol('nftfx.TransferOperation');
+
 /**
  * https://docs.avax.network/specs/avm-transaction-serialization#nft-transfer-op
  *
  */
 @serializable()
 export class TransferOperation {
-  id = 'nftfx.TransferOperation';
+  _type = _symbol;
 
   constructor(private input: Input, private output: TransferOutput) {}
 

@@ -1,7 +1,7 @@
 import type { Codec } from '../codec';
 
 export interface Serializable {
-  id: string;
+  _type: symbol;
 
   toBytes(codec?: Codec): Uint8Array;
 }

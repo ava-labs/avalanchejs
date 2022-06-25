@@ -6,12 +6,14 @@ import { packSimple, unpack } from '../../utils/struct';
 import { sha256 } from '@noble/hashes/sha256';
 import { BigIntPr, Int } from '../../primatives';
 
+const _symbol = Symbol('avax.UTXOID');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/utxo_id.go
  */
 @serializable()
 export class UTXOID {
-  id = 'avax.UTXOID';
+  _type = _symbol;
 
   constructor(private txID: Id, private outputIdx: Int) {}
 

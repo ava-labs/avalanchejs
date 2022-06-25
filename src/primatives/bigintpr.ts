@@ -1,10 +1,12 @@
 import { serializable } from '../common/types';
 import { bufferToBigInt, hexToBuffer, padLeft } from '../utils/buffer';
 
+const _symbol = Symbol('primatives.BigInt');
+
 // typescript doesn't like BigInt as a class name
 @serializable()
 export class BigIntPr {
-  id = 'primatives.BigInt';
+  _type = _symbol;
   constructor(private bigint: bigint) {}
 
   static fromBytes(buf: Uint8Array): [BigIntPr, Uint8Array] {

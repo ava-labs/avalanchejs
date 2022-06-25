@@ -3,9 +3,11 @@ import { bytesForInt } from '../fixtures/utils/bytesFor';
 import { concatBytes } from '../utils/buffer';
 import { Int } from './int';
 
+const _symbol = Symbol('primatives.Bytes');
+
 @serializable()
 export class Bytes {
-  id = 'primatives.bytes';
+  _type = _symbol;
   constructor(private bytes: Uint8Array) {}
 
   static fromBytes(buf: Uint8Array): [Bytes, Uint8Array] {

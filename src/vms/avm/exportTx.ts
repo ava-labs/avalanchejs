@@ -6,12 +6,14 @@ import { Id } from '../../fxs/common';
 import { convertListStruct, packList } from '../../utils/serializeList';
 import { packSimpleWithCodec, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avm.ExportTx');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-Exporttx
  */
 @serializable()
 export class ExportTx {
-  id = 'avax.ExportTx';
+  _type = _symbol;
 
   constructor(
     private baseTx: BaseTx,

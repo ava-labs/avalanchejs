@@ -2,9 +2,11 @@ import type { Codec } from '../codec';
 import { serializable } from '../common/types';
 import { bufferToNumber, hexToBuffer, padLeft } from '../utils/buffer';
 
+const _symbol = Symbol('primatives.Int');
+
 @serializable()
 export class Int {
-  id = 'primatives.int';
+  _type = _symbol;
   constructor(private int: number) {}
 
   static fromBytes(buf: Uint8Array): [Int, Uint8Array] {

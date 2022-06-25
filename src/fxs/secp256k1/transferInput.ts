@@ -3,6 +3,8 @@ import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primatives/bigintpr';
 import { packSimple, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('secp256k1fx.TransferInput');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/transfer_input.go
  * @see https://docs.avax.network/specs/coreth-atomic-transaction-serialization/#secp256k1-transfer-input
@@ -11,7 +13,7 @@ import { packSimple, unpack } from '../../utils/struct';
  */
 @serializable()
 export class TransferInput {
-  id = 'secp256k1fx.TransferInput';
+  _type = _symbol;
 
   constructor(private amt: BigIntPr, private input: Input) {}
 

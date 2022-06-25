@@ -2,6 +2,8 @@ import { serializable } from '../../common/types';
 import { Ints } from '../../primatives/ints';
 import { packSimple, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('secp256k1fx.Input');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/input.go
  * @see https://docs.avax.network/specs/coreth-atomic-transaction-serialization/#secp256k1-transfer-input
@@ -10,7 +12,7 @@ import { packSimple, unpack } from '../../utils/struct';
  */
 @serializable()
 export class Input {
-  id = 'secp256k1fx.Input';
+  _type = _symbol;
 
   constructor(private sigIndices: Ints) {}
 

@@ -3,13 +3,15 @@ import { serializable } from '../../common/types';
 import { concatBytes } from '../../utils/buffer';
 import { unpack } from '../../utils/struct';
 
+const _symbol = Symbol('secp256k1fx.MintOperation');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/mint_operation.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-mint-operation
  */
 @serializable()
 export class MintOperation {
-  id = 'secp256k1fx.MintOperation';
+  _type = _symbol;
 
   constructor(
     private input: Input,

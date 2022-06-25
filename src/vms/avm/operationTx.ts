@@ -6,12 +6,14 @@ import { TransferableOp } from '../../components/avax/transferableOp';
 import { convertListStruct, packList } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avm.OperationTx');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-OperationTx
  */
 @serializable()
 export class OperationTx {
-  id = 'avax.OperationTx';
+  _type = _symbol;
 
   constructor(private baseTx: BaseTx, private ops: TransferableOp[]) {}
 

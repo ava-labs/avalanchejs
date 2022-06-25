@@ -8,12 +8,14 @@ import { convertListStruct, packList } from '../../utils/serializeList';
 import { packSimpleWithCodec, unpack } from '../../utils/struct';
 import { InitialState } from './initialState';
 
+const _symbol = Symbol('avm.CreateAssetTx');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-createassettx
  */
 @serializable()
 export class CreateAssetTx {
-  id = 'avax.CreateAssetTx';
+  _type = _symbol;
 
   constructor(
     private baseTx: BaseTx,

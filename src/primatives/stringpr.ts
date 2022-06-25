@@ -2,9 +2,11 @@ import { serializable } from '../common/types';
 import { concatBytes, hexToBuffer, padLeft } from '../utils/buffer';
 import { Short } from './short';
 
+const _symbol = Symbol('primatives.String');
+
 @serializable()
 export class Stringpr {
-  id = 'primatives.string';
+  _type = _symbol;
   constructor(private string: string) {}
 
   static fromBytes(buf: Uint8Array): [Stringpr, Uint8Array] {

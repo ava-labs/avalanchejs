@@ -5,8 +5,7 @@ import { packSimple, unpack } from '../../utils/struct';
 import { Input } from '../secp256k1';
 import { OutputOwnersList } from '../secp256k1/outputOwnersList';
 
-/**
-import { Input, OutputOwnersList } from '../secp256k1';
+const _symbol = Symbol('nftfx.MintOperation');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/nftfx/mint_operation.go
@@ -14,7 +13,7 @@ import { Input, OutputOwnersList } from '../secp256k1';
  */
 @serializable()
 export class MintOperation {
-  id = 'nftfx.MintOperation';
+  _type = _symbol;
   constructor(
     private input: Input,
     private groupId: Int,

@@ -4,13 +4,15 @@ import { Int } from '../../primatives/int';
 import { packSimple, unpack } from '../../utils/struct';
 import { OutputOwners } from '../secp256k1';
 
+const _symbol = Symbol('nftfx.TransferOutput');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/nftfx/transfer_output.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#nft-transfer-output
  */
 @serializable()
 export class TransferOutput {
-  id = 'nftfx.TransferOutput';
+  _type = _symbol;
 
   constructor(
     private groupId: Int,

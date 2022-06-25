@@ -5,12 +5,14 @@ import { serializable } from '../../common/types';
 import { convertListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avm.SignedTx');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-Exporttx
  */
 @serializable()
 export class SignedTx {
-  id = 'avax.SignedTx';
+  _type = _symbol;
 
   constructor(
     private unsignedTx: Serializable,

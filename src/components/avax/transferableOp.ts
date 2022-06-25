@@ -7,12 +7,14 @@ import { Id } from '../../fxs/common/id';
 import { convertListStruct, packList } from '../../utils/serializeList';
 import { packSimpleWithCodec, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avax.TransferableOp');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#transferable-op
  */
 @serializable()
 export class TransferableOp {
-  id = 'avax.TransferableOp';
+  _type = _symbol;
 
   constructor(
     private assetId: Id,

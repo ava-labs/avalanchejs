@@ -1,8 +1,10 @@
 import { serializable } from '../common/types';
 
+const _symbol = Symbol('primatives.Byte');
+
 @serializable()
 export class Byte {
-  id = 'primatives.byte';
+  _type = _symbol;
   constructor(private byte: Uint8Array) {}
 
   static fromBytes(buf: Uint8Array): [Byte, Uint8Array] {

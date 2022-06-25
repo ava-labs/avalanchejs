@@ -1,9 +1,11 @@
 import { serializable } from '../../common/types';
 import { bufferToHex, hexToBuffer, padLeft } from '../../utils/buffer';
 
+const _symbol = Symbol('common.Id');
+
 @serializable()
 export class Id {
-  id = 'common.Id';
+  _type = _symbol;
   constructor(private idVal: string) {}
 
   static fromBytes(buf: Uint8Array): [Id, Uint8Array] {

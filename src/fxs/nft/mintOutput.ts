@@ -3,13 +3,15 @@ import { Int } from '../../primatives/int';
 import { packSimple, unpack } from '../../utils/struct';
 import { OutputOwners } from '../secp256k1';
 
+const _symbol = Symbol('nftfx.MintOutput');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/nftfx/mint_output.go
  * @see https://docs.avax.network/specs/avm-transaction-serialization/#nft-mint-output
  */
 @serializable()
 export class MintOutput {
-  id = 'nftfx.MintOutput';
+  _type = _symbol;
 
   constructor(private groupId: Int, private outputOwners: OutputOwners) {}
 

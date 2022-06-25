@@ -1,14 +1,15 @@
 import { serializable } from '../../common/types';
 import { packList, unpackList } from '../../utils/serializeList';
 import { Signature } from './signature';
-/**
- *
- *@see https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-credential
- */
 
+const _symbol = Symbol('secp256k1fx.Credential');
+
+/**
+ * @see https://docs.avax.network/specs/avm-transaction-serialization#secp256k1-credential
+ */
 @serializable()
 export class Credential {
-  id = 'secp256k1fx.Credential';
+  _type = _symbol;
 
   constructor(private signatures: Signature[]) {}
 

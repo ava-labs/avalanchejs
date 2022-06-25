@@ -5,23 +5,25 @@ import { bytesForInt } from '../fixtures/utils/bytesFor';
 import { Int } from '../primatives';
 import { unpack } from '../utils/struct';
 
+const _symbol = Symbol('codec');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/codec/linearcodec/codec.go
  */
 @serializable()
 export class Codec {
-  id = '';
-  typeToTypeID: Map<string, number>;
+  _type = _symbol;
+  typeToTypeID: Map<symbol, number>;
 
   constructor(private typeIdToType: (SerializableStatic | undefined)[]) {
     this.typeToTypeID = typeIdToType.reduce(
-      (agg, type, index) => (type ? agg.set(new type().id, index) : agg),
-      new Map<string, number>(),
+      (agg, type, index) => (type ? agg.set(new type()._type, index) : agg),
+      new Map<symbol, number>(),
     );
   }
 
   PackPrefix = (type: Serializable) => {
-    const id = this.typeToTypeID.get(type.id);
+    const id = this.typeToTypeID.get(type._type);
     if (id === undefined) {
       throw new Error("can't marshal unregistered type");
     }

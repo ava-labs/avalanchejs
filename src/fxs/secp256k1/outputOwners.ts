@@ -4,13 +4,15 @@ import { Int } from '../../primatives/int';
 import { packSimple, unpack } from '../../utils/struct';
 import { Addresses } from '../common/addresses';
 
+const _symbol = Symbol('secp256k1fx.OutputOwners');
+
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/output_owners.go
  * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-output-owners-output
  */
 @serializable()
 export class OutputOwners {
-  id = 'secp256k1fx.OutputOwners';
+  _type = _symbol;
 
   constructor(
     private locktime: BigIntPr,

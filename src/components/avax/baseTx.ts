@@ -7,12 +7,14 @@ import { Bytes, Int } from '../../primatives';
 import { convertListStruct, packList } from '../../utils/serializeList';
 import { packSimple, unpack } from '../../utils/struct';
 
+const _symbol = Symbol('avax.BaseTx');
+
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-basetx
  */
 @serializable()
 export class BaseTx {
-  id = 'avax.BaseTx';
+  _type = _symbol;
 
   constructor(
     private NetworkId: Int,
