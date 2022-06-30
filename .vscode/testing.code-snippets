@@ -10,9 +10,41 @@
     "scope": "typescript",
     "prefix": "testser",
     "body": [
-      "testSerialization('${TM_FILENAME/(.)(.+?)\\.(.+)/${1:/upcase}$2/}', ${TM_FILENAME/(.)(.+?)\\.(.+)/${1:/upcase}$2/}, ${TM_FILENAME/\\.(.+)//g}, ${TM_FILENAME/\\.(.+)//g}Bytes);",
+      "testSerialization('${TM_FILENAME/(.)(.+?)\\.(.+)/${1:/upcase}$2/}', ${TM_FILENAME/(.)(.+?)\\.(.+)/${1:/upcase}$2/}, ${TM_FILENAME/\\.(.+)//g}, ${TM_FILENAME/\\.(.+)//g}Bytes, testPVMCodec);",
       "$2"
     ],
     "description": "Log output to console"
+  },
+  "newtx": {
+    "scope": "typescript",
+    "prefix": "newtx",
+    "body": [
+      "import type { Codec } from '../../codec/codec';",
+      "import { serializable } from '../../common/types';",
+      "import { concatBytes } from '../../utils/buffer';",
+      "import { unpack } from '../../utils/struct';",
+      "",
+      "const _symbol = Symbol('pvm.${1:TxName}');",
+      "",
+      "/**",
+      " * @see ",
+      " */",
+      "@serializable()",
+      "export class $1 {",
+      "  _type = _symbol;",
+      "",
+      "  constructor(public readonly ) {}",
+      "",
+      "  static fromBytes(bytes: Uint8Array, codec: Codec): [$1, Uint8Array] {",
+      "    const [$2, rest] = unpack(bytes, [], codec);",
+      "    return [new $1($2), rest];",
+      "  }",
+      "",
+      "  toBytes(codec: Codec) {",
+      "    return concatBytes();",
+      "  }",
+      "}"
+    ],
+    "description": "new tx type"
   }
 }
