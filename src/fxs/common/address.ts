@@ -15,4 +15,7 @@ export class Address {
   toBytes() {
     return padLeft(hexToBuffer(this.address), 20);
   }
+  value() {
+    return this.address;
+  }
 }

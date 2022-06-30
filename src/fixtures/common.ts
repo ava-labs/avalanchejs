@@ -1,7 +1,7 @@
 import { Address } from '../fxs/common/address';
-import { Addresses } from '../fxs/common/addresses';
 import { Id } from '../fxs/common/id';
 import { bytesForInt } from './utils/bytesFor';
+import { makeList } from './utils/makeList';
 
 export const addressBytes = () =>
   new Uint8Array([
@@ -30,4 +30,4 @@ export const addressesBytes = () =>
     ...addressBytes(),
   ]);
 
-export const addresses = () => new Addresses([address(), address()]);
+export const addresses = () => makeList(address);

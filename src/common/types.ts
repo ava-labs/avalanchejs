@@ -22,3 +22,7 @@ export function staticImplements<T>() {
 export function serializable() {
   return staticImplements<SerializableStatic>();
 }
+
+export interface Amounter extends Serializable {
+  amount(): bigint;
+}

@@ -15,7 +15,14 @@ const _symbol = Symbol('secp256k1fx.TransferOutput');
 export class TransferOutput {
   _type = _symbol;
 
-  constructor(private amt: BigIntPr, private outputOwners: OutputOwners) {}
+  constructor(
+    public readonly amt: BigIntPr,
+    public readonly outputOwners: OutputOwners,
+  ) {}
+
+  amount() {
+    return this.amt.value();
+  }
 
   static fromBytes(bytes: Uint8Array): [TransferOutput, Uint8Array] {
     const [amt, owners, remaining] = unpack(bytes, [BigIntPr, OutputOwners]);

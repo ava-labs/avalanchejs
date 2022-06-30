@@ -1,8 +1,8 @@
-import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { BaseTx, TransferableOutput } from '../../components/avax';
 import { Id } from '../../fxs/common';
+import { concatBytes } from '../../utils/buffer';
 import { convertListStruct, packList } from '../../utils/serializeList';
 import { packSimpleWithCodec, unpack } from '../../utils/struct';
 
@@ -16,9 +16,9 @@ export class ExportTx {
   _type = _symbol;
 
   constructor(
-    private baseTx: BaseTx,
-    private destination: Id,
-    private outs: TransferableOutput[],
+    public readonly baseTx: BaseTx,
+    public readonly destination: Id,
+    public readonly outs: TransferableOutput[],
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ExportTx, Uint8Array] {

@@ -1,5 +1,5 @@
 import type { Codec } from '../../codec/codec';
-import type { Serializable } from '../../common/types';
+import type { Amounter } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
@@ -17,14 +17,14 @@ const _symbol = Symbol('avax.TransferableOutput');
 export class TransferableOutput {
   _type = _symbol;
 
-  constructor(private assetId: Id, private output: Serializable) {}
+  constructor(public readonly assetId: Id, public readonly output: Amounter) {}
 
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
   ): [TransferableOutput, Uint8Array] {
     const [assetId, remaining] = unpack(bytes, [Id]);
-    const [output, rest] = codec.UnpackPrefix(remaining);
+    const [output, rest] = codec.UnpackPrefix<Amounter>(remaining);
     return [new TransferableOutput(assetId, output), rest];
   }
 

@@ -1,8 +1,8 @@
-import { concatBytes } from '../utils/buffer';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { serializable } from '../common/types';
 import { bytesForInt } from '../fixtures/utils/bytesFor';
 import { Int } from '../primitives';
+import { concatBytes } from '../utils/buffer';
 import { unpack } from '../utils/struct';
 
 const _symbol = Symbol('codec');
@@ -31,7 +31,7 @@ export class Codec {
     return concatBytes(bytesForInt(id), type.toBytes(this));
   };
 
-  UnpackPrefix = (buf: Uint8Array) => {
+  UnpackPrefix = <T extends Serializable>(buf: Uint8Array): [T, Uint8Array] => {
     let typeId: Int;
     [typeId, buf] = unpack(buf, [Int]);
 
@@ -42,7 +42,8 @@ export class Codec {
       );
     }
 
-    return type.fromBytes(buf, this);
+    const [entity, rest] = type.fromBytes(buf, this);
+    return [entity as T, rest];
   };
 
   static fromBytes(buf: Uint8Array, codec?: Codec) {

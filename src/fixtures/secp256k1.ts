@@ -43,7 +43,7 @@ export const outputOwnerBytes = () =>
   );
 
 export const outputOwner = () =>
-  new OutputOwners(bigIntPr(), int(), addresses());
+  new OutputOwners(bigIntPr(), int(), addresses()());
 
 export const inputBytes = () => intsBytes();
 

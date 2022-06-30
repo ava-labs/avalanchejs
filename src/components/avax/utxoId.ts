@@ -1,10 +1,10 @@
-import { base58check } from '../../utils/base58';
-import { concatBytes } from '../../utils/buffer';
+import { sha256 } from '@noble/hashes/sha256';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
-import { packSimple, unpack } from '../../utils/struct';
-import { sha256 } from '@noble/hashes/sha256';
 import { BigIntPr, Int } from '../../primitives';
+import { base58check } from '../../utils/base58';
+import { concatBytes } from '../../utils/buffer';
+import { packSimple, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.UTXOID');
 
@@ -15,7 +15,7 @@ const _symbol = Symbol('avax.UTXOID');
 export class UTXOID {
   _type = _symbol;
 
-  constructor(private txID: Id, private outputIdx: Int) {}
+  constructor(public readonly txID: Id, public readonly outputIdx: Int) {}
 
   static fromBytes(bytes: Uint8Array): [UTXOID, Uint8Array] {
     const [txID, outputIdx, remaining] = unpack(bytes, [Id, Int]);

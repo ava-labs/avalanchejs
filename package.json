@@ -9,7 +9,8 @@
     "lint": "eslint --fix -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
     "check": "tsc --noEmit",
     "bench": "ts-node --esm ./scripts/bench.ts",
-    "example": "ts-node --esm ./examples/x-chain/utxos.ts"
+    "example": "ts-node --esm ./examples/x-chain/utxos.ts",
+    "debug": "ts-node --esm ./src/debug.ts"
   },
   "dependencies": {
     "@noble/hashes": "1.1.2",

@@ -1,7 +1,6 @@
-import { concatBytes } from '../../utils/buffer';
+import { concatBytes } from '@noble/hashes/utils';
 import { Codec } from '../../codec/codec';
-import type { Serializable } from '../../common/types';
-import { serializable } from '../../common/types';
+import { Serializable, serializable } from '../../common/types';
 import { UTXOID } from '../../components/avax';
 import { Id } from '../../fxs/common';
 import { packSimpleWithCodec, unpack } from '../../utils/struct';
@@ -16,9 +15,9 @@ export class Utxo {
   _type = _symbol;
 
   constructor(
-    private utxoId: UTXOID,
-    private assetId: Id,
-    private output: Serializable,
+    public utxoId: UTXOID,
+    public assetId: Id,
+    public output: Serializable,
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [Utxo, Uint8Array] {

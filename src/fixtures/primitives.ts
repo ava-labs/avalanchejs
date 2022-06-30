@@ -1,4 +1,4 @@
-import { BigIntPr, Bytes, Int, Ints, Short, Stringpr } from '../primitives';
+import { BigIntPr, Bytes, Int, Short, Stringpr } from '../primitives';
 import { concatBytes } from '../utils/buffer';
 import { bytesForInt } from './utils/bytesFor';
 
@@ -9,7 +9,7 @@ export const int = () => new Int(13);
 export const intsBytes = () =>
   concatBytes(bytesForInt(3), intBytes(), intBytes(), intBytes());
 
-export const ints = () => new Ints([int(), int(), int()]);
+export const ints = () => [int(), int(), int()];
 
 export const bytesBytes = () =>
   concatBytes(bytesForInt(2), new Uint8Array([0x01, 0x02]));

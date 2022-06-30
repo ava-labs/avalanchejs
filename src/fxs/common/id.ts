@@ -15,4 +15,8 @@ export class Id {
   toBytes() {
     return padLeft(hexToBuffer(this.idVal), 32);
   }
+
+  value() {
+    return this.idVal;
+  }
 }

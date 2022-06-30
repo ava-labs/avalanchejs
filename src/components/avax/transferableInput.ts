@@ -19,9 +19,9 @@ export class TransferableInput {
   _type = _symbol;
 
   constructor(
-    private utxoID: UTXOID,
-    private assetId: Id,
-    private input: Serializable,
+    public readonly utxoID: UTXOID,
+    public readonly assetId: Id,
+    public readonly input: Serializable,
   ) {}
 
   static fromBytes(
