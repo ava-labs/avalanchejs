@@ -4,7 +4,7 @@ import { BaseTx, TransferableOutput } from '../../components/avax';
 import { Id } from '../../fxs/common';
 import { concatBytes } from '../../utils/buffer';
 import { convertListStruct, packList } from '../../utils/serializeList';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avm.ExportTx');
 
@@ -32,7 +32,7 @@ export class ExportTx {
 
   toBytes(codec: Codec) {
     return concatBytes(
-      packSimpleWithCodec([this.baseTx, this.destination], codec),
+      pack([this.baseTx, this.destination], codec),
       packList(this.outs, codec),
     );
   }

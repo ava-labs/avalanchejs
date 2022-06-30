@@ -5,7 +5,7 @@ import { OutputOwners } from '../../fxs/secp256k1';
 import { Int } from '../../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { convertListStruct, packList } from '../../utils/serializeList';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 import { Validator } from './validator';
 
 const _symbol = Symbol('pvm.AddValidatorTx');
@@ -48,9 +48,9 @@ export class AddValidatorTx {
 
   toBytes(codec: Codec) {
     return concatBytes(
-      packSimpleWithCodec([this.baseTx, this.validator], codec),
+      pack([this.baseTx, this.validator], codec),
       packList(this.stake, codec),
-      packSimpleWithCodec([this.rewardsOwner, this.shares], codec),
+      pack([this.rewardsOwner, this.shares], codec),
     );
   }
 }

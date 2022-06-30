@@ -1,7 +1,7 @@
 import { OutputOwners } from '.';
 import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('secp256k1fx.TransferOutput');
 
@@ -30,7 +30,7 @@ export class TransferOutput {
     return [new TransferOutput(amt, owners), remaining];
   }
 
-  toBytes() {
-    return packSimple(this.amt, this.outputOwners);
+  toBytes(codec) {
+    return pack([this.amt, this.outputOwners], codec);
   }
 }

@@ -14,12 +14,12 @@ export class OutputOwnersList {
 
   constructor(private outputOwners: OutputOwners[]) {}
 
-  static fromBytes(bytes: Uint8Array): [OutputOwnersList, Uint8Array] {
-    const [owners, remaining] = unpackList(bytes, OutputOwners);
+  static fromBytes(bytes: Uint8Array, codec): [OutputOwnersList, Uint8Array] {
+    const [owners, remaining] = unpackList(bytes, OutputOwners, codec);
     return [new OutputOwnersList(owners), remaining];
   }
 
-  toBytes() {
-    return packList(this.outputOwners);
+  toBytes(codec) {
+    return packList(this.outputOwners, codec);
   }
 }

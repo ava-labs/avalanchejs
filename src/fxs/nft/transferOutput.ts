@@ -1,6 +1,6 @@
 import { serializable } from '../../common/types';
 import { Bytes, Int } from '../../primitives';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 import { OutputOwners } from '../secp256k1';
 
 const _symbol = Symbol('nftfx.TransferOutput');
@@ -29,7 +29,7 @@ export class TransferOutput {
     return [new TransferOutput(groupId, payload, outputOwners), remaining];
   }
 
-  toBytes() {
-    return packSimple(this.groupId, this.payload, this.outputOwners);
+  toBytes(codec) {
+    return pack([this.groupId, this.payload, this.outputOwners], codec);
   }
 }

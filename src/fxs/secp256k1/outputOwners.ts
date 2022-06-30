@@ -2,7 +2,7 @@ import { concatBytes } from '@noble/hashes/utils';
 import { serializable } from '../../common/types';
 import { BigIntPr, Int } from '../../primitives';
 import { convertListStruct, packList } from '../../utils/serializeList';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 import { Address } from '../common';
 
 const _symbol = Symbol('secp256k1fx.OutputOwners');
@@ -21,20 +21,20 @@ export class OutputOwners {
     public readonly addrs: Address[],
   ) {}
 
-  static fromBytes(bytes: Uint8Array): [OutputOwners, Uint8Array] {
-    const [locktime, threshold, addresses, remaining] = unpack(bytes, [
-      BigIntPr,
-      Int,
-      convertListStruct(Address),
-    ]);
+  static fromBytes(bytes: Uint8Array, codec): [OutputOwners, Uint8Array] {
+    const [locktime, threshold, addresses, remaining] = unpack(
+      bytes,
+      [BigIntPr, Int, convertListStruct(Address)],
+      codec,
+    );
 
     return [new OutputOwners(locktime, threshold, addresses), remaining];
   }
 
-  toBytes() {
+  toBytes(codec) {
     return concatBytes(
-      packSimple(this.locktime, this.threshold),
-      packList(this.addrs),
+      pack([this.locktime, this.threshold], codec),
+      packList(this.addrs, codec),
     );
   }
 }

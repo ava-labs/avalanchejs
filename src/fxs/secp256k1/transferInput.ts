@@ -1,7 +1,7 @@
 import { Input } from '.';
 import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('secp256k1fx.TransferInput');
 
@@ -22,7 +22,7 @@ export class TransferInput {
     return [new TransferInput(amt, input), remaining];
   }
 
-  toBytes() {
-    return packSimple(this.amt, this.input);
+  toBytes(codec) {
+    return pack([this.amt, this.input], codec);
   }
 }

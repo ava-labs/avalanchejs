@@ -1,7 +1,7 @@
 import { serializable } from '../../common/types';
 import { Bytes, Int } from '../../primitives';
+import { pack, unpack } from '../../utils/struct';
 import { Input, OutputOwnersList } from '../secp256k1';
-import { packSimple, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('nftfx.MintOperation');
 
@@ -30,12 +30,10 @@ export class MintOperation {
     ];
   }
 
-  toBytes() {
-    return packSimple(
-      this.input,
-      this.groupId,
-      this.payload,
-      this.outputOwnerList,
+  toBytes(codec) {
+    return pack(
+      [this.input, this.groupId, this.payload, this.outputOwnerList],
+      codec,
     );
   }
 }

@@ -1,11 +1,11 @@
-import { concatBytes } from '../../utils/buffer';
 import { UTXOID } from '.';
 import { Codec } from '../../codec/codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
+import { concatBytes } from '../../utils/buffer';
 import { convertListStruct, packList } from '../../utils/serializeList';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.TransferableOp');
 
@@ -37,8 +37,8 @@ export class TransferableOp {
 
   toBytes(codec: Codec) {
     return concatBytes(
-      packSimpleWithCodec([this.assetId], codec),
-      packList(this.UTXOId),
+      pack([this.assetId], codec),
+      packList(this.UTXOId, codec),
       codec.PackPrefix(this.transferOp),
     );
   }

@@ -4,7 +4,7 @@ import { Id } from '../../fxs/common/id';
 import { BigIntPr, Int } from '../../primitives';
 import { base58check } from '../../utils/base58';
 import { concatBytes } from '../../utils/buffer';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.UTXOID');
 
@@ -23,8 +23,8 @@ export class UTXOID {
     return [new UTXOID(txID, outputIdx), remaining];
   }
 
-  toBytes() {
-    return packSimple(this.txID, this.outputIdx);
+  toBytes(codec) {
+    return pack([this.txID, this.outputIdx], codec);
   }
 
   ID() {

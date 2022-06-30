@@ -1,7 +1,7 @@
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 import { Validator } from './validator';
 
 const _symbol = Symbol('pvm.SubnetValidator');
@@ -27,6 +27,6 @@ export class SubnetValidator {
   }
 
   toBytes(codec: Codec) {
-    return packSimpleWithCodec([this.validator, this.subnetId], codec);
+    return pack([this.validator, this.subnetId], codec);
   }
 }

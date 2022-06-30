@@ -3,7 +3,7 @@ import { Codec } from '../../codec/codec';
 import { Serializable, serializable } from '../../common/types';
 import { UTXOID } from '../../components/avax';
 import { Id } from '../../fxs/common';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.Utxo');
 
@@ -31,7 +31,7 @@ export class Utxo {
 
   toBytes(codec) {
     return concatBytes(
-      packSimpleWithCodec([this.utxoId, this.assetId], codec),
+      pack([this.utxoId, this.assetId], codec),
       codec.PackPrefix(this.output),
     );
   }

@@ -1,5 +1,5 @@
 import { serializable } from '../../common/types';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 import { Input } from '../secp256k1';
 import { TransferOutput } from './transferOutput';
 
@@ -21,7 +21,7 @@ export class TransferOperation {
     return [new TransferOperation(input, output), remaining];
   }
 
-  toBytes() {
-    return packSimple(this.input, this.output);
+  toBytes(codec) {
+    return pack([this.input, this.output], codec);
   }
 }

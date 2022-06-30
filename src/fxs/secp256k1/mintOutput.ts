@@ -13,14 +13,14 @@ export class MintOutput {
 
   constructor(private outputOwners: OutputOwners) {}
 
-  static fromBytes(bytes: Uint8Array): [MintOutput, Uint8Array] {
+  static fromBytes(bytes: Uint8Array, codec): [MintOutput, Uint8Array] {
     let owners: OutputOwners;
-    [owners, bytes] = OutputOwners.fromBytes(bytes);
+    [owners, bytes] = OutputOwners.fromBytes(bytes, codec);
 
     return [new MintOutput(owners), bytes];
   }
 
-  toBytes() {
-    return this.outputOwners.toBytes();
+  toBytes(codec) {
+    return this.outputOwners.toBytes(codec);
   }
 }

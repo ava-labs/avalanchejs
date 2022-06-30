@@ -9,14 +9,16 @@ import { unpack } from './struct';
 describe('SerializeList', () => {
   it('unpacks list', () => {
     const adds = addressesBytes();
-    expect(unpackList(adds, Address)).toEqual([
+    expect(unpackList(adds, Address, testCodec())).toEqual([
       [address(), address()],
       new Uint8Array([]),
     ]);
   });
 
   it('unpacks list', () => {
-    expect(packList([address(), address()])).toEqual(addressesBytes());
+    expect(packList([address(), address()], testCodec())).toEqual(
+      addressesBytes(),
+    );
   });
 
   it('unpack for list type', () => {

@@ -4,7 +4,7 @@ import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.TransferableInput');
 
@@ -38,7 +38,7 @@ export class TransferableInput {
 
   toBytes(codec: Codec) {
     return concatBytes(
-      packSimple(this.utxoID, this.assetId),
+      pack([this.utxoID, this.assetId], codec),
       codec.PackPrefix(this.input),
     );
   }

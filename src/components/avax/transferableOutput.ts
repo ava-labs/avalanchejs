@@ -3,7 +3,7 @@ import type { Amounter } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.TransferableOutput');
 
@@ -29,6 +29,9 @@ export class TransferableOutput {
   }
 
   toBytes(codec: Codec) {
-    return concatBytes(packSimple(this.assetId), codec.PackPrefix(this.output));
+    return concatBytes(
+      pack([this.assetId], codec),
+      codec.PackPrefix(this.output),
+    );
   }
 }

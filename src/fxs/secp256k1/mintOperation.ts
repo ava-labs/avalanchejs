@@ -29,11 +29,11 @@ export class MintOperation {
     return [new MintOperation(input, mintOutput, transferOutput), remaining];
   }
 
-  toBytes() {
+  toBytes(codec) {
     return concatBytes(
-      this.input.toBytes(),
-      this.mintOutput.toBytes(),
-      this.transferOutput.toBytes(),
+      this.input.toBytes(codec),
+      this.mintOutput.toBytes(codec),
+      this.transferOutput.toBytes(codec),
     );
   }
 }

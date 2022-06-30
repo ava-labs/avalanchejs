@@ -1,5 +1,5 @@
 import type { Codec } from '../codec';
-import type { Serializable, SerializableStatic } from '../common/types';
+import type { Serializable } from '../common/types';
 import { concatBytes } from './buffer';
 
 export type FromBytesReturn<T> = T extends {
@@ -9,12 +9,6 @@ export type FromBytesReturn<T> = T extends {
   : T extends {
       fromBytes: (buff: Uint8Array, codec: Codec) => [infer rType, Uint8Array];
     }
-  ? rType
-  : never;
-
-type ConstructorReturnType<T> = T extends {
-  new (...args: any[]): infer rType;
-}
   ? rType
   : never;
 
@@ -40,29 +34,6 @@ export function unpack<O extends readonly any[]>(
   return [...unpacked, buffer] as unknown as [...ReturnTypes<O>, Uint8Array];
 }
 
-export function packSimple(...serializables: Serializable[]) {
-  return concatBytes(...serializables.map((ser) => ser.toBytes()));
-}
-
-export function packSimpleWithCodec(
-  serializables: Serializable[],
-  codec?: Codec,
-) {
+export function pack(serializables: Serializable[], codec: Codec) {
   return concatBytes(...serializables.map((ser) => ser.toBytes(codec)));
-}
-
-export function unpackV2<
-  O extends readonly any[],
-  T extends SerializableStatic,
->(
-  buf: Uint8Array,
-  sers: O,
-  outerClass: T,
-  codec?: Codec,
-): [ConstructorReturnType<T>, Uint8Array] {
-  const results = unpack(buf, sers, codec);
-  return [
-    new outerClass(...results.slice(0, -1)),
-    results[results.length - 1],
-  ] as unknown as [ConstructorReturnType<T>, Uint8Array];
 }

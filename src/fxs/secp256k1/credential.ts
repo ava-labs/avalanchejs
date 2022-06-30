@@ -1,3 +1,4 @@
+import { Codec } from '../../codec';
 import { serializable } from '../../common/types';
 import { packList, unpackList } from '../../utils/serializeList';
 import { Signature } from './signature';
@@ -13,12 +14,12 @@ export class Credential {
 
   constructor(private signatures: Signature[]) {}
 
-  static fromBytes(bytes: Uint8Array): [Credential, Uint8Array] {
-    const [sigs, remaining] = unpackList(bytes, Signature);
+  static fromBytes(bytes: Uint8Array, codec: Codec): [Credential, Uint8Array] {
+    const [sigs, remaining] = unpackList(bytes, Signature, codec);
     return [new Credential(sigs), remaining];
   }
 
-  toBytes() {
-    return packList(this.signatures);
+  toBytes(codec) {
+    return packList(this.signatures, codec);
   }
 }

@@ -2,7 +2,7 @@ import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common';
 import { BigIntPr } from '../../primitives';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('pvm.Validator');
 
@@ -30,7 +30,7 @@ export class Validator {
   }
 
   toBytes(codec: Codec) {
-    return packSimpleWithCodec(
+    return pack(
       [this.nodeId, this.startTime, this.endTime, this.weight],
       codec,
     );

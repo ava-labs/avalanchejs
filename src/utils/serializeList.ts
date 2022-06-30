@@ -1,15 +1,15 @@
 import type { Codec } from '../codec';
 import type { Serializable, SerializableStatic } from '../common/types';
-import { Int } from '../primitives';
 import { bytesForInt } from '../fixtures/utils/bytesFor';
+import { Int } from '../primitives';
 import { concatBytes } from './buffer';
 
-type unpackFunc = (buf: Uint8Array, codec?: Codec) => [any, Uint8Array];
+type unpackFunc = (buf: Uint8Array, codec: Codec) => [any, Uint8Array];
 
 export const unpackList = <T extends SerializableStatic>(
   buf: Uint8Array,
   serializable: T,
-  codec?: Codec,
+  codec: Codec,
 ): [ReturnType<T['fromBytes']>[0][], Uint8Array] => {
   return unpackListForEach(buf, serializable.fromBytes, codec);
 };
@@ -17,7 +17,7 @@ export const unpackList = <T extends SerializableStatic>(
 export const unpackListForEach = <T extends unpackFunc>(
   buf: Uint8Array,
   callback: T,
-  codec?: Codec,
+  codec: Codec,
 ): [ReturnType<T>[0][], Uint8Array] => {
   let len;
   [len, buf] = Int.fromBytes(buf);
@@ -36,7 +36,7 @@ export const unpackListForEach = <T extends unpackFunc>(
 export const convertListStruct = <T extends SerializableStatic>(
   serializable: T,
 ) => ({
-  fromBytes: (buff: Uint8Array, codec?: Codec) =>
+  fromBytes: (buff: Uint8Array, codec: Codec) =>
     unpackList(buff, serializable, codec),
 });
 
@@ -52,7 +52,7 @@ export const unpackCodecList = {
 
 export const packList = (
   serializables: Serializable[],
-  codec?: Codec,
+  codec: Codec,
 ): Uint8Array => {
   return concatBytes(
     bytesForInt(serializables.length),

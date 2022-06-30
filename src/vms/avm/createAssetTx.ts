@@ -1,10 +1,10 @@
-import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { BaseTx } from '../../components/avax';
 import { Byte, Stringpr } from '../../primitives';
+import { concatBytes } from '../../utils/buffer';
 import { convertListStruct, packList } from '../../utils/serializeList';
-import { packSimpleWithCodec, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 import { InitialState } from './initialState';
 
 const _symbol = Symbol('avm.CreateAssetTx');
@@ -41,10 +41,7 @@ export class CreateAssetTx {
 
   toBytes(codec: Codec) {
     return concatBytes(
-      packSimpleWithCodec(
-        [this.baseTx, this.name, this.symbol, this.denomination],
-        codec,
-      ),
+      pack([this.baseTx, this.name, this.symbol, this.denomination], codec),
       packList(this.initialStates, codec),
     );
   }

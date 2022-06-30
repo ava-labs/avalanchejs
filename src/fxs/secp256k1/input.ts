@@ -22,7 +22,7 @@ export class Input {
     return [new Input(sigIndices), remaining];
   }
 
-  toBytes() {
-    return packList(this.sigIndices);
+  toBytes(codec) {
+    return packList(this.sigIndices, codec);
   }
 }

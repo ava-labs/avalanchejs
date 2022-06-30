@@ -1,11 +1,11 @@
-import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { TransferableInput, TransferableOutput } from '../../components/avax';
 import { Id } from '../../fxs/common/id';
 import { Bytes, Int } from '../../primitives';
+import { concatBytes } from '../../utils/buffer';
 import { convertListStruct, packList } from '../../utils/serializeList';
-import { packSimple, unpack } from '../../utils/struct';
+import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.BaseTx');
 
@@ -45,7 +45,7 @@ export class BaseTx {
 
   toBytes(codec) {
     return concatBytes(
-      packSimple(this.NetworkId, this.BlockchainId),
+      pack([this.NetworkId, this.BlockchainId], codec),
       packList(this.outputs, codec),
       packList(this.inputs, codec),
       this.memo.toBytes(),
