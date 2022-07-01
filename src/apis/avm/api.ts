@@ -1788,7 +1788,8 @@ export class AVMAPI extends JRPCAPI {
       )
     }
     const params: IssueTxParams = {
-      tx: Transaction.toString()
+      tx: Transaction.toString(),
+      encoding: "hex"
     }
     const response: RequestResponseData = await this.callMethod(
       "avm.issueTx",

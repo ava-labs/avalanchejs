@@ -558,7 +558,7 @@ export class EVMAPI extends JRPCAPI {
     } else if (tx instanceof Buffer) {
       const txobj: Tx = new Tx()
       txobj.fromBuffer(tx)
-      Transaction = txobj.toString()
+      Transaction = txobj.toStringHex()
     } else if (tx instanceof Tx) {
       Transaction = tx.toStringHex()
     } else {
@@ -568,7 +568,8 @@ export class EVMAPI extends JRPCAPI {
       )
     }
     const params: IssueTxParams = {
-      tx: Transaction.toString()
+      tx: Transaction.toString(),
+      encoding: "hex"
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.issueTx",
