@@ -361,7 +361,7 @@ export abstract class EVMStandardTx<
   }
 
   toStringHex(): string {
-    return bintools.addChecksum(this.toBuffer()).toString("hex")
+    return `0x${bintools.addChecksum(this.toBuffer()).toString("hex")}`
   }
 
   /**

@@ -168,7 +168,7 @@ export abstract class StandardBaseTx<
   }
 
   toStringHex(): string {
-    return bintools.addChecksum(this.toBuffer()).toString("hex")
+    return `0x${bintools.addChecksum(this.toBuffer()).toString("hex")}`
   }
 
   /**
@@ -460,7 +460,7 @@ export abstract class StandardTx<
   }
 
   toStringHex(): string {
-    return bintools.addChecksum(this.toBuffer()).toString("hex")
+    return `0x${bintools.addChecksum(this.toBuffer()).toString("hex")}`
   }
 
   /**
