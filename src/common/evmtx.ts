@@ -360,6 +360,10 @@ export abstract class EVMStandardTx<
     return bintools.cb58Encode(this.toBuffer())
   }
 
+  toStringHex(): string {
+    return `0x${bintools.addChecksum(this.toBuffer()).toString("hex")}`
+  }
+
   /**
    * Class representing a signed transaction.
    *

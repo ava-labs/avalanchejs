@@ -915,9 +915,9 @@ export class PlatformVMAPI extends JRPCAPI {
     } else if (tx instanceof Buffer) {
       const txobj: Tx = new Tx()
       txobj.fromBuffer(tx)
-      Transaction = txobj.toString()
+      Transaction = txobj.toStringHex()
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString()
+      Transaction = tx.toStringHex()
     } else {
       /* istanbul ignore next */
       throw new TransactionError(
@@ -925,7 +925,8 @@ export class PlatformVMAPI extends JRPCAPI {
       )
     }
     const params: any = {
-      tx: Transaction.toString()
+      tx: Transaction.toString(),
+      encoding: "hex"
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.issueTx",
@@ -1323,15 +1324,15 @@ export class PlatformVMAPI extends JRPCAPI {
   ): Promise<UnsignedTx> => {
     const to: Buffer[] = this._cleanAddressArray(
       toAddresses,
-      "buildBaseTx"
+      "buildImportTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
     const from: Buffer[] = this._cleanAddressArray(
       fromAddresses,
-      "buildBaseTx"
+      "buildImportTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
     const change: Buffer[] = this._cleanAddressArray(
       changeAddresses,
-      "buildBaseTx"
+      "buildImportTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     let srcChain: string = undefined
@@ -1616,7 +1617,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).map((a: string): Buffer => bintools.stringToAddress(a))
     const rewards: Buffer[] = this._cleanAddressArray(
       rewardAddresses,
-      "buildAddValidatorTx"
+      "buildAddDelegatorTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
 
     if (memo instanceof PayloadBase) {
