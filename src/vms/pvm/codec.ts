@@ -25,21 +25,21 @@ export const codec = new Codec([
   Secp256k1Fx.Input, // 10
   Secp256k1Fx.OutputOwners, //11
 
-  AddValidatorTx, // 5
-  AddSubnetValidatorTx, // 6
-  AddDelegatorTx, // 7
+  AddValidatorTx, // 12
+  AddSubnetValidatorTx, // 13
+  AddDelegatorTx, // 14
 
-  CreateChainTx, // TODO: 8
-  CreateSubnetTx, // TODO: 9
+  CreateChainTx, // TODO: 15
+  CreateSubnetTx, // TODO: 16
 
-  ImportTx, // 10
-  ExportTx, // 11
+  ImportTx, // 17
+  ExportTx, // 18
 
-  AdvanceTimeTx, //12
-  RewardValidatorTx, //13
+  AdvanceTimeTx, //19
+  RewardValidatorTx, //20
 
-  StakableLockIn, // 14
-  StakableLockOut, // 15
+  StakableLockIn, // 21
+  StakableLockOut, // 22
 ]);
 
 export const manager = new Manager();
