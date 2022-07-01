@@ -4,14 +4,14 @@ import { BaseTx, TransferableOutput } from '../../components/avax';
 import { OutputOwners } from '../../fxs/secp256k1';
 import { Int } from '../../primitives';
 import { concatBytes } from '../../utils/buffer';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 import { Validator } from './validator';
 
 const _symbol = Symbol('pvm.AddValidatorTx');
 
 /**
- * @see
+ * @see https://docs.avax.network/specs/platform-transaction-serialization#unsigned-add-validator-tx
  */
 @serializable()
 export class AddValidatorTx {
@@ -31,13 +31,7 @@ export class AddValidatorTx {
   ): [AddValidatorTx, Uint8Array] {
     const [baseTx, validator, stake, rewardsOwner, shares, rest] = unpack(
       bytes,
-      [
-        BaseTx,
-        Validator,
-        convertListStruct(TransferableOutput),
-        OutputOwners,
-        Int,
-      ],
+      [BaseTx, Validator, toListStruct(TransferableOutput), OutputOwners, Int],
       codec,
     );
     return [

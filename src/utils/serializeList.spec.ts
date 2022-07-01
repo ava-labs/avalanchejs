@@ -3,7 +3,7 @@ import { transferableInputs, transferableInputsBytes } from '../fixtures/avax';
 import { testCodec } from '../fixtures/codec';
 import { address, addressesBytes } from '../fixtures/common';
 import { Address } from '../fxs/common';
-import { convertListStruct, packList, unpackList } from './serializeList';
+import { packList, toListStruct, unpackList } from './serializeList';
 import { unpack } from './struct';
 
 describe('SerializeList', () => {
@@ -22,7 +22,7 @@ describe('SerializeList', () => {
   });
 
   it('unpack for list type', () => {
-    const transferableInputsType = convertListStruct(TransferableInput);
+    const transferableInputsType = toListStruct(TransferableInput);
     const [result, remaining] = unpack(
       transferableInputsBytes(),
       [transferableInputsType],

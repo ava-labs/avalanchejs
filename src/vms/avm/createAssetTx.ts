@@ -3,7 +3,7 @@ import { serializable } from '../../common/types';
 import { BaseTx } from '../../components/avax';
 import { Byte, Stringpr } from '../../primitives';
 import { concatBytes } from '../../utils/buffer';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 import { InitialState } from './initialState';
 
@@ -30,7 +30,7 @@ export class CreateAssetTx {
   ): [CreateAssetTx, Uint8Array] {
     const [baseTx, name, symbol, domination, initialStates, remaining] = unpack(
       bytes,
-      [BaseTx, Stringpr, Stringpr, Byte, convertListStruct(InitialState)],
+      [BaseTx, Stringpr, Stringpr, Byte, toListStruct(InitialState)],
       codec,
     );
     return [

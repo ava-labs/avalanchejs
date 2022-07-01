@@ -3,7 +3,7 @@ import { serializable } from '../../common/types';
 import { BaseTx, TransferableInput } from '../../components/avax';
 import { Id } from '../../fxs/common';
 import { concatBytes } from '../../utils/buffer';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avm.ImportTx');
@@ -24,7 +24,7 @@ export class ImportTx {
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {
     const [baseTx, sourceChain, ins, remaining] = unpack(
       bytes,
-      [BaseTx, Id, convertListStruct(TransferableInput)],
+      [BaseTx, Id, toListStruct(TransferableInput)],
       codec,
     );
     return [new ImportTx(baseTx, sourceChain, ins), remaining];

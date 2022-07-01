@@ -1,8 +1,8 @@
-import { concatBytes } from '../../utils/buffer';
 import { Codec } from '../../codec/codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
-import { convertListStruct } from '../../utils/serializeList';
+import { concatBytes } from '../../utils/buffer';
+import { toListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avm.SignedTx');
@@ -22,7 +22,7 @@ export class SignedTx {
   static fromBytes(bytes: Uint8Array, codec: Codec): [SignedTx, Uint8Array] {
     const [unsignedTx, outs, remaining] = unpack(
       bytes,
-      [Codec, convertListStruct(Codec)],
+      [Codec, toListStruct(Codec)],
       codec,
     );
     return [new SignedTx(unsignedTx, outs), remaining];

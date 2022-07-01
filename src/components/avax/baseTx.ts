@@ -4,7 +4,7 @@ import { TransferableInput, TransferableOutput } from '../../components/avax';
 import { Id } from '../../fxs/common/id';
 import { Bytes, Int } from '../../primitives';
 import { concatBytes } from '../../utils/buffer';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.BaseTx');
@@ -30,8 +30,8 @@ export class BaseTx {
       [
         Int,
         Id,
-        convertListStruct(TransferableOutput),
-        convertListStruct(TransferableInput),
+        toListStruct(TransferableOutput),
+        toListStruct(TransferableInput),
         Bytes,
       ],
       codec,

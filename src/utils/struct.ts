@@ -1,6 +1,7 @@
 import type { Codec } from '../codec';
 import type { Serializable } from '../common/types';
 import { concatBytes } from './buffer';
+import { packList } from './serializeList';
 
 export type FromBytesReturn<T> = T extends {
   fromBytes: (buff: Uint8Array, codec?: Codec) => [infer rType, Uint8Array];
@@ -34,6 +35,23 @@ export function unpack<O extends readonly any[]>(
   return [...unpacked, buffer] as unknown as [...ReturnTypes<O>, Uint8Array];
 }
 
-export function pack(serializables: Serializable[], codec: Codec) {
-  return concatBytes(...serializables.map((ser) => ser.toBytes(codec)));
+export function pack(
+  serializables: (Serializable | Serializable[])[],
+  codec: Codec,
+) {
+  return concatBytes(
+    ...serializables.map((ser) => {
+      if (Array.isArray(ser)) {
+        return packList(ser, codec);
+      }
+      return ser.toBytes(codec);
+    }),
+  );
+}
+
+export function packSwitched(
+  codec: Codec,
+  ...serializables: (Serializable | Serializable[])[]
+) {
+  return pack(serializables, codec);
 }

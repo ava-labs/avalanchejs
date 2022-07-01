@@ -4,7 +4,7 @@ import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.TransferableOp');
@@ -28,7 +28,7 @@ export class TransferableOp {
   ): [TransferableOp, Uint8Array] {
     const [assetId, utxoID, transferOp, remaining] = unpack(
       bytes,
-      [Id, convertListStruct(UTXOID), Codec],
+      [Id, toListStruct(UTXOID), Codec],
       codec,
     );
 

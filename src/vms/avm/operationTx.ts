@@ -1,9 +1,9 @@
-import { concatBytes } from '../../utils/buffer';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { BaseTx } from '../../components/avax';
 import { TransferableOp } from '../../components/avax/transferableOp';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { concatBytes } from '../../utils/buffer';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avm.OperationTx');
@@ -20,7 +20,7 @@ export class OperationTx {
   static fromBytes(bytes: Uint8Array, codec: Codec): [OperationTx, Uint8Array] {
     const [baseTx, ops, remaining] = unpack(
       bytes,
-      [BaseTx, convertListStruct(TransferableOp)],
+      [BaseTx, toListStruct(TransferableOp)],
       codec,
     );
     return [new OperationTx(baseTx, ops), remaining];

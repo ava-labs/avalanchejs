@@ -1,7 +1,7 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { serializable } from '../../common/types';
 import { BigIntPr, Int } from '../../primitives';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 import { Address } from '../common';
 
@@ -24,7 +24,7 @@ export class OutputOwners {
   static fromBytes(bytes: Uint8Array, codec): [OutputOwners, Uint8Array] {
     const [locktime, threshold, addresses, remaining] = unpack(
       bytes,
-      [BigIntPr, Int, convertListStruct(Address)],
+      [BigIntPr, Int, toListStruct(Address)],
       codec,
     );
 

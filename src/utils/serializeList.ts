@@ -33,7 +33,7 @@ export const unpackListForEach = <T extends unpackFunc>(
   return [result, buf];
 };
 
-export const convertListStruct = <T extends SerializableStatic>(
+export const toListStruct = <T extends SerializableStatic>(
   serializable: T,
 ) => ({
   fromBytes: (buff: Uint8Array, codec: Codec) =>

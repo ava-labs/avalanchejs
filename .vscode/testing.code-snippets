@@ -22,7 +22,7 @@
       "import type { Codec } from '../../codec/codec';",
       "import { serializable } from '../../common/types';",
       "import { concatBytes } from '../../utils/buffer';",
-      "import { unpack } from '../../utils/struct';",
+      "import { pack, unpack } from '../../utils/struct';",
       "",
       "const _symbol = Symbol('pvm.${1:TxName}');",
       "",
@@ -41,7 +41,7 @@
       "  }",
       "",
       "  toBytes(codec: Codec) {",
-      "    return concatBytes();",
+      "    return pack();",
       "  }",
       "}"
     ],

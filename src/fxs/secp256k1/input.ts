@@ -1,6 +1,6 @@
 import { serializable } from '../../common/types';
 import { Int } from '../../primitives';
-import { convertListStruct, packList } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
 
 const _symbol = Symbol('secp256k1fx.Input');
@@ -18,7 +18,7 @@ export class Input {
   constructor(private sigIndices: Int[]) {}
 
   static fromBytes(bytes: Uint8Array): [Input, Uint8Array] {
-    const [sigIndices, remaining] = unpack(bytes, [convertListStruct(Int)]);
+    const [sigIndices, remaining] = unpack(bytes, [toListStruct(Int)]);
     return [new Input(sigIndices), remaining];
   }
 
