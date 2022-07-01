@@ -1780,7 +1780,7 @@ export class AVMAPI extends JRPCAPI {
       txobj.fromBuffer(tx)
       Transaction = txobj.toString()
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString()
+      Transaction = tx.toStringHex()
     } else {
       /* istanbul ignore next */
       throw new TransactionError(
