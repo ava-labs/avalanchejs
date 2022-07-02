@@ -7,6 +7,7 @@
     "test:cov": "jest --collect-coverage=true",
     "test:watch": "jest --watch",
     "lint": "eslint --fix -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
+    "lint:check": "eslint -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
     "check": "tsc --noEmit",
     "bench": "ts-node --esm ./scripts/bench.ts",
     "example": "ts-node --esm ./examples/x-chain/utxos.ts",
