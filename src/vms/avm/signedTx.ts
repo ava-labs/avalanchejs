@@ -15,8 +15,8 @@ export class SignedTx {
   _type = _symbol;
 
   constructor(
-    private unsignedTx: Serializable,
-    private credentials: Serializable[],
+    private readonly unsignedTx: Serializable,
+    private readonly credentials: Serializable[],
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [SignedTx, Uint8Array] {

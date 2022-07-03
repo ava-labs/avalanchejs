@@ -11,7 +11,7 @@ const _symbol = Symbol('secp256k1fx.MintOutput');
 export class MintOutput {
   _type = _symbol;
 
-  constructor(private outputOwners: OutputOwners) {}
+  constructor(private readonly outputOwners: OutputOwners) {}
 
   static fromBytes(bytes: Uint8Array, codec): [MintOutput, Uint8Array] {
     let owners: OutputOwners;

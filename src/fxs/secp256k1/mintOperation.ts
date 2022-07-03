@@ -14,9 +14,9 @@ export class MintOperation {
   _type = _symbol;
 
   constructor(
-    private input: Input,
-    private mintOutput: MintOutput,
-    private transferOutput: TransferOutput,
+    private readonly input: Input,
+    private readonly mintOutput: MintOutput,
+    private readonly transferOutput: TransferOutput,
   ) {}
 
   static fromBytes(bytes: Uint8Array): [MintOperation, Uint8Array] {

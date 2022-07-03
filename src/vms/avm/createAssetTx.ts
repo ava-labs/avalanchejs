@@ -17,11 +17,11 @@ export class CreateAssetTx {
   _type = _symbol;
 
   constructor(
-    private baseTx: BaseTx,
-    private name: Stringpr,
-    private symbol: Stringpr,
-    private denomination: Byte,
-    private initialStates: InitialState[],
+    private readonly baseTx: BaseTx,
+    private readonly name: Stringpr,
+    private readonly symbol: Stringpr,
+    private readonly denomination: Byte,
+    private readonly initialStates: InitialState[],
   ) {}
 
   static fromBytes(

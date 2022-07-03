@@ -15,7 +15,7 @@ const _symbol = Symbol('secp256k1fx.Input');
 export class Input {
   _type = _symbol;
 
-  constructor(private sigIndices: Int[]) {}
+  constructor(private readonly sigIndices: Int[]) {}
 
   static fromBytes(bytes: Uint8Array): [Input, Uint8Array] {
     const [sigIndices, remaining] = unpack(bytes, [toListStruct(Int)]);

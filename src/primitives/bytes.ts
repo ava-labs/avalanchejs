@@ -8,7 +8,7 @@ const _symbol = Symbol('primitives.Bytes');
 @serializable()
 export class Bytes {
   _type = _symbol;
-  constructor(private bytes: Uint8Array) {}
+  constructor(private readonly bytes: Uint8Array) {}
 
   static fromBytes(buf: Uint8Array): [Bytes, Uint8Array] {
     const [len, remaining] = Int.fromBytes(buf);

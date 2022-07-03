@@ -7,7 +7,7 @@ const _symbol = Symbol('primitives.BigInt');
 @serializable()
 export class BigIntPr {
   _type = _symbol;
-  constructor(private bigint: bigint) {}
+  constructor(private readonly bigint: bigint) {}
 
   static fromBytes(buf: Uint8Array): [BigIntPr, Uint8Array] {
     return [new BigIntPr(bufferToBigInt(buf.slice(0, 8))), buf.slice(8)];

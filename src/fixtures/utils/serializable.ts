@@ -1,4 +1,4 @@
-import { Codec } from '../../codec';
+import type { Codec } from '../../codec';
 import type { Serializable, SerializableStatic } from '../../common/types';
 import { testCodec } from '../codec';
 

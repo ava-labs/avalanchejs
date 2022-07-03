@@ -17,9 +17,9 @@ export class TransferableOp {
   _type = _symbol;
 
   constructor(
-    private assetId: Id,
-    private UTXOId: UTXOID[],
-    private transferOp: Serializable,
+    private readonly assetId: Id,
+    private readonly UTXOId: UTXOID[],
+    private readonly transferOp: Serializable,
   ) {}
 
   static fromBytes(

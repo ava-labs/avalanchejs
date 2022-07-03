@@ -16,9 +16,9 @@ export class ImportTx {
   _type = _symbol;
 
   constructor(
-    private baseTx: BaseTx,
-    private sourceChain: Id,
-    private ins: TransferableInput[],
+    private readonly baseTx: BaseTx,
+    private readonly sourceChain: Id,
+    private readonly ins: TransferableInput[],
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {

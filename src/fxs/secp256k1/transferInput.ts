@@ -15,7 +15,7 @@ const _symbol = Symbol('secp256k1fx.TransferInput');
 export class TransferInput {
   _type = _symbol;
 
-  constructor(private amt: BigIntPr, private input: Input) {}
+  constructor(private readonly amt: BigIntPr, private readonly input: Input) {}
 
   static fromBytes(bytes: Uint8Array): [TransferInput, Uint8Array] {
     const [amt, input, remaining] = unpack(bytes, [BigIntPr, Input]);

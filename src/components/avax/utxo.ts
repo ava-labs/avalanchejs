@@ -1,6 +1,7 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { Codec } from '../../codec/codec';
-import { Serializable, serializable } from '../../common/types';
+import type { Serializable } from '../../common/types';
+import { serializable } from '../../common/types';
 import { UTXOID } from '../../components/avax';
 import { Id } from '../../fxs/common';
 import { pack, unpack } from '../../utils/struct';

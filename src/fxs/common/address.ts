@@ -6,7 +6,7 @@ const _symbol = Symbol('common.Address');
 @serializable()
 export class Address {
   _type = _symbol;
-  constructor(private address: string) {}
+  constructor(private readonly address: string) {}
 
   static fromBytes(buf: Uint8Array): [Address, Uint8Array] {
     return [new Address(bufferToHex(buf.slice(0, 20))), buf.slice(20)];

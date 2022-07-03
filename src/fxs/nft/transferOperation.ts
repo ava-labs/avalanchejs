@@ -13,7 +13,10 @@ const _symbol = Symbol('nftfx.TransferOperation');
 export class TransferOperation {
   _type = _symbol;
 
-  constructor(private input: Input, private output: TransferOutput) {}
+  constructor(
+    private readonly input: Input,
+    private readonly output: TransferOutput,
+  ) {}
 
   static fromBytes(bytes: Uint8Array): [TransferOperation, Uint8Array] {
     const [input, output, remaining] = unpack(bytes, [Input, TransferOutput]);

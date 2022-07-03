@@ -1,4 +1,4 @@
-import { Codec } from '../../codec';
+import type { Codec } from '../../codec';
 import { serializable } from '../../common/types';
 import { packList, unpackList } from '../../utils/serializeList';
 import { Signature } from './signature';
@@ -12,7 +12,7 @@ const _symbol = Symbol('secp256k1fx.Credential');
 export class Credential {
   _type = _symbol;
 
-  constructor(private signatures: Signature[]) {}
+  constructor(private readonly signatures: Signature[]) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [Credential, Uint8Array] {
     const [sigs, remaining] = unpackList(bytes, Signature, codec);

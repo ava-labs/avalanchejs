@@ -6,7 +6,7 @@ const _symbol = Symbol('common.Id');
 @serializable()
 export class Id {
   _type = _symbol;
-  constructor(private idVal: string) {}
+  constructor(private readonly idVal: string) {}
 
   static fromBytes(buf: Uint8Array): [Id, Uint8Array] {
     return [new Id(bufferToHex(buf.slice(0, 32))), buf.slice(32)];

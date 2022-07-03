@@ -11,7 +11,7 @@ const SepkSignatureLength = 65;
 export class Signature {
   _type = _symbol;
 
-  constructor(private sig: string) {}
+  constructor(private readonly sig: string) {}
 
   static fromBytes(bytes: Uint8Array): [Signature, Uint8Array] {
     return [

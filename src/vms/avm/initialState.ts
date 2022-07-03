@@ -15,7 +15,10 @@ const _symbol = Symbol('avm.InitialState');
 export class InitialState {
   _type = _symbol;
 
-  constructor(private fxId: Int, private outputs: Serializable[]) {}
+  constructor(
+    private readonly fxId: Int,
+    private readonly outputs: Serializable[],
+  ) {}
 
   static fromBytes(
     bytes: Uint8Array,
@@ -26,9 +29,6 @@ export class InitialState {
   }
 
   toBytes(codec: Codec) {
-    return concatBytes(
-      this.fxId.toBytes(codec),
-      codec.PackPrefixList(this.outputs),
-    );
+    return concatBytes(this.fxId.toBytes(), codec.PackPrefixList(this.outputs));
   }
 }

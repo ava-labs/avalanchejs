@@ -3,7 +3,7 @@ import {
   TransferableInput,
   TransferableOutput,
 } from '../components/avax';
-import { Utxo } from '../components/avax/utxo';
+import type { Utxo } from '../components/avax/utxo';
 import { Address, Id } from '../fxs/common';
 import {
   Input,
@@ -20,15 +20,7 @@ import {
 } from '../utils/sort';
 import { ExportTx } from '../vms/avm';
 import { getAVMContextFromURI } from './context';
-import { AVMContext } from './models';
-
-/* 
-  Builder is useful for building transactions that are specific to a chain. 
- */
-type XBuilderDeps = {
-  context?: AVMContext;
-  baseURL?: string;
-};
+import type { AVMContext } from './models';
 
 type SpendOptions = {
   minIssuanceTime?: bigint;
@@ -41,7 +33,7 @@ type SpendOptions = {
 type SpendOptionsRequired = Required<SpendOptions>;
 
 export class XBuilder {
-  constructor(private context: AVMContext) {}
+  constructor(private readonly context: AVMContext) {}
   static async fromURI(baseURL?: string): Promise<XBuilder> {
     return new XBuilder(await getAVMContextFromURI('AVAX', baseURL));
   }

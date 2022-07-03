@@ -7,7 +7,7 @@ const _symbol = Symbol('primitives.String');
 @serializable()
 export class Stringpr {
   _type = _symbol;
-  constructor(private string: string) {}
+  constructor(private readonly string: string) {}
 
   static fromBytes(buf: Uint8Array): [Stringpr, Uint8Array] {
     const [length, remaining] = Short.fromBytes(buf);

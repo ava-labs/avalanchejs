@@ -13,10 +13,10 @@ const _symbol = Symbol('nftfx.MintOperation');
 export class MintOperation {
   _type = _symbol;
   constructor(
-    private input: Input,
-    private groupId: Int,
-    private payload: Bytes,
-    private outputOwnerList: OutputOwnersList,
+    private readonly input: Input,
+    private readonly groupId: Int,
+    private readonly payload: Bytes,
+    private readonly outputOwnerList: OutputOwnersList,
   ) {}
 
   static fromBytes(bytes: Uint8Array): [MintOperation, Uint8Array] {

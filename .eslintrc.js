@@ -18,12 +18,17 @@ module.exports = {
     },
     ecmaVersion: 12,
     sourceType: 'module',
+    // TODO: Why does uncommenting this remove the type imports?
+    // project: ['./tsconfig.json'],
   },
   plugins: ['@typescript-eslint'],
   rules: {
-    '@typescript-eslint/consistent-type-imports': 'warn',
+    '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-var-requires': 'error',
+    // Uncomment prefer-readonly and parserOptions.project to apply the rule.
+    // TODO: Uncomment both permanently after fixing the type import issue.
+    // '@typescript-eslint/prefer-readonly': 'error',
   },
 };

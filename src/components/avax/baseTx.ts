@@ -17,11 +17,11 @@ export class BaseTx {
   _type = _symbol;
 
   constructor(
-    private NetworkId: Int,
-    private BlockchainId: Id,
-    private outputs: TransferableOutput[],
-    private inputs: TransferableInput[],
-    private memo: Bytes,
+    private readonly NetworkId: Int,
+    private readonly BlockchainId: Id,
+    private readonly outputs: TransferableOutput[],
+    private readonly inputs: TransferableInput[],
+    private readonly memo: Bytes,
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [BaseTx, Uint8Array] {

@@ -14,7 +14,7 @@ import type {
 } from './model';
 
 export class Info extends Api {
-  constructor(private baseURL: string = AVAX_PUBLIC_URL) {
+  constructor(private readonly baseURL: string = AVAX_PUBLIC_URL) {
     super(baseURL, '/ext/info', 'info');
   }
 

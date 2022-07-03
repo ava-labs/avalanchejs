@@ -12,7 +12,7 @@ const _symbol = Symbol('secp256k1fx.OutputOwnersList');
 export class OutputOwnersList {
   _type = _symbol;
 
-  constructor(private outputOwners: OutputOwners[]) {}
+  constructor(private readonly outputOwners: OutputOwners[]) {}
 
   static fromBytes(bytes: Uint8Array, codec): [OutputOwnersList, Uint8Array] {
     const [owners, remaining] = unpackList(bytes, OutputOwners, codec);

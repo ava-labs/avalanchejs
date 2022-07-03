@@ -15,7 +15,9 @@ export class Codec {
   _type = _symbol;
   typeToTypeID: Map<symbol, number>;
 
-  constructor(private typeIdToType: (SerializableStatic | undefined)[]) {
+  constructor(
+    private readonly typeIdToType: (SerializableStatic | undefined)[],
+  ) {
     this.typeToTypeID = typeIdToType.reduce(
       (agg, type, index) => (type ? agg.set(new type()._type, index) : agg),
       new Map<symbol, number>(),
@@ -54,7 +56,7 @@ export class Codec {
   }
 
   // this is placed here to satisfy serializable and should not be used directly
-  toBytes(codec: Codec): Uint8Array {
+  toBytes(): Uint8Array {
     throw new Error('not implemented');
   }
 

@@ -15,7 +15,10 @@ const _symbol = Symbol('avm.OperationTx');
 export class OperationTx {
   _type = _symbol;
 
-  constructor(private baseTx: BaseTx, private ops: TransferableOp[]) {}
+  constructor(
+    private readonly baseTx: BaseTx,
+    private readonly ops: TransferableOp[],
+  ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [OperationTx, Uint8Array] {
     const [baseTx, ops, remaining] = unpack(
