@@ -5,6 +5,7 @@ import {
 } from '../components/avax';
 import type { Utxo } from '../components/avax/utxo';
 import { PlatformChainID } from '../constants/networkIDs';
+import { zeroOutputOwners } from '../constants/zeroValue';
 import { Address, Id } from '../fxs/common';
 import {
   Input,
@@ -14,13 +15,17 @@ import {
 } from '../fxs/secp256k1';
 import { BigIntPr, Bytes, Int } from '../primitives';
 import { bigIntMin } from '../utils/bigintMath';
-import { bufferToHex } from '../utils/buffer';
 import { matchOwners } from '../utils/matchOwners';
 import {
   compareTransferableInputs,
   compareTransferableOutputs,
 } from '../utils/sort';
-import { ExportTx, StakableLockIn, StakableLockOut } from '../vms/pvm';
+import {
+  CreateSubnetTx,
+  ExportTx,
+  StakableLockIn,
+  StakableLockOut,
+} from '../vms/pvm';
 import { getPVMContextFromURI } from './context';
 import type { PVMContext } from './models';
 
@@ -58,6 +63,49 @@ export class PVMBuilder {
     };
   }
 
+  newBaseTx(
+    fromAddresses: string[],
+    utxoSet: Utxo[],
+    outputs: TransferableOutput[],
+    options: SpendOptions,
+  ) {
+    const defaultedOptions = this.defaultSpendOptions(fromAddresses, options);
+    const toBurn = this.getToBurn(outputs, this.context.createSubnetTxFee);
+
+    const { inputs, changeOutputs } = this.spend(
+      toBurn,
+      new Map(),
+      utxoSet,
+      fromAddresses,
+      defaultedOptions,
+    );
+
+    const resultOutputs = outputs.concat(changeOutputs);
+    resultOutputs.sort(compareTransferableOutputs);
+    return new CreateSubnetTx(
+      new BaseTx(
+        new Int(this.context.networkID),
+        PlatformChainID,
+        resultOutputs,
+        inputs,
+        new Bytes(defaultedOptions.memo),
+      ),
+      zeroOutputOwners,
+    );
+  }
+
+  getToBurn = (outputs: TransferableOutput[], baseFee: bigint) => {
+    const toBurn = new Map<string, bigint>([
+      [this.context.avaxAssetID, baseFee],
+    ]);
+
+    outputs.forEach((output) => {
+      const assetId = output.assetId.value();
+      toBurn.set(assetId, (toBurn.get(assetId) || 0n) + output.output.amount());
+    });
+    return toBurn;
+  };
+
   newExportTx(
     chainId: string,
     fromAddresses: string[],
@@ -66,14 +114,7 @@ export class PVMBuilder {
     options: SpendOptions,
   ) {
     const defaultedOptions = this.defaultSpendOptions(fromAddresses, options);
-    const toBurn = new Map<string, bigint>([
-      [this.context.avaxAssetID, this.context.baseTxFee],
-    ]);
-
-    outputs.forEach((out) => {
-      const assetId = out.assetId.value();
-      toBurn.set(assetId, (toBurn.get(assetId) || 0n) + out.output.amount());
-    });
+    const toBurn = this.getToBurn(outputs, this.context.baseTxFee);
 
     const { inputs, changeOutputs } = this.spend(
       toBurn,
@@ -87,7 +128,7 @@ export class PVMBuilder {
     return new ExportTx(
       new BaseTx(
         new Int(this.context.networkID),
-        new Id(bufferToHex(PlatformChainID)),
+        PlatformChainID,
         changeOutputs,
         inputs,
         new Bytes(defaultedOptions.memo),
