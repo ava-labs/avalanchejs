@@ -30,7 +30,7 @@ export interface GetContainerByIndexParams extends BaseIndexParams {
 export interface GetContainerByIndexResponse extends BaseIndexResponse {}
 
 export interface GetContainerByIDParams extends BaseIndexParams {
-  containerID: string
+  id: string
 }
 
 export interface GetContainerByIDResponse extends BaseIndexResponse {}
@@ -49,9 +49,9 @@ export interface GetContainerRangeResponse {
 }
 
 export interface GetIndexParams extends BaseIndexParams {
-  containerID: string
+  id: string
 }
 
 export interface GetIsAcceptedParams extends BaseIndexParams {
-  containerID: string
+  id: string
 }
