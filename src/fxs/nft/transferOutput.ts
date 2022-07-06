@@ -14,9 +14,9 @@ export class TransferOutput {
   _type = _symbol;
 
   constructor(
-    private readonly groupId: Int,
-    private readonly payload: Bytes,
-    private readonly outputOwners: OutputOwners,
+    public readonly groupId: Int,
+    public readonly payload: Bytes,
+    public readonly outputOwners: OutputOwners,
   ) {}
 
   static fromBytes(bytes: Uint8Array): [TransferOutput, Uint8Array] {

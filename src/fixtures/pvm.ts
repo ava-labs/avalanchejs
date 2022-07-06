@@ -33,7 +33,16 @@ import {
   stringPr,
   stringPrBytes,
 } from './primitives';
-import { input, inputBytes, outputOwner, outputOwnerBytes } from './secp256k1';
+import {
+  input,
+  inputBytes,
+  outputOwner,
+  outputOwnerBytes,
+  transferInput,
+  transferInputBytes,
+  transferOutput,
+  transferOutputBytes,
+} from './secp256k1';
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
 export const validator = () =>
@@ -140,16 +149,16 @@ export const exportTxBytes = () =>
   );
 
 export const stakableLockIn = () =>
-  new StakableLockIn(bigIntPr(), transferableInput());
+  new StakableLockIn(bigIntPr(), transferInput());
 
 export const stakableLockInBytes = () =>
-  concatBytes(bigIntPrBytes(), transferableInputBytes());
+  concatBytes(bigIntPrBytes(), bytesForInt(5), transferInputBytes());
 
 export const stakableLockOut = () =>
-  new StakableLockOut(bigIntPr(), transferableOutput());
+  new StakableLockOut(bigIntPr(), transferOutput());
 
 export const stakableLockOutBytes = () =>
-  concatBytes(bigIntPrBytes(), transferableOutputBytes());
+  concatBytes(bigIntPrBytes(), bytesForInt(7), transferOutputBytes());
 
 export const advanceTimeTx = () => new AdvanceTimeTx(bigIntPr());
 

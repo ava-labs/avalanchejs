@@ -1,4 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
+import type { Codec } from '../../codec';
 import { serializable } from '../../common/types';
 import { Id } from '../../fxs/common/id';
 import { BigIntPr, Int } from '../../primitives';
@@ -17,8 +18,8 @@ export class UTXOID {
 
   constructor(public readonly txID: Id, public readonly outputIdx: Int) {}
 
-  static fromBytes(bytes: Uint8Array): [UTXOID, Uint8Array] {
-    const [txID, outputIdx, remaining] = unpack(bytes, [Id, Int]);
+  static fromBytes(bytes: Uint8Array, codec: Codec): [UTXOID, Uint8Array] {
+    const [txID, outputIdx, remaining] = unpack(bytes, [Id, Int], codec);
 
     return [new UTXOID(txID, outputIdx), remaining];
   }

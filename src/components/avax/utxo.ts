@@ -16,9 +16,9 @@ export class Utxo {
   _type = _symbol;
 
   constructor(
-    public utxoId: UTXOID,
-    public assetId: Id,
-    public output: Serializable,
+    public readonly utxoId: UTXOID,
+    public readonly assetId: Id,
+    public readonly output: Serializable,
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [Utxo, Uint8Array] {

@@ -1,6 +1,6 @@
-import { concatBytes } from '../utils/buffer';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { Short } from '../primitives';
+import { concatBytes } from '../utils/buffer';
 import type { FromBytesReturn } from '../utils/struct';
 import { unpack } from '../utils/struct';
 import { DEFAULT_CODEC_VERSION } from '../vms/avm/codec';
@@ -25,7 +25,6 @@ export class Manager {
   ): FromBytesReturn<T> => {
     const [codecId, rest] = unpack(buff, [Short]);
     const codec = this.getCodecForVersion(codecId);
-
     // TODO: try to do this without casting
     return unpacker.fromBytes(rest, codec)[0] as FromBytesReturn<T>;
   };

@@ -24,9 +24,11 @@ export function unpack<O extends readonly any[]>(
 ): [...ReturnTypes<O>, Uint8Array] {
   const unpacked = sers.map((ser) => {
     let res: ReturnType<typeof ser.fromBytes>[0];
+
     if (!buffer.length) {
       throw new Error('not enough bytes');
     }
+
     [res, buffer] = ser.fromBytes(buffer, codec);
 
     return res;

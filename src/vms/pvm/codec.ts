@@ -42,5 +42,10 @@ export const codec = new Codec([
   StakableLockOut, // 22
 ]);
 
-export const manager = new Manager();
-manager.RegisterCodec(0, codec);
+let manager: Manager;
+export const getManager = () => {
+  if (manager) return manager;
+  manager = new Manager();
+  manager.RegisterCodec(0, codec);
+  return manager;
+};

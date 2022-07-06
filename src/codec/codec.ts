@@ -36,9 +36,11 @@ export class Codec {
   UnpackPrefix = <T extends Serializable>(buf: Uint8Array): [T, Uint8Array] => {
     let typeId: Int;
     [typeId, buf] = unpack(buf, [Int]);
-
     const type = this.typeIdToType[typeId.value()];
+
     if (type === undefined) {
+      console.log('buf=', buf);
+
       throw new Error(
         `couldn't unmarshal interface: unknown type ID ${typeId.value()}`,
       );

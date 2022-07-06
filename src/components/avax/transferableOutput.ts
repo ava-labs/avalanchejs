@@ -23,7 +23,7 @@ export class TransferableOutput {
     bytes: Uint8Array,
     codec: Codec,
   ): [TransferableOutput, Uint8Array] {
-    const [assetId, remaining] = unpack(bytes, [Id]);
+    const [assetId, remaining] = unpack(bytes, [Id], codec);
     const [output, rest] = codec.UnpackPrefix<Amounter>(remaining);
     return [new TransferableOutput(assetId, output), rest];
   }

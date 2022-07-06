@@ -1,3 +1,5 @@
+export const PlatformChainID = new Uint8Array(32);
+
 export const MainnetName = 'mainnet';
 export const CascadeName = 'cascade';
 export const DenaliName = 'denali';
@@ -27,13 +29,13 @@ export const LocalHRP = 'local';
 export const FallbackHRP = 'custom';
 
 export const NetworkIDToHRP = {
-  MainnetID: MainnetHRP,
-  CascadeID: CascadeHRP,
-  DenaliID: DenaliHRP,
-  EverestID: EverestHRP,
-  FujiID: FujiHRP,
-  UnitTestID: UnitTestHRP,
-  LocalID: LocalHRP,
+  [MainnetID]: MainnetHRP,
+  [CascadeID]: CascadeHRP,
+  [DenaliID]: DenaliHRP,
+  [EverestID]: EverestHRP,
+  [FujiID]: FujiHRP,
+  [UnitTestID]: UnitTestHRP,
+  [LocalID]: LocalHRP,
 };
 
 export const getHRP = (networkID: number): string => {

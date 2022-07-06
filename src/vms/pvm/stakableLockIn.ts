@@ -1,6 +1,7 @@
-import type { Codec } from '../../codec/codec';
+import { concatBytes } from '@noble/hashes/utils';
+import { Codec } from '../../codec/codec';
+import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
-import { TransferableInput } from '../../components/avax';
 import { BigIntPr } from '../../primitives';
 import { packSwitched, unpack } from '../../utils/struct';
 
@@ -15,7 +16,7 @@ export class StakableLockIn {
 
   constructor(
     public readonly lockTime: BigIntPr,
-    public readonly transferableInput: TransferableInput,
+    public readonly transferableInput: Serializable,
   ) {}
 
   static fromBytes(
@@ -24,13 +25,16 @@ export class StakableLockIn {
   ): [StakableLockIn, Uint8Array] {
     const [lockTime, transferableInput, rest] = unpack(
       bytes,
-      [BigIntPr, TransferableInput],
+      [BigIntPr, Codec],
       codec,
     );
     return [new StakableLockIn(lockTime, transferableInput), rest];
   }
 
   toBytes(codec: Codec) {
-    return packSwitched(codec, this.lockTime, this.transferableInput);
+    return concatBytes(
+      packSwitched(codec, this.lockTime),
+      codec.PackPrefix(this.transferableInput),
+    );
   }
 }
