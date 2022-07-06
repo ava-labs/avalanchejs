@@ -504,7 +504,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
           unlockedChange,
           aad.getChangeAddresses(),
           zero.clone(), // make sure that we don't lock the change output.
-          1 // only require one of the changes addresses to spend this output.
+          threshold
         ) as AmountOutput
         const transferOutput: TransferableOutput = new TransferableOutput(
           assetID,
@@ -936,7 +936,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         changeAddresses
       )
       aad.addAssetAmount(feeAssetID, zero, fee)
-      const success: Error = this.getMinimumSpendable(aad, asOf)
+      const success: Error = this.getMinimumSpendable(
+        aad,
+        asOf,
+        undefined,
+        undefined,
+        true
+      )
       if (typeof success === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
@@ -988,6 +994,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
    * @param feeAssetID Optional. The assetID of the fees being burned.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the change UTXO
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -1008,8 +1015,20 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     fee: BN = undefined,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeThreshold: number = 1
   ): UnsignedTx => {
+    if (rewardThreshold > rewardAddresses.length) {
+      /* istanbul ignore next */
+      throw new ThresholdError(
+        "Error - UTXOSet.buildAddDelegatorTx: reward threshold is greater than number of addresses"
+      )
+    }
+
+    if (typeof changeAddresses === "undefined") {
+      changeAddresses = toAddresses
+    }
+
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
     let stakeOuts: TransferableOutput[] = []
@@ -1040,7 +1059,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       aad,
       asOf,
       undefined,
-      undefined,
+      changeThreshold,
       true
     )
     if (typeof minSpendableErr === "undefined") {

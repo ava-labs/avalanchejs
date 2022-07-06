@@ -39,8 +39,8 @@ describe("PChain", (): void => {
       "createUser",
       () => keystore.createUser(user, passwd),
       (x) => x,
-      Matcher.toBe,
-      () => true
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "createaddrB",
