@@ -936,7 +936,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         changeAddresses
       )
       aad.addAssetAmount(feeAssetID, zero, fee)
-      const success: Error = this.getMinimumSpendable(aad, asOf)
+      const success: Error = this.getMinimumSpendable(
+        aad,
+        asOf,
+        undefined,
+        undefined,
+        true
+      )
       if (typeof success === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
