@@ -1,35 +1,24 @@
 # E2E Testing
 
-To run E2E tests locally, run the `avash_avalanchejs_e2e.sh` script and pass in two arguments. The first is your full working directory of your Avash directory, and the second is the full working directory of your AvalancheJS directory.
+We can do the end-to-end testing for the latest AvalancheJS by setting up a local Avalanche network and running the `e2e_tests` in the root directory.
 
-`./avash_avalanchejs_e2e.sh "<avash dir>" "<avalanchejs dir>"`
+## Setup Local Avalanche Network
 
-For example,
+For testing end to end, you need to have a local network running. This can easily be achieved by using Avalanche Network Runner. You can follow the steps [here](https://docs.avax.network/quickstart/network-runner) to setup a local network.
 
-`./avash_avalanchejs_e2e.sh "/path/to/avash/" "/path/to/avalanchejs/"`
+## Setup Environment Variables
 
-This script runs the five node script by default.
+You need to add IP and PORT of the node running the local network to your environment variables. Run the following command according to your setup:
 
-- New E2E tests go in the /e2e_tests/ directory.
+```bash
+AVALANCHEGO_IP=0.0.0.0
+AVALANCHEGO_PORT=9650
+```
 
-Follow the steps below if you do not wish to use the five node script, but instead test against one of the nodes. You provide the PORT of the specified node.
+## Run Tests
 
-## Avash
+The following command will start the E2E testing
 
-This option does not require executing a docker container, but it may not lead to the same results of CI, depending on the branch, version, and configuration options of the nodes executed by avash.
-
-* Launch `avash`
-* Set env vars `AVALANCHEGO_IP`, `AVALANCHEGO_PORT` to point to one of the nodes of avash
-* From avalanchejs dir execute: `yarn test -i --roots e2e_tests`
-
-Example workflow
-
-```zsh
-cd /path/to/avash
- ./avash
-avash> runscript scripts/five_node_staking.lua
-
-# Open another terminal tab/window
-cd /path/to/avalanchejs
-AVALANCHEGO_IP=localhost AVALANCHEGO_PORT=9650 yarn test -i --roots e2e_tests
+```
+yarn test -i --roots e2e_tests
 ```
