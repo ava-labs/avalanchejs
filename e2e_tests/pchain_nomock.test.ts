@@ -105,7 +105,7 @@ describe("PChain", (): void => {
       () => pchain.getBlockchainStatus(avalancheBlockChainID),
       (x) => x,
       Matcher.toBe,
-      () => "Created"
+      () => "Unknown"
     ],
     [
       "getCurrentSupply",
