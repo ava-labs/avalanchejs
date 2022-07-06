@@ -18,28 +18,28 @@ describe("Keystore", (): void => {
     [
       "createUserWeakPass",
       () => keystore.createUser(username1, "weak"),
-      (x: any) => x,
+      (x) => x,
       Matcher.toThrow,
       () => "password is too weak"
     ],
     [
       "createUser",
       () => keystore.createUser(username1, password),
-      (x: any) => x,
-      Matcher.toBe,
-      () => true
+      (x) => x,
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "createRepeatedUser",
       () => keystore.createUser(username1, password),
-      (x: any) => x,
+      (x) => x,
       Matcher.toThrow,
       () => "user already exists: " + username1
     ],
     [
       "listUsers",
       () => keystore.listUsers(),
-      (x: any) => x,
+      (x) => x,
       Matcher.toContain,
       () => [username1]
     ],
@@ -53,16 +53,16 @@ describe("Keystore", (): void => {
     [
       "getExportedUser",
       () => keystore.exportUser(username1, password),
-      (x: any) => x,
+      (x) => x,
       Matcher.Get,
       () => exportedUser
     ],
     [
       "importUser",
       () => keystore.importUser(username2, exportedUser.value, password),
-      (x: any) => x,
-      Matcher.toBe,
-      () => true
+      (x) => x,
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "exportImportUser",
@@ -71,37 +71,37 @@ describe("Keystore", (): void => {
           let exported = await keystore.exportUser(username1, password)
           return await keystore.importUser(username3, exported, password)
         })(),
-      (x: any) => x,
-      Matcher.toBe,
-      () => true
+      (x) => x,
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "listUsers2",
       () => keystore.listUsers(),
-      (x: any) => x,
+      (x) => x,
       Matcher.toContain,
       () => [username1, username2, username3]
     ],
     [
       "deleteUser1",
       () => keystore.deleteUser(username1, password),
-      (x: any) => x,
-      Matcher.toBe,
-      () => true
+      (x) => x,
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "deleteUser2",
       () => keystore.deleteUser(username2, password),
-      (x: any) => x,
-      Matcher.toBe,
-      () => true
+      (x) => x,
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "deleteUser3",
       () => keystore.deleteUser(username3, password),
-      (x: any) => x,
-      Matcher.toBe,
-      () => true
+      (x) => x,
+      Matcher.toEqual,
+      () => { return {} }
     ]
   ]
 
