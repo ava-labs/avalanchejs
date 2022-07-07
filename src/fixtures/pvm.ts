@@ -12,7 +12,7 @@ import {
   StakableLockOut,
   SubnetValidator,
   Validator,
-} from '../vms/pvm';
+} from '../serializable/pvm';
 
 import {
   baseTx,

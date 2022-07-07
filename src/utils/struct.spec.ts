@@ -1,4 +1,4 @@
-import { TransferableOutput } from '../components/avax';
+import { TransferableOutput } from '../serializable/avax';
 import { transferableOutput, transferableOutputBytes } from '../fixtures/avax';
 import { testCodec } from '../fixtures/codec';
 import {
@@ -7,7 +7,7 @@ import {
   transferOutput,
   transferOutputBytes,
 } from '../fixtures/secp256k1';
-import { MintOutput, TransferOutput } from '../fxs/secp256k1';
+import { MintOutput, TransferOutput } from '../serializable/fxs/secp256k1';
 import { concatBytes } from './buffer';
 import { unpack } from './struct';
 

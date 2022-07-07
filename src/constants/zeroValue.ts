@@ -1,5 +1,5 @@
-import { OutputOwners } from '../fxs/secp256k1';
-import { BigIntPr, Int } from '../primitives';
+import { OutputOwners } from '../serializable/fxs/secp256k1';
+import { BigIntPr, Int } from '../serializable/primitives';
 
 export const zeroOutputOwners = new OutputOwners(
   new BigIntPr(0n),

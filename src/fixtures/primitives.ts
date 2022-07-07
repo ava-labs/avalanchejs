@@ -1,4 +1,10 @@
-import { BigIntPr, Bytes, Int, Short, Stringpr } from '../primitives';
+import {
+  BigIntPr,
+  Bytes,
+  Int,
+  Short,
+  Stringpr,
+} from '../serializable/primitives';
 import { concatBytes } from '../utils/buffer';
 import { bytesForInt } from './utils/bytesFor';
 

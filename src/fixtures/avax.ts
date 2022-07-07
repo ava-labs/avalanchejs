@@ -3,17 +3,17 @@ import {
   TransferableInput,
   TransferableOutput,
   UTXOID,
-} from '../components/avax';
-import { TransferableOp } from '../components/avax/transferableOp';
-import { Utxo } from '../components/avax/utxo';
-import { Byte, Int } from '../primitives';
+} from '../serializable/avax';
+import { TransferableOp } from '../serializable/avax/transferableOp';
+import { Utxo } from '../serializable/avax/utxo';
+import { Byte, Int } from '../serializable/primitives';
 import { concatBytes } from '../utils/buffer';
-import { CreateAssetTx } from '../vms/avm/createAssetTx';
-import { ExportTx } from '../vms/avm/exportTx';
-import { ImportTx } from '../vms/avm/importTx';
-import { InitialState } from '../vms/avm/initialState';
-import { OperationTx } from '../vms/avm/operationTx';
-import { SignedTx } from '../vms/avm/signedTx';
+import { CreateAssetTx } from '../serializable/avm/createAssetTx';
+import { ExportTx } from '../serializable/avm/exportTx';
+import { ImportTx } from '../serializable/avm/importTx';
+import { InitialState } from '../serializable/avm/initialState';
+import { OperationTx } from '../serializable/avm/operationTx';
+import { SignedTx } from '../serializable/avm/signedTx';
 import { id, idBytes } from './common';
 import { mintOperation, mintOperationBytes } from './nft';
 import {

@@ -1,4 +1,4 @@
-import { AVMApi } from '../../src/avm/x-chain';
+import { AVMApi } from '../../src/vms/avm/x-chain';
 
 async function main() {
   const xChain = new AVMApi();

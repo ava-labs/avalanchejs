@@ -1,5 +1,5 @@
-import { Address } from '../fxs/common/address';
-import { Id } from '../fxs/common/id';
+import { Address } from '../serializable/fxs/common/address';
+import { Id } from '../serializable/fxs/common/id';
 import { bytesForInt } from './utils/bytesFor';
 import { makeList } from './utils/makeList';
 

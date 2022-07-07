@@ -1,8 +1,8 @@
-import { TransferableInput } from '../components/avax';
+import { TransferableInput } from '../serializable/avax';
 import { transferableInputs, transferableInputsBytes } from '../fixtures/avax';
 import { testCodec } from '../fixtures/codec';
 import { address, addressesBytes } from '../fixtures/common';
-import { Address } from '../fxs/common';
+import { Address } from '../serializable/fxs/common';
 import { packList, toListStruct, unpackList } from './serializeList';
 import { unpack } from './struct';
 

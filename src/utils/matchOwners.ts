@@ -1,4 +1,4 @@
-import type { OutputOwners } from '../fxs/secp256k1';
+import type { OutputOwners } from '../serializable/fxs/secp256k1';
 
 export const matchOwners = (
   owners: OutputOwners,

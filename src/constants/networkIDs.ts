@@ -1,4 +1,4 @@
-import { Id } from '../fxs/common';
+import { Id } from '../serializable/fxs/common';
 import { bufferToHex } from '../utils/buffer';
 
 export const PlatformChainID = new Id(bufferToHex(new Uint8Array(32)));

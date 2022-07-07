@@ -1,6 +1,10 @@
-import { MintOperation, MintOutput, TransferOutput } from '../fxs/nft';
+import {
+  MintOperation,
+  MintOutput,
+  TransferOutput,
+} from '../serializable/fxs/nft';
 import { bytes, bytesBytes, int, intBytes } from './primitives';
-import { TransferOperation } from '../fxs/nft/transferOperation';
+import { TransferOperation } from '../serializable/fxs/nft/transferOperation';
 import { concatBytes } from '../utils/buffer';
 import {
   input,

@@ -1,5 +1,8 @@
-import type { TransferableInput, TransferableOutput } from '../components/avax';
-import { DEFAULT_CODEC_VERSION, getManager } from '../vms/avm/codec';
+import type {
+  TransferableInput,
+  TransferableOutput,
+} from '../serializable/avax';
+import { DEFAULT_CODEC_VERSION, getManager } from '../serializable/avm/codec';
 
 export const compareTransferableInputs = (
   a: TransferableInput,

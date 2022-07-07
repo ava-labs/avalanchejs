@@ -1,6 +1,6 @@
-import { Short } from '../primitives';
-import { getManager } from '../vms/avm/codec';
-import { codec } from '../vms/pvm/codec';
+import { Short } from '../serializable/primitives';
+import { getManager } from '../serializable/avm/codec';
+import { codec } from '../serializable/pvm/codec';
 
 // Check for circular imports in the fx type
 // registries if tests are throwing errors

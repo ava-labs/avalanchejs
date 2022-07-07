@@ -5,10 +5,10 @@ import {
   OutputOwners,
   TransferInput,
   TransferOutput,
-} from '../fxs/secp256k1';
-import { Credential } from '../fxs/secp256k1/credential';
-import { OutputOwnersList } from '../fxs/secp256k1/outputOwnersList';
-import { Signature } from '../fxs/secp256k1/signature';
+} from '../serializable/fxs/secp256k1';
+import { Credential } from '../serializable/fxs/secp256k1/credential';
+import { OutputOwnersList } from '../serializable/fxs/secp256k1/outputOwnersList';
+import { Signature } from '../serializable/fxs/secp256k1/signature';
 import { concatBytes } from '../utils/buffer';
 import { addresses, addressesBytes } from './common';
 import {
