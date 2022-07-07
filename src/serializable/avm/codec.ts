@@ -1,5 +1,6 @@
-import { Codec, Manager } from '../codec';
 import { BaseTx } from '../avax';
+import { Codec } from '../codec/codec';
+import { Manager } from '../codec/manager';
 import * as NftFx from '../fxs/nft';
 import * as Secp256k1Fx from '../fxs/secp256k1';
 import { CreateAssetTx } from './createAssetTx';
@@ -7,7 +8,6 @@ import { ExportTx } from './exportTx';
 import { ImportTx } from './importTx';
 import { OperationTx } from './operationTx';
 
-export const DEFAULT_CODEC_VERSION = 0;
 // https://github.com/ava-labs/avalanchego/blob/master/vms/avm/txs/parser.go
 // https://github.com/ava-labs/avalanchego/blob/master/wallet/chain/x/constants.go
 let manager: Manager;

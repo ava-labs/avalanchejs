@@ -1,7 +1,9 @@
-import { Input, MintOutput, TransferOutput } from '.';
-import { serializable } from '../../common/types';
 import { concatBytes } from '../../../utils/buffer';
 import { unpack } from '../../../utils/struct';
+import { serializable } from '../../common/types';
+import { Input } from './input';
+import { MintOutput } from './mintOutput';
+import { TransferOutput } from './transferOutput';
 
 const _symbol = Symbol('secp256k1fx.MintOperation');
 

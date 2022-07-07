@@ -1,7 +1,7 @@
-import { Input } from '.';
+import { pack, unpack } from '../../../utils/struct';
 import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
-import { pack, unpack } from '../../../utils/struct';
+import { Input } from './input';
 
 const _symbol = Symbol('secp256k1fx.TransferInput');
 

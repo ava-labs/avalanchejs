@@ -1,10 +1,10 @@
 import { concatBytes } from '@noble/hashes/utils';
+import { UTXOID } from '.';
+import { pack, unpack } from '../../utils/struct';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
-import { UTXOID } from '.';
 import { Id } from '../fxs/common';
-import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.Utxo');
 

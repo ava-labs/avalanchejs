@@ -1,8 +1,10 @@
 import json from '@rollup/plugin-json';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import del from 'rollup-plugin-delete';
-import ttypescript from 'ttypescript';
+import filesize from 'rollup-plugin-filesize';
 import typescript from 'rollup-plugin-typescript2';
+import ttypescript from 'ttypescript';
 
 export default {
   input: './index.ts',
@@ -12,6 +14,8 @@ export default {
     sourcemap: process.env.BUILD === 'production' ? false : true,
   },
   plugins: [
+    filesize(),
+    nodeResolve(),
     del({ targets: 'dist/*' }),
     typescript({
       typescript: ttypescript,

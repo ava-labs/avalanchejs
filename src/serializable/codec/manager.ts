@@ -1,9 +1,9 @@
-import type { Serializable, SerializableStatic } from '../common/types';
-import { Short } from '../primitives';
+import { DEFAULT_CODEC_VERSION } from '../../constants/codec';
 import { concatBytes } from '../../utils/buffer';
 import type { FromBytesReturn } from '../../utils/struct';
 import { unpack } from '../../utils/struct';
-import { DEFAULT_CODEC_VERSION } from '../avm/codec';
+import type { Serializable, SerializableStatic } from '../common/types';
+import { Short } from '../primitives';
 import type { Codec } from './codec';
 
 /**

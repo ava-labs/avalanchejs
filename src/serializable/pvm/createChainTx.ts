@@ -1,12 +1,12 @@
 import { concatBytes } from '@noble/hashes/utils';
+import { toListStruct } from '../../utils/serializeList';
+import { pack, unpack } from '../../utils/struct';
+import { BaseTx } from '../avax';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
-import { BaseTx } from '../avax';
 import { Id } from '../fxs/common';
 import { Bytes, Stringpr } from '../primitives';
-import { toListStruct } from '../../utils/serializeList';
-import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('pvm.CreateChainTx');
 

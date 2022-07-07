@@ -1,8 +1,8 @@
 import { concatBytes } from '@noble/hashes/utils';
-import { serializable } from '../../common/types';
-import { BigIntPr, Int } from '../../primitives';
 import { packList, toListStruct } from '../../../utils/serializeList';
 import { pack, unpack } from '../../../utils/struct';
+import { serializable } from '../../common/types';
+import { BigIntPr, Int } from '../../primitives';
 import { Address } from '../common';
 
 const _symbol = Symbol('secp256k1fx.OutputOwners');

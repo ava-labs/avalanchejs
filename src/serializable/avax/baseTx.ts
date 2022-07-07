@@ -1,11 +1,12 @@
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
-import { TransferableInput, TransferableOutput } from '.';
 import { Id } from '../fxs/common/id';
 import { Bytes, Int } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { TransferableOutput } from './transferableOutput';
+import { TransferableInput } from './transferableInput';
 
 const _symbol = Symbol('avax.BaseTx');
 
