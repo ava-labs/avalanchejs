@@ -1,14 +1,14 @@
-import { getManager } from '../../serializable/avm/codec';
+import { getManager } from '../../serializable/evm/codec';
 import { Api } from '../common/api';
 import type {
   GetAssetDescriptionResponse,
   GetUTXOResponse,
   GetUTXOsInput,
-} from './models';
+} from '../common/apiModels';
 
-export class AVMApi extends Api {
+export class PVMApi extends Api {
   constructor(baseURL?: string) {
-    super(baseURL, '/ext/bc/X', 'avm');
+    super(baseURL, '/ext/bc/P', 'platform');
   }
 
   async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {

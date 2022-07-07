@@ -1,4 +1,8 @@
 import { AVAX_PUBLIC_URL } from '../../constants/public-urls';
+import { Utxo } from '../../serializable/avax/utxo';
+import { Manager } from '../../serializable/codec';
+import { hexToBuffer } from '../../utils/buffer';
+import { GetUTXOsApiResp, GetUTXOsInput } from './apiModels';
 import { JrpcProvider } from './rpc';
 
 export abstract class Api {
@@ -20,4 +24,20 @@ export abstract class Api {
     params?: Array<Record<string, any>> | Record<string, any>,
   ): Promise<T> =>
     this.rpcProvider.callMethod<T>(this.getMethodName(methodName), params);
+
+  async getUTXOsForManager(input: GetUTXOsInput, manager: Manager) {
+    const resp = await this.callRpc<GetUTXOsApiResp>('getUTXOs', {
+      ...input,
+      encoding: 'hex',
+    });
+
+    const utxos = resp.utxos.map((utxoHex) =>
+      manager.unpackCodec(hexToBuffer(utxoHex), Utxo),
+    );
+
+    return {
+      ...resp,
+      utxos,
+    };
+  }
 }

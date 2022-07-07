@@ -1,13 +1,10 @@
+import { getManager } from '../../serializable/pvm/codec';
 import { Api } from '../common/api';
 import type {
   GetAssetDescriptionResponse,
   GetUTXOResponse,
-  GetUTXOsApiResp,
   GetUTXOsInput,
 } from '../common/apiModels';
-import { Utxo } from '../../serializable/avax/utxo';
-import { getManager } from '../../serializable/pvm/codec';
-import { hexToBuffer } from '../../utils/buffer';
 
 export class PVMApi extends Api {
   constructor(baseURL?: string) {
@@ -15,21 +12,7 @@ export class PVMApi extends Api {
   }
 
   async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    const resp = await this.callRpc<GetUTXOsApiResp>('getUTXOs', {
-      ...input,
-      encoding: 'hex',
-    });
-
-    const manager = getManager();
-
-    const utxos = resp.utxos.map((utxoHex) =>
-      manager.unpackCodec(hexToBuffer(utxoHex), Utxo),
-    );
-
-    return {
-      ...resp,
-      utxos,
-    };
+    return this.getUTXOsForManager(input, getManager());
   }
 
   getAssetDescription(assetID: string): Promise<GetAssetDescriptionResponse> {
