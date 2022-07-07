@@ -2,7 +2,12 @@
   "name": "avalanchejs-v2",
   "version": "0.0.1",
   "packageManager": "yarn@1.22.18",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
+    "start": "rollup -c --watch",
+    "build": "rollup -c",
+    "build:prod": "rollup -c --environment BUILD:production",
     "test": "jest",
     "test:cov": "jest --collect-coverage=true",
     "test:watch": "jest --watch",
@@ -19,6 +24,7 @@
     "@scure/base": "1.1.1"
   },
   "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
     "@types/benchmark": "2.1.1",
     "@types/jest": "28.1.4",
     "@types/node": "18.0.1",
@@ -30,8 +36,13 @@
     "eslint-plugin-prettier": "4.2.1",
     "jest": "28.1.2",
     "prettier": "2.7.1",
+    "rollup": "^2.75.7",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-typescript2": "^0.32.1",
     "ts-jest": "28.0.5",
     "ts-node": "10.8.2",
+    "ttypescript": "^1.5.13",
     "typescript": "4.7.4"
   },
   "engines": {
