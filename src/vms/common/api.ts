@@ -1,4 +1,4 @@
-import { AVAX_PUBLIC_URL } from '../constants/public-urls';
+import { AVAX_PUBLIC_URL } from '../../constants/public-urls';
 import { JrpcProvider } from './rpc';
 
 export abstract class Api {

@@ -1,6 +1,6 @@
-import { serializable } from '../common/types';
 import { toListStruct } from '../../utils/serializeList';
 import { packSwitched, unpack } from '../../utils/struct';
+import { serializable } from '../../vms/common/types';
 import { TransferableOutput } from '../avax';
 import type { Codec } from '../codec';
 import { Id } from '../fxs/common';

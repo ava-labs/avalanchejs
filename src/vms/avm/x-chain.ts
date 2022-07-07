@@ -1,4 +1,4 @@
-import { Api } from '../../common/api';
+import { Api } from '../common/api';
 import { Utxo } from '../../serializable/avax/utxo';
 import { getManager } from '../../serializable/avm/codec';
 import { hexToBuffer } from '../../utils/buffer';

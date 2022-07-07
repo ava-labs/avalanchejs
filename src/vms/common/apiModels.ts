@@ -1,4 +1,4 @@
-import type { Utxo } from '../serializable/avax/utxo';
+import type { Utxo } from '../../serializable/avax/utxo';
 
 export type GetUTXOsInput = {
   addresses: string[];

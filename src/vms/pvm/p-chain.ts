@@ -1,10 +1,10 @@
-import { Api } from '../../common/api';
+import { Api } from '../common/api';
 import type {
   GetAssetDescriptionResponse,
   GetUTXOResponse,
   GetUTXOsApiResp,
   GetUTXOsInput,
-} from '../../common/apiModels';
+} from '../common/apiModels';
 import { Utxo } from '../../serializable/avax/utxo';
 import { getManager } from '../../serializable/pvm/codec';
 import { hexToBuffer } from '../../utils/buffer';
