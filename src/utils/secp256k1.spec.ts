@@ -8,6 +8,10 @@ describe('secp256k1', function () {
     const privKey = base58check.decode(key);
     const pubKey = secp.getPublicKey(privKey);
 
+    expect(base58check.encode(secp.publicKeyBytesToAddress(pubKey))).toEqual(
+      'Q4MzFZZDPHRPAHFeDs3NiyyaZDvxHKivf',
+    );
+
     const tests = [
       {
         msg: 'hello world',

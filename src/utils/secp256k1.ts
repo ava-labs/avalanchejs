@@ -1,4 +1,5 @@
 import { sha256 } from '@noble/hashes/sha256';
+import { ripemd160 } from '@noble/hashes/ripemd160';
 import * as secp from '@noble/secp256k1';
 import { concatBytes } from './buffer';
 
@@ -38,4 +39,8 @@ export function verify(
   publicKey: Uint8Array,
 ) {
   return secp.verify(sig.slice(0, -1), hash, publicKey);
+}
+
+export function publicKeyBytesToAddress(publicKey: Uint8Array) {
+  return ripemd160(sha256(publicKey));
 }
