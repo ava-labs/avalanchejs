@@ -1,8 +1,8 @@
 import { AVAX_PUBLIC_URL } from '../../constants/public-urls';
 import { Utxo } from '../../serializable/avax/utxo';
-import { Manager } from '../../serializable/codec';
+import type { Manager } from '../../serializable/codec';
 import { hexToBuffer } from '../../utils/buffer';
-import { GetUTXOsApiResp, GetUTXOsInput } from './apiModels';
+import type { GetUTXOsApiResp, GetUTXOsInput } from './apiModels';
 import { JrpcProvider } from './rpc';
 
 export abstract class Api {
