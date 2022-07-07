@@ -1,4 +1,3 @@
-export * from './src/avm/avmBuilder';
-export * from './src/avm/context';
-export * from './src/avm/models';
-export * from './src/avm/x-chain';
+export * as avm from 'src/vms/avm';
+export * as evm from 'src/vms/evm';
+export * as pvm from 'src/vms/pvm';
