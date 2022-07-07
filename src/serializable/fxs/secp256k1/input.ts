@@ -1,4 +1,4 @@
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 import { Int } from '../../primitives';
 import { packList, toListStruct } from '../../../utils/serializeList';
 import { unpack } from '../../../utils/struct';

@@ -1,5 +1,5 @@
 import type { Codec } from '../serializable/codec';
-import type { Serializable } from '../common/types';
+import type { Serializable } from '../serializable/common/types';
 import { concatBytes } from './buffer';
 import { packList } from './serializeList';
 

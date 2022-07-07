@@ -1,4 +1,4 @@
-import type { Serializable, SerializableStatic } from '../../common/types';
+import type { Serializable, SerializableStatic } from '../common/types';
 import { Short } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import type { FromBytesReturn } from '../../utils/struct';

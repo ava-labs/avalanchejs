@@ -1,5 +1,5 @@
 import type { Codec } from '../codec/codec';
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { BaseTx } from '../avax';
 import { TransferableOp } from '../avax/transferableOp';
 import { concatBytes } from '../../utils/buffer';

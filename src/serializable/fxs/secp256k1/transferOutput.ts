@@ -1,5 +1,5 @@
 import { OutputOwners } from '.';
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
 import { pack, unpack } from '../../../utils/struct';
 

@@ -1,5 +1,5 @@
 import type { Codec } from '../codec/codec';
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { TransferableInput, TransferableOutput } from '.';
 import { Id } from '../fxs/common/id';
 import { Bytes, Int } from '../primitives';

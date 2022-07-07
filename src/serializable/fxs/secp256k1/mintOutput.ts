@@ -1,5 +1,5 @@
 import { OutputOwners } from '.';
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 
 const _symbol = Symbol('secp256k1fx.MintOutput');
 

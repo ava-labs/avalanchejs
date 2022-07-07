@@ -1,5 +1,5 @@
 import { Input, MintOutput, TransferOutput } from '.';
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 import { concatBytes } from '../../../utils/buffer';
 import { unpack } from '../../../utils/struct';
 

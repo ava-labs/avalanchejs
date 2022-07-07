@@ -1,5 +1,8 @@
 import type { Codec } from '../../serializable/codec';
-import type { Serializable, SerializableStatic } from '../../common/types';
+import type {
+  Serializable,
+  SerializableStatic,
+} from '../../serializable/common/types';
 import { testCodec } from '../codec';
 
 export const testSerialization = (

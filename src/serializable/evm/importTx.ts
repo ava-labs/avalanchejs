@@ -1,4 +1,4 @@
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { toListStruct } from '../../utils/serializeList';
 import { packSwitched, unpack } from '../../utils/struct';
 import { TransferableInput } from '../avax';

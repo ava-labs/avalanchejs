@@ -1,4 +1,4 @@
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 import { packList, unpackList } from '../../../utils/serializeList';
 import { OutputOwners } from './outputOwners';
 

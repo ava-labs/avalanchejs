@@ -1,4 +1,4 @@
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
 import { concatBytes } from '../../utils/buffer';
 import { Int } from './int';

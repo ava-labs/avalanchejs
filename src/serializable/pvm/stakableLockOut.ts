@@ -1,7 +1,7 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { Codec } from '../codec/codec';
-import type { Amounter } from '../../common/types';
-import { serializable } from '../../common/types';
+import type { Amounter } from '../common/types';
+import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
 import { packSwitched, unpack } from '../../utils/struct';
 

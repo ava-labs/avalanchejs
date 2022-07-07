@@ -1,4 +1,4 @@
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { packSwitched, unpack } from '../../utils/struct';
 import type { Codec } from '../codec';
 import { Address, Id } from '../fxs/common';

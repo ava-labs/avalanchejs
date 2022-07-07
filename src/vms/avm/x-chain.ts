@@ -1,7 +1,7 @@
 import { Api } from '../../common/api';
 import { Utxo } from '../../serializable/avax/utxo';
-import { hexToBuffer } from '../../utils/buffer';
 import { getManager } from '../../serializable/avm/codec';
+import { hexToBuffer } from '../../utils/buffer';
 import type {
   GetAssetDescriptionResponse,
   GetUTXOResponse,
@@ -15,10 +15,10 @@ export class AVMApi extends Api {
   }
 
   async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    const resp = await this.rpcProvider.callMethod<GetUTXOsApiResp>(
-      'avm.getUTXOs',
-      { ...input, encoding: 'hex' },
-    );
+    const resp = await this.callRpc<GetUTXOsApiResp>('getUTXOs', {
+      ...input,
+      encoding: 'hex',
+    });
 
     const manager = getManager();
 

@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import type { Codec } from '../codec';
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
 import { BigIntPr, Int } from '../primitives';
 import { base58check } from '../../utils/base58';

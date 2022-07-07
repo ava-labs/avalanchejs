@@ -1,4 +1,4 @@
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 
 const _symbol = Symbol('primitives.Byte');
 

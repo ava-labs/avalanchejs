@@ -1,4 +1,4 @@
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 import { Bytes, Int } from '../../primitives';
 import { pack, unpack } from '../../../utils/struct';
 import { OutputOwners } from '../secp256k1';

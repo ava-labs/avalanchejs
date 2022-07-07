@@ -1,6 +1,6 @@
 import type { Codec } from '../codec/codec';
-import type { Amounter } from '../../common/types';
-import { serializable } from '../../common/types';
+import type { Amounter } from '../common/types';
+import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';

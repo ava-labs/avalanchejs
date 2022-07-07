@@ -1,4 +1,4 @@
-import { serializable } from '../../../common/types';
+import { serializable } from '../../common/types';
 import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
 
 const _symbol = Symbol('secp256k1fx.Signature');

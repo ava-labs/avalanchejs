@@ -1,5 +1,5 @@
 import type { Codec } from '../codec/codec';
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { Id } from '../fxs/common';
 import { BigIntPr } from '../primitives';
 import { pack, unpack } from '../../utils/struct';

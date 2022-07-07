@@ -1,7 +1,7 @@
 import { UTXOID } from '.';
 import { Codec } from '../codec/codec';
-import type { Serializable } from '../../common/types';
-import { serializable } from '../../common/types';
+import type { Serializable } from '../common/types';
+import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';

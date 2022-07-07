@@ -1,5 +1,5 @@
 import { concatBytes } from '../../utils/buffer';
-import type { Serializable } from '../../common/types';
+import type { Serializable } from '../../serializable/common/types';
 import { bytesForInt } from './bytesFor';
 
 export const makeList =

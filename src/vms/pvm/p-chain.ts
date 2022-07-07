@@ -6,8 +6,8 @@ import type {
   GetUTXOsInput,
 } from '../../common/apiModels';
 import { Utxo } from '../../serializable/avax/utxo';
-import { hexToBuffer } from '../../utils/buffer';
 import { getManager } from '../../serializable/pvm/codec';
+import { hexToBuffer } from '../../utils/buffer';
 
 export class PVMApi extends Api {
   constructor(baseURL?: string) {
@@ -22,9 +22,9 @@ export class PVMApi extends Api {
 
     const manager = getManager();
 
-    const utxos = resp.utxos
-      .slice(1)
-      .map((utxoHex, index) => manager.unpackCodec(hexToBuffer(utxoHex), Utxo));
+    const utxos = resp.utxos.map((utxoHex) =>
+      manager.unpackCodec(hexToBuffer(utxoHex), Utxo),
+    );
 
     return {
       ...resp,

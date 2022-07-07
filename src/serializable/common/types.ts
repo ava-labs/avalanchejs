@@ -1,4 +1,4 @@
-import type { Codec } from '../serializable/codec';
+import type { Codec } from '../codec';
 
 export interface Serializable {
   _type: symbol;

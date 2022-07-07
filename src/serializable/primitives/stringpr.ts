@@ -1,4 +1,4 @@
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { concatBytes, hexToBuffer, padLeft } from '../../utils/buffer';
 import { Short } from './short';
 

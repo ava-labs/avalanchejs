@@ -1,5 +1,5 @@
-import type { Serializable, SerializableStatic } from '../../common/types';
-import { serializable } from '../../common/types';
+import type { Serializable, SerializableStatic } from '../common/types';
+import { serializable } from '../common/types';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
 import { Int } from '../primitives';
 import { concatBytes } from '../../utils/buffer';

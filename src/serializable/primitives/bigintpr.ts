@@ -1,4 +1,4 @@
-import { serializable } from '../../common/types';
+import { serializable } from '../common/types';
 import { bufferToBigInt, hexToBuffer, padLeft } from '../../utils/buffer';
 
 const _symbol = Symbol('primitives.BigInt');

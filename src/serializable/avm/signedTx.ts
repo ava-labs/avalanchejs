@@ -1,6 +1,6 @@
 import { Codec } from '../codec/codec';
-import type { Serializable } from '../../common/types';
-import { serializable } from '../../common/types';
+import type { Serializable } from '../common/types';
+import { serializable } from '../common/types';
 import { concatBytes } from '../../utils/buffer';
 import { toListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
