@@ -1,5 +1,6 @@
 import { serializable } from '../../common/types';
 import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
+import { base58check } from '../../../utils/base58';
 
 const _symbol = Symbol('common.Id');
 
@@ -14,6 +15,14 @@ export class Id {
 
   toBytes() {
     return padLeft(hexToBuffer(this.idVal), 32);
+  }
+
+  toString() {
+    return base58check.encode(this.toBytes());
+  }
+
+  static fromString(str: string) {
+    return Id.fromBytes(base58check.decode(str))[0];
   }
 
   value() {
