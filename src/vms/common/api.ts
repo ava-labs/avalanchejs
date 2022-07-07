@@ -25,7 +25,7 @@ export abstract class Api {
   ): Promise<T> =>
     this.rpcProvider.callMethod<T>(this.getMethodName(methodName), params);
 
-  async getUTXOsForManager(input: GetUTXOsInput, manager: Manager) {
+  protected async getUTXOsForManager(input: GetUTXOsInput, manager: Manager) {
     const resp = await this.callRpc<GetUTXOsApiResp>('getUTXOs', {
       ...input,
       encoding: 'hex',
