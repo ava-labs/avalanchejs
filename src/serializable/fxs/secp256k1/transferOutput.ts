@@ -3,7 +3,7 @@ import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
 import { OutputOwners } from './outputOwners';
 
-const _symbol = Symbol('secp256k1fx.TransferOutput');
+export const transferOutput_symbol = Symbol('secp256k1fx.TransferOutput');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/transfer_output.go
@@ -13,7 +13,7 @@ const _symbol = Symbol('secp256k1fx.TransferOutput');
  */
 @serializable()
 export class TransferOutput {
-  _type = _symbol;
+  readonly _type = transferOutput_symbol;
 
   constructor(
     public readonly amt: BigIntPr,
@@ -22,6 +22,14 @@ export class TransferOutput {
 
   amount() {
     return this.amt.value();
+  }
+
+  getLocktime() {
+    return this.outputOwners.locktime.value();
+  }
+
+  getOwners() {
+    return this.outputOwners.addrs.map((addr) => addr.toBytes());
   }
 
   static fromBytes(bytes: Uint8Array): [TransferOutput, Uint8Array] {

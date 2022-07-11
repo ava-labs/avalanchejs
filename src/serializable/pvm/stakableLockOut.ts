@@ -5,14 +5,14 @@ import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
 
-const _symbol = Symbol('pvm.StakableLockOut');
+export const stakeableLockOut_symbol = Symbol('pvm.StakableLockOut');
 
 /**
  * @see https://docs.avax.network/specs/platform-transaction-serialization#stakeablelockin
  */
 @serializable()
 export class StakableLockOut implements Amounter {
-  _type = _symbol;
+  _type = stakeableLockOut_symbol;
 
   constructor(
     public readonly lockTime: BigIntPr,

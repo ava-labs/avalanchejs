@@ -26,8 +26,8 @@ import {
   compareTransferableInputs,
   compareTransferableOutputs,
 } from '../../utils/sort';
-import { getPVMContextFromURI } from './context';
-import type { PVMContext } from './models';
+import { getContextFromURI } from '../context/context';
+import type { Context } from '../context/model';
 
 /* 
   Builder is useful for building transactions that are specific to a chain. 
@@ -44,9 +44,9 @@ type SpendOptions = {
 type SpendOptionsRequired = Required<SpendOptions>;
 
 export class PVMBuilder {
-  constructor(private context: PVMContext) {}
+  constructor(private context: Context) {}
   static async fromURI(baseURL?: string): Promise<PVMBuilder> {
-    return new PVMBuilder(await getPVMContextFromURI('AVAX', baseURL));
+    return new PVMBuilder(await getContextFromURI('AVAX', baseURL));
   }
 
   defaultSpendOptions(

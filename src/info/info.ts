@@ -1,5 +1,5 @@
-import { Api } from '../vms/common/api';
 import { AVAX_PUBLIC_URL } from '../constants/public-urls';
+import { Api } from '../vms/common/api';
 import type {
   GetBlockchainIDResponse,
   GetNetworkIdResponse,

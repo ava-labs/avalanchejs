@@ -41,6 +41,10 @@ export const NetworkIDToHRP = {
   [LocalID]: LocalHRP,
 };
 
+/**
+ * Returns the human readbale part for a bech32 string given the network ID.
+ * @param networkID
+ */
 export const getHRP = (networkID: number): string => {
   return NetworkIDToHRP[networkID] ?? FallbackHRP;
 };

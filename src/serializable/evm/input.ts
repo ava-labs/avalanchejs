@@ -29,6 +29,13 @@ export class Input {
     return [new Input(address, amount, assetId, nonce), rest];
   }
 
+  static compare = (a: Input, b: Input) => {
+    if (a.address.value() !== b.address.value()) {
+      return a.address.value().localeCompare(b.address.value());
+    }
+    return a.assetId.value().localeCompare(b.assetId.value());
+  };
+
   toBytes(codec: Codec) {
     return packSwitched(
       codec,

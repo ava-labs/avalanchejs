@@ -26,17 +26,8 @@ export type GetUTXOResponse = Omit<GetUTXOsApiResp, 'utxos'> & {
 };
 
 export type GetAssetDescriptionResponse = {
-  assetId: string;
+  assetID: string;
   name: string;
   symbol: string;
   denomination: number;
-};
-
-export type AVMContext = {
-  readonly networkID: number;
-  readonly hrp: string;
-  readonly blockchainID: string;
-  readonly avaxAssetID: string;
-  readonly baseTxFee: bigint;
-  readonly createAssetTxFee: bigint;
 };
