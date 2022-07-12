@@ -1,12 +1,15 @@
 import type { AssetDict } from './models';
 import type { Utxo } from '../../serializable/avax/utxo';
 import { isTransferOut } from '../typeGuards';
+import { filterDuplicateUTXOs } from '../removeDuplicateUTXOs';
 
 export class UtxoSet {
-  constructor(private utxos: Utxo[]) {}
+  constructor(private utxos: Utxo[]) {
+    this.utxos = filterDuplicateUTXOs(utxos);
+  }
 
   getUTXOs() {
-    return this.utxos;
+    return [...this.utxos];
   }
 
   /**
@@ -37,12 +40,27 @@ export class UtxoSet {
   }
 
   /**
-   * Add a UTXO to the set
+   * Add a UTXO to the set, and return a new set.
    * @param utxo
    */
   push(utxo: Utxo) {
-    //TODO: Do not push duplicates
-    this.utxos.push(utxo);
+    return new UtxoSet([...this.getUTXOs(), utxo]);
+  }
+
+  /**
+   * Return the UTXO ids in this set.
+   */
+  getUTXOIDs() {
+    return this.utxos.map((utxo) => utxo.ID());
+  }
+
+  /**
+   * Merge 2 UtxoSets and return a new set.
+   * @param set
+   */
+  merge(set: UtxoSet) {
+    const newUTXOs = [...this.getUTXOs(), ...set.getUTXOs()];
+    return new UtxoSet(newUTXOs);
   }
 
   /**

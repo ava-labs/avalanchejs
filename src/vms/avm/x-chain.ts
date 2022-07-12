@@ -4,7 +4,7 @@ import type {
   GetAssetDescriptionResponse,
   GetUTXOResponse,
   GetUTXOsInput,
-} from './models';
+} from '../common/apiModels';
 
 export class AVMApi extends Api {
   constructor(baseURL?: string) {

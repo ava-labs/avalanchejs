@@ -26,7 +26,7 @@ export type GetUTXOResponse = Omit<GetUTXOsApiResp, 'utxos'> & {
 };
 
 export type GetAssetDescriptionResponse = {
-  assetId: string;
+  assetID: string;
   name: string;
   symbol: string;
   denomination: number;

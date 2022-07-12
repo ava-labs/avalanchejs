@@ -3,7 +3,7 @@ import { Info } from '../../info/info';
 import { AVMApi } from '../avm/x-chain';
 import type { Context } from './model';
 
-/* 
+/*
 grabs some basic info about an avm chain
 */
 export const getContextFromURI = async (

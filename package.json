@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "packageManager": "yarn@1.22.18",
   "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "start": "rollup -c --watch",
     "build": "rollup -c",
