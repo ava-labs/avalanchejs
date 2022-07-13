@@ -1,9 +1,9 @@
+import { concatBytes } from '../../utils/buffer';
+import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
-import { concatBytes } from '../../utils/buffer';
-import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('avax.TransferableOutput');
 
@@ -26,6 +26,14 @@ export class TransferableOutput {
     const [assetId, remaining] = unpack(bytes, [Id], codec);
     const [output, rest] = codec.UnpackPrefix<Amounter>(remaining);
     return [new TransferableOutput(assetId, output), rest];
+  }
+
+  getAssetId() {
+    return this.assetId.toString();
+  }
+
+  amount() {
+    return this.output.amount();
   }
 
   toBytes(codec: Codec) {

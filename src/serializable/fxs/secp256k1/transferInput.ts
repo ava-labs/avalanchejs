@@ -1,4 +1,5 @@
 import { pack, unpack } from '../../../utils/struct';
+import type { Amounter } from '../../common/types';
 import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
 import { Input } from './input';
@@ -12,7 +13,7 @@ const _symbol = Symbol('secp256k1fx.TransferInput');
  * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-transfer-input
  */
 @serializable()
-export class TransferInput {
+export class TransferInput implements Amounter {
   _type = _symbol;
 
   constructor(private readonly amt: BigIntPr, private readonly input: Input) {}
@@ -21,7 +22,9 @@ export class TransferInput {
     const [amt, input, remaining] = unpack(bytes, [BigIntPr, Input]);
     return [new TransferInput(amt, input), remaining];
   }
-
+  amount() {
+    return this.amt.value();
+  }
   toBytes(codec) {
     return pack([this.amt, this.input], codec);
   }

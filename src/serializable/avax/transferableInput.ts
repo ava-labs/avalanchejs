@@ -1,7 +1,7 @@
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
-import type { Serializable } from '../common/types';
+import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
 import { UTXOID } from './utxoId';
@@ -21,7 +21,7 @@ export class TransferableInput {
   constructor(
     public readonly utxoID: UTXOID,
     public readonly assetId: Id,
-    public readonly input: Serializable,
+    public readonly input: Amounter,
   ) {}
 
   static fromBytes(
@@ -29,11 +29,17 @@ export class TransferableInput {
     codec: Codec,
   ): [TransferableInput, Uint8Array] {
     const [utxoID, assetId, remaining] = unpack(bytes, [UTXOID, Id]);
+    const [input, rest] = codec.UnpackPrefix<Amounter>(remaining);
 
-    let input: Serializable;
-    [input, bytes] = codec.UnpackPrefix(remaining);
+    return [new TransferableInput(utxoID, assetId, input), rest];
+  }
 
-    return [new TransferableInput(utxoID, assetId, input), bytes];
+  amount() {
+    return this.input.amount();
+  }
+
+  getAssetId() {
+    return this.assetId.toString();
   }
 
   toBytes(codec: Codec) {

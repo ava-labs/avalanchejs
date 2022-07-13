@@ -1,12 +1,12 @@
+import { concatBytes } from '../../utils/buffer';
+import { packList, toListStruct } from '../../utils/serializeList';
+import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
 import { Bytes, Int } from '../primitives';
-import { concatBytes } from '../../utils/buffer';
-import { packList, toListStruct } from '../../utils/serializeList';
-import { pack, unpack } from '../../utils/struct';
-import { TransferableOutput } from './transferableOutput';
 import { TransferableInput } from './transferableInput';
+import { TransferableOutput } from './transferableOutput';
 
 const _symbol = Symbol('avax.BaseTx');
 
@@ -18,11 +18,11 @@ export class BaseTx {
   _type = _symbol;
 
   constructor(
-    private readonly NetworkId: Int,
-    private readonly BlockchainId: Id,
-    private readonly outputs: TransferableOutput[],
-    private readonly inputs: TransferableInput[],
-    private readonly memo: Bytes,
+    public readonly NetworkId: Int,
+    public readonly BlockchainId: Id,
+    public readonly outputs: TransferableOutput[],
+    public readonly inputs: TransferableInput[],
+    public readonly memo: Bytes,
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [BaseTx, Uint8Array] {
