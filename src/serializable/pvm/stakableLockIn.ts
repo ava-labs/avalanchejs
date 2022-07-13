@@ -1,7 +1,7 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { packSwitched, unpack } from '../../utils/struct';
 import { Codec } from '../codec/codec';
-import type { Serializable } from '../common/types';
+import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
 
@@ -16,19 +16,21 @@ export class StakableLockIn {
 
   constructor(
     public readonly lockTime: BigIntPr,
-    public readonly transferableInput: Serializable,
+    public readonly transferableInput: Amounter,
   ) {}
 
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
   ): [StakableLockIn, Uint8Array] {
-    const [lockTime, transferableInput, rest] = unpack(
-      bytes,
-      [BigIntPr, Codec],
-      codec,
-    );
-    return [new StakableLockIn(lockTime, transferableInput), rest];
+    const [lockTime, rest] = unpack(bytes, [BigIntPr], codec);
+
+    const [transferableInput, remaining] = codec.UnpackPrefix<Amounter>(rest);
+
+    return [new StakableLockIn(lockTime, transferableInput), remaining];
+  }
+  amount() {
+    return this.transferableInput.amount();
   }
 
   toBytes(codec: Codec) {
