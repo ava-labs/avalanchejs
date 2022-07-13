@@ -4,6 +4,7 @@ import type {
   TransferableOutput,
 } from '../serializable/avax';
 import { getManager } from '../serializable/avm/codec';
+import { Output } from '../serializable/evm';
 
 export const compareTransferableInputs = (
   a: TransferableInput,
@@ -26,6 +27,13 @@ export const compareTransferableOutputs = (
   const aBytes = manager.packCodec(a, DEFAULT_CODEC_VERSION);
   const bBytes = manager.packCodec(b, DEFAULT_CODEC_VERSION);
   return compareBytes(aBytes, bBytes);
+};
+
+export const compareEVMOutputs = (a: Output, b: Output) => {
+  if (a.address.value() === b.address.value()) {
+    return compareBytes(a.assetId.toBytes(), b.assetId.toBytes());
+  }
+  return a.address.value().localeCompare(b.address.value());
 };
 
 export const compareBytes = (a: Uint8Array, b: Uint8Array) => {

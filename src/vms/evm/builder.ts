@@ -1,9 +1,19 @@
 import { base58 } from '@scure/base';
+import type { Utxo } from '../../..';
 import { TransferableOutput, utils } from '../../..';
-import { ExportTx, Input } from '../../serializable/evm';
+import { emptyId } from '../../constants/zeroValue';
+import { TransferableInput } from '../../serializable/avax';
+import { ExportTx, ImportTx, Input, Output } from '../../serializable/evm';
 import { Address, Id } from '../../serializable/fxs/common';
-import { OutputOwners, TransferOutput } from '../../serializable/fxs/secp256k1';
+import {
+  Input as SepkInput,
+  OutputOwners,
+  TransferInput,
+  TransferOutput,
+} from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
+import { matchOwners } from '../../utils/matchOwners';
+import { compareEVMOutputs, compareTransferableInputs } from '../../utils/sort';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
 
@@ -103,83 +113,87 @@ export class CorethBuilder {
     );
   }
 
-  // newImportTx(
-  //   networkID: number,
-  //   blockchainID: Buffer,
-  //   toAddress: string,
-  //   atomics: Utxo[],
-  //   sourceChain?: string,
-  //   fee = 0n,
-  //   feeAssetId?: string,
-  // ) {
-  //   const map: Map<string, string> = new Map();
+  newImportTx(
+    networkID: number,
+    blockchainID: Buffer,
+    toAddress: string,
+    fromAddresses: string[],
+    atomics: Utxo[],
+    sourceChain?: string,
+    fee = 0n,
+    feeAssetId?: string,
+  ) {
+    const map: Map<string, bigint> = new Map();
 
-  //   let ins: TransferableInput[] = [];
-  //   let outs: Output[] = [];
-  //   let feepaid = 0n;
+    let ins: TransferableInput[] = [];
+    let outs: Output[] = [];
+    let feepaid = 0n;
 
-  //   // build a set of inputs which covers the fee
-  //   atomics.forEach((atomic) => {
-  //     const assetID: string = atomic.ID.toString();
-  //     const output = atomic.output as TransferOutput;
-  //     const amount = output.amount();
-  //     let infeeamount = amount;
+    // build a set of inputs which covers the fee
+    atomics.forEach((atomic) => {
+      const assetID: string = atomic.ID.toString();
+      const output = atomic.output as TransferOutput;
+      const amount = output.amount();
+      let infeeamount = amount;
 
-  //     if (feeAssetId && fee && feepaid < fee && feeAssetId === assetID) {
-  //       feepaid += infeeamount;
-  //       if (feepaid > fee) {
-  //         infeeamount = feepaid - fee;
-  //         feepaid = fee;
-  //       } else {
-  //         infeeamount = 0n;
-  //       }
-  //     }
+      if (feeAssetId && fee && feepaid < fee && feeAssetId === assetID) {
+        feepaid += infeeamount;
+        if (feepaid > fee) {
+          infeeamount = feepaid - fee;
+          feepaid = fee;
+        } else {
+          infeeamount = 0n;
+        }
+      }
 
-  //     if (atomic.output) {
-  //       const inputSigIndicies = matchOwners(
-  //         atomic.output,
-  //         new Set(fromAddresses),
-  //         options.minIssuanceTime,
-  //       );
-  //     }
+      const inputSigIndicies = matchOwners(
+        output.outputOwners,
+        new Set(fromAddresses),
+        0n,
+      );
 
-  //     const input = new TransferInput(new BigIntPr(amount), new SepkInput([]));
-  //     const xferin: TransferableInput = new TransferableInput(
-  //       atomic.utxoId,
-  //       atomic.assetId,
-  //       input,
-  //     );
+      if (!inputSigIndicies) return;
 
-  //     ins.push(xferin);
+      const input = new TransferInput(
+        new BigIntPr(amount),
+        new SepkInput(inputSigIndicies.map((inx) => new Int(inx))),
+      );
+      const xferin: TransferableInput = new TransferableInput(
+        atomic.utxoId,
+        atomic.assetId,
+        input,
+      );
 
-  //     if (map.has(assetID)) {
-  //       infeeamount = infeeamount.add(new BN(map.get(assetID)));
-  //     }
-  //     map.set(assetID, infeeamount.toString());
-  //   });
+      ins.push(xferin);
 
-  //   for (const [assetID, amount] of map) {
-  //     // Create single EVMOutput for each assetID
-  //     const evmOutput: EVMOutput = new EVMOutput(
-  //       toAddress,
-  //       new BN(amount),
-  //       bintools.cb58Decode(assetID),
-  //     );
-  //     outs.push(evmOutput);
-  //   }
+      if (map.get(assetID)) {
+        infeeamount += map.get(assetID)!;
+      }
+      map.set(assetID, infeeamount);
+    });
 
-  //   // lexicographically sort array
-  //   ins = ins.sort(TransferableInput.comparator());
-  //   outs = outs.sort(EVMOutput.comparator());
+    for (const [assetID, amount] of map.entries()) {
+      // Create single EVMOutput for each assetID
+      outs.push(
+        new Output(
+          new Address(toAddress),
+          new BigIntPr(amount),
+          new Id(assetID),
+        ),
+      );
+    }
 
-  //   const importTx: ImportTx = new ImportTx(
-  //     networkID,
-  //     blockchainID,
-  //     sourceChain,
-  //     ins,
-  //     outs,
-  //     fee,
-  //   );
-  //   return new UnsignedTx(importTx);
-  // }
+    // lexicographically sort array
+    ins = ins.sort(compareTransferableInputs);
+    outs = outs.sort(compareEVMOutputs);
+
+    const importTx = new ImportTx(
+      new Int(this.context.networkID),
+      new Id(this.context.cBlockchainID),
+      sourceChain ? new Id(sourceChain) : emptyId,
+      ins,
+      outs,
+    );
+    return importTx;
+  }
 }
