@@ -1,7 +1,8 @@
 import { AxiosRequestConfig, AxiosResponse, AxiosError } from "axios"
+const f = require('node-fetch');
 
 function createRequest(config: AxiosRequestConfig): Request {
-  const headers = new Headers(config.headers as Record<string, string>)
+  const headers = new f.Headers(config.headers as Record<string, string>)
 
   if (config.auth) {
     const username = config.auth.username || ""
@@ -32,7 +33,7 @@ function createRequest(config: AxiosRequestConfig): Request {
 
   const url = `${fullPath}${params}`
 
-  return new Request(url, options)
+  return new f.Request(url, options)
 }
 
 async function getResponse(request, config): Promise<AxiosResponse> {
