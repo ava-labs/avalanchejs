@@ -3,7 +3,10 @@ import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
+import { Address } from '../fxs/common';
 import { Id } from '../fxs/common/id';
+import { OutputOwners, TransferOutput } from '../fxs/secp256k1';
+import { BigIntPr, Int } from '../primitives';
 
 const _symbol = Symbol('avax.TransferableOutput');
 
@@ -18,6 +21,26 @@ export class TransferableOutput {
   _type = _symbol;
 
   constructor(public readonly assetId: Id, public readonly output: Amounter) {}
+
+  static fromNative(
+    assetId: string,
+    amt: bigint,
+    locktime: bigint,
+    threshold: number,
+    addresses: string[],
+  ) {
+    return new TransferableOutput(
+      Id.fromString(assetId),
+      new TransferOutput(
+        new BigIntPr(amt),
+        new OutputOwners(
+          new BigIntPr(locktime),
+          new Int(threshold),
+          addresses.map((addr) => new Address(addr)),
+        ),
+      ),
+    );
+  }
 
   static fromBytes(
     bytes: Uint8Array,

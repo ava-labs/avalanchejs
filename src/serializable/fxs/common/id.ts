@@ -1,6 +1,6 @@
-import { serializable } from '../../common/types';
-import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
 import { base58check } from '../../../utils/base58';
+import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
+import { serializable } from '../../common/types';
 
 const _symbol = Symbol('common.Id');
 
@@ -26,6 +26,6 @@ export class Id {
   }
 
   value() {
-    return this.idVal;
+    return this.toString();
   }
 }

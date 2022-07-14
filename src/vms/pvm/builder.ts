@@ -17,9 +17,11 @@ import { BigIntPr, Bytes, Int } from '../../serializable/primitives';
 import {
   CreateSubnetTx,
   ExportTx,
+  ImportTx,
   StakableLockIn,
   StakableLockOut,
 } from '../../serializable/pvm';
+import { isTransferOut } from '../../utils';
 import { bigIntMin } from '../../utils/bigintMath';
 import { matchOwners } from '../../utils/matchOwners';
 import {
@@ -28,15 +30,16 @@ import {
 } from '../../utils/sort';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
+import { addressesToHexes } from '../utils/addressesToHexes';
 
-/* 
-  Builder is useful for building transactions that are specific to a chain. 
+/*
+  Builder is useful for building transactions that are specific to a chain.
  */
 
 type SpendOptions = {
   minIssuanceTime?: bigint;
   changeAddresses?: string[];
-  threashold: number;
+  threshold: number;
   memo?: Uint8Array;
   locktime?: bigint;
 };
@@ -56,7 +59,7 @@ export class PVMBuilder {
     return {
       minIssuanceTime: BigInt(Math.floor(new Date().getTime() / 100)),
       changeAddresses: fromAddress,
-      threashold: 1,
+      threshold: 1,
       memo: new Uint8Array(),
       locktime: 0n,
       ...options,
@@ -91,6 +94,90 @@ export class PVMBuilder {
         new Bytes(defaultedOptions.memo),
       ),
       zeroOutputOwners,
+    );
+  }
+
+  newImportTx(
+    sourceChainId: string,
+    utxos: Utxo[],
+    to: OutputOwners,
+    fromAddresses: string[],
+    options?: SpendOptions,
+  ) {
+    const importedInputs: TransferableInput[] = [];
+    const defaultedOptions = this.defaultSpendOptions(fromAddresses, options);
+    const fromAddresseshex = addressesToHexes(fromAddresses);
+    let importedAmount = 0n;
+    utxos.forEach((utxo) => {
+      if (utxo.assetId.toString() !== this.context.avaxAssetID) {
+        // Currently - only AVAX is allowed to be imported to the P-chain
+        return;
+      }
+      if (!isTransferOut(utxo.output)) {
+        return;
+      }
+
+      const inputSigIndicies = matchOwners(
+        utxo.output.outputOwners,
+        new Set(fromAddresseshex),
+        defaultedOptions.minIssuanceTime,
+      );
+      if (!inputSigIndicies) {
+        return;
+      }
+      importedInputs.push(
+        new TransferableInput(
+          utxo.utxoId,
+          utxo.assetId,
+          new TransferInput(utxo.output.amt, new Input(inputSigIndicies)),
+        ),
+      );
+      importedAmount += utxo.output.amount();
+    });
+
+    importedInputs.sort(compareTransferableInputs);
+
+    if (!importedInputs.length) {
+      throw new Error('no UTXOs available to import');
+    }
+    let inputs: TransferableInput[] = [];
+    let changeOutputs: TransferableOutput[] = [];
+    if (importedAmount < this.context.baseTxFee) {
+      const toBurn = new Map<string, bigint>([
+        [this.context.avaxAssetID, this.context.baseTxFee - importedAmount],
+      ]);
+
+      const spendRes = this.spend(
+        toBurn,
+        new Map(),
+        utxos,
+        fromAddresses,
+        defaultedOptions,
+      );
+      inputs = spendRes.inputs;
+      changeOutputs = spendRes.changeOutputs;
+    } else if (importedAmount > this.context.baseTxFee) {
+      changeOutputs.push(
+        new TransferableOutput(
+          new Id(this.context.avaxAssetID),
+          new TransferOutput(
+            new BigIntPr(importedAmount - this.context.baseTxFee),
+            to,
+          ),
+        ),
+      );
+    }
+
+    return new ImportTx(
+      new BaseTx(
+        new Int(this.context.networkID),
+        PlatformChainID,
+        changeOutputs,
+        inputs,
+        new Bytes(defaultedOptions.memo),
+      ),
+      new Id(sourceChainId),
+      importedInputs,
     );
   }
 
@@ -201,10 +288,7 @@ export class PVMBuilder {
           utxo.assetId,
           new StakableLockIn(
             lockedOutput.lockTime,
-            new TransferInput(
-              out.amt,
-              new Input(inputSigIndicies.map((i) => new Int(i))),
-            ),
+            new TransferInput(out.amt, new Input(inputSigIndicies)),
           ),
         ),
       );
@@ -215,7 +299,7 @@ export class PVMBuilder {
           utxo.assetId,
           new StakableLockOut(
             lockedOutput.lockTime,
-            new TransferOutput(amountToStake, out.outputOwners),
+            new TransferOutput(new BigIntPr(amountToStake), out.outputOwners),
           ),
         ),
       );
@@ -262,10 +346,7 @@ export class PVMBuilder {
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          new TransferInput(
-            utxoTransferout.amt,
-            new Input(inputSigIndicies.map((i) => new Int(i))),
-          ),
+          new TransferInput(utxoTransferout.amt, new Input(inputSigIndicies)),
         ),
       );
 
@@ -294,7 +375,7 @@ export class PVMBuilder {
         stakeOutputs.push(
           new TransferableOutput(
             utxo.assetId,
-            new TransferOutput(amountToStake, changeOwner),
+            new TransferOutput(new BigIntPr(amountToStake), changeOwner),
           ),
         );
       }

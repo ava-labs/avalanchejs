@@ -32,6 +32,10 @@ export class TransferOutput {
     return this.outputOwners.addrs.map((addr) => addr.toBytes());
   }
 
+  getThreshold() {
+    return this.outputOwners.threshold.value();
+  }
+
   static fromBytes(bytes: Uint8Array): [TransferOutput, Uint8Array] {
     const [amt, owners, remaining] = unpack(bytes, [BigIntPr, OutputOwners]);
 

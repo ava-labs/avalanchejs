@@ -53,7 +53,6 @@ export class XBuilder {
       fromAddresses,
       defaultedOptions,
     );
-
     outputs.sort(compareTransferableOutputs);
     return this.exportTxUnsafe(
       outputs,

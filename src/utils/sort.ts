@@ -4,7 +4,7 @@ import type {
   TransferableOutput,
 } from '../serializable/avax';
 import { getManager } from '../serializable/avm/codec';
-import { Output } from '../serializable/evm';
+import type { Output } from '../serializable/evm';
 
 export const compareTransferableInputs = (
   a: TransferableInput,

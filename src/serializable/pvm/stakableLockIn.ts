@@ -1,6 +1,6 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { packSwitched, unpack } from '../../utils/struct';
-import { Codec } from '../codec/codec';
+import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';

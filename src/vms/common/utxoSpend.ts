@@ -14,6 +14,7 @@ import {
   compareTransferableInputs,
   compareTransferableOutputs,
 } from '../../utils/sort';
+import { addressesToHexes } from '../utils/addressesToHexes';
 import type { SpendOptionsRequired } from './models';
 
 // UTXO Spend for coreth/AVM UTXOs
@@ -30,9 +31,10 @@ export const utxoSpend = (
     new Int(1),
     options.changeAddresses.map((addr) => new Address(addr)),
   );
+  const fromAddresseshex = addressesToHexes(fromAddresses);
 
   utxos.forEach((utxo) => {
-    const remainingAmountToBurn = amountsToBurn.get(utxo.assetId.value());
+    const remainingAmountToBurn = amountsToBurn.get(utxo.assetId.toString());
     if (!remainingAmountToBurn) {
       return;
     }
@@ -44,10 +46,9 @@ export const utxoSpend = (
 
     const inputSigIndicies = matchOwners(
       utxoTransferout.outputOwners,
-      new Set(fromAddresses),
+      new Set(fromAddresseshex),
       options.minIssuanceTime,
     );
-
     if (!inputSigIndicies) {
       return;
     }
@@ -56,10 +57,7 @@ export const utxoSpend = (
       new TransferableInput(
         utxo.utxoId,
         utxo.assetId,
-        new TransferInput(
-          utxoTransferout.amt,
-          new Input(inputSigIndicies.map((i) => new Int(i))),
-        ),
+        new TransferInput(utxoTransferout.amt, new Input(inputSigIndicies)),
       ),
     );
 
@@ -68,7 +66,10 @@ export const utxoSpend = (
       utxoTransferout.amt.value(),
     );
 
-    amountsToBurn[utxo.assetId.value()] -= amountToBurn;
+    amountsToBurn.set(
+      utxo.assetId.toString(),
+      remainingAmountToBurn - amountToBurn,
+    );
     const remainingAmount = utxoTransferout.amt.value() - amountToBurn;
     if (remainingAmount > 0) {
       changeOutputs.push(
@@ -79,7 +80,6 @@ export const utxoSpend = (
       );
     }
   });
-
   amountsToBurn.forEach((amount, assetId) => {
     if (amount !== 0n) {
       throw new Error(

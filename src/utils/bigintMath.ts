@@ -1,1 +1,2 @@
-export const bigIntMin = (...args) => args.reduce((m, e) => (e < m ? e : m));
+export const bigIntMin = (...args: bigint[]): bigint =>
+  args.reduce((m, e) => (e < m ? e : m));
