@@ -1,8 +1,7 @@
 import { base58 } from '@scure/base';
-import type { Utxo } from '../../..';
-import { TransferableOutput, utils } from '../../..';
 import { emptyId } from '../../constants/zeroValue';
-import { TransferableInput } from '../../serializable/avax';
+import { TransferableInput, TransferableOutput } from '../../serializable/avax';
+import type { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx, ImportTx, Input, Output } from '../../serializable/evm';
 import { Address, Id } from '../../serializable/fxs/common';
 import {
@@ -12,6 +11,7 @@ import {
   TransferOutput,
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
+import { hexToBuffer } from '../../utils';
 import { matchOwners } from '../../utils/matchOwners';
 import { compareEVMOutputs, compareTransferableInputs } from '../../utils/sort';
 import { getContextFromURI } from '../context/context';
@@ -58,8 +58,7 @@ export class CorethBuilder {
       assetId: string;
     }[] = [];
 
-    const assetIsAvax =
-      base58.encode(utils.hexToBuffer(avaxAssetID)) === assetId;
+    const assetIsAvax = base58.encode(hexToBuffer(avaxAssetID)) === assetId;
 
     if (assetIsAvax) {
       evmInputConfigs.push({

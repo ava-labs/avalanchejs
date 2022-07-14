@@ -15,9 +15,10 @@
     "lint": "eslint --fix -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
     "lint:check": "eslint -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
     "check": "tsc --noEmit",
-    "bench": "ts-node --esm ./scripts/bench.ts",
-    "example": "ts-node --esm ./examples/x-chain/utxos.ts",
-    "debug": "ts-node --esm ./src/debug.ts"
+    "tsNode": "ts-node -P ./debugTsConfig.json --esm",
+    "bench": "yarn tsNode ./scripts/bench.ts",
+    "example": "yarn tsNode ./examples/x-chain/utxos.ts",
+    "debug": "yarn tsNode ./src/debug.ts"
   },
   "dependencies": {
     "@noble/hashes": "1.1.2",

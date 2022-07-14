@@ -1,10 +1,11 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx, TransferableOutput } from '../avax';
-import { Id } from '../fxs/common';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx, TransferableOutput } from '../avax';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { Id } from '../fxs/common';
+import { getManager } from './codec';
 
 const _symbol = Symbol('avm.ExportTx');
 
@@ -28,6 +29,10 @@ export class ExportTx {
       codec,
     );
     return [new ExportTx(baseTx, sourceChain, outs), remaining];
+  }
+
+  bytes() {
+    return getManager().packCodec(this);
   }
 
   toBytes(codec: Codec) {
