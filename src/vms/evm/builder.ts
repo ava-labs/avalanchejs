@@ -156,7 +156,7 @@ export class CorethBuilder {
 
       const input = new TransferInput(
         new BigIntPr(amount),
-        new SepkInput(inputSigIndicies.map((inx) => new Int(inx))),
+        new SepkInput(inputSigIndicies),
       );
       const xferin: TransferableInput = new TransferableInput(
         atomic.utxoId,
@@ -165,9 +165,9 @@ export class CorethBuilder {
       );
 
       ins.push(xferin);
-
-      if (map.get(assetID)) {
-        infeeamount += map.get(assetID)!;
+      const assetFeeAmount = map.get(assetID);
+      if (assetFeeAmount) {
+        infeeamount += assetFeeAmount;
       }
       map.set(assetID, infeeamount);
     });

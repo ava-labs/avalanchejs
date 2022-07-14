@@ -16,7 +16,6 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn lint:check
-      - run: yarn check
   Test:
     runs-on: ubuntu-latest
     strategy:

@@ -44,6 +44,7 @@
     "rollup-plugin-delete": "2.0.0",
     "rollup-plugin-filesize": "9.1.2",
     "rollup-plugin-typescript2": "0.32.1",
+    "semantic-release": "19.0.3",
     "ts-jest": "28.0.5",
     "ts-node": "10.8.2",
     "ttypescript": "1.5.13",
