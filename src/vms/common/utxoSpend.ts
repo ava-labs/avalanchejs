@@ -29,7 +29,7 @@ export const utxoSpend = (
   const changeOwner = new OutputOwners(
     new BigIntPr(0n),
     new Int(1),
-    options.changeAddresses.map((addr) => new Address(addr)),
+    options.changeAddresses.map((addr) => Address.fromString(addr)),
   );
   const fromAddresseshex = addressesToHexes(fromAddresses);
 

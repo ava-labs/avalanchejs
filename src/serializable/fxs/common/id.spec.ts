@@ -6,7 +6,7 @@ testSerialization('Id', Id, id, idBytes);
 
 describe('id', function () {
   it('works correctly', () => {
-    const id = new Id(
+    const id = Id.fromHex(
       '0x6176617800000000000000000000000000000000000000000000000000000000',
     );
     const expectedIDStr = 'jvYiYUgxB6hG1dBobJK2JSoyuLtmFiDoXmUVxmAB7juqfbVtu';

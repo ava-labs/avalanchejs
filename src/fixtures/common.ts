@@ -10,7 +10,7 @@ export const addressBytes = () =>
   ]);
 
 export const address = () =>
-  new Address('0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc');
+  Address.fromHex('8db97c7cece249c2b98bdc0226cc4c2a57bf52fc');
 
 export const idBytes = () =>
   new Uint8Array([
@@ -20,7 +20,9 @@ export const idBytes = () =>
   ]);
 
 export const id = () =>
-  new Id('0xdbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db');
+  Id.fromHex(
+    'dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db',
+  );
 
 export const addressesBytes = () =>
   new Uint8Array([

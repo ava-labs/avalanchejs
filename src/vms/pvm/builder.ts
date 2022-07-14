@@ -159,7 +159,7 @@ export class PVMBuilder {
     } else if (importedAmount > this.context.baseTxFee) {
       changeOutputs.push(
         new TransferableOutput(
-          new Id(this.context.avaxAssetID),
+          Id.fromString(this.context.avaxAssetID),
           new TransferOutput(
             new BigIntPr(importedAmount - this.context.baseTxFee),
             to,
@@ -176,7 +176,7 @@ export class PVMBuilder {
         inputs,
         new Bytes(defaultedOptions.memo),
       ),
-      new Id(sourceChainId),
+      Id.fromString(sourceChainId),
       importedInputs,
     );
   }
@@ -220,7 +220,7 @@ export class PVMBuilder {
         inputs,
         new Bytes(defaultedOptions.memo),
       ),
-      new Id(chainId),
+      Id.fromString(chainId),
       outputs,
     );
   }
@@ -243,7 +243,7 @@ export class PVMBuilder {
     const changeOwner = new OutputOwners(
       new BigIntPr(0n),
       new Int(1),
-      options.changeAddresses.map((addr) => new Address(addr)),
+      options.changeAddresses.map((addr) => Address.fromString(addr)),
     );
 
     const unlockedUTXOs = utxos.filter(

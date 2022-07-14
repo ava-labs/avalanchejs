@@ -36,7 +36,7 @@ export class TransferableOutput {
         new OutputOwners(
           new BigIntPr(locktime),
           new Int(threshold),
-          addresses.map((addr) => new Address(addr)),
+          addresses.map((addr) => Address.fromString(addr)),
         ),
       ),
     );

@@ -76,7 +76,7 @@ export class XBuilder {
   ) => {
     return new BaseTx(
       new Int(this.context.networkID),
-      new Id(this.context.xBlockchainID),
+      Id.fromString(this.context.xBlockchainID),
       changeOutputs,
       inputs,
       new Bytes(memo),
@@ -116,7 +116,7 @@ export class XBuilder {
 
     return new ExportTx(
       this.baseTxUnsafe(changeOutputs, inputs, memo),
-      new Id(destinationChain),
+      Id.fromString(destinationChain),
       outputs,
     );
   };
