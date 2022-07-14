@@ -1,5 +1,5 @@
 {
-  "name": "avalanchejs-v2",
+  "name": "@avalabs/avalanchejs-v2",
   "version": "0.0.1",
   "packageManager": "yarn@1.22.18",
   "main": "dist/index.js",
