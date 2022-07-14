@@ -4,7 +4,10 @@
   "packageManager": "yarn@1.22.18",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "private": false,
   "scripts": {
     "start": "rollup -c --watch",
     "build": "rollup -c",
