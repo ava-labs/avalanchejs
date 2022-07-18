@@ -7,3 +7,4 @@ export * as Common from './src/vms/common';
 export * as Context from './src/vms/context';
 export * as evm from './src/vms/evm';
 export * as pvm from './src/vms/pvm';
+export * as avmSerial from './src/serializable/avm';
