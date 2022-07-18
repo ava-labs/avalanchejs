@@ -1,16 +1,28 @@
+import { customInspectSymbol } from '../../../constants/node';
 import { parse } from '../../../utils/address';
 import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
+import { Primitives } from '../../primitives/primatives';
 
 const _symbol = Symbol('common.Address');
 
 @serializable()
-export class Address {
+export class Address extends Primitives {
   _type = _symbol;
-  constructor(private readonly address: Uint8Array) {}
+  constructor(private readonly address: Uint8Array) {
+    super();
+  }
 
   static fromBytes(buf: Uint8Array): [Address, Uint8Array] {
     return [new Address(buf.slice(0, 20)), buf.slice(20)];
+  }
+
+  [customInspectSymbol](_, options: any) {
+    return options.stylize(this.toJSON(), 'string');
+  }
+
+  toJSON() {
+    return this.toString();
   }
 
   //decodes from bech32 Addresses

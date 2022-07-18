@@ -42,6 +42,6 @@ export class Manager {
   ): Uint8Array {
     const codecIdShort = new Short(codecVersion);
     const codec = this.getCodecForVersion(codecIdShort);
-    return concatBytes(codecIdShort.toBytes(), serializable.toBytes(codec));
+    return concatBytes(codecIdShort.toBytes(), codec.PackPrefix(serializable));
   }
 }

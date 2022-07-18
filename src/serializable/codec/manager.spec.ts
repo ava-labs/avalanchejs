@@ -1,8 +1,9 @@
-import { concatBytes } from '../../utils/buffer';
 import { Codec, Manager } from '.';
 import { createAssetTx, createAssetTxBytes } from '../../fixtures/avax';
-import { Bytes, Short, Stringpr } from '../primitives';
+import { bytesForInt } from '../../fixtures/utils/bytesFor';
+import { concatBytes } from '../../utils/buffer';
 import { CreateAssetTx } from '../avm/createAssetTx';
+import { Bytes, Short, Stringpr } from '../primitives';
 
 // jest.mock('../vms/avm/createAssetTx');
 
@@ -57,12 +58,17 @@ describe('using the codecs', () => {
 
   it('packs with correct prefix', () => {
     const tx = createAssetTx();
-    tx.toBytes = jest.fn(() => createAssetTxBytes());
+    codec1.PackPrefix = jest.fn(() =>
+      concatBytes(bytesForInt(2), createAssetTxBytes()),
+    );
     const bytes = m.packCodec(tx, 1);
 
-    const output = concatBytes(new Short(1).toBytes(), createAssetTxBytes());
+    const output = concatBytes(
+      new Short(1).toBytes(),
+      concatBytes(bytesForInt(2), createAssetTxBytes()),
+    );
 
-    expect(tx.toBytes).toBeCalledWith(codec1);
+    expect(codec1.PackPrefix).toBeCalledWith(tx);
     expect(bytes).toEqual(output);
   });
 });

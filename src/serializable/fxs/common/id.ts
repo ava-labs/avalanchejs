@@ -1,20 +1,32 @@
+import { customInspectSymbol } from '../../../constants/node';
 import { base58check } from '../../../utils/base58';
 import { hexToBuffer, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
+import { Primitives } from '../../primitives/primatives';
 
 const _symbol = Symbol('common.Id');
 
 @serializable()
-export class Id {
+export class Id extends Primitives {
   _type = _symbol;
-  constructor(private readonly idVal: Uint8Array) {}
+  constructor(private readonly idVal: Uint8Array) {
+    super();
+  }
 
   static fromBytes(buf: Uint8Array): [Id, Uint8Array] {
     return [new Id(buf.slice(0, 32)), buf.slice(32)];
   }
 
+  [customInspectSymbol](_, options: any) {
+    return options.stylize(this.toString(), 'string');
+  }
+
   toBytes() {
     return padLeft(this.idVal, 32);
+  }
+
+  toJSON() {
+    return this.toString();
   }
 
   toString() {
