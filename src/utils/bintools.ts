@@ -92,9 +92,13 @@ export default class BinTools {
     if (hex === "" || hex.trim() === "") {
       return false
     }
+    const startsWith0x = hex.startsWith("0x")
+    const matchResult = startsWith0x
+      ? hex.slice(2).match(/[0-9A-Fa-f]/g)
+      : hex.match(/[0-9A-Fa-f]/g)
     if (
-      (hex.startsWith("0x") && hex.slice(2).match(/^[0-9A-Fa-f]/g)) ||
-      hex.match(/^[0-9A-Fa-f]/g)
+      (startsWith0x && hex.length - 2 == matchResult.length) ||
+      hex.length == matchResult.length
     ) {
       return true
     } else {
