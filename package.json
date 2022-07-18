@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@noble/hashes": "1.1.2",
-    "@noble/secp256k1": "1.6.0",
+    "@noble/secp256k1": "1.6.3",
     "@scure/base": "1.1.1"
   },
   "devDependencies": {
