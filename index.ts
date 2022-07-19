@@ -8,3 +8,6 @@ export * as Context from './src/vms/context';
 export * as evm from './src/vms/evm';
 export * as pvm from './src/vms/pvm';
 export * as avmSerial from './src/serializable/avm';
+export * as pvmSerial from './src/serializable/pvm';
+export * as evmSerial from './src/serializable/evm';
+export { UnsignedTx } from './src/vms/common/unsignedTx';

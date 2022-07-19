@@ -13,7 +13,7 @@ export class BigIntPr extends Primitives {
     super();
   }
 
-  [customInspectSymbol](_, options: any) {
+  [customInspectSymbol]() {
     return this.bigint;
   }
 

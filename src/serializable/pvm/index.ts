@@ -10,6 +10,7 @@ import { StakableLockIn } from './stakableLockIn';
 import { StakableLockOut } from './stakableLockOut';
 import { SubnetValidator } from './subnetValidator';
 import { Validator } from './validator';
+export * from './typeGuards';
 export {
   AddDelegatorTx,
   AddSubnetValidatorTx,

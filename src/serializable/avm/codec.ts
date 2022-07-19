@@ -12,7 +12,7 @@ import { OperationTx } from './operationTx';
 // https://github.com/ava-labs/avalanchego/blob/master/wallet/chain/x/constants.go
 let manager: Manager;
 
-export const getManager = () => {
+export const getAVMManager = () => {
   if (manager) return manager;
 
   manager = new Manager();

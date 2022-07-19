@@ -14,9 +14,11 @@ import type { SpendOptions } from '../common/models';
 import { utxoSpend } from '../common/utxoSpend';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
+import { UnsignedTx } from '../common/unsignedTx';
 
 export class XBuilder {
   constructor(private readonly context: Context) {}
+
   static async fromURI(baseURL?: string): Promise<XBuilder> {
     return new XBuilder(await getContextFromURI('AVAX', baseURL));
   }
@@ -47,7 +49,7 @@ export class XBuilder {
       toBurn.set(assetId, (toBurn.get(assetId) || 0n) + out.output.amount());
     });
 
-    const { inputs, changeOutputs } = utxoSpend(
+    const { inputs, changeOutputs, inputUtxos } = utxoSpend(
       toBurn,
       utxoSet,
       fromAddresses,
@@ -60,6 +62,7 @@ export class XBuilder {
       inputs,
       destinationChain,
       defaultedOptions.memo,
+      inputUtxos,
     );
   }
 
@@ -97,6 +100,7 @@ export class XBuilder {
     inputs: TransferableInput[],
     destinationChain: string,
     memo: Uint8Array,
+    inputUtxos?: Utxo[],
   ) => {
     outputs.sort(compareTransferableOutputs);
 
@@ -114,10 +118,13 @@ export class XBuilder {
       throw new Error('Not enough inputs to cover the outputs');
     }
 
-    return new ExportTx(
-      this.baseTxUnsafe(changeOutputs, inputs, memo),
-      Id.fromString(destinationChain),
-      outputs,
+    return new UnsignedTx(
+      new ExportTx(
+        this.baseTxUnsafe(changeOutputs, inputs, memo),
+        Id.fromString(destinationChain),
+        outputs,
+      ),
+      inputUtxos,
     );
   };
 }

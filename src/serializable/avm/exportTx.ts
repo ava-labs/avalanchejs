@@ -7,15 +7,14 @@ import { serializable } from '../common/types';
 import { Id } from '../fxs/common';
 import { AVMTx } from './abstractTx';
 
-const _symbol = Symbol('avm.ExportTx');
+export const exportTx_symbol = Symbol('avm.ExportTx');
 
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-Exporttx
  */
 @serializable()
 export class ExportTx extends AVMTx {
-  _type = _symbol;
-
+  _type = exportTx_symbol;
   constructor(
     public readonly baseTx: BaseTx,
     public readonly destination: Id,

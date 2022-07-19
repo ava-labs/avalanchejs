@@ -1,4 +1,4 @@
-import { getManager } from '../../serializable/pvm/codec';
+import { getPVMManager } from '../../serializable/pvm/codec';
 import { Api } from '../common/api';
 import type {
   GetAssetDescriptionResponse,
@@ -12,7 +12,7 @@ export class PVMApi extends Api {
   }
 
   async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    return this.getUTXOsForManager(input, getManager());
+    return this.getUTXOsForManager(input, getPVMManager());
   }
 
   getAssetDescription(assetID: string): Promise<GetAssetDescriptionResponse> {

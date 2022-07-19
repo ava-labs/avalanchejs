@@ -1,4 +1,4 @@
-import { getManager } from '../../serializable/avm/codec';
+import { getAVMManager } from '../../serializable/avm/codec';
 import { Api } from '../common/api';
 import type {
   GetAssetDescriptionResponse,
@@ -12,7 +12,7 @@ export class AVMApi extends Api {
   }
 
   async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    return this.getUTXOsForManager(input, getManager());
+    return this.getUTXOsForManager(input, getAVMManager());
   }
 
   getAssetDescription(assetID: string): Promise<GetAssetDescriptionResponse> {

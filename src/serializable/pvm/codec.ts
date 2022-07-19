@@ -1,7 +1,7 @@
-import { Codec, Manager } from '../codec';
 import { BaseTx } from '../avax';
-import * as Secp256k1Fx from '../fxs/secp256k1';
 import { ImportTx } from '../avm';
+import { Codec, Manager } from '../codec';
+import * as Secp256k1Fx from '../fxs/secp256k1';
 import { AddDelegatorTx } from './addDelegatorTx';
 import { AddSubnetValidatorTx } from './addSubnetValidatorTx';
 import { AddValidatorTx } from './addValidatorTx';
@@ -43,7 +43,7 @@ export const codec = new Codec([
 ]);
 
 let manager: Manager;
-export const getManager = () => {
+export const getPVMManager = () => {
   if (manager) return manager;
   manager = new Manager();
   manager.RegisterCodec(0, codec);

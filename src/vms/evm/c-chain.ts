@@ -1,4 +1,4 @@
-import { getManager } from '../../serializable/evm/codec';
+import { getEVMManager } from '../../serializable/evm/codec';
 import { Api } from '../common/api';
 import type { GetUTXOResponse, GetUTXOsInput } from '../common/apiModels';
 
@@ -8,6 +8,6 @@ export class EVMApi extends Api {
   }
 
   async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    return this.getUTXOsForManager(input, getManager());
+    return this.getUTXOsForManager(input, getEVMManager());
   }
 }

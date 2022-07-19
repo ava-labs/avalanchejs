@@ -6,14 +6,14 @@ import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 
-const _symbol = Symbol('avm.ImportTx');
+export const importTx_symbol = Symbol('avm.ImportTx');
 
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-importtx
  */
 @serializable()
 export class ImportTx {
-  _type = _symbol;
+  _type = importTx_symbol;
 
   constructor(
     private readonly baseTx: BaseTx,

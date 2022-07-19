@@ -1,21 +1,22 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx, TransferableOutput } from '../avax';
-import { OutputOwners } from '../fxs/secp256k1';
-import { Int } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx, TransferableOutput } from '../avax';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { OutputOwners } from '../fxs/secp256k1';
+import { Int } from '../primitives';
+import { PVMTx } from './abstractTx';
 import { Validator } from './validator';
 
-const _symbol = Symbol('pvm.AddValidatorTx');
+export const addValidatorTx_symbol = Symbol('pvm.AddValidatorTx');
 
 /**
  * @see https://docs.avax.network/specs/platform-transaction-serialization#unsigned-add-validator-tx
  */
 @serializable()
-export class AddValidatorTx {
-  _type = _symbol;
+export class AddValidatorTx extends PVMTx {
+  _type = addValidatorTx_symbol;
 
   constructor(
     public readonly baseTx: BaseTx,
@@ -23,7 +24,9 @@ export class AddValidatorTx {
     public readonly stake: TransferableOutput[],
     public readonly rewardsOwner: OutputOwners,
     public readonly shares: Int,
-  ) {}
+  ) {
+    super();
+  }
 
   static fromBytes(
     bytes: Uint8Array,

@@ -3,7 +3,7 @@ import type {
   TransferableInput,
   TransferableOutput,
 } from '../serializable/avax';
-import { getManager } from '../serializable/avm/codec';
+import { getAVMManager } from '../serializable/avm/codec';
 import type { Output } from '../serializable/evm';
 
 export const compareTransferableInputs = (
@@ -23,7 +23,7 @@ export const compareTransferableOutputs = (
   a: TransferableOutput,
   b: TransferableOutput,
 ) => {
-  const manager = getManager();
+  const manager = getAVMManager();
   const aBytes = manager.packCodec(a, DEFAULT_CODEC_VERSION);
   const bBytes = manager.packCodec(b, DEFAULT_CODEC_VERSION);
   return compareBytes(aBytes, bBytes);

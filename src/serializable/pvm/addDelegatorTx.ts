@@ -1,26 +1,29 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx, TransferableOutput } from '../avax';
-import { OutputOwners } from '../fxs/secp256k1';
 import { toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx, TransferableOutput } from '../avax';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { OutputOwners } from '../fxs/secp256k1';
+import { PVMTx } from './abstractTx';
 import { Validator } from './validator';
 
-const _symbol = Symbol('pvm.AddDelegatorTx');
+export const addDelegatorTx_symbol = Symbol('pvm.AddDelegatorTx');
 
 /**
  * @see
  */
 @serializable()
-export class AddDelegatorTx {
-  _type = _symbol;
+export class AddDelegatorTx extends PVMTx {
+  _type = addDelegatorTx_symbol;
 
   constructor(
     public readonly baseTx: BaseTx,
     public readonly validator: Validator,
     public readonly stake: TransferableOutput[],
     public readonly rewardsOwner: OutputOwners,
-  ) {}
+  ) {
+    super();
+  }
 
   static fromBytes(
     bytes: Uint8Array,

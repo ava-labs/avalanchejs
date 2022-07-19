@@ -1,12 +1,13 @@
-import type { Codec } from '../codec';
-import { getManager } from './codec';
+import { Transaction } from '../../vms/common/transaction';
+import type { BaseTx } from '../avax';
+import { AVM } from '../constants';
 
-export abstract class AVMTx {
-  bytes() {
-    return getManager().packCodec(this);
-  }
-  _type = Symbol.for('');
-  toBytes(codec: Codec): Uint8Array {
-    throw new Error('unimplemented');
+export abstract class AVMTx extends Transaction {
+  abstract baseTx: BaseTx;
+
+  vm = AVM;
+
+  getBlockchainId() {
+    return this.baseTx.BlockchainId.toString();
   }
 }

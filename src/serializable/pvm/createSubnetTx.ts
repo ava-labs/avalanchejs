@@ -1,22 +1,25 @@
+import { pack, unpack } from '../../utils/struct';
+import { BaseTx } from '../avax';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
-import { BaseTx } from '../avax';
 import { OutputOwners } from '../fxs/secp256k1';
-import { pack, unpack } from '../../utils/struct';
+import { PVMTx } from './abstractTx';
 
-const _symbol = Symbol('pvm.CreateSubnetTx');
+export const createSubnetTx_symbol = Symbol('pvm.CreateSubnetTx');
 
 /**
  * @see
  */
 @serializable()
-export class CreateSubnetTx {
-  _type = _symbol;
+export class CreateSubnetTx extends PVMTx {
+  _type = createSubnetTx_symbol;
 
   constructor(
     public readonly baseTx: BaseTx,
     public readonly rewardsOwner: OutputOwners,
-  ) {}
+  ) {
+    super();
+  }
 
   static fromBytes(
     bytes: Uint8Array,

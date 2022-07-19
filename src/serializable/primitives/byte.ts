@@ -1,4 +1,4 @@
-import { bufferToHex } from '../../utils';
+import { bufferToHex } from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 

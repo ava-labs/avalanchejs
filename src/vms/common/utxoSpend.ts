@@ -32,7 +32,7 @@ export const utxoSpend = (
     options.changeAddresses.map((addr) => Address.fromString(addr)),
   );
   const fromAddresseshex = addressesToHexes(fromAddresses);
-
+  const inputUtxos: Utxo[] = [];
   utxos.forEach((utxo) => {
     const remainingAmountToBurn = amountsToBurn.get(utxo.assetId.toString());
     if (!remainingAmountToBurn) {
@@ -60,6 +60,8 @@ export const utxoSpend = (
         new TransferInput(utxoTransferout.amt, new Input(inputSigIndicies)),
       ),
     );
+
+    inputUtxos.push(utxo);
 
     const amountToBurn = bigIntMin(
       remainingAmountToBurn,
@@ -91,5 +93,5 @@ export const utxoSpend = (
   inputs.sort(compareTransferableInputs);
   changeOutputs.sort(compareTransferableOutputs);
 
-  return { inputs, changeOutputs };
+  return { inputs, changeOutputs, inputUtxos };
 };

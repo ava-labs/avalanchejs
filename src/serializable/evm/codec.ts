@@ -16,7 +16,7 @@ export const codec = new Codec([
   Secp256k1Fx.OutputOwners,
 ]);
 
-export const getManager = () => {
+export const getEVMManager = () => {
   if (manager) return manager;
   manager = new Manager();
   manager.RegisterCodec(0, codec);

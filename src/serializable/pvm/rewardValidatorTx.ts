@@ -1,7 +1,8 @@
+import { packSwitched, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common';
-import { packSwitched, unpack } from '../../utils/struct';
+import { PVMTx } from './abstractTx';
 
 const _symbol = Symbol('pvm.RewardValidatorTx');
 
@@ -9,10 +10,14 @@ const _symbol = Symbol('pvm.RewardValidatorTx');
  * @see
  */
 @serializable()
-export class RewardValidatorTx {
+export class RewardValidatorTx extends PVMTx {
   _type = _symbol;
 
-  constructor(public readonly txId: Id) {}
+  constructor(public readonly txId: Id) {
+    super();
+  }
+
+  baseTx = undefined;
 
   static fromBytes(
     bytes: Uint8Array,
