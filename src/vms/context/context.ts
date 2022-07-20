@@ -1,6 +1,6 @@
 import { getHRP } from '../../constants/networkIDs';
 import { Info } from '../../info/info';
-import { AVMApi } from '../avm/x-chain';
+import { AVMApi } from '../avm/api';
 import type { Context } from './model';
 
 /*
