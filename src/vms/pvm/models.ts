@@ -180,3 +180,7 @@ export interface GetTxStatusResponse {
   status: string;
   reason: string;
 }
+
+export interface GetCurrentSupplyResponse {
+  supply: bigint;
+}

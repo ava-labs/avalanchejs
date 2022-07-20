@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  Lint:
+  Lint-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,6 +16,7 @@ jobs:
           cache: yarn
       - run: yarn install --frozen-lockfile
       - run: yarn lint:check
+      - run: yarn build
   Test:
     runs-on: ubuntu-latest
     strategy:
