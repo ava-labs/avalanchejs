@@ -1,9 +1,10 @@
-import { Codec } from '../codec/codec';
-import type { Serializable } from '../common/types';
-import { serializable } from '../common/types';
 import { concatBytes } from '../../utils/buffer';
 import { toListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
+import { Codec } from '../codec/codec';
+import type { Serializable } from '../common/types';
+import { serializable } from '../common/types';
+import type { Credential } from '../fxs/secp256k1';
 
 const _symbol = Symbol('avm.SignedTx');
 
@@ -15,8 +16,8 @@ export class SignedTx {
   _type = _symbol;
 
   constructor(
-    private readonly unsignedTx: Serializable,
-    private readonly credentials: Serializable[],
+    public readonly unsignedTx: Serializable,
+    public readonly credentials: Serializable[],
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [SignedTx, Uint8Array] {
@@ -26,6 +27,14 @@ export class SignedTx {
       codec,
     );
     return [new SignedTx(unsignedTx, outs), remaining];
+  }
+
+  getCredentials(): Credential[] {
+    return this.credentials as Credential[];
+  }
+
+  getAllSignatures() {
+    return this.getCredentials().flatMap((cred) => cred.getSignatures());
   }
 
   toBytes(codec: Codec) {

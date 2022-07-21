@@ -1,5 +1,5 @@
+import { bufferToHex, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
-import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
 
 const _symbol = Symbol('secp256k1fx.Signature');
 
@@ -11,16 +11,20 @@ const SepkSignatureLength = 65;
 export class Signature {
   _type = _symbol;
 
-  constructor(private readonly sig: string) {}
+  constructor(private readonly sig: Uint8Array) {}
 
   static fromBytes(bytes: Uint8Array): [Signature, Uint8Array] {
     return [
-      new Signature(bufferToHex(bytes.slice(0, SepkSignatureLength))),
+      new Signature(bytes.slice(0, SepkSignatureLength)),
       bytes.slice(SepkSignatureLength),
     ];
   }
 
+  toString() {
+    return bufferToHex(this.sig);
+  }
+
   toBytes() {
-    return padLeft(hexToBuffer(this.sig), SepkSignatureLength);
+    return padLeft(this.sig, SepkSignatureLength);
   }
 }

@@ -1,9 +1,10 @@
+import { concatBytes } from '../../utils';
 import { toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 import { BaseTx, TransferableOutput } from '../avax';
-import type { Codec } from '../codec/codec';
+import { Codec } from '../codec/codec';
+import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
-import { OutputOwners } from '../fxs/secp256k1';
 import { PVMTx } from './abstractTx';
 import { Validator } from './validator';
 
@@ -20,7 +21,7 @@ export class AddDelegatorTx extends PVMTx {
     public readonly baseTx: BaseTx,
     public readonly validator: Validator,
     public readonly stake: TransferableOutput[],
-    public readonly rewardsOwner: OutputOwners,
+    public readonly rewardsOwner: Serializable,
   ) {
     super();
   }
@@ -31,16 +32,17 @@ export class AddDelegatorTx extends PVMTx {
   ): [AddDelegatorTx, Uint8Array] {
     const [baseTx, validator, stake, rewardsOwner, rest] = unpack(
       bytes,
-      [BaseTx, Validator, toListStruct(TransferableOutput), OutputOwners],
+      [BaseTx, Validator, toListStruct(TransferableOutput), Codec],
       codec,
     );
+
     return [new AddDelegatorTx(baseTx, validator, stake, rewardsOwner), rest];
   }
 
   toBytes(codec: Codec) {
-    return pack(
-      [this.baseTx, this.validator, this.stake, this.rewardsOwner],
-      codec,
+    return concatBytes(
+      pack([this.baseTx, this.validator, this.stake], codec),
+      codec.PackPrefix(this.rewardsOwner),
     );
   }
 }

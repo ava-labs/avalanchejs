@@ -163,14 +163,6 @@ export interface GetMaxStakeAmountParams {
   endTime: bigint;
 }
 
-export interface IssueTxParams {
-  tx: string;
-}
-
-export interface IssueTxResponse {
-  txID: string;
-}
-
 export interface GetTxStatusParams {
   txID: string;
   includeReason?: boolean;

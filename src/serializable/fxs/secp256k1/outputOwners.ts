@@ -27,7 +27,6 @@ export class OutputOwners {
       [BigIntPr, Int, toListStruct(Address)],
       codec,
     );
-
     return [new OutputOwners(locktime, threshold, addresses), remaining];
   }
 

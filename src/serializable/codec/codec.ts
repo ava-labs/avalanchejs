@@ -1,9 +1,9 @@
-import type { Serializable, SerializableStatic } from '../common/types';
-import { serializable } from '../common/types';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
-import { Int } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { unpack } from '../../utils/struct';
+import type { Serializable, SerializableStatic } from '../common/types';
+import { serializable } from '../common/types';
+import { Int } from '../primitives';
 
 const _symbol = Symbol('codec');
 
@@ -39,8 +39,6 @@ export class Codec {
     const type = this.typeIdToType[typeId.value()];
 
     if (type === undefined) {
-      console.log('buf=', buf);
-
       throw new Error(
         `couldn't unmarshal interface: unknown type ID ${typeId.value()}`,
       );

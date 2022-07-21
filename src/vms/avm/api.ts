@@ -1,23 +1,8 @@
 import { getAVMManager } from '../../serializable/avm/codec';
-import { Api } from '../common/api';
-import type {
-  GetAssetDescriptionResponse,
-  GetUTXOResponse,
-  GetUTXOsInput,
-} from '../common/apiModels';
+import { AvaxApi } from '../common/avaxApi';
 
-export class AVMApi extends Api {
+export class AVMApi extends AvaxApi {
   constructor(baseURL?: string) {
-    super(baseURL, '/ext/bc/X', 'avm');
-  }
-
-  async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    return this.getUTXOsForManager(input, getAVMManager());
-  }
-
-  getAssetDescription(assetID: string): Promise<GetAssetDescriptionResponse> {
-    return this.callRpc<GetAssetDescriptionResponse>('getAssetDescription', {
-      assetID,
-    });
+    super(baseURL, '/ext/bc/X', 'avm', getAVMManager());
   }
 }

@@ -22,7 +22,7 @@ import {
   transferableOutput,
   transferableOutputBytes,
 } from './avax';
-import { id, idBytes } from './common';
+import { id, idBytes, nodeId, nodeIdBytes } from './common';
 import {
   bigIntPr,
   bigIntPrBytes,
@@ -46,10 +46,10 @@ import {
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
 export const validator = () =>
-  new Validator(id(), bigIntPr(), bigIntPr(), bigIntPr());
+  new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
 
 export const validatorBytes = () =>
-  concatBytes(idBytes(), bigIntPrBytes(), bigIntPrBytes(), bigIntPrBytes());
+  concatBytes(nodeIdBytes(), bigIntPrBytes(), bigIntPrBytes(), bigIntPrBytes());
 
 export const addValidatorTx = () =>
   new AddValidatorTx(
@@ -64,6 +64,7 @@ export const addValidatorTxBytes = () =>
     baseTxbytes(),
     validatorBytes(),
     makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
     outputOwnerBytes(),
     intBytes(),
   );
@@ -97,6 +98,7 @@ export const addDelegatorTxBytes = () =>
     baseTxbytes(),
     validatorBytes(),
     makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
     outputOwnerBytes(),
   );
 

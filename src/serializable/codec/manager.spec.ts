@@ -48,7 +48,7 @@ describe('using the codecs', () => {
 
     const input = concatBytes(new Short(1).toBytes(), createAssetTxBytes());
 
-    m.unpackCodec(input, CreateAssetTx);
+    m.unpack(input, CreateAssetTx);
 
     expect(CreateAssetTx.fromBytes).toBeCalledWith(
       createAssetTxBytes(),

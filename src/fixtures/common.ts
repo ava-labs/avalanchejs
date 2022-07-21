@@ -1,5 +1,6 @@
 import { Address } from '../serializable/fxs/common/address';
 import { Id } from '../serializable/fxs/common/id';
+import { NodeId } from '../serializable/fxs/common/nodeId';
 import { bytesForInt } from './utils/bytesFor';
 import { makeList } from './utils/makeList';
 
@@ -23,6 +24,15 @@ export const id = () =>
   Id.fromHex(
     'dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db',
   );
+
+export const nodeIdBytes = () =>
+  new Uint8Array([
+    0xe9, 0x09, 0x4f, 0x73, 0x69, 0x80, 0x02, 0xfd, 0x52, 0xc9, 0x08, 0x19,
+    0xb4, 0x57, 0xb9, 0xfb, 0xc8, 0x66, 0xab, 0x80,
+  ]);
+
+export const nodeId = () =>
+  NodeId.fromHex('0xe9094f73698002fd52c90819b457b9fbc866ab80');
 
 export const addressesBytes = () =>
   new Uint8Array([

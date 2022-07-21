@@ -37,7 +37,6 @@ export class BaseTx {
       ],
       codec,
     );
-
     return [
       new BaseTx(networkId, blockchainId, outputs, inputs, memo),
       remaining,

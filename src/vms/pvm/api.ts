@@ -2,12 +2,8 @@ import { TransferableOutput } from '../../serializable/avax';
 import { Utxo } from '../../serializable/avax/utxo';
 import { getPVMManager } from '../../serializable/pvm/codec';
 import { hexToBuffer } from '../../utils';
-import { Api } from '../common/api';
-import type {
-  GetAssetDescriptionResponse,
-  GetUTXOResponse,
-  GetUTXOsInput,
-} from '../common/apiModels';
+import type { GetAssetDescriptionResponse } from '../common/apiModels';
+import { AvaxApi } from '../common/avaxApi';
 import type {
   GetCurrentSupplyResponse,
   GetCurrentValidatorsParams,
@@ -23,21 +19,15 @@ import type {
   GetTxStatusResponse,
   GetValidatorsAtParams,
   GetValidatorsAtResponse,
-  IssueTxParams,
-  IssueTxResponse,
 } from './models';
 import type {
   GetRewardUTXOsServerResponse,
   GetStakeServerResponse,
 } from './privateModels';
 
-export class PVMApi extends Api {
+export class PVMApi extends AvaxApi {
   constructor(baseURL?: string) {
-    super(baseURL, '/ext/bc/P', 'platform');
-  }
-
-  async getUTXOs(input: GetUTXOsInput): Promise<GetUTXOResponse> {
-    return this.getUTXOsForManager(input, getPVMManager());
+    super(baseURL, '/ext/bc/P', 'platform', getPVMManager());
   }
 
   getAssetDescription(assetID: string): Promise<GetAssetDescriptionResponse> {
@@ -73,7 +63,7 @@ export class PVMApi extends Api {
     return {
       ...resp,
       utxos: resp.utxos.map((bytes) =>
-        getPVMManager().unpackCodec(hexToBuffer(bytes), Utxo),
+        getPVMManager().unpack(hexToBuffer(bytes), Utxo),
       ),
     };
   }
@@ -86,7 +76,7 @@ export class PVMApi extends Api {
     return {
       ...resp,
       stakedOutputs: resp.stakedOutputs.map((bytes) =>
-        getPVMManager().unpackCodec(hexToBuffer(bytes), TransferableOutput),
+        getPVMManager().unpack(hexToBuffer(bytes), TransferableOutput),
       ),
     };
   }
@@ -98,10 +88,6 @@ export class PVMApi extends Api {
       'getValidatorsAt',
       getValidatorsAtParams,
     );
-  }
-
-  issueTx(issueTxParams: IssueTxParams): Promise<IssueTxResponse> {
-    return this.callRpc<IssueTxResponse>('issueTx', issueTxParams);
   }
 
   getCurrentSupply(): Promise<GetCurrentSupplyResponse> {

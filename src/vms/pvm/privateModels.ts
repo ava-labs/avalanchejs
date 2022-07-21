@@ -11,3 +11,7 @@ export interface GetStakeServerResponse {
   staked: bigint;
   stakedOutputs: string[];
 }
+
+export interface GetTxServerResponse {
+  tx: any;
+}

@@ -19,15 +19,20 @@ export class Manager {
     this.codecs[version] = codec;
   }
 
-  unpackCodec = <T extends SerializableStatic>(
+  unpack = <T extends SerializableStatic>(
     buff: Uint8Array,
     unpacker: T,
   ): FromBytesReturn<T> => {
-    const [codecId, rest] = unpack(buff, [Short]);
-    const codec = this.getCodecForVersion(codecId);
+    const [codec, rest] = this.unpackCodec(buff);
     // TODO: try to do this without casting
     return unpacker.fromBytes(rest, codec)[0] as FromBytesReturn<T>;
   };
+
+  private unpackCodec(buff: Uint8Array): [Codec, Uint8Array] {
+    const [codecId, rest] = unpack(buff, [Short]);
+    const codec = this.getCodecForVersion(codecId);
+    return [codec, rest];
+  }
 
   getCodecForVersion(codecId: Short): Codec {
     if (!this.codecs[codecId.value()]) {
