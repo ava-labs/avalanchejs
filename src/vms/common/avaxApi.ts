@@ -5,7 +5,12 @@
 import { SignedTx } from '../../serializable/avm';
 import { hexToBuffer } from '../../utils';
 import type { GetTxServerResponse } from '../pvm/privateModels';
-import type { GetAssetDescriptionResponse, GetTxParams } from './apiModels';
+import type {
+  GetAssetDescriptionResponse,
+  GetTxParams,
+  GetTxStatusParams,
+  GetTxStatusResponse,
+} from './apiModels';
 import { ChainApi } from './chainAPI';
 
 export class AvaxApi extends ChainApi {
@@ -29,4 +34,11 @@ export class AvaxApi extends ChainApi {
       encoding: 'json',
     });
   };
+
+  getTxStatus(getTxStatus: GetTxStatusParams): Promise<GetTxStatusResponse> {
+    return this.callRpc<GetTxStatusResponse>('getTxStatus', {
+      includeReason: true,
+      ...getTxStatus,
+    });
+  }
 }

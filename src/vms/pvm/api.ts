@@ -15,8 +15,6 @@ import type {
   GetRewardUTXOsResponse,
   GetStakeParams,
   GetStakeResponse,
-  GetTxStatusParams,
-  GetTxStatusResponse,
   GetValidatorsAtParams,
   GetValidatorsAtResponse,
 } from './models';
@@ -101,12 +99,5 @@ export class PVMApi extends AvaxApi {
       'getMaxStakeAmount',
       getMaxStakeAmountParams,
     );
-  }
-
-  getTxStatus(getTxStatus: GetTxStatusParams): Promise<GetTxStatusResponse> {
-    return this.callRpc<GetTxStatusResponse>('getTxStatus', {
-      includeReason: true,
-      ...getTxStatus,
-    });
   }
 }

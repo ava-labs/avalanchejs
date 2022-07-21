@@ -141,16 +141,6 @@ export interface Blockchain {
   vmID: string;
 }
 
-export interface GetTxStatusParams {
-  txID: string;
-  includeReason?: boolean | true;
-}
-
-export interface GetTxStatusResponse {
-  status: string;
-  reason: string;
-}
-
 export interface GetMinStakeResponse {
   minValidatorStake: bigint;
   minDelegatorStake: bigint;
