@@ -8,7 +8,6 @@ import {
 import type { Utxo } from '../../serializable/avax/utxo';
 import { Address, Id } from '../../serializable/fxs/common';
 import {
-  Input,
   OutputOwners,
   TransferInput,
   TransferOutput,
@@ -21,7 +20,7 @@ import {
   StakableLockIn,
   StakableLockOut,
 } from '../../serializable/pvm';
-import { isTransferOut } from '../../utils';
+import { isStakeableLockOut, isTransferOut } from '../../utils';
 import { bigIntMin } from '../../utils/bigintMath';
 import { matchOwners } from '../../utils/matchOwners';
 import {
@@ -129,7 +128,7 @@ export class PVMBuilder {
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          new TransferInput(utxo.output.amt, new Input(inputSigIndicies)),
+          TransferInput.fromNative(utxo.output.amount(), inputSigIndicies),
         ),
       );
       importedAmount += utxo.output.amount();
@@ -246,12 +245,8 @@ export class PVMBuilder {
       options.changeAddresses.map((addr) => Address.fromString(addr)),
     );
 
-    const unlockedUTXOs = utxos.filter(
-      (utxo) => utxo.output instanceof TransferOutput,
-    );
-    const lockedUTXOs = utxos.filter(
-      (utxo) => utxo.output instanceof StakableLockOut,
-    );
+    const unlockedUTXOs = utxos.filter((utxo) => isTransferOut(utxo.output));
+    const lockedUTXOs = utxos.filter((utxo) => isStakeableLockOut(utxo.output));
 
     lockedUTXOs.forEach((utxo) => {
       const assetId = utxo.assetId.value();
@@ -288,7 +283,7 @@ export class PVMBuilder {
           utxo.assetId,
           new StakableLockIn(
             lockedOutput.lockTime,
-            new TransferInput(out.amt, new Input(inputSigIndicies)),
+            TransferInput.fromNative(out.amount(), inputSigIndicies),
           ),
         ),
       );
@@ -346,7 +341,7 @@ export class PVMBuilder {
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          new TransferInput(utxoTransferout.amt, new Input(inputSigIndicies)),
+          TransferInput.fromNative(utxoTransferout.amount(), inputSigIndicies),
         ),
       );
 

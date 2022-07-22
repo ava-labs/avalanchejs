@@ -22,6 +22,14 @@ export class TransferInput implements Amounter {
     const [amt, input, remaining] = unpack(bytes, [BigIntPr, Input]);
     return [new TransferInput(amt, input), remaining];
   }
+
+  static fromNative(amount: bigint, sigIndicies: number[]) {
+    return new TransferInput(
+      new BigIntPr(amount),
+      Input.fromNative(sigIndicies),
+    );
+  }
+
   amount() {
     return this.amt.value();
   }

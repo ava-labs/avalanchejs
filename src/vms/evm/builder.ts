@@ -5,7 +5,6 @@ import type { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx, ImportTx, Input, Output } from '../../serializable/evm';
 import { Address, Id } from '../../serializable/fxs/common';
 import {
-  Input as SepkInput,
   OutputOwners,
   TransferInput,
   TransferOutput,
@@ -151,14 +150,10 @@ export class CorethBuilder {
 
       if (!inputSigIndicies) return;
 
-      const input = new TransferInput(
-        new BigIntPr(amount),
-        new SepkInput(inputSigIndicies),
-      );
       const xferin: TransferableInput = new TransferableInput(
         atomic.utxoId,
         atomic.assetId,
-        input,
+        TransferInput.fromNative(amount, inputSigIndicies),
       );
 
       ins.push(xferin);

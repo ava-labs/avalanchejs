@@ -2,7 +2,6 @@ import { TransferableInput, TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
 import { Address } from '../../serializable/fxs/common';
 import {
-  Input,
   OutputOwners,
   TransferInput,
   TransferOutput,
@@ -57,7 +56,7 @@ export const utxoSpend = (
       new TransferableInput(
         utxo.utxoId,
         utxo.assetId,
-        new TransferInput(utxoTransferout.amt, new Input(inputSigIndicies)),
+        TransferInput.fromNative(utxoTransferout.amount(), inputSigIndicies),
       ),
     );
 

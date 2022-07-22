@@ -43,6 +43,22 @@ export class BaseTx {
     ];
   }
 
+  static fromNative(
+    networkId: number,
+    blockchainId: string,
+    outputs: TransferableOutput[],
+    inputs: TransferableInput[],
+    memo: Uint8Array,
+  ) {
+    return new BaseTx(
+      new Int(networkId),
+      Id.fromString(blockchainId),
+      outputs,
+      inputs,
+      new Bytes(memo),
+    );
+  }
+
   toBytes(codec) {
     return concatBytes(
       pack([this.NetworkId, this.BlockchainId], codec),

@@ -1,10 +1,11 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx, TransferableInput } from '../avax';
-import { Id } from '../fxs/common';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx, TransferableInput } from '../avax';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { Id } from '../fxs/common';
+import { AVMTx } from './abstractTx';
 
 export const importTx_symbol = Symbol('avm.ImportTx');
 
@@ -12,14 +13,16 @@ export const importTx_symbol = Symbol('avm.ImportTx');
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-importtx
  */
 @serializable()
-export class ImportTx {
+export class ImportTx extends AVMTx {
   _type = importTx_symbol;
 
   constructor(
-    private readonly baseTx: BaseTx,
+    readonly baseTx: BaseTx,
     private readonly sourceChain: Id,
     private readonly ins: TransferableInput[],
-  ) {}
+  ) {
+    super();
+  }
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {
     const [baseTx, sourceChain, ins, remaining] = unpack(
