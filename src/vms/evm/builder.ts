@@ -82,22 +82,22 @@ export class CorethBuilder {
     const evmInputs = evmInputConfigs.map(
       ({ assetId, amount }) =>
         new Input(
-          new Address(fromAddressHex),
+          Address.fromHex(fromAddressHex),
           new BigIntPr(amount),
-          new Id(assetId),
+          Id.fromString(assetId),
           new BigIntPr(nonce),
         ),
     );
 
     const transferableOutputs = [
       new TransferableOutput(
-        new Id(assetId),
+        Id.fromString(assetId),
         new TransferOutput(
           new BigIntPr(amount),
           new OutputOwners(
             new BigIntPr(locktime),
             new Int(threshold),
-            toAddresses.map((addr) => new Address(addr)),
+            toAddresses.map((addr) => Address.fromString(addr)),
           ),
         ),
       ),
@@ -105,16 +105,14 @@ export class CorethBuilder {
     evmInputs.sort(Input.compare);
     return new ExportTx(
       new Int(this.context.networkID),
-      new Id(this.context.cBlockchainID),
-      new Id(destinationChain),
+      Id.fromString(this.context.cBlockchainID),
+      Id.fromString(destinationChain),
       evmInputs,
       transferableOutputs,
     );
   }
 
   newImportTx(
-    networkID: number,
-    blockchainID: Buffer,
     toAddress: string,
     fromAddresses: string[],
     atomics: Utxo[],
@@ -175,9 +173,9 @@ export class CorethBuilder {
       // Create single EVMOutput for each assetID
       outs.push(
         new Output(
-          new Address(toAddress),
+          Address.fromString(toAddress),
           new BigIntPr(amount),
-          new Id(assetID),
+          Id.fromString(assetID),
         ),
       );
     }
@@ -188,8 +186,8 @@ export class CorethBuilder {
 
     const importTx = new ImportTx(
       new Int(this.context.networkID),
-      new Id(this.context.cBlockchainID),
-      sourceChain ? new Id(sourceChain) : emptyId,
+      Id.fromString(this.context.cBlockchainID),
+      sourceChain ? Id.fromString(sourceChain) : emptyId,
       ins,
       outs,
     );

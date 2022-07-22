@@ -1,3 +1,3 @@
 export abstract class Primitives {
-  abstract toJSON(): string;
+  abstract toJSON(): any;
 }

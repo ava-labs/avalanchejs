@@ -4,6 +4,8 @@ import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
+import { Input, TransferInput } from '../fxs/secp256k1';
+import { BigIntPr, Int } from '../primitives';
 import { UTXOID } from './utxoId';
 
 const _symbol = Symbol('avax.TransferableInput');
@@ -32,6 +34,27 @@ export class TransferableInput {
     const [input, rest] = codec.UnpackPrefix<Amounter>(remaining);
 
     return [new TransferableInput(utxoID, assetId, input), rest];
+  }
+
+  static fromNative(
+    utxoId: string,
+    outputIdx: number,
+    assetId: string,
+    amount: bigint,
+    sigIndices: number[],
+  ) {
+    return new TransferableInput(
+      UTXOID.fromNative(utxoId, outputIdx),
+      Id.fromString(assetId),
+      new TransferInput(
+        new BigIntPr(amount),
+        new Input(sigIndices.map((num) => new Int(num))),
+      ),
+    );
+  }
+
+  static compare(input1: TransferableInput, input2: TransferableInput): number {
+    return UTXOID.compare(input1.utxoID, input2.utxoID);
   }
 
   amount() {

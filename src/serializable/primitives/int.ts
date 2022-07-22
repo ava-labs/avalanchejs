@@ -21,7 +21,7 @@ export class Int extends Primitives {
   }
 
   toJSON() {
-    return this.int.toString();
+    return this.int;
   }
 
   toBytes() {
