@@ -1,5 +1,5 @@
 import { concatBytes } from '@noble/hashes/utils';
-import { addressesFromBytes } from '../../../utils';
+import { addressesFromBytes } from '../../../utils/address';
 import { packList, toListStruct } from '../../../utils/serializeList';
 import { pack, unpack } from '../../../utils/struct';
 import { serializable } from '../../common/types';
