@@ -26,6 +26,10 @@ export class Input {
     return [new Input(sigIndices), remaining];
   }
 
+  values() {
+    return this.sigIndices.map((i) => i.value());
+  }
+
   toBytes(codec) {
     return packList(this.sigIndices, codec);
   }

@@ -1,13 +1,6 @@
-import { Transaction } from '../../vms/common/transaction';
-import type { BaseTx } from '../avax';
+import { AvaxTx } from '../avax/avaxTx';
 import { AVM } from '../constants';
 
-export abstract class AVMTx extends Transaction {
-  abstract baseTx: BaseTx;
-
+export abstract class AVMTx extends AvaxTx {
   vm = AVM;
-
-  getBlockchainId() {
-    return this.baseTx.BlockchainId.toString();
-  }
 }

@@ -1,6 +1,6 @@
 import { customInspectSymbol } from '../../../constants/node';
 import { formatBech32, parse } from '../../../utils/address';
-import { hexToBuffer, padLeft } from '../../../utils/buffer';
+import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
 
@@ -32,6 +32,10 @@ export class Address extends Primitives {
 
   static fromHex(hex: string): Address {
     return new Address(hexToBuffer(hex));
+  }
+
+  toHex(): string {
+    return bufferToHex(this.address);
   }
 
   toBytes() {

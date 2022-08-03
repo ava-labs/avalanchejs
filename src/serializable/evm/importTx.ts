@@ -27,6 +27,10 @@ export class ImportTx extends EVMTx {
     super();
   }
 
+  getSigIndices() {
+    return this.importedInputs.map((inp) => inp.sigIndicies());
+  }
+
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {
     const [networkId, blockchainId, sourceChain, importedInputs, Outs, rest] =
       unpack(

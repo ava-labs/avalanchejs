@@ -6,14 +6,14 @@ import {
 } from '../serializable/avax';
 import { TransferableOp } from '../serializable/avax/transferableOp';
 import { Utxo } from '../serializable/avax/utxo';
-import { Byte, Int } from '../serializable/primitives';
-import { concatBytes } from '../utils/buffer';
 import { CreateAssetTx } from '../serializable/avm/createAssetTx';
 import { ExportTx } from '../serializable/avm/exportTx';
 import { ImportTx } from '../serializable/avm/importTx';
 import { InitialState } from '../serializable/avm/initialState';
 import { OperationTx } from '../serializable/avm/operationTx';
 import { SignedTx } from '../serializable/avm/signedTx';
+import { Byte, Int, Short } from '../serializable/primitives';
+import { concatBytes } from '../utils/buffer';
 import { id, idBytes } from './common';
 import { mintOperation, mintOperationBytes } from './nft';
 import {
@@ -145,6 +145,7 @@ export const signedTx = () =>
 
 export const signedTxBytes = () =>
   concatBytes(
+    new Short(0).toBytes(),
     bytesForInt(4),
     exportTxBytes(),
     bytesForInt(2),

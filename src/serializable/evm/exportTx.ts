@@ -26,6 +26,9 @@ export class ExportTx extends EVMTx {
   ) {
     super();
   }
+  getSigIndices() {
+    return [[0]];
+  }
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ExportTx, Uint8Array] {
     const [networkId, blockchainId, sourceChain, ins, exportedOutputs, rest] =

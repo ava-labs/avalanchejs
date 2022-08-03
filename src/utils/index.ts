@@ -7,3 +7,4 @@ export * from './secp256k1';
 export * from './strip0x';
 export * from './typeGuards';
 export * from './UTXOSet';
+export * from './addChecksum';

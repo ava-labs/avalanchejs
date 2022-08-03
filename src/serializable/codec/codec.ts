@@ -27,6 +27,8 @@ export class Codec {
   PackPrefix = (type: Serializable) => {
     const id = this.typeToTypeID.get(type._type);
     if (id === undefined) {
+      console.log('type._type=', type._type);
+
       throw new Error("can't marshal unregistered type");
     }
 
@@ -45,6 +47,7 @@ export class Codec {
     }
 
     const [entity, rest] = type.fromBytes(buf, this);
+
     return [entity as T, rest];
   };
 

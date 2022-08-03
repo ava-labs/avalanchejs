@@ -1,11 +1,14 @@
-import { concatBytes } from '../../utils/buffer';
+import { concatBytes } from '@noble/hashes/utils';
+import { DEFAULT_CODEC_VERSION } from '../../constants/codec';
+import { getDefaultCodecFromTx } from '../../utils/packTx';
 import { toListStruct } from '../../utils/serializeList';
 import { unpack } from '../../utils/struct';
+import type { Transaction } from '../../vms/common/transaction';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
 import type { Credential } from '../fxs/secp256k1';
-
+import { Short } from '../primitives';
 const _symbol = Symbol('avm.SignedTx');
 
 /**
@@ -16,7 +19,7 @@ export class SignedTx {
   _type = _symbol;
 
   constructor(
-    public readonly unsignedTx: Serializable,
+    public readonly unsignedTx: Transaction,
     public readonly credentials: Serializable[],
   ) {}
 
@@ -26,7 +29,7 @@ export class SignedTx {
       [Codec, toListStruct(Codec)],
       codec,
     );
-    return [new SignedTx(unsignedTx, outs), remaining];
+    return [new SignedTx(unsignedTx as Transaction, outs), remaining];
   }
 
   getCredentials(): Credential[] {
@@ -37,8 +40,10 @@ export class SignedTx {
     return this.getCredentials().flatMap((cred) => cred.getSignatures());
   }
 
-  toBytes(codec: Codec) {
+  toBytes() {
+    const codec = getDefaultCodecFromTx(this.unsignedTx);
     return concatBytes(
+      new Short(DEFAULT_CODEC_VERSION).toBytes(),
       codec.PackPrefix(this.unsignedTx),
       codec.PackPrefixList(this.credentials),
     );

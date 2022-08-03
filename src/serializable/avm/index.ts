@@ -5,6 +5,7 @@ import { InitialState } from './initialState';
 import { OperationTx } from './operationTx';
 import { SignedTx } from './signedTx';
 export * from './typeGuards';
+export { getAVMManager } from './codec';
 export {
   CreateAssetTx,
   ExportTx,

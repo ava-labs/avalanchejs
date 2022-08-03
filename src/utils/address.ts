@@ -1,4 +1,5 @@
 import { bech32 } from '@scure/base';
+import { Address } from '../serializable/fxs/common/address';
 
 const addressSep = '-';
 
@@ -36,4 +37,8 @@ export function parseBech32(addrStr: string): [string, Uint8Array] {
 export function formatBech32(hrp: string, payload: Uint8Array) {
   const words = bech32.toWords(payload);
   return bech32.encode(hrp, words);
+}
+
+export function addressesFromBytes(bytes: Uint8Array[]): Address[] {
+  return bytes.map((b) => new Address(b));
 }

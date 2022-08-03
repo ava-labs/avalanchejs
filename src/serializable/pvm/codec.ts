@@ -1,5 +1,5 @@
 import { BaseTx } from '../avax';
-import { ImportTx } from '../avm';
+import { ImportTx } from '../avm/importTx';
 import { Codec, Manager } from '../codec';
 import * as Secp256k1Fx from '../fxs/secp256k1';
 import { AddDelegatorTx } from './addDelegatorTx';

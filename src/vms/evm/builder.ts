@@ -10,9 +10,11 @@ import {
   TransferOutput,
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
-import { hexToBuffer } from '../../utils';
+import { addressesFromBytes, hexToBuffer } from '../../utils';
+import { AddressMap, AddressMaps } from '../../utils/addressMap';
 import { matchOwners } from '../../utils/matchOwners';
 import { compareEVMOutputs, compareTransferableInputs } from '../../utils/sort';
+import { UnsignedTx } from '../common/unsignedTx';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
 
@@ -45,8 +47,8 @@ export class CorethBuilder {
     amount: bigint,
     assetId: string,
     destinationChain: string,
-    fromAddressHex: string,
-    toAddresses: string[],
+    fromAddress: Uint8Array,
+    toAddresses: Uint8Array[],
     options?: Partial<EVMExportOptions>,
   ) {
     const { fee, nonce, threshold, locktime } =
@@ -81,7 +83,7 @@ export class CorethBuilder {
     const evmInputs = evmInputConfigs.map(
       ({ assetId, amount }) =>
         new Input(
-          Address.fromHex(fromAddressHex),
+          new Address(fromAddress),
           new BigIntPr(amount),
           Id.fromString(assetId),
           new BigIntPr(nonce),
@@ -96,34 +98,41 @@ export class CorethBuilder {
           new OutputOwners(
             new BigIntPr(locktime),
             new Int(threshold),
-            toAddresses.map((addr) => Address.fromString(addr)),
+            addressesFromBytes(toAddresses),
           ),
         ),
       ),
     ];
     evmInputs.sort(Input.compare);
-    return new ExportTx(
-      new Int(this.context.networkID),
-      Id.fromString(this.context.cBlockchainID),
-      Id.fromString(destinationChain),
-      evmInputs,
-      transferableOutputs,
+    return new UnsignedTx(
+      new ExportTx(
+        new Int(this.context.networkID),
+        Id.fromString(this.context.cBlockchainID),
+        Id.fromString(destinationChain),
+        evmInputs,
+        transferableOutputs,
+      ),
+      [],
+      new AddressMaps([new AddressMap([[new Address(fromAddress), 0]])]),
     );
   }
 
   newImportTx(
-    toAddress: string,
-    fromAddresses: string[],
+    toAddress: Uint8Array,
+    fromAddressesBytes: Uint8Array[],
     atomics: Utxo[],
     sourceChain?: string,
     fee = 0n,
     feeAssetId?: string,
   ) {
-    const map: Map<string, bigint> = new Map();
+    const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
+    const map: Map<string, bigint> = new Map();
+    const addressMaps = new AddressMaps();
     let ins: TransferableInput[] = [];
     let outs: Output[] = [];
     let feepaid = 0n;
+    const inputUtxos: Utxo[] = [];
 
     // build a set of inputs which covers the fee
     atomics.forEach((atomic) => {
@@ -142,21 +151,18 @@ export class CorethBuilder {
         }
       }
 
-      const inputSigIndicies = matchOwners(
-        output.outputOwners,
-        new Set(fromAddresses),
-        0n,
-      );
+      const sigData = matchOwners(output.outputOwners, fromAddresses, 0n);
 
-      if (!inputSigIndicies) return;
+      if (!sigData) return;
 
       const xferin: TransferableInput = new TransferableInput(
         atomic.utxoId,
         atomic.assetId,
-        TransferInput.fromNative(amount, inputSigIndicies),
+        TransferInput.fromNative(amount, sigData.sigIndicies),
       );
-
+      addressMaps.push(sigData.addressMap);
       ins.push(xferin);
+      inputUtxos.push(atomic);
       const assetFeeAmount = map.get(assetID);
       if (assetFeeAmount) {
         infeeamount += assetFeeAmount;
@@ -168,7 +174,7 @@ export class CorethBuilder {
       // Create single EVMOutput for each assetID
       outs.push(
         new Output(
-          Address.fromString(toAddress),
+          new Address(toAddress),
           new BigIntPr(amount),
           Id.fromString(assetID),
         ),
@@ -186,6 +192,6 @@ export class CorethBuilder {
       ins,
       outs,
     );
-    return importTx;
+    return new UnsignedTx(importTx, inputUtxos, addressMaps);
   }
 }

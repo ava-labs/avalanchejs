@@ -4,8 +4,10 @@
 
 import { AVAX_PUBLIC_URL } from '../../constants/public-urls';
 import { Utxo } from '../../serializable/avax/utxo';
+import type { SignedTx } from '../../serializable/avm';
 import type { Manager } from '../../serializable/codec';
-import { hexToBuffer } from '../../utils/buffer';
+import { addChecksum } from '../../utils';
+import { bufferToHex, hexToBuffer } from '../../utils/buffer';
 import type {
   GetUTXOsApiResp,
   GetUTXOsInput,
@@ -24,7 +26,7 @@ export abstract class ChainApi extends Api {
     super(baseURL, path, base);
   }
 
-  protected async getUTXOs(input: GetUTXOsInput) {
+  async getUTXOs(input: GetUTXOsInput) {
     const resp = await this.callRpc<GetUTXOsApiResp>('getUTXOs', {
       ...input,
       encoding: 'hex',
@@ -42,5 +44,11 @@ export abstract class ChainApi extends Api {
 
   issueTx(issueTxParams: IssueTxParams): Promise<IssueTxResponse> {
     return this.callRpc<IssueTxResponse>('issueTx', issueTxParams);
+  }
+
+  issueSignedTx(tx: SignedTx) {
+    return this.issueTx({
+      tx: bufferToHex(addChecksum(tx.toBytes())),
+    });
   }
 }

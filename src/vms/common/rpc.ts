@@ -47,7 +47,9 @@ export class JrpcProvider {
         ...options?.headers,
       },
     })
-      .then(async (r) => r.json())
+      .then(async (r) => {
+        return r.json();
+      })
       .then((data) => data as JsonRpcSuccessResp<T> | JsonRpcErrorResp);
 
     if (resp.error) throw new Error(resp.error.message);

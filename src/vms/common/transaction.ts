@@ -7,6 +7,8 @@ export abstract class Transaction {
   abstract vm: VM;
   abstract getBlockchainId(): string;
 
+  abstract getSigIndices(): number[][];
+
   getVM() {
     return this.vm;
   }

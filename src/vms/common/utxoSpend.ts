@@ -1,54 +1,63 @@
 import { TransferableInput, TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
-import { Address } from '../../serializable/fxs/common';
+import type { Address } from '../../serializable/fxs/common';
 import {
   OutputOwners,
   TransferInput,
   TransferOutput,
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
+import { addressesFromBytes, isTransferOut } from '../../utils';
+import { AddressMaps } from '../../utils/addressMap';
 import { bigIntMin } from '../../utils/bigintMath';
 import { matchOwners } from '../../utils/matchOwners';
 import {
   compareTransferableInputs,
   compareTransferableOutputs,
 } from '../../utils/sort';
-import { addressesToHexes } from '../utils/addressesToHexes';
 import type { SpendOptionsRequired } from './models';
+
+export interface UtxoSpendReturn {
+  changeOutputs: TransferableOutput[];
+  inputs: TransferableInput[];
+  inputUtxos: Utxo[];
+  addressMaps: AddressMaps;
+}
 
 // UTXO Spend for coreth/AVM UTXOs
 export const utxoSpend = (
   amountsToBurn: Map<string, bigint>,
   utxos: Utxo[],
-  fromAddresses: string[],
+  fromAddresses: Address[],
   options: SpendOptionsRequired,
-) => {
+): UtxoSpendReturn => {
   const inputs: TransferableInput[] = [];
   const changeOutputs: TransferableOutput[] = [];
   const changeOwner = new OutputOwners(
     new BigIntPr(0n),
     new Int(1),
-    options.changeAddresses.map((addr) => Address.fromString(addr)),
+    addressesFromBytes(options.changeAddresses),
   );
-  const fromAddresseshex = addressesToHexes(fromAddresses);
   const inputUtxos: Utxo[] = [];
+  const addressMaps = new AddressMaps();
+
   utxos.forEach((utxo) => {
     const remainingAmountToBurn = amountsToBurn.get(utxo.assetId.toString());
     if (!remainingAmountToBurn) {
       return;
     }
-    if (!(utxo.output instanceof TransferOutput)) {
+    const utxoTransferout = utxo.output;
+    if (!isTransferOut(utxoTransferout)) {
       // We only support burning [secp256k1fx.TransferOutput]s.
       return;
     }
-    const utxoTransferout = utxo.output as TransferOutput;
 
-    const inputSigIndicies = matchOwners(
+    const sigData = matchOwners(
       utxoTransferout.outputOwners,
-      new Set(fromAddresseshex),
+      fromAddresses,
       options.minIssuanceTime,
     );
-    if (!inputSigIndicies) {
+    if (!sigData) {
       return;
     }
 
@@ -56,11 +65,12 @@ export const utxoSpend = (
       new TransferableInput(
         utxo.utxoId,
         utxo.assetId,
-        TransferInput.fromNative(utxoTransferout.amount(), inputSigIndicies),
+        TransferInput.fromNative(utxoTransferout.amount(), sigData.sigIndicies),
       ),
     );
 
     inputUtxos.push(utxo);
+    addressMaps.push(sigData.addressMap);
 
     const amountToBurn = bigIntMin(
       remainingAmountToBurn,
@@ -92,5 +102,5 @@ export const utxoSpend = (
   inputs.sort(compareTransferableInputs);
   changeOutputs.sort(compareTransferableOutputs);
 
-  return { inputs, changeOutputs, inputUtxos };
+  return { inputs, changeOutputs, inputUtxos, addressMaps };
 };

@@ -3,10 +3,9 @@ import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
-import { Address } from '../fxs/common';
 import { Id } from '../fxs/common/id';
 import { OutputOwners, TransferOutput } from '../fxs/secp256k1';
-import { BigIntPr, Int } from '../primitives';
+import { BigIntPr } from '../primitives';
 
 const _symbol = Symbol('avax.TransferableOutput');
 
@@ -25,19 +24,15 @@ export class TransferableOutput {
   static fromNative(
     assetId: string,
     amt: bigint,
-    locktime: bigint,
-    threshold: number,
-    addresses: string[],
+    addresses: Uint8Array[],
+    locktime?: bigint,
+    threshold?: number,
   ) {
     return new TransferableOutput(
       Id.fromString(assetId),
       new TransferOutput(
         new BigIntPr(amt),
-        new OutputOwners(
-          new BigIntPr(locktime),
-          new Int(threshold),
-          addresses.map((addr) => Address.fromString(addr)),
-        ),
+        OutputOwners.fromNative(addresses, locktime, threshold),
       ),
     );
   }

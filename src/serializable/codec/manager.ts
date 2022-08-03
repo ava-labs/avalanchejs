@@ -23,12 +23,12 @@ export class Manager {
     buff: Uint8Array,
     unpacker: T,
   ): FromBytesReturn<T> => {
-    const [codec, rest] = this.unpackCodec(buff);
+    const [codec, rest] = this.getCodecFromBuffer(buff);
     // TODO: try to do this without casting
     return unpacker.fromBytes(rest, codec)[0] as FromBytesReturn<T>;
   };
 
-  private unpackCodec(buff: Uint8Array): [Codec, Uint8Array] {
+  public getCodecFromBuffer(buff: Uint8Array): [Codec, Uint8Array] {
     const [codecId, rest] = unpack(buff, [Short]);
     const codec = this.getCodecForVersion(codecId);
     return [codec, rest];

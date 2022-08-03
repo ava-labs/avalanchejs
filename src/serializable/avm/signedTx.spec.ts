@@ -1,5 +1,16 @@
 import { signedTx, signedTxBytes } from '../../fixtures/avax';
-import { testSerialization } from '../../fixtures/utils/serializable';
+import { getAVMManager } from './codec';
 import { SignedTx } from './signedTx';
 
-testSerialization('SignedTx', SignedTx, signedTx, signedTxBytes);
+describe('SignedTx', () => {
+  it('deserializes correctly', () => {
+    const output = getAVMManager().unpack(signedTxBytes(), SignedTx);
+    expect(JSON.stringify(output)).toBe(JSON.stringify(signedTx()));
+  });
+});
+
+describe('SignedTx', () => {
+  it('serializes correctly', () => {
+    expect(signedTx().toBytes()).toStrictEqual(signedTxBytes());
+  });
+});

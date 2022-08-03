@@ -1,7 +1,7 @@
 import type { SpendOptions, SpendOptionsRequired } from './models';
 
 export const defaultSpendOptions = (
-  fromAddress: string[],
+  fromAddress: Uint8Array[],
   options?: SpendOptions,
 ): SpendOptionsRequired => {
   return {

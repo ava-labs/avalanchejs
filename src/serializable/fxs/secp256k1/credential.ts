@@ -19,6 +19,13 @@ export class Credential {
     return [new Credential(sigs), remaining];
   }
 
+  setSignature(index: number, signature: Uint8Array) {
+    if (index >= this.signatures.length) {
+      throw new Error(`index ${index} is out of bounds for credential`);
+    }
+    this.signatures[index] = new Signature(signature);
+  }
+
   getSignatures() {
     return this.signatures.map((sig) => sig.toString());
   }

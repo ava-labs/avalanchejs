@@ -1,3 +1,4 @@
+import { isTransferInput } from '../../utils';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
@@ -8,7 +9,7 @@ import { Input, TransferInput } from '../fxs/secp256k1';
 import { BigIntPr, Int } from '../primitives';
 import { UTXOID } from './utxoId';
 
-const _symbol = Symbol('avax.TransferableInput');
+const transferableInputType = Symbol('avax.TransferableInput');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
@@ -18,7 +19,7 @@ const _symbol = Symbol('avax.TransferableInput');
  */
 @serializable()
 export class TransferableInput {
-  _type = _symbol;
+  _type = transferableInputType;
 
   constructor(
     public readonly utxoID: UTXOID,
@@ -51,6 +52,14 @@ export class TransferableInput {
         new Input(sigIndices.map((num) => new Int(num))),
       ),
     );
+  }
+
+  sigIndicies() {
+    const input = this.input;
+    if (!isTransferInput(input)) {
+      throw new Error('unknown input');
+    }
+    return input.sigIndicies();
   }
 
   static compare(input1: TransferableInput, input2: TransferableInput): number {

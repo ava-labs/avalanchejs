@@ -7,8 +7,8 @@ import type { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx, ImportTx } from '../../serializable/avm';
 import { Id } from '../../serializable/fxs/common';
 import { TransferInput } from '../../serializable/fxs/secp256k1';
-import { Bytes, Int } from '../../serializable/primitives';
-import { isTransferOut } from '../../utils';
+import { addressesFromBytes, isTransferOut } from '../../utils';
+import { AddressMaps } from '../../utils/addressMap';
 import { matchOwners } from '../../utils/matchOwners';
 import {
   compareTransferableInputs,
@@ -18,6 +18,7 @@ import { transferableAmounts } from '../../utils/transferableAmounts';
 import { defaultSpendOptions } from '../common/defaultSpendOptions';
 import type { SpendOptions } from '../common/models';
 import { UnsignedTx } from '../common/unsignedTx';
+import type { UtxoSpendReturn } from '../common/utxoSpend';
 import { utxoSpend } from '../common/utxoSpend';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
@@ -31,36 +32,41 @@ export class XBuilder {
 
   newImportTx(
     utxos: Utxo[],
-    toAddresses: string[],
-    fromAddresses: string[],
+    toAddresses: Uint8Array[],
+    fromAddressesBytes: Uint8Array[],
     sourceChain: string,
     options?: SpendOptions,
     threshold = 0,
     locktime = 0n,
   ) {
-    const defaultedOptions = defaultSpendOptions(fromAddresses, options);
+    const fromAddresses = addressesFromBytes(fromAddressesBytes);
+    const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
     const importedInputs: TransferableInput[] = [];
     const importedAmounts: Record<string, bigint> = {};
+    const inputUTXOs: Utxo[] = [];
 
+    const addressMaps = new AddressMaps();
     utxos.forEach((utxo) => {
       const out = utxo.output;
       if (!isTransferOut(out)) return;
 
-      const sigIndicies = matchOwners(
+      const sigData = matchOwners(
         out.outputOwners,
-        new Set(fromAddresses),
+        fromAddresses,
         defaultedOptions.minIssuanceTime,
       );
 
-      if (!sigIndicies) return;
+      if (!sigData) return;
 
       importedInputs.push(
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          TransferInput.fromNative(out.amount(), sigIndicies),
+          TransferInput.fromNative(out.amount(), sigData.sigIndicies),
         ),
       );
+      addressMaps.push(sigData.addressMap);
+      inputUTXOs.push(utxo);
       importedAmounts[utxo.getAssetId()] =
         (importedAmounts[utxo.getAssetId()] ?? 0n) + out.amount();
     });
@@ -73,12 +79,11 @@ export class XBuilder {
 
     const importedAvax = importedAmounts[this.context.avaxAssetID];
 
-    let inputOutputs: {
-      changeOutputs: TransferableOutput[];
-      inputs: TransferableInput[];
-    } = {
+    let inputOutputs: UtxoSpendReturn = {
       changeOutputs: [],
       inputs: [],
+      inputUtxos: [],
+      addressMaps: new AddressMaps(),
     };
     const txFee = this.context.baseTxFee;
     const avaxAssetID = this.context.avaxAssetID;
@@ -101,14 +106,17 @@ export class XBuilder {
       delete importedAmounts[avaxAssetID];
     }
 
+    inputUTXOs.push(...inputOutputs.inputUtxos);
+    addressMaps.merge(inputOutputs.addressMaps);
+
     Object.entries(importedAmounts).forEach(([assetID, amount]) => {
       inputOutputs.changeOutputs.push(
         TransferableOutput.fromNative(
           assetID,
           amount,
+          toAddresses,
           locktime,
           threshold,
-          toAddresses,
         ),
       );
     });
@@ -126,6 +134,8 @@ export class XBuilder {
         Id.fromString(sourceChain),
         importedInputs,
       ),
+      inputUTXOs,
+      addressMaps,
     );
   }
 
@@ -140,12 +150,13 @@ export class XBuilder {
    */
   newExportTx(
     destinationChain: string,
-    fromAddresses: string[],
+    fromAddressesBytes: Uint8Array[],
     utxoSet: Utxo[],
     outputs: TransferableOutput[],
     options?: SpendOptions,
   ) {
-    const defaultedOptions = defaultSpendOptions(fromAddresses, options);
+    const fromAddresses = addressesFromBytes(fromAddressesBytes);
+    const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
     const toBurn = new Map<string, bigint>([
       [this.context.avaxAssetID, this.context.baseTxFee],
     ]);
@@ -155,7 +166,7 @@ export class XBuilder {
       toBurn.set(assetId, (toBurn.get(assetId) || 0n) + out.output.amount());
     });
 
-    const { inputs, changeOutputs, inputUtxos } = utxoSpend(
+    const { inputs, changeOutputs, inputUtxos, addressMaps } = utxoSpend(
       toBurn,
       utxoSet,
       fromAddresses,
@@ -169,6 +180,7 @@ export class XBuilder {
       destinationChain,
       defaultedOptions.memo,
       inputUtxos,
+      addressMaps,
     );
   }
 
@@ -183,12 +195,12 @@ export class XBuilder {
     inputs: TransferableInput[],
     memo: Uint8Array,
   ) => {
-    return new BaseTx(
-      new Int(this.context.networkID),
-      Id.fromString(this.context.xBlockchainID),
+    return BaseTx.fromNative(
+      this.context.networkID,
+      this.context.xBlockchainID,
       changeOutputs,
       inputs,
-      new Bytes(memo),
+      memo,
     );
   };
 
@@ -206,7 +218,8 @@ export class XBuilder {
     inputs: TransferableInput[],
     destinationChain: string,
     memo: Uint8Array,
-    inputUtxos?: Utxo[],
+    inputUtxos: Utxo[],
+    sigMappings: AddressMaps,
   ) => {
     outputs.sort(compareTransferableOutputs);
 
@@ -231,6 +244,7 @@ export class XBuilder {
         outputs,
       ),
       inputUtxos,
+      sigMappings,
     );
   };
 }
