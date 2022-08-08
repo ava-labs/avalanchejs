@@ -51,7 +51,7 @@
     "@types/create-hash": "1.2.2",
     "@types/hdkey": "2.0.1",
     "@types/jest": "27.5.0",
-    "@types/node": "16.11.12",
+    "@types/node": "18.6.5",
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "clean-webpack-plugin": "4.0.0",
