@@ -2,7 +2,7 @@
   this class is for shared methods between avm/pvm api's
 */
 
-import { SignedTx } from '../../serializable/avm';
+import { SignedTx } from '../../serializable/avax';
 import { hexToBuffer } from '../../utils';
 import type { GetTxServerResponse } from '../pvm/privateModels';
 import type {

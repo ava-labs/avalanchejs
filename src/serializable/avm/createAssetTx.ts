@@ -1,10 +1,10 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx } from '../avax';
-import { Byte, Stringpr } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx } from '../avax/baseTx';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { Byte, Stringpr } from '../primitives';
 import { InitialState } from './initialState';
 
 export const createAssetTx_symbol = Symbol('avm.CreateAssetTx');

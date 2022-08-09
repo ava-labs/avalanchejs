@@ -11,10 +11,7 @@ import { addressesFromBytes, isTransferOut } from '../../utils';
 import { AddressMaps } from '../../utils/addressMap';
 import { bigIntMin } from '../../utils/bigintMath';
 import { matchOwners } from '../../utils/matchOwners';
-import {
-  compareTransferableInputs,
-  compareTransferableOutputs,
-} from '../../utils/sort';
+import { compareTransferableOutputs } from '../../utils/sort';
 import type { SpendOptionsRequired } from './models';
 
 export interface UtxoSpendReturn {
@@ -99,7 +96,7 @@ export const utxoSpend = (
     }
   });
 
-  inputs.sort(compareTransferableInputs);
+  inputs.sort(TransferableInput.compare);
   changeOutputs.sort(compareTransferableOutputs);
 
   return { inputs, changeOutputs, inputUtxos, addressMaps };

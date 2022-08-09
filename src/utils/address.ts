@@ -19,6 +19,10 @@ export function parse(addrStr: string): [string, string, Uint8Array] {
   return [chainID, hrp, addr];
 }
 
+export function bech32ToBytes(addrStr: string): Uint8Array {
+  return parse(addrStr)[2];
+}
+
 // format takes in a chain ID alias, bech32 HRP, and byte slice to produce a
 // string for an address.
 export function format(chainIDAlias: string, hrp: string, addr: Uint8Array) {

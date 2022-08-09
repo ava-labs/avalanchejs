@@ -1,6 +1,6 @@
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
-import { BaseTx } from '../avax';
+import { BaseTx } from '../avax/baseTx';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';

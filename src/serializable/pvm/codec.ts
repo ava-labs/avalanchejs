@@ -1,5 +1,4 @@
-import { BaseTx } from '../avax';
-import { ImportTx } from '../avm/importTx';
+import { BaseTx } from '../avax/baseTx';
 import { Codec, Manager } from '../codec';
 import * as Secp256k1Fx from '../fxs/secp256k1';
 import { AddDelegatorTx } from './addDelegatorTx';
@@ -9,6 +8,7 @@ import { AdvanceTimeTx } from './advanceTimeTx';
 import { CreateChainTx } from './createChainTx';
 import { CreateSubnetTx } from './createSubnetTx';
 import { ExportTx } from './exportTx';
+import { ImportTx } from './importTx';
 import { RewardValidatorTx } from './rewardValidatorTx';
 import { StakableLockIn } from './stakableLockIn';
 import { StakableLockOut } from './stakableLockOut';

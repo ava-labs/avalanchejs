@@ -1,7 +1,8 @@
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
-import { BaseTx, TransferableInput } from '../avax';
+import { BaseTx } from '../avax/baseTx';
+import { TransferableInput } from '../avax/transferableInput';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common';
@@ -22,6 +23,12 @@ export class ImportTx extends AVMTx {
     private readonly ins: TransferableInput[],
   ) {
     super();
+  }
+
+  getSigIndices() {
+    return this.ins
+      .map((inp) => inp.sigIndicies())
+      .concat(super.getSigIndices());
   }
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {

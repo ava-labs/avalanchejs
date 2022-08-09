@@ -38,7 +38,6 @@ export class JrpcProvider {
       method,
       params: parameters,
     };
-
     const resp = await fetch(this.url, {
       method: 'POST',
       body: JSON.stringify(body),

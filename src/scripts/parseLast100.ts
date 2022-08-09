@@ -1,4 +1,4 @@
-import type { SignedTx } from '../serializable/avm';
+import type { SignedTx } from '../serializable/avax';
 import { AVMApi } from '../vms/avm';
 import { EVMApi } from '../vms/evm';
 import { PVMApi } from '../vms/pvm/api';

@@ -1,5 +1,5 @@
 import { signedTx, signedTxBytes } from '../../fixtures/avax';
-import { getAVMManager } from './codec';
+import { getAVMManager } from '../avm/codec';
 import { SignedTx } from './signedTx';
 
 describe('SignedTx', () => {

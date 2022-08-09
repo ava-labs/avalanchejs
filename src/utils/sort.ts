@@ -1,24 +1,8 @@
-import type {
-  TransferableInput,
-  TransferableOutput,
-} from '../serializable/avax';
+import type { TransferableOutput } from '../serializable/avax';
 import { getAVMManager } from '../serializable/avm/codec';
 import type { Output } from '../serializable/evm';
 import { Id } from '../serializable/fxs/common';
 import { bytesCompare } from './bytesCompare';
-
-export const compareTransferableInputs = (
-  a: TransferableInput,
-  b: TransferableInput,
-) => {
-  const txSortResult = a.utxoID.txID
-    .value()
-    .localeCompare(b.utxoID.txID.value());
-  if (txSortResult !== 0) {
-    return txSortResult;
-  }
-  return a.utxoID.outputIdx.value() - a.utxoID.outputIdx.value();
-};
 
 export const compareTransferableOutputs = (
   output1: TransferableOutput,

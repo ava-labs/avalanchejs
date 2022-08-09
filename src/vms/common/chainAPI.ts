@@ -3,8 +3,8 @@
 */
 
 import { AVAX_PUBLIC_URL } from '../../constants/public-urls';
+import type { SignedTx } from '../../serializable/avax';
 import { Utxo } from '../../serializable/avax/utxo';
-import type { SignedTx } from '../../serializable/avm';
 import type { Manager } from '../../serializable/codec';
 import { addChecksum } from '../../utils';
 import { bufferToHex, hexToBuffer } from '../../utils/buffer';

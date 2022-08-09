@@ -1,36 +1,32 @@
-import { Address } from '../serializable/fxs/common';
-import {
-  bufferToHex,
-  getPublicKey,
-  printDeep,
-  publicKeyBytesToAddress,
-  sign,
-} from '../utils';
+import { bufferToHex, getPublicKey, hexToBuffer, sign } from '../utils';
 import type { UnsignedTx } from '../vms/common/unsignedTx';
 
 export interface Keychain {
-  AddPrivateKey(privateKey: Uint8Array);
-  RemovePrivateKey(privateKey: Uint8Array);
+  addPrivateKey(privateKey: Uint8Array);
+  removePrivateKey(privateKey: Uint8Array);
   addSignatures(unsignedTx: UnsignedTx): Promise<void>;
 }
 
 export class Secp256K1Keychain implements Keychain {
-  addressToPrivateKey = new Map<string, Uint8Array>();
+  publicKeyToPrivateKey = new Map<string, Uint8Array>();
   constructor(private keys: Uint8Array[]) {
-    keys.forEach((key) => this.AddPrivateKey(key));
+    keys.forEach((key) => this.addPrivateKey(key));
   }
 
-  AddPrivateKey(key: Uint8Array) {
-    this.addressToPrivateKey.set(bufferToHex(this.addressFromPK(key)), key);
+  addPrivateKey(key: Uint8Array) {
+    this.publicKeyToPrivateKey.set(
+      bufferToHex(this.publicKeyFromPrivate(key)),
+      key,
+    );
   }
 
-  private addressFromPK(key) {
-    return publicKeyBytesToAddress(getPublicKey(key));
+  private publicKeyFromPrivate(key) {
+    return getPublicKey(key);
   }
 
-  RemovePrivateKey(privateKey: Uint8Array) {
-    this.addressToPrivateKey.delete(
-      bufferToHex(this.addressFromPK(privateKey)),
+  removePrivateKey(privateKey: Uint8Array) {
+    this.publicKeyToPrivateKey.delete(
+      bufferToHex(this.publicKeyFromPrivate(privateKey)),
     );
   }
 
@@ -38,14 +34,12 @@ export class Secp256K1Keychain implements Keychain {
     const unsignedBytes = unsignedTx.toBytes();
     const promises: Promise<void>[] = [];
 
-    this.addressToPrivateKey.forEach((privateKey, addressHex) => {
+    this.publicKeyToPrivateKey.forEach((privateKey, publicKey) => {
       promises.push(
         (async () => {
-          const address = Address.fromHex(addressHex);
-          printDeep(address);
-          if (unsignedTx.hasAddress(address)) {
+          if (unsignedTx.hasPubkey(hexToBuffer(publicKey))) {
             const signature = await sign(unsignedBytes, privateKey);
-            unsignedTx.addSignatureForAddress(signature, address);
+            unsignedTx.addSignature(signature);
           }
         })(),
       );

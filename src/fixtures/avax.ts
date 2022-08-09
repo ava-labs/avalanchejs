@@ -11,7 +11,7 @@ import { ExportTx } from '../serializable/avm/exportTx';
 import { ImportTx } from '../serializable/avm/importTx';
 import { InitialState } from '../serializable/avm/initialState';
 import { OperationTx } from '../serializable/avm/operationTx';
-import { SignedTx } from '../serializable/avm/signedTx';
+import { SignedTx } from '../serializable/avax/signedTx';
 import { Byte, Int, Short } from '../serializable/primitives';
 import { concatBytes } from '../utils/buffer';
 import { id, idBytes } from './common';

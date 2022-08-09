@@ -1,5 +1,5 @@
 import { customInspectSymbol } from '../../../constants/node';
-import { formatBech32, parse } from '../../../utils/address';
+import { bech32ToBytes, formatBech32 } from '../../../utils/address';
 import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
@@ -27,7 +27,7 @@ export class Address extends Primitives {
 
   //decodes from bech32 Addresses
   static fromString(addr: string): Address {
-    return new Address(parse(addr)[2]);
+    return new Address(bech32ToBytes(addr));
   }
 
   static fromHex(hex: string): Address {

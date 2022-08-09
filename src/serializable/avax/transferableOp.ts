@@ -1,11 +1,11 @@
-import { UTXOID } from '.';
+import { concatBytes } from '../../utils/buffer';
+import { packList, toListStruct } from '../../utils/serializeList';
+import { pack, unpack } from '../../utils/struct';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
-import { concatBytes } from '../../utils/buffer';
-import { packList, toListStruct } from '../../utils/serializeList';
-import { pack, unpack } from '../../utils/struct';
+import { UTXOID } from './utxoId';
 
 const _symbol = Symbol('avax.TransferableOp');
 

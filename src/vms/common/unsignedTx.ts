@@ -1,7 +1,7 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { emptySignature } from '../../constants/zeroValue';
+import { SignedTx } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
-import { SignedTx } from '../../serializable/avm';
 import { Address } from '../../serializable/fxs/common';
 import { Credential } from '../../serializable/fxs/secp256k1';
 import {
@@ -27,8 +27,16 @@ export class UnsignedTx {
       .map((indicies) => new Credential(indicies.map(() => emptySignature)));
   }
 
+  getSigIndices() {
+    return this.tx.getSigIndices();
+  }
+
   hasAddress(address: Address) {
     return this.addressMaps.has(address);
+  }
+
+  hasPubkey(pubKey: Uint8Array) {
+    return this.hasAddress(new Address(this.publicKeyBytesToAddress(pubKey)));
   }
 
   getAddresses() {
@@ -72,18 +80,22 @@ export class UnsignedTx {
 
   addSignature(sig: Uint8Array) {
     const unsignedHash = sha256(this.toBytes());
-    const addr = publicKeyBytesToAddress(recoverPublicKey(unsignedHash, sig));
-
-    this.addSignatureForAddress(sig, new Address(addr));
+    const publicKey = recoverPublicKey(unsignedHash, sig);
+    this.addSignatureForPubKey(sig, publicKey);
   }
 
-  addSignatureForAddress(sig: Uint8Array, addr: Address) {
-    const coordinates = this.getSigIndicesForAddress(addr);
+  addSignatureForPubKey(sig: Uint8Array, publicKey: Uint8Array) {
+    const addr = this.publicKeyBytesToAddress(publicKey);
+    const coordinates = this.getSigIndicesForAddress(new Address(addr));
     if (coordinates) {
       coordinates.forEach(([index, subIndex]) => {
         this.addSignatureAt(sig, index, subIndex);
       });
     }
+  }
+
+  publicKeyBytesToAddress(pubKey: Uint8Array) {
+    return publicKeyBytesToAddress(pubKey);
   }
 
   hasAllSignatures() {

@@ -7,11 +7,13 @@ import type { Context } from './model';
 grabs some basic info about an avm chain
 */
 export const getContextFromURI = async (
-  assetID: string,
   baseURL?: string,
+  assetDescription = 'AVAX',
 ): Promise<Context> => {
   const xChainApi = new AVMApi(baseURL);
-  const { assetID: avaxAssetID } = await xChainApi.getAssetDescription(assetID);
+  const { assetID: avaxAssetID } = await xChainApi.getAssetDescription(
+    assetDescription,
+  );
   const info = new Info(baseURL);
   const {
     txFee: baseTxFee,

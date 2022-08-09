@@ -1,5 +1,5 @@
 import { pack, unpack } from '../../utils/struct';
-import { BaseTx } from '../avax';
+import { BaseTx } from '../avax/baseTx';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
 import { OutputOwners } from '../fxs/secp256k1';

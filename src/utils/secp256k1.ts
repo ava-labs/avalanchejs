@@ -1,5 +1,6 @@
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
+import { keccak_256 } from '@noble/hashes/sha3';
 import * as secp from '@noble/secp256k1';
 import { concatBytes } from './buffer';
 
@@ -43,4 +44,12 @@ export function verify(
 
 export function publicKeyBytesToAddress(publicKey: Uint8Array) {
   return ripemd160(sha256(publicKey));
+}
+
+export function publicKeyToEthAddress(key: Uint8Array) {
+  const len = key.length;
+  if (![33, 65].includes(len))
+    throw new Error(`Invalid key with length "${len}"`);
+  const pub = len === 65 ? key : secp.Point.fromHex(key).toRawBytes(false);
+  return keccak_256(pub.slice(1, 65)).slice(12);
 }

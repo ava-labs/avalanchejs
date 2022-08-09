@@ -1,7 +1,8 @@
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
-import { BaseTx, TransferableOutput } from '../avax';
+import { BaseTx } from '../avax/baseTx';
+import { TransferableOutput } from '../avax/transferableOutput';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common';

@@ -11,13 +11,17 @@ export abstract class Api {
   constructor(
     baseURL: string = AVAX_PUBLIC_URL,
     protected path: string,
-    protected base: string,
+    protected base?: string,
   ) {
     this.rpcProvider = new JrpcProvider(baseURL + path);
   }
 
-  protected getMethodName = (methodName: string) =>
-    `${this.base}.${methodName}`;
+  protected getMethodName = (methodName: string) => {
+    if (!this.base) {
+      return methodName;
+    }
+    return `${this.base}.${methodName}`;
+  };
 
   protected callRpc = <T>(
     methodName: string,

@@ -10,10 +10,7 @@ import { TransferInput } from '../../serializable/fxs/secp256k1';
 import { addressesFromBytes, isTransferOut } from '../../utils';
 import { AddressMaps } from '../../utils/addressMap';
 import { matchOwners } from '../../utils/matchOwners';
-import {
-  compareTransferableInputs,
-  compareTransferableOutputs,
-} from '../../utils/sort';
+import { compareTransferableOutputs } from '../../utils/sort';
 import { transferableAmounts } from '../../utils/transferableAmounts';
 import { defaultSpendOptions } from '../common/defaultSpendOptions';
 import type { SpendOptions } from '../common/models';
@@ -27,16 +24,16 @@ export class XBuilder {
   constructor(private readonly context: Context) {}
 
   static async fromURI(baseURL?: string): Promise<XBuilder> {
-    return new XBuilder(await getContextFromURI('AVAX', baseURL));
+    return new XBuilder(await getContextFromURI(baseURL));
   }
 
   newImportTx(
+    sourceChainId: string,
     utxos: Utxo[],
     toAddresses: Uint8Array[],
     fromAddressesBytes: Uint8Array[],
-    sourceChain: string,
     options?: SpendOptions,
-    threshold = 0,
+    threshold = 1,
     locktime = 0n,
   ) {
     const fromAddresses = addressesFromBytes(fromAddressesBytes);
@@ -75,7 +72,7 @@ export class XBuilder {
       throw new Error('no UTXOs available to import');
     }
 
-    importedInputs.sort(compareTransferableInputs);
+    importedInputs.sort(TransferableInput.compare);
 
     const importedAvax = importedAmounts[this.context.avaxAssetID];
 
@@ -126,12 +123,12 @@ export class XBuilder {
       new ImportTx(
         BaseTx.fromNative(
           this.context.networkID,
-          this.context.cBlockchainID,
+          this.context.xBlockchainID,
           inputOutputs.changeOutputs,
           inputOutputs.inputs,
           defaultedOptions.memo,
         ),
-        Id.fromString(sourceChain),
+        Id.fromString(sourceChainId),
         importedInputs,
       ),
       inputUTXOs,

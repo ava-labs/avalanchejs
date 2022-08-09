@@ -1,5 +1,3 @@
-import { base58 } from '@scure/base';
-import { emptyId } from '../../constants/zeroValue';
 import { TransferableInput, TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx, ImportTx, Input, Output } from '../../serializable/evm';
@@ -10,56 +8,91 @@ import {
   TransferOutput,
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
-import { addressesFromBytes, hexToBuffer } from '../../utils';
+import { addressesFromBytes } from '../../utils';
 import { AddressMap, AddressMaps } from '../../utils/addressMap';
+import { costCorethTx } from '../../utils/costs';
 import { matchOwners } from '../../utils/matchOwners';
-import { compareEVMOutputs, compareTransferableInputs } from '../../utils/sort';
+import { compareEVMOutputs } from '../../utils/sort';
+import { EVMUnsignedTx } from '../common/evmUnsignedTx';
 import { UnsignedTx } from '../common/unsignedTx';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
 
 export type EVMExportOptions = {
-  nonce: bigint;
   locktime: bigint;
   threshold: number;
-  fee: bigint;
 };
 
 export class CorethBuilder {
   constructor(private readonly context: Context) {}
   static async fromURI(baseURL?: string): Promise<CorethBuilder> {
-    return new CorethBuilder(await getContextFromURI('AVAX', baseURL));
+    return new CorethBuilder(await getContextFromURI(baseURL));
   }
 
   defaultEVMExportOptions = (
     options?: Partial<EVMExportOptions>,
   ): EVMExportOptions => {
     return {
-      nonce: 0n,
       locktime: 0n,
       threshold: 1,
-      fee: 0n,
       ...options,
     };
   };
 
-  newExportTx(
+  newExportTxFromBaseFee(
+    baseFee: bigint,
     amount: bigint,
-    assetId: string,
     destinationChain: string,
     fromAddress: Uint8Array,
     toAddresses: Uint8Array[],
+    nonce: bigint,
+    assetId?: string,
     options?: Partial<EVMExportOptions>,
   ) {
-    const { fee, nonce, threshold, locktime } =
-      this.defaultEVMExportOptions(options);
+    const dummyTx = this.newExportTx(
+      amount,
+      destinationChain,
+      fromAddress,
+      toAddresses,
+      baseFee,
+      nonce,
+      assetId,
+      options,
+    );
+
+    const importCost = costCorethTx(dummyTx);
+    const fee = baseFee * importCost;
+
+    return this.newExportTx(
+      amount,
+      destinationChain,
+      fromAddress,
+      toAddresses,
+      fee,
+      nonce,
+      assetId,
+      options,
+    );
+  }
+
+  newExportTx(
+    amount: bigint,
+    destinationChain: string,
+    fromAddress: Uint8Array,
+    toAddresses: Uint8Array[],
+    fee: bigint,
+    nonce: bigint,
+    assetId = this.context.avaxAssetID,
+    options?: Partial<EVMExportOptions>,
+  ) {
+    const { threshold, locktime } = this.defaultEVMExportOptions(options);
     const avaxAssetID = this.context.avaxAssetID;
     const evmInputConfigs: {
       amount: bigint;
       assetId: string;
     }[] = [];
 
-    const assetIsAvax = base58.encode(hexToBuffer(avaxAssetID)) === assetId;
+    const assetIsAvax = avaxAssetID === assetId;
 
     if (assetIsAvax) {
       evmInputConfigs.push({
@@ -104,7 +137,7 @@ export class CorethBuilder {
       ),
     ];
     evmInputs.sort(Input.compare);
-    return new UnsignedTx(
+    return new EVMUnsignedTx(
       new ExportTx(
         new Int(this.context.networkID),
         Id.fromString(this.context.cBlockchainID),
@@ -117,14 +150,50 @@ export class CorethBuilder {
     );
   }
 
+  /* 
+  this method will handle making a dummy tx to calculate fees, and then using that to return the
+  correct tx
+
+  basefee is in nAvax
+   */
+  newImportTxFromBaseFee(
+    toAddress: Uint8Array,
+    fromAddressesBytes: Uint8Array[],
+    atomics: Utxo[],
+    sourceChain: string,
+    baseFee = 0n,
+    feeAssetId?: string,
+  ) {
+    const dummyImportTx = this.newImportTx(
+      toAddress,
+      fromAddressesBytes,
+      atomics,
+      sourceChain,
+      baseFee,
+      feeAssetId,
+    );
+
+    const importCost = costCorethTx(dummyImportTx);
+    const fee = baseFee * importCost;
+
+    return this.newImportTx(
+      toAddress,
+      fromAddressesBytes,
+      atomics,
+      sourceChain,
+      fee,
+      feeAssetId,
+    );
+  }
+
   newImportTx(
     toAddress: Uint8Array,
     fromAddressesBytes: Uint8Array[],
     atomics: Utxo[],
-    sourceChain?: string,
+    sourceChain: string,
     fee = 0n,
-    feeAssetId?: string,
-  ) {
+    feeAssetId = this.context.avaxAssetID,
+  ): UnsignedTx {
     const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
     const map: Map<string, bigint> = new Map();
@@ -136,11 +205,10 @@ export class CorethBuilder {
 
     // build a set of inputs which covers the fee
     atomics.forEach((atomic) => {
-      const assetID: string = atomic.ID.toString();
+      const assetID: string = atomic.getAssetId();
       const output = atomic.output as TransferOutput;
       const amount = output.amount();
       let infeeamount = amount;
-
       if (feeAssetId && fee && feepaid < fee && feeAssetId === assetID) {
         feepaid += infeeamount;
         if (feepaid > fee) {
@@ -182,13 +250,13 @@ export class CorethBuilder {
     }
 
     // lexicographically sort array
-    ins = ins.sort(compareTransferableInputs);
+    ins = ins.sort(TransferableInput.compare);
     outs = outs.sort(compareEVMOutputs);
 
     const importTx = new ImportTx(
       new Int(this.context.networkID),
       Id.fromString(this.context.cBlockchainID),
-      sourceChain ? Id.fromString(sourceChain) : emptyId,
+      Id.fromString(sourceChain),
       ins,
       outs,
     );

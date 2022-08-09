@@ -29,10 +29,7 @@ import {
 import { AddressMaps } from '../../utils/addressMap';
 import { bigIntMin } from '../../utils/bigintMath';
 import { matchOwners } from '../../utils/matchOwners';
-import {
-  compareTransferableInputs,
-  compareTransferableOutputs,
-} from '../../utils/sort';
+import { compareTransferableOutputs } from '../../utils/sort';
 import { defaultSpendOptions } from '../common/defaultSpendOptions';
 import type { SpendOptions, SpendOptionsRequired } from '../common/models';
 import { UnsignedTx } from '../common/unsignedTx';
@@ -46,7 +43,7 @@ import type { Context } from '../context/model';
 export class PVMBuilder {
   constructor(private context: Context) {}
   static async fromURI(baseURL?: string): Promise<PVMBuilder> {
-    return new PVMBuilder(await getContextFromURI('AVAX', baseURL));
+    return new PVMBuilder(await getContextFromURI(baseURL));
   }
 
   newCreateSubnetTx(
@@ -85,9 +82,11 @@ export class PVMBuilder {
   newImportTx(
     sourceChainId: string,
     utxos: Utxo[],
-    to: OutputOwners,
+    toAddresses: Uint8Array[],
     fromAddressesBytes: Uint8Array[],
     options?: SpendOptions,
+    threshold = 1,
+    locktime = 0n,
   ) {
     const importedInputs: TransferableInput[] = [];
     const fromAddresses = addressesFromBytes(fromAddressesBytes);
@@ -126,7 +125,7 @@ export class PVMBuilder {
       importedAmount += utxo.output.amount();
     });
 
-    importedInputs.sort(compareTransferableInputs);
+    importedInputs.sort(TransferableInput.compare);
 
     if (!importedInputs.length) {
       throw new Error('no UTXOs available to import');
@@ -150,12 +149,12 @@ export class PVMBuilder {
       changeOutputs = spendRes.changeOutputs;
     } else if (importedAmount > this.context.baseTxFee) {
       changeOutputs.push(
-        new TransferableOutput(
-          Id.fromString(this.context.avaxAssetID),
-          new TransferOutput(
-            new BigIntPr(importedAmount - this.context.baseTxFee),
-            to,
-          ),
+        TransferableOutput.fromNative(
+          this.context.avaxAssetID,
+          importedAmount - this.context.baseTxFee,
+          toAddresses,
+          locktime,
+          threshold,
         ),
       );
     }
@@ -194,7 +193,7 @@ export class PVMBuilder {
     fromAddressesBytes: Uint8Array[],
     utxoSet: Utxo[],
     outputs: TransferableOutput[],
-    options: SpendOptions,
+    options?: SpendOptions,
   ) {
     const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
@@ -417,7 +416,7 @@ export class PVMBuilder {
       }
     });
 
-    inputs.sort(compareTransferableInputs);
+    inputs.sort(TransferableInput.compare);
     changeOutputs.sort(compareTransferableOutputs);
     stakeOutputs.sort(compareTransferableOutputs);
 
