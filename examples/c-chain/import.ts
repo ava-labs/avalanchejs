@@ -1,7 +1,7 @@
 import { AVAX_PUBLIC_URL_FUJI } from '../../src/constants/public-urls';
 import { Address } from '../../src/serializable/fxs/common';
 import { Secp256K1Keychain } from '../../src/signer/keychain';
-import { hexToBuffer } from '../../src/utils';
+import { bech32ToBytes, hexToBuffer } from '../../src/utils';
 import { getContextFromURI } from '../../src/vms/context';
 import { CorethBuilder, EVMApi } from '../../src/vms/evm';
 import { cAddress, cAddressBech32, privateKey } from '../example_accounts';
@@ -15,14 +15,14 @@ const main = async () => {
 
   const { utxos } = await evmapi.getUTXOs({
     sourceChain: 'X',
-    addresses: [cAddress],
+    addresses: [cAddressBech32],
   });
 
   const builder = new CorethBuilder(context);
 
   const newImportTx = builder.newImportTxFromBaseFee(
     hexToBuffer(cAddress),
-    [Address.fromString(cAddressBech32).toBytes()],
+    [bech32ToBytes(cAddressBech32)],
     utxos,
     context.xBlockchainID,
     baseFee / BigInt(1e9),

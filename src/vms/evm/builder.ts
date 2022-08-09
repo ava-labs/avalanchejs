@@ -49,6 +49,39 @@ export class CorethBuilder {
     assetId?: string,
     options?: Partial<EVMExportOptions>,
   ) {
+    const fee = this.estimateExportCost(
+      baseFee,
+      amount,
+      destinationChain,
+      fromAddress,
+      toAddresses,
+      nonce,
+      assetId,
+      options,
+    );
+
+    return this.newExportTx(
+      amount,
+      destinationChain,
+      fromAddress,
+      toAddresses,
+      fee,
+      nonce,
+      assetId,
+      options,
+    );
+  }
+
+  estimateExportCost(
+    baseFee: bigint,
+    amount: bigint,
+    destinationChain: string,
+    fromAddress: Uint8Array,
+    toAddresses: Uint8Array[],
+    nonce: bigint,
+    assetId?: string,
+    options?: Partial<EVMExportOptions>,
+  ) {
     const dummyTx = this.newExportTx(
       amount,
       destinationChain,
@@ -61,18 +94,7 @@ export class CorethBuilder {
     );
 
     const importCost = costCorethTx(dummyTx);
-    const fee = baseFee * importCost;
-
-    return this.newExportTx(
-      amount,
-      destinationChain,
-      fromAddress,
-      toAddresses,
-      fee,
-      nonce,
-      assetId,
-      options,
-    );
+    return baseFee * importCost;
   }
 
   newExportTx(
@@ -164,6 +186,33 @@ export class CorethBuilder {
     baseFee = 0n,
     feeAssetId?: string,
   ) {
+    const fee = this.estimateImportCost(
+      toAddress,
+      fromAddressesBytes,
+      atomics,
+      sourceChain,
+      baseFee,
+      feeAssetId,
+    );
+
+    return this.newImportTx(
+      toAddress,
+      fromAddressesBytes,
+      atomics,
+      sourceChain,
+      fee,
+      feeAssetId,
+    );
+  }
+
+  estimateImportCost(
+    toAddress: Uint8Array,
+    fromAddressesBytes: Uint8Array[],
+    atomics: Utxo[],
+    sourceChain: string,
+    baseFee = 0n,
+    feeAssetId?: string,
+  ) {
     const dummyImportTx = this.newImportTx(
       toAddress,
       fromAddressesBytes,
@@ -174,16 +223,7 @@ export class CorethBuilder {
     );
 
     const importCost = costCorethTx(dummyImportTx);
-    const fee = baseFee * importCost;
-
-    return this.newImportTx(
-      toAddress,
-      fromAddressesBytes,
-      atomics,
-      sourceChain,
-      fee,
-      feeAssetId,
-    );
+    return baseFee * importCost;
   }
 
   newImportTx(
