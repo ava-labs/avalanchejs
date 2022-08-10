@@ -4,6 +4,8 @@ import { bytesForInt } from '../../fixtures/utils/bytesFor';
 import { concatBytes } from '../../utils/buffer';
 import { CreateAssetTx } from '../avm/createAssetTx';
 import { Bytes, Short, Stringpr } from '../primitives';
+import { jest } from '@jest/globals';
+import type { Mock } from 'jest-mock';
 
 // jest.mock('../vms/avm/createAssetTx');
 
@@ -44,7 +46,7 @@ describe('using the codecs', () => {
     CreateAssetTx.fromBytes = jest.fn(() => [
       createAssetTx(),
       new Uint8Array(),
-    ]);
+    ]) as Mock<() => [CreateAssetTx, Uint8Array]>;
 
     const input = concatBytes(new Short(1).toBytes(), createAssetTxBytes());
 
