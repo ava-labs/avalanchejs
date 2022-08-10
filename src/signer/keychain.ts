@@ -35,14 +35,14 @@ export class Secp256K1Keychain implements Keychain {
     const promises: Promise<void>[] = [];
 
     this.publicKeyToPrivateKey.forEach((privateKey, publicKey) => {
-      promises.push(
-        (async () => {
-          if (unsignedTx.hasPubkey(hexToBuffer(publicKey))) {
+      if (unsignedTx.hasPubkey(hexToBuffer(publicKey))) {
+        promises.push(
+          (async () => {
             const signature = await sign(unsignedBytes, privateKey);
             unsignedTx.addSignature(signature);
-          }
-        })(),
-      );
+          })(),
+        );
+      }
     });
 
     await Promise.all(promises);

@@ -12,8 +12,8 @@ export const compareTransferableOutputs = (
   if (assetIdRes !== 0) {
     return assetIdRes;
   }
-  const manager = getAVMManager();
-  return bytesCompare(manager.packCodec(output1), manager.packCodec(output2));
+  const codec = getAVMManager().getDefaultCodec();
+  return bytesCompare(output1.toBytes(codec), output2.toBytes(codec));
 };
 
 export const compareEVMOutputs = (a: Output, b: Output) => {

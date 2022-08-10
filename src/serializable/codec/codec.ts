@@ -27,9 +27,9 @@ export class Codec {
   PackPrefix = (type: Serializable) => {
     const id = this.typeToTypeID.get(type._type);
     if (id === undefined) {
-      console.log('type._type=', type._type);
-
-      throw new Error("can't marshal unregistered type");
+      throw new Error(
+        `can't marshal unregistered type: ${type._type.toString()}`,
+      );
     }
 
     return concatBytes(bytesForInt(id), type.toBytes(this));

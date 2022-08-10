@@ -15,11 +15,14 @@ import {
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Bytes, Int } from '../../serializable/primitives';
 import {
+  AddDelegatorTx,
+  AddValidatorTx,
   CreateSubnetTx,
   ExportTx,
   ImportTx,
   StakableLockIn,
   StakableLockOut,
+  Validator,
 } from '../../serializable/pvm';
 import {
   addressesFromBytes,
@@ -188,6 +191,51 @@ export class PVMBuilder {
     return toBurn;
   };
 
+  newAddValidatorTx(
+    utxos: Utxo[],
+    fromAddressesBytes: Uint8Array[],
+    nodeID: string,
+    start: bigint,
+    end: bigint,
+    weight: bigint,
+    ownerAddress: Uint8Array[],
+    shares: number,
+    options?: SpendOptions,
+  ) {
+    const toStake = new Map<string, bigint>([
+      [this.context.avaxAssetID, weight],
+    ]);
+
+    const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+    const { addressMaps, changeOutputs, inputUTXOs, inputs, stakeOutputs } =
+      this.spend(
+        new Map(),
+        toStake,
+        utxos,
+        addressesFromBytes(fromAddressesBytes),
+        defaultedOptions,
+      );
+
+    const validatorTx = new AddValidatorTx(
+      BaseTx.fromNative(
+        this.context.networkID,
+        this.context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        defaultedOptions.memo,
+      ),
+      Validator.fromNative(nodeID, start, end, weight),
+      stakeOutputs,
+      OutputOwners.fromNative(
+        ownerAddress,
+        defaultedOptions.locktime,
+        defaultedOptions.threshold,
+      ),
+      new Int(shares),
+    );
+    return new UnsignedTx(validatorTx, inputUTXOs, addressMaps);
+  }
+
   newExportTx(
     chainId: string,
     fromAddressesBytes: Uint8Array[],
@@ -224,6 +272,49 @@ export class PVMBuilder {
       inputUTXOs,
       addressMaps,
     );
+  }
+
+  newAddDelegatorTx(
+    utxos: Utxo[],
+    fromAddressesBytes: Uint8Array[],
+    nodeID: string,
+    start: bigint,
+    end: bigint,
+    weight: bigint,
+    ownerAddress: Uint8Array[],
+    options?: SpendOptions,
+  ) {
+    const toStake = new Map<string, bigint>([
+      [this.context.avaxAssetID, weight],
+    ]);
+
+    const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+    const { inputs, addressMaps, changeOutputs, inputUTXOs, stakeOutputs } =
+      this.spend(
+        new Map(),
+        toStake,
+        utxos,
+        addressesFromBytes(fromAddressesBytes),
+        defaultedOptions,
+      );
+
+    const addDelegatorTx = new AddDelegatorTx(
+      BaseTx.fromNative(
+        this.context.networkID,
+        this.context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        defaultedOptions.memo,
+      ),
+      Validator.fromNative(nodeID, start, end, weight),
+      stakeOutputs,
+      OutputOwners.fromNative(
+        ownerAddress,
+        defaultedOptions.locktime,
+        defaultedOptions.threshold,
+      ),
+    );
+    return new UnsignedTx(addDelegatorTx, inputUTXOs, addressMaps);
   }
 
   // TODO: this function is really big refactor this
@@ -308,6 +399,7 @@ export class PVMBuilder {
       );
       amountsToStake.set(assetId, remainingAmountToStake - amountToStake);
       const remainingAmount = out.amount() - amountToStake;
+
       if (remainingAmount > 0n) {
         changeOutputs.push(
           new TransferableOutput(
@@ -377,7 +469,7 @@ export class PVMBuilder {
 
       amountsToStake.set(
         utxo.assetId.value(),
-        amountsToStake.get(utxo.assetId.value()) ?? 0n - amountToStake,
+        (amountsToStake.get(utxo.assetId.value()) ?? 0n) - amountToStake,
       );
 
       if (amountToStake > 0n) {
@@ -389,7 +481,7 @@ export class PVMBuilder {
         );
       }
 
-      const remainingAmount = utxoTransferout.amt.value() - amountToBurn;
+      const remainingAmount = amountAvailableToStake - amountToStake;
       if (remainingAmount > 0) {
         changeOutputs.push(
           new TransferableOutput(
@@ -425,7 +517,7 @@ export class PVMBuilder {
       changeOutputs,
       stakeOutputs,
       inputUTXOs,
-      addressMaps: addressMaps,
+      addressMaps,
     };
   }
 }

@@ -41,6 +41,10 @@ export class Manager {
     return this.codecs[codecId.value()];
   }
 
+  getDefaultCodec() {
+    return this.getCodecForVersion(new Short(DEFAULT_CODEC_VERSION));
+  }
+
   packCodec(
     serializable: Serializable,
     codecVersion = DEFAULT_CODEC_VERSION,
