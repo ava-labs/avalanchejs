@@ -1,6 +1,5 @@
 import { bytesToHex, concatBytes, hexToBytes } from '@noble/hashes/utils';
-import { prepend0x } from './prepend0x';
-import { strip0x } from './strip0x';
+import { add0x, strip0x } from 'micro-eth-signer';
 
 export function bufferToBigInt(buf: Uint8Array) {
   return BigInt(bufferToHex(buf));
@@ -11,7 +10,7 @@ export function bufferToNumber(buf: Uint8Array) {
 }
 
 export function bufferToHex(buf: Uint8Array) {
-  return prepend0x(bytesToHex(buf));
+  return add0x(bytesToHex(buf));
 }
 
 export function hexToBuffer(hex: string) {
@@ -34,4 +33,4 @@ export function padLeft(bytes: Uint8Array, length: number) {
   return out;
 }
 
-export { concatBytes };
+export { concatBytes, strip0x, add0x };
