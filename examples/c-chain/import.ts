@@ -1,5 +1,4 @@
 import { AVAX_PUBLIC_URL_FUJI } from '../../src/constants/public-urls';
-import { Address } from '../../src/serializable/fxs/common';
 import { Secp256K1Keychain } from '../../src/signer/keychain';
 import { bech32ToBytes, hexToBuffer } from '../../src/utils';
 import { getContextFromURI } from '../../src/vms/context';
@@ -31,8 +30,7 @@ const main = async () => {
   const keyChain = new Secp256K1Keychain([pk]);
   await keyChain.addSignatures(newImportTx);
 
-  const resp = await evmapi.issueSignedTx(newImportTx.getSignedTx());
-  console.log('resp=', resp);
+  return evmapi.issueSignedTx(newImportTx.getSignedTx());
 };
 
-main();
+main().then(console.log);

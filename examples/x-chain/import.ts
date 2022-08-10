@@ -26,6 +26,7 @@ export const main = async () => {
   );
   await keyChain.addSignatures(newExportTx);
   printDeep(newExportTx.getSignedTx());
-  const resp = await avmapi.issueSignedTx(newExportTx.getSignedTx());
-  console.log('resp=', resp);
+  return avmapi.issueSignedTx(newExportTx.getSignedTx());
 };
+
+main().then(console.log);

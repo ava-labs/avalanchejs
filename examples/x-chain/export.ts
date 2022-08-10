@@ -31,6 +31,7 @@ const main = async () => {
   );
 
   await keyChain.addSignatures(newExportTx);
-  const resp = await pvmapi.issueSignedTx(newExportTx.getSignedTx());
-  console.log('resp=', resp);
+  return pvmapi.issueSignedTx(newExportTx.getSignedTx());
 };
+
+main().then(console.log);

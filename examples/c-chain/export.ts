@@ -29,6 +29,7 @@ const main = async () => {
   );
 
   await keyChain.addSignatures(tx);
-  const resp = await evmapi.issueSignedTx(tx.getSignedTx());
-  console.log('resp=', resp);
+  return evmapi.issueSignedTx(tx.getSignedTx());
 };
+
+main().then(console.log);

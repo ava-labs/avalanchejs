@@ -24,7 +24,7 @@ export class OutputOwners {
 
   static fromNative(address: Uint8Array[], locktime = 0n, threshold = 1) {
     return new OutputOwners(
-      new BigIntPr(0n),
+      new BigIntPr(locktime),
       new Int(threshold),
       addressesFromBytes(address),
     );
