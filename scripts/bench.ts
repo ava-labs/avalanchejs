@@ -1,28 +1,15 @@
-import pkg from 'benchmark';
-const { Suite } = pkg;
+import { run, mark } from 'micro-bmark';
 
-const contenders = {
-  current: () => {
+run(async () => {
+  await mark('for loop', () => {
     const arr: number[] = [];
     for (let i = 0; i < 10000; i++) {
       arr.push(i);
     }
     return arr;
-  },
-  new: () => {
+  });
+
+  await mark('keys()', () => {
     return new Array(...new Array(10000).keys());
-  },
-};
-
-console.log('Benchmark:');
-const bench = new Suite().on('cycle', (e) => {
-  console.log('  ' + e.target);
-});
-
-Object.keys(contenders).forEach((name) => {
-  bench.add(name + ' '.repeat(28 - name.length), () => {
-    contenders[name]();
   });
 });
-
-bench.run();
