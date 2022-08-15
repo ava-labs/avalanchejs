@@ -16,12 +16,12 @@
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2022",
+    "target": "esnext",
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true,
     "strictNullChecks": true,
     "noImplicitAny": false,
     "strictBindCallApply": false
-  }
+  },
+  "include": ["src", "index.d.ts"]
 }

@@ -5,6 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "private": true,
+  "sideEffects": false,
+  "module": "dist/index.js",
   "scripts": {
     "start": "rollup -c --watch",
     "build": "rollup -c",
@@ -27,9 +29,6 @@
     "micro-eth-signer": "0.5.0"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "22.0.2",
-    "@rollup/plugin-json": "4.1.0",
-    "@rollup/plugin-node-resolve": "13.3.0",
     "@semantic-release/commit-analyzer": "9.0.2",
     "@semantic-release/git": "10.0.1",
     "@semantic-release/github": "8.0.5",
@@ -38,6 +37,7 @@
     "@types/node": "18.7.3",
     "@typescript-eslint/eslint-plugin": "5.33.0",
     "@typescript-eslint/parser": "5.33.0",
+    "esbuild": "0.15.1",
     "eslint": "8.22.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.2.1",
@@ -47,13 +47,14 @@
     "prettier": "2.7.1",
     "rollup": "2.78.0",
     "rollup-plugin-bundle-size": "1.0.3",
-    "rollup-plugin-delete": "2.0.0",
+    "rollup-plugin-dts": "4.2.2",
+    "rollup-plugin-esbuild": "4.9.1",
     "rollup-plugin-filesize": "9.1.2",
     "rollup-plugin-typescript2": "0.32.1",
+    "rollup-plugin-visualizer": "5.7.1",
     "semantic-release": "19.0.3",
     "ts-jest": "28.0.7",
     "ts-node": "10.9.1",
-    "ttypescript": "1.5.13",
     "typescript": "4.7.4"
   },
   "engines": {
