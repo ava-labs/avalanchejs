@@ -3,7 +3,7 @@ import { getEVMManager } from '../../serializable/evm/codec';
 import { hexToBuffer } from '../../utils';
 import { Api } from '../common/baseApi';
 import { ChainApi } from '../common/chainAPI';
-import type { GetAtomicTxParams } from './model';
+import type { GetAtomicTxParams, GetAtomicTxStatusResponse } from './model';
 import type { GetAtomicTxServerResponse } from './privateModels';
 
 export class EVMApi extends ChainApi {
@@ -23,6 +23,12 @@ export class EVMApi extends ChainApi {
 
   getBaseFee() {
     return this.ethAPI.getBaseFee();
+  }
+
+  getAtomicTxStatus(txID: string): Promise<GetAtomicTxStatusResponse> {
+    return this.callRpc<GetAtomicTxStatusResponse>('getAtomicTxStatus', {
+      txID,
+    });
   }
 }
 

@@ -61,5 +61,19 @@
       "}"
     ],
     "description": "new rpc"
+  },
+  "newResponse": {
+    "scope": "typescript",
+    "prefix": "nresp",
+    "body": [
+      "export interface  ${1/(.*)/${1:/pascalcase}/}Params {",
+      "$2",
+      "}",
+      "",
+      "export interface  ${1/(.*)/${1:/pascalcase}/}Response {",
+      "  $3",
+      "}"
+    ],
+    "description": "new rpc response"
   }
 }

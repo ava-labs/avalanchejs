@@ -112,6 +112,14 @@ export interface SampleValidatorsParams {
   subnetID?: string;
 }
 
+export interface SampleValidatorsResponse {
+  validators: string[];
+}
+
+export interface GetBalanceParams {
+  address: string;
+}
+
 export interface GetBalanceResponse {
   balance: bigint;
   unlocked: bigint;
@@ -165,4 +173,76 @@ export interface GetTxStatusResponse {
 
 export interface GetCurrentSupplyResponse {
   supply: bigint;
+}
+
+export interface GetBalanceResponse {
+  balance: bigint;
+  unlocked: bigint;
+  lockedStakeable: bigint;
+  lockedNotStakeable: bigint;
+  utxoIDs: {
+    txID: string;
+    outputIndex: number;
+  }[];
+}
+
+export interface GetBlockchainsResponse {
+  blockchains: {
+    id: string;
+    name: string;
+    subnetID: string;
+    vmID: string;
+  }[];
+}
+
+export interface GetBlockchainStatusResponse {
+  status: string;
+}
+
+export interface GetHeightResponse {
+  height: number;
+}
+
+export interface GetStakingAssetIDParams {
+  subnetID: string;
+}
+
+export interface GetStakingAssetIDResponse {
+  assetID: string;
+}
+
+export interface GetSubnetsParams {
+  ids: string[];
+}
+
+export interface GetSubnetsResponse {
+  subnets: {
+    id: string;
+    controlKeys: string[];
+    threshold: string;
+  }[];
+}
+
+export interface GetTimestampResponse {
+  time: string;
+}
+
+export interface GetTotalStakeResponse {
+  weight: string;
+}
+
+export interface ValidatedByParams {
+  blockchainID: string;
+}
+
+export interface ValidatedByResponse {
+  subnetID: string;
+}
+
+export interface ValidatesParams {
+  subnetID: string;
+}
+
+export interface ValidatesResponse {
+  blockchainIDs: string[];
 }
