@@ -29,7 +29,7 @@ export class CorethBuilder {
     return new CorethBuilder(await getContextFromURI(baseURL));
   }
 
-  defaultEVMExportOptions = (
+  private defaultEVMExportOptions = (
     options?: Partial<EVMExportOptions>,
   ): EVMExportOptions => {
     return {
@@ -39,6 +39,18 @@ export class CorethBuilder {
     };
   };
 
+  /**
+   * similar to new exportTX, except it estimates the price from base fee automatically
+   * @param baseFee dynamic fee fetched from evmapi
+   * @param amount amount to export
+   * @param destinationChain chainID of the destination chain
+   * @param fromAddress address that can sign this tx
+   * @param toAddresses address on the destination chain
+   * @param nonce the number of tx's on the sender's evm address. need to get from EVM directly using a lib like ethers.
+   * @param assetId the assetId to export
+   * @param options for additional properties of the resulting utxo
+   * @returns UnsignedTx
+   */
   newExportTxFromBaseFee(
     baseFee: bigint,
     amount: bigint,
@@ -72,6 +84,20 @@ export class CorethBuilder {
     );
   }
 
+  /**
+   *
+   * estimate the export cost by forming a dummy tx and returning the fee based on the length of the tx
+   * @param baseFee dynamic fee fetched from EVMAPI
+   * @param amount amount to export in nAVAX
+   * @param destinationChain chainID of the destination chain
+   * @param fromAddress address that can sign this tx
+   * @param toAddresses address on the destination chain
+   * @param nonce the number of tx's on the sender's evm address. need to get from EVM directly using a lib like ethers.
+   * @param assetId the assetId to export
+   * @param options for additional properties of the resulting utxo
+   * @returns BigInt
+   */
+
   estimateExportCost(
     baseFee: bigint,
     amount: bigint,
@@ -96,6 +122,19 @@ export class CorethBuilder {
     const importCost = costCorethTx(dummyTx);
     return baseFee * importCost;
   }
+
+  /**
+   * returns an export tx
+   * @param amount amount to export
+   * @param destinationChain chainID of the destination chain
+   * @param fromAddress address that can sign this tx
+   * @param toAddresses address on the destination chain
+   * @param fee dynamic fee fetched from evmapi
+   * @param nonce the number of tx's on the sender's evm address. need to get from EVM directly using a lib like ethers.
+   * @param assetId the assetId to export
+   * @param options for additional properties of the resulting utxo
+   * @returns UnsignedTx
+   */
 
   newExportTx(
     amount: bigint,
@@ -172,9 +211,16 @@ export class CorethBuilder {
     );
   }
 
-  /* 
+  /**
   this method will handle making a dummy tx to calculate fees, and then using that to return the
   correct tx
+  * @param toAddresses address on C-chain
+  * @param fromAddress address that can sign this tx
+  * @param sourceChain chainID of the source chain
+   * @param baseFee dynamic fee fetched from evmapi
+   * @param feeAssetId the assetId that the fee is measured in. defaults to AVAX
+   * @returns UnsignedTx
+
 
   basefee is in nAvax
    */
@@ -205,6 +251,17 @@ export class CorethBuilder {
     );
   }
 
+  /**
+   * calculates the fee by forming a dummy tx and calculating based on the length of the tx
+   * @param toAddress address to import the utxos
+   * @param fromAddressesBytes addresses that are able to sign utxos
+   * @param atomics list of available utxos
+   * @param sourceChain base58 id of the chain to import from
+   * @param baseFee baseFee from EVMAPI.getBaseFee
+   * @param feeAssetId base58 ID of the asset to use for fee
+   * @returns BigInt
+   */
+
   estimateImportCost(
     toAddress: Uint8Array,
     fromAddressesBytes: Uint8Array[],
@@ -226,6 +283,16 @@ export class CorethBuilder {
     return baseFee * importCost;
   }
 
+  /**
+   *
+   * @param toAddress address to import the utxos
+   * @param fromAddressesBytes addresses that are able to sign utxos
+   * @param atomics list of available utxos
+   * @param sourceChain base58 id of the chain to import from
+   * @param fee fee to subtract. If unsure, use newImportTxFromBaseFee
+   * @param feeAssetId base58 ID of the asset to use for fee
+   * @returns UnsignedTx
+   */
   newImportTx(
     toAddress: Uint8Array,
     fromAddressesBytes: Uint8Array[],

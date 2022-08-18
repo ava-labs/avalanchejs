@@ -1,5 +1,4 @@
 import { PlatformChainID } from '../../constants/networkIDs';
-import { zeroOutputOwners } from '../../constants/zeroValue';
 import {
   BaseTx,
   TransferableInput,
@@ -17,7 +16,6 @@ import { BigIntPr, Bytes, Int } from '../../serializable/primitives';
 import {
   AddDelegatorTx,
   AddValidatorTx,
-  CreateSubnetTx,
   ExportTx,
   ImportTx,
   StakableLockIn,
@@ -49,39 +47,17 @@ export class PVMBuilder {
     return new PVMBuilder(await getContextFromURI(baseURL));
   }
 
-  newCreateSubnetTx(
-    fromAddressesBytes: Uint8Array[],
-    utxoSet: Utxo[],
-    outputs: TransferableOutput[],
-    options: SpendOptions,
-  ) {
-    const fromAddresses = addressesFromBytes(fromAddressesBytes);
+  /** 
+    @param sourceChainID - base58 of the sourceChain. can pass in from context
+    @param utxos - list of utxos
+    @param toAddress - list of addresses to import into
+    @param fromAddressesBytes - used for utxo selection. provide all addresses that can sign Tx
+    @param options - see SpendOptions
+    @param threshold - the threshold to write on the utxo
+    @param locktime - the locktime to write onto the utxo
 
-    const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-    const toBurn = this.getToBurn(outputs, this.context.createSubnetTxFee);
-
-    const { inputs, changeOutputs } = this.spend(
-      toBurn,
-      new Map(),
-      utxoSet,
-      fromAddresses,
-      defaultedOptions,
-    );
-
-    const resultOutputs = outputs.concat(changeOutputs);
-    resultOutputs.sort(compareTransferableOutputs);
-    return new CreateSubnetTx(
-      new BaseTx(
-        new Int(this.context.networkID),
-        PlatformChainID,
-        resultOutputs,
-        inputs,
-        new Bytes(defaultedOptions.memo),
-      ),
-      zeroOutputOwners,
-    );
-  }
-
+    @returns a unsignedTx
+  */
   newImportTx(
     sourceChainId: string,
     utxos: Utxo[],
@@ -179,7 +155,7 @@ export class PVMBuilder {
     );
   }
 
-  getToBurn = (outputs: TransferableOutput[], baseFee: bigint) => {
+  private getToBurn = (outputs: TransferableOutput[], baseFee: bigint) => {
     const toBurn = new Map<string, bigint>([
       [this.context.avaxAssetID, baseFee],
     ]);
@@ -191,6 +167,23 @@ export class PVMBuilder {
     return toBurn;
   };
 
+  /**
+   * Helper function which creates an unsigned [[AddValidatorTx]]. For more granular control, you may create your own
+   * [[UnsignedTx]] manually and import the [[AddValidatorTx]] class directly.
+   *
+   * @param utxos A list of UTXOs that the transaction is built on
+   * @param fromAddresses An array of addresses as uint8Array who own the staking UTXOs the fees in AVAX
+   * @param nodeID The node ID of the validator being added.
+   * @param start The Unix time when the validator starts validating the Primary Network.
+   * @param end The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
+   * @param weight The amount being delegated in nAVAX
+   * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+   * @param shares A number for the percentage times 10,000 of reward to be given to the validator when someone delegates to them.
+   * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
+   * @param locktime Optional. The locktime field created in the resulting reward outputs
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
   newAddValidatorTx(
     utxos: Utxo[],
     fromAddressesBytes: Uint8Array[],
@@ -198,9 +191,11 @@ export class PVMBuilder {
     start: bigint,
     end: bigint,
     weight: bigint,
-    ownerAddress: Uint8Array[],
+    rewardAddresses: Uint8Array[],
     shares: number,
     options?: SpendOptions,
+    threshold = 1,
+    locktime = 0n,
   ) {
     const toStake = new Map<string, bigint>([
       [this.context.avaxAssetID, weight],
@@ -226,15 +221,21 @@ export class PVMBuilder {
       ),
       Validator.fromNative(nodeID, start, end, weight),
       stakeOutputs,
-      OutputOwners.fromNative(
-        ownerAddress,
-        defaultedOptions.locktime,
-        defaultedOptions.threshold,
-      ),
+      OutputOwners.fromNative(rewardAddresses, locktime, threshold),
       new Int(shares),
     );
     return new UnsignedTx(validatorTx, inputUTXOs, addressMaps);
   }
+
+  /**
+   *
+   * @param chainId chain to send the UTXOs to
+   * @param fromAddressesBytes used for filtering utxos.
+   * @param utxoSet list of utxos to choose from
+   * @param outputs list of outputs to create.
+   * @param options used for filtering UTXO's
+   * @returns unsingedTx containing an exportTx
+   */
 
   newExportTx(
     chainId: string,
@@ -274,6 +275,21 @@ export class PVMBuilder {
     );
   }
 
+  /**
+   *
+   * @param utxos list of utxos to choose from
+   * @param fromAddressesBytes used for filtering utxos
+   * @param nodeID id of the node to delegate. starts with "NodeID-"
+   * @param start The Unix time when the validator starts validating the Primary Network.
+   * @param end The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
+   * @param weight The amount being delegated in nAVAX
+   * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+   * @param options - used for filtering utxos
+   * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
+   * @param locktime Optional. The locktime field created in the resulting reward outputs
+   * @returns UnsingedTx
+   */
+
   newAddDelegatorTx(
     utxos: Utxo[],
     fromAddressesBytes: Uint8Array[],
@@ -281,8 +297,10 @@ export class PVMBuilder {
     start: bigint,
     end: bigint,
     weight: bigint,
-    ownerAddress: Uint8Array[],
+    rewardAddresses: Uint8Array[],
     options?: SpendOptions,
+    threshold = 1,
+    locktime = 0n,
   ) {
     const toStake = new Map<string, bigint>([
       [this.context.avaxAssetID, weight],
@@ -308,17 +326,13 @@ export class PVMBuilder {
       ),
       Validator.fromNative(nodeID, start, end, weight),
       stakeOutputs,
-      OutputOwners.fromNative(
-        ownerAddress,
-        defaultedOptions.locktime,
-        defaultedOptions.threshold,
-      ),
+      OutputOwners.fromNative(rewardAddresses, locktime, threshold),
     );
     return new UnsignedTx(addDelegatorTx, inputUTXOs, addressMaps);
   }
 
   // TODO: this function is really big refactor this
-  spend(
+  private spend(
     amountsToBurn: Map<string, bigint>,
     amountsToStake: Map<string, bigint>,
     utxos: Utxo[],

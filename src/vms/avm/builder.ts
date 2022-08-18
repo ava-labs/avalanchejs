@@ -27,6 +27,17 @@ export class XBuilder {
     return new XBuilder(await getContextFromURI(baseURL));
   }
 
+  /**
+   *
+   * @param sourceChainId id of the chain to import from
+   * @param utxos list of utxos
+   * @param toAddresses addresses to import the tx
+   * @param fromAddressesBytes used to filter UTXOs
+   * @param options used to filter UTXOs
+   * @param threshold number of signers to put on the resulting utxo
+   * @param locktime time the resulting utxo unlocks
+   * @returns
+   */
   newImportTx(
     sourceChainId: string,
     utxos: Utxo[],
