@@ -8,8 +8,8 @@ export interface Keychain {
 }
 
 export class Secp256K1Keychain implements Keychain {
-  publicKeyToPrivateKey = new Map<string, Uint8Array>();
-  constructor(private keys: Uint8Array[]) {
+  private publicKeyToPrivateKey = new Map<string, Uint8Array>();
+  constructor(private keys: Uint8Array[] = []) {
     keys.forEach((key) => this.addPrivateKey(key));
   }
 

@@ -19,8 +19,8 @@ export class ImportTx extends AVMTx {
 
   constructor(
     readonly baseTx: BaseTx,
-    private readonly sourceChain: Id,
-    private readonly ins: TransferableInput[],
+    readonly sourceChain: Id,
+    readonly ins: TransferableInput[],
   ) {
     super();
   }

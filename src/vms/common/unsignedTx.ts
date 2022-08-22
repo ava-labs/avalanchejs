@@ -84,7 +84,7 @@ export class UnsignedTx {
     this.addSignatureForPubKey(sig, publicKey);
   }
 
-  addSignatureForPubKey(sig: Uint8Array, publicKey: Uint8Array) {
+  private addSignatureForPubKey(sig: Uint8Array, publicKey: Uint8Array) {
     const addr = this.publicKeyBytesToAddress(publicKey);
     const coordinates = this.getSigIndicesForAddress(new Address(addr));
     if (coordinates) {
@@ -94,7 +94,7 @@ export class UnsignedTx {
     }
   }
 
-  publicKeyBytesToAddress(pubKey: Uint8Array) {
+  protected publicKeyBytesToAddress(pubKey: Uint8Array) {
     return publicKeyBytesToAddress(pubKey);
   }
 

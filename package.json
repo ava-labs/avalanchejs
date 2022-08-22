@@ -17,7 +17,7 @@
     "lint": "eslint --fix -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
     "lint:check": "eslint -c ./.eslintrc.js --ignore-path .gitignore \"./**/*.ts*\"",
     "check": "tsc --noEmit",
-    "tsNode": "ts-node -P ./debugTsConfig.json --esm",
+    "tsNode": "ts-node --experimental-specifier-resolution=node -P ./debugTsConfig.json --esm",
     "bench": "yarn tsNode ./scripts/bench.ts",
     "example": "yarn tsNode ./examples/x-chain/utxos.ts",
     "debug": "yarn tsNode ./src/debug.ts"

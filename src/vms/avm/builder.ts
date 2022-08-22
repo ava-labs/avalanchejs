@@ -6,17 +6,16 @@ import {
 import type { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx, ImportTx } from '../../serializable/avm';
 import { Id } from '../../serializable/fxs/common';
-import { TransferInput } from '../../serializable/fxs/secp256k1';
-import { addressesFromBytes, isTransferOut } from '../../utils';
+import { addressesFromBytes } from '../../utils';
 import { AddressMaps } from '../../utils/addressMap';
-import { matchOwners } from '../../utils/matchOwners';
+import { getImportedInputsFromUtxos } from '../../utils/builderUtils';
 import { compareTransferableOutputs } from '../../utils/sort';
 import { transferableAmounts } from '../../utils/transferableAmounts';
 import { defaultSpendOptions } from '../common/defaultSpendOptions';
 import type { SpendOptions } from '../common/models';
 import { UnsignedTx } from '../common/unsignedTx';
-import type { UtxoSpendReturn } from '../common/utxoSpend';
-import { utxoSpend } from '../common/utxoSpend';
+import type { UtxoSpendReturn } from '../utils/utxoSpend';
+import { utxoSpend } from '../utils/utxoSpend';
 import { getContextFromURI } from '../context/context';
 import type { Context } from '../context/model';
 
@@ -49,35 +48,12 @@ export class XBuilder {
   ) {
     const fromAddresses = addressesFromBytes(fromAddressesBytes);
     const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-    const importedInputs: TransferableInput[] = [];
-    const importedAmounts: Record<string, bigint> = {};
-    const inputUTXOs: Utxo[] = [];
-
-    const addressMaps = new AddressMaps();
-    utxos.forEach((utxo) => {
-      const out = utxo.output;
-      if (!isTransferOut(out)) return;
-
-      const sigData = matchOwners(
-        out.outputOwners,
-        fromAddresses,
+    const { addressMaps, importedAmounts, importedInputs, inputUTXOs } =
+      getImportedInputsFromUtxos(
+        utxos,
+        fromAddressesBytes,
         defaultedOptions.minIssuanceTime,
       );
-
-      if (!sigData) return;
-
-      importedInputs.push(
-        new TransferableInput(
-          utxo.utxoId,
-          utxo.assetId,
-          TransferInput.fromNative(out.amount(), sigData.sigIndicies),
-        ),
-      );
-      addressMaps.push(sigData.addressMap);
-      inputUTXOs.push(utxo);
-      importedAmounts[utxo.getAssetId()] =
-        (importedAmounts[utxo.getAssetId()] ?? 0n) + out.amount();
-    });
 
     if (!importedInputs.length) {
       throw new Error('no UTXOs available to import');
@@ -85,7 +61,7 @@ export class XBuilder {
 
     importedInputs.sort(TransferableInput.compare);
 
-    const importedAvax = importedAmounts[this.context.avaxAssetID];
+    const importedAvax = importedAmounts[this.context.avaxAssetID] ?? 0n;
 
     let inputOutputs: UtxoSpendReturn = {
       changeOutputs: [],

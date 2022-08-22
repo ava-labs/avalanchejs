@@ -1,4 +1,4 @@
-import { isTransferInput } from '../../utils';
+import { isTransferInput, isTransferOut } from '../../utils';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
@@ -7,6 +7,7 @@ import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
 import { Input, TransferInput } from '../fxs/secp256k1';
 import { BigIntPr, Int } from '../primitives';
+import type { Utxo } from './utxo';
 import { UTXOID } from './utxoId';
 
 const transferableInputType = Symbol('avax.TransferableInput');
@@ -51,6 +52,19 @@ export class TransferableInput {
         new BigIntPr(amount),
         new Input(sigIndices.map((num) => new Int(num))),
       ),
+    );
+  }
+
+  static fromUtxoAndSigindicies(utxo: Utxo, sigIndicies: number[]) {
+    const out = utxo.output;
+    if (!isTransferOut(out)) {
+      throw new Error('utxo.output must be Transferout');
+    }
+
+    return new TransferableInput(
+      utxo.utxoId,
+      utxo.assetId,
+      TransferInput.fromNative(out.amount(), sigIndicies),
     );
   }
 

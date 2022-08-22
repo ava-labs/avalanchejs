@@ -29,6 +29,7 @@ import {
 } from '../../utils';
 import { AddressMaps } from '../../utils/addressMap';
 import { bigIntMin } from '../../utils/bigintMath';
+import { getImportedInputsFromUtxos } from '../../utils/builderUtils';
 import { matchOwners } from '../../utils/matchOwners';
 import { compareTransferableOutputs } from '../../utils/sort';
 import { defaultSpendOptions } from '../common/defaultSpendOptions';
@@ -67,42 +68,22 @@ export class PVMBuilder {
     threshold = 1,
     locktime = 0n,
   ) {
-    const importedInputs: TransferableInput[] = [];
     const fromAddresses = addressesFromBytes(fromAddressesBytes);
     const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-    const sigMappings = new AddressMaps();
-    const inputUTXOs: Utxo[] = [];
 
-    let importedAmount = 0n;
-    utxos.forEach((utxo) => {
-      if (utxo.assetId.toString() !== this.context.avaxAssetID) {
-        // Currently - only AVAX is allowed to be imported to the P-chain
-        return;
-      }
-      if (!isTransferOut(utxo.output)) {
-        return;
-      }
+    utxos = utxos.filter(
+      // Currently - only AVAX is allowed to be imported to the P-chain
+      (utxo) => utxo.assetId.toString() === this.context.avaxAssetID,
+    );
 
-      const sigData = matchOwners(
-        utxo.output.outputOwners,
-        fromAddresses,
+    const { addressMaps, importedAmounts, importedInputs, inputUTXOs } =
+      getImportedInputsFromUtxos(
+        utxos,
+        fromAddressesBytes,
         defaultedOptions.minIssuanceTime,
       );
-      if (!sigData) {
-        return;
-      }
-      importedInputs.push(
-        new TransferableInput(
-          utxo.utxoId,
-          utxo.assetId,
-          TransferInput.fromNative(utxo.output.amount(), sigData.sigIndicies),
-        ),
-      );
-      sigMappings.push(sigData.addressMap);
-      inputUTXOs.push(utxo);
 
-      importedAmount += utxo.output.amount();
-    });
+    const importedAvax = importedAmounts[this.context.avaxAssetID] ?? 0n;
 
     importedInputs.sort(TransferableInput.compare);
 
@@ -112,9 +93,9 @@ export class PVMBuilder {
     let inputs: TransferableInput[] = [];
     let changeOutputs: TransferableOutput[] = [];
 
-    if (importedAmount < this.context.baseTxFee) {
+    if (importedAvax < this.context.baseTxFee) {
       const toBurn = new Map<string, bigint>([
-        [this.context.avaxAssetID, this.context.baseTxFee - importedAmount],
+        [this.context.avaxAssetID, this.context.baseTxFee - importedAvax],
       ]);
 
       const spendRes = this.spend(
@@ -126,11 +107,11 @@ export class PVMBuilder {
       );
       inputs = spendRes.inputs;
       changeOutputs = spendRes.changeOutputs;
-    } else if (importedAmount > this.context.baseTxFee) {
+    } else if (importedAvax > this.context.baseTxFee) {
       changeOutputs.push(
         TransferableOutput.fromNative(
           this.context.avaxAssetID,
-          importedAmount - this.context.baseTxFee,
+          importedAvax - this.context.baseTxFee,
           toAddresses,
           locktime,
           threshold,
@@ -151,7 +132,7 @@ export class PVMBuilder {
         importedInputs,
       ),
       inputUTXOs,
-      sigMappings,
+      addressMaps,
     );
   }
 
@@ -229,18 +210,18 @@ export class PVMBuilder {
 
   /**
    *
-   * @param chainId chain to send the UTXOs to
+   * @param destinationChainID chain to send the UTXOs to
    * @param fromAddressesBytes used for filtering utxos.
-   * @param utxoSet list of utxos to choose from
+   * @param utxos list of utxos to choose from
    * @param outputs list of outputs to create.
    * @param options used for filtering UTXO's
    * @returns unsingedTx containing an exportTx
    */
 
   newExportTx(
-    chainId: string,
+    destinationChainID: string,
     fromAddressesBytes: Uint8Array[],
-    utxoSet: Utxo[],
+    utxos: Utxo[],
     outputs: TransferableOutput[],
     options?: SpendOptions,
   ) {
@@ -252,7 +233,7 @@ export class PVMBuilder {
     const { inputs, changeOutputs, addressMaps, inputUTXOs } = this.spend(
       toBurn,
       new Map(),
-      utxoSet,
+      utxos,
       fromAddresses,
       defaultedOptions,
     );
@@ -267,7 +248,7 @@ export class PVMBuilder {
           inputs,
           new Bytes(defaultedOptions.memo),
         ),
-        Id.fromString(chainId),
+        Id.fromString(destinationChainID),
         outputs,
       ),
       inputUTXOs,
@@ -354,8 +335,23 @@ export class PVMBuilder {
       addressesFromBytes(options.changeAddresses),
     );
 
-    const unlockedUTXOs = utxos.filter((utxo) => isTransferOut(utxo.output));
-    const lockedUTXOs = utxos.filter((utxo) => isStakeableLockOut(utxo.output));
+    const unlockedUTXOs = utxos.filter((utxo) => {
+      if (isTransferOut(utxo.output)) {
+        return true;
+      }
+      const out = utxo.output;
+      if (!isStakeableLockOut(out) || !isTransferOut(out.transferOut)) {
+        return false;
+      }
+      return out.getLocktime() < options.minIssuanceTime;
+    });
+    const lockedUTXOs = utxos.filter((utxo) => {
+      const out = utxo.output;
+      if (!isStakeableLockOut(out)) {
+        return false;
+      }
+      return options.minIssuanceTime < out.getLocktime();
+    });
     const inputUTXOs: Utxo[] = [];
     const addressMaps = new AddressMaps();
 
@@ -439,7 +435,11 @@ export class PVMBuilder {
         return;
       }
 
-      const utxoTransferout = utxo.output as TransferOutput;
+      const utxoTransferout = (
+        isTransferOut(utxo.output)
+          ? utxo.output
+          : (utxo.output as StakableLockOut).transferOut
+      ) as TransferOutput;
 
       const sigData = matchOwners(
         utxoTransferout.outputOwners,

@@ -1,1 +1,5 @@
-{ "extends": "./tsconfig.json", "compilerOptions": { "module": "CommonJS" } }
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "module": "ESNext" },
+  "include": ["src/**/*", "index.d.ts, debug.ts"]
+}
