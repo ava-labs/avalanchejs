@@ -65,7 +65,7 @@
     "jest": "26.6.3",
     "jest-mock-axios": "4.5.0",
     "prettier": "2.7.1",
-    "terser-webpack-plugin": "5.3.3",
+    "terser-webpack-plugin": "5.3.5",
     "ts-jest": "26.5.6",
     "ts-loader": "9.3.1",
     "typedoc": "^0.18.0",
@@ -95,7 +95,7 @@
     "store2": "2.13.2",
     "stream-browserify": "3.0.0",
     "ws": "8.8.0",
-    "xss": "1.0.13"
+    "xss": "1.0.14"
   },
   "prettier": {
     "tabWidth": 2,
