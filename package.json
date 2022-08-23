@@ -92,7 +92,7 @@
     "hdkey": "2.0.1",
     "isomorphic-ws": "5.0.0",
     "randombytes": "^2.1.0",
-    "store2": "2.13.2",
+    "store2": "2.14.2",
     "stream-browserify": "3.0.0",
     "ws": "8.8.0",
     "xss": "1.0.14"
