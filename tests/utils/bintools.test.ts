@@ -234,11 +234,22 @@ describe("BinTools", (): void => {
       "95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d01612940bd5"
     const invalidHex1: string =
       "rrrrr.c2b7a6ee7ad7e597c2f5349b03e461c36c2e1e5.fc98a84d016129zzzzz"
-    const invalidHex2: string = ""
+    const invalidHex2: string =
+      "0x95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d016129zzzz"
+    const invalidHex3: string =
+      "95eaac2b7a6ee7ad7e597c2f5349b03e461c36c2e1e50fc98a84d016129zzzz"
+    const invalidHex4: string =
+      "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
+    const invalidHex5: string = ""
+    const invalidHex6: string = "    "
     expect(bintools.isHex(validHex1)).toBe(true)
     expect(bintools.isHex(validHex2)).toBe(true)
     expect(bintools.isHex(invalidHex1)).toBe(false)
     expect(bintools.isHex(invalidHex2)).toBe(false)
+    expect(bintools.isHex(invalidHex3)).toBe(false)
+    expect(bintools.isHex(invalidHex3)).toBe(false)
+    expect(bintools.isHex(invalidHex5)).toBe(false)
+    expect(bintools.isHex(invalidHex6)).toBe(false)
   })
 
   test("stringToAddress", (): void => {
