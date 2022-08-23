@@ -330,7 +330,7 @@ describe("EVMAPI", (): void => {
   test("getBaseFee", async (): Promise<void> => {
     const result: Promise<string> = api.getBaseFee()
     const payload: object = {
-      result: "0x34630b8a00"
+      result: "0x5d21dba00"
     }
     const responseObj: HttpResponse = {
       data: payload
@@ -340,7 +340,7 @@ describe("EVMAPI", (): void => {
     const response: string = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe("0x34630b8a00")
+    expect(response).toBe("0x5d21dba00")
   })
 
   test("getMaxPriorityFeePerGas", async (): Promise<void> => {
