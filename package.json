@@ -65,14 +65,14 @@
     "jest": "26.6.3",
     "jest-mock-axios": "4.5.0",
     "prettier": "2.7.1",
-    "terser-webpack-plugin": "5.3.3",
+    "terser-webpack-plugin": "5.3.5",
     "ts-jest": "26.5.6",
     "ts-loader": "9.3.1",
     "typedoc": "^0.18.0",
     "typedoc-plugin-external-module-name": "^4.0.3",
     "typedoc-plugin-markdown": "^2.4.0",
     "typescript": "4.7.4",
-    "webpack": "5.73.0",
+    "webpack": "5.74.0",
     "webpack-cli": "4.10.0"
   },
   "engines": {
@@ -88,14 +88,14 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.6.9",
+    "ethers": "5.7.0",
     "hdkey": "2.0.1",
     "isomorphic-ws": "5.0.0",
     "randombytes": "^2.1.0",
     "store2": "2.13.2",
     "stream-browserify": "3.0.0",
     "ws": "8.8.0",
-    "xss": "1.0.13"
+    "xss": "1.0.14"
   },
   "prettier": {
     "tabWidth": 2,
