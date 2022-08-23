@@ -23,7 +23,7 @@ jobs:
       - name: Setup GoLang Version
         uses: actions/setup-go@v1
         with:
-          go-version: '1.19.0'
+          go-version: 1.19.x
       - name: Setup GOPATH and AVAPATH
         run : |
           mkdir -p $GOPATH/$AVAPATH
