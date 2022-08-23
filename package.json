@@ -72,7 +72,7 @@
     "typedoc-plugin-external-module-name": "^4.0.3",
     "typedoc-plugin-markdown": "^2.4.0",
     "typescript": "4.7.4",
-    "webpack": "5.73.0",
+    "webpack": "5.74.0",
     "webpack-cli": "4.10.0"
   },
   "engines": {
@@ -88,7 +88,7 @@
     "create-hash": "1.2.0",
     "crypto-browserify": "3.12.0",
     "elliptic": "6.5.4",
-    "ethers": "5.6.9",
+    "ethers": "5.7.0",
     "hdkey": "2.0.1",
     "isomorphic-ws": "5.0.0",
     "randombytes": "^2.1.0",
