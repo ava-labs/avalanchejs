@@ -1,10 +1,10 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { packSwitched, unpack } from '../../utils/struct';
+import { isTransferOut } from '../../utils/typeGuards';
 import { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
-import { isTransferOut } from '../../utils/typeGuards';
 
 export const stakeableLockOut_symbol = Symbol('pvm.StakableLockOut');
 
@@ -32,10 +32,7 @@ export class StakableLockOut implements Amounter {
   }
 
   getLocktime() {
-    if (isTransferOut(this.transferOut)) {
-      return this.transferOut.getLocktime();
-    }
-    throw new Error('Unable to get locktime.');
+    return this.lockTime.value();
   }
 
   static fromBytes(

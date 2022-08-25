@@ -46,7 +46,7 @@ export abstract class ChainApi extends Api {
     return this.callRpc<IssueTxResponse>('issueTx', issueTxParams);
   }
 
-  issueSignedTx(tx: SignedTx) {
+  issueSignedTx(tx: SignedTx): Promise<IssueTxResponse> {
     return this.issueTx({
       tx: bufferToHex(addChecksum(tx.toBytes())),
     });
