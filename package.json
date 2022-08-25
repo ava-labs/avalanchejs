@@ -7,6 +7,7 @@
   "private": true,
   "sideEffects": false,
   "module": "dist/index.js",
+  "type": "module",
   "scripts": {
     "start": "rollup -c --watch",
     "build": "rollup -c",
@@ -17,7 +18,7 @@
     "lint": "eslint --fix  --ignore-path .gitignore \"./**/*.ts*\"",
     "lint:check": "eslint  --ignore-path .gitignore \"./**/*.ts*\"",
     "check": "tsc --noEmit",
-    "tsNode": "ts-node --experimental-specifier-resolution=node -P ./debugTsConfig.json --esm",
+    "tsNode": "ts-node",
     "bench": "yarn tsNode ./scripts/bench.ts",
     "example": "yarn tsNode ./examples/x-chain/utxos.ts",
     "debug": "yarn tsNode ./src/debug.ts"

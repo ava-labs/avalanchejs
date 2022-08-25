@@ -23,5 +23,10 @@
     "noImplicitAny": false,
     "strictBindCallApply": false
   },
-  "include": ["src", "index.d.ts"]
+  "include": ["src", "index.d.ts"],
+  "ts-node": {
+    "esm": true,
+    "include": ["index.ts", "src/debug.ts"],
+    "experimentalSpecifierResolution": "node"
+  }
 }
