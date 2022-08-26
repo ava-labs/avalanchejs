@@ -12,7 +12,6 @@ export default {
     '@scure/base',
     '@noble/hashes/utils',
     '@noble/hashes/sha256',
-    'micro-eth-signer',
     '@noble/secp256k1',
     '@noble/hashes/ripemd160',
   ], // we don't want these dependencies bundled in the dist folder
