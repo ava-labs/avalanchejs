@@ -1,11 +1,11 @@
 import { testPVMCodec } from '../../fixtures/codec';
 import { stakableLockIn, stakableLockInBytes } from '../../fixtures/pvm';
 import { testSerialization } from '../../fixtures/utils/serializable';
-import { StakableLockIn } from './stakableLockIn';
+import { StakeableLockIn } from './stakableLockIn';
 
 testSerialization(
   'StakableLockIn',
-  StakableLockIn,
+  StakeableLockIn,
   stakableLockIn,
   stakableLockInBytes,
   testPVMCodec,

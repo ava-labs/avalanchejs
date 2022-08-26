@@ -12,7 +12,7 @@ export const stakeableLockOut_symbol = Symbol('pvm.StakableLockOut');
  * @see https://docs.avax.network/specs/platform-transaction-serialization#stakeablelockin
  */
 @serializable()
-export class StakableLockOut implements Amounter {
+export class StakeableLockOut implements Amounter {
   _type = stakeableLockOut_symbol;
 
   constructor(
@@ -38,13 +38,13 @@ export class StakableLockOut implements Amounter {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [StakableLockOut, Uint8Array] {
+  ): [StakeableLockOut, Uint8Array] {
     const [lockTime, transferOut, rest] = unpack(
       bytes,
       [BigIntPr, Codec],
       codec,
     );
-    return [new StakableLockOut(lockTime, transferOut as Amounter), rest];
+    return [new StakeableLockOut(lockTime, transferOut as Amounter), rest];
   }
 
   getOwners() {

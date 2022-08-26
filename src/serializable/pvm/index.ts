@@ -6,8 +6,8 @@ import { CreateChainTx } from './createChainTx';
 import { CreateSubnetTx } from './createSubnetTx';
 import { ExportTx } from './exportTx';
 import { ImportTx } from './importTx';
-import { StakableLockIn } from './stakableLockIn';
-import { StakableLockOut } from './stakableLockOut';
+import { StakeableLockIn } from './stakableLockIn';
+import { StakeableLockOut } from './stakableLockOut';
 import { SubnetValidator } from './subnetValidator';
 import { Validator } from './validator';
 export * from './typeGuards';
@@ -20,8 +20,8 @@ export {
   CreateSubnetTx,
   ExportTx,
   ImportTx,
-  StakableLockIn,
-  StakableLockOut,
+  StakeableLockIn,
+  StakeableLockOut,
   SubnetValidator,
   Validator,
 };

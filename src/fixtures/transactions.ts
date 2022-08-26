@@ -8,7 +8,7 @@ import { Utxo } from '../serializable/avax/utxo';
 import { Address, Id } from '../serializable/fxs/common';
 import { OutputOwners, TransferOutput } from '../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../serializable/primitives';
-import { StakableLockIn } from '../serializable/pvm';
+import { StakeableLockIn } from '../serializable/pvm';
 import { hexToBuffer } from '../utils';
 import { testContext } from './context';
 
@@ -48,7 +48,7 @@ const lockedUTXO = new Utxo(
 const NotTransferOutput = new Utxo(
   new UTXOID(testUTXOID2, new Int(0)),
   testAvaxAssetID,
-  new StakableLockIn(
+  new StakeableLockIn(
     new BigIntPr(2000000000n),
     TransferableOutput.fromNative(
       testAvaxAssetID.toString(),

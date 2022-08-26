@@ -1,4 +1,4 @@
-import { isTransferInput, isTransferOut } from '../../utils';
+import { isStakeableLockIn, isTransferInput, isTransferOut } from '../../utils';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
@@ -70,10 +70,18 @@ export class TransferableInput {
 
   sigIndicies() {
     const input = this.input;
-    if (!isTransferInput(input)) {
-      throw new Error('unknown input');
+
+    if (isTransferInput(input)) {
+      return input.sigIndicies();
     }
-    return input.sigIndicies();
+    if (isStakeableLockIn(input)) {
+      const lockedInput = input.transferableInput;
+
+      if (isTransferInput(lockedInput)) {
+        return lockedInput.sigIndicies();
+      }
+    }
+    throw new Error('Input must be TransferInput or StakeableLockIn');
   }
 
   static compare(input1: TransferableInput, input2: TransferableInput): number {

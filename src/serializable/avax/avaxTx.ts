@@ -15,11 +15,7 @@ export abstract class AvaxTx extends Transaction {
   getSigIndices(): number[][] {
     return this.getInputs()
       .map((input) => {
-        try {
-          return input.sigIndicies();
-        } catch (e) {
-          return;
-        }
+        return input.sigIndicies();
       })
       .filter((indicies): indicies is number[] => indicies !== undefined);
   }

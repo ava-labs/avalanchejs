@@ -1,6 +1,14 @@
 import { TransferableInput } from '.';
-import { transferableInput, transferableInputBytes } from '../../fixtures/avax';
+import {
+  transferableInput,
+  transferableInputBytes,
+  utxoId,
+} from '../../fixtures/avax';
+import { id } from '../../fixtures/common';
+import { bigIntPr } from '../../fixtures/primitives';
 import { testSerialization } from '../../fixtures/utils/serializable';
+import { Input, TransferInput } from '../fxs/secp256k1';
+import { StakeableLockIn } from '../pvm';
 
 testSerialization(
   'TransferableInput',
@@ -159,5 +167,30 @@ describe('TransferableInput sorting', () => {
     inputTransferableInputs.sort(TransferableInput.compare);
 
     expect(inputTransferableInputs).toStrictEqual(expectedTransferableInputs);
+  });
+});
+
+describe('sigindicies', () => {
+  it('gets sigindicies for transferinput', () => {
+    const transferableInputWithTransferInput = new TransferableInput(
+      utxoId(),
+      id(),
+      new TransferInput(bigIntPr(), Input.fromNative([0, 1])),
+    );
+
+    expect(transferableInputWithTransferInput.sigIndicies()).toEqual([0, 1]);
+  });
+
+  it('gets sigindicies for stakeableLockIn', () => {
+    const transferableInputWithTransferInput = new TransferableInput(
+      utxoId(),
+      id(),
+      new StakeableLockIn(
+        bigIntPr(),
+        new TransferInput(bigIntPr(), Input.fromNative([0, 1])),
+      ),
+    );
+
+    expect(transferableInputWithTransferInput.sigIndicies()).toEqual([0, 1]);
   });
 });

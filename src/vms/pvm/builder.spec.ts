@@ -25,7 +25,7 @@ import {
   AddValidatorTx,
   ExportTx,
   ImportTx,
-  StakableLockOut,
+  StakeableLockOut,
   Validator,
 } from '../../serializable/pvm';
 import { hexToBuffer } from '../../utils';
@@ -131,7 +131,7 @@ describe('pvmBuilder', () => {
     const lockedUtxo = new Utxo(
       new UTXOID(Id.fromHex('0x1234512345123451234516'), new Int(0)),
       testAvaxAssetID,
-      new StakableLockOut(
+      new StakeableLockOut(
         new BigIntPr(0n),
         new TransferOutput(
           new BigIntPr(BigInt(50 * 1e9)),

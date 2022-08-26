@@ -10,8 +10,8 @@ import { CreateSubnetTx } from './createSubnetTx';
 import { ExportTx } from './exportTx';
 import { ImportTx } from './importTx';
 import { RewardValidatorTx } from './rewardValidatorTx';
-import { StakableLockIn } from './stakableLockIn';
-import { StakableLockOut } from './stakableLockOut';
+import { StakeableLockIn } from './stakableLockIn';
+import { StakeableLockOut } from './stakableLockOut';
 
 // https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/codec.go
 export const codec = new Codec([
@@ -38,8 +38,8 @@ export const codec = new Codec([
   AdvanceTimeTx, //19
   RewardValidatorTx, //20
 
-  StakableLockIn, // 21
-  StakableLockOut, // 22
+  StakeableLockIn, // 21
+  StakeableLockOut, // 22
 ]);
 
 let manager: Manager;

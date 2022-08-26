@@ -8,8 +8,8 @@ import {
   CreateSubnetTx,
   ExportTx,
   ImportTx,
-  StakableLockIn,
-  StakableLockOut,
+  StakeableLockIn,
+  StakeableLockOut,
   SubnetValidator,
   Validator,
 } from '../serializable/pvm';
@@ -151,13 +151,13 @@ export const exportTxBytes = () =>
   );
 
 export const stakableLockIn = () =>
-  new StakableLockIn(bigIntPr(), transferInput());
+  new StakeableLockIn(bigIntPr(), transferInput());
 
 export const stakableLockInBytes = () =>
   concatBytes(bigIntPrBytes(), bytesForInt(5), transferInputBytes());
 
 export const stakableLockOut = () =>
-  new StakableLockOut(bigIntPr(), transferOutput());
+  new StakeableLockOut(bigIntPr(), transferOutput());
 
 export const stakableLockOutBytes = () =>
   concatBytes(bigIntPrBytes(), bytesForInt(7), transferOutputBytes());

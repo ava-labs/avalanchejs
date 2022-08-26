@@ -18,8 +18,8 @@ import {
   AddValidatorTx,
   ExportTx,
   ImportTx,
-  StakableLockIn,
-  StakableLockOut,
+  StakeableLockIn,
+  StakeableLockOut,
   Validator,
 } from '../../serializable/pvm';
 import {
@@ -363,7 +363,7 @@ export class PVMBuilder {
         return;
       }
 
-      const lockedOutput = utxo.output as StakableLockOut;
+      const lockedOutput = utxo.output as StakeableLockOut;
       if (options.minIssuanceTime >= lockedOutput.lockTime.value()) {
         return;
       }
@@ -388,7 +388,7 @@ export class PVMBuilder {
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          new StakableLockIn(
+          new StakeableLockIn(
             lockedOutput.lockTime,
             TransferInput.fromNative(out.amount(), sigData.sigIndicies),
           ),
@@ -401,7 +401,7 @@ export class PVMBuilder {
       stakeOutputs.push(
         new TransferableOutput(
           utxo.assetId,
-          new StakableLockOut(
+          new StakeableLockOut(
             lockedOutput.lockTime,
             new TransferOutput(new BigIntPr(amountToStake), out.outputOwners),
           ),
@@ -414,7 +414,7 @@ export class PVMBuilder {
         changeOutputs.push(
           new TransferableOutput(
             utxo.assetId,
-            new StakableLockOut(
+            new StakeableLockOut(
               lockedOutput.lockTime,
               new TransferOutput(
                 new BigIntPr(remainingAmount),
@@ -438,7 +438,7 @@ export class PVMBuilder {
       const utxoTransferout = (
         isTransferOut(utxo.output)
           ? utxo.output
-          : (utxo.output as StakableLockOut).transferOut
+          : (utxo.output as StakeableLockOut).transferOut
       ) as TransferOutput;
 
       const sigData = matchOwners(

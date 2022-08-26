@@ -5,14 +5,14 @@ import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
 
-const _symbol = Symbol('pvm.StakableLockIn');
+export const stakeableLockIn_symbol = Symbol('pvm.StakeableLockIn');
 
 /**
  * @see https://docs.avax.network/specs/platform-transaction-serialization#stakeablelockin
  */
 @serializable()
-export class StakableLockIn {
-  _type = _symbol;
+export class StakeableLockIn {
+  _type = stakeableLockIn_symbol;
 
   constructor(
     public readonly lockTime: BigIntPr,
@@ -22,12 +22,12 @@ export class StakableLockIn {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [StakableLockIn, Uint8Array] {
+  ): [StakeableLockIn, Uint8Array] {
     const [lockTime, rest] = unpack(bytes, [BigIntPr], codec);
 
     const [transferableInput, remaining] = codec.UnpackPrefix<Amounter>(rest);
 
-    return [new StakableLockIn(lockTime, transferableInput), remaining];
+    return [new StakeableLockIn(lockTime, transferableInput), remaining];
   }
   amount() {
     return this.transferableInput.amount();
