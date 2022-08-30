@@ -20,19 +20,17 @@ import {
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
 import { hexToBuffer } from '../../utils';
-import { XBuilder } from './builder';
+import { newExportTx, newImportTx } from '../pvm';
 
 describe('AVMBuilder', () => {
   let utxos: Utxo[];
-  let builder: XBuilder;
   beforeEach(() => {
-    builder = new XBuilder(testContext);
-
     utxos = testUtxos();
   });
   it('importTx', async () => {
     const toAddress = hexToBuffer('0x5432112345123451234512');
-    const tx = builder.newImportTx(
+    const tx = newImportTx(
+      testContext,
       testContext.cBlockchainID,
       utxos,
       [toAddress],
@@ -58,7 +56,8 @@ describe('AVMBuilder', () => {
       ),
     );
 
-    const tx = builder.newImportTx(
+    const tx = newImportTx(
+      testContext,
       testContext.cBlockchainID,
       utxos,
       [toAddress],
@@ -81,7 +80,8 @@ describe('AVMBuilder', () => {
     utxos.pop();
 
     expect(() =>
-      builder.newImportTx(
+      newImportTx(
+        testContext,
         testContext.cBlockchainID,
         utxos,
         [toAddress],
@@ -97,7 +97,8 @@ describe('AVMBuilder', () => {
       BigInt(5 * 1e9),
       [toAddress],
     );
-    const tx = builder.newExportTx(
+    const tx = newExportTx(
+      testContext,
       testContext.cBlockchainID,
       [testOwnerAddress.toBytes()],
       utxos,
@@ -136,7 +137,8 @@ describe('AVMBuilder', () => {
     );
     utxos.pop();
     expect(() =>
-      builder.newExportTx(
+      newExportTx(
+        testContext,
         testContext.cBlockchainID,
         [testOwnerAddress.toBytes()],
         utxos,

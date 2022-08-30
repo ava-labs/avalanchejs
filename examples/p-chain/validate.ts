@@ -1,27 +1,32 @@
 import { AVAX_PUBLIC_URL_FUJI } from '../../src/constants/public-urls';
 import { Secp256K1Keychain } from '../../src/signer';
 import { bech32ToBytes, hexToBuffer, printDeep } from '../../src/utils';
-import { PVMApi, PVMBuilder } from '../../src/vms/pvm';
-import { pAddress, privateKey } from '../example_accounts';
+import { getContextFromURI } from '../../src/vms/context';
+import { newAddValidatorTx, PVMApi } from '../../src/vms/pvm';
+import {
+  pAddressForExamples,
+  privateKeyForExamples,
+} from '../example_accounts';
 
 const delegate = async () => {
   const api = new PVMApi(AVAX_PUBLIC_URL_FUJI);
-  const { utxos } = await api.getUTXOs({ addresses: [pAddress] });
-  const builder = await PVMBuilder.fromURI(AVAX_PUBLIC_URL_FUJI);
-  const keyChain = new Secp256K1Keychain([hexToBuffer(privateKey)]);
+  const { utxos } = await api.getUTXOs({ addresses: [pAddressForExamples] });
+  const context = await getContextFromURI(AVAX_PUBLIC_URL_FUJI);
+  const keyChain = new Secp256K1Keychain([hexToBuffer(privateKeyForExamples)]);
   const startTime = BigInt(Math.floor(new Date().getTime() / 1000) + 60);
   const endTime = startTime + BigInt(60 * 60 * 24 * 21);
 
   const nodeID = 'NodeID-HKLp5269LH8DcrLvNDoJquQs2w1LwLCga'; // be sure to generate a new base54 nodeID each time
 
-  const tx = builder.newAddValidatorTx(
+  const tx = newAddValidatorTx(
+    context,
     utxos,
-    [bech32ToBytes(pAddress)],
+    [bech32ToBytes(pAddressForExamples)],
     nodeID,
     startTime,
     endTime,
     BigInt(1e9),
-    [bech32ToBytes(pAddress)],
+    [bech32ToBytes(pAddressForExamples)],
     1e4 * 20,
   );
   printDeep(tx);

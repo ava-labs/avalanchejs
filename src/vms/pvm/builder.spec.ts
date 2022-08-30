@@ -29,10 +29,14 @@ import {
   Validator,
 } from '../../serializable/pvm';
 import { hexToBuffer } from '../../utils';
-import { PVMBuilder } from './builder';
+import {
+  newAddDelegatorTx,
+  newAddValidatorTx,
+  newExportTx,
+  newImportTx,
+} from './builder';
 
 describe('pvmBuilder', () => {
-  const builder = new PVMBuilder(testContext);
   const nodeID = 'NodeID-2m38qc95mhHXtrhjyGbe7r2NhniqHHJRB';
   const toAddress = hexToBuffer('0x5432112345123451234512');
 
@@ -40,7 +44,8 @@ describe('pvmBuilder', () => {
 
   it('importTx', () => {
     const utxos = testUtxos();
-    const tx = builder.newImportTx(
+    const tx = newImportTx(
+      testContext,
       testContext.cBlockchainID,
       utxos,
       [testAddress1],
@@ -75,7 +80,8 @@ describe('pvmBuilder', () => {
       BigInt(5 * 1e9),
       [toAddress],
     );
-    const unsignedTx = builder.newExportTx(
+    const unsignedTx = newExportTx(
+      testContext,
       testContext.cBlockchainID,
       fromAddressBytes,
       testUtxos(),
@@ -104,7 +110,8 @@ describe('pvmBuilder', () => {
   });
 
   it('AddValidatorTx', () => {
-    const unsignedTx = builder.newAddValidatorTx(
+    const unsignedTx = newAddValidatorTx(
+      testContext,
       testUtxos(),
       fromAddressBytes,
       nodeID,
@@ -141,7 +148,8 @@ describe('pvmBuilder', () => {
     );
 
     utxos.push(lockedUtxo);
-    const unsignedTx = builder.newAddValidatorTx(
+    const unsignedTx = newAddValidatorTx(
+      testContext,
       utxos,
       fromAddressBytes,
       nodeID,
@@ -164,7 +172,8 @@ describe('pvmBuilder', () => {
   });
 
   it('AddDelegatorTx', () => {
-    const unsignedTx = builder.newAddDelegatorTx(
+    const unsignedTx = newAddDelegatorTx(
+      testContext,
       testUtxos(),
       fromAddressBytes,
       nodeID,

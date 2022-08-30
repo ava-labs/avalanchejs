@@ -12,16 +12,16 @@ import { Address, Id } from '../../serializable/fxs/common';
 import { BigIntPr, Int } from '../../serializable/primitives';
 import { hexToBuffer, isTransferOut } from '../../utils';
 import { AvaxToNAvax } from '../../utils/avaxToNAvax';
-import { CorethBuilder } from './builder';
+import { newExportTxFromBaseFee, newImportTxFromBaseFee } from './builder';
 
 describe('CorethBuilder', () => {
-  const builder = new CorethBuilder(testContext);
   const baseFee = 25n;
   const fromAddress = testOwnerAddress.toBytes();
   const toAddress = hexToBuffer('0x5432112345123451234512');
 
   it('exportTx', () => {
-    const tx = builder.newExportTxFromBaseFee(
+    const tx = newExportTxFromBaseFee(
+      testContext,
       baseFee,
       AvaxToNAvax(1),
       testContext.xBlockchainID,
@@ -52,7 +52,8 @@ describe('CorethBuilder', () => {
   });
 
   it('importTx', () => {
-    const tx = builder.newImportTxFromBaseFee(
+    const tx = newImportTxFromBaseFee(
+      testContext,
       toAddress,
       [fromAddress],
       testUtxos().filter((utxo) => isTransferOut(utxo.output)),

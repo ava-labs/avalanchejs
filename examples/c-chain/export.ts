@@ -3,8 +3,12 @@ import { AVAX_PUBLIC_URL_FUJI } from '../../src/constants/public-urls';
 import { Secp256K1Keychain } from '../../src/signer';
 import { bech32ToBytes, hexToBuffer } from '../../src/utils';
 import { getContextFromURI } from '../../src/vms/context';
-import { CorethBuilder, EVMApi } from '../../src/vms/evm';
-import { cAddress, privateKey, xAddress } from '../example_accounts';
+import { EVMApi, newExportTxFromBaseFee } from '../../src/vms/evm';
+import {
+  cAddressForExamples,
+  privateKeyForExamples,
+  xAddressForExamples,
+} from '../example_accounts';
 
 const main = async () => {
   const evmapi = new EVMApi(AVAX_PUBLIC_URL_FUJI);
@@ -13,17 +17,17 @@ const main = async () => {
   );
 
   const context = await getContextFromURI(AVAX_PUBLIC_URL_FUJI);
-  const keyChain = new Secp256K1Keychain([hexToBuffer(privateKey)]);
-  const txCount = await provider.getTransactionCount(cAddress);
-  const xAddressBytes = bech32ToBytes(xAddress);
+  const keyChain = new Secp256K1Keychain([hexToBuffer(privateKeyForExamples)]);
+  const txCount = await provider.getTransactionCount(cAddressForExamples);
+  const xAddressBytes = bech32ToBytes(xAddressForExamples);
 
   const baseFee = await evmapi.getBaseFee();
-  const builder = new CorethBuilder(context);
-  const tx = builder.newExportTxFromBaseFee(
+  const tx = newExportTxFromBaseFee(
+    context,
     baseFee / BigInt(1e9),
     BigInt(0.5 * 1e9),
     context.xBlockchainID,
-    hexToBuffer(cAddress),
+    hexToBuffer(cAddressForExamples),
     [xAddressBytes],
     BigInt(txCount),
   );
