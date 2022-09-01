@@ -20,7 +20,9 @@
     "check": "tsc --noEmit",
     "bench": "ts-node ./scripts/bench.ts",
     "example": "ts-node ./examples/x-chain/utxos.ts",
-    "debug": "ts-node ./src/debug.ts"
+    "debug": "ts-node ./src/debug.ts",
+    "cm": "cz",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@noble/hashes": "1.1.2",
@@ -40,11 +42,13 @@
     "@types/node": "18.7.13",
     "@typescript-eslint/eslint-plugin": "5.35.1",
     "@typescript-eslint/parser": "5.35.1",
+    "cz-conventional-changelog": "3.3.0",
     "esbuild": "0.15.5",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.2.1",
     "ethers": "5.7.0",
+    "husky": "8.0.0",
     "jest": "29.0.1",
     "micro-bmark": "0.2.0",
     "prettier": "2.7.1",
@@ -107,5 +111,10 @@
         }
       ]
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
