@@ -363,94 +363,57 @@ function spend(
       return;
     }
 
-    const unlockedUTXOs = utxos.filter((utxo) => {
-      if (isTransferOut(utxo.output)) {
-        return true;
-      }
-      const out = utxo.output;
-      if (!isStakeableLockOut(out) || !isTransferOut(out.transferOut)) {
-        return false;
-      }
-      return out.getLocktime() < options.minIssuanceTime;
-    });
-    const lockedUTXOs = utxos.filter((utxo) => {
-      const out = utxo.output;
-      if (!isStakeableLockOut(out)) {
-        return false;
-      }
-      return options.minIssuanceTime < out.getLocktime();
-    });
-    const inputUTXOs: Utxo[] = [];
-    const addressMaps = new AddressMaps();
+    if (!(lockedOutput.transferOut instanceof TransferOutput)) {
+      throw new Error('unknown output type');
+    }
 
-    lockedUTXOs.forEach((utxo) => {
-      const assetId = utxo.assetId.value();
-      const remainingAmountToStake = amountsToStake.get(assetId) ?? 0n;
+    const out = lockedOutput.transferOut as TransferOutput;
 
-      if (!remainingAmountToStake) {
-        return;
-      }
+    const sigData = matchOwners(
+      out.outputOwners,
+      fromAddresses,
+      options.minIssuanceTime,
+    );
 
-      const lockedOutput = utxo.output as StakeableLockOut;
-      if (options.minIssuanceTime >= lockedOutput.lockTime.value()) {
-        return;
-      }
+    if (!sigData) return;
 
-      if (!(lockedOutput.transferOut instanceof TransferOutput)) {
-        throw new Error('unknown output type');
-      }
-
-      const out = lockedOutput.transferOut as TransferOutput;
-
-      const sigData = matchOwners(
-        out.outputOwners,
-        fromAddresses,
-        options.minIssuanceTime,
-      );
-
-      if (!sigData) return;
-
-      inputs.push(
-        new TransferableInput(
-          utxo.utxoId,
-          utxo.assetId,
-          new StakeableLockIn(
-            lockedOutput.lockTime,
-            TransferInput.fromNative(out.amount(), sigData.sigIndicies),
-          ),
+    inputs.push(
+      new TransferableInput(
+        utxo.utxoId,
+        utxo.assetId,
+        new StakeableLockIn(
+          lockedOutput.lockTime,
+          TransferInput.fromNative(out.amount(), sigData.sigIndicies),
         ),
-      );
-      inputUTXOs.push(utxo);
-      addressMaps.push(sigData.addressMap);
+      ),
+    );
+    inputUTXOs.push(utxo);
+    addressMaps.push(sigData.addressMap);
 
-      const amountToStake = bigIntMin(remainingAmountToStake, out.amt.value());
-      stakeOutputs.push(
+    const amountToStake = bigIntMin(remainingAmountToStake, out.amt.value());
+    stakeOutputs.push(
+      new TransferableOutput(
+        utxo.assetId,
+        new StakeableLockOut(
+          lockedOutput.lockTime,
+          new TransferOutput(new BigIntPr(amountToStake), out.outputOwners),
+        ),
+      ),
+    );
+    amountsToStake.set(assetId, remainingAmountToStake - amountToStake);
+    const remainingAmount = out.amount() - amountToStake;
+
+    if (remainingAmount > 0n) {
+      changeOutputs.push(
         new TransferableOutput(
           utxo.assetId,
           new StakeableLockOut(
             lockedOutput.lockTime,
-            new TransferOutput(new BigIntPr(amountToStake), out.outputOwners),
+            new TransferOutput(new BigIntPr(remainingAmount), out.outputOwners),
           ),
         ),
       );
-      amountsToStake.set(assetId, remainingAmountToStake - amountToStake);
-      const remainingAmount = out.amount() - amountToStake;
-
-      if (remainingAmount > 0n) {
-        changeOutputs.push(
-          new TransferableOutput(
-            utxo.assetId,
-            new StakeableLockOut(
-              lockedOutput.lockTime,
-              new TransferOutput(
-                new BigIntPr(remainingAmount),
-                out.outputOwners,
-              ),
-            ),
-          ),
-        );
-      }
-    });
+    }
   });
 
   unlockedUTXOs.forEach((utxo) => {
