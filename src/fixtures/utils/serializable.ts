@@ -15,7 +15,7 @@ export const testSerialization = (
   describe(name, () => {
     it('deserializes correctly', () => {
       const [output, remainder] = entity.fromBytes(bytesFixture(), codec());
-      expect(output).toStrictEqual(entityFixture());
+      expect(JSON.stringify(output)).toBe(JSON.stringify(entityFixture()));
       expect(remainder).toStrictEqual(new Uint8Array());
     });
   });

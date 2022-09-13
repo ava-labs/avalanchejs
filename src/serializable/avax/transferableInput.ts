@@ -1,12 +1,16 @@
+import { isStakeableLockIn, isTransferInput, isTransferOut } from '../../utils';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';
 import { Id } from '../fxs/common/id';
+import { Input, TransferInput } from '../fxs/secp256k1';
+import { BigIntPr, Int } from '../primitives';
+import type { Utxo } from './utxo';
 import { UTXOID } from './utxoId';
 
-const _symbol = Symbol('avax.TransferableInput');
+const transferableInputType = Symbol('avax.TransferableInput');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
@@ -16,7 +20,7 @@ const _symbol = Symbol('avax.TransferableInput');
  */
 @serializable()
 export class TransferableInput {
-  _type = _symbol;
+  _type = transferableInputType;
 
   constructor(
     public readonly utxoID: UTXOID,
@@ -32,6 +36,56 @@ export class TransferableInput {
     const [input, rest] = codec.UnpackPrefix<Amounter>(remaining);
 
     return [new TransferableInput(utxoID, assetId, input), rest];
+  }
+
+  static fromNative(
+    utxoId: string,
+    outputIdx: number,
+    assetId: string,
+    amount: bigint,
+    sigIndices: number[],
+  ) {
+    return new TransferableInput(
+      UTXOID.fromNative(utxoId, outputIdx),
+      Id.fromString(assetId),
+      new TransferInput(
+        new BigIntPr(amount),
+        new Input(sigIndices.map((num) => new Int(num))),
+      ),
+    );
+  }
+
+  static fromUtxoAndSigindicies(utxo: Utxo, sigIndicies: number[]) {
+    const out = utxo.output;
+    if (!isTransferOut(out)) {
+      throw new Error('utxo.output must be Transferout');
+    }
+
+    return new TransferableInput(
+      utxo.utxoId,
+      utxo.assetId,
+      TransferInput.fromNative(out.amount(), sigIndicies),
+    );
+  }
+
+  sigIndicies() {
+    const input = this.input;
+
+    if (isTransferInput(input)) {
+      return input.sigIndicies();
+    }
+    if (isStakeableLockIn(input)) {
+      const lockedInput = input.transferableInput;
+
+      if (isTransferInput(lockedInput)) {
+        return lockedInput.sigIndicies();
+      }
+    }
+    throw new Error('Input must be TransferInput or StakeableLockIn');
+  }
+
+  static compare(input1: TransferableInput, input2: TransferableInput): number {
+    return UTXOID.compare(input1.utxoID, input2.utxoID);
   }
 
   amount() {

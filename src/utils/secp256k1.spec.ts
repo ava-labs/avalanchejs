@@ -1,5 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { base58check } from './base58';
+import { bufferToHex, hexToBuffer } from './buffer';
 import * as secp from './secp256k1';
 
 describe('secp256k1', function () {
@@ -56,5 +57,16 @@ describe('secp256k1', function () {
       expect(secp.recoverPublicKey(hash, test.sig)).toEqual(pubKey);
       expect(secp.verify(test.sig, hash, pubKey)).toEqual(true);
     }
+  });
+
+  it('works with EVM', () => {
+    const publicKey = hexToBuffer(
+      '04e68acfc0253a10620dff706b0a1b1f1f5833ea3beb3bde2250d5f271f3563606672ebc45e0b7ea2e816ecb70ca03137b1c9476eec63d4632e990020b7b6fba39',
+    );
+
+    const ethAddrKey = bufferToHex(secp.publicKeyToEthAddress(publicKey));
+    expect(ethAddrKey).toBe(
+      '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'.toLocaleLowerCase(),
+    );
   });
 });

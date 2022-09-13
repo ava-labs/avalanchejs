@@ -8,8 +8,8 @@ import {
   CreateSubnetTx,
   ExportTx,
   ImportTx,
-  StakableLockIn,
-  StakableLockOut,
+  StakeableLockIn,
+  StakeableLockOut,
   SubnetValidator,
   Validator,
 } from '../serializable/pvm';
@@ -22,7 +22,7 @@ import {
   transferableOutput,
   transferableOutputBytes,
 } from './avax';
-import { id, idBytes } from './common';
+import { id, idBytes, nodeId, nodeIdBytes } from './common';
 import {
   bigIntPr,
   bigIntPrBytes,
@@ -46,10 +46,10 @@ import {
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
 export const validator = () =>
-  new Validator(id(), bigIntPr(), bigIntPr(), bigIntPr());
+  new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
 
 export const validatorBytes = () =>
-  concatBytes(idBytes(), bigIntPrBytes(), bigIntPrBytes(), bigIntPrBytes());
+  concatBytes(nodeIdBytes(), bigIntPrBytes(), bigIntPrBytes(), bigIntPrBytes());
 
 export const addValidatorTx = () =>
   new AddValidatorTx(
@@ -64,6 +64,7 @@ export const addValidatorTxBytes = () =>
     baseTxbytes(),
     validatorBytes(),
     makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
     outputOwnerBytes(),
     intBytes(),
   );
@@ -97,6 +98,7 @@ export const addDelegatorTxBytes = () =>
     baseTxbytes(),
     validatorBytes(),
     makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
     outputOwnerBytes(),
   );
 
@@ -149,13 +151,13 @@ export const exportTxBytes = () =>
   );
 
 export const stakableLockIn = () =>
-  new StakableLockIn(bigIntPr(), transferInput());
+  new StakeableLockIn(bigIntPr(), transferInput());
 
 export const stakableLockInBytes = () =>
   concatBytes(bigIntPrBytes(), bytesForInt(5), transferInputBytes());
 
 export const stakableLockOut = () =>
-  new StakableLockOut(bigIntPr(), transferOutput());
+  new StakeableLockOut(bigIntPr(), transferOutput());
 
 export const stakableLockOutBytes = () =>
   concatBytes(bigIntPrBytes(), bytesForInt(7), transferOutputBytes());

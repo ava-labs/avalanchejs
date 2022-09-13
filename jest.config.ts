@@ -9,4 +9,10 @@ module.exports = {
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
   coverageProvider: 'v8',
+  extensionsToTreatAsEsm: ['.ts'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
+  },
 };

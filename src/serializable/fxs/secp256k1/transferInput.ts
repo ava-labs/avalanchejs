@@ -4,7 +4,7 @@ import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
 import { Input } from './input';
 
-const _symbol = Symbol('secp256k1fx.TransferInput');
+export const transferInputType = Symbol('secp256k1fx.TransferInput');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/transfer_input.go
@@ -14,7 +14,7 @@ const _symbol = Symbol('secp256k1fx.TransferInput');
  */
 @serializable()
 export class TransferInput implements Amounter {
-  _type = _symbol;
+  _type = transferInputType;
 
   constructor(private readonly amt: BigIntPr, private readonly input: Input) {}
 
@@ -22,6 +22,18 @@ export class TransferInput implements Amounter {
     const [amt, input, remaining] = unpack(bytes, [BigIntPr, Input]);
     return [new TransferInput(amt, input), remaining];
   }
+
+  static fromNative(amount: bigint, sigIndicies: number[]) {
+    return new TransferInput(
+      new BigIntPr(amount),
+      Input.fromNative(sigIndicies),
+    );
+  }
+
+  sigIndicies() {
+    return this.input.values();
+  }
+
   amount() {
     return this.amt.value();
   }

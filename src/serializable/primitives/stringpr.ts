@@ -1,13 +1,16 @@
-import { serializable } from '../common/types';
 import { concatBytes, hexToBuffer, padLeft } from '../../utils/buffer';
+import { serializable } from '../common/types';
+import { Primitives } from './primatives';
 import { Short } from './short';
 
 const _symbol = Symbol('primitives.String');
 
 @serializable()
-export class Stringpr {
+export class Stringpr extends Primitives {
   _type = _symbol;
-  constructor(private readonly string: string) {}
+  constructor(private readonly string: string) {
+    super();
+  }
 
   static fromBytes(buf: Uint8Array): [Stringpr, Uint8Array] {
     const [length, remaining] = Short.fromBytes(buf);
@@ -17,6 +20,10 @@ export class Stringpr {
       ),
       remaining.slice(length.value()),
     ];
+  }
+
+  toJSON() {
+    return this.string;
   }
 
   toBytes() {

@@ -1,7 +1,8 @@
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import * as secp from '@noble/secp256k1';
-import { concatBytes } from './buffer';
+import { Address } from 'micro-eth-signer';
+import { concatBytes, hexToBuffer } from './buffer';
 
 export function randomPrivateKey() {
   return secp.utils.randomPrivateKey();
@@ -43,4 +44,8 @@ export function verify(
 
 export function publicKeyBytesToAddress(publicKey: Uint8Array) {
   return ripemd160(sha256(publicKey));
+}
+
+export function publicKeyToEthAddress(key: Uint8Array) {
+  return hexToBuffer(Address.fromPublicKey(key));
 }

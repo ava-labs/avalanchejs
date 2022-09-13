@@ -1,4 +1,4 @@
-import { BaseTx } from '../avax';
+import { BaseTx } from '../avax/baseTx';
 import { Codec } from '../codec/codec';
 import { Manager } from '../codec/manager';
 import * as NftFx from '../fxs/nft';
@@ -12,7 +12,7 @@ import { OperationTx } from './operationTx';
 // https://github.com/ava-labs/avalanchego/blob/master/wallet/chain/x/constants.go
 let manager: Manager;
 
-export const getManager = () => {
+export const getAVMManager = () => {
   if (manager) return manager;
 
   manager = new Manager();

@@ -37,6 +37,10 @@ export class Utxo {
     );
   }
 
+  getAssetId() {
+    return this.assetId.toString();
+  }
+
   ID() {
     return this.utxoId.ID();
   }

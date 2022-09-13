@@ -1,20 +1,20 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx } from '../avax';
-import { Byte, Stringpr } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx } from '../avax/baseTx';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { Byte, Stringpr } from '../primitives';
 import { InitialState } from './initialState';
 
-const _symbol = Symbol('avm.CreateAssetTx');
+export const createAssetTx_symbol = Symbol('avm.CreateAssetTx');
 
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-createassettx
  */
 @serializable()
 export class CreateAssetTx {
-  _type = _symbol;
+  _type = createAssetTx_symbol;
 
   constructor(
     private readonly baseTx: BaseTx,

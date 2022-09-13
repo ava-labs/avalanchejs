@@ -1,15 +1,19 @@
+import { packSwitched, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
-import { packSwitched, unpack } from '../../utils/struct';
+import { PVMTx } from './abstractTx';
 
 const _symbol = Symbol('pvm.AdvanceTime');
 
 @serializable()
-export class AdvanceTimeTx {
+export class AdvanceTimeTx extends PVMTx {
   _type = _symbol;
 
-  constructor(public readonly time: BigIntPr) {}
+  constructor(public readonly time: BigIntPr) {
+    super();
+  }
+  baseTx = undefined;
 
   static fromBytes(
     bytes: Uint8Array,

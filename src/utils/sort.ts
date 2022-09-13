@@ -1,53 +1,24 @@
-import { DEFAULT_CODEC_VERSION } from '../constants/codec';
-import type {
-  TransferableInput,
-  TransferableOutput,
-} from '../serializable/avax';
-import { getManager } from '../serializable/avm/codec';
+import type { TransferableOutput } from '../serializable/avax';
+import { getAVMManager } from '../serializable/avm/codec';
 import type { Output } from '../serializable/evm';
-
-export const compareTransferableInputs = (
-  a: TransferableInput,
-  b: TransferableInput,
-) => {
-  const txSortResult = a.utxoID.txID
-    .value()
-    .localeCompare(b.utxoID.txID.value());
-  if (txSortResult !== 0) {
-    return txSortResult;
-  }
-  return a.utxoID.outputIdx.value() - a.utxoID.outputIdx.value();
-};
+import { Id } from '../serializable/fxs/common';
+import { bytesCompare } from './bytesCompare';
 
 export const compareTransferableOutputs = (
-  a: TransferableOutput,
-  b: TransferableOutput,
-) => {
-  const manager = getManager();
-  const aBytes = manager.packCodec(a, DEFAULT_CODEC_VERSION);
-  const bBytes = manager.packCodec(b, DEFAULT_CODEC_VERSION);
-  return compareBytes(aBytes, bBytes);
+  output1: TransferableOutput,
+  output2: TransferableOutput,
+): number => {
+  const assetIdRes = Id.compare(output1.assetId, output2.assetId);
+  if (assetIdRes !== 0) {
+    return assetIdRes;
+  }
+  const codec = getAVMManager().getDefaultCodec();
+  return bytesCompare(output1.toBytes(codec), output2.toBytes(codec));
 };
 
 export const compareEVMOutputs = (a: Output, b: Output) => {
   if (a.address.value() === b.address.value()) {
-    return compareBytes(a.assetId.toBytes(), b.assetId.toBytes());
+    return bytesCompare(a.assetId.toBytes(), b.assetId.toBytes());
   }
   return a.address.value().localeCompare(b.address.value());
-};
-
-export const compareBytes = (a: Uint8Array, b: Uint8Array) => {
-  let i;
-  for (i = 0; i < a.length && i < b.length; i++) {
-    const aByte = a[i];
-    const bByte = b[i];
-    if (aByte !== bByte) {
-      return aByte - bByte;
-    }
-  }
-  if (i === a.length && i === b.length) {
-    // throw error?
-    return 0;
-  }
-  return i === a.length ? -1 : 1;
 };

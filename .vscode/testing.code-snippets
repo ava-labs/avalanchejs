@@ -46,5 +46,34 @@
       "}"
     ],
     "description": "new tx type"
+  },
+  "newtx": {
+    "scope": "typescript",
+    "prefix": "nrpc",
+    "body": [
+      "$1(",
+      "  $1Params: ${1/(.*)/${1:/pascalcase}/}Params,",
+      "): Promise<${1/(.*)/${1:/pascalcase}/}Response> {",
+      "  return this.callRpc<${1/(.*)/${1:/pascalcase}/}Response>(",
+      "    '$1',",
+      "    $1Params,",
+      "  );",
+      "}"
+    ],
+    "description": "new rpc"
+  },
+  "newResponse": {
+    "scope": "typescript",
+    "prefix": "nresp",
+    "body": [
+      "export interface  ${1/(.*)/${1:/pascalcase}/}Params {",
+      "$2",
+      "}",
+      "",
+      "export interface  ${1/(.*)/${1:/pascalcase}/}Response {",
+      "  $3",
+      "}"
+    ],
+    "description": "new rpc response"
   }
 }

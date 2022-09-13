@@ -1,9 +1,9 @@
-import type { Serializable, SerializableStatic } from '../common/types';
-import { serializable } from '../common/types';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
-import { Int } from '../primitives';
 import { concatBytes } from '../../utils/buffer';
 import { unpack } from '../../utils/struct';
+import type { Serializable, SerializableStatic } from '../common/types';
+import { serializable } from '../common/types';
+import { Int } from '../primitives';
 
 const _symbol = Symbol('codec');
 
@@ -27,7 +27,9 @@ export class Codec {
   PackPrefix = (type: Serializable) => {
     const id = this.typeToTypeID.get(type._type);
     if (id === undefined) {
-      throw new Error("can't marshal unregistered type");
+      throw new Error(
+        `can't marshal unregistered type: ${type._type.toString()}`,
+      );
     }
 
     return concatBytes(bytesForInt(id), type.toBytes(this));
@@ -39,14 +41,13 @@ export class Codec {
     const type = this.typeIdToType[typeId.value()];
 
     if (type === undefined) {
-      console.log('buf=', buf);
-
       throw new Error(
         `couldn't unmarshal interface: unknown type ID ${typeId.value()}`,
       );
     }
 
     const [entity, rest] = type.fromBytes(buf, this);
+
     return [entity as T, rest];
   };
 

@@ -1,7 +1,6 @@
 import { Id } from '../serializable/fxs/common';
-import { bufferToHex } from '../utils/buffer';
 
-export const PlatformChainID = new Id(bufferToHex(new Uint8Array(32)));
+export const PlatformChainID = new Id(new Uint8Array(32));
 
 export const MainnetName = 'mainnet';
 export const CascadeName = 'cascade';

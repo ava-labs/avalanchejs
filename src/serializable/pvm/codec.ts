@@ -1,7 +1,6 @@
+import { BaseTx } from '../avax/baseTx';
 import { Codec, Manager } from '../codec';
-import { BaseTx } from '../avax';
 import * as Secp256k1Fx from '../fxs/secp256k1';
-import { ImportTx } from '../avm';
 import { AddDelegatorTx } from './addDelegatorTx';
 import { AddSubnetValidatorTx } from './addSubnetValidatorTx';
 import { AddValidatorTx } from './addValidatorTx';
@@ -9,9 +8,10 @@ import { AdvanceTimeTx } from './advanceTimeTx';
 import { CreateChainTx } from './createChainTx';
 import { CreateSubnetTx } from './createSubnetTx';
 import { ExportTx } from './exportTx';
+import { ImportTx } from './importTx';
 import { RewardValidatorTx } from './rewardValidatorTx';
-import { StakableLockIn } from './stakableLockIn';
-import { StakableLockOut } from './stakableLockOut';
+import { StakeableLockIn } from './stakableLockIn';
+import { StakeableLockOut } from './stakableLockOut';
 
 // https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/codec.go
 export const codec = new Codec([
@@ -38,12 +38,12 @@ export const codec = new Codec([
   AdvanceTimeTx, //19
   RewardValidatorTx, //20
 
-  StakableLockIn, // 21
-  StakableLockOut, // 22
+  StakeableLockIn, // 21
+  StakeableLockOut, // 22
 ]);
 
 let manager: Manager;
-export const getManager = () => {
+export const getPVMManager = () => {
   if (manager) return manager;
   manager = new Manager();
   manager.RegisterCodec(0, codec);

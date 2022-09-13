@@ -40,3 +40,25 @@ export type AVMContext = {
   readonly baseTxFee: bigint;
   readonly createAssetTxFee: bigint;
 };
+
+export interface IssueTxParams {
+  tx: string;
+}
+
+export interface IssueTxResponse {
+  txID: string;
+}
+
+export interface GetTxParams {
+  txID: string;
+}
+
+export interface GetTxStatusParams {
+  txID: string;
+  includeReason?: boolean | true;
+}
+
+export interface GetTxStatusResponse {
+  status: string;
+  reason: string;
+}

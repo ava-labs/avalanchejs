@@ -1,20 +1,21 @@
 import { toListStruct } from '../../utils/serializeList';
 import { packSwitched, unpack } from '../../utils/struct';
 import { serializable } from '../../vms/common/types';
-import { TransferableInput } from '../avax';
+import { TransferableInput } from '../avax/transferableInput';
 import type { Codec } from '../codec';
 import { Id } from '../fxs/common';
 import { Int } from '../primitives';
+import { EVMTx } from './abstractTx';
 import { Output } from './output';
 
-const _symbol = Symbol('evm.ImportTx');
+export const importTx_symbol = Symbol('evm.ImportTx');
 
 /**
  * @see
  */
 @serializable()
-export class ImportTx {
-  _type = _symbol;
+export class ImportTx extends EVMTx {
+  _type = importTx_symbol;
 
   constructor(
     public readonly networkId: Int,
@@ -22,7 +23,13 @@ export class ImportTx {
     public readonly sourceChain: Id,
     public readonly importedInputs: TransferableInput[],
     public readonly Outs: Output[],
-  ) {}
+  ) {
+    super();
+  }
+
+  getSigIndices() {
+    return this.importedInputs.map((inp) => inp.sigIndicies());
+  }
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {
     const [networkId, blockchainId, sourceChain, importedInputs, Outs, rest] =

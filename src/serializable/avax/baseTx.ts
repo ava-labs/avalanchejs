@@ -37,11 +37,26 @@ export class BaseTx {
       ],
       codec,
     );
-
     return [
       new BaseTx(networkId, blockchainId, outputs, inputs, memo),
       remaining,
     ];
+  }
+
+  static fromNative(
+    networkId: number,
+    blockchainId: string,
+    outputs: TransferableOutput[],
+    inputs: TransferableInput[],
+    memo: Uint8Array,
+  ) {
+    return new BaseTx(
+      new Int(networkId),
+      Id.fromString(blockchainId),
+      outputs,
+      inputs,
+      new Bytes(memo),
+    );
   }
 
   toBytes(codec) {

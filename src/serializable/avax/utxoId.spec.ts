@@ -1,8 +1,8 @@
-import { Id } from '../fxs/common';
-import { Int } from '../primitives';
 import { UTXOID } from '.';
 import { utxoId, utxoIdBytes } from '../../fixtures/avax';
 import { testSerialization } from '../../fixtures/utils/serializable';
+import { Id } from '../fxs/common';
+import { Int } from '../primitives';
 
 testSerialization('UTXOID', UTXOID, utxoId, utxoIdBytes);
 
@@ -10,8 +10,8 @@ describe('UTXOID', () => {
   it('generates correct id', () => {
     expect(
       new UTXOID(
-        new Id(
-          '0x0400000000000000000000000000000000000000000000000000000000000000',
+        Id.fromHex(
+          '0400000000000000000000000000000000000000000000000000000000000000',
         ),
         new Int(0),
       ).ID(),
@@ -19,7 +19,7 @@ describe('UTXOID', () => {
 
     expect(
       new UTXOID(
-        new Id(
+        Id.fromHex(
           '0x0500000000000000000000000000000000000000000000000000000000000000',
         ),
         new Int(4),

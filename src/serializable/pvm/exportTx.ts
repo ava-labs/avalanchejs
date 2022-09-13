@@ -1,24 +1,28 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx, TransferableOutput } from '../avax';
-import { Id } from '../fxs/common';
 import { toListStruct } from '../../utils/serializeList';
 import { packSwitched, unpack } from '../../utils/struct';
+import { BaseTx } from '../avax/baseTx';
+import { TransferableOutput } from '../avax/transferableOutput';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { Id } from '../fxs/common';
+import { PVMTx } from './abstractTx';
 
-const _symbol = Symbol('pvm.ExportTx');
+export const exportTx_symbol = Symbol('pvm.ExportTx');
 
 /**
  * @see
  */
 @serializable()
-export class ExportTx {
-  _type = _symbol;
+export class ExportTx extends PVMTx {
+  _type = exportTx_symbol;
 
   constructor(
     public readonly baseTx: BaseTx,
-    public readonly id: Id,
+    public readonly destination: Id,
     public readonly outs: TransferableOutput[],
-  ) {}
+  ) {
+    super();
+  }
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ExportTx, Uint8Array] {
     const [baseTx, id, outs, rest] = unpack(
@@ -30,6 +34,6 @@ export class ExportTx {
   }
 
   toBytes(codec: Codec) {
-    return packSwitched(codec, this.baseTx, this.id, this.outs);
+    return packSwitched(codec, this.baseTx, this.destination, this.outs);
   }
 }

@@ -8,9 +8,16 @@ import ttypescript from 'ttypescript';
 
 export default {
   input: './index.ts',
+  external: [
+    '@scure/base',
+    '@noble/hashes/utils',
+    '@noble/hashes/sha256',
+    '@noble/secp256k1',
+    '@noble/hashes/ripemd160',
+  ], // we don't want these dependencies bundled in the dist folder
   output: {
     dir: 'dist',
-    format: 'cjs',
+    format: 'es',
     sourcemap: process.env.BUILD === 'production' ? false : true,
   },
   plugins: [

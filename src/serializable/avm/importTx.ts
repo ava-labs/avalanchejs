@@ -1,25 +1,35 @@
-import type { Codec } from '../codec/codec';
-import { serializable } from '../common/types';
-import { BaseTx, TransferableInput } from '../avax';
-import { Id } from '../fxs/common';
 import { concatBytes } from '../../utils/buffer';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
+import { BaseTx } from '../avax/baseTx';
+import { TransferableInput } from '../avax/transferableInput';
+import type { Codec } from '../codec/codec';
+import { serializable } from '../common/types';
+import { Id } from '../fxs/common';
+import { AVMTx } from './abstractTx';
 
-const _symbol = Symbol('avm.ImportTx');
+export const importTx_symbol = Symbol('avm.ImportTx');
 
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-importtx
  */
 @serializable()
-export class ImportTx {
-  _type = _symbol;
+export class ImportTx extends AVMTx {
+  _type = importTx_symbol;
 
   constructor(
-    private readonly baseTx: BaseTx,
-    private readonly sourceChain: Id,
-    private readonly ins: TransferableInput[],
-  ) {}
+    readonly baseTx: BaseTx,
+    readonly sourceChain: Id,
+    readonly ins: TransferableInput[],
+  ) {
+    super();
+  }
+
+  getSigIndices() {
+    return this.ins
+      .map((inp) => inp.sigIndicies())
+      .concat(super.getSigIndices());
+  }
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [ImportTx, Uint8Array] {
     const [baseTx, sourceChain, ins, remaining] = unpack(

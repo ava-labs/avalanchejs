@@ -3,5 +3,9 @@
 /node_modules
 /dist
 /coverage
+/yarn-error.log
 
 .idea
+
+stats.html
+.dccache

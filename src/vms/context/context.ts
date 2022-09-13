@@ -1,17 +1,19 @@
 import { getHRP } from '../../constants/networkIDs';
 import { Info } from '../../info/info';
-import { AVMApi } from '../avm/x-chain';
+import { AVMApi } from '../avm/api';
 import type { Context } from './model';
 
 /*
 grabs some basic info about an avm chain
 */
 export const getContextFromURI = async (
-  assetID: string,
   baseURL?: string,
+  assetDescription = 'AVAX',
 ): Promise<Context> => {
   const xChainApi = new AVMApi(baseURL);
-  const { assetID: avaxAssetID } = await xChainApi.getAssetDescription(assetID);
+  const { assetID: avaxAssetID } = await xChainApi.getAssetDescription(
+    assetDescription,
+  );
   const info = new Info(baseURL);
   const {
     txFee: baseTxFee,

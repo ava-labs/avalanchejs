@@ -1,4 +1,5 @@
 import { bech32 } from '@scure/base';
+import { Address } from '../serializable/fxs/common/address';
 
 const addressSep = '-';
 
@@ -16,6 +17,10 @@ export function parse(addrStr: string): [string, string, Uint8Array] {
   const [hrp, addr] = parseBech32(rawAddr);
 
   return [chainID, hrp, addr];
+}
+
+export function bech32ToBytes(addrStr: string): Uint8Array {
+  return parse(addrStr)[2];
 }
 
 // format takes in a chain ID alias, bech32 HRP, and byte slice to produce a
@@ -36,4 +41,8 @@ export function parseBech32(addrStr: string): [string, Uint8Array] {
 export function formatBech32(hrp: string, payload: Uint8Array) {
   const words = bech32.toWords(payload);
   return bech32.encode(hrp, words);
+}
+
+export function addressesFromBytes(bytes: Uint8Array[]): Address[] {
+  return bytes.map((b) => new Address(b));
 }

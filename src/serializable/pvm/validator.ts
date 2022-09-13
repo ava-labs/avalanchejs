@@ -1,8 +1,8 @@
+import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec/codec';
 import { serializable } from '../common/types';
-import { Id } from '../fxs/common';
+import { NodeId } from '../fxs/common/nodeId';
 import { BigIntPr } from '../primitives';
-import { pack, unpack } from '../../utils/struct';
 
 const _symbol = Symbol('pvm.Validator');
 
@@ -14,18 +14,33 @@ export class Validator {
   _type = _symbol;
 
   constructor(
-    public readonly nodeId: Id,
+    public readonly nodeId: NodeId,
     public readonly startTime: BigIntPr,
     public readonly endTime: BigIntPr,
     public readonly weight: BigIntPr,
   ) {}
 
+  static fromNative(
+    nodeId: string,
+    startTime: bigint,
+    endTime: bigint,
+    weight: bigint,
+  ) {
+    return new Validator(
+      NodeId.fromString(nodeId),
+      new BigIntPr(startTime),
+      new BigIntPr(endTime),
+      new BigIntPr(weight),
+    );
+  }
+
   static fromBytes(bytes: Uint8Array, codec: Codec): [Validator, Uint8Array] {
     const [nodeId, startTime, endTime, weight, rest] = unpack(
       bytes,
-      [Id, BigIntPr, BigIntPr, BigIntPr],
+      [NodeId, BigIntPr, BigIntPr, BigIntPr],
       codec,
     );
+
     return [new Validator(nodeId, startTime, endTime, weight), rest];
   }
 
