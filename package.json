@@ -24,7 +24,6 @@
     "bench": "ts-node ./scripts/bench.ts",
     "example": "ts-node ./examples/x-chain/utxos.ts",
     "debug": "ts-node ./src/debug.ts",
-    "cm": "cz",
     "prepare": "husky install"
   },
   "dependencies": {
