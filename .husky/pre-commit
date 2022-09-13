@@ -1,8 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-git reset src/debug.ts
-yarn lint --quiet
-
-
 
