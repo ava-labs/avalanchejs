@@ -7,7 +7,6 @@
   "publishConfig": {
     "access": "restricted"
   },
-  "private": true,
   "sideEffects": false,
   "module": "dist/index.js",
   "type": "module",
