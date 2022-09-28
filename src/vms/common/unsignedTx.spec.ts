@@ -5,6 +5,7 @@ import {
 } from '../../fixtures/avax';
 import { id } from '../../fixtures/common';
 import { bigIntPr, bytes, int } from '../../fixtures/primitives';
+import { transferOutput } from '../../fixtures/secp256k1';
 import {
   testAddress1,
   testAddress2,
@@ -12,6 +13,7 @@ import {
   testPrivateKey2,
 } from '../../fixtures/vms';
 import { BaseTx, TransferableInput } from '../../serializable/avax';
+import { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx } from '../../serializable/avm';
 import { Address } from '../../serializable/fxs/common';
 import { Input, TransferInput } from '../../serializable/fxs/secp256k1';
@@ -65,5 +67,39 @@ describe('UnsignedTx', () => {
     unsignedTx.addSignature(sig2);
 
     expect(unsignedTx.hasAllSignatures()).toBeTruthy();
+  });
+
+  it('serializes', () => {
+    const tx = new ExportTx(
+      new BaseTx(
+        int(),
+        id(),
+        [transferableOutput()],
+        [
+          new TransferableInput(
+            utxoId(),
+            id(),
+            new TransferInput(bigIntPr(), Input.fromNative([0])),
+          ),
+          new TransferableInput(
+            utxoId(),
+            id(),
+            new TransferInput(bigIntPr(), Input.fromNative([0])),
+          ),
+        ],
+        bytes(),
+      ),
+      id(),
+      transferableOutputs(),
+    );
+
+    const unsignedTx = new UnsignedTx(
+      tx,
+      [new Utxo(utxoId(), id(), transferOutput())],
+      addressMaps,
+    );
+    const unsignedTxJson = unsignedTx.toJSON();
+
+    expect(UnsignedTx.fromJSON(unsignedTxJson)).toEqual(unsignedTx);
   });
 });

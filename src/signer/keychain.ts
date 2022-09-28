@@ -30,6 +30,26 @@ export class Secp256K1Keychain implements Keychain {
     );
   }
 
+  /*
+  This is for the use case that we're getting a buffer from a dapp and we just sign and let the dapp
+  figure out which signature to use and where to put it
+  */
+  async signBytes(unsignedTxBytes: Uint8Array) {
+    const promises: Promise<void>[] = [];
+    const publicKeyToSignatures: Record<string, Uint8Array> = {};
+    this.publicKeyToPrivateKey.forEach((privateKey, publicKey) => {
+      promises.push(
+        (async () => {
+          const signature = await sign(unsignedTxBytes, privateKey);
+          publicKeyToSignatures[publicKey] = signature;
+        })(),
+      );
+    });
+
+    await Promise.all(promises);
+    return publicKeyToSignatures;
+  }
+
   async addSignatures(unsignedTx: UnsignedTx) {
     const unsignedBytes = unsignedTx.toBytes();
     const promises: Promise<void>[] = [];

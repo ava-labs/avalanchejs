@@ -1,7 +1,9 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { emptySignature } from '../../constants/zeroValue';
 import { SignedTx } from '../../serializable/avax';
-import type { Utxo } from '../../serializable/avax/utxo';
+import { Utxo } from '../../serializable/avax/utxo';
+import type { VM } from '../../serializable/constants';
+import { ValidVMs } from '../../serializable/constants';
 import { Address } from '../../serializable/fxs/common';
 import { Credential } from '../../serializable/fxs/secp256k1';
 import {
@@ -10,10 +12,17 @@ import {
   publicKeyBytesToAddress,
   recoverPublicKey,
 } from '../../utils';
-import type { AddressMaps } from '../../utils/addressMap';
-import { packTx } from '../../utils/packTx';
+import { AddressMaps } from '../../utils/addressMap';
+import { getManagerForVM, packTx } from '../../utils/packTx';
 import type { Transaction } from './transaction';
 
+type UnsingedTxSerialize = {
+  txBytes: string;
+  utxos: string[];
+  addressMaps: string;
+  vm: string;
+  codecId: string;
+};
 export class UnsignedTx {
   credentials: Credential[];
 
@@ -25,6 +34,42 @@ export class UnsignedTx {
     this.credentials = this.tx
       .getSigIndices()
       .map((indicies) => new Credential(indicies.map(() => emptySignature)));
+  }
+
+  toJSON() {
+    const codec = getManagerForVM(this.tx.vm).getDefaultCodec();
+    const codecId = getManagerForVM(this.tx.vm).getDefaultCodecId();
+    return JSON.stringify({
+      codecId: codecId.toJSON(),
+      vm: this.tx.vm,
+      txBytes: bufferToHex(this.toBytes()),
+      utxos: this.utxos.map((utxo) => bufferToHex(utxo.toBytes(codec))),
+      addressMaps: this.addressMaps,
+    });
+  }
+
+  static fromJSON(jsonString: string) {
+    const res = JSON.parse(jsonString) as UnsingedTxSerialize;
+    const fields = ['txBytes', 'utxos', 'addressMaps', 'vm', 'codecId'];
+    if (!fields.every((field) => res[field])) {
+      throw new Error(`invalid structure. must have ${fields.join(', ')}`);
+    }
+    const vm = res.vm as VM;
+    if (!ValidVMs.includes(vm)) {
+      throw new Error('invalid VM');
+    }
+
+    const manager = getManagerForVM(vm);
+    const [codec, rest] = manager.getCodecFromBuffer(hexToBuffer(res.txBytes));
+    const tx = codec.UnpackPrefix<Transaction>(rest)[0];
+
+    const utxos = res.utxos.map(
+      (utxo) => Utxo.fromBytes(hexToBuffer(utxo), codec)[0],
+    );
+
+    const addressMaps = AddressMaps.fromJSON(res.addressMaps);
+
+    return new UnsignedTx(tx, utxos, addressMaps);
   }
 
   getSigIndices() {

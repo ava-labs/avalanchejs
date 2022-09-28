@@ -14,6 +14,16 @@ export class AddressMap {
     this.storage.set(add.toHex(), item);
     return this;
   }
+  toJSON() {
+    return JSON.stringify(Array.from(this.storage.entries()));
+  }
+
+  static fromJSON(jsonString: string) {
+    const parsed = JSON.parse(jsonString) as [string, number][];
+    return new AddressMap(
+      parsed.map(([addressHex, idx]) => [Address.fromHex(addressHex), idx]),
+    );
+  }
 
   get(add: Address): number | undefined {
     return this.storage.get(add.toHex());
@@ -56,6 +66,15 @@ export class AddressMaps {
       });
       this.storage.push(addressMap);
     });
+  }
+
+  toJSON() {
+    return JSON.stringify(this.storage);
+  }
+
+  static fromJSON(jsonString: string) {
+    const addressMaps = JSON.parse(jsonString);
+    return new AddressMaps(addressMaps.map((map) => AddressMap.fromJSON(map)));
   }
 
   getAddresses(): Uint8Array[] {
