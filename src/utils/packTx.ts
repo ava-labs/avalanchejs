@@ -11,7 +11,7 @@ export interface GenericTransaction extends Serializable {
   vm: VM;
 }
 
-export const getManagerForVM = (vm: VM): Manager => {
+export function getManagerForVM(vm: VM): Manager {
   switch (vm) {
     case 'AVM':
       return getAVMManager();
@@ -22,14 +22,18 @@ export const getManagerForVM = (vm: VM): Manager => {
     default:
       throw new Error('unknown VM');
   }
-};
+}
 
-export const packTx = (tx: GenericTransaction) => {
+export function unpackWithManager(vm: VM, txBytes: Uint8Array) {
+  return getManagerForVM(vm).unpackTransaction(txBytes);
+}
+
+export function packTx(tx: GenericTransaction) {
   return getManagerForVM(tx.vm).packCodec(tx);
-};
+}
 
-export const getDefaultCodecFromTx = (tx: GenericTransaction) => {
+export function getDefaultCodecFromTx(tx: GenericTransaction) {
   return getManagerForVM(tx.vm).getCodecForVersion(
     new Short(DEFAULT_CODEC_VERSION),
   );
-};
+}

@@ -15,11 +15,18 @@ export default {
     '@noble/secp256k1',
     '@noble/hashes/ripemd160',
   ], // we don't want these dependencies bundled in the dist folder
-  output: {
-    dir: 'dist',
-    format: 'es',
-    sourcemap: process.env.BUILD === 'production' ? false : true,
-  },
+  output: [
+    {
+      dir: 'dist',
+      format: 'commonjs',
+      sourcemap: process.env.BUILD === 'production' ? false : true,
+    },
+    {
+      dir: 'dist/es',
+      format: 'es',
+      sourcemap: process.env.BUILD === 'production' ? false : true,
+    },
+  ],
   plugins: [
     filesize(),
     nodeResolve(),

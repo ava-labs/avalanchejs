@@ -2,6 +2,7 @@ import { DEFAULT_CODEC_VERSION } from '../../constants/codec';
 import { concatBytes } from '../../utils/buffer';
 import type { FromBytesReturn } from '../../utils/struct';
 import { unpack } from '../../utils/struct';
+import type { Transaction } from '../../vms/common/transaction';
 import type { Serializable, SerializableStatic } from '../common/types';
 import { Short } from '../primitives';
 import type { Codec } from './codec';
@@ -26,6 +27,11 @@ export class Manager {
     const [codec, rest] = this.getCodecFromBuffer(buff);
     // TODO: try to do this without casting
     return unpacker.fromBytes(rest, codec)[0] as FromBytesReturn<T>;
+  };
+
+  unpackTransaction = (buff: Uint8Array): Transaction => {
+    const [codec, rest] = this.getCodecFromBuffer(buff);
+    return codec.UnpackPrefix<Transaction>(rest)[0];
   };
 
   public getCodecFromBuffer(buff: Uint8Array): [Codec, Uint8Array] {

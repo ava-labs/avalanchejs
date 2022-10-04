@@ -1,4 +1,4 @@
-import { concatBytes } from '../../utils';
+import { concatBytes } from '../../utils/buffer';
 import { toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 import { BaseTx } from '../avax/baseTx';
@@ -8,6 +8,7 @@ import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
 import { PVMTx } from './abstractTx';
 import { Validator } from './validator';
+import type { OutputOwners } from '../fxs/secp256k1';
 
 export const addDelegatorTx_symbol = Symbol('pvm.AddDelegatorTx');
 
@@ -25,6 +26,10 @@ export class AddDelegatorTx extends PVMTx {
     public readonly rewardsOwner: Serializable,
   ) {
     super();
+  }
+
+  getRewardsOwner() {
+    return this.rewardsOwner as OutputOwners;
   }
 
   static fromBytes(

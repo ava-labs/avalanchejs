@@ -1,6 +1,10 @@
-import { isStakeableLockIn, isTransferInput, isTransferOut } from '../../utils';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
+import {
+  isStakeableLockIn,
+  isTransferInput,
+  isTransferOut,
+} from '../../utils/typeGuards';
 import type { Codec } from '../codec/codec';
 import type { Amounter } from '../common/types';
 import { serializable } from '../common/types';

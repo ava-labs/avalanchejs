@@ -8,7 +8,7 @@
     "access": "restricted"
   },
   "sideEffects": false,
-  "module": "dist/index.js",
+  "module": "dist/es/index.js",
   "type": "module",
   "scripts": {
     "start": "rollup -c --watch",
