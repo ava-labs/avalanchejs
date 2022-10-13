@@ -10,7 +10,7 @@ const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
   const txID: string = "2fJer7o3HpPYxqyHXo23G4HoPvfEqcUXYojMULi2mbBEoBFqoM"
-  const hex = await xchain.getTx(txID) as string
+  const hex = (await xchain.getTx(txID)) as string
   const buf: Buffer = new Buffer(hex.slice(2), "hex")
   const tx: Tx = new Tx()
   tx.fromBuffer(buf)
