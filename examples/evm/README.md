@@ -15,3 +15,4 @@ Example scripts for the Avalanche [EVM](https://docs.avax.network/build/avalanch
 * [getAtomicTxStatus.ts](./getAtomicTxStatus.ts)
 * [getInterfaces.ts](./getInterfaces.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
+* [JSONCChainTx.ts](./JSONCChainTx.ts)
