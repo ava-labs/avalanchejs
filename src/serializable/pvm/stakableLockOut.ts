@@ -51,7 +51,7 @@ export class StakeableLockOut implements Amounter {
     if (isTransferOut(this.transferOut)) {
       return this.transferOut.getOwners();
     }
-    throw new Error('Unable to get locktime.');
+    throw new Error('Unable to get owners.');
   }
 
   toBytes(codec: Codec) {

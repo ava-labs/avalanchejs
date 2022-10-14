@@ -7,7 +7,7 @@ import { Id } from '../fxs/common/id';
 import { OutputOwners, TransferOutput } from '../fxs/secp256k1';
 import { BigIntPr } from '../primitives';
 
-const _symbol = Symbol('avax.TransferableOutput');
+export const transferableOutput_symbol = Symbol('avax.TransferableOutput');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go
@@ -17,7 +17,7 @@ const _symbol = Symbol('avax.TransferableOutput');
  */
 @serializable()
 export class TransferableOutput {
-  _type = _symbol;
+  _type = transferableOutput_symbol;
 
   constructor(public readonly assetId: Id, public readonly output: Amounter) {}
 

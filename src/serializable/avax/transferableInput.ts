@@ -14,7 +14,7 @@ import { BigIntPr, Int } from '../primitives';
 import type { Utxo } from './utxo';
 import { UTXOID } from './utxoId';
 
-const transferableInputType = Symbol('avax.TransferableInput');
+export const transferableInputType = Symbol('avax.TransferableInput');
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/components/avax/transferables.go

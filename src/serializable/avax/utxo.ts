@@ -1,5 +1,5 @@
 import { concatBytes } from '@noble/hashes/utils';
-import { UTXOID } from '.';
+import { UTXOID } from './utxoId';
 import { pack, unpack } from '../../utils/struct';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
