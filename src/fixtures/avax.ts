@@ -2,8 +2,8 @@ import {
   BaseTx,
   TransferableInput,
   TransferableOutput,
-  UTXOID,
 } from '../serializable/avax';
+import { UTXOID } from '../serializable/avax/utxoId';
 import { TransferableOp } from '../serializable/avax/transferableOp';
 import { Utxo } from '../serializable/avax/utxo';
 import { CreateAssetTx } from '../serializable/avm/createAssetTx';

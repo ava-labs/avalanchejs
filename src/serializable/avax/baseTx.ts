@@ -8,14 +8,14 @@ import { Bytes, Int } from '../primitives';
 import { TransferableInput } from './transferableInput';
 import { TransferableOutput } from './transferableOutput';
 
-const _symbol = Symbol('avax.BaseTx');
+export const baseTx_symbol = Symbol('avax.BaseTx');
 
 /**
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-basetx
  */
 @serializable()
 export class BaseTx {
-  _type = _symbol;
+  _type = baseTx_symbol;
 
   constructor(
     public readonly NetworkId: Int,
