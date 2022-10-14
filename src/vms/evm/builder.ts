@@ -310,7 +310,6 @@ export function newImportTx(
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
   const map: Map<string, bigint> = new Map();
-  const addressMaps = new AddressMaps();
   let ins: TransferableInput[] = [];
   let outs: Output[] = [];
   let feepaid = 0n;
@@ -341,7 +340,6 @@ export function newImportTx(
       atomic.assetId,
       TransferInput.fromNative(amount, sigData.sigIndicies),
     );
-    addressMaps.push(sigData.addressMap);
     ins.push(xferin);
     inputUtxos.push(atomic);
     const assetFeeAmount = map.get(assetID);
@@ -364,6 +362,12 @@ export function newImportTx(
 
   // lexicographically sort array
   ins = ins.sort(TransferableInput.compare);
+  const addressMaps = AddressMaps.fromTransferableInputs(
+    ins,
+    atomics,
+    fromAddressesBytes,
+    0n,
+  );
   outs = outs.sort(compareEVMOutputs);
 
   const importTx = new ImportTx(

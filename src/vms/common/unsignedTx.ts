@@ -45,6 +45,7 @@ export class UnsignedTx {
       txBytes: bufferToHex(this.toBytes()),
       utxos: this.utxos.map((utxo) => bufferToHex(utxo.toBytes(codec))),
       addressMaps: this.addressMaps,
+      credentials: this.credentials,
     });
   }
 

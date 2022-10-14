@@ -26,7 +26,6 @@ export const iterateUtxoforSpend = (
 ) => {
   const inputs: TransferableInput[] = [];
   const inputUtxos: Utxo[] = [];
-  const addressMaps = new AddressMaps();
 
   utxos.forEach((utxo) => {
     if (utxoPredicate && !utxoPredicate(utxo)) {
@@ -52,7 +51,6 @@ export const iterateUtxoforSpend = (
     );
 
     inputUtxos.push(utxo);
-    addressMaps.push(sigData.addressMap);
 
     if (postAction) {
       postAction(utxo);
@@ -60,7 +58,12 @@ export const iterateUtxoforSpend = (
   });
 
   inputs.sort(TransferableInput.compare);
-
+  const addressMaps = AddressMaps.fromTransferableInputs(
+    inputs,
+    inputUtxos,
+    fromAddresses.map((add) => add.toBytes()),
+    options.minIssuanceTime,
+  );
   return { inputs, inputUtxos, addressMaps };
 };
 
@@ -78,7 +81,7 @@ export const utxoSpend = (
     addressesFromBytes(options.changeAddresses),
   );
 
-  const { addressMaps, inputUtxos, inputs } = iterateUtxoforSpend(
+  const { inputUtxos, inputs } = iterateUtxoforSpend(
     utxos,
     fromAddresses,
     options,
@@ -112,6 +115,12 @@ export const utxoSpend = (
   );
 
   inputs.sort(TransferableInput.compare);
+  const addressMaps = AddressMaps.fromTransferableInputs(
+    inputs,
+    utxos,
+    fromAddresses.map((add) => add.toBytes()),
+    options.minIssuanceTime,
+  );
   changeOutputs.sort(compareTransferableOutputs);
 
   return { inputs, changeOutputs, inputUtxos, addressMaps };

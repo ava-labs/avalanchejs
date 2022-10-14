@@ -1,5 +1,6 @@
 import { concatBytes } from '@noble/hashes/utils';
-import { UTXOID } from './utxoId';
+import { UTXOID } from '.';
+import { isStakeableLockOut, isTransferOut } from '../../utils';
 import { pack, unpack } from '../../utils/struct';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
@@ -28,6 +29,16 @@ export class Utxo {
       codec,
     );
     return [new Utxo(utxoId, assetId, output), remaining];
+  }
+
+  getOutputOwners() {
+    if (isTransferOut(this.output)) {
+      return this.output.outputOwners;
+    }
+    if (isStakeableLockOut(this.output)) {
+      return this.output.getOutputOwners();
+    }
+    throw new Error('unable to get output owner');
   }
 
   toBytes(codec) {

@@ -70,7 +70,7 @@ export function newImportTx(
     (utxo) => utxo.assetId.toString() === context.avaxAssetID,
   );
 
-  const { addressMaps, importedAmounts, importedInputs, inputUTXOs } =
+  const { importedAmounts, importedInputs, inputUTXOs } =
     getImportedInputsFromUtxos(
       utxos,
       fromAddressesBytes,
@@ -80,7 +80,12 @@ export function newImportTx(
   const importedAvax = importedAmounts[context.avaxAssetID] ?? 0n;
 
   importedInputs.sort(TransferableInput.compare);
-
+  const addressMaps = AddressMaps.fromTransferableInputs(
+    importedInputs,
+    utxos,
+    fromAddressesBytes,
+    defaultedOptions.minIssuanceTime,
+  );
   if (!importedInputs.length) {
     throw new Error('no UTXOs available to import');
   }
@@ -348,7 +353,6 @@ function spend(
     return options.minIssuanceTime < out.getLocktime();
   });
   const inputUTXOs: Utxo[] = [];
-  const addressMaps = new AddressMaps();
 
   lockedUTXOs.forEach((utxo) => {
     const assetId = utxo.assetId.value();
@@ -388,7 +392,6 @@ function spend(
       ),
     );
     inputUTXOs.push(utxo);
-    addressMaps.push(sigData.addressMap);
 
     const amountToStake = bigIntMin(remainingAmountToStake, out.amt.value());
     stakeOutputs.push(
@@ -449,7 +452,6 @@ function spend(
     );
 
     inputUTXOs.push(utxo);
-    addressMaps.push(sigData.addressMap);
 
     const amountToBurn = bigIntMin(
       remainingAmountToBurn,
@@ -511,7 +513,12 @@ function spend(
   inputs.sort(TransferableInput.compare);
   changeOutputs.sort(compareTransferableOutputs);
   stakeOutputs.sort(compareTransferableOutputs);
-
+  const addressMaps = AddressMaps.fromTransferableInputs(
+    inputs,
+    inputUTXOs,
+    fromAddresses.map((add) => add.toBytes()),
+    options.minIssuanceTime,
+  );
   return {
     inputs,
     changeOutputs,

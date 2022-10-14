@@ -41,7 +41,7 @@ export function newImportTx(
 ) {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-  const { addressMaps, importedAmounts, importedInputs, inputUTXOs } =
+  const { importedAmounts, importedInputs, inputUTXOs } =
     getImportedInputsFromUtxos(
       utxos,
       fromAddressesBytes,
@@ -53,7 +53,12 @@ export function newImportTx(
   }
 
   importedInputs.sort(TransferableInput.compare);
-
+  const addressMaps = AddressMaps.fromTransferableInputs(
+    importedInputs,
+    utxos,
+    fromAddressesBytes,
+    defaultedOptions.minIssuanceTime,
+  );
   const importedAvax = importedAmounts[context.avaxAssetID] ?? 0n;
 
   let inputOutputs: UtxoSpendReturn = {
