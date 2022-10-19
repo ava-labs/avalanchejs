@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -7,13 +7,14 @@ import {
   Tx,
   AVMConstants,
   UTXO
-} from "../../src/apis/avm"
-import { OutputOwners } from "../../src/common"
+} from "avalanche/dist/apis/avm"
+import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
+import { OutputOwners } from "avalanche/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 // run ts-node examples/avm/buildCreateNFTMintTx.ts
 // before you run this example buildCreateNFTAssetTx.ts
@@ -22,7 +23,7 @@ const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
   outputType: number = AVMConstants.SECPXFEROUTPUTID_CODECONE,
-  assetID = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
+  assetID = "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
 ): string[] => {
   const utxoids: string[] = utxoSet.getUTXOIDs()
   let result: string[] = []
@@ -42,7 +43,7 @@ const getUTXOIDs = (
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
@@ -60,7 +61,9 @@ const payload: Buffer = Buffer.from("NFT Payload")
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const outputOwners: OutputOwners = new OutputOwners(
     xAddresses,
@@ -69,12 +72,12 @@ const main = async (): Promise<any> => {
   )
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   let txid: Buffer = Buffer.from(
-    "2nYzSgeo7vyoaH2UbqPPDNfyUPAfZkomXmMk5GUjtDpiChMPBB"
+    "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
   )
   let assetID: Buffer = Buffer.from(
-    "2nYzSgeo7vyoaH2UbqPPDNfyUPAfZkomXmMk5GUjtDpiChMPBB"
+    "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
   )
-  utxos.forEach((utxo: UTXO) => {
+  utxos.forEach((utxo: UTXO): void => {
     if (utxo.getOutput().getTypeID() === 10) {
       txid = utxo.getTxID()
       assetID = utxo.getAssetID()

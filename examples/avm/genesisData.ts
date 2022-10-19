@@ -1,4 +1,4 @@
-import Avalanche, { BN, Buffer } from "../../src"
+import Avalanche, { BN, Buffer } from "avalanche/dist"
 import {
   AVMAPI,
   GenesisAsset,
@@ -7,18 +7,18 @@ import {
   KeyChain,
   SECPMintOutput,
   SECPTransferOutput
-} from "../../src/apis/avm"
+} from "avalanche/dist/apis/avm"
 import {
   DefaultLocalGenesisPrivateKey,
   PrivateKeyPrefix,
   Serialization,
   SerializedType
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()

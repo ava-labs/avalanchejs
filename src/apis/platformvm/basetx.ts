@@ -60,7 +60,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
   /**
    * Returns the id of the [[BaseTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return PlatformVMConstants.BASETX
   }
 
@@ -115,7 +115,7 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = []
+    const creds: Credential[] = []
     for (let i: number = 0; i < this.ins.length; i++) {
       const cred: Credential = SelectCredentialClass(
         this.ins[`${i}`].getInput().getCredentialID()
@@ -128,9 +128,9 @@ export class BaseTx extends StandardBaseTx<KeyPair, KeyChain> {
         sig.fromBuffer(signval)
         cred.addSignature(sig)
       }
-      sigs.push(cred)
+      creds.push(cred)
     }
-    return sigs
+    return creds
   }
 
   clone(): this {

@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -12,16 +12,16 @@ import {
   UnsignedTx,
   Tx,
   ImportTx
-} from "../../src/apis/platformvm"
+} from "avalanche/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const bintools: BinTools = BinTools.getInstance()

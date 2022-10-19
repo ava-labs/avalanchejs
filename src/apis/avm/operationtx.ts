@@ -70,7 +70,7 @@ export class OperationTx extends BaseTx {
   /**
    * Returns the id of the [[OperationTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
@@ -125,7 +125,7 @@ export class OperationTx extends BaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc)
+    const creds: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.ops.length; i++) {
       const cred: Credential = SelectCredentialClass(
         this.ops[`${i}`].getOperation().getCredentialID()
@@ -138,9 +138,9 @@ export class OperationTx extends BaseTx {
         sig.fromBuffer(signval)
         cred.addSignature(sig)
       }
-      sigs.push(cred)
+      creds.push(cred)
     }
-    return sigs
+    return creds
   }
 
   clone(): this {

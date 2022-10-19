@@ -1,21 +1,21 @@
-import { Avalanche, BN } from "../../src"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
+import { Avalanche, BN } from "avalanche/dist"
+import { AVMAPI, KeyChain as AVMKeyChain } from "avalanche/dist/apis/avm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx
-} from "../../src/apis/evm"
+} from "avalanche/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   costExportTx
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const cchain: EVMAPI = avalanche.CChain()

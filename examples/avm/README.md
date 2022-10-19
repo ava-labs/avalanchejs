@@ -1,8 +1,9 @@
 # AVM
 
-Tests for the [Avalanche Virtual Machine](https://docs.avax.network/build/references/avm-transaction-serialization)
+Example scripts for the [Avalanche Virtual Machine](https://docs.avax.network/build/references/avm-transaction-serialization)
 
 * [addressFromBuffer.ts](./addressFromBuffer.ts)
+* [baseEndpoint.ts](./baseEndpoint.ts)
 * [baseTx-ant.ts](./baseTx-ant.ts)
 * [baseTx-avax-create-multisig.ts](./baseTx-avax-create-multisig.ts)
 * [baseTx-avax-send-multisig.ts](./baseTx-avax-send-multisig.ts)
@@ -37,6 +38,7 @@ Tests for the [Avalanche Virtual Machine](https://docs.avax.network/build/refere
 * [getCreationTxFee.ts](./getCreationTxFee.ts)
 * [getDefaultCreationTxFee.ts](./getDefaultCreationTxFee.ts)
 * [getDefaultTxFee.ts](./getDefaultTxFee.ts)
+* [getInterfaces.ts](./getInterfaces.ts)
 * [getTx.ts](./getTx.ts)
 * [getTxFee.ts](./getTxFee.ts)
 * [getTxStatus.ts](./getTxStatus.ts)

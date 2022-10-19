@@ -22,12 +22,12 @@ describe("PChain", (): void => {
   const badUser: string = "asdfasdfsa"
   const badPass: string = "pass"
   const memo: string = "hello world"
-  const whaleAddr: string = "P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
+  const whaleAddr: string = "P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
   const key: string =
     "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
   const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
   const subnetID: string = "2bGsYJorY6X7RhjPBFs3kYjiNEHo4zGrD2eeyZbb43T2KKi7fM"
-  const xChainAddr: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
+  const xChainAddr: string = "X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
   const avalancheBlockChainID: string =
     "2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD"
 
@@ -39,8 +39,8 @@ describe("PChain", (): void => {
       "createUser",
       () => keystore.createUser(user, passwd),
       (x) => x,
-      Matcher.toBe,
-      () => true
+      Matcher.toEqual,
+      () => { return {} }
     ],
     [
       "createaddrB",
@@ -62,7 +62,7 @@ describe("PChain", (): void => {
       (x) => x,
       Matcher.toThrow,
       () =>
-        `problem retrieving user '${badUser}': incorrect password for user "${badUser}"`
+        `problem retrieving user "${badUser}": incorrect password for user "${badUser}"`
     ],
     [
       "incorrectPass",
@@ -70,7 +70,7 @@ describe("PChain", (): void => {
       (x) => x,
       Matcher.toThrow,
       () =>
-        `problem retrieving user '${user}': incorrect password for user "${user}"`
+        `problem retrieving user "${user}": incorrect password for user "${user}"`
     ],
     [
       "getBalance",
@@ -91,21 +91,21 @@ describe("PChain", (): void => {
       () => pchain.getBlockchains(),
       (x) => x[0].id,
       Matcher.toBe,
-      () => "2CA6j5zYzasynPsFeNoqWkmTCt3VScMvXUZHbfDJ8k3oGzAPtU"
+      () => "BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88"
     ],
     [
       "getBlockchainsX",
       () => pchain.getBlockchains(),
       (x) => x[1].id,
       Matcher.toBe,
-      () => "2eNy1mUFdmaxXNj1eQHUe7Np4gju9sJsEtWQ4MX3ToiNKuADed"
+      () => "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
     ],
     [
       "getBlockchainStatus",
       () => pchain.getBlockchainStatus(avalancheBlockChainID),
       (x) => x,
       Matcher.toBe,
-      () => "Created"
+      () => "Unknown"
     ],
     [
       "getCurrentSupply",
@@ -130,7 +130,7 @@ describe("PChain", (): void => {
         return x.minDelegatorStake.toString()
       },
       Matcher.toBe,
-      () => "5000000"
+      () => "25000000000"
     ],
     [
       "importKey",

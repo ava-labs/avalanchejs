@@ -8,7 +8,12 @@ import { RequestResponseData } from "../../common/apibase"
 import {
   AliasChainParams,
   AliasParams,
-  GetChainAliasesParams
+  GetChainAliasesParams,
+  GetLoggerLevelParams,
+  GetLoggerLevelResponse,
+  LoadVMsResponse,
+  SetLoggerLevelParams,
+  SetLoggerLevelResponse
 } from "./interfaces"
 
 /**
@@ -29,7 +34,7 @@ export class AdminAPI extends JRPCAPI {
    * the endpoint after /ext/
    * @param alias The API being aliased can now be called at ext/alias
    *
-   * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
+   * @returns Returns a Promise boolean containing success, true for success, false for failure.
    */
   alias = async (endpoint: string, alias: string): Promise<boolean> => {
     const params: AliasParams = {
@@ -52,7 +57,7 @@ export class AdminAPI extends JRPCAPI {
    * @param chain The blockchain’s ID
    * @param alias Can now be used in place of the blockchain’s ID (in API endpoints, for example)
    *
-   * @returns Returns a Promise<boolean> containing success, true for success, false for failure.
+   * @returns Returns a Promise boolean containing success, true for success, false for failure.
    */
   aliasChain = async (chain: string, alias: string): Promise<boolean> => {
     const params: AliasChainParams = {
@@ -73,7 +78,7 @@ export class AdminAPI extends JRPCAPI {
    *
    * @param chain The blockchain’s ID
    *
-   * @returns Returns a Promise<string[]> containing aliases of the blockchain.
+   * @returns Returns a Promise string[] containing aliases of the blockchain.
    */
   getChainAliases = async (chain: string): Promise<string[]> => {
     const params: GetChainAliasesParams = {
@@ -83,6 +88,39 @@ export class AdminAPI extends JRPCAPI {
       "admin.getChainAliases",
       params
     )
+    return response.data.result.aliases
+      ? response.data.result.aliases
+      : response.data.result
+  }
+
+  /**
+   * Returns log and display levels of loggers
+   *
+   * @param loggerName the name of the logger to be returned. This is an optional argument. If not specified, it returns all possible loggers.
+   *
+   * @returns Returns a Promise containing logger levels
+   */
+  getLoggerLevel = async (
+    loggerName?: string
+  ): Promise<GetLoggerLevelResponse> => {
+    const params: GetLoggerLevelParams = {}
+    if (typeof loggerName !== "undefined") {
+      params.loggerName = loggerName
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "admin.getLoggerLevel",
+      params
+    )
+    return response.data.result
+  }
+
+  /**
+   * Dynamically loads any virtual machines installed on the node as plugins
+   *
+   * @returns Returns a Promise containing new VMs and failed VMs
+   */
+  loadVMs = async (): Promise<LoadVMsResponse> => {
+    const response: RequestResponseData = await this.callMethod("admin.loadVMs")
     return response.data.result.aliases
       ? response.data.result.aliases
       : response.data.result
@@ -114,6 +152,37 @@ export class AdminAPI extends JRPCAPI {
     return response.data.result.success
       ? response.data.result.success
       : response.data.result
+  }
+
+  /**
+   * Sets log and display levels of loggers.
+   *
+   * @param loggerName the name of the logger to be changed. This is an optional parameter.
+   * @param logLevel the log level of written logs, can be omitted.
+   * @param displayLevel the log level of displayed logs, can be omitted.
+   *
+   * @returns Returns a Promise containing logger levels
+   */
+  setLoggerLevel = async (
+    loggerName?: string,
+    logLevel?: string,
+    displayLevel?: string
+  ): Promise<SetLoggerLevelResponse> => {
+    const params: SetLoggerLevelParams = {}
+    if (typeof loggerName !== "undefined") {
+      params.loggerName = loggerName
+    }
+    if (typeof logLevel !== "undefined") {
+      params.logLevel = logLevel
+    }
+    if (typeof displayLevel !== "undefined") {
+      params.displayLevel = displayLevel
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "admin.setLoggerLevel",
+      params
+    )
+    return response.data.result
   }
 
   /**

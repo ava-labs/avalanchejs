@@ -1,18 +1,24 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
-import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
+import { Avalanche, BN, Buffer } from "avalanche/dist"
+import {
+  AVMAPI,
+  KeyChain,
+  UTXOSet,
+  UnsignedTx,
+  Tx
+} from "avalanche/dist/apis/avm"
+import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
-const bintools: BinTools = BinTools.getInstance()
 const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 xKeychain.importKey(privKey)
@@ -26,7 +32,7 @@ const memo: Buffer = Buffer.from(
 )
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
     xAddressStrings,
     cChainBlockchainID
   )

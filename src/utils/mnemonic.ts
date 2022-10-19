@@ -57,7 +57,7 @@ export default class Mnemonic {
   }
 
   /**
-   * Asynchronously takes mnemonic and password and returns Promise<{@link https://github.com/feross/buffer|Buffer}>
+   * Asynchronously takes mnemonic and password and returns Promise {@link https://github.com/feross/buffer|Buffer}
    *
    * @param mnemonic the mnemonic as a string
    * @param password the password as a string

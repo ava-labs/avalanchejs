@@ -92,9 +92,13 @@ export default class BinTools {
     if (hex === "" || hex.trim() === "") {
       return false
     }
+    const startsWith0x = hex.startsWith("0x")
+    const matchResult = startsWith0x
+      ? hex.slice(2).match(/[0-9A-Fa-f]/g)
+      : hex.match(/[0-9A-Fa-f]/g)
     if (
-      (hex.startsWith("0x") && hex.slice(2).match(/^[0-9A-Fa-f]/g)) ||
-      hex.match(/^[0-9A-Fa-f]/g)
+      (startsWith0x && hex.length - 2 == matchResult.length) ||
+      hex.length == matchResult.length
     ) {
       return true
     } else {
@@ -316,6 +320,16 @@ export default class BinTools {
     throw new ChecksumError("Error - BinTools.cb58Decode: invalid checksum")
   }
 
+  cb58DecodeWithChecksum = (bytes: Buffer | string): string => {
+    if (typeof bytes === "string") {
+      bytes = this.b58ToBuffer(bytes)
+    }
+    if (this.validateChecksum(bytes)) {
+      return `0x${this.copyFrom(bytes, 0, bytes.length).toString("hex")}`
+    }
+    throw new ChecksumError("Error - BinTools.cb58Decode: invalid checksum")
+  }
+
   addressToString = (hrp: string, chainid: string, bytes: Buffer): string =>
     `${chainid}-${bech32.bech32.encode(hrp, bech32.bech32.toWords(bytes))}`
 
@@ -355,6 +369,7 @@ export default class BinTools {
       humanReadablePart != "local" &&
       humanReadablePart != "columbus" &&
       humanReadablePart != "camino" &&
+      humanReadablePart != "custom" &&
       humanReadablePart != hrp
     ) {
       throw new Bech32Error("Error - Invalid HRP")

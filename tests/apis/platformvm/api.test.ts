@@ -40,11 +40,19 @@ import {
 } from "../../../src/utils/serialization"
 import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
 import {
+  Blockchain,
+  GetMinStakeResponse,
   GetRewardUTXOsResponse,
+  Subnet,
+  GetTxStatusResponse,
   GetValidatorsAtResponse
 } from "../../../src/apis/platformvm/interfaces"
 import { ErrorResponseObject } from "../../../src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import {
+  GetBalanceResponse,
+  GetUTXOsResponse
+} from "src/apis/platformvm/interfaces"
 
 /**
  * @ignore
@@ -139,6 +147,20 @@ describe("PlatformVMAPI", (): void => {
     mockAxios.reset()
   })
 
+  test("getCreateSubnetTxFee", async (): Promise<void> => {
+    let pchain: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
+    const feeResponse: string = "1000000000"
+    const fee: BN = pchain.getCreateSubnetTxFee()
+    expect(fee.toString()).toBe(feeResponse)
+  })
+
+  test("getCreateChainTxFee", async (): Promise<void> => {
+    let pchain: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
+    const feeResponse: string = "1000000000"
+    const fee: BN = pchain.getCreateChainTxFee()
+    expect(fee.toString()).toBe(feeResponse)
+  })
+
   test("listAddresses", async (): Promise<void> => {
     const addresses: string[] = [addrA, addrB]
 
@@ -214,8 +236,14 @@ describe("PlatformVMAPI", (): void => {
 
   test("getBalance", async (): Promise<void> => {
     const balance: BN = new BN("100", 10)
-    const respobj: object = {
+    const unlocked: BN = new BN("100", 10)
+    const lockedStakeable: BN = new BN("100", 10)
+    const lockedNotStakeable: BN = new BN("100", 10)
+    const respobj: GetBalanceResponse = {
       balance,
+      unlocked,
+      lockedStakeable,
+      lockedNotStakeable,
       utxoIDs: [
         {
           txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
@@ -223,7 +251,7 @@ describe("PlatformVMAPI", (): void => {
         }
       ]
     }
-    const result: Promise<object> = api.getBalance(addrA)
+    const result: Promise<GetBalanceResponse> = api.getBalance(addrA)
     const payload: object = {
       result: respobj
     }
@@ -307,7 +335,7 @@ describe("PlatformVMAPI", (): void => {
   test("getMinStake", async (): Promise<void> => {
     const minStake: BN = new BN("2000000000000", 10)
     const minDelegate: BN = new BN("25000000000", 10)
-    const result: Promise<object> = api.getMinStake()
+    const result: Promise<GetMinStakeResponse> = api.getMinStake()
     const payload: object = {
       result: {
         minValidatorStake: "2000000000000",
@@ -319,7 +347,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: object = await result
+    const response: GetMinStakeResponse = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response["minValidatorStake"].toString(10)).toBe(
@@ -472,7 +500,7 @@ describe("PlatformVMAPI", (): void => {
         vmID: "vmID"
       }
     ]
-    const result: Promise<object[]> = api.getBlockchains()
+    const result: Promise<Blockchain[]> = api.getBlockchains()
     const payload: object = {
       result: {
         blockchains: resp
@@ -483,7 +511,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: object[] = await result
+    const response: Blockchain[] = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(resp)
@@ -497,7 +525,7 @@ describe("PlatformVMAPI", (): void => {
         threshold: "threshold"
       }
     ]
-    const result: Promise<object> = api.getSubnets()
+    const result: Promise<Subnet[]> = api.getSubnets()
     const payload: object = {
       result: {
         subnets: resp
@@ -892,7 +920,7 @@ describe("PlatformVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string | ErrorResponseObject> = api.getTx(txid)
+    const result: Promise<string | object> = api.getTx(txid)
     const payload: object = {
       result: {
         tx: "sometx"
@@ -903,7 +931,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string | ErrorResponseObject = await result
+    const response: string | object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("sometx")
@@ -913,8 +941,7 @@ describe("PlatformVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string | { status: string; reason: string }> =
-      api.getTxStatus(txid)
+    const result: Promise<string | GetTxStatusResponse> = api.getTxStatus(txid)
     const payload: object = {
       result: "accepted"
     }
@@ -923,7 +950,7 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string | { status: string; reason: string } = await result
+    const response: string | GetTxStatusResponse = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("accepted")
@@ -963,11 +990,7 @@ describe("PlatformVMAPI", (): void => {
     let addresses: string[] = set
       .getAddresses()
       .map((a): string => api.addressFromBuffer(a))
-    let result: Promise<{
-      numFetched: number
-      utxos: UTXOSet
-      endIndex: { address: string; utxo: string }
-    }> = api.getUTXOs(
+    let result: Promise<GetUTXOsResponse> = api.getUTXOs(
       addresses,
       api.getBlockchainID(),
       0,
@@ -2419,7 +2442,7 @@ describe("PlatformVMAPI", (): void => {
         set,
         addrs1,
         addrs2,
-        addrs3,
+        [addrs1[0]],
         1,
         new UTF8Payload("hello world"),
         UnixNow()
@@ -2430,9 +2453,9 @@ describe("PlatformVMAPI", (): void => {
         bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
-        addrbuff3,
+        [addrbuff1[0]],
         1,
-        platformvm.getCreationTxFee(),
+        platformvm.getCreateSubnetTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()
@@ -2466,17 +2489,23 @@ describe("PlatformVMAPI", (): void => {
       serialzeit(tx1, "CreateSubnetTx")
     })
 
-    test("buildCreateSubnetTx 2", async (): Promise<void> => {
+    test("buildCreateSubnetTx2", async (): Promise<void> => {
       platformvm.setCreationTxFee(new BN(10))
-      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
-      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
-      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a))
+      const addrbuff1: Buffer[] = addrs1.map((a: string) =>
+        platformvm.parseAddress(a)
+      )
+      const addrbuff2: Buffer[] = addrs2.map((a: string) =>
+        platformvm.parseAddress(a)
+      )
+      const addrbuff3: Buffer[] = addrs3.map((a: string) =>
+        platformvm.parseAddress(a)
+      )
 
       const txu1: UnsignedTx = await platformvm.buildCreateSubnetTx(
         lset,
         addrs1,
         addrs2,
-        addrs3,
+        [addrs1[0]],
         1,
         new UTF8Payload("hello world"),
         UnixNow()
@@ -2487,9 +2516,9 @@ describe("PlatformVMAPI", (): void => {
         bintools.cb58Decode(blockchainID),
         addrbuff1,
         addrbuff2,
-        addrbuff3,
+        [addrbuff1[0]],
         1,
-        platformvm.getCreationTxFee(),
+        platformvm.getCreateSubnetTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()

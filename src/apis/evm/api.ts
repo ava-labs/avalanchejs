@@ -118,7 +118,7 @@ export class EVMAPI extends JRPCAPI {
    *
    * @param assetID Either a {@link https://github.com/feross/buffer|Buffer} or an b58 serialized string for the AssetID or its alias.
    *
-   * @returns Returns a Promise<Asset> with keys "name", "symbol", "assetID" and "denomination".
+   * @returns Returns a Promise Asset with keys "name", "symbol", "assetID" and "denomination".
    */
   getAssetDescription = async (assetID: Buffer | string): Promise<any> => {
     let asset: string
@@ -199,7 +199,7 @@ export class EVMAPI extends JRPCAPI {
    * @param blockHeight The block height
    * @param assetID The asset ID
    *
-   * @returns Returns a Promise<object> containing the balance
+   * @returns Returns a Promise object containing the balance
    */
   getAssetBalance = async (
     hexAddress: string,
@@ -223,7 +223,7 @@ export class EVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the status retrieved from the node
+   * @returns Returns a Promise string containing the status retrieved from the node
    */
   getAtomicTxStatus = async (txID: string): Promise<string> => {
     const params: GetAtomicTxStatusParams = {
@@ -244,7 +244,7 @@ export class EVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise<string> containing the bytes retrieved from the node
+   * @returns Returns a Promise string containing the bytes retrieved from the node
    */
   getAtomicTx = async (txID: string): Promise<string> => {
     const params: GetAtomicTxParams = {
@@ -354,7 +354,8 @@ export class EVMAPI extends JRPCAPI {
     addresses: string[] | string,
     sourceChain: string = undefined,
     limit: number = 0,
-    startIndex: Index = undefined
+    startIndex: Index = undefined,
+    encoding: string = "hex"
   ): Promise<{
     numFetched: number
     utxos
@@ -366,7 +367,8 @@ export class EVMAPI extends JRPCAPI {
 
     const params: GetUTXOsParams = {
       addresses: addresses,
-      limit
+      limit,
+      encoding
     }
     if (typeof startIndex !== "undefined" && startIndex) {
       params.startIndex = startIndex
@@ -382,7 +384,16 @@ export class EVMAPI extends JRPCAPI {
     )
     const utxos: UTXOSet = new UTXOSet()
     const data: any = response.data.result.utxos
-    utxos.addArray(data, false)
+    if (data.length > 0 && data[0].substring(0, 2) === "0x") {
+      const cb58Strs: string[] = []
+      data.forEach((str: string): void => {
+        cb58Strs.push(bintools.cb58Encode(new Buffer(str.slice(2), "hex")))
+      })
+
+      utxos.addArray(cb58Strs, false)
+    } else {
+      utxos.addArray(data, false)
+    }
     response.data.result.utxos = utxos
     return response.data.result
   }
@@ -489,7 +500,7 @@ export class EVMAPI extends JRPCAPI {
    *
    * @param tx A string, {@link https://github.com/feross/buffer|Buffer}, or [[Tx]] representing a transaction
    *
-   * @returns A Promise<string> representing the transaction ID of the posted transaction.
+   * @returns A Promise string representing the transaction ID of the posted transaction.
    */
   issueTx = async (tx: string | Buffer | Tx): Promise<string> => {
     let Transaction: string = ""
@@ -498,9 +509,9 @@ export class EVMAPI extends JRPCAPI {
     } else if (tx instanceof Buffer) {
       const txobj: Tx = new Tx()
       txobj.fromBuffer(tx)
-      Transaction = txobj.toString()
+      Transaction = txobj.toStringHex()
     } else if (tx instanceof Tx) {
-      Transaction = tx.toString()
+      Transaction = tx.toStringHex()
     } else {
       /* istanbul ignore next */
       throw new TransactionError(
@@ -508,7 +519,8 @@ export class EVMAPI extends JRPCAPI {
       )
     }
     const params: IssueTxParams = {
-      tx: Transaction.toString()
+      tx: Transaction.toString(),
+      encoding: "hex"
     }
     const response: RequestResponseData = await this.callMethod(
       "avax.issueTx",
@@ -828,7 +840,7 @@ export class EVMAPI extends JRPCAPI {
   }
 
   /**
-   * @returns a Promise<string> containing the base fee for the next block.
+   * @returns a Promise string containing the base fee for the next block.
    */
   getBaseFee = async (): Promise<string> => {
     const params: string[] = []
@@ -845,7 +857,7 @@ export class EVMAPI extends JRPCAPI {
   /**
    * returns the priority fee needed to be included in a block.
    *
-   * @returns Returns a Promise<string> containing the priority fee needed to be included in a block.
+   * @returns Returns a Promise string containing the priority fee needed to be included in a block.
    */
   getMaxPriorityFeePerGas = async (): Promise<string> => {
     const params: string[] = []

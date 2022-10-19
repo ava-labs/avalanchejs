@@ -1,6 +1,6 @@
 # Info RPC
 
-Tests for the Avalanche [Info RPC](https://docs.avax.network/build/avalanchego-apis/info-api)
+Example scripts for the Avalanche [Info RPC](https://docs.avax.network/build/avalanchego-apis/info-api)
 
 * [getBlockchainID.ts](./getBlockchainID.ts)
 * [getNetworkID.ts](./getNetworkID.ts)

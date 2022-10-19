@@ -12,6 +12,8 @@ import axios, {
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
 import { Network } from "./utils/networks"
+import { fetchAdapter } from "./utils/fetchadapter"
+
 /**
  * AvalancheCore is middleware for interacting with Avalanche node RPC APIs.
  *
@@ -20,6 +22,7 @@ import { Network } from "./utils/networks"
  * let avalanche = new AvalancheCore("127.0.0.1", 9650, "https")
  * ```
  *
+ *
  */
 export default class AvalancheCore {
   protected networkID: number = 0
@@ -27,6 +30,7 @@ export default class AvalancheCore {
   protected ip: string
   protected host: string
   protected port: number
+  protected baseEndpoint: string
   protected url: string
   protected auth: string = undefined
   protected headers: { [k: string]: string } = {}
@@ -41,14 +45,17 @@ export default class AvalancheCore {
    * @param port The port to resolve to reach the Avalanche Client RPC APIs.
    * @param protocol The protocol string to use before a "://" in a request,
    * ex: "http", "https", etc. Defaults to http
+   * @param baseEndpoint the base endpoint to reach the Avalanche Client RPC APIs,
+   * ex: "/rpc". Defaults to "/"
    * The following special characters are removed from host and protocol
-   * &#,@+()$~%'":*?<>{}
+   * &#,@+()$~%'":*?{} also less than and greater than signs
    */
   setNetwork = (
     host: string,
     port: number,
     protocol: string,
-    networkID: number
+    networkID: number,
+    baseEndpoint: string = ""
   ): void => {
     host = host.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
     protocol = protocol.replace(/[&#,@+()$~%'":*?<>{}]/g, "")
@@ -72,9 +79,20 @@ export default class AvalancheCore {
     this.host = host
     this.port = port
     this.protocol = protocol
+    this.baseEndpoint = baseEndpoint
     let url: string = `${protocol}://${host}`
     if (port !== undefined && typeof port === "number" && port >= 0) {
       url = `${url}:${port}`
+    }
+    if (
+      baseEndpoint != undefined &&
+      typeof baseEndpoint == "string" &&
+      baseEndpoint.length > 0
+    ) {
+      if (baseEndpoint[0] != "/") {
+        baseEndpoint = `/${baseEndpoint}`
+      }
+      url = `${url}${baseEndpoint}`
     }
     this.url = url
     this.networkID = networkID
@@ -104,6 +122,11 @@ export default class AvalancheCore {
    * Returns the port for the Avalanche node.
    */
   getPort = (): number => this.port
+
+  /**
+   * Returns the base endpoint for the Avalanche node.
+   */
+  getBaseEndpoint = (): string => this.baseEndpoint
 
   /**
    * Returns the URL of the Avalanche node (ip + port)
@@ -284,7 +307,7 @@ export default class AvalancheCore {
       }
     } else {
       config = {
-        baseURL: `${this.protocol}://${this.host}:${this.port}`,
+        baseURL: this.url,
         responseType: "text",
         ...this.requestConfig
       }
@@ -294,6 +317,10 @@ export default class AvalancheCore {
     config.headers = headers
     config.data = postdata
     config.params = getdata
+    // use the fetch adapter if fetch is available e.g. non Node<17 env
+    if (typeof fetch !== "undefined") {
+      config.adapter = fetchAdapter
+    }
     const resp: AxiosResponse<any> = await axios.request(config)
     // purging all that is axios
     const xhrdata: RequestResponseData = new RequestResponseData(

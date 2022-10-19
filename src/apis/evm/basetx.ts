@@ -33,7 +33,7 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
   /**
    * Returns the id of the [[BaseTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
@@ -63,8 +63,8 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = []
-    return sigs
+    const creds: Credential[] = []
+    return creds
   }
 
   clone(): this {

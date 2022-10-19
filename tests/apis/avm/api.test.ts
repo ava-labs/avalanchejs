@@ -44,6 +44,13 @@ import {
   SerializedType
 } from "../../../src/utils/serialization"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
+import {
+  GetBalanceResponse,
+  SendMultipleResponse,
+  SendResponse
+} from "src/apis/avm/interfaces"
+import { CENTIAVAX } from "src/utils"
+import { MILLIAVAX } from "src/utils"
 
 /**
  * @ignore
@@ -127,7 +134,7 @@ describe("AVMAPI", (): void => {
     const memo: string = "hello world"
     const incorrectUserName: string = "asdfasdfsa"
     const message: string = `problem retrieving user: incorrect password for user "${incorrectUserName}"`
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       incorrectUserName,
       password,
       "assetId",
@@ -161,7 +168,7 @@ describe("AVMAPI", (): void => {
     const memo: string = "hello world"
     const incorrectPassword: string = "asdfasdfsa"
     const message: string = `problem retrieving user: incorrect password for user "${incorrectPassword}"`
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       username,
       incorrectPassword,
       "assetId",
@@ -195,7 +202,7 @@ describe("AVMAPI", (): void => {
     const txId: string = "asdfhvl234"
     const memo: string = "hello world"
     const changeAddr: string = "X-local1"
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       username,
       password,
       "assetId",
@@ -227,7 +234,7 @@ describe("AVMAPI", (): void => {
     const txId: string = "asdfhvl234"
     const memo: Buffer = Buffer.from("hello world")
     const changeAddr: string = "X-local1"
-    const result: Promise<object> = api.send(
+    const result: Promise<SendResponse> = api.send(
       username,
       password,
       bintools.b58ToBuffer("6h2s5de1VC65meajE1L2PjvZ1MXvHc3F6eqPCGKuDt4MxiweF"),
@@ -259,7 +266,7 @@ describe("AVMAPI", (): void => {
     const txId: string = "asdfhvl234"
     const memo: string = "hello world"
     const changeAddr: string = "X-local1"
-    const result: Promise<object> = api.sendMultiple(
+    const result: Promise<SendMultipleResponse> = api.sendMultiple(
       username,
       password,
       [{ assetID: "assetId", amount: 10, to: addrA }],
@@ -278,7 +285,7 @@ describe("AVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: object = await result
+    const response: SendMultipleResponse = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response["txID"]).toBe(txId)
@@ -325,7 +332,7 @@ describe("AVMAPI", (): void => {
 
   test("getBalance", async (): Promise<void> => {
     const balance: BN = new BN("100", 10)
-    const respobj = {
+    const respobj: GetBalanceResponse = {
       balance,
       utxoIDs: [
         {
@@ -335,7 +342,7 @@ describe("AVMAPI", (): void => {
       ]
     }
 
-    const result: Promise<object> = api.getBalance(addrA, "ATH")
+    const result: Promise<GetBalanceResponse> = api.getBalance(addrA, "ATH")
     const payload: object = {
       result: respobj
     }
@@ -362,7 +369,11 @@ describe("AVMAPI", (): void => {
       ]
     }
 
-    const result: Promise<object> = api.getBalance(addrA, "ATH", true)
+    const result: Promise<GetBalanceResponse> = api.getBalance(
+      addrA,
+      "ATH",
+      true
+    )
     const payload: object = {
       result: respobj
     }
@@ -385,7 +396,7 @@ describe("AVMAPI", (): void => {
     const response: object = await result
     const calledWith: object = {
       baseURL: "https://127.0.0.1:9650",
-      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
+      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-custom1d6kkj0qh4wcmus3tk59npwt3rluc6en755a58g","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
       headers: {
         "Content-Type": "application/json;charset=UTF-8"
       },
@@ -673,7 +684,7 @@ describe("AVMAPI", (): void => {
     const txid: string =
       "f966750f438867c3c9828ddcdbe660e21ccdbb36a9276958f011ba472f75d4e7"
 
-    const result: Promise<string> = api.getTx(txid)
+    const result: Promise<string | object> = api.getTx(txid)
     const payload: object = {
       result: {
         tx: "sometx"
@@ -684,7 +695,7 @@ describe("AVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: string | object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe("sometx")
@@ -910,6 +921,7 @@ describe("AVMAPI", (): void => {
 
     beforeEach(async (): Promise<void> => {
       avm = new AVMAPI(avalanche, "/ext/bc/X", blockchainID)
+
       const result: Promise<Buffer> = avm.getAVAXAssetID(true)
       const payload: object = {
         result: {
@@ -1110,6 +1122,10 @@ describe("AVMAPI", (): void => {
       )
     })
 
+    test("getDefaultMintTxFee", (): void => {
+      expect(avm.getDefaultMintTxFee().toString()).toBe("1000000")
+    })
+
     test("signTx", async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(
         set,
@@ -1203,7 +1219,7 @@ describe("AVMAPI", (): void => {
       expect(tx4.toBuffer().toString("hex")).toBe(checkTx)
     })
 
-    test("DOMPurifyCleanObject", async (): Promise<void> => {
+    test("xssPreventionObject", async (): Promise<void> => {
       const txu1: UnsignedTx = await avm.buildBaseTx(
         set,
         new BN(amnt),
@@ -1219,9 +1235,9 @@ describe("AVMAPI", (): void => {
       expect(tx1obj).toStrictEqual(sanitized)
     })
 
-    test("DOMPurifyDirtyObject", async (): Promise<void> => {
-      const dirtyDom: string = "<img src=x onerror=alert(1)//>"
-      const sanitizedString: string = `<img src="x">`
+    test("xssPreventionHTML", async (): Promise<void> => {
+      const dirtyDom: string = "<img src='https://x' onerror=alert(1)//>"
+      const sanitizedString: string = `<img src="https://x" />`
 
       const txu1: UnsignedTx = await avm.buildBaseTx(
         set,
@@ -1239,7 +1255,7 @@ describe("AVMAPI", (): void => {
         dirtyDom: dirtyDom
       }
       const sanitizedObj: any = tx1.sanitizeObject(dirtyObj)
-      expect(sanitizedString).toBe(sanitizedObj.dirtyDom)
+      expect(sanitizedObj.dirtyDom).toBe(sanitizedString)
     })
 
     test("buildBaseTx2", async (): Promise<void> => {
@@ -1435,7 +1451,7 @@ describe("AVMAPI", (): void => {
         symbol,
         denomination,
         undefined,
-        avm.getCreationTxFee(),
+        CENTIAVAX,
         assetID
       )
 
@@ -1558,7 +1574,7 @@ describe("AVMAPI", (): void => {
         addrs1.map((a) => avm.parseAddress(a)),
         addrs2.map((a) => avm.parseAddress(a)),
         secpMintUTXO.getUTXOID(),
-        avm.getTxFee(),
+        MILLIAVAX,
         assetID
       )
 

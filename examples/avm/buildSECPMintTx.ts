@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -9,12 +9,13 @@ import {
   AVMConstants,
   SECPTransferOutput,
   UTXO
-} from "../../src/apis/avm"
+} from "avalanche/dist/apis/avm"
+import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 // assetID is generated from running
 // ts-node examples/avm/buildCreateAssetTx.ts
@@ -24,7 +25,7 @@ const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
   outputType: number = AVMConstants.SECPXFEROUTPUTID_CODECONE,
-  assetID = "8eqonZUiJZ655TLQdhFDCqY8oV4SPDMPzqfoVMVsSNE4wSMWu"
+  assetID = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
 ): string[] => {
   const utxoids: string[] = utxoSet.getUTXOIDs()
   let result: string[] = []
@@ -44,7 +45,7 @@ const getUTXOIDs = (
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const bintools: BinTools = BinTools.getInstance()
@@ -61,7 +62,9 @@ const memo: Buffer = Buffer.from(
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   let mintUTXOID: string = ""

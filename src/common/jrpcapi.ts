@@ -4,6 +4,7 @@
  */
 
 import { AxiosRequestConfig } from "axios"
+import { fetchAdapter } from "../utils"
 import AvalancheCore from "../avalanche"
 import { APIBase, RequestResponseData } from "./apibase"
 
@@ -38,15 +39,13 @@ export class JRPCAPI extends APIBase {
       headrs = { ...headrs, ...headers }
     }
 
-    baseURL = `${this.core.getProtocol()}://${this.core.getHost()}`
-    const port: number = this.core.getPort()
-    if (port != undefined && typeof port === "number" && port >= 0) {
-      baseURL = `${baseURL}:${port}`
-    }
+    baseURL = this.core.getURL()
 
     const axConf: AxiosRequestConfig = {
       baseURL: baseURL,
-      responseType: "json"
+      responseType: "json",
+      // use the fetch adapter if fetch is available e.g. non Node<17 env
+      adapter: typeof fetch !== "undefined" ? fetchAdapter : undefined
     }
 
     const resp: RequestResponseData = await this.core.post(

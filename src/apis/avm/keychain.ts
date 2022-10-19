@@ -17,54 +17,8 @@ const serialization: Serialization = Serialization.getInstance()
  * Class for representing a private and public keypair on an AVM Chain.
  */
 export class KeyPair extends SECP256k1KeyPair {
-  protected chainid: string = ""
-  protected hrp: string = ""
-
-  /**
-   * Returns the address's string representation.
-   *
-   * @returns A string representation of the address
-   */
-  getAddressString = (): string => {
-    const addr: Buffer = this.addressFromPublicKey(this.pubk)
-    const type: SerializedType = "bech32"
-    return serialization.bufferToType(addr, type, this.hrp, this.chainid)
-  }
-
-  /**
-   * Returns the chainID associated with this key.
-   *
-   * @returns The [[KeyPair]]'s chainID
-   */
-  getChainID = (): string => this.chainid
-
-  /**
-   * Sets the the chainID associated with this key.
-   *
-   * @param chainid String for the chainID
-   */
-  setChainID = (chainid: string): void => {
-    this.chainid = chainid
-  }
-
-  /**
-   * Returns the Human-Readable-Part of the network associated with this key.
-   *
-   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
-   */
-  getHRP = (): string => this.hrp
-
-  /**
-   * Sets the the Human-Readable-Part of the network associated with this key.
-   *
-   * @param hrp String for the Human-Readable-Part of Bech32 addresses
-   */
-  setHRP = (hrp: string): void => {
-    this.hrp = hrp
-  }
-
   clone(): this {
-    const newkp: KeyPair = new KeyPair(this.hrp, this.chainid)
+    const newkp: KeyPair = new KeyPair(this.hrp, this.chainID)
     newkp.importKey(bintools.copyFrom(this.getPrivateKey()))
     return newkp as this
   }
@@ -73,14 +27,7 @@ export class KeyPair extends SECP256k1KeyPair {
     if (args.length == 2) {
       return new KeyPair(args[0], args[1]) as this
     }
-    return new KeyPair(this.hrp, this.chainid) as this
-  }
-
-  constructor(hrp: string, chainid: string) {
-    super()
-    this.chainid = chainid
-    this.hrp = hrp
-    this.generateKey()
+    return new KeyPair(this.hrp, this.chainID) as this
   }
 }
 

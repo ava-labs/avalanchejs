@@ -65,7 +65,7 @@ export class ExportTx extends BaseTx {
   /**
    * Returns the id of the [[ExportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return PlatformVMConstants.EXPORTTX
   }
 
@@ -99,7 +99,9 @@ export class ExportTx extends BaseTx {
   /**
    * Returns the destinationChain as a {@link https://github.com/feross/buffer|Buffer}
    */
-  getDestinationChain = (): Buffer => this.destinationChain
+  getDestinationChain(): Buffer {
+    return this.destinationChain
+  }
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[ExportTx]], parses it, populates the class, and returns the length of the [[ExportTx]] in bytes.

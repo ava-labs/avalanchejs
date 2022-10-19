@@ -1,4 +1,4 @@
-import { BinTools } from "../../src"
+import { BinTools } from "avalanche/dist"
 const bintools: BinTools = BinTools.getInstance()
 const validCB581: string = "isGvtnDqETNmmFw7guSJ7mmWhCqboExrpmC8VsWxckHcH9oXb"
 const validCB582: string = "2PwX8qwMHbwVAm28howu3Ef7Lk4ib2XG7AaY9aK8dTTGNXQkCz"

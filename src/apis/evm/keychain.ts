@@ -18,52 +18,6 @@ const serialization: Serialization = Serialization.getInstance()
  * Class for representing a private and public keypair on an AVM Chain.
  */
 export class KeyPair extends SECP256k1KeyPair {
-  protected chainID: string = ""
-  protected hrp: string = ""
-
-  /**
-   * Returns the address's string representation.
-   *
-   * @returns A string representation of the address
-   */
-  getAddressString = (): string => {
-    const addr: Buffer = this.addressFromPublicKey(this.pubk)
-    const type: SerializedType = "bech32"
-    return serialization.bufferToType(addr, type, this.hrp, this.chainID)
-  }
-
-  /**
-   * Returns the chainID associated with this key.
-   *
-   * @returns The [[KeyPair]]'s chainID
-   */
-  getChainID = (): string => this.chainID
-
-  /**
-   * Sets the the chainID associated with this key.
-   *
-   * @param chainID String for the chainID
-   */
-  setChainID = (chainID: string): void => {
-    this.chainID = chainID
-  }
-
-  /**
-   * Returns the Human-Readable-Part of the network associated with this key.
-   *
-   * @returns The [[KeyPair]]'s Human-Readable-Part of the network's Bech32 addressing scheme
-   */
-  getHRP = (): string => this.hrp
-
-  /**
-   * Sets the the Human-Readable-Part of the network associated with this key.
-   *
-   * @param hrp String for the Human-Readable-Part of Bech32 addresses
-   */
-  setHRP = (hrp: string): void => {
-    this.hrp = hrp
-  }
-
   clone(): this {
     const newkp: KeyPair = new KeyPair(this.hrp, this.chainID)
     newkp.importKey(bintools.copyFrom(this.getPrivateKey()))
@@ -75,13 +29,6 @@ export class KeyPair extends SECP256k1KeyPair {
       return new KeyPair(args[0], args[1]) as this
     }
     return new KeyPair(this.hrp, this.chainID) as this
-  }
-
-  constructor(hrp: string, chainid: string) {
-    super()
-    this.chainID = chainid
-    this.hrp = hrp
-    this.generateKey()
   }
 }
 

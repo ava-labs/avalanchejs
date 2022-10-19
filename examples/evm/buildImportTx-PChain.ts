@@ -1,25 +1,25 @@
-import { Avalanche, BN } from "../../src"
+import { Avalanche, BN } from "avalanche/dist"
 import {
   PlatformVMAPI,
   KeyChain as PlatformVMKeyChain
-} from "../../src/apis/platformvm"
+} from "avalanche/dist/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx,
   UTXOSet
-} from "../../src/apis/evm"
+} from "avalanche/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   costImportTx
-} from "../../src/utils"
+} from "avalanche/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const cchain: EVMAPI = avalanche.CChain()
@@ -34,7 +34,7 @@ const pChainBlockchainId: string = avalanche.getNetwork().P.blockchainID
 
 const main = async (): Promise<any> => {
   const baseFeeResponse: string = await cchain.getBaseFee()
-  const baseFee = new BN(parseInt(baseFeeResponse, 16))
+  const baseFee = new BN(parseInt(baseFeeResponse, 16) / 1e9)
   let fee: BN = baseFee
   const evmUTXOResponse: any = await cchain.getUTXOs(
     cAddressStrings,

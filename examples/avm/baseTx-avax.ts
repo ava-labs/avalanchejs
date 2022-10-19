@@ -1,4 +1,5 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import createHash from "create-hash"
+import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -12,18 +13,21 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "../../src/apis/avm"
+} from "avalanche/dist/apis/avm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+  DefaultLocalGenesisPrivateKey,
+  Defaults
+} from "avalanche/dist/utils"
 
+const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 12345
+const networkID: number = 1337
+
+const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const bintools: BinTools = BinTools.getInstance()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
@@ -63,7 +67,7 @@ const main = async (): Promise<any> => {
     xAddressStrings[0],
     avaxAssetID
   )
-  const balance: BN = new BN(getBalanceResponse["balance"])
+  const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     balance.sub(fee).sub(new BN("500000000000")),
     xAddresses,
@@ -103,7 +107,7 @@ const main = async (): Promise<any> => {
 
   const baseTx: BaseTx = new BaseTx(
     networkID,
-    bintools.cb58Decode(blockchainID),
+    bintools.cb58Decode(xBlockchainID),
     outputs,
     inputs,
     memo
@@ -112,11 +116,26 @@ const main = async (): Promise<any> => {
   // baseTx.setCodecID(codecID)
   const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
   const tx: Tx = unsignedTx.sign(xKeychain)
-  // console.log(tx.toBuffer().toString("hex"))
-  //const serialized: any = baseTx.serialize("display")
-  //console.log(JSON.stringify(serialized))
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+  const txBuf: Buffer = tx.toBuffer()
+
+  // Start example script for generating the TxID in
+  // advance of issuing the tx to a full node
+
+  // Create sha256 hash of the tx buffer
+  const sha256Hash: Buffer = Buffer.from(
+    createHash("sha256").update(txBuf).digest().buffer
+  )
+
+  // cb58 the sha256 hash
+  const generatedTxID: string = bintools.cb58Encode(sha256Hash)
+  console.log(`Generated TXID: ${generatedTxID}`)
+
+  // End example script for generating the TxID in
+  // advance of issuing the tx to a full node
+
+  // get the actual txID from the full node
+  const actualTxID: string = await xchain.issueTx(tx)
+  console.log(`Success! TXID: ${actualTxID}`)
 }
 
 main()

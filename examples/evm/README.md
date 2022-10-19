@@ -1,6 +1,6 @@
 # EVM
 
-Tests for the Avalanche [EVM](https://docs.avax.network/build/avalanchego-apis/contract-chain-c-chain-api)
+Example scripts for the Avalanche [EVM](https://docs.avax.network/build/avalanchego-apis/contract-chain-c-chain-api)
 
 * [buildExportTx-xchain-ant.ts](./buildExportTx-xchain-ant.ts)
 * [buildExportTx-xchain-avax.ts](./buildExportTx-xchain-avax.ts)
@@ -13,4 +13,5 @@ Tests for the Avalanche [EVM](https://docs.avax.network/build/avalanchego-apis/c
 * [getMaxPriorityFeePerGas.ts](./getMaxPriorityFeePerGas.ts)
 * [getAtomicTx.ts](./getAtomicTx.ts)
 * [getAtomicTxStatus.ts](./getAtomicTxStatus.ts)
+* [getInterfaces.ts](./getInterfaces.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
