@@ -14,7 +14,7 @@ import { costCorethTx } from '../../utils/costs';
 import { matchOwners } from '../../utils/matchOwners';
 import { compareEVMOutputs } from '../../utils/sort';
 import { EVMUnsignedTx } from '../common/evmUnsignedTx';
-import { UnsignedTx } from '../common/unsignedTx';
+import type { UnsignedTx } from '../common/unsignedTx';
 import type { Context } from '../context';
 
 export type EVMExportOptions = {
@@ -42,7 +42,7 @@ const defaultEVMExportOptions = (
  * @param nonce the number of tx's on the sender's evm address. need to get from EVM directly using a lib like ethers.
  * @param assetId the assetId to export
  * @param options for additional properties of the resulting utxo
- * @returns UnsignedTx
+ * @returns EVMUnsignedTx
  */
 export function newExportTxFromBaseFee(
   context: Context,
@@ -131,7 +131,7 @@ export function estimateExportCost(
  * @param nonce the number of tx's on the sender's evm address. need to get from EVM directly using a lib like ethers.
  * @param assetId the assetId to export
  * @param options for additional properties of the resulting utxo
- * @returns UnsignedTx
+ * @returns EVMUnsignedTx
  */
 
 export function newExportTx(
@@ -377,5 +377,5 @@ export function newImportTx(
     ins,
     outs,
   );
-  return new UnsignedTx(importTx, inputUtxos, addressMaps);
+  return new EVMUnsignedTx(importTx, inputUtxos, addressMaps);
 }

@@ -1,3 +1,5 @@
+import { bytesToHex } from '@noble/hashes/utils';
+import { hexToBytes } from 'micro-eth-signer';
 import { customInspectSymbol } from '../../../constants/node';
 import { bufferToHex, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
@@ -16,6 +18,14 @@ export class Signature {
     if (sig.length !== SepkSignatureLength) {
       throw new Error('incorrect number of bytes for signature');
     }
+  }
+
+  toJSON() {
+    return bytesToHex(this.sig);
+  }
+
+  static fromJSON(jsonStr: string) {
+    return new Signature(hexToBytes(jsonStr));
   }
 
   static fromBytes(bytes: Uint8Array): [Signature, Uint8Array] {

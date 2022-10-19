@@ -19,18 +19,23 @@ import type { Transaction } from './transaction';
 type UnsingedTxSerialize = {
   txBytes: string;
   utxos: string[];
-  addressMaps: string;
+  addressMaps: [string, number][][];
   vm: string;
   codecId: string;
+  credentials: string[][];
 };
 export class UnsignedTx {
   credentials: Credential[];
-
   constructor(
     readonly tx: Transaction,
     readonly utxos: Utxo[],
     readonly addressMaps: AddressMaps,
+    credentials?: Credential[],
   ) {
+    if (credentials) {
+      this.credentials = credentials;
+      return;
+    }
     this.credentials = this.tx
       .getSigIndices()
       .map((indicies) => new Credential(indicies.map(() => emptySignature)));
@@ -39,22 +44,36 @@ export class UnsignedTx {
   toJSON() {
     const codec = getManagerForVM(this.tx.vm).getDefaultCodec();
     const codecId = getManagerForVM(this.tx.vm).getDefaultCodecId();
-    return JSON.stringify({
-      codecId: codecId.toJSON(),
+    return {
+      codecId: codecId,
       vm: this.tx.vm,
       txBytes: bufferToHex(this.toBytes()),
       utxos: this.utxos.map((utxo) => bufferToHex(utxo.toBytes(codec))),
       addressMaps: this.addressMaps,
       credentials: this.credentials,
-    });
+    };
   }
 
   static fromJSON(jsonString: string) {
     const res = JSON.parse(jsonString) as UnsingedTxSerialize;
-    const fields = ['txBytes', 'utxos', 'addressMaps', 'vm', 'codecId'];
-    if (!fields.every((field) => res[field])) {
-      throw new Error(`invalid structure. must have ${fields.join(', ')}`);
-    }
+
+    const fields = [
+      'txBytes',
+      'utxos',
+      'addressMaps',
+      'vm',
+      'codecId',
+      'credentials',
+    ];
+
+    fields.forEach((field) => {
+      if (!res[field]) {
+        throw new Error(
+          `invalid structure. must have ${fields.join(', ')}, missing ${field}`,
+        );
+      }
+    });
+
     const vm = res.vm as VM;
     if (!ValidVMs.includes(vm)) {
       throw new Error('invalid VM');
@@ -70,7 +89,10 @@ export class UnsignedTx {
 
     const addressMaps = AddressMaps.fromJSON(res.addressMaps);
 
-    return new UnsignedTx(tx, utxos, addressMaps);
+    const credentials = res.credentials.map((credStr) =>
+      Credential.fromJSON(credStr),
+    );
+    return new UnsignedTx(tx, utxos, addressMaps, credentials);
   }
 
   getSigIndices() {
@@ -167,7 +189,9 @@ export class UnsignedTx {
         }
         const sigBytes = hexToBuffer(sig);
         const publicKey = recoverPublicKey(unsignedHash, sigBytes);
-        const derivedAddress = bufferToHex(publicKeyBytesToAddress(publicKey));
+        const derivedAddress = bufferToHex(
+          this.publicKeyBytesToAddress(publicKey),
+        );
         if (address !== derivedAddress) {
           valid = false;
         }

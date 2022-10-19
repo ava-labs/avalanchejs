@@ -19,13 +19,12 @@ export class AddressMap {
     return this;
   }
   toJSON() {
-    return JSON.stringify(Array.from(this.storage.entries()));
+    return Array.from(this.storage.entries());
   }
 
-  static fromJSON(jsonString: string) {
-    const parsed = JSON.parse(jsonString) as [string, number][];
+  static fromJSON(maps: [string, number][]) {
     return new AddressMap(
-      parsed.map(([addressHex, idx]) => [Address.fromHex(addressHex), idx]),
+      maps.map(([addressHex, idx]) => [Address.fromHex(addressHex), idx]),
     );
   }
 
@@ -104,11 +103,10 @@ export class AddressMaps {
   }
 
   toJSON() {
-    return JSON.stringify(this.storage);
+    return this.storage;
   }
 
-  static fromJSON(jsonString: string) {
-    const addressMaps = JSON.parse(jsonString);
+  static fromJSON(addressMaps: [string, number][][]) {
     return new AddressMaps(addressMaps.map((map) => AddressMap.fromJSON(map)));
   }
 

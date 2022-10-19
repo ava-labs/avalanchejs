@@ -19,6 +19,16 @@ export class Credential {
     return [new Credential(sigs), remaining];
   }
 
+  toJSON() {
+    return this.signatures;
+  }
+
+  static fromJSON(credentialsStrings: string[]) {
+    return new Credential(
+      credentialsStrings.map((str) => Signature.fromJSON(str)),
+    );
+  }
+
   setSignature(index: number, signature: Uint8Array) {
     if (index >= this.signatures.length) {
       throw new Error(`index ${index} is out of bounds for credential`);
