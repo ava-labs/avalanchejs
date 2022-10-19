@@ -5,7 +5,7 @@ import {
 } from '../../fixtures/avax';
 import { id } from '../../fixtures/common';
 import { bigIntPr, bytes, int } from '../../fixtures/primitives';
-import { transferOutput } from '../../fixtures/secp256k1';
+import { signature, transferOutput } from '../../fixtures/secp256k1';
 import {
   testAddress1,
   testAddress2,
@@ -98,7 +98,8 @@ describe('UnsignedTx', () => {
       [new Utxo(utxoId(), id(), transferOutput())],
       addressMaps,
     );
-    const unsignedTxJson = unsignedTx.toJSON();
+    unsignedTx.addSignatureAt(signature().toBytes(), 0, 0);
+    const unsignedTxJson = JSON.stringify(unsignedTx);
 
     expect(UnsignedTx.fromJSON(unsignedTxJson)).toEqual(unsignedTx);
   });
