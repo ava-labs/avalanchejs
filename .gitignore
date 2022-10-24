@@ -118,3 +118,5 @@ public/
 web
 package
 .vscode
+examples/*.lock
+*.diff
