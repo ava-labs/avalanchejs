@@ -1,11 +1,11 @@
-import { Avalanche } from "avalanche/dist"
-import { HealthAPI } from "avalanche/dist/apis/health"
-import { HealthResponse } from "avalanche/dist/apis/health/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { HealthAPI } from "@c4tplatform/caminojs/dist/apis/health"
+import { HealthResponse } from "@c4tplatform/caminojs/dist/apis/health/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const health: HealthAPI = avalanche.Health()
 

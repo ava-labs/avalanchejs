@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -12,21 +12,21 @@ import {
   UnsignedTx,
   Tx,
   ExportTx
-} from "avalanche/dist/apis/avm"
+} from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain as PlatformVMKeyChain
-} from "avalanche/dist/apis/platformvm"
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "avalanche/dist/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const pchain: PlatformVMAPI = avalanche.PChain()
@@ -34,17 +34,17 @@ const bintools: BinTools = BinTools.getInstance()
 const xKeychain: KeyChain = xchain.keyChain()
 const pKeychain: PlatformVMKeyChain = pchain.keyChain()
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+// P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
 xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)
 
 privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// X-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+// X-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
 xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)
 
 privKey = "PrivateKey-rKsiN3X4NSJcPpWxMSh7WcuY653NGQ7tfADgQwDZ9yyUPPDG9"
-// P-custom1jwwk62ktygl0w29rsq2hq55amamhpvx82kfnte
+// P-local1jwwk62ktygl0w29rsq2hq55amamhpvx82kfnte
 xKeychain.importKey(privKey)
 pKeychain.importKey(privKey)
 const xAddresses: Buffer[] = xchain.keyChain().getAddresses()

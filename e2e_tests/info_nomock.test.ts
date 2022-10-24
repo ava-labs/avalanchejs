@@ -42,7 +42,7 @@ describe("Info", (): void => {
       () => info.getNodeVersion(),
       (x) => x,
       Matcher.toMatch,
-      () => /^avalanche\/\d*\.\d*\.\d*$/
+      () => /^camino\/\d*\.\d*\.\d*$/
     ],
     [
       "isBootstrapped",

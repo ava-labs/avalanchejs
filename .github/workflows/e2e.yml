@@ -3,10 +3,10 @@ on: push
 
 env:
   GOPATH: /home/runner/go
-  AVAPATH: src/github.com/ava-labs
-  ACTIONS_RUNTIME_URL: 
-  ACTIONS_RUNTIME_TOKEN: 
-  ACTIONS_CACHE_URL: 
+  AVAPATH: src/github.com/chain4travel
+  ACTIONS_RUNTIME_URL:
+  ACTIONS_RUNTIME_TOKEN:
+  ACTIONS_CACHE_URL:
 
 jobs:
   e2e:
@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: Checkout AvalancheJS
         uses: actions/checkout@v2
-        with: 
-          repository: 'ava-labs/avalanchejs'
+        with:
+          repository: 'chain4travel/caminojs'
       - name: Install dependencies
         run: sudo apt update && sudo apt install zstd git build-essential nodejs -y
       - name: Install NodeJS dependencies
@@ -32,21 +32,21 @@ jobs:
       - name: Clone and Build AvalancheGo
         run : |
           cd $GOPATH/$AVAPATH
-          git clone https://github.com/ava-labs/avalanchego
-          cd avalanchego
+          git clone https://github.com/chain4travel/camino-node
+          cd camino-node
           ./scripts/build.sh
       - name: Checkout ANR
         run : |
           cd $GOPATH/$AVAPATH
-          git clone https://github.com/ava-labs/avalanche-network-runner
+          git clone https://github.com/chain4travel/camino-network-runner
       - name: Starting ANR
         run: |
           cd $GOPATH/$AVAPATH
-          cd avalanche-network-runner
-          git checkout v1.0.12
+          cd camino-network-runner
+          git checkout v0.1.4
           go run ./examples/local/fivenodenetwork/main.go &
       - name: AvalancheJS E2E Test
-        env: 
+        env:
           AVALANCHEGO_IP: localhost
           AVALANCHEGO_PORT: 9650
         run: sleep 60 && yarn test -i --roots e2e_tests

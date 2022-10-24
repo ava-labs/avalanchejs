@@ -169,7 +169,7 @@ This example creates an asset in the X-Chain and publishes it to the Avalanche P
 
 ```js
 import { Avalanche, BinTools, Buffer, BN } from "avalanche"
-import { InitialStates, SECPTransferOutput } from "avalanche/dist/apis/avm"
+import { InitialStates, SECPTransferOutput } from "@c4tplatform/caminojs/dist/apis/avm"
 
 const myNetworkID = 12345 // default is 1, we want to override that for our local network
 const avalanche = new Avalanche("localhost", 9650, "http", myNetworkID)

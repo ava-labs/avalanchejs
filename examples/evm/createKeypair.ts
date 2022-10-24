@@ -1,11 +1,11 @@
-import { Avalanche } from "avalanche/dist"
-import { EVMAPI, KeyChain, KeyPair } from "avalanche/dist/apis/evm"
-import { CreateKeyPairResponse } from "avalanche/dist/apis/evm/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { EVMAPI, KeyChain, KeyPair } from "@c4tplatform/caminojs/dist/apis/evm"
+import { CreateKeyPairResponse } from "@c4tplatform/caminojs/dist/apis/evm/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const cchain: EVMAPI = avalanche.CChain()
 

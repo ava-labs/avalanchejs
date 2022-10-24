@@ -1,5 +1,5 @@
-import Mnemonic from "avalanche/dist/utils/mnemonic"
-import { Buffer } from "avalanche/dist"
+import Mnemonic from "@c4tplatform/caminojs/dist/utils/mnemonic"
+import { Buffer } from "@c4tplatform/caminojs/dist"
 const mnemonic: Mnemonic = Mnemonic.getInstance()
 
 const main = async (): Promise<any> => {

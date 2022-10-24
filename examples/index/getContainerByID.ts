@@ -1,11 +1,11 @@
-import { Avalanche } from "avalanche/dist"
-import { IndexAPI } from "avalanche/dist/apis/index"
-import { GetContainerByIDResponse } from "avalanche/dist/apis/index/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index"
+import { GetContainerByIDResponse } from "@c4tplatform/caminojs/dist/apis/index/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 

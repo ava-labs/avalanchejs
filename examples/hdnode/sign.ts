@@ -1,4 +1,4 @@
-import HDNode from "avalanche/dist/utils/hdnode"
+import HDNode from "@c4tplatform/caminojs/dist/utils/hdnode"
 import { Buffer } from "buffer/"
 
 const main = async (): Promise<any> => {

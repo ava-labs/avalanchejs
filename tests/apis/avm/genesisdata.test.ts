@@ -11,7 +11,7 @@ import { Serialization, SerializedType } from "../../../src/utils"
 const serialization: Serialization = Serialization.getInstance()
 describe("AVM", (): void => {
   test("GenesisData", (): void => {
-    const networkID: number = 1337
+    const networkID: number = 12345
     const m: string = "2Zc54v4ek37TEwu4LiV3j41PUMRd6acDDU3ZCVSxE7X"
     const cb58: SerializedType = "cb58"
     const memo: Buffer = serialization.typeToBuffer(m, cb58)

@@ -1,8 +1,8 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   PlatformVMAPI,
   KeyChain as PlatformVMKeyChain
-} from "avalanche/dist/apis/platformvm"
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -12,40 +12,40 @@ import {
   ExportTx,
   SECPTransferOutput,
   TransferableOutput
-} from "avalanche/dist/apis/evm"
+} from "@c4tplatform/caminojs/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   ONEAVAX
-} from "avalanche/dist/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 const Web3 = require("web3")
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const cchain: EVMAPI = avalanche.CChain()
 const bintools: BinTools = BinTools.getInstance()
 const pKeychain: PlatformVMKeyChain = pchain.keyChain()
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+// X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
 
 // let privKey: string = "PrivateKey-2PvNEohp3sNL41g4XcCBym5hpeT1szSTZXxL7VGS28eoGvq3k7"
 const cKeychain: EVMKeyChain = cchain.keyChain()
 cKeychain.importKey(privKey)
 
 privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
-// P-custom1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
+// P-local1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
 pKeychain.importKey(privKey)
 
 // privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// X-custom15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+// X-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
 
 privKey = "PrivateKey-rKsiN3X4NSJcPpWxMSh7WcuY653NGQ7tfADgQwDZ9yyUPPDG9"
-// P-custom1jwwk62ktygl0w29rsq2hq55amamhpvx82kfnte
+// P-local1jwwk62ktygl0w29rsq2hq55amamhpvx82kfnte
 pKeychain.importKey(privKey)
 const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const cAddresses: Buffer[] = cchain.keyChain().getAddresses()

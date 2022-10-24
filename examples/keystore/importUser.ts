@@ -3,13 +3,13 @@
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
 import { readFile } from "fs"
-import { Avalanche } from "avalanche/dist"
-import { KeystoreAPI } from "avalanche/dist/apis/keystore"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { KeystoreAPI } from "@c4tplatform/caminojs/dist/apis/keystore"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const keystore: KeystoreAPI = avalanche.NodeKeys()
 

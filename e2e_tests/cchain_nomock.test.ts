@@ -27,7 +27,7 @@ describe("CChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "importKey",
@@ -48,7 +48,7 @@ describe("CChain", (): void => {
       () => cchain.getBaseFee(),
       (x) => x,
       Matcher.toBe,
-      () => "0x34630b8a00"
+      () => "0xba43b7400"
     ],
     [
       "getMaxPriorityFeePerGas",

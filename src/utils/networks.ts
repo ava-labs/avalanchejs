@@ -85,7 +85,8 @@ const TestNetwork: Network = {
     avaxAssetID: TestAvaxAssetID,
     avaxAssetAlias: "AVAX",
     txFee: MILLIAVAX,
-    creationTxFee: CENTIAVAX
+    creationTxFee: CENTIAVAX,
+    mintTxFee: MILLIAVAX
   },
   P: {
     blockchainID: DefaultPlatformChainID,

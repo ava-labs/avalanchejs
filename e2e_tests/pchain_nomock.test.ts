@@ -40,7 +40,7 @@ describe("PChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "createaddrB",
@@ -105,7 +105,7 @@ describe("PChain", (): void => {
       () => pchain.getBlockchainStatus(avalancheBlockChainID),
       (x) => x,
       Matcher.toBe,
-      () => "Unknown"
+      () => "Created"
     ],
     [
       "getCurrentSupply",

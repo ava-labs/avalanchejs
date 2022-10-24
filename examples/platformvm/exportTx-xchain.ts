@@ -1,5 +1,8 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
-import { AVMAPI, KeyChain as AVMKeyChain } from "avalanche/dist/apis/avm"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import {
+  AVMAPI,
+  KeyChain as AVMKeyChain
+} from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -13,18 +16,18 @@ import {
   UnsignedTx,
   Tx,
   ExportTx
-} from "avalanche/dist/apis/platformvm"
-import { Output } from "avalanche/dist/common"
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Output } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   MILLIAVAX
-} from "avalanche/dist/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const pchain: PlatformVMAPI = avalanche.PChain()

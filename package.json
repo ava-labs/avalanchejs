@@ -1,11 +1,11 @@
 {
-  "name": "@c4tplatform/camino",
+  "name": "@c4tplatform/caminojs",
   "version": "0.0.2",
-  "description": "Avalanche Platform JS Library",
+  "description": "Camino Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
-    "build-linux": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",
-    "build": "del /S /Q dist\\ && npx tsc -b && xcopy /S typings\\src .\\dist",
+    "build": "rm -rf dist/ && npx tsc -b && cp -r typings/src ./dist",
+    "build-win": "del /S /Q dist\\ && npx tsc -b && xcopy /S typings\\src .\\dist",
     "prebundle": "yarn build",
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
@@ -26,15 +26,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ava-labs/avalanchejs.git"
+    "url": "git+https://github.com/chain4travel/caminojs.git"
   },
   "keywords": [
-    "Avalanche",
+    "camino",
     "blockchain",
-    "defi"
+    "travel"
   ],
-  "author": "Gabriel Cardona <gabriel@avalabs.org>",
+  "author": "C4T Team <devs@chain4travel.com>",
   "contributors": [
+    "Gabriel Cardona <gabriel@avalabs.org>",
     "Evan Richard <evan@avalabs.org>",
     "Paul Kim <paul.kim@avalabs.org>",
     "Raj Ranjan <raj.ranjan@avalabs.org>",
@@ -42,10 +43,7 @@
     "Dhruba Basu <dhruba@avalabs.org>"
   ],
   "license": "BSD-3-Clause",
-  "bugs": {
-    "url": "https://github.com/ava-labs/avalanchejs/issues"
-  },
-  "homepage": "https://github.com/ava-labs/avalanchejs#readme",
+  "homepage": "https://github.com/chain4travel/caminojs#readme",
   "devDependencies": {
     "@types/bech32": "1.1.4",
     "@types/bn.js": "5.1.0",

@@ -1,4 +1,4 @@
-import { SendResponse } from "avalanche/dist/apis/avm"
+import { SendResponse } from "@c4tplatform/caminojs/dist/apis/avm"
 
 const main = async (): Promise<any> => {
   const sendResponse: SendResponse = {

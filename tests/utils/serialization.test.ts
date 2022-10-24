@@ -312,7 +312,7 @@ describe("Serialization", (): void => {
   })
 
   describe("serialize && deserialize", (): void => {
-    const networkID: number = 1337
+    const networkID: number = 12345
     const m: string = "2Zc54v4ek37TEwu4LiV3j41PUMRd6acDDU3ZCVSxE7X"
     const mHex: string =
       "66726f6d20736e6f77666c616b6520746f206176616c616e636865"
@@ -353,7 +353,7 @@ describe("Serialization", (): void => {
       const blockchainIDHex: string =
         "d891ad56056d9c01f18f43f58b5c784ad07a4a49cf3d1f11623804b5cba2c6bf"
       const defaultNetworkIDHex: string = "00000001"
-      const localNetworkIDHex: string = "00000539"
+      const localNetworkIDHex: string = "00003039"
       const outs: TransferableOutput[] = []
       const ins: TransferableInput[] = []
       const vm: string = "AVM"

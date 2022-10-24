@@ -27,7 +27,7 @@ describe("Keystore", (): void => {
       () => keystore.createUser(username1, password),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "createRepeatedUser",
@@ -62,7 +62,7 @@ describe("Keystore", (): void => {
       () => keystore.importUser(username2, exportedUser.value, password),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "exportImportUser",
@@ -73,7 +73,7 @@ describe("Keystore", (): void => {
         })(),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "listUsers2",
@@ -87,21 +87,21 @@ describe("Keystore", (): void => {
       () => keystore.deleteUser(username1, password),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "deleteUser2",
       () => keystore.deleteUser(username2, password),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ],
     [
       "deleteUser3",
       () => keystore.deleteUser(username3, password),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => { return true }
     ]
   ]
 

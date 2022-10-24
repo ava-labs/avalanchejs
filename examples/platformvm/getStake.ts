@@ -1,15 +1,18 @@
-import { Avalanche } from "avalanche/dist"
-import { PlatformVMAPI, KeyChain } from "avalanche/dist/apis/platformvm"
-import { GetStakeResponse } from "avalanche/dist/apis/platformvm/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import {
+  PlatformVMAPI,
+  KeyChain
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { GetStakeResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "avalanche/dist/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
-const networkID: number = 1337
+const networkID: number = 12345
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()

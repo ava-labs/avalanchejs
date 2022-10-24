@@ -65,7 +65,11 @@ describe("EVM Transactions", () => {
           evmOutputs
         )
       }).toThrow(
-        "Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC)"
+        "Error - ImportTx: duplicate (address, assetId) pair found in outputs: (" +
+          cHexAddress1.toLowerCase() +
+          ", " +
+          avaxAssetID +
+          ")"
       )
     })
 
@@ -134,7 +138,11 @@ describe("EVM Transactions", () => {
           evmOutputs
         )
       }).toThrow(
-        "Error - ImportTx: duplicate (address, assetId) pair found in outputs: (0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc, F4MyJcUvq3Rxbqgd4Zs8sUpvwLHApyrp4yxJXe2bAV86Vvp38)"
+        "Error - ImportTx: duplicate (address, assetId) pair found in outputs: (" +
+          cHexAddress1.toLowerCase() +
+          ", " +
+          antAssetID +
+          ")"
       )
     })
 
