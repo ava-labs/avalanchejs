@@ -1,5 +1,5 @@
-import { Avalanche } from "../../src"
-import { IndexAPI } from "../../src/apis/index"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -9,16 +9,11 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 
 const main = async (): Promise<any> => {
-  const containerID: string =
-    "2ceDnmxh59AsXqTG95vf3dr2a7ohXprNn9mvWgQJ39uHryBecT"
+  const id: string = "eLXEKFFMgGmK7ZLokCFjppdBfGy5hDuRqh5uJVyXXPaRErpAX"
   const encoding: string = "hex"
-  const baseurl: string = "/ext/index/C/block"
-  const containerRange: string = await index.getIndex(
-    containerID,
-    encoding,
-    baseurl
-  )
-  console.log(containerRange)
+  const baseurl: string = "/ext/index/X/tx"
+  const containerIndex: string = await index.getIndex(id, encoding, baseurl)
+  console.log(containerIndex)
 }
 
 main()

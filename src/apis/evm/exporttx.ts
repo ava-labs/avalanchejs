@@ -69,17 +69,23 @@ export class ExportTx extends EVMBaseTx {
   /**
    * Returns the destinationChain as a {@link https://github.com/feross/buffer|Buffer}
    */
-  getDestinationChain = (): Buffer => this.destinationChain
+  getDestinationChain(): Buffer {
+    return this.destinationChain
+  }
 
   /**
    * Returns the inputs as an array of [[EVMInputs]]
    */
-  getInputs = (): EVMInput[] => this.inputs
+  getInputs(): EVMInput[] {
+    return this.inputs
+  }
 
   /**
    * Returns the outs as an array of [[EVMOutputs]]
    */
-  getExportedOutputs = (): TransferableOutput[] => this.exportedOutputs
+  getExportedOutputs(): TransferableOutput[] {
+    return this.exportedOutputs
+  }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[ExportTx]].
@@ -156,7 +162,7 @@ export class ExportTx extends EVMBaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc)
+    const creds: Credential[] = super.sign(msg, kc)
     this.inputs.forEach((input: EVMInput) => {
       const cred: Credential = SelectCredentialClass(input.getCredentialID())
       const sigidxs: SigIdx[] = input.getSigIdxs()
@@ -167,9 +173,9 @@ export class ExportTx extends EVMBaseTx {
         sig.fromBuffer(signval)
         cred.addSignature(sig)
       })
-      sigs.push(cred)
+      creds.push(cred)
     })
-    return sigs
+    return creds
   }
 
   /**

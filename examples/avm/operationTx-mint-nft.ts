@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   SECPTransferOutput,
@@ -16,12 +16,12 @@ import {
   KeyChain,
   NFTMintOperation,
   NFTMintOutput
-} from "../../src/apis/avm"
-import { OutputOwners } from "../../src/common"
+} from "@c4tplatform/caminojs/dist/apis/avm"
+import { OutputOwners } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 // before you run this example buildCreateNFTAssetTx.ts
 

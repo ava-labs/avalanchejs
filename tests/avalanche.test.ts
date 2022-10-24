@@ -54,6 +54,16 @@ describe("Avalanche", (): void => {
     expect(avalancheCore.getProtocol()).toBe(encrypted)
     expect(avalancheCore.getURL()).toBe(url)
   })
+  test("Can specify base endpoint", (): void => {
+    avalanche = new Avalanche(host, port, encrypted, networkID)
+    avalanche.setNetwork(host, port, encrypted, networkID, "rpc")
+    expect(avalanche.getHost()).toBe(api)
+    expect(avalanche.getProtocol()).toBe(encrypted)
+    expect(avalanche.getPort()).toBe(port)
+    expect(avalanche.getBaseEndpoint()).toBe("rpc")
+    expect(avalanche.getURL()).toBe(`${url}/rpc`)
+    expect(avalanche.getNetworkID()).toBe(networkID)
+  })
   test("Can initialize without port", (): void => {
     protocol = encrypted
     host = api

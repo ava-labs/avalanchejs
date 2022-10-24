@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -7,12 +7,13 @@ import {
   Tx,
   AVMConstants,
   UTXO
-} from "../../src/apis/avm"
+} from "@c4tplatform/caminojs/dist/apis/avm"
+import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const getUTXOIDs = (
   utxoSet: UTXOSet,
@@ -54,7 +55,9 @@ const memo: Buffer = Buffer.from(
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   let txid: Buffer = Buffer.from("")

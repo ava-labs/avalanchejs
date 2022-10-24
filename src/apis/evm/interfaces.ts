@@ -32,6 +32,7 @@ export interface GetUTXOsParams {
   limit: number
   sourceChain?: string
   startIndex?: Index
+  encoding?: string
 }
 
 export interface ImportAVAXParams extends CredsInterface {
@@ -47,4 +48,10 @@ export interface ImportKeyParams extends CredsInterface {
 
 export interface ExportKeyParams extends CredsInterface {
   address: string
+}
+
+export interface CreateKeyPairResponse {
+  address: string
+  publicKey: string
+  privateKey: string
 }

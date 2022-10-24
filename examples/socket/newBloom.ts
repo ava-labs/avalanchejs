@@ -1,4 +1,4 @@
-import { PubSub, Socket } from "../../src"
+import { PubSub, Socket } from "@c4tplatform/caminojs/dist"
 
 const protocol: string = "ws"
 const host: string = "localhost"

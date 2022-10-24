@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -9,12 +9,13 @@ import {
   AVMConstants,
   SECPTransferOutput,
   UTXO
-} from "../../src/apis/avm"
+} from "@c4tplatform/caminojs/dist/apis/avm"
+import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 // assetID is generated from running
 // ts-node examples/avm/buildCreateAssetTx.ts
@@ -24,7 +25,7 @@ const getUTXOIDs = (
   utxoSet: UTXOSet,
   txid: string,
   outputType: number = AVMConstants.SECPXFEROUTPUTID_CODECONE,
-  assetID = "8eqonZUiJZ655TLQdhFDCqY8oV4SPDMPzqfoVMVsSNE4wSMWu"
+  assetID = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
 ): string[] => {
   const utxoids: string[] = utxoSet.getUTXOIDs()
   let result: string[] = []
@@ -61,7 +62,9 @@ const memo: Buffer = Buffer.from(
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   let mintUTXOID: string = ""

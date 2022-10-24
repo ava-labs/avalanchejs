@@ -42,6 +42,10 @@ export class AVMConstants {
 
   static NFTXFEROPID_CODECONE: number = 131075
 
+  static VERTEX: number = 0
+
+  static VERTEX_CODECONE: number = 0
+
   static BASETX: number = 0
 
   static BASETX_CODECONE: number = 0

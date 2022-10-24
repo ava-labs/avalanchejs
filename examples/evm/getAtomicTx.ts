@@ -1,5 +1,5 @@
-import { Avalanche } from "../../src"
-import { EVMAPI } from "../../src/apis/evm"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { EVMAPI } from "@c4tplatform/caminojs/dist/apis/evm"
 
 const ip: string = "localhost"
 const port: number = 9650

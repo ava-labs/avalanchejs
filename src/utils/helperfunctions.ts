@@ -8,7 +8,7 @@ import { Buffer } from "buffer/"
 import { C } from "./networks"
 import BinTools from "../utils/bintools"
 import { PrivateKeyError, NodeIdError } from "../utils/errors"
-import { ExportTx, ImportTx, TransferableInput, UnsignedTx } from "src/apis/evm"
+import { ExportTx, ImportTx, TransferableInput, UnsignedTx } from "../apis/evm"
 
 /**
  * @ignore
@@ -32,7 +32,7 @@ export function UnixNow(): BN {
  * @param pk A {@link https://github.com/feross/buffer|Buffer} for the private key.
  */
 export function bufferToPrivateKeyString(pk: Buffer): string {
-  return "PrivateKey-" + bintools.cb58Encode(pk)
+  return `PrivateKey-${bintools.cb58Encode(pk)}`
 }
 
 /**
@@ -46,7 +46,7 @@ export function privateKeyStringToBuffer(pk: string): Buffer {
       "Error - privateKeyStringToBuffer: private keys must start with 'PrivateKey-'"
     )
   }
-  let pksplit: string[] = pk.split("-")
+  const pksplit: string[] = pk.split("-")
   return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }
 
@@ -56,7 +56,7 @@ export function privateKeyStringToBuffer(pk: string): Buffer {
  * @param pk A {@link https://github.com/feross/buffer|Buffer} for the nodeID.
  */
 export function bufferToNodeIDString(pk: Buffer): string {
-  return "NodeID-" + bintools.cb58Encode(pk)
+  return `NodeID-${bintools.cb58Encode(pk)}`
 }
 
 /**
@@ -70,7 +70,7 @@ export function NodeIDStringToBuffer(pk: string): Buffer {
       "Error - privateNodeIDToBuffer: nodeID must start with 'NodeID-'"
     )
   }
-  let pksplit: string[] = pk.split("-")
+  const pksplit: string[] = pk.split("-")
   return bintools.cb58Decode(pksplit[pksplit.length - 1])
 }
 

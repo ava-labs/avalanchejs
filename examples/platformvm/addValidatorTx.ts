@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -14,14 +14,14 @@ import {
   Tx,
   SECPOwnerOutput,
   ParseableOutput
-} from "../../src/apis/platformvm"
-import { Output } from "../../src/common"
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Output } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   NodeIDStringToBuffer,
   UnixNow
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

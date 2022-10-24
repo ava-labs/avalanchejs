@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -12,11 +12,11 @@ import {
   UnsignedTx,
   Tx,
   ImportTx
-} from "../../src/apis/platformvm"
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

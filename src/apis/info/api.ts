@@ -8,6 +8,7 @@ import { RequestResponseData } from "../../common/apibase"
 import BN from "bn.js"
 import {
   GetBlockchainIDParams,
+  GetTxFeeResponse,
   IsBootstrappedParams,
   PeersParams,
   PeersResponse,
@@ -27,7 +28,7 @@ export class InfoAPI extends JRPCAPI {
    *
    * @param alias The blockchain alias to get the blockchainID
    *
-   * @returns Returns a Promise<string> containing the base 58 string representation of the blockchainID.
+   * @returns Returns a Promise string containing the base 58 string representation of the blockchainID.
    */
   getBlockchainID = async (alias: string): Promise<string> => {
     const params: GetBlockchainIDParams = {
@@ -42,9 +43,21 @@ export class InfoAPI extends JRPCAPI {
   }
 
   /**
+   * Fetches the IP address from the node.
+   *
+   * @returns Returns a Promise string of the node IP address.
+   */
+  getNodeIP = async (): Promise<string> => {
+    const response: RequestResponseData = await this.callMethod(
+      "info.getBlockchainID"
+    )
+    return response.data.result.ip
+  }
+
+  /**
    * Fetches the networkID from the node.
    *
-   * @returns Returns a Promise<number> of the networkID.
+   * @returns Returns a Promise number of the networkID.
    */
   getNetworkID = async (): Promise<number> => {
     const response: RequestResponseData = await this.callMethod(
@@ -56,7 +69,7 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Fetches the network name this node is running on
    *
-   * @returns Returns a Promise<string> containing the network name.
+   * @returns Returns a Promise string containing the network name.
    */
   getNetworkName = async (): Promise<string> => {
     const response: RequestResponseData = await this.callMethod(
@@ -68,7 +81,7 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Fetches the nodeID from the node.
    *
-   * @returns Returns a Promise<string> of the nodeID.
+   * @returns Returns a Promise string of the nodeID.
    */
   getNodeID = async (): Promise<string> => {
     const response: RequestResponseData = await this.callMethod(
@@ -80,7 +93,7 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Fetches the version of Gecko this node is running
    *
-   * @returns Returns a Promise<string> containing the version of Gecko.
+   * @returns Returns a Promise string containing the version of Gecko.
    */
   getNodeVersion = async (): Promise<string> => {
     const response: RequestResponseData = await this.callMethod(
@@ -92,16 +105,9 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Fetches the transaction fee from the node.
    *
-   * @returns Returns a Promise<object> of the transaction fee in nAVAX.
+   * @returns Returns a Promise object of the transaction fee in nAVAX.
    */
-  getTxFee = async (): Promise<{
-    txFee: BN
-    creationTxFee: BN
-    createAssetTxFee: BN
-    createSubnetTxFee: BN
-    createBlockchainTxFee: BN
-  }> => {
-    // TODO - Add `GetTxFee` response interface
+  getTxFee = async (): Promise<GetTxFeeResponse> => {
     const response: RequestResponseData = await this.callMethod("info.getTxFee")
     return {
       txFee: new BN(response.data.result.txFee, 10),
@@ -119,7 +125,7 @@ export class InfoAPI extends JRPCAPI {
    * Check whether a given chain is done bootstrapping
    * @param chain The ID or alias of a chain.
    *
-   * @returns Returns a Promise<boolean> of whether the chain has completed bootstrapping.
+   * @returns Returns a Promise boolean of whether the chain has completed bootstrapping.
    */
   isBootstrapped = async (chain: string): Promise<boolean> => {
     const params: IsBootstrappedParams = {
@@ -154,7 +160,7 @@ export class InfoAPI extends JRPCAPI {
   /**
    * Returns the network's observed uptime of this node.
    *
-   * @returns Returns a Promise<UptimeResponse> which contains rewardingStakePercentage and weightedAveragePercentage.
+   * @returns Returns a Promise UptimeResponse which contains rewardingStakePercentage and weightedAveragePercentage.
    */
   uptime = async (): Promise<UptimeResponse> => {
     const response: RequestResponseData = await this.callMethod("info.uptime")

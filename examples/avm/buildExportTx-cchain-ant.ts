@@ -1,17 +1,21 @@
-import { Avalanche, BN, Buffer } from "../../src"
+import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "../../src/apis/avm"
-import { KeyChain as EVMKeyChain, EVMAPI } from "../../src/apis/evm"
+} from "@c4tplatform/caminojs/dist/apis/avm"
+import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
+import {
+  KeyChain as EVMKeyChain,
+  EVMAPI
+} from "@c4tplatform/caminojs/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -35,11 +39,13 @@ const memo: Buffer = Buffer.from(
 )
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const amount: BN = new BN(350)
   const threshold: number = 1
-  const assetID: string = "2HgQ12Akkpht8vX9RGuGMTvPXhBnGuaSTQncxWCw22NXkxuaKn"
+  const assetID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
 
   const unsignedTx: UnsignedTx = await xchain.buildExportTx(
     utxoSet,

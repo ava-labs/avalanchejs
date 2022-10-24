@@ -97,14 +97,14 @@ export class ImportTx extends BaseTx {
   /**
    * Returns the id of the [[ImportTx]]
    */
-  getTxType = (): number => {
+  getTxType(): number {
     return this._typeID
   }
 
   /**
    * Returns a {@link https://github.com/feross/buffer|Buffer} for the source chainid.
    */
-  getSourceChain = (): Buffer => {
+  getSourceChain(): Buffer {
     return this.sourceChain
   }
 
@@ -175,7 +175,7 @@ export class ImportTx extends BaseTx {
    * @returns An array of [[Credential]]s
    */
   sign(msg: Buffer, kc: KeyChain): Credential[] {
-    const sigs: Credential[] = super.sign(msg, kc)
+    const creds: Credential[] = super.sign(msg, kc)
     for (let i: number = 0; i < this.importIns.length; i++) {
       const cred: Credential = SelectCredentialClass(
         this.importIns[`${i}`].getInput().getCredentialID()
@@ -188,9 +188,9 @@ export class ImportTx extends BaseTx {
         sig.fromBuffer(signval)
         cred.addSignature(sig)
       }
-      sigs.push(cred)
+      creds.push(cred)
     }
-    return sigs
+    return creds
   }
 
   /**

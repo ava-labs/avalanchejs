@@ -1,6 +1,11 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
+import {
+  GetLoggerLevelResponse,
+  LoadVMsResponse,
+  SetLoggerLevelResponse
+} from "src/apis/admin/interfaces"
 import { AdminAPI } from "../../../src/apis/admin/api"
 
 describe("Admin", (): void => {
@@ -106,6 +111,42 @@ describe("Admin", (): void => {
     expect(response).toBe(payload.result.aliases)
   })
 
+  test("getLoggerLevel", async (): Promise<void> => {
+    const result: Promise<GetLoggerLevelResponse> = admin.getLoggerLevel()
+    const payload: object = {
+      result: {
+        loggerLevels: { C: { logLevel: "DEBUG", displayLevel: "ERROR" } }
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: GetLoggerLevelResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    // @ts-ignore
+    expect(response).toBe(payload.result)
+  })
+
+  test("loadVMs", async (): Promise<void> => {
+    const result: Promise<LoadVMsResponse> = admin.loadVMs()
+    const payload: object = {
+      result: { newVMs: {} }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: LoadVMsResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    // @ts-ignore
+    expect(response).toBe(payload.result)
+  })
+
   test("lockProfile", async () => {
     const result: Promise<boolean> = admin.lockProfile()
     const payload: object = {
@@ -140,6 +181,32 @@ describe("Admin", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(true)
+  })
+
+  test("setLoggerLevel", async (): Promise<void> => {
+    const loggerName: string = "C"
+    const logLevel: string = "DEBUG"
+    const displayLevel: string = "INFO"
+    const result: Promise<SetLoggerLevelResponse> = admin.setLoggerLevel(
+      loggerName,
+      logLevel,
+      displayLevel
+    )
+    const payload: object = {
+      result: {
+        success: true
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: SetLoggerLevelResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    // @ts-ignore
+    expect(response).toBe(payload.result)
   })
 
   test("startCPUProfiler", async (): Promise<void> => {

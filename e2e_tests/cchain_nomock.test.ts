@@ -18,7 +18,7 @@ describe("CChain", (): void => {
   const privateKeyHex: string =
     "0x56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
   const whaleAddr: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
-  const xChainAddr: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
+  const xChainAddr: string = "X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
 
   // test_name        response_promise                            resp_fn          matcher           expected_value/obtained_value
   const tests_spec: any = [
@@ -26,8 +26,8 @@ describe("CChain", (): void => {
       "createUser",
       () => keystore.createUser(user, passwd),
       (x) => x,
-      Matcher.toBe,
-      () => true
+      Matcher.toEqual,
+      () => { return true }
     ],
     [
       "importKey",
@@ -48,7 +48,7 @@ describe("CChain", (): void => {
       () => cchain.getBaseFee(),
       (x) => x,
       Matcher.toBe,
-      () => "0x34630b8a00"
+      () => "0xba43b7400"
     ],
     [
       "getMaxPriorityFeePerGas",

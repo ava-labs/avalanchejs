@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   EVMAPI,
   EVMOutput,
@@ -11,11 +11,11 @@ import {
   AmountOutput,
   UnsignedTx,
   Tx
-} from "../../src/apis/evm"
+} from "@c4tplatform/caminojs/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

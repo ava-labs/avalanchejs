@@ -1,6 +1,6 @@
-import { Avalanche } from "../../dist"
-import { GetRewardUTXOsResponse } from "../../dist/common"
-import { PlatformVMAPI, KeyChain, KeyPair } from "../../dist/apis/platformvm"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { GetRewardUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
+import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -11,7 +11,7 @@ const pchain: PlatformVMAPI = avalanche.PChain()
 
 const main = async (): Promise<any> => {
   const txID: string = "2nmH8LithVbdjaXsxVQCQfXtzN9hBbmebrsaEYnLM9T32Uy2Y4"
-  const encoding: string = "cb58"
+  const encoding: string = "hex"
   const rewardUTXOs: GetRewardUTXOsResponse = await pchain.getRewardUTXOs(
     txID,
     encoding

@@ -1,5 +1,5 @@
-import { Avalanche, Buffer } from "../../dist"
-import { AVMAPI } from "../../dist/apis/avm"
+import { Avalanche, Buffer } from "@c4tplatform/caminojs/dist"
+import { AVMAPI } from "@c4tplatform/caminojs/dist/apis/avm"
 
 const ip: string = "localhost"
 const port: number = 9650

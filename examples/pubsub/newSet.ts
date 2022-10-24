@@ -1,4 +1,4 @@
-import { PubSub } from "../../src"
+import { PubSub } from "@c4tplatform/caminojs/dist"
 
 const main = async (): Promise<any> => {
   const pubsub: PubSub = new PubSub()

@@ -1,6 +1,6 @@
-import { Avalanche } from "../../src"
-import { GetValidatorsAtResponse } from "../../src/apis/platformvm/interfaces"
-import { PlatformVMAPI } from "../../src/apis/platformvm"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { GetValidatorsAtResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
+import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
 
 const ip: string = "localhost"
 const port: number = 9650

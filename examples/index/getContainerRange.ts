@@ -1,6 +1,6 @@
-import { Avalanche } from "../../src"
-import { IndexAPI } from "../../src/apis/index"
-import { GetContainerRangeResponse } from "../../src/common/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index"
+import { GetContainerRangeResponse } from "@c4tplatform/caminojs/dist/apis/index/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -13,7 +13,7 @@ const main = async (): Promise<any> => {
   const startIndex: number = 0
   const numToFetch: number = 100
   const encoding: string = "hex"
-  const baseurl: string = "/ext/index/C/block"
+  const baseurl: string = "/ext/index/X/tx"
   const containerRange: GetContainerRangeResponse[] =
     await index.getContainerRange(startIndex, numToFetch, encoding, baseurl)
   console.log(containerRange)

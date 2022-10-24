@@ -1,5 +1,5 @@
-import { Avalanche, BN } from "../../dist"
-import { AVMAPI } from "../../dist/apis/avm"
+import { Avalanche, BN } from "@c4tplatform/caminojs/dist"
+import { AVMAPI } from "@c4tplatform/caminojs/dist/apis/avm"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -10,7 +10,7 @@ const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
   const defaultTxFee: BN = xchain.getDefaultTxFee()
-  console.log(defaultTxFee)
+  console.log(defaultTxFee.toString())
 }
 
 main()

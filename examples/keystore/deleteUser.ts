@@ -1,5 +1,5 @@
-import { Avalanche } from "../../dist"
-import { KeystoreAPI } from "../../dist/apis/keystore"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { KeystoreAPI } from "@c4tplatform/caminojs/dist/apis/keystore"
 
 const ip: string = "localhost"
 const port: number = 9650

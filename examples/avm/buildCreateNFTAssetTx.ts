@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
+import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   KeyChain as AVMKeyChain,
@@ -6,12 +6,13 @@ import {
   UnsignedTx,
   Tx,
   MinterSet
-} from "../../src/apis/avm"
+} from "@c4tplatform/caminojs/dist/apis/avm"
+import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -34,7 +35,9 @@ const name: string = "non fungible token"
 const symbol: string = "NFT"
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const minterSets: MinterSet[] = [new MinterSet(threshold, xAddresses)]
   const unsignedTx: UnsignedTx = await xchain.buildCreateNFTAssetTx(

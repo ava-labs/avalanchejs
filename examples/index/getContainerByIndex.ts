@@ -1,6 +1,6 @@
-import { Avalanche } from "../../src"
-import { IndexAPI } from "../../src/apis/index"
-import { GetContainerByIndexResponse } from "../../src/common/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index"
+import { GetContainerByIndexResponse } from "@c4tplatform/caminojs/dist/apis/index/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -11,8 +11,8 @@ const index: IndexAPI = avalanche.Index()
 
 const main = async (): Promise<any> => {
   const idx: string = "0"
-  const encoding: string = "cb58"
-  const baseurl: string = "/ext/index/C/block"
+  const encoding: string = "hex"
+  const baseurl: string = "/ext/index/X/tx"
   const containerByIndex: GetContainerByIndexResponse =
     await index.getContainerByIndex(idx, encoding, baseurl)
   console.log(containerByIndex)

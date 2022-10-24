@@ -1,5 +1,5 @@
-import { Avalanche } from "../../dist"
-import { MetricsAPI } from "../../dist/apis/metrics"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { MetricsAPI } from "@c4tplatform/caminojs/dist/apis/metrics"
 
 const ip: string = "localhost"
 const port: number = 9650

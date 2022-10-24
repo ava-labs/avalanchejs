@@ -1,16 +1,19 @@
-import { Avalanche, BN } from "../../src"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
+import { Avalanche, BN } from "@c4tplatform/caminojs/dist"
+import {
+  AVMAPI,
+  KeyChain as AVMKeyChain
+} from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx
-} from "../../src/apis/evm"
+} from "@c4tplatform/caminojs/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   costExportTx
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

@@ -1,19 +1,19 @@
-import { Avalanche, BN } from "../../src"
+import { Avalanche, BN } from "@c4tplatform/caminojs/dist"
 import {
   PlatformVMAPI,
   KeyChain as PlatformKeyChain
-} from "../../src/apis/platformvm"
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx
-} from "../../src/apis/evm"
+} from "@c4tplatform/caminojs/dist/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   costExportTx
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -45,25 +45,11 @@ const main = async (): Promise<any> => {
   const txcount = await web3.eth.getTransactionCount(cHexAddress)
   const nonce: number = txcount
   const locktime: BN = new BN(0)
-  let avaxAmount: BN = balance.sub(baseFee)
-  let fee: BN = baseFee
+  let avaxAmount: BN = new BN(1e7)
+  let fee: BN = baseFee.div(new BN(1e9))
+  fee = fee.add(new BN(1e6))
 
   let unsignedTx: UnsignedTx = await cchain.buildExportTx(
-    avaxAmount,
-    avaxAssetID,
-    pChainBlockchainIdStr,
-    cHexAddress,
-    cAddressStrings[0],
-    pAddressStrings,
-    nonce,
-    locktime,
-    threshold,
-    fee
-  )
-  const exportCost: number = costExportTx(avalanche.getNetwork().C, unsignedTx)
-  fee = baseFee.mul(new BN(exportCost))
-  avaxAmount = balance.sub(fee)
-  unsignedTx = await cchain.buildExportTx(
     avaxAmount,
     avaxAssetID,
     pChainBlockchainIdStr,

@@ -1,5 +1,5 @@
-import Mnemonic from "../../src/utils/mnemonic"
-import { Buffer } from "../../src"
+import Mnemonic from "@c4tplatform/caminojs/dist/utils/mnemonic"
+import { Buffer } from "@c4tplatform/caminojs/dist"
 const mnemonic: Mnemonic = Mnemonic.getInstance()
 
 const main = async (): Promise<any> => {

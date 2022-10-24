@@ -1,6 +1,6 @@
-import { Avalanche } from "../../dist"
-import { InfoAPI } from "../../dist/apis/info"
-import { UptimeResponse } from "../../dist/apis/info/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { InfoAPI } from "@c4tplatform/caminojs/dist/apis/info"
+import { UptimeResponse } from "@c4tplatform/caminojs/dist/apis/info/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650

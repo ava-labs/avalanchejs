@@ -16,20 +16,25 @@ import {
   TransferableOutput
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
-import { Avalanche } from "../../../src/index"
+import { Avalanche, GenesisData } from "../../../src/index"
 import { UTF8Payload } from "../../../src/utils/payload"
-import { UnixNow } from "../../../src/utils/helperfunctions"
+import {
+  NodeIDStringToBuffer,
+  UnixNow
+} from "../../../src/utils/helperfunctions"
 import { BaseTx } from "../../../src/apis/platformvm/basetx"
 import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { DefaultPlatformChainID } from "src/utils"
 
-/**
- * @ignore
- */
-const bintools: BinTools = BinTools.getInstance()
 describe("Transactions", (): void => {
+  /**
+   * @ignore
+   */
+  const bintools: BinTools = BinTools.getInstance()
+
+  const networkID: number = 12345
   let set: UTXOSet
   let keymgr1: KeyChain
   let keymgr2: KeyChain
@@ -59,11 +64,8 @@ describe("Transactions", (): void => {
   )
   let amount: BN
   let addresses: Buffer[]
-  let fallAddresses: Buffer[]
   let locktime: BN
-  let fallLocktime: BN
   let threshold: number
-  let fallThreshold: number
   const ip: string = "127.0.0.1"
   const port: number = 8080
   const protocol: string = "http"
@@ -72,6 +74,12 @@ describe("Transactions", (): void => {
   const symbol: string = "morT"
   const denomination: number = 8
   let avaxAssetID: Buffer
+  const genesisDataStr: string =
+    "11111DdZMhYXUZiFV9FNpfpTSQroysjHyMuT5zapYkPYrmap7t7S3sDNNwFzngxR9x1XmoRj5JK1XomX8RHvXYY5h3qYeEsMQRF8Ypia7p1CFHDo6KGSjMdiQkrmpvL8AvoezSxVWKXt2ubmBCnSkpPjnQbBSF7gNg4sPu1PXdh1eKgthaSFREqqG5FKMrWNiS6U87kxCmbKjkmBvwnAd6TpNx75YEiS9YKMyHaBZjkRDNf6Nj1"
+  const gd: GenesisData = new GenesisData()
+  gd.fromBuffer(bintools.cb58Decode(genesisDataStr))
+  const addressIndex: Buffer = Buffer.alloc(4)
+  addressIndex.writeUIntBE(0x0, 0, 4)
 
   beforeAll(async (): Promise<void> => {
     avalanche = new Avalanche(
@@ -124,11 +132,8 @@ describe("Transactions", (): void => {
     }
     amount = new BN(amnt)
     addresses = keymgr1.getAddresses()
-    fallAddresses = keymgr2.getAddresses()
     locktime = new BN(54321)
-    fallLocktime = locktime.add(new BN(50))
     threshold = 3
-    fallThreshold = 1
 
     const payload: Buffer = Buffer.alloc(1024)
     payload.write(
@@ -186,9 +191,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create small BaseTx that is Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
-
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
     const outputAmt: BN = new BN("266")
@@ -226,7 +228,6 @@ describe("Transactions", (): void => {
 
   test("confirm inputTotal, outputTotal and fee are correct", async (): Promise<void> => {
     const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     // AVAX assetID
     const assetID: Buffer = bintools.cb58Decode(
@@ -273,8 +274,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create small BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network X Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -312,8 +311,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create large BaseTx that is Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []
@@ -351,8 +348,6 @@ describe("Transactions", (): void => {
   })
 
   test("Create large BaseTx that isn't Goose Egg Tx", async (): Promise<void> => {
-    const bintools: BinTools = BinTools.getInstance()
-    const networkID: number = 12345
     // local network P Chain ID
     const outs: TransferableOutput[] = []
     const ins: TransferableInput[] = []

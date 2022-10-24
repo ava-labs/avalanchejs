@@ -1,6 +1,7 @@
 import mockAxios from "jest-mock-axios"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Avalanche } from "src"
+import { IsAcceptedResponse } from "src/apis/index/interfaces"
 import { IndexAPI } from "../../../src/apis/index/api"
 
 describe("Index", () => {
@@ -26,7 +27,7 @@ describe("Index", () => {
   })
 
   test("getLastAccepted", async () => {
-    const encoding: string = "cb58"
+    const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
     const respobj = {
       id,
@@ -51,7 +52,7 @@ describe("Index", () => {
   })
 
   test("getContainerByIndex", async () => {
-    const encoding: string = "cb58"
+    const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
     const respobj = {
       id,
@@ -80,7 +81,7 @@ describe("Index", () => {
   })
 
   test("getContainerByID", async () => {
-    const encoding: string = "cb58"
+    const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
     const respobj = {
       id,
@@ -164,7 +165,11 @@ describe("Index", () => {
   test("isAccepted", async () => {
     const encoding: string = "hex"
     const baseurl: string = "/ext/index/X/tx"
-    const result: Promise<boolean> = index.isAccepted(id, encoding, baseurl)
+    const result: Promise<IsAcceptedResponse> = index.isAccepted(
+      id,
+      encoding,
+      baseurl
+    )
 
     const payload: object = {
       result: true
@@ -174,7 +179,7 @@ describe("Index", () => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: boolean = await result
+    const response: IsAcceptedResponse = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(true)

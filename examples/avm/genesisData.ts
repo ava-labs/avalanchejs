@@ -1,4 +1,4 @@
-import Avalanche, { BN, Buffer } from "../../src"
+import Avalanche, { BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   GenesisAsset,
@@ -7,13 +7,13 @@ import {
   KeyChain,
   SECPMintOutput,
   SECPTransferOutput
-} from "../../src/apis/avm"
+} from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   DefaultLocalGenesisPrivateKey,
   PrivateKeyPrefix,
   Serialization,
   SerializedType
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 const serialization: Serialization = Serialization.getInstance()
 const ip: string = "localhost"
 const port: number = 9650

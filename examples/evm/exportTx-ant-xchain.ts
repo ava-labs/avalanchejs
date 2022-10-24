@@ -1,5 +1,8 @@
-import { Avalanche, BinTools, BN, Buffer } from "../../src"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
+import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import {
+  AVMAPI,
+  KeyChain as AVMKeyChain
+} from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -9,12 +12,12 @@ import {
   ExportTx,
   SECPTransferOutput,
   TransferableOutput
-} from "../../src/apis/evm"
-import { RequestResponseData } from "../../src/common"
+} from "@c4tplatform/caminojs/dist/apis/evm"
+import { RequestResponseData } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

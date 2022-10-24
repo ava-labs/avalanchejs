@@ -1,10 +1,20 @@
-import { Avalanche, BN, Buffer } from "../../src"
-import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../src/apis/avm"
+import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import {
+  AVMAPI,
+  KeyChain,
+  UTXOSet,
+  UnsignedTx,
+  Tx
+} from "@c4tplatform/caminojs/dist/apis/avm"
+import {
+  GetBalanceResponse,
+  GetUTXOsResponse
+} from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "../../src/utils"
+} from "@c4tplatform/caminojs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
@@ -41,8 +51,11 @@ const main = async (): Promise<any> => {
     avaxAssetID
   )
   const balance: BN = new BN(getBalanceResponse.balance)
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+    xAddressStrings
+  )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
+  const amount: BN = balance.sub(fee)
 
   const unsignedTx: UnsignedTx = await xchain.buildBaseTx(
     utxoSet,
