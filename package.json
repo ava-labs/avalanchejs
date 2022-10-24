@@ -1,6 +1,6 @@
 {
   "name": "@c4tplatform/caminojs",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Camino Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
@@ -10,6 +10,7 @@
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
     "prepublish": "yarn build",
+    "examples:prepare": "yarn build && yarn pack",
     "release:prepare": "rm -rf ./dist ./node_modules && yarn install && yarn build && yarn bundle && yarn test && git status",
     "test": "jest",
     "test-watch": "jest --watch",
