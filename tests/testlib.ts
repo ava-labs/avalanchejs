@@ -1,4 +1,4 @@
-import AvalancheCore from "../src/avalanche"
+import AvalancheCore from "../src/camino"
 import { AxiosRequestConfig } from "axios"
 import { APIBase, RequestResponseData } from "../src/common/apibase"
 

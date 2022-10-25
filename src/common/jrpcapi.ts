@@ -5,7 +5,7 @@
 
 import { AxiosRequestConfig } from "axios"
 import { fetchAdapter } from "../utils"
-import AvalancheCore from "../avalanche"
+import AvalancheCore from "../camino"
 import { APIBase, RequestResponseData } from "./apibase"
 
 export class JRPCAPI extends APIBase {

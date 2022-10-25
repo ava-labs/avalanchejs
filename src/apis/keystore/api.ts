@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module API-Keystore
  */
-import AvalancheCore from "../../avalanche"
+import AvalancheCore from "../../camino"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
 import { ImportUserParams } from "./interfaces"

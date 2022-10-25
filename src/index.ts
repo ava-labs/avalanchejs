@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module Avalanche
  */
-import AvalancheCore from "./avalanche"
+import AvalancheCore from "./camino"
 import { AdminAPI } from "./apis/admin/api"
 import { AuthAPI } from "./apis/auth/api"
 import { AVMAPI } from "./apis/avm/api"
