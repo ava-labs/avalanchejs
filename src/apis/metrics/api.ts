@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module API-Metrics
  */
-import AvalancheCore from "../../avalanche"
+import AvalancheCore from "../../camino"
 import { RESTAPI } from "../../common/restapi"
 import { RequestResponseData } from "../../common/apibase"
 import { AxiosRequestConfig } from "axios"

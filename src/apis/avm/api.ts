@@ -4,7 +4,7 @@
  */
 import BN from "bn.js"
 import { Buffer } from "buffer/"
-import AvalancheCore from "../../avalanche"
+import AvalancheCore from "../../camino"
 import BinTools from "../../utils/bintools"
 import { UTXO, UTXOSet } from "./utxos"
 import { AVMConstants } from "./constants"

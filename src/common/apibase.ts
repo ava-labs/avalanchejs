@@ -6,7 +6,7 @@
 import { StoreAPI } from "store2"
 import { ClientRequest } from "http"
 import DB from "../utils/db"
-import AvalancheCore from "../avalanche"
+import AvalancheCore from "../camino"
 
 /**
  * Response data for HTTP requests.

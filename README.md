@@ -1,8 +1,8 @@
-# AvalancheJS - The Avalanche Platform JavaScript Library
+# CaminoJS - The Camino Platform JavaScript Library
 
 ## Overview
 
-AvalancheJS is a JavaScript Library for interfacing with the Avalanche Platform. It is built using TypeScript and intended to support both browser and Node.js. The AvalancheJS library allows you to issue commands to the Avalanche node APIs.
+CaminoJS is a JavaScript Library for interfacing with the Camino Platform. It is built using TypeScript and intended to support both browser and Node.js. The CaminoJS library allows you to issue transactions to the Camino node APIs.
 
 The APIs currently supported by default are:
 
@@ -18,9 +18,9 @@ The APIs currently supported by default are:
 * PlatformVM API (P-Chain)
 * Socket
 
-We built AvalancheJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Avalanche Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Avalanche Platform Specification](https://docs.avax.network).
+We built CaminoJS with ease of use in mind. With this library, any Javascript developer is able to interact with a node on the Camino Platform who has enabled their API endpoints for the developer's consumption. We keep the library up-to-date with the latest changes in the [Camino Platform Specification](https://docs.camino.foundation).
 
-  Using AvalancheJS, developers can:
+  Using CaminoJS, developers can:
 
 * Locally manage private keys
 * Retrieve balances on addresses
@@ -28,66 +28,66 @@ We built AvalancheJS with ease of use in mind. With this library, any Javascript
 * Build and sign transactions
 * Issue signed transactions to the X-Chain, P-Chain, and C-Chain
 * Perform cross-chain swaps between the X-Chain<->P-Chain and between the X-Chain<->C-Chain
-* Add Validators and Delegators to the Primary Subnetwork by staking AVAX
+* Add Validators and Delegators to the Primary Subnetwork by staking CAM
 * Create a Subnetwork
 * Administer a local node
-* Retrieve Avalanche network information from a node
+* Retrieve Camino network information from a node
 
-### Requirements
+## Requirements
 
-AvalancheJS requires Node.js LTS version 14.16.0 or higher to compile.
+CaminoJS requires Node.js LTS version 14.16.0 or higher to compile.
 
-### Installation
+## Installation
 
-Avalanche is available for install via `yarn`:
+CaminoJS is available for install via `yarn`:
 
-`yarn add avalanche`
+`yarn add @c4tplatform/caminojs`
 
 You can also pull the repo down directly and build it from scratch:
 
 `yarn build`
 
-This will generate a pure Javascript library and place it in a folder named "web" in the project root. The "avalanche.js" file can then be dropped into any project as a pure javascript implementation of Avalanche.
+This will generate a pure Javascript library and place it in a folder named "web" in the project root. The "camino.js" file can then be dropped into any project as a pure javascript implementation of Camino.
 
-The AvalancheJS library can be imported into your existing Node.js project as follows:
+The CaminoJS library can be imported into your existing Node.js project as follows:
 
 ```js
-const avalanche = require("avalanche")
+const Camino = require("@c4tplatform/caminojs")
 ```
 
 Or into your TypeScript project like this:
 
 ```js
-import { Avalanche } from "avalanche"
+import { Camino } from "@c4tplatform/caminojs"
 ```
 
-### Importing essentials
+## Importing essentials
 
 ```js
-import { Avalanche, BinTools, BN, Buffer } from "avalanche"
+import { Camino, BinTools, BN, Buffer } from "@c4tplatform/caminojs"
 
 const bintools = BinTools.getInstance()
 ```
 
 The above lines import the libraries used in the tutorials. The libraries include:
 
-* Avalanche: Our javascript module.
-* BinTools: A singleton built into AvalancheJS that is used for dealing with binary data.
-* [BN](https://www.npmjs.com/package/bn.js): A bignumber module use by AvalancheJS.
+* Camino: Our javascript module.
+* BinTools: A singleton built into CaminoJS that is used for dealing with binary data.
+* [BN](https://www.npmjs.com/package/bn.js): A bignumber module use by CaminoJS.
 * [Buffer](https://www.npmjs.com/package/buffer): A Buffer library.
 
 ## Example 1 &mdash; Managing X-Chain Keys
 
-AvalancheJS comes with its own AVM Keychain. This KeyChain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
+CaminoJS comes with its own AVM Keychain. This KeyChain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of CaminoJS connected to our Camino Platform endpoint of choice.
 
 ```js
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Camino, BinTools, Buffer, BN } from "@c4tplatform/caminojs"
 
 const bintools = BinTools.getInstance()
 
 const myNetworkID = 12345 //default is 1, we want to override that for our local network
-const avalanche = new Avalanche("localhost", 9650, "http", myNetworkID)
-const xchain = avalanche.XChain() //returns a reference to the X-Chain used by AvalancheJS
+const Camino = new Camino("localhost", 9650, "http", myNetworkID)
+const xchain = Camino.XChain() //returns a reference to the X-Chain used by CaminoJS
 ```
 
 ### Accessing the KeyChain
@@ -165,28 +165,28 @@ const isValid = keypair.verify(message, signature) // returns a boolean
 
 ## Example 2 &mdash; Creating An Asset
 
-This example creates an asset in the X-Chain and publishes it to the Avalanche Platform. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
+This example creates an asset in the X-Chain and publishes it to the Camino Platform. The first step in this process is to create an instance of CaminoJS connected to our Camino Platform endpoint of choice.
 
 ```js
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Camino, BinTools, Buffer, BN } from "@c4tplatform/caminojs"
 import { InitialStates, SECPTransferOutput } from "@c4tplatform/caminojs/dist/apis/avm"
 
 const myNetworkID = 12345 // default is 1, we want to override that for our local network
-const avalanche = new Avalanche("localhost", 9650, "http", myNetworkID)
-const xchain = avalanche.XChain() // returns a reference to the X-Chain used by AvalancheJS
+const Camino = new Camino("localhost", 9650, "http", myNetworkID)
+const xchain = Camino.XChain() // returns a reference to the X-Chain used by CaminoJS
 ```
 
 ### Describe the new asset
 
-The first steps in creating a new asset using AvalancheJS is to determine the qualities of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
+The first steps in creating a new asset using CaminoJS is to determine the qualities of the asset. We will give the asset a name, a ticker symbol, as well as a denomination.
 
 ```js
 // Name our new coin and give it a symbol
-const name = "TeamRocket"
-const symbol = "ROKT"
+const name = "World Token"
+const symbol = "WORLD"
 
 // Where is the decimal point indicate what 1 asset is and where fractional assets begin
-// Ex: 1 AVAX is denomination 9, so the smallest unit of AVAX is nanoAVAX (nAVAX) at 10^-9 AVAX
+// Ex: 1 CAM is denomination 9, so the smallest unit of CAM is nanoCAM (nCAM) at 10^-9 CAM
 const denomination = 9
 ```
 
@@ -247,7 +247,7 @@ const signed = unsigned.sign(xchain) // returns a Tx class
 
 Now that we have a signed transaction ready to send to the network, let's issue it!
 
-Using the AvalancheJS X-Chain API, we going to call the `issueTx` function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
+Using the CaminoJS X-Chain API, we going to call the `issueTx` function. This function can take either the Tx class returned in the previous step, a CB58 representation of the transaction, or a raw Buffer class with the data for the transaction. Examples of each are below:
 
 ```js
 // using the Tx class
@@ -288,19 +288,19 @@ The X-Chain uses the TxID of the transaction which created the asset as the uniq
 
 ## Example 3 &mdash; Sending An Asset
 
-This example sends an asset in the X-Chain to a single recipient. The first step in this process is to create an instance of Avalanche connected to our Avalanche Platform endpoint of choice.
+This example sends an asset in the X-Chain to a single recipient. The first step in this process is to create an instance of Camino connected to our Camino Platform endpoint of choice.
 
 ```js
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Camino, BinTools, Buffer, BN } from "@c4tplatform/caminojs"
 
 const myNetworkID = 12345 // default is 1, we want to override that for our local network
-const avalanche = new avalanche.Avalanche(
+const Camino = new Camino.Camino(
   "localhost",
   9650,
   "http",
   myNetworkID
 )
-const xchain = avalanche.XChain() // returns a reference to the X-Chain used by AvalancheJS
+const xchain = Camino.XChain() // returns a reference to the X-Chain used by CaminoJS
 ```
 
 We're also assuming that the keystore contains a list of addresses used in this transaction.
@@ -333,7 +333,7 @@ We have 400 coins! We're going to now send 100 of those coins to our friend's ad
 
 ```js
 const sendAmount = new BN(100) // amounts are in BN format
-const friendsAddress = "X-avax1k26jvfdzyukms95puxcceyzsa3lzwf5ftt0fjk" // address format is Bech32
+const friendsAddress = "X-local1k26jvfdzyukms95puxcceyzsa3lzwf5ftt0fjk" // address format is Bech32
 
 // The below returns a UnsignedTx
 // Parameters sent are (in order of appearance):
@@ -387,8 +387,20 @@ if (newBalance.toNumber() != mybalance.sub(sendAmount).toNumber()) {
   throw Error("heyyy these should equal!")
 }
 ```
+## Running examples
+The examples provided in `examples` folder are designed to import caminoJS from a npm package. A package.json is part
+of this folder which allows you to fetch all required packages to run the examples.
+By default, instead pulling caminoJS from npm, a local package - which has to be created - is taken.
 
-### Repo Dependency Updates
+1.) execute `yarn examples:prepare` in the root folder of this project  
+2.) head over into the examples folder and call yarn  
+3.) you are now able to execute the examples using ts-node  
+
+*Note: Openssl 3.0 is part of node version >= 1.17 and some cryptographic algorithms were moved into openssl's legacy provider.
+You have to define the `NODE_OPTIONS=--openssl-legacy-provider` environment variable to get examples working. Older node versions
+are working without this workaround*
+
+## Repo Dependency Updates
 
 Dependabot will make pull requests against the development branch. If all tests pass, it is safe to merge into development, but for redundancy you want to try to build it locally.
 
@@ -400,7 +412,7 @@ yarn build && yarn test
 ```
 
 If the E2E check does not pass, go into the 'checks' section of the PR.
-`https://github.com/ava-labs/avalanchejs/pull/<PR number>/checks`
+`https://github.com/chain4travel/caminojs/pull/<PR number>/checks`
 
 * Click on the `> E2E` tab on the left
 * Click 'Re-run jobs' on the right

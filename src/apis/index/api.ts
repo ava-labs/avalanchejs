@@ -2,7 +2,7 @@
  * @packageDocumentation
  * @module API-Index
  */
-import AvalancheCore from "../../avalanche"
+import AvalancheCore from "../../camino"
 import { JRPCAPI } from "../../common/jrpcapi"
 import { RequestResponseData } from "../../common/apibase"
 import {
