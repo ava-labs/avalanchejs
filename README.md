@@ -405,4 +405,3 @@ If the E2E check does not pass, go into the 'checks' section of the PR.
 * Click on the `> E2E` tab on the left
 * Click 'Re-run jobs' on the right
 
-Redeploy
