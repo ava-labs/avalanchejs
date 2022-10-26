@@ -63,4 +63,16 @@ describe("Inputs", () => {
     expect(cmp(output3, output1)).toBe(1)
     expect(cmp(output3, output2)).toBe(1)
   })
+
+  test("EVMOutput from buffer should return amount", () => {
+    const address: string = "0x55ee05dF718f1a5C1441e76190EB1a19eE2C9430"
+    const amount: number = 1
+    const assetID: string = "2fombhL7aGPwj3KH4bfrmJwW6PVnMobf9Y2fn9GwxiAAJyFDbe"
+    const output: EVMOutput = new EVMOutput(address, amount, assetID)
+    expect(output.getAmount().toString()).toBe("1")
+
+    const outputBuffer = new EVMOutput()
+    outputBuffer.fromBuffer(output.toBuffer())
+    expect(outputBuffer.getAmount().toString()).toBe("1")
+  })
 })
