@@ -169,6 +169,7 @@ export class EVMOutput {
     offset += 8
     this.assetID = bintools.copyFrom(bytes, offset, offset + 32)
     offset += 32
+    this.amountValue = new BN(this.amount)
     return offset
   }
 
