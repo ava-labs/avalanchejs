@@ -3,7 +3,7 @@ on: push
 
 env:
   GOPATH: /home/runner/go
-  AVAPATH: src/github.com/chain4travel
+  CAMPATH: src/github.com/chain4travel
   ACTIONS_RUNTIME_URL:
   ACTIONS_RUNTIME_TOKEN:
   ACTIONS_CACHE_URL:
@@ -12,7 +12,7 @@ jobs:
   e2e:
     runs-on: ubuntu-18.04
     steps:
-      - name: Checkout AvalancheJS
+      - name: Checkout CaminoJS
         uses: actions/checkout@v2
         with:
           repository: 'chain4travel/caminojs'
@@ -24,29 +24,29 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: 1.19.x
-      - name: Setup GOPATH and AVAPATH
+      - name: Setup GOPATH and CAMPATH
         run : |
-          mkdir -p $GOPATH/$AVAPATH
+          mkdir -p $GOPATH/$CAMPATH
       - name: Install autoremove
         run: sudo apt-get autoremove -y
-      - name: Clone and Build AvalancheGo
+      - name: Clone and Build Camino Node
         run : |
-          cd $GOPATH/$AVAPATH
+          cd $GOPATH/$CAMPATH
           git clone https://github.com/chain4travel/camino-node
           cd camino-node
           ./scripts/build.sh
-      - name: Checkout ANR
+      - name: Checkout Camino Network Runner
         run : |
-          cd $GOPATH/$AVAPATH
+          cd $GOPATH/$CAMPATH
           git clone https://github.com/chain4travel/camino-network-runner
-      - name: Starting ANR
+      - name: Starting Camino Network Runner
         run: |
-          cd $GOPATH/$AVAPATH
+          cd $GOPATH/$CAMPATH
           cd camino-network-runner
           git checkout v0.1.4
           go run ./examples/local/fivenodenetwork/main.go &
-      - name: AvalancheJS E2E Test
+      - name: CaminoJS E2E Test
         env:
-          AVALANCHEGO_IP: localhost
-          AVALANCHEGO_PORT: 9650
+          CAMINOGO_IP: localhost
+          CAMINOGO_PORT: 9650
         run: sleep 60 && yarn test -i --roots e2e_tests

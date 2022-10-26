@@ -38,7 +38,7 @@ import { DefaultPlatformChainID } from "./utils"
 import { GetConfigurationResponse } from "./apis/platformvm/interfaces"
 
 /**
- * AvalancheJS is middleware for interacting with Avalanche node RPC APIs.
+ * CaminoJS is middleware for interacting with Camino node RPC APIs.
  *
  * Example usage:
  * ```js

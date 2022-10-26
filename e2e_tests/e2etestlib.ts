@@ -1,15 +1,15 @@
 import { Avalanche } from "src"
 
 export const getAvalanche = (): Avalanche => {
-  if (typeof process.env.AVALANCHEGO_IP === "undefined") {
-    throw "Undefined environment variable: AVALANCHEGO_IP"
+  if (typeof process.env.CAMINOGO_IP === "undefined") {
+    throw "Undefined environment variable: CAMINOGO_IP"
   }
-  if (typeof process.env.AVALANCHEGO_PORT === "undefined") {
-    throw "Undefined environment variable: AVALANCHEGO_PORT"
+  if (typeof process.env.CAMINOGO_PORT === "undefined") {
+    throw "Undefined environment variable: CAMINOGO_PORT"
   }
   const avalanche: Avalanche = new Avalanche(
-    process.env.AVALANCHEGO_IP,
-    parseInt(process.env.AVALANCHEGO_PORT),
+    process.env.CAMINOGO_IP,
+    parseInt(process.env.CAMINOGO_PORT),
     'http',
     12345
   )

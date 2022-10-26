@@ -34,7 +34,7 @@ export const DummyPlatformChainID: string =
   "11111111111111111111111111111111LpoXX"
 
 // DO NOT use the following private keys and/or mnemonic on Fuji or Testnet
-// This address/account is for testing on the local avash network
+// This address/account is for testing on the local camsh network
 export const DefaultLocalGenesisPrivateKey: string =
   "ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 export const DefaultEVMLocalGenesisPrivateKey: string =

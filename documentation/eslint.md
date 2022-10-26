@@ -1,4 +1,4 @@
-# AvalancheJS - ESlint Documentation
+# CaminoJS - ESlint Documentation
 
 ## Overview
 
