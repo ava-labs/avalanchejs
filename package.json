@@ -9,7 +9,6 @@
   },
   "sideEffects": false,
   "module": "dist/es/index.js",
-  "type": "module",
   "scripts": {
     "start": "rollup -c --watch",
     "build": "rollup -c",
