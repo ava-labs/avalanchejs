@@ -94,7 +94,7 @@
     "randombytes": "^2.1.0",
     "store2": "2.14.2",
     "stream-browserify": "3.0.0",
-    "ws": "8.8.1",
+    "ws": "8.11.0",
     "xss": "1.0.14"
   },
   "prettier": {
