@@ -38,12 +38,12 @@ export const SelectOutputClass = (outputid: number, ...args: any[]): Output => {
     return new SECPMintOutput(...args)
   } else if (
     outputid === AVMConstants.NFTMINTOUTPUTID ||
-    outputid === AVMConstants.NFTMINTOUTPUTID_CODECONE
+    outputid === AVMConstants.NFTMINTOUTPUTID_CODECTWO
   ) {
     return new NFTMintOutput(...args)
   } else if (
     outputid === AVMConstants.NFTXFEROUTPUTID ||
-    outputid === AVMConstants.NFTXFEROUTPUTID_CODECONE
+    outputid === AVMConstants.NFTXFEROUTPUTID_CODECTWO
   ) {
     return new NFTTransferOutput(...args)
   }
@@ -239,7 +239,7 @@ export class NFTMintOutput extends NFTOutput {
   protected _typeID =
     this._codecID === 0
       ? AVMConstants.NFTMINTOUTPUTID
-      : AVMConstants.NFTMINTOUTPUTID_CODECONE
+      : AVMConstants.NFTMINTOUTPUTID_CODECTWO
 
   //serialize and deserialize both are inherited
 
@@ -259,7 +259,7 @@ export class NFTMintOutput extends NFTOutput {
     this._typeID =
       this._codecID === 0
         ? AVMConstants.NFTMINTOUTPUTID
-        : AVMConstants.NFTMINTOUTPUTID_CODECONE
+        : AVMConstants.NFTMINTOUTPUTID_CODECTWO
   }
 
   /**
@@ -329,7 +329,7 @@ export class NFTTransferOutput extends NFTOutput {
   protected _typeID =
     this._codecID === 0
       ? AVMConstants.NFTXFEROUTPUTID
-      : AVMConstants.NFTXFEROUTPUTID_CODECONE
+      : AVMConstants.NFTXFEROUTPUTID_CODECTWO
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding)
@@ -375,7 +375,7 @@ export class NFTTransferOutput extends NFTOutput {
     this._typeID =
       this._codecID === 0
         ? AVMConstants.NFTXFEROUTPUTID
-        : AVMConstants.NFTXFEROUTPUTID_CODECONE
+        : AVMConstants.NFTXFEROUTPUTID_CODECTWO
   }
 
   /**

@@ -3,8 +3,22 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - chain4travel
+      - kopernikus
   pull_request:
+    branches:
+      - chain4travel
+      - kopernikus
+  workflow_dispatch:
+    inputs:
+      caminojsRepo:
+        description: 'caminojs github repository'
+        required: true
+        default: 'chain4travel/caminojs'
+      caminojsBranch:
+        description: 'caminojs branch'
+        required: true
+        default: 'chain4travel'      
 
 env:
   CI: true
@@ -16,7 +30,16 @@ jobs:
       matrix:
         node-version: [16]
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out chain4travel/caminojs
+        uses: actions/checkout@v2
+        with:
+          repository: 'chain4travel/caminojs'
+      - name: Check out ${{ github.event.inputs.caminojsRepo }} ${{ github.event.inputs.caminojsBranch }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.caminojsRepo }}
+          ref: ${{ github.event.inputs.caminojsBranch }}
       - uses: actions/setup-node@v2
         with:
           cache: yarn

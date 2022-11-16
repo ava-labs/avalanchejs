@@ -20,11 +20,6 @@ export class PlatformVMConstants {
 
   static STAKEABLELOCKINID: number = 21
 
-  static LOCKEDSTAKEABLES: number[] = [
-    PlatformVMConstants.STAKEABLELOCKINID,
-    PlatformVMConstants.STAKEABLELOCKOUTID
-  ]
-
   static BASETX: number = 0
 
   static SUBNETAUTH: number = 10

@@ -26,7 +26,7 @@ export const SelectCredentialClass = (
   }
   if (
     credid === AVMConstants.NFTCREDENTIAL ||
-    credid === AVMConstants.NFTCREDENTIAL_CODECONE
+    credid === AVMConstants.NFTCREDENTIAL_CODECTWO
   ) {
     return new NFTCredential(...args)
   }
@@ -89,7 +89,7 @@ export class NFTCredential extends Credential {
   protected _typeID =
     this._codecID === 0
       ? AVMConstants.NFTCREDENTIAL
-      : AVMConstants.NFTCREDENTIAL_CODECONE
+      : AVMConstants.NFTCREDENTIAL_CODECTWO
 
   //serialize and deserialize both are inherited
 
@@ -109,7 +109,7 @@ export class NFTCredential extends Credential {
     this._typeID =
       this._codecID === 0
         ? AVMConstants.NFTCREDENTIAL
-        : AVMConstants.NFTCREDENTIAL_CODECONE
+        : AVMConstants.NFTCREDENTIAL_CODECTWO
   }
 
   getCredentialID(): number {

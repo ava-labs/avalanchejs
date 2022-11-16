@@ -114,7 +114,7 @@ describe("Operations", (): void => {
       nftMintOperation.setCodecID(codecID_one)
       expect(nftMintOperation.getCodecID()).toBe(codecID_one)
       expect(nftMintOperation.getOperationID()).toBe(
-        AVMConstants.NFTMINTOPID_CODECONE
+        AVMConstants.NFTMINTOPID_CODECTWO
       )
       nftMintOperation.setCodecID(codecID_zero)
       expect(nftMintOperation.getCodecID()).toBe(codecID_zero)
@@ -210,7 +210,7 @@ describe("Operations", (): void => {
       nftTransferOperation.setCodecID(codecID_one)
       expect(nftTransferOperation.getCodecID()).toBe(codecID_one)
       expect(nftTransferOperation.getOperationID()).toBe(
-        AVMConstants.NFTXFEROPID_CODECONE
+        AVMConstants.NFTXFEROPID_CODECTWO
       )
       nftTransferOperation.setCodecID(codecID_zero)
       expect(nftTransferOperation.getCodecID()).toBe(codecID_zero)

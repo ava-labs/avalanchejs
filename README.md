@@ -28,7 +28,7 @@ We built CaminoJS with ease of use in mind. With this library, any Javascript de
 * Build and sign transactions
 * Issue signed transactions to the X-Chain, P-Chain, and C-Chain
 * Perform cross-chain swaps between the X-Chain<->P-Chain and between the X-Chain<->C-Chain
-* Add Validators and Delegators to the Primary Subnetwork by staking CAM
+* Add Validators and Deposits to the Primary Subnetwork by staking CAM
 * Create a Subnetwork
 * Administer a local node
 * Retrieve Camino network information from a node

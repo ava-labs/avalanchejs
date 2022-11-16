@@ -123,15 +123,15 @@ describe("PChain", (): void => {
       Matcher.toEqual,
       () => "0"
     ],
-    [
-      "getMinStake",
+    /*[
+      "getMinDeposit",
       () => pchain.getMinStake(),
       (x) => {
-        return x.minDelegatorStake.toString()
+        return x.minDepositAmount.toString()
       },
       Matcher.toBe,
       () => "25000000000"
-    ],
+    ],*/
     [
       "importKey",
       () => pchain.importKey(user, passwd, key),
@@ -185,11 +185,10 @@ describe("PChain", (): void => {
       Matcher.toBe,
       () => "0"
     ],
-
-    [
-      "addDelegator",
+    /*[
+      "addDeposit",
       () =>
-        pchain.addDelegator(
+        pchain.addDeposit(
           user,
           passwd,
           nodeID,
@@ -204,7 +203,7 @@ describe("PChain", (): void => {
       Matcher.toThrow,
       () =>
         "couldn't unmarshal an argument. Ensure arguments are valid and properly formatted. See documentation for example calls"
-    ],
+    ],*/
     [
       "addValidator",
       () =>
@@ -215,8 +214,7 @@ describe("PChain", (): void => {
           startTime,
           endTime,
           stakeAmount,
-          whaleAddr,
-          new BN(10)
+          whaleAddr
         ),
       (x) => {
         return x

@@ -20,11 +20,11 @@ export class AVMConstants {
 
   static NFTXFEROUTPUTID: number = 11
 
-  static NFTXFEROUTPUTID_CODECONE: number = 131073
+  static NFTXFEROUTPUTID_CODECTWO: number = 131073
 
   static NFTMINTOUTPUTID: number = 10
 
-  static NFTMINTOUTPUTID_CODECONE: number = 131072
+  static NFTMINTOUTPUTID_CODECTWO: number = 131072
 
   static SECPINPUTID: number = 5
 
@@ -36,11 +36,11 @@ export class AVMConstants {
 
   static NFTMINTOPID: number = 12
 
-  static NFTMINTOPID_CODECONE: number = 131074
+  static NFTMINTOPID_CODECTWO: number = 131074
 
   static NFTXFEROPID: number = 13
 
-  static NFTXFEROPID_CODECONE: number = 131075
+  static NFTXFEROPID_CODECTWO: number = 131075
 
   static VERTEX: number = 0
 
@@ -72,7 +72,7 @@ export class AVMConstants {
 
   static NFTCREDENTIAL: number = 14
 
-  static NFTCREDENTIAL_CODECONE: number = 131076
+  static NFTCREDENTIAL_CODECTWO: number = 131076
 
   static ASSETIDLEN: number = 32
 

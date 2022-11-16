@@ -51,12 +51,12 @@ export const SelectOperationClass = (
     return new SECPMintOperation(...args)
   } else if (
     opid === AVMConstants.NFTMINTOPID ||
-    opid === AVMConstants.NFTMINTOPID_CODECONE
+    opid === AVMConstants.NFTMINTOPID_CODECTWO
   ) {
     return new NFTMintOperation(...args)
   } else if (
     opid === AVMConstants.NFTXFEROPID ||
-    opid === AVMConstants.NFTXFEROPID_CODECONE
+    opid === AVMConstants.NFTXFEROPID_CODECTWO
   ) {
     return new NFTTransferOperation(...args)
   }
@@ -455,7 +455,7 @@ export class NFTMintOperation extends Operation {
   protected _typeID =
     this._codecID === 0
       ? AVMConstants.NFTMINTOPID
-      : AVMConstants.NFTMINTOPID_CODECONE
+      : AVMConstants.NFTMINTOPID_CODECTWO
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     const fields: object = super.serialize(encoding)
@@ -521,7 +521,7 @@ export class NFTMintOperation extends Operation {
     this._typeID =
       this._codecID === 0
         ? AVMConstants.NFTMINTOPID
-        : AVMConstants.NFTMINTOPID_CODECONE
+        : AVMConstants.NFTMINTOPID_CODECTWO
   }
 
   /**
@@ -538,7 +538,7 @@ export class NFTMintOperation extends Operation {
     if (this._codecID === 0) {
       return AVMConstants.NFTCREDENTIAL
     } else if (this._codecID === 1) {
-      return AVMConstants.NFTCREDENTIAL_CODECONE
+      return AVMConstants.NFTCREDENTIAL_CODECTWO
     }
   }
 
@@ -674,7 +674,7 @@ export class NFTTransferOperation extends Operation {
   protected _typeID =
     this._codecID === 0
       ? AVMConstants.NFTXFEROPID
-      : AVMConstants.NFTXFEROPID_CODECONE
+      : AVMConstants.NFTXFEROPID_CODECTWO
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     const fields: object = super.serialize(encoding)
@@ -707,7 +707,7 @@ export class NFTTransferOperation extends Operation {
     this._typeID =
       this._codecID === 0
         ? AVMConstants.NFTXFEROPID
-        : AVMConstants.NFTXFEROPID_CODECONE
+        : AVMConstants.NFTXFEROPID_CODECTWO
   }
 
   /**
@@ -724,7 +724,7 @@ export class NFTTransferOperation extends Operation {
     if (this._codecID === 0) {
       return AVMConstants.NFTCREDENTIAL
     } else if (this._codecID === 1) {
-      return AVMConstants.NFTCREDENTIAL_CODECONE
+      return AVMConstants.NFTCREDENTIAL_CODECTWO
     }
   }
 

@@ -65,7 +65,7 @@ describe("Outputs", (): void => {
       nftMintOutput.setCodecID(codecID_one)
       expect(nftMintOutput.getCodecID()).toBe(codecID_one)
       expect(nftMintOutput.getOutputID()).toBe(
-        AVMConstants.NFTMINTOUTPUTID_CODECONE
+        AVMConstants.NFTMINTOUTPUTID_CODECTWO
       )
       nftMintOutput.setCodecID(codecID_zero)
       expect(nftMintOutput.getCodecID()).toBe(codecID_zero)

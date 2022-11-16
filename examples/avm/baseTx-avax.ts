@@ -16,8 +16,7 @@ import {
 } from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 
 const bintools: BinTools = BinTools.getInstance()
@@ -26,7 +25,6 @@ const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 12345
 
-const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 const outputs: TransferableOutput[] = []
@@ -43,7 +41,7 @@ var xAddresses: Buffer[]
 var xAddressStrings: string[]
 var avaxAssetID: string
 var fee: BN
-var blockchainID: string
+var xBlockchainID: string
 var avaxAssetIDBuf: Buffer
 
 const InitAvalanche = async () => {
@@ -56,7 +54,7 @@ const InitAvalanche = async () => {
   avaxAssetID = avalanche.getNetwork().X.avaxAssetID
   fee = xchain.getDefaultTxFee()
 
-  blockchainID = avalanche.getNetwork().X.blockchainID
+  xBlockchainID = avalanche.getNetwork().X.blockchainID
   avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
 }
 
