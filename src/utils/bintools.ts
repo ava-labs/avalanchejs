@@ -369,6 +369,7 @@ export default class BinTools {
       humanReadablePart != "local" &&
       humanReadablePart != "columbus" &&
       humanReadablePart != "camino" &&
+      humanReadablePart != "kopernikus" &&
       humanReadablePart != "custom" &&
       humanReadablePart != hrp
     ) {

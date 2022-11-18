@@ -8,7 +8,11 @@ import { Credential } from "./credentials"
 import BN from "bn.js"
 import { StandardKeyChain, StandardKeyPair } from "./keychain"
 import { StandardAmountInput, StandardTransferableInput } from "./input"
-import { StandardAmountOutput, StandardTransferableOutput } from "./output"
+import {
+  StandardAmountOutput,
+  StandardParseableOutput,
+  StandardTransferableOutput
+} from "./output"
 import { DefaultNetworkID } from "../utils/constants"
 import {
   Serializable,
@@ -307,15 +311,15 @@ export abstract class StandardUnsignedTx<
     let total: BN = new BN(0)
 
     for (let i: number = 0; i < outs.length; i++) {
+      const inner = outs[`${i}`].getOutput()
+      const innerOut =
+        inner instanceof StandardParseableOutput ? inner.getOutput() : inner
       // only check StandardAmountOutput
       if (
-        outs[`${i}`].getOutput() instanceof StandardAmountOutput &&
+        innerOut instanceof StandardAmountOutput &&
         aIDHex === outs[`${i}`].getAssetID().toString("hex")
       ) {
-        const output: StandardAmountOutput = outs[
-          `${i}`
-        ].getOutput() as StandardAmountOutput
-        total = total.add(output.getAmount())
+        total = total.add(innerOut.getAmount())
       }
     }
     return total

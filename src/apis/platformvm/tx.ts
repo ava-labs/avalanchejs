@@ -14,7 +14,11 @@ import { BaseTx } from "./basetx"
 import { ImportTx } from "./importtx"
 import { ExportTx } from "./exporttx"
 import { SerializedEncoding } from "../../utils/serialization"
-import { AddDelegatorTx, AddValidatorTx } from "./validationtx"
+import {
+  AddDelegatorTx,
+  AddValidatorTx,
+  CaminoAddValidatorTx
+} from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
 import { TransactionError } from "../../utils/errors"
 
@@ -41,6 +45,8 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new AddDelegatorTx(...args)
   } else if (txtype === PlatformVMConstants.ADDVALIDATORTX) {
     return new AddValidatorTx(...args)
+  } else if (txtype === PlatformVMConstants.CAMINOADDVALIDATORTX) {
+    return new CaminoAddValidatorTx(...args)
   } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
     return new CreateSubnetTx(...args)
   }

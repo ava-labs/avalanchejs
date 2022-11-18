@@ -32,7 +32,7 @@ import {
   StandardAssetAmountDestination,
   AssetAmount
 } from "../../common/assetamount"
-import { Output } from "../../common/output"
+import { BaseOutput } from "../../common/output"
 import { AddDelegatorTx, AddValidatorTx } from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
@@ -125,7 +125,7 @@ export class UTXO extends StandardUTXO {
     txid: Buffer = undefined,
     outputidx: Buffer | number = undefined,
     assetID: Buffer = undefined,
-    output: Output = undefined
+    output: BaseOutput = undefined
   ): this {
     return new UTXO(codecID, txid, outputidx, assetID, output) as this
   }
@@ -235,7 +235,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         // stakeable transactions can consume any UTXO.
         return true
       }
-      const output: Output = utxo.getOutput()
+      const output: BaseOutput = utxo.getOutput()
       if (!(output instanceof StakeableLockOut)) {
         // non-stakeable transactions can consume any UTXO that isn't locked.
         return true
@@ -300,9 +300,11 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       const assetID: Buffer = utxo.getAssetID()
       const assetKey: string = assetID.toString("hex")
       const fromAddresses: Buffer[] = aad.getSenders()
-      const output: Output = utxo.getOutput()
+      const output: BaseOutput = utxo.getOutput()
+      const amountOutput =
+        output instanceof ParseableOutput ? output.getOutput() : output
       if (
-        !(output instanceof AmountOutput) ||
+        !(amountOutput instanceof AmountOutput) ||
         !aad.assetExists(assetKey) ||
         !output.meetsThreshold(fromAddresses, asOf)
       ) {
@@ -327,7 +329,6 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         }
       }
 
-      const amountOutput: AmountOutput = output as AmountOutput
       // amount is the amount of funds available from this UTXO.
       const amount = amountOutput.getAmount()
 
@@ -335,9 +336,8 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       let input: AmountInput = new SECPTransferInput(amount)
 
       let locked: boolean = false
-      if (amountOutput instanceof StakeableLockOut) {
-        const stakeableOutput: StakeableLockOut =
-          amountOutput as StakeableLockOut
+      if (output instanceof StakeableLockOut) {
+        const stakeableOutput: StakeableLockOut = output as StakeableLockOut
         const stakeableLocktime: BN = stakeableOutput.getStakeableLocktime()
 
         if (stakeableLocktime.gt(asOf)) {
@@ -356,10 +356,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       assetAmount.spendAmount(amount, locked)
       if (locked) {
         // Track the UTXO as locked.
-        outs[`${assetKey}`].lockedStakeable.push(amountOutput)
+        outs[`${assetKey}`].lockedStakeable.push(output)
       } else {
         // Track the UTXO as unlocked.
-        outs[`${assetKey}`].unlocked.push(amountOutput)
+        outs[`${assetKey}`].unlocked.push(output)
       }
 
       // Get the indices of the outputs that should be used to authorize the
@@ -430,12 +430,10 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         outs[`${assetKey}`].lockedStakeable
       lockedOutputs.forEach((lockedOutput: StakeableLockOut, i: number) => {
         const stakeableLocktime: BN = lockedOutput.getStakeableLocktime()
-        const parseableOutput: ParseableOutput =
-          lockedOutput.getTransferableOutput()
 
         // We know that parseableOutput contains an AmountOutput because the
         // first loop filters for fungible assets.
-        const output: AmountOutput = parseableOutput.getOutput() as AmountOutput
+        const output: AmountOutput = lockedOutput.getOutput() as AmountOutput
 
         let outputAmountRemaining: BN = output.getAmount()
         // The only output that could generate change is the last output.
@@ -444,23 +442,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
           // update outputAmountRemaining to no longer hold the change that we
           // are returning.
           outputAmountRemaining = outputAmountRemaining.sub(lockedChange)
-          // Create the inner output.
-          const newChangeOutput: AmountOutput = SelectOutputClass(
-            output.getOutputID(),
-            lockedChange,
-            output.getAddresses(),
-            output.getLocktime(),
-            output.getThreshold()
-          ) as AmountOutput
-          // Wrap the inner output in the StakeableLockOut wrapper.
           let newLockedChangeOutput: StakeableLockOut = SelectOutputClass(
             lockedOutput.getOutputID(),
             lockedChange,
             output.getAddresses(),
             output.getLocktime(),
             output.getThreshold(),
-            stakeableLocktime,
-            new ParseableOutput(newChangeOutput)
+            stakeableLocktime
           ) as StakeableLockOut
           const transferOutput: TransferableOutput = new TransferableOutput(
             assetID,
@@ -471,24 +459,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
         // We know that outputAmountRemaining > 0. Otherwise, we would never
         // have consumed this UTXO, as it would be only change.
-
-        // Create the inner output.
-        const newOutput: AmountOutput = SelectOutputClass(
-          output.getOutputID(),
-          outputAmountRemaining,
-          output.getAddresses(),
-          output.getLocktime(),
-          output.getThreshold()
-        ) as AmountOutput
-        // Wrap the inner output in the StakeableLockOut wrapper.
         const newLockedOutput: StakeableLockOut = SelectOutputClass(
           lockedOutput.getOutputID(),
           outputAmountRemaining,
           output.getAddresses(),
           output.getLocktime(),
           output.getThreshold(),
-          stakeableLocktime,
-          new ParseableOutput(newOutput)
+          stakeableLocktime
         ) as StakeableLockOut
         const transferOutput: TransferableOutput = new TransferableOutput(
           assetID,

@@ -5,7 +5,7 @@ import {
   SECPTransferOutput,
   SelectOutputClass
 } from "../../../src/apis/platformvm/outputs"
-import { Output } from "../../../src/common/output"
+import { BaseOutput, Output } from "../../../src/common/output"
 
 const bintools: BinTools = BinTools.getInstance()
 
@@ -28,7 +28,7 @@ describe("Outputs", (): void => {
         fallLocktime,
         1
       )
-      const outpayment: Output = SelectOutputClass(goodout.getOutputID())
+      const outpayment: BaseOutput = SelectOutputClass(goodout.getOutputID())
       expect(outpayment).toBeInstanceOf(SECPTransferOutput)
       expect(() => {
         SelectOutputClass(99)
@@ -54,7 +54,7 @@ describe("Outputs", (): void => {
         locktime,
         3
       )
-      const cmp = Output.comparator()
+      const cmp = BaseOutput.comparator()
       expect(cmp(outpayment1, outpayment1)).toBe(0)
       expect(cmp(outpayment2, outpayment2)).toBe(0)
       expect(cmp(outpayment3, outpayment3)).toBe(0)

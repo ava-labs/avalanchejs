@@ -543,3 +543,49 @@ export class AddValidatorTx extends AddDelegatorTx {
     }
   }
 }
+
+export class CaminoAddValidatorTx extends AddValidatorTx {
+  protected _typeName = "CaminoAddValidatorTx"
+  protected _typeID = PlatformVMConstants.CAMINOADDVALIDATORTX
+
+  /**
+   * Class representing an unsigned CaminoAddValidatorTx transaction.
+   *
+   * @param networkID Optional. Networkid, [[DefaultNetworkID]]
+   * @param blockchainID Optional. Blockchainid, default Buffer.alloc(32, 16)
+   * @param outs Optional. Array of the [[TransferableOutput]]s
+   * @param ins Optional. Array of the [[TransferableInput]]s
+   * @param memo Optional. {@link https://github.com/feross/buffer|Buffer} for the memo field
+   * @param nodeID Optional. The node ID of the validator being added.
+   * @param startTime Optional. The Unix time when the validator starts validating the Primary Network.
+   * @param endTime Optional. The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
+   * @param stakeAmount Optional. The amount of nAVAX the validator is staking.
+   * @param rewardOwners Optional. The [[ParseableOutput]] containing the [[SECPOwnerOutput]] for the rewards.
+   */
+  constructor(
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer = Buffer.alloc(32, 16),
+    outs: TransferableOutput[] = undefined,
+    ins: TransferableInput[] = undefined,
+    memo: Buffer = undefined,
+    nodeID: Buffer = undefined,
+    startTime: BN = undefined,
+    endTime: BN = undefined,
+    stakeAmount: BN = undefined,
+    rewardOwners: ParseableOutput = undefined
+  ) {
+    super(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      nodeID,
+      startTime,
+      endTime,
+      stakeAmount,
+      [],
+      rewardOwners
+    )
+  }
+}
