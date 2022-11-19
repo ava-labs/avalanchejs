@@ -18,6 +18,44 @@ import {
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
+export abstract class BaseInput extends Serializable {
+  abstract serialize(encoding: SerializedEncoding): object
+  abstract deserialize(fields: object, encoding: SerializedEncoding): void
+  abstract fromBuffer(bytes: Buffer, offset: number): number
+  abstract toBuffer(): Buffer
+
+  abstract getInput(): BaseInput
+  abstract getInputID(): number
+  abstract getCredentialID(): number
+  abstract addSignatureIdx(addressIdx: number, address: Buffer): void
+  abstract getSigIdxs(): SigIdx[]
+
+  abstract clone(): this
+  abstract create(...args: any[]): this
+
+  static comparator =
+    (): ((a: BaseInput, b: BaseInput) => 1 | -1 | 0) =>
+    (a: BaseInput, b: BaseInput): 1 | -1 | 0 => {
+      const aoutid: Buffer = Buffer.alloc(4)
+      aoutid.writeUInt32BE(a.getInputID(), 0)
+      const abuff: Buffer = a.toBuffer()
+
+      const boutid: Buffer = Buffer.alloc(4)
+      boutid.writeUInt32BE(b.getInputID(), 0)
+      const bbuff: Buffer = b.toBuffer()
+
+      const asort: Buffer = Buffer.concat(
+        [aoutid, abuff],
+        aoutid.length + abuff.length
+      )
+      const bsort: Buffer = Buffer.concat(
+        [boutid, bbuff],
+        boutid.length + bbuff.length
+      )
+      return Buffer.compare(asort, bsort) as 1 | -1 | 0
+    }
+}
+
 export abstract class Input extends Serializable {
   protected _typeName = "Input"
   protected _typeID = undefined
@@ -42,27 +80,9 @@ export abstract class Input extends Serializable {
   protected sigCount: Buffer = Buffer.alloc(4)
   protected sigIdxs: SigIdx[] = [] // idxs of signers from utxo
 
-  static comparator =
-    (): ((a: Input, b: Input) => 1 | -1 | 0) =>
-    (a: Input, b: Input): 1 | -1 | 0 => {
-      const aoutid: Buffer = Buffer.alloc(4)
-      aoutid.writeUInt32BE(a.getInputID(), 0)
-      const abuff: Buffer = a.toBuffer()
-
-      const boutid: Buffer = Buffer.alloc(4)
-      boutid.writeUInt32BE(b.getInputID(), 0)
-      const bbuff: Buffer = b.toBuffer()
-
-      const asort: Buffer = Buffer.concat(
-        [aoutid, abuff],
-        aoutid.length + abuff.length
-      )
-      const bsort: Buffer = Buffer.concat(
-        [boutid, bbuff],
-        boutid.length + bbuff.length
-      )
-      return Buffer.compare(asort, bsort) as 1 | -1 | 0
-    }
+  getInput(): BaseInput {
+    return this
+  }
 
   abstract getInputID(): number
 
@@ -127,7 +147,7 @@ export abstract class Input extends Serializable {
 
   abstract create(...args: any[]): this
 
-  abstract select(id: number, ...args: any[]): Input
+  abstract select(id: number, ...args: any[]): BaseInput
 }
 
 export abstract class StandardParseableInput extends Serializable {
@@ -142,7 +162,7 @@ export abstract class StandardParseableInput extends Serializable {
     }
   }
 
-  protected input: Input
+  protected input: BaseInput
 
   /**
    * Returns a function used to sort an array of [[StandardParseableInput]]s
@@ -158,7 +178,15 @@ export abstract class StandardParseableInput extends Serializable {
       return Buffer.compare(sorta, sortb) as 1 | -1 | 0
     }
 
-  getInput = (): Input => this.input
+  getInput = (): BaseInput => this.input
+
+  addSignatureIdx(addressIdx: number, address: Buffer): void {
+    this.input.addSignatureIdx(addressIdx, address)
+  }
+
+  getSigIdxs = (): SigIdx[] => {
+    return this.input.getSigIdxs()
+  }
 
   // must be implemented to select input types for the VM in question
   abstract fromBuffer(bytes: Buffer, offset?: number): number
@@ -176,11 +204,9 @@ export abstract class StandardParseableInput extends Serializable {
    *
    * @param input A number representing the InputID of the [[StandardParseableInput]]
    */
-  constructor(input: Input = undefined) {
+  constructor(input: BaseInput = undefined) {
     super()
-    if (input instanceof Input) {
-      this.input = input
-    }
+    this.input = input
   }
 }
 
@@ -251,7 +277,7 @@ export abstract class StandardTransferableInput extends StandardParseableInput {
   /**
    * Returns the input.
    */
-  getInput = (): Input => this.input
+  getInput = (): BaseInput => this.input
 
   /**
    * Returns the assetID of the input.
@@ -300,14 +326,14 @@ export abstract class StandardTransferableInput extends StandardParseableInput {
     txid: Buffer = undefined,
     outputidx: Buffer = undefined,
     assetID: Buffer = undefined,
-    input: Input = undefined
+    input: BaseInput = undefined
   ) {
     super()
     if (
-      typeof txid !== "undefined" &&
-      typeof outputidx !== "undefined" &&
-      typeof assetID !== "undefined" &&
-      input instanceof Input
+      typeof txid !== undefined &&
+      typeof outputidx !== undefined &&
+      typeof assetID !== undefined &&
+      input !== undefined
     ) {
       this.input = input
       this.txid = txid

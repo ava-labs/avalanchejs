@@ -15,7 +15,6 @@ import {
   SECPTransferOutput
 } from "./outputs"
 import {
-  AmountInput,
   SECPTransferInput,
   StakeableLockIn,
   TransferableInput,
@@ -32,6 +31,7 @@ import {
   StandardAssetAmountDestination,
   AssetAmount
 } from "../../common/assetamount"
+import { BaseInput } from "../../common/input"
 import { BaseOutput } from "../../common/output"
 import { AddDelegatorTx, AddValidatorTx } from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
@@ -333,7 +333,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       const amount = amountOutput.getAmount()
 
       // Set up the SECP input with the same amount as the output.
-      let input: AmountInput = new SECPTransferInput(amount)
+      let input: BaseInput = new SECPTransferInput(amount)
 
       let locked: boolean = false
       if (output instanceof StakeableLockOut) {

@@ -346,11 +346,6 @@ export class LockedOut extends ParseableOutput {
    */
   fromBuffer(outbuff: Buffer, offset: number = 0): number {
     offset = this.ids.fromBuffer(outbuff, offset)
-    // Verify that outputId is
-    const outputid: number = bintools
-      .copyFrom(outbuff, offset, offset + 4)
-      .readUInt32BE(0)
-    offset += 4
     offset = super.fromBuffer(outbuff, offset)
     return offset
   }
