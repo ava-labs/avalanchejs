@@ -27,15 +27,15 @@ env:
 
 jobs:
   e2e:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check out chain4travel/caminojs
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: 'chain4travel/caminojs'
       - name: Check out ${{ github.event.inputs.caminojsRepo }} ${{ github.event.inputs.caminojsBranch }}
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ github.event.inputs.caminojsRepo }}
           ref: ${{ github.event.inputs.caminojsBranch }}
@@ -44,9 +44,9 @@ jobs:
       - name: Install NodeJS dependencies
         run: yarn install --frozen-lockfile
       - name: Setup GoLang Version
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.19.x
+          go-version: 1.18
       - name: Setup GOPATH and CAMPATH
         run : |
           mkdir -p $GOPATH/$CAMPATH
@@ -55,19 +55,18 @@ jobs:
       - name: Clone and Build Camino Node
         run : |
           cd $GOPATH/$CAMPATH
-          git clone https://github.com/chain4travel/camino-node
+          git clone https://github.com/chain4travel/camino-node --depth 1 -bv0.3.1-alpha1
           cd camino-node
           ./scripts/build.sh
       - name: Checkout Camino Network Runner
         run : |
           cd $GOPATH/$CAMPATH
-          git clone https://github.com/chain4travel/camino-network-runner
+          git clone https://github.com/chain4travel/camino-network-runner --depth 1 -bv0.2.1-alpha1
       - name: Starting Camino Network Runner
         run: |
           cd $GOPATH/$CAMPATH
           cd camino-network-runner
-          git checkout v0.1.4
-          go run ./examples/local/fivenodenetwork/main.go &
+          CAMINO_NODE_PATH=$GOPATH/$CAMPATH/camino-node/build/camino-node go run ./examples/local/fivenodenetwork/main.go &
       - name: CaminoJS E2E Test
         env:
           CAMINOGO_IP: localhost

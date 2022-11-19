@@ -14,7 +14,7 @@ describe("Info", (): void => {
       () => info.getBlockchainID("X"),
       (x) => x,
       Matcher.toBe,
-      () => "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
+      () => "2huFztbeB4LijVCoLrxP8NwFbRCdtLfUyvx4VXwD5VnVxzxkMX"
     ],
     [
       "getNetworkID",
@@ -35,14 +35,14 @@ describe("Info", (): void => {
       () => info.getNodeID(),
       (x) => x,
       Matcher.toBe,
-      () => "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
+      () => "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
     ],
     [
       "getNodeVersion",
       () => info.getNodeVersion(),
       (x) => x,
       Matcher.toMatch,
-      () => /^camino\/\d*\.\d*\.\d*$/
+      () => /^avalanche\/\d*\.\d*\.\d*$/
     ],
     [
       "isBootstrapped",

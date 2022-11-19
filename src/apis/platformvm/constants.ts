@@ -44,6 +44,16 @@ export class PlatformVMConstants {
 
   static SECPCREDENTIAL: number = 9
 
+  // Camino
+  static CUSTOM_TYPE_ID: number = 8192
+  static LOCKEDINID: number = PlatformVMConstants.CUSTOM_TYPE_ID + 0
+  static LOCKEDOUTID: number = PlatformVMConstants.CUSTOM_TYPE_ID + 1
+  static CAMINOADDVALIDATORTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 2
+  static CAMINOREWARDVALIDATORTX: number =
+    PlatformVMConstants.CUSTOM_TYPE_ID + 3
+  static ADDADDRESSSTATETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 4
+
+  // Length Constants
   static ASSETIDLEN: number = 32
 
   static BLOCKCHAINIDLEN: number = 32

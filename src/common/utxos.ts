@@ -5,7 +5,7 @@
 import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
 import BN from "bn.js"
-import { Output, StandardAmountOutput } from "./output"
+import { BaseOutput, StandardAmountOutput } from "./output"
 import { UnixNow } from "../utils/helperfunctions"
 import { MergeRule } from "../utils/constants"
 import {
@@ -85,7 +85,7 @@ export abstract class StandardUTXO extends Serializable {
   protected txid: Buffer = Buffer.alloc(32)
   protected outputidx: Buffer = Buffer.alloc(4)
   protected assetID: Buffer = Buffer.alloc(32)
-  protected output: Output = undefined
+  protected output: BaseOutput = undefined
 
   /**
    * Returns the numeric representation of the CodecID.
@@ -122,7 +122,7 @@ export abstract class StandardUTXO extends Serializable {
   /**
    * Returns a reference to the output
    */
-  getOutput = (): Output => this.output
+  getOutput = (): BaseOutput => this.output
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[StandardUTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
@@ -168,7 +168,7 @@ export abstract class StandardUTXO extends Serializable {
     txid?: Buffer,
     outputidx?: Buffer | number,
     assetID?: Buffer,
-    output?: Output
+    output?: BaseOutput
   ): this
 
   /**
@@ -185,7 +185,7 @@ export abstract class StandardUTXO extends Serializable {
     txID: Buffer = undefined,
     outputidx: Buffer | number = undefined,
     assetID: Buffer = undefined,
-    output: Output = undefined
+    output: BaseOutput = undefined
   ) {
     super()
     if (typeof codecID !== "undefined") {

@@ -6,7 +6,7 @@ import {
   SelectOutputClass,
   NFTMintOutput
 } from "../../../src/apis/avm/outputs"
-import { Output } from "../../../src/common/output"
+import { BaseOutput, Output } from "../../../src/common/output"
 import { SECPMintOutput } from "../../../src/apis/avm/outputs"
 import { AVMConstants } from "../../../src/apis/avm"
 
@@ -44,7 +44,7 @@ describe("Outputs", (): void => {
       const outpayment1: Output = new NFTMintOutput(1, addrs, fallLocktime, 1)
       const outpayment2: Output = new NFTMintOutput(2, addrs, fallLocktime, 1)
       const outpayment3: Output = new NFTMintOutput(0, addrs, fallLocktime, 1)
-      const cmp = Output.comparator()
+      const cmp = BaseOutput.comparator()
       expect(cmp(outpayment1, outpayment1)).toBe(0)
       expect(cmp(outpayment2, outpayment2)).toBe(0)
       expect(cmp(outpayment3, outpayment3)).toBe(0)
@@ -163,7 +163,7 @@ describe("Outputs", (): void => {
         locktime,
         3
       )
-      const cmp = Output.comparator()
+      const cmp = BaseOutput.comparator()
       expect(cmp(outpayment1, outpayment1)).toBe(0)
       expect(cmp(outpayment2, outpayment2)).toBe(0)
       expect(cmp(outpayment3, outpayment3)).toBe(0)

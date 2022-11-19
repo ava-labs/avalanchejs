@@ -21,6 +21,44 @@ import { ChecksumError, AddressError, AddressIndexError } from "../utils/errors"
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
+export abstract class BaseOutput extends Serializable {
+  abstract serialize(encoding: SerializedEncoding): object
+  abstract deserialize(fields: object, encoding: SerializedEncoding): void
+  abstract fromBuffer(bytes: Buffer, offset: number): number
+  abstract toBuffer(): Buffer
+
+  abstract getThreshold(): number
+  abstract getLocktime(): BN
+  abstract getAddresses(): Buffer[]
+  abstract meetsThreshold(addrs: Buffer[], asOf: BN): boolean
+
+  abstract getOutputID(): number
+  abstract clone(): this
+  abstract create(...args: any[]): this
+
+  static comparator =
+    (): ((a: BaseOutput, b: BaseOutput) => 1 | -1 | 0) =>
+    (a: BaseOutput, b: BaseOutput): 1 | -1 | 0 => {
+      const aoutid: Buffer = Buffer.alloc(4)
+      aoutid.writeUInt32BE(a.getOutputID(), 0)
+      const abuff: Buffer = a.toBuffer()
+
+      const boutid: Buffer = Buffer.alloc(4)
+      boutid.writeUInt32BE(b.getOutputID(), 0)
+      const bbuff: Buffer = b.toBuffer()
+
+      const asort: Buffer = Buffer.concat(
+        [aoutid, abuff],
+        aoutid.length + abuff.length
+      )
+      const bsort: Buffer = Buffer.concat(
+        [boutid, bbuff],
+        boutid.length + bbuff.length
+      )
+      return Buffer.compare(asort, bsort) as 1 | -1 | 0
+    }
+}
+
 /**
  * Class for representing an address used in [[Output]] types
  */
@@ -316,28 +354,6 @@ export class OutputOwners extends Serializable {
     return bintools.bufferToB58(this.toBuffer())
   }
 
-  static comparator =
-    (): ((a: Output, b: Output) => 1 | -1 | 0) =>
-    (a: Output, b: Output): 1 | -1 | 0 => {
-      const aoutid: Buffer = Buffer.alloc(4)
-      aoutid.writeUInt32BE(a.getOutputID(), 0)
-      const abuff: Buffer = a.toBuffer()
-
-      const boutid: Buffer = Buffer.alloc(4)
-      boutid.writeUInt32BE(b.getOutputID(), 0)
-      const bbuff: Buffer = b.toBuffer()
-
-      const asort: Buffer = Buffer.concat(
-        [aoutid, abuff],
-        aoutid.length + abuff.length
-      )
-      const bsort: Buffer = Buffer.concat(
-        [boutid, bbuff],
-        boutid.length + bbuff.length
-      )
-      return Buffer.compare(asort, bsort) as 1 | -1 | 0
-    }
-
   /**
    * An [[Output]] class which contains addresses, locktimes, and thresholds.
    *
@@ -385,8 +401,6 @@ export abstract class Output extends OutputOwners {
 
   abstract create(...args: any[]): this
 
-  abstract select(id: number, ...args: any[]): Output
-
   /**
    *
    * @param assetID An assetID which is wrapped around the Buffer of the Output
@@ -408,7 +422,7 @@ export abstract class StandardParseableOutput extends Serializable {
     }
   }
 
-  protected output: Output
+  protected output: BaseOutput
 
   /**
    * Returns a function used to sort an array of [[ParseableOutput]]s
@@ -424,8 +438,6 @@ export abstract class StandardParseableOutput extends Serializable {
       return Buffer.compare(sorta, sortb) as 1 | -1 | 0
     }
 
-  getOutput = (): Output => this.output
-
   // must be implemented to select output types for the VM in question
   abstract fromBuffer(bytes: Buffer, offset?: number): number
 
@@ -437,16 +449,30 @@ export abstract class StandardParseableOutput extends Serializable {
     return Buffer.concat(barr, outid.length + outbuff.length)
   }
 
+  getThreshold(): number {
+    return this.output.getThreshold()
+  }
+  getLocktime(): BN {
+    return this.output.getLocktime()
+  }
+  getAddresses(): Buffer[] {
+    return this.output.getAddresses()
+  }
+
+  meetsThreshold(addrs: Buffer[], asOf: BN): boolean {
+    return this.output.meetsThreshold(addrs, asOf)
+  }
+
+  getOutput = (): BaseOutput => this.output
+
   /**
    * Class representing an [[ParseableOutput]] for a transaction.
    *
    * @param output A number representing the InputID of the [[ParseableOutput]]
    */
-  constructor(output: Output = undefined) {
+  constructor(output: BaseOutput = undefined) {
     super()
-    if (output instanceof Output) {
-      this.output = output
-    }
+    this.output = output
   }
 }
 
@@ -491,7 +517,7 @@ export abstract class StandardTransferableOutput extends StandardParseableOutput
    * @param assetID A {@link https://github.com/feross/buffer|Buffer} representing the assetID of the [[Output]]
    * @param output A number representing the InputID of the [[StandardTransferableOutput]]
    */
-  constructor(assetID: Buffer = undefined, output: Output = undefined) {
+  constructor(assetID: Buffer = undefined, output: BaseOutput = undefined) {
     super(output)
     if (typeof assetID !== "undefined") {
       this.assetID = assetID

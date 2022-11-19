@@ -28,7 +28,7 @@ describe("XChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return true }
+      () => { return {} }
     ],
     [
       "createaddrB",
@@ -90,7 +90,7 @@ describe("XChain", (): void => {
       () => xchain.getBalance(whaleAddr, "AVAX"),
       (x) => x.utxoIDs[0].txID,
       Matcher.toBe,
-      () => "BUuypiq2wyuLMvyhzFXcPyxPMCgSp7eeDohhQRqTChoBjKziC"
+      () => "28N55gFiYRrHWTopC4mybgvTw92x4EmWiZBLCRBgjXFyBgx9UN"
     ],
     [
       "importKey",
