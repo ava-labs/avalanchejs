@@ -14,7 +14,7 @@ import {
   TransferableOutput
 } from "../../../src/apis/platformvm/outputs"
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
-import { Input } from "../../../src/common/input"
+import { BaseInput } from "../../../src/common/input"
 import { Output } from "../../../src/common/output"
 
 /**
@@ -119,7 +119,7 @@ describe("Inputs", (): void => {
       (utxos[2].getOutput() as AmountOutput).getAmount()
     )
 
-    const cmp = Input.comparator()
+    const cmp = BaseInput.comparator()
     expect(cmp(inpt1, inpt2)).toBe(-1)
     expect(cmp(inpt1, inpt3)).toBe(-1)
     expect(cmp(inpt1, inpt1)).toBe(0)

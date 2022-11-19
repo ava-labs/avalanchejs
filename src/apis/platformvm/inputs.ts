@@ -6,7 +6,7 @@ import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import {
-  Input,
+  BaseInput,
   StandardTransferableInput,
   StandardAmountInput,
   StandardParseableInput
@@ -14,6 +14,7 @@ import {
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import BN from "bn.js"
 import { InputIdError } from "../../utils/errors"
+import { LockedIDs } from "./locked"
 
 /**
  * @ignore
@@ -28,11 +29,16 @@ const serialization: Serialization = Serialization.getInstance()
  *
  * @returns An instance of an [[Input]]-extended class.
  */
-export const SelectInputClass = (inputid: number, ...args: any[]): Input => {
+export const SelectInputClass = (
+  inputid: number,
+  ...args: any[]
+): BaseInput => {
   if (inputid === PlatformVMConstants.SECPINPUTID) {
     return new SECPTransferInput(...args)
   } else if (inputid === PlatformVMConstants.STAKEABLELOCKINID) {
     return new StakeableLockIn(...args)
+  } else if (inputid === PlatformVMConstants.LOCKEDINID) {
+    return new LockedIn(...args)
   }
   /* istanbul ignore next */
   throw new InputIdError("Error - SelectInputClass: unknown inputid")
@@ -43,7 +49,6 @@ export class ParseableInput extends StandardParseableInput {
   protected _typeID = undefined
 
   //serialize is inherited
-
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
     this.input = SelectInputClass(fields["input"]["_typeID"])
@@ -105,7 +110,7 @@ export abstract class AmountInput extends StandardAmountInput {
 
   //serialize and deserialize both are inherited
 
-  select(id: number, ...args: any[]): Input {
+  select(id: number, ...args: any[]): BaseInput {
     return SelectInputClass(id, ...args)
   }
 }
@@ -137,14 +142,14 @@ export class SECPTransferInput extends AmountInput {
 }
 
 /**
- * An [[Input]] class which specifies an input that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
+ * An [[Input]] class which specifies an input that has a locktime which can also
+ * enable staking of the value held, preventing transfers but not validation.
  */
-export class StakeableLockIn extends AmountInput {
+export class StakeableLockIn extends ParseableInput {
   protected _typeName = "StakeableLockIn"
-  protected _typeID = PlatformVMConstants.STAKEABLELOCKINID
+  protected _typeID = PlatformVMConstants.STAKEABLELOCKOUTID
 
   //serialize and deserialize both are inherited
-
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding)
     let outobj: object = {
@@ -155,18 +160,11 @@ export class StakeableLockIn extends AmountInput {
         "Buffer",
         "decimalString",
         8
-      ),
-      transferableInput: this.transferableInput.serialize(encoding)
+      )
     }
-    delete outobj["sigIdxs"]
-    delete outobj["sigCount"]
-    delete outobj["amount"]
     return outobj
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
-    fields["sigIdxs"] = []
-    fields["sigCount"] = "0"
-    fields["amount"] = "98"
     super.deserialize(fields, encoding)
     this.stakeableLocktime = serialization.decoder(
       fields["stakeableLocktime"],
@@ -175,30 +173,35 @@ export class StakeableLockIn extends AmountInput {
       "Buffer",
       8
     )
-    this.transferableInput = new ParseableInput()
-    this.transferableInput.deserialize(fields["transferableInput"], encoding)
-    this.synchronize()
   }
 
   protected stakeableLocktime: Buffer
-  protected transferableInput: ParseableInput
-
-  private synchronize() {
-    let input: AmountInput = this.transferableInput.getInput() as AmountInput
-    this.sigIdxs = input.getSigIdxs()
-    this.sigCount = Buffer.alloc(4)
-    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
-    this.amount = bintools.fromBNToBuffer(input.getAmount(), 8)
-    this.amountValue = input.getAmount()
-  }
 
   getStakeableLocktime(): BN {
     return bintools.fromBufferToBN(this.stakeableLocktime)
   }
 
-  getTransferablInput(): ParseableInput {
-    return this.transferableInput
+  /**
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockOut]] and returns the size of the output.
+   */
+  fromBuffer(outbuff: Buffer, offset: number = 0): number {
+    this.stakeableLocktime = bintools.copyFrom(outbuff, offset, offset + 8)
+    offset += 8
+    offset = super.fromBuffer(outbuff, offset)
+    return offset
   }
+
+  /**
+   * Returns the buffer representing the [[StakeableLockOut]] instance.
+   */
+  toBuffer(): Buffer {
+    const superBuf = super.toBuffer()
+    return Buffer.concat(
+      [this.stakeableLocktime, superBuf],
+      superBuf.length + 8
+    )
+  }
+
   /**
    * Returns the inputID for this input
    */
@@ -207,28 +210,6 @@ export class StakeableLockIn extends AmountInput {
   }
 
   getCredentialID = (): number => PlatformVMConstants.SECPCREDENTIAL
-
-  /**
-   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer} representing the [[StakeableLockIn]] and returns the size of the output.
-   */
-  fromBuffer(bytes: Buffer, offset: number = 0): number {
-    this.stakeableLocktime = bintools.copyFrom(bytes, offset, offset + 8)
-    offset += 8
-    this.transferableInput = new ParseableInput()
-    offset = this.transferableInput.fromBuffer(bytes, offset)
-    this.synchronize()
-    return offset
-  }
-
-  /**
-   * Returns the buffer representing the [[StakeableLockIn]] instance.
-   */
-  toBuffer(): Buffer {
-    const xferinBuff: Buffer = this.transferableInput.toBuffer()
-    const bsize: number = this.stakeableLocktime.length + xferinBuff.length
-    const barr: Buffer[] = [this.stakeableLocktime, xferinBuff]
-    return Buffer.concat(barr, bsize)
-  }
 
   create(...args: any[]): this {
     return new StakeableLockIn(...args) as this
@@ -240,12 +221,23 @@ export class StakeableLockIn extends AmountInput {
     return newout as this
   }
 
-  select(id: number, ...args: any[]): Input {
-    return SelectInputClass(id, ...args)
+  /**
+   * Returns the amount from the underlying input
+   */
+  getAmount(): BN {
+    return (this.getInput() as StandardAmountInput).getAmount()
   }
 
   /**
-   * A [[Output]] class which specifies an [[Input]] that has a locktime which can also enable staking of the value held, preventing transfers but not validation.
+   * Backwards compatibility
+   */
+  getTransferableInput(): ParseableInput {
+    return this
+  }
+
+  /**
+   * A [[Input]] class which specifies an [[Input]] that has a locktime which can also
+   * enable staking of the value held, preventing transfers but not validation.
    *
    * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the input
    * @param stakeableLocktime A {@link https://github.com/indutny/bn.js/|BN} representing the stakeable locktime
@@ -256,13 +248,95 @@ export class StakeableLockIn extends AmountInput {
     stakeableLocktime: BN = undefined,
     transferableInput: ParseableInput = undefined
   ) {
-    super(amount)
+    super(
+      typeof transferableInput !== "undefined"
+        ? transferableInput.getInput()
+        : new SECPTransferInput(amount)
+    )
     if (typeof stakeableLocktime !== "undefined") {
       this.stakeableLocktime = bintools.fromBNToBuffer(stakeableLocktime, 8)
     }
-    if (typeof transferableInput !== "undefined") {
-      this.transferableInput = transferableInput
-      this.synchronize()
+  }
+}
+
+/**
+ * An [[Input]] class which specifies an input that is controlled by deposit and bond tx.
+ */
+export class LockedIn extends ParseableInput {
+  protected _typeName = "LockedIn"
+  protected _typeID = PlatformVMConstants.LOCKEDINID
+
+  //serialize and deserialize both are inherited
+  serialize(encoding: SerializedEncoding = "hex"): object {
+    let fields: object = super.serialize(encoding)
+    let outobj: object = {
+      ...fields,
+      ids: this.ids.serialize()
     }
+    return outobj
+  }
+
+  deserialize(fields: object, encoding: SerializedEncoding = "hex") {
+    super.deserialize(fields, encoding)
+    this.ids.deserialize(fields["ids"], encoding)
+  }
+
+  protected ids: LockedIDs = new LockedIDs()
+
+  create(...args: any[]): this {
+    return new LockedIn(...args) as this
+  }
+
+  clone(): this {
+    const newout: LockedIn = this.create()
+    newout.fromBuffer(this.toBuffer())
+    return newout as this
+  }
+
+  /**
+   * Popuates the instance from a {@link https://github.com/feross/buffer|Buffer}
+   * representing the [[LockedIn]] and returns the size of the input.
+   */
+  fromBuffer(outbuff: Buffer, offset: number = 0): number {
+    offset = this.ids.fromBuffer(outbuff, offset)
+    offset = super.fromBuffer(outbuff, offset)
+    return offset
+  }
+
+  /**
+   * Returns the buffer representing the [[LockedIn]] instance.
+   */
+  toBuffer(): Buffer {
+    const idsBuf: Buffer = this.ids.toBuffer()
+    const superBuff: Buffer = super.toBuffer()
+    return Buffer.concat([idsBuf, superBuff], superBuff.length + 64)
+  }
+
+  /**
+   * Returns the inputID for this input
+   */
+  getInputID(): number {
+    return this._typeID
+  }
+
+  /**
+   * Returns the credentialID for this input
+   */
+  getCredentialID = (): number => PlatformVMConstants.SECPCREDENTIAL
+
+  /**
+   * Returns the amount from the underlying input
+   */
+  getAmount(): BN {
+    return (this.getInput() as StandardAmountInput).getAmount()
+  }
+
+  /**
+   * An [[Input]] class which specifies an input that is controlled by deposit and bond tx.
+   *
+   * @param amount A {@link https://github.com/indutny/bn.js/|BN} representing the amount in the input
+   */
+  constructor(amount: BN = undefined) {
+    super(new SECPTransferInput(amount))
   }
 }
