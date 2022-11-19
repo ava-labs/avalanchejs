@@ -25,11 +25,11 @@ describe("PChain", (): void => {
   const whaleAddr: string = "P-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
   const key: string =
     "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
-  const nodeID: string = "NodeID-7Xhw2mDxuDS44j42TCB6U5579esbSt3Lg"
+  const nodeID: string = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
   const subnetID: string = "2bGsYJorY6X7RhjPBFs3kYjiNEHo4zGrD2eeyZbb43T2KKi7fM"
   const xChainAddr: string = "X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
   const avalancheBlockChainID: string =
-    "2VvmkRw4yrz8tPrVnCCbvEK1JxNyujpqhmU6SGonxMpkWBx9UD"
+    "11111111111111111111111111111111LpoYY"
 
   const rewardUTXOTxID: string =
     "2nmH8LithVbdjaXsxVQCQfXtzN9hBbmebrsaEYnLM9T32Uy2Y4"
@@ -40,7 +40,7 @@ describe("PChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return true }
+      () => { return {} }
     ],
     [
       "createaddrB",
@@ -91,21 +91,21 @@ describe("PChain", (): void => {
       () => pchain.getBlockchains(),
       (x) => x[0].id,
       Matcher.toBe,
-      () => "BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88"
+      () => "2LqjNQWTVU7KEkFC5WenqdcwRzsjmJH1erk1xbFQDwt5EHC1Zr"
     ],
     [
       "getBlockchainsX",
       () => pchain.getBlockchains(),
       (x) => x[1].id,
       Matcher.toBe,
-      () => "qzfF3A11KzpcHkkqznEyQgupQrCNS6WV6fTUTwZpEKqhj1QE7"
+      () => "2huFztbeB4LijVCoLrxP8NwFbRCdtLfUyvx4VXwD5VnVxzxkMX"
     ],
     [
       "getBlockchainStatus",
       () => pchain.getBlockchainStatus(avalancheBlockChainID),
       (x) => x,
       Matcher.toBe,
-      () => "Created"
+      () => "Syncing"
     ],
     [
       "getCurrentSupply",
