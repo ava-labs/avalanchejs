@@ -5,7 +5,11 @@ import {
   SECPTransferOutput,
   SelectOutputClass
 } from "../../../src/apis/platformvm/outputs"
-import { BaseOutput, Output } from "../../../src/common/output"
+import {
+  BaseOutput,
+  BaseOutputComparator,
+  Output
+} from "../../../src/common/output"
 
 const bintools: BinTools = BinTools.getInstance()
 
@@ -54,7 +58,7 @@ describe("Outputs", (): void => {
         locktime,
         3
       )
-      const cmp = BaseOutput.comparator()
+      const cmp = BaseOutputComparator()
       expect(cmp(outpayment1, outpayment1)).toBe(0)
       expect(cmp(outpayment2, outpayment2)).toBe(0)
       expect(cmp(outpayment3, outpayment3)).toBe(0)

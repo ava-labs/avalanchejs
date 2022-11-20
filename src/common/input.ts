@@ -18,43 +18,45 @@ import {
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
-export abstract class BaseInput extends Serializable {
-  abstract serialize(encoding: SerializedEncoding): object
-  abstract deserialize(fields: object, encoding: SerializedEncoding): void
-  abstract fromBuffer(bytes: Buffer, offset: number): number
-  abstract toBuffer(): Buffer
+export interface BaseInput {
+  getTypeID(): number
 
-  abstract getInput(): BaseInput
-  abstract getInputID(): number
-  abstract getCredentialID(): number
-  abstract addSignatureIdx(addressIdx: number, address: Buffer): void
-  abstract getSigIdxs(): SigIdx[]
+  serialize(encoding: SerializedEncoding): object
+  deserialize(fields: object, encoding: SerializedEncoding): void
+  fromBuffer(bytes: Buffer, offset: number): number
+  toBuffer(): Buffer
 
-  abstract clone(): this
-  abstract create(...args: any[]): this
+  getInput(): BaseInput
+  getInputID(): number
+  getCredentialID(): number
+  addSignatureIdx(addressIdx: number, address: Buffer): void
+  getSigIdxs(): SigIdx[]
 
-  static comparator =
-    (): ((a: BaseInput, b: BaseInput) => 1 | -1 | 0) =>
-    (a: BaseInput, b: BaseInput): 1 | -1 | 0 => {
-      const aoutid: Buffer = Buffer.alloc(4)
-      aoutid.writeUInt32BE(a.getInputID(), 0)
-      const abuff: Buffer = a.toBuffer()
-
-      const boutid: Buffer = Buffer.alloc(4)
-      boutid.writeUInt32BE(b.getInputID(), 0)
-      const bbuff: Buffer = b.toBuffer()
-
-      const asort: Buffer = Buffer.concat(
-        [aoutid, abuff],
-        aoutid.length + abuff.length
-      )
-      const bsort: Buffer = Buffer.concat(
-        [boutid, bbuff],
-        boutid.length + bbuff.length
-      )
-      return Buffer.compare(asort, bsort) as 1 | -1 | 0
-    }
+  clone(): this
+  create(...args: any[]): this
 }
+
+export const BaseInputComparator =
+  (): ((a: BaseInput, b: BaseInput) => 1 | -1 | 0) =>
+  (a: BaseInput, b: BaseInput): 1 | -1 | 0 => {
+    const aoutid: Buffer = Buffer.alloc(4)
+    aoutid.writeUInt32BE(a.getInputID(), 0)
+    const abuff: Buffer = a.toBuffer()
+
+    const boutid: Buffer = Buffer.alloc(4)
+    boutid.writeUInt32BE(b.getInputID(), 0)
+    const bbuff: Buffer = b.toBuffer()
+
+    const asort: Buffer = Buffer.concat(
+      [aoutid, abuff],
+      aoutid.length + abuff.length
+    )
+    const bsort: Buffer = Buffer.concat(
+      [boutid, bbuff],
+      boutid.length + bbuff.length
+    )
+    return Buffer.compare(asort, bsort) as 1 | -1 | 0
+  }
 
 export abstract class Input extends Serializable {
   protected _typeName = "Input"

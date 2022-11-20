@@ -5,7 +5,7 @@
 
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
-import { BaseOutput } from "../../common/output"
+import { BaseOutput, BaseOutputComparator } from "../../common/output"
 import { SelectOutputClass } from "./outputs"
 import { AVMConstants } from "./constants"
 import { Serializable, SerializedEncoding } from "../../utils/serialization"
@@ -101,7 +101,7 @@ export class InitialStates extends Serializable {
       const fxidbuff: Buffer = Buffer.alloc(4)
       fxidbuff.writeUInt32BE(fxid, 0)
       buff.push(fxidbuff)
-      const initialState = this.fxs[`${fxid}`].sort(BaseOutput.comparator())
+      const initialState = this.fxs[`${fxid}`].sort(BaseOutputComparator())
       const statelen: Buffer = Buffer.alloc(4)
       statelen.writeUInt32BE(initialState.length, 0)
       buff.push(statelen)
