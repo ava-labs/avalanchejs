@@ -21,43 +21,45 @@ import { ChecksumError, AddressError, AddressIndexError } from "../utils/errors"
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
-export abstract class BaseOutput extends Serializable {
-  abstract serialize(encoding: SerializedEncoding): object
-  abstract deserialize(fields: object, encoding: SerializedEncoding): void
-  abstract fromBuffer(bytes: Buffer, offset: number): number
-  abstract toBuffer(): Buffer
+export interface BaseOutput {
+  getTypeID(): number
 
-  abstract getThreshold(): number
-  abstract getLocktime(): BN
-  abstract getAddresses(): Buffer[]
-  abstract meetsThreshold(addrs: Buffer[], asOf: BN): boolean
+  serialize(encoding: SerializedEncoding): object
+  deserialize(fields: object, encoding: SerializedEncoding): void
+  fromBuffer(bytes: Buffer, offset: number): number
+  toBuffer(): Buffer
 
-  abstract getOutputID(): number
-  abstract clone(): this
-  abstract create(...args: any[]): this
+  getThreshold(): number
+  getLocktime(): BN
+  getAddresses(): Buffer[]
+  meetsThreshold(addrs: Buffer[], asOf: BN): boolean
 
-  static comparator =
-    (): ((a: BaseOutput, b: BaseOutput) => 1 | -1 | 0) =>
-    (a: BaseOutput, b: BaseOutput): 1 | -1 | 0 => {
-      const aoutid: Buffer = Buffer.alloc(4)
-      aoutid.writeUInt32BE(a.getOutputID(), 0)
-      const abuff: Buffer = a.toBuffer()
-
-      const boutid: Buffer = Buffer.alloc(4)
-      boutid.writeUInt32BE(b.getOutputID(), 0)
-      const bbuff: Buffer = b.toBuffer()
-
-      const asort: Buffer = Buffer.concat(
-        [aoutid, abuff],
-        aoutid.length + abuff.length
-      )
-      const bsort: Buffer = Buffer.concat(
-        [boutid, bbuff],
-        boutid.length + bbuff.length
-      )
-      return Buffer.compare(asort, bsort) as 1 | -1 | 0
-    }
+  getOutputID(): number
+  clone(): this
+  create(...args: any[]): this
 }
+
+export const BaseOutputComparator =
+  (): ((a: BaseOutput, b: BaseOutput) => 1 | -1 | 0) =>
+  (a: BaseOutput, b: BaseOutput): 1 | -1 | 0 => {
+    const aoutid: Buffer = Buffer.alloc(4)
+    aoutid.writeUInt32BE(a.getOutputID(), 0)
+    const abuff: Buffer = a.toBuffer()
+
+    const boutid: Buffer = Buffer.alloc(4)
+    boutid.writeUInt32BE(b.getOutputID(), 0)
+    const bbuff: Buffer = b.toBuffer()
+
+    const asort: Buffer = Buffer.concat(
+      [aoutid, abuff],
+      aoutid.length + abuff.length
+    )
+    const bsort: Buffer = Buffer.concat(
+      [boutid, bbuff],
+      boutid.length + bbuff.length
+    )
+    return Buffer.compare(asort, bsort) as 1 | -1 | 0
+  }
 
 /**
  * Class for representing an address used in [[Output]] types
