@@ -1,13 +1,9 @@
 name: E2E
 on: 
-  push:
-    branches:
-      - chain4travel
-      - kopernikus
   pull_request:
     branches:
       - chain4travel
-      - kopernikus
+      - dev
   workflow_dispatch:
     inputs:
       caminojsRepo:

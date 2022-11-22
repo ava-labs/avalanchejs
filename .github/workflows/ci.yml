@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - chain4travel
-      - kopernikus
+      - dev
   pull_request:
     branches:
       - chain4travel
-      - kopernikus
+      - dev
   workflow_dispatch:
     inputs:
       caminojsRepo:
