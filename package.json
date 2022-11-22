@@ -22,7 +22,8 @@
     "prettier-tests": "prettier --write ./tests",
     "prettier-web": "prettier --write ./web",
     "prettier-mocks": "prettier --write ./__mocks__",
-    "prettier": "yarn prettier-src && yarn prettier-examples && yarn prettier-tests && yarn prettier-mocks",
+    "prettier-workflows": "prettier --write .github/**/*.yml",
+    "prettier": "yarn prettier-src && yarn prettier-examples && yarn prettier-tests && yarn prettier-mocks && yarn prettier-workflows",
     "prepare": "husky install"
   },
   "repository": {

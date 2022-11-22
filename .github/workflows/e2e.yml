@@ -1,23 +1,19 @@
 name: E2E
-on: 
-  push:
-    branches:
-      - chain4travel
-      - kopernikus
+on:
   pull_request:
     branches:
       - chain4travel
-      - kopernikus
+      - dev
   workflow_dispatch:
     inputs:
       caminojsRepo:
-        description: 'caminojs github repository'
+        description: "caminojs github repository"
         required: true
-        default: 'chain4travel/caminojs'
+        default: "chain4travel/caminojs"
       caminojsBranch:
-        description: 'caminojs branch'
+        description: "caminojs branch"
         required: true
-        default: 'chain4travel'      
+        default: "chain4travel"
 env:
   GOPATH: /home/runner/go
   CAMPATH: src/github.com/chain4travel
@@ -32,7 +28,7 @@ jobs:
       - name: Check out chain4travel/caminojs
         uses: actions/checkout@v3
         with:
-          repository: 'chain4travel/caminojs'
+          repository: "chain4travel/caminojs"
       - name: Check out ${{ github.event.inputs.caminojsRepo }} ${{ github.event.inputs.caminojsBranch }}
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/checkout@v3
@@ -48,18 +44,18 @@ jobs:
         with:
           go-version: 1.18
       - name: Setup GOPATH and CAMPATH
-        run : |
+        run: |
           mkdir -p $GOPATH/$CAMPATH
       - name: Install autoremove
         run: sudo apt-get autoremove -y
       - name: Clone and Build Camino Node
-        run : |
+        run: |
           cd $GOPATH/$CAMPATH
           git clone https://github.com/chain4travel/camino-node --depth 1 -bv0.3.1-alpha1
           cd camino-node
           ./scripts/build.sh
       - name: Checkout Camino Network Runner
-        run : |
+        run: |
           cd $GOPATH/$CAMPATH
           git clone https://github.com/chain4travel/camino-network-runner --depth 1 -bv0.2.1-alpha1
       - name: Starting Camino Network Runner
