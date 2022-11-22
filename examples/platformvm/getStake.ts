@@ -8,20 +8,31 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const pchain: PlatformVMAPI = avalanche.PChain()
-const pKeychain: KeyChain = pchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-pKeychain.importKey(privKey)
-const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const encoding: string = "hex"
 
+let pchain: PlatformVMAPI
+let pAddressStrings: string[]
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const getStakeResponse: GetStakeResponse = await pchain.getStake(
     pAddressStrings,
     encoding

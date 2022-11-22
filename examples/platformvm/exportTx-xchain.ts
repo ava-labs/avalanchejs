@@ -23,33 +23,63 @@ import {
   DefaultLocalGenesisPrivateKey,
   MILLIAVAX
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const pchain: PlatformVMAPI = avalanche.PChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
-const pKeychain: KeyChain = pchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-pKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const xChainBlockchainID: string = avalanche.getNetwork().X.blockchainID
-const pChainBlockchainID: string = avalanche.getNetwork().P.blockchainID
 const exportedOuts: TransferableOutput[] = []
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = MILLIAVAX
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from("Manually Export AVAX from P-Chain to X-Chain")
 
+let pchain: PlatformVMAPI
+let pKeychain: KeyChain
+let pAddresses: Buffer[]
+let pAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let pChainBlockchainID: string
+let avaxAssetIDBuf: Buffer
+
+let xchain: AVMAPI
+let xKeychain: AVMKeyChain
+let xChainBlockchainID: string
+let xChainBlockchainIDBuf: Buffer
+let xAddresses: Buffer[]
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  pKeychain = pchain.keyChain()
+  pKeychain.importKey(privKey)
+  pAddresses = pchain.keyChain().getAddresses()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = pchain.getDefaultTxFee()
+  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddresses = xchain.keyChain().getAddresses()
+  xChainBlockchainID = avalanche.getNetwork().X.blockchainID
+  xChainBlockchainIDBuf = bintools.cb58Decode(xChainBlockchainID)
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
@@ -91,7 +121,7 @@ const main = async (): Promise<any> => {
   })
 
   const exportTx: ExportTx = new ExportTx(
-    networkID,
+    config.networkID,
     bintools.cb58Decode(pChainBlockchainID),
     outputs,
     inputs,

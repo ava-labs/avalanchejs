@@ -1,10 +1,10 @@
 import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
-  KeyChain as AVMKeyChain,
-  UTXOSet,
+  KeyChain,
+  Tx,
   UnsignedTx,
-  Tx
+  UTXOSet
 } from "@c4tplatform/caminojs/dist/apis/avm"
 import {
   GetBalanceResponse,
@@ -15,35 +15,54 @@ import {
   PlatformVMAPI
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
-  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
+  PrivateKeyPrefix,
   UnixNow
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const pchain: PlatformVMAPI = avalanche.PChain()
-const xKeychain: AVMKeyChain = xchain.keyChain()
-const pKeychain: PlatformVMKeyChain = pchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-pKeychain.importKey(privKey)
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const pChainBlockchainID: string = avalanche.getNetwork().P.blockchainID
-const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
 const memo: Buffer = Buffer.from(
   "AVM utility method buildExportTx to export AVAX to the P-Chain from the X-Chain"
 )
-const fee: BN = xchain.getDefaultTxFee()
+
+let xchain: AVMAPI
+let pchain: PlatformVMAPI
+let xKeychain: KeyChain
+let pKeychain: PlatformVMKeyChain
+let xAddressStrings: string[]
+let pAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let pChainBlockchainID: string
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  pchain = avalanche.PChain()
+  xKeychain = xchain.keyChain()
+  pKeychain = pchain.keyChain()
+  xKeychain.importKey(privKey)
+  pKeychain.importKey(privKey)
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = xchain.getDefaultTxFee()
+  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
     xAddressStrings
   )

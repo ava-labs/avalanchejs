@@ -17,37 +17,61 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const cchain: EVMAPI = avalanche.CChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: AVMKeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-const cKeychain: EVMKeyChain = cchain.keyChain()
-xKeychain.importKey(privKey)
-cKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const cAddresses: Buffer[] = cchain.keyChain().getAddresses()
-const xChainBlockchainIdStr: string = avalanche.getNetwork().X.blockchainID
-const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
-const cChainBlockchainIdStr: string = avalanche.getNetwork().C.blockchainID
-const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
-const avaxAssetID: string = avalanche.getNetwork().X.avaxAssetID
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const evmInputs: EVMInput[] = []
 const exportedOuts: TransferableOutput[] = []
 const Web3 = require("web3")
 const path: string = "/ext/bc/C/rpc"
-const web3 = new Web3(`${protocol}://${ip}:${port}${path}`)
+const web3 = new Web3(
+  `${config.protocol}://${config.host}:${config.port}${path}`
+)
 const threshold: number = 1
 
+let xchain: AVMAPI
+let cchain: EVMAPI
+let xKeychain: AVMKeyChain
+let cKeychain: EVMKeyChain
+let xAddresses: Buffer[]
+let cAddresses: Buffer[]
+let xChainBlockchainIdStr: string
+let xChainBlockchainIdBuf: Buffer
+let cChainBlockchainIdStr: string
+let cChainBlockchainIdBuf: Buffer
+let avaxAssetID: string
+let avaxAssetIDBuf: Buffer
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  cchain = avalanche.CChain()
+  xKeychain = xchain.keyChain()
+  cKeychain = cchain.keyChain()
+  xKeychain.importKey(privKey)
+  cKeychain.importKey(privKey)
+  xAddresses = xchain.keyChain().getAddresses()
+  cAddresses = cchain.keyChain().getAddresses()
+  xChainBlockchainIdStr = avalanche.getNetwork().X.blockchainID
+  xChainBlockchainIdBuf = bintools.cb58Decode(xChainBlockchainIdStr)
+  cChainBlockchainIdStr = avalanche.getNetwork().C.blockchainID
+  cChainBlockchainIdBuf = bintools.cb58Decode(cChainBlockchainIdStr)
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   let balance: BN = await web3.eth.getBalance(cHexAddress)
   balance = new BN(balance.toString().substring(0, 17))
   const fee: BN = cchain.getDefaultTxFee()
@@ -77,7 +101,7 @@ const main = async (): Promise<any> => {
   exportedOuts.push(transferableOutput)
 
   const exportTx: ExportTx = new ExportTx(
-    networkID,
+    config.networkID,
     cChainBlockchainIdBuf,
     xChainBlockchainIdBuf,
     evmInputs,

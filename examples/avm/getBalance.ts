@@ -1,16 +1,34 @@
 import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { AVMAPI } from "@c4tplatform/caminojs/dist/apis/avm"
+import { AVMAPI, KeyChain } from "@c4tplatform/caminojs/dist/apis/avm"
+import { ExamplesConfig } from "../common/examplesConfig"
+import {
+  DefaultLocalGenesisPrivateKey,
+  PrivateKeyPrefix
+} from "@c4tplatform/caminojs/dist/utils"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+let xchain: AVMAPI
+let xKeychain: KeyChain
+let xAddressStrings: string[]
+
+const InitAvalanche = async () => {
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+}
 
 const main = async (): Promise<any> => {
-  const address: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
-  const balance: object = await xchain.getBalance(address, "AVAX")
+  await InitAvalanche()
+
+  const balance: object = await xchain.getBalance(xAddressStrings[0], "AVAX")
   console.log(balance)
 }
 

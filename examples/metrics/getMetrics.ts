@@ -1,14 +1,25 @@
 import { Avalanche } from "@c4tplatform/caminojs/dist"
 import { MetricsAPI } from "@c4tplatform/caminojs/dist/apis/metrics"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const metrics: MetricsAPI = avalanche.Metrics()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+
+let metrics: MetricsAPI
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  metrics = avalanche.Metrics()
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const m: string = await metrics.getMetrics()
   console.log(m)
 }

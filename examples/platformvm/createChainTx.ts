@@ -27,50 +27,67 @@ import {
   DefaultLocalGenesisPrivateKey,
   ONEAVAX
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
+
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 
 const bintools: BinTools = BinTools.getInstance()
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const pchain: PlatformVMAPI = avalanche.PChain()
-// Keychain with 4 keys-A, B, C, and D
-const pKeychain: KeyChain = pchain.keyChain()
-// Keypair A
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
-pKeychain.importKey(privKey)
-
-// Keypair B
-privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// P-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
-pKeychain.importKey(privKey)
-
-// Keypair C
-privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
-// P-local1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
-pKeychain.importKey(privKey)
-
-// Keypair D
-privKey = "PrivateKey-2uWuEQbY5t7NPzgqzDrXSgGPhi3uyKj2FeAvPUHYo6CmENHJfn"
-// P-local1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
-pKeychain.importKey(privKey)
-const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
-const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const pChainBlockchainID: string = "11111111111111111111111111111111LpoYY"
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = ONEAVAX
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const avaxUTXOKeychain: Buffer[] = [pAddresses[0], pAddresses[1]]
-const avaxUTXOKeychainStrings: string[] = [
-  pAddressStrings[0],
-  pAddressStrings[1]
-]
+
+let pchain: PlatformVMAPI
+let pKeychain: KeyChain
+let pAddresses: Buffer[]
+let pAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let pChainBlockchainID: string
+let avaxAssetIDBuf: Buffer
+
+let avaxUTXOKeychain: Buffer[]
+let avaxUTXOKeychainStrings: string[]
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  pKeychain = pchain.keyChain()
+  // P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+  pKeychain.importKey(privKey)
+  // P-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+  pKeychain.importKey(
+    "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
+  )
+  // P-local1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
+  pKeychain.importKey(
+    "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
+  )
+  // P-local1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
+  pKeychain.importKey(
+    "PrivateKey-2uWuEQbY5t7NPzgqzDrXSgGPhi3uyKj2FeAvPUHYo6CmENHJfn"
+  )
+  pAddresses = pchain.keyChain().getAddresses()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = pchain.getDefaultTxFee()
+  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+
+  avaxUTXOKeychain = [pAddresses[0], pAddresses[1]]
+  avaxUTXOKeychainStrings = [pAddressStrings[0], pAddressStrings[1]]
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const assetAlias: string = "AssetAliasTest"
   const name: string = "Test Asset"
   const symbol: string = "TEST"
@@ -97,7 +114,10 @@ const main = async (): Promise<any> => {
   )
   const genesisAssets: GenesisAsset[] = []
   genesisAssets.push(genesisAsset)
-  const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
+  const genesisData: GenesisData = new GenesisData(
+    genesisAssets,
+    config.networkID
+  )
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
   const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
@@ -148,7 +168,7 @@ const main = async (): Promise<any> => {
   fxIDs.sort()
   const blockchainID: Buffer = bintools.cb58Decode(pChainBlockchainID)
   const createChainTx: CreateChainTx = new CreateChainTx(
-    networkID,
+    config.networkID,
     blockchainID,
     outputs,
     inputs,

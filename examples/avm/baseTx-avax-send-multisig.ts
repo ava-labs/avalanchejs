@@ -1,56 +1,34 @@
 import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
-  AVMAPI,
-  KeyChain,
-  SECPTransferOutput,
-  SECPTransferInput,
-  TransferableOutput,
-  TransferableInput,
-  UTXOSet,
-  UTXO,
   AmountOutput,
-  UnsignedTx,
+  AVMAPI,
+  BaseTx,
+  KeyChain,
+  SECPTransferInput,
+  SECPTransferOutput,
+  TransferableInput,
+  TransferableOutput,
   Tx,
-  BaseTx
+  UnsignedTx,
+  UTXO,
+  UTXOSet
 } from "@c4tplatform/caminojs/dist/apis/avm"
 import {
-  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
-  Defaults
+  PrivateKeyPrefix
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
+const config: ExamplesConfig = require("../common/examplesConfig.json")
 const bintools: BinTools = BinTools.getInstance()
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
-const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(
-  ip,
-  port,
-  protocol,
-  networkID,
-  xBlockchainID
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
 )
-const xchain: AVMAPI = avalanche.XChain()
-const xKeychain: KeyChain = xchain.keyChain()
-let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
-xKeychain.importKey(privKey)
-privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// X-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
-xKeychain.importKey(privKey)
-privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
-// X-local1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
-xKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = xchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
@@ -59,7 +37,41 @@ const memo: Buffer = Buffer.from(
 // Uncomment for codecID 00 01
 // const codecID: number = 1
 
+let xchain: AVMAPI
+let xKeychain: KeyChain
+let xAddresses: Buffer[]
+let xAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let xBlockchainID: string
+let avaxAssetIDBuf: Buffer
+let xBlockchainIDBuf: Buffer
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+  // X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+  xKeychain.importKey(privKey)
+  privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
+  // X-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+  xKeychain.importKey(privKey)
+  privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
+  // X-local1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
+  xKeychain.importKey(privKey)
+  xAddresses = xchain.keyChain().getAddresses()
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+  fee = xchain.getDefaultTxFee()
+  xBlockchainID = avalanche.getNetwork().X.blockchainID
+  xBlockchainIDBuf = bintools.cb58Decode(xBlockchainID)
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const getBalanceResponse: any = await xchain.getBalance(
     xAddressStrings[0],
     avaxAssetID
@@ -107,7 +119,7 @@ const main = async (): Promise<any> => {
   })
 
   const baseTx: BaseTx = new BaseTx(
-    networkID,
+    config.networkID,
     xBlockchainIDBuf,
     outputs,
     inputs,

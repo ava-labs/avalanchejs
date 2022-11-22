@@ -16,38 +16,24 @@ import {
 import { GetBalanceResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  Defaults
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
+
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 
 const bintools: BinTools = BinTools.getInstance()
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
-const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
-const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
-const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const pchain: PlatformVMAPI = avalanche.PChain()
-const pKeychain: KeyChain = pchain.keyChain()
+
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
-pKeychain.importKey(privKey)
 
-privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// X-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
-pKeychain.importKey(privKey)
-
-privKey = "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
-// X-local1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
-pKeychain.importKey(privKey)
-const xAddresses: Buffer[] = pchain.keyChain().getAddresses()
-const xAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 3
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
@@ -56,14 +42,51 @@ const memo: Buffer = Buffer.from(
 // Uncomment for codecID 00 01
 // const codecID: number = 1
 
+let pchain: PlatformVMAPI
+let pKeychain: KeyChain
+let pAddresses: Buffer[]
+let pAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let pChainBlockchainID: string
+let avaxAssetIDBuf: Buffer
+let xBlockchainID: string
+let xBlockchainIDBuf: Buffer
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  pKeychain = pchain.keyChain()
+  // X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+  pKeychain.importKey(privKey)
+  // X-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+  pKeychain.importKey(
+    "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
+  )
+  // X-local1aekly2mwnsz6lswd6u0jqvd9u6yddt5884pyuc
+  pKeychain.importKey(
+    "PrivateKey-24b2s6EqkBp9bFG5S3Xxi4bjdxFqeRk56ck7QdQArVbwKkAvxz"
+  )
+  pAddresses = pchain.keyChain().getAddresses()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = pchain.getDefaultTxFee()
+  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+  xBlockchainID = avalanche.getNetwork().X.blockchainID
+  xBlockchainIDBuf = bintools.cb58Decode(xBlockchainID)
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const getBalanceResponse: GetBalanceResponse = await pchain.getBalance(
-    xAddressStrings[0]
+    pAddressStrings[0]
   )
   const balance: BN = new BN(getBalanceResponse.balance)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     balance.sub(fee),
-    xAddresses,
+    pAddresses,
     locktime,
     threshold
   )
@@ -75,7 +98,7 @@ const main = async (): Promise<any> => {
   )
   outputs.push(transferableOutput)
 
-  const avmUTXOResponse: any = await pchain.getUTXOs(xAddressStrings)
+  const avmUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO): void => {
@@ -87,7 +110,7 @@ const main = async (): Promise<any> => {
     const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
     // Uncomment for codecID 00 01
     // secpTransferInput.setCodecID(codecID)
-    secpTransferInput.addSignatureIdx(0, xAddresses[0])
+    secpTransferInput.addSignatureIdx(0, pAddresses[0])
 
     const input: TransferableInput = new TransferableInput(
       txid,
@@ -99,7 +122,7 @@ const main = async (): Promise<any> => {
   })
 
   const baseTx: BaseTx = new BaseTx(
-    networkID,
+    config.networkID,
     xBlockchainIDBuf,
     outputs,
     inputs,
