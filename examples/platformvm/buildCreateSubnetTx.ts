@@ -12,47 +12,62 @@ import {
   DefaultLocalGenesisPrivateKey,
   UnixNow
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const pchain: PlatformVMAPI = avalanche.PChain()
-// Keychain with 4 keys-A, B, C, and D
-const pKeychain: KeyChain = pchain.keyChain()
-// Keypair A
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-// P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
-pKeychain.importKey(privKey)
-
-// Keypair B
-privKey = "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
-// P-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
-pKeychain.importKey(privKey)
-
-// Keypair C
-privKey = "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
-// P-local1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
-pKeychain.importKey(privKey)
-
-// Keypair D
-privKey = "PrivateKey-2uWuEQbY5t7NPzgqzDrXSgGPhi3uyKj2FeAvPUHYo6CmENHJfn"
-// P-local1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
-pKeychain.importKey(privKey)
-const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
 const threshold: number = 2
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildCreateSubnetTx to create a CreateSubnetTx which creates a 1-of-2 AVAX utxo and a 2-of-3 SubnetAuth"
 )
 const asOf: BN = UnixNow()
-const subnetAuthKeychain: string[] = [
-  pAddressStrings[1],
-  pAddressStrings[2],
-  pAddressStrings[3]
-]
+
+let pchain: PlatformVMAPI
+let pKeychain: KeyChain
+let pAddresses: Buffer[]
+let pAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let pChainBlockchainID: string
+let subnetAuthKeychain: string[]
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  pKeychain = pchain.keyChain()
+  // P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+  pKeychain.importKey(privKey)
+  // P-local15s7p7mkdev0uajrd0pzxh88kr8ryccztnlmzvj
+  pKeychain.importKey(
+    "PrivateKey-R6e8f5QSa89DjpvL9asNdhdJ4u8VqzMJStPV8VVdDmLgPd8a4"
+  )
+  // P-local1u6eth2fg33ye63mnyu5jswtj326jaypvhyar45
+  pKeychain.importKey(
+    "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
+  )
+  // P-local1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
+  pAddresses = pchain.keyChain().getAddresses()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = pchain.getDefaultTxFee()
+  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
+  subnetAuthKeychain = [
+    pAddressStrings[1],
+    pAddressStrings[2],
+    pAddressStrings[3]
+  ]
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const platformVMUTXOResponse: GetUTXOsResponse = await pchain.getUTXOs(
     pAddressStrings
   )

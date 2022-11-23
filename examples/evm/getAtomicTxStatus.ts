@@ -1,14 +1,23 @@
 import { Avalanche } from "@c4tplatform/caminojs/dist"
 import { EVMAPI } from "@c4tplatform/caminojs/dist/apis/evm"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const cchain: EVMAPI = avalanche.CChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+let cchain: EVMAPI
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  cchain = avalanche.CChain()
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
   const txID: string = "FCry2Z1Su9KZqK1XRMhxQS6XuPorxDm3C3RBT7hw32ojiqyvP"
   const status: string = await cchain.getAtomicTxStatus(txID)
   console.log(status)

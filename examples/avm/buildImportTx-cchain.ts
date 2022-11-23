@@ -2,28 +2,26 @@ import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
 import {
   AVMAPI,
   KeyChain,
-  UTXOSet,
+  Tx,
   UnsignedTx,
-  Tx
+  UTXOSet
 } from "@c4tplatform/caminojs/dist/apis/avm"
 import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
-  PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
+  PrivateKeyPrefix,
   UnixNow
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const xKeychain: KeyChain = xchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
-const cChainBlockchainID: string = avalanche.getNetwork().C.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const asOf: BN = UnixNow()
@@ -31,7 +29,27 @@ const memo: Buffer = Buffer.from(
   "AVM utility method buildImportTx to import AVAX to the X-Chain from the C-Chain"
 )
 
+let xchain: AVMAPI
+let xKeychain: KeyChain
+let xAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let cChainBlockchainID: string
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = xchain.getDefaultTxFee()
+  cChainBlockchainID = avalanche.getNetwork().C.blockchainID
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
     xAddressStrings,
     cChainBlockchainID

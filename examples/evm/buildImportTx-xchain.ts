@@ -15,24 +15,40 @@ import {
   DefaultLocalGenesisPrivateKey,
   costImportTx
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const cchain: EVMAPI = avalanche.CChain()
-const xKeychain: AVMKeyChain = xchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-const cKeychain: EVMKeyChain = cchain.keyChain()
-xKeychain.importKey(privKey)
-cKeychain.importKey(privKey)
-const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const xChainBlockchainId: string = avalanche.getNetwork().X.blockchainID
+
+let xchain: AVMAPI
+let cchain: EVMAPI
+let xKeychain: AVMKeyChain
+let cKeychain: EVMKeyChain
+let cAddressStrings: string[]
+let xChainBlockchainId: string
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  cchain = avalanche.CChain()
+  xKeychain = xchain.keyChain()
+  cKeychain = cchain.keyChain()
+  xKeychain.importKey(privKey)
+  cKeychain.importKey(privKey)
+  cAddressStrings = cchain.keyChain().getAddressStrings()
+  xChainBlockchainId = avalanche.getNetwork().X.blockchainID
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const baseFeeResponse: string = await cchain.getBaseFee()
   const baseFee = new BN(parseInt(baseFeeResponse, 16) / 1e9)
   let fee: BN = baseFee

@@ -1,8 +1,8 @@
 import { PubSub, Socket } from "@c4tplatform/caminojs/dist"
+import { ExamplesConfig } from "../common/examplesConfig"
 
+const config: ExamplesConfig = require("../common/examplesConfig.json")
 const protocol: string = "ws"
-const host: string = "localhost"
-const port: number = 9650
 const addresses: string[] = ["X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"]
 
 const main = async (): Promise<any> => {
@@ -10,7 +10,7 @@ const main = async (): Promise<any> => {
   const newBloom: string = pubsub.newBloom()
   const addAddresses: string = pubsub.addAddresses(addresses)
   const socket: Socket = new Socket(
-    `${protocol}://${host}:${port}/ext/bc/X/events`
+    `${protocol}://${config.host}:${config.port}/ext/bc/X/events`
   )
   socket.onopen = () => {
     console.log("Socket Connected")

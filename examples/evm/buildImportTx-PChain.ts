@@ -15,24 +15,43 @@ import {
   DefaultLocalGenesisPrivateKey,
   costImportTx
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
+import { KeyChain as PlatformKeyChain } from "@c4tplatform/caminojs/dist/apis/platformvm/keychain"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const pchain: PlatformVMAPI = avalanche.PChain()
-const cchain: EVMAPI = avalanche.CChain()
-const pKeychain: PlatformVMKeyChain = pchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-const cKeychain: EVMKeyChain = cchain.keyChain()
-pKeychain.importKey(privKey)
-cKeychain.importKey(privKey)
-const cAddressStrings: string[] = cchain.keyChain().getAddressStrings()
-const pChainBlockchainId: string = avalanche.getNetwork().P.blockchainID
+
+let pchain: PlatformVMAPI
+let cchain: EVMAPI
+let pKeychain: PlatformKeyChain
+let cKeychain: EVMKeyChain
+let pAddressStrings: string[]
+let cAddressStrings: string[]
+let pChainBlockchainId: string
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  cchain = avalanche.CChain()
+  pKeychain = pchain.keyChain()
+  cKeychain = cchain.keyChain()
+  pKeychain.importKey(privKey)
+  cKeychain.importKey(privKey)
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  cAddressStrings = cchain.keyChain().getAddressStrings()
+  pChainBlockchainId = avalanche.getNetwork().P.blockchainID
+}
 
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const baseFeeResponse: string = await cchain.getBaseFee()
   const baseFee = new BN(parseInt(baseFeeResponse, 16) / 1e9)
   let fee: BN = baseFee

@@ -11,19 +11,17 @@ import {
   DefaultLocalGenesisPrivateKey,
   UnixNow
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const pchain: PlatformVMAPI = avalanche.PChain()
-const pKeychain: KeyChain = pchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
+
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-pKeychain.importKey(privKey)
-const pAddressStrings: string[] = pchain.keyChain().getAddressStrings()
-const xChainBlockchainID: string = avalanche.getNetwork().X.blockchainID
-const pChainBlockchainID: string = avalanche.getNetwork().P.blockchainID
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
@@ -31,7 +29,34 @@ const memo: Buffer = Buffer.from(
 )
 const asOf: BN = UnixNow()
 
+let pchain: PlatformVMAPI
+let pKeychain: KeyChain
+let pAddresses: Buffer[]
+let pAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let pChainBlockchainID: string
+let avaxAssetIDBuf: Buffer
+
+let xChainBlockchainID: string
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  pchain = avalanche.PChain()
+  pKeychain = pchain.keyChain()
+  pKeychain.importKey(privKey)
+  pAddresses = pchain.keyChain().getAddresses()
+  pAddressStrings = pchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = pchain.getDefaultTxFee()
+  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
+
+  xChainBlockchainID = avalanche.getNetwork().X.blockchainID
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const platformVMUTXOResponse: any = await pchain.getUTXOs(
     pAddressStrings,
     pChainBlockchainID

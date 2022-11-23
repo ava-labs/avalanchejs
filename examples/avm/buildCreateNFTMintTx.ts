@@ -15,6 +15,7 @@ import {
   DefaultLocalGenesisPrivateKey,
   UnixNow
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
 // run ts-node examples/avm/buildCreateNFTMintTx.ts
 // before you run this example buildCreateNFTAssetTx.ts
@@ -40,18 +41,15 @@ const getUTXOIDs = (
   return result
 }
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const bintools: BinTools = BinTools.getInstance()
-const xKeychain: KeyChain = xchain.keyChain()
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
@@ -60,7 +58,31 @@ const memo: Buffer = Buffer.from(
 const payload: Buffer = Buffer.from("NFT Payload")
 const asOf: BN = UnixNow()
 
+let xchain: AVMAPI
+let xKeychain: KeyChain
+let xAddresses: Buffer[]
+let xAddressStrings: string[]
+let avaxAssetID: string
+let fee: BN
+let xBlockchainID: string
+let avaxAssetIDBuf: Buffer
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddresses = xchain.keyChain().getAddresses()
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
+  fee = xchain.getDefaultTxFee()
+  xBlockchainID = avalanche.getNetwork().X.blockchainID
+  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
     xAddressStrings
   )

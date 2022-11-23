@@ -1,12 +1,21 @@
 import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { ExamplesConfig } from "../common/examplesConfig"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const baseEndpoint: string = "rpc"
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-avalanche.setAddress(ip, port, protocol, baseEndpoint)
+avalanche.setNetwork(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID,
+  baseEndpoint
+)
 
 const main = async (): Promise<any> => {
   const baseEndpoint: string = avalanche.getBaseEndpoint()

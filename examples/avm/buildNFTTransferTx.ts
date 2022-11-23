@@ -14,6 +14,7 @@ import {
   DefaultLocalGenesisPrivateKey,
   UnixNow
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
 const getUTXOIDs = (
   utxoSet: UTXOSet,
@@ -36,17 +37,15 @@ const getUTXOIDs = (
   return result
 }
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 12345
-const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
-const xchain: AVMAPI = avalanche.XChain()
-const bintools: BinTools = BinTools.getInstance()
-const xKeychain: KeyChain = xchain.keyChain()
+const config: ExamplesConfig = require("../common/examplesConfig.json")
+const avalanche: Avalanche = new Avalanche(
+  config.host,
+  config.port,
+  config.protocol,
+  config.networkID
+)
 const privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-xKeychain.importKey(privKey)
-const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
+const bintools: BinTools = BinTools.getInstance()
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
@@ -54,7 +53,21 @@ const memo: Buffer = Buffer.from(
 )
 const asOf: BN = UnixNow()
 
+let xchain: AVMAPI
+let xKeychain: KeyChain
+let xAddressStrings: string[]
+
+const InitAvalanche = async () => {
+  await avalanche.fetchNetworkSettings()
+  xchain = avalanche.XChain()
+  xKeychain = xchain.keyChain()
+  xKeychain.importKey(privKey)
+  xAddressStrings = xchain.keyChain().getAddressStrings()
+}
+
 const main = async (): Promise<any> => {
+  await InitAvalanche()
+
   const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
     xAddressStrings
   )
