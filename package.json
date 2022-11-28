@@ -43,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "5.36.1",
     "@typescript-eslint/parser": "5.36.1",
     "cz-conventional-changelog": "3.3.0",
-    "esbuild": "0.15.5",
+    "esbuild": "0.15.16",
     "eslint": "8.23.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-prettier": "4.2.1",
