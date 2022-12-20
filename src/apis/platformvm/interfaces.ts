@@ -53,6 +53,8 @@ export interface GetConfigurationResponse {
   minConsumptionRate: number
   maxConsumptionRate: number
   supplyCap: BN
+  verifyNodeSignature: boolean
+  lockModeBondDeposit: boolean
 }
 
 export interface GetCurrentValidatorsParams {

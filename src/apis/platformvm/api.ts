@@ -1973,7 +1973,9 @@ export class PlatformVMAPI extends JRPCAPI {
       minDelegatorStake: new BN(r.minDelegatorStake),
       minConsumptionRate: parseInt(r.minConsumptionRate) / rewardPercentDenom,
       maxConsumptionRate: parseInt(r.maxConsumptionRate) / rewardPercentDenom,
-      supplyCap: new BN(r.supplyCap)
+      supplyCap: new BN(r.supplyCap),
+      verifyNodeSignature : r.verifyNodeSignature ?? false,
+      lockModeBondDeposit: r.lockModeBondDeposit ?? false
     }
   }
 }
