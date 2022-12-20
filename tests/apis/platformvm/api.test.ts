@@ -251,7 +251,9 @@ describe("PlatformVMAPI", (): void => {
         }
       ]
     }
-    const result: Promise<GetBalanceResponse> = api.getBalance(addrA)
+    const result: Promise<GetBalanceResponse> = api.getBalance({
+      address: addrA
+    })
     const payload: object = {
       result: respobj
     }

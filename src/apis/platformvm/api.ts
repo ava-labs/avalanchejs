@@ -423,16 +423,27 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
-  getBalance = async (address: string): Promise<GetBalanceResponse> => {
-    if (typeof this.parseAddress(address) === "undefined") {
+  getBalance = async (params: {
+    address?: string
+    addresses?: string[]
+  }): Promise<GetBalanceResponse> => {
+    if (
+      params.address &&
+      typeof this.parseAddress(params.address) === "undefined"
+    ) {
       /* istanbul ignore next */
       throw new AddressError(
         "Error - PlatformVMAPI.getBalance: Invalid address format"
       )
     }
-    const params: any = {
-      address
-    }
+    params.addresses?.forEach((address) => {
+      if (typeof this.parseAddress(address) === "undefined") {
+        /* istanbul ignore next */
+        throw new AddressError(
+          "Error - PlatformVMAPI.getBalance: Invalid address format"
+        )
+      }
+    })
     const response: RequestResponseData = await this.callMethod(
       "platform.getBalance",
       params

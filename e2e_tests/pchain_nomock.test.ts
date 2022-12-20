@@ -74,14 +74,21 @@ describe("PChain", (): void => {
     ],
     [
       "getBalance",
-      () => pchain.getBalance(whaleAddr),
+      () => pchain.getBalance({ address: whaleAddr }),
+      (x) => x.balance,
+      Matcher.toBe,
+      () => "30000000000000000"
+    ],
+    [
+      "getBalanceOfMultipleAddresses",
+      () => pchain.getBalance({ addresses: [ whaleAddr ] }),
       (x) => x.balance,
       Matcher.toBe,
       () => "30000000000000000"
     ],
     [
       "getBalance2",
-      () => pchain.getBalance(whaleAddr),
+      () => pchain.getBalance({ address: whaleAddr }),
       (x) => x.utxoIDs[0].txID,
       Matcher.toBe,
       () => "11111111111111111111111111111111LpoYY"
