@@ -68,6 +68,8 @@ export interface P {
   minDelegationFee: BN
   txFee?: BN | number
   fee?: BN
+  verifyNodeSignature: boolean
+  lockModeBondDeposit: boolean
 }
 export interface Network {
   hrp: string
@@ -104,7 +106,9 @@ const TestNetwork: Network = {
     minStakeDuration: 24 * 60 * 60, //one day
     maxStakeDuration: 365 * 24 * 60 * 60, // one year
     minDelegationStake: ONEAVAX,
-    minDelegationFee: new BN(2)
+    minDelegationFee: new BN(2),
+    verifyNodeSignature: false,
+    lockModeBondDeposit: false
   },
   C: {
     blockchainID: TestCBlockchainID,
@@ -149,7 +153,9 @@ const AvaxMainNetwork: Network = {
     minStakeDuration: 2 * 7 * 24 * 60 * 60, //one day
     maxStakeDuration: 365 * 24 * 60 * 60, // one year
     minDelegationStake: ONEAVAX.mul(new BN(25)),
-    minDelegationFee: new BN(2)
+    minDelegationFee: new BN(2),
+    verifyNodeSignature: false,
+    lockModeBondDeposit: false
   },
   C: {
     blockchainID: "2q9e4r6Mu3U68nU1fYjgbR6JvwrRx36CohpAX5UQxse55x1Q5",

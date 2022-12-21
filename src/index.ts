@@ -208,7 +208,9 @@ export default class Avalanche extends AvalancheCore {
         minStake: response.minValidatorStake,
         minStakeDuration: response.minStakeDuration,
         vm: PChainVMName,
-        txFee: fees.txFee
+        txFee: fees.txFee,
+        verifyNodeSignature: response.verifyNodeSignature,
+        lockModeBondDeposit: response.lockModeBondDeposit
       },
       C: {
         alias: CChainAlias,
