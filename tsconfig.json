@@ -14,9 +14,17 @@
     "noFallthroughCasesInSwitch": true,
     "strictFunctionTypes": true,
     "esModuleInterop": true,
-    "typeRoots": ["./typings/**", "./node_modules/@types"]
+    "typeRoots": ["./typings/**", "./node_modules/@types"],
+    // "sourceMap": true
   },
-  "exclude": ["node_modules", "examples", "typings"],
+  "files": [
+    "examples/platformvm/proofOfPossession.ts"
+  ],
+  "exclude": [
+    "node_modules", 
+    "examples", 
+    "typings"
+  ],
   "typeAcquisition": {
     "enable": true,
     "exclude": ["bn.js"]
