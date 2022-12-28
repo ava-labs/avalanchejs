@@ -49,6 +49,8 @@ export class PlatformVMConstants {
 
   static REMOVESUBNETVALIDATORTX: number = 23
 
+  static TRANSFORMSUBNETTX: number = 24
+
   static SECPCREDENTIAL: number = 9
 
   static ASSETIDLEN: number = 32
