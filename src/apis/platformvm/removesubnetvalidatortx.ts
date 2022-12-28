@@ -10,17 +10,14 @@ import { TransferableInput } from "./inputs"
 import { Credential, SigIdx, Signature } from "../../common/credentials"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
-import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { SelectCredentialClass, SubnetAuth } from "."
 import { KeyChain, KeyPair } from "./keychain"
-import BN from "bn.js"
 import { bufferToNodeIDString } from "../../utils"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
-const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class representing an unsigned RemoveSubnetValidatorTx transaction.
@@ -28,31 +25,6 @@ const serialization: Serialization = Serialization.getInstance()
 export class RemoveSubnetValidatorTx extends BaseTx {
   protected _typeName = "RemoveSubnetValidatorTx"
   protected _typeID = PlatformVMConstants.REMOVESUBNETVALIDATORTX
-
-  // serialize(encoding: SerializedEncoding = "hex"): object {
-  //   let fields: object = super.serialize(encoding)
-  //   return {
-  //     ...fields,
-  //     subnetID: serialization.encoder(this.subnetID, encoding, "Buffer", "cb58")
-  //     // exportOuts: this.exportOuts.map((e) => e.serialize(encoding))
-  //   }
-  // }
-  // deserialize(fields: object, encoding: SerializedEncoding = "hex") {
-  //   super.deserialize(fields, encoding)
-  //   this.subnetID = serialization.decoder(
-  //     fields["subnetID"],
-  //     encoding,
-  //     "cb58",
-  //     "Buffer",
-  //     32
-  //   )
-  //   // this.exportOuts = fields["exportOuts"].map((e: object) => {
-  //   //   let eo: TransferableOutput = new TransferableOutput()
-  //   //   eo.deserialize(e, encoding)
-  //   //   return eo
-  //   // })
-  // }
-
   protected nodeID: Buffer = Buffer.alloc(20)
   protected subnetID: Buffer = Buffer.alloc(32)
   protected subnetAuth: SubnetAuth
@@ -94,7 +66,7 @@ export class RemoveSubnetValidatorTx extends BaseTx {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[RemoveSubnetValidatorTx]], parses it, populates the class, and returns the length of the [[CreateChainTx]] in bytes.
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[RemoveSubnetValidatorTx]], parses it, populates the class, and returns the length of the [[RemoveSubnetValidatorTx]] in bytes.
    *
    * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[RemoveSubnetValidatorTx]]
    *
@@ -119,7 +91,7 @@ export class RemoveSubnetValidatorTx extends BaseTx {
   }
 
   /**
-   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[CreateChainTx]].
+   * Returns a {@link https://github.com/feross/buffer|Buffer} representation of the [[RemoveSubnetValidatorTx]].
    */
   toBuffer(): Buffer {
     const superbuff: Buffer = super.toBuffer()
