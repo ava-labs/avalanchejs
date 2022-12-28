@@ -1,4 +1,5 @@
-const bls = require("@noble/bls12-381")
+// using https://www.npmjs.com/package/@noble/bls12-381
+import { getPublicKey, sign, verify } from "@noble/bls12-381"
 import { Avalanche, Buffer } from "../../src"
 import {
   KeyChain,
@@ -19,15 +20,14 @@ const keypair: KeyPair = keychain.makeKey()
 const main = async (): Promise<any> => {
   const privateKey: string = keypair.getPrivateKey().toString("hex")
   // 48 byte public key
-  const publicKey: Buffer = bls.getPublicKey(privateKey)
+  const publicKey = getPublicKey(privateKey) as Buffer
   // 96 byte signature
-  const signature: Buffer = await bls.sign(publicKey, privateKey)
+  const signature = await sign(publicKey, privateKey) as Buffer
   const proofOfPossession: ProofOfPossession = new ProofOfPossession(
     publicKey,
     signature
   )
-  console.log(`Proof of Possession:`, proofOfPossession)
-  const isValid = await bls.verify(signature, publicKey, publicKey)
+  const isValid: boolean = await verify(signature, publicKey, publicKey)
   console.log(isValid)
   const pubKey: Buffer = proofOfPossession.getPublicKey()
   const sig: Buffer = proofOfPossession.getSignature()
