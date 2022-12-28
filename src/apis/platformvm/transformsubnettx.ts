@@ -47,7 +47,7 @@ export class TransformSubnetTx extends BaseTx {
    * Returns the id of the [[TransformSubnetTx]]
    */
   getTxType(): number {
-    return PlatformVMConstants.ADDSUBNETVALIDATORTX
+    return PlatformVMConstants.TRANSFORMSUBNETTX
   }
 
   /**
@@ -374,7 +374,7 @@ export class TransformSubnetTx extends BaseTx {
     minStakeDuration: number = undefined,
     maxStakeDuration: number = undefined,
     minDelegationFee: number = undefined,
-    minDelegatorStake: number = undefined,
+    minDelegatorStake: BN = undefined,
     maxValidatorWeightFactor: number = undefined,
     uptimeRequirement: number = undefined
   ) {
@@ -430,7 +430,7 @@ export class TransformSubnetTx extends BaseTx {
     } 
   
     if (typeof minDelegatorStake != "undefined") {
-      this.minDelegatorStake.writeUInt32BE(minDelegatorStake, 0)
+      this.minDelegatorStake = bintools.fromBNToBuffer(minDelegatorStake, 8)
     } 
   
     if (typeof maxValidatorWeightFactor != "undefined") {

@@ -57,7 +57,6 @@ const inputs: TransferableInput[] = []
 const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
 const locktime: BN = new BN(0)
-const nodeID: string = "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN"
 const memo: Buffer = Buffer.from(
   "Manually create a removeSubnetValidatorTx which creates a 1-of-2 AVAX utxo and removes a validator from a subnet by correctly signing the 2-of-3 SubnetAuth"
 )
@@ -106,7 +105,8 @@ const main = async (): Promise<any> => {
   const subnetID: Buffer = bintools.cb58Decode(
     "8T4oUrP7kXzetGF2bYWF21oJHUT18rJCjfBt3J299hA1Smcqa"
   )
-  const assetID: string = "must not be AVAX"
+  // AssetID must not be AVAX and must be ANT issued on the Primary Subnet's X-Chain
+  const assetID: string = "2r2x62v3WxP6xs7rZhoakaTK3hxpf1L6q8bqs6FZ83dTcKFwRA"
   const initialSupply: BN = new BN(1000)
   const maximumSupply: BN = new BN(10000)
   const minConsumptionRate: BN = new BN(1)
@@ -116,7 +116,7 @@ const main = async (): Promise<any> => {
   const minStakeDuration: number = 2000
   const maxStakeDuration: number = 20000
   const minDelegationFee: number = 1
-  const minDelegatorStake: number = 1
+  const minDelegatorStake: BN = new BN(1)
   const maxValidatorWeightFactor: number = 2
   const uptimeRequirement: number = 25
   const transformSubnetTx: TransformSubnetTx = new TransformSubnetTx(
