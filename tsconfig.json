@@ -14,8 +14,7 @@
     "noFallthroughCasesInSwitch": true,
     "strictFunctionTypes": true,
     "esModuleInterop": true,
-    "typeRoots": ["./typings/**", "./node_modules/@types"],
-    // "sourceMap": true
+    "typeRoots": ["./typings/**", "./node_modules/@types"]
   },
   "files": [
     "examples/platformvm/proofOfPossession.ts"
