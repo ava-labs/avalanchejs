@@ -11,7 +11,6 @@ import BinTools from "../../utils/bintools"
 const bintools: BinTools = BinTools.getInstance()
 
 // A BLS public key and a proof of possession of the key.
-// export class ProofOfPossession extends Serializable {
 export class ProofOfPossession {
   protected _typeName = "ProofOfPossession"
   protected _typeID = undefined
