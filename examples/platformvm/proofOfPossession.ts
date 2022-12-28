@@ -1,5 +1,5 @@
 // using https://www.npmjs.com/package/@noble/bls12-381
-import { getPublicKey, sign, verify } from "@noble/bls12-381"
+// import { getPublicKey, sign, verify } from "@noble/bls12-381"
 import { Avalanche, Buffer } from "../../src"
 import {
   KeyChain,
@@ -7,6 +7,12 @@ import {
   PlatformVMAPI,
   ProofOfPossession
 } from "../../src/apis/platformvm"
+
+// start placeholder functions
+const getPublicKey = (privateKey): Buffer => {return new Buffer("00")}
+const sign = (publicKey, privateKey): Buffer => {return new Buffer("00")}
+const verify = (signature, message, publicKey): boolean => {return true}
+// end placeholder functions
 
 const ip: string = "localhost"
 const port: number = 9650
