@@ -43,7 +43,7 @@ jobs:
         run: |
           cd $GOPATH/$AVAPATH
           cd avalanche-network-runner
-          git checkout v1.0.12
+          git checkout v1.3.4
           go run ./examples/local/fivenodenetwork/main.go &
       - name: AvalancheJS E2E Test
         env: 

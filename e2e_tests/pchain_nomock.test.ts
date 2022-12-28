@@ -91,7 +91,7 @@ describe("PChain", (): void => {
       () => pchain.getBlockchains(),
       (x) => x[0].id,
       Matcher.toBe,
-      () => "BR28ypgLATNS6PbtHMiJ7NQ61vfpT27Hj8tAcZ1AHsfU5cz88"
+      () => "VctwH3nkmztWbkdNXbuo6eCYndsUuemtM9ZFmEUZ5QpA1Fu8G"
     ],
     [
       "getBlockchainsX",
