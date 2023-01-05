@@ -14,6 +14,7 @@ import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
+import { ExamplesConfig } from "common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

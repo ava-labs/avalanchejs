@@ -21,7 +21,7 @@ import {
   CreateChainTx,
   Tx
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { Output } from "@c4tplatform/caminojs/dist/common"
+import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
@@ -119,7 +119,9 @@ const main = async (): Promise<any> => {
     config.networkID
   )
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
+  const getBalanceResponse: any = await pchain.getBalance({
+    address: pAddressStrings[0]
+  })
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
@@ -139,7 +141,7 @@ const main = async (): Promise<any> => {
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO) => {
-    const output: Output = utxo.getOutput()
+    const output: BaseOutput = utxo.getOutput()
     if (output.getOutputID() === 7) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()

@@ -17,11 +17,9 @@ import {
   Tx,
   ExportTx
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { Output } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  MILLIAVAX
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -81,7 +79,9 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
+  const getBalanceResponse: any = await pchain.getBalance({
+    address: pAddressStrings[0]
+  })
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   console.log(unlocked.sub(fee).toString())
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
@@ -100,8 +100,6 @@ const main = async (): Promise<any> => {
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO) => {
-    const output: Output = utxo.getOutput()
-    // if (output.getOutputID() === 7) {
     const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
     const amt: BN = amountOutput.getAmount().clone()
     const txid: Buffer = utxo.getTxID()

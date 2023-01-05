@@ -1,5 +1,5 @@
-import { Avalanche } from "../../src"
-import { GetConfigurationResponse } from "../../src/apis/platformvm/interfaces"
+import { Avalanche } from "@c4tplatform/caminojs/dist"
+import { GetConfigurationResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

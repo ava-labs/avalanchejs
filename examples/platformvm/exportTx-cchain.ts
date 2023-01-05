@@ -86,7 +86,9 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance(pAddressStrings[0])
+  const getBalanceResponse: any = await pchain.getBalance({
+    address: pAddressStrings[0]
+  })
   const unlocked: BN = new BN(getBalanceResponse.unlocked)
   console.log(unlocked.sub(fee).toString())
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(

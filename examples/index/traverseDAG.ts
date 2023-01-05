@@ -1,10 +1,10 @@
-import { Avalanche, Buffer } from "../../src"
-import { Vertex } from "../../src/apis/avm"
-import { IndexAPI } from "../../src/apis/index"
+import { Avalanche, Buffer } from "@c4tplatform/caminojs/dist"
+import { Vertex } from "@c4tplatform/caminojs/dist/apis/avm"
+import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index"
 import {
   GetContainerByIndexResponse,
   GetLastAcceptedResponse
-} from "../../src/apis/index/interfaces"
+} from "@c4tplatform/caminojs/dist/apis/index/interfaces"
 
 import { ExamplesConfig } from "../common/examplesConfig"
 

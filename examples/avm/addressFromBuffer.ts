@@ -1,7 +1,7 @@
 import { Avalanche, Buffer } from "@c4tplatform/caminojs/dist"
 import { AVMAPI } from "@c4tplatform/caminojs/dist/apis/avm"
 import { UTXO, UTXOSet } from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { Output } from "@c4tplatform/caminojs/dist/common"
+import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
 // Change the networkID to affect the HRP of the bech32 encoded address
 // NetworkID - Bech32 Address - ChainPrefix-HRP1AddressChecksum
 //         0 - X-local19rknw8l0grnfunjrzwxlxync6zrlu33yeg5dya
@@ -30,7 +30,7 @@ const main = async (): Promise<any> => {
   const utxos: UTXO[] = utxoset.getAllUTXOs()
 
   utxos.map((utxo: UTXO): void => {
-    const output: Output = utxo.getOutput()
+    const output: BaseOutput = utxo.getOutput()
     const addresses: string[] = output
       .getAddresses()
       .map((x: Buffer): string => xchain.addressFromBuffer(x))
