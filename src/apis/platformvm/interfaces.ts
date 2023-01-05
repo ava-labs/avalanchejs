@@ -5,7 +5,7 @@
 
 import BN from "bn.js"
 import { PersistanceOptions } from "../../utils/persistenceoptions"
-import { TransferableOutput } from "."
+import { TransferableInput, TransferableOutput } from "."
 import { UTXOSet } from "../platformvm/utxos"
 
 export interface GetStakeParams {
@@ -220,4 +220,18 @@ export interface GetMaxStakeAmountParams {
   nodeID: string
   startTime: BN
   endTime: BN
+}
+
+export interface SpendParams {
+  from: string[] | string
+  changeAddr: string
+  lockMode: 0 | 1 | 2
+  amountToLock: string
+  amountToBurn: string
+  encoding?: string
+}
+
+export interface SpendReply {
+  ins: TransferableInput[]
+  out: TransferableOutput[]
 }

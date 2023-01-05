@@ -102,6 +102,18 @@ export class TransferableInput extends StandardTransferableInput {
     this.input = SelectInputClass(inputid)
     return this.input.fromBuffer(bytes, offset)
   }
+
+  static fromArray(b: Buffer): TransferableInput[] {
+    var offset = 6 //version + counter
+    var num = b.readUInt32BE(2)
+    const result: TransferableInput[] = []
+    while (offset < b.length && num-- > 0) {
+      const t = new TransferableInput()
+      offset = t.fromBuffer(b, offset)
+      result.push(t)
+    }
+    return result
+  }
 }
 
 export abstract class AmountInput extends StandardAmountInput {

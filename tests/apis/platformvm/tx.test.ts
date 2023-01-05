@@ -1,4 +1,3 @@
-import mockAxios from "jest-mock-axios"
 import { UTXOSet, UTXO } from "../../../src/apis/platformvm/utxos"
 import { PlatformVMAPI } from "../../../src/apis/platformvm/api"
 import { UnsignedTx, Tx } from "../../../src/apis/platformvm/tx"
@@ -18,14 +17,10 @@ import {
 import { PlatformVMConstants } from "../../../src/apis/platformvm/constants"
 import { Avalanche, GenesisData } from "../../../src/index"
 import { UTF8Payload } from "../../../src/utils/payload"
-import {
-  NodeIDStringToBuffer,
-  UnixNow
-} from "../../../src/utils/helperfunctions"
+import { UnixNow } from "../../../src/utils/helperfunctions"
 import { BaseTx } from "../../../src/apis/platformvm/basetx"
 import { ImportTx } from "../../../src/apis/platformvm/importtx"
 import { ExportTx } from "../../../src/apis/platformvm/exporttx"
-import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { DefaultPlatformChainID } from "src/utils"
 
 describe("Transactions", (): void => {
@@ -92,21 +87,8 @@ describe("Transactions", (): void => {
       true
     )
     api = new PlatformVMAPI(avalanche, "/ext/bc/P")
-    const result: Promise<Buffer> = api.getAVAXAssetID()
-    const payload: object = {
-      result: {
-        name,
-        symbol,
-        assetID: bintools.cb58Encode(assetID),
-        denomination: `${denomination}`
-      }
-    }
-    const responseObj: HttpResponse = {
-      data: payload
-    }
-
-    mockAxios.mockResponse(responseObj)
-    avaxAssetID = await result
+    avaxAssetID = assetID
+    api.setAVAXAssetID(avaxAssetID)
   })
 
   beforeEach((): void => {

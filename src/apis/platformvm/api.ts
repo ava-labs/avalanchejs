@@ -55,11 +55,15 @@ import {
   GetTxStatusParams,
   GetTxStatusResponse,
   GetMinStakeResponse,
-  GetMaxStakeAmountParams
+  GetMaxStakeAmountParams,
+  SpendParams,
+  SpendReply
 } from "./interfaces"
+import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
 import { GenesisData } from "../avm"
+import { CaminoExecutor } from "./camino_executor"
 
 /**
  * @ignore
@@ -151,8 +155,9 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   getAVAXAssetID = async (refresh: boolean = false): Promise<Buffer> => {
     if (typeof this.AVAXAssetID === "undefined" || refresh) {
-      const assetID: string = await this.getStakingAssetID()
-      this.AVAXAssetID = bintools.cb58Decode(assetID)
+      this.AVAXAssetID = bintools.cb58Decode(
+        this.core.getNetwork().X.avaxAssetID
+      )
     }
     return this.AVAXAssetID
   }
@@ -1869,6 +1874,70 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * Build an unsigned [[RegisterNodeTx]].
+   *
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param oldNodeID Optional. ID of the existing NodeID to replace or remove.
+   * @param newNodeID Optional. ID of the newNodID to register address.
+   * @param address The consortiumMemberAddress, single or multi-sig.
+   * @param consortiumMemberAuthCredentials An array of index and address to sign for each SubnetAuth.
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildRegisterNodeTx = async (
+    fromAddresses: string[],
+    changeAddresses: string[],
+    oldNodeID: string | Buffer = undefined,
+    newNodeID: string | Buffer = undefined,
+    address: Buffer = undefined,
+    consortiumMemberAuthCredentials: [number, Buffer][] = [],
+    memo: PayloadBase | Buffer = undefined
+  ): Promise<UnsignedTx> => {
+    const from: Buffer[] = this._cleanAddressArray(
+      fromAddresses,
+      "buildRegisterNodeTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(
+      changeAddresses,
+      "buildRegisterNodeTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getTxFee()
+
+    const executor = new CaminoExecutor(this)
+
+    const builtUnsignedTx: UnsignedTx = await executor.buildRegisterNodeTx(
+      networkID,
+      blockchainID,
+      from,
+      change,
+      oldNodeID,
+      newNodeID,
+      address,
+      consortiumMemberAuthCredentials,
+      fee,
+      avaxAssetID,
+      memo
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  /**
    * @ignore
    */
   protected _cleanAddressArray(
@@ -1974,8 +2043,50 @@ export class PlatformVMAPI extends JRPCAPI {
       minConsumptionRate: parseInt(r.minConsumptionRate) / rewardPercentDenom,
       maxConsumptionRate: parseInt(r.maxConsumptionRate) / rewardPercentDenom,
       supplyCap: new BN(r.supplyCap),
-      verifyNodeSignature : r.verifyNodeSignature ?? false,
+      verifyNodeSignature: r.verifyNodeSignature ?? false,
       lockModeBondDeposit: r.lockModeBondDeposit ?? false
+    }
+  }
+
+  /**
+   * Get blockchains configuration (genesis)
+   *
+   * @returns Promise for an GetConfigurationResponse
+   */
+  spend = async (
+    from: string[] | string,
+    changeAddr: string,
+    lockMode: "Unlocked" | "Deposit" | "Bond",
+    amountToLock: BN,
+    amountToBurn: BN,
+    encoding?: string
+  ): Promise<SpendReply> => {
+    const params: SpendParams = {
+      from,
+      changeAddr,
+      lockMode: lockMode === "Unlocked" ? 0 : lockMode === "Deposit" ? 1 : 2,
+      amountToLock: amountToLock.toString(),
+      amountToBurn: amountToBurn.toString(),
+      encoding: encoding ?? "hex"
+    }
+
+    const response: RequestResponseData = await this.callMethod(
+      "platform.spend",
+      params
+    )
+    const r = response.data.result
+
+    // We need to update signature index source here
+    const ins = TransferableInput.fromArray(Buffer.from(r.ins.slice(2), "hex"))
+    ins.forEach((e, idx) =>
+      e.getSigIdxs().forEach((s, sidx) => {
+        s.setSource(bintools.cb58Decode(r.signers[`${idx}`][`${sidx}`]))
+      })
+    )
+
+    return {
+      ins,
+      out: TransferableOutput.fromArray(Buffer.from(r.outs.slice(2), "hex"))
     }
   }
 }

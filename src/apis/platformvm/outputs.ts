@@ -71,6 +71,18 @@ export class TransferableOutput extends StandardTransferableOutput {
     this.output = SelectOutputClass(outputid)
     return this.output.fromBuffer(bytes, offset)
   }
+
+  static fromArray(b: Buffer): TransferableOutput[] {
+    var offset = 6 //version + counter
+    var num = b.readUInt32BE(2)
+    const result: TransferableOutput[] = []
+    while (offset < b.length && num-- > 0) {
+      const t = new TransferableOutput()
+      offset = t.fromBuffer(b, offset)
+      result.push(t)
+    }
+    return result
+  }
 }
 
 export class ParseableOutput extends StandardParseableOutput {

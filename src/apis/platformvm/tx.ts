@@ -8,7 +8,7 @@ import { PlatformVMConstants } from "./constants"
 import { SelectCredentialClass } from "./credentials"
 import { KeyChain, KeyPair } from "./keychain"
 import { StandardTx, StandardUnsignedTx } from "../../common/tx"
-import { Credential } from "../../common/credentials"
+import { Credential, Signature } from "../../common/credentials"
 import createHash from "create-hash"
 import { BaseTx } from "./basetx"
 import { ImportTx } from "./importtx"
@@ -21,6 +21,7 @@ import {
 } from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
 import { TransactionError } from "../../utils/errors"
+import { SECPCredential } from "./credentials"
 
 /**
  * @ignore

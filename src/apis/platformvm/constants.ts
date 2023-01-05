@@ -52,6 +52,9 @@ export class PlatformVMConstants {
   static CAMINOREWARDVALIDATORTX: number =
     PlatformVMConstants.CUSTOM_TYPE_ID + 3
   static ADDADDRESSSTATETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 4
+  static DEPOSITTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 5
+  static UNLOCKDEPOSITTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 6
+  static REGISTERNODETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 7
 
   // Length Constants
   static ASSETIDLEN: number = 32

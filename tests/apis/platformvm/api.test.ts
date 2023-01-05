@@ -1066,21 +1066,7 @@ describe("PlatformVMAPI", (): void => {
 
     beforeEach(async (): Promise<void> => {
       platformvm = new PlatformVMAPI(avalanche, "/ext/bc/P")
-      const result: Promise<Buffer> = platformvm.getAVAXAssetID()
-      const payload: object = {
-        result: {
-          name,
-          symbol,
-          assetID: bintools.cb58Encode(assetID),
-          denomination: `${denomination}`
-        }
-      }
-      const responseObj: HttpResponse = {
-        data: payload
-      }
-
-      mockAxios.mockResponse(responseObj)
-      await result
+      platformvm.setAVAXAssetID(assetID)
       set = new UTXOSet()
       lset = new UTXOSet()
       platformvm.newKeyChain()
