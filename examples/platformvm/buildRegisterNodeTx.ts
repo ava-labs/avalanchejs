@@ -35,9 +35,9 @@ const InitAvalanche = async () => {
   pKeychain = pchain.keyChain()
   // P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
   pKeychain.importKey(privKey)
-  // NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL
+  // NodeID-D1LbWvUf9iaeEyUbTYYtYq4b7GaYR5tnJ (staker2)
   pKeychain.importKey(
-    "PrivateKey-26ksbvjbz8jUTtzbCm3MYobKcDh22QPuPQX5dj2faQdR63TRdM"
+    "PrivateKey-2ZW6HUePBW2dP7dBGa5stjXe1uvK9LwEgrjebDwXEyL5bDMWWS"
   )
 
   pAddresses = pchain.keyChain().getAddresses()
@@ -48,7 +48,7 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const oldNodeID = undefined
-  const newNodeID = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
+  const newNodeID = "NodeID-D1LbWvUf9iaeEyUbTYYtYq4b7GaYR5tnJ"
   const addr = pAddresses[0]
   const consortiumMemberAuthCredentials: [number, Buffer][] = [
     [0, pAddresses[0]]

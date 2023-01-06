@@ -28,7 +28,7 @@ const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildAddValidatorTx to add a validator to the primary subnet"
 )
 const asOf: BN = UnixNow()
-const nodeID: string = "NodeID-DueWyGi3B9jtKfa9mPoecd4YSDJ1ftF69"
+const nodeID: string = "NodeID-D1LbWvUf9iaeEyUbTYYtYq4b7GaYR5tnJ"
 const startTime: BN = UnixNow().add(new BN(60 * 1))
 const endTime: BN = startTime.add(new BN(26300000))
 const delegationFee: number = 10
