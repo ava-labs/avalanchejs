@@ -24,7 +24,7 @@
     "prettier-mocks": "prettier --write ./__mocks__",
     "prettier-workflows": "prettier --write .github/**/*.yml",
     "prettier": "yarn prettier-src && yarn prettier-examples && yarn prettier-tests && yarn prettier-mocks && yarn prettier-workflows",
-    "prepare": "husky install"
+    "prettier-check": "prettier --check ./src ./examples ./tests ./__mocks__ .github/**/*.yml"
   },
   "repository": {
     "type": "git",
@@ -62,7 +62,6 @@
     "eslint-plugin-security": "1.5.0",
     "git-revision-webpack-plugin": "5.0.0",
     "html-webpack-plugin": "5.5.0",
-    "husky": "8.0.1",
     "jest": "26.6.3",
     "jest-mock-axios": "4.5.0",
     "prettier": "2.7.1",
