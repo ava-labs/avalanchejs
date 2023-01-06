@@ -1705,27 +1705,49 @@ export class PlatformVMAPI extends JRPCAPI {
         "PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime"
       )
     }
+    var builtUnsignedTx: UnsignedTx
 
-    const builtUnsignedTx: UnsignedTx = utxoset.buildAddValidatorTx(
-      this.core.getNetworkID(),
-      bintools.cb58Decode(this.blockchainID),
-      avaxAssetID,
-      to,
-      from,
-      change,
-      NodeIDStringToBuffer(nodeID),
-      startTime,
-      endTime,
-      stakeAmount,
-      rewardLocktime,
-      rewardThreshold,
-      rewards,
-      delegationFee,
-      new BN(0),
-      avaxAssetID,
-      memo,
-      asOf
-    )
+    if (this.core.getNetwork().P.lockModeBondDeposit) {
+      const executor = new CaminoExecutor(this)
+
+      builtUnsignedTx = await executor.buildCaminoAddValidatorTx(
+        this.core.getNetworkID(),
+        bintools.cb58Decode(this.blockchainID),
+        to,
+        from,
+        change,
+        NodeIDStringToBuffer(nodeID),
+        startTime,
+        endTime,
+        stakeAmount,
+        rewards,
+        rewardLocktime,
+        rewardThreshold,
+        memo,
+        avaxAssetID
+      )
+    } else {
+      builtUnsignedTx = utxoset.buildAddValidatorTx(
+        this.core.getNetworkID(),
+        bintools.cb58Decode(this.blockchainID),
+        avaxAssetID,
+        to,
+        from,
+        change,
+        NodeIDStringToBuffer(nodeID),
+        startTime,
+        endTime,
+        stakeAmount,
+        rewardLocktime,
+        rewardThreshold,
+        rewards,
+        delegationFee,
+        new BN(0),
+        avaxAssetID,
+        memo,
+        asOf
+      )
+    }
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
