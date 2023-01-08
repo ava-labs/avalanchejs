@@ -25,7 +25,7 @@ const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 /**
- * Class representing an unsigned CreateChainTx transaction.
+ * Class representing an unsigned DepositTx transaction.
  */
 export class RegisterNodeTx extends BaseTx {
   protected _typeName = "RegisterNodeTx"
@@ -86,7 +86,7 @@ export class RegisterNodeTx extends BaseTx {
   }
 
   /**
-   * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[RegisterNodeTx]], parses it, populates the class, and returns the length of the [[RegisterNodeTx]] in bytes.
+   * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[RegisterNodeTx]], parses it, populates the class, and returns the length of the [[RegisterNodeTx]] in bytes.
    *
    * @param bytes A {@link https://github.com/feross/buffer|Buffer} containing a raw [[RegisterNodeTx]]
    *

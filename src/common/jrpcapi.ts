@@ -3,10 +3,15 @@
  * @module Common-JRPCAPI
  */
 
+import BN from "bn.js"
 import { AxiosRequestConfig } from "axios"
 import { fetchAdapter } from "../utils"
 import AvalancheCore from "../camino"
 import { APIBase, RequestResponseData } from "./apibase"
+
+BN.prototype.toJSON = function () {
+  return this.toString(10)
+}
 
 export class JRPCAPI extends APIBase {
   protected jrpcVersion: string = "2.0"

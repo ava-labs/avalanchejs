@@ -6,6 +6,7 @@
 import BN from "bn.js"
 
 import { Buffer } from "buffer/"
+import { OutputOwners } from "../../common/output"
 import { DefaultNetworkID, UnixNow } from "../../utils"
 import {
   AddressError,
@@ -38,6 +39,7 @@ import {
   UTXO
 } from "."
 import { GenesisData } from "../avm"
+import { DepositTx } from "./depositTx"
 
 export type LockMode = "Unlocked" | "Bond" | "Deposit" | "Stake"
 
@@ -1115,6 +1117,86 @@ export class Builder {
     )
 
     return new UnsignedTx(registerNodeTx)
+  }
+
+  /**
+   * Build an unsigned [[DepositTx]].
+   *
+   * @param networkID Networkid, [[DefaultNetworkID]]
+   * @param blockchainID Blockchainid, default undefined
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+   * @param depositOfferID ID of the deposit offer.
+   * @param depositDuration Duration of the deposit
+   * @param rewardsOwner Optional The owners of the reward. If omitted, all inputs must have the same owner
+   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned DepositTx created from the passed in parameters.
+   */
+  buildDepositTx = async (
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromAddresses: Buffer[],
+    changeAddresses: Buffer[],
+    depositOfferID: string | Buffer,
+    depositDuration: number | Buffer,
+    rewardsOwner: OutputOwners,
+    fee: BN = zero,
+    feeAssetID: Buffer = undefined,
+    memo: Buffer = undefined,
+    asOf: BN = zero,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+
+    if (this._feeCheck(fee, feeAssetID)) {
+      const aad: AssetAmountDestination = new AssetAmountDestination(
+        [],
+        0,
+        fromAddresses,
+        changeAddresses,
+        changeThreshold
+      )
+
+      aad.addAssetAmount(feeAssetID, zero, fee)
+
+      const minSpendableErr: Error = await this.spender.getMinimumSpendable(
+        aad,
+        asOf,
+        zero,
+        "Unlocked"
+      )
+      if (typeof minSpendableErr === "undefined") {
+        ins = aad.getInputs()
+        outs = aad.getAllOutputs()
+      } else {
+        throw minSpendableErr
+      }
+    }
+
+    const secpOwners = new SECPOwnerOutput(
+      rewardsOwner.getAddresses(),
+      rewardsOwner?.getLocktime(),
+      rewardsOwner.getThreshold()
+    )
+
+    const depositTx: DepositTx = new DepositTx(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      depositOfferID,
+      depositDuration,
+      new ParseableOutput(secpOwners)
+    )
+
+    return new UnsignedTx(depositTx)
   }
 
   _feeCheck(fee: BN, feeAssetID: Buffer): boolean {
