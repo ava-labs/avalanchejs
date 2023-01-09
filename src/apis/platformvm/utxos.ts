@@ -97,7 +97,7 @@ export class UTXO extends StandardUTXO {
    * @returns The length of the raw [[UTXO]]
    *
    * @remarks
-   * unlike most fromStrings, it expects the string to be serialized in cb58 format
+   * Default encoding format is cb58, if providing hex encoded string please specify format as 'hex'
    */
   fromString(serialized: string, format: string = 'cb58'): number {
     switch (format) {
@@ -118,13 +118,25 @@ export class UTXO extends StandardUTXO {
 
   /**
    * Returns a base-58 representation of the [[UTXO]].
+   * 
+   * @param format The format of the encoded [[UTXO]] (cb58 or hex). Defaults to cb58 per existing codebase
    *
    * @remarks
-   * unlike most toStrings, this returns in cb58 serialization format
+   * Default encoding format to cb58, if you want a hex encoded output please specify format as 'hex'
    */
-  toString(): string {
-    /* istanbul ignore next */
-    return bintools.cb58Encode(this.toBuffer())
+  toString(format: string = 'cb58'): string {
+    switch (format) {
+      case "cb58": {
+        /* istanbul ignore next */
+        return bintools.cb58Encode(this.toBuffer())
+      };
+      case "hex": {
+        return serialization.encoder(bintools.cb58Encode(this.toBuffer()), 'hex', 'cb58', 'hex');
+      };
+      default: {
+        throw new UnknownFormatError(`Specified format '${format}' is unknown, should be hex or cb58.`);
+      };
+    }      
   }
 
   clone(): this {
