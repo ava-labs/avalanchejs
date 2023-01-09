@@ -113,8 +113,10 @@ export abstract class StandardAssetAmountDestination<
 > {
   protected amounts: AssetAmount[] = []
   protected destinations: Buffer[] = []
+  protected destinationsThreshold: number = 0
   protected senders: Buffer[] = []
   protected changeAddresses: Buffer[] = []
+  protected changeAddressesThreshold: number = 0
   protected amountkey: object = {}
   protected inputs: TI[] = []
   protected outputs: TO[] = []
@@ -148,12 +150,20 @@ export abstract class StandardAssetAmountDestination<
     return this.destinations
   }
 
+  getDestinationsThreshold = (): number => {
+    return this.destinationsThreshold
+  }
+
   getSenders = (): Buffer[] => {
     return this.senders
   }
 
   getChangeAddresses = (): Buffer[] => {
     return this.changeAddresses
+  }
+
+  getChangeAddressesThreshold = (): number => {
+    return this.changeAddressesThreshold
   }
 
   getAssetAmount = (assetHexStr: string): AssetAmount => {
@@ -191,11 +201,15 @@ export abstract class StandardAssetAmountDestination<
 
   constructor(
     destinations: Buffer[],
+    destinationsThreshold: number,
     senders: Buffer[],
-    changeAddresses: Buffer[]
+    changeAddresses: Buffer[],
+    changeAddressesThreshold: number
   ) {
     this.destinations = destinations
+    this, (destinationsThreshold = destinationsThreshold)
     this.changeAddresses = changeAddresses
+    this.changeAddressesThreshold = changeAddressesThreshold
     this.senders = senders
   }
 }

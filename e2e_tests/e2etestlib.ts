@@ -10,7 +10,7 @@ export const getAvalanche = (): Avalanche => {
   const avalanche: Avalanche = new Avalanche(
     process.env.CAMINOGO_IP,
     parseInt(process.env.CAMINOGO_PORT),
-    'http',
+    "http",
     12345
   )
   return avalanche
@@ -35,7 +35,9 @@ export const createTests = (tests_spec: any[]): void => {
         expect(preprocess(await promise())).toEqual(expected())
       }
       if (matcher == Matcher.toContain) {
-        expect(preprocess(await promise())).toEqual(expect.arrayContaining(expected()))
+        expect(preprocess(await promise())).toEqual(
+          expect.arrayContaining(expected())
+        )
       }
       if (matcher == Matcher.toMatch) {
         expect(preprocess(await promise())).toMatch(expected())
@@ -50,4 +52,3 @@ export const createTests = (tests_spec: any[]): void => {
     })
   }
 }
-

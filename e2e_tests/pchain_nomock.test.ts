@@ -28,8 +28,7 @@ describe("PChain", (): void => {
   const nodeID: string = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
   const subnetID: string = "2bGsYJorY6X7RhjPBFs3kYjiNEHo4zGrD2eeyZbb43T2KKi7fM"
   const xChainAddr: string = "X-custom18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p"
-  const avalancheBlockChainID: string =
-    "11111111111111111111111111111111LpoYY"
+  const avalancheBlockChainID: string = "11111111111111111111111111111111LpoYY"
 
   const rewardUTXOTxID: string =
     "2nmH8LithVbdjaXsxVQCQfXtzN9hBbmebrsaEYnLM9T32Uy2Y4"
@@ -40,7 +39,9 @@ describe("PChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => {
+        return {}
+      }
     ],
     [
       "createaddrB",
@@ -81,7 +82,7 @@ describe("PChain", (): void => {
     ],
     [
       "getBalanceOfMultipleAddresses",
-      () => pchain.getBalance({ addresses: [ whaleAddr ] }),
+      () => pchain.getBalance({ addresses: [whaleAddr] }),
       (x) => x.balance,
       Matcher.toBe,
       () => "30000000000000000"

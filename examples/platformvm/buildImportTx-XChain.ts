@@ -8,8 +8,7 @@ import {
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  UnixNow
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -27,17 +26,12 @@ const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildImportTx to import AVAX to the P-Chain from the X-Chain"
 )
-const asOf: BN = UnixNow()
+const asOf: BN = new BN(0)
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
-let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
-let fee: BN
 let pChainBlockchainID: string
-let avaxAssetIDBuf: Buffer
-
 let xChainBlockchainID: string
 
 const InitAvalanche = async () => {
@@ -45,12 +39,7 @@ const InitAvalanche = async () => {
   pchain = avalanche.PChain()
   pKeychain = pchain.keyChain()
   pKeychain.importKey(privKey)
-  pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
-  fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
-
   xChainBlockchainID = avalanche.getNetwork().X.blockchainID
 }
 

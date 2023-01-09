@@ -1017,7 +1017,8 @@ export class AVMAPI extends JRPCAPI {
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[BaseTx]].
    *
@@ -1034,7 +1035,8 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0),
-    threshold: number = 1
+    toThreshold: number = 1,
+    changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildBaseTx"
     const to: Buffer[] = this._cleanAddressArray(toAddresses, caller).map(
@@ -1073,7 +1075,8 @@ export class AVMAPI extends JRPCAPI {
       memo,
       asOf,
       locktime,
-      threshold
+      toThreshold,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
@@ -1098,7 +1101,8 @@ export class AVMAPI extends JRPCAPI {
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[NFTTransferTx]].
    *
@@ -1114,7 +1118,8 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0),
-    threshold: number = 1
+    toThreshold: number = 1,
+    changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildNFTTransferTx"
     const to: Buffer[] = this._cleanAddressArray(toAddresses, caller).map(
@@ -1152,7 +1157,8 @@ export class AVMAPI extends JRPCAPI {
       memo,
       asOf,
       locktime,
-      threshold
+      toThreshold,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
@@ -1178,7 +1184,8 @@ export class AVMAPI extends JRPCAPI {
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[ImportTx]].
    *
@@ -1195,7 +1202,8 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0),
-    threshold: number = 1
+    toThreshold: number = 1,
+    changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildImportTx"
     const to: Buffer[] = this._cleanAddressArray(toAddresses, caller).map(
@@ -1257,7 +1265,8 @@ export class AVMAPI extends JRPCAPI {
       memo,
       asOf,
       locktime,
-      threshold
+      toThreshold,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
@@ -1283,7 +1292,8 @@ export class AVMAPI extends JRPCAPI {
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    * @param assetID Optional. The assetID of the asset to send. Defaults to AVAX assetID.
    * Regardless of the asset which you"re exporting, all fees are paid in AVAX.
    *
@@ -1299,7 +1309,8 @@ export class AVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = UnixNow(),
     locktime: BN = new BN(0),
-    threshold: number = 1,
+    toThreshold: number = 1,
+    changeThreshold: number = 1,
     assetID: string = undefined
   ): Promise<UnsignedTx> => {
     const prefixes: object = {}
@@ -1372,7 +1383,8 @@ export class AVMAPI extends JRPCAPI {
       memo,
       asOf,
       locktime,
-      threshold
+      toThreshold,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
@@ -1399,6 +1411,7 @@ export class AVMAPI extends JRPCAPI {
    * @param mintOutputs Optional. Array of [[SECPMintOutput]]s to be included in the transaction. These outputs can be spent to mint more tokens.
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[CreateAssetTx]].
    *
@@ -1413,7 +1426,8 @@ export class AVMAPI extends JRPCAPI {
     denomination: number,
     mintOutputs: SECPMintOutput[] = undefined,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller: string = "buildCreateAssetTx"
     const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
@@ -1458,7 +1472,8 @@ export class AVMAPI extends JRPCAPI {
       fee,
       avaxAssetID,
       memo,
-      asOf
+      asOf,
+      changeThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, fee))) {
@@ -1471,6 +1486,22 @@ export class AVMAPI extends JRPCAPI {
     return builtUnsignedTx
   }
 
+  /**
+   * Creates an unsigned Secp mint transaction. For more granular control, you may create your own
+   * [[OperationTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param mintOwner A [[SECPMintOutput]] which specifies the new set of minters
+   * @param transferOwner A [[SECPTransferOutput]] which specifies where the minted tokens will go
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param mintUTXOID The UTXOID for the [[SCPMintOutput]] being spent to produce more tokens
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changethreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[SECPMintTx]].
+   */
   buildSECPMintTx = async (
     utxoset: UTXOSet,
     mintOwner: SECPMintOutput,
@@ -1479,7 +1510,8 @@ export class AVMAPI extends JRPCAPI {
     changeAddresses: string[],
     mintUTXOID: string,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = UnixNow()
+    asOf: BN = UnixNow(),
+    changeThreshold: number = 1
   ): Promise<any> => {
     const caller: string = "buildSECPMintTx"
     const from: Buffer[] = this._cleanAddressArray(fromAddresses, caller).map(
@@ -1509,7 +1541,8 @@ export class AVMAPI extends JRPCAPI {
       fee,
       avaxAssetID,
       memo,
-      asOf
+      asOf,
+      changeThreshold
     )
     if (!(await this.checkGooseEgg(builtUnsignedTx))) {
       /* istanbul ignore next */
@@ -1533,6 +1566,7 @@ export class AVMAPI extends JRPCAPI {
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param locktime Optional. The locktime field created in the resulting mint output
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * ```js
    * Example minterSets:
@@ -1635,6 +1669,7 @@ export class AVMAPI extends JRPCAPI {
    * @param payload Optional. Data for NFT Payload as either a [[PayloadBase]] or a {@link https://github.com/feross/buffer|Buffer}
    * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[OperationTx]].
    *

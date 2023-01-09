@@ -9,8 +9,7 @@ import {
 import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  UnixNow
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -26,16 +25,11 @@ let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 const nodeID: string = "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN"
 const startTime: BN = new BN(1652217329)
 const endTime: BN = new BN(1653511017)
-const asOf: BN = UnixNow()
+const asOf: BN = new BN(0)
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
-let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
-let fee: BN
-let pChainBlockchainID: string
-let avaxAssetIDBuf: Buffer
 
 const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
@@ -54,11 +48,7 @@ const InitAvalanche = async () => {
   pKeychain.importKey(
     "PrivateKey-2uWuEQbY5t7NPzgqzDrXSgGPhi3uyKj2FeAvPUHYo6CmENHJfn"
   )
-  pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
-  fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
 }
 
 const main = async (): Promise<any> => {

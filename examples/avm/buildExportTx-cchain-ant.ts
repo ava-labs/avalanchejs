@@ -73,7 +73,8 @@ const main = async (): Promise<any> => {
   )
   const utxoSet: UTXOSet = avmUTXOResponse.utxos
   const amount: BN = new BN(350)
-  const threshold: number = 1
+  const toThreshold: number = 1
+  const changeThreshold: number = 1
   const assetID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
 
   const unsignedTx: UnsignedTx = await xchain.buildExportTx(
@@ -86,7 +87,8 @@ const main = async (): Promise<any> => {
     memo,
     asOf,
     locktime,
-    threshold,
+    toThreshold,
+    changeThreshold,
     assetID
   )
 

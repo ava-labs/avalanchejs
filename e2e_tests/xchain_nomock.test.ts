@@ -28,7 +28,9 @@ describe("XChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => {
+        return {}
+      }
     ],
     [
       "createaddrB",
@@ -59,7 +61,8 @@ describe("XChain", (): void => {
         ),
       (x) => x,
       Matcher.toThrow,
-      () => `problem retrieving user "${badUser}": incorrect password for user "${badUser}"`
+      () =>
+        `problem retrieving user "${badUser}": incorrect password for user "${badUser}"`
     ],
     [
       "incorrectPass",
@@ -76,7 +79,8 @@ describe("XChain", (): void => {
         ),
       (x) => x,
       Matcher.toThrow,
-      () => `problem retrieving user "${user}": incorrect password for user "${user}"`
+      () =>
+        `problem retrieving user "${user}": incorrect password for user "${user}"`
     ],
     [
       "getBalance",
@@ -159,8 +163,8 @@ describe("XChain", (): void => {
           "AVAX"
         ),
       (x) => x,
-      Matcher.toThrow,
-      () => "couldn't unmarshal an argument"
+      Matcher.Get,
+      () => tx
     ],
     [
       "import",
@@ -195,7 +199,8 @@ describe("XChain", (): void => {
         xchain.mint(user, passwd, 1500, asset.value, addrB.value, [whaleAddr]),
       (x) => x,
       Matcher.toThrow,
-      () => "couldn't unmarshal an argument"
+      () =>
+        "provided addresses don't have the authority to mint the provided asset"
     ],
     [
       "getTx",

@@ -638,12 +638,13 @@ export class EVMAPI extends JRPCAPI {
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
    * @param assetID The asset id which is being sent
    * @param destinationChain The chainid for where the assets will be sent.
-   * @param toAddresses The addresses to send the funds
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
-   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
-   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param fromAddressesHex The addresses to send the funds (hex)
+   * @param fromAddressesBech The addresses being used to send the funds from the UTXOs provided
+   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
+   * @param nonce Optional. The nonce to be used
    * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param fee Optional. The the fee for this transaction
    *
    * @returns An unsigned transaction ([[UnsignedTx]]) which contains an [[ExportTx]].
    */
@@ -656,7 +657,7 @@ export class EVMAPI extends JRPCAPI {
     toAddresses: string[],
     nonce: number = 0,
     locktime: BN = new BN(0),
-    threshold: number = 1,
+    toThreshold: number = 1,
     fee: BN = new BN(0)
   ): Promise<UnsignedTx> => {
     const prefixes: object = {}
@@ -731,7 +732,7 @@ export class EVMAPI extends JRPCAPI {
       amount,
       to,
       locktime,
-      threshold
+      toThreshold
     )
     const transferableOutput: TransferableOutput = new TransferableOutput(
       bintools.cb58Decode(assetID),

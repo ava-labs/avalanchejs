@@ -58,6 +58,7 @@ const main = async (): Promise<any> => {
   )
 
   const unsignedTx: UnsignedTx = await pchain.buildRegisterNodeTx(
+    undefined,
     pAddressStrings,
     pAddressStrings,
     oldNodeID,

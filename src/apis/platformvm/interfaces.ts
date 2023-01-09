@@ -222,12 +222,21 @@ export interface GetMaxStakeAmountParams {
   endTime: BN
 }
 
+export interface Owner {
+  locktime: BN
+  threshold: number
+  addresses: string[]
+}
+
 export interface SpendParams {
   from: string[] | string
-  changeAddr: string
+  to?: Owner
+  change?: Owner
+
   lockMode: 0 | 1 | 2
-  amountToLock: string
-  amountToBurn: string
+  amountToLock: BN
+  amountToBurn: BN
+  asOf: BN
   encoding?: string
 }
 

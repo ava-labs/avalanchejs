@@ -9,8 +9,7 @@ import {
 import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  UnixNow
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -27,15 +26,11 @@ const threshold: number = 2
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildCreateSubnetTx to create a CreateSubnetTx which creates a 1-of-2 AVAX utxo and a 2-of-3 SubnetAuth"
 )
-const asOf: BN = UnixNow()
+const asOf: BN = new BN(0)
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
-let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
-let fee: BN
-let pChainBlockchainID: string
 let subnetAuthKeychain: string[]
 
 const InitAvalanche = async () => {
@@ -53,11 +48,7 @@ const InitAvalanche = async () => {
     "PrivateKey-24gdABgapjnsJfnYkfev6YPyQhTaCU72T9bavtDNTYivBLp2eW"
   )
   // P-local1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
-  pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
-  fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
   subnetAuthKeychain = [
     pAddressStrings[1],
     pAddressStrings[2],

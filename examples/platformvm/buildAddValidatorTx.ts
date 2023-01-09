@@ -27,7 +27,6 @@ const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildAddValidatorTx to add a validator to the primary subnet"
 )
-const asOf: BN = UnixNow()
 const nodeID: string = "NodeID-D1LbWvUf9iaeEyUbTYYtYq4b7GaYR5tnJ"
 const startTime: BN = UnixNow().add(new BN(60 * 1))
 const endTime: BN = startTime.add(new BN(26300000))
@@ -35,22 +34,14 @@ const delegationFee: number = 10
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
-let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
-let fee: BN
-let pChainBlockchainID: string
 
 const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
   pchain = avalanche.PChain()
   pKeychain = pchain.keyChain()
   pKeychain.importKey(privKey)
-  pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
-  fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
 }
 
 const main = async (): Promise<any> => {
@@ -73,8 +64,7 @@ const main = async (): Promise<any> => {
     delegationFee,
     locktime,
     threshold,
-    memo,
-    asOf
+    memo
   )
 
   const tx: Tx = unsignedTx.sign(pKeychain)

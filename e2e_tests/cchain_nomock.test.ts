@@ -27,7 +27,9 @@ describe("CChain", (): void => {
       () => keystore.createUser(user, passwd),
       (x) => x,
       Matcher.toEqual,
-      () => { return {} }
+      () => {
+        return {}
+      }
     ],
     [
       "importKey",

@@ -14,8 +14,7 @@ import {
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  UnixNow
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -32,16 +31,12 @@ const avalanche: Avalanche = new Avalanche(
  */
 const bintools: BinTools = BinTools.getInstance()
 let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
-const asOf: BN = UnixNow()
+const asOf: BN = new BN(0)
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
 let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
-let fee: BN
-let pChainBlockchainID: string
-let avaxAssetIDBuf: Buffer
 
 const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
@@ -60,10 +55,6 @@ const InitAvalanche = async () => {
   // P-local1t3qjau2pf3ys83yallqt4y5xc3l6ya5f7wr6aq
   pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
-  fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
-  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
 }
 
 const main = async (): Promise<any> => {

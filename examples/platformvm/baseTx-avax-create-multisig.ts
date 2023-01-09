@@ -48,7 +48,6 @@ let pAddresses: Buffer[]
 let pAddressStrings: string[]
 let avaxAssetID: string
 let fee: BN
-let pChainBlockchainID: string
 let avaxAssetIDBuf: Buffer
 let xBlockchainID: string
 let xBlockchainIDBuf: Buffer
@@ -71,7 +70,6 @@ const InitAvalanche = async () => {
   pAddressStrings = pchain.keyChain().getAddressStrings()
   avaxAssetID = avalanche.getNetwork().X.avaxAssetID
   fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
   avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
   xBlockchainID = avalanche.getNetwork().X.blockchainID
   xBlockchainIDBuf = bintools.cb58Decode(xBlockchainID)

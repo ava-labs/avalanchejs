@@ -19,7 +19,7 @@
     "docs": "yarn docshtml && yarn docsmd",
     "prettier-src": "prettier --write ./src",
     "prettier-examples": "prettier --write ./examples",
-    "prettier-tests": "prettier --write ./tests",
+    "prettier-tests": "prettier --write ./tests ./e2e_tests",
     "prettier-web": "prettier --write ./web",
     "prettier-mocks": "prettier --write ./__mocks__",
     "prettier-workflows": "prettier --write .github/**/*.yml",

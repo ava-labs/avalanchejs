@@ -53,6 +53,7 @@ import {
   GetBalanceResponse,
   GetUTXOsResponse
 } from "src/apis/platformvm/interfaces"
+import { Builder } from "../../../src/apis/platformvm/builder"
 
 /**
  * @ignore
@@ -1039,6 +1040,8 @@ describe("PlatformVMAPI", (): void => {
   describe("Transactions", (): void => {
     let set: UTXOSet
     let lset: UTXOSet
+    let builder: Builder
+    let lbuilder: Builder
     let keymgr2: KeyChain
     let keymgr3: KeyChain
     let addrs1: string[]
@@ -1069,6 +1072,8 @@ describe("PlatformVMAPI", (): void => {
       platformvm.setAVAXAssetID(assetID)
       set = new UTXOSet()
       lset = new UTXOSet()
+      builder = new Builder(set, false)
+      lbuilder = new Builder(lset, false)
       platformvm.newKeyChain()
       keymgr2 = new KeyChain(avalanche.getHRP(), alias)
       keymgr3 = new KeyChain(avalanche.getHRP(), alias)
@@ -1206,7 +1211,7 @@ describe("PlatformVMAPI", (): void => {
 
     test("signTx", async (): Promise<void> => {
       const assetID: Buffer = await platformvm.getAVAXAssetID()
-      const txu2: UnsignedTx = set.buildBaseTx(
+      const txu2: UnsignedTx = await builder.buildBaseTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         new BN(amnt),
@@ -1259,7 +1264,7 @@ describe("PlatformVMAPI", (): void => {
       mockAxios.mockResponse(responseObj)
       const txu1: UnsignedTx = await result
 
-      const txu2: UnsignedTx = set.buildImportTx(
+      const txu2: UnsignedTx = await builder.buildImportTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         addrbuff3,
@@ -1324,15 +1329,15 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = set.buildExportTx(
+      const txu2: UnsignedTx = await builder.buildExportTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         amount,
         assetID,
         addrbuff3,
         addrbuff1,
-        addrbuff2,
         bintools.cb58Decode(TestXBlockchainID),
+        addrbuff2,
         platformvm.getTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
@@ -1355,25 +1360,24 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu4: UnsignedTx = set.buildExportTx(
+      const txu4: UnsignedTx = await builder.buildExportTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         amount,
         assetID,
         addrbuff3,
         addrbuff1,
-        addrbuff2,
         undefined,
+        addrbuff2,
         platformvm.getTxFee(),
         assetID,
         new UTF8Payload("hello world").getPayload(),
         UnixNow()
       )
 
-      expect(txu4.toBuffer().toString("hex")).toBe(
-        txu3.toBuffer().toString("hex")
-      )
-      expect(txu4.toString()).toBe(txu3.toString())
+      expect((): void => {
+        txu4.toBuffer()
+      }).toThrow()
 
       expect(txu2.toBuffer().toString("hex")).toBe(
         txu1.toBuffer().toString("hex")
@@ -1403,42 +1407,43 @@ describe("PlatformVMAPI", (): void => {
 
       serialzeit(tx1, "ExportTx")
     })
+
     /*
-        test('buildAddSubnetValidatorTx', async (): Promise<void> => {
-          platformvm.setFee(new BN(fee));
-          const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
-          const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
-          const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
-          const amount:BN = new BN(90);
+    test('buildAddSubnetValidatorTx', async (): Promise<void> => {
+      platformvm.setFee(new BN(fee));
+      const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a));
+      const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a));
+      const addrbuff3 = addrs3.map((a) => platformvm.parseAddress(a));
+      const amount:BN = new BN(90);
 
-          const txu1:UnsignedTx = await platformvm.buildAddSubnetValidatorTx(
-            set,
-            addrs1,
-            addrs2,
-            nodeID,
-            startTime,
-            endTime,
-            PlatformVMConstants.MINSTAKE,
-            new UTF8Payload("hello world"), UnixNow()
-          );
+      const txu1:UnsignedTx = await platformvm.buildAddSubnetValidatorTx(
+        set,
+        addrs1,
+        addrs2,
+        nodeID,
+        startTime,
+        endTime,
+        PlatformVMConstants.MINSTAKE,
+        new UTF8Payload("hello world"), UnixNow()
+      );
 
-          const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
-            networkID, bintools.cb58Decode(blockchainID),
-            addrbuff1,
-            addrbuff2,
-            NodeIDStringToBuffer(nodeID),
-            startTime,
-            endTime,
-            PlatformVMConstants.MINSTAKE,
-            platformvm.getFee(),
-            assetID,
-            new UTF8Payload("hello world").getPayload(), UnixNow()
-          );
-          expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
-          expect(txu2.toString()).toBe(txu1.toString());
-
-        });
+      const txu2:UnsignedTx = set.buildAddSubnetValidatorTx(
+        networkID, bintools.cb58Decode(blockchainID),
+        addrbuff1,
+        addrbuff2,
+        NodeIDStringToBuffer(nodeID),
+        startTime,
+        endTime,
+        PlatformVMConstants.MINSTAKE,
+        platformvm.getFee(),
+        assetID,
+        new UTF8Payload("hello world").getPayload(), UnixNow()
+      );
+      expect(txu2.toBuffer().toString('hex')).toBe(txu1.toBuffer().toString('hex'));
+      expect(txu2.toString()).toBe(txu1.toString());
+    });
     */
+
     test("buildAddDelegatorTx 1", async (): Promise<void> => {
       const addrbuff1 = addrs1.map((a) => platformvm.parseAddress(a))
       const addrbuff2 = addrs2.map((a) => platformvm.parseAddress(a))
@@ -1469,7 +1474,7 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = set.buildAddDelegatorTx(
+      const txu2: UnsignedTx = await builder.buildAddDelegatorTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         assetID,
@@ -2085,10 +2090,9 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = set.buildAddValidatorTx(
+      const txu2: UnsignedTx = await builder.buildAddValidatorTx(
         networkID,
         bintools.cb58Decode(blockchainID),
-        assetID,
         addrbuff3,
         addrbuff1,
         addrbuff2,
@@ -2096,6 +2100,7 @@ describe("PlatformVMAPI", (): void => {
         startTime,
         endTime,
         amount,
+        assetID,
         locktime,
         threshold,
         addrbuff3,
@@ -2163,7 +2168,7 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = lset.buildAddDelegatorTx(
+      const txu2: UnsignedTx = await lbuilder.buildAddDelegatorTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         assetID,
@@ -2239,10 +2244,9 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = lset.buildAddValidatorTx(
+      const txu2: UnsignedTx = await lbuilder.buildAddValidatorTx(
         networkID,
         bintools.cb58Decode(blockchainID),
-        assetID,
         addrbuff3,
         addrbuff1,
         addrbuff2,
@@ -2250,6 +2254,7 @@ describe("PlatformVMAPI", (): void => {
         startTime,
         endTime,
         amount,
+        assetID,
         locktime,
         threshold,
         addrbuff3,
@@ -2436,7 +2441,7 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = set.buildCreateSubnetTx(
+      const txu2: UnsignedTx = await builder.buildCreateSubnetTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         addrbuff1,
@@ -2499,7 +2504,7 @@ describe("PlatformVMAPI", (): void => {
         UnixNow()
       )
 
-      const txu2: UnsignedTx = lset.buildCreateSubnetTx(
+      const txu2: UnsignedTx = await lbuilder.buildCreateSubnetTx(
         networkID,
         bintools.cb58Decode(blockchainID),
         addrbuff1,

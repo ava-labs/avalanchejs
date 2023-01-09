@@ -32,15 +32,12 @@ const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildExportTx to export AVAX from the P-Chain to the C-Chain"
 )
-const asOf: BN = UnixNow()
+const asOf: BN = new BN(0)
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
-let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
 let fee: BN
-let pChainBlockchainID: string
 
 let xchain: AVMAPI
 let xKeychain: AVMKeyChain
@@ -51,11 +48,8 @@ const InitAvalanche = async () => {
   pchain = avalanche.PChain()
   pKeychain = pchain.keyChain()
   pKeychain.importKey(privKey)
-  pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
   fee = pchain.getDefaultTxFee()
-  pChainBlockchainID = avalanche.getNetwork().P.blockchainID
 
   xchain = avalanche.XChain()
   xKeychain = xchain.keyChain()
