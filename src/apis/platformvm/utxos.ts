@@ -106,10 +106,9 @@ export class UTXO extends StandardUTXO {
         return this.fromBuffer(bintools.cb58Decode(serialized));
       };
       case "hex": {
-        let utxo = new UTXO();
         let decoded = serialization.decoder(serialized, 'hex', 'hex', 'cb58');
-        utxo.fromString(decoded);
-        return utxo.toBuffer().length;
+        this.fromString(decoded);
+        return this.toBuffer().length;
       };
       default: {
         throw new UnknownFormatError(`Specified format '${format}' is unknown, should be hex or cb58.`);
