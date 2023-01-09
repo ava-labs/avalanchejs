@@ -43,7 +43,8 @@ import {
   InsufficientFundsError,
   ThresholdError,
   FeeAssetError,
-  TimeError
+  TimeError,
+  UnknownFormatError
 } from "../../utils/errors"
 import { CreateChainTx } from "."
 import { GenesisData } from "../avm"
@@ -88,18 +89,32 @@ export class UTXO extends StandardUTXO {
   }
 
   /**
-   * Takes a base-58 string containing a [[UTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
+   * Takes a base-58 or hex string containing a [[UTXO]], parses it, populates the class, and returns the length of the StandardUTXO in bytes.
    *
    * @param serialized A base-58 string containing a raw [[UTXO]]
+   * @param format The format of the encoded [[UTXO]] (cb58 or hex). Defaults to cb58 per existing codebase
    *
    * @returns The length of the raw [[UTXO]]
    *
    * @remarks
    * unlike most fromStrings, it expects the string to be serialized in cb58 format
    */
-  fromString(serialized: string): number {
-    /* istanbul ignore next */
-    return this.fromBuffer(bintools.cb58Decode(serialized))
+  fromString(serialized: string, format: string = 'cb58'): number {
+    switch (format) {
+      case "cb58": {
+         /* istanbul ignore next */
+        return this.fromBuffer(bintools.cb58Decode(serialized));
+      };
+      case "hex": {
+        let utxo = new UTXO();
+        let decoded = serialization.decoder(serialized, 'hex', 'hex', 'cb58');
+        utxo.fromString(decoded);
+        return utxo.toBuffer().length;
+      };
+      default: {
+        throw new UnknownFormatError(`Specified format '${format}' is unknown, should be hex or cb58.`);
+      };
+    }   
   }
 
   /**
