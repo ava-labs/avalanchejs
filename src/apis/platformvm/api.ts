@@ -1939,6 +1939,75 @@ export class PlatformVMAPI extends JRPCAPI {
 
     return builtUnsignedTx
   }
+  /**
+   * Build an unsigned [[AddressStateTx]].
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+   * @param address The address to alter state.
+   * @param state The state to set or remove on the given address
+   * @param remove Optional. Flag if state should be applied or removed
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned AddressStateTx created from the passed in parameters.
+   */
+  buildAddressStateTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: string[],
+    changeAddresses: string[],
+    address: string | Buffer,
+    state: number,
+    remove: boolean = false,
+    memo: Buffer = undefined,
+    asOf: BN = ZeroBN,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    const from: Buffer[] = this._cleanAddressArray(
+      fromAddresses,
+      "buildAddressStateTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const change: Buffer[] = this._cleanAddressArray(
+      changeAddresses,
+      "buildAddressStateTx"
+    ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const addressBuf =
+      typeof address === "string" ? this.parseAddress(address) : address
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getTxFee()
+
+    const builtUnsignedTx: UnsignedTx = await this._getBuilder(
+      utxoset
+    ).buildAddressStateTx(
+      networkID,
+      blockchainID,
+      from,
+      change,
+      addressBuf,
+      state,
+      remove,
+      fee,
+      avaxAssetID,
+      memo,
+      asOf,
+      changeThreshold
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
 
   /**
    * Build an unsigned [[RegisterNodeTx]].
