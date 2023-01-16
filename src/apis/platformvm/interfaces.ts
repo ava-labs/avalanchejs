@@ -8,6 +8,10 @@ import { PersistanceOptions } from "../../utils/persistenceoptions"
 import { TransferableInput, TransferableOutput } from "."
 import { UTXOSet } from "../platformvm/utxos"
 
+export interface AddressParams {
+  address: string
+}
+
 export interface GetStakeParams {
   addresses: string[]
   encoding: string
@@ -226,6 +230,10 @@ export interface Owner {
   locktime: BN
   threshold: number
   addresses: string[]
+}
+
+export interface MultisigAliasReply extends Owner {
+  Memo: string
 }
 
 export interface SpendParams {

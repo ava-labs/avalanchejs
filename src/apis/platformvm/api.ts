@@ -63,7 +63,9 @@ import {
   GetMinStakeResponse,
   GetMaxStakeAmountParams,
   SpendParams,
-  SpendReply
+  SpendReply,
+  AddressParams,
+  MultisigAliasReply
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -1265,6 +1267,36 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * getAddressStates() returns an 64 bit bitmask of states applied to address
+   *
+   * @returns A big number representing the states applied to given address
+   */
+  getAddressStates = async (address: string): Promise<BN> => {
+    const params: AddressParams = {
+      address: address
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getAddressStates"
+    )
+    return new BN(response.data.result, 10)
+  }
+
+  /**
+   * getMultisigAlias() returns a MultisigAliasReply
+   *
+   * @returns A MultiSigAlias
+   */
+  getMultisigAlias = async (address: string): Promise<MultisigAliasReply> => {
+    const params: AddressParams = {
+      address: address
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getMultisigAlias"
+    )
+    return response.data.result
+  }
+
+  /**
    * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
    *
@@ -2032,7 +2064,7 @@ export class PlatformVMAPI extends JRPCAPI {
     oldNodeID: string | Buffer = undefined,
     newNodeID: string | Buffer = undefined,
     address: Buffer = undefined,
-    consortiumMemberAuthCredentials: [number, Buffer][] = [],
+    consortiumMemberAuthCredentials: [number, string | Buffer][] = [],
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
     changeThreshold: number = 1
@@ -2049,6 +2081,13 @@ export class PlatformVMAPI extends JRPCAPI {
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
     }
+    const auth: [number, Buffer][] = []
+    consortiumMemberAuthCredentials.forEach((c) => {
+      auth.push([
+        c[0],
+        typeof c[1] === "string" ? this.parseAddress(c[1]) : c[1]
+      ])
+    })
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
     const networkID: number = this.core.getNetworkID()
@@ -2065,7 +2104,7 @@ export class PlatformVMAPI extends JRPCAPI {
       oldNodeID,
       newNodeID,
       address,
-      consortiumMemberAuthCredentials,
+      auth,
       fee,
       avaxAssetID,
       memo,
