@@ -1276,7 +1276,8 @@ export class PlatformVMAPI extends JRPCAPI {
       address: address
     }
     const response: RequestResponseData = await this.callMethod(
-      "platform.getAddressStates"
+      "platform.getAddressStates",
+      params
     )
     return new BN(response.data.result, 10)
   }
@@ -1291,7 +1292,8 @@ export class PlatformVMAPI extends JRPCAPI {
       address: address
     }
     const response: RequestResponseData = await this.callMethod(
-      "platform.getMultisigAlias"
+      "platform.getMultisigAlias",
+      params
     )
     return response.data.result
   }
@@ -2063,7 +2065,7 @@ export class PlatformVMAPI extends JRPCAPI {
     changeAddresses: string[] = undefined,
     oldNodeID: string | Buffer = undefined,
     newNodeID: string | Buffer = undefined,
-    address: Buffer = undefined,
+    address: string | Buffer = undefined,
     consortiumMemberAuthCredentials: [number, string | Buffer][] = [],
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
@@ -2077,6 +2079,8 @@ export class PlatformVMAPI extends JRPCAPI {
       changeAddresses,
       "buildRegisterNodeTx"
     ).map((a: string): Buffer => bintools.stringToAddress(a))
+    const addrBuf =
+      typeof address === "string" ? this.parseAddress(address) : address
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -2103,7 +2107,7 @@ export class PlatformVMAPI extends JRPCAPI {
       change,
       oldNodeID,
       newNodeID,
-      address,
+      addrBuf,
       auth,
       fee,
       avaxAssetID,
