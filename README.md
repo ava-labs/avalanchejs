@@ -76,6 +76,15 @@ The above lines import the libraries used in the tutorials. The libraries includ
 * [BN](https://www.npmjs.com/package/bn.js): A bignumber module use by CaminoJS.
 * [Buffer](https://www.npmjs.com/package/buffer): A Buffer library.
 
+
+## Releasing dist branch
+
+1. Create a branch derived from `dev` with `git checkout -b dev_dist`
+2. `git rebase dist` 
+3. `yarn build`
+4. Commit changes
+5. Remove `dist` branch and rename `dev_dist` to `dist`
+
 ## Example 1 &mdash; Managing X-Chain Keys
 
 CaminoJS comes with its own AVM Keychain. This KeyChain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of CaminoJS connected to our Camino Platform endpoint of choice.

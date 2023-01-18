@@ -9,10 +9,6 @@ import { fetchAdapter } from "../utils"
 import AvalancheCore from "../camino"
 import { APIBase, RequestResponseData } from "./apibase"
 
-BN.prototype.toJSON = function () {
-  return this.toString(10)
-}
-
 export class JRPCAPI extends APIBase {
   protected jrpcVersion: string = "2.0"
   protected rpcID = 1
@@ -53,6 +49,12 @@ export class JRPCAPI extends APIBase {
       adapter: typeof fetch !== "undefined" ? fetchAdapter : undefined
     }
 
+    const prototypeBefore = BN.prototype.toJSON
+
+    BN.prototype.toJSON = function () {
+      return this.toString(10)
+    }
+
     const resp: RequestResponseData = await this.core.post(
       ep,
       {},
@@ -60,6 +62,9 @@ export class JRPCAPI extends APIBase {
       headrs,
       axConf
     )
+
+    BN.prototype.toJSON = prototypeBefore
+
     if (resp.status >= 200 && resp.status < 300) {
       this.rpcID += 1
       if (typeof resp.data === "string") {
