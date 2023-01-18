@@ -14,6 +14,7 @@
     "build": "rollup -c",
     "build:prod": "rollup -c --environment BUILD:production",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:path": "NODE_OPTIONS=--experimental-vm-modules jest --watch --testPathPattern",
     "test:cov": "NODE_OPTIONS=--experimental-vm-modules jest --collect-coverage=true",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "lint": "eslint --fix --ignore-path .gitignore \"./**/*.ts*\"",

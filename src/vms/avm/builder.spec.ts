@@ -1,3 +1,4 @@
+import type { BaseTx } from 'src/serializable/avm/baseTx';
 import { testContext } from '../../fixtures/context';
 import {
   testAvaxAssetID,
@@ -21,6 +22,7 @@ import {
 import { BigIntPr, Int } from '../../serializable/primitives';
 import { hexToBuffer } from '../../utils';
 import { newExportTx, newImportTx } from '../pvm';
+import { newBaseTx } from './builder';
 
 describe('AVMBuilder', () => {
   let utxos: Utxo[];
@@ -145,5 +147,42 @@ describe('AVMBuilder', () => {
         [tnsOut],
       ),
     ).toThrow();
+  });
+
+  it('baseTx', () => {
+    const toAddress = hexToBuffer('0x5432112345123451234512');
+    const tnsOut = TransferableOutput.fromNative(
+      testAvaxAssetID.toString(),
+      BigInt(1 * 1e9),
+      [toAddress],
+    );
+    const tx = newBaseTx(testContext, [testOwnerAddress.toBytes()], utxos, [
+      tnsOut,
+    ]);
+    const {
+      baseTx: { inputs, outputs },
+    } = tx.getTx() as BaseTx;
+
+    expect(outputs as TransferableOutput[]).toEqual([
+      tnsOut,
+      new TransferableOutput(
+        testAvaxAssetID,
+        new TransferOutput(
+          new BigIntPr(48999000000n), // input - amount sent - fee
+          OutputOwners.fromNative([testOwnerAddress.toBytes()]),
+        ),
+      ),
+    ]);
+
+    expect(inputs as TransferableInput[]).toEqual([
+      new TransferableInput(
+        utxos[2].utxoId,
+        testAvaxAssetID,
+        new TransferInput(
+          new BigIntPr(BigInt(50 * 1e9)),
+          Input.fromNative([0]),
+        ),
+      ),
+    ]);
   });
 });
