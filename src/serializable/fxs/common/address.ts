@@ -21,8 +21,8 @@ export class Address extends Primitives {
     return options.stylize(this.toJSON(), 'string');
   }
 
-  toJSON() {
-    return this.toString();
+  toJSON(hrp = 'avax') {
+    return this.toString(hrp);
   }
 
   //decodes from bech32 Addresses
@@ -42,8 +42,8 @@ export class Address extends Primitives {
     return padLeft(this.address, 20);
   }
 
-  toString() {
-    return formatBech32('avax', this.address);
+  toString(hrp = 'avax') {
+    return formatBech32(hrp, this.address);
   }
 
   value() {
