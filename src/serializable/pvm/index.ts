@@ -10,6 +10,11 @@ import { StakeableLockIn } from './stakableLockIn';
 import { StakeableLockOut } from './stakableLockOut';
 import { SubnetValidator } from './subnetValidator';
 import { Validator } from './validator';
+import { Signer } from './signer';
+import { ProofOfPossession } from './proofOfPossession';
+import { AddPermissionlessValidatorTx } from './addPermissionlessValidatorTx';
+import { AddPermissionlessDelegatorTx } from './addPermissionlessDelegatorTx';
+
 export * from './typeGuards';
 export {
   AddDelegatorTx,
@@ -24,4 +29,8 @@ export {
   StakeableLockOut,
   SubnetValidator,
   Validator,
+  Signer,
+  AddPermissionlessValidatorTx,
+  AddPermissionlessDelegatorTx,
+  ProofOfPossession,
 };

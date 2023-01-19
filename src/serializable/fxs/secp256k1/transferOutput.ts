@@ -1,4 +1,5 @@
 import { pack, unpack } from '../../../utils/struct';
+import type { Amounter } from '../../common/types';
 import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
 import { OutputOwners } from './outputOwners';
@@ -12,7 +13,7 @@ export const transferOutput_symbol = Symbol('secp256k1fx.TransferOutput');
  * @see https://docs.avax.network/specs/platform-transaction-serialization/#secp256k1-transfer-output
  */
 @serializable()
-export class TransferOutput {
+export class TransferOutput implements Amounter {
   readonly _type = transferOutput_symbol;
 
   constructor(

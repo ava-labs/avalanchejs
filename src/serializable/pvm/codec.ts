@@ -12,6 +12,9 @@ import { ImportTx } from './importTx';
 import { RewardValidatorTx } from './rewardValidatorTx';
 import { StakeableLockIn } from './stakableLockIn';
 import { StakeableLockOut } from './stakableLockOut';
+import { AddPermissionlessValidatorTx } from './addPermissionlessValidatorTx';
+import { AddPermissionlessDelegatorTx } from './addPermissionlessDelegatorTx';
+import { Signer, SignerEmpty } from './signer';
 
 // https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/codec.go
 export const codec = new Codec([
@@ -29,8 +32,8 @@ export const codec = new Codec([
   AddSubnetValidatorTx, // 13
   AddDelegatorTx, // 14
 
-  CreateChainTx, // TODO: 15
-  CreateSubnetTx, // TODO: 16
+  CreateChainTx, // 15
+  CreateSubnetTx, // 16
 
   ImportTx, // 17
   ExportTx, // 18
@@ -40,6 +43,14 @@ export const codec = new Codec([
 
   StakeableLockIn, // 21
   StakeableLockOut, // 22
+
+  undefined, // TODO: RemoveSubnetValidatorTx // 23
+  undefined, // TODO: TransformSubnetTx // 24
+  AddPermissionlessValidatorTx, //  25
+  AddPermissionlessDelegatorTx, // 26
+
+  SignerEmpty, // 27
+  Signer, // 28
 ]);
 
 let manager: Manager;

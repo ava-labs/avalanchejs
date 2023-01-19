@@ -1,5 +1,5 @@
 import {
-  BaseTx,
+  BaseTx as AvaxBaseTx,
   TransferableInput,
   TransferableOutput,
 } from '../serializable/avax';
@@ -9,6 +9,7 @@ import { Utxo } from '../serializable/avax/utxo';
 import { CreateAssetTx } from '../serializable/avm/createAssetTx';
 import { ExportTx } from '../serializable/avm/exportTx';
 import { ImportTx } from '../serializable/avm/importTx';
+import { BaseTx } from '../serializable/avm/baseTx';
 import { InitialState } from '../serializable/avm/initialState';
 import { OperationTx } from '../serializable/avm/operationTx';
 import { SignedTx } from '../serializable/avax/signedTx';
@@ -73,7 +74,13 @@ export const utxoIdBytes = () => concatBytes(idBytes(), bytesForInt(5));
 export const utxoId = () => new UTXOID(id(), new Int(5));
 
 export const baseTx = () =>
-  new BaseTx(int(), id(), transferableOutputs(), transferableInputs(), bytes());
+  new AvaxBaseTx(
+    int(),
+    id(),
+    transferableOutputs(),
+    transferableInputs(),
+    bytes(),
+  );
 
 export const baseTxbytes = () =>
   concatBytes(
@@ -139,6 +146,10 @@ export const exportTxBytes = () =>
     idBytes(),
     makeListBytes(transferableOutputBytes)(),
   );
+
+export const avmBaseTx = () => new BaseTx(baseTx());
+
+export const avmBaseTxBytes = () => baseTxbytes();
 
 export const signedTx = () =>
   new SignedTx(exportTx(), [credential(), credential()]);

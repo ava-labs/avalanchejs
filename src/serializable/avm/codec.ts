@@ -1,4 +1,4 @@
-import { BaseTx } from '../avax/baseTx';
+import { BaseTx } from './baseTx';
 import { Codec } from '../codec/codec';
 import { Manager } from '../codec/manager';
 import * as NftFx from '../fxs/nft';

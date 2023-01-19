@@ -1,5 +1,5 @@
 import {
-  BaseTx,
+  BaseTx as AvaxBaseTx,
   TransferableInput,
   TransferableOutput,
 } from '../../serializable/avax';
@@ -17,6 +17,7 @@ import { UnsignedTx } from '../common/unsignedTx';
 import type { Context } from '../context/model';
 import type { UtxoSpendReturn } from '../utils/utxoSpend';
 import { utxoSpend } from '../utils/utxoSpend';
+import { BaseTx } from '../../serializable/avm/baseTx';
 
 /**
  *
@@ -101,7 +102,7 @@ export function newImportTx(
   inputOutputs.changeOutputs.sort(compareTransferableOutputs);
   return new UnsignedTx(
     new ImportTx(
-      BaseTx.fromNative(
+      AvaxBaseTx.fromNative(
         context.networkID,
         context.xBlockchainID,
         inputOutputs.changeOutputs,
@@ -164,6 +165,51 @@ export function newExportTx(
 }
 
 /**
+ * Format base Tx given a set of utxos. The priority is determined by the order of the utxo
+ * array. Fee is automatically added
+ * @param fromAddresses - used for selecting which utxos are signable
+ * @param utxoSet - list of utxos to spend from
+ * @param outputs - the desired output (change outputs will be added to them automatically)
+ * @param options - see SpendingOptions
+ */
+export function newBaseTx(
+  context: Context,
+  fromAddressesBytes: Uint8Array[],
+  utxoSet: Utxo[],
+  outputs: TransferableOutput[],
+  options?: SpendOptions,
+) {
+  const fromAddresses = addressesFromBytes(fromAddressesBytes);
+  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+  const toBurn = new Map<string, bigint>([
+    [context.avaxAssetID, context.baseTxFee],
+  ]);
+
+  outputs.forEach((out) => {
+    const assetId = out.assetId.value();
+    toBurn.set(assetId, (toBurn.get(assetId) || 0n) + out.output.amount());
+  });
+
+  const { inputs, inputUtxos, changeOutputs, addressMaps } = utxoSpend(
+    toBurn,
+    utxoSet,
+    fromAddresses,
+    defaultedOptions,
+  );
+
+  const allOutputs = [...outputs, ...changeOutputs];
+  allOutputs.sort(compareTransferableOutputs);
+
+  return new UnsignedTx(
+    new BaseTx(
+      baseTxUnsafe(context, allOutputs, inputs, defaultedOptions.memo),
+    ),
+    inputUtxos,
+    addressMaps,
+  );
+}
+
+/**
  * format a baseTx directly from inputs with no validation
  * @param changeOutputs - the output representing the remaining amounts from each input
  * @param inputs - the inputs of the tx
@@ -175,7 +221,7 @@ const baseTxUnsafe = (
   inputs: TransferableInput[],
   memo: Uint8Array,
 ) => {
-  return BaseTx.fromNative(
+  return AvaxBaseTx.fromNative(
     context.networkID,
     context.xBlockchainID,
     changeOutputs,
