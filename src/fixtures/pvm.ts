@@ -1,6 +1,8 @@
 import { concatBytes } from '@noble/hashes/utils';
 import {
   AddDelegatorTx,
+  AddPermissionlessDelegatorTx,
+  AddPermissionlessValidatorTx,
   AddSubnetValidatorTx,
   AddValidatorTx,
   AdvanceTimeTx,
@@ -8,6 +10,8 @@ import {
   CreateSubnetTx,
   ExportTx,
   ImportTx,
+  ProofOfPossession,
+  Signer,
   StakeableLockIn,
   StakeableLockOut,
   SubnetValidator,
@@ -30,6 +34,8 @@ import {
   bytesBytes,
   int,
   intBytes,
+  blsPublicKeyBytes,
+  blsSignatureBytes,
   stringPr,
   stringPrBytes,
 } from './primitives';
@@ -165,3 +171,52 @@ export const stakableLockOutBytes = () =>
 export const advanceTimeTx = () => new AdvanceTimeTx(bigIntPr());
 
 export const advanceTimeBytesTx = () => bigIntPrBytes();
+
+export const proofOfPossession = () =>
+  new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes());
+
+export const signer = () => new Signer(proofOfPossession());
+export const signerBytes = () =>
+  concatBytes(blsPublicKeyBytes(), blsSignatureBytes());
+
+export const addPermissionlessValidatorTx = () =>
+  new AddPermissionlessValidatorTx(
+    baseTx(),
+    subnetValidator(),
+    signer(),
+    makeList(transferableOutput)(),
+    outputOwner(),
+    outputOwner(),
+    int(),
+  );
+
+export const addPermissionlessValidatorTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    subnetValidatorBytes(),
+    bytesForInt(28),
+    signerBytes(),
+    makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+    intBytes(),
+  );
+
+export const addPermissionlessDelegatorTx = () =>
+  new AddPermissionlessDelegatorTx(
+    baseTx(),
+    subnetValidator(),
+    makeList(transferableOutput)(),
+    outputOwner(),
+  );
+
+export const addPermissionlessDelegatorTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    subnetValidatorBytes(),
+    makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+  );

@@ -42,7 +42,7 @@ export class Manager {
 
   getCodecForVersion(codecId: Short): Codec {
     if (!this.codecs[codecId.value()]) {
-      throw new Error('codec id not found');
+      throw new Error(`codec id(${codecId.value()}) not found`);
     }
     return this.codecs[codecId.value()];
   }

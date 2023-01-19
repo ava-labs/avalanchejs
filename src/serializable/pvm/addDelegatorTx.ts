@@ -13,7 +13,7 @@ import type { OutputOwners } from '../fxs/secp256k1';
 export const addDelegatorTx_symbol = Symbol('pvm.AddDelegatorTx');
 
 /**
- * @see
+ * @see https://docs.avax.network/specs/platform-transaction-serialization#unsigned-add-delegator-tx
  */
 @serializable()
 export class AddDelegatorTx extends PVMTx {
