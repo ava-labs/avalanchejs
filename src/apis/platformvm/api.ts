@@ -995,9 +995,9 @@ export class PlatformVMAPI extends JRPCAPI {
     }
 
     const params: GetMaxStakeAmountParams = {
-      nodeID,
-      startTime,
-      endTime
+      nodeID: nodeID,
+      startTime: startTime.toString(10),
+      endTime: endTime.toString(10)
     }
 
     if (typeof subnetID === "string") {
@@ -2329,16 +2329,20 @@ export class PlatformVMAPI extends JRPCAPI {
       from,
       to:
         to.length > 0
-          ? { locktime: toLockTime, threshold: toThreshold, addresses: to }
+          ? {
+              locktime: toLockTime.toString(10),
+              threshold: toThreshold,
+              addresses: to
+            }
           : undefined,
       change:
         change.length > 0
-          ? { locktime: ZeroBN, threshold: changeThreshold, addresses: change }
+          ? { locktime: "0", threshold: changeThreshold, addresses: change }
           : undefined,
       lockMode: lockMode === "Unlocked" ? 0 : lockMode === "Deposit" ? 1 : 2,
-      amountToLock: amountToLock,
-      amountToBurn: amountToBurn,
-      asOf: asOf,
+      amountToLock: amountToLock.toString(10),
+      amountToBurn: amountToBurn.toString(10),
+      asOf: asOf.toString(10),
       encoding: encoding ?? "hex"
     }
 

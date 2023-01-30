@@ -222,12 +222,12 @@ export interface GetMinStakeResponse {
 export interface GetMaxStakeAmountParams {
   subnetID?: string
   nodeID: string
-  startTime: BN
-  endTime: BN
+  startTime: string
+  endTime: string
 }
 
 export interface Owner {
-  locktime: BN
+  locktime: string
   threshold: number
   addresses: string[]
 }
@@ -242,9 +242,9 @@ export interface SpendParams {
   change?: Owner
 
   lockMode: 0 | 1 | 2
-  amountToLock: BN
-  amountToBurn: BN
-  asOf: BN
+  amountToLock: string
+  amountToBurn: string
+  asOf: string
   encoding?: string
 }
 

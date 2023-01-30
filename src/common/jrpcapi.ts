@@ -49,12 +49,6 @@ export class JRPCAPI extends APIBase {
       adapter: typeof fetch !== "undefined" ? fetchAdapter : undefined
     }
 
-    const prototypeBefore = BN.prototype.toJSON
-
-    BN.prototype.toJSON = function () {
-      return this.toString(10)
-    }
-
     const resp: RequestResponseData = await this.core.post(
       ep,
       {},
@@ -62,8 +56,6 @@ export class JRPCAPI extends APIBase {
       headrs,
       axConf
     )
-
-    BN.prototype.toJSON = prototypeBefore
 
     if (resp.status >= 200 && resp.status < 300) {
       this.rpcID += 1

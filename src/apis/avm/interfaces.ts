@@ -48,7 +48,7 @@ export interface CreateVariableCapAssetParams extends CredsInterface {
 }
 
 export interface MintParams extends CredsInterface {
-  amount: number | BN
+  amount: number | string
   assetID: Buffer | string
   to: string
   minters: string[]
@@ -64,7 +64,7 @@ export interface ImportKeyParams extends CredsInterface {
 
 export interface ExportParams extends CredsInterface {
   to: string
-  amount: BN
+  amount: string
   assetID: string
 }
 

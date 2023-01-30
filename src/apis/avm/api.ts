@@ -548,7 +548,7 @@ export class AVMAPI extends JRPCAPI {
     const params: MintParams = {
       username: username,
       password: password,
-      amount: amnt,
+      amount: amnt.toString(10),
       assetID: asset,
       to,
       minters
@@ -770,7 +770,7 @@ export class AVMAPI extends JRPCAPI {
       username,
       password,
       to,
-      amount: amount,
+      amount: amount.toString(10),
       assetID
     }
     const response: RequestResponseData = await this.callMethod(
