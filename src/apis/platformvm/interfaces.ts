@@ -135,16 +135,35 @@ export interface ImportKeyParams {
   privateKey: string
 }
 
-export interface GetBalanceResponse {
-  balance: BN | number
-  unlocked: BN | number
-  lockedStakeable: BN | number
-  lockedNotStakeable: BN | number
-  utxoIDs: {
-    txID: string
-    outputIndex: number
-  }[]
+export interface UTXOID {
+  txID: string
+  outputIndex: number
 }
+
+export interface BalanceDict {
+  [assetId: string]: BN
+}
+
+export interface GetBalanceResponseAvax {
+  balance: BN
+  unlocked: BN
+  lockedStakeable: BN
+  lockedNotStakeable: BN
+  utxoIDs: UTXOID[]
+}
+
+export interface GetBalanceResponseCamino {
+  balances: BalanceDict
+  unlockedOutputs: BalanceDict
+  bondedOutputs: BalanceDict
+  depositedOutputs: BalanceDict
+  bondedDepositedOutputs: BalanceDict
+  utxoIDs: UTXOID[]
+}
+
+export type GetBalanceResponse =
+  | GetBalanceResponseAvax
+  | GetBalanceResponseCamino
 
 export interface CreateAddressParams {
   username: string

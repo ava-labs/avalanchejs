@@ -45,14 +45,12 @@ import {
   GetRewardUTXOsResponse,
   Subnet,
   GetTxStatusResponse,
-  GetValidatorsAtResponse
+  GetValidatorsAtResponse,
+  GetBalanceResponse,
+  GetUTXOsResponse
 } from "../../../src/apis/platformvm/interfaces"
 import { ErrorResponseObject } from "../../../src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import {
-  GetBalanceResponse,
-  GetUTXOsResponse
-} from "src/apis/platformvm/interfaces"
 import { Builder } from "../../../src/apis/platformvm/builder"
 
 /**
@@ -236,27 +234,32 @@ describe("PlatformVMAPI", (): void => {
   })
 
   test("getBalance", async (): Promise<void> => {
-    const balance: BN = new BN("100", 10)
-    const unlocked: BN = new BN("100", 10)
-    const lockedStakeable: BN = new BN("100", 10)
-    const lockedNotStakeable: BN = new BN("100", 10)
-    const respobj: GetBalanceResponse = {
-      balance,
-      unlocked,
-      lockedStakeable,
-      lockedNotStakeable,
-      utxoIDs: [
-        {
-          txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
-          outputIndex: 0
-        }
-      ]
+    const s100 = "100"
+    const b100 = new BN("100", 10)
+    const utxoIDs = [
+      {
+        txID: "LUriB3W919F84LwPMMw4sm2fZ4Y76Wgb6msaauEY7i1tFNmtv",
+        outputIndex: 0
+      }
+    ]
+    const expected: GetBalanceResponse = {
+      balance: b100,
+      unlocked: b100,
+      lockedStakeable: b100,
+      lockedNotStakeable: b100,
+      utxoIDs: utxoIDs
     }
     const result: Promise<GetBalanceResponse> = api.getBalance({
       address: addrA
     })
     const payload: object = {
-      result: respobj
+      result: {
+        balance: s100,
+        unlocked: s100,
+        lockedStakeable: s100,
+        lockedNotStakeable: s100,
+        utxoIDs: utxoIDs
+      }
     }
     const responseObj: HttpResponse = {
       data: payload
@@ -266,7 +269,7 @@ describe("PlatformVMAPI", (): void => {
     const response: object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
+    expect(JSON.stringify(response)).toBe(JSON.stringify(expected))
   })
 
   test("getCurrentSupply", async (): Promise<void> => {

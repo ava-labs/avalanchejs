@@ -13,7 +13,9 @@ import {
   AddValidatorTx,
   Tx,
   SECPOwnerOutput,
-  ParseableOutput
+  ParseableOutput,
+  GetBalanceResponse,
+  GetBalanceResponseAvax
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
 import {
@@ -74,10 +76,10 @@ const main = async (): Promise<any> => {
 
   const stakeAmount: any = await pchain.getMinStake()
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance({
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
     address: pAddressStrings[0]
-  })
-  const unlocked: BN = new BN(getBalanceResponse.unlocked)
+  })) as GetBalanceResponseAvax
+  const unlocked: BN = getBalanceResponse.unlocked
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee).sub(stakeAmount.minValidatorStake),
     pAddresses,

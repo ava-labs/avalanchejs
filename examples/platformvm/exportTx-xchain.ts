@@ -15,7 +15,9 @@ import {
   AmountOutput,
   UnsignedTx,
   Tx,
-  ExportTx
+  ExportTx,
+  GetBalanceResponse,
+  GetBalanceResponseAvax
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
@@ -79,10 +81,10 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance({
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
     address: pAddressStrings[0]
-  })
-  const unlocked: BN = new BN(getBalanceResponse.unlocked)
+  })) as GetBalanceResponseAvax
+  const unlocked: BN = getBalanceResponse.unlocked
   console.log(unlocked.sub(fee).toString())
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),

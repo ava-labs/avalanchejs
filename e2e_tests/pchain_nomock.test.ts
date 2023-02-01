@@ -76,14 +76,14 @@ describe("PChain", (): void => {
     [
       "getBalance",
       () => pchain.getBalance({ address: whaleAddr }),
-      (x) => x.balance,
+      (x) => x.balance.toString(10),
       Matcher.toBe,
       () => "30000000000000000"
     ],
     [
       "getBalanceOfMultipleAddresses",
       () => pchain.getBalance({ addresses: [whaleAddr] }),
-      (x) => x.balance,
+      (x) => x.balance.toString(10),
       Matcher.toBe,
       () => "30000000000000000"
     ],

@@ -1,8 +1,13 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Avalanche, BinTools } from "@c4tplatform/caminojs/dist"
+import {
+  PlatformVMAPI,
+  GetBalanceResponse
+} from "@c4tplatform/caminojs/dist/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
+const bintools: BinTools = BinTools.getInstance()
+
 const avalanche: Avalanche = new Avalanche(
   config.host,
   config.port,
@@ -11,26 +16,34 @@ const avalanche: Avalanche = new Avalanche(
 )
 
 let pchain: PlatformVMAPI = avalanche.PChain()
+let hrp: string
 
 const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
   pchain = avalanche.PChain()
+  hrp = avalanche.getNetwork().hrp
 }
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const address: string = "P-local1g65uqn6t77p656w64023nh8nd9updzmxyymev2"
+  const toHrp = (s: string): string => {
+    return bintools.addressToString(hrp, "P", bintools.parseAddress(s, "P"))
+  }
+
+  const address: string = toHrp(
+    "P-local1g65uqn6t77p656w64023nh8nd9updzmxyymev2"
+  )
   const addresses: string[] = [
-    "P-local1clz7hpsnrr6r9ukmjxn9wajgkhe3mgx8gqcm3a",
-    "P-local13w8m4qh6hay8fz3a4hzrs9k4wk4ytmfla756w2",
-    "P-local1hgjcjp3shkyxda8deyjlsde05g9fgwdk2xnwy3"
+    toHrp("P-local1clz7hpsnrr6r9ukmjxn9wajgkhe3mgx8gqcm3a"),
+    toHrp("P-local13w8m4qh6hay8fz3a4hzrs9k4wk4ytmfla756w2"),
+    toHrp("P-local1hgjcjp3shkyxda8deyjlsde05g9fgwdk2xnwy3")
   ]
-  const balance: object = await pchain.getBalance({
+  const balance: GetBalanceResponse = await pchain.getBalance({
     address,
     addresses
   })
-  console.log(balance)
+  console.log(JSON.stringify(balance, undefined, 2))
 }
 
 main()

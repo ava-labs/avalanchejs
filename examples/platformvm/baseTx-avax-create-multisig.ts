@@ -11,9 +11,10 @@ import {
   AmountOutput,
   UnsignedTx,
   Tx,
-  BaseTx
+  BaseTx,
+  GetBalanceResponse,
+  GetBalanceResponseAvax
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { GetBalanceResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
@@ -78,10 +79,10 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const getBalanceResponse: GetBalanceResponse = await pchain.getBalance({
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
     address: pAddressStrings[0]
-  })
-  const balance: BN = new BN(getBalanceResponse.balance)
+  })) as GetBalanceResponseAvax
+  const balance: BN = getBalanceResponse.balance
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     balance.sub(fee),
     pAddresses,

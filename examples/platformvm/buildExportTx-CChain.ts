@@ -8,12 +8,13 @@ import {
   KeyChain,
   UTXOSet,
   UnsignedTx,
-  Tx
+  Tx,
+  GetBalanceResponse,
+  GetBalanceResponseAvax
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  UnixNow
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -60,10 +61,10 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const getBalanceResponse: any = await pchain.getBalance({
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
     address: pAddressStrings[0]
-  })
-  const unlocked: BN = new BN(getBalanceResponse.unlocked)
+  })) as GetBalanceResponseAvax
+  const unlocked: BN = getBalanceResponse.unlocked
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const unsignedTx: UnsignedTx = await pchain.buildExportTx(

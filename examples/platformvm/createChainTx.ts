@@ -19,13 +19,14 @@ import {
   AmountOutput,
   UnsignedTx,
   CreateChainTx,
-  Tx
+  Tx,
+  GetBalanceResponse,
+  GetBalanceResponseAvax
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
 import {
   PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey,
-  ONEAVAX
+  DefaultLocalGenesisPrivateKey
 } from "@c4tplatform/caminojs/dist/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -48,10 +49,8 @@ let pchain: PlatformVMAPI
 let pKeychain: KeyChain
 let pAddresses: Buffer[]
 let pAddressStrings: string[]
-let avaxAssetID: string
 let fee: BN
 let pChainBlockchainID: string
-let avaxAssetIDBuf: Buffer
 
 let avaxUTXOKeychain: Buffer[]
 let avaxUTXOKeychainStrings: string[]
@@ -76,10 +75,8 @@ const InitAvalanche = async () => {
   )
   pAddresses = pchain.keyChain().getAddresses()
   pAddressStrings = pchain.keyChain().getAddressStrings()
-  avaxAssetID = avalanche.getNetwork().X.avaxAssetID
   fee = pchain.getDefaultTxFee()
   pChainBlockchainID = avalanche.getNetwork().P.blockchainID
-  avaxAssetIDBuf = bintools.cb58Decode(avaxAssetID)
 
   avaxUTXOKeychain = [pAddresses[0], pAddresses[1]]
   avaxUTXOKeychainStrings = [pAddressStrings[0], pAddressStrings[1]]
@@ -119,10 +116,10 @@ const main = async (): Promise<any> => {
     config.networkID
   )
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: any = await pchain.getBalance({
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
     address: pAddressStrings[0]
-  })
-  const unlocked: BN = new BN(getBalanceResponse.unlocked)
+  })) as GetBalanceResponseAvax
+  const unlocked: BN = getBalanceResponse.unlocked
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
     avaxUTXOKeychain,

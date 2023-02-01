@@ -33,6 +33,7 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
+  BalanceDict,
   GetCurrentValidatorsParams,
   GetPendingValidatorsParams,
   GetRewardUTXOsParams,
@@ -475,7 +476,32 @@ export class PlatformVMAPI extends JRPCAPI {
       "platform.getBalance",
       params
     )
-    return response.data.result
+
+    const result = response.data.result
+
+    const parseDict = (input: any[]): BalanceDict => {
+      var dict: BalanceDict = {}
+      for (const [k, v] of Object.entries(input)) dict[k] = new BN(v)
+      return dict
+    }
+
+    if (this.core.getNetwork().P.lockModeBondDeposit) {
+      return {
+        balances: parseDict(result.balances),
+        unlockedOutputs: parseDict(result.unlockedOutputs),
+        bondedOutputs: parseDict(result.bondedOutputs),
+        depositedOutputs: parseDict(result.depositedOutputs),
+        bondedDepositedOutputs: parseDict(result.bondedDepositedOutputs),
+        utxoIDs: result.utxoIDs
+      } as GetBalanceResponse
+    }
+    return {
+      balance: new BN(result.balance),
+      unlocked: new BN(result.unlocked),
+      lockedStakeable: new BN(result.lockedStakeable),
+      lockedNotStakeable: new BN(result.lockedNotStakeable),
+      utxoIDs: result.utxoIDs
+    } as GetBalanceResponse
   }
 
   /**
@@ -2338,7 +2364,7 @@ export class PlatformVMAPI extends JRPCAPI {
       supplyCap: new BN(r.supplyCap),
       verifyNodeSignature: r.verifyNodeSignature ?? false,
       lockModeBondDeposit: r.lockModeBondDeposit ?? false
-    }
+    } as GetConfigurationResponse
   }
 
   /**
