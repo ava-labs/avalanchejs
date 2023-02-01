@@ -60,15 +60,11 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const getBalanceResponse: any = await pchain.getBalance({
-    address: pAddressStrings[0]
-  })
-  const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
   const unsignedTx: UnsignedTx = await pchain.buildExportTx(
     utxoSet,
-    unlocked.sub(fee),
+    new BN(1000000000),
     xChainBlockchainID,
     xAddressStrings,
     pAddressStrings,

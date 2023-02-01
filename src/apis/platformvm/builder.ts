@@ -371,9 +371,11 @@ export class Builder {
       changeThreshold
     )
 
+    var singleAsset = true
     if (amountAssetID.toString("hex") === feeAssetID.toString("hex")) {
       aad.addAssetAmount(amountAssetID, zero, fee.add(amount))
     } else {
+      singleAsset = false
       aad.addAssetAmount(amountAssetID, amount, zero)
       if (this._feeCheck(fee, feeAssetID)) {
         aad.addAssetAmount(feeAssetID, zero, fee)
@@ -388,8 +390,8 @@ export class Builder {
     )
     if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs()
-      outs = aad.getChangeOutputs()
-      exports = aad.getOutputs()
+      outs = singleAsset ? aad.getAllOutputs() : aad.getChangeOutputs()
+      exports = singleAsset ? [] : aad.getOutputs()
     } else {
       throw minSpendableErr
     }
