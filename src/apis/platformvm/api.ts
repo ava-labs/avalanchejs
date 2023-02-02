@@ -65,7 +65,9 @@ import {
   SpendParams,
   SpendReply,
   AddressParams,
-  MultisigAliasReply
+  MultisigAliasReply,
+  GetClaimablesParams,
+  GetClaimablesResponse
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -527,6 +529,41 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result
+  }
+  /**
+   * List amounts that can be claimed: validator rewards, expired deposit rewards, active deposit rewards claimable at current time.
+   *
+   * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
+   * @param depositTxIDs An array of deposit transactions ids
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   *
+   * @returns Promise for an object containing the amounts that can be claimed.
+   */
+  getClaimables = async (
+    addresses: string[],
+    depositTxIDs: string[],
+    locktime: string = undefined,
+    threshold: number = 1
+  ): Promise<GetClaimablesResponse> => {
+    const params: GetClaimablesParams = {
+      threshold,
+      addresses,
+      depositTxIDs
+    }
+    if (typeof locktime !== "undefined") {
+      params.locktime = locktime
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getClaimables",
+      params
+    )
+    const result = response.data.result
+    return {
+      depositRewards: new BN(result.depositRewards),
+      validatorRewards: new BN(result.validatorRewards),
+      expiredDepositRewards: new BN(result.expiredDepositRewards)
+    } as GetClaimablesResponse
   }
 
   /**

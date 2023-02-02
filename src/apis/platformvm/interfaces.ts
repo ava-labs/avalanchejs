@@ -66,6 +66,13 @@ export interface GetCurrentValidatorsParams {
   nodeIDs?: string[]
 }
 
+export interface GetClaimablesParams {
+  addresses: string[]
+  depositTxIDs: string[]
+  locktime?: string
+  threshold: number
+}
+
 export interface SampleValidatorsParams {
   size: number | string
   subnetID?: Buffer | string | undefined
@@ -217,6 +224,12 @@ export interface GetTxStatusResponse {
 export interface GetMinStakeResponse {
   minValidatorStake: BN
   minDelegatorStake: BN
+}
+
+export interface GetClaimablesResponse {
+  depositRewards: BN
+  validatorRewards: BN
+  expiredDepositRewards: BN
 }
 
 export interface GetMaxStakeAmountParams {

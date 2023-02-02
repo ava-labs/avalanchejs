@@ -82,8 +82,10 @@ The above lines import the libraries used in the tutorials. The libraries includ
 1. Create a branch derived from `dev` with `git checkout -b dev_dist`
 2. `git rebase dist` 
 3. `yarn build`
-4. Commit changes
-5. Remove `dist` branch and rename `dev_dist` to `dist`
+4. Commit changes with message containing short summary of changes being released
+5. Remove `dist` branch with `git branch -d dist`
+6. Rename `dev_dist` to `dist` with `git branch -m dev_dist dist`
+7. Push changes with `git push --set-upstream origin dist`
 
 ## Example 1 &mdash; Managing X-Chain Keys
 
