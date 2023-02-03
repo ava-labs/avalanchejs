@@ -336,6 +336,10 @@ export class LockedOut extends ParseableOutput {
 
   protected ids: LockedIDs = new LockedIDs()
 
+  getLockedIDs(): LockedIDs {
+    return this.ids
+  }
+
   /**
    * @param assetID An assetID which is wrapped around the Buffer of the Output
    */

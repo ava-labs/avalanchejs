@@ -295,6 +295,10 @@ export class LockedIn extends ParseableInput {
 
   protected ids: LockedIDs = new LockedIDs()
 
+  getLockedIDs(): LockedIDs {
+    return this.ids
+  }
+
   create(...args: any[]): this {
     return new LockedIn(...args) as this
   }
