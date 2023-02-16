@@ -18,8 +18,8 @@ const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
 export const ADDRESSSTATEKYCVERIFIED: number = 32
-export const ADDRESSSTATECONSORTIUM: number = 34
-export const ADDRESSSTATEREGISTERNODE: number = 38
+export const ADDRESSSTATECONSORTIUM: number = 38
+export const ADDRESSSTATEDEFERRED: number = 39
 
 /**
  * Class representing an unsigned AdressStateTx transaction.
