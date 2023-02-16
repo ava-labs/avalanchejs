@@ -556,6 +556,25 @@ export class PlatformVMAPI extends JRPCAPI {
     )
     return response.data.result
   }
+
+  /**
+   * A request that in address field accepts either a nodeID (and returns a bech32 address if it exists), or a bech32 address (and returns a NodeID if it exists).
+   *
+   * @param address A nodeID or a bech32 address
+   *
+   * @returns Promise for a string containing bech32 address that is the node owner or nodeID that the address passed is an owner of.
+   */
+  getRegisteredShortIDLink = async (address: string): Promise<string> => {
+    const params = {
+      address
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getRegisteredShortIDLink",
+      params
+    )
+    return response.data.result.address
+  }
+
   /**
    * List amounts that can be claimed: validator rewards, expired deposit rewards, active deposit rewards claimable at current time.
    *
