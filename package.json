@@ -9,16 +9,11 @@
     "bundle": "webpack --mode production",
     "lint": "eslint ./ --ext js,ts --fix",
     "prepublish": "yarn build",
-    "release:prepare": "rm -rf ./dist ./node_modules && yarn install && yarn build && yarn bundle && yarn test && git status",
+    "release:prepare": "rm -rf ./dist ./node_modules && yarn install && yarn test && yarn build && yarn bundle && git status",
     "test": "jest",
     "test-watch": "jest --watch",
     "docs": "rm -rf docsMD && yarn build && npx typedoc --readme none --theme markdown --out docs",
-    "prettier-src": "prettier --write ./src",
-    "prettier-examples": "prettier --write ./examples",
-    "prettier-tests": "prettier --write ./tests",
-    "prettier-web": "prettier --write ./web",
-    "prettier-mocks": "prettier --write ./__mocks__",
-    "prettier": "yarn prettier-src && yarn prettier-examples && yarn prettier-tests && yarn prettier-web && yarn prettier-mocks",
+    "prettier": "npx prettier --write .",
     "prepare": "husky install"
   },
   "repository": {
