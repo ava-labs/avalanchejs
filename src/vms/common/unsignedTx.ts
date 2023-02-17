@@ -10,6 +10,7 @@ import {
   bufferToHex,
   hexToBuffer,
   publicKeyBytesToAddress,
+  publicKeyToEthAddress,
   recoverPublicKey,
 } from '../../utils';
 import { AddressMaps } from '../../utils/addressMap';
@@ -115,6 +116,17 @@ export class UnsignedTx {
     return this.addressMaps.getSigIndicesForAddress(address);
   }
 
+  getSigIndicesForPubKey(pubkey: Uint8Array) {
+    const addrAvax = this.publicKeyBytesToAddress(pubkey);
+    const addrEvm = publicKeyToEthAddress(pubkey);
+
+    // Check against both addresses
+    const coordinatesAvax = this.getSigIndicesForAddress(new Address(addrAvax));
+    const coordinatesEvm = this.getSigIndicesForAddress(new Address(addrEvm));
+
+    return coordinatesAvax || coordinatesEvm;
+  }
+
   getInputUtxos() {
     return this.utxos;
   }
@@ -153,8 +165,7 @@ export class UnsignedTx {
   }
 
   private addSignatureForPubKey(sig: Uint8Array, publicKey: Uint8Array) {
-    const addr = this.publicKeyBytesToAddress(publicKey);
-    const coordinates = this.getSigIndicesForAddress(new Address(addr));
+    const coordinates = this.getSigIndicesForPubKey(publicKey);
     if (coordinates) {
       coordinates.forEach(([index, subIndex]) => {
         this.addSignatureAt(sig, index, subIndex);

@@ -10,4 +10,5 @@ export const xAddressForExamples =
 export const pAddressForExamples =
   'P-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wuleftqzg';
 export const cAddressBech32ForExamples =
-  'C-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wul4m0lwh';
+  'C-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wuleftqzg';
+// 'C-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wul4m0lwh';

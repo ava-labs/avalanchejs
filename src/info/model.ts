@@ -26,10 +26,14 @@ export type GetTxFeeApiResponse = {
 
 export type GetTxFeeResponse = {
   txFee: bigint;
-  creationTxFee: bigint;
   createAssetTxFee: bigint;
   createSubnetTxFee: bigint;
+  transformSubnetTxFee: bigint;
   createBlockchainTxFee: bigint;
+  addPrimaryNetworkValidatorFee: bigint;
+  addPrimaryNetworkDelegatorFee: bigint;
+  addSubnetValidatorFee: bigint;
+  addSubnetDelegatorFee: bigint;
 };
 
 export type UptimeResponse = {

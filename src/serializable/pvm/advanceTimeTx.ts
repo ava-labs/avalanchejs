@@ -4,11 +4,11 @@ import { serializable } from '../common/types';
 import { BigIntPr } from '../primitives';
 import { PVMTx } from './abstractTx';
 
-const _symbol = Symbol('pvm.AdvanceTime');
+export const advanceTimeTx_symbol = Symbol('pvm.AdvanceTimeTx');
 
 @serializable()
 export class AdvanceTimeTx extends PVMTx {
-  _type = _symbol;
+  _type = advanceTimeTx_symbol;
 
   constructor(public readonly time: BigIntPr) {
     super();

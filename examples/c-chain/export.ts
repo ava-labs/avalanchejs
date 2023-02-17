@@ -3,15 +3,15 @@ import { AVAX_PUBLIC_URL_FUJI } from '../../src/constants/public-urls';
 import { Secp256K1Keychain } from '../../src/signer';
 import { bech32ToBytes, hexToBuffer } from '../../src/utils';
 import { getContextFromURI } from '../../src/vms/context';
-import { EVMApi, newExportTxFromBaseFee } from '../../src/vms/evm';
+import { newExportTxFromBaseFee } from '../../src/vms/evm';
 import {
   cAddressForExamples,
   privateKeyForExamples,
   xAddressForExamples,
 } from '../example_accounts';
+import { evmapi } from '../chain_apis';
 
 const main = async () => {
-  const evmapi = new EVMApi(AVAX_PUBLIC_URL_FUJI);
   const provider = new ethers.providers.JsonRpcProvider(
     AVAX_PUBLIC_URL_FUJI + '/ext/bc/C/rpc',
   );
@@ -22,10 +22,11 @@ const main = async () => {
   const xAddressBytes = bech32ToBytes(xAddressForExamples);
 
   const baseFee = await evmapi.getBaseFee();
+
   const tx = newExportTxFromBaseFee(
     context,
     baseFee / BigInt(1e9),
-    BigInt(0.5 * 1e9),
+    BigInt(0.2 * 1e9),
     context.xBlockchainID,
     hexToBuffer(cAddressForExamples),
     [xAddressBytes],

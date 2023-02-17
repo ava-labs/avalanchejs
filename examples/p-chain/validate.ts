@@ -2,15 +2,15 @@ import { AVAX_PUBLIC_URL_FUJI } from '../../src/constants/public-urls';
 import { Secp256K1Keychain } from '../../src/signer';
 import { bech32ToBytes, hexToBuffer, printDeep } from '../../src/utils';
 import { getContextFromURI } from '../../src/vms/context';
-import { newAddValidatorTx, PVMApi } from '../../src/vms/pvm';
+import { newAddValidatorTx } from '../../src/vms/pvm';
+import { pvmapi } from '../chain_apis';
 import {
   pAddressForExamples,
   privateKeyForExamples,
 } from '../example_accounts';
 
 const delegate = async () => {
-  const api = new PVMApi(AVAX_PUBLIC_URL_FUJI);
-  const { utxos } = await api.getUTXOs({ addresses: [pAddressForExamples] });
+  const { utxos } = await pvmapi.getUTXOs({ addresses: [pAddressForExamples] });
   const context = await getContextFromURI(AVAX_PUBLIC_URL_FUJI);
   const keyChain = new Secp256K1Keychain([hexToBuffer(privateKeyForExamples)]);
   const startTime = BigInt(Math.floor(new Date().getTime() / 1000) + 60);
@@ -31,7 +31,7 @@ const delegate = async () => {
   );
   printDeep(tx);
   await keyChain.addSignatures(tx);
-  return api.issueSignedTx(tx.getSignedTx());
+  return pvmapi.issueSignedTx(tx.getSignedTx());
 };
 
 delegate().then(console.log);

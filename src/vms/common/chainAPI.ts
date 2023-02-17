@@ -31,7 +31,6 @@ export abstract class ChainApi extends Api {
       ...input,
       encoding: 'hex',
     });
-
     const utxos = resp.utxos.map((utxoHex) =>
       this.manager.unpack(hexToBuffer(utxoHex), Utxo),
     );
