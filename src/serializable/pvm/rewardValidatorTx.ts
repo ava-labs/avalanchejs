@@ -4,14 +4,14 @@ import { serializable } from '../common/types';
 import { Id } from '../fxs/common';
 import { PVMTx } from './abstractTx';
 
-const _symbol = Symbol('pvm.RewardValidatorTx');
+export const rewardValidatorTx_symbol = Symbol('pvm.RewardValidatorTx');
 
 /**
  * @see
  */
 @serializable()
 export class RewardValidatorTx extends PVMTx {
-  _type = _symbol;
+  _type = rewardValidatorTx_symbol;
 
   constructor(public readonly txId: Id) {
     super();
