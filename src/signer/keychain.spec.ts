@@ -21,7 +21,7 @@ import { Secp256K1Keychain } from './keychain';
 import { ImportTx } from '../serializable/evm';
 import { Id } from '../serializable/fxs/common';
 
-describe.only('Secp256K1Keychain', () => {
+describe('Secp256K1Keychain', () => {
   it('should sign AddValidatorTx', async () => {
     const addressMaps = new AddressMaps([
       new AddressMap([[testOwnerXAddress, 0]]),
