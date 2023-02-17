@@ -78,12 +78,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("Everything should be made as simple as possible, but not simpler.")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "Everything should be made as simple as possible, but not simpler."
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("33a69cd2065432a30f3d1ce4eb0d59b8ab58c74f27c41a7fdb5696ad4e6108c96f807982866f785d3f6418d24163ddae117b7db4d5fdf0071de069fa54342262")
+    expect(sig).toBe(
+      "33a69cd2065432a30f3d1ce4eb0d59b8ab58c74f27c41a7fdb5696ad4e6108c96f807982866f785d3f6418d24163ddae117b7db4d5fdf0071de069fa54342262"
+    )
   })
 
   test("rfc6979 2", (): void => {
@@ -96,12 +104,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("Equations are more important to me, because politics is for the present, but an equation is something for eternity.")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "Equations are more important to me, because politics is for the present, but an equation is something for eternity."
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("54c4a33c6423d689378f160a7ff8b61330444abb58fb470f96ea16d99d4a2fed07082304410efa6b2943111b6a4e0aaa7b7db55a07e9861d1fb3cb1f421044a5")
+    expect(sig).toBe(
+      "54c4a33c6423d689378f160a7ff8b61330444abb58fb470f96ea16d99d4a2fed07082304410efa6b2943111b6a4e0aaa7b7db55a07e9861d1fb3cb1f421044a5"
+    )
   })
 
   test("rfc6979 3", (): void => {
@@ -114,12 +130,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("Not only is the Universe stranger than we think, it is stranger than we can think.")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "Not only is the Universe stranger than we think, it is stranger than we can think."
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("ff466a9f1b7b273e2f4c3ffe032eb2e814121ed18ef84665d0f515360dab3dd06fc95f5132e5ecfdc8e5e6e616cc77151455d46ed48f5589b7db7771a332b283")
+    expect(sig).toBe(
+      "ff466a9f1b7b273e2f4c3ffe032eb2e814121ed18ef84665d0f515360dab3dd06fc95f5132e5ecfdc8e5e6e616cc77151455d46ed48f5589b7db7771a332b283"
+    )
   })
 
   test("rfc6979 4", (): void => {
@@ -132,12 +156,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("How wonderful that we have met with a paradox. Now we have some hope of making progress.")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "How wonderful that we have met with a paradox. Now we have some hope of making progress."
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("c0dafec8251f1d5010289d210232220b03202cba34ec11fec58b3e93a85b91d375afdc06b7d6322a590955bf264e7aaa155847f614d80078a90292fe205064d3")
+    expect(sig).toBe(
+      "c0dafec8251f1d5010289d210232220b03202cba34ec11fec58b3e93a85b91d375afdc06b7d6322a590955bf264e7aaa155847f614d80078a90292fe205064d3"
+    )
   })
 
   test("rfc6979 5", (): void => {
@@ -150,12 +182,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("Computer science is no more about computers than astronomy is about telescopes.")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "Computer science is no more about computers than astronomy is about telescopes."
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("7186363571d65e084e7f02b0b77c3ec44fb1b257dee26274c38c928986fea45d0de0b38e06807e46bda1f1e293f4f6323e854c86d58abdd00c46c16441085df6")
+    expect(sig).toBe(
+      "7186363571d65e084e7f02b0b77c3ec44fb1b257dee26274c38c928986fea45d0de0b38e06807e46bda1f1e293f4f6323e854c86d58abdd00c46c16441085df6"
+    )
   })
 
   test("rfc6979 6", (): void => {
@@ -168,12 +208,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("...if you aren't, at any given time, scandalized by code you wrote five or even three years ago, you're not learning anywhere near enough")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "...if you aren't, at any given time, scandalized by code you wrote five or even three years ago, you're not learning anywhere near enough"
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("fbfe5076a15860ba8ed00e75e9bd22e05d230f02a936b653eb55b61c99dda4870e68880ebb0050fe4312b1b1eb0899e1b82da89baa5b895f612619edf34cbd37")
+    expect(sig).toBe(
+      "fbfe5076a15860ba8ed00e75e9bd22e05d230f02a936b653eb55b61c99dda4870e68880ebb0050fe4312b1b1eb0899e1b82da89baa5b895f612619edf34cbd37"
+    )
   })
 
   test("rfc6979 7", (): void => {
@@ -186,12 +234,20 @@ describe("PlatformVMKeyPair", (): void => {
     )
 
     const msg: Buffer = Buffer.from(
-      createHash("sha256").update(Buffer.from("The question of whether computers can think is like the question of whether submarines can swim.")).digest("hex"),
+      createHash("sha256")
+        .update(
+          Buffer.from(
+            "The question of whether computers can think is like the question of whether submarines can swim."
+          )
+        )
+        .digest("hex"),
       "hex"
     )
     const sig: string = kp.sign(msg).slice(0, 64).toString("hex")
 
-    expect(sig).toBe("cde1302d83f8dd835d89aef803c74a119f561fbaef3eb9129e45f30de86abbf906ce643f5049ee1f27890467b77a6a8e11ec4661cc38cd8badf90115fbd03cef")
+    expect(sig).toBe(
+      "cde1302d83f8dd835d89aef803c74a119f561fbaef3eb9129e45f30de86abbf906ce643f5049ee1f27890467b77a6a8e11ec4661cc38cd8badf90115fbd03cef"
+    )
   })
 
   test("repeatable 1", (): void => {
