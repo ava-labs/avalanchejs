@@ -2,7 +2,7 @@ import { testContext } from '../../fixtures/context';
 import {
   getTransferableInputForTest,
   testAvaxAssetID,
-  testOwnerAddress,
+  testOwnerXAddress,
   testUtxos,
 } from '../../fixtures/transactions';
 import { expectTxs } from '../../fixtures/utils/expectTx';
@@ -16,7 +16,7 @@ import { newExportTxFromBaseFee, newImportTxFromBaseFee } from './builder';
 
 describe('CorethBuilder', () => {
   const baseFee = 25n;
-  const fromAddress = testOwnerAddress.toBytes();
+  const fromAddress = testOwnerXAddress.toBytes();
   const toAddress = hexToBuffer('0x5432112345123451234512');
 
   it('exportTx', () => {
@@ -36,7 +36,7 @@ describe('CorethBuilder', () => {
       Id.fromString(testContext.xBlockchainID),
       [
         new Input(
-          testOwnerAddress,
+          testOwnerXAddress,
           new BigIntPr(1000280750n),
           testAvaxAssetID,
           new BigIntPr(3n),

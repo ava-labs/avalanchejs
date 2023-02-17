@@ -2,7 +2,7 @@ import type { BaseTx } from 'src/serializable/avm/baseTx';
 import { testContext } from '../../fixtures/context';
 import {
   testAvaxAssetID,
-  testOwnerAddress,
+  testOwnerXAddress,
   testUtxos,
 } from '../../fixtures/transactions';
 import {
@@ -36,7 +36,7 @@ describe('AVMBuilder', () => {
       testContext.cBlockchainID,
       utxos,
       [toAddress],
-      [testOwnerAddress.toBytes()],
+      [testOwnerXAddress.toBytes()],
     );
 
     const importTx = tx.getTx() as ImportTx;
@@ -54,7 +54,7 @@ describe('AVMBuilder', () => {
       testAvaxAssetID,
       new TransferOutput(
         new BigIntPr(BigInt(50 * 1e5)),
-        OutputOwners.fromNative([testOwnerAddress.toBytes()]),
+        OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
       ),
     );
 
@@ -63,7 +63,7 @@ describe('AVMBuilder', () => {
       testContext.cBlockchainID,
       utxos,
       [toAddress],
-      [testOwnerAddress.toBytes()],
+      [testOwnerXAddress.toBytes()],
     );
 
     const importTx = tx.getTx() as ImportTx;
@@ -87,7 +87,7 @@ describe('AVMBuilder', () => {
         testContext.cBlockchainID,
         utxos,
         [toAddress],
-        [testOwnerAddress.toBytes()],
+        [testOwnerXAddress.toBytes()],
       ),
     ).toThrow();
   });
@@ -102,7 +102,7 @@ describe('AVMBuilder', () => {
     const tx = newExportTx(
       testContext,
       testContext.cBlockchainID,
-      [testOwnerAddress.toBytes()],
+      [testOwnerXAddress.toBytes()],
       utxos,
       [tnsOut],
     );
@@ -124,7 +124,7 @@ describe('AVMBuilder', () => {
         testAvaxAssetID,
         new TransferOutput(
           new BigIntPr(44999000000n),
-          OutputOwners.fromNative([testOwnerAddress.toBytes()]),
+          OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
         ),
       ),
     ]);
@@ -142,7 +142,7 @@ describe('AVMBuilder', () => {
       newExportTx(
         testContext,
         testContext.cBlockchainID,
-        [testOwnerAddress.toBytes()],
+        [testOwnerXAddress.toBytes()],
         utxos,
         [tnsOut],
       ),
@@ -156,7 +156,7 @@ describe('AVMBuilder', () => {
       BigInt(1 * 1e9),
       [toAddress],
     );
-    const tx = newBaseTx(testContext, [testOwnerAddress.toBytes()], utxos, [
+    const tx = newBaseTx(testContext, [testOwnerXAddress.toBytes()], utxos, [
       tnsOut,
     ]);
     const {
@@ -169,7 +169,7 @@ describe('AVMBuilder', () => {
         testAvaxAssetID,
         new TransferOutput(
           new BigIntPr(48999000000n), // input - amount sent - fee
-          OutputOwners.fromNative([testOwnerAddress.toBytes()]),
+          OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
         ),
       ),
     ]);

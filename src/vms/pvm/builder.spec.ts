@@ -5,7 +5,7 @@ import {
   getTransferableInputForTest,
   getTransferableOutForTest,
   testAvaxAssetID,
-  testOwnerAddress,
+  testOwnerXAddress,
   testUtxos,
 } from '../../fixtures/transactions';
 import { expectTxs } from '../../fixtures/utils/expectTx';
@@ -142,7 +142,7 @@ describe('pvmBuilder', () => {
         new BigIntPr(0n),
         new TransferOutput(
           new BigIntPr(BigInt(50 * 1e9)),
-          OutputOwners.fromNative([testOwnerAddress.toBytes()]),
+          OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
         ),
       ),
     );

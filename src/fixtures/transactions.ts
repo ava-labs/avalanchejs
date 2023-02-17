@@ -1,3 +1,4 @@
+import { Output } from '../serializable/evm';
 import {
   BaseTx,
   TransferableInput,
@@ -18,10 +19,13 @@ export const privateKeyForTest =
 export const xAddressForTest = 'X-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wuleftqzg';
 export const pAddressForTest = 'P-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wuleftqzg';
 export const cAddressBech32ForTest =
-  'C-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wul4m0lwh';
+  'C-fuji1w5jg0xyw2zq22nhpjar834gyeksc6wuleftqzg';
 
 export const testAvaxAssetID = Id.fromString(testContext.avaxAssetID);
-export const testOwnerAddress = Address.fromString(xAddressForTest);
+export const testOwnerXAddress = Address.fromString(xAddressForTest);
+export const testOwnerCBech32Address = Address.fromString(
+  cAddressBech32ForTest,
+);
 
 export const testUTXOID1 = Id.fromHex(
   '0x009e71412d5b89d0b51e679a93cf59966c3c89346949f1976f930feddbfd765d',
@@ -39,7 +43,7 @@ const lockedUTXO = new Utxo(
   new TransferOutput(
     new BigIntPr(BigInt(30 * 1e9)),
     OutputOwners.fromNative(
-      [testOwnerAddress.toBytes()],
+      [testOwnerXAddress.toBytes()],
       BigInt(Math.floor(new Date().getTime() / 1000)) + 100000n,
     ),
   ),
@@ -71,11 +75,11 @@ const validUtxo = new Utxo(
   testAvaxAssetID,
   new TransferOutput(
     new BigIntPr(BigInt(50 * 1e9)),
-    OutputOwners.fromNative([testOwnerAddress.toBytes()]),
+    OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
   ),
 );
 
-export const fromAddressBytes = [testOwnerAddress.toBytes()];
+export const fromAddressBytes = [testOwnerXAddress.toBytes()];
 
 export const getTransferableOutForTest = (amount: bigint) => {
   return TransferableOutput.fromNative(
@@ -94,4 +98,11 @@ export const getBaseTxForTest = (changeAmount: bigint, blockchainId: string) =>
     [getTransferableOutForTest(changeAmount)],
     [getTransferableInputForTest()],
     new Uint8Array(),
+  );
+
+export const getOutputForTest = () =>
+  new Output(
+    testOwnerXAddress,
+    new BigIntPr(BigInt(0.1 * 1e9)),
+    Id.fromString(testContext.avaxAssetID),
   );
