@@ -30,8 +30,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_BRANCH: release
         run: yarn run semantic-release
-      - name: Rebase main
+      - name: Rebase master
         run: |
-          git checkout main &&
+          git checkout master &&
           git rebase release &&
-          git push origin main
+          git push origin master
