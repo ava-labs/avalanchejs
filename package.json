@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/ava-labs/avalanchejs#readme",
   "devDependencies": {
+    "@semantic-release/git": "10.0.1",
     "@types/bech32": "1.1.4",
     "@types/bn.js": "5.1.1",
     "@types/create-hash": "1.2.2",
