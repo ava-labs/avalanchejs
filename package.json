@@ -1,5 +1,5 @@
 {
-  "name": "avalanche",
+  "name": "@avalabs/avalanchejs",
   "version": "3.16.0-alpha.1",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.js",
