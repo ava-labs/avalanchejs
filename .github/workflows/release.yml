@@ -5,6 +5,7 @@ on:
     branches:
       - release
       - master
+      - 3.x.x-legacy
 jobs:
   release:
     name: Release

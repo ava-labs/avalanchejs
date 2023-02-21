@@ -84,11 +84,8 @@ if (process.env && process.env.RELEASE_BRANCH === "release") {
 module.exports = {
   branches: [
     {
-      name: "release"
-    },
-    {
-      name: "master",
-      prerelease: "alpha"
+      name: "3.x.x",
+      range: "3.x.x"
     }
   ],
   plugins
