@@ -73,6 +73,10 @@ export interface GetClaimablesParams {
   threshold: number
 }
 
+export interface GetAllDepositOffersParams {
+  active: boolean
+}
+
 export interface SampleValidatorsParams {
   size: number | string
   subnetID?: Buffer | string | undefined
@@ -249,6 +253,24 @@ export interface GetClaimablesResponse {
   depositRewards: BN
   validatorRewards: BN
   expiredDepositRewards: BN
+}
+
+export interface GetAllDepositOffersResponse {
+  depositOffers: DepositOffer[]
+}
+
+interface DepositOffer {
+  ID: string
+  InterestRateNominator: number
+  Start: number
+  End: number
+  MinAmount: number
+  MinDuration: number
+  MaxDuration: number
+  UnlockPeriodDuration: number
+  NoRewardsPeriodDuration: number
+  Memo: string
+  Flags: number
 }
 
 export interface GetMaxStakeAmountParams {

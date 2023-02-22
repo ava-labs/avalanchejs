@@ -2,7 +2,7 @@ import { Avalanche } from "@c4tplatform/caminojs/dist"
 import {
   KeyChain,
   PlatformVMAPI,
-  GetClaimablesResponse
+  GetAllDepositOffersResponse
 } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 import {
@@ -35,12 +35,10 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const txIDs: string[] = []
-  const claimables: GetClaimablesResponse = await pchain.getClaimables(
-    pAddressStrings,
-    txIDs
-  )
-  console.log(claimables)
+  const active = true
+  const response: GetAllDepositOffersResponse =
+    await pchain.getAllDepositOffers(active)
+  console.log(response.depositOffers)
 }
 
 main()

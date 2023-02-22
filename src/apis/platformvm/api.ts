@@ -68,7 +68,9 @@ import {
   AddressParams,
   MultisigAliasReply,
   GetClaimablesParams,
-  GetClaimablesResponse
+  GetClaimablesResponse,
+  GetAllDepositOffersParams,
+  GetAllDepositOffersResponse
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -573,6 +575,26 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result.address
+  }
+
+  /**
+   * Returns active or inactive deposit offers.
+   *
+   * @param active A boolean indicating whether to return active or inactive deposit offers.
+   *
+   * @returns Promise for a list containing deposit offers.
+   */
+  getAllDepositOffers = async (
+    active: boolean
+  ): Promise<GetAllDepositOffersResponse> => {
+    const params: GetAllDepositOffersParams = {
+      active
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getAllDepositOffers",
+      params
+    )
+    return response.data.result as GetAllDepositOffersResponse
   }
 
   /**
