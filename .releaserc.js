@@ -17,79 +17,81 @@ $ run yarn run semantic-release -d
 */
 
 const commitAnalyzerSetting = [
-  "@semantic-release/commit-analyzer",
+  '@semantic-release/commit-analyzer',
   {
-    preset: "angular",
+    preset: 'angular',
     releaseRules: [
       {
-        type: "feat",
-        release: "minor"
+        type: 'feat',
+        release: 'minor',
       },
       {
-        type: "*",
-        release: "patch"
-      }
+        type: '*',
+        release: 'patch',
+      },
     ],
     parserOpts: {
-      noteKeywords: ["BREAKING CHANGE", "BREAKING CHANGES"]
-    }
-  }
-]
+      noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
+    },
+  },
+];
 
 const githubSetting = [
-  "@semantic-release/github",
+  '@semantic-release/github',
   {
-    assets: [{ path: "dist/index.js", label: "SDK Distributable" }],
+    assets: [{ path: 'dist/index.js', label: 'SDK Distributable' }],
     failTitle: false,
     successComment: false,
     failComment: false,
-    labels: false
-  }
-]
+    labels: false,
+  },
+];
 
 const gitSetting = [
-  "@semantic-release/git",
+  '@semantic-release/git',
   {
-    assets: ["package.json"],
+    assets: ['package.json'],
     message:
-      "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-  }
-]
+      'chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}',
+  },
+];
 
 const npmRelease = [
-  "@semantic-release/npm",
+  '@semantic-release/npm',
   {
-    npmPublish: true
-  }
-]
+    npmPublish: true,
+  },
+];
 
-const changelogGen = ["@semantic-release/changelog", {}]
+const changelogGen = ['@semantic-release/changelog', {}];
 
-const releaseNotesGen = ["@semantic-release/release-notes-generator", {}]
+const releaseNotesGen = ['@semantic-release/release-notes-generator', {}];
 
-let plugins
-if (process.env && process.env.RELEASE_BRANCH === "release") {
+let plugins;
+if (process.env && process.env.RELEASE_BRANCH === 'release') {
   plugins = [
     commitAnalyzerSetting,
     githubSetting,
     changelogGen,
     releaseNotesGen,
     npmRelease,
-    gitSetting
-  ]
+    gitSetting,
+  ];
 } else {
-  plugins = [githubSetting, gitSetting]
+  plugins = [githubSetting, gitSetting];
 }
 
 module.exports = {
   branches: [
     {
-      name: "release"
+      name: 'release',
+      range: '4.x.x',
     },
     {
-      name: "master",
-      prerelease: "alpha"
-    }
+      name: 'master',
+      prerelease: 'alpha',
+      range: '4.x.x',
+    },
   ],
-  plugins
-}
+  plugins,
+};
