@@ -180,7 +180,6 @@ export class UnsignedTx {
   hasAllSignatures() {
     const allSigsHex = this.credentials.map((cred) => cred.getSignatures());
     const emptySignatureHex = emptySignature.toString();
-
     const unsignedHash = sha256(this.toBytes());
 
     const hasNoPlaceholders = allSigsHex.every((cred) => {
@@ -192,7 +191,7 @@ export class UnsignedTx {
     if (!hasNoPlaceholders) return false;
     let valid = true;
 
-    this.addressMaps.forEach((coordinates, address) => {
+    this.addressMaps.forEach((coordinates) => {
       coordinates.forEach(([index, subIndex]) => {
         const sig = allSigsHex[index]?.[subIndex];
         if (!sig) {
@@ -200,10 +199,7 @@ export class UnsignedTx {
         }
         const sigBytes = hexToBuffer(sig);
         const publicKey = recoverPublicKey(unsignedHash, sigBytes);
-        const derivedAddress = bufferToHex(
-          this.publicKeyBytesToAddress(publicKey),
-        );
-        if (address !== derivedAddress) {
+        if (!this.hasPubkey(publicKey)) {
           valid = false;
         }
       });
