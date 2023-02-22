@@ -59,12 +59,18 @@ jobs:
           cd $GOPATH/$CAMPATH
           git clone https://github.com/chain4travel/camino-network-runner --depth 1 -bv0.2.1-alpha1
       - name: Starting Camino Network Runner
+        env:
+          CAMINO_NODE_PATH: ${{env.GOPATH}}/${{env.CAMPATH}}/camino-node/build/camino-node
+        shell: bash
         run: |
           cd $GOPATH/$CAMPATH
           cd camino-network-runner
-          CAMINO_NODE_PATH=$GOPATH/$CAMPATH/camino-node/build/camino-node go run ./examples/local/fivenodenetwork/main.go &
+          go run ./examples/local/fivenodenetwork/main.go &>/tmp/cnr.log &
       - name: CaminoJS E2E Test
         env:
-          CAMINOGO_IP: localhost
+          CAMINOGO_IP: 127.0.0.1
           CAMINOGO_PORT: 9650
-        run: sleep 60 && yarn test -i --roots e2e_tests
+        run: |
+          sleep 90
+          cat /tmp/cnr.log
+          yarn test -i --roots e2e_tests

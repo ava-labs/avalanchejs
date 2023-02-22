@@ -371,7 +371,7 @@ export class Builder {
       changeThreshold
     )
 
-    var singleAsset = true
+    let singleAsset = true
     if (amountAssetID.toString("hex") === feeAssetID.toString("hex")) {
       aad.addAssetAmount(amountAssetID, zero, fee.add(amount))
     } else {

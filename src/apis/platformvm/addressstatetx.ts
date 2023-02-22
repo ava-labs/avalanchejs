@@ -74,7 +74,7 @@ export class AddressStateTx extends BaseTx {
   /**
    * Returns the state
    */
-  getState(): Number {
+  getState(): number {
     return this.state
   }
 

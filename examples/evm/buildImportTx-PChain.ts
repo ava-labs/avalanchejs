@@ -1,8 +1,5 @@
 import { Avalanche, BN } from "@c4tplatform/caminojs/dist"
-import {
-  PlatformVMAPI,
-  KeyChain as PlatformVMKeyChain
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
@@ -32,7 +29,6 @@ let pchain: PlatformVMAPI
 let cchain: EVMAPI
 let pKeychain: PlatformKeyChain
 let cKeychain: EVMKeyChain
-let pAddressStrings: string[]
 let cAddressStrings: string[]
 let pChainBlockchainId: string
 
@@ -44,7 +40,6 @@ const InitAvalanche = async () => {
   cKeychain = cchain.keyChain()
   pKeychain.importKey(privKey)
   cKeychain.importKey(privKey)
-  pAddressStrings = pchain.keyChain().getAddressStrings()
   cAddressStrings = cchain.keyChain().getAddressStrings()
   pChainBlockchainId = avalanche.getNetwork().P.blockchainID
 }
@@ -65,7 +60,6 @@ const main = async (): Promise<any> => {
     cHexAddress,
     cAddressStrings,
     pChainBlockchainId,
-    cAddressStrings,
     fee
   )
   const importCost: number = costImportTx(avalanche.getNetwork().C, unsignedTx)
@@ -76,7 +70,6 @@ const main = async (): Promise<any> => {
     cHexAddress,
     cAddressStrings,
     pChainBlockchainId,
-    cAddressStrings,
     fee
   )
 

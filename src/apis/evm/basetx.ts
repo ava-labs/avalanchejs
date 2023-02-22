@@ -62,6 +62,7 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    *
    * @returns An array of [[Credential]]s
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const creds: Credential[] = []
     return creds

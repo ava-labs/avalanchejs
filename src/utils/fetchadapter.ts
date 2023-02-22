@@ -23,7 +23,7 @@ function createRequest(config: AxiosRequestConfig): Request {
     options.body = config.data
   }
 
-  if (!!config.withCredentials) {
+  if (config.withCredentials) {
     options.credentials = config.withCredentials ? "include" : "omit"
   }
 

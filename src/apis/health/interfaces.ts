@@ -4,7 +4,7 @@
  */
 
 export interface Entity {
-  message?: Object[]
+  message?: any[]
   timestamp: string
   duration: number
   contiguousFailures?: number

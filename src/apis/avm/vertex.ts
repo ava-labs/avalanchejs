@@ -5,10 +5,9 @@
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { AVMConstants } from "./constants"
-import { Tx, UnsignedTx } from "./tx"
+import { Tx } from "./tx"
 import { Serializable, CodecIdError, DefaultNetworkID } from "../../utils"
 import BN from "bn.js"
-import { BaseTx } from "."
 
 /**
  * @ignore

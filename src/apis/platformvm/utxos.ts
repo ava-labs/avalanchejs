@@ -285,7 +285,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
     // We only need to iterate over UTXOs until we have spent sufficient funds
     // to met the requested amounts.
-    utxoArray.forEach((utxo: UTXO, index: number) => {
+    utxoArray.forEach((utxo: UTXO) => {
       const assetID: Buffer = utxo.getAssetID()
       const assetKey: string = assetID.toString("hex")
       const fromAddresses: Buffer[] = aad.getSenders()

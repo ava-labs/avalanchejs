@@ -6,8 +6,18 @@ import { EVMAPI } from "src/apis/evm"
 
 describe("CChain", (): void => {
   const avalanche: Avalanche = getAvalanche()
-  const cchain: EVMAPI = avalanche.CChain()
-  const keystore: KeystoreAPI = avalanche.NodeKeys()
+  var cchain: EVMAPI
+  var keystore: KeystoreAPI
+
+  beforeAll(() => {
+    return new Promise((resolve) => {
+      avalanche.fetchNetworkSettings().then((value) => {
+        cchain = avalanche.CChain()
+        keystore = new KeystoreAPI(avalanche)
+        resolve(value)
+      })
+    })
+  })
 
   let exportTxHash = { value: "" }
 

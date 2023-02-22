@@ -577,13 +577,8 @@ export class EVMAPI extends JRPCAPI {
     toAddress: string,
     ownerAddresses: string[],
     sourceChain: Buffer | string,
-    fromAddresses: string[],
     fee: BN = new BN(0)
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildImportTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
     let srcChain: string = undefined
 
     if (typeof sourceChain === "string") {

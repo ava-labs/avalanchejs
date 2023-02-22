@@ -11,7 +11,16 @@ describe("Keystore", (): void => {
   let exportedUser = { value: "" }
 
   const avalanche: Avalanche = getAvalanche()
-  const keystore: KeystoreAPI = avalanche.NodeKeys()
+  var keystore: KeystoreAPI
+
+  beforeAll(() => {
+    return new Promise((resolve) => {
+      avalanche.fetchNetworkSettings().then((value) => {
+        keystore = new KeystoreAPI(avalanche)
+        resolve(value)
+      })
+    })
+  })
 
   // test_name             response_promise                              resp_fn  matcher           expected_value/obtained_value
   const tests_spec: any = [

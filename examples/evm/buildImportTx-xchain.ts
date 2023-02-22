@@ -62,7 +62,6 @@ const main = async (): Promise<any> => {
     cHexAddress,
     cAddressStrings,
     xChainBlockchainId,
-    cAddressStrings,
     fee
   )
   const importCost: number = costImportTx(avalanche.getNetwork().C, unsignedTx)
@@ -73,7 +72,6 @@ const main = async (): Promise<any> => {
     cHexAddress,
     cAddressStrings,
     xChainBlockchainId,
-    cAddressStrings,
     fee
   )
 

@@ -15,25 +15,25 @@ export interface BaseIndexResponse {
   index: string
 }
 
-export interface GetLastAcceptedParams extends BaseIndexParams {}
+export type GetLastAcceptedParams = BaseIndexParams
 
-export interface GetLastAcceptedResponse extends BaseIndexResponse {}
+export type GetLastAcceptedResponse = BaseIndexResponse
 
-export interface GetLastVertexParams extends BaseIndexParams {}
+export type GetLastVertexParams = BaseIndexParams
 
-export interface GetLastVertexResponse extends BaseIndexResponse {}
+export type GetLastVertexResponse = BaseIndexResponse
 
 export interface GetContainerByIndexParams extends BaseIndexParams {
   index: string
 }
 
-export interface GetContainerByIndexResponse extends BaseIndexResponse {}
+export type GetContainerByIndexResponse = BaseIndexResponse
 
 export interface GetContainerByIDParams extends BaseIndexParams {
   id: string
 }
 
-export interface GetContainerByIDResponse extends BaseIndexResponse {}
+export type GetContainerByIDResponse = BaseIndexResponse
 
 export interface GetContainerRangeParams extends BaseIndexParams {
   startIndex: number

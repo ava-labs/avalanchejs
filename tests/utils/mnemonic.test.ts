@@ -1,7 +1,10 @@
 import Mnemonic from "src/utils/mnemonic"
 import { Buffer } from "buffer/"
+import rdb from "randombytes"
 
-const randomBytes: any = require("randombytes")
+const randomBytes = (size: number) => {
+  return Buffer.from(rdb(size))
+}
 const mnemonic = Mnemonic.getInstance()
 const entropy: string =
   "9d7c99e77261acb88a5ed717f625d5d3ed5569e0f60429cc6eb9c4e91f48fb7c"
@@ -281,9 +284,8 @@ describe("Mnemonic", () => {
       )
       expect(mnemonicToEntropy).toBe(vector.entropy)
       const password: string = "TREZOR"
-      const mnemonicToSeed: Buffer = await mnemonic.mnemonicToSeed(
-        vector.mnemonic,
-        password
+      const mnemonicToSeed: Buffer = Buffer.from(
+        await mnemonic.mnemonicToSeed(vector.mnemonic, password)
       )
       expect(mnemonicToSeed.toString("hex")).toBe(vector.seed)
     })
@@ -292,7 +294,7 @@ describe("Mnemonic", () => {
   test("badMnemonics", (): void => {
     const wordlist = mnemonic.getWordlists("english") as string[]
     badMnemonics.forEach((badMnemonic: BadMnemonic, index: number): void => {
-      const validateMnemonic: string = mnemonic.validateMnemonic(
+      const validateMnemonic: boolean = mnemonic.validateMnemonic(
         badMnemonic.mnemonic,
         wordlist
       )
@@ -304,7 +306,7 @@ describe("Mnemonic", () => {
     const wordlist = mnemonic.getWordlists("english") as string[]
     malformedMnemonics.forEach(
       (malformedMnemonic: string, index: number): void => {
-        const validateMnemonic: string = mnemonic.validateMnemonic(
+        const validateMnemonic = mnemonic.validateMnemonic(
           malformedMnemonic,
           wordlist
         )
@@ -381,9 +383,8 @@ describe("Mnemonic", () => {
   test("mnemonicToSeed", async (): Promise<void> => {
     mnemnonics.forEach(async (mnemnnic: string): Promise<any> => {
       const password: string = "password"
-      const mnemonicToSeed: Buffer = await mnemonic.mnemonicToSeed(
-        mnemnnic,
-        password
+      const mnemonicToSeed: Buffer = Buffer.from(
+        await mnemonic.mnemonicToSeed(mnemnnic, password)
       )
       expect(typeof mnemonicToSeed === "object").toBeTruthy()
     })
@@ -392,9 +393,8 @@ describe("Mnemonic", () => {
   test("mnemonicToSeedSync", (): void => {
     mnemnonics.forEach((mnemnnic: string, index: number): void => {
       const password: string = "password"
-      const mnemonicToSeedSync: Buffer = mnemonic.mnemonicToSeedSync(
-        mnemnnic,
-        password
+      const mnemonicToSeedSync: Buffer = Buffer.from(
+        mnemonic.mnemonicToSeedSync(mnemnnic, password)
       )
       expect(mnemonicToSeedSync.toString("hex")).toBe(seeds[index])
     })
@@ -403,10 +403,7 @@ describe("Mnemonic", () => {
   test("validateMnemonic", (): void => {
     mnemnonics.forEach((mnemnnic: string, index: number): void => {
       const wordlist = mnemonic.getWordlists(langs[index]) as string[]
-      const validateMnemonic: string = mnemonic.validateMnemonic(
-        mnemnnic,
-        wordlist
-      )
+      const validateMnemonic = mnemonic.validateMnemonic(mnemnnic, wordlist)
       expect(validateMnemonic).toBeTruthy()
     })
   })

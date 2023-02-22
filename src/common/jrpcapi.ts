@@ -3,8 +3,7 @@
  * @module Common-JRPCAPI
  */
 
-import BN from "bn.js"
-import { AxiosRequestConfig } from "axios"
+import { AxiosError, AxiosRequestConfig } from "axios"
 import { fetchAdapter } from "../utils"
 import AvalancheCore from "../camino"
 import { APIBase, RequestResponseData } from "./apibase"
@@ -49,13 +48,12 @@ export class JRPCAPI extends APIBase {
       adapter: typeof fetch !== "undefined" ? fetchAdapter : undefined
     }
 
-    const resp: RequestResponseData = await this.core.post(
-      ep,
-      {},
-      JSON.stringify(rpc),
-      headrs,
-      axConf
-    )
+    var resp: RequestResponseData
+    try {
+      resp = await this.core.post(ep, {}, JSON.stringify(rpc), headrs, axConf)
+    } catch (e) {
+      throw e.message
+    }
 
     if (resp.status >= 200 && resp.status < 300) {
       this.rpcID += 1

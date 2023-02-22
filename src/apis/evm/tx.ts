@@ -15,7 +15,6 @@ import { EVMBaseTx } from "./basetx"
 import { ImportTx } from "./importtx"
 import { ExportTx } from "./exporttx"
 import { SerializedEncoding } from "../../utils/serialization"
-import { TransactionError } from "../../utils/errors"
 
 /**
  * @ignore

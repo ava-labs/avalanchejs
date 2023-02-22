@@ -104,8 +104,8 @@ export class TransferableInput extends StandardTransferableInput {
   }
 
   static fromArray(b: Buffer): TransferableInput[] {
-    var offset = 6 //version + counter
-    var num = b.readUInt32BE(2)
+    let offset = 6 //version + counter
+    let num = b.readUInt32BE(2)
     const result: TransferableInput[] = []
     while (offset < b.length && num-- > 0) {
       const t = new TransferableInput()

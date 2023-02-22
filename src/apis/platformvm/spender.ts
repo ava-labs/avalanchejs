@@ -6,7 +6,7 @@
 import BN from "bn.js"
 
 import { AssetAmountDestination, PlatformVMAPI } from "."
-import { FeeAssetError, TimeError } from "../../utils/errors"
+import { FeeAssetError } from "../../utils/errors"
 
 import { LockMode } from "./builder"
 

@@ -4,7 +4,16 @@ import Avalanche from "src"
 
 describe("Info", (): void => {
   const avalanche: Avalanche = getAvalanche()
-  const health: HealthAPI = avalanche.Health()
+  var health: HealthAPI
+
+  beforeAll(() => {
+    return new Promise((resolve) => {
+      avalanche.fetchNetworkSettings().then((value) => {
+        health = avalanche.Health()
+        resolve(value)
+      })
+    })
+  })
 
   // test_name          response_promise               resp_fn                 matcher           expected_value/obtained_value
   const tests_spec: any = [

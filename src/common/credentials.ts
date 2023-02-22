@@ -63,7 +63,7 @@ export class SigIdx extends NBytes {
     return newbase as this
   }
 
-  create(...args: any[]): this {
+  create(): this {
     return new SigIdx() as this
   }
 
@@ -93,7 +93,7 @@ export class Signature extends NBytes {
     return newbase as this
   }
 
-  create(...args: any[]): this {
+  create(): this {
     return new Signature() as this
   }
 
@@ -134,6 +134,7 @@ export abstract class Credential extends Serializable {
    *
    * @param codecID The codecID to set
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setCodecID(codecID: number): void {}
 
   /**

@@ -125,7 +125,7 @@ export class Address extends NBytes {
     return newbase as this
   }
 
-  create(...args: any[]): this {
+  create(): this {
     return new Address() as this
   }
 

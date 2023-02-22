@@ -87,6 +87,7 @@ export abstract class Serializable {
 
   //sometimes the parent class manages the fields
   //these are so you can say super.serialize(encoding)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   serialize(encoding?: SerializedEncoding): object {
     return {
       _typeName: xss(this._typeName),
@@ -94,6 +95,7 @@ export abstract class Serializable {
       _codecID: typeof this._codecID === "undefined" ? null : this._codecID
     }
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   deserialize(fields: object, encoding?: SerializedEncoding): void {
     fields = this.sanitizeObject(fields)
     if (typeof fields["_typeName"] !== "string") {

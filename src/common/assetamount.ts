@@ -207,7 +207,7 @@ export abstract class StandardAssetAmountDestination<
     changeAddressesThreshold: number
   ) {
     this.destinations = destinations
-    this, (destinationsThreshold = destinationsThreshold)
+    this.destinationsThreshold = destinationsThreshold
     this.changeAddresses = changeAddresses
     this.changeAddressesThreshold = changeAddressesThreshold
     this.senders = senders

@@ -73,8 +73,8 @@ export class TransferableOutput extends StandardTransferableOutput {
   }
 
   static fromArray(b: Buffer): TransferableOutput[] {
-    var offset = 6 //version + counter
-    var num = b.readUInt32BE(2)
+    let offset = 6 //version + counter
+    let num = b.readUInt32BE(2)
     const result: TransferableOutput[] = []
     while (offset < b.length && num-- > 0) {
       const t = new TransferableOutput()

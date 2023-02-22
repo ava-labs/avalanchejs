@@ -2035,7 +2035,7 @@ export class AVMAPI extends JRPCAPI {
           ) {
             /* istanbul ignore next */
             throw new AddressError(
-              "Error - AVMAPI.${caller}: Invalid address format"
+              `Error - AVMAPI.${caller}: Invalid address format`
             )
           }
           addrs.push(addresses[`${i}`] as string)

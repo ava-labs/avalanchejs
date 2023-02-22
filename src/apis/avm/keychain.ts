@@ -5,13 +5,11 @@
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { SECP256k1KeyChain, SECP256k1KeyPair } from "../../common/secp256k1"
-import { Serialization, SerializedType } from "../../utils"
 
 /**
  * @ignore
  */
 const bintools: BinTools = BinTools.getInstance()
-const serialization: Serialization = Serialization.getInstance()
 
 /**
  * Class for representing a private and public keypair on an AVM Chain.

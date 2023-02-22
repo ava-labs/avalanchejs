@@ -83,7 +83,7 @@ describe("HDNode", (): void => {
   })
 
   test("BIP44", (): void => {
-    const seed: Buffer = mnemonic.mnemonicToSeedSync(m)
+    const seed: Buffer = Buffer.from(mnemonic.mnemonicToSeedSync(m))
     const hdnode: HDNode = new HDNode(seed)
     for (let i: number = 0; i <= 9; i++) {
       const child: HDNode = hdnode.derive(`m/44'/9000'/0'/0/${i}`)

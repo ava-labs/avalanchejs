@@ -40,7 +40,7 @@ export interface ImportAVAXParams extends CredsInterface {
   sourceChain: string
 }
 
-export interface ImportParams extends ImportAVAXParams {}
+export type ImportParams = ImportAVAXParams
 
 export interface ImportKeyParams extends CredsInterface {
   privateKey: string

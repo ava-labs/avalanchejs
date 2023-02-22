@@ -1,6 +1,7 @@
 import { getAvalanche, createTests, Matcher } from "./e2etestlib"
 import { KeystoreAPI } from "src/apis/keystore/api"
 import BN from "bn.js"
+import { AVMAPI } from "src/apis/avm"
 
 describe("XChain", (): void => {
   let tx = { value: "" }
@@ -9,8 +10,18 @@ describe("XChain", (): void => {
   let addrC = { value: "" }
 
   const avalanche = getAvalanche()
-  const xchain = avalanche.XChain()
-  const keystore = new KeystoreAPI(avalanche)
+  var xchain: AVMAPI
+  var keystore: KeystoreAPI
+
+  beforeAll(() => {
+    return new Promise((resolve) => {
+      avalanche.fetchNetworkSettings().then((value) => {
+        xchain = avalanche.XChain()
+        keystore = new KeystoreAPI(avalanche)
+        resolve(value)
+      })
+    })
+  })
 
   const user: string = "avalancheJsXChainUser"
   const passwd: string = "avalancheJsP1ssw4rd"

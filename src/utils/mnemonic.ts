@@ -4,10 +4,19 @@
  */
 
 import { Buffer } from "buffer/"
-import { Wordlist } from "ethers"
 import { InvalidEntropy } from "./errors"
-const bip39: any = require("bip39")
-const randomBytes: any = require("randombytes")
+import {
+  entropyToMnemonic,
+  getDefaultWordlist,
+  generateMnemonic,
+  mnemonicToEntropy,
+  mnemonicToSeed,
+  mnemonicToSeedSync,
+  setDefaultWordlist,
+  validateMnemonic,
+  wordlists as bip39_wordlists
+} from "bip39"
+import randomBytes from "randombytes"
 
 /**
  * BIP39 Mnemonic code for generating deterministic keys.
@@ -16,7 +25,7 @@ const randomBytes: any = require("randombytes")
 export default class Mnemonic {
   private static instance: Mnemonic
   private constructor() {}
-  protected wordlists: string[] = bip39.wordlists
+  protected wordlists = bip39_wordlists
 
   /**
    * Retrieves the Mnemonic singleton.
@@ -35,11 +44,11 @@ export default class Mnemonic {
    *
    * @returns A [[Wordlist]] object or array of strings
    */
-  getWordlists(language?: string): string[] | Wordlist {
+  getWordlists(language?: string): string[] {
     if (language !== undefined) {
       return this.wordlists[`${language}`]
     } else {
-      return this.wordlists
+      return this.wordlists[`${getDefaultWordlist()}`]
     }
   }
 
@@ -52,7 +61,7 @@ export default class Mnemonic {
    * @returns A {@link https://github.com/feross/buffer|Buffer}
    */
   mnemonicToSeedSync(mnemonic: string, password: string = ""): Buffer {
-    const seed: Buffer = bip39.mnemonicToSeedSync(mnemonic, password)
+    const seed = mnemonicToSeedSync(mnemonic, password)
     return Buffer.from(seed)
   }
 
@@ -68,7 +77,7 @@ export default class Mnemonic {
     mnemonic: string,
     password: string = ""
   ): Promise<Buffer> {
-    const seed: Buffer = await bip39.mnemonicToSeed(mnemonic, password)
+    const seed = await mnemonicToSeed(mnemonic, password)
     return Buffer.from(seed)
   }
 
@@ -81,7 +90,7 @@ export default class Mnemonic {
    * @returns A string
    */
   mnemonicToEntropy(mnemonic: string, wordlist?: string[]): string {
-    return bip39.mnemonicToEntropy(mnemonic, wordlist)
+    return mnemonicToEntropy(mnemonic, wordlist)
   }
 
   /**
@@ -93,7 +102,9 @@ export default class Mnemonic {
    * @returns A string
    */
   entropyToMnemonic(entropy: Buffer | string, wordlist?: string[]): string {
-    return bip39.entropyToMnemonic(entropy, wordlist)
+    const param: globalThis.Buffer | string =
+      typeof entropy === "string" ? entropy : globalThis.Buffer.from(entropy)
+    return entropyToMnemonic(param, wordlist)
   }
 
   /**
@@ -104,8 +115,8 @@ export default class Mnemonic {
    *
    * @returns A string
    */
-  validateMnemonic(mnemonic: string, wordlist?: string[]): string {
-    return bip39.validateMnemonic(mnemonic, wordlist)
+  validateMnemonic(mnemonic: string, wordlist?: string[]): boolean {
+    return validateMnemonic(mnemonic, wordlist)
   }
 
   /**
@@ -115,7 +126,7 @@ export default class Mnemonic {
    *
    */
   setDefaultWordlist(language: string): void {
-    bip39.setDefaultWordlist(language)
+    setDefaultWordlist(language)
   }
 
   /**
@@ -124,7 +135,7 @@ export default class Mnemonic {
    * @returns A string
    */
   getDefaultWordlist(): string {
-    return bip39.getDefaultWordlist()
+    return getDefaultWordlist()
   }
 
   /**
@@ -144,7 +155,12 @@ export default class Mnemonic {
     if (strength % 32 !== 0) {
       throw new InvalidEntropy("Error - Invalid entropy")
     }
-    rng = rng || randomBytes
-    return bip39.generateMnemonic(strength, rng, wordlist)
+    var rnGT = rng
+      ? (size: number) => {
+          return globalThis.Buffer.from(rng(size))
+        }
+      : undefined
+    rnGT = rnGT || randomBytes
+    return generateMnemonic(strength, rnGT, wordlist)
   }
 }

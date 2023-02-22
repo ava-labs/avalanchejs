@@ -144,7 +144,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
-    let utxos = {}
+    let utxos: { [key: string]: UTXO } = {}
     for (let utxoid in fields["utxos"]) {
       let utxoidCleaned: string = serialization.decoder(
         utxoid,
@@ -158,7 +158,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         encoding
       )
     }
-    let addressUTXOs = {}
+    let addressUTXOs: { [key: string]: { [key: string]: BN } } = {}
     for (let address in fields["addressUTXOs"]) {
       let addressCleaned: string = serialization.decoder(
         address,
@@ -166,7 +166,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         "cb58",
         "hex"
       )
-      let utxobalance: {} = {}
+      let utxobalance: { [key: string]: BN } = {}
       for (let utxoid in fields["addressUTXOs"][`${address}`]) {
         let utxoidCleaned: string = serialization.decoder(
           utxoid,
@@ -203,7 +203,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     return utxovar
   }
 
-  create(...args: any[]): this {
+  create(): this {
     return new UTXOSet() as this
   }
 

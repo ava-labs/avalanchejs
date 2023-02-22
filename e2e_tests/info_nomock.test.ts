@@ -5,7 +5,16 @@ import Avalanche from "src"
 
 describe("Info", (): void => {
   const avalanche: Avalanche = getAvalanche()
-  const info: InfoAPI = avalanche.Info()
+  var info: InfoAPI
+
+  beforeAll(() => {
+    return new Promise((resolve) => {
+      avalanche.fetchNetworkSettings().then((value) => {
+        info = avalanche.Info()
+        resolve(value)
+      })
+    })
+  })
 
   // test_name          response_promise               resp_fn                 matcher           expected_value/obtained_value
   const tests_spec: any = [

@@ -480,9 +480,9 @@ export class PlatformVMAPI extends JRPCAPI {
     const result = response.data.result
 
     const parseDict = (input: any[]): BalanceDict => {
-      var dict: BalanceDict = {}
+      let dict: BalanceDict = {}
       for (const [k, v] of Object.entries(input)) dict[k] = new BN(v)
-      return dict
+      return dict as BalanceDict
     }
 
     if (this.core.getNetwork().P.lockModeBondDeposit) {
@@ -2294,7 +2294,7 @@ export class PlatformVMAPI extends JRPCAPI {
             "undefined"
           ) {
             /* istanbul ignore next */
-            throw new AddressError("Error - Invalid address format")
+            throw new AddressError(`Error - Invalid address format (${caller})`)
           }
           addrs.push(addresses[`${i}`] as string)
         } else {

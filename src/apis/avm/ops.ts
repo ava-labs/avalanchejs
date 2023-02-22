@@ -834,7 +834,7 @@ export class UTXOID extends NBytes {
     return newbase as this
   }
 
-  create(...args: any[]): this {
+  create(): this {
     return new UTXOID() as this
   }
 
