@@ -22,11 +22,11 @@ jobs:
       - name: Create .npmrc
         run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' >> .npmrc
       - name: Install dependencies
-        run: yarn install
+        run: yarn
       - name: Build library
-        run: yarn build
+        run: yarn build:prod
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_BRANCH: release
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: yarn run semantic-release

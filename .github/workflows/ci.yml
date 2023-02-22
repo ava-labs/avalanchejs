@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches:
+<<<<<<< HEAD
       - master
   pull_request:
 
@@ -10,16 +11,43 @@ env:
   CI: true
 
 jobs:
+=======
+      - main
+  pull_request:
+
+jobs:
+  Lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - run: yarn lint:check
+      - run: yarn build
+>>>>>>> main
   Test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+<<<<<<< HEAD
         node-version: [16]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
+=======
+        node-version: [16, 18]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+>>>>>>> main
         with:
           cache: yarn
           node-version: ${{ matrix.node-version }}
       - run: yarn install --frozen-lockfile
+<<<<<<< HEAD
       - run: yarn test
+=======
+      - run: yarn test:cov
+>>>>>>> main

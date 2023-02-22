@@ -1,0 +1,79 @@
+{
+  // Place your avalanchejs-v2 workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+  // description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+  // is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+  // used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+  // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+  // Placeholders with the same ids are connected.
+  // Example:
+  "testSerial": {
+    "scope": "typescript",
+    "prefix": "testser",
+    "body": [
+      "testSerialization('${TM_FILENAME/(.)(.+?)\\.(.+)/${1:/upcase}$2/}', ${TM_FILENAME/(.)(.+?)\\.(.+)/${1:/upcase}$2/}, ${TM_FILENAME/\\.(.+)//g}, ${TM_FILENAME/\\.(.+)//g}Bytes, testPVMCodec);",
+      "$2"
+    ],
+    "description": "Log output to console"
+  },
+  "newtx": {
+    "scope": "typescript",
+    "prefix": "newtx",
+    "body": [
+      "import { Codec } from '../codec';",
+      "import { serializable } from '../../common/types';",
+      "import { concatBytes } from '../../utils/buffer';",
+      "import { pack, unpack } from '../../utils/struct';",
+      "",
+      "const _symbol = Symbol('pvm.${1:TxName}');",
+      "",
+      "/**",
+      " * @see ",
+      " */",
+      "@serializable()",
+      "export class $1 {",
+      "  _type = _symbol;",
+      "",
+      "  constructor($2 ) {}",
+      "",
+      "  static fromBytes(bytes: Uint8Array, codec: Codec): [$1, Uint8Array] {",
+      "    const [$3, rest] = unpack(bytes, [], codec);",
+      "    return [new $1(), rest];",
+      "  }",
+      "",
+      "  toBytes(codec: Codec) {",
+      "    return pack();",
+      "  }",
+      "}"
+    ],
+    "description": "new tx type"
+  },
+  "newtx": {
+    "scope": "typescript",
+    "prefix": "nrpc",
+    "body": [
+      "$1(",
+      "  $1Params: ${1/(.*)/${1:/pascalcase}/}Params,",
+      "): Promise<${1/(.*)/${1:/pascalcase}/}Response> {",
+      "  return this.callRpc<${1/(.*)/${1:/pascalcase}/}Response>(",
+      "    '$1',",
+      "    $1Params,",
+      "  );",
+      "}"
+    ],
+    "description": "new rpc"
+  },
+  "newResponse": {
+    "scope": "typescript",
+    "prefix": "nresp",
+    "body": [
+      "export interface  ${1/(.*)/${1:/pascalcase}/}Params {",
+      "$2",
+      "}",
+      "",
+      "export interface  ${1/(.*)/${1:/pascalcase}/}Response {",
+      "  $3",
+      "}"
+    ],
+    "description": "new rpc response"
+  }
+}
