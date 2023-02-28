@@ -17,6 +17,7 @@ import { SerializedEncoding } from "../../utils/serialization"
 import { AddDelegatorTx, AddValidatorTx } from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
 import { TransactionError } from "../../utils/errors"
+import { AddSubnetValidatorTx } from "./addsubnetvalidatortx"
 
 /**
  * @ignore
@@ -43,6 +44,8 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new AddValidatorTx(...args)
   } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
     return new CreateSubnetTx(...args)
+  } else if (txtype === PlatformVMConstants.ADDSUBNETVALIDATORTX) {
+    return new AddSubnetValidatorTx(...args)
   }
   /* istanbul ignore next */
   throw new TransactionError("Error - SelectTxClass: unknown txtype")
