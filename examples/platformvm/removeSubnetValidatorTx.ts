@@ -10,24 +10,24 @@ import {
   UTXO,
   AmountOutput,
   UnsignedTx,
-  CreateSubnetTx,
   Tx,
-  SECPOwnerOutput
+  RemoveSubnetValidatorTx
 } from "../../src/apis/platformvm"
 import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
+  NodeIDStringToBuffer,
   Defaults
 } from "../../src/utils"
 
+const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
 const port: number = 9650
 const protocol: string = "http"
 const networkID: number = 1337
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
-const bintools: BinTools = BinTools.getInstance()
 // Keychain with 4 keys-A, B, C, and D
 const pKeychain: KeyChain = pchain.keyChain()
 // Keypair A
@@ -55,19 +55,14 @@ const pChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
 const pChainBlockchainIDBuf: Buffer = bintools.cb58Decode(pChainBlockchainID)
 const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
-const fee: BN = pchain.getCreateSubnetTxFee()
+const fee: BN = pchain.getDefaultTxFee()
 const threshold: number = 1
-const threshold2: number = 2
 const locktime: BN = new BN(0)
+const nodeID: string = "NodeID-NFBbbJ4qCmNaCzeW7sxErhvWqvEQMnYcN"
 const memo: Buffer = Buffer.from(
-  "Manually create a CreateSubnetTx which creates a 1-of-2 AVAX utxo and a 2-of-3 SubnetAuth"
+  "Manually create a removeSubnetValidatorTx which creates a 1-of-2 AVAX utxo and removes a validator from a subnet by correctly signing the 2-of-3 SubnetAuth"
 )
 const avaxUTXOKeychain: Buffer[] = [pAddresses[0], pAddresses[1]]
-const subnetAuthKeychain: Buffer[] = [
-  pAddresses[1],
-  pAddresses[2],
-  pAddresses[3]
-]
 
 const main = async (): Promise<any> => {
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
@@ -91,7 +86,7 @@ const main = async (): Promise<any> => {
   utxos.forEach((utxo: UTXO): void => {
     const output: Output = utxo.getOutput()
     if(output.getTypeID() === 7) {
-      const amountOutput = utxo.getOutput() as AmountOutput
+      const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
       const txid: Buffer = utxo.getTxID()
       const outputidx: Buffer = utxo.getOutputIdx()
@@ -109,21 +104,22 @@ const main = async (): Promise<any> => {
     }
   })
 
-  const subnetOwner: SECPOwnerOutput = new SECPOwnerOutput(
-    subnetAuthKeychain,
-    locktime,
-    threshold2
+  const subnetID: Buffer = bintools.cb58Decode(
+    "8T4oUrP7kXzetGF2bYWF21oJHUT18rJCjfBt3J299hA1Smcqa"
   )
-  const createSubnetTx: CreateSubnetTx = new CreateSubnetTx(
+  const nodeIDBuf: Buffer = NodeIDStringToBuffer(nodeID)
+  const removeSubnetValidatorTx: RemoveSubnetValidatorTx = new RemoveSubnetValidatorTx(
     networkID,
     pChainBlockchainIDBuf,
     outputs,
     inputs,
     memo,
-    subnetOwner
+    nodeIDBuf,
+    subnetID
   )
-
-  const unsignedTx: UnsignedTx = new UnsignedTx(createSubnetTx)
+  removeSubnetValidatorTx.addSignatureIdx(0, pAddresses[3])
+  removeSubnetValidatorTx.addSignatureIdx(1, pAddresses[1])
+  const unsignedTx: UnsignedTx = new UnsignedTx(removeSubnetValidatorTx)
   const tx: Tx = unsignedTx.sign(pKeychain)
   const txid: string = await pchain.issueTx(tx)
   console.log(`Success! TXID: ${txid}`)

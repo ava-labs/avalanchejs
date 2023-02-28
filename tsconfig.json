@@ -14,7 +14,7 @@
     "noFallthroughCasesInSwitch": true,
     "strictFunctionTypes": true,
     "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./typings/**", "./node_modules/@types"]
   },
   "exclude": ["node_modules", "examples", "*/**/*.test.ts", "e2e_tests"],
   "include": ["src/"],
