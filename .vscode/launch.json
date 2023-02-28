@@ -8,9 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/examples/platformvm/proofOfPossession.ts",
       "preLaunchTask": "npm: build",
       "sourceMaps": true,
@@ -18,4 +16,3 @@
     }
   ]
 }
-

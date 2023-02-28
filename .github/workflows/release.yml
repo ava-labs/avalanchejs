@@ -1,0 +1,32 @@
+name: Push to release branch
+
+on:
+  push:
+    branches:
+      - release
+      - master
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+      - name: Create .npmrc
+        run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' >> .npmrc
+      - name: Install dependencies
+        run: yarn install
+      - name: Build library
+        run: yarn build
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_BRANCH: release
+        run: yarn run semantic-release
