@@ -3,10 +3,7 @@ import { Avalanche, BN } from "src"
 import { EVMAPI } from "../../../src/apis/evm/api"
 import BinTools from "../../../src/utils/bintools"
 import * as bech32 from "bech32"
-import {
-  DummyBlockchainID,
-  TestCBlockchainID
-} from "../../../src/utils/constants"
+import { TestCBlockchainID } from "../../../src/utils/constants"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 
 /**
@@ -29,8 +26,7 @@ describe("EVMAPI", (): void => {
     protocol,
     networkID,
     undefined,
-    undefined,
-    true
+    undefined
   )
   let api: EVMAPI
 

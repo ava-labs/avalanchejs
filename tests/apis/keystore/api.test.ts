@@ -17,8 +17,7 @@ describe("Keystore", (): void => {
     protocol,
     12345,
     undefined,
-    undefined,
-    true
+    undefined
   )
   let keystore: KeystoreAPI
 

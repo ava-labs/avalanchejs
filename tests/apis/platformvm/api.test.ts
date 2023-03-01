@@ -106,8 +106,7 @@ describe("PlatformVMAPI", (): void => {
     protocol,
     networkID,
     undefined,
-    undefined,
-    true
+    undefined
   )
   let api: PlatformVMAPI
   let alias: string

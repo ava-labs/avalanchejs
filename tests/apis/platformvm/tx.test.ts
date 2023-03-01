@@ -79,15 +79,7 @@ describe("Transactions", (): void => {
   addressIndex.writeUIntBE(0x0, 0, 4)
 
   beforeAll(async (): Promise<void> => {
-    avalanche = new Avalanche(
-      ip,
-      port,
-      protocol,
-      12345,
-      undefined,
-      undefined,
-      true
-    )
+    avalanche = new Avalanche(ip, port, protocol, 12345, undefined, undefined)
     api = new PlatformVMAPI(avalanche, "/ext/bc/P")
     avaxAssetID = assetID
     api.setAVAXAssetID(avaxAssetID)

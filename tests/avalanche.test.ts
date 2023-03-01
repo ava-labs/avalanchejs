@@ -23,7 +23,6 @@ describe("Avalanche", (): void => {
   const api: string = "api.avax.network"
   const url: string = "https://api.avax.network:9650"
   const encrypted: string = "https"
-  const skipinit: boolean = true
   beforeAll((): void => {
     avalanche = new Avalanche(
       host,
@@ -31,8 +30,7 @@ describe("Avalanche", (): void => {
       protocol,
       networkID,
       undefined,
-      undefined,
-      skipinit
+      undefined
     )
     avalanche.addAPI("admin", AdminAPI)
     avalanche.addAPI("xchain", AVMAPI, "/ext/subnet/avm", blockchainID)
@@ -173,15 +171,7 @@ describe("HTTP Operations", (): void => {
   const path: string = "/ext/testingrequests"
   let avalanche: Avalanche
   beforeAll((): void => {
-    avalanche = new Avalanche(
-      host,
-      port,
-      protocol,
-      12345,
-      undefined,
-      undefined,
-      true
-    )
+    avalanche = new Avalanche(host, port, protocol, 12345, undefined, undefined)
     avalanche.addAPI("testingrequests", TestAPI, path)
   })
 

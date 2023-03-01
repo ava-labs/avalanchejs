@@ -72,6 +72,7 @@ export interface P {
   lockModeBondDeposit: boolean
 }
 export interface Network {
+  preDefined?: boolean
   hrp: string
   C: C
   X: X
@@ -79,6 +80,7 @@ export interface Network {
 }
 
 const TestNetwork: Network = {
+  preDefined: true,
   hrp: TestHRP,
   X: {
     blockchainID: TestXBlockchainID,
@@ -126,6 +128,7 @@ const TestNetwork: Network = {
 
 // Does not support p:getConfiguration
 const AvaxMainNetwork: Network = {
+  preDefined: true,
   hrp: "avax",
   X: {
     blockchainID: "2oYMBNV4eNHyqk2fjjV5nVQLDbtmNJzq5s3qs3Lo6ftnC6FByM",
@@ -188,6 +191,10 @@ class Networks {
 
   getNetwork(networkID: number): Network {
     return this.registry[networkID.toString()]
+  }
+
+  isPredefined(networkID: number): boolean {
+    return this.registry[networkID.toString()]?.preDefined ?? false
   }
 }
 

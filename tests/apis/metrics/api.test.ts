@@ -14,8 +14,7 @@ describe("Metrics", (): void => {
     protocol,
     12345,
     undefined,
-    undefined,
-    true
+    undefined
   )
   let metrics: MetricsAPI
 

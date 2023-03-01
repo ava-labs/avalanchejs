@@ -98,15 +98,7 @@ describe("Transactions", (): void => {
   let avaxAssetID: Buffer
 
   beforeAll(async (): Promise<void> => {
-    avalanche = new Avalanche(
-      ip,
-      port,
-      protocol,
-      netid,
-      undefined,
-      undefined,
-      true
-    )
+    avalanche = new Avalanche(ip, port, protocol, netid, undefined, undefined)
     api = new AVMAPI(avalanche, "/ext/bc/avm", bID)
 
     const result: Promise<Buffer> = api.getAVAXAssetID()

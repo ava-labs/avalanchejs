@@ -19,8 +19,7 @@ describe("EVMKeyPair", (): void => {
     protocol,
     networkID,
     undefined,
-    undefined,
-    true
+    undefined
   )
 
   test("repeatable 1", (): void => {

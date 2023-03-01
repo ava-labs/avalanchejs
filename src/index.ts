@@ -119,38 +119,14 @@ export default class Avalanche extends AvalancheCore {
     protocol: string,
     networkID: number = undefined,
     XChainID: string = undefined,
-    CChainID: string = undefined,
-    skipinit: boolean = false
+    CChainID: string = undefined
   ) {
     super(host, port, protocol, networkID)
-    if (!skipinit) {
-      this.addAPI("admin", AdminAPI)
-      this.addAPI("auth", AuthAPI)
-      this.addAPI("health", HealthAPI)
-      this.addAPI("info", InfoAPI)
-      this.addAPI("index", IndexAPI)
-      this.addAPI("keystore", KeystoreAPI)
-      this.addAPI("metrics", MetricsAPI)
-    }
 
-    // Static initializing
-    if (networkID && (this.network = networks.getNetwork(networkID))) {
+    if (networkID && networks.isPredefined(networkID)) {
+      this.network = networks.getNetwork(networkID)
       this.networkID = networkID
-      if (!skipinit) {
-        this.addAPI("pchain", PlatformVMAPI)
-        this.addAPI(
-          "xchain",
-          AVMAPI,
-          "/ext/bc/X",
-          XChainID ? XChainID : this.network.X.blockchainID
-        )
-        this.addAPI(
-          "cchain",
-          EVMAPI,
-          "/ext/bc/C/avax",
-          CChainID ? CChainID : this.network.C.blockchainID
-        )
-      }
+      this.setupAPIs(XChainID, CChainID)
     }
   }
 
@@ -169,8 +145,10 @@ export default class Avalanche extends AvalancheCore {
       this.networkID = await this.Info().getNetworkID()
     }
 
-    if ((this.network = networks.getNetwork(this.networkID)))
-      return this.refreshAPI()
+    if (networks.isPredefined(this.networkID)) {
+      this.network = networks.getNetwork(this.networkID)
+      return this.setupAPIs()
+    }
 
     if (!response) {
       throw new Error("Configuration required")
@@ -228,16 +206,31 @@ export default class Avalanche extends AvalancheCore {
 
     networks.registerNetwork(this.networkID, this.network)
 
-    return this.refreshAPI()
+    return this.setupAPIs()
   }
 
-  protected refreshAPI = (): boolean => {
-    // Re-apply pchain which creates the correct keychain
-    this.addAPI("pchain", PlatformVMAPI)
+  protected setupAPIs = (XChainID?: string, CChainID?: string): boolean => {
+    this.addAPI("admin", AdminAPI)
+    this.addAPI("auth", AuthAPI)
+    this.addAPI("health", HealthAPI)
+    this.addAPI("info", InfoAPI)
+    this.addAPI("index", IndexAPI)
+    this.addAPI("keystore", KeystoreAPI)
+    this.addAPI("metrics", MetricsAPI)
 
-    // Finally register x and c chains
-    this.addAPI("xchain", AVMAPI, "/ext/bc/X", this.network.X.blockchainID)
-    this.addAPI("cchain", EVMAPI, "/ext/bc/C/avax", this.network.C.blockchainID)
+    this.addAPI("pchain", PlatformVMAPI)
+    this.addAPI(
+      "xchain",
+      AVMAPI,
+      "/ext/bc/X",
+      XChainID ? XChainID : this.network.X.blockchainID
+    )
+    this.addAPI(
+      "cchain",
+      EVMAPI,
+      "/ext/bc/C/avax",
+      CChainID ? CChainID : this.network.C.blockchainID
+    )
 
     return true
   }

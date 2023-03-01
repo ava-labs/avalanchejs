@@ -11,7 +11,7 @@ import axios, {
 
 import { APIBase, RequestResponseData } from "./common/apibase"
 import { ProtocolError } from "./utils/errors"
-import { Network } from "./utils/networks"
+import networks, { Network } from "./utils/networks"
 import { fetchAdapter } from "./utils/fetchadapter"
 
 /**
@@ -68,11 +68,7 @@ export default class AvalancheCore {
     }
 
     // Reset network specific
-    if (
-      this.networkID !== networkID ||
-      this.host !== host ||
-      this.port !== port
-    ) {
+    if (this.networkID !== networkID || !networks.isPredefined(networkID)) {
       this.network = undefined
     }
 

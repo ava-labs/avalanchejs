@@ -14,8 +14,7 @@ describe("Auth", (): void => {
     protocol,
     12345,
     "What is my purpose? You pass butter. Oh my god.",
-    undefined,
-    false
+    undefined
   )
   let auth: AuthAPI
 

@@ -15,8 +15,7 @@ describe("Health", (): void => {
     protocol,
     12345,
     undefined,
-    undefined,
-    true
+    undefined
   )
   let health: HealthAPI
 

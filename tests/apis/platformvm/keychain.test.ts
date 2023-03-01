@@ -8,20 +8,6 @@ const bintools: BinTools = BinTools.getInstance()
 const alias: string = "P"
 const hrp: string = "tests"
 describe("PlatformVMKeyPair", (): void => {
-  const networkID: number = 12345
-  const ip: string = "127.0.0.1"
-  const port: number = 9650
-  const protocol: string = "https"
-  const avalanche: Avalanche = new Avalanche(
-    ip,
-    port,
-    protocol,
-    networkID,
-    undefined,
-    undefined,
-    true
-  )
-
   test("repeatable 1", (): void => {
     const kp: KeyPair = new KeyPair(hrp, alias)
     kp.importKey(

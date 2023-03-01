@@ -96,8 +96,7 @@ describe("AVMAPI", (): void => {
     protocol,
     networkID,
     undefined,
-    undefined,
-    true
+    undefined
   )
   let api: AVMAPI
   let alias: string
