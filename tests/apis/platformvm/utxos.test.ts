@@ -2,9 +2,10 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import BinTools from "../../../src/utils/bintools"
 import { UTXO, UTXOSet } from "../../../src/apis/platformvm/utxos"
-import { AmountOutput } from "../../../src/apis/platformvm/outputs"
+import { AmountOutput, LockedOut } from "../../../src/apis/platformvm/outputs"
 import { UnixNow } from "../../../src/utils/helperfunctions"
 import { SerializedEncoding } from "../../../src/utils"
+import { LockedIDs } from "../../../src/apis/platformvm/locked"
 
 const bintools: BinTools = BinTools.getInstance()
 const display: SerializedEncoding = "display"
@@ -628,5 +629,73 @@ describe("UTXOSet", (): void => {
         expect(test).toBe(true)
       })
     })
+  })
+})
+
+describe("LockedUTXOs", (): void => {
+  const assetID = new Buffer(32)
+  const emptyTxID = new Buffer(32)
+  const txIDs: Buffer[] = [
+    new Buffer(32),
+    new Buffer(32),
+    new Buffer(32),
+    new Buffer(32)
+  ]
+  assetID.write("ASSETID")
+  txIDs[0].write("TX0")
+  txIDs[1].write("TX1")
+  txIDs[2].write("TX2")
+  txIDs[3].write("TX3")
+
+  const utxos: UTXO[] = [
+    new UTXO(
+      0,
+      txIDs[0],
+      0,
+      assetID,
+      new LockedOut(
+        undefined,
+        [],
+        undefined,
+        0,
+        new LockedIDs(emptyTxID, txIDs[0])
+      )
+    ),
+    new UTXO(
+      0,
+      txIDs[1],
+      0,
+      assetID,
+      new LockedOut(
+        undefined,
+        [],
+        undefined,
+        0,
+        new LockedIDs(txIDs[1], txIDs[2])
+      )
+    ),
+    new UTXO(
+      0,
+      txIDs[2],
+      0,
+      assetID,
+      new LockedOut(
+        undefined,
+        [],
+        undefined,
+        0,
+        new LockedIDs(txIDs[3], emptyTxID)
+      )
+    )
+  ]
+
+  test("Creation", (): void => {
+    const set: UTXOSet = new UTXOSet()
+    set.addArray(utxos)
+    const db = set.getLockedTxIDs()
+    expect(db.bondIDs.length).toBe(2)
+    expect(db.depositIDs.length).toBe(2)
+    expect(bintools.cb58Decode(db.bondIDs[0])).toEqual(txIDs[0])
+    expect(bintools.cb58Decode(db.depositIDs[0])).toEqual(txIDs[1])
   })
 })

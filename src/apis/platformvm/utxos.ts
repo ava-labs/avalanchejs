@@ -11,7 +11,8 @@ import {
   TransferableOutput,
   ParseableOutput,
   StakeableLockOut,
-  SECPTransferOutput
+  SECPTransferOutput,
+  LockedOut
 } from "./outputs"
 import {
   SECPTransferInput,
@@ -238,6 +239,21 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       // transaction.
       return false
     })
+  }
+
+  getLockedTxIDs = (): { depositIDs: string[]; bondIDs: string[] } => {
+    const d = new Set<string>(),
+      b = new Set<string>()
+    this.getAllUTXOs().forEach((utxo: UTXO) => {
+      const output: BaseOutput = utxo.getOutput()
+      if (output instanceof LockedOut) {
+        var id = output.getLockedIDs().getDepositTxID()
+        if (!id.isEmpty()) d.add(id.encode("cb58"))
+        id = output.getLockedIDs().getBondTxID()
+        if (!id.isEmpty()) b.add(id.encode("cb58"))
+      }
+    })
+    return { depositIDs: [...d.keys()], bondIDs: [...b.keys()] }
   }
 
   getMinimumSpendable = async (

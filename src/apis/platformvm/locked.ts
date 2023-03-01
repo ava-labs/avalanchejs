@@ -25,7 +25,7 @@ export class SerializableTxID {
     return this.txid.equals(Buffer.alloc(32))
   }
 
-  fromBuffer(bytes: Buffer, offset?: number): number {
+  fromBuffer(bytes: Buffer, offset = 0): number {
     this.txid = bintools.copyFrom(bytes, offset, offset + 32)
     return offset + 32
   }
@@ -59,7 +59,7 @@ export class LockedIDs {
     return this.bondTxID
   }
 
-  fromBuffer(bytes: Buffer, offset?: number): number {
+  fromBuffer(bytes: Buffer, offset = 0): number {
     offset = this.depositTxID.fromBuffer(bytes, offset)
     offset = this.bondTxID.fromBuffer(bytes, offset)
     return offset

@@ -394,13 +394,16 @@ export class LockedOut extends ParseableOutput {
    * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing addresses
    * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
    * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   * @param ids LockIDs set of deposit and bond txIDs
    */
   constructor(
     amount: BN = undefined,
     addresses: Buffer[] = undefined,
     locktime: BN = undefined,
-    threshold: number = undefined
+    threshold: number = undefined,
+    ids: LockedIDs = undefined
   ) {
     super(new SECPTransferOutput(amount, addresses, locktime, threshold))
+    if (typeof ids !== "undefined") this.ids = ids
   }
 }
