@@ -29,4 +29,6 @@ Example scripts for the Avalanche [PlatformVM RPC](https://docs.avax.network/bui
 * [getValidatorsAt.ts](./getValidatorsAt.ts)
 * [importTx-xchain.ts](./importTx-xchain.ts)
 * [JSONPChainTx.ts](./JSONPChainTx.ts)
+* [proofOfPossession.ts](./proofOfPossession.ts)
+* [removeSubnetValidatorTx.ts](./removeSubnetValidatorTx.ts)
 * [subnetAuth.ts](./subnetAuth.ts)
