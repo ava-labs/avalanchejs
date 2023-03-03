@@ -133,8 +133,12 @@ export default class Avalanche extends AvalancheCore {
   fetchNetworkSettings = async (): Promise<boolean> => {
     // Nothing to do if network is known
     if (this.network) return true
-    // We need this be able to make next call
+    // We need this to be able to make init calls
+    const pAPI = this.apis["pchain"]
+    const iAPI = this.apis["info"]
     this.addAPI("pchain", PlatformVMAPI)
+    this.addAPI("info", InfoAPI)
+
     //Get platform configuration
     let response: GetConfigurationResponse
 
@@ -151,6 +155,10 @@ export default class Avalanche extends AvalancheCore {
     }
 
     if (!response) {
+      // restore apis
+      this.apis["pchain"] = pAPI
+      this.apis["info"] = iAPI
+
       throw new Error("Configuration required")
     }
 

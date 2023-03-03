@@ -141,11 +141,13 @@ export class ImportTx extends BaseTx {
       )
       const sigidxs: SigIdx[] = this.importIns[`${i}`].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
-        const signval: Buffer = keypair.sign(msg)
-        const sig: Signature = new Signature()
-        sig.fromBuffer(signval)
-        cred.addSignature(sig)
+        const keypairs: KeyPair[] = kc.getKeys(sigidxs[`${j}`].getSource())
+        keypairs.forEach((keypair) => {
+          const signval: Buffer = keypair.sign(msg)
+          const sig: Signature = new Signature()
+          sig.fromBuffer(signval)
+          cred.addSignature(sig)
+        })
       }
       creds.push(cred)
     }

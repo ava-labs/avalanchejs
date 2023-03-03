@@ -268,11 +268,13 @@ export class CreateChainTx extends BaseTx {
     const sigidxs: SigIdx[] = this.getSigIdxs()
     const cred: Credential = SelectCredentialClass(this.getCredentialID())
     for (let i: number = 0; i < sigidxs.length; i++) {
-      const keypair: KeyPair = kc.getKey(sigidxs[`${i}`].getSource())
-      const signval: Buffer = keypair.sign(msg)
-      const sig: Signature = new Signature()
-      sig.fromBuffer(signval)
-      cred.addSignature(sig)
+      const keypairs: KeyPair[] = kc.getKeys(sigidxs[`${i}`].getSource())
+      keypairs.forEach((keypair) => {
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
+      })
     }
     creds.push(cred)
     return creds

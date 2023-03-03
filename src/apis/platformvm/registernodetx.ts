@@ -186,11 +186,13 @@ export class RegisterNodeTx extends BaseTx {
     let cred: Credential = SelectCredentialClass(this.getCredentialID())
 
     function addSig(source: Buffer) {
-      const keypair: KeyPair = kc.getKey(source)
-      const signval: Buffer = keypair.sign(msg)
-      const sig: Signature = new Signature()
-      sig.fromBuffer(signval)
-      cred.addSignature(sig)
+      const keypairs: KeyPair[] = kc.getKeys(source)
+      keypairs.forEach((keypair) => {
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
+      })
     }
 
     // Add NodeSignature

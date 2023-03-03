@@ -204,6 +204,16 @@ export abstract class StandardKeyChain<KPClass extends StandardKeyPair> {
    */
   getKey = (address: Buffer): KPClass => this.keys[address.toString("hex")]
 
+  /**
+   * Returns the [[StandardKeyPair]]'s listed under the provided address
+   *
+   * @param address The {@link https://github.com/feross/buffer|Buffer} of the address to
+   * retrieve from the keys database
+   *
+   * @returns A reference to the [[StandardKeyPair]]'s in the keys database
+   */
+  getKeys = (address: Buffer): KPClass[] => [this.keys[address.toString("hex")]]
+
   abstract create(...args: any[]): this
 
   abstract clone(): this
