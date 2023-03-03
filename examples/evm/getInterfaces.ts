@@ -1,4 +1,4 @@
-import { GetAtomicTxParams } from "@c4tplatform/caminojs/dist/apis/evm"
+import { GetAtomicTxParams } from "caminojs/apis/evm"
 
 const main = async (): Promise<any> => {
   const getAtomicTxParams: GetAtomicTxParams = {

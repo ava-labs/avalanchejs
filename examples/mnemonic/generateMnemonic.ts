@@ -1,5 +1,5 @@
 import randomBytes from "randombytes"
-import Mnemonic from "@c4tplatform/caminojs/dist/utils/mnemonic"
+import Mnemonic from "caminojs/utils/mnemonic"
 import { Buffer } from "buffer/"
 
 const mnemonic: Mnemonic = Mnemonic.getInstance()

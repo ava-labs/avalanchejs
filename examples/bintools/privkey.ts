@@ -1,4 +1,4 @@
-import { BinTools, Buffer } from "@c4tplatform/caminojs/dist"
+import { BinTools, Buffer } from "caminojs/index"
 const bintools: BinTools = BinTools.getInstance()
 
 const ethPrivateKey =

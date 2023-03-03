@@ -1,19 +1,19 @@
-import { Avalanche, BN } from "@c4tplatform/caminojs/dist"
-import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Avalanche, BN } from "caminojs/index"
+import { PlatformVMAPI } from "caminojs/apis/platformvm"
 import {
   EVMAPI,
   KeyChain as EVMKeyChain,
   UnsignedTx,
   Tx,
   UTXOSet
-} from "@c4tplatform/caminojs/dist/apis/evm"
+} from "caminojs/apis/evm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   costImportTx
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
-import { KeyChain as PlatformKeyChain } from "@c4tplatform/caminojs/dist/apis/platformvm/keychain"
+import { KeyChain as PlatformKeyChain } from "caminojs/apis/platformvm/keychain"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

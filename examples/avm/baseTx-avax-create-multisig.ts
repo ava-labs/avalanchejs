@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BinTools, BN, Buffer } from "caminojs/index"
 import {
   AmountOutput,
   AVMAPI,
@@ -12,12 +12,9 @@ import {
   UnsignedTx,
   UTXO,
   UTXOSet
-} from "@c4tplatform/caminojs/dist/apis/avm"
-import { GetBalanceResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
-import {
-  DefaultLocalGenesisPrivateKey,
-  PrivateKeyPrefix
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/apis/avm"
+import { GetBalanceResponse } from "caminojs/apis/avm/interfaces"
+import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

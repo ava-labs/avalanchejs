@@ -1,16 +1,13 @@
-import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BN, Buffer } from "caminojs/index"
 import {
   PlatformVMAPI,
   KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
-import {
-  PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/apis/platformvm"
+import { GetUTXOsResponse } from "caminojs/apis/platformvm/interfaces"
+import { PrivateKeyPrefix, DefaultLocalGenesisPrivateKey } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

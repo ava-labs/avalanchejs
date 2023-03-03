@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BinTools, BN, Buffer } from "caminojs/index"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -16,14 +16,14 @@ import {
   ParseableOutput,
   GetBalanceResponse,
   GetBalanceResponseAvax
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
+} from "caminojs/apis/platformvm"
+import { BaseOutput } from "caminojs/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   NodeIDStringToBuffer,
   UnixNow
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

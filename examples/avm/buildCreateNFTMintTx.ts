@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BinTools, BN, Buffer } from "caminojs/index"
 import {
   AVMAPI,
   KeyChain,
@@ -7,14 +7,14 @@ import {
   Tx,
   AVMConstants,
   UTXO
-} from "@c4tplatform/caminojs/dist/apis/avm"
-import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
-import { OutputOwners } from "@c4tplatform/caminojs/dist/common"
+} from "caminojs/apis/avm"
+import { GetUTXOsResponse } from "caminojs/apis/avm/interfaces"
+import { OutputOwners } from "caminojs/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 // run ts-node examples/avm/buildCreateNFTMintTx.ts

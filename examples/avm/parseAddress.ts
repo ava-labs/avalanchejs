@@ -1,10 +1,7 @@
-import { Avalanche, Buffer } from "@c4tplatform/caminojs/dist"
-import { AVMAPI, KeyChain } from "@c4tplatform/caminojs/dist/apis/avm"
+import { Avalanche, Buffer } from "caminojs/index"
+import { AVMAPI, KeyChain } from "caminojs/apis/avm"
 import { ExamplesConfig } from "../common/examplesConfig"
-import {
-  DefaultLocalGenesisPrivateKey,
-  PrivateKeyPrefix
-} from "@c4tplatform/caminojs/dist/utils"
+import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

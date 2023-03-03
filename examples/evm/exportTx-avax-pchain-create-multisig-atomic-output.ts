@@ -1,5 +1,5 @@
-import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
-import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Avalanche, BinTools, BN, Buffer } from "caminojs/index"
+import { PlatformVMAPI } from "caminojs/apis/platformvm"
 import {
   EVMAPI,
   EVMInput,
@@ -9,14 +9,14 @@ import {
   TransferableOutput,
   Tx,
   UnsignedTx
-} from "@c4tplatform/caminojs/dist/apis/evm"
+} from "caminojs/apis/evm"
 import {
   DefaultLocalGenesisPrivateKey,
   ONEAVAX,
   PrivateKeyPrefix
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
-import { KeyChain as PlatformKeyChain } from "@c4tplatform/caminojs/dist/apis/platformvm/keychain"
+import { KeyChain as PlatformKeyChain } from "caminojs/apis/platformvm/keychain"
 
 const Web3 = require("web3")
 

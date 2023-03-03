@@ -1,6 +1,6 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { HealthAPI } from "@c4tplatform/caminojs/dist/apis/health"
-import { HealthResponse } from "@c4tplatform/caminojs/dist/apis/health/interfaces"
+import { Avalanche } from "caminojs/index"
+import { HealthAPI } from "caminojs/apis/health"
+import { HealthResponse } from "caminojs/apis/health/interfaces"
 
 import { ExamplesConfig } from "../common/examplesConfig"
 

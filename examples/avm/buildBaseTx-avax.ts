@@ -1,20 +1,14 @@
-import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
-import {
-  AVMAPI,
-  KeyChain,
-  UTXOSet,
-  UnsignedTx,
-  Tx
-} from "@c4tplatform/caminojs/dist/apis/avm"
+import { Avalanche, BN, Buffer } from "caminojs/index"
+import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "caminojs/apis/avm"
 import {
   GetBalanceResponse,
   GetUTXOsResponse
-} from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
+} from "caminojs/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

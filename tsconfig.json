@@ -14,9 +14,12 @@
     "noFallthroughCasesInSwitch": true,
     "strictFunctionTypes": true,
     "esModuleInterop": true,
-    "typeRoots": ["./typings/**", "./node_modules/@types"]
+    "typeRoots": ["./typings/**", "./node_modules/@types"],
+    "paths": {
+      "caminojs/*" : ["./src/*"],
+    },
   },
-  "exclude": ["node_modules", "examples", "typings"],
+  "exclude": ["node_modules", "examples_", "typings"],
   "typeAcquisition": {
     "enable": true,
     "exclude": ["bn.js"]

@@ -1,5 +1,5 @@
-import { Buffer } from "@c4tplatform/caminojs/dist"
-import { SubnetAuth } from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Buffer } from "caminojs/index"
+import { SubnetAuth } from "caminojs/apis/platformvm"
 
 const address1: Buffer = Buffer.alloc(4)
 const address2: Buffer = Buffer.alloc(4)

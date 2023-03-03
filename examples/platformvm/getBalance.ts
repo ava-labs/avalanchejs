@@ -1,8 +1,5 @@
-import { Avalanche, BinTools } from "@c4tplatform/caminojs/dist"
-import {
-  PlatformVMAPI,
-  GetBalanceResponse
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Avalanche, BinTools } from "caminojs/index"
+import { PlatformVMAPI, GetBalanceResponse } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

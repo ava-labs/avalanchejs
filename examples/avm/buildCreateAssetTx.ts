@@ -1,4 +1,4 @@
-import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BN, Buffer } from "caminojs/index"
 import {
   AVMAPI,
   KeyChain,
@@ -8,13 +8,10 @@ import {
   InitialStates,
   SECPMintOutput,
   SECPTransferOutput
-} from "@c4tplatform/caminojs/dist/apis/avm"
-import { GetUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/avm/interfaces"
-import {
-  PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "@c4tplatform/caminojs/dist/utils"
-import { ExamplesConfig } from "common/examplesConfig"
+} from "caminojs/apis/avm"
+import { GetUTXOsResponse } from "caminojs/apis/avm/interfaces"
+import { PrivateKeyPrefix, DefaultLocalGenesisPrivateKey } from "caminojs/utils"
+import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

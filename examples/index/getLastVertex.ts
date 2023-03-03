@@ -1,7 +1,7 @@
-import { Avalanche, BinTools, Buffer } from "@c4tplatform/caminojs/dist"
-import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index/index"
-import { GetLastAcceptedResponse } from "@c4tplatform/caminojs/dist/apis/index/interfaces"
-import { Vertex } from "@c4tplatform/caminojs/dist/apis/avm"
+import { Avalanche, BinTools, Buffer } from "caminojs/index"
+import { IndexAPI } from "caminojs/apis/index/index"
+import { GetLastAcceptedResponse } from "caminojs/apis/index/interfaces"
+import { Vertex } from "caminojs/apis/avm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

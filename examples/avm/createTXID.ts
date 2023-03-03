@@ -1,23 +1,23 @@
 import createHash from "create-hash"
-import { Avalanche, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BN, Buffer } from "caminojs/index"
 import {
   AVMAPI,
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "@c4tplatform/caminojs/dist/apis/avm"
+} from "caminojs/apis/avm"
 import {
   KeyChain as PlatformVMKeyChain,
   PlatformVMAPI
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
+} from "caminojs/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow,
   SerializedType
-} from "@c4tplatform/caminojs/dist/utils"
-import { Serialization } from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
+import { Serialization } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const serialization: Serialization = Serialization.getInstance()

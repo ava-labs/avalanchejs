@@ -1,6 +1,6 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { InfoAPI } from "@c4tplatform/caminojs/dist/apis/info"
-import { UptimeResponse } from "@c4tplatform/caminojs/dist/apis/info/interfaces"
+import { Avalanche } from "caminojs/index"
+import { InfoAPI } from "caminojs/apis/info"
+import { UptimeResponse } from "caminojs/apis/info/interfaces"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

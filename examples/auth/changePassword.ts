@@ -2,8 +2,8 @@
 // which you can create based on "secrets.example" which is in the
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { AuthAPI } from "@c4tplatform/caminojs/dist/apis/auth"
+import { Avalanche } from "caminojs/index"
+import { AuthAPI } from "caminojs/apis/auth"
 import { readFile } from "fs"
 import { ExamplesConfig } from "../common/examplesConfig"
 

@@ -1,10 +1,10 @@
-import { Avalanche, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, Buffer } from "caminojs/index"
 import {
   PlatformVMAPI,
   KeyChain,
   UnsignedTx,
   Tx
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
+} from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

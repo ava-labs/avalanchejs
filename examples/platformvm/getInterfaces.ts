@@ -1,4 +1,4 @@
-import { GetStakeParams } from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { GetStakeParams } from "caminojs/apis/platformvm"
 
 const main = async (): Promise<any> => {
   const getStakeParams: GetStakeParams = {

@@ -1,6 +1,6 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { GetRewardUTXOsResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
-import { PlatformVMAPI } from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Avalanche } from "caminojs/index"
+import { GetRewardUTXOsResponse } from "caminojs/apis/platformvm/interfaces"
+import { PlatformVMAPI } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

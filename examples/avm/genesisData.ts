@@ -1,4 +1,4 @@
-import Avalanche, { BN, Buffer } from "@c4tplatform/caminojs/dist"
+import Avalanche, { BN, Buffer } from "caminojs/index"
 import {
   AVMAPI,
   GenesisAsset,
@@ -7,13 +7,13 @@ import {
   KeyChain,
   SECPMintOutput,
   SECPTransferOutput
-} from "@c4tplatform/caminojs/dist/apis/avm"
+} from "caminojs/apis/avm"
 import {
   DefaultLocalGenesisPrivateKey,
   PrivateKeyPrefix,
   Serialization,
   SerializedType
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 const serialization: Serialization = Serialization.getInstance()
 const config: ExamplesConfig = require("../common/examplesConfig.json")

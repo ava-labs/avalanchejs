@@ -1,7 +1,7 @@
-import { Avalanche, Buffer } from "@c4tplatform/caminojs/dist"
-import { AVMAPI } from "@c4tplatform/caminojs/dist/apis/avm"
-import { UTXO, UTXOSet } from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
+import { Avalanche, Buffer } from "caminojs/index"
+import { AVMAPI } from "caminojs/apis/avm"
+import { UTXO, UTXOSet } from "caminojs/apis/platformvm"
+import { BaseOutput } from "caminojs/common"
 // Change the networkID to affect the HRP of the bech32 encoded address
 // NetworkID - Bech32 Address - ChainPrefix-HRP1AddressChecksum
 //         0 - X-local19rknw8l0grnfunjrzwxlxync6zrlu33yeg5dya

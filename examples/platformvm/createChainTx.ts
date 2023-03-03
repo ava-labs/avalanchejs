@@ -5,8 +5,8 @@ import {
   Buffer,
   GenesisAsset,
   GenesisData
-} from "@c4tplatform/caminojs/dist"
-import { InitialStates } from "@c4tplatform/caminojs/dist/apis/avm"
+} from "caminojs/index"
+import { InitialStates } from "caminojs/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -22,12 +22,9 @@ import {
   Tx,
   GetBalanceResponse,
   GetBalanceResponseAvax
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { BaseOutput } from "@c4tplatform/caminojs/dist/common"
-import {
-  PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/apis/platformvm"
+import { BaseOutput } from "caminojs/common"
+import { PrivateKeyPrefix, DefaultLocalGenesisPrivateKey } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

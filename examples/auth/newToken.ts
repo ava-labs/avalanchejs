@@ -3,9 +3,9 @@
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
 import { readFile } from "fs"
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { AuthAPI } from "@c4tplatform/caminojs/dist/apis/auth"
-import { ErrorResponseObject } from "@c4tplatform/caminojs/dist/utils"
+import { Avalanche } from "caminojs/index"
+import { AuthAPI } from "caminojs/apis/auth"
+import { ErrorResponseObject } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

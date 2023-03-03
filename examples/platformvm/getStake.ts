@@ -1,13 +1,7 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import {
-  PlatformVMAPI,
-  KeyChain
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
-import { GetStakeResponse } from "@c4tplatform/caminojs/dist/apis/platformvm/interfaces"
-import {
-  PrivateKeyPrefix,
-  DefaultLocalGenesisPrivateKey
-} from "@c4tplatform/caminojs/dist/utils"
+import { Avalanche } from "caminojs/index"
+import { PlatformVMAPI, KeyChain } from "caminojs/apis/platformvm"
+import { GetStakeResponse } from "caminojs/apis/platformvm/interfaces"
+import { PrivateKeyPrefix, DefaultLocalGenesisPrivateKey } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

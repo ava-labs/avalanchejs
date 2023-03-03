@@ -1,5 +1,5 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { AdminAPI } from "@c4tplatform/caminojs/dist/apis/admin"
+import { Avalanche } from "caminojs/index"
+import { AdminAPI } from "caminojs/apis/admin"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

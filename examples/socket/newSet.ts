@@ -1,4 +1,4 @@
-import { PubSub, Socket } from "@c4tplatform/caminojs/dist"
+import { PubSub, Socket } from "caminojs/index"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

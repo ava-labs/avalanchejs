@@ -1,4 +1,4 @@
-import Mnemonic from "@c4tplatform/caminojs/dist/utils/mnemonic"
+import Mnemonic from "caminojs/utils/mnemonic"
 const mnemonic: Mnemonic = Mnemonic.getInstance()
 
 const main = async (): Promise<any> => {

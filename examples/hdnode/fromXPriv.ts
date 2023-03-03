@@ -1,4 +1,4 @@
-import HDNode from "@c4tplatform/caminojs/dist/utils/hdnode"
+import HDNode from "caminojs/utils/hdnode"
 
 const main = async (): Promise<any> => {
   const xpriv: string =

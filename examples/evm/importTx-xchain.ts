@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "@c4tplatform/caminojs/dist"
+import { Avalanche, BinTools, BN, Buffer } from "caminojs/index"
 import {
   AmountOutput,
   EVMAPI,
@@ -10,15 +10,12 @@ import {
   UnsignedTx,
   UTXO,
   UTXOSet
-} from "@c4tplatform/caminojs/dist/apis/evm"
-import {
-  DefaultLocalGenesisPrivateKey,
-  PrivateKeyPrefix
-} from "@c4tplatform/caminojs/dist/utils"
+} from "caminojs/apis/evm"
+import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
-import { AVMAPI } from "@c4tplatform/caminojs/dist/apis/avm"
-import { KeyChain as AVMKeyChain } from "@c4tplatform/caminojs/dist/apis/avm/keychain"
-import { KeyChain as EVMKeyChain } from "@c4tplatform/caminojs/dist/apis/evm/keychain"
+import { AVMAPI } from "caminojs/apis/avm"
+import { KeyChain as AVMKeyChain } from "caminojs/apis/avm/keychain"
+import { KeyChain as EVMKeyChain } from "caminojs/apis/evm/keychain"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

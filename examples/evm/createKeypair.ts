@@ -1,6 +1,6 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { EVMAPI, KeyChain, KeyPair } from "@c4tplatform/caminojs/dist/apis/evm"
-import { CreateKeyPairResponse } from "@c4tplatform/caminojs/dist/apis/evm/interfaces"
+import { Avalanche } from "caminojs/index"
+import { EVMAPI, KeyChain, KeyPair } from "caminojs/apis/evm"
+import { CreateKeyPairResponse } from "caminojs/apis/evm/interfaces"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

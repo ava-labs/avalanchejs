@@ -1,6 +1,6 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import { IndexAPI } from "@c4tplatform/caminojs/dist/apis/index"
-import { GetLastAcceptedResponse } from "@c4tplatform/caminojs/dist/apis/index/interfaces"
+import { Avalanche } from "caminojs/index"
+import { IndexAPI } from "caminojs/apis/index"
+import { GetLastAcceptedResponse } from "caminojs/apis/index/interfaces"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")

@@ -1,9 +1,5 @@
-import { Avalanche } from "@c4tplatform/caminojs/dist"
-import {
-  PlatformVMAPI,
-  KeyChain,
-  KeyPair
-} from "@c4tplatform/caminojs/dist/apis/platformvm"
+import { Avalanche } from "caminojs/index"
+import { PlatformVMAPI, KeyChain, KeyPair } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
