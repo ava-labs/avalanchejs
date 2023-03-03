@@ -6,8 +6,12 @@ import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { SelectCredentialClass } from "./credentials"
-import { KeyChain, KeyPair } from "./keychain"
-import { StandardTx, StandardUnsignedTx } from "../../common/tx"
+import {
+  SignerKeyChain,
+  SignerKeyPair,
+  StandardTx,
+  StandardUnsignedTx
+} from "../../common"
 import { Credential } from "../../common/credentials"
 import createHash from "create-hash"
 import { BaseTx } from "./basetx"
@@ -54,7 +58,11 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
   throw new TransactionError("Error - SelectTxClass: unknown txtype")
 }
 
-export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
+export class UnsignedTx extends StandardUnsignedTx<
+  SignerKeyPair,
+  SignerKeyChain,
+  BaseTx
+> {
   protected _typeName = "UnsignedTx"
   protected _typeID = undefined
 
@@ -88,7 +96,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
    *
    * @returns A signed [[StandardTx]]
    */
-  sign(kc: KeyChain): Tx {
+  sign(kc: SignerKeyChain): Tx {
     const txbuff = this.toBuffer()
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
@@ -98,7 +106,7 @@ export class UnsignedTx extends StandardUnsignedTx<KeyPair, KeyChain, BaseTx> {
   }
 }
 
-export class Tx extends StandardTx<KeyPair, KeyChain, UnsignedTx> {
+export class Tx extends StandardTx<SignerKeyPair, SignerKeyChain, UnsignedTx> {
   protected _typeName = "Tx"
   protected _typeID = undefined
 

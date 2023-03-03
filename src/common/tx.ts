@@ -6,7 +6,7 @@ import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
 import { Credential } from "./credentials"
 import BN from "bn.js"
-import { StandardKeyChain, StandardKeyPair } from "./keychain"
+import { SignerKeyChain, SignerKeyPair } from "./keychain"
 import { StandardAmountInput, StandardTransferableInput } from "./input"
 import {
   StandardAmountOutput,
@@ -35,8 +35,8 @@ const buffer: SerializedType = "Buffer"
  * Class representing a base for all transactions.
  */
 export abstract class StandardBaseTx<
-  KPClass extends StandardKeyPair,
-  KCClass extends StandardKeyChain<KPClass>
+  KPClass extends SignerKeyPair,
+  KCClass extends SignerKeyChain
 > extends Serializable {
   protected _typeName = "StandardBaseTx"
   protected _typeID = undefined
@@ -183,7 +183,7 @@ export abstract class StandardBaseTx<
    *
    * @returns An array of [[Credential]]s
    */
-  abstract sign(msg: Buffer, kc: StandardKeyChain<KPClass>): Credential[]
+  abstract sign(msg: Buffer, kc: SignerKeyChain): Credential[]
 
   abstract clone(): this
 
@@ -227,8 +227,8 @@ export abstract class StandardBaseTx<
  * Class representing an unsigned transaction.
  */
 export abstract class StandardUnsignedTx<
-  KPClass extends StandardKeyPair,
-  KCClass extends StandardKeyChain<KPClass>,
+  KPClass extends SignerKeyPair,
+  KCClass extends SignerKeyChain,
   SBTx extends StandardBaseTx<KPClass, KCClass>
 > extends Serializable {
   protected _typeName = "StandardUnsignedTx"
@@ -373,8 +373,8 @@ export abstract class StandardUnsignedTx<
  * Class representing a signed transaction.
  */
 export abstract class StandardTx<
-  KPClass extends StandardKeyPair,
-  KCClass extends StandardKeyChain<KPClass>,
+  KPClass extends SignerKeyPair,
+  KCClass extends SignerKeyChain,
   SUBTx extends StandardUnsignedTx<
     KPClass,
     KCClass,

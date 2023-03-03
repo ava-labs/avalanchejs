@@ -18,7 +18,7 @@ const serialization: Serialization = Serialization.getInstance()
 const bintools: BinTools = BinTools.getInstance()
 const MaxSignatures = 256
 
-export type MultiSigAliasSet = Map<Buffer, OutputOwners>
+export type MultiSigAliasSet = Map<string, OutputOwners>
 
 /**
  * Class for representing a generic multi signature key.
@@ -181,7 +181,7 @@ export class MultiSigKeyChain extends StandardKeyChain<MultiSigKeyPair> {
         const addr = currentStack.owners.getAddress(currentStack.index)
         currentStack.index++
         // Is it a multi-sig address ?
-        const alias = this.msigAliases.get(addr)
+        const alias = this.msigAliases.get(addr.toString())
         if (alias !== undefined) {
           // multi-sig
           if (stack.length > MaxSignatures) {
@@ -198,23 +198,23 @@ export class MultiSigKeyChain extends StandardKeyChain<MultiSigKeyPair> {
           if (visited > MaxSignatures) {
             throw TooManySignatures
           }
-          const sig = this.keys[address.toString("hex")]
+          const sig = this.keys[addr.toString("hex")]
           if (sig !== undefined) {
             result.push(sig)
             currentStack.verified++
           }
           visited++
         }
-        // verify current level
-        if (currentStack.verified < currentStack.owners.getThreshold()) {
-          throw new Error("not enough signatures")
-        }
-        // remove head
-        stack.pop()
-        // apply child verification
-        if (stack.length > 0) {
-          stack[stack.length - 1].verified++
-        }
+      }
+      // verify current level
+      if (currentStack.verified < currentStack.owners.getThreshold()) {
+        throw new Error("not enough signatures")
+      }
+      // remove head
+      stack.pop()
+      // apply child verification
+      if (stack.length > 0) {
+        stack[stack.length - 1].verified++
       }
     }
     return result
