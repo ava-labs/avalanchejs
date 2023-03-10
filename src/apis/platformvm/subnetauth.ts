@@ -32,9 +32,8 @@ export class SubnetAuth extends Serializable {
    * @param index the Buffer of the address index to add
    */
   addAddressIndex(index: Buffer): void {
-    const numAddrIndices: number = this.getNumAddressIndices()
-    this.numAddressIndices.writeUIntBE(numAddrIndices + 1, 0, 4)
     this.addressIndices.push(index)
+    this.numAddressIndices.writeUIntBE(this.addressIndices.length, 0, 4)
   }
 
   /**
@@ -49,6 +48,14 @@ export class SubnetAuth extends Serializable {
    */
   getAddressIndices(): Buffer[] {
     return this.addressIndices
+  }
+
+  /**
+   * Set an array of AddressIndices as Buffers
+   */
+  setAddressIndices(addressIndices: Buffer[]) {
+    this.addressIndices = addressIndices
+    this.numAddressIndices.writeUIntBE(this.addressIndices.length, 0, 4)
   }
 
   protected addressIndices: Buffer[] = []
@@ -76,9 +83,9 @@ export class SubnetAuth extends Serializable {
     numAddressIndices.writeIntBE(this.addressIndices.length, 0, 4)
     const barr: Buffer[] = [typeIDBuf, numAddressIndices]
     let bsize: number = typeIDBuf.length + numAddressIndices.length
-    this.addressIndices.forEach((addressIndex: Buffer, i: number): void => {
+    this.addressIndices.forEach((addressIndex: Buffer): void => {
       bsize += 4
-      barr.push(this.addressIndices[`${i}`])
+      barr.push(addressIndex)
     })
     return Buffer.concat(barr, bsize)
   }

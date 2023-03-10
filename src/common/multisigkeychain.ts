@@ -1,31 +1,137 @@
 /**
  * @packageDocumentation
- * @module Common-MultiSigKeyChain
+ * @module Common-MultisigKeyChain
  */
 
 import { Buffer } from "buffer/"
-import { OutputOwners } from "."
+import { OutputOwners, SigIdx } from "."
 
 import { Serialization, SerializedType } from "../utils"
 import BinTools from "../utils/bintools"
 import { StandardKeyChain, StandardKeyPair } from "./keychain"
 import { SECP256k1KeyPair } from "./secp256k1"
 
+export class SignatureError extends Error {}
 const NotImplemented = new Error("not implemented in MultiSig KeyPair")
-const TooManySignatures = new Error("too many signatures")
+const TooManySignatures = new SignatureError("too many signatures")
 
 const serialization: Serialization = Serialization.getInstance()
 const bintools: BinTools = BinTools.getInstance()
 const MaxSignatures = 256
+const WildcardBuffer = new Buffer([0xff, 0xff, 0xff, 0xff])
 
-export type MultiSigAliasSet = Map<string, OutputOwners>
+export class MultisigAliasSet {
+  protected msigs: Map<string, OutputOwners>
+  protected addresses: Set<string>
+  protected isDryRun = false
+
+  resolveMultisig(source: SigIdx[]): SigIdx[] {
+    type stackItem = {
+      index: number
+      verified: number
+      owners: OutputOwners
+    }
+
+    var visited: number = 0
+    const cycleCheck = new Set<string>()
+    const stack: stackItem[] = [
+      {
+        index: 0,
+        verified: 0,
+        owners: new OutputOwners(
+          source.map((s) => s.getSource()),
+          undefined,
+          source.length
+        )
+      }
+    ]
+
+    const result: SigIdx[] = []
+    const helper = Buffer.alloc(4)
+    const noAddresses = this.addresses.size === 0
+
+    Stack: while (stack.length > 0) {
+      // get head
+      const currentStack = stack[stack.length - 1]
+      while (
+        currentStack.index < currentStack.owners.getAddresses().length &&
+        currentStack.verified < currentStack.owners.getThreshold()
+      ) {
+        // get the next address to check
+        const addr = currentStack.owners.getAddress(currentStack.index)
+        const addrString = addr.toString("hex")
+        currentStack.index++
+        // Is it a multi-sig address ?
+        const alias = this.msigs.get(addrString)
+        if (alias !== undefined) {
+          // multi-sig
+          if (stack.length > MaxSignatures) {
+            throw TooManySignatures
+          }
+          if (cycleCheck.has(addrString)) {
+            throw new Error("cyclink multisig alias")
+          }
+          cycleCheck.add(addrString)
+          // Ignore empty alias definitions
+          if (alias.getThreshold() > 0) {
+            stack.push({ index: 0, verified: 0, owners: alias })
+            continue Stack
+          }
+        } else {
+          // non-multi-sig
+          if (visited > MaxSignatures) {
+            throw TooManySignatures
+          }
+          // Special case for preparing Signavault
+          if (noAddresses || this.addresses.has(addrString)) {
+            const sigIdx = new SigIdx()
+            if (noAddresses) {
+              sigIdx.fromBuffer(WildcardBuffer)
+            } else {
+              sigIdx.setSource(addr)
+              helper.writeUIntBE(visited, 0, 4)
+              sigIdx.fromBuffer(helper)
+            }
+            result.push(sigIdx)
+            currentStack.verified++
+          }
+          visited++
+        }
+      }
+      // verify current level
+      if (currentStack.verified < currentStack.owners.getThreshold()) {
+        throw new SignatureError("not enough signatures")
+      }
+      // remove head
+      stack.pop()
+      // apply child verification
+      if (stack.length > 0) {
+        stack[stack.length - 1].verified++
+      }
+    }
+    return this.isDryRun ? source : result
+  }
+
+  dryRun(enable: boolean) {
+    this.isDryRun = enable
+  }
+
+  clearAddresses(): void {
+    this.addresses.clear()
+  }
+
+  constructor(msigs: Map<string, OutputOwners>, addresses: Set<string>) {
+    this.msigs = msigs
+    this.addresses = addresses
+  }
+}
 
 /**
  * Class for representing a generic multi signature key.
  */
-export class MultiSigKeyPair extends StandardKeyPair {
+export class MultisigKeyPair extends StandardKeyPair {
   // The keychain required for address generation
-  protected keyChain: MultiSigKeyChain
+  protected keyChain: MultisigKeyChain
 
   generateKey() {
     throw NotImplemented
@@ -64,13 +170,13 @@ export class MultiSigKeyPair extends StandardKeyPair {
 
   create(...args: any[]): this {
     if (args.length == 3) {
-      return new MultiSigKeyPair(args[0], args[1], args[2]) as this
+      return new MultisigKeyPair(args[0], args[1], args[2]) as this
     }
-    return new MultiSigKeyPair(this.keyChain, this.pubk, this.privk) as this
+    return new MultisigKeyPair(this.keyChain, this.pubk, this.privk) as this
   }
 
   clone(): this {
-    return new MultiSigKeyPair(this.keyChain, this.pubk, this.privk) as this
+    return new MultisigKeyPair(this.keyChain, this.pubk, this.privk) as this
   }
 
   getPrivateKeyString(): string {
@@ -81,7 +187,7 @@ export class MultiSigKeyPair extends StandardKeyPair {
     return bintools.cb58Encode(this.pubk)
   }
 
-  constructor(keyChain: MultiSigKeyChain, address: Buffer, signature: Buffer) {
+  constructor(keyChain: MultisigKeyChain, address: Buffer, signature: Buffer) {
     super()
     this.keyChain = keyChain
     this.pubk = Buffer.from(address)
@@ -94,15 +200,13 @@ export class MultiSigKeyPair extends StandardKeyPair {
  *
  * @typeparam MultisigKeyChain Class extending [[StandardKeyChain]]
  */
-export class MultiSigKeyChain extends StandardKeyChain<MultiSigKeyPair> {
+export class MultisigKeyChain extends StandardKeyChain<MultisigKeyPair> {
   // The HRP required for address generation
   protected hrp: string
   // The chain ID required for address generation
   protected chainID: string
   // The bytes which are signed by this txID
   protected signedBytes: Buffer
-  // MultiSigAliases which are resolved in getKeys
-  protected msigAliases: MultiSigAliasSet
 
   getHRP(): string {
     return this.hrp
@@ -113,11 +217,10 @@ export class MultiSigKeyChain extends StandardKeyChain<MultiSigKeyPair> {
   }
 
   create(...args: any[]): this {
-    if (args.length == 4) {
-      return new MultiSigKeyChain(args[0], args[1], args[2], args[3]) as this
+    if (args.length == 3) {
+      return new MultisigKeyChain(args[0], args[1], args[2]) as this
     }
-    return new MultiSigKeyChain(
-      this.msigAliases,
+    return new MultisigKeyChain(
       this.signedBytes,
       this.hrp,
       this.chainID
@@ -125,8 +228,7 @@ export class MultiSigKeyChain extends StandardKeyChain<MultiSigKeyPair> {
   }
 
   clone(): this {
-    const newkc = new MultiSigKeyChain(
-      this.msigAliases,
+    const newkc = new MultisigKeyChain(
       this.signedBytes,
       this.hrp,
       this.chainID
@@ -151,83 +253,8 @@ export class MultiSigKeyChain extends StandardKeyChain<MultiSigKeyPair> {
     return newkc
   }
 
-  getKeys = (address: Buffer): MultiSigKeyPair[] => {
-    const result: MultiSigKeyPair[] = []
-
-    type stackItem = {
-      index: number
-      verified: number
-      owners: OutputOwners
-    }
-
-    var visited: number
-    const cycleCheck = new Set<Buffer>()
-    const stack: stackItem[] = [
-      {
-        index: 0,
-        verified: 0,
-        owners: new OutputOwners([address], undefined, 1)
-      }
-    ]
-
-    Stack: while (stack.length > 0) {
-      // get head
-      const currentStack = stack[stack.length - 1]
-      while (
-        currentStack.index < currentStack.owners.getAddresses().length &&
-        currentStack.verified < currentStack.owners.getThreshold()
-      ) {
-        // get the next address to check
-        const addr = currentStack.owners.getAddress(currentStack.index)
-        currentStack.index++
-        // Is it a multi-sig address ?
-        const alias = this.msigAliases.get(addr.toString())
-        if (alias !== undefined) {
-          // multi-sig
-          if (stack.length > MaxSignatures) {
-            throw TooManySignatures
-          }
-          if (cycleCheck.has(addr)) {
-            throw new Error("cyclink multisig alias")
-          }
-          cycleCheck.add(addr)
-          stack.push({ index: 0, verified: 0, owners: alias })
-          continue Stack
-        } else {
-          // non-multi-sig
-          if (visited > MaxSignatures) {
-            throw TooManySignatures
-          }
-          const sig = this.keys[addr.toString("hex")]
-          if (sig !== undefined) {
-            result.push(sig)
-            currentStack.verified++
-          }
-          visited++
-        }
-      }
-      // verify current level
-      if (currentStack.verified < currentStack.owners.getThreshold()) {
-        throw new Error("not enough signatures")
-      }
-      // remove head
-      stack.pop()
-      // apply child verification
-      if (stack.length > 0) {
-        stack[stack.length - 1].verified++
-      }
-    }
-    return result
-  }
-
-  constructor(
-    msigAliases: MultiSigAliasSet,
-    signedBytes: Buffer,
-    hrp: string,
-    chainID: string
-  ) {
+  constructor(signedBytes: Buffer, hrp: string, chainID: string) {
     super()
-    this.msigAliases = msigAliases
     this.signedBytes = Buffer.from(signedBytes)
     this.hrp = hrp
     this.chainID = chainID

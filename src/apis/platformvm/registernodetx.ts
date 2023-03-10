@@ -7,7 +7,7 @@ import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
-import { Credential, SigIdx, Signature } from "../../common/credentials"
+import { Credential, MultisigAliasSet, SigIdx, Signature } from "../../common"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import {
@@ -163,10 +163,21 @@ export class RegisterNodeTx extends BaseTx {
   }
 
   /**
-   * Returns the array of [[SigIdx]] for this [[Input]]
+   * Returns the array of [[SigIdx]] for this [[TX]]
    */
   getSigIdxs(): SigIdx[] {
     return this.sigIdxs
+  }
+
+  /**
+   * Sets the array of [[SigIdx]] for this [[TX]]
+   */
+  setSigIdxs(sigIdxs: SigIdx[]) {
+    this.sigIdxs = sigIdxs
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
+    this.consortiumMemberAuth.setAddressIndices(
+      sigIdxs.map((idx) => idx.toBuffer())
+    )
   }
 
   getCredentialID(): number {
@@ -186,13 +197,11 @@ export class RegisterNodeTx extends BaseTx {
     let cred: Credential = SelectCredentialClass(this.getCredentialID())
 
     function addSig(source: Buffer) {
-      const keypairs: KeyPair[] = kc.getKeys(source)
-      keypairs.forEach((keypair) => {
-        const signval: Buffer = keypair.sign(msg)
-        const sig: Signature = new Signature()
-        sig.fromBuffer(signval)
-        cred.addSignature(sig)
-      })
+      const keypair: KeyPair = kc.getKey(source)
+      const signval: Buffer = keypair.sign(msg)
+      const sig: Signature = new Signature()
+      sig.fromBuffer(signval)
+      cred.addSignature(sig)
     }
 
     // Add NodeSignature
@@ -210,6 +219,11 @@ export class RegisterNodeTx extends BaseTx {
     }
     creds.push(cred)
     return creds
+  }
+
+  resolveMultisigIndices(resolver: MultisigAliasSet) {
+    super.resolveMultisigIndices(resolver)
+    this.setSigIdxs(resolver.resolveMultisig(this.sigIdxs))
   }
 
   /**

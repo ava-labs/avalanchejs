@@ -128,15 +128,11 @@ export class BaseTx extends StandardBaseTx<SignerKeyPair, SignerKeyChain> {
       )
       const sigidxs: SigIdx[] = this.ins[`${i}`].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypairs: SignerKeyPair[] = kc.getKeys(
-          sigidxs[`${j}`].getSource()
-        )
-        keypairs.forEach((keypair) => {
-          const signval: Buffer = keypair.sign(msg)
-          const sig: Signature = new Signature()
-          sig.fromBuffer(signval)
-          cred.addSignature(sig)
-        })
+        const keypair: SignerKeyPair = kc.getKey(sigidxs[`${j}`].getSource())
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
       }
       creds.push(cred)
     }

@@ -130,16 +130,6 @@ export abstract class SignerKeyChain {
    * @returns A reference to the [[SignerKeyPair]] in the keys database
    */
   abstract getKey(address: Buffer): SignerKeyPair
-
-  /**
-   * Returns the [[SignerKeyPair]]'s listed under the provided address
-   *
-   * @param address The {@link https://github.com/feross/buffer|Buffer} of the address to
-   * retrieve from the keys database
-   *
-   * @returns A reference to the [[SignerKeyPair]]'s in the keys database
-   */
-  abstract getKeys(address: Buffer): SignerKeyPair[]
 }
 
 /**

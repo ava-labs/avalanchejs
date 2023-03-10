@@ -5,9 +5,12 @@
 import { Buffer } from "buffer/"
 import BN from "bn.js"
 import AvalancheCore from "../../camino"
-import { RequestResponseData } from "../../common/apibase"
-import { JRPCAPI } from "../../common/jrpcapi"
-import { OutputOwners } from "../../common/output"
+import {
+  JRPCAPI,
+  OutputOwners,
+  RequestResponseData,
+  ZeroBN
+} from "../../common"
 
 import {
   ErrorResponseObject,
@@ -86,7 +89,6 @@ import { Spender } from "./spender"
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
-const ZeroBN: BN = new BN(0)
 const NanoBN = new BN(1000000000)
 const rewardPercentDenom = 1000000
 

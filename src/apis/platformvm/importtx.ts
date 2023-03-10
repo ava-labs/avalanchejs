@@ -9,7 +9,7 @@ import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
 import { KeyChain, KeyPair } from "./keychain"
 import { SelectCredentialClass } from "./credentials"
-import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { Signature, MultisigAliasSet, SigIdx, Credential } from "../../common"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
@@ -141,17 +141,22 @@ export class ImportTx extends BaseTx {
       )
       const sigidxs: SigIdx[] = this.importIns[`${i}`].getInput().getSigIdxs()
       for (let j: number = 0; j < sigidxs.length; j++) {
-        const keypairs: KeyPair[] = kc.getKeys(sigidxs[`${j}`].getSource())
-        keypairs.forEach((keypair) => {
-          const signval: Buffer = keypair.sign(msg)
-          const sig: Signature = new Signature()
-          sig.fromBuffer(signval)
-          cred.addSignature(sig)
-        })
+        const keypair: KeyPair = kc.getKey(sigidxs[`${j}`].getSource())
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
       }
       creds.push(cred)
     }
     return creds
+  }
+
+  resolveMultisigIndices(resolver: MultisigAliasSet) {
+    for (let i: number = 0; i < this.importIns.length; i++) {
+      const input = this.importIns[`${i}`].getInput()
+      input.setSigIdxs(resolver.resolveMultisig(input.getSigIdxs()))
+    }
   }
 
   clone(): this {

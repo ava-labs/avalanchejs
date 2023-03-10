@@ -7,7 +7,7 @@ import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
-import { Credential, SigIdx, Signature } from "../../common/credentials"
+import { Credential, MultisigAliasSet, SigIdx, Signature } from "../../common"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
@@ -245,10 +245,19 @@ export class CreateChainTx extends BaseTx {
   }
 
   /**
-   * Returns the array of [[SigIdx]] for this [[Input]]
+   * Returns the array of [[SigIdx]] for this [[TX]]
    */
   getSigIdxs(): SigIdx[] {
     return this.sigIdxs
+  }
+
+  /**
+   * Set the array of [[SigIdx]] for this [[TX]]
+   */
+  setSigIdxs(sigIdxs: SigIdx[]) {
+    this.sigIdxs = sigIdxs
+    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
+    this.subnetAuth.setAddressIndices(this.sigIdxs.map((s) => s.toBuffer()))
   }
 
   getCredentialID(): number {
@@ -268,16 +277,19 @@ export class CreateChainTx extends BaseTx {
     const sigidxs: SigIdx[] = this.getSigIdxs()
     const cred: Credential = SelectCredentialClass(this.getCredentialID())
     for (let i: number = 0; i < sigidxs.length; i++) {
-      const keypairs: KeyPair[] = kc.getKeys(sigidxs[`${i}`].getSource())
-      keypairs.forEach((keypair) => {
-        const signval: Buffer = keypair.sign(msg)
-        const sig: Signature = new Signature()
-        sig.fromBuffer(signval)
-        cred.addSignature(sig)
-      })
+      const keypair: KeyPair = kc.getKey(sigidxs[`${i}`].getSource())
+      const signval: Buffer = keypair.sign(msg)
+      const sig: Signature = new Signature()
+      sig.fromBuffer(signval)
+      cred.addSignature(sig)
     }
     creds.push(cred)
     return creds
+  }
+
+  resolveMultisigIndices(resolver: MultisigAliasSet) {
+    super.resolveMultisigIndices(resolver)
+    this.setSigIdxs(resolver.resolveMultisig(this.sigIdxs))
   }
 
   /**

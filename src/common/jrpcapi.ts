@@ -51,8 +51,8 @@ export class JRPCAPI extends APIBase {
     var resp: RequestResponseData
     try {
       resp = await this.core.post(ep, {}, JSON.stringify(rpc), headrs, axConf)
-    } catch (e) {
-      throw e.message
+    } catch (e: any) {
+      throw e.message ?? (e as AxiosError).toJSON()
     }
 
     if (resp.status >= 200 && resp.status < 300) {
