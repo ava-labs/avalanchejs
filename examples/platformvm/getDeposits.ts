@@ -1,5 +1,10 @@
 import { Avalanche } from "caminojs/index"
-import { KeyChain, PlatformVMAPI } from "caminojs/apis/platformvm"
+import {
+  GetUTXOsResponse,
+  KeyChain,
+  PlatformVMAPI,
+  UTXOSet
+} from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 
@@ -28,10 +33,14 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const active = true
-  const depositOffers = await pchain.getAllDepositOffers(active)
-  console.log(depositOffers)
-  console.log("start: ", depositOffers[0].start.toNumber())
+  const platformVMUTXOResponse: GetUTXOsResponse = await pchain.getUTXOs(
+    pAddressStrings
+  )
+  const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
+  const txIDs = utxoSet.getLockedTxIDs()
+
+  const deposits = await pchain.getDeposits(txIDs.depositIDs)
+  console.log(deposits)
 }
 
 main()

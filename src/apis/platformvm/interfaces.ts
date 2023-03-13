@@ -259,18 +259,36 @@ export interface GetAllDepositOffersResponse {
   depositOffers: DepositOffer[]
 }
 
-interface DepositOffer {
-  ID: string
-  InterestRateNominator: number
-  Start: number
-  End: number
-  MinAmount: number
-  MinDuration: number
-  MaxDuration: number
-  UnlockPeriodDuration: number
-  NoRewardsPeriodDuration: number
-  Memo: string
-  Flags: number
+export interface DepositOffer {
+  id: string
+  interestRateNominator: BN
+  start: BN
+  end: BN
+  minAmount: BN
+  minDuration: number
+  maxDuration: number
+  unlockPeriodDuration: number
+  noRewardsPeriodDuration: number
+  memo: string
+  flags: BN
+}
+
+export interface GetDepositsParams {
+  depositTxIDs: string[]
+}
+
+export interface GetDepositsResponse {
+  deposits: APIDeposit[]
+}
+
+export interface APIDeposit {
+  depositTxID: string
+  depositOfferID: string
+  unlockedAmount: BN
+  claimedRewardAmount: BN
+  start: BN
+  duration: number
+  amount: BN
 }
 
 export interface GetMaxStakeAmountParams {

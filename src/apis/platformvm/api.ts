@@ -36,7 +36,9 @@ import {
   DelegationFeeError
 } from "../../utils/errors"
 import {
+  APIDeposit,
   BalanceDict,
+  DepositOffer,
   GetCurrentValidatorsParams,
   GetPendingValidatorsParams,
   GetRewardUTXOsParams,
@@ -73,7 +75,9 @@ import {
   GetClaimablesParams,
   GetClaimablesResponse,
   GetAllDepositOffersParams,
-  GetAllDepositOffersResponse
+  GetAllDepositOffersResponse,
+  GetDepositsParams,
+  GetDepositsResponse
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -586,9 +590,7 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for a list containing deposit offers.
    */
-  getAllDepositOffers = async (
-    active: boolean
-  ): Promise<GetAllDepositOffersResponse> => {
+  getAllDepositOffers = async (active: boolean): Promise<DepositOffer[]> => {
     const params: GetAllDepositOffersParams = {
       active
     }
@@ -596,7 +598,53 @@ export class PlatformVMAPI extends JRPCAPI {
       "platform.getAllDepositOffers",
       params
     )
-    return response.data.result as GetAllDepositOffersResponse
+
+    const offers: GetAllDepositOffersResponse = response.data.result
+    return offers.depositOffers.map((offer) => {
+      return {
+        id: offer.id,
+        interestRateNominator: new BN(offer.interestRateNominator),
+        start: new BN(offer.start),
+        end: new BN(offer.end),
+        minAmount: new BN(offer.minAmount),
+        minDuration: offer.minDuration,
+        maxDuration: offer.maxDuration,
+        unlockPeriodDuration: offer.unlockPeriodDuration,
+        noRewardsPeriodDuration: offer.noRewardsPeriodDuration,
+        memo: offer.memo,
+        flags: new BN(offer.flags)
+      } as DepositOffer
+    })
+  }
+
+  /**
+   * Returns deposits coressponding to requested txIDs.
+   *
+   * @param depositTxIDs A list of txIDs (cb58) to request deposits for.
+   *
+   * @returns Promise for a list containing deposits.
+   */
+  getDeposits = async (depositTxIDs: string[]): Promise<APIDeposit[]> => {
+    const params: GetDepositsParams = {
+      depositTxIDs
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getDeposits",
+      params
+    )
+
+    const deposits: GetDepositsResponse = response.data.result
+    return deposits.deposits.map((deposit) => {
+      return {
+        depositTxID: deposit.depositTxID,
+        depositOfferID: deposit.depositOfferID,
+        unlockedAmount: new BN(deposit.unlockedAmount),
+        claimedRewardAmount: new BN(deposit.claimedRewardAmount),
+        start: new BN(deposit.start),
+        duration: deposit.duration,
+        amount: new BN(deposit.amount)
+      } as APIDeposit
+    })
   }
 
   /**
