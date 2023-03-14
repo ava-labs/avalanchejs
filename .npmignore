@@ -5,6 +5,7 @@ tsconfig.json
 .*
 *.tar
 *.tgz
+*.diff
 e2eSequencer.js
 jest.config.js
 yarn.lock
