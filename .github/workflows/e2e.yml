@@ -49,15 +49,17 @@ jobs:
       - name: Install autoremove
         run: sudo apt-get autoremove -y
       - name: Clone and Build Camino Node
+        env:
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref || github.event.inputs.caminojsBranch }}
         run: |
           cd $GOPATH/$CAMPATH
-          git clone https://github.com/chain4travel/camino-node --depth 1 -bv0.3.1-alpha1
+          git clone https://github.com/chain4travel/camino-node --depth 1 -b$TARGET_BRANCH
           cd camino-node
           ./scripts/build.sh
       - name: Checkout Camino Network Runner
         run: |
           cd $GOPATH/$CAMPATH
-          git clone https://github.com/chain4travel/camino-network-runner --depth 1 -bv0.2.1-alpha1
+          git clone https://github.com/chain4travel/camino-network-runner --depth 1
       - name: Starting Camino Network Runner
         env:
           CAMINO_NODE_PATH: ${{env.GOPATH}}/${{env.CAMPATH}}/camino-node/build/camino-node
@@ -66,11 +68,30 @@ jobs:
           cd $GOPATH/$CAMPATH
           cd camino-network-runner
           go run ./examples/local/fivenodenetwork/main.go &>/tmp/cnr.log &
-      - name: CaminoJS E2E Test
+      - name: CaminoJS E2E Avax Tests
         env:
           CAMINOGO_IP: 127.0.0.1
           CAMINOGO_PORT: 9650
         run: |
           sleep 90
           cat /tmp/cnr.log
-          yarn test -i --roots e2e_tests
+          yarn test -i --roots e2e_tests --testPathIgnorePatterns=e2e_tests/camino
+      - name: Restarting Camino Network Runner with Kopernikus Configuration
+        env:
+          CAMINO_NODE_PATH: ${{env.GOPATH}}/${{env.CAMPATH}}/camino-node/build/camino-node
+          CAMINO_NETWORK: true
+        run: |
+          pkill -f camino-node
+          sleep 10
+          cd $GOPATH/$CAMPATH
+          cd camino-network-runner
+          go run ./examples/local/e2enodenetwork/main.go  &>/tmp/cnr-e2e.log &
+      - name: CaminoJS E2E Camino Tests
+        env:
+          CAMINOGO_IP: 127.0.0.1
+          CAMINOGO_PORT: 9650
+          NETWORK_ID: 1002
+        run: |
+          sleep 60
+          cat /tmp/cnr-e2e.log
+          yarn test -i --roots e2e_tests/camino

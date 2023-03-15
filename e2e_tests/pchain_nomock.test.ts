@@ -107,7 +107,7 @@ describe("PChain", (): void => {
       () => pchain.getBlockchains(),
       (x) => x[0].id,
       Matcher.toBe,
-      () => "2LqjNQWTVU7KEkFC5WenqdcwRzsjmJH1erk1xbFQDwt5EHC1Zr"
+      () => "27VLzZQ8SxuYiXWzov7wn5upEscX63KrweVDf6an5w45zqvJJv"
     ],
     [
       "getBlockchainsX",
@@ -130,7 +130,7 @@ describe("PChain", (): void => {
         return x.toString()
       },
       Matcher.toBe,
-      () => "361196333750752149"
+      () => "361210240952952649"
     ],
     [
       "getHeight",

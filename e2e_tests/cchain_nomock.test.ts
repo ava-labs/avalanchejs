@@ -60,7 +60,7 @@ describe("CChain", (): void => {
       () => cchain.getBaseFee(),
       (x) => x,
       Matcher.toBe,
-      () => "0xba43b7400"
+      () => "0x34630b8a00"
     ],
     [
       "getMaxPriorityFeePerGas",

@@ -1689,6 +1689,7 @@ export class PlatformVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
     subnetAuthCredentials: [number, Buffer][] = [],
+    nodeCredentials: [number, Buffer] = undefined,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const from: Buffer[] = this._cleanAddressArray(
@@ -1730,6 +1731,7 @@ export class PlatformVMAPI extends JRPCAPI {
       memo,
       asOf,
       subnetAuthCredentials,
+      nodeCredentials,
       changeThreshold
     )
 

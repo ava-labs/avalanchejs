@@ -453,6 +453,7 @@ export class Builder {
     memo: Buffer = undefined,
     asOf: BN = zero,
     subnetAuthCredentials: [number, Buffer][] = [],
+    nodeCredentials: [number, Buffer] = undefined,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
@@ -462,6 +463,12 @@ export class Builder {
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new Error(
         "CaminoExecutor.buildAddSubnetValidatorTx -- startTime must be in the future and endTime must come after startTime"
+      )
+    }
+
+    if (this.caminoEnabled && nodeCredentials == undefined) {
+      throw new Error(
+        "CaminoExecutor.buildAddSubnetValidatorTx -- nodeCredentials must be provided when Camino is enabled"
       )
     }
 
@@ -479,7 +486,7 @@ export class Builder {
         aad,
         asOf,
         zero,
-        "Stake"
+        this.caminoEnabled ? "Unlocked" : "Stake"
       )
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
@@ -509,6 +516,13 @@ export class Builder {
         )
       }
     )
+
+    if (this.caminoEnabled) {
+      addSubnetValidatorTx.setNodeSignatureIdx(
+        nodeCredentials[0],
+        nodeCredentials[1]
+      )
+    }
     return new UnsignedTx(addSubnetValidatorTx)
   }
 
