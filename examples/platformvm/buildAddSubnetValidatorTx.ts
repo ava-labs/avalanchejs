@@ -77,7 +77,11 @@ const main = async (): Promise<any> => {
     subnetID,
     memo,
     asOf,
-    subnetAuthCredentials
+    {
+      addresses: [pAddresses[3], pAddresses[1]],
+      threshold: 2,
+      signer: subnetAuthCredentials
+    }
   )
   const tx: Tx = unsignedTx.sign(pKeychain)
   const txid: string = await pchain.issueTx(tx)

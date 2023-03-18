@@ -6,7 +6,7 @@
 import BN from "bn.js"
 
 import { Buffer } from "buffer/"
-import { OutputOwners } from "../../common/output"
+import { OutputOwners, ZeroBN } from "../../common"
 import { DefaultNetworkID, UnixNow } from "../../utils"
 import {
   AddressError,
@@ -53,6 +53,17 @@ export interface MinimumSpendable {
   ): Promise<Error>
 }
 
+export type FromSigner = {
+  from: Buffer[]
+  signer: Buffer[]
+}
+
+export type Auth = {
+  addresses: Buffer[]
+  threshold: number
+  signer: [number, Buffer][]
+}
+
 const zero: BN = new BN(0)
 
 export class Builder {
@@ -73,7 +84,7 @@ export class Builder {
    * @param amount The amount of the asset to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
    * @param assetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for the UTXO
    * @param toAddresses The addresses to send the funds
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
    * @param feeAssetID Optional. The assetID of the fees being burned. Default: assetID
@@ -92,7 +103,7 @@ export class Builder {
     amount: BN,
     amountAssetID: Buffer,
     toAddresses: Buffer[],
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[] = undefined,
     fee: BN = zero,
     feeAssetID: Buffer = undefined,
@@ -124,7 +135,8 @@ export class Builder {
     const aad: AssetAmountDestination = new AssetAmountDestination(
       toAddresses,
       toThreshold,
-      fromAddresses,
+      fromSigner.from,
+      fromSigner.signer,
       changeAddresses,
       changeThreshold
     )
@@ -139,6 +151,7 @@ export class Builder {
 
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     const minSpendableErr: Error = await this.spender.getMinimumSpendable(
       aad,
@@ -149,11 +162,13 @@ export class Builder {
     if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs()
       outs = aad.getAllOutputs()
+      owners = aad.getOutputOwners()
     } else {
       throw minSpendableErr
     }
 
     const baseTx: BaseTx = new BaseTx(networkID, blockchainID, outs, ins, memo)
+    baseTx.setOutputOwners(owners)
     return new UnsignedTx(baseTx)
   }
 
@@ -163,7 +178,7 @@ export class Builder {
    * @param networkID The number representing NetworkID of the node
    * @param blockchainID The {@link https://github.com/feross/buffer|Buffer} representing the BlockchainID for the transaction
    * @param toAddresses The addresses to send the funds
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses Optional. The addresses that can spend the change remaining from the spent UTXOs. Default: toAddresses
    * @param importIns An array of [[TransferableInput]]s being imported
    * @param sourceChain A {@link https://github.com/feross/buffer|Buffer} for the chainid where the imports are coming from.
@@ -181,7 +196,7 @@ export class Builder {
     networkID: number,
     blockchainID: Buffer,
     toAddresses: Buffer[],
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     atomics: UTXO[],
     sourceChain: Buffer = undefined,
@@ -195,6 +210,9 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
+    const importOwners: OutputOwners[] = []
+
     if (typeof fee === "undefined") {
       fee = zero.clone()
     }
@@ -247,6 +265,13 @@ export class Builder {
         }
         xferin.getInput().addSignatureIdx(idx, spenders[`${j}`])
       }
+      importOwners.push(
+        new OutputOwners(
+          output.getAddresses(),
+          output.getLocktime(),
+          output.getThreshold()
+        )
+      )
       importIns.push(xferin)
       //add extra outputs for each amount (calculated from the imported inputs), minus fees
       if (infeeamount.gt(zero)) {
@@ -271,7 +296,8 @@ export class Builder {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         toAddresses,
         toThreshold,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -286,12 +312,14 @@ export class Builder {
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
+        owners.push(...importOwners)
       } else {
         throw minSpendableErr
       }
     }
 
-    const importTx: ImportTx = new ImportTx(
+    const baseTx: ImportTx = new ImportTx(
       networkID,
       blockchainID,
       outs,
@@ -300,7 +328,9 @@ export class Builder {
       sourceChain,
       importIns
     )
-    return new UnsignedTx(importTx)
+
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -311,7 +341,7 @@ export class Builder {
    * @param amount The amount being exported as a {@link https://github.com/indutny/bn.js/|BN}
    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who recieves the AVAX
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who owns the AVAX
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover of the AVAX
    * @param destinationChain Optional. A {@link https://github.com/feross/buffer|Buffer} for the chainid where to send the asset.
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
@@ -331,7 +361,7 @@ export class Builder {
     amount: BN,
     amountAssetID: Buffer,
     toAddresses: Buffer[],
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     destinationChain: Buffer,
     changeAddresses: Buffer[] = undefined,
     fee: BN = zero,
@@ -344,6 +374,7 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     if (typeof changeAddresses === "undefined") {
       changeAddresses = toAddresses
@@ -364,9 +395,10 @@ export class Builder {
     }
 
     const aad: AssetAmountDestination = new AssetAmountDestination(
-      [],
-      0,
-      fromAddresses,
+      toAddresses,
+      toThreshold,
+      fromSigner.from,
+      fromSigner.signer,
       changeAddresses,
       changeThreshold
     )
@@ -392,11 +424,12 @@ export class Builder {
       ins = aad.getInputs()
       outs = singleAsset ? aad.getAllOutputs() : aad.getChangeOutputs()
       exports = singleAsset ? [] : aad.getOutputs()
+      owners = aad.getOutputOwners()
     } else {
       throw minSpendableErr
     }
 
-    const exportTx: ExportTx = new ExportTx(
+    const baseTx: ExportTx = new ExportTx(
       networkID,
       blockchainID,
       outs,
@@ -415,7 +448,8 @@ export class Builder {
           ]
     )
 
-    return new UnsignedTx(exportTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -423,7 +457,7 @@ export class Builder {
    *
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees in AVAX
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
    * @param nodeID The node ID of the validator being added.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -433,7 +467,7 @@ export class Builder {
    * @param feeAssetID Optional. The assetID of the fees being burned.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
+   * @param subnetAuth Optional. An Auth struct which contains the subnet Auth and the signers.
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction created from the passed in parameters.
@@ -441,7 +475,7 @@ export class Builder {
   buildAddSubnetValidatorTx = async (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     nodeID: Buffer,
     startTime: BN,
@@ -452,12 +486,12 @@ export class Builder {
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
     asOf: BN = zero,
-    subnetAuthCredentials: [number, Buffer][] = [],
-    nodeCredentials: [number, Buffer] = undefined,
+    subnetAuth: Auth = { addresses: [], threshold: 0, signer: [] },
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
@@ -466,17 +500,12 @@ export class Builder {
       )
     }
 
-    if (this.caminoEnabled && nodeCredentials == undefined) {
-      throw new Error(
-        "CaminoExecutor.buildAddSubnetValidatorTx -- nodeCredentials must be provided when Camino is enabled"
-      )
-    }
-
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
         0,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -491,12 +520,13 @@ export class Builder {
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
       } else {
         throw minSpendableErr
       }
     }
 
-    const addSubnetValidatorTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
+    const baseTx: AddSubnetValidatorTx = new AddSubnetValidatorTx(
       networkID,
       blockchainID,
       outs,
@@ -508,22 +538,22 @@ export class Builder {
       weight,
       subnetID
     )
-    subnetAuthCredentials.forEach(
-      (subnetAuthCredential: [number, Buffer]): void => {
-        addSubnetValidatorTx.addSignatureIdx(
-          subnetAuthCredential[0],
-          subnetAuthCredential[1]
-        )
-      }
+    subnetAuth.signer.forEach((subnetSigner): void => {
+      baseTx.addSignatureIdx(subnetSigner[0], subnetSigner[1])
+    })
+
+    // We need to fetch the AUTH for later msig verification
+    // For now we use simply what we get in subnetAuth
+    owners.push(
+      new OutputOwners(subnetAuth.addresses, ZeroBN, subnetAuth.threshold)
     )
 
     if (this.caminoEnabled) {
-      addSubnetValidatorTx.setNodeSignatureIdx(
-        nodeCredentials[0],
-        nodeCredentials[1]
-      )
+      baseTx.includeNodeSignature()
+      owners.push(new OutputOwners([nodeID], ZeroBN, 1))
     }
-    return new UnsignedTx(addSubnetValidatorTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -533,7 +563,7 @@ export class Builder {
    * @param blockchainID Blockchainid, default undefined
    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
    * @param nodeID The node ID of the validator being added.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -556,7 +586,7 @@ export class Builder {
     blockchainID: Buffer,
     avaxAssetID: Buffer,
     toAddresses: Buffer[],
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     nodeID: Buffer,
     startTime: BN,
@@ -592,6 +622,7 @@ export class Builder {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
     let stakeOuts: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
@@ -603,7 +634,8 @@ export class Builder {
     const aad: AssetAmountDestination = new AssetAmountDestination(
       toAddresses,
       toThreshold,
-      fromAddresses,
+      fromSigner.from,
+      fromSigner.signer,
       changeAddresses,
       changeThreshold
     )
@@ -626,6 +658,7 @@ export class Builder {
       ins = aad.getInputs()
       outs = aad.getChangeOutputs()
       stakeOuts = aad.getOutputs()
+      owners = aad.getOutputOwners()
     } else {
       throw minSpendableErr
     }
@@ -636,7 +669,7 @@ export class Builder {
       rewardThreshold
     )
 
-    const UTx: AddDelegatorTx = new AddDelegatorTx(
+    const baseTx: AddDelegatorTx = new AddDelegatorTx(
       networkID,
       blockchainID,
       outs,
@@ -649,7 +682,8 @@ export class Builder {
       stakeOuts,
       new ParseableOutput(rewardOutputOwners)
     )
-    return new UnsignedTx(UTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -659,7 +693,7 @@ export class Builder {
    * @param blockchainID BlockchainID, default undefined
    * @param avaxAssetID {@link https://github.com/feross/buffer|Buffer} of the asset ID for AVAX
    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} recieves the stake at the end of the staking period
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who pays the fees and the stake
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the staking payment
    * @param nodeID The node ID of the validator being added.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -681,7 +715,7 @@ export class Builder {
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
     toAddresses: Buffer[],
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     nodeID: Buffer,
     startTime: BN,
@@ -704,7 +738,7 @@ export class Builder {
         networkID,
         blockchainID,
         toAddresses,
-        fromAddresses,
+        fromSigner,
         changeAddresses,
         nodeID,
         startTime,
@@ -724,6 +758,7 @@ export class Builder {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
     let stakeOuts: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
@@ -741,7 +776,8 @@ export class Builder {
     const aad: AssetAmountDestination = new AssetAmountDestination(
       toAddresses,
       toThreshold,
-      fromAddresses,
+      fromSigner.from,
+      fromSigner.signer,
       changeAddresses,
       changeThreshold
     )
@@ -764,6 +800,7 @@ export class Builder {
       ins = aad.getInputs()
       outs = aad.getChangeOutputs()
       stakeOuts = aad.getOutputs()
+      owners = aad.getOutputOwners()
     } else {
       throw minSpendableErr
     }
@@ -774,7 +811,7 @@ export class Builder {
       rewardThreshold
     )
 
-    const UTx: AddValidatorTx = new AddValidatorTx(
+    const baseTx: AddValidatorTx = new AddValidatorTx(
       networkID,
       blockchainID,
       outs,
@@ -788,7 +825,8 @@ export class Builder {
       new ParseableOutput(rewardOutputOwners),
       delegationFee
     )
-    return new UnsignedTx(UTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -796,7 +834,7 @@ export class Builder {
    *
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
    * @param subnetOwnerAddresses An array of {@link https://github.com/feross/buffer|Buffer} for the addresses to add to a subnet
    * @param subnetOwnerThreshold The number of owners's signatures required to add a validator to the network
@@ -811,7 +849,7 @@ export class Builder {
   buildCreateSubnetTx = async (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     subnetOwnerAddresses: Buffer[],
     subnetOwnerThreshold: number,
@@ -823,12 +861,14 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
         0,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -843,6 +883,7 @@ export class Builder {
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
       } else {
         throw minSpendableErr
       }
@@ -854,7 +895,7 @@ export class Builder {
       locktime,
       subnetOwnerThreshold
     )
-    const createSubnetTx: CreateSubnetTx = new CreateSubnetTx(
+    const baseTx: CreateSubnetTx = new CreateSubnetTx(
       networkID,
       blockchainID,
       outs,
@@ -862,8 +903,8 @@ export class Builder {
       memo,
       subnetOwners
     )
-
-    return new UnsignedTx(createSubnetTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -871,7 +912,7 @@ export class Builder {
    *
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
    * @param subnetID Optional ID of the Subnet that validates this blockchain
    * @param chainName Optional A human readable name for the chain; need not be unique
@@ -882,7 +923,7 @@ export class Builder {
    * @param feeAssetID Optional. The assetID of the fees being burned
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
+   * @param subnetAuth Optional. An Auth struct to sign for the Subnet.
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned CreateChainTx created from the passed in parameters.
@@ -890,7 +931,7 @@ export class Builder {
   buildCreateChainTx = async (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     subnetID: string | Buffer = undefined,
     chainName: string = undefined,
@@ -901,17 +942,19 @@ export class Builder {
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
     asOf: BN = zero,
-    subnetAuthCredentials: [number, Buffer][] = [],
+    subnetAuth: Auth = { addresses: [], threshold: 0, signer: [] },
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
         0,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -926,12 +969,13 @@ export class Builder {
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
       } else {
         throw minSpendableErr
       }
     }
 
-    const createChainTx: CreateChainTx = new CreateChainTx(
+    const baseTx: CreateChainTx = new CreateChainTx(
       networkID,
       blockchainID,
       outs,
@@ -943,16 +987,18 @@ export class Builder {
       fxIDs,
       genesisData
     )
-    subnetAuthCredentials.forEach(
-      (subnetAuthCredential: [number, Buffer]): void => {
-        createChainTx.addSignatureIdx(
-          subnetAuthCredential[0],
-          subnetAuthCredential[1]
-        )
-      }
+    subnetAuth.signer.forEach((subnetAuthSigner): void => {
+      baseTx.addSignatureIdx(subnetAuthSigner[0], subnetAuthSigner[1])
+    })
+
+    // We need to fetch the AUTH for later msig verification
+    // For now we use simply what we get in subnetAuth
+    owners.push(
+      new OutputOwners(subnetAuth.addresses, ZeroBN, subnetAuth.threshold)
     )
 
-    return new UnsignedTx(createChainTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -962,7 +1008,7 @@ export class Builder {
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
    * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who received the staked tokens at the end of the staking period
-   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
    * @param nodeID The node ID of the validator being added.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
@@ -982,7 +1028,7 @@ export class Builder {
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
     to: Buffer[],
-    from: Buffer[],
+    fromSigner: FromSigner,
     change: Buffer[],
     nodeID: Buffer,
     startTime: BN,
@@ -999,6 +1045,7 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
@@ -1010,7 +1057,8 @@ export class Builder {
     const aad: AssetAmountDestination = new AssetAmountDestination(
       to,
       toThreshold,
-      from,
+      fromSigner.from,
+      fromSigner.signer,
       change,
       changeThreshold
     )
@@ -1026,6 +1074,7 @@ export class Builder {
     if (typeof minSpendableErr === "undefined") {
       ins = aad.getInputs()
       outs = aad.getAllOutputs()
+      owners = aad.getOutputOwners()
     } else {
       throw minSpendableErr
     }
@@ -1036,7 +1085,7 @@ export class Builder {
       rewardThreshold
     )
 
-    const tx: CaminoAddValidatorTx = new CaminoAddValidatorTx(
+    const baseTx: CaminoAddValidatorTx = new CaminoAddValidatorTx(
       networkID,
       blockchainID,
       outs,
@@ -1049,7 +1098,8 @@ export class Builder {
       new ParseableOutput(rewardOutputOwners)
     )
 
-    return new UnsignedTx(tx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -1057,7 +1107,7 @@ export class Builder {
    *
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
    * @param address The address to alter state.
    * @param state The state to set or remove on the given address
@@ -1073,7 +1123,7 @@ export class Builder {
   buildAddressStateTx = async (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     address: Buffer,
     state: number,
@@ -1086,12 +1136,14 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
         0,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -1112,7 +1164,7 @@ export class Builder {
       }
     }
 
-    const addressStateTx: AddressStateTx = new AddressStateTx(
+    const baseTx: AddressStateTx = new AddressStateTx(
       networkID,
       blockchainID,
       outs,
@@ -1123,7 +1175,8 @@ export class Builder {
       remove
     )
 
-    return new UnsignedTx(addressStateTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -1131,12 +1184,12 @@ export class Builder {
    *
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
    * @param oldNodeID Optional. ID of the existing NodeID to replace or remove.
    * @param newNodeID Optional. ID of the newNodID to register address.
    * @param address The consortiumMemberAddress, single or multi-sig.
-   * @param consortiumMemberAuthCredentials An array of index and address to sign for each SubnetAuth.
+   * @param addressAuths An array of index and address to verify ownership of address.
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
    * @param feeAssetID Optional. The assetID of the fees being burned
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -1148,12 +1201,12 @@ export class Builder {
   buildRegisterNodeTx = async (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
-    oldNodeID: string | Buffer = undefined,
-    newNodeID: string | Buffer = undefined,
+    oldNodeID: Buffer = undefined,
+    newNodeID: Buffer = undefined,
     address: Buffer = undefined,
-    consortiumMemberAuthCredentials: [number, Buffer][] = [],
+    addressAuths: [number, Buffer][] = [],
     fee: BN = zero,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
@@ -1162,12 +1215,14 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
         0,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -1183,12 +1238,13 @@ export class Builder {
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
       } else {
         throw minSpendableErr
       }
     }
 
-    const registerNodeTx: RegisterNodeTx = new RegisterNodeTx(
+    const baseTx: RegisterNodeTx = new RegisterNodeTx(
       networkID,
       blockchainID,
       outs,
@@ -1198,16 +1254,20 @@ export class Builder {
       newNodeID,
       address
     )
-    consortiumMemberAuthCredentials.forEach(
-      (subnetAuthCredential: [number, Buffer]): void => {
-        registerNodeTx.addSignatureIdx(
-          subnetAuthCredential[0],
-          subnetAuthCredential[1]
-        )
-      }
-    )
 
-    return new UnsignedTx(registerNodeTx)
+    addressAuths.forEach((addressAuth) => {
+      baseTx.addSignatureIdx(addressAuth[0], addressAuth[1])
+    })
+
+    owners.push(
+      newNodeID && !oldNodeID
+        ? new OutputOwners([newNodeID], ZeroBN, 1)
+        : new OutputOwners()
+    )
+    owners.push(new OutputOwners([address], ZeroBN, 1))
+
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   /**
@@ -1215,7 +1275,7 @@ export class Builder {
    *
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
-   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
    * @param depositOfferID ID of the deposit offer.
    * @param depositDuration Duration of the deposit
@@ -1231,7 +1291,7 @@ export class Builder {
   buildDepositTx = async (
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
-    fromAddresses: Buffer[],
+    fromSigner: FromSigner,
     changeAddresses: Buffer[],
     depositOfferID: string | Buffer,
     depositDuration: number | Buffer,
@@ -1244,12 +1304,14 @@ export class Builder {
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
         0,
-        fromAddresses,
+        fromSigner.from,
+        fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
@@ -1265,6 +1327,7 @@ export class Builder {
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
         outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
       } else {
         throw minSpendableErr
       }
@@ -1276,7 +1339,7 @@ export class Builder {
       rewardsOwner.getThreshold()
     )
 
-    const depositTx: DepositTx = new DepositTx(
+    const baseTx: DepositTx = new DepositTx(
       networkID,
       blockchainID,
       outs,
@@ -1287,7 +1350,8 @@ export class Builder {
       new ParseableOutput(secpOwners)
     )
 
-    return new UnsignedTx(depositTx)
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   _feeCheck(fee: BN, feeAssetID: Buffer): boolean {

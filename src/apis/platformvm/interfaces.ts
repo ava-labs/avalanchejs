@@ -6,7 +6,8 @@
 import BN from "bn.js"
 import { PersistanceOptions } from "../../utils/persistenceoptions"
 import { TransferableInput, TransferableOutput } from "."
-import { UTXOSet } from "../platformvm/utxos"
+import { UTXOSet } from "./utxos"
+import { OutputOwners } from "../../common/output"
 
 export interface AddressParams {
   address: string
@@ -310,6 +311,7 @@ export interface MultisigAliasReply extends Owner {
 
 export interface SpendParams {
   from: string[] | string
+  signer: string[] | string
   to?: Owner
   change?: Owner
 
@@ -323,4 +325,5 @@ export interface SpendParams {
 export interface SpendReply {
   ins: TransferableInput[]
   out: TransferableOutput[]
+  owners: OutputOwners[]
 }

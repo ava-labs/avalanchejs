@@ -9,7 +9,7 @@ import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
 import { KeyChain, KeyPair } from "./keychain"
 import { SelectCredentialClass } from "./credentials"
-import { Signature, MultisigAliasSet, SigIdx, Credential } from "../../common"
+import { Signature, SigIdx, Credential, OutputOwners } from "../../common"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
@@ -150,13 +150,6 @@ export class ImportTx extends BaseTx {
       creds.push(cred)
     }
     return creds
-  }
-
-  resolveMultisigIndices(resolver: MultisigAliasSet) {
-    for (let i: number = 0; i < this.importIns.length; i++) {
-      const input = this.importIns[`${i}`].getInput()
-      input.setSigIdxs(resolver.resolveMultisig(input.getSigIdxs()))
-    }
   }
 
   clone(): this {

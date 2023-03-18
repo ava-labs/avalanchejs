@@ -83,7 +83,7 @@ import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
 import { GenesisData } from "../avm"
-import { LockMode, Builder } from "./builder"
+import { Auth, LockMode, Builder, FromSigner } from "./builder"
 import { Network } from "../../utils/networks"
 import { Spender } from "./spender"
 
@@ -95,6 +95,8 @@ const serialization: Serialization = Serialization.getInstance()
 
 const NanoBN = new BN(1000000000)
 const rewardPercentDenom = 1000000
+
+type FromType = String[] | String[][]
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -1478,7 +1480,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ownerAddresses: string[],
     sourceChain: Buffer | string,
     toAddresses: string[],
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[] = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
@@ -1486,18 +1488,16 @@ export class PlatformVMAPI extends JRPCAPI {
     toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const to: Buffer[] = this._cleanAddressArray(
-      toAddresses,
-      "buildImportTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildImportTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildImportTx"
+
+    const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildImportTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     let srcChain: string = undefined
 
@@ -1531,7 +1531,7 @@ export class PlatformVMAPI extends JRPCAPI {
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
       to,
-      from,
+      fromSigner,
       change,
       atomics,
       sourceChain,
@@ -1575,7 +1575,7 @@ export class PlatformVMAPI extends JRPCAPI {
     amount: BN,
     destinationChain: Buffer | string,
     toAddresses: string[],
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[] = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
@@ -1583,6 +1583,8 @@ export class PlatformVMAPI extends JRPCAPI {
     toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
+    const caller = "buildExportTx"
+
     let prefixes: object = {}
     toAddresses.map((a: string): void => {
       prefixes[a.split("-")[0]] = true
@@ -1615,14 +1617,13 @@ export class PlatformVMAPI extends JRPCAPI {
     toAddresses.map((a: string): void => {
       to.push(bintools.stringToAddress(a))
     })
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildExportTx"
-    ).map((a): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildExportTx"
-    ).map((a): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1638,7 +1639,7 @@ export class PlatformVMAPI extends JRPCAPI {
       amount,
       avaxAssetID,
       to,
-      from,
+      fromSigner,
       destinationChain,
       change,
       this.getTxFee(),
@@ -1671,7 +1672,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param weight The amount of weight for this subnet validator.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
+   * @param subnetAuth Optional. An Auth struct which contains the subnet Auth and the signers.
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction created from the passed in parameters.
@@ -1679,7 +1680,7 @@ export class PlatformVMAPI extends JRPCAPI {
 
   buildAddSubnetValidatorTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[],
     nodeID: string,
     startTime: BN,
@@ -1688,18 +1689,17 @@ export class PlatformVMAPI extends JRPCAPI {
     subnetID: string,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
-    subnetAuthCredentials: [number, Buffer][] = [],
-    nodeCredentials: [number, Buffer] = undefined,
+    subnetAuth: Auth = { addresses: [], threshold: 0, signer: [] },
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildAddSubnetValidatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildAddSubnetValidatorTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildAddSubnetValidatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1719,7 +1719,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildAddSubnetValidatorTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
-      from,
+      fromSigner,
       change,
       NodeIDStringToBuffer(nodeID),
       startTime,
@@ -1730,8 +1730,7 @@ export class PlatformVMAPI extends JRPCAPI {
       avaxAssetID,
       memo,
       asOf,
-      subnetAuthCredentials,
-      nodeCredentials,
+      subnetAuth,
       changeThreshold
     )
 
@@ -1768,7 +1767,7 @@ export class PlatformVMAPI extends JRPCAPI {
   buildAddDelegatorTx = async (
     utxoset: UTXOSet,
     toAddresses: string[],
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[],
     nodeID: string,
     startTime: BN,
@@ -1782,22 +1781,19 @@ export class PlatformVMAPI extends JRPCAPI {
     toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const to: Buffer[] = this._cleanAddressArray(
-      toAddresses,
-      "buildAddDelegatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildAddDelegatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildAddDelegatorTx"
+    const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildAddDelegatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const rewards: Buffer[] = this._cleanAddressArray(
+      caller
+    )
+    const rewards: Buffer[] = this._cleanAddressArrayBuffer(
       rewardAddresses,
-      "buildAddDelegatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1833,7 +1829,7 @@ export class PlatformVMAPI extends JRPCAPI {
       bintools.cb58Decode(this.blockchainID),
       avaxAssetID,
       to,
-      from,
+      fromSigner,
       change,
       NodeIDStringToBuffer(nodeID),
       startTime,
@@ -1884,7 +1880,7 @@ export class PlatformVMAPI extends JRPCAPI {
   buildAddValidatorTx = async (
     utxoset: UTXOSet,
     toAddresses: string[],
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[],
     nodeID: string,
     startTime: BN,
@@ -1899,22 +1895,20 @@ export class PlatformVMAPI extends JRPCAPI {
     toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const to: Buffer[] = this._cleanAddressArray(
-      toAddresses,
-      "buildAddValidatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildAddValidatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildAddValidatorTx"
+
+    const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildAddValidatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const rewards: Buffer[] = this._cleanAddressArray(
+      caller
+    )
+    const rewards: Buffer[] = this._cleanAddressArrayBuffer(
       rewardAddresses,
-      "buildAddValidatorTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -1953,7 +1947,7 @@ export class PlatformVMAPI extends JRPCAPI {
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
       to,
-      from,
+      fromSigner,
       change,
       NodeIDStringToBuffer(nodeID),
       startTime,
@@ -1996,7 +1990,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildCreateSubnetTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[],
     subnetOwnerAddresses: string[],
     subnetOwnerThreshold: number,
@@ -2004,18 +1998,18 @@ export class PlatformVMAPI extends JRPCAPI {
     asOf: BN = ZeroBN,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildCreateSubnetTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildCreateSubnetTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildCreateSubnetTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const owners: Buffer[] = this._cleanAddressArray(
+      caller
+    )
+    const owners: Buffer[] = this._cleanAddressArrayBuffer(
       subnetOwnerAddresses,
-      "buildCreateSubnetTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -2031,7 +2025,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildCreateSubnetTx(
       networkID,
       blockchainID,
-      from,
+      fromSigner,
       change,
       owners,
       subnetOwnerThreshold,
@@ -2063,14 +2057,14 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param genesisData Optional Byte representation of genesis state of the new chain
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
+   * @param subnetAuth Optional. An Auth struct which contains the subnet Auth and the signers.
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
   buildCreateChainTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[],
     subnetID: string | Buffer = undefined,
     chainName: string = undefined,
@@ -2079,17 +2073,17 @@ export class PlatformVMAPI extends JRPCAPI {
     genesisData: string | GenesisData = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
-    subnetAuthCredentials: [number, Buffer][] = [],
+    subnetAuth: Auth = { addresses: [], threshold: 0, signer: [] },
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildCreateChainTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildCreateChainTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildCreateChainTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -2107,7 +2101,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildCreateChainTx(
       networkID,
       blockchainID,
-      from,
+      fromSigner,
       change,
       subnetID,
       chainName,
@@ -2118,7 +2112,7 @@ export class PlatformVMAPI extends JRPCAPI {
       avaxAssetID,
       memo,
       asOf,
-      subnetAuthCredentials,
+      subnetAuth,
       changeThreshold
     )
 
@@ -2146,7 +2140,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildAddressStateTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[],
     address: string | Buffer,
     state: number,
@@ -2155,14 +2149,14 @@ export class PlatformVMAPI extends JRPCAPI {
     asOf: BN = ZeroBN,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildAddressStateTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildAddressStateTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildAddressStateTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
     const addressBuf =
       typeof address === "string" ? this.parseAddress(address) : address
     if (memo instanceof PayloadBase) {
@@ -2179,7 +2173,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildAddressStateTx(
       networkID,
       blockchainID,
-      from,
+      fromSigner,
       change,
       addressBuf,
       state,
@@ -2208,7 +2202,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param oldNodeID Optional. ID of the existing NodeID to replace or remove.
    * @param newNodeID Optional. ID of the newNodID to register address.
    * @param address The consortiumMemberAddress, single or multi-sig.
-   * @param consortiumMemberAuthCredentials An array of index and address to sign for each SubnetAuth.
+   * @param addressAuths An array of index and address to verify ownership of address.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
@@ -2217,24 +2211,24 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildRegisterNodeTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[] = undefined,
     oldNodeID: string | Buffer = undefined,
     newNodeID: string | Buffer = undefined,
     address: string | Buffer = undefined,
-    consortiumMemberAuthCredentials: [number, string | Buffer][] = [],
+    addressAuths: [number, string | Buffer][] = [],
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildRegisterNodeTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildRegisterNodeTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildRegisterNodeTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
     const addrBuf =
       typeof address === "string" ? this.parseAddress(address) : address
 
@@ -2242,12 +2236,20 @@ export class PlatformVMAPI extends JRPCAPI {
       memo = memo.getPayload()
     }
     const auth: [number, Buffer][] = []
-    consortiumMemberAuthCredentials.forEach((c) => {
+    addressAuths.forEach((c) => {
       auth.push([
         c[0],
         typeof c[1] === "string" ? this.parseAddress(c[1]) : c[1]
       ])
     })
+
+    if (typeof oldNodeID === "string") {
+      oldNodeID = NodeIDStringToBuffer(oldNodeID)
+    }
+
+    if (typeof newNodeID === "string") {
+      newNodeID = NodeIDStringToBuffer(newNodeID)
+    }
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
     const networkID: number = this.core.getNetworkID()
@@ -2259,7 +2261,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildRegisterNodeTx(
       networkID,
       blockchainID,
-      from,
+      fromSigner,
       change,
       oldNodeID,
       newNodeID,
@@ -2297,7 +2299,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildDepositTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[] = undefined,
     depositOfferID: string | Buffer,
     depositDuration: number | Buffer,
@@ -2306,14 +2308,14 @@ export class PlatformVMAPI extends JRPCAPI {
     asOf: BN = ZeroBN,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const from: Buffer[] = this._cleanAddressArray(
-      fromAddresses,
-      "buildRegisterNodeTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
-    const change: Buffer[] = this._cleanAddressArray(
+    const caller = "buildRegisterNodeTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
       changeAddresses,
-      "buildRegisterNodeTx"
-    ).map((a: string): Buffer => bintools.stringToAddress(a))
+      caller
+    )
 
     if (memo instanceof PayloadBase) {
       memo = memo.getPayload()
@@ -2329,7 +2331,7 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildDepositTx(
       networkID,
       blockchainID,
-      from,
+      fromSigner,
       change,
       depositOfferID,
       depositDuration,
@@ -2385,6 +2387,38 @@ export class PlatformVMAPI extends JRPCAPI {
       }
     }
     return addrs
+  }
+
+  protected _cleanAddressArrayBuffer(
+    addresses: string[] | Buffer[],
+    caller: string
+  ): Buffer[] {
+    return this._cleanAddressArray(addresses, caller).map(
+      (a: string): Buffer => {
+        return typeof a === "undefined"
+          ? undefined
+          : bintools.stringToAddress(a)
+      }
+    )
+  }
+
+  protected _parseFromSigner(from: FromType, caller: string): FromSigner {
+    if (from.length > 0) {
+      if (typeof from[0] === "string")
+        return {
+          from: this._cleanAddressArrayBuffer(from as string[], caller),
+          signer: []
+        }
+      else
+        return {
+          from: this._cleanAddressArrayBuffer(from[0] as string[], caller),
+          signer:
+            from.length > 1
+              ? this._cleanAddressArrayBuffer(from[1] as string[], caller)
+              : []
+        }
+    }
+    return { from: [], signer: [] }
   }
 
   /**
@@ -2467,6 +2501,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   spend = async (
     from: string[] | string,
+    signer: string[] | string,
     to: string[],
     toThreshold: number,
     toLockTime: BN,
@@ -2483,6 +2518,7 @@ export class PlatformVMAPI extends JRPCAPI {
     }
     const params: SpendParams = {
       from,
+      signer,
       to:
         to.length > 0
           ? {
@@ -2518,7 +2554,10 @@ export class PlatformVMAPI extends JRPCAPI {
 
     return {
       ins,
-      out: TransferableOutput.fromArray(Buffer.from(r.outs.slice(2), "hex"))
+      out: TransferableOutput.fromArray(Buffer.from(r.outs.slice(2), "hex")),
+      owners: r.owners
+        ? OutputOwners.fromArray(Buffer.from(r.owners.slice(2), "hex"))
+        : []
     }
   }
 

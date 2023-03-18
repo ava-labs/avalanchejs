@@ -7,7 +7,7 @@ import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
-import { Credential, MultisigAliasSet, SigIdx, Signature } from "../../common"
+import { Credential, SigIdx, Signature } from "../../common"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import {
@@ -221,11 +221,6 @@ export class RegisterNodeTx extends BaseTx {
     return creds
   }
 
-  resolveMultisigIndices(resolver: MultisigAliasSet) {
-    super.resolveMultisigIndices(resolver)
-    this.setSigIdxs(resolver.resolveMultisig(this.sigIdxs))
-  }
-
   /**
    * Class representing an unsigned RegisterNode transaction.
    *
@@ -244,25 +239,16 @@ export class RegisterNodeTx extends BaseTx {
     outs: TransferableOutput[] = undefined,
     ins: TransferableInput[] = undefined,
     memo: Buffer = undefined,
-    oldNodeID: string | Buffer = undefined,
-    newNodeID: string | Buffer = undefined,
+    oldNodeID: Buffer = undefined,
+    newNodeID: Buffer = undefined,
     address: Buffer = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
-    if (typeof oldNodeID != "undefined") {
-      if (typeof oldNodeID === "string") {
-        this.oldNodeID = NodeIDStringToBuffer(oldNodeID)
-      } else {
-        this.oldNodeID = oldNodeID
-      }
-    }
-    if (typeof newNodeID != "undefined") {
-      if (typeof newNodeID === "string") {
-        this.newNodeID = NodeIDStringToBuffer(newNodeID)
-      } else {
-        this.newNodeID = newNodeID
-      }
-    }
+
+    if (typeof oldNodeID !== "undefined") this.oldNodeID = oldNodeID
+
+    if (typeof newNodeID !== "undefined") this.newNodeID = newNodeID
+
     if (typeof address != "undefined") {
       this.consortiumMemberAddress = address
     }

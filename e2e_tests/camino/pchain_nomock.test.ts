@@ -237,7 +237,6 @@ describe("Camino-PChain-Add-Validator", (): void => {
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
           const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[1]]]
-          const nodeCredentials: [number, Buffer] = [2, pAddresses[2]]
           const unsignedTx: UnsignedTx = await pChain.buildAddSubnetValidatorTx(
             undefined,
             [P(addrB)],
@@ -249,8 +248,11 @@ describe("Camino-PChain-Add-Validator", (): void => {
             createdSubnetID.value,
             memo,
             new BN(0),
-            subnetAuthCredentials,
-            nodeCredentials
+            {
+              addresses: [pAddresses[1]],
+              threshold: 1,
+              signer: subnetAuthCredentials
+            }
           )
 
           const tx: Tx = unsignedTx.sign(pKeychain)

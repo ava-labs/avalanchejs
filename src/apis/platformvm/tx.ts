@@ -7,6 +7,7 @@ import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { SelectCredentialClass } from "./credentials"
 import {
+  MultisigKeyChain,
   SignerKeyChain,
   SignerKeyPair,
   StandardTx,
@@ -25,6 +26,9 @@ import {
 } from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
 import { TransactionError } from "../../utils/errors"
+import { RegisterNodeTx } from "./registernodetx"
+import { DepositTx } from "./depositTx"
+import { AddressStateTx } from "./addressstatetx"
 
 /**
  * @ignore
@@ -53,6 +57,12 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new CaminoAddValidatorTx(...args)
   } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
     return new CreateSubnetTx(...args)
+  } else if (txtype === PlatformVMConstants.REGISTERNODETX) {
+    return new RegisterNodeTx(...args)
+  } else if (txtype === PlatformVMConstants.DEPOSITTX) {
+    return new DepositTx(...args)
+  } else if (txtype === PlatformVMConstants.ADDRESSSTATETX) {
+    return new AddressStateTx(...args)
   }
   /* istanbul ignore next */
   throw new TransactionError("Error - SelectTxClass: unknown txtype")
@@ -101,7 +111,11 @@ export class UnsignedTx extends StandardUnsignedTx<
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
     )
-    const creds: Credential[] = this.transaction.sign(msg, kc)
+
+    const creds: Credential[] =
+      kc instanceof MultisigKeyChain
+        ? kc.getCredentials()
+        : this.transaction.sign(msg, kc)
     return new Tx(this, creds)
   }
 }

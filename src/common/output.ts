@@ -219,6 +219,11 @@ export class OutputOwners extends Serializable {
   }
 
   /**
+   * Returns an the length of the Addresses array.
+   */
+  getAddressesLength = (): number => this.addresses.length
+
+  /**
    * Returns the index of the address.
    *
    * @param address A {@link https://github.com/feross/buffer|Buffer} of the address to look up to return its index.
@@ -385,6 +390,31 @@ export class OutputOwners extends Serializable {
     if (typeof locktime !== "undefined") {
       this.locktime = bintools.fromBNToBuffer(locktime, 8)
     }
+  }
+
+  static fromArray(b: Buffer): OutputOwners[] {
+    let offset = 6 //version + counter
+    let num = b.readUInt32BE(2)
+    const result: OutputOwners[] = []
+    while (offset < b.length && num-- > 0) {
+      const t = new OutputOwners()
+      offset = t.fromBuffer(b, offset)
+      result.push(t)
+    }
+    return result
+  }
+
+  static toArray(o: OutputOwners[]): Buffer {
+    const numOutputOwners = Buffer.alloc(6)
+    numOutputOwners.writeUInt32BE(o.length, 2)
+    let bsize: number = 6
+    const barr: Buffer[] = [numOutputOwners]
+    for (const outputOwner of o) {
+      const b = outputOwner.toBuffer()
+      bsize += b.length
+      barr.push(b)
+    }
+    return Buffer.concat(barr, bsize)
   }
 }
 

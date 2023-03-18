@@ -4,11 +4,9 @@ import {
   PlatformVMAPI,
   KeyChain,
   UTXOSet,
-  UnsignedTx,
-  Tx
+  PlatformVMConstants
 } from "caminojs/apis/platformvm"
 import {
-  MultisigAliasSet,
   MultisigKeyChain,
   MultisigKeyPair,
   OutputOwners
@@ -41,8 +39,8 @@ const memo: Buffer = Buffer.from(
 )
 const asOf: BN = new BN(0)
 const msigAliasArray = [
-  "P-kopernikus1fq0jc8svlyazhygkj0s36qnl6s0km0h3uuc99w",
-  "P-kopernikus1k4przmfu79ypp4u7y98glmdpzwk0u3sc7saazy"
+  "P-kopernikus1z5tv4tg04kf4l9ghclw6ssek8zugs7yd65prpl"
+  //"P-kopernikus1t5qgr9hcmf2vxj7k0hz77kawf9yr389cxte5j0"
 ]
 
 let pchain: PlatformVMAPI
@@ -80,12 +78,13 @@ const main = async (): Promise<any> => {
     for (const msigAlias of msigAliasArray) {
       const platformVMUTXOResponse: any = await pchain.getUTXOs([msigAlias])
       const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
-      const unsignedTx: UnsignedTx = await pchain.buildExportTx(
+
+      var unsignedTx = await pchain.buildExportTx(
         utxoSet,
         new BN(1000000000),
         xChainBlockchainID,
         xAddressStrings,
-        [msigAlias],
+        [[msigAlias], pAddressStrings],
         [msigAlias],
         memo,
         asOf,
@@ -93,14 +92,49 @@ const main = async (): Promise<any> => {
         threshold
       )
 
-      // Create MultiSig resolver which resolves all aliases
-      // If you provide addresses, no wildcard sigIndices are created
+      // UnsignedTx now contains additionally to the sigIdx all OutputOwners
+      // which must be fulfilled. This example makes 2 transactions to show
+      // the workflow of both variants.
 
-      // MultiSigAliasSet
+      // Variant 1 -> TX can be fired directly
+      var tx = unsignedTx.sign(pKeychain)
+      var txid = await pchain.issueTx(tx)
+      console.log(`Success! TXID: ${txid}`)
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Variant 2 -> Create a multisig keychain and use CaminoCredentials
+
+      // We need to fetch UTXOs again because the previous are not longer valid
+      unsignedTx = await pchain.buildExportTx(
+        utxoSet,
+        new BN(1000000000),
+        xChainBlockchainID,
+        xAddressStrings,
+        [[msigAlias], pAddressStrings],
+        [msigAlias],
+        memo,
+        asOf,
+        locktime,
+        threshold
+      )
+
+      // Create the hash from the tx
+      const txbuff = unsignedTx.toBuffer()
+      const msg: Buffer = Buffer.from(
+        createHash("sha256").update(txbuff).digest()
+      )
+
+      // Create the Multisig keychain
       const msigAliasBuffer = pchain.parseAddress(msigAlias)
       const owner = await pchain.getMultisigAlias(msigAlias)
 
-      var msSet = new MultisigAliasSet(
+      const msKeyChain = new MultisigKeyChain(
+        avalanche.getHRP(),
+        PChainAlias,
+        msg,
+        PlatformVMConstants.SECPMULTISIGCREDENTIAL,
+        unsignedTx.getTransaction().getOutputOwners(),
         new Map([
           [
             msigAliasBuffer.toString("hex"),
@@ -110,22 +144,7 @@ const main = async (): Promise<any> => {
               owner.threshold
             )
           ]
-        ]),
-        new Set(pAddresses.map((a) => a.toString("hex")))
-      )
-      // Note: inplace modifying of input indices
-      unsignedTx.getTransaction().resolveMultisigIndices(msSet)
-
-      // Create the hash from the tx
-      const txbuff = unsignedTx.toBuffer()
-      const msg: Buffer = Buffer.from(
-        createHash("sha256").update(txbuff).digest()
-      )
-
-      const msKeyChain = new MultisigKeyChain(
-        msg,
-        avalanche.getHRP(),
-        PChainAlias
+        ])
       )
 
       for (const address of pAddresses) {
@@ -136,10 +155,15 @@ const main = async (): Promise<any> => {
         msKeyChain.addKey(new MultisigKeyPair(msKeyChain, address, signature))
       }
 
+      // Create signature indices (throws if not able to do so)
+      msKeyChain.buildSignatureIndices()
+
       // Sign the transaction with msig keychain and issue
-      const tx: Tx = unsignedTx.sign(msKeyChain)
-      const txid: string = await pchain.issueTx(tx)
+      tx = unsignedTx.sign(msKeyChain)
+      txid = await pchain.issueTx(tx)
       console.log(`Success! TXID: ${txid}`)
+
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
   } catch (e: any) {
     console.log(e)

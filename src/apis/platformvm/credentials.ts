@@ -4,7 +4,7 @@
  */
 
 import { PlatformVMConstants } from "./constants"
-import { Credential } from "../../common/credentials"
+import { Credential, SECPMultisigCredential } from "../../common"
 import { CredIdError } from "../../utils/errors"
 
 /**
@@ -18,11 +18,15 @@ export const SelectCredentialClass = (
   credid: number,
   ...args: any[]
 ): Credential => {
-  if (credid === PlatformVMConstants.SECPCREDENTIAL) {
-    return new SECPCredential(...args)
+  switch (credid) {
+    case PlatformVMConstants.SECPCREDENTIAL:
+      return new SECPCredential(...args)
+    case PlatformVMConstants.SECPMULTISIGCREDENTIAL:
+      return new SECPMultisigCredential(credid)
+    default:
+      /* istanbul ignore next */
+      throw new CredIdError("Error - SelectCredentialClass: unknown credid")
   }
-  /* istanbul ignore next */
-  throw new CredIdError("Error - SelectCredentialClass: unknown credid")
 }
 
 export class SECPCredential extends Credential {
@@ -30,10 +34,6 @@ export class SECPCredential extends Credential {
   protected _typeID = PlatformVMConstants.SECPCREDENTIAL
 
   //serialize and deserialize both are inherited
-
-  getCredentialID(): number {
-    return this._typeID
-  }
 
   clone(): this {
     let newbase: SECPCredential = new SECPCredential()

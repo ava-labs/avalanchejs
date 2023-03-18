@@ -409,7 +409,7 @@ describe("Transactions", (): void => {
         new BN(amnt * 1000),
         assetID,
         addrs3,
-        addrs1,
+        { from: addrs1, signer: [] },
         addrs1
       )
       .catch((e) => expect(e).toBeDefined())
@@ -496,7 +496,7 @@ describe("Transactions", (): void => {
       new BN(9000),
       assetID,
       addrs3,
-      addrs1,
+      { from: addrs1, signer: [] },
       addrs1,
       undefined,
       undefined,
@@ -519,7 +519,7 @@ describe("Transactions", (): void => {
       new BN(9000),
       assetID,
       addrs3,
-      addrs1,
+      { from: addrs1, signer: [] },
       addrs1
     )
     const tx: Tx = txu.sign(keymgr1)
@@ -534,7 +534,7 @@ describe("Transactions", (): void => {
       netid,
       blockchainID,
       addrs3,
-      addrs1,
+      { from: addrs1, signer: [] },
       addrs2,
       importUTXOs,
       bintools.cb58Decode(DefaultPlatformChainID),
@@ -556,7 +556,7 @@ describe("Transactions", (): void => {
       new BN(90),
       avaxAssetID,
       addrs3,
-      addrs1,
+      { from: addrs1, signer: [] },
       bintools.cb58Decode(DefaultPlatformChainID),
       addrs2,
       new BN(0),

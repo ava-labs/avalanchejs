@@ -55,6 +55,12 @@ export class PlatformVMConstants {
   static DEPOSITTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 5
   static UNLOCKDEPOSITTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 6
   static REGISTERNODETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 7
+  // static BASETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 8
+  static MULTISIGALIASTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 9
+  static CLAIMTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 10
+  static REWARDSIMPORTTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 11
+  static SECPMULTISIGCREDENTIAL: number =
+    PlatformVMConstants.CUSTOM_TYPE_ID + 12
 
   // Length Constants
   static ASSETIDLEN: number = 32

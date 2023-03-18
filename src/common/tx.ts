@@ -13,7 +13,6 @@ import {
   StandardParseableOutput,
   StandardTransferableOutput
 } from "./output"
-import { MultisigAliasSet } from "./multisigkeychain"
 import { DefaultNetworkID } from "../utils/constants"
 import {
   Serializable,
@@ -191,13 +190,6 @@ export abstract class StandardBaseTx<
   abstract create(...args: any[]): this
 
   abstract select(id: number, ...args: any[]): this
-
-  resolveMultisigIndices(resolver: MultisigAliasSet) {
-    for (let i: number = 0; i < this.ins.length; i++) {
-      const input = this.ins[`${i}`].getInput()
-      input.setSigIdxs(resolver.resolveMultisig(input.getSigIdxs()))
-    }
-  }
 
   /**
    * Class representing a StandardBaseTx which is the foundation for all transactions.

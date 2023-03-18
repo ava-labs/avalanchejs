@@ -31,6 +31,10 @@ export class Spender {
       .getSenders()
       .map((a) => this.platformAPI.addressFromBuffer(a))
 
+    const signer = aad
+      .getSigners()
+      .map((a) => this.platformAPI.addressFromBuffer(a))
+
     const to = aad
       .getDestinations()
       .map((a) => this.platformAPI.addressFromBuffer(a))
@@ -43,6 +47,7 @@ export class Spender {
 
     const result = await this.platformAPI.spend(
       addr,
+      signer,
       to,
       aad.getDestinationsThreshold(),
       lockTime,
@@ -60,7 +65,7 @@ export class Spender {
     result.out.forEach((out) => {
       aad.addOutput(out)
     })
-
+    aad.setOutputOwners(result.owners)
     return
   }
 }

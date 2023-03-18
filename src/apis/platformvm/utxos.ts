@@ -28,7 +28,7 @@ import {
   AssetAmount
 } from "../../common/assetamount"
 import { BaseInput } from "../../common/input"
-import { BaseOutput } from "../../common/output"
+import { BaseOutput, OutputOwners } from "../../common/output"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import {
   UTXOError,
@@ -123,7 +123,33 @@ export class UTXO extends StandardUTXO {
 export class AssetAmountDestination extends StandardAssetAmountDestination<
   TransferableOutput,
   TransferableInput
-> {}
+> {
+  protected signers: Buffer[]
+  protected outputOwners: OutputOwners[] = []
+
+  getSigners = (): Buffer[] => this.signers
+
+  setOutputOwners = (owners: OutputOwners[]) => (this.outputOwners = owners)
+  getOutputOwners = (): OutputOwners[] => this.outputOwners
+
+  constructor(
+    destinations: Buffer[],
+    destinationsThreshold: number,
+    senders: Buffer[],
+    signers: Buffer[],
+    changeAddresses: Buffer[],
+    changeAddressesThreshold: number
+  ) {
+    super(
+      destinations,
+      destinationsThreshold,
+      senders,
+      changeAddresses,
+      changeAddressesThreshold
+    )
+    this.signers = signers
+  }
+}
 
 /**
  * Class representing a set of [[UTXO]]s.

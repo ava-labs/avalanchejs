@@ -7,7 +7,7 @@ import BinTools from "../../utils/bintools"
 import { PlatformVMConstants } from "./constants"
 import { TransferableOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
-import { Credential, MultisigAliasSet, SigIdx, Signature } from "../../common"
+import { Credential, SigIdx, Signature } from "../../common"
 import { BaseTx } from "./basetx"
 import { DefaultNetworkID } from "../../utils/constants"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
@@ -285,11 +285,6 @@ export class CreateChainTx extends BaseTx {
     }
     creds.push(cred)
     return creds
-  }
-
-  resolveMultisigIndices(resolver: MultisigAliasSet) {
-    super.resolveMultisigIndices(resolver)
-    this.setSigIdxs(resolver.resolveMultisig(this.sigIdxs))
   }
 
   /**

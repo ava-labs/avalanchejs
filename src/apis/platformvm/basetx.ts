@@ -14,7 +14,8 @@ import {
   StandardBaseTx,
   Signature,
   SigIdx,
-  Credential
+  Credential,
+  OutputOwners
 } from "../../common"
 import { DefaultNetworkID } from "../../utils/constants"
 import { SelectTxClass } from "../platformvm/tx"
@@ -32,6 +33,7 @@ const bintools: BinTools = BinTools.getInstance()
 export class BaseTx extends StandardBaseTx<SignerKeyPair, SignerKeyChain> {
   protected _typeName = "BaseTx"
   protected _typeID = PlatformVMConstants.CREATESUBNETTX
+  protected _outputOwners: OutputOwners[] = undefined
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
     super.deserialize(fields, encoding)
@@ -68,6 +70,23 @@ export class BaseTx extends StandardBaseTx<SignerKeyPair, SignerKeyChain> {
    */
   getTxType(): number {
     return PlatformVMConstants.BASETX
+  }
+
+  /**
+   * @returns The outputOwners of inputs, one per input
+   */
+  getOutputOwners(): OutputOwners[] {
+    if (this._outputOwners) {
+      return [...this._outputOwners]
+    }
+    return []
+  }
+
+  /**
+   * @params The outputOwners of inputs, one per input
+   */
+  setOutputOwners(owners: OutputOwners[]) {
+    this._outputOwners = [...owners]
   }
 
   /**
