@@ -51,7 +51,7 @@
     "@typescript-eslint/parser": "5.54.0",
     "clean-webpack-plugin": "4.0.0",
     "eslint": "7.32.0",
-    "eslint-config-prettier": "8.6.0",
+    "eslint-config-prettier": "8.8.0",
     "eslint-plugin-prettier": "4.2.1",
     "eslint-plugin-security": "1.7.1",
     "git-revision-webpack-plugin": "5.0.0",
