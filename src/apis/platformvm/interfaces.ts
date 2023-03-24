@@ -306,7 +306,7 @@ export interface Owner {
 }
 
 export interface MultisigAliasReply extends Owner {
-  Memo: string
+  memo: string // hex encoded string
 }
 
 export interface SpendParams {
