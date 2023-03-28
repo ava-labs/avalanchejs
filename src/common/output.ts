@@ -366,7 +366,7 @@ export class OutputOwners extends Serializable {
    *
    * @param addresses An array of {@link https://github.com/feross/buffer|Buffer}s representing output owner's addresses
    * @param locktime A {@link https://github.com/indutny/bn.js/|BN} representing the locktime
-   * @param threshold A number representing the the threshold number of signers required to sign the transaction
+   * @param threshold A number representing the threshold number of signers required to sign the transaction
    */
   constructor(
     addresses: Buffer[] = undefined,

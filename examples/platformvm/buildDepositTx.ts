@@ -8,6 +8,7 @@ import {
 import { OutputOwners } from "caminojs/common/output"
 import { PrivateKeyPrefix, DefaultLocalGenesisPrivateKey } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
+import BN from "bn.js"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
@@ -39,6 +40,7 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
+  const amountToLock = new BN(1000000000)
   const depositOfferID = "wVVZinZkN9x6e9dh3DNNfrmdXaHPPwKWt3Zerx2vD8Ccuo6E7"
   const depositDuration = 110376000
   const memo: Buffer = Buffer.from(
@@ -57,7 +59,9 @@ const main = async (): Promise<any> => {
     depositOfferID,
     depositDuration,
     owners,
-    memo
+    memo,
+    new BN(0),
+    amountToLock
   )
 
   const tx: Tx = unsignedTx.sign(pKeychain)

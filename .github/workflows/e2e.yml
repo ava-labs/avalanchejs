@@ -95,3 +95,34 @@ jobs:
           sleep 60
           cat /tmp/cnr-e2e.log
           yarn test -i --roots e2e_tests/camino
+      - name: Check produced logs
+        id: check-logs
+        run: |
+          export LOG_DIR=$(grep -Po '"log-dir": "[^"]*node1[^"]+"' /tmp/cnr-e2e.log | sed 's/"log-dir": "\(.*\)"/\1/')
+          grep -E 'FATAL |ERROR ' $LOG_DIR/*.log | cat > /tmp/parsed_logs
+          cat /tmp/parsed_logs
+          export errors=$(grep 'ERROR ' /tmp/parsed_logs | wc -l)
+          export fatal=$(grep 'FATAL' /tmp/parsed_logs | wc -l)
+          echo "errors=${errors}"  >> $GITHUB_OUTPUT
+          echo "fatal=${fatal}"  >> $GITHUB_OUTPUT
+          echo errors: ${errors}
+          echo fatal: ${fatal}
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "Found errors/fatal log records."
+      - name: Create PR comment if errors/fatal logs produced
+        if: ${{ steps.check-logs.outputs.errors > 0 || steps.check-logs.outputs.fatal > 0 }}
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find_comment.outputs.comment-id || '' }}
+          edit-mode: replace
+          body: |
+            :warning: Found errors/fatal log records. Please review them(job:e2e, step:"Check produced logs") and resolve this comment.
+            ```
+            ${{ steps.check-logs.outputs.errors }} errors
+            ${{ steps.check-logs.outputs.fatal }} fatal
+            ```

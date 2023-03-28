@@ -41,6 +41,7 @@ import {
 import { GenesisData } from "../avm"
 import { DepositTx } from "./depositTx"
 import { AddressStateTx } from "./addressstatetx"
+import { UnlockDepositTx } from "./unlockdeposittx"
 
 export type LockMode = "Unlocked" | "Bond" | "Deposit" | "Stake"
 
@@ -1300,6 +1301,7 @@ export class Builder {
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
     asOf: BN = zero,
+    amountToLock: BN,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
@@ -1316,13 +1318,13 @@ export class Builder {
         changeThreshold
       )
 
-      aad.addAssetAmount(feeAssetID, zero, fee)
+      aad.addAssetAmount(feeAssetID, amountToLock, fee)
 
       const minSpendableErr: Error = await this.spender.getMinimumSpendable(
         aad,
         asOf,
         zero,
-        "Unlocked"
+        "Deposit"
       )
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
@@ -1352,6 +1354,72 @@ export class Builder {
 
     baseTx.setOutputOwners(owners)
     return new UnsignedTx(baseTx)
+  }
+
+  /**
+   * Build an unsigned [[UnlockDepositTx]].
+   *
+   * @param networkID Networkid, [[DefaultNetworkID]]
+   * @param blockchainID Blockchainid, default undefined
+   * @param fromSigner @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+   * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
+   * @param feeAssetID Optional. The assetID of the fees being burned
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned UnlockDepositTx created from the passed in parameters.
+   */
+  buildUnlockDepositTx = async (
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromSigner: FromSigner,
+    changeAddresses: Buffer[],
+    fee: BN = zero,
+    feeAssetID: Buffer = undefined,
+    memo: Buffer = undefined,
+    asOf: BN = zero,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+
+    if (this._feeCheck(fee, feeAssetID)) {
+      const aad: AssetAmountDestination = new AssetAmountDestination(
+        [],
+        0,
+        fromSigner.from,
+        fromSigner.signer,
+        changeAddresses,
+        changeThreshold
+      )
+
+      aad.addAssetAmount(feeAssetID, zero, fee)
+
+      const minSpendableErr: Error = await this.spender.getMinimumSpendable(
+        aad,
+        asOf,
+        zero,
+        "Unlocked"
+      )
+      if (typeof minSpendableErr === "undefined") {
+        ins = aad.getInputs()
+        outs = aad.getAllOutputs()
+      } else {
+        throw minSpendableErr
+      }
+    }
+
+    const unlockDepositTx: UnlockDepositTx = new UnlockDepositTx(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo
+    )
+
+    return new UnsignedTx(unlockDepositTx)
   }
 
   _feeCheck(fee: BN, feeAssetID: Buffer): boolean {
