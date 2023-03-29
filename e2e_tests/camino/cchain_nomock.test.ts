@@ -3,11 +3,9 @@ import { KeystoreAPI } from "src/apis/keystore/api"
 import BN from "bn.js"
 import { costImportTx } from "src/utils"
 import { UTXOSet, Tx, UnsignedTx } from "src/apis/evm"
-import { avm, evm } from "src"
-import { Buffer } from "buffer"
+import { avm } from "src"
 import { GetUTXOsResponse } from "src/apis/avm"
-import {EVMCaminoConstants} from "../../src/apis/evm/camino_constants";
-const assert = require('assert');
+import { EVMCaminoConstants } from "../../src/apis/evm/camino_constants"
 
 const avalanche = getAvalanche()
 const user: string = "avalancheJspChainUser" + Math.random()
@@ -19,7 +17,7 @@ const adminPrivateKey =
 const gasFeeAddrPrivateKey =
   "PrivateKey-Ge71NJhUY3TjZ9dLohijSnNq46QxobjqxHGMUDAPoVsNFA93w"
 const kycAddrPrivateKey =
-    "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+  "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 
 // c private keys
 const adminCPrivateKey =
@@ -95,34 +93,45 @@ beforeAll(async () => {
 })
 
 describe("Camino-CChain-Admin-Role", (): void => {
-  const dummyContractBin = "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
+  const dummyContractBin =
+    "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
 
   const tests_spec: any = [
     // Initial Role Check
     [
       "adminAddress role check",
-      () => contract.methods.hasRole(adminAddr, EVMCaminoConstants.ADMINROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(adminAddr, EVMCaminoConstants.ADMINROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => true
     ],
     [
       "gasFeeAddr role check",
-      () => contract.methods.hasRole(gasFeeAddr, EVMCaminoConstants.GASFEEROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(gasFeeAddr, EVMCaminoConstants.GASFEEROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => false
     ],
     [
       "kycAddr role check",
-      () => contract.methods.hasRole(kycAddr, EVMCaminoConstants.KYCROLE).call(),
+      () =>
+        contract.methods.hasRole(kycAddr, EVMCaminoConstants.KYCROLE).call(),
       (x) => x,
       Matcher.toEqual,
       () => false
     ],
     [
       "blacklistAddr role check",
-      () => contract.methods.hasRole(blacklistAddr, EVMCaminoConstants.BLACKLISTROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(blacklistAddr, EVMCaminoConstants.BLACKLISTROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => false
@@ -151,10 +160,10 @@ describe("Camino-CChain-Admin-Role", (): void => {
           user,
           passwd,
           "CAM",
-            900000000000,
+          900000000000,
           gasFeeXAddr,
           [adminAddress],
-            adminAddress,
+          adminAddress,
           "memo"
         ),
       (x) => x.txID,
@@ -205,7 +214,7 @@ describe("Camino-CChain-Admin-Role", (): void => {
             gasFeeAddr,
             [cAddressStrings[1]],
             avalanche.getNetwork().X.blockchainID,
-            cChain.getDefaultTxFee(),
+            cChain.getDefaultTxFee()
           )
           const importCost: number = costImportTx(
             avalanche.getNetwork().C,
@@ -218,7 +227,7 @@ describe("Camino-CChain-Admin-Role", (): void => {
             gasFeeAddr,
             [cAddressStrings[1]],
             avalanche.getNetwork().X.blockchainID,
-            fee,
+            fee
           )
 
           const tx: Tx = unsignedTx.sign(cChain.keyChain())
@@ -381,19 +390,19 @@ describe("Camino-CChain-Admin-Role", (): void => {
     [
       "SC deployment",
       async function () {
-          try {
-            const response: any = await contract.deploy({ data: dummyContractBin })
-              .send({ from: adminAddr, gas: 1000000 })
+        try {
+          const response: any = await contract
+            .deploy({ data: dummyContractBin })
+            .send({ from: adminAddr, gas: 1000000 })
 
-            if (response.options.address == null) {
-              throw "Contract was not deployed"
-            }
-            else {
-              throw "Contract was deployed"
-            }
-          } catch (e) {
-              return e
+          if (response.options.address == null) {
+            throw "Contract was not deployed"
+          } else {
+            throw "Contract was deployed"
           }
+        } catch (e) {
+          return e
+        }
       },
       (x) => x,
       Matcher.toBe,
@@ -409,14 +418,20 @@ describe("Camino-CChain-Gas-Fee-Role", (): void => {
     // Initial Role Check
     [
       "adminAddress role check",
-      () => contract.methods.hasRole(adminAddr, EVMCaminoConstants.ADMINROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(adminAddr, EVMCaminoConstants.ADMINROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => true
     ],
     [
       "gasFeeAddr role check",
-      () => contract.methods.hasRole(gasFeeAddr, EVMCaminoConstants.GASFEEROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(gasFeeAddr, EVMCaminoConstants.GASFEEROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => false
@@ -484,14 +499,18 @@ describe("Camino-CChain-KYC-Role", (): void => {
     // Initial Role Check
     [
       "adminAddress role check",
-      () => contract.methods.hasRole(adminAddr, EVMCaminoConstants.ADMINROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(adminAddr, EVMCaminoConstants.ADMINROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => true
     ],
     [
       "kycAddr role check",
-      () => contract.methods.hasRole(kycAddr, EVMCaminoConstants.KYCROLE).call(),
+      () =>
+        contract.methods.hasRole(kycAddr, EVMCaminoConstants.KYCROLE).call(),
       (x) => x,
       Matcher.toEqual,
       () => false

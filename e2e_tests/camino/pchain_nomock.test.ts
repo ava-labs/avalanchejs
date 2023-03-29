@@ -4,7 +4,7 @@ import BN from "bn.js"
 import { DepositOffer, Tx, UnsignedTx } from "../../src/apis/platformvm"
 import { UnixNow } from "../../src/utils"
 import { Buffer } from "buffer/"
-import { OutputOwners } from "../../src/common"
+import { OutputOwners, ZeroBN } from "../../src/common"
 
 const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
 const adminNodePrivateKey =
@@ -17,9 +17,9 @@ const addrC = "X-kopernikus1lx58kettrnt2kyr38adyrrmxt5x57u4vg4cfky"
 const addrBPrivateKey =
   "PrivateKey-21QkTk3Zn2wxLd1WvRgWn1UpT5BC2Pz6caKbcsSpmuz7Qm8R7C"
 const node6Id = "NodeID-FHseEbTVS7U3odWfjgZYyygsv5gWCqVdk"
-const user: string = "avalancheJspChainUser"
+const user: string = "avalancheJspChainUser" + Math.random()
 const passwd: string = "avalancheJsP@ssw4rd"
-const user2: string = "avalancheJspChainUser2"
+const user2: string = "avalancheJspChainUser2" + Math.random()
 const passwd2: string = "avalancheJsP@ssw4rd2"
 const avalanche = getAvalanche()
 
@@ -31,6 +31,7 @@ const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildAddValidatorTx to add a validator to the primary subnet"
 )
+const interestRateDenominator = new BN(1_000_000 * (365 * 24 * 60 * 60))
 const P = function (s: string): string {
   return "P" + s.substring(1)
 }
@@ -43,15 +44,14 @@ const sumAllValues = function (map: Map<string, string>): BN {
 }
 
 let keystore: KeystoreAPI
-let depositOffers = {
-  value: undefined as DepositOffer[] | undefined
-}
+let depositOffers = undefined as DepositOffer[] | undefined
+let depositTx = { value: "" }
 let tx = { value: "" }
 let xChain, pChain, pKeychain, pAddresses: any
 let createdSubnetID = { value: "" }
 let pAddressStrings: string[]
 let balanceOutputs = { value: new Map() }
-
+let oneMinRewardsAmount: BN
 beforeAll(async () => {
   await avalanche.fetchNetworkSettings()
   keystore = new KeystoreAPI(avalanche)
@@ -63,6 +63,21 @@ beforeAll(async () => {
   pKeychain.importKey(node6PrivateKey)
   pAddresses = pKeychain.getAddresses()
   pAddressStrings = pKeychain.getAddressStrings()
+
+  // create user2
+  await keystore.createUser(user2, passwd2)
+  await pChain.importKey(user2, passwd2, addrBPrivateKey)
+
+  depositOffers = await pChain.getAllDepositOffers()
+  oneMinRewardsAmount = getOneMinuteDepositOffer()
+    .minAmount.mul(
+      new BN(
+        getOneMinuteDepositOffer().minDuration -
+          getOneMinuteDepositOffer().noRewardsPeriodDuration
+      )
+    )
+    .mul(getOneMinuteDepositOffer().interestRateNominator)
+    .div(interestRateDenominator)
 })
 
 describe("Camino-PChain-Add-Validator", (): void => {
@@ -219,22 +234,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
       Matcher.toBe,
       () => 1
     ],
-    [
-      "create user2",
-      () => keystore.createUser(user2, passwd2),
-      (x) => x,
-      Matcher.toEqual,
-      () => {
-        return {}
-      }
-    ],
-    [
-      "importKey of user2",
-      () => pChain.importKey(user2, passwd2, addrBPrivateKey),
-      (x) => x,
-      Matcher.toBe,
-      () => "P" + addrB.substring(1)
-    ],
+
     [
       "createSubnet",
       () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1),
@@ -290,24 +290,13 @@ describe("Camino-PChain-Add-Validator", (): void => {
 
   createTests(tests_spec)
 })
-
 describe("Camino-PChain-Deposit", (): void => {
   const tests_spec: any = [
-    [
-      "Get all deposit offers",
-      () => pChain.getAllDepositOffers(),
-      (x) => x,
-      Matcher.Get,
-      () => depositOffers
-    ],
     [
       "Issue depositTx with inactive offer",
       () =>
         (async function () {
-          const inactiveOffer: DepositOffer = getFirstDepositOfferWithFlag(
-            depositOffers.value,
-            1
-          )
+          const inactiveOffer: DepositOffer = getLockedPresale3yDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
             [P(addrB)],
@@ -330,10 +319,7 @@ describe("Camino-PChain-Deposit", (): void => {
       "Issue depositTx with duration < minDuration",
       () =>
         (async function () {
-          const activeOffer: DepositOffer = getFirstDepositOfferWithFlag(
-            depositOffers.value,
-            0
-          )
+          const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
             [P(addrB)],
@@ -357,10 +343,7 @@ describe("Camino-PChain-Deposit", (): void => {
       "Issue depositTx with duration > maxDuration",
       () =>
         (async function () {
-          const activeOffer: DepositOffer = getFirstDepositOfferWithFlag(
-            depositOffers.value,
-            0
-          )
+          const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
             [P(addrB)],
@@ -391,10 +374,7 @@ describe("Camino-PChain-Deposit", (): void => {
       "Issue depositTx with insufficient unlocked funds",
       () =>
         (async function () {
-          const activeOffer: DepositOffer = getFirstDepositOfferWithFlag(
-            depositOffers.value,
-            0
-          )
+          const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
             [P(addrC)],
@@ -417,16 +397,13 @@ describe("Camino-PChain-Deposit", (): void => {
       "Issue depositTx",
       () =>
         (async function () {
-          const activeOffer: DepositOffer = getFirstDepositOfferWithFlag(
-            depositOffers.value,
-            0
-          )
+          const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
             [P(addrB)],
             [P(addrB)],
             activeOffer.id,
-            activeOffer.minDuration,
+            activeOffer.maxDuration,
             new OutputOwners([pAddresses[1]]),
             memo,
             new BN(0),
@@ -460,7 +437,7 @@ describe("Camino-PChain-Deposit", (): void => {
       () =>
         sumAllValues(balanceOutputs.value["depositedOutputs"]).add(
           sumAllValues(balanceOutputs.value["bondedDepositedOutputs"]).add(
-            getFirstDepositOfferWithFlag(depositOffers.value, 0).minAmount
+            getTest1DepositOffer().minAmount
           )
         )
     ],
@@ -513,12 +490,318 @@ describe("Camino-PChain-Deposit", (): void => {
   ]
   createTests(tests_spec)
 })
+describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
+  const tests_spec: any = [
+    [
+      "Get balance outputs",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Issue depositTx -> presale1min",
+      () =>
+        (async function () {
+          const activeOffer: DepositOffer = getOneMinuteDepositOffer()
+          const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
+            undefined,
+            [P(addrB)],
+            [P(addrB)],
+            activeOffer.id,
+            activeOffer.minDuration,
+            new OutputOwners([pAddresses[1]]),
+            memo,
+            new BN(0),
+            activeOffer.minAmount
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify tx has been committed",
+      () => {
+        return pChain.getTxStatus(tx.value)
+      },
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify deposited/depositedBonded amounts haven been appropriately increased",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) =>
+        sumAllValues(x.depositedOutputs).add(
+          sumAllValues(x.bondedDepositedOutputs)
+        ),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["depositedOutputs"]).add(
+          sumAllValues(balanceOutputs.value["bondedDepositedOutputs"]).add(
+            getOneMinuteDepositOffer().minAmount
+          )
+        )
+    ],
+    [
+      "Refresh balance outputs",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Wait 1 min for deposit to be unlocked & issue a random tx to trigger a block built",
+      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1),
+      (x) => {
+        return x
+      },
+      Matcher.Get,
+      () => createdSubnetID,
+      60000 + 1000 // presale1min has a 1 minute unlock period +1 second
+    ],
+    [
+      "Verify deposited/depositedBonded amounts have decreased by the amount of the deposit",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) =>
+        sumAllValues(x.depositedOutputs)
+          .add(sumAllValues(x.bondedDepositedOutputs))
+          .toNumber(),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["depositedOutputs"])
+          .add(sumAllValues(balanceOutputs.value["bondedDepositedOutputs"]))
+          .sub(getOneMinuteDepositOffer().minAmount)
+          .toNumber(),
+      3000
+    ],
+    [
+      "Refresh balance outputs",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Issue a claimTx",
+      () =>
+        (async function () {
+          const claimableSigners: [number, Buffer][] = [[0, pAddresses[1]]]
 
-function getFirstDepositOfferWithFlag(
-  depositOffers: DepositOffer[],
-  flag: number
-): DepositOffer {
-  return depositOffers.find((depositOffer) =>
-    depositOffer.flags.eq(new BN(flag, 10))
-  )
+          const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
+            undefined,
+            [P(addrB)],
+            [P(addrB)],
+            undefined,
+            ZeroBN,
+            1,
+            [],
+            ["HmxunfrZ4ar9jfBzu4PbwPAjukGZmeWGWgSEmnyFt8VFfPir1"], // hard-coded ownerID
+            [oneMinRewardsAmount],
+            new OutputOwners([pAddresses[1]]),
+            claimableSigners
+          )
+          const claimTx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(claimTx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify tx has been committed",
+      () => pChain.getTxStatus(tx.value),
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify deposited/depositedBonded amounts have increased by rewards amount (minus tx fee)",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => sumAllValues(x.unlockedOutputs),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["unlockedOutputs"])
+          .add(oneMinRewardsAmount)
+          .sub(avalanche.PChain().getTxFee())
+    ]
+  ]
+  createTests(tests_spec)
+})
+describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
+  const tests_spec: any = [
+    [
+      "Get balance outputs",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Issue depositTx -> presale1min",
+      () =>
+        (async function () {
+          const activeOffer: DepositOffer = getOneMinuteDepositOffer()
+          const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
+            undefined,
+            [P(addrB)],
+            [P(addrB)],
+            activeOffer.id,
+            activeOffer.minDuration,
+            new OutputOwners([pAddresses[1]]),
+            memo,
+            new BN(0),
+            activeOffer.minAmount
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => depositTx
+    ],
+    [
+      "Verify tx has been committed",
+      () => {
+        return pChain.getTxStatus(depositTx.value)
+      },
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify deposited/depositedBonded amounts have increased by the deposited amount",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) =>
+        sumAllValues(x.depositedOutputs).add(
+          sumAllValues(x.bondedDepositedOutputs)
+        ),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["depositedOutputs"]).add(
+          sumAllValues(balanceOutputs.value["bondedDepositedOutputs"]).add(
+            getOneMinuteDepositOffer().minAmount
+          )
+        )
+    ],
+    [
+      "Refresh balance outputs",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Wait 75% of unlock duration and issue an unlockDepositTx to manually unlock deposit",
+      () =>
+        (async function () {
+          const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
+            undefined,
+            [P(addrB)],
+            [P(addrB)]
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx,
+      45000 // 75% * unlock period
+    ],
+    [
+      "Verify tx has been committed",
+      () => pChain.getTxStatus(tx.value),
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify deposited/depositedBonded amounts have decreased by 50%",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) =>
+        sumAllValues(x.depositedOutputs).add(
+          sumAllValues(x.bondedDepositedOutputs)
+        ),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["depositedOutputs"]).add(
+          sumAllValues(balanceOutputs.value["bondedDepositedOutputs"]).sub(
+            getOneMinuteDepositOffer().minAmount.mul(
+              new BN(0.5) // 50% of deposit amount
+            )
+          )
+        )
+    ],
+    [
+      "Verify unlocked amounts haven been appropriately increased by 50% of the locked amount",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) => sumAllValues(x.unlockedOutputs),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["unlockedOutputs"])
+          .add(
+            getOneMinuteDepositOffer().minAmount.mul(
+              new BN(0.5) // 50% of deposit amount
+            )
+          )
+          .sub(avalanche.PChain().getTxFee())
+    ],
+    [
+      "Wait unlock duration and & issue a random tx to trigger build block",
+      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1),
+      (x) => {
+        return x
+      },
+      Matcher.Get,
+      () => createdSubnetID,
+      16000 // 25% * unlock period + 1s
+    ],
+    [
+      "Verify deposited/depositedBonded amounts haven been appropriately decreased by 100%",
+      () => pChain.getBalance({ address: P(addrB) }),
+      (x) =>
+        sumAllValues(x.depositedOutputs).add(
+          sumAllValues(x.bondedDepositedOutputs)
+        ),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["depositedOutputs"]).add(
+          sumAllValues(balanceOutputs.value["bondedDepositedOutputs"]).sub(
+            getOneMinuteDepositOffer().minAmount
+          )
+        ),
+      3000
+    ]
+  ]
+  createTests(tests_spec)
+})
+
+function getOneMinuteDepositOffer(): DepositOffer {
+  return depositOffers.find((offer) => {
+    return (
+      Buffer.from(offer.memo.substring(2), "hex").toString() == "presale1min"
+    )
+  })
+}
+function getLockedPresale3yDepositOffer(): DepositOffer {
+  return depositOffers.find((offer) => {
+    return (
+      Buffer.from(offer.memo.substring(2), "hex").toString() ==
+      "lockedpresale3y"
+    )
+  })
+}
+function getTest1DepositOffer(): DepositOffer {
+  return depositOffers.find((offer) => {
+    return Buffer.from(offer.memo.substring(2), "hex")
+      .toString()
+      .includes("depositOffer test#1")
+  })
 }
