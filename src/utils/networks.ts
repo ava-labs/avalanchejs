@@ -71,12 +71,18 @@ export interface P {
   verifyNodeSignature: boolean
   lockModeBondDeposit: boolean
 }
+
 export interface Network {
   preDefined?: boolean
   hrp: string
   C: C
   X: X
   P: P
+}
+
+export interface Chain {
+  alias: string
+  id: string
 }
 
 const TestNetwork: Network = {
