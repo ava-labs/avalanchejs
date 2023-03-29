@@ -275,7 +275,7 @@ export class MultisigKeyChain extends StandardKeyChain<MultisigKeyPair> {
         }
         // We recover to previous state
         addrVerified = currentStack.addrVerifiedTotal
-        stack.splice(addrVerified)
+        sigIdxs.splice(addrVerified)
       } else if (stack.length > 0) {
         currentStack = stack[stack.length - 1]
         if (currentStack.verified < currentStack.owners.getThreshold()) {
