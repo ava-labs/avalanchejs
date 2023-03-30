@@ -280,6 +280,8 @@ export interface GetDepositsParams {
 
 export interface GetDepositsResponse {
   deposits: APIDeposit[]
+  availableRewards: BN[]
+  timestamp: BN
 }
 
 export interface APIDeposit {

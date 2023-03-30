@@ -620,13 +620,15 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * Returns deposits coressponding to requested txIDs.
+   * Returns deposits corresponding to requested txIDs.
    *
    * @param depositTxIDs A list of txIDs (cb58) to request deposits for.
    *
-   * @returns Promise for a list containing deposits.
+   * @returns Promise for a GetDepositsResponse object.
    */
-  getDeposits = async (depositTxIDs: string[]): Promise<APIDeposit[]> => {
+  getDeposits = async (
+    depositTxIDs: string[]
+  ): Promise<GetDepositsResponse> => {
     const params: GetDepositsParams = {
       depositTxIDs
     }
@@ -636,17 +638,21 @@ export class PlatformVMAPI extends JRPCAPI {
     )
 
     const deposits: GetDepositsResponse = response.data.result
-    return deposits.deposits.map((deposit) => {
-      return {
-        depositTxID: deposit.depositTxID,
-        depositOfferID: deposit.depositOfferID,
-        unlockedAmount: new BN(deposit.unlockedAmount),
-        claimedRewardAmount: new BN(deposit.claimedRewardAmount),
-        start: new BN(deposit.start),
-        duration: deposit.duration,
-        amount: new BN(deposit.amount)
-      } as APIDeposit
-    })
+    return {
+      deposits: deposits.deposits.map((deposit) => {
+        return {
+          depositTxID: deposit.depositTxID,
+          depositOfferID: deposit.depositOfferID,
+          unlockedAmount: new BN(deposit.unlockedAmount),
+          claimedRewardAmount: new BN(deposit.claimedRewardAmount),
+          start: new BN(deposit.start),
+          duration: deposit.duration,
+          amount: new BN(deposit.amount)
+        } as APIDeposit
+      }),
+      availableRewards: deposits.availableRewards.map((a) => new BN(a)),
+      timestamp: new BN(deposits.timestamp)
+    } as GetDepositsResponse
   }
 
   /**
