@@ -229,7 +229,7 @@ export class MultisigKeyChain extends StandardKeyChain<MultisigKeyPair> {
             throw TooManySignatures
           }
           if (cycleCheck.has(addrStr)) {
-            throw new Error("cyclink multisig alias")
+            throw new Error("Cyclic multisig alias")
           }
           cycleCheck.add(addrStr)
           stack.push({
