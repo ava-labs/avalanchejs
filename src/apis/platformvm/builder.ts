@@ -1435,7 +1435,7 @@ export class Builder {
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
-   * @param depositTxs The deposit transactions with which the claiblable rewards are associated
+   * @param depositTxIDs The deposit transactions ids with which the claiblable rewards are associated
    * @param claimableOwnerIDs The ownerIDs of the rewards to claim
    * @param claimedAmounts The amounts of the rewards to claim
    * @param claimType The type of claim tx
@@ -1453,7 +1453,7 @@ export class Builder {
     memo: Buffer = undefined,
     asOf: BN = zero,
     changeThreshold: number = 1,
-    depositTxs: string[] | Buffer[],
+    depositTxIDs: string[] | Buffer[],
     claimableOwnerIDs: string[] | Buffer[],
     claimedAmounts: BN[],
     claimTo: OutputOwners,
@@ -1502,7 +1502,7 @@ export class Builder {
       outs,
       ins,
       memo,
-      depositTxs,
+      depositTxIDs,
       claimableOwnerIDs,
       claimedAmounts,
       claimType,

@@ -52,6 +52,7 @@ let createdSubnetID = { value: "" }
 let pAddressStrings: string[]
 let balanceOutputs = { value: new Map() }
 let oneMinRewardsAmount: BN
+let rewardsOwner: OutputOwners
 beforeAll(async () => {
   await avalanche.fetchNetworkSettings()
   keystore = new KeystoreAPI(avalanche)
@@ -78,6 +79,7 @@ beforeAll(async () => {
     )
     .mul(getOneMinuteDepositOffer().interestRateNominator)
     .div(interestRateDenominator)
+  rewardsOwner = new OutputOwners([pAddresses[1]])
 })
 
 describe("Camino-PChain-Add-Validator", (): void => {
@@ -404,7 +406,7 @@ describe("Camino-PChain-Deposit", (): void => {
             [P(addrB)],
             activeOffer.id,
             activeOffer.maxDuration,
-            new OutputOwners([pAddresses[1]]),
+            rewardsOwner,
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -510,7 +512,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
             [P(addrB)],
             activeOffer.id,
             activeOffer.minDuration,
-            new OutputOwners([pAddresses[1]]),
+            rewardsOwner,
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -591,7 +593,6 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
       () =>
         (async function () {
           const claimableSigners: [number, Buffer][] = [[0, pAddresses[1]]]
-
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
             undefined,
             [P(addrB)],
@@ -600,9 +601,9 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
             ZeroBN,
             1,
             [],
-            ["HmxunfrZ4ar9jfBzu4PbwPAjukGZmeWGWgSEmnyFt8VFfPir1"], // hard-coded ownerID
+            [rewardsOwner],
             [oneMinRewardsAmount],
-            new OutputOwners([pAddresses[1]]),
+            rewardsOwner,
             new BN(2), // ClaimTypeExpiredDepositReward
             claimableSigners
           )
@@ -654,7 +655,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
             [P(addrB)],
             activeOffer.id,
             activeOffer.minDuration,
-            new OutputOwners([pAddresses[1]]),
+            rewardsOwner,
             memo,
             new BN(0),
             activeOffer.minAmount

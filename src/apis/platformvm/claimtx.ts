@@ -265,7 +265,7 @@ export class ClaimTx extends BaseTx {
    * @param blockchainID Optional blockchainID, default Buffer.alloc(32, 16)
    * @param outs Optional array of the [[TransferableOutput]]s
    * @param ins Optional array of the [[TransferableInput]]s
-   * @param depositTxs Optional array of the deposit txids
+   * @param depositTxIDs Optional array of the deposit tx ids
    * @param claimableOwnerIDs Optional array of the claimable owner ids
    * @param claimedAmounts Optional array of the claimed amounts
    * @param claimType Optional the type of the claim
@@ -277,7 +277,7 @@ export class ClaimTx extends BaseTx {
     outs: TransferableOutput[] = undefined,
     ins: TransferableInput[] = undefined,
     memo: Buffer = undefined,
-    depositTxs: string[] | Buffer[] = undefined,
+    depositTxIDs: string[] | Buffer[] = undefined,
     claimableOwnerIDs: string[] | Buffer[] = undefined,
     claimedAmounts: BN[] = undefined,
     claimType: BN = undefined,
@@ -285,10 +285,10 @@ export class ClaimTx extends BaseTx {
   ) {
     super(networkID, blockchainID, outs, ins, memo)
 
-    if (typeof depositTxs != "undefined") {
-      this.numDepositTxs.writeUInt32BE(depositTxs.length, 0)
+    if (typeof depositTxIDs != "undefined") {
+      this.numDepositTxs.writeUInt32BE(depositTxIDs.length, 0)
       const depositTxBufs: Buffer[] = []
-      depositTxs.forEach((txID: string | Buffer): void => {
+      depositTxIDs.forEach((txID: string | Buffer): void => {
         if (typeof txID === "string") {
           depositTxBufs.push(bintools.cb58Decode(txID))
         } else {
