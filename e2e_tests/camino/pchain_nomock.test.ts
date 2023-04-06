@@ -1,10 +1,26 @@
 import { createTests, getAvalanche, Matcher } from "../e2etestlib"
 import { KeystoreAPI } from "src/apis/keystore/api"
 import BN from "bn.js"
-import { DepositOffer, Tx, UnsignedTx } from "../../src/apis/platformvm"
+import {
+  DepositOffer,
+  Tx,
+  UnsignedTx,
+  UTXOSet,
+  PlatformVMConstants,
+  Owner
+} from "../../src/apis/platformvm"
 import { UnixNow } from "../../src/utils"
+import { Avalanche, BinTools } from "../../src/index"
 import { Buffer } from "buffer/"
-import { OutputOwners, ZeroBN } from "../../src/common"
+import {
+  MultisigKeyChain,
+  MultisigKeyPair,
+  OutputOwners,
+  ZeroBN
+} from "../../src/common"
+import { PChainAlias } from "../../src/utils"
+import createHash from "create-hash"
+const bintools = BinTools.getInstance()
 
 const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
 const adminNodePrivateKey =
@@ -12,18 +28,31 @@ const adminNodePrivateKey =
 const adminNodeId = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
 const node6PrivateKey =
   "PrivateKey-UfV3iPVP8ThZuSXmUacsahdzePs5VkXct4XoQKsW9mffN1d8J"
+const node7PrivateKey =
+  "PrivateKey-2DXzE36hZ3MSKxk1Un5mBHGwcV69CqkKvbVvSwFBhDRtnbFCDX"
 const addrB = "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
 const addrC = "X-kopernikus1lx58kettrnt2kyr38adyrrmxt5x57u4vg4cfky"
 const addrBPrivateKey =
   "PrivateKey-21QkTk3Zn2wxLd1WvRgWn1UpT5BC2Pz6caKbcsSpmuz7Qm8R7C"
 const node6Id = "NodeID-FHseEbTVS7U3odWfjgZYyygsv5gWCqVdk"
+const node7Id = "NodeID-AAFgkP7AVeQjmv4MSi2DaQbobg3wpZbFp"
 const user: string = "avalancheJspChainUser" + Math.random()
 const passwd: string = "avalancheJsP@ssw4rd"
 const user2: string = "avalancheJspChainUser2" + Math.random()
 const passwd2: string = "avalancheJsP@ssw4rd2"
+
+const multiSigUser: string = "avalancheJspChainUser3"
+const multiSigPasswd: string = "avalancheJsP@ssw4rd3"
+const multiSigAliasAddr = "X-kopernikus1fwrv3kj5jqntuucw67lzgu9a9tkqyczxgcvpst"
+const multiSigOwnerAddr = "X-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7"
+const signerAddrPrivateKey =
+  "PrivateKey-2Vtf2ZhTRz6WcVcSH7cS7ghKneZxZ2L5W8assdCcaNDVdpoYfY"
+const multiSigAddrPrivateKey =
+  "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+
 const avalanche = getAvalanche()
 
-const startTime = UnixNow().add(new BN(60 * 1))
+const startTime = UnixNow().add(new BN(600 * 1))
 const endTime: BN = startTime.add(new BN(26300000))
 const delegationFee: number = 10
 const threshold: number = 1
@@ -47,9 +76,10 @@ let keystore: KeystoreAPI
 let depositOffers = undefined as DepositOffer[] | undefined
 let depositTx = { value: "" }
 let tx = { value: "" }
-let xChain, pChain, pKeychain, pAddresses: any
+let xChain, pChain, pKeychain, pAddresses, pChainApi: any
 let createdSubnetID = { value: "" }
 let pAddressStrings: string[]
+let pendingValidators = { value: "" }
 let balanceOutputs = { value: new Map() }
 let oneMinRewardsAmount: BN
 let rewardsOwner: OutputOwners
@@ -58,10 +88,14 @@ beforeAll(async () => {
   keystore = new KeystoreAPI(avalanche)
   xChain = avalanche.XChain()
   pChain = avalanche.PChain()
+  pChainApi = avalanche.PChain()
   pKeychain = pChain.keyChain()
   pKeychain.importKey(adminNodePrivateKey)
   pKeychain.importKey(addrBPrivateKey)
   pKeychain.importKey(node6PrivateKey)
+  pKeychain.importKey(node7PrivateKey)
+  pKeychain.importKey(multiSigAddrPrivateKey)
+  pKeychain.importKey(signerAddrPrivateKey)
   pAddresses = pKeychain.getAddresses()
   pAddressStrings = pKeychain.getAddressStrings()
 
@@ -162,11 +196,11 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const consortiumMemberAuthCredentials: [number, Buffer][] = [
-            [0, pAddresses[1]]
+            [0, pAddresses[1]] // "P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
           ]
           const unsignedTx: UnsignedTx = await pChain.buildRegisterNodeTx(
             undefined,
-            [P(addrB)],
+            [P(addrB)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
             [P(addrB)],
             undefined,
             node6Id,
@@ -200,7 +234,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildAddValidatorTx(
             undefined,
-            [P(addrB)],
+            [P(addrB)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
             [P(addrB)],
             [P(addrB)],
             node6Id,
@@ -239,7 +273,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
 
     [
       "createSubnet",
-      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1),
+      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1), // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
       (x) => {
         return x
       },
@@ -251,10 +285,10 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
-          const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[1]]]
+          const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[1]]] // P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
           const unsignedTx: UnsignedTx = await pChain.buildAddSubnetValidatorTx(
             undefined,
-            [P(addrB)],
+            [P(addrB)], // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
             [P(addrB)],
             node6Id,
             startTime,
@@ -785,6 +819,216 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
   createTests(tests_spec)
 })
 
+describe("Camino-PChain-Multisig", (): void => {
+  const tests_spec: any = [
+    [
+      "createUser",
+      () => keystore.createUser(multiSigUser, multiSigPasswd),
+      (x) => x,
+      Matcher.toEqual,
+      () => {
+        return {}
+      }
+    ],
+    [
+      "register node",
+      () =>
+        (async function () {
+          const msigAliasBuffer = pChainApi.parseAddress(P(multiSigAliasAddr))
+          const owner = await pChainApi.getMultisigAlias(P(multiSigAliasAddr))
+          const platformVMUTXOResponse: any = await pChainApi.getUTXOs([
+            P(multiSigAliasAddr)
+          ])
+          const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
+
+          const unsignedTx: UnsignedTx = await pChainApi.buildRegisterNodeTx(
+            utxoSet,
+            [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
+            [P(multiSigAliasAddr)],
+            undefined,
+            node7Id,
+            P(multiSigAliasAddr),
+            [[0, P(multiSigAliasAddr)]],
+            undefined,
+            locktime,
+            owner.threshold
+          )
+
+          const txbuff = unsignedTx.toBuffer()
+          const msg: Buffer = Buffer.from(
+            createHash("sha256").update(txbuff).digest()
+          )
+
+          const msKeyChain = createMsigKCAndAddSignatures(
+            [pAddresses[3], pAddresses[5]],
+            msg,
+            msigAliasBuffer,
+            owner,
+            unsignedTx
+          )
+          const tx: Tx = unsignedTx.sign(msKeyChain)
+          return pChainApi.issueTx(tx)
+        })(),
+      (x) => {
+        return x
+      },
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Get pending validators",
+      () => pChain.getPendingValidators(),
+      (x) => x.validators.length,
+      Matcher.Get,
+      () => pendingValidators
+    ],
+    [
+      "addValidator in main net",
+      () =>
+        (async function () {
+          const msigAliasBuffer = pChainApi.parseAddress(P(multiSigAliasAddr))
+          const owner = await pChainApi.getMultisigAlias(P(multiSigAliasAddr))
+          const platformVMUTXOResponse: any = await pChainApi.getUTXOs([
+            P(multiSigAliasAddr)
+          ])
+          const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
+
+          const unsignedTx: UnsignedTx = await pChainApi.buildAddValidatorTx(
+            utxoSet,
+            [P(multiSigAliasAddr)],
+            [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
+            [P(multiSigAliasAddr)],
+            node7Id, // the node where the alias is registered
+            startTime,
+            endTime,
+            new BN(2000000000000),
+            [P(multiSigAliasAddr)],
+            0,
+            undefined,
+            threshold,
+            undefined,
+            locktime,
+            owner.threshold,
+            owner.threshold
+          )
+
+          const txbuff = unsignedTx.toBuffer()
+          const msg: Buffer = Buffer.from(
+            createHash("sha256").update(txbuff).digest()
+          )
+          const msKeyChain = createMsigKCAndAddSignatures(
+            pAddresses,
+            msg,
+            msigAliasBuffer,
+            owner,
+            unsignedTx
+          )
+          const tx: Tx = unsignedTx.sign(msKeyChain)
+          return pChainApi.issueTx(tx)
+        })(),
+      (x) => {
+        return x
+      },
+      Matcher.Get,
+      () => tx,
+      3000
+    ],
+    [
+      "assert pending validators of main net",
+      () => pChain.getPendingValidators(),
+      (x) => x.validators.length,
+      Matcher.toBe,
+      () => pendingValidators.value + 1,
+      3000
+    ],
+    [
+      "importKey of multiSigUser",
+      () =>
+        pChain.importKey(multiSigUser, multiSigPasswd, signerAddrPrivateKey),
+      (x) => x,
+      Matcher.toBe,
+      () => "P" + multiSigOwnerAddr.substring(1)
+    ],
+    [
+      "createSubnet",
+      () =>
+        pChain.createSubnet(
+          multiSigUser,
+          multiSigPasswd,
+          [P(multiSigOwnerAddr)],
+          1
+        ),
+      (x) => x,
+      Matcher.Get,
+      () => createdSubnetID
+    ],
+    [
+      "addSubnetValidator",
+      () =>
+        (async function () {
+          const msigAliasBuffer = pChainApi.parseAddress(P(multiSigAliasAddr))
+          const owner = await pChainApi.getMultisigAlias(P(multiSigAliasAddr))
+          const platformVMUTXOResponse: any = await pChainApi.getUTXOs([
+            P(multiSigAliasAddr)
+          ])
+          const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
+          const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[5]]]
+          const stakeAmount: any = await pChain.getMinStake()
+
+          const unsignedTx: UnsignedTx =
+            await pChainApi.buildAddSubnetValidatorTx(
+              utxoSet,
+              [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
+              [P(multiSigAliasAddr)],
+              node7Id,
+              startTime,
+              startTime.add(new BN(263000)),
+              stakeAmount.minValidatorStake,
+              createdSubnetID.value,
+              undefined,
+              ZeroBN,
+              {
+                addresses: [pAddresses[5]],
+                threshold: 1,
+                signer: subnetAuthCredentials
+              },
+              owner.threshold
+            )
+
+          const txbuff = unsignedTx.toBuffer()
+          const msg: Buffer = Buffer.from(
+            createHash("sha256").update(txbuff).digest()
+          )
+
+          const msKeyChain = createMsigKCAndAddSignatures(
+            pAddresses,
+            msg,
+            msigAliasBuffer,
+            owner,
+            unsignedTx
+          )
+          const tx: Tx = unsignedTx.sign(msKeyChain)
+          return pChainApi.issueTx(tx)
+        })(),
+      (x) => {
+        return x
+      },
+      Matcher.Get,
+      () => tx,
+      3000
+    ],
+    [
+      "assert pending validators of subnet",
+      () => pChain.getPendingValidators(createdSubnetID.value),
+      (x) => x.validators.length,
+      Matcher.toBe,
+      () => 1,
+      3000
+    ]
+  ]
+  createTests(tests_spec)
+})
+
 function getOneMinuteDepositOffer(): DepositOffer {
   return depositOffers.find((offer) => {
     return (
@@ -806,4 +1050,37 @@ function getTest1DepositOffer(): DepositOffer {
       .toString()
       .includes("depositOffer test#1")
   })
+}
+function createMsigKCAndAddSignatures(
+  addresses: Buffer[],
+  msg: Buffer,
+  msigAliasBuffer: Buffer,
+  owner: Owner,
+  unsignedTx: UnsignedTx
+): MultisigKeyChain {
+  const msKeyChain = new MultisigKeyChain(
+    avalanche.getHRP(),
+    PChainAlias,
+    msg,
+    PlatformVMConstants.SECPMULTISIGCREDENTIAL,
+    unsignedTx.getTransaction().getOutputOwners(),
+    new Map([
+      [
+        msigAliasBuffer.toString("hex"),
+        new OutputOwners(
+          owner.addresses.map((a) => bintools.parseAddress(a, "P")),
+          new BN(owner.locktime),
+          owner.threshold
+        )
+      ]
+    ])
+  )
+  // add KeyPairs to msKeyChain
+  for (let i = 0; i < addresses.length; i++) {
+    const keyPair = pKeychain.getKey(addresses[i])
+    const signature = keyPair.sign(msg)
+    msKeyChain.addKey(new MultisigKeyPair(msKeyChain, addresses[i], signature))
+  }
+  msKeyChain.buildSignatureIndices()
+  return msKeyChain
 }
