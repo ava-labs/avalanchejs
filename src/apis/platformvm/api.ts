@@ -2430,6 +2430,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param claimableOwnerIDs The ownerIDs of the rewards to claim
    * @param claimedAmounts The amounts of the rewards to claim
    * @param claimTo The address to claimed rewards will be directed to
+   * @param claimType The type of claim tx
    * @param claimableSigners The signers of the claimable rewards
    *
    * @returns An unsigned transaction created from the passed in parameters.
@@ -2445,6 +2446,7 @@ export class PlatformVMAPI extends JRPCAPI {
     claimableOwnerIDs: string[] | Buffer[],
     claimedAmounts: BN[],
     claimTo: OutputOwners,
+    claimType: BN,
     claimableSigners: [number, Buffer][] = []
   ): Promise<UnsignedTx> => {
     const caller = "buildClaimTx"
@@ -2478,6 +2480,7 @@ export class PlatformVMAPI extends JRPCAPI {
       claimableOwnerIDs,
       claimedAmounts,
       claimTo,
+      claimType,
       claimableSigners
     )
 

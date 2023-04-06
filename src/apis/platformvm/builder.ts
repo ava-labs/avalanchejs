@@ -1438,6 +1438,7 @@ export class Builder {
    * @param depositTxs The deposit transactions with which the claiblable rewards are associated
    * @param claimableOwnerIDs The ownerIDs of the rewards to claim
    * @param claimedAmounts The amounts of the rewards to claim
+   * @param claimType The type of claim tx
    * @param claimTo The address to claimed rewards will be directed to
    *
    * @returns An unsigned ClaimTx created from the passed in parameters.
@@ -1456,6 +1457,7 @@ export class Builder {
     claimableOwnerIDs: string[] | Buffer[],
     claimedAmounts: BN[],
     claimTo: OutputOwners,
+    claimType: BN,
     claimableSigners: [number, Buffer][] = []
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
@@ -1503,6 +1505,7 @@ export class Builder {
       depositTxs,
       claimableOwnerIDs,
       claimedAmounts,
+      claimType,
       new ParseableOutput(secpOwners)
     )
     claimableSigners.forEach((signer: [number, Buffer]) => {

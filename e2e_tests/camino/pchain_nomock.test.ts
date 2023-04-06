@@ -603,6 +603,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
             ["HmxunfrZ4ar9jfBzu4PbwPAjukGZmeWGWgSEmnyFt8VFfPir1"], // hard-coded ownerID
             [oneMinRewardsAmount],
             new OutputOwners([pAddresses[1]]),
+            new BN(2), // ClaimTypeExpiredDepositReward
             claimableSigners
           )
           const claimTx: Tx = unsignedTx.sign(pKeychain)

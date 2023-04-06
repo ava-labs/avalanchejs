@@ -41,15 +41,20 @@ export class ClaimTx extends BaseTx {
     this.claimedAmounts = fields["claimedAmounts"].map((amount: string) =>
       serialization.decoder(amount, encoding, "decimalString", "Buffer")
     )
+
+    this.claimType = serialization.decoder(
+      fields["claimType"],
+      encoding,
+      "decimalString",
+      "Buffer",
+      8
+    )
     this.claimTo.deserialize(fields["claimTo"], encoding)
 
     // initialize other num fields
-    this.numDepositTxs = Buffer.alloc(4)
     this.numDepositTxs.writeUInt32BE(this.numDepositTxs.length, 0)
-    this.numClaimableOwnerIDs = Buffer.alloc(4)
     this.numClaimableOwnerIDs.writeUInt32BE(this.numClaimableOwnerIDs.length, 0)
-    this.numClaimedAmounts = Buffer.alloc(8)
-    this.numClaimedAmounts.writeUIntBE(this.numClaimedAmounts.length, 0, 8)
+    this.numClaimedAmounts.writeUInt32BE(this.numClaimedAmounts.length, 0)
   }
 
   serialize(encoding: SerializedEncoding = "hex"): object {
@@ -65,6 +70,12 @@ export class ClaimTx extends BaseTx {
       claimedAmounts: this.claimedAmounts.map((amount) =>
         serialization.encoder(amount, encoding, "Buffer", "decimalString")
       ),
+      claimType: serialization.encoder(
+        this.claimType,
+        encoding,
+        "Buffer",
+        "decimalString"
+      ),
       claimTo: this.claimTo.serialize(encoding)
     }
   }
@@ -77,6 +88,8 @@ export class ClaimTx extends BaseTx {
 
   protected numClaimedAmounts: Buffer = Buffer.alloc(4)
   protected claimedAmounts: Buffer[] = []
+
+  protected claimType: Buffer = Buffer.alloc(8)
 
   // Deposit rewards outputs will be minted to this owner, unless all of its fields has zero-values.
   // If it is empty, deposit rewards will be minted for depositTx.RewardsOwner.
@@ -160,7 +173,8 @@ export class ClaimTx extends BaseTx {
       this.claimedAmounts.push(amount)
     }
 
-    offset += 4
+    this.claimType = bintools.copyFrom(bytes, offset, offset + 8)
+    offset += 8
     offset = this.claimTo.fromBuffer(bytes, offset)
 
     return offset
@@ -196,6 +210,8 @@ export class ClaimTx extends BaseTx {
       bsize += claimedAmount.length
     })
 
+    barr.push(this.claimType)
+    bsize += this.claimType.length
     barr.push(this.claimTo.toBuffer())
     bsize += this.claimTo.toBuffer().length
 
@@ -252,6 +268,7 @@ export class ClaimTx extends BaseTx {
    * @param depositTxs Optional array of the deposit txids
    * @param claimableOwnerIDs Optional array of the claimable owner ids
    * @param claimedAmounts Optional array of the claimed amounts
+   * @param claimType Optional the type of the claim
    * @param claimTo Optional the owner of the rewards
    */
   constructor(
@@ -263,6 +280,7 @@ export class ClaimTx extends BaseTx {
     depositTxs: string[] | Buffer[] = undefined,
     claimableOwnerIDs: string[] | Buffer[] = undefined,
     claimedAmounts: BN[] = undefined,
+    claimType: BN = undefined,
     claimTo: ParseableOutput = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
@@ -302,6 +320,7 @@ export class ClaimTx extends BaseTx {
       this.claimedAmounts = claimedAmountBufs
     }
 
+    this.claimType = bintools.fromBNToBuffer(claimType, 8)
     this.claimTo = claimTo
   }
 
