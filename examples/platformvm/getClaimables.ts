@@ -31,11 +31,8 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
-
-  const txIDs: string[] = []
   const claimables: GetClaimablesResponse = await pchain.getClaimables(
-    pAddressStrings,
-    txIDs
+    pAddressStrings
   )
   console.log(claimables)
 }

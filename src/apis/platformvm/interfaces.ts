@@ -67,13 +67,6 @@ export interface GetCurrentValidatorsParams {
   nodeIDs?: string[]
 }
 
-export interface GetClaimablesParams {
-  addresses: string[]
-  depositTxIDs: string[]
-  locktime?: string
-  threshold: number
-}
-
 export interface GetAllDepositOffersParams {
   active: boolean
 }
