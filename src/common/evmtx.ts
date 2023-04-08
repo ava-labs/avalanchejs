@@ -7,9 +7,13 @@ import { Buffer } from "buffer/"
 import BinTools from "../utils/bintools"
 import { Credential } from "./credentials"
 import BN from "bn.js"
-import { StandardKeyChain, StandardKeyPair } from "./keychain"
+import { SignerKeyChain, SignerKeyPair } from "./keychain"
 import { StandardAmountInput, StandardTransferableInput } from "./input"
-import { StandardAmountOutput, StandardTransferableOutput } from "./output"
+import {
+  OutputOwners,
+  StandardAmountOutput,
+  StandardTransferableOutput
+} from "./output"
 import { DefaultNetworkID } from "../utils/constants"
 import {
   Serializable,
@@ -27,11 +31,12 @@ const serializer: Serialization = Serialization.getInstance()
  * Class representing a base for all transactions.
  */
 export abstract class EVMStandardBaseTx<
-  KPClass extends StandardKeyPair,
-  KCClass extends StandardKeyChain<KPClass>
+  KPClass extends SignerKeyPair,
+  KCClass extends SignerKeyChain
 > extends Serializable {
   protected _typeName = "EVMStandardBaseTx"
   protected _typeID = undefined
+  protected _outputOwners: OutputOwners[] = undefined
 
   serialize(encoding: SerializedEncoding = "hex"): object {
     let fields: object = super.serialize(encoding)
@@ -77,6 +82,23 @@ export abstract class EVMStandardBaseTx<
    * Returns the id of the [[StandardBaseTx]]
    */
   abstract getTxType(): number
+
+  /**
+   * @returns The outputOwners of inputs, one per input
+   */
+  getOutputOwners(): OutputOwners[] {
+    if (this._outputOwners) {
+      return [...this._outputOwners]
+    }
+    return []
+  }
+
+  /**
+   * @params The outputOwners of inputs, one per input
+   */
+  setOutputOwners(owners: OutputOwners[]) {
+    this._outputOwners = [...owners]
+  }
 
   /**
    * Returns the NetworkID as a number
@@ -137,8 +159,8 @@ export abstract class EVMStandardBaseTx<
  * Class representing an unsigned transaction.
  */
 export abstract class EVMStandardUnsignedTx<
-  KPClass extends StandardKeyPair,
-  KCClass extends StandardKeyChain<KPClass>,
+  KPClass extends SignerKeyPair,
+  KCClass extends SignerKeyChain,
   SBTx extends EVMStandardBaseTx<KPClass, KCClass>
 > extends Serializable {
   protected _typeName = "StandardUnsignedTx"
@@ -281,8 +303,8 @@ export abstract class EVMStandardUnsignedTx<
  * Class representing a signed transaction.
  */
 export abstract class EVMStandardTx<
-  KPClass extends StandardKeyPair,
-  KCClass extends StandardKeyChain<KPClass>,
+  KPClass extends SignerKeyPair,
+  KCClass extends SignerKeyChain,
   SUBTx extends EVMStandardUnsignedTx<
     KPClass,
     KCClass,

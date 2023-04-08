@@ -8,8 +8,12 @@ import BinTools from "../../utils/bintools"
 import { EVMConstants } from "./constants"
 import { SelectCredentialClass } from "./credentials"
 import { KeyChain, KeyPair } from "./keychain"
-import { Credential } from "../../common/credentials"
-import { EVMStandardTx, EVMStandardUnsignedTx } from "../../common/evmtx"
+import {
+  Credential,
+  EVMStandardTx,
+  EVMStandardUnsignedTx,
+  MultisigKeyChain
+} from "../../common"
 import createHash from "create-hash"
 import { EVMBaseTx } from "./basetx"
 import { ImportTx } from "./importtx"
@@ -81,7 +85,10 @@ export class UnsignedTx extends EVMStandardUnsignedTx<
     const msg: Buffer = Buffer.from(
       createHash("sha256").update(txbuff).digest()
     )
-    const creds: Credential[] = this.transaction.sign(msg, kc)
+    const creds: Credential[] =
+      kc instanceof MultisigKeyChain
+        ? kc.getCredentials()
+        : this.transaction.sign(msg, kc)
     return new Tx(this, creds)
   }
 }

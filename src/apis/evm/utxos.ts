@@ -14,7 +14,7 @@ import {
 } from "./outputs"
 import { EVMConstants } from "./constants"
 import { EVMInput, SECPTransferInput, TransferableInput } from "./inputs"
-import { Output } from "../../common/output"
+import { Output, OutputOwners } from "../../common/output"
 import { UnixNow } from "../../utils/helperfunctions"
 import { StandardUTXO, StandardUTXOSet } from "../../common/utxos"
 import { DefaultPlatformChainID } from "../../utils/constants"
@@ -339,6 +339,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
     let ins: TransferableInput[] = []
     let outs: EVMOutput[] = []
     let feepaid: BN = new BN(0)
+    let owners: OutputOwners[] = []
 
     if (typeof fee === "undefined") {
       fee = zero.clone()
@@ -378,6 +379,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       )
       const from: Buffer[] = output.getAddresses()
       const spenders: Buffer[] = output.getSpenders(from)
+
       spenders.forEach((spender: Buffer): void => {
         const idx: number = output.getAddressIdx(spender)
         if (idx === -1) {
@@ -389,6 +391,13 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
         xferin.getInput().addSignatureIdx(idx, spender)
       })
       ins.push(xferin)
+      owners.push(
+        new OutputOwners(
+          output.getAddresses(),
+          output.getLocktime(),
+          output.getThreshold()
+        )
+      )
 
       if (map.has(assetID)) {
         infeeamount = infeeamount.add(new BN(map.get(assetID)))
@@ -418,6 +427,7 @@ export class UTXOSet extends StandardUTXOSet<UTXO> {
       outs,
       fee
     )
+    importTx.setOutputOwners(owners)
     return new UnsignedTx(importTx)
   }
 
