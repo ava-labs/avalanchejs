@@ -13,6 +13,7 @@ import BN from "bn.js"
 import { AmountOutput } from "../platformvm/outputs"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { ChainIdError, TransferableOutputError } from "../../utils/errors"
+import { UTXO } from "./utxos"
 
 /**
  * @ignore
@@ -101,6 +102,29 @@ export class ExportTx extends BaseTx {
    */
   getDestinationChain(): Buffer {
     return this.destinationChain
+  }
+
+  /**
+   * Returns UTXOIds build from exportedOuts
+   */
+  getUTXOs(txID: Buffer): UTXO[] {
+    var outLen = this.getOuts().length
+    const utxos: UTXO[] = []
+    const outIdx = Buffer.alloc(4)
+
+    for (const exp of this.getExportOutputs()) {
+      utxos.push(
+        new UTXO(
+          this._codecID,
+          txID,
+          outLen++,
+          exp.getAssetID(),
+          exp.getOutput()
+        )
+      )
+    }
+
+    return utxos
   }
 
   /**
