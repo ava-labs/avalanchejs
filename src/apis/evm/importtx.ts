@@ -11,9 +11,9 @@ import { EVMOutput } from "./outputs"
 import { TransferableInput } from "./inputs"
 import { EVMBaseTx } from "./basetx"
 import { SelectCredentialClass } from "./credentials"
-import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { Credential, Signature, SigIdx } from "../../common/credentials"
+import { SignerKeyChain, SignerKeyPair } from "../../common/keychain"
 import { StandardAmountInput } from "../../common/input"
-import { KeyChain, KeyPair } from "./keychain"
 import { DefaultNetworkID } from "../../utils/constants"
 import {
   ChainIdError,
@@ -47,7 +47,8 @@ export class ImportTx extends EVMBaseTx {
         "Buffer",
         "cb58"
       ),
-      importIns: this.importIns.map((i) => i.serialize(encoding))
+      importIns: this.importIns.map((i) => i.serialize(encoding)),
+      outs: this.outs.map((o) => o.serialize(encoding))
     }
   }
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
@@ -182,7 +183,7 @@ export class ImportTx extends EVMBaseTx {
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg: Buffer, kc: KeyChain): Credential[] {
+  sign(msg: Buffer, kc: SignerKeyChain): Credential[] {
     const creds: Credential[] = super.sign(msg, kc)
     this.importIns.forEach((importIn: TransferableInput) => {
       const cred: Credential = SelectCredentialClass(
@@ -190,7 +191,7 @@ export class ImportTx extends EVMBaseTx {
       )
       const sigidxs: SigIdx[] = importIn.getInput().getSigIdxs()
       sigidxs.forEach((sigidx: SigIdx) => {
-        const keypair: KeyPair = kc.getKey(sigidx.getSource())
+        const keypair: SignerKeyPair = kc.getKey(sigidx.getSource())
         const signval: Buffer = keypair.sign(msg)
         const sig: Signature = new Signature()
         sig.fromBuffer(signval)

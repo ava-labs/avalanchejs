@@ -573,7 +573,7 @@ export class EVMAPI extends JRPCAPI {
    * This helper exists because the endpoint API should be the primary point of entry for most functionality.
    */
   buildImportTx = async (
-    utxoset: UTXOSet,
+    utxoset: UTXOSet | undefined,
     toAddress: string,
     ownerAddresses: string[],
     sourceChain: Buffer | string,
@@ -595,13 +595,18 @@ export class EVMAPI extends JRPCAPI {
         "Error - EVMAPI.buildImportTx: sourceChain is undefined or invalid sourceChain type."
       )
     }
-    const utxoResponse: UTXOResponse = await this.getUTXOs(
-      ownerAddresses,
-      srcChain,
-      0,
-      undefined
-    )
-    const atomicUTXOs: UTXOSet = utxoResponse.utxos
+
+    var atomicUTXOs = utxoset
+    if (!utxoset) {
+      const utxoResponse: UTXOResponse = await this.getUTXOs(
+        ownerAddresses,
+        srcChain,
+        0,
+        undefined
+      )
+      atomicUTXOs = utxoResponse.utxos
+    }
+
     const networkID: number = this.core.getNetworkID()
     const avaxAssetID: string = this.core.getNetwork().X.avaxAssetID
     const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
@@ -613,7 +618,7 @@ export class EVMAPI extends JRPCAPI {
       )
     }
 
-    const builtUnsignedTx: UnsignedTx = utxoset.buildImportTx(
+    const builtUnsignedTx: UnsignedTx = atomicUTXOs.buildImportTx(
       networkID,
       bintools.cb58Decode(this.blockchainID),
       toAddress,

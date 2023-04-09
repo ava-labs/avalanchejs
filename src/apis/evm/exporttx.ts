@@ -6,10 +6,10 @@
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
 import { EVMConstants } from "./constants"
-import { KeyChain, KeyPair } from "./keychain"
 import { EVMBaseTx } from "./basetx"
 import { SelectCredentialClass } from "./credentials"
-import { Signature, SigIdx, Credential } from "../../common/credentials"
+import { Credential, Signature, SigIdx } from "../../common/credentials"
+import { SignerKeyChain, SignerKeyPair } from "../../common/keychain"
 import { EVMInput } from "./inputs"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { TransferableOutput } from "./outputs"
@@ -161,13 +161,13 @@ export class ExportTx extends EVMBaseTx {
    *
    * @returns An array of [[Credential]]s
    */
-  sign(msg: Buffer, kc: KeyChain): Credential[] {
+  sign(msg: Buffer, kc: SignerKeyChain): Credential[] {
     const creds: Credential[] = super.sign(msg, kc)
     this.inputs.forEach((input: EVMInput) => {
       const cred: Credential = SelectCredentialClass(input.getCredentialID())
       const sigidxs: SigIdx[] = input.getSigIdxs()
       sigidxs.forEach((sigidx: SigIdx) => {
-        const keypair: KeyPair = kc.getKey(sigidx.getSource())
+        const keypair: SignerKeyPair = kc.getKey(sigidx.getSource())
         const signval: Buffer = keypair.sign(msg)
         const sig: Signature = new Signature()
         sig.fromBuffer(signval)

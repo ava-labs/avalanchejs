@@ -5,9 +5,9 @@
 
 import { Buffer } from "buffer/"
 import BinTools from "../../utils/bintools"
-import { KeyChain, KeyPair } from "./keychain"
 import { EVMStandardBaseTx } from "../../common/evmtx"
 import { Credential } from "../../common/credentials"
+import { SignerKeyChain, SignerKeyPair } from "../../common/keychain"
 import { DefaultNetworkID } from "../../utils/constants"
 import { SelectTxClass } from "./tx"
 import { SerializedEncoding } from "../../utils/serialization"
@@ -20,7 +20,10 @@ const bintools: BinTools = BinTools.getInstance()
 /**
  * Class representing a base for all transactions.
  */
-export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
+export class EVMBaseTx extends EVMStandardBaseTx<
+  SignerKeyPair,
+  SignerKeyChain
+> {
   protected _typeName = "BaseTx"
   protected _typeID = undefined
 
@@ -63,7 +66,7 @@ export class EVMBaseTx extends EVMStandardBaseTx<KeyPair, KeyChain> {
    * @returns An array of [[Credential]]s
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  sign(msg: Buffer, kc: KeyChain): Credential[] {
+  sign(msg: Buffer, kc: SignerKeyChain): Credential[] {
     const creds: Credential[] = []
     return creds
   }
