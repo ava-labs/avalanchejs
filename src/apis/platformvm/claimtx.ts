@@ -21,6 +21,12 @@ import { SelectCredentialClass } from "./credentials"
 const bintools: BinTools = BinTools.getInstance()
 const serialization: Serialization = Serialization.getInstance()
 
+export const ClaimType = {
+  VALIDATOR_REWARD: new BN("1"),
+  EXPIRED_DEPOSIT_REWARD: new BN("2"),
+  ALL: new BN("3")
+} as const
+
 /**
  * Class representing an unsigned ClaimTx transaction.
  */
@@ -131,6 +137,10 @@ export class ClaimTx extends BaseTx {
     return this.claimTo
   }
 
+  getClaimType(): Buffer {
+    return this.claimType
+  }
+
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[ClaimTx]], parses it, populates the class, and returns the length of the [[ClaimTx]] in bytes.
    *
@@ -175,8 +185,8 @@ export class ClaimTx extends BaseTx {
 
     this.claimType = bintools.copyFrom(bytes, offset, offset + 8)
     offset += 8
+    this.claimTo = new ParseableOutput()
     offset = this.claimTo.fromBuffer(bytes, offset)
-
     return offset
   }
 

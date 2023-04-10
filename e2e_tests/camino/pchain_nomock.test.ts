@@ -20,6 +20,7 @@ import {
 } from "../../src/common"
 import { PChainAlias } from "../../src/utils"
 import createHash from "create-hash"
+import { ClaimType } from "../../src/apis/platformvm/claimtx"
 const bintools = BinTools.getInstance()
 
 const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
@@ -638,7 +639,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
             [rewardsOwner],
             [oneMinRewardsAmount],
             rewardsOwner,
-            new BN(2), // ClaimTypeExpiredDepositReward
+            ClaimType.EXPIRED_DEPOSIT_REWARD,
             claimableSigners
           )
           const claimTx: Tx = unsignedTx.sign(pKeychain)

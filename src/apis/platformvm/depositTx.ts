@@ -112,6 +112,7 @@ export class DepositTx extends BaseTx {
     offset += 32
     this.depositDuration = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
+    this.rewardsOwner = new ParseableOutput()
     offset = this.rewardsOwner.fromBuffer(bytes, offset)
 
     return offset
@@ -134,7 +135,7 @@ export class DepositTx extends BaseTx {
     ]
 
     barr.push(this.rewardsOwner.toBuffer())
-    bsize += barr[barr.length - 1].length
+    bsize += this.rewardsOwner.toBuffer().length
 
     return Buffer.concat(barr, bsize)
   }

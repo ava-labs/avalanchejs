@@ -78,6 +78,17 @@ export class RegisterNodeTx extends BaseTx {
     return PlatformVMConstants.REGISTERNODETX
   }
 
+  getOldNodeID(): Buffer {
+    return this.oldNodeID
+  }
+
+  getNewNodeID(): Buffer {
+    return this.newNodeID
+  }
+  getConsortiumMemberAddress(): Buffer {
+    return this.consortiumMemberAddress
+  }
+
   /**
    * Returns the subnetAuth
    */
