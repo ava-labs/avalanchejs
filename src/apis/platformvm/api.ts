@@ -1457,6 +1457,81 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * Helper function which creates an unsigned transaction. For more granular control, you may create your own
+   * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param amount The amount of AssetID to be spent in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}.
+   * @param toAddresses The addresses to send the funds
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs provided
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param memo Optional CB58 Buffer or String which contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param locktime Optional. The locktime field created in the resulting outputs
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned transaction ([[UnsignedTx]]) which contains a [[BaseTx]].
+   *
+   * @remarks
+   * This helper exists because the endpoint API should be the primary point of entry for most functionality.
+   */
+  buildBaseTx = async (
+    utxoset: UTXOSet,
+    amount: BN,
+    toAddresses: string[],
+    fromAddresses: FromType,
+    changeAddresses: string[],
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = UnixNow(),
+    locktime: BN = new BN(0),
+    toThreshold: number = 1,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    const caller: string = "buildBaseTx"
+    const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
+      changeAddresses,
+      caller
+    )
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+    const networkID: number = this.core.getNetworkID()
+    const blockchainIDBuf: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getTxFee()
+    const feeAssetID: Buffer = await this.getAVAXAssetID()
+
+    const builtUnsignedTx: UnsignedTx = await this._getBuilder(
+      utxoset
+    ).buildBaseTx(
+      networkID,
+      blockchainIDBuf,
+      amount,
+      feeAssetID,
+      to,
+      fromSigner,
+      change,
+      fee,
+      feeAssetID,
+      memo,
+      asOf,
+      locktime,
+      toThreshold,
+      changeThreshold
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx))) {
+      /* istanbul ignore next */
+      new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  /**
    * Helper function which creates an unsigned Import Tx. For more granular control, you may create your own
    * [[UnsignedTx]] manually (with their corresponding [[TransferableInput]]s, [[TransferableOutput]]s, and [[TransferOperation]]s).
    *
