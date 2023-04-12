@@ -20,8 +20,6 @@ export class PlatformVMConstants {
 
   static STAKEABLELOCKINID: number = 21
 
-  static BASETX: number = 0
-
   static SUBNETAUTH: number = 10
 
   static ADDVALIDATORTX: number = 12
@@ -55,7 +53,7 @@ export class PlatformVMConstants {
   static DEPOSITTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 5
   static UNLOCKDEPOSITTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 6
   static REGISTERNODETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 7
-  // static BASETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 8
+  static BASETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 8
   static MULTISIGALIASTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 9
   static CLAIMTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 10
   static REWARDSIMPORTTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 11

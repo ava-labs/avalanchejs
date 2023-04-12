@@ -369,7 +369,7 @@ describe("Transactions", (): void => {
     expect(txins.length).toBe(inputs.length)
     expect(txouts.length).toBe(outputs.length)
 
-    expect(txu.getTransaction().getTxType()).toBe(0)
+    expect(txu.getTransaction().getTxType()).toBe(PlatformVMConstants.BASETX)
     expect(txu.getTransaction().getNetworkID()).toBe(12345)
     expect(txu.getTransaction().getBlockchainID().toString("hex")).toBe(
       blockchainID.toString("hex")
