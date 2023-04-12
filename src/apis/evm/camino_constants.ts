@@ -11,4 +11,8 @@ export class EVMCaminoConstants {
   static KYCROLE: number = 4
 
   static BLACKLISTROLE: number = 8
+
+  static KYC_APPROVED: number = 1
+
+  static KYC_EXPIRED: number = 1
 }
