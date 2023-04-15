@@ -32,7 +32,7 @@ const bintools: BinTools = BinTools.getInstance()
  */
 export class BaseTx extends StandardBaseTx<SignerKeyPair, SignerKeyChain> {
   protected _typeName = "BaseTx"
-  protected _typeID = PlatformVMConstants.CREATESUBNETTX
+  protected _typeID = PlatformVMConstants.BASETX
   protected _outputOwners: OutputOwners[] = undefined
 
   deserialize(fields: object, encoding: SerializedEncoding = "hex") {
