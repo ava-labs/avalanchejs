@@ -29,6 +29,7 @@ import { TransactionError } from "../../utils/errors"
 import { RegisterNodeTx } from "./registernodetx"
 import { DepositTx } from "./depositTx"
 import { AddressStateTx } from "./addressstatetx"
+import { ClaimTx } from "./claimtx"
 
 /**
  * @ignore
@@ -63,6 +64,8 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new DepositTx(...args)
   } else if (txtype === PlatformVMConstants.ADDRESSSTATETX) {
     return new AddressStateTx(...args)
+  } else if (txtype === PlatformVMConstants.CLAIMTX) {
+    return new ClaimTx(...args)
   }
   /* istanbul ignore next */
   throw new TransactionError("Error - SelectTxClass: unknown txtype")

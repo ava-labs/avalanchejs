@@ -2508,7 +2508,7 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildClaimTx = async (
     utxoset: UTXOSet,
-    fromAddresses: string[],
+    fromAddresses: FromType,
     changeAddresses: string[] = undefined,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
