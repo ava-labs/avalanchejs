@@ -2501,8 +2501,8 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param claimableOwners Optional. The owners of the rewards to claim
    * @param claimedAmounts Optional. The amounts of the rewards to claim
    * @param claimTo The address to claimed rewards will be directed to
+   * @param signers The addresses which need to sign to verify claims (deposit / treasury)
    * @param claimType The type of claim tx
-   * @param claimableSigners The signers of the claimable rewards
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -2517,8 +2517,8 @@ export class PlatformVMAPI extends JRPCAPI {
     claimableOwners: OutputOwners[] = [],
     claimedAmounts: BN[] = [],
     claimTo: OutputOwners,
-    claimType: BN,
-    claimableSigners: [number, Buffer][] = []
+    signers: Buffer[],
+    claimType: BN
   ): Promise<UnsignedTx> => {
     const caller = "buildClaimTx"
     const fromSigner = this._parseFromSigner(fromAddresses, caller)
@@ -2570,8 +2570,8 @@ export class PlatformVMAPI extends JRPCAPI {
       claimableOwnerIDs,
       claimedAmounts,
       claimTo,
-      claimType,
-      claimableSigners
+      signers,
+      claimType
     )
 
     if (!(await this.checkGooseEgg(unsignedClaimTx, this.getCreationTxFee()))) {

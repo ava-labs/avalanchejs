@@ -43,7 +43,8 @@ const gasFeeAddr: string = "0x305cea207112c0561033133f816d7a2233699f06"
 
 const blacklistAddr: string = "0x7f28dcdfc67af590918c271226034058fd15e868"
 
-const dummyContractBin = "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
+const dummyContractBin =
+  "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
 
 let keystore: KeystoreAPI
 let contract: any
@@ -392,16 +393,23 @@ describe("Camino-CChain-Admin-Role", (): void => {
     [
       "grant kyc role to adminAddr",
       () =>
-          contract.methods
-              .grantRole(adminAddr, EVMCaminoConstants.KYCROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .grantRole(adminAddr, EVMCaminoConstants.KYCROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.SetRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.KYCROLE.toString()
     ],
     [
       "ApplyKycState with KYC Role to adminAddr",
-      () => contract.methods.applyKycState(adminAddr, false, BigInt(EVMCaminoConstants.KYC_APPROVED)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .applyKycState(
+            adminAddr,
+            false,
+            BigInt(EVMCaminoConstants.KYC_APPROVED)
+          )
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.KycStateChanged.returnValues.newState,
       Matcher.toBe,
       () => EVMCaminoConstants.KYC_APPROVED.toString()
@@ -436,7 +444,14 @@ describe("Camino-CChain-Admin-Role", (): void => {
     ],
     [
       "ApplyKycState with KYC Role to adminAddr (remove)",
-      () => contract.methods.applyKycState(adminAddr, true, BigInt(EVMCaminoConstants.KYC_APPROVED)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .applyKycState(
+            adminAddr,
+            true,
+            BigInt(EVMCaminoConstants.KYC_APPROVED)
+          )
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.KycStateChanged.returnValues.newState,
       Matcher.toBe,
       () => "0"
@@ -451,9 +466,9 @@ describe("Camino-CChain-Admin-Role", (): void => {
     [
       "revoke kyc role from adminAddr",
       () =>
-          contract.methods
-              .revokeRole(adminAddr, EVMCaminoConstants.KYCROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .revokeRole(adminAddr, EVMCaminoConstants.KYCROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.DropRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.KYCROLE.toString()
@@ -464,7 +479,7 @@ describe("Camino-CChain-Admin-Role", (): void => {
       (x) => x,
       Matcher.toBe,
       () => "1"
-    ],
+    ]
   ]
 
   createTests(tests_spec)
@@ -497,9 +512,9 @@ describe("Camino-CChain-Gas-Fee-Role", (): void => {
     [
       "grant gas fee role to gasFeeAddr",
       () =>
-          contract.methods
-              .grantRole(gasFeeAddr, EVMCaminoConstants.GASFEEROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .grantRole(gasFeeAddr, EVMCaminoConstants.GASFEEROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.SetRole.returnValues.role,
       Matcher.Get,
       () => tx
@@ -538,7 +553,9 @@ describe("Camino-CChain-Gas-Fee-Role", (): void => {
     [
       "set base fee with the new gas price",
       () =>
-          contract.methods.setBaseFee(50).send({ from: gasFeeAddr, gas: 1000000, gasPrice: 5 }),
+        contract.methods
+          .setBaseFee(50)
+          .send({ from: gasFeeAddr, gas: 1000000, gasPrice: 5 }),
       (x) => x.events.GasFeeSet.returnValues.newGasFee,
       Matcher.toBe,
       () => "50"
@@ -553,7 +570,9 @@ describe("Camino-CChain-Gas-Fee-Role", (): void => {
     [
       "set base fee with the new gas price (Fail)",
       () =>
-          contract.methods.setBaseFee(50).send({ from: gasFeeAddr, gas: 1000000, gasPrice: 5 }),
+        contract.methods
+          .setBaseFee(50)
+          .send({ from: gasFeeAddr, gas: 1000000, gasPrice: 5 }),
       (x) => x,
       Matcher.toThrow,
       () => "transaction underpriced"
@@ -635,13 +654,13 @@ describe("Camino-CChain-KYC-Role", (): void => {
       "SC deployment with KYC_APPROVED State",
       async function () {
         try {
-          const response: any = await contract.deploy({ data: dummyContractBin })
-              .send({ from: kycAddr, gas: 1000000 })
+          const response: any = await contract
+            .deploy({ data: dummyContractBin })
+            .send({ from: kycAddr, gas: 1000000 })
 
           if (response.options.address == null) {
             throw "Contract was not deployed"
-          }
-          else {
+          } else {
             throw "Contract was deployed"
           }
         } catch (e) {
@@ -655,9 +674,9 @@ describe("Camino-CChain-KYC-Role", (): void => {
     [
       "applyKycState expiration",
       () =>
-          contract.methods
-              .applyKycState(kycAddr, false, EVMCaminoConstants.KYC_EXPIRED)
-              .send({ from: kycAddr, gas: 1000000 }),
+        contract.methods
+          .applyKycState(kycAddr, false, EVMCaminoConstants.KYC_EXPIRED)
+          .send({ from: kycAddr, gas: 1000000 }),
       (x) => x.events.KycStateChanged.returnValues.newState,
       Matcher.toBe,
       () => EVMCaminoConstants.KYC_APPROVED.toString()
@@ -673,13 +692,13 @@ describe("Camino-CChain-KYC-Role", (): void => {
       "SC deployment with KYC_EXPIRED State",
       async function () {
         try {
-          const response: any = await contract.deploy({ data: dummyContractBin })
-              .send({ from: kycAddr, gas: 1000000 })
+          const response: any = await contract
+            .deploy({ data: dummyContractBin })
+            .send({ from: kycAddr, gas: 1000000 })
 
           if (response.options.address == null) {
             throw "Contract was not deployed"
-          }
-          else {
+          } else {
             throw "Contract was deployed"
           }
         } catch (e) {
@@ -693,9 +712,9 @@ describe("Camino-CChain-KYC-Role", (): void => {
     [
       "applyKycState addition",
       () =>
-          contract.methods
-              .applyKycState(kycAddr, false, EVMCaminoConstants.KYC_APPROVED)
-              .send({ from: kycAddr, gas: 1000000 }),
+        contract.methods
+          .applyKycState(kycAddr, false, EVMCaminoConstants.KYC_APPROVED)
+          .send({ from: kycAddr, gas: 1000000 }),
       (x) => x.events.KycStateChanged.returnValues.newState,
       Matcher.toBe,
       () => EVMCaminoConstants.KYC_APPROVED.toString()
@@ -726,7 +745,9 @@ describe("Camino-CChain-KYC-Role", (): void => {
     ],
     [
       "SC deployment with No State",
-      () => contract.deploy({ data: dummyContractBin })
+      () =>
+        contract
+          .deploy({ data: dummyContractBin })
           .send({ from: kycAddr, gas: 1000000 }),
       (x) => x,
       Matcher.toThrow,
@@ -771,7 +792,10 @@ describe("Camino-CChain-Multi-Role", (): void => {
     // Initial Role Check
     [
       "adminAddress role check",
-      () => contract.methods.hasRole(adminAddr, EVMCaminoConstants.ADMINROLE).call(),
+      () =>
+        contract.methods
+          .hasRole(adminAddr, EVMCaminoConstants.ADMINROLE)
+          .call(),
       (x) => x,
       Matcher.toEqual,
       () => true
@@ -780,9 +804,9 @@ describe("Camino-CChain-Multi-Role", (): void => {
     [
       "grant gas fee role to adminAddr",
       () =>
-          contract.methods
-              .grantRole(adminAddr, EVMCaminoConstants.GASFEEROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .grantRole(adminAddr, EVMCaminoConstants.GASFEEROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.SetRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.GASFEEROLE.toString()
@@ -790,9 +814,9 @@ describe("Camino-CChain-Multi-Role", (): void => {
     [
       "grant kyc role to adminAddr",
       () =>
-          contract.methods
-              .grantRole(adminAddr, EVMCaminoConstants.KYCROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .grantRole(adminAddr, EVMCaminoConstants.KYCROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.SetRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.KYCROLE.toString()
@@ -803,11 +827,19 @@ describe("Camino-CChain-Multi-Role", (): void => {
       () => contract.methods.getRoles(adminAddr).call(),
       (x) => x,
       Matcher.toBe,
-      () => (EVMCaminoConstants.ADMINROLE + EVMCaminoConstants.GASFEEROLE + EVMCaminoConstants.KYCROLE).toString()
+      () =>
+        (
+          EVMCaminoConstants.ADMINROLE +
+          EVMCaminoConstants.GASFEEROLE +
+          EVMCaminoConstants.KYCROLE
+        ).toString()
     ],
     [
       "setBaseFee with Gas Fee Role",
-      () => contract.methods.setBaseFee(BigInt(10)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .setBaseFee(BigInt(10))
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.GasFeeSet.returnValues.newGasFee,
       Matcher.toBe,
       () => "10"
@@ -822,9 +854,9 @@ describe("Camino-CChain-Multi-Role", (): void => {
     [
       "revoke gas fee role from adminAddr",
       () =>
-          contract.methods
-              .revokeRole(adminAddr, EVMCaminoConstants.GASFEEROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .revokeRole(adminAddr, EVMCaminoConstants.GASFEEROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.DropRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.GASFEEROLE.toString()
@@ -835,11 +867,15 @@ describe("Camino-CChain-Multi-Role", (): void => {
       () => contract.methods.getRoles(adminAddr).call(),
       (x) => x,
       Matcher.toBe,
-      () => (EVMCaminoConstants.ADMINROLE + EVMCaminoConstants.KYCROLE).toString()
+      () =>
+        (EVMCaminoConstants.ADMINROLE + EVMCaminoConstants.KYCROLE).toString()
     ],
     [
       "setBaseFee without Gas Fee Role",
-      () => contract.methods.setBaseFee(BigInt(100)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .setBaseFee(BigInt(100))
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x,
       Matcher.toThrow,
       () => "Transaction has been reverted by the EVM"
@@ -854,7 +890,10 @@ describe("Camino-CChain-Multi-Role", (): void => {
     //   Admin state (and not KYC) is needed to deploy a contract
     [
       "ApplyKycState with KYC Role to adminAddr",
-      () => contract.methods.applyKycState(adminAddr, false, BigInt(1)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .applyKycState(adminAddr, false, BigInt(1))
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.KycStateChanged.returnValues.newState,
       Matcher.toBe,
       () => "1"
@@ -870,13 +909,13 @@ describe("Camino-CChain-Multi-Role", (): void => {
       "SC deployment from adminAddr (Successfully)",
       async function () {
         try {
-          const response: any = await contract.deploy({ data: dummyContractBin })
-              .send({ from: adminAddr, gas: 1000000 })
+          const response: any = await contract
+            .deploy({ data: dummyContractBin })
+            .send({ from: adminAddr, gas: 1000000 })
 
           if (response.options.address == null) {
             throw "Contract was not deployed"
-          }
-          else {
+          } else {
             throw "Contract was deployed"
           }
         } catch (e) {
@@ -889,7 +928,10 @@ describe("Camino-CChain-Multi-Role", (): void => {
     ],
     [
       "ApplyKycState with KYC Role to kycAddr (remove)",
-      () => contract.methods.applyKycState(adminAddr, true, BigInt(EVMCaminoConstants.ADMINROLE)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .applyKycState(adminAddr, true, BigInt(EVMCaminoConstants.ADMINROLE))
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.KycStateChanged.returnValues.newState,
       Matcher.toBe,
       () => "0"
@@ -904,7 +946,9 @@ describe("Camino-CChain-Multi-Role", (): void => {
     //   Failed deployment throws a quite misleading error
     [
       "SC deployment from adminAddr (Not Successfully)",
-      () => contract.deploy({ data: dummyContractBin })
+      () =>
+        contract
+          .deploy({ data: dummyContractBin })
           .send({ from: adminAddr, gas: 1000000 }),
       (x) => x,
       Matcher.toThrow,
@@ -913,9 +957,9 @@ describe("Camino-CChain-Multi-Role", (): void => {
     [
       "revoke KYC role from adminAddr",
       () =>
-          contract.methods
-              .revokeRole(adminAddr, EVMCaminoConstants.KYCROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .revokeRole(adminAddr, EVMCaminoConstants.KYCROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.DropRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.KYCROLE.toString()
@@ -931,7 +975,10 @@ describe("Camino-CChain-Multi-Role", (): void => {
     //   Cannot call applyKycState without KYC role
     [
       "ApplyKycState without KYC Role to adminAddr",
-      () => contract.methods.applyKycState(adminAddr, false, BigInt(1)).send({ from: adminAddr, gas: 1000000 }),
+      () =>
+        contract.methods
+          .applyKycState(adminAddr, false, BigInt(1))
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x,
       Matcher.toThrow,
       () => "Transaction has been reverted by the EVM"
@@ -946,9 +993,9 @@ describe("Camino-CChain-Multi-Role", (): void => {
     [
       "revoke admin role",
       () =>
-          contract.methods
-              .revokeRole(adminAddr, EVMCaminoConstants.ADMINROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .revokeRole(adminAddr, EVMCaminoConstants.ADMINROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x.events.DropRole.returnValues.role,
       Matcher.toBe,
       () => EVMCaminoConstants.ADMINROLE.toString()
@@ -964,13 +1011,13 @@ describe("Camino-CChain-Multi-Role", (): void => {
     [
       "grant admin role to adminAddr without having admin rights",
       () =>
-          contract.methods
-              .grantRole(adminAddr, EVMCaminoConstants.ADMINROLE)
-              .send({ from: adminAddr, gas: 1000000 }),
+        contract.methods
+          .grantRole(adminAddr, EVMCaminoConstants.ADMINROLE)
+          .send({ from: adminAddr, gas: 1000000 }),
       (x) => x,
       Matcher.toThrow,
       () => "Transaction has been reverted by the EVM"
-    ],
+    ]
   ]
   createTests(tests_spec)
 })
