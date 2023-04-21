@@ -55,6 +55,8 @@ export class ClaimTx extends BaseTx {
       "Buffer",
       8
     )
+
+    this.claimTo = new ParseableOutput()
     this.claimTo.deserialize(fields["claimTo"], encoding)
 
     // initialize other num fields

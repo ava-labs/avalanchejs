@@ -1,6 +1,7 @@
 export * from "./api"
 export * from "./addsubnetvalidatortx"
 export * from "./basetx"
+export * from "./claimtx"
 export * from "./constants"
 export * from "./createchaintx"
 export * from "./createsubnettx"

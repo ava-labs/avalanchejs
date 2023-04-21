@@ -627,7 +627,6 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
       "Issue a claimTx",
       () =>
         (async function () {
-          const claimableSigners: [number, Buffer][] = [[0, pAddresses[1]]]
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
             undefined,
             [P(addrB)],
@@ -639,8 +638,8 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
             [rewardsOwner],
             [oneMinRewardsAmount],
             rewardsOwner,
-            ClaimType.EXPIRED_DEPOSIT_REWARD,
-            claimableSigners
+            [pAddresses[1]],
+            ClaimType.EXPIRED_DEPOSIT_REWARD
           )
           const claimTx: Tx = unsignedTx.sign(pKeychain)
           return pChain.issueTx(claimTx)
