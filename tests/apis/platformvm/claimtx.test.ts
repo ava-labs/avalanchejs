@@ -2,16 +2,14 @@ import BN from "bn.js"
 import { Buffer } from "buffer/"
 import {
   KeyChain,
-  ParseableOutput,
   PlatformVMAPI,
   PlatformVMConstants,
-  SECPOwnerOutput,
   SECPTransferInput,
   SECPTransferOutput,
   TransferableInput,
   TransferableOutput
 } from "src/apis/platformvm"
-import { ClaimTx, ClaimType } from "src/apis/platformvm/claimtx"
+import { ClaimAmount, ClaimTx, ClaimType } from "src/apis/platformvm/claimtx"
 import BinTools from "src/utils/bintools"
 import {
   DefaultLocalGenesisPrivateKey,
@@ -44,13 +42,13 @@ const depositTxID: Buffer = Buffer.from(
     .update(bintools.fromBNToBuffer(new BN(1), 32))
     .digest()
 )
-const claimedAmount = new BN(1)
-let rewardOutputOwners: SECPOwnerOutput
+
 let platformVM: PlatformVMAPI
 let keychain: KeyChain
 let avaxAssetID: Buffer
 let secpTransferOutput: SECPTransferOutput
 let secpTransferInput: SECPTransferInput
+let claimTx: ClaimTx
 
 const removeJsonProperty = (obj, property) => {
   let json = JSON.stringify(obj)
@@ -60,17 +58,12 @@ const removeJsonProperty = (obj, property) => {
   return JSON.parse(json)
 }
 
-beforeAll(async () => {
+beforeAll(() => {
   platformVM = new PlatformVMAPI(avalanche, "/ext/bc/P")
   keychain = platformVM.keyChain()
   keychain.importKey(privKey)
 
-  rewardOutputOwners = new SECPOwnerOutput(
-    [keychain.getAddresses()[0]],
-    ZeroBN,
-    1
-  )
-  avaxAssetID = await platformVM.getAVAXAssetID()
+  avaxAssetID = bintools.cb58Decode(platformVM.getNetwork().X.avaxAssetID)
   secpTransferInput = new SECPTransferInput(new BN(1))
   secpTransferInput.addSignatureIdx(0, keychain.getAddresses()[0])
 
@@ -80,14 +73,28 @@ beforeAll(async () => {
     ZeroBN,
     1
   )
-})
-describe("ClaimTx", (): void => {
-  const claimTxHex: string =
-    "00000001101010101010101010101010101010101010101010101010101010101010101000000001dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db000000070000000000000001000000000000000000000001000000013cb7d3842e8cee6a0ebd09f1fe884f6861e1b29c00000001ec4916dd28fc4c10d78e287ca5d9cc51ee1ae73cbfde08c6b37324cbfaac8bc500000000dbcf890f77f49b96857648b72b77f9f82937f28a68704af05da0dc12ba53f2db0000000500000000000000010000000100000000000000046d656d6f00000001ec4916dd28fc4c10d78e287ca5d9cc51ee1ae73cbfde08c6b37324cbfaac8bc5000000019267d3dbed802941483f1afa2a6bc68de5f653128aca9bf1461c5d0a3ad36ed200000001000000000000000100000000000000020000000b000000000000000000000001000000013cb7d3842e8cee6a0ebd09f1fe884f6861e1b29c"
-  const claimTxBuf: Buffer = Buffer.from(claimTxHex, "hex")
-  const claimTx: ClaimTx = new ClaimTx()
-  claimTx.fromBuffer(claimTxBuf)
 
+  claimTx = new ClaimTx(
+    1,
+    Buffer.from(
+      "1010101010101010101010101010101010101010101010101010101010101010",
+      "hex"
+    ),
+    [new TransferableOutput(avaxAssetID, secpTransferOutput)],
+    [
+      new TransferableInput(
+        depositTxID,
+        Buffer.from("00000000", "hex"),
+        avaxAssetID,
+        secpTransferInput
+      )
+    ],
+    Buffer.from("memo"),
+    [new ClaimAmount(ownerID, ClaimType.EXPIRED_DEPOSIT_REWARD, new BN(1))]
+  )
+})
+
+describe("ClaimTx", (): void => {
   test("getTypeName", async (): Promise<void> => {
     const claimTxTypeName: string = claimTx.getTypeName()
     expect(claimTxTypeName).toBe("ClaimTx")
@@ -134,11 +141,13 @@ describe("ClaimTx", (): void => {
         .typeToBuffer(bintools.cb58Encode(Buffer.from("memo")), "cb58")
         .toString("hex"),
       networkID: String(DefaultNetworkID).padStart(8, "0"),
-      claimableOwnerIDs: [ownerID.toString("hex")],
-      claimedAmounts: [new BN(1).toString(10, 16)],
-      depositTxs: [depositTxID.toString("hex")],
-      claimType: ClaimType.EXPIRED_DEPOSIT_REWARD.toString(10, 16),
-      claimTo: new ParseableOutput(rewardOutputOwners).serialize()
+      claimAmounts: [
+        {
+          id: ownerID.toString("hex"),
+          type: new BN(ClaimType.EXPIRED_DEPOSIT_REWARD).toString(10, 16),
+          amount: new BN(1).toString(10, 16)
+        }
+      ]
     }
 
     expect(removeJsonProperty(serializedClaimTx, "source")).toStrictEqual(
@@ -146,42 +155,12 @@ describe("ClaimTx", (): void => {
     )
   })
 
-  test("getClaimableOwnerIDs", async (): Promise<void> => {
-    const actualClaimableOwnerIDs: Buffer[] = claimTx.getClaimableOwnerIDs()
-    expect(actualClaimableOwnerIDs).toStrictEqual([ownerID])
-  })
-
-  test("getClaimedAmounts", async (): Promise<void> => {
-    const actualClaimedAmounts: Buffer[] = claimTx.getClaimedAmounts()
-    expect(actualClaimedAmounts).toStrictEqual([
-      bintools.fromBNToBuffer(claimedAmount, 8)
-    ])
-  })
-
-  test("getClaimTo", async (): Promise<void> => {
-    const actualClaimTo: ParseableOutput = claimTx.getClaimTo()
-    const expectedClaimTo = new ParseableOutput(rewardOutputOwners)
-    expect(actualClaimTo.serialize()).toMatchObject(expectedClaimTo.serialize())
-  })
-
-  test("getClaimType", async (): Promise<void> => {
-    expect(
-      bintools
-        .fromBufferToBN(claimTx.getClaimType())
-        .cmp(ClaimType.EXPIRED_DEPOSIT_REWARD)
-    ).toBe(0)
-  })
-
-  test("getDepositTxs", async (): Promise<void> => {
-    const actualDepositTxs: Buffer[] = claimTx.getDepositTxs()
-    expect(actualDepositTxs).toStrictEqual([depositTxID])
-  })
-
   test("addSignatureIdx", async (): Promise<void> => {
-    claimTx.addSignatureIdx(0, keychain.getAddresses()[0])
-    const actualSigIdxs: SigIdx[] = claimTx.getSigIdxs()
+    claimTx.addSigIdxs([new SigIdx(0, keychain.getAddresses()[0])])
+    const actualSigIdxs: SigIdx[][] = claimTx.getSigIdxs()
     expect(actualSigIdxs.length).toBe(1)
-    expect(actualSigIdxs[0].getSource()).toStrictEqual(
+    expect(actualSigIdxs[0].length).toBe(1)
+    expect(actualSigIdxs[0][0].getSource()).toStrictEqual(
       keychain.getAddresses()[0]
     )
   })

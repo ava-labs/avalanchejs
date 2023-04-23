@@ -31,7 +31,6 @@ export interface BaseInput {
   getCredentialID(): number
   addSignatureIdx(addressIdx: number, address: Buffer): void
   getSigIdxs(): SigIdx[]
-  setSigIdxs(sigIdxs: SigIdx[])
 
   clone(): this
   create(...args: any[]): this
@@ -93,15 +92,6 @@ export abstract class Input extends Serializable {
    * Returns the array of [[SigIdx]] for this [[Input]]
    */
   getSigIdxs = (): SigIdx[] => this.sigIdxs
-
-  /**
-   * Sets the array of [[SigIdx]] for this [[Input]]
-   * Normaly only called for Multisig replacement
-   */
-  setSigIdxs = (sigIdxs: SigIdx[]) => {
-    this.sigIdxs = sigIdxs
-    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
-  }
 
   abstract getCredentialID(): number
 
@@ -199,8 +189,6 @@ export abstract class StandardParseableInput extends Serializable {
   getSigIdxs = (): SigIdx[] => {
     return this.input.getSigIdxs()
   }
-
-  setSigIdxs = (sigIdxs: SigIdx[]) => this.input.setSigIdxs(sigIdxs)
 
   // must be implemented to select input types for the VM in question
   abstract fromBuffer(bytes: Buffer, offset?: number): number

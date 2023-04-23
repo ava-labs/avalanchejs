@@ -251,15 +251,6 @@ export class CreateChainTx extends BaseTx {
     return this.sigIdxs
   }
 
-  /**
-   * Set the array of [[SigIdx]] for this [[TX]]
-   */
-  setSigIdxs(sigIdxs: SigIdx[]) {
-    this.sigIdxs = sigIdxs
-    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
-    this.subnetAuth.setAddressIndices(this.sigIdxs.map((s) => s.toBuffer()))
-  }
-
   getCredentialID(): number {
     return PlatformVMConstants.SECPCREDENTIAL
   }

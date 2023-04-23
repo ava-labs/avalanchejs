@@ -6,7 +6,7 @@
 import BN from "bn.js"
 
 import { Buffer } from "buffer/"
-import { OutputOwners, ZeroBN } from "../../common"
+import { OutputOwners, SigIdx, ZeroBN } from "../../common"
 import { DefaultNetworkID, UnixNow } from "../../utils"
 import {
   AddressError,
@@ -17,17 +17,24 @@ import {
 } from "../../utils/errors"
 import {
   AddDelegatorTx,
+  AddressStateTx,
   AddSubnetValidatorTx,
   AddValidatorTx,
   AmountOutput,
   AssetAmountDestination,
   BaseTx,
   CaminoAddValidatorTx,
+  ClaimAmount,
+  ClaimAmountParams,
+  ClaimTx,
+  ClaimType,
   CreateChainTx,
   CreateSubnetTx,
+  DepositTx,
   ExportTx,
   ImportTx,
   ParseableOutput,
+  PlatformVMConstants,
   RegisterNodeTx,
   SECPOwnerOutput,
   SECPTransferInput,
@@ -35,14 +42,12 @@ import {
   SelectOutputClass,
   TransferableInput,
   TransferableOutput,
+  UnlockDepositTx,
   UnsignedTx,
   UTXO
 } from "."
 import { GenesisData } from "../avm"
-import { DepositTx } from "./depositTx"
-import { AddressStateTx } from "./addressstatetx"
-import { UnlockDepositTx } from "./unlockdeposittx"
-import { ClaimTx } from "./claimtx"
+import createHash from "create-hash"
 
 export type LockMode = "Unlocked" | "Bond" | "Deposit" | "Stake"
 
@@ -1435,12 +1440,8 @@ export class Builder {
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
-   * @param depositTxIDs The deposit transactions ids with which the claiblable rewards are associated
-   * @param claimableOwnerIDs The ownerIDs of the rewards to claim
-   * @param claimedAmounts The amounts of the rewards to claim
+   * @param claimAmounts The specification and authentication what and how much to claim
    * @param claimTo The address to claimed rewards will be directed to
-   * @param signers The addresses which need to sign to verify claims (deposit / treasury)
-   * @param claimType The type of claim tx
    *
    * @returns An unsigned ClaimTx created from the passed in parameters.
    */
@@ -1454,12 +1455,8 @@ export class Builder {
     memo: Buffer = undefined,
     asOf: BN = zero,
     changeThreshold: number = 1,
-    depositTxIDs: string[] | Buffer[],
-    claimableOwnerIDs: string[] | Buffer[],
-    claimedAmounts: BN[],
-    claimTo: OutputOwners,
-    signers: Buffer[],
-    claimType: BN
+    claimAmounts: ClaimAmountParams[],
+    claimTo: OutputOwners = undefined
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
@@ -1492,33 +1489,65 @@ export class Builder {
       }
     }
 
-    const secpOwners = new SECPOwnerOutput(
-      claimTo.getAddresses(),
-      claimTo?.getLocktime(),
-      claimTo.getThreshold()
-    )
+    // TODO: Compact if possible
+    const txClaimAmounts: ClaimAmount[] = []
+    const allSigIdxs: SigIdx[][] = []
+    for (const amt of claimAmounts) {
+      const receiver = claimTo ? claimTo : amt.owners
+      outs.push(
+        new TransferableOutput(
+          feeAssetID,
+          new SECPTransferOutput(
+            amt.amount,
+            receiver.getAddresses(),
+            receiver.getLocktime(),
+            receiver.getThreshold()
+          )
+        )
+      )
+      let id = amt.id
+      if (!id) {
+        if (amt.claimType === ClaimType.ACTIVE_DEPOSIT_REWARD)
+          throw new Error("ClaimAmount id must be set")
+        const b = Buffer.alloc(2, PlatformVMConstants.LATESTCODEC)
+        id = Buffer.from(
+          createHash("sha256")
+            .update(Buffer.concat([b, amt.owners.toBuffer()]))
+            .digest()
+        )
+      }
+
+      // Create SigIdxs
+      if (amt.sigIdxs.length !== amt.owners.getThreshold())
+        throw new Error("SigIdx count mismatch")
+      const sigIdxs: SigIdx[] = []
+      const addrs = amt.owners.getAddresses()
+      for (const idx of amt.sigIdxs) {
+        if (idx >= addrs.length) throw new Error("SigIdx out of bound")
+        sigIdxs.push(new SigIdx(idx, addrs[idx]))
+      }
+
+      // Create auth for verification of claimAmount owner
+      const bufferSigIdxs = sigIdxs.map((s) => s.getBytes())
+
+      txClaimAmounts.push(
+        new ClaimAmount(id, amt.claimType, amt.amount, bufferSigIdxs)
+      )
+      allSigIdxs.push(sigIdxs)
+      owners.push(amt.owners)
+    }
+
     const claimTx: ClaimTx = new ClaimTx(
       networkID,
       blockchainID,
       outs,
       ins,
       memo,
-      depositTxIDs,
-      claimableOwnerIDs,
-      claimedAmounts,
-      claimType,
-      new ParseableOutput(secpOwners)
+      txClaimAmounts
     )
 
-    const signerOwners: OutputOwners = new OutputOwners(
-      signers,
-      ZeroBN,
-      signers.length
-    )
-    signers.forEach((signer: Buffer, index) => {
-      claimTx.addSignatureIdx(index, signer)
-    })
-    owners.push(signerOwners)
+    // Build signatureIndices
+    for (const s of allSigIdxs) claimTx.addSigIdxs(s)
 
     claimTx.setOutputOwners(owners)
     return new UnsignedTx(claimTx)

@@ -221,15 +221,6 @@ export class AddSubnetValidatorTx extends BaseTx {
     return this.sigIdxs
   }
 
-  /**
-   * Sets the array of [[SigIdx]] for this [[TX]]
-   */
-  setSigIdxs(sigIdxs: SigIdx[]) {
-    this.sigIdxs = sigIdxs
-    this.sigCount.writeUInt32BE(this.sigIdxs.length, 0)
-    this.subnetAuth.setAddressIndices(sigIdxs.map((idx) => idx.toBuffer()))
-  }
-
   getCredentialID(): number {
     return PlatformVMConstants.SECPCREDENTIAL
   }

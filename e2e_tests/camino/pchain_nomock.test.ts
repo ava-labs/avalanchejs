@@ -7,10 +7,12 @@ import {
   UnsignedTx,
   UTXOSet,
   PlatformVMConstants,
-  Owner
+  Owner,
+  PlatformVMAPI,
+  ClaimAmountParams
 } from "../../src/apis/platformvm"
 import { UnixNow } from "../../src/utils"
-import { Avalanche, BinTools } from "../../src/index"
+import { BinTools } from "../../src/index"
 import { Buffer } from "buffer/"
 import {
   MultisigKeyChain,
@@ -77,7 +79,8 @@ let keystore: KeystoreAPI
 let depositOffers = undefined as DepositOffer[] | undefined
 let depositTx = { value: "" }
 let tx = { value: "" }
-let xChain, pChain, pKeychain, pAddresses, pChainApi: any
+let xChain, pKeychain, pAddresses: any
+let pChain: PlatformVMAPI
 let createdSubnetID = { value: "" }
 let pAddressStrings: string[]
 let pendingValidators = { value: "" }
@@ -89,7 +92,6 @@ beforeAll(async () => {
   keystore = new KeystoreAPI(avalanche)
   xChain = avalanche.XChain()
   pChain = avalanche.PChain()
-  pChainApi = avalanche.PChain()
   pKeychain = pChain.keyChain()
   pKeychain.importKey(adminNodePrivateKey)
   pKeychain.importKey(addrBPrivateKey)
@@ -492,7 +494,10 @@ describe("Camino-PChain-Deposit", (): void => {
           const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
             undefined,
             [P(addrB)],
-            [P(addrB)]
+            [P(addrB)],
+            undefined,
+            undefined,
+            ZeroBN
           )
           const tx: Tx = unsignedTx.sign(pKeychain)
           return pChain.issueTx(tx)
@@ -634,12 +639,14 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
             undefined,
             ZeroBN,
             1,
-            [],
-            [rewardsOwner],
-            [oneMinRewardsAmount],
-            rewardsOwner,
-            [pAddresses[1]],
-            ClaimType.EXPIRED_DEPOSIT_REWARD
+            [
+              {
+                amount: oneMinRewardsAmount,
+                claimType: ClaimType.EXPIRED_DEPOSIT_REWARD,
+                owners: new OutputOwners([pAddresses[1]], ZeroBN, 1),
+                sigIdxs: [0]
+              } as ClaimAmountParams
+            ]
           )
           const claimTx: Tx = unsignedTx.sign(pKeychain)
           return pChain.issueTx(claimTx)
@@ -740,7 +747,10 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
           const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
             undefined,
             [P(addrB)],
-            [P(addrB)]
+            [P(addrB)],
+            undefined,
+            undefined,
+            ZeroBN
           )
           const tx: Tx = unsignedTx.sign(pKeychain)
           return pChain.issueTx(tx)
@@ -834,14 +844,14 @@ describe("Camino-PChain-Multisig", (): void => {
       "register node",
       () =>
         (async function () {
-          const msigAliasBuffer = pChainApi.parseAddress(P(multiSigAliasAddr))
-          const owner = await pChainApi.getMultisigAlias(P(multiSigAliasAddr))
-          const platformVMUTXOResponse: any = await pChainApi.getUTXOs([
+          const msigAliasBuffer = pChain.parseAddress(P(multiSigAliasAddr))
+          const owner = await pChain.getMultisigAlias(P(multiSigAliasAddr))
+          const platformVMUTXOResponse: any = await pChain.getUTXOs([
             P(multiSigAliasAddr)
           ])
           const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
 
-          const unsignedTx: UnsignedTx = await pChainApi.buildRegisterNodeTx(
+          const unsignedTx: UnsignedTx = await pChain.buildRegisterNodeTx(
             utxoSet,
             [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
             [P(multiSigAliasAddr)],
@@ -867,7 +877,7 @@ describe("Camino-PChain-Multisig", (): void => {
             unsignedTx
           )
           const tx: Tx = unsignedTx.sign(msKeyChain)
-          return pChainApi.issueTx(tx)
+          return pChain.issueTx(tx)
         })(),
       (x) => {
         return x
@@ -886,14 +896,14 @@ describe("Camino-PChain-Multisig", (): void => {
       "addValidator in main net",
       () =>
         (async function () {
-          const msigAliasBuffer = pChainApi.parseAddress(P(multiSigAliasAddr))
-          const owner = await pChainApi.getMultisigAlias(P(multiSigAliasAddr))
-          const platformVMUTXOResponse: any = await pChainApi.getUTXOs([
+          const msigAliasBuffer = pChain.parseAddress(P(multiSigAliasAddr))
+          const owner = await pChain.getMultisigAlias(P(multiSigAliasAddr))
+          const platformVMUTXOResponse: any = await pChain.getUTXOs([
             P(multiSigAliasAddr)
           ])
           const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
 
-          const unsignedTx: UnsignedTx = await pChainApi.buildAddValidatorTx(
+          const unsignedTx: UnsignedTx = await pChain.buildAddValidatorTx(
             utxoSet,
             [P(multiSigAliasAddr)],
             [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
@@ -924,7 +934,7 @@ describe("Camino-PChain-Multisig", (): void => {
             unsignedTx
           )
           const tx: Tx = unsignedTx.sign(msKeyChain)
-          return pChainApi.issueTx(tx)
+          return pChain.issueTx(tx)
         })(),
       (x) => {
         return x
@@ -966,34 +976,33 @@ describe("Camino-PChain-Multisig", (): void => {
       "addSubnetValidator",
       () =>
         (async function () {
-          const msigAliasBuffer = pChainApi.parseAddress(P(multiSigAliasAddr))
-          const owner = await pChainApi.getMultisigAlias(P(multiSigAliasAddr))
-          const platformVMUTXOResponse: any = await pChainApi.getUTXOs([
+          const msigAliasBuffer = pChain.parseAddress(P(multiSigAliasAddr))
+          const owner = await pChain.getMultisigAlias(P(multiSigAliasAddr))
+          const platformVMUTXOResponse: any = await pChain.getUTXOs([
             P(multiSigAliasAddr)
           ])
           const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
           const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[5]]]
           const stakeAmount: any = await pChain.getMinStake()
 
-          const unsignedTx: UnsignedTx =
-            await pChainApi.buildAddSubnetValidatorTx(
-              utxoSet,
-              [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
-              [P(multiSigAliasAddr)],
-              node7Id,
-              startTime,
-              startTime.add(new BN(263000)),
-              stakeAmount.minValidatorStake,
-              createdSubnetID.value,
-              undefined,
-              ZeroBN,
-              {
-                addresses: [pAddresses[5]],
-                threshold: 1,
-                signer: subnetAuthCredentials
-              },
-              owner.threshold
-            )
+          const unsignedTx: UnsignedTx = await pChain.buildAddSubnetValidatorTx(
+            utxoSet,
+            [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
+            [P(multiSigAliasAddr)],
+            node7Id,
+            startTime,
+            startTime.add(new BN(263000)),
+            stakeAmount.minValidatorStake,
+            createdSubnetID.value,
+            undefined,
+            ZeroBN,
+            {
+              addresses: [pAddresses[5]],
+              threshold: 1,
+              signer: subnetAuthCredentials
+            },
+            owner.threshold
+          )
 
           const txbuff = unsignedTx.toBuffer()
           const msg: Buffer = Buffer.from(
@@ -1008,7 +1017,7 @@ describe("Camino-PChain-Multisig", (): void => {
             unsignedTx
           )
           const tx: Tx = unsignedTx.sign(msKeyChain)
-          return pChainApi.issueTx(tx)
+          return pChain.issueTx(tx)
         })(),
       (x) => {
         return x

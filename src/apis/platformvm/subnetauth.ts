@@ -66,6 +66,7 @@ export class SubnetAuth extends Serializable {
     offset += 4
     this.numAddressIndices = bintools.copyFrom(bytes, offset, offset + 4)
     offset += 4
+    this.addressIndices = []
     for (let i: number = 0; i < this.getNumAddressIndices(); i++) {
       this.addressIndices.push(bintools.copyFrom(bytes, offset, offset + 4))
       offset += 4

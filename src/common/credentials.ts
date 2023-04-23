@@ -57,6 +57,11 @@ export class SigIdx extends NBytes {
    */
   getSource = (): Buffer => this.source
 
+  /**
+   * Retrieves the index buffer for the signature
+   */
+  getBytes = (): Buffer => this.bytes
+
   clone(): this {
     let newbase: SigIdx = new SigIdx()
     newbase.fromBuffer(this.toBuffer())
@@ -70,8 +75,10 @@ export class SigIdx extends NBytes {
   /**
    * Type representing a [[Signature]] index used in [[Input]]
    */
-  constructor() {
+  constructor(addressIdx?: number, address?: Buffer) {
     super()
+    if (addressIdx) this.bytes.writeUInt32BE(addressIdx, 0)
+    if (address) this.setSource(address)
   }
 }
 

@@ -4,8 +4,9 @@
  */
 
 import BN from "bn.js"
+import { Buffer } from "buffer/"
 import { PersistanceOptions } from "../../utils/persistenceoptions"
-import { TransferableInput, TransferableOutput } from "."
+import { ClaimType, TransferableInput, TransferableOutput } from "."
 import { UTXOSet } from "./utxos"
 import { OutputOwners } from "../../common/output"
 
@@ -321,4 +322,12 @@ export interface SpendReply {
   ins: TransferableInput[]
   out: TransferableOutput[]
   owners: OutputOwners[]
+}
+
+export interface ClaimAmountParams {
+  id?: Buffer
+  claimType: ClaimType
+  amount: BN
+  owners: OutputOwners
+  sigIdxs: number[]
 }
