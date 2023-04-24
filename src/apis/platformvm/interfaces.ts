@@ -289,6 +289,7 @@ export interface APIDeposit {
   start: BN
   duration: number
   amount: BN
+  rewardOwner: Owner
 }
 
 export interface GetMaxStakeAmountParams {

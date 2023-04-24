@@ -40,7 +40,7 @@ const main = async (): Promise<any> => {
   const txIDs = utxoSet.getLockedTxIDs()
 
   const deposits = await pchain.getDeposits(txIDs.depositIDs)
-  console.log(deposits)
+  console.log(JSON.stringify(deposits, null, 2))
 }
 
 main()

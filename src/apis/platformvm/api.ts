@@ -652,7 +652,8 @@ export class PlatformVMAPI extends JRPCAPI {
           claimedRewardAmount: new BN(deposit.claimedRewardAmount),
           start: new BN(deposit.start),
           duration: deposit.duration,
-          amount: new BN(deposit.amount)
+          amount: new BN(deposit.amount),
+          rewardOwner: deposit.rewardOwner
         } as APIDeposit
       }),
       availableRewards: deposits.availableRewards.map((a) => new BN(a)),
