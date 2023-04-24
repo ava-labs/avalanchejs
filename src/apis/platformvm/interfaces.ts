@@ -244,10 +244,13 @@ export interface GetMinStakeResponse {
   minDelegatorStake: BN
 }
 
-export interface GetClaimablesResponse {
-  depositRewards: BN
+export interface Claimable {
   validatorRewards: BN
   expiredDepositRewards: BN
+}
+
+export interface GetClaimablesResponse {
+  claimables: Claimable[]
 }
 
 export interface GetAllDepositOffersResponse {

@@ -38,6 +38,7 @@ import {
 import {
   APIDeposit,
   BalanceDict,
+  Claimable,
   ClaimAmountParams,
   DepositOffer,
   GetCurrentValidatorsParams,
@@ -603,6 +604,7 @@ export class PlatformVMAPI extends JRPCAPI {
     )
 
     const offers: GetAllDepositOffersResponse = response.data.result
+    if (!offers.depositOffers) return []
     return offers.depositOffers.map((offer) => {
       return {
         id: offer.id,
@@ -639,6 +641,8 @@ export class PlatformVMAPI extends JRPCAPI {
     )
 
     const deposits: GetDepositsResponse = response.data.result
+    if (!deposits.deposits)
+      return { deposits: [], availableRewards: [], timestamp: ZeroBN }
     return {
       deposits: deposits.deposits.map((deposit) => {
         return {
@@ -657,33 +661,29 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * List amounts that can be claimed: validator rewards, expired deposit rewards, active deposit rewards claimable at current time.
+   * List amounts that can be claimed: validator rewards, expired deposit rewards claimable at current time.
    *
-   * @param addresses An array of addresses as cb58 strings or addresses as {@link https://github.com/feross/buffer|Buffer}s
-   * @param locktime Optional. The locktime field created in the resulting outputs
-   * @param threshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param owners RewardOwner of DepositTx or AddValidatorTx
    *
    * @returns Promise for an object containing the amounts that can be claimed.
    */
-  getClaimables = async (
-    addresses: string[],
-    locktime: string = undefined,
-    threshold: number = 1
-  ): Promise<GetClaimablesResponse> => {
-    const params: Owner = {
-      locktime,
-      threshold,
-      addresses
+  getClaimables = async (owners: Owner[]): Promise<GetClaimablesResponse> => {
+    const params = {
+      Owners: owners
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getClaimables",
       params
     )
     const result = response.data.result
+
     return {
-      depositRewards: new BN(result.depositRewards),
-      validatorRewards: new BN(result.validatorRewards),
-      expiredDepositRewards: new BN(result.expiredDepositRewards)
+      claimables: result.claimables.map((c: any) => {
+        return {
+          validatorRewards: new BN(result.validatorRewards),
+          expiredDepositRewards: new BN(result.expiredDepositRewards)
+        } as Claimable
+      })
     } as GetClaimablesResponse
   }
 

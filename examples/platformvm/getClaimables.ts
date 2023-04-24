@@ -1,8 +1,9 @@
 import { Avalanche } from "caminojs/index"
 import {
+  GetClaimablesResponse,
   KeyChain,
-  PlatformVMAPI,
-  GetClaimablesResponse
+  Owner,
+  PlatformVMAPI
 } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
@@ -31,9 +32,13 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
-  const claimables: GetClaimablesResponse = await pchain.getClaimables(
-    pAddressStrings
-  )
+  const claimables: GetClaimablesResponse = await pchain.getClaimables([
+    {
+      addresses: pAddressStrings,
+      threshold: 1,
+      locktime: "0"
+    } as Owner
+  ])
   console.log(claimables)
 }
 
