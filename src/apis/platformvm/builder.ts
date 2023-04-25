@@ -65,6 +65,11 @@ export type FromSigner = {
   signer: Buffer[]
 }
 
+export type NodeOwner = {
+  address: Buffer
+  auth: [number, Buffer][]
+}
+
 export type Auth = {
   addresses: Buffer[]
   threshold: number
@@ -741,25 +746,7 @@ export class Builder {
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     if (this.caminoEnabled) {
-      return this.buildCaminoAddValidatorTx(
-        networkID,
-        blockchainID,
-        toAddresses,
-        fromSigner,
-        changeAddresses,
-        nodeID,
-        startTime,
-        endTime,
-        stakeAmount,
-        stakeAssetID,
-        rewardAddresses,
-        rewardLocktime,
-        rewardThreshold,
-        memo,
-        asOf,
-        toThreshold,
-        changeThreshold
-      )
+      throw new Error("Use buildCaminoAddValidatorTx")
     }
 
     let ins: TransferableInput[] = []
@@ -1018,6 +1005,7 @@ export class Builder {
    * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
    * @param nodeID The node ID of the validator being added.
+   * @param nodeOwner The address and signature indices of the registered nodeId owner.
    * @param startTime The Unix time when the validator starts validating the Primary Network.
    * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
    * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
@@ -1038,6 +1026,7 @@ export class Builder {
     fromSigner: FromSigner,
     change: Buffer[],
     nodeID: Buffer,
+    nodeOwner: NodeOwner,
     startTime: BN,
     endTime: BN,
     stakeAmount: BN,
@@ -1104,6 +1093,11 @@ export class Builder {
       stakeAmount,
       new ParseableOutput(rewardOutputOwners)
     )
+
+    nodeOwner.auth.forEach((o) => {
+      baseTx.addSignatureIdx(o[0], o[1])
+    })
+    owners.push(new OutputOwners([nodeOwner.address], ZeroBN, 1))
 
     baseTx.setOutputOwners(owners)
     return new UnsignedTx(baseTx)

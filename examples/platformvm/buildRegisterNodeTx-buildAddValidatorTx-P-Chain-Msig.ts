@@ -135,17 +135,20 @@ const sendAddValidatorTx = async (): Promise<any> => {
   let startDate = new Date(Date.now() + 0.5 * 60 * 1000).getTime() / 1000
   let endDate = startDate + 60 * 60 * 24 * 10
 
-  const unsignedTx: UnsignedTx = await pchain.buildAddValidatorTx(
+  const unsignedTx: UnsignedTx = await pchain.buildCaminoAddValidatorTx(
     utxoSet,
     [msigAlias],
     [[msigAlias], pAddressStrings],
     [msigAlias],
     nodeID,
+    {
+      address: msigAlias,
+      auth: [[0, msigAliasArray[0]]]
+    },
     new BN(startDate),
     new BN(endDate),
     new BN(2000000000000),
     [msigAlias],
-    0, // delegation fee
     undefined,
     threshold,
     undefined,

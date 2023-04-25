@@ -72,7 +72,7 @@ const delegationFee: number = 10
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
-  "PlatformVM utility method buildAddValidatorTx to add a validator to the primary subnet"
+  "PlatformVM utility method buildCaminoAddValidatorTx to add a validator to the primary subnet"
 )
 const interestRateDenominator = new BN(1_000_000 * (365 * 24 * 60 * 60))
 const dummyContractBin =
@@ -149,17 +149,20 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
-          const unsignedTx: UnsignedTx = await pChain.buildAddValidatorTx(
+          const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             undefined,
             [P(adminAddress)],
             [P(adminAddress)],
             [P(adminAddress)],
             adminNodeId,
+            {
+              address: P(adminAddress),
+              auth: [[0, P(adminAddress)]]
+            },
             startTime,
             endTime,
             stakeAmount.minValidatorStake,
             [P(adminAddress)],
-            delegationFee,
             locktime,
             threshold,
             memo
@@ -177,17 +180,20 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
-          const unsignedTx: UnsignedTx = await pChain.buildAddValidatorTx(
+          const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             undefined,
             [P(adminAddress)],
             [P(adminAddress)],
             [P(adminAddress)],
             node6Id,
+            {
+              address: P(adminAddress),
+              auth: [[0, P(adminAddress)]]
+            },
             startTime,
             endTime,
             stakeAmount.minValidatorStake,
             [P(adminAddress)],
-            delegationFee,
             locktime,
             threshold,
             memo
@@ -248,17 +254,20 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
-          const unsignedTx: UnsignedTx = await pChain.buildAddValidatorTx(
+          const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             undefined,
             [P(addrB)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
             [P(addrB)],
             [P(addrB)],
             node6Id,
+            {
+              address: P(addrB),
+              auth: [[0, P(addrB)]]
+            },
             startTime,
             endTime,
             stakeAmount.minValidatorStake,
             [P(addrB)],
-            delegationFee,
             locktime,
             threshold,
             memo
@@ -912,17 +921,20 @@ describe("Camino-PChain-Multisig", (): void => {
           ])
           const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
 
-          const unsignedTx: UnsignedTx = await pChain.buildAddValidatorTx(
+          const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             utxoSet,
             [P(multiSigAliasAddr)],
             [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
             [P(multiSigAliasAddr)],
             node7Id, // the node where the alias is registered
+            {
+              address: P(multiSigAliasAddr),
+              auth: [[0, pAddressStrings[5]]]
+            },
             startTime,
             endTime,
             new BN(2000000000000),
             [P(multiSigAliasAddr)],
-            0,
             undefined,
             threshold,
             undefined,

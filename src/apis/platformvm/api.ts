@@ -86,7 +86,7 @@ import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
 import { GenesisData } from "../avm"
-import { Auth, LockMode, Builder, FromSigner } from "./builder"
+import { Auth, LockMode, Builder, FromSigner, NodeOwner } from "./builder"
 import { Network } from "../../utils/networks"
 import { Spender } from "./spender"
 
@@ -100,6 +100,10 @@ const NanoBN = new BN(1000000000)
 const rewardPercentDenom = 1000000
 
 type FromType = String[] | String[][]
+type NodeOwnerType = {
+  address: string
+  auth: [number, string][]
+}
 
 /**
  * Class for interacting with a node's PlatformVMAPI
@@ -2007,7 +2011,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const minStake: BN = (await this.getMinStake())["minValidatorStake"]
     if (stakeAmount.lt(minStake)) {
       throw new StakeError(
-        "PlatformVMAPI.buildAddValidatorTx -- stake amount must be at least " +
+        `PlatformVMAPI.${caller} -- stake amount must be at least ` +
           minStake.toString(10)
       )
     }
@@ -2018,7 +2022,7 @@ export class PlatformVMAPI extends JRPCAPI {
       delegationFee < 0
     ) {
       throw new DelegationFeeError(
-        "PlatformVMAPI.buildAddValidatorTx -- delegationFee must be a number between 0 and 100"
+        `PlatformVMAPI.${caller} -- delegationFee must be a number between 0 and 100`
       )
     }
 
@@ -2027,7 +2031,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const now: BN = UnixNow()
     if (startTime.lt(now) || endTime.lte(startTime)) {
       throw new TimeError(
-        "PlatformVMAPI.buildAddValidatorTx -- startTime must be in the future and endTime must come after startTime"
+        `PlatformVMAPI.${caller} -- startTime must be in the future and endTime must come after startTime`
       )
     }
 
@@ -2213,6 +2217,123 @@ export class PlatformVMAPI extends JRPCAPI {
 
     return builtUnsignedTx
   }
+
+  /**
+   * Helper function which creates an unsigned [[CaminoAddValidatorTx]]. For more granular control, you may create your own
+   * [[UnsignedTx]] manually and import the [[CaminoAddValidatorTx]] class directly.
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param toAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who received the staked tokens at the end of the staking period
+   * @param fromAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who own the staking UTXOs the fees in AVAX
+   * @param changeAddresses An array of addresses as {@link https://github.com/feross/buffer|Buffer} who gets the change leftover from the fee payment
+   * @param nodeID The node ID of the validator being added.
+   * @param nodeOwner The address and signature indices of the registered nodeId owner.
+   * @param startTime The Unix time when the validator starts validating the Primary Network.
+   * @param endTime The Unix time when the validator stops validating the Primary Network (and staked AVAX is returned).
+   * @param stakeAmount The amount being delegated as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+   * @param rewardLocktime Optional. The locktime field created in the resulting reward outputs
+   * @param rewardThreshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildCaminoAddValidatorTx = async (
+    utxoset: UTXOSet,
+    toAddresses: string[],
+    fromAddresses: FromType,
+    changeAddresses: string[],
+    nodeID: string,
+    nodeOwner: NodeOwnerType,
+    startTime: BN,
+    endTime: BN,
+    stakeAmount: BN,
+    rewardAddresses: string[],
+    rewardLocktime: BN = ZeroBN,
+    rewardThreshold: number = 1,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = ZeroBN,
+    toThreshold: number = 1,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    const caller = "buildCaminoAddValidatorTx"
+
+    const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
+      changeAddresses,
+      caller
+    )
+    const rewards: Buffer[] = this._cleanAddressArrayBuffer(
+      rewardAddresses,
+      caller
+    )
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const minStake: BN = (await this.getMinStake())["minValidatorStake"]
+    if (stakeAmount.lt(minStake)) {
+      throw new StakeError(
+        `PlatformVMAPI.${caller} -- stake amount must be at least ` +
+          minStake.toString(10)
+      )
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+
+    const now: BN = UnixNow()
+    if (startTime.lt(now) || endTime.lte(startTime)) {
+      throw new TimeError(
+        `PlatformVMAPI.${caller} -- startTime must be in the future and endTime must come after startTime`
+      )
+    }
+
+    const auth: NodeOwner = {
+      address: this.parseAddress(nodeOwner.address),
+      auth: []
+    }
+    nodeOwner.auth.forEach((o) => {
+      auth.auth.push([o[0], this.parseAddress(o[1])])
+    })
+
+    const builtUnsignedTx: UnsignedTx = await this._getBuilder(
+      utxoset
+    ).buildCaminoAddValidatorTx(
+      this.core.getNetworkID(),
+      bintools.cb58Decode(this.blockchainID),
+      to,
+      fromSigner,
+      change,
+      NodeIDStringToBuffer(nodeID),
+      auth,
+      startTime,
+      endTime,
+      stakeAmount,
+      avaxAssetID,
+      rewards,
+      rewardLocktime,
+      rewardThreshold,
+      memo,
+      asOf,
+      toThreshold,
+      changeThreshold
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
   /**
    * Build an unsigned [[AddressStateTx]].
    *

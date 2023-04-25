@@ -6,8 +6,8 @@
 import BN from "bn.js"
 import BinTools from "../../utils/bintools"
 import { BaseTx } from "./basetx"
-import { TransferableOutput } from "../platformvm/outputs"
-import { TransferableInput } from "../platformvm/inputs"
+import { TransferableOutput } from "./outputs"
+import { TransferableInput } from "./inputs"
 import { Buffer } from "buffer/"
 import { PlatformVMConstants } from "./constants"
 import { DefaultNetworkID } from "../../utils/constants"
@@ -15,6 +15,10 @@ import { bufferToNodeIDString } from "../../utils/helperfunctions"
 import { AmountOutput, ParseableOutput } from "./outputs"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
 import { DelegationFeeError } from "../../utils/errors"
+import { Credential, SigIdx, Signature } from "../../common"
+import { SubnetAuth } from "./subnetauth"
+import { KeyChain, KeyPair } from "./keychain"
+import { SelectCredentialClass } from "./credentials"
 
 /**
  * @ignore
@@ -547,6 +551,55 @@ export class AddValidatorTx extends AddDelegatorTx {
 export class CaminoAddValidatorTx extends AddValidatorTx {
   protected _typeName = "CaminoAddValidatorTx"
   protected _typeID = PlatformVMConstants.CAMINOADDVALIDATORTX
+
+  // signatures
+  protected nodeOwnerAuth: SubnetAuth = new SubnetAuth()
+  protected sigIdxs: SigIdx[] = [] // idxs of registered nodeID owner
+
+  addSignatureIdx(addressIdx: number, address: Buffer): void {
+    const sigIdx = new SigIdx(addressIdx, address)
+    this.sigIdxs.push(sigIdx)
+    this.nodeOwnerAuth.addAddressIndex(sigIdx.getBytes())
+  }
+
+  getCredentialID(): number {
+    return PlatformVMConstants.SECPCREDENTIAL
+  }
+
+  fromBuffer(bytes: Buffer, offset: number = 0): number {
+    offset = super.fromBuffer(bytes, offset)
+
+    this.nodeOwnerAuth = new SubnetAuth()
+    offset += this.nodeOwnerAuth.fromBuffer(bytes, offset)
+
+    return offset
+  }
+
+  toBuffer(): Buffer {
+    let superBuff = super.toBuffer()
+    let bsize = superBuff.length
+
+    const authBuf = this.nodeOwnerAuth.toBuffer()
+    bsize += authBuf.length
+
+    return Buffer.concat([superBuff, authBuf], bsize)
+  }
+
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const creds = super.sign(msg, kc)
+
+    const cred = SelectCredentialClass(this.getCredentialID())
+    for (const sigIdx of this.sigIdxs) {
+      const keypair: KeyPair = kc.getKey(sigIdx.getSource())
+      const signval: Buffer = keypair.sign(msg)
+      const sig: Signature = new Signature()
+      sig.fromBuffer(signval)
+      cred.addSignature(sig)
+    }
+    creds.push(cred)
+
+    return creds
+  }
 
   /**
    * Class representing an unsigned CaminoAddValidatorTx transaction.
