@@ -19,7 +19,7 @@
     "prettier-mocks": "prettier --write ./__mocks__",
     "prettier-workflows": "prettier --write .github/**/*.yml",
     "prettier": "yarn prettier-src && yarn prettier-examples && yarn prettier-tests && yarn prettier-mocks && yarn prettier-workflows",
-    "prettier-check": "prettier --check ./src ./examples ./tests ./__mocks__ .github/**/*.yml",
+    "prettier-check": "prettier --check ./src ./e2e_tests ./examples ./tests ./__mocks__ .github/**/*.yml",
     "release:prepare": "rm -rf ./dist ./node_modules && yarn install && yarn build && yarn bundle && yarn test && git status",
     "test": "jest",
     "test-watch": "jest --watch",

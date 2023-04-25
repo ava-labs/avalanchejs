@@ -64,7 +64,7 @@ beforeAll(async () => {
   )
   const config = JSON.parse(configFile)
   const rpcUrl = `${config.protocol}://${config.host}:${config.port}/ext/bc/C/rpc`
-  const web3 = new Web3(rpcUrl)
+  const web3 = new Web3(rpcUrl, null, { transactionConfirmationBlocks: 1 }) //s
 
   const abiFile = fs.readFileSync(path.join(__dirname, "abi/CaminoAdmin.abi"))
   const ABI = JSON.parse(abiFile.toString())
@@ -786,7 +786,79 @@ describe("Camino-CChain-KYC-Role", (): void => {
 
   createTests(tests_spec)
 })
+describe("Camino-CChain-Prepare-Validator-Rewards", (): void => {
+  const tests_spec: any = [
+    [
+      "Grant kyc role to adminAddr",
+      () =>
+        (async function () {
+          const hasKycRole = await contract.methods
+            .hasRole(adminAddr, EVMCaminoConstants.KYCROLE)
+            .call()
+          if (hasKycRole) {
+            return Promise.resolve(true)
+          }
+          const response = await contract.methods
+            .grantRole(adminAddr, EVMCaminoConstants.KYCROLE)
+            .send({ from: adminAddr, gas: 1000000 })
 
+          return Promise.resolve(
+            Number(response.events.SetRole.returnValues.role) >=
+              EVMCaminoConstants.KYCROLE
+          )
+        })(),
+      (x) => x,
+      Matcher.toBe,
+      () => true
+    ],
+    [
+      "ApplyKycState with KYC Role to adminAddr",
+      () =>
+        contract.methods
+          .applyKycState(
+            adminAddr,
+            false,
+            BigInt(EVMCaminoConstants.KYC_APPROVED)
+          )
+          .send({ from: adminAddr, gas: 1000000 }),
+      (x) => x.events.KycStateChanged.returnValues.newState,
+      Matcher.toBe,
+      () => String(EVMCaminoConstants.KYC_APPROVED)
+    ],
+    [
+      "Trigger txs on cchain to accumulate gas fees as rewards",
+      () =>
+        (async function () {
+          for (let i = 0; i < 3; i++) {
+            await contract
+              .deploy({ data: dummyContractBin })
+              .send({ from: adminAddr, gas: 1000000 })
+            await new Promise((res) => setTimeout(res, 1000))
+          }
+          return Promise.resolve("done")
+        })(),
+      (x) => x,
+      Matcher.toBe,
+      () => "done"
+    ],
+    [
+      "Trigger another sc deployment after the feeRewardExportMinTimeInterval has passed",
+      () =>
+        contract
+          .deploy({ data: dummyContractBin })
+          .send({ from: adminAddr, gas: 1000000 }),
+      (x) => x.options.address != null,
+      Matcher.toBe,
+      () => true,
+      60000 // wait 1 minute [feeRewardExportMinTimeInterval] before re-issuing a cchain tx
+    ]
+  ]
+
+  createTests(tests_spec)
+})
+
+// Important: Please note that the following test scenario should run last as it will remove the adminAddr's admin role which
+// will prevent the other test cases from running such as granting roles on behalf of the adminAddr
 describe("Camino-CChain-Multi-Role", (): void => {
   const tests_spec: any = [
     // Initial Role Check

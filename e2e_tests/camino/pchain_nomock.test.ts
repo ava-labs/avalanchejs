@@ -25,25 +25,36 @@ import createHash from "create-hash"
 import { ClaimType } from "../../src/apis/platformvm/claimtx"
 const bintools = BinTools.getInstance()
 
-const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
+// private keys
 const adminNodePrivateKey =
   "PrivateKey-vmRQiZeXEXYMyJhEiqdC2z5JhuDbxL8ix9UVvjgMu2Er1NepE"
-const adminNodeId = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
+const addrBPrivateKey =
+  "PrivateKey-21QkTk3Zn2wxLd1WvRgWn1UpT5BC2Pz6caKbcsSpmuz7Qm8R7C"
 const node6PrivateKey =
   "PrivateKey-UfV3iPVP8ThZuSXmUacsahdzePs5VkXct4XoQKsW9mffN1d8J"
 const node7PrivateKey =
   "PrivateKey-2DXzE36hZ3MSKxk1Un5mBHGwcV69CqkKvbVvSwFBhDRtnbFCDX"
+
+// X addresses
+const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
 const addrB = "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
 const addrC = "X-kopernikus1lx58kettrnt2kyr38adyrrmxt5x57u4vg4cfky"
-const addrBPrivateKey =
-  "PrivateKey-21QkTk3Zn2wxLd1WvRgWn1UpT5BC2Pz6caKbcsSpmuz7Qm8R7C"
+
+// C addresses
+const adminCAddr: string = "0x1f0e5c64afdf53175f78846f7125776e76fa8f34"
+
+// Node ids
+const adminNodeId = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
 const node6Id = "NodeID-FHseEbTVS7U3odWfjgZYyygsv5gWCqVdk"
 const node7Id = "NodeID-AAFgkP7AVeQjmv4MSi2DaQbobg3wpZbFp"
+
+// keystore users
 const user: string = "avalancheJspChainUser" + Math.random()
 const passwd: string = "avalancheJsP@ssw4rd"
 const user2: string = "avalancheJspChainUser2" + Math.random()
 const passwd2: string = "avalancheJsP@ssw4rd2"
 
+// multisig
 const multiSigUser: string = "avalancheJspChainUser3"
 const multiSigPasswd: string = "avalancheJsP@ssw4rd3"
 const multiSigAliasAddr = "X-kopernikus1fwrv3kj5jqntuucw67lzgu9a9tkqyczxgcvpst"
@@ -53,8 +64,8 @@ const signerAddrPrivateKey =
 const multiSigAddrPrivateKey =
   "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
 
+// test context
 const avalanche = getAvalanche()
-
 const startTime = UnixNow().add(new BN(600 * 1))
 const endTime: BN = startTime.add(new BN(26300000))
 const delegationFee: number = 10
@@ -64,6 +75,9 @@ const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildAddValidatorTx to add a validator to the primary subnet"
 )
 const interestRateDenominator = new BN(1_000_000 * (365 * 24 * 60 * 60))
+const dummyContractBin =
+  "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
+
 const P = function (s: string): string {
   return "P" + s.substring(1)
 }
@@ -87,6 +101,8 @@ let pendingValidators = { value: "" }
 let balanceOutputs = { value: new Map() }
 let oneMinRewardsAmount: BN
 let rewardsOwner: OutputOwners
+let contract: any
+
 beforeAll(async () => {
   await avalanche.fetchNetworkSettings()
   keystore = new KeystoreAPI(avalanche)
@@ -184,7 +200,6 @@ describe("Camino-PChain-Add-Validator", (): void => {
       Matcher.toThrow,
       () => "couldn't issue tx: no address registered for this node: not found"
     ],
-
     [
       "createUser",
       () => keystore.createUser(user, passwd),
@@ -215,9 +230,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const tx: Tx = unsignedTx.sign(pKeychain)
           return pChain.issueTx(tx)
         })(),
-      (x) => {
-        return x
-      },
+      (x) => x,
       Matcher.Get,
       () => tx,
       3000
@@ -273,13 +286,10 @@ describe("Camino-PChain-Add-Validator", (): void => {
       Matcher.toBe,
       () => 1
     ],
-
     [
       "createSubnet",
       () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1), // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
-      (x) => {
-        return x
-      },
+      (x) => x,
       Matcher.Get,
       () => createdSubnetID
     ],
@@ -310,9 +320,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const tx: Tx = unsignedTx.sign(pKeychain)
           return pChain.issueTx(tx)
         })(),
-      (x) => {
-        return x
-      },
+      (x) => x,
       Matcher.Get,
       () => tx,
       3000
@@ -329,6 +337,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
 
   createTests(tests_spec)
 })
+
 describe("Camino-PChain-Deposit", (): void => {
   const tests_spec: any = [
     [
@@ -1035,6 +1044,80 @@ describe("Camino-PChain-Multisig", (): void => {
       3000
     ]
   ]
+  createTests(tests_spec)
+})
+describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
+  const tests_spec: any = [
+    [
+      "Get balance outputs after rewards have been exported to P chain",
+      () =>
+        (async function () {
+          // check every 5 seconds if rewards have been exported to P chain
+          let claimables = await pChain.getClaimables([
+            { addresses: [P(adminAddress)], locktime: "0", threshold: 1 }
+          ])
+          while (
+            claimables.claimables.length == 0 ||
+            claimables.claimables[0].validatorRewards.isZero()
+          ) {
+            await new Promise((resolve) => setTimeout(resolve, 5000))
+            claimables = await pChain.getClaimables([
+              { addresses: [P(adminAddress)], locktime: "0", threshold: 1 }
+            ])
+          }
+          return pChain.getBalance({ address: P(adminAddress) })
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Claim validator rewards",
+      () =>
+        (async function () {
+          const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
+            undefined,
+            [P(adminAddress)],
+            [P(adminAddress)],
+            undefined,
+            ZeroBN,
+            1,
+            [
+              {
+                amount: new BN(1),
+                claimType: ClaimType.VALIDATOR_REWARD,
+                owners: new OutputOwners([pAddresses[0]], ZeroBN, 1),
+                sigIdxs: [0]
+              } as ClaimAmountParams
+            ]
+          )
+          const claimTx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(claimTx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify claim tx has been committed",
+      () => pChain.getTxStatus(tx.value),
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify unlocked amounts have increased by rewards amount (minus tx fee)",
+      () => pChain.getBalance({ address: P(adminAddress) }),
+      (x) => sumAllValues(x.unlockedOutputs),
+      Matcher.toEqual,
+      () =>
+        sumAllValues(balanceOutputs.value["unlockedOutputs"])
+          .add(new BN(1)) // claimed reward
+          .sub(avalanche.PChain().getTxFee())
+    ]
+  ]
+
   createTests(tests_spec)
 })
 

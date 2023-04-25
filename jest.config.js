@@ -15,18 +15,7 @@ module.exports = {
   transformIgnorePatterns: [
     "<rootDir>/node_modules/(?!ethereum-cryptography|keccak)"
   ],
-  moduleFileExtensions: [
-    "js",
-    "ts",
-    "json",
-    "jsx",
-    "tsx",
-    "node"
-  ],
-  transform: {
-    "^.+\\.tsx?$": "ts-jest"
-  },
-  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  moduleFileExtensions: ["js", "ts", "json", "jsx", "tsx", "node"],
   moduleDirectories: ["node_modules", "<rootDir>/src"],
   collectCoverage: true,
   coverageReporters: ["html"],
@@ -39,5 +28,6 @@ module.exports = {
   moduleNameMapper: {
     "^src(.*)$": "<rootDir>/src$1"
   },
-  testSequencer: "<rootDir>/e2eSequencer.js"
+  testSequencer: "<rootDir>/e2eSequencer.js",
+  testTimeout: 300000 // 5 minutes
 }
