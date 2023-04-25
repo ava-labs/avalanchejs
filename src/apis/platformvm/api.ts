@@ -681,8 +681,8 @@ export class PlatformVMAPI extends JRPCAPI {
     return {
       claimables: result.claimables.map((c: any) => {
         return {
-          validatorRewards: new BN(result.validatorRewards),
-          expiredDepositRewards: new BN(result.expiredDepositRewards)
+          validatorRewards: new BN(c.validatorRewards),
+          expiredDepositRewards: new BN(c.expiredDepositRewards)
         } as Claimable
       })
     } as GetClaimablesResponse
