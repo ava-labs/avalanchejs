@@ -79,7 +79,8 @@ import {
   GetAllDepositOffersResponse,
   GetDepositsParams,
   GetDepositsResponse,
-  Owner
+  Owner,
+  OwnerParam
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -653,7 +654,11 @@ export class PlatformVMAPI extends JRPCAPI {
           start: new BN(deposit.start),
           duration: deposit.duration,
           amount: new BN(deposit.amount),
-          rewardOwner: deposit.rewardOwner
+          rewardOwner: {
+            locktime: new BN(deposit.rewardOwner.locktime),
+            threshold: new BN(deposit.rewardOwner.threshold).toNumber(),
+            addresses: deposit.rewardOwner.addresses
+          } as Owner
         } as APIDeposit
       }),
       availableRewards: deposits.availableRewards.map((a) => new BN(a)),
@@ -668,7 +673,9 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for an object containing the amounts that can be claimed.
    */
-  getClaimables = async (owners: Owner[]): Promise<GetClaimablesResponse> => {
+  getClaimables = async (
+    owners: OwnerParam[]
+  ): Promise<GetClaimablesResponse> => {
     const params = {
       Owners: owners
     }
@@ -1454,7 +1461,12 @@ export class PlatformVMAPI extends JRPCAPI {
       "platform.getMultisigAlias",
       params
     )
-    return response.data.result
+    return {
+      memo: response.data.result.memo,
+      locktime: new BN(response.data.result.locktime),
+      threshold: new BN(response.data.result.threshold).toNumber(),
+      addresses: response.data.result.addresses
+    } as MultisigAliasReply
   }
 
   /**

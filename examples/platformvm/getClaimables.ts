@@ -2,7 +2,7 @@ import { Avalanche } from "caminojs/index"
 import {
   GetClaimablesResponse,
   KeyChain,
-  Owner,
+  OwnerParam,
   PlatformVMAPI
 } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
@@ -37,7 +37,7 @@ const main = async (): Promise<any> => {
       addresses: pAddressStrings,
       threshold: 1,
       locktime: "0"
-    } as Owner
+    } as OwnerParam
   ])
   console.log(claimables)
 }

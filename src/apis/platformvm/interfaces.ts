@@ -300,6 +300,12 @@ export interface GetMaxStakeAmountParams {
 }
 
 export interface Owner {
+  locktime: BN
+  threshold: number
+  addresses: string[]
+}
+
+export interface OwnerParam {
   locktime: string
   threshold: number
   addresses: string[]
@@ -312,8 +318,8 @@ export interface MultisigAliasReply extends Owner {
 export interface SpendParams {
   from: string[] | string
   signer: string[] | string
-  to?: Owner
-  change?: Owner
+  to?: OwnerParam
+  change?: OwnerParam
 
   lockMode: 0 | 1 | 2
   amountToLock: string
