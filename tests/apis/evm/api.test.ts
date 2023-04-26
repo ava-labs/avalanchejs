@@ -364,7 +364,7 @@ describe("EVMAPI", (): void => {
     const tx =
       "111119TRhWSj932BnTyhskYtn4j7dY9Nqq8wi3mmmFvHvDEoAfifMnRcUuTFqRxhsqWyXMTHmFBcSrMS6u9F6LRA1G3DmKWoA3Yb27JbhUV7ismLkiEsWJ187q2AwgE2RCVG7eZ9zL89ZBmaVA1bkzsx324LjU9NiYgkceJxm5d3L9ATiLgWt4mWMDR4YKpSv4qKqjfD2fRzYm7gX2C2F1auCvVN6Hd15J3jRUB7vKEEcBZJexdYdqnCX7vFdwoGpJM7tUiFRDgAAPpMoxz6QF7gwKbkkXK5Vg4LG2szScX9qL5BegNwUeNQYB42kF3M3w5tnVekhmHQdZSEYU8NjSnSZnqAFPcHc4StM3yZem3MTFRYJqNc7RAvoMGi8am3Hx4GVpwYqjiqev3XiqfyuTssn4bR1XaJbjQTyC"
 
-    const result: Promise<string> = api.getAtomicTx(txID)
+    const result: Promise<object> = api.getAtomicTx(txID)
     const payload: object = {
       result: {
         tx,
@@ -377,9 +377,11 @@ describe("EVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: string = await result
+    const response: object = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response).toBe(tx)
+    expect(response["result"]["tx"]).toBe(tx)
+    expect(response["result"]["encoding"]).toBe("hex")
+    expect(response["result"]["blockHeight"]).toBe(8)
   })
 })

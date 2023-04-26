@@ -293,9 +293,9 @@ export class EVMAPI extends JRPCAPI {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise string containing the bytes retrieved from the node
+   * @returns Returns a Promise object containing the bytes retrieved from the node
    */
-  getAtomicTx = async (txID: string): Promise<string> => {
+  getAtomicTx = async (txID: string): Promise<object> => {
     const params: GetAtomicTxParams = {
       txID
     }
@@ -304,7 +304,7 @@ export class EVMAPI extends JRPCAPI {
       "avax.getAtomicTx",
       params
     )
-    return response.data.result.tx
+    return response.data
   }
 
   /**
