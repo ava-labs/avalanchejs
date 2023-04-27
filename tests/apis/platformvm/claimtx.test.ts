@@ -105,6 +105,13 @@ describe("ClaimTx", (): void => {
     expect(claimTxTypeID).toBe(PlatformVMConstants.CLAIMTX)
   })
 
+  test("getClaimAmounts", async (): Promise<void> => {
+    const claimAmounts: ClaimAmount[] = claimTx.getClaimAmounts()
+    expect(claimAmounts).toStrictEqual([
+      new ClaimAmount(ownerID, ClaimType.EXPIRED_DEPOSIT_REWARD, new BN(1))
+    ])
+  })
+
   test("toBuffer and fromBuffer", async (): Promise<void> => {
     const buf: Buffer = claimTx.toBuffer()
     const asvTx: ClaimTx = new ClaimTx()

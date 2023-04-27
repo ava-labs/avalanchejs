@@ -114,6 +114,16 @@ export class ClaimAmount {
       this.amount = bintools.fromBNToBuffer(amount, 8)
     if (typeof auth != "undefined") this.auth.setAddressIndices(auth)
   }
+
+  getID(): Buffer {
+    return this.id
+  }
+  getType(): Buffer {
+    return this.type
+  }
+  getAmount(): Buffer {
+    return this.amount
+  }
 }
 
 /**
@@ -151,6 +161,9 @@ export class ClaimTx extends BaseTx {
     return this._typeID
   }
 
+  getClaimAmounts(): ClaimAmount[] {
+    return this.claimAmounts
+  }
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing a [[ClaimTx]], parses it, populates the class, and returns the length of the [[ClaimTx]] in bytes.
    *
