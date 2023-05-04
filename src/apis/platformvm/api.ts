@@ -599,9 +599,10 @@ export class PlatformVMAPI extends JRPCAPI {
    *
    * @returns Promise for a list containing deposit offers.
    */
-  getAllDepositOffers = async (active?: boolean): Promise<DepositOffer[]> => {
+  getAllDepositOffers = async (timestamp?: number): Promise<DepositOffer[]> => {
+    if (!timestamp) timestamp = Math.floor(Date.now() / 1000)
     const params: GetAllDepositOffersParams = {
-      active
+      timestamp
     }
     const response: RequestResponseData = await this.callMethod(
       "platform.getAllDepositOffers",

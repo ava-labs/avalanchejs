@@ -69,7 +69,7 @@ export interface GetCurrentValidatorsParams {
 }
 
 export interface GetAllDepositOffersParams {
-  active: boolean
+  timestamp: number
 }
 
 export interface SampleValidatorsParams {

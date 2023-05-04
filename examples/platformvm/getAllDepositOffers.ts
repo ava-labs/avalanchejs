@@ -28,8 +28,9 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const active = true
-  const depositOffers = await pchain.getAllDepositOffers(active)
+  // Just for demonstration, omitting timestamp will do the same
+  const timestamp = Math.floor(Date.now() / 1000)
+  const depositOffers = await pchain.getAllDepositOffers(timestamp)
   console.log(depositOffers)
   console.log("start: ", depositOffers[0].start.toNumber())
 }
