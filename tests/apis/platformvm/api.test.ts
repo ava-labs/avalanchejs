@@ -1,44 +1,48 @@
 import mockAxios from "jest-mock-axios"
 import { Avalanche } from "src"
-import { PlatformVMAPI } from "../../../src/apis/platformvm/api"
+import { PlatformVMAPI } from "src/apis/platformvm/api"
 import { Buffer } from "buffer/"
 import BN from "bn.js"
-import BinTools from "../../../src/utils/bintools"
+import BinTools from "src/utils/bintools"
 import * as bech32 from "bech32"
 import {
+  DefaultLocalGenesisPrivateKey,
+  DefaultLocalGenesisPrivateKey2,
   DefaultPlatformChainID,
+  PrivateKeyPrefix,
   TestXBlockchainID
-} from "../../../src/utils/constants"
-import { UTXOSet } from "../../../src/apis/platformvm/utxos"
-import { PersistanceOptions } from "../../../src/utils/persistenceoptions"
-import { KeyChain } from "../../../src/apis/platformvm/keychain"
+} from "src/utils/constants"
+import { UTXOSet } from "src/apis/platformvm/utxos"
+import { PersistanceOptions } from "src/utils/persistenceoptions"
+import { KeyChain } from "src/apis/platformvm/keychain"
 import {
   SECPTransferOutput,
   TransferableOutput,
   AmountOutput,
   ParseableOutput,
-  StakeableLockOut
-} from "../../../src/apis/platformvm/outputs"
+  StakeableLockOut,
+  SECPOwnerOutput
+} from "src/apis/platformvm/outputs"
 import {
   TransferableInput,
   SECPTransferInput,
   AmountInput,
   StakeableLockIn
-} from "../../../src/apis/platformvm/inputs"
-import { UTXO } from "../../../src/apis/platformvm/utxos"
+} from "src/apis/platformvm/inputs"
+import { UTXO } from "src/apis/platformvm/utxos"
 import createHash from "create-hash"
-import { UnsignedTx, Tx } from "../../../src/apis/platformvm/tx"
-import { UnixNow } from "../../../src/utils/helperfunctions"
-import { UTF8Payload } from "../../../src/utils/payload"
-import { NodeIDStringToBuffer } from "../../../src/utils/helperfunctions"
-import { ONEAVAX } from "../../../src/utils/constants"
+import { UnsignedTx, Tx } from "src/apis/platformvm/tx"
+import { UnixNow } from "src/utils/helperfunctions"
+import { UTF8Payload } from "src/utils/payload"
+import { NodeIDStringToBuffer } from "src/utils/helperfunctions"
+import { ONEAVAX } from "src/utils/constants"
 import {
   Serializable,
   Serialization,
   SerializedEncoding,
   SerializedType
-} from "../../../src/utils/serialization"
-import { AddValidatorTx } from "../../../src/apis/platformvm/validationtx"
+} from "src/utils/serialization"
+import { AddValidatorTx } from "src/apis/platformvm/validationtx"
 import {
   Blockchain,
   GetMinStakeResponse,
@@ -47,12 +51,25 @@ import {
   GetTxStatusResponse,
   GetValidatorsAtResponse,
   GetBalanceResponse,
-  GetUTXOsResponse
-} from "../../../src/apis/platformvm/interfaces"
-import { ErrorResponseObject } from "../../../src/utils/errors"
+  GetUTXOsResponse,
+  DepositOffer,
+  GetDepositsResponse,
+  GetClaimablesResponse,
+  ClaimAmountParams
+} from "src/apis/platformvm/interfaces"
+import { ErrorResponseObject } from "src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
-import { Builder } from "../../../src/apis/platformvm/builder"
-import { ZeroBN } from "../../../src/common"
+import { Builder } from "src/apis/platformvm/builder"
+import { OutputOwners, SigIdx, ZeroBN } from "src/common"
+import {
+  BaseTx,
+  ClaimAmount,
+  ClaimTx,
+  ClaimType,
+  DepositTx,
+  RegisterNodeTx,
+  UnlockDepositTx
+} from "src/apis/platformvm"
 
 /**
  * @ignore
@@ -61,6 +78,13 @@ const bintools: BinTools = BinTools.getInstance()
 const serializer: Serialization = Serialization.getInstance()
 const display: SerializedEncoding = "display"
 const dumpSerialization: boolean = false
+const defaultPK: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
+const defaultPK2: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey2}`
+const txID: Buffer = Buffer.from(
+  createHash("sha256")
+    .update(bintools.fromBNToBuffer(new BN(1), 32))
+    .digest()
+)
 
 const serialzeit = (aThing: Serializable, name: string): void => {
   if (dumpSerialization) {
@@ -111,7 +135,7 @@ describe("PlatformVMAPI", (): void => {
   )
   let api: PlatformVMAPI
   let alias: string
-
+  let assetID: Buffer
   const addrA: string =
     "P-" +
     bech32.bech32.encode(
@@ -136,10 +160,10 @@ describe("PlatformVMAPI", (): void => {
         bintools.cb58Decode("6Y3kysjF9jnHnYkdS9yGAuoHyae2eNmeV")
       )
     )
-
-  beforeAll((): void => {
+  beforeAll(async () => {
     api = new PlatformVMAPI(avalanche, "/ext/bc/P")
     alias = api.getBlockchainAlias()
+    assetID = await api.getAVAXAssetID()
   })
 
   afterEach((): void => {
@@ -2560,5 +2584,529 @@ describe("PlatformVMAPI", (): void => {
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
     expect(response).toBe(payload["result"])
+  })
+
+  test("getRegisteredShortIDLink", async (): Promise<void> => {
+    const result: Promise<string> = api.getRegisteredShortIDLink(nodeID)
+    const payload: object = {
+      result: { address: addrA }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: string = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response).toBe(addrA)
+  })
+
+  test("getAllDepositOffers", async (): Promise<void> => {
+    const result: Promise<DepositOffer[]> = api.getAllDepositOffers()
+    const payload: object = {
+      result: {
+        depositOffers: [
+          {
+            id: "1",
+            interestRateNominator: "2",
+            start: "3",
+            end: "4",
+            minAmount: "5",
+            minDuration: 6,
+            maxDuration: 7,
+            unlockPeriodDuration: 8,
+            noRewardsPeriodDuration: 9,
+            memo: "memo",
+            flags: 0
+          },
+          {
+            id: "2",
+            interestRateNominator: "2",
+            start: "3",
+            end: "4",
+            minAmount: "5",
+            minDuration: 6,
+            maxDuration: 7,
+            unlockPeriodDuration: 8,
+            noRewardsPeriodDuration: 9,
+            memo: "memo",
+            flags: 1
+          }
+        ]
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: DepositOffer[] = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response.length).toBe(2)
+    expect(response[0].id).toBe("1")
+    expect(response[0].interestRateNominator).toStrictEqual(new BN("2"))
+    expect(response[0].start).toStrictEqual(new BN("3"))
+    expect(response[0].end).toStrictEqual(new BN("4"))
+    expect(response[0].minAmount).toStrictEqual(new BN("5"))
+    expect(response[0].minDuration).toBe(6)
+    expect(response[0].maxDuration).toBe(7)
+    expect(response[0].unlockPeriodDuration).toBe(8)
+    expect(response[0].noRewardsPeriodDuration).toBe(9)
+    expect(response[0].memo).toBe("memo")
+    expect(response[0].flags).toStrictEqual(new BN(0))
+    expect(response[1].id).toBe("2")
+    expect(response[1].flags).toStrictEqual(new BN(1))
+  })
+
+  test("getDeposits", async (): Promise<void> => {
+    const result: Promise<GetDepositsResponse> = api.getDeposits(["1", "2"])
+    const payload: object = {
+      result: {
+        deposits: [
+          {
+            depositTxID: "1",
+            depositOfferID: "2",
+            unlockedAmount: "3",
+            claimedRewardAmount: "4",
+            start: "5",
+            duration: 6,
+            amount: "7",
+            rewardOwner: {
+              locktime: 0,
+              threshold: 1,
+              addresses: [addrA]
+            }
+          },
+          {
+            depositTxID: "2",
+            depositOfferID: "2",
+            unlockedAmount: "3",
+            claimedRewardAmount: "4",
+            start: "5",
+            duration: 6,
+            amount: "7",
+            rewardOwner: {
+              locktime: 0,
+              threshold: 1,
+              addresses: [addrA]
+            }
+          }
+        ],
+        availableRewards: ["9", "10"],
+        timestamp: "11"
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: GetDepositsResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response.deposits.length).toBe(2)
+    expect(response.deposits[0].depositTxID).toBe("1")
+    expect(response.deposits[0].depositOfferID).toBe("2")
+    expect(response.deposits[0].unlockedAmount).toStrictEqual(new BN("3"))
+    expect(response.deposits[0].claimedRewardAmount).toStrictEqual(new BN("4"))
+    expect(response.deposits[0].start).toStrictEqual(new BN("5"))
+    expect(response.deposits[0].duration).toBe(6)
+    expect(response.deposits[0].amount).toStrictEqual(new BN("7"))
+    expect(response.deposits[0].rewardOwner.locktime).toStrictEqual(new BN("0"))
+    expect(response.deposits[0].rewardOwner.threshold).toBe(1)
+    expect(response.deposits[0].rewardOwner.addresses).toStrictEqual([addrA])
+    expect(response.deposits[1].depositTxID).toBe("2")
+    expect(response.availableRewards.length).toBe(2)
+    expect(response.availableRewards[0]).toStrictEqual(new BN("9"))
+    expect(response.availableRewards[1]).toStrictEqual(new BN("10"))
+    expect(response.timestamp).toStrictEqual(new BN("11"))
+  })
+
+  test("getClaimables", async (): Promise<void> => {
+    const result: Promise<GetClaimablesResponse> = api.getClaimables([])
+    const payload: object = {
+      result: {
+        claimables: [
+          {
+            validatorRewards: "1",
+            expiredDepositRewards: "2"
+          }
+        ]
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+
+    mockAxios.mockResponse(responseObj)
+    const response: GetClaimablesResponse = await result
+
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response.claimables[0].validatorRewards).toStrictEqual(new BN("1"))
+    expect(response.claimables[0].expiredDepositRewards).toStrictEqual(
+      new BN("2")
+    )
+  })
+
+  test("buildBaseTx", async (): Promise<void> => {
+    api.keyChain().importKey(defaultPK)
+
+    const defaultAddr = api.keyChain().getAddressStrings()[0]
+    const defaultAddrBuffer = api.keyChain().getAddresses()[0]
+    avalanche.getNetwork().P.lockModeBondDeposit = true
+
+    const secpTransferInput = new SECPTransferInput(new BN(1))
+    secpTransferInput.addSignatureIdx(0, defaultAddrBuffer)
+    const secpTransferOutput = new SECPTransferOutput(
+      new BN(1),
+      [defaultAddrBuffer],
+      ZeroBN,
+      1
+    )
+    const spendResponse = {
+      ins: [
+        new TransferableInput(
+          txID,
+          Buffer.from(bintools.fromBNToBuffer(new BN(0), 4)),
+          assetID,
+          secpTransferInput
+        )
+      ],
+      out: [new TransferableOutput(assetID, secpTransferOutput)],
+      owners: []
+    }
+
+    api.spend = jest.fn().mockReturnValue(spendResponse)
+
+    const result = api.buildBaseTx(
+      undefined,
+      new BN(1),
+      [defaultAddr],
+      [defaultAddr],
+      [defaultAddr],
+      Buffer.from("memo"),
+      ZeroBN,
+      ZeroBN,
+      1,
+      1
+    )
+
+    const txu1 = await result
+    const expectedBaseTx = new BaseTx(
+      networkID,
+      Buffer.alloc(32, 0),
+      spendResponse.out,
+      spendResponse.ins,
+      Buffer.from("memo")
+    )
+    const expectedUnsignedBaseTx = new UnsignedTx(expectedBaseTx)
+    expect(txu1.serialize()).toMatchObject(expectedUnsignedBaseTx.serialize())
+  })
+
+  test("buildDepositTx", async (): Promise<void> => {
+    api.keyChain().importKey(defaultPK)
+
+    const defaultAddr = api.keyChain().getAddressStrings()[0]
+    const defaultAddrBuffer = api.keyChain().getAddresses()[0]
+    avalanche.getNetwork().P.lockModeBondDeposit = true
+
+    const secpTransferInput = new SECPTransferInput(new BN(1))
+    secpTransferInput.addSignatureIdx(0, defaultAddrBuffer)
+    const secpTransferOutput = new SECPTransferOutput(
+      new BN(1),
+      [defaultAddrBuffer],
+      ZeroBN,
+      1
+    )
+    const spendResponse = {
+      ins: [
+        new TransferableInput(
+          txID,
+          Buffer.from(bintools.fromBNToBuffer(new BN(0), 4)),
+          assetID,
+          secpTransferInput
+        )
+      ],
+      out: [new TransferableOutput(assetID, secpTransferOutput)],
+      owners: []
+    }
+
+    api.spend = jest.fn().mockReturnValue(spendResponse)
+
+    const depositOfferID = "wVVZinZkN9x6e9dh3DNNfrmdXaHPPwKWt3Zerx2vD8Ccuo6E7"
+    const depositDuration = 110376000
+    const rewardsOwner = new OutputOwners([defaultAddrBuffer])
+    const rewardOutputOwners = new SECPOwnerOutput(
+      [defaultAddrBuffer],
+      ZeroBN,
+      1
+    )
+    const result = api.buildDepositTx(
+      undefined,
+      [defaultAddr],
+      [defaultAddr],
+      depositOfferID,
+      depositDuration,
+      rewardsOwner,
+      Buffer.from("memo"),
+      ZeroBN,
+      new BN(1),
+      1
+    )
+
+    const txu1 = await result
+    const expectedDepositTx = new DepositTx(
+      networkID,
+      Buffer.alloc(32, 0),
+      spendResponse.out,
+      spendResponse.ins,
+      Buffer.from("memo"),
+      depositOfferID,
+      depositDuration,
+      new ParseableOutput(rewardOutputOwners)
+    )
+    expectedDepositTx.setOutputOwners([new OutputOwners([defaultAddrBuffer])])
+    const expectedUnsignedTx = new UnsignedTx(expectedDepositTx)
+    expect(txu1.serialize()).toMatchObject(expectedUnsignedTx.serialize())
+  })
+
+  test("buildRegisterNodeTx", async (): Promise<void> => {
+    const nodeID = "NodeID-AAFgkP7AVeQjmv4MSi2DaQbobg3wpZbFp"
+    const nodePK =
+      "PrivateKey-2DXzE36hZ3MSKxk1Un5mBHGwcV69CqkKvbVvSwFBhDRtnbFCDX"
+    api.keyChain().importKey(defaultPK)
+    api.keyChain().importKey(nodePK)
+
+    const defaultAddr = api.keyChain().getAddressStrings()[0]
+    const defaultAddrBuffer = api.keyChain().getAddresses()[0]
+    const nodeAddrBuffer = api.keyChain().getAddresses()[1]
+    avalanche.getNetwork().P.lockModeBondDeposit = true
+
+    const secpTransferInput = new SECPTransferInput(new BN(1))
+    secpTransferInput.addSignatureIdx(0, defaultAddrBuffer)
+    const secpTransferOutput = new SECPTransferOutput(
+      new BN(1),
+      [defaultAddrBuffer],
+      ZeroBN,
+      1
+    )
+    const spendResponse = {
+      ins: [
+        new TransferableInput(
+          txID,
+          Buffer.from(bintools.fromBNToBuffer(new BN(0), 4)),
+          assetID,
+          secpTransferInput
+        )
+      ],
+      out: [new TransferableOutput(assetID, secpTransferOutput)],
+      owners: []
+    }
+
+    api.spend = jest.fn().mockReturnValue(spendResponse)
+
+    const authCredentials: [number, Buffer][] = [[0, defaultAddrBuffer]]
+
+    const result = api.buildRegisterNodeTx(
+      undefined,
+      [defaultAddr],
+      [defaultAddr],
+      undefined,
+      nodeID,
+      defaultAddr,
+      authCredentials,
+      Buffer.from("memo")
+    )
+
+    const txu1 = await result
+    const expectedRegisterNodeTx = new RegisterNodeTx(
+      networkID,
+      Buffer.alloc(32, 0),
+      spendResponse.out,
+      spendResponse.ins,
+      Buffer.from("memo"),
+      undefined,
+      NodeIDStringToBuffer(nodeID),
+      defaultAddrBuffer
+    )
+    expectedRegisterNodeTx.setOutputOwners([
+      new OutputOwners([nodeAddrBuffer]),
+      new OutputOwners([defaultAddrBuffer])
+    ])
+    authCredentials.forEach((addressAuth) => {
+      expectedRegisterNodeTx.addSignatureIdx(addressAuth[0], addressAuth[1])
+    })
+    const expectedUnsignedTx = new UnsignedTx(expectedRegisterNodeTx)
+    expect(txu1.serialize()).toMatchObject(expectedUnsignedTx.serialize())
+  })
+
+  test("buildUnlockDepositTx", async (): Promise<void> => {
+    api.keyChain().importKey(defaultPK)
+
+    const defaultAddr = api.keyChain().getAddressStrings()[0]
+    const defaultAddrBuffer = api.keyChain().getAddresses()[0]
+    avalanche.getNetwork().P.lockModeBondDeposit = true
+
+    const secpTransferInput = new SECPTransferInput(new BN(1))
+    secpTransferInput.addSignatureIdx(0, defaultAddrBuffer)
+    const secpTransferOutput = new SECPTransferOutput(
+      new BN(1),
+      [defaultAddrBuffer],
+      ZeroBN,
+      1
+    )
+    const spendResponse = {
+      ins: [
+        new TransferableInput(
+          txID,
+          Buffer.from(bintools.fromBNToBuffer(new BN(0), 4)),
+          assetID,
+          secpTransferInput
+        )
+      ],
+      out: [new TransferableOutput(assetID, secpTransferOutput)],
+      owners: []
+    }
+
+    api.spend = jest.fn().mockReturnValue(spendResponse)
+
+    const result = api.buildUnlockDepositTx(
+      undefined,
+      [defaultAddr],
+      [defaultAddr],
+      Buffer.from("memo"),
+      ZeroBN,
+      new BN(1),
+      1
+    )
+
+    const txu1 = await result
+    const expectedUnlockDepositTx = new UnlockDepositTx(
+      networkID,
+      Buffer.alloc(32, 0),
+      spendResponse.out,
+      spendResponse.ins,
+      Buffer.from("memo")
+    )
+    const expectedUnsignedTx = new UnsignedTx(expectedUnlockDepositTx)
+    expect(txu1.serialize()).toMatchObject(expectedUnsignedTx.serialize())
+  })
+
+  test("buildClaimTx", async (): Promise<void> => {
+    api.keyChain().importKey(defaultPK)
+    api.keyChain().importKey(defaultPK2)
+
+    const defaultAddr = api.keyChain().getAddressStrings()[0]
+    const defaultAddrBuffer = api.keyChain().getAddresses()[0]
+    const claimToAddrBuffer = api.keyChain().getAddresses()[1]
+    const claimTo = new OutputOwners([claimToAddrBuffer])
+    const sigidx = 0
+    const inputAmount = new BN(20)
+    const toClaimAmount = new BN(10)
+    avalanche.getNetwork().P.lockModeBondDeposit = true
+
+    const secpTransferInput = new SECPTransferInput(inputAmount)
+    secpTransferInput.addSignatureIdx(0, defaultAddrBuffer)
+    const secpTransferOutput = new SECPTransferOutput(
+      new BN(10),
+      [defaultAddrBuffer],
+      ZeroBN,
+      1
+    )
+    const secpTransferOutput2 = new SECPTransferOutput(
+      inputAmount.sub(toClaimAmount),
+      [claimToAddrBuffer],
+      ZeroBN,
+      1
+    )
+
+    const spendResponse = {
+      ins: [
+        new TransferableInput(
+          txID,
+          Buffer.from(bintools.fromBNToBuffer(inputAmount, 4)),
+          assetID,
+          secpTransferInput
+        )
+      ],
+      out: [new TransferableOutput(assetID, secpTransferOutput)],
+      owners: [claimTo]
+    }
+
+    api.spend = jest.fn().mockReturnValue(spendResponse)
+
+    // number to buffer
+    const sigidxbytes = Buffer.alloc(4)
+    sigidxbytes.writeUInt32BE(sigidx, 0)
+    const claimAmounts: ClaimAmount[] = [
+      new ClaimAmount(
+        Buffer.alloc(32, 1),
+        ClaimType.VALIDATOR_REWARD,
+        toClaimAmount,
+        [sigidxbytes]
+      )
+    ]
+    const claimAmountParams: ClaimAmountParams[] = [
+      {
+        id: Buffer.alloc(32, 1),
+        claimType: ClaimType.VALIDATOR_REWARD,
+        amount: toClaimAmount,
+        owners: new OutputOwners([defaultAddrBuffer]),
+        sigIdxs: [sigidx]
+      }
+    ]
+
+    const result = api.buildClaimTx(
+      undefined,
+      [defaultAddr],
+      [defaultAddr],
+      Buffer.from("memo"),
+      ZeroBN,
+      1,
+      claimAmountParams,
+      claimTo
+    )
+
+    const expectedOutputs = spendResponse.out.concat(
+      new TransferableOutput(assetID, secpTransferOutput2)
+    )
+
+    const txu1 = await result
+    const expectedClaimTx = new ClaimTx(
+      networkID,
+      Buffer.alloc(32, 0),
+      expectedOutputs,
+      spendResponse.ins,
+      Buffer.from("memo"),
+      claimAmounts
+    )
+    expectedClaimTx.setOutputOwners([
+      claimTo,
+      new OutputOwners([defaultAddrBuffer])
+    ])
+    expectedClaimTx.addSigIdxs([new SigIdx(sigidx, defaultAddrBuffer)])
+    const expectedUnsignedTx = new UnsignedTx(expectedClaimTx)
+    expect(txu1.serialize()).toMatchObject(expectedUnsignedTx.serialize())
+    expectedClaimTx["claimAmounts"] = []
+
+    // error case - empty claimAmounts
+    try {
+      await api.buildClaimTx(
+        undefined,
+        [defaultAddr],
+        [defaultAddr],
+        Buffer.from("memo"),
+        ZeroBN,
+        1,
+        [],
+        claimTo
+      )
+    } catch (e: any) {
+      expect(e).toMatchObject(
+        new Error("Must provide at least one claimAmount")
+      )
+    }
   })
 })
