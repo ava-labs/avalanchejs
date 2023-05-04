@@ -618,6 +618,8 @@ export class PlatformVMAPI extends JRPCAPI {
         start: new BN(offer.start),
         end: new BN(offer.end),
         minAmount: new BN(offer.minAmount),
+        totalMaxAmount: new BN(offer.totalMaxAmount),
+        depositedAmount: new BN(offer.depositedAmount),
         minDuration: offer.minDuration,
         maxDuration: offer.maxDuration,
         unlockPeriodDuration: offer.unlockPeriodDuration,

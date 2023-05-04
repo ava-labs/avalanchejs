@@ -264,6 +264,8 @@ export interface DepositOffer {
   start: BN
   end: BN
   minAmount: BN
+  totalMaxAmount: BN
+  depositedAmount: BN
   minDuration: number
   maxDuration: number
   unlockPeriodDuration: number
