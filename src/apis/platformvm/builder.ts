@@ -33,6 +33,7 @@ import {
   DepositTx,
   ExportTx,
   ImportTx,
+  MultisigAliasParams,
   ParseableOutput,
   PlatformVMConstants,
   RegisterNodeTx,
@@ -44,7 +45,9 @@ import {
   TransferableOutput,
   UnlockDepositTx,
   UnsignedTx,
-  UTXO
+  UTXO,
+  MultisigAlias,
+  MultisigAliasTx
 } from "."
 import { GenesisData } from "../avm"
 import createHash from "create-hash"
@@ -1545,6 +1548,98 @@ export class Builder {
 
     claimTx.setOutputOwners(owners)
     return new UnsignedTx(claimTx)
+  }
+
+  /**
+   * Build an unsigned [[MultisigAliasTx]].
+   *
+   * @param networkID Network ID, default [[DefaultNetworkID]]
+   * @param blockchainID Blockchain ID, default undefined
+   * @param fromSigner The addresses being used to send and verify the funds from the UTXOs
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs
+   * @param multisigAliasParams Parameters of MultisigAliasTx. multisigAliasParams.ID must be empty if it's the new alias
+   * @param fee Optional amount of fees to burn in its smallest denomination, represented as BN
+   * @param feeAssetID Optional asset ID of the fees being burned
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional timestamp to verify the transaction against, as BN
+   * @param changeThreshold Optional number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned MultisigAliasTx created from the passed-in parameters.
+   */
+  buildMultisigAliasTx = async (
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromSigner: FromSigner,
+    changeAddresses: Buffer[],
+    multisigAliasParams: MultisigAliasParams,
+    fee: BN = zero,
+    feeAssetID: Buffer = undefined,
+    memo: Buffer = undefined,
+    asOf: BN = zero,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
+
+    if (this._feeCheck(fee, feeAssetID)) {
+      const aad: AssetAmountDestination = new AssetAmountDestination(
+        [],
+        0,
+        fromSigner.from,
+        fromSigner.signer,
+        changeAddresses,
+        changeThreshold
+      )
+
+      aad.addAssetAmount(feeAssetID, zero, fee)
+
+      const minSpendableErr: Error = await this.spender.getMinimumSpendable(
+        aad,
+        asOf,
+        zero,
+        "Unlocked"
+      )
+      if (typeof minSpendableErr === "undefined") {
+        ins = aad.getInputs()
+        outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
+      } else {
+        throw minSpendableErr
+      }
+    }
+
+    const output: SECPOwnerOutput = new SECPOwnerOutput(
+      multisigAliasParams.owners.getAddresses(),
+      multisigAliasParams.owners.getLocktime(),
+      multisigAliasParams.owners.getThreshold()
+    )
+
+    const multisigAlias: MultisigAlias = new MultisigAlias(
+      multisigAliasParams.id,
+      Buffer.from(multisigAliasParams.memo, "utf-8"),
+      new ParseableOutput(output)
+    )
+
+    const baseTx: MultisigAliasTx = new MultisigAliasTx(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      multisigAlias
+    )
+
+    multisigAliasParams.auth.forEach((addressAuth) => {
+      baseTx.addSignatureIdx(addressAuth[0], addressAuth[1])
+    })
+
+    if (multisigAliasParams.id && multisigAliasParams.id.length != 0) {
+      owners.push(new OutputOwners([multisigAliasParams.id], ZeroBN, 1))
+    }
+
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 
   _feeCheck(fee: BN, feeAssetID: Buffer): boolean {

@@ -318,6 +318,13 @@ export interface MultisigAliasReply extends Owner {
   memo: string // hex encoded string
 }
 
+export interface MultisigAliasParams {
+  id?: Buffer
+  memo: string
+  owners: OutputOwners
+  auth: [number, Buffer][]
+}
+
 export interface SpendParams {
   from: string[] | string
   signer: string[] | string
