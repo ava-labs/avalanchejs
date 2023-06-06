@@ -1,12 +1,30 @@
 import { getAvalanche, createTests, Matcher } from "../e2etestlib"
 import { KeystoreAPI } from "src/apis/keystore/api"
 import BN from "bn.js"
-import { costImportTx } from "src/utils"
-import { UTXOSet, Tx, UnsignedTx } from "src/apis/evm"
-import { avm } from "src"
-import { GetUTXOsResponse } from "src/apis/avm"
+import { costImportTx, PayloadBase } from "src/utils"
+import { UTXOSet, Tx, UnsignedTx, EVMAPI } from "src/apis/evm"
+import { avm, BinTools } from "src"
+import { AVMAPI, GetUTXOsResponse } from "src/apis/avm"
 import { EVMCaminoConstants } from "../../src/apis/evm/camino_constants"
+import { Buffer } from "buffer/"
+import createHash from "create-hash"
+import {
+  UnsignedTx as PlatformUnsignedTx,
+  Tx as PlatformTx,
+  UTXOSet as PlatformUTXOSet,
+  PlatformVMConstants,
+  Owner,
+  PlatformVMAPI
+} from "../../src/apis/platformvm"
+import {
+  MultisigKeyChain,
+  MultisigKeyPair,
+  OutputOwners,
+  ZeroBN
+} from "../../src/common"
+import { CChainAlias, PChainAlias } from "../../src/utils"
 
+const bintools = BinTools.getInstance()
 const avalanche = getAvalanche()
 const user: string = "avalancheJspChainUser" + Math.random()
 const passwd: string = "avalancheJsP@ssw4rd"
@@ -26,7 +44,16 @@ const gasFeeAddrCPrivateKey =
   "23830b3225cb76144fa3c12ccb7ff387f11e2feedbb0ec009b2121f3f8b80c52"
 const kycPrivateKey =
   "56289e99c94b6912bfc12adc093c9b51124f0dc54ac7a766b2bc5ccf558d8027"
+const node6PrivateKey =
+  "PrivateKey-UfV3iPVP8ThZuSXmUacsahdzePs5VkXct4XoQKsW9mffN1d8J"
+const node7PrivateKey =
+  "PrivateKey-2DXzE36hZ3MSKxk1Un5mBHGwcV69CqkKvbVvSwFBhDRtnbFCDX"
+const signerAddrPrivateKey =
+  "PrivateKey-2Vtf2ZhTRz6WcVcSH7cS7ghKneZxZ2L5W8assdCcaNDVdpoYfY"
+const signer2AddrPrivateKey =
+  "PrivateKey-XQFgPzByKfqFfpVTafmZHBqfaw4hsDTGbbcArUg4unMiEKvrD"
 
+const node6Id = "NodeID-FHseEbTVS7U3odWfjgZYyygsv5gWCqVdk"
 // x addresses
 const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
 
@@ -41,6 +68,11 @@ const kycAddr: string = "0x8db97c7cece249c2b98bdc0226cc4c2a57bf52fc"
 const gasFeeXAddr = "X-kopernikus13kyf72ftu4l77kss7xm0kshm0au29s48zjaygq"
 const gasFeeAddr: string = "0x305cea207112c0561033133f816d7a2233699f06"
 
+const ownerPAddr = "P-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7"
+const ownerCAddr = "0x3187aFA01C28A200Bf27F605E2753E8d9CcBe0e1"
+
+const multiSigAliasPAddr = "P-kopernikus1fwrv3kj5jqntuucw67lzgu9a9tkqyczxgcvpst"
+
 const blacklistAddr: string = "0x7f28dcdfc67af590918c271226034058fd15e868"
 
 const dummyContractBin =
@@ -48,8 +80,11 @@ const dummyContractBin =
 
 let keystore: KeystoreAPI
 let contract: any
-let xChain, cChain: any
-let cAddressStrings: any
+let xChain: avm.AVMAPI
+let pChain: PlatformVMAPI
+let cChain: EVMAPI
+let cAddresses, pAddresses: Buffer[]
+let cAddressStrings, pAddressStrings: string[]
 let tx = { value: "" }
 
 beforeAll(async () => {
@@ -84,14 +119,29 @@ beforeAll(async () => {
 
   cChain = avalanche.CChain()
   xChain = avalanche.XChain()
+  pChain = avalanche.PChain()
   xChain.keyChain().importKey(adminPrivateKey)
   xChain.keyChain().importKey(gasFeeAddrPrivateKey)
   xChain.keyChain().importKey(kycAddrPrivateKey)
+
+  pChain.keyChain().importKey(adminPrivateKey)
+  pChain.keyChain().importKey(gasFeeAddrPrivateKey)
+  pChain.keyChain().importKey(kycAddrPrivateKey)
+  pChain.keyChain().importKey(signerAddrPrivateKey)
+  pChain.keyChain().importKey(signer2AddrPrivateKey)
+  pAddresses = pChain.keyChain().getAddresses()
+  pAddressStrings = pChain.keyChain().getAddressStrings()
 
   cChain.keyChain().importKey(adminPrivateKey)
   cChain.keyChain().importKey(gasFeeAddrPrivateKey)
   cChain.keyChain().importKey(kycAddrPrivateKey)
 
+  cChain.keyChain().importKey(node6PrivateKey)
+  cChain.keyChain().importKey(node7PrivateKey)
+  cChain.keyChain().importKey(signerAddrPrivateKey)
+  cChain.keyChain().importKey(signer2AddrPrivateKey)
+
+  cAddresses = cChain.keyChain().getAddresses()
   cAddressStrings = cChain.keyChain().getAddressStrings()
 })
 
@@ -1093,3 +1143,173 @@ describe("Camino-CChain-Multi-Role", (): void => {
   ]
   createTests(tests_spec)
 })
+
+describe("Camino-CChain-Multisig", (): void => {
+  const tests_spec: any = [
+    [
+      "export P->C with recipient",
+      () =>
+        (async function () {
+          const msigAliasBuffer = pChain.parseAddress(multiSigAliasPAddr)
+          const owner = await pChain.getMultisigAlias(multiSigAliasPAddr)
+          const platformVMUTXOResponse: any = await pChain.getUTXOs([
+            ownerPAddr
+          ])
+          const utxoSet: PlatformUTXOSet = platformVMUTXOResponse.utxos
+
+          const pUnsignedTx: PlatformUnsignedTx = await pChain.buildExportTx(
+            utxoSet,
+            new BN(2246001),
+            cChain.getBlockchainID(),
+            [pAddressStrings[2], pAddressStrings[3]],
+            [ownerPAddr],
+            [ownerPAddr],
+            undefined,
+            new BN(0),
+            owner.locktime,
+            owner.threshold,
+            owner.threshold
+          )
+
+          const txbuff = pUnsignedTx.toBuffer()
+          const msg: Buffer = Buffer.from(
+            createHash("sha256").update(txbuff).digest()
+          )
+
+          const msKeyChain = createMsigKCAndAddSignatures(
+            [pAddresses[2], pAddresses[3]],
+            msg,
+            msigAliasBuffer,
+            owner,
+            pUnsignedTx,
+            "P"
+          )
+          const tx: PlatformTx = pUnsignedTx.sign(msKeyChain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx,
+      3000
+    ],
+    [
+      "import P->C with recipient",
+      () =>
+        (async function () {
+          const msigAliasBuffer = pChain.parseAddress(multiSigAliasPAddr)
+          const baseFeeResponse: string =
+            cChain.getBaseFee()[Symbol.toStringTag]
+          const baseFee = new BN(parseInt(baseFeeResponse, 16) / 1e9)
+          const owner = await pChain.getMultisigAlias(multiSigAliasPAddr)
+          let fee: BN
+
+          const evmUTXOResponse: any = await cChain.getUTXOs(
+            cAddressStrings,
+            pChain.getBlockchainID(),
+            0,
+            undefined
+          )
+          const utxoSet: UTXOSet = evmUTXOResponse.utxos
+
+          let unsignedTx: UnsignedTx = await cChain.buildImportTx(
+            utxoSet,
+            ownerCAddr,
+            [cAddressStrings[6], cAddressStrings[5]],
+            pChain.getBlockchainID().toString(),
+            new BN(0)
+          )
+          const importCost: number = costImportTx(
+            avalanche.getNetwork().C,
+            unsignedTx
+          )
+
+          if (baseFee > new BN(0)) {
+            fee = baseFee.mul(new BN(importCost))
+          } else {
+            fee = new BN(2246000)
+          }
+
+          unsignedTx = await cChain.buildImportTx(
+            utxoSet,
+            ownerCAddr,
+            [cAddressStrings[6], cAddressStrings[5]],
+            avalanche.getNetwork().P.blockchainID,
+            new BN(fee)
+          )
+
+          const txbuff = unsignedTx.toBuffer()
+          const msg: Buffer = Buffer.from(
+            createHash("sha256").update(txbuff).digest()
+          )
+
+          const msKeyChain = createMsigKCAndAddSignatures(
+            [cAddresses[6], cAddresses[5]],
+            msg,
+            msigAliasBuffer,
+            owner,
+            unsignedTx,
+            "C"
+          )
+          const tx: Tx = unsignedTx.sign(msKeyChain)
+          return cChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx,
+      3000
+    ],
+    [
+      "verify import tx has been committed",
+      () => cChain.getAtomicTxStatus(tx.value),
+      (x) => x,
+      Matcher.toBe,
+      () => "Accepted",
+      3000
+    ]
+  ]
+  createTests(tests_spec)
+})
+
+function createMsigKCAndAddSignatures(
+  addresses: Buffer[],
+  msg: Buffer,
+  msigAliasBuffer: Buffer,
+  owner: Owner,
+  unsignedTx: PlatformUnsignedTx | UnsignedTx,
+  chainPrefix: string
+): MultisigKeyChain {
+  let alias: string
+  let chain: any
+  if (chainPrefix === "P") {
+    alias = PChainAlias
+    chain = pChain
+  } else if (chainPrefix === "C") {
+    alias = PChainAlias
+    chain = cChain
+  }
+  const msKeyChain = new MultisigKeyChain(
+    avalanche.getHRP(),
+    alias,
+    msg,
+    PlatformVMConstants.SECPMULTISIGCREDENTIAL,
+    unsignedTx.getTransaction().getOutputOwners(),
+    new Map([
+      [
+        msigAliasBuffer.toString("hex"),
+        new OutputOwners(
+          owner.addresses.map((a) => bintools.parseAddress(a, "P")),
+          new BN(owner.locktime),
+          owner.threshold
+        )
+      ]
+    ])
+  )
+  // add KeyPairs to msKeyChain
+  for (let i = 0; i < addresses.length; i++) {
+    const keyPair = chain.keyChain().getKey(addresses[i])
+    const signature = keyPair.sign(msg)
+    msKeyChain.addKey(new MultisigKeyPair(msKeyChain, addresses[i], signature))
+  }
+  msKeyChain.buildSignatureIndices()
+  return msKeyChain
+}
