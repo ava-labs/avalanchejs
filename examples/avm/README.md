@@ -44,6 +44,7 @@ Example scripts for the [Avalanche Virtual Machine](https://docs.avax.network/bu
 * [getTxStatus.ts](./getTxStatus.ts)
 * [importTx-cchain.ts](./importTx-cchain.ts)
 * [importTx-cchain.ts](./importTx-cchain.ts)
+* [JSONXChainTx.ts](./JSONXChainTx.ts)
 * [keyChain.ts](./keyChain.ts)
 * [listAddresses.ts](./listAddresses.ts)
 * [newKeyChain.ts](./newKeyChain.ts)

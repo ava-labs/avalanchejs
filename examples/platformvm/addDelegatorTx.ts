@@ -75,9 +75,9 @@ const main = async (): Promise<any> => {
 
   const stakeAmount: any = await pchain.getMinStake()
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
-    address: pAddressStrings[0]
-  })) as GetBalanceResponseAvax
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance([
+    pAddressStrings[0]
+  ])) as GetBalanceResponseAvax
   const unlocked: BN = getBalanceResponse.unlocked
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee).sub(stakeAmount.minValidatorStake),

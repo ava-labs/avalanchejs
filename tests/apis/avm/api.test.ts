@@ -380,17 +380,6 @@ describe("AVMAPI", (): void => {
       data: payload
     }
 
-    const expectedRequestPayload = {
-      id: 9,
-      method: "avm.getBalance",
-      params: {
-        address: addrA,
-        assetID: "ATH",
-        includePartial: true
-      },
-      jsonrpc: "2.0"
-    }
-
     mockAxios.mockResponse(responseObj)
     const response: object = await result
     const calledWith: object = {

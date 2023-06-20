@@ -26,6 +26,7 @@ import {
 } from "./validationtx"
 import { CreateSubnetTx } from "./createsubnettx"
 import { TransactionError } from "../../utils/errors"
+import { AddSubnetValidatorTx } from "./addsubnetvalidatortx"
 import { RegisterNodeTx } from "./registernodetx"
 import { DepositTx } from "./depositTx"
 import { AddressStateTx } from "./addressstatetx"
@@ -59,6 +60,8 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new CaminoAddValidatorTx(...args)
   } else if (txtype === PlatformVMConstants.CREATESUBNETTX) {
     return new CreateSubnetTx(...args)
+  } else if (txtype === PlatformVMConstants.ADDSUBNETVALIDATORTX) {
+    return new AddSubnetValidatorTx(...args)
   } else if (txtype === PlatformVMConstants.REGISTERNODETX) {
     return new RegisterNodeTx(...args)
   } else if (txtype === PlatformVMConstants.DEPOSITTX) {

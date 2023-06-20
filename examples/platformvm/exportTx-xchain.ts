@@ -75,11 +75,10 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const avaxAssetID: Buffer = await pchain.getAVAXAssetID()
-  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
-    address: pAddressStrings[0]
-  })) as GetBalanceResponseAvax
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance([
+    pAddressStrings[0]
+  ])) as GetBalanceResponseAvax
   const unlocked: BN = getBalanceResponse.unlocked
-  console.log(unlocked.sub(fee).toString())
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
     xAddresses,
@@ -111,7 +110,6 @@ const main = async (): Promise<any> => {
       secpTransferInput
     )
     inputs.push(input)
-    // }
   })
 
   const exportTx: ExportTx = new ExportTx(

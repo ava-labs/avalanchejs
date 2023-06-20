@@ -28,18 +28,12 @@ const main = async (): Promise<any> => {
     return bintools.addressToString(hrp, "P", bintools.parseAddress(s, "P"))
   }
 
-  const address: string = toHrp(
-    "P-local1g65uqn6t77p656w64023nh8nd9updzmxyymev2"
-  )
   const addresses: string[] = [
     toHrp("P-local1clz7hpsnrr6r9ukmjxn9wajgkhe3mgx8gqcm3a"),
     toHrp("P-local13w8m4qh6hay8fz3a4hzrs9k4wk4ytmfla756w2"),
     toHrp("P-local1hgjcjp3shkyxda8deyjlsde05g9fgwdk2xnwy3")
   ]
-  const balance: GetBalanceResponse = await pchain.getBalance({
-    address,
-    addresses
-  })
+  const balance: GetBalanceResponse = await pchain.getBalance(addresses)
   console.log(JSON.stringify(balance, undefined, 2))
 }
 

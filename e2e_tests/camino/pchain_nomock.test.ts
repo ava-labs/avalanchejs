@@ -422,7 +422,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Get balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -485,7 +485,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts haven been appropriately increased",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -500,7 +500,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Get balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -536,7 +536,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Verify deposited amounts haven NOT increased further",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -554,7 +554,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
   const tests_spec: any = [
     [
       "Get balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -594,7 +594,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts haven been appropriately increased",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -609,7 +609,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Refresh balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -626,7 +626,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have decreased by the amount of the deposit",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs)
           .add(sumAllValues(x.bondedDepositedOutputs))
@@ -641,7 +641,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Refresh balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -683,7 +683,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have increased by rewards amount (minus tx fee)",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => sumAllValues(x.unlockedOutputs),
       Matcher.toEqual,
       () =>
@@ -698,7 +698,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
   const tests_spec: any = [
     [
       "Get balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -738,7 +738,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have increased by the deposited amount",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -753,7 +753,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Refresh balance outputs",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -788,7 +788,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have decreased by 50%",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -805,7 +805,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify unlocked amounts haven been appropriately increased by 50% of the locked amount",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) => sumAllValues(x.unlockedOutputs),
       Matcher.toEqual,
       () =>
@@ -829,7 +829,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts haven been appropriately decreased by 100%",
-      () => pChain.getBalance({ address: P(addrB) }),
+      () => pChain.getBalance([P(addrB)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -1077,7 +1077,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
               { addresses: [P(adminAddress)], locktime: "0", threshold: 1 }
             ])
           }
-          return pChain.getBalance({ address: P(adminAddress) })
+          return pChain.getBalance([P(adminAddress)])
         })(),
       (x) => x,
       Matcher.Get,
@@ -1120,7 +1120,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
     ],
     [
       "Verify unlocked amounts have increased by rewards amount (minus tx fee)",
-      () => pChain.getBalance({ address: P(adminAddress) }),
+      () => pChain.getBalance([P(adminAddress)]),
       (x) => sumAllValues(x.unlockedOutputs),
       Matcher.toEqual,
       () =>

@@ -1,4 +1,4 @@
-import { Avalanche, BN, Buffer } from "caminojs/index"
+import { Avalanche, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   KeyChain,

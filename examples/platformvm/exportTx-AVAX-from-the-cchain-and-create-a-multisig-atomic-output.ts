@@ -38,7 +38,9 @@ const outputs: TransferableOutput[] = []
 const inputs: TransferableInput[] = []
 const threshold: number = 2
 const locktime: BN = new BN(0)
-const memo: Buffer = Buffer.from("Manually Export AVAX from P-Chain to C-Chain")
+const memo: Buffer = Buffer.from(
+  "Export AVAX from P-Chain to C-Chain and consume a multisig output and create a multisig atomic output"
+)
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
@@ -84,8 +86,7 @@ const main = async (): Promise<any> => {
   const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance([
     pAddressStrings[0]
   ])) as GetBalanceResponseAvax
-  const unlocked: BN = getBalanceResponse.unlocked
-  console.log(unlocked.sub(fee).toString())
+  const unlocked: BN = new BN(getBalanceResponse.unlocked)
   const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
     unlocked.sub(fee),
     cAddresses,
@@ -103,14 +104,14 @@ const main = async (): Promise<any> => {
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO): void => {
     const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-    const amt: BN = amountOutput.getAmount().clone()
+    const amt: BN = amountOutput.getAmount()
     const txid: Buffer = utxo.getTxID()
     const outputidx: Buffer = utxo.getOutputIdx()
 
     const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-    secpTransferInput.addSignatureIdx(0, pAddresses[0])
+    secpTransferInput.addSignatureIdx(0, pAddresses[1])
     if (utxo.getOutput().getThreshold() === 2) {
-      secpTransferInput.addSignatureIdx(1, pAddresses[1])
+      secpTransferInput.addSignatureIdx(1, pAddresses[0])
     }
 
     const input: TransferableInput = new TransferableInput(

@@ -33,7 +33,10 @@ const main = async (): Promise<any> => {
     const output: BaseOutput = utxo.getOutput()
     const addresses: string[] = output
       .getAddresses()
-      .map((x: Buffer): string => xchain.addressFromBuffer(x))
+      .map((x: Buffer): string => {
+        const addy: string = xchain.addressFromBuffer(x)
+        return addy
+      })
     console.log(addresses)
   })
 }

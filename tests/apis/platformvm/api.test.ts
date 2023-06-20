@@ -184,6 +184,20 @@ describe("PlatformVMAPI", (): void => {
     expect(fee.toString()).toBe(feeResponse)
   })
 
+  test("getCreateSubnetTxFee", async (): Promise<void> => {
+    let pchain: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
+    const feeResponse: string = "1000000000"
+    const fee: BN = pchain.getCreateSubnetTxFee()
+    expect(fee.toString()).toBe(feeResponse)
+  })
+
+  test("getCreateChainTxFee", async (): Promise<void> => {
+    let pchain: PlatformVMAPI = new PlatformVMAPI(avalanche, "/ext/bc/P")
+    const feeResponse: string = "1000000000"
+    const fee: BN = pchain.getCreateChainTxFee()
+    expect(fee.toString()).toBe(feeResponse)
+  })
+
   test("listAddresses", async (): Promise<void> => {
     const addresses: string[] = [addrA, addrB]
 
@@ -273,9 +287,7 @@ describe("PlatformVMAPI", (): void => {
       lockedNotStakeable: b100,
       utxoIDs: utxoIDs
     }
-    const result: Promise<GetBalanceResponse> = api.getBalance({
-      address: addrA
-    })
+    const result: Promise<GetBalanceResponse> = api.getBalance([addrA])
     const payload: object = {
       result: {
         balance: s100,

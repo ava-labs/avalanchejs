@@ -19,6 +19,7 @@ on:
         description: "caminojs branch"
         required: true
         default: "chain4travel"
+  workflow_call:
 
 env:
   CI: true

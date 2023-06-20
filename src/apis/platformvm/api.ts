@@ -86,6 +86,7 @@ import {
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
+import { SubnetAuth } from "."
 import { GenesisData } from "../avm"
 import { Auth, LockMode, Builder, FromSigner, NodeOwner } from "./builder"
 import { Network } from "../../utils/networks"
@@ -465,24 +466,12 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Gets the balance of a particular asset.
    *
-   * @param address The address to pull the asset balance from
+   * @param addresses The addresses to pull the asset balance from
    *
    * @returns Promise with the balance as a {@link https://github.com/indutny/bn.js/|BN} on the provided address.
    */
-  getBalance = async (params: {
-    address?: string
-    addresses?: string[]
-  }): Promise<GetBalanceResponse> => {
-    if (
-      params.address &&
-      typeof this.parseAddress(params.address) === "undefined"
-    ) {
-      /* istanbul ignore next */
-      throw new AddressError(
-        "Error - PlatformVMAPI.getBalance: Invalid address format"
-      )
-    }
-    params.addresses?.forEach((address) => {
+  getBalance = async (addresses: string[]): Promise<GetBalanceResponse> => {
+    addresses.forEach((address) => {
       if (typeof this.parseAddress(address) === "undefined") {
         /* istanbul ignore next */
         throw new AddressError(
@@ -490,6 +479,9 @@ export class PlatformVMAPI extends JRPCAPI {
         )
       }
     })
+    const params: any = {
+      addresses
+    }
     const response: RequestResponseData = await this.callMethod(
       "platform.getBalance",
       params
@@ -1593,7 +1585,7 @@ export class PlatformVMAPI extends JRPCAPI {
     toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const caller = "buildImportTx"
+    const caller = "buildAddValidatorTx"
 
     const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
 
@@ -2162,14 +2154,13 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param genesisData Optional Byte representation of genesis state of the new chain
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param subnetAuth Optional. An Auth struct which contains the subnet Auth and the signers.
-   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   * @param subnetAuthCredentials Optional. An array of index and address to sign for each SubnetAuth.
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
   buildCreateChainTx = async (
     utxoset: UTXOSet,
-    fromAddresses: FromType,
+    fromAddresses: string[],
     changeAddresses: string[],
     subnetID: string | Buffer = undefined,
     chainName: string = undefined,

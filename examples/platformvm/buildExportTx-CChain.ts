@@ -55,9 +55,9 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance({
-    address: pAddressStrings[0]
-  })) as GetBalanceResponseAvax
+  const getBalanceResponse: GetBalanceResponse = (await pchain.getBalance([
+    pAddressStrings[0]
+  ])) as GetBalanceResponseAvax
   const unlocked: BN = getBalanceResponse.unlocked
   const platformVMUTXOResponse: any = await pchain.getUTXOs(pAddressStrings)
   const utxoSet: UTXOSet = platformVMUTXOResponse.utxos

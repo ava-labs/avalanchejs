@@ -18,6 +18,16 @@ A recent build of one of the typedoc dependencies broke this workflow so for now
 
 ### Generate Docs
 
+#### Checkout the Latest and Greatest Release
+
+```zsh
+# if you need to refresh your memory for the latest tag
+git tag -l
+
+# now checkout the tag/release that you want to build docs off of
+git checkout v1.13.0
+```
+
 Generate typedocs using the `docsmd` yarn/npm script.
 
 ```zsh
