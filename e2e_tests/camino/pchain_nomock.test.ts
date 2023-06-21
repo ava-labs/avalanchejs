@@ -30,18 +30,22 @@ const adminNodePrivateKey =
   "PrivateKey-vmRQiZeXEXYMyJhEiqdC2z5JhuDbxL8ix9UVvjgMu2Er1NepE"
 const addrBPrivateKey =
   "PrivateKey-21QkTk3Zn2wxLd1WvRgWn1UpT5BC2Pz6caKbcsSpmuz7Qm8R7C"
+const addrCPrivateKey =
+  "PrivateKey-Ge71NJhUY3TjZ9dLohijSnNq46QxobjqxHGMUDAPoVsNFA93w"
 const node6PrivateKey =
   "PrivateKey-UfV3iPVP8ThZuSXmUacsahdzePs5VkXct4XoQKsW9mffN1d8J"
 const node7PrivateKey =
   "PrivateKey-2DXzE36hZ3MSKxk1Un5mBHGwcV69CqkKvbVvSwFBhDRtnbFCDX"
+const multiSigAliasMember1PrivateKey =
+  "PrivateKey-2Vtf2ZhTRz6WcVcSH7cS7ghKneZxZ2L5W8assdCcaNDVdpoYfY"
 
 // X addresses
-const adminAddress = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
-const addrB = "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
-const addrC = "X-kopernikus1lx58kettrnt2kyr38adyrrmxt5x57u4vg4cfky"
+const addrAdminString = "X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3"
+const addrBString = "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
+const addrCString = "X-kopernikus13kyf72ftu4l77kss7xm0kshm0au29s48zjaygq"
 
-// C addresses
-const adminCAddr: string = "0x1f0e5c64afdf53175f78846f7125776e76fa8f34"
+// P addresses - Buffer
+let addrAdmin, addrB, addrC, addrNode7, addrSigner: Buffer
 
 // Node ids
 const adminNodeId = "NodeID-AK7sPBsZM9rQwse23aLhEEBPHZD5gkLrL"
@@ -58,25 +62,19 @@ const passwd2: string = "avalancheJsP@ssw4rd2"
 const multiSigUser: string = "avalancheJspChainUser3"
 const multiSigPasswd: string = "avalancheJsP@ssw4rd3"
 const multiSigAliasAddr = "X-kopernikus1fwrv3kj5jqntuucw67lzgu9a9tkqyczxgcvpst"
-const multiSigOwnerAddr = "X-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7"
-const signerAddrPrivateKey =
-  "PrivateKey-2Vtf2ZhTRz6WcVcSH7cS7ghKneZxZ2L5W8assdCcaNDVdpoYfY"
-const multiSigAddrPrivateKey =
-  "PrivateKey-ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN"
+const multiSigAliasMember1Addr =
+  "X-kopernikus1jla8ty5c9ud6lsj8s4re2dvzvfxpzrxdcrd8q7"
 
 // test context
 const avalanche = getAvalanche()
 const startTime = UnixNow().add(new BN(600 * 1))
 const endTime: BN = startTime.add(new BN(26300000))
-const delegationFee: number = 10
 const threshold: number = 1
 const locktime: BN = new BN(0)
 const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildCaminoAddValidatorTx to add a validator to the primary subnet"
 )
 const interestRateDenominator = new BN(1_000_000 * (365 * 24 * 60 * 60))
-const dummyContractBin =
-  "0x60806040523480156100115760006000fd5b50610017565b61016e806100266000396000f3fe60806040523480156100115760006000fd5b506004361061005c5760003560e01c806350f6fe3414610062578063aa8b1d301461006c578063b9b046f914610076578063d8b9839114610080578063e09fface1461008a5761005c565b60006000fd5b61006a610094565b005b6100746100ad565b005b61007e6100b5565b005b6100886100c2565b005b610092610135565b005b6000600090505b5b808060010191505061009b565b505b565b60006000fd5b565b600015156100bf57fe5b5b565b6040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252600d8152602001807f72657665727420726561736f6e0000000000000000000000000000000000000081526020015060200191505060405180910390fd5b565b5b56fea2646970667358221220345bbcbb1a5ecf22b53a78eaebf95f8ee0eceff6d10d4b9643495084d2ec934a64736f6c63430006040033"
 
 const P = function (s: string): string {
   return "P" + s.substring(1)
@@ -101,7 +99,6 @@ let pendingValidators = { value: "" }
 let balanceOutputs = { value: new Map() }
 let oneMinRewardsAmount: BN
 let rewardsOwner: OutputOwners
-let contract: any
 
 beforeAll(async () => {
   await avalanche.fetchNetworkSettings()
@@ -111,12 +108,19 @@ beforeAll(async () => {
   pKeychain = pChain.keyChain()
   pKeychain.importKey(adminNodePrivateKey)
   pKeychain.importKey(addrBPrivateKey)
+  pKeychain.importKey(addrCPrivateKey)
   pKeychain.importKey(node6PrivateKey)
   pKeychain.importKey(node7PrivateKey)
-  pKeychain.importKey(multiSigAddrPrivateKey)
-  pKeychain.importKey(signerAddrPrivateKey)
+  // pKeychain.importKey(multiSigAddrPrivateKey)
+  pKeychain.importKey(multiSigAliasMember1PrivateKey)
   pAddresses = pKeychain.getAddresses()
   pAddressStrings = pKeychain.getAddressStrings()
+
+  addrAdmin = pAddresses[0]
+  addrB = pAddresses[1]
+  addrC = pAddresses[2]
+  addrNode7 = pAddresses[4]
+  addrSigner = pAddresses[5]
 
   // create user2
   await keystore.createUser(user2, passwd2)
@@ -132,7 +136,7 @@ beforeAll(async () => {
     )
     .mul(getOneMinuteDepositOffer().interestRateNominator)
     .div(interestRateDenominator)
-  rewardsOwner = new OutputOwners([pAddresses[1]])
+  rewardsOwner = new OutputOwners([addrB])
 })
 
 describe("Camino-PChain-Add-Validator", (): void => {
@@ -151,18 +155,18 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             undefined,
-            [P(adminAddress)],
-            [P(adminAddress)],
-            [P(adminAddress)],
+            [P(addrAdminString)],
+            [P(addrAdminString)],
+            [P(addrAdminString)],
             adminNodeId,
             {
-              address: P(adminAddress),
-              auth: [[0, P(adminAddress)]]
+              address: P(addrAdminString),
+              auth: [[0, P(addrAdminString)]]
             },
             startTime,
             endTime,
             stakeAmount.minValidatorStake,
-            [P(adminAddress)],
+            [P(addrAdminString)],
             locktime,
             threshold,
             memo
@@ -182,18 +186,18 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             undefined,
-            [P(adminAddress)],
-            [P(adminAddress)],
-            [P(adminAddress)],
+            [P(addrAdminString)],
+            [P(addrAdminString)],
+            [P(addrAdminString)],
             node6Id,
             {
-              address: P(adminAddress),
-              auth: [[0, P(adminAddress)]]
+              address: P(addrAdminString),
+              auth: [[0, P(addrAdminString)]]
             },
             startTime,
             endTime,
             stakeAmount.minValidatorStake,
-            [P(adminAddress)],
+            [P(addrAdminString)],
             locktime,
             threshold,
             memo
@@ -220,15 +224,15 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const consortiumMemberAuthCredentials: [number, Buffer][] = [
-            [0, pAddresses[1]] // "P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
+            [0, addrB] // "P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
           ]
           const unsignedTx: UnsignedTx = await pChain.buildRegisterNodeTx(
             undefined,
-            [P(addrB)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
-            [P(addrB)],
+            [P(addrBString)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
+            [P(addrBString)],
             undefined,
             node6Id,
-            P(addrB),
+            P(addrBString),
             consortiumMemberAuthCredentials,
             memo
           )
@@ -250,24 +254,24 @@ describe("Camino-PChain-Add-Validator", (): void => {
       3000
     ],
     [
-      "addValidator - return with node6 as a new consortium member",
+      "addValidator - with node6 as a new consortium member and rewards owner different than node owner",
       () =>
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             undefined,
-            [P(addrB)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
+            [P(addrBString)],
+            [P(addrBString)],
             node6Id,
             {
-              address: P(addrB),
-              auth: [[0, P(addrB)]]
+              address: P(addrBString),
+              auth: [[0, P(addrBString)]]
             },
-            startTime,
+            UnixNow().add(new BN(20)), // starttime should be very close to the current time so that this validator can claim rewards
             endTime,
             stakeAmount.minValidatorStake,
-            [P(addrB)],
+            [P(addrCString)],
             locktime,
             threshold,
             memo
@@ -297,7 +301,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
     ],
     [
       "createSubnet",
-      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1), // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
+      () => pChain.createSubnet(user2, passwd2, [P(addrBString)], 1), // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
       (x) => x,
       Matcher.Get,
       () => createdSubnetID
@@ -307,11 +311,11 @@ describe("Camino-PChain-Add-Validator", (): void => {
       () =>
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
-          const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[1]]] // P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
+          const subnetAuthCredentials: [number, Buffer][] = [[0, addrB]] // P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
           const unsignedTx: UnsignedTx = await pChain.buildAddSubnetValidatorTx(
             undefined,
-            [P(addrB)], // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
-            [P(addrB)],
+            [P(addrBString)], // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
+            [P(addrBString)],
             node6Id,
             startTime,
             endTime,
@@ -320,7 +324,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
             memo,
             new BN(0),
             {
-              addresses: [pAddresses[1]],
+              addresses: [addrB],
               threshold: 1,
               signer: subnetAuthCredentials
             }
@@ -356,11 +360,11 @@ describe("Camino-PChain-Deposit", (): void => {
           const inactiveOffer: DepositOffer = getLockedPresale3yDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             inactiveOffer.id,
             inactiveOffer.minDuration,
-            new OutputOwners([pAddresses[1]], new BN(10000), 1),
+            new OutputOwners([addrB], new BN(10000), 1),
             memo,
             new BN(0),
             inactiveOffer.minAmount
@@ -379,11 +383,11 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             activeOffer.id,
             activeOffer.minDuration - 1,
-            new OutputOwners([pAddresses[1]], new BN(10000), 1),
+            new OutputOwners([addrB], new BN(10000), 1),
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -403,11 +407,11 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             activeOffer.id,
             activeOffer.maxDuration + 1,
-            new OutputOwners([pAddresses[1]], new BN(10000), 1),
+            new OutputOwners([addrB], new BN(10000), 1),
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -422,7 +426,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Get balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -434,11 +438,11 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrC)],
-            [P(addrC)],
+            [P(addrCString)],
+            [P(addrCString)],
             activeOffer.id,
             activeOffer.maxDuration,
-            new OutputOwners([pAddresses[1]], new BN(10000), 1),
+            new OutputOwners([addrB], new BN(10000), 1),
             memo,
             new BN(0),
             sumAllValues(balanceOutputs.value["unlockedOutputs"]).add(new BN(1))
@@ -457,8 +461,8 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             activeOffer.id,
             activeOffer.maxDuration,
             rewardsOwner,
@@ -485,7 +489,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts haven been appropriately increased",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -500,7 +504,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Get balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -511,8 +515,8 @@ describe("Camino-PChain-Deposit", (): void => {
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             undefined,
             undefined,
             ZeroBN
@@ -536,7 +540,7 @@ describe("Camino-PChain-Deposit", (): void => {
     ],
     [
       "Verify deposited amounts haven NOT increased further",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -554,7 +558,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
   const tests_spec: any = [
     [
       "Get balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -566,8 +570,8 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
           const activeOffer: DepositOffer = getOneMinuteDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             activeOffer.id,
             activeOffer.minDuration,
             rewardsOwner,
@@ -594,7 +598,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts haven been appropriately increased",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -609,14 +613,14 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Refresh balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
     ],
     [
       "Wait 1 min for deposit to be unlocked & issue a random tx to trigger a block built",
-      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1),
+      () => pChain.createSubnet(user2, passwd2, [P(addrBString)], 1),
       (x) => {
         return x
       },
@@ -626,7 +630,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have decreased by the amount of the deposit",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs)
           .add(sumAllValues(x.bondedDepositedOutputs))
@@ -641,7 +645,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Refresh balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -652,8 +656,8 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             undefined,
             ZeroBN,
             1,
@@ -661,7 +665,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
               {
                 amount: oneMinRewardsAmount,
                 claimType: ClaimType.EXPIRED_DEPOSIT_REWARD,
-                owners: new OutputOwners([pAddresses[1]], ZeroBN, 1),
+                owners: new OutputOwners([addrB], ZeroBN, 1),
                 sigIdxs: [0]
               } as ClaimAmountParams
             ]
@@ -683,7 +687,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have increased by rewards amount (minus tx fee)",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => sumAllValues(x.unlockedOutputs),
       Matcher.toEqual,
       () =>
@@ -698,7 +702,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
   const tests_spec: any = [
     [
       "Get balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -710,8 +714,8 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
           const activeOffer: DepositOffer = getOneMinuteDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             activeOffer.id,
             activeOffer.minDuration,
             rewardsOwner,
@@ -738,7 +742,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have increased by the deposited amount",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -753,7 +757,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Refresh balance outputs",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => x,
       Matcher.Get,
       () => balanceOutputs
@@ -764,8 +768,8 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
             undefined,
-            [P(addrB)],
-            [P(addrB)],
+            [P(addrBString)],
+            [P(addrBString)],
             undefined,
             undefined,
             ZeroBN
@@ -788,7 +792,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts have decreased by 50%",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -805,7 +809,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify unlocked amounts haven been appropriately increased by 50% of the locked amount",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) => sumAllValues(x.unlockedOutputs),
       Matcher.toEqual,
       () =>
@@ -819,7 +823,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Wait unlock duration and & issue a random tx to trigger build block",
-      () => pChain.createSubnet(user2, passwd2, [P(addrB)], 1),
+      () => pChain.createSubnet(user2, passwd2, [P(addrBString)], 1),
       (x) => {
         return x
       },
@@ -829,7 +833,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
     ],
     [
       "Verify deposited/depositedBonded amounts haven been appropriately decreased by 100%",
-      () => pChain.getBalance([P(addrB)]),
+      () => pChain.getBalance([P(addrBString)]),
       (x) =>
         sumAllValues(x.depositedOutputs).add(
           sumAllValues(x.bondedDepositedOutputs)
@@ -871,7 +875,7 @@ describe("Camino-PChain-Multisig", (): void => {
 
           const unsignedTx: UnsignedTx = await pChain.buildRegisterNodeTx(
             utxoSet,
-            [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
+            [[P(multiSigAliasAddr)], [P(multiSigAliasMember1Addr)]],
             [P(multiSigAliasAddr)],
             undefined,
             node7Id,
@@ -888,7 +892,7 @@ describe("Camino-PChain-Multisig", (): void => {
           )
 
           const msKeyChain = createMsigKCAndAddSignatures(
-            [pAddresses[3], pAddresses[5]],
+            [addrNode7, addrSigner],
             msg,
             msigAliasBuffer,
             owner,
@@ -975,10 +979,14 @@ describe("Camino-PChain-Multisig", (): void => {
     [
       "importKey of multiSigUser",
       () =>
-        pChain.importKey(multiSigUser, multiSigPasswd, signerAddrPrivateKey),
+        pChain.importKey(
+          multiSigUser,
+          multiSigPasswd,
+          multiSigAliasMember1PrivateKey
+        ),
       (x) => x,
       Matcher.toBe,
-      () => "P" + multiSigOwnerAddr.substring(1)
+      () => P(multiSigAliasMember1Addr)
     ],
     [
       "createSubnet",
@@ -986,7 +994,7 @@ describe("Camino-PChain-Multisig", (): void => {
         pChain.createSubnet(
           multiSigUser,
           multiSigPasswd,
-          [P(multiSigOwnerAddr)],
+          [P(multiSigAliasMember1Addr)],
           1
         ),
       (x) => x,
@@ -1003,7 +1011,7 @@ describe("Camino-PChain-Multisig", (): void => {
             P(multiSigAliasAddr)
           ])
           const utxoSet: UTXOSet = platformVMUTXOResponse.utxos
-          const subnetAuthCredentials: [number, Buffer][] = [[0, pAddresses[5]]]
+          const subnetAuthCredentials: [number, Buffer][] = [[0, addrSigner]]
           const stakeAmount: any = await pChain.getMinStake()
 
           const unsignedTx: UnsignedTx = await pChain.buildAddSubnetValidatorTx(
@@ -1018,7 +1026,7 @@ describe("Camino-PChain-Multisig", (): void => {
             undefined,
             ZeroBN,
             {
-              addresses: [pAddresses[5]],
+              addresses: [addrSigner],
               threshold: 1,
               signer: subnetAuthCredentials
             },
@@ -1066,7 +1074,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
         (async function () {
           // check every 5 seconds if rewards have been exported to P chain
           let claimables = await pChain.getClaimables([
-            { addresses: [P(adminAddress)], locktime: "0", threshold: 1 }
+            { addresses: [P(addrAdminString)], locktime: "0", threshold: 1 }
           ])
           while (
             claimables.claimables.length == 0 ||
@@ -1074,10 +1082,10 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
           ) {
             await new Promise((resolve) => setTimeout(resolve, 5000))
             claimables = await pChain.getClaimables([
-              { addresses: [P(adminAddress)], locktime: "0", threshold: 1 }
+              { addresses: [P(addrAdminString)], locktime: "0", threshold: 1 }
             ])
           }
-          return pChain.getBalance([P(adminAddress)])
+          return pChain.getBalance([P(addrAdminString)])
         })(),
       (x) => x,
       Matcher.Get,
@@ -1089,8 +1097,8 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
             undefined,
-            [P(adminAddress)],
-            [P(adminAddress)],
+            [P(addrAdminString)],
+            [P(addrAdminString)],
             undefined,
             ZeroBN,
             1,
@@ -1098,7 +1106,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
               {
                 amount: new BN(1),
                 claimType: ClaimType.VALIDATOR_REWARD,
-                owners: new OutputOwners([pAddresses[0]], ZeroBN, 1),
+                owners: new OutputOwners([addrAdmin], ZeroBN, 1),
                 sigIdxs: [0]
               } as ClaimAmountParams
             ]
@@ -1120,13 +1128,111 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
     ],
     [
       "Verify unlocked amounts have increased by rewards amount (minus tx fee)",
-      () => pChain.getBalance([P(adminAddress)]),
+      () => pChain.getBalance([P(addrAdminString)]),
       (x) => sumAllValues(x.unlockedOutputs),
       Matcher.toEqual,
       () =>
         sumAllValues(balanceOutputs.value["unlockedOutputs"])
           .add(new BN(1)) // claimed reward
           .sub(avalanche.PChain().getTxFee())
+    ],
+    [
+      "Refresh balance outputs",
+      () => pChain.getBalance([P(addrAdminString)]),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Claim validator rewards from a different address",
+      () =>
+        (async function () {
+          const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
+            undefined,
+            [P(addrBString)],
+            [P(addrBString)],
+            undefined,
+            ZeroBN,
+            1,
+            [
+              {
+                amount: new BN(1),
+                claimType: ClaimType.VALIDATOR_REWARD,
+                owners: new OutputOwners([addrAdmin], ZeroBN, 1),
+                sigIdxs: [0]
+              } as ClaimAmountParams
+            ]
+          )
+          const claimTx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(claimTx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify claim tx has been committed",
+      () => pChain.getTxStatus(tx.value),
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify unlocked amounts have increased by rewards amount",
+      () => pChain.getBalance([P(addrAdminString)]),
+      (x) => sumAllValues(x.unlockedOutputs),
+      Matcher.toEqual,
+      () => sumAllValues(balanceOutputs.value["unlockedOutputs"]).add(new BN(1)) // claimed reward
+    ],
+    [
+      "Get balance outputs for addrC",
+      () => pChain.getBalance([P(addrCString)]),
+      (x) => x,
+      Matcher.Get,
+      () => balanceOutputs
+    ],
+    [
+      "Claim validator rewards for a rewards owner different than node owner",
+      () =>
+        (async function () {
+          const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
+            undefined,
+            [P(addrBString)],
+            [P(addrBString)],
+            undefined,
+            ZeroBN,
+            1,
+            [
+              {
+                amount: new BN(1),
+                claimType: ClaimType.VALIDATOR_REWARD,
+                owners: new OutputOwners([addrC], ZeroBN, 1), // addrC being the rewards owner
+                sigIdxs: [0]
+              } as ClaimAmountParams
+            ]
+          )
+          const claimTx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(claimTx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify claim tx has been committed",
+      () => pChain.getTxStatus(tx.value),
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Verify unlocked amounts have increased by rewards amount",
+      () => pChain.getBalance([P(addrCString)]),
+      (x) => sumAllValues(x.unlockedOutputs),
+      Matcher.toEqual,
+      () => sumAllValues(balanceOutputs.value["unlockedOutputs"]).add(new BN(1)) // claimed reward
     ]
   ]
 
