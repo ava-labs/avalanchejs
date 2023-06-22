@@ -2857,11 +2857,16 @@ describe("PlatformVMAPI", (): void => {
     )
     const result = api.buildDepositTx(
       undefined,
+      undefined,
       [defaultAddr],
       [defaultAddr],
       depositOfferID,
       depositDuration,
       rewardsOwner,
+      undefined, // empty depositCreatorAddress
+      [], // empty depositCreatorAuth
+      undefined, // empty depositOfferOwnerSigs
+      [], // empty depositOfferOwnerAuth
       Buffer.from("memo"),
       ZeroBN,
       new BN(1),
@@ -2870,12 +2875,13 @@ describe("PlatformVMAPI", (): void => {
 
     const txu1 = await result
     const expectedDepositTx = new DepositTx(
+      undefined,
       networkID,
       Buffer.alloc(32, 0),
       spendResponse.out,
       spendResponse.ins,
       Buffer.from("memo"),
-      depositOfferID,
+      bintools.cb58Decode(depositOfferID),
       depositDuration,
       new ParseableOutput(rewardOutputOwners)
     )

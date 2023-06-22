@@ -7,7 +7,11 @@ import BN from "bn.js"
 
 import { Buffer } from "buffer/"
 import { OutputOwners, SigIdx, ZeroBN } from "../../common"
-import { DefaultNetworkID, UnixNow } from "../../utils"
+import {
+  DefaultNetworkID,
+  DefaultTransactionVersionNumber,
+  UnixNow
+} from "../../utils"
 import {
   AddressError,
   FeeAssetError,
@@ -51,6 +55,10 @@ import {
 } from "."
 import { GenesisData } from "../avm"
 import createHash from "create-hash"
+import {
+  AddDepositOfferTx,
+  Offer
+} from "../../apis/platformvm/adddepositoffertx"
 
 export type LockMode = "Unlocked" | "Bond" | "Deposit" | "Stake"
 
@@ -1109,6 +1117,7 @@ export class Builder {
   /**
    * Build an unsigned [[AddressStateTx]].
    *
+   * @param version Optional. Transaction version number, default 0.
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
    * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
@@ -1125,6 +1134,7 @@ export class Builder {
    * @returns An unsigned AddressStateTx created from the passed in parameters.
    */
   buildAddressStateTx = async (
+    version: number = DefaultTransactionVersionNumber,
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
     fromSigner: FromSigner,
@@ -1169,6 +1179,7 @@ export class Builder {
     }
 
     const baseTx: AddressStateTx = new AddressStateTx(
+      version,
       networkID,
       blockchainID,
       outs,
@@ -1277,6 +1288,7 @@ export class Builder {
   /**
    * Build an unsigned [[DepositTx]].
    *
+   * @param version Optional. Transaction version number, default 0.
    * @param networkID Networkid, [[DefaultNetworkID]]
    * @param blockchainID Blockchainid, default undefined
    * @param fromSigner The addresses being used to send and verify the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
@@ -1284,6 +1296,10 @@ export class Builder {
    * @param depositOfferID ID of the deposit offer.
    * @param depositDuration Duration of the deposit
    * @param rewardsOwner Optional The owners of the reward. If omitted, all inputs must have the same owner
+   * @param depositCreatorAddress Address that is authorized to create deposit with given offer. Could be empty, if offer owner is empty.
+   * @param depositCreatorAuth Auth for deposit creator address
+   * @param depositOfferOwnerSigs Signatures which recover to depositOfferOwner address(es)
+   * @param depositOfferOwnerAuth Auth for deposit offer owner
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
    * @param feeAssetID Optional. The assetID of the fees being burned
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
@@ -1293,13 +1309,18 @@ export class Builder {
    * @returns An unsigned DepositTx created from the passed in parameters.
    */
   buildDepositTx = async (
+    version: number = DefaultTransactionVersionNumber,
     networkID: number = DefaultNetworkID,
     blockchainID: Buffer,
     fromSigner: FromSigner,
     changeAddresses: Buffer[],
-    depositOfferID: string | Buffer,
-    depositDuration: number | Buffer,
+    depositOfferID: Buffer,
+    depositDuration: number,
     rewardsOwner: OutputOwners,
+    depositCreatorAddress: Buffer = undefined,
+    depositCreatorAuth: [number, Buffer][] = [],
+    depositOfferOwnerSigs: Buffer[] = [],
+    depositOfferOwnerAuth: [number, Buffer][] = [],
     fee: BN = zero,
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
@@ -1345,6 +1366,7 @@ export class Builder {
     )
 
     const baseTx: DepositTx = new DepositTx(
+      version,
       networkID,
       blockchainID,
       outs,
@@ -1352,8 +1374,29 @@ export class Builder {
       memo,
       depositOfferID,
       depositDuration,
-      new ParseableOutput(secpOwners)
+      new ParseableOutput(secpOwners),
+      depositCreatorAddress
     )
+
+    if (version > 0) {
+      baseTx.addDepositCreatorAuth(depositCreatorAuth)
+      baseTx.addOwnerAuth(depositOfferOwnerAuth, depositOfferOwnerSigs)
+
+      owners.push(new OutputOwners([depositCreatorAddress], ZeroBN, 1))
+
+      // Create pseudo addresses for Multisig, they have to passed
+      // to MultisigKeychain on keychain initialization
+      const numAddresses =
+        depositOfferOwnerAuth.length > 0
+          ? depositOfferOwnerAuth.at(depositOfferOwnerAuth.length - 1)[0]
+          : 0
+      const addrs: Buffer[] = []
+      for (let i = 0; i < numAddresses; ++i) {
+        addrs.push(Buffer.alloc(20))
+        addrs.at(addrs.length - 1).writeUIntBE(i + 1, 16, 4)
+      }
+      owners.push(new OutputOwners(addrs, ZeroBN, depositOfferOwnerAuth.length))
+    }
 
     baseTx.setOutputOwners(owners)
     return new UnsignedTx(baseTx)
@@ -1649,5 +1692,86 @@ export class Builder {
       fee.gt(new BN(0)) &&
       feeAssetID instanceof Buffer
     )
+  }
+
+  /**
+   * Build an unsigned [[AddDepositOfferTx]].
+   *
+   * @param networkID
+   * @param blockchainID
+   * @param fromSigner
+   * @param changeAddresses
+   * @param depositOffer
+   * @param depositOfferCreatorAddress
+   * @param depositOfferCreatorAuth
+   * @param fee
+   * @param feeAssetID
+   * @param memo
+   * @param asOf
+   * @param changeThreshold
+   */
+  buildAddDepositOfferTx = async (
+    networkID: number = DefaultNetworkID,
+    blockchainID: Buffer,
+    fromSigner: FromSigner,
+    changeAddresses: Buffer[],
+    offer: Offer,
+    depositOfferCreatorAddress: Buffer,
+    depositOfferCreatorAuth: [number, Buffer][] = [],
+    fee: BN = zero,
+    feeAssetID: Buffer = undefined,
+    memo: Buffer = undefined,
+    asOf: BN = zero,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    let ins: TransferableInput[] = []
+    let outs: TransferableOutput[] = []
+    let owners: OutputOwners[] = []
+
+    if (this._feeCheck(fee, feeAssetID)) {
+      const aad: AssetAmountDestination = new AssetAmountDestination(
+        [],
+        0,
+        fromSigner.from,
+        fromSigner.signer,
+        changeAddresses,
+        changeThreshold
+      )
+
+      aad.addAssetAmount(feeAssetID, zero, fee)
+
+      const minSpendableErr: Error = await this.spender.getMinimumSpendable(
+        aad,
+        asOf,
+        zero,
+        "Unlocked"
+      )
+      if (typeof minSpendableErr === "undefined") {
+        ins = aad.getInputs()
+        outs = aad.getAllOutputs()
+        owners = aad.getOutputOwners()
+      } else {
+        throw minSpendableErr
+      }
+    }
+
+    const baseTx: AddDepositOfferTx = new AddDepositOfferTx(
+      networkID,
+      blockchainID,
+      outs,
+      ins,
+      memo,
+      offer,
+      depositOfferCreatorAddress
+    )
+
+    depositOfferCreatorAuth.forEach((signer): void => {
+      baseTx.addSignatureIdx(signer[0], signer[1])
+    })
+
+    owners.push(new OutputOwners([depositOfferCreatorAddress], ZeroBN, 1))
+
+    baseTx.setOutputOwners(owners)
+    return new UnsignedTx(baseTx)
   }
 }

@@ -9,7 +9,9 @@ import {
   PlatformVMConstants,
   Owner,
   PlatformVMAPI,
-  ClaimAmountParams
+  ClaimAmountParams,
+  OfferFlag,
+  AddressState
 } from "../../src/apis/platformvm"
 import { UnixNow } from "../../src/utils"
 import { BinTools } from "../../src/index"
@@ -18,6 +20,7 @@ import {
   MultisigKeyChain,
   MultisigKeyPair,
   OutputOwners,
+  SignerKeyPair,
   ZeroBN
 } from "../../src/common"
 import { PChainAlias } from "../../src/utils"
@@ -111,7 +114,6 @@ beforeAll(async () => {
   pKeychain.importKey(addrCPrivateKey)
   pKeychain.importKey(node6PrivateKey)
   pKeychain.importKey(node7PrivateKey)
-  // pKeychain.importKey(multiSigAddrPrivateKey)
   pKeychain.importKey(multiSigAliasMember1PrivateKey)
   pAddresses = pKeychain.getAddresses()
   pAddressStrings = pKeychain.getAddressStrings()
@@ -360,11 +362,16 @@ describe("Camino-PChain-Deposit", (): void => {
           const inactiveOffer: DepositOffer = getLockedPresale3yDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrBString)],
             [P(addrBString)],
             inactiveOffer.id,
             inactiveOffer.minDuration,
             new OutputOwners([addrB], new BN(10000), 1),
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             inactiveOffer.minAmount
@@ -374,7 +381,7 @@ describe("Camino-PChain-Deposit", (): void => {
         })(),
       (x) => x,
       Matcher.toThrow,
-      () => "couldn't issue tx: deposit offer inactive"
+      () => "couldn't issue tx: deposit offer is inactive"
     ],
     [
       "Issue depositTx with duration < minDuration",
@@ -383,11 +390,16 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
             activeOffer.minDuration - 1,
             new OutputOwners([addrB], new BN(10000), 1),
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -407,11 +419,16 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
             activeOffer.maxDuration + 1,
             new OutputOwners([addrB], new BN(10000), 1),
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -438,11 +455,16 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrCString)],
             [P(addrCString)],
             activeOffer.id,
             activeOffer.maxDuration,
             new OutputOwners([addrB], new BN(10000), 1),
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             sumAllValues(balanceOutputs.value["unlockedOutputs"]).add(new BN(1))
@@ -461,11 +483,16 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
             activeOffer.maxDuration,
             rewardsOwner,
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -570,11 +597,16 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
           const activeOffer: DepositOffer = getOneMinuteDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
             activeOffer.minDuration,
             rewardsOwner,
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -714,11 +746,16 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
           const activeOffer: DepositOffer = getOneMinuteDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
+            undefined,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
             activeOffer.minDuration,
             rewardsOwner,
+            undefined, // empty depositCreatorAddress
+            [], // empty depositCreatorAuth
+            undefined, // empty depositOfferOwnerSigs
+            [], // empty depositOfferOwnerAuth
             memo,
             new BN(0),
             activeOffer.minAmount
@@ -851,6 +888,342 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
   createTests(tests_spec)
 })
 
+describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
+  const tests_spec: any = [
+    [
+      "Issue AddDepositOfferTx from unauthorized creator address",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+          const depositOfferCreatorAuth: [number, string | Buffer][] = [
+            [0, addrB]
+          ]
+          const depositOwner = P(addrCString)
+          const offer: DepositOffer = {
+            upgradeVersion: 1,
+            id: undefined,
+            interestRateNominator: new BN(1000000000),
+            start: startTime,
+            end: endTime,
+            minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
+            totalMaxAmount: undefined,
+            depositedAmount: undefined,
+            minDuration: 60,
+            maxDuration: 360,
+            unlockPeriodDuration: 20,
+            noRewardsPeriodDuration: 10,
+            memo: "post-genesis-deposit-offer",
+            flags: new BN(OfferFlag.NONE),
+            totalMaxRewardAmount: new BN(1000000),
+            rewardedAmount: new BN(0),
+            ownerAddress: depositOwner
+          }
+          const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
+            undefined,
+            [depositOfferCreator],
+            [depositOfferCreator],
+            offer,
+            depositOfferCreator,
+            depositOfferCreatorAuth,
+            Buffer.from("new-deposit-offer")
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.toThrow,
+      () => "couldn't issue tx: address isn't allowed to create deposit offers"
+    ],
+    [
+      "Grant Offers admin role to depositOfferCreator",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+
+          const unsignedTx: UnsignedTx = await pChain.buildAddressStateTx(
+            0,
+            undefined,
+            [P(addrAdminString)],
+            [P(addrAdminString)],
+            depositOfferCreator,
+            AddressState.ROLE_OFFERS_ADMIN
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify tx has been committed",
+      () => {
+        return pChain.getTxStatus(tx.value)
+      },
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Grant offers creator role to depositOfferCreator",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+
+          const unsignedTx: UnsignedTx = await pChain.buildAddressStateTx(
+            0,
+            undefined,
+            [depositOfferCreator],
+            [depositOfferCreator],
+            depositOfferCreator,
+            AddressState.OFFERS_CREATOR
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Verify tx has been committed",
+      () => {
+        return pChain.getTxStatus(tx.value)
+      },
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Issue AddDepositOfferTx with minAmount > amount necessary to claiming max rewards",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+          const depositOfferCreatorAuth: [number, string | Buffer][] = [
+            [0, addrB]
+          ]
+          const depositOwner = P(addrCString)
+          const offer: DepositOffer = {
+            upgradeVersion: 1,
+            id: undefined,
+            interestRateNominator: new BN(1000000000),
+            start: UnixNow().add(new BN(10)), // start in 10 seconds so that I can deposit in the next test
+            end: endTime,
+            minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
+            totalMaxAmount: undefined,
+            depositedAmount: undefined,
+            minDuration: 60,
+            maxDuration: 360,
+            unlockPeriodDuration: 20,
+            noRewardsPeriodDuration: 10,
+            memo: "post-genesis-deposit-offer",
+            flags: new BN(OfferFlag.NONE),
+            totalMaxRewardAmount: new BN(1000),
+            rewardedAmount: new BN(0),
+            ownerAddress: depositOwner
+          }
+          const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
+            undefined,
+            [depositOfferCreator],
+            [depositOfferCreator],
+            offer,
+            depositOfferCreator,
+            depositOfferCreatorAuth,
+            Buffer.from("new-deposit-offer")
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.toThrow,
+      () => "couldn't issue tx: bad deposit offer: offer minAmount is too big"
+    ],
+    [
+      "Issue AddDepositOfferTx from authorized creator address with offer owner",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+          const depositOfferCreatorAuth: [number, string | Buffer][] = [
+            [0, addrB]
+          ]
+          const depositOwner = P(addrCString)
+          const offer: DepositOffer = {
+            upgradeVersion: 1,
+            id: undefined,
+            interestRateNominator: new BN(1000000000),
+            start: UnixNow().add(new BN(10)), // start in 10 seconds so that I can deposit in the next test
+            end: endTime,
+            minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
+            totalMaxAmount: undefined,
+            depositedAmount: undefined,
+            minDuration: 60,
+            maxDuration: 360,
+            unlockPeriodDuration: 20,
+            noRewardsPeriodDuration: 10,
+            memo: "post-genesis-deposit-offer",
+            flags: new BN(OfferFlag.NONE),
+            totalMaxRewardAmount: new BN(1000000),
+            rewardedAmount: new BN(0),
+            ownerAddress: depositOwner
+          }
+          const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
+            undefined,
+            [depositOfferCreator],
+            [depositOfferCreator],
+            offer,
+            depositOfferCreator,
+            depositOfferCreatorAuth,
+            Buffer.from("new-deposit-offer")
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Deposit funds to the newly created deposit offer",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+          const depositOfferCreatorAuth: [number, string | Buffer][] = [
+            [0, addrB]
+          ]
+          const depositOwner = P(addrCString)
+          const depositOfferOwnerAuth: [number, string | Buffer][] = [
+            [0, depositOwner]
+          ]
+          const offer: DepositOffer = await getDepositOffer(tx.value, true)
+
+          // hash concatenated bytes of offer id and deposit owner address
+          const msgHashed: Buffer = Buffer.from(
+            createHash("sha256")
+              .update(
+                Buffer.concat([
+                  bintools.cb58Decode(offer.id),
+                  pChain.parseAddress(depositOfferCreator)
+                ])
+              )
+              .digest()
+          )
+          const keypair: SignerKeyPair = pKeychain.getKey(
+            pChain.parseAddress(depositOwner)
+          )
+          // sign the hash
+          const signatureBuffer: Buffer = keypair.sign(msgHashed)
+
+          const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
+            1,
+            undefined,
+            [P(addrBString)],
+            [P(addrBString)],
+            offer.id,
+            offer.maxDuration,
+            rewardsOwner,
+            depositOfferCreator,
+            depositOfferCreatorAuth,
+            [signatureBuffer],
+            depositOfferOwnerAuth,
+            memo,
+            new BN(0),
+            offer.minAmount
+          )
+          const depositTx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(depositTx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx,
+      13000 // deposit offer starttime + 3 seconds
+    ],
+    [
+      "Verify tx has been committed",
+      () => {
+        return pChain.getTxStatus(tx.value)
+      },
+      (x) => x.status,
+      Matcher.toBe,
+      () => "Committed",
+      3000
+    ],
+    [
+      "Issue AddDepositOfferTx from authorized creator address without offer owner",
+      () =>
+        (async function () {
+          const depositOfferCreator = P(addrBString)
+          const depositOfferCreatorAuth: [number, string | Buffer][] = [
+            [0, addrB]
+          ]
+          const offer: DepositOffer = {
+            upgradeVersion: 1,
+            id: undefined,
+            interestRateNominator: new BN(1000000000),
+            start: UnixNow().add(new BN(10)), // start in 10 seconds so that I can deposit in the next test
+            end: endTime,
+            minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
+            totalMaxAmount: undefined,
+            depositedAmount: undefined,
+            minDuration: 60,
+            maxDuration: 360,
+            unlockPeriodDuration: 20,
+            noRewardsPeriodDuration: 10,
+            memo: "post-genesis-deposit-offer-without-owner",
+            flags: new BN(OfferFlag.NONE),
+            totalMaxRewardAmount: new BN(1000000),
+            rewardedAmount: new BN(0),
+            ownerAddress: undefined
+          }
+          const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
+            undefined,
+            [depositOfferCreator],
+            [depositOfferCreator],
+            offer,
+            depositOfferCreator,
+            depositOfferCreatorAuth,
+            Buffer.from("new-deposit-offer-2")
+          )
+          const tx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(tx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx
+    ],
+    [
+      "Deposit funds to the newly created 'ownerless' deposit offer",
+      () =>
+        (async function () {
+          const offer: DepositOffer = await getDepositOffer(tx.value, true)
+          const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
+            0,
+            undefined,
+            [P(addrBString)],
+            [P(addrBString)],
+            offer.id,
+            offer.maxDuration,
+            rewardsOwner,
+            undefined,
+            [],
+            [],
+            undefined,
+            memo,
+            new BN(0),
+            offer.minAmount
+          )
+          const depositTx: Tx = unsignedTx.sign(pKeychain)
+          return pChain.issueTx(depositTx)
+        })(),
+      (x) => x,
+      Matcher.Get,
+      () => tx,
+      13000 // deposit offer starttime + 3 seconds
+    ]
+  ]
+  createTests(tests_spec)
+})
 describe("Camino-PChain-Multisig", (): void => {
   const tests_spec: any = [
     [
@@ -1253,6 +1626,16 @@ function getLockedPresale3yDepositOffer(): DepositOffer {
       "lockedpresale3y"
     )
   })
+}
+
+async function getDepositOffer(
+  id: string,
+  refresh: boolean = false
+): Promise<DepositOffer> {
+  if (refresh) {
+    depositOffers = await pChain.getAllDepositOffers()
+  }
+  return depositOffers.filter((o) => o.id == id)[0]
 }
 function getTest1DepositOffer(): DepositOffer {
   return depositOffers.find((offer) => {

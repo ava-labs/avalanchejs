@@ -3,7 +3,8 @@ import {
   PlatformVMAPI,
   KeyChain,
   UnsignedTx,
-  Tx
+  Tx,
+  AddressState
 } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
@@ -29,7 +30,7 @@ const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
   pchain = avalanche.PChain()
   pKeychain = pchain.keyChain()
-  // P-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u9xde7p
+  // X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3
   pKeychain.importKey(privKey)
 
   pAddressStrings = pchain.keyChain().getAddressStrings()
@@ -39,7 +40,7 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const address = pAddressStrings[0]
-  const state = 1 // AddressStateRoleKyc
+  const state = AddressState.ROLE_KYC
   const remove = false
   const memo: Buffer = Buffer.from(
     "Utility function to create an AddressStateTx transaction"

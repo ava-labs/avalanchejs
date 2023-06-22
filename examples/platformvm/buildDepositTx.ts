@@ -59,6 +59,10 @@ const main = async (): Promise<any> => {
     depositOfferID,
     depositDuration,
     owners,
+    Buffer.alloc(20),
+    [],
+    [],
+    [],
     memo,
     new BN(0),
     amountToLock

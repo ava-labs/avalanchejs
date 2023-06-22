@@ -259,6 +259,7 @@ export interface GetAllDepositOffersResponse {
 }
 
 export interface DepositOffer {
+  upgradeVersion: number
   id: string
   interestRateNominator: BN
   start: BN
@@ -272,6 +273,9 @@ export interface DepositOffer {
   noRewardsPeriodDuration: number
   memo: string
   flags: BN
+  totalMaxRewardAmount: BN
+  rewardedAmount: BN
+  ownerAddress?: string
 }
 
 export interface GetDepositsParams {

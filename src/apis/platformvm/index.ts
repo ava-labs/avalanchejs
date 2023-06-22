@@ -1,5 +1,6 @@
 export * from "./api"
 export * from "./addressstatetx"
+export * from "./adddepositoffertx"
 export * from "./addsubnetvalidatortx"
 export * from "./basetx"
 export * from "./claimtx"

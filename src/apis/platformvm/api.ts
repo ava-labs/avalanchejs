@@ -19,7 +19,7 @@ import {
 } from "../../utils/errors"
 import BinTools from "../../utils/bintools"
 import { KeyChain } from "./keychain"
-import { ONEAVAX } from "../../utils/constants"
+import { DefaultTransactionVersionNumber, ONEAVAX } from "../../utils/constants"
 import { PlatformVMConstants } from "./constants"
 import { UnsignedTx, Tx } from "./tx"
 import { PayloadBase } from "../../utils/payload"
@@ -86,11 +86,11 @@ import {
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
 import { Serialization, SerializedType } from "../../utils"
-import { SubnetAuth } from "."
 import { GenesisData } from "../avm"
 import { Auth, LockMode, Builder, FromSigner, NodeOwner } from "./builder"
 import { Network } from "../../utils/networks"
 import { Spender } from "./spender"
+import { Offer } from "./adddepositoffertx"
 
 /**
  * @ignore
@@ -606,6 +606,7 @@ export class PlatformVMAPI extends JRPCAPI {
     if (!offers.depositOffers) return []
     return offers.depositOffers.map((offer) => {
       return {
+        upgradeVersion: offer.upgradeVersion,
         id: offer.id,
         interestRateNominator: new BN(offer.interestRateNominator),
         start: new BN(offer.start),
@@ -618,7 +619,10 @@ export class PlatformVMAPI extends JRPCAPI {
         unlockPeriodDuration: offer.unlockPeriodDuration,
         noRewardsPeriodDuration: offer.noRewardsPeriodDuration,
         memo: offer.memo,
-        flags: new BN(offer.flags)
+        flags: new BN(offer.flags),
+        totalMaxRewardAmount: new BN(offer.totalMaxRewardAmount),
+        rewardedAmount: new BN(offer.rewardedAmount),
+        ownerAddress: offer.ownerAddress
       } as DepositOffer
     })
   }
@@ -2339,6 +2343,7 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Build an unsigned [[AddressStateTx]].
    *
+   * @param version Optional. Transaction version number, default 0.
    * @param utxoset A set of UTXOs that the transaction is built on
    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
@@ -2352,6 +2357,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns An unsigned AddressStateTx created from the passed in parameters.
    */
   buildAddressStateTx = async (
+    version: number = DefaultTransactionVersionNumber,
     utxoset: UTXOSet,
     fromAddresses: FromType,
     changeAddresses: string[],
@@ -2384,6 +2390,7 @@ export class PlatformVMAPI extends JRPCAPI {
     const builtUnsignedTx: UnsignedTx = await this._getBuilder(
       utxoset
     ).buildAddressStateTx(
+      version,
       networkID,
       blockchainID,
       fromSigner,
@@ -2498,12 +2505,17 @@ export class PlatformVMAPI extends JRPCAPI {
   /**
    * Build an unsigned [[DepositTx]].
    *
+   * @param version Optional. Transaction version number, default 0.
    * @param utxoset A set of UTXOs that the transaction is built on
    * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
    * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
    * @param depositOfferID ID of the deposit offer.
    * @param depositDuration Duration of the deposit
    * @param rewardsOwner Optional The owners of the reward. If omitted, all inputs must have the same owner
+   * @param depositCreatorAddress Address that is authorized to create deposit with given offer. Could be empty, if offer owner is empty.
+   * @param depositCreatorAuth Auth for deposit creator address
+   * @param depositOfferOwnerSigs Signatures which recover to depositOfferOwner address(es)
+   * @param depositOfferOwnerAuth Auth for deposit offer owner
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
@@ -2511,18 +2523,23 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns An unsigned transaction created from the passed in parameters.
    */
   buildDepositTx = async (
+    version: number = DefaultTransactionVersionNumber,
     utxoset: UTXOSet,
     fromAddresses: FromType,
     changeAddresses: string[] = undefined,
     depositOfferID: string | Buffer,
-    depositDuration: number | Buffer,
+    depositDuration: number,
     rewardsOwner: OutputOwners = undefined,
+    depositCreatorAddress: string | Buffer = undefined,
+    depositCreatorAuth: [number, string | Buffer][] = [],
+    depositOfferOwnerSigs: Buffer[] = [],
+    depositOfferOwnerAuth: [number, string | Buffer][] = [],
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
     amountToLock: BN,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
-    const caller = "buildRegisterNodeTx"
+    const caller = "buildDepositTx"
 
     const fromSigner = this._parseFromSigner(fromAddresses, caller)
 
@@ -2540,9 +2557,36 @@ export class PlatformVMAPI extends JRPCAPI {
     const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
     const fee: BN = this.getTxFee()
 
+    if (typeof depositOfferID === "string")
+      depositOfferID = bintools.cb58Decode(depositOfferID)
+
+    const dc_auth: [number, Buffer][] = []
+    depositCreatorAuth.forEach((c) => {
+      dc_auth.push([
+        c[0],
+        typeof c[1] === "string" ? this.parseAddress(c[1]) : c[1]
+      ])
+    })
+
+    if (depositOfferOwnerAuth.length !== depositOfferOwnerSigs.length) {
+      throw new Error("OwnerAuth length must mathch OwnerSigs length")
+    }
+
+    const o_auth: [number, Buffer][] = []
+    depositOfferOwnerAuth.forEach((c) => {
+      o_auth.push([
+        c[0],
+        typeof c[1] === "string" ? this.parseAddress(c[1]) : c[1]
+      ])
+    })
+
+    if (typeof depositCreatorAddress === "string")
+      depositCreatorAddress = this.parseAddress(depositCreatorAddress)
+
     const builtUnsignedTx: UnsignedTx = await this._getBuilder(
       utxoset
     ).buildDepositTx(
+      version,
       networkID,
       blockchainID,
       fromSigner,
@@ -2550,6 +2594,10 @@ export class PlatformVMAPI extends JRPCAPI {
       depositOfferID,
       depositDuration,
       rewardsOwner,
+      depositCreatorAddress,
+      dc_auth,
+      depositOfferOwnerSigs,
+      o_auth,
       fee,
       avaxAssetID,
       memo,
@@ -2737,6 +2785,92 @@ export class PlatformVMAPI extends JRPCAPI {
       fromSigner,
       change,
       multisigAliasParams,
+      fee,
+      avaxAssetID,
+      memo,
+      asOf,
+      changeThreshold
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  buildAddDepositOfferTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: FromType,
+    changeAddresses: string[],
+    depositOffer: DepositOffer,
+    depositOfferCreatorAddress: string,
+    depositOfferCreatorAuth: [number, string | Buffer][] = [],
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = ZeroBN,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    const caller = "buildAddDepositOfferTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
+      changeAddresses,
+      caller
+    )
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getTxFee()
+
+    const auth: [number, Buffer][] = []
+    depositOfferCreatorAuth.forEach((c) => {
+      auth.push([
+        c[0],
+        typeof c[1] === "string" ? this.parseAddress(c[1]) : c[1]
+      ])
+    })
+
+    let ownerAddress: Buffer
+    if (depositOffer.ownerAddress) {
+      ownerAddress = this.parseAddress(depositOffer.ownerAddress)
+    }
+
+    const offer: Offer = new Offer(
+      depositOffer.upgradeVersion,
+      depositOffer.interestRateNominator,
+      depositOffer.start,
+      depositOffer.end,
+      depositOffer.minAmount,
+      depositOffer.totalMaxAmount,
+      depositOffer.depositedAmount,
+      depositOffer.minDuration,
+      depositOffer.maxDuration,
+      depositOffer.unlockPeriodDuration,
+      depositOffer.noRewardsPeriodDuration,
+      Buffer.from(depositOffer.memo, "utf-8"),
+      depositOffer.flags,
+      depositOffer.totalMaxRewardAmount,
+      depositOffer.rewardedAmount,
+      ownerAddress
+    )
+
+    const builtUnsignedTx: UnsignedTx = await this._getBuilder(
+      utxoset
+    ).buildAddDepositOfferTx(
+      networkID,
+      blockchainID,
+      fromSigner,
+      change,
+      offer,
+      this.parseAddress(depositOfferCreatorAddress),
+      auth,
       fee,
       avaxAssetID,
       memo,

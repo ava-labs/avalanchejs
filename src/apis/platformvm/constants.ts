@@ -61,6 +61,7 @@ export class PlatformVMConstants {
   static REWARDSIMPORTTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 11
   static SECPMULTISIGCREDENTIAL: number =
     PlatformVMConstants.CUSTOM_TYPE_ID + 12
+  static ADDDEPOSITOFFERTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 15
 
   // Length Constants
   static ASSETIDLEN: number = 32

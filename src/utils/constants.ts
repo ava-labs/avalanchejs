@@ -6,6 +6,7 @@
 import BN from "bn.js"
 
 export const DefaultNetworkID = 1
+export const DefaultTransactionVersionNumber: number = 0
 
 export const PrivateKeyPrefix: string = "PrivateKey-"
 export const NodeIDPrefix: string = "NodeID-"
