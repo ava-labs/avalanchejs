@@ -30,7 +30,7 @@ const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
   pchain = avalanche.PChain()
   pKeychain = pchain.keyChain()
-  // X-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3
+  // P-kopernikus1g65uqn6t77p656w64023nh8nd9updzmxh8ttv3
   pKeychain.importKey(privKey)
 
   pAddressStrings = pchain.keyChain().getAddressStrings()
@@ -47,6 +47,7 @@ const main = async (): Promise<any> => {
   )
 
   const unsignedTx: UnsignedTx = await pchain.buildAddressStateTx(
+    0,
     undefined,
     pAddressStrings,
     pAddressStrings,

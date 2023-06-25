@@ -1,10 +1,10 @@
 import { getAvalanche, createTests, Matcher } from "../e2etestlib"
-import { KeystoreAPI } from "src/apis/keystore/api"
+import { KeystoreAPI } from "../../src/apis/keystore/api"
 import BN from "bn.js"
-import { costImportTx, PayloadBase } from "src/utils"
-import { UTXOSet, Tx, UnsignedTx, EVMAPI } from "src/apis/evm"
-import { avm, BinTools } from "src"
-import { AVMAPI, GetUTXOsResponse } from "src/apis/avm"
+import { costImportTx } from "../../src/utils"
+import { UTXOSet, Tx, UnsignedTx, EVMAPI } from "../../src/apis/evm"
+import { avm, BinTools } from "../../src"
+import { GetUTXOsResponse } from "../../src/apis/avm"
 import { EVMCaminoConstants } from "../../src/apis/evm/camino_constants"
 import { Buffer } from "buffer/"
 import createHash from "create-hash"
@@ -19,10 +19,9 @@ import {
 import {
   MultisigKeyChain,
   MultisigKeyPair,
-  OutputOwners,
-  ZeroBN
+  OutputOwners
 } from "../../src/common"
-import { CChainAlias, PChainAlias } from "../../src/utils"
+import { PChainAlias } from "../../src/utils"
 
 const bintools = BinTools.getInstance()
 const avalanche = getAvalanche()
@@ -1278,7 +1277,7 @@ function createMsigKCAndAddSignatures(
   unsignedTx: PlatformUnsignedTx | UnsignedTx,
   chainPrefix: string
 ): MultisigKeyChain {
-  let alias: string
+  let alias: string = ""
   let chain: any
   if (chainPrefix === "P") {
     alias = PChainAlias

@@ -355,3 +355,7 @@ export interface ClaimAmountParams {
   owners: OutputOwners
   sigIdxs: number[]
 }
+
+export interface UpgradePhasesReply {
+  SunrisePhase: number
+}

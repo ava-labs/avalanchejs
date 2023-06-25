@@ -4,7 +4,7 @@
   "description": "Camino Platform JS Library",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rm -rf dist && npx tsc -b",
+    "build": "rm -rf dist && npx tsc -b tsconfig_build.json",
     "bundle": "webpack --mode production",
     "docshtml": "npx typedoc --plugin typedoc-plugin-external-module-name --mode file src",
     "docsmd": "npx typedoc --readme none --plugin typedoc-plugin-markdown,typedoc-plugin-external-module-name --theme markdown --out docsMD src",

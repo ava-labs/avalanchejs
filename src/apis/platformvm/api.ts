@@ -81,7 +81,8 @@ import {
   GetDepositsResponse,
   Owner,
   OwnerParam,
-  MultisigAliasParams
+  MultisigAliasParams,
+  UpgradePhasesReply
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -735,6 +736,20 @@ export class PlatformVMAPI extends JRPCAPI {
       params
     )
     return response.data.result
+  }
+
+  /**
+   * Retrieves the current phases.
+   *
+   * @returns Returns a Promise of a UpgradePhasesReply.
+   */
+  getUpgradePhases = async (): Promise<UpgradePhasesReply> => {
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getUpgradePhases"
+    )
+    return {
+      SunrisePhase: parseInt(response.data.result.sunrisePhase)
+    }
   }
 
   /**

@@ -1,5 +1,5 @@
 import { createTests, getAvalanche, Matcher } from "../e2etestlib"
-import { KeystoreAPI } from "src/apis/keystore/api"
+import { KeystoreAPI } from "../../src/apis/keystore/api"
 import BN from "bn.js"
 import {
   DepositOffer,
@@ -78,6 +78,7 @@ const memo: Buffer = Buffer.from(
   "PlatformVM utility method buildCaminoAddValidatorTx to add a validator to the primary subnet"
 )
 const interestRateDenominator = new BN(1_000_000 * (365 * 24 * 60 * 60))
+const DepositNotFound = new Error("Deposit not found")
 
 const P = function (s: string): string {
   return "P" + s.substring(1)
@@ -94,7 +95,7 @@ let keystore: KeystoreAPI
 let depositOffers = undefined as DepositOffer[] | undefined
 let depositTx = { value: "" }
 let tx = { value: "" }
-let xChain, pKeychain, pAddresses: any
+let pKeychain, pAddresses: any
 let pChain: PlatformVMAPI
 let createdSubnetID = { value: "" }
 let pAddressStrings: string[]
@@ -102,11 +103,11 @@ let pendingValidators = { value: "" }
 let balanceOutputs = { value: new Map() }
 let oneMinRewardsAmount: BN
 let rewardsOwner: OutputOwners
+let dummyUtxoSet = new UTXOSet()
 
 beforeAll(async () => {
   await avalanche.fetchNetworkSettings()
   keystore = new KeystoreAPI(avalanche)
-  xChain = avalanche.XChain()
   pChain = avalanche.PChain()
   pKeychain = pChain.keyChain()
   pKeychain.importKey(adminNodePrivateKey)
@@ -156,7 +157,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrAdminString)],
             [P(addrAdminString)],
             [P(addrAdminString)],
@@ -187,7 +188,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrAdminString)],
             [P(addrAdminString)],
             [P(addrAdminString)],
@@ -229,7 +230,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
             [0, addrB] // "P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
           ]
           const unsignedTx: UnsignedTx = await pChain.buildRegisterNodeTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
             [P(addrBString)],
             undefined,
@@ -261,7 +262,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
         (async function () {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
             [P(addrBString)],
             [P(addrBString)],
@@ -315,7 +316,7 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const stakeAmount: any = await pChain.getMinStake()
           const subnetAuthCredentials: [number, Buffer][] = [[0, addrB]] // P-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
           const unsignedTx: UnsignedTx = await pChain.buildAddSubnetValidatorTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)], // X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g
             [P(addrBString)],
             node6Id,
@@ -362,7 +363,7 @@ describe("Camino-PChain-Deposit", (): void => {
           const inactiveOffer: DepositOffer = getLockedPresale3yDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             inactiveOffer.id,
@@ -390,7 +391,7 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
@@ -419,7 +420,7 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
@@ -455,7 +456,7 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrCString)],
             [P(addrCString)],
             activeOffer.id,
@@ -483,7 +484,7 @@ describe("Camino-PChain-Deposit", (): void => {
           const activeOffer: DepositOffer = getTest1DepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
@@ -541,7 +542,7 @@ describe("Camino-PChain-Deposit", (): void => {
       () =>
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             undefined,
@@ -597,7 +598,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
           const activeOffer: DepositOffer = getOneMinuteDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
@@ -687,7 +688,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Full-Amount", (): void => {
       () =>
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             undefined,
@@ -746,7 +747,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
           const activeOffer: DepositOffer = getOneMinuteDepositOffer()
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             undefined,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             activeOffer.id,
@@ -804,7 +805,7 @@ describe("Camino-PChain-Auto-Unlock-Deposit-Half-Amount", (): void => {
       () =>
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildUnlockDepositTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             undefined,
@@ -901,13 +902,13 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
           const depositOwner = P(addrCString)
           const offer: DepositOffer = {
             upgradeVersion: 1,
-            id: undefined,
+            id: "",
             interestRateNominator: new BN(1000000000),
             start: startTime,
             end: endTime,
             minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
-            totalMaxAmount: undefined,
-            depositedAmount: undefined,
+            totalMaxAmount: ZeroBN,
+            depositedAmount: ZeroBN,
             minDuration: 60,
             maxDuration: 360,
             unlockPeriodDuration: 20,
@@ -919,7 +920,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
             ownerAddress: depositOwner
           }
           const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
-            undefined,
+            dummyUtxoSet,
             [depositOfferCreator],
             [depositOfferCreator],
             offer,
@@ -942,7 +943,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
 
           const unsignedTx: UnsignedTx = await pChain.buildAddressStateTx(
             0,
-            undefined,
+            dummyUtxoSet,
             [P(addrAdminString)],
             [P(addrAdminString)],
             depositOfferCreator,
@@ -973,7 +974,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
 
           const unsignedTx: UnsignedTx = await pChain.buildAddressStateTx(
             0,
-            undefined,
+            dummyUtxoSet,
             [depositOfferCreator],
             [depositOfferCreator],
             depositOfferCreator,
@@ -1007,13 +1008,13 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
           const depositOwner = P(addrCString)
           const offer: DepositOffer = {
             upgradeVersion: 1,
-            id: undefined,
+            id: "",
             interestRateNominator: new BN(1000000000),
             start: UnixNow().add(new BN(10)), // start in 10 seconds so that I can deposit in the next test
             end: endTime,
             minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
-            totalMaxAmount: undefined,
-            depositedAmount: undefined,
+            totalMaxAmount: ZeroBN,
+            depositedAmount: ZeroBN,
             minDuration: 60,
             maxDuration: 360,
             unlockPeriodDuration: 20,
@@ -1025,7 +1026,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
             ownerAddress: depositOwner
           }
           const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
-            undefined,
+            dummyUtxoSet,
             [depositOfferCreator],
             [depositOfferCreator],
             offer,
@@ -1051,13 +1052,13 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
           const depositOwner = P(addrCString)
           const offer: DepositOffer = {
             upgradeVersion: 1,
-            id: undefined,
+            id: "",
             interestRateNominator: new BN(1000000000),
             start: UnixNow().add(new BN(10)), // start in 10 seconds so that I can deposit in the next test
             end: endTime,
             minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
-            totalMaxAmount: undefined,
-            depositedAmount: undefined,
+            totalMaxAmount: ZeroBN,
+            depositedAmount: ZeroBN,
             minDuration: 60,
             maxDuration: 360,
             unlockPeriodDuration: 20,
@@ -1069,7 +1070,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
             ownerAddress: depositOwner
           }
           const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
-            undefined,
+            dummyUtxoSet,
             [depositOfferCreator],
             [depositOfferCreator],
             offer,
@@ -1117,7 +1118,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
 
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             1,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             offer.id,
@@ -1159,13 +1160,13 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
           ]
           const offer: DepositOffer = {
             upgradeVersion: 1,
-            id: undefined,
+            id: "",
             interestRateNominator: new BN(1000000000),
             start: UnixNow().add(new BN(10)), // start in 10 seconds so that I can deposit in the next test
             end: endTime,
             minAmount: new BN(1000000), // min deposit amount = 1 milliAvax
-            totalMaxAmount: undefined,
-            depositedAmount: undefined,
+            totalMaxAmount: ZeroBN,
+            depositedAmount: ZeroBN,
             minDuration: 60,
             maxDuration: 360,
             unlockPeriodDuration: 20,
@@ -1177,7 +1178,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
             ownerAddress: undefined
           }
           const unsignedTx: UnsignedTx = await pChain.buildAddDepositOfferTx(
-            undefined,
+            dummyUtxoSet,
             [depositOfferCreator],
             [depositOfferCreator],
             offer,
@@ -1199,7 +1200,7 @@ describe("Camino-PChain-Add-Deposit-Offer-And-Deposit-Funds", (): void => {
           const offer: DepositOffer = await getDepositOffer(tx.value, true)
           const unsignedTx: UnsignedTx = await pChain.buildDepositTx(
             0,
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             offer.id,
@@ -1469,7 +1470,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
       () =>
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrAdminString)],
             [P(addrAdminString)],
             undefined,
@@ -1521,7 +1522,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
       () =>
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             undefined,
@@ -1570,7 +1571,7 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
       () =>
         (async function () {
           const unsignedTx: UnsignedTx = await pChain.buildClaimTx(
-            undefined,
+            dummyUtxoSet,
             [P(addrBString)],
             [P(addrBString)],
             undefined,
@@ -1613,19 +1614,23 @@ describe("Camino-PChain-Claim-Validator-Rewards", (): void => {
 })
 
 function getOneMinuteDepositOffer(): DepositOffer {
-  return depositOffers.find((offer) => {
+  const res = depositOffers?.find((offer) => {
     return (
       Buffer.from(offer.memo.substring(2), "hex").toString() == "presale1min"
     )
   })
+  if (res) return res
+  throw DepositNotFound
 }
 function getLockedPresale3yDepositOffer(): DepositOffer {
-  return depositOffers.find((offer) => {
+  const res = depositOffers?.find((offer) => {
     return (
       Buffer.from(offer.memo.substring(2), "hex").toString() ==
       "lockedpresale3y"
     )
   })
+  if (res) return res
+  throw DepositNotFound
 }
 
 async function getDepositOffer(
@@ -1635,14 +1640,18 @@ async function getDepositOffer(
   if (refresh) {
     depositOffers = await pChain.getAllDepositOffers()
   }
-  return depositOffers.filter((o) => o.id == id)[0]
+  const res = depositOffers?.filter((o) => o.id == id)[0]
+  if (res) return res
+  throw DepositNotFound
 }
 function getTest1DepositOffer(): DepositOffer {
-  return depositOffers.find((offer) => {
+  const res = depositOffers?.find((offer) => {
     return Buffer.from(offer.memo.substring(2), "hex")
       .toString()
       .includes("depositOffer test#1")
   })
+  if (res) return res
+  throw DepositNotFound
 }
 function createMsigKCAndAddSignatures(
   addresses: Buffer[],

@@ -1,7 +1,6 @@
 import { Avalanche } from "caminojs/index"
 import { PlatformVMAPI } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
-import { json } from "stream/consumers"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

@@ -20,7 +20,7 @@
     }
   },
   "exclude": ["node_modules", "*/**/*.test.ts", "e2e_tests"],
-  "include": ["src/", "examples/"],
+  "include": ["src/"],
   "typeAcquisition": {
     "enable": true,
     "exclude": ["bn.js"]

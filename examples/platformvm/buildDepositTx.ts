@@ -53,6 +53,7 @@ const main = async (): Promise<any> => {
   )
 
   const unsignedTx: UnsignedTx = await pchain.buildDepositTx(
+    0,
     undefined,
     pAddressStrings,
     pAddressStrings,
