@@ -10,11 +10,17 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const admin: AdminAPI = avalanche.Admin()
 
 const main = async (): Promise<any> => {
-  const loggerName: string = "C"
-  const loggerLevel: GetLoggerLevelResponse = await admin.getLoggerLevel(
-    loggerName
-  )
-  console.log(loggerLevel)
+  try {
+    const loggerName: string = "C"
+    const loggerLevel: GetLoggerLevelResponse = await admin.getLoggerLevel(
+      loggerName
+    )
+    console.log(loggerLevel)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

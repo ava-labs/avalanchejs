@@ -9,8 +9,14 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const admin: AdminAPI = avalanche.Admin()
 
 const main = async (): Promise<any> => {
-  const successful: boolean = await admin.memoryProfile()
-  console.log(successful)
+  try {
+    const successful: boolean = await admin.memoryProfile()
+    console.log(successful)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

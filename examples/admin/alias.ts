@@ -9,10 +9,16 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const admin: AdminAPI = avalanche.Admin()
 
 const main = async (): Promise<any> => {
-  const endpoint: string = "/ext/bc/X"
-  const alias: string = "xchain"
-  const successful: boolean = await admin.alias(endpoint, alias)
-  console.log(successful)
+  try {
+    const endpoint: string = "/ext/bc/X"
+    const alias: string = "xchain"
+    const successful: boolean = await admin.alias(endpoint, alias)
+    console.log(successful)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

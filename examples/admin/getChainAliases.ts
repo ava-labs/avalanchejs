@@ -10,9 +10,15 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const admin: AdminAPI = avalanche.Admin()
 
 const main = async (): Promise<any> => {
-  const blockchain: string = Defaults.network[networkID].X.blockchainID
-  const aliases: string[] = await admin.getChainAliases(blockchain)
-  console.log(aliases)
+  try {
+    const blockchain: string = Defaults.network[networkID].X.blockchainID
+    const aliases: string[] = await admin.getChainAliases(blockchain)
+    console.log(aliases)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()
