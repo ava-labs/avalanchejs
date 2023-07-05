@@ -61,52 +61,58 @@ const payload: Buffer = Buffer.from("NFT Payload")
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const outputOwners: OutputOwners = new OutputOwners(
-    xAddresses,
-    locktime,
-    threshold
-  )
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  let txid: Buffer = Buffer.from(
-    "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
-  )
-  let assetID: Buffer = Buffer.from(
-    "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
-  )
-  utxos.forEach((utxo: UTXO): void => {
-    if (utxo.getOutput().getTypeID() === 10) {
-      txid = utxo.getTxID()
-      assetID = utxo.getAssetID()
-    }
-  })
-  const nftMintOutputUTXOIDs: string[] = getUTXOIDs(
-    utxoSet,
-    bintools.cb58Encode(txid),
-    AVMConstants.NFTMINTOUTPUTID,
-    bintools.cb58Encode(assetID)
-  )
-  const nftMintOutputUTXOID: string = nftMintOutputUTXOIDs[0]
-  const groupID: number = 0
+  try {
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const outputOwners: OutputOwners = new OutputOwners(
+      xAddresses,
+      locktime,
+      threshold
+    )
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    let txid: Buffer = Buffer.from(
+      "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
+    )
+    let assetID: Buffer = Buffer.from(
+      "2fSX8P4vhGNZsD3WELwwTxx4XzCNwicyFiYbp3Q965BMgJ8g9"
+    )
+    utxos.forEach((utxo: UTXO): void => {
+      if (utxo.getOutput().getTypeID() === 10) {
+        txid = utxo.getTxID()
+        assetID = utxo.getAssetID()
+      }
+    })
+    const nftMintOutputUTXOIDs: string[] = getUTXOIDs(
+      utxoSet,
+      bintools.cb58Encode(txid),
+      AVMConstants.NFTMINTOUTPUTID,
+      bintools.cb58Encode(assetID)
+    )
+    const nftMintOutputUTXOID: string = nftMintOutputUTXOIDs[0]
+    const groupID: number = 0
 
-  const unsignedTx: UnsignedTx = await xchain.buildCreateNFTMintTx(
-    utxoSet,
-    outputOwners,
-    xAddressStrings,
-    xAddressStrings,
-    nftMintOutputUTXOID,
-    groupID,
-    payload,
-    memo,
-    asOf
-  )
+    const unsignedTx: UnsignedTx = await xchain.buildCreateNFTMintTx(
+      utxoSet,
+      outputOwners,
+      xAddressStrings,
+      xAddressStrings,
+      nftMintOutputUTXOID,
+      groupID,
+      payload,
+      memo,
+      asOf
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${id}`)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const id: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${id}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

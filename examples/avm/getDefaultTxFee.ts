@@ -9,8 +9,14 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const defaultTxFee: BN = xchain.getDefaultTxFee()
-  console.log(defaultTxFee.toString())
+  try {
+    const defaultTxFee: BN = xchain.getDefaultTxFee()
+    console.log(defaultTxFee.toString())
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

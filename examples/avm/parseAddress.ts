@@ -9,9 +9,16 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const addressString: string = "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
-  const addressBuffer: Buffer = xchain.parseAddress(addressString)
-  console.log(addressBuffer)
+  try {
+    const addressString: string =
+      "X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"
+    const addressBuffer: Buffer = xchain.parseAddress(addressString)
+    console.log(addressBuffer)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

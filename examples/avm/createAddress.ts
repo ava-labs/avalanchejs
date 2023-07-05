@@ -9,10 +9,16 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const username: string = "username"
-  const password: string = "Vz48jjHLTCcAepH95nT4B"
-  const address: string = await xchain.createAddress(username, password)
-  console.log(address)
+  try {
+    const username: string = "username"
+    const password: string = "Vz48jjHLTCcAepH95nT4B"
+    const address: string = await xchain.createAddress(username, password)
+    console.log(address)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

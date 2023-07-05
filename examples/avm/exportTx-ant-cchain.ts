@@ -48,70 +48,76 @@ const memo: Buffer = Buffer.from(
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
-    if (utxo.getOutput().getTypeID() != 6) {
-      const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-      let amt: BN = amountOutput.getAmount().clone()
-      const txid: Buffer = utxo.getTxID()
-      let assetID: Buffer = utxo.getAssetID()
-      const outputidx: Buffer = utxo.getOutputIdx()
-      let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
-      if (avaxAssetIDBuf.toString("hex") === assetID.toString("hex")) {
-        secpTransferOutput = new SECPTransferOutput(
-          amt.sub(fee),
-          xAddresses,
-          locktime,
-          threshold
+  try {
+    const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    utxos.forEach((utxo: UTXO) => {
+      if (utxo.getOutput().getTypeID() != 6) {
+        const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
+        let amt: BN = amountOutput.getAmount().clone()
+        const txid: Buffer = utxo.getTxID()
+        let assetID: Buffer = utxo.getAssetID()
+        const outputidx: Buffer = utxo.getOutputIdx()
+        let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
+        if (avaxAssetIDBuf.toString("hex") === assetID.toString("hex")) {
+          secpTransferOutput = new SECPTransferOutput(
+            amt.sub(fee),
+            xAddresses,
+            locktime,
+            threshold
+          )
+        } else {
+          secpTransferOutput = new SECPTransferOutput(
+            amt,
+            xAddresses,
+            locktime,
+            threshold
+          )
+        }
+        // Uncomment for codecID 00 01
+        // secpTransferOutput.setCodecID(codecID)
+        const transferableOutput: TransferableOutput = new TransferableOutput(
+          assetID,
+          secpTransferOutput
         )
-      } else {
-        secpTransferOutput = new SECPTransferOutput(
-          amt,
-          xAddresses,
-          locktime,
-          threshold
+        exportedOuts.push(transferableOutput)
+
+        const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
+        // Uncomment for codecID 00 01
+        // secpTransferInput.setCodecID(codecID)
+        secpTransferInput.addSignatureIdx(0, xAddresses[0])
+
+        const input: TransferableInput = new TransferableInput(
+          txid,
+          outputidx,
+          assetID,
+          secpTransferInput
         )
+        inputs.push(input)
       }
-      // Uncomment for codecID 00 01
-      // secpTransferOutput.setCodecID(codecID)
-      const transferableOutput: TransferableOutput = new TransferableOutput(
-        assetID,
-        secpTransferOutput
-      )
-      exportedOuts.push(transferableOutput)
+    })
 
-      const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-      // Uncomment for codecID 00 01
-      // secpTransferInput.setCodecID(codecID)
-      secpTransferInput.addSignatureIdx(0, xAddresses[0])
-
-      const input: TransferableInput = new TransferableInput(
-        txid,
-        outputidx,
-        assetID,
-        secpTransferInput
-      )
-      inputs.push(input)
-    }
-  })
-
-  const exportTx: ExportTx = new ExportTx(
-    networkID,
-    bintools.cb58Decode(blockchainID),
-    outputs,
-    inputs,
-    memo,
-    bintools.cb58Decode(cChainBlockchainID),
-    exportedOuts
-  )
-  // Uncomment for codecID 00 01
-  // exportTx.setCodecID(codecID)
-  const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const exportTx: ExportTx = new ExportTx(
+      networkID,
+      bintools.cb58Decode(blockchainID),
+      outputs,
+      inputs,
+      memo,
+      bintools.cb58Decode(cChainBlockchainID),
+      exportedOuts
+    )
+    // Uncomment for codecID 00 01
+    // exportTx.setCodecID(codecID)
+    const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

@@ -62,53 +62,59 @@ const memo: Buffer = Buffer.from(
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  let mintUTXOID: string = ""
-  let mintOwner: SECPMintOutput = new SECPMintOutput()
-  let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
-  let txid: Buffer = Buffer.from("")
-  let assetID: Buffer = Buffer.from("")
-  utxos.forEach((utxo: UTXO) => {
-    if (utxo.getOutput().getTypeID() === 6) {
-      txid = utxo.getTxID()
-      assetID = utxo.getAssetID()
-    }
-  })
-  const secpMintOutputUTXOIDs: string[] = getUTXOIDs(
-    utxoSet,
-    bintools.cb58Encode(txid),
-    AVMConstants.SECPMINTOUTPUTID,
-    bintools.cb58Encode(assetID)
-  )
-  mintUTXOID = secpMintOutputUTXOIDs[0]
-  const utxo: UTXO = utxoSet.getUTXO(secpMintOutputUTXOIDs[0])
-  mintOwner = utxo.getOutput() as SECPMintOutput
-  const amount: BN = new BN(54321)
-  secpTransferOutput = new SECPTransferOutput(
-    amount,
-    xAddresses,
-    locktime,
-    threshold
-  )
+  try {
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    let mintUTXOID: string = ""
+    let mintOwner: SECPMintOutput = new SECPMintOutput()
+    let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
+    let txid: Buffer = Buffer.from("")
+    let assetID: Buffer = Buffer.from("")
+    utxos.forEach((utxo: UTXO) => {
+      if (utxo.getOutput().getTypeID() === 6) {
+        txid = utxo.getTxID()
+        assetID = utxo.getAssetID()
+      }
+    })
+    const secpMintOutputUTXOIDs: string[] = getUTXOIDs(
+      utxoSet,
+      bintools.cb58Encode(txid),
+      AVMConstants.SECPMINTOUTPUTID,
+      bintools.cb58Encode(assetID)
+    )
+    mintUTXOID = secpMintOutputUTXOIDs[0]
+    const utxo: UTXO = utxoSet.getUTXO(secpMintOutputUTXOIDs[0])
+    mintOwner = utxo.getOutput() as SECPMintOutput
+    const amount: BN = new BN(54321)
+    secpTransferOutput = new SECPTransferOutput(
+      amount,
+      xAddresses,
+      locktime,
+      threshold
+    )
 
-  const unsignedTx: UnsignedTx = await xchain.buildSECPMintTx(
-    utxoSet,
-    mintOwner,
-    secpTransferOutput,
-    xAddressStrings,
-    xAddressStrings,
-    mintUTXOID,
-    memo,
-    asOf
-  )
+    const unsignedTx: UnsignedTx = await xchain.buildSECPMintTx(
+      utxoSet,
+      mintOwner,
+      secpTransferOutput,
+      xAddressStrings,
+      xAddressStrings,
+      mintUTXOID,
+      memo,
+      asOf
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${id}`)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const id: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${id}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

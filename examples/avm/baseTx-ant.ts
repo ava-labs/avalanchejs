@@ -44,87 +44,97 @@ const memo: Buffer = Buffer.from("AVM manual BaseTx to send AVAX and ANT")
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO): void => {
-    const typeID: number = utxo.getOutput().getTypeID()
-    if (typeID != 6) {
-      const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-      const amt: BN = amountOutput.getAmount().clone()
-      const txID: Buffer = utxo.getTxID()
-      const outputIDX: Buffer = utxo.getOutputIdx()
-      const assetID: Buffer = utxo.getAssetID()
+  try {
+    const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    utxos.forEach((utxo: UTXO): void => {
+      const typeID: number = utxo.getOutput().getTypeID()
+      if (typeID != 6) {
+        const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
+        const amt: BN = amountOutput.getAmount().clone()
+        const txID: Buffer = utxo.getTxID()
+        const outputIDX: Buffer = utxo.getOutputIdx()
+        const assetID: Buffer = utxo.getAssetID()
 
-      if (assetID.toString("hex") === avaxAssetIDBuf.toString("hex")) {
-        const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
-          amt.sub(fee),
-          xAddresses,
-          locktime,
-          threshold
-        )
-        // Uncomment for codecID 00 01
-        // secpTransferOutput.setCodecID(codecID)
-        const transferableOutput: TransferableOutput = new TransferableOutput(
-          avaxAssetIDBuf,
-          secpTransferOutput
-        )
-        outputs.push(transferableOutput)
+        if (assetID.toString("hex") === avaxAssetIDBuf.toString("hex")) {
+          const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+            amt.sub(fee),
+            xAddresses,
+            locktime,
+            threshold
+          )
+          // Uncomment for codecID 00 01
+          // secpTransferOutput.setCodecID(codecID)
+          const transferableOutput: TransferableOutput = new TransferableOutput(
+            avaxAssetIDBuf,
+            secpTransferOutput
+          )
+          outputs.push(transferableOutput)
 
-        const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-        // Uncomment for codecID 00 01
-        // secpTransferInput.setCodecID(codecID)
-        secpTransferInput.addSignatureIdx(0, xAddresses[0])
-        const input: TransferableInput = new TransferableInput(
-          txID,
-          outputIDX,
-          avaxAssetIDBuf,
-          secpTransferInput
-        )
-        inputs.push(input)
-      } else {
-        const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
-          amt,
-          xAddresses,
-          locktime,
-          threshold
-        )
-        // Uncomment for codecID 00 01
-        // secpTransferOutput.setCodecID(codecID)
-        const transferableOutput: TransferableOutput = new TransferableOutput(
-          assetID,
-          secpTransferOutput
-        )
-        outputs.push(transferableOutput)
+          const secpTransferInput: SECPTransferInput = new SECPTransferInput(
+            amt
+          )
+          // Uncomment for codecID 00 01
+          // secpTransferInput.setCodecID(codecID)
+          secpTransferInput.addSignatureIdx(0, xAddresses[0])
+          const input: TransferableInput = new TransferableInput(
+            txID,
+            outputIDX,
+            avaxAssetIDBuf,
+            secpTransferInput
+          )
+          inputs.push(input)
+        } else {
+          const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+            amt,
+            xAddresses,
+            locktime,
+            threshold
+          )
+          // Uncomment for codecID 00 01
+          // secpTransferOutput.setCodecID(codecID)
+          const transferableOutput: TransferableOutput = new TransferableOutput(
+            assetID,
+            secpTransferOutput
+          )
+          outputs.push(transferableOutput)
 
-        const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-        // Uncomment for codecID 00 01
-        // secpTransferInput.setCodecID(codecID)
-        secpTransferInput.addSignatureIdx(0, xAddresses[0])
-        const input: TransferableInput = new TransferableInput(
-          txID,
-          outputIDX,
-          assetID,
-          secpTransferInput
-        )
-        inputs.push(input)
+          const secpTransferInput: SECPTransferInput = new SECPTransferInput(
+            amt
+          )
+          // Uncomment for codecID 00 01
+          // secpTransferInput.setCodecID(codecID)
+          secpTransferInput.addSignatureIdx(0, xAddresses[0])
+          const input: TransferableInput = new TransferableInput(
+            txID,
+            outputIDX,
+            assetID,
+            secpTransferInput
+          )
+          inputs.push(input)
+        }
       }
-    }
-  })
+    })
 
-  const baseTx: BaseTx = new BaseTx(
-    networkID,
-    bintools.cb58Decode(blockchainID),
-    outputs,
-    inputs,
-    memo
-  )
-  // Uncomment for codecID 00 01
-  // baseTx.setCodecID(codecID)
-  const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const baseTx: BaseTx = new BaseTx(
+      networkID,
+      bintools.cb58Decode(blockchainID),
+      outputs,
+      inputs,
+      memo
+    )
+    // Uncomment for codecID 00 01
+    // baseTx.setCodecID(codecID)
+    const unsignedTx: UnsignedTx = new UnsignedTx(baseTx)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

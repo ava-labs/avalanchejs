@@ -9,8 +9,14 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const success: boolean = xchain.refreshBlockchainID()
-  console.log(success)
+  try {
+    const success: boolean = xchain.refreshBlockchainID()
+    console.log(success)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

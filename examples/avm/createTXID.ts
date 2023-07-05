@@ -46,34 +46,40 @@ const fee: BN = xchain.getDefaultTxFee()
 const cb58: SerializedType = "cb58"
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const getBalanceResponse: any = await xchain.getBalance(
-    xAddressStrings[0],
-    avaxAssetID
-  )
-  const balance: BN = new BN(getBalanceResponse.balance)
-  const amount: BN = balance.sub(fee)
+  try {
+    const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const getBalanceResponse: any = await xchain.getBalance(
+      xAddressStrings[0],
+      avaxAssetID
+    )
+    const balance: BN = new BN(getBalanceResponse.balance)
+    const amount: BN = balance.sub(fee)
 
-  const unsignedTx: UnsignedTx = await xchain.buildExportTx(
-    utxoSet,
-    amount,
-    pChainBlockchainID,
-    pAddressStrings,
-    xAddressStrings,
-    xAddressStrings,
-    memo,
-    asOf,
-    locktime
-  )
+    const unsignedTx: UnsignedTx = await xchain.buildExportTx(
+      utxoSet,
+      amount,
+      pChainBlockchainID,
+      pAddressStrings,
+      xAddressStrings,
+      xAddressStrings,
+      memo,
+      asOf,
+      locktime
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const buffer: Buffer = Buffer.from(
-    createHash("sha256").update(tx.toBuffer()).digest().buffer
-  )
-  const txid: string = serialization.bufferToType(buffer, cb58)
-  console.log(txid)
-  // APfkX9NduHkZtghRpQASNZJjLut4ZAkVhkTGeazQerLSRa36t
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const buffer: Buffer = Buffer.from(
+      createHash("sha256").update(tx.toBuffer()).digest().buffer
+    )
+    const txid: string = serialization.bufferToType(buffer, cb58)
+    console.log(txid)
+    // APfkX9NduHkZtghRpQASNZJjLut4ZAkVhkTGeazQerLSRa36t
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

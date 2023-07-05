@@ -38,49 +38,55 @@ let symbol: string = "MFCA"
 let denomination: number = 1
 
 const main = async (): Promise<any> => {
-  const amount: BN = new BN(1000000000000)
-  const vcapSecpOutput = new SECPTransferOutput(
-    amount,
-    xAddresses,
-    locktime,
-    threshold
-  )
-  let initialStates: InitialStates = new InitialStates()
-  initialStates.addOutput(vcapSecpOutput)
+  try {
+    const amount: BN = new BN(1000000000000)
+    const vcapSecpOutput = new SECPTransferOutput(
+      amount,
+      xAddresses,
+      locktime,
+      threshold
+    )
+    let initialStates: InitialStates = new InitialStates()
+    initialStates.addOutput(vcapSecpOutput)
 
-  let genesisAsset: GenesisAsset = new GenesisAsset(
-    assetAlias,
-    name,
-    symbol,
-    denomination,
-    initialStates,
-    memo
-  )
-  const genesisAssets: GenesisAsset[] = [genesisAsset]
-  assetAlias = "asset2"
-  name = "asset2"
-  symbol = "MVCA"
-  denomination = 2
-  initialStates = new InitialStates()
-  const secpMintOutput: SECPMintOutput = new SECPMintOutput(
-    xAddresses,
-    locktime,
-    threshold
-  )
-  initialStates.addOutput(secpMintOutput)
-  genesisAsset = new GenesisAsset(
-    assetAlias,
-    name,
-    symbol,
-    denomination,
-    initialStates,
-    memo
-  )
-  genesisAssets.push(genesisAsset)
-  const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
-  const c: string = serialization.bufferToType(genesisData.toBuffer(), cb58)
-  console.log(c)
-  // 111113q4vh8kDKrDmvmGm1zGBKURDLcikSCbPQBjEmfnzmW5QkZpQUAXck5gt5XCgehm4HDjgj2yiTS6nekoVUgoLkQ2hQrCwc7Y7uDC99h6ThzwMz3dCLQMmfSXyuCmqwK1fw4mPnKowzxjAjchJ6w1JSxLdhTd2R9tB3qaNTPGE5BRjkZtrMyxVvWR5qxrWPhyEqy5yjxtjG2Jva2NN34tYRePo2GdKpaTwxvxguFNGTW6kUe3pu6uKVEc8Staet1xYeUa4SZnYi5Lv6xnXvc6Sj8ve1ZyRHdHkq1rCMdyKvegUXjsaT7YVYcdAG21y8sxN3FEe7eBAcLmGa8U44bN1tB8ddCWag1tusHkYjiKivWQNyMYJsavbfP5Y8gAw51YmuYy1XbiKwLJCWnj6jNG5PZE4p4anJNy3y4tj2An5ZhH
+    let genesisAsset: GenesisAsset = new GenesisAsset(
+      assetAlias,
+      name,
+      symbol,
+      denomination,
+      initialStates,
+      memo
+    )
+    const genesisAssets: GenesisAsset[] = [genesisAsset]
+    assetAlias = "asset2"
+    name = "asset2"
+    symbol = "MVCA"
+    denomination = 2
+    initialStates = new InitialStates()
+    const secpMintOutput: SECPMintOutput = new SECPMintOutput(
+      xAddresses,
+      locktime,
+      threshold
+    )
+    initialStates.addOutput(secpMintOutput)
+    genesisAsset = new GenesisAsset(
+      assetAlias,
+      name,
+      symbol,
+      denomination,
+      initialStates,
+      memo
+    )
+    genesisAssets.push(genesisAsset)
+    const genesisData: GenesisData = new GenesisData(genesisAssets, networkID)
+    const c: string = serialization.bufferToType(genesisData.toBuffer(), cb58)
+    console.log(c)
+    // 111113q4vh8kDKrDmvmGm1zGBKURDLcikSCbPQBjEmfnzmW5QkZpQUAXck5gt5XCgehm4HDjgj2yiTS6nekoVUgoLkQ2hQrCwc7Y7uDC99h6ThzwMz3dCLQMmfSXyuCmqwK1fw4mPnKowzxjAjchJ6w1JSxLdhTd2R9tB3qaNTPGE5BRjkZtrMyxVvWR5qxrWPhyEqy5yjxtjG2Jva2NN34tYRePo2GdKpaTwxvxguFNGTW6kUe3pu6uKVEc8Staet1xYeUa4SZnYi5Lv6xnXvc6Sj8ve1ZyRHdHkq1rCMdyKvegUXjsaT7YVYcdAG21y8sxN3FEe7eBAcLmGa8U44bN1tB8ddCWag1tusHkYjiKivWQNyMYJsavbfP5Y8gAw51YmuYy1XbiKwLJCWnj6jNG5PZE4p4anJNy3y4tj2An5ZhH
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

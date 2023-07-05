@@ -35,26 +35,32 @@ const name: string = "non fungible token"
 const symbol: string = "NFT"
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const minterSets: MinterSet[] = [new MinterSet(threshold, xAddresses)]
-  const unsignedTx: UnsignedTx = await xchain.buildCreateNFTAssetTx(
-    utxoSet,
-    xAddressStrings,
-    xAddressStrings,
-    minterSets,
-    name,
-    symbol,
-    memo,
-    asOf,
-    locktime
-  )
+  try {
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const minterSets: MinterSet[] = [new MinterSet(threshold, xAddresses)]
+    const unsignedTx: UnsignedTx = await xchain.buildCreateNFTAssetTx(
+      utxoSet,
+      xAddressStrings,
+      xAddressStrings,
+      minterSets,
+      name,
+      symbol,
+      memo,
+      asOf,
+      locktime
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

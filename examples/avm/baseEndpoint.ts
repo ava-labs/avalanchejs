@@ -9,8 +9,14 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 avalanche.setAddress(ip, port, protocol, baseEndpoint)
 
 const main = async (): Promise<any> => {
-  const baseEndpoint: string = avalanche.getBaseEndpoint()
-  console.log(baseEndpoint)
+  try {
+    const baseEndpoint: string = avalanche.getBaseEndpoint()
+    console.log(baseEndpoint)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

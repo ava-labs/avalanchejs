@@ -48,73 +48,79 @@ const memo: Buffer = Buffer.from(
 // const codecID: number = 1
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: any = await xchain.getUTXOs(
-    xAddressStrings,
-    cChainBlockchainID
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO) => {
-    const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-    const amt: BN = amountOutput.getAmount().clone()
-    const txid: Buffer = utxo.getTxID()
-    let assetID: Buffer = utxo.getAssetID()
-    const outputidx: Buffer = utxo.getOutputIdx()
-    let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
-    if (avaxAssetIDBuf.toString("hex") === assetID.toString("hex")) {
-      secpTransferOutput = new SECPTransferOutput(
-        amt.sub(fee),
-        xAddresses,
-        locktime,
-        threshold
-      )
-    } else {
-      secpTransferOutput = new SECPTransferOutput(
-        amt,
-        xAddresses,
-        locktime,
-        threshold
-      )
-    }
-    // Uncomment for codecID 00 01
-    // secpTransferOutput.setCodecID(codecID)
-
-    const transferableOutput: TransferableOutput = new TransferableOutput(
-      assetID,
-      secpTransferOutput
+  try {
+    const avmUTXOResponse: any = await xchain.getUTXOs(
+      xAddressStrings,
+      cChainBlockchainID
     )
-    outputs.push(transferableOutput)
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    utxos.forEach((utxo: UTXO) => {
+      const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
+      const amt: BN = amountOutput.getAmount().clone()
+      const txid: Buffer = utxo.getTxID()
+      let assetID: Buffer = utxo.getAssetID()
+      const outputidx: Buffer = utxo.getOutputIdx()
+      let secpTransferOutput: SECPTransferOutput = new SECPTransferOutput()
+      if (avaxAssetIDBuf.toString("hex") === assetID.toString("hex")) {
+        secpTransferOutput = new SECPTransferOutput(
+          amt.sub(fee),
+          xAddresses,
+          locktime,
+          threshold
+        )
+      } else {
+        secpTransferOutput = new SECPTransferOutput(
+          amt,
+          xAddresses,
+          locktime,
+          threshold
+        )
+      }
+      // Uncomment for codecID 00 01
+      // secpTransferOutput.setCodecID(codecID)
 
-    const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
-    secpTransferInput.addSignatureIdx(0, xAddresses[0])
-    // Uncomment for codecID 00 01
-    // secpTransferInput.setCodecID(codecID)
+      const transferableOutput: TransferableOutput = new TransferableOutput(
+        assetID,
+        secpTransferOutput
+      )
+      outputs.push(transferableOutput)
 
-    const input: TransferableInput = new TransferableInput(
-      txid,
-      outputidx,
-      assetID,
-      secpTransferInput
+      const secpTransferInput: SECPTransferInput = new SECPTransferInput(amt)
+      secpTransferInput.addSignatureIdx(0, xAddresses[0])
+      // Uncomment for codecID 00 01
+      // secpTransferInput.setCodecID(codecID)
+
+      const input: TransferableInput = new TransferableInput(
+        txid,
+        outputidx,
+        assetID,
+        secpTransferInput
+      )
+      importedInputs.push(input)
+    })
+
+    const importTx: ImportTx = new ImportTx(
+      networkID,
+      bintools.cb58Decode(blockchainID),
+      outputs,
+      inputs,
+      memo,
+      bintools.cb58Decode(cChainBlockchainID),
+      importedInputs
     )
-    importedInputs.push(input)
-  })
+    // Uncomment for codecID 00 01
+    // importTx.setCodecID(codecID)
 
-  const importTx: ImportTx = new ImportTx(
-    networkID,
-    bintools.cb58Decode(blockchainID),
-    outputs,
-    inputs,
-    memo,
-    bintools.cb58Decode(cChainBlockchainID),
-    importedInputs
-  )
-  // Uncomment for codecID 00 01
-  // importTx.setCodecID(codecID)
-
-  const unsignedTx: UnsignedTx = new UnsignedTx(importTx)
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const unsignedTx: UnsignedTx = new UnsignedTx(importTx)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

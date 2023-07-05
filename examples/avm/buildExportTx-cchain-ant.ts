@@ -37,31 +37,37 @@ const memo: Buffer = Buffer.from(
 )
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const amount: BN = new BN(350)
-  const threshold: number = 1
-  const assetID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
+  try {
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const amount: BN = new BN(350)
+    const threshold: number = 1
+    const assetID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
 
-  const unsignedTx: UnsignedTx = await xchain.buildExportTx(
-    utxoSet,
-    amount,
-    cChainBlockchainID,
-    cAddressStrings,
-    xAddressStrings,
-    xAddressStrings,
-    memo,
-    asOf,
-    locktime,
-    threshold,
-    assetID
-  )
+    const unsignedTx: UnsignedTx = await xchain.buildExportTx(
+      utxoSet,
+      amount,
+      cChainBlockchainID,
+      cAddressStrings,
+      xAddressStrings,
+      xAddressStrings,
+      memo,
+      asOf,
+      locktime,
+      threshold,
+      assetID
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

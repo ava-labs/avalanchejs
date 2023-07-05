@@ -9,10 +9,16 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const txID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
-  const encoding: string = "json"
-  const tx: string | object = await xchain.getTx(txID, encoding)
-  console.log(tx)
+  try {
+    const txID: string = "Ycg5QzddNwe3ebfFXhoGUDnWgC6GE88QRakRnn9dp3nGwqCwD"
+    const encoding: string = "json"
+    const tx: string | object = await xchain.getTx(txID, encoding)
+    console.log(tx)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

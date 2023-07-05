@@ -55,42 +55,48 @@ const memo: Buffer = Buffer.from(
 const asOf: BN = UnixNow()
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  let txid: Buffer = Buffer.from("")
-  let assetID: Buffer = Buffer.from("")
-  utxos.forEach((utxo: UTXO) => {
-    if (utxo.getOutput().getTypeID() === 11) {
-      txid = utxo.getTxID()
-      assetID = utxo.getAssetID()
-    }
-  })
-  const nftTransferOutputUTXOIDs: string[] = getUTXOIDs(
-    utxoSet,
-    bintools.cb58Encode(txid),
-    AVMConstants.NFTXFEROUTPUTID,
-    bintools.cb58Encode(assetID)
-  )
-  const nftTransferOutputUTXOID: string = nftTransferOutputUTXOIDs[0]
+  try {
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    let txid: Buffer = Buffer.from("")
+    let assetID: Buffer = Buffer.from("")
+    utxos.forEach((utxo: UTXO) => {
+      if (utxo.getOutput().getTypeID() === 11) {
+        txid = utxo.getTxID()
+        assetID = utxo.getAssetID()
+      }
+    })
+    const nftTransferOutputUTXOIDs: string[] = getUTXOIDs(
+      utxoSet,
+      bintools.cb58Encode(txid),
+      AVMConstants.NFTXFEROUTPUTID,
+      bintools.cb58Encode(assetID)
+    )
+    const nftTransferOutputUTXOID: string = nftTransferOutputUTXOIDs[0]
 
-  const unsignedTx: UnsignedTx = await xchain.buildNFTTransferTx(
-    utxoSet,
-    xAddressStrings,
-    xAddressStrings,
-    xAddressStrings,
-    nftTransferOutputUTXOID,
-    memo,
-    asOf,
-    locktime,
-    threshold
-  )
+    const unsignedTx: UnsignedTx = await xchain.buildNFTTransferTx(
+      utxoSet,
+      xAddressStrings,
+      xAddressStrings,
+      xAddressStrings,
+      nftTransferOutputUTXOID,
+      memo,
+      asOf,
+      locktime,
+      threshold
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const id: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${id}`)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const id: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${id}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

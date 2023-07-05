@@ -42,33 +42,39 @@ const memo: Buffer = Buffer.from("AVM utility method buildBaseTx to send AVAX")
 const fee: BN = xchain.getDefaultTxFee()
 
 const main = async (): Promise<any> => {
-  const getBalanceResponse: GetBalanceResponse = await xchain.getBalance(
-    xAddressStrings[0],
-    avaxAssetID
-  )
-  const balance: BN = new BN(getBalanceResponse.balance)
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const amount: BN = balance.sub(fee)
+  try {
+    const getBalanceResponse: GetBalanceResponse = await xchain.getBalance(
+      xAddressStrings[0],
+      avaxAssetID
+    )
+    const balance: BN = new BN(getBalanceResponse.balance)
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const amount: BN = balance.sub(fee)
 
-  const unsignedTx: UnsignedTx = await xchain.buildBaseTx(
-    utxoSet,
-    amount,
-    avaxAssetID,
-    xAddressStrings,
-    xAddressStrings,
-    xAddressStrings,
-    memo,
-    asOf,
-    locktime,
-    threshold
-  )
+    const unsignedTx: UnsignedTx = await xchain.buildBaseTx(
+      utxoSet,
+      amount,
+      avaxAssetID,
+      xAddressStrings,
+      xAddressStrings,
+      xAddressStrings,
+      memo,
+      asOf,
+      locktime,
+      threshold
+    )
 
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

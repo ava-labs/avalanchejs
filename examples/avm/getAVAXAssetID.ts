@@ -9,8 +9,14 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const assetID: Buffer = await xchain.getAVAXAssetID()
-  console.log(assetID)
+  try {
+    const assetID: Buffer = await xchain.getAVAXAssetID()
+    console.log(assetID)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

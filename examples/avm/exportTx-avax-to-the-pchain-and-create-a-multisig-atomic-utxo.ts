@@ -67,57 +67,63 @@ const memo: Buffer = Buffer.from(
 )
 
 const main = async (): Promise<any> => {
-  const getBalanceResponse: any = await xchain.getBalance(
-    xAddressStrings[0],
-    avaxAssetID
-  )
-  const balance: BN = new BN(getBalanceResponse.balance)
-  const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
-    balance.sub(fee),
-    pAddresses,
-    locktime,
-    threshold
-  )
-  const transferableOutput: TransferableOutput = new TransferableOutput(
-    avaxAssetIDBuf,
-    secpTransferOutput
-  )
-  exportedOuts.push(transferableOutput)
-
-  const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
-  const utxos: UTXO[] = utxoSet.getAllUTXOs()
-  utxos.forEach((utxo: UTXO): void => {
-    const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
-    const amount: BN = amountOutput.getAmount().clone()
-    const txID: Buffer = utxo.getTxID()
-    const outputIdx: Buffer = utxo.getOutputIdx()
-
-    const secpTransferInput: SECPTransferInput = new SECPTransferInput(amount)
-    secpTransferInput.addSignatureIdx(0, xAddresses[0])
-
-    const input: TransferableInput = new TransferableInput(
-      txID,
-      outputIdx,
-      avaxAssetIDBuf,
-      secpTransferInput
+  try {
+    const getBalanceResponse: any = await xchain.getBalance(
+      xAddressStrings[0],
+      avaxAssetID
     )
-    inputs.push(input)
-  })
+    const balance: BN = new BN(getBalanceResponse.balance)
+    const secpTransferOutput: SECPTransferOutput = new SECPTransferOutput(
+      balance.sub(fee),
+      pAddresses,
+      locktime,
+      threshold
+    )
+    const transferableOutput: TransferableOutput = new TransferableOutput(
+      avaxAssetIDBuf,
+      secpTransferOutput
+    )
+    exportedOuts.push(transferableOutput)
 
-  const exportTx: ExportTx = new ExportTx(
-    networkID,
-    xChainIDBuf,
-    outputs,
-    inputs,
-    memo,
-    pChainIDBuf,
-    exportedOuts
-  )
-  const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const avmUTXOResponse: any = await xchain.getUTXOs(xAddressStrings)
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
+    const utxos: UTXO[] = utxoSet.getAllUTXOs()
+    utxos.forEach((utxo: UTXO): void => {
+      const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
+      const amount: BN = amountOutput.getAmount().clone()
+      const txID: Buffer = utxo.getTxID()
+      const outputIdx: Buffer = utxo.getOutputIdx()
+
+      const secpTransferInput: SECPTransferInput = new SECPTransferInput(amount)
+      secpTransferInput.addSignatureIdx(0, xAddresses[0])
+
+      const input: TransferableInput = new TransferableInput(
+        txID,
+        outputIdx,
+        avaxAssetIDBuf,
+        secpTransferInput
+      )
+      inputs.push(input)
+    })
+
+    const exportTx: ExportTx = new ExportTx(
+      networkID,
+      xChainIDBuf,
+      outputs,
+      inputs,
+      memo,
+      pChainIDBuf,
+      exportedOuts
+    )
+    const unsignedTx: UnsignedTx = new UnsignedTx(exportTx)
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()

@@ -37,42 +37,48 @@ const symbol: string = "TEST"
 const denomination: number = 3
 
 const main = async (): Promise<any> => {
-  const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
-    xAddressStrings
-  )
-  const utxoSet: UTXOSet = avmUTXOResponse.utxos
+  try {
+    const avmUTXOResponse: GetUTXOsResponse = await xchain.getUTXOs(
+      xAddressStrings
+    )
+    const utxoSet: UTXOSet = avmUTXOResponse.utxos
 
-  const amount: BN = new BN(507)
-  const vcapSecpOutput = new SECPTransferOutput(
-    amount,
-    xAddresses,
-    locktime,
-    threshold
-  )
-  const initialStates: InitialStates = new InitialStates()
-  initialStates.addOutput(vcapSecpOutput)
+    const amount: BN = new BN(507)
+    const vcapSecpOutput = new SECPTransferOutput(
+      amount,
+      xAddresses,
+      locktime,
+      threshold
+    )
+    const initialStates: InitialStates = new InitialStates()
+    initialStates.addOutput(vcapSecpOutput)
 
-  const secpMintOutput: SECPMintOutput = new SECPMintOutput(
-    xAddresses,
-    locktime,
-    threshold
-  )
-  outputs.push(secpMintOutput)
+    const secpMintOutput: SECPMintOutput = new SECPMintOutput(
+      xAddresses,
+      locktime,
+      threshold
+    )
+    outputs.push(secpMintOutput)
 
-  const unsignedTx: UnsignedTx = await xchain.buildCreateAssetTx(
-    utxoSet,
-    xAddressStrings,
-    xAddressStrings,
-    initialStates,
-    name,
-    symbol,
-    denomination,
-    outputs,
-    memo
-  )
-  const tx: Tx = unsignedTx.sign(xKeychain)
-  const txid: string = await xchain.issueTx(tx)
-  console.log(`Success! TXID: ${txid}`)
+    const unsignedTx: UnsignedTx = await xchain.buildCreateAssetTx(
+      utxoSet,
+      xAddressStrings,
+      xAddressStrings,
+      initialStates,
+      name,
+      symbol,
+      denomination,
+      outputs,
+      memo
+    )
+    const tx: Tx = unsignedTx.sign(xKeychain)
+    const txid: string = await xchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
+    )
+  }
 }
 
 main()
