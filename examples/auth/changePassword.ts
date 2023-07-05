@@ -14,20 +14,26 @@ const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const auth: AuthAPI = avalanche.Auth()
 
 const main = async (): Promise<any> => {
-  const path: string = "./examples/secrets.json"
-  const encoding: "utf8" = "utf8"
-  const cb = async (err: any, data: any): Promise<void> => {
-    if (err) throw err
-    const jsonData: any = JSON.parse(data)
-    const oldPassword: string = jsonData.oldPassword
-    const newPassword: string = jsonData.newPassword
-    const successful: boolean = await auth.changePassword(
-      oldPassword,
-      newPassword
+  try {
+    const path: string = "./examples/secrets.json"
+    const encoding: "utf8" = "utf8"
+    const cb = async (err: any, data: any): Promise<void> => {
+      if (err) throw err
+      const jsonData: any = JSON.parse(data)
+      const oldPassword: string = jsonData.oldPassword
+      const newPassword: string = jsonData.newPassword
+      const successful: boolean = await auth.changePassword(
+        oldPassword,
+        newPassword
+      )
+      console.log(successful)
+    }
+    readFile(path, encoding, cb)
+  } catch (e: any) {
+    console.log(
+      "Error. Please check if all the parameters are configured correctly."
     )
-    console.log(successful)
   }
-  readFile(path, encoding, cb)
 }
 
 main()
