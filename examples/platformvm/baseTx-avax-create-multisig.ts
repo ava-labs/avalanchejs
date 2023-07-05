@@ -28,6 +28,8 @@ const networkID: number = 1337
 const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const xBlockchainIDBuf: Buffer = bintools.cb58Decode(xBlockchainID)
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+  ? Defaults.network[networkID].X.avaxAssetID
+  : ""
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()

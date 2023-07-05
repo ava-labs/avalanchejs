@@ -36,6 +36,8 @@ const xChainBlockchainIdBuf: Buffer = bintools.cb58Decode(xChainBlockchainIdStr)
 const cChainBlockchainIdStr: string = Defaults.network[networkID].C.blockchainID
 const cChainBlockchainIdBuf: Buffer = bintools.cb58Decode(cChainBlockchainIdStr)
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+  ? Defaults.network[networkID].X.avaxAssetID
+  : ""
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const cHexAddress: string = "0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC"
 const evmInputs: EVMInput[] = []

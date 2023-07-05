@@ -53,6 +53,8 @@ const pAddresses: Buffer[] = pchain.keyChain().getAddresses()
 const xChainID: string = Defaults.network[networkID].X.blockchainID
 const xChainIDBuf: Buffer = bintools.cb58Decode(xChainID)
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+  ? Defaults.network[networkID].X.avaxAssetID
+  : ""
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const pChainID: string = Defaults.network[networkID].P.blockchainID
 const pChainIDBuf: Buffer = bintools.cb58Decode(pChainID)

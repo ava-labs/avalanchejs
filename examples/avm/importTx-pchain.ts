@@ -33,6 +33,8 @@ const xAddresses: Buffer[] = xchain.keyChain().getAddresses()
 const xAddressStrings: string[] = xchain.keyChain().getAddressStrings()
 const blockchainID: string = Defaults.network[networkID].X.blockchainID
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID
+  ? Defaults.network[networkID].X.avaxAssetID
+  : ""
 const avaxAssetIDBuf: Buffer = bintools.cb58Decode(avaxAssetID)
 const cChainBlockchainID: string = Defaults.network[networkID].P.blockchainID
 const importedInputs: TransferableInput[] = []
