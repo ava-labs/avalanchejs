@@ -138,7 +138,7 @@ Run the script:
 
 ### JavaScript File
 
-As Node.js is already installed per [requirements](/#Requirements),
+As Node.js is already installed per requirements,
 simply run the script:
 
 `node script-name.js`
