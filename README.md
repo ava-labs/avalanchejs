@@ -2,7 +2,7 @@
 
 ## Deprecation of avalancheJS
 
-The npm package `https://www.npmjs.com/package/avalanche` is being deprecated. For the latest version please use @avalabs/avalanchejs. We will no longer support the avalanche npm package.
+The [npm package](https://www.npmjs.com/package/avalanche) is being deprecated. For the latest version please use @avalabs/avalanchejs. We will no longer support the [avalanche npm package](https://www.npmjs.com/package/avalanche).
 
 ## Overview
 
