@@ -55,7 +55,6 @@ For installing via `yarn`:
 
 `yarn add @avalabs/avalanchejs`
 
-:::caution
 
 Please note that [this](https://www.npmjs.com/package/avalanche)
 npm package is deprecated.
@@ -63,7 +62,6 @@ Make sure to always use
 [@avalabs/avalanchejs](https://www.npmjs.com/package/@avalabs/avalanchejs)
 instead.
 
-:::
 
 ### Build from Repository
 
@@ -84,8 +82,6 @@ or
 This will generate a pure JavaScript library and place it in a folder named
 "web" in the project root. The "avalanchejs" file can then be dropped into any
 project as a pure JavaScript implementation of Avalanche.
-
-![avalanchejs](/img/avalanchejs/avalanchejs-1.png)
  
 ## Use AvalancheJS in Projects
 
@@ -142,7 +138,7 @@ Run the script:
 
 ### JavaScript File
 
-As Node.js is already installed per [requirements](/#Requirements),
+As Node.js is already installed per requirements,
 simply run the script:
 
 `node script-name.js`
