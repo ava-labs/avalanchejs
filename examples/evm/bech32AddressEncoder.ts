@@ -12,6 +12,7 @@ const bech32Encoder = (item: string) => {
   let arrBuf = [...bufFromHex]
   let bech32Address = bech32.bech32.encode(hrp, bech32.bech32.toWords(arrBuf))
   return "C-" + bech32Address
+  //to get P and X chains format, just change the C- prefix to P- or X-
 }
 
 const main = async (): Promise<any> => {
