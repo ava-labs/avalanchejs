@@ -16,8 +16,9 @@ const bech32Encoder = (item: string) => {
       : item.length < 40
       ? "Address too short. Enter a valid address"
       : "Add 0x prefix to the address"
-  return item.length === 42 ? "C-" + bech32Address : "Error. " + errorMessage
+  if (item.length === 42) return "C-" + bech32Address
   //to get P and X chains format, just change the C- prefix to P- or X-
+  else throw new Error(errorMessage)
 }
 
 const main = async (): Promise<any> => {
