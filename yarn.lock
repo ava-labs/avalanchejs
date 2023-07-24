@@ -15,6 +15,29 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
+"@avalabs/avalanchejs@3.17.0":
+  version "3.17.0"
+  resolved "https://registry.yarnpkg.com/@avalabs/avalanchejs/-/avalanchejs-3.17.0.tgz#6f11b80616f221c750c3402849ae82ac1cdb951d"
+  integrity sha512-Fv5Vu5hwzPNN4e7ER9TFIFU9msOZa+C28BcZUVW5TnabpglOpL46hA3iihRGTDRx1Y95cra29uctPqDRnVTMpQ==
+  dependencies:
+    assert "2.0.0"
+    axios "0.27.2"
+    bech32 "2.0.0"
+    bip39 "3.1.0"
+    bn.js "5.2.1"
+    buffer "6.0.3"
+    create-hash "1.2.0"
+    crypto-browserify "3.12.0"
+    elliptic "6.5.4"
+    ethers "6.0.8"
+    hdkey "2.1.0"
+    isomorphic-ws "5.0.0"
+    randombytes "^2.1.0"
+    store2 "2.14.2"
+    stream-browserify "3.0.0"
+    ws "8.12.1"
+    xss "1.0.14"
+
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
