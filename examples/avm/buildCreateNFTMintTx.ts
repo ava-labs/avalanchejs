@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "@avalabs/avalanchejs/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -7,14 +7,14 @@ import {
   Tx,
   AVMConstants,
   UTXO
-} from "avalanche/dist/apis/avm"
-import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
-import { OutputOwners } from "avalanche/dist/common"
+} from "@avalabs/avalanchejs/dist/apis/avm"
+import { GetUTXOsResponse } from "@avalabs/avalanchejs/dist/apis/avm/interfaces"
+import { OutputOwners } from "@avalabs/avalanchejs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   UnixNow
-} from "avalanche/dist/utils"
+} from "@avalabs/avalanchejs/dist/utils"
 
 // run ts-node examples/avm/buildCreateNFTMintTx.ts
 // before you run this example buildCreateNFTAssetTx.ts

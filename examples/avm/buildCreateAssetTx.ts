@@ -1,4 +1,4 @@
-import { Avalanche, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BN, Buffer } from "@avalabs/avalanchejs/dist"
 import {
   AVMAPI,
   KeyChain,
@@ -8,12 +8,12 @@ import {
   InitialStates,
   SECPMintOutput,
   SECPTransferOutput
-} from "avalanche/dist/apis/avm"
-import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
+} from "@avalabs/avalanchejs/dist/apis/avm"
+import { GetUTXOsResponse } from "@avalabs/avalanchejs/dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "avalanche/dist/utils"
+} from "@avalabs/avalanchejs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

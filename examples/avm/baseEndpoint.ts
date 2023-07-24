@@ -1,4 +1,4 @@
-import { Avalanche } from "avalanche/dist"
+import { Avalanche } from "@avalabs/avalanchejs/dist"
 
 const ip: string = "localhost"
 const port: number = 9650
