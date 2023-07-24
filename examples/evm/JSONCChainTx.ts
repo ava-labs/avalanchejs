@@ -1,7 +1,7 @@
 import { Avalanche, BN, Buffer } from "../../src"
 import { EVMAPI, Tx } from "../../src/apis/evm"
-import { Serialization } from "avalanche/dist/utils"
-import { SerializedType } from "avalanche/dist/utils"
+import { Serialization } from "@avalabs/avalanchejs/dist/utils"
+import { SerializedType } from "@avalabs/avalanchejs/dist/utils"
 import * as bech32 from "bech32"
 
 const ip: string = "api.avax.network"
