@@ -1,5 +1,5 @@
-import { Avalanche } from "avalanche/dist"
-import { IndexAPI } from "avalanche/dist/apis/index"
+import { Avalanche } from "@avalabs/avalanchejs/dist"
+import { IndexAPI } from "@avalabs/avalanchejs/dist/apis/index"
 
 const ip: string = "localhost"
 const port: number = 9650

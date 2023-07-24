@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { AdminAPI } from "avalanche/dist/apis/admin"
-import { GetLoggerLevelResponse } from "avalanche/dist/apis/admin/interfaces"
+import { Avalanche } from "@avalabs/avalanchejs/dist"
+import { AdminAPI } from "@avalabs/avalanchejs/dist/apis/admin"
+import { GetLoggerLevelResponse } from "@avalabs/avalanchejs/dist/apis/admin/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650

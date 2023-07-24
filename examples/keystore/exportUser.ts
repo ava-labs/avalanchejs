@@ -1,5 +1,5 @@
-import { Avalanche } from "avalanche/dist"
-import { KeystoreAPI } from "avalanche/dist/apis/keystore"
+import { Avalanche } from "@avalabs/avalanchejs/dist"
+import { KeystoreAPI } from "@avalabs/avalanchejs/dist/apis/keystore"
 
 const ip: string = "localhost"
 const port: number = 9650

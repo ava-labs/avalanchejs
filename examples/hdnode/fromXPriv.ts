@@ -1,4 +1,4 @@
-import HDNode from "avalanche/dist/utils/hdnode"
+import HDNode from "@avalabs/avalanchejs/dist/utils/hdnode"
 
 const main = async (): Promise<any> => {
   const xpriv: string =
