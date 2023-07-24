@@ -94,13 +94,13 @@ const avalanche = require("avalanche")
 Or into your TypeScript project like this:
 
 ```ts
-import { Avalanche } from "avalanche"
+import { Avalanche }from "@avalabs/avalanchejs"
 ```
 
 ## Importing Essentials
 
 ```ts
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Avalanche, BinTools, Buffer, BN }from "@avalabs/avalanchejs"
 
 let bintools = BinTools.getInstance()
 ```
@@ -177,7 +177,7 @@ user@users-MacBook-Pro avalanchejs % ts-node examples/avm/getTx.ts
 AvalancheJS comes with its own AVM Keychain. This KeyChain is used in the functions of the API, enabling them to sign using keys it's registered. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
 
 ```js
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Avalanche, BinTools, Buffer, BN }from "@avalabs/avalanchejs"
 
 const bintools = BinTools.getInstance()
 
@@ -264,8 +264,8 @@ const isValid = keypair.verify(message, signature) // returns a boolean
 This example creates an asset in the X-Chain and publishes it to the Avalanche Platform. The first step in this process is to create an instance of AvalancheJS connected to our Avalanche Platform endpoint of choice.
 
 ```js
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
-import { InitialStates, SECPTransferOutput } from "avalanche/dist/apis/avm"
+import { Avalanche, BinTools, Buffer, BN }from "@avalabs/avalanchejs"
+import { InitialStates, SECPTransferOutput }from "@avalabs/avalanchejs/dist/apis/avm"
 
 const myNetworkID = 12345 // default is 1, we want to override that for our local network
 const avalanche = new Avalanche("localhost", 9650, "http", myNetworkID)
@@ -387,7 +387,7 @@ The X-Chain uses the TxID of the transaction which created the asset as the uniq
 This example sends an asset in the X-Chain to a single recipient. The first step in this process is to create an instance of Avalanche connected to our Avalanche Platform endpoint of choice.
 
 ```js
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Avalanche, BinTools, Buffer, BN }from "@avalabs/avalanchejs"
 
 const myNetworkID = 12345 // default is 1, we want to override that for our local network
 const avalanche = new avalanche.Avalanche(
