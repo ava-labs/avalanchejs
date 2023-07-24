@@ -1,10 +1,13 @@
-import { Avalanche } from "avalanche/dist"
-import { PlatformVMAPI, KeyChain } from "avalanche/dist/apis/platformvm"
-import { GetStakeResponse } from "avalanche/dist/apis/platformvm/interfaces"
+import { Avalanche } from "@avalabs/avalanchejs/dist"
+import {
+  PlatformVMAPI,
+  KeyChain
+} from "@avalabs/avalanchejs/dist/apis/platformvm"
+import { GetStakeResponse } from "@avalabs/avalanchejs/dist/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "avalanche/dist/utils"
+} from "@avalabs/avalanchejs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

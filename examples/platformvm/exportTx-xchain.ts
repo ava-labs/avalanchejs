@@ -1,5 +1,8 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
-import { AVMAPI, KeyChain as AVMKeyChain } from "avalanche/dist/apis/avm"
+import { Avalanche, BinTools, BN, Buffer } from "@avalabs/avalanchejs/dist"
+import {
+  AVMAPI,
+  KeyChain as AVMKeyChain
+} from "@avalabs/avalanchejs/dist/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -13,14 +16,14 @@ import {
   UnsignedTx,
   Tx,
   ExportTx
-} from "avalanche/dist/apis/platformvm"
-import { Output } from "avalanche/dist/common"
+} from "@avalabs/avalanchejs/dist/apis/platformvm"
+import { Output } from "@avalabs/avalanchejs/dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   MILLIAVAX
-} from "avalanche/dist/utils"
+} from "@avalabs/avalanchejs/dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { GetRewardUTXOsResponse } from "avalanche/dist/apis/platformvm/interfaces"
-import { PlatformVMAPI } from "avalanche/dist/apis/platformvm"
+import { Avalanche } from "@avalabs/avalanchejs/dist"
+import { GetRewardUTXOsResponse } from "@avalabs/avalanchejs/dist/apis/platformvm/interfaces"
+import { PlatformVMAPI } from "@avalabs/avalanchejs/dist/apis/platformvm"
 
 const ip: string = "localhost"
 const port: number = 9650

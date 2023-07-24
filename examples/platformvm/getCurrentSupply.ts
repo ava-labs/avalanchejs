@@ -1,5 +1,5 @@
-import { Avalanche, BN } from "avalanche/dist"
-import { PlatformVMAPI } from "avalanche/dist/apis/platformvm"
+import { Avalanche, BN } from "@avalabs/avalanchejs/dist"
+import { PlatformVMAPI } from "@avalabs/avalanchejs/dist/apis/platformvm"
 
 const ip: string = "localhost"
 const port: number = 9650
