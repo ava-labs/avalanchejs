@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { AdminAPI } from "avalanche/dist/apis/admin"
-import { LoadVMsResponse } from "avalanche/dist/apis/admin/interfaces"
+import { Avalanche } from "../../dist"
+import { AdminAPI } from "../../dist/apis/admin"
+import { LoadVMsResponse } from "../../dist/apis/admin/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
