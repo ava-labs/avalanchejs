@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { EVMAPI, KeyChain, KeyPair } from "avalanche/dist/apis/evm"
-import { CreateKeyPairResponse } from "avalanche/dist/apis/evm/interfaces"
+import { Avalanche } from "../../dist"
+import { EVMAPI, KeyChain, KeyPair } from "../../dist/apis/evm"
+import { CreateKeyPairResponse } from "../../dist/apis/evm/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650
