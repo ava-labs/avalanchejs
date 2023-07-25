@@ -5,8 +5,8 @@ import {
   Buffer,
   GenesisAsset,
   GenesisData
-} from "avalanche/dist"
-import { InitialStates } from "avalanche/dist/apis/avm"
+} from "../../dist"
+import { InitialStates } from "../../dist/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -20,13 +20,13 @@ import {
   UnsignedTx,
   CreateChainTx,
   Tx
-} from "avalanche/dist/apis/platformvm"
-import { Output } from "avalanche/dist/common"
+} from "../../dist/apis/platformvm"
+import { Output } from "../../dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   ONEAVAX
-} from "avalanche/dist/utils"
+} from "../../dist/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"

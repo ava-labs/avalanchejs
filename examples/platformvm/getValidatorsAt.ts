@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { GetValidatorsAtResponse } from "avalanche/dist/apis/platformvm/interfaces"
-import { PlatformVMAPI } from "avalanche/dist/apis/platformvm"
+import { Avalanche } from "../../dist"
+import { GetValidatorsAtResponse } from "../../dist/apis/platformvm/interfaces"
+import { PlatformVMAPI } from "../../dist/apis/platformvm"
 
 const ip: string = "localhost"
 const port: number = 9650

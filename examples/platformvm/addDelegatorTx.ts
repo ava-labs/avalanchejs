@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../dist"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -14,15 +14,15 @@ import {
   Tx,
   SECPOwnerOutput,
   ParseableOutput
-} from "avalanche/dist/apis/platformvm"
-import { Output } from "avalanche/dist/common"
+} from "../../dist/apis/platformvm"
+import { Output } from "../../dist/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   NodeIDStringToBuffer,
   UnixNow
-} from "avalanche/dist/utils"
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

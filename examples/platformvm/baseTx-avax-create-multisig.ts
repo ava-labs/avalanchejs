@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../dist"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -12,13 +12,13 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "avalanche/dist/apis/platformvm"
-import { GetBalanceResponse } from "avalanche/dist/apis/avm/interfaces"
+} from "../../dist/apis/platformvm"
+import { GetBalanceResponse } from "../../dist/apis/avm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "avalanche/dist/utils"
+} from "../../dist/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
