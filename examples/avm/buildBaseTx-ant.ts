@@ -1,17 +1,11 @@
-import { GetUTXOsResponse } from "avalanche/dist/apis/avm/interfaces"
-import { Avalanche, BN, Buffer } from "avalanche/dist"
-import {
-  AVMAPI,
-  KeyChain,
-  UTXOSet,
-  UnsignedTx,
-  Tx
-} from "avalanche/dist/apis/avm"
-import { UnixNow } from "avalanche/dist/utils"
+import { GetUTXOsResponse } from "../../dist/apis/avm/interfaces"
+import { Avalanche, BN, Buffer } from "../../dist"
+import { AVMAPI, KeyChain, UTXOSet, UnsignedTx, Tx } from "../../dist/apis/avm"
+import { UnixNow } from "../../dist/utils"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "avalanche/dist/utils"
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

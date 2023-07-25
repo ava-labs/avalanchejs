@@ -1,25 +1,25 @@
-import { Avalanche, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BN, Buffer } from "../../dist"
 import {
   AVMAPI,
   KeyChain as AVMKeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "avalanche/dist/apis/avm"
+} from "../../dist/apis/avm"
 import {
   GetBalanceResponse,
   GetUTXOsResponse
-} from "avalanche/dist/apis/avm/interfaces"
+} from "../../dist/apis/avm/interfaces"
 import {
   KeyChain as PlatformVMKeyChain,
   PlatformVMAPI
-} from "avalanche/dist/apis/platformvm"
+} from "../../dist/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   UnixNow
-} from "avalanche/dist/utils"
+} from "../../dist/utils"
 
 const ip: string = "localhost"
 const port: number = 9650
