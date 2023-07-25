@@ -1,4 +1,4 @@
-import { PubSub } from "avalanche/dist"
+import { PubSub } from "../../dist"
 
 const main = async (): Promise<any> => {
   const pubsub: PubSub = new PubSub()
