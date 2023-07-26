@@ -88,19 +88,19 @@ project as a pure JavaScript implementation of Avalanche.
 The AvalancheJS library can be imported into your existing Node.js project as follows:
 
 ```ts
-const avalanche = require("avalanche")
+const avalanche = require("@avalabs/avalanchejs")
 ```
 
 Or into your TypeScript project like this:
 
 ```ts
-import { Avalanche } from "avalanche"
+import { Avalanche } from "@avalabs/avalanchejs"
 ```
 
 ## Importing Essentials
 
 ```ts
-import { Avalanche, BinTools, Buffer, BN } from "avalanche"
+import { Avalanche, BinTools, Buffer, BN } from "@avalabs/avalanchejs"
 
 let bintools = BinTools.getInstance()
 ```

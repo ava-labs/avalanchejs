@@ -1,6 +1,6 @@
-import { Avalanche } from "avalanche/dist"
-import { HealthAPI } from "avalanche/dist/apis/health"
-import { HealthResponse } from "avalanche/dist/apis/health/interfaces"
+import { Avalanche } from "../../src"
+import { HealthAPI } from "../../src/apis/health"
+import { HealthResponse } from "../../src/apis/health/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650

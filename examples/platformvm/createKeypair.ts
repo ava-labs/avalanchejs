@@ -1,9 +1,5 @@
-import { Avalanche } from "avalanche/dist"
-import {
-  PlatformVMAPI,
-  KeyChain,
-  KeyPair
-} from "avalanche/dist/apis/platformvm"
+import { Avalanche } from "../../src"
+import { PlatformVMAPI, KeyChain, KeyPair } from "../../src/apis/platformvm"
 
 const ip: string = "localhost"
 const port: number = 9650

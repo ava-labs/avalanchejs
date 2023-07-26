@@ -1,4 +1,4 @@
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   SECPTransferOutput,
@@ -16,13 +16,13 @@ import {
   KeyChain,
   NFTMintOperation,
   NFTMintOutput
-} from "avalanche/dist/apis/avm"
-import { OutputOwners } from "avalanche/dist/common"
+} from "../../src/apis/avm"
+import { OutputOwners } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 
 // before you run this example buildCreateNFTAssetTx.ts
 
