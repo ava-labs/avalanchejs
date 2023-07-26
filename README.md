@@ -71,6 +71,14 @@ Clone the AvalancheJS repository:
 
 `git clone https://github.com/ava-labs/avalanchejs.git`
 
+Install dependencies:
+
+`yarn`
+
+or
+
+`npm install`
+
 Then build it:
 
 `npm run build`
