@@ -1,4 +1,4 @@
-import { PubSub, Socket } from "../../dist"
+import { PubSub, Socket } from "../../src"
 
 const protocol: string = "ws"
 const host: string = "localhost"

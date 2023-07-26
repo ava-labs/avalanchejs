@@ -1,5 +1,5 @@
-import { Avalanche } from "../../dist"
-import { IndexAPI } from "../../dist/apis/index"
+import { Avalanche } from "../../src"
+import { IndexAPI } from "../../src/apis/index"
 
 const ip: string = "localhost"
 const port: number = 9650

@@ -1,5 +1,5 @@
-import Mnemonic from "../../dist/utils/mnemonic"
-import { Buffer } from "../../dist"
+import Mnemonic from "../../src/utils/mnemonic"
+import { Buffer } from "../../src"
 const mnemonic: Mnemonic = Mnemonic.getInstance()
 
 const main = async (): Promise<any> => {

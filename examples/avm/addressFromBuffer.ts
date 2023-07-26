@@ -1,7 +1,7 @@
-import { Avalanche, Buffer } from "../../dist"
-import { AVMAPI } from "../../dist/apis/avm"
-import { UTXOSet, UTXO } from "../../dist/apis/platformvm"
-import { Output } from "../../dist/common"
+import { Avalanche, Buffer } from "../../src"
+import { AVMAPI } from "../../src/apis/avm"
+import { UTXOSet, UTXO } from "../../src/apis/platformvm"
+import { Output } from "../../src/common"
 // Change the networkID to affect the HRP of the bech32 encoded address
 // NetworkID - Bech32 Address - ChainPrefix-HRP1AddressChecksum
 //         0 - X-custom19rknw8l0grnfunjrzwxlxync6zrlu33yeg5dya

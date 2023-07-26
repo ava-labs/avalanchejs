@@ -1,6 +1,6 @@
-import { Avalanche } from "../../dist"
-import { IndexAPI } from "../../dist/apis/index"
-import { GetContainerByIDResponse } from "../../dist/apis/index/interfaces"
+import { Avalanche } from "../../src"
+import { IndexAPI } from "../../src/apis/index"
+import { GetContainerByIDResponse } from "../../src/apis/index/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650

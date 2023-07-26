@@ -1,18 +1,18 @@
-import { Avalanche, BN, Buffer } from "../../dist"
-import { AVMAPI, KeyChain as AVMKeyChain } from "../../dist/apis/avm"
+import { Avalanche, BN, Buffer } from "../../src"
+import { AVMAPI, KeyChain as AVMKeyChain } from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
   UTXOSet,
   UnsignedTx,
   Tx
-} from "../../dist/apis/platformvm"
+} from "../../src/apis/platformvm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults,
   UnixNow
-} from "../../dist/utils"
+} from "../../src/utils"
 
 const ip: string = "localhost"
 const port: number = 9650

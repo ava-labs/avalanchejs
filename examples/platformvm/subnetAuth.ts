@@ -1,5 +1,5 @@
-import { Buffer } from "../../dist"
-import { SubnetAuth } from "../../dist/apis/platformvm"
+import { Buffer } from "../../src"
+import { SubnetAuth } from "../../src/apis/platformvm"
 
 const address1: Buffer = Buffer.alloc(4)
 const address2: Buffer = Buffer.alloc(4)

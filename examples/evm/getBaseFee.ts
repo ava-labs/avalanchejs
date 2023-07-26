@@ -1,5 +1,5 @@
-import { Avalanche, BN } from "../../dist"
-import { EVMAPI } from "../../dist/apis/evm"
+import { Avalanche, BN } from "../../src"
+import { EVMAPI } from "../../src/apis/evm"
 
 const ip: string = "localhost"
 const port: number = 9650

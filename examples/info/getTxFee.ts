@@ -1,6 +1,6 @@
-import { Avalanche } from "../../dist"
-import { InfoAPI } from "../../dist/apis/info"
-import { GetTxFeeResponse } from "../../dist/apis/info/interfaces"
+import { Avalanche } from "../../src"
+import { InfoAPI } from "../../src/apis/info"
+import { GetTxFeeResponse } from "../../src/apis/info/interfaces"
 
 const ip: string = "localhost"
 const port: number = 9650

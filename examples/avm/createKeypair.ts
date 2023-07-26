@@ -1,5 +1,5 @@
-import { Avalanche } from "../../dist"
-import { AVMAPI, KeyChain, KeyPair } from "../../dist/apis/avm"
+import { Avalanche } from "../../src"
+import { AVMAPI, KeyChain, KeyPair } from "../../src/apis/avm"
 
 const ip: string = "localhost"
 const port: number = 9650

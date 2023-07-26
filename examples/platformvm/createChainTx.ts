@@ -5,8 +5,8 @@ import {
   Buffer,
   GenesisAsset,
   GenesisData
-} from "../../dist"
-import { InitialStates } from "../../dist/apis/avm"
+} from "../../src"
+import { InitialStates } from "../../src/apis/avm"
 import {
   PlatformVMAPI,
   KeyChain,
@@ -20,13 +20,13 @@ import {
   UnsignedTx,
   CreateChainTx,
   Tx
-} from "../../dist/apis/platformvm"
-import { Output } from "../../dist/common"
+} from "../../src/apis/platformvm"
+import { Output } from "../../src/common"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   ONEAVAX
-} from "../../dist/utils"
+} from "../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
 const ip: string = "localhost"
