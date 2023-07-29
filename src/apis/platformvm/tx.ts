@@ -32,6 +32,7 @@ import { DepositTx } from "./depositTx"
 import { AddressStateTx } from "./addressstatetx"
 import { ClaimTx } from "./claimtx"
 import { MultisigAliasTx } from "./multisigaliastx"
+import { AddDepositOfferTx } from "./adddepositoffertx"
 
 /**
  * @ignore
@@ -72,6 +73,8 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new ClaimTx(...args)
   } else if (txtype === PlatformVMConstants.MULTISIGALIASTX) {
     return new MultisigAliasTx(...args)
+  } else if (txtype === PlatformVMConstants.ADDDEPOSITOFFERTX) {
+    return new AddDepositOfferTx(...args)
   }
   /* istanbul ignore next */
   throw new TransactionError("Error - SelectTxClass: unknown txtype")
