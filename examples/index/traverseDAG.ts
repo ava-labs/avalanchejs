@@ -7,10 +7,10 @@ import {
   GetLastAcceptedResponse
 } from "../../src/apis/index/interfaces"
 
-const ip: string = "indexer-demo.avax.network"
+const ip = process.env.IP_INDEXER
 const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
 const networkID = Number(process.env.NETWORK_ID)
-const networkID: number = 1
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 

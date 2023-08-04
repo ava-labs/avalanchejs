@@ -4,7 +4,7 @@ import { IndexAPI } from "../../src/apis/index/index"
 import { GetLastAcceptedResponse } from "../../src/apis/index/interfaces"
 import { Vertex } from "../../src/apis/avm"
 
-const ip: string = "indexer-demo.avax.network"
+const ip = process.env.IP_INDEXER
 const port = Number(process.env.PORT)
 const protocol = process.env.PROTOCOL
 const networkID = Number(process.env.NETWORK_ID)
