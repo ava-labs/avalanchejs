@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, Buffer } from "../../src"
 import { Vertex } from "../../src/apis/avm"
 import { IndexAPI } from "../../src/apis/index"

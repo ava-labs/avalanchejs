@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   PlatformVMAPI,
@@ -22,10 +23,10 @@ import {
 } from "../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 // Keychain with 4 keys-A, B, C, and D
@@ -85,7 +86,7 @@ const main = async (): Promise<any> => {
   const utxos: UTXO[] = utxoSet.getAllUTXOs()
   utxos.forEach((utxo: UTXO): void => {
     const output: Output = utxo.getOutput()
-    if(output.getTypeID() === 7) {
+    if (output.getTypeID() === 7) {
       const amountOutput: AmountOutput = utxo.getOutput() as AmountOutput
       const amt: BN = amountOutput.getAmount().clone()
       const txid: Buffer = utxo.getTxID()
@@ -108,15 +109,16 @@ const main = async (): Promise<any> => {
     "8T4oUrP7kXzetGF2bYWF21oJHUT18rJCjfBt3J299hA1Smcqa"
   )
   const nodeIDBuf: Buffer = NodeIDStringToBuffer(nodeID)
-  const removeSubnetValidatorTx: RemoveSubnetValidatorTx = new RemoveSubnetValidatorTx(
-    networkID,
-    pChainBlockchainIDBuf,
-    outputs,
-    inputs,
-    memo,
-    nodeIDBuf,
-    subnetID
-  )
+  const removeSubnetValidatorTx: RemoveSubnetValidatorTx =
+    new RemoveSubnetValidatorTx(
+      networkID,
+      pChainBlockchainIDBuf,
+      outputs,
+      inputs,
+      memo,
+      nodeIDBuf,
+      subnetID
+    )
   removeSubnetValidatorTx.addSignatureIdx(0, pAddresses[3])
   removeSubnetValidatorTx.addSignatureIdx(1, pAddresses[1])
   const unsignedTx: UnsignedTx = new UnsignedTx(removeSubnetValidatorTx)

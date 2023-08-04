@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche } from "../../src"
 import { PlatformVMAPI } from "../../src/apis/platformvm"
 

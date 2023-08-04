@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, Buffer } from "../../src"
 import { AVMAPI } from "../../src/apis/avm"
 import { UTXOSet, UTXO } from "../../src/apis/platformvm"

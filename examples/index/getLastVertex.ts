@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, BinTools, Buffer } from "../../src"
 import { IndexAPI } from "../../src/apis/index/index"
 import { GetLastAcceptedResponse } from "../../src/apis/index/interfaces"

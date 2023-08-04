@@ -1,4 +1,5 @@
-import Avalanche, { BN, Buffer } from "../../src"
+import "dotenv/config"
+import { Avalanche, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   GenesisAsset,
@@ -15,10 +16,10 @@ import {
   SerializedType
 } from "../../src/utils"
 const serialization: Serialization = Serialization.getInstance()
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const xchain: AVMAPI = avalanche.XChain()
 const xKeychain: KeyChain = xchain.keyChain()

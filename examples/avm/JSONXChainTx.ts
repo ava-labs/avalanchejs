@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, Buffer } from "../../src"
 import { AVMAPI, Tx } from "../../src/apis/avm"
 

@@ -1,5 +1,6 @@
 // using https://www.npmjs.com/package/@noble/bls12-381
 // import { getPublicKey, sign, verify } from "@noble/bls12-381"
+import "dotenv/config"
 import { Avalanche, Buffer } from "../../src"
 import {
   KeyChain,
@@ -9,15 +10,21 @@ import {
 } from "../../src/apis/platformvm"
 
 // start placeholder functions
-const getPublicKey = (privateKey): Buffer => {return new Buffer("00")}
-const sign = (publicKey, privateKey): Buffer => {return new Buffer("00")}
-const verify = (signature, message, publicKey): boolean => {return true}
+const getPublicKey = (privateKey): Buffer => {
+  return new Buffer("00")
+}
+const sign = (publicKey, privateKey): Buffer => {
+  return new Buffer("00")
+}
+const verify = (signature, message, publicKey): boolean => {
+  return true
+}
 // end placeholder functions
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const keychain: KeyChain = pchain.keyChain()
@@ -28,7 +35,7 @@ const main = async (): Promise<any> => {
   // 48 byte public key
   const publicKey = getPublicKey(privateKey) as Buffer
   // 96 byte signature
-  const signature = await sign(publicKey, privateKey) as Buffer
+  const signature = (await sign(publicKey, privateKey)) as Buffer
   const proofOfPossession: ProofOfPossession = new ProofOfPossession(
     publicKey,
     signature
