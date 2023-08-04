@@ -8,8 +8,8 @@ import {
 } from "../../src/apis/index/interfaces"
 
 const ip: string = "indexer-demo.avax.network"
-const port: number = 443
-const protocol: string = "https"
+const port = Number(process.env.PORT)
+const networkID = Number(process.env.NETWORK_ID)
 const networkID: number = 1
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
