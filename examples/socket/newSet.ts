@@ -1,11 +1,9 @@
 import "dotenv/config"
 import { PubSub, Socket } from "../../src"
 
-const protocol: string = "ws"
-const host: string = "localhost"
-const ip = process.env.IP
+const protocol = process.env.PROTOCOL_WS
+const host = process.env.LOCALHOST
 const port = Number(process.env.PORT)
-const protocol = process.env.PROTOCOL
 const addresses: string[] = ["X-local18jma8ppw3nhx5r4ap8clazz0dps7rv5u00z96u"]
 
 const main = async (): Promise<any> => {
