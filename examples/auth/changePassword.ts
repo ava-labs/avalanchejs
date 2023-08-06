@@ -7,10 +7,10 @@ import { Avalanche } from "../../src"
 import { AuthAPI } from "../../src/apis/auth"
 import { readFile } from "fs"
 
-const ip = process.env.IP
-const port = Number(process.env.PORT)
-const protocol = process.env.PROTOCOL
-const networkID = Number(process.env.NETWORK_ID)
+const ip = process.env.LOCAL_IP
+const port = Number(process.env.LOCAL_PORT)
+const protocol = process.env.LOCAL_PROTOCOL
+const networkID = Number(process.env.LOCAL_NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const auth: AuthAPI = avalanche.Auth()
 
