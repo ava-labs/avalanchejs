@@ -11,7 +11,7 @@ const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
   const status: string = await xchain.getTxStatus(
-    "2WdpWdsqE26Qypmf66No8KeBYbNhdk3zSG7a5uNYZ3FLSvCu1D"
+    "2MSJdxJ64sVLQ9GUatyzjCjazrgVMCYbD1zxFHPseqY5r8Hrdp"
   )
   console.log(status)
 }
