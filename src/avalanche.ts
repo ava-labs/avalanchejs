@@ -50,7 +50,7 @@ export default class AvalancheCore {
    * &#,@+()$~%'":*?{} also less than and greater than signs
    */
   setAddress = (
-    host: string,
+    host: string | undefined,
     port: number,
     protocol: string = "http",
     baseEndpoint: string = ""
