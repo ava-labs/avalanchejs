@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import { EVMAPI, KeyChain as EVMKeyChain } from "../../src/apis/evm"
 import {
@@ -21,10 +22,10 @@ import {
   MILLIAVAX
 } from "../../src/utils"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const cchain: EVMAPI = avalanche.CChain()
 const pchain: PlatformVMAPI = avalanche.PChain()

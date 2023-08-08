@@ -1,10 +1,6 @@
 import * as bech32 from "bech32"
 import { Buffer } from "../../src"
 
-const fromDecToHex = (item: number) => {
-  const hexVal = item.toString(16)
-  return hexVal.length < 2 ? "0" + hexVal : hexVal
-}
 const bech32Encoder = (item: string) => {
   const hrp = "avax"
   const bufFromHex = Buffer.from(item.slice(2), "hex")

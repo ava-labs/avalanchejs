@@ -1,13 +1,15 @@
-import { Avalanche, BN, Buffer } from "../../src"
+import "dotenv/config"
+import { Avalanche, Buffer } from "../../src"
 import { EVMAPI, Tx } from "../../src/apis/evm"
 import { Serialization } from "../../src/utils"
 import { SerializedType } from "../../src/utils"
 import * as bech32 from "bech32"
+import "dotenv/config"
 
-const ip: string = "api.avax.network"
-const port: number = 443
-const protocol: string = "https"
-const networkID: number = 1
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const cchain: EVMAPI = avalanche.CChain()
 const cb58: SerializedType = "cb58"

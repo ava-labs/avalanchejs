@@ -2,14 +2,15 @@
 // which you can create based on "secrets.example" which is in the
 // root of the `examples/` directory.
 // Unlike "secrets.example", "secrets.json" should never be committed to git.
+import "dotenv/config"
 import { Avalanche } from "../../src"
 import { AuthAPI } from "../../src/apis/auth"
 import { readFile } from "fs"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.LOCAL_IP
+const port = Number(process.env.LOCAL_PORT)
+const protocol = process.env.LOCAL_PROTOCOL
+const networkID = Number(process.env.LOCAL_NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const auth: AuthAPI = avalanche.Auth()
 
