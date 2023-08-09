@@ -1,10 +1,8 @@
-import "dotenv/config"
 import { Buffer } from "../../src"
 import { Tx } from "../../src/apis/evm"
 import { Serialization } from "../../src/utils"
 import { SerializedType } from "../../src/utils"
 import * as bech32 from "bech32"
-import "dotenv/config"
 
 const cb58: SerializedType = "cb58"
 const serialization: Serialization = Serialization.getInstance()
