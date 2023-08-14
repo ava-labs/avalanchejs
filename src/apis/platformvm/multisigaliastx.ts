@@ -44,6 +44,10 @@ export class MultisigAlias {
     return this.memo
   }
 
+  getOwners(): ParseableOutput {
+    return this.owners
+  }
+
   deserialize(fields: object, encoding: SerializedEncoding = "hex"): this {
     this.id = serialization.decoder(fields["id"], encoding, "cb58", "Buffer")
     this.memo = serialization.decoder(
