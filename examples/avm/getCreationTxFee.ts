@@ -9,10 +9,10 @@ const avalanche: Avalanche = new Avalanche(
   config.protocol,
   config.networkID
 )
-const xchain: AVMAPI = avalanche.XChain()
 
 const main = async (): Promise<any> => {
-  const txFee: BN = xchain.getCreationTxFee()
+  await avalanche.fetchNetworkSettings()
+  const txFee: BN = avalanche.XChain().getCreationTxFee()
   console.log(txFee)
 }
 

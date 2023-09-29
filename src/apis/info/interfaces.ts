@@ -28,7 +28,6 @@ export interface PeersResponse {
 
 export interface GetTxFeeResponse {
   txFee: BN
-  creationTxFee: BN
   createAssetTxFee: BN
   createSubnetTxFee: BN
   createBlockchainTxFee: BN

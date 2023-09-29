@@ -42,7 +42,7 @@ export interface X {
   blockchainID: string
   alias: string
   vm: string
-  creationTxFee: BN | number
+  createAssetTxFee: BN | number
   avaxAssetID: string
   avaxAssetAlias: string
   txFee?: BN | number
@@ -54,7 +54,7 @@ export interface P {
   blockchainID: string
   alias: string
   vm: string
-  creationTxFee: BN | number
+  createAssetTxFee: BN | number
   createSubnetTx: BN | number
   createChainTx: BN | number
   minConsumption: number
@@ -95,7 +95,7 @@ const TestNetwork: Network = {
     avaxAssetID: TestAvaxAssetID,
     avaxAssetAlias: "AVAX",
     txFee: MILLIAVAX,
-    creationTxFee: CENTIAVAX,
+    createAssetTxFee: CENTIAVAX,
     mintTxFee: MILLIAVAX
   },
   P: {
@@ -103,7 +103,7 @@ const TestNetwork: Network = {
     alias: PChainAlias,
     vm: PChainVMName,
     txFee: MILLIAVAX,
-    creationTxFee: CENTIAVAX,
+    createAssetTxFee: CENTIAVAX,
     createSubnetTx: ONEAVAX,
     createChainTx: ONEAVAX,
     minConsumption: 0.1,
@@ -143,7 +143,7 @@ const AvaxMainNetwork: Network = {
     avaxAssetID: "FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z",
     avaxAssetAlias: "AVAX",
     txFee: MILLIAVAX,
-    creationTxFee: CENTIAVAX,
+    createAssetTxFee: CENTIAVAX,
     mintTxFee: MILLIAVAX
   },
   P: {
@@ -151,7 +151,7 @@ const AvaxMainNetwork: Network = {
     alias: PChainAlias,
     vm: PChainVMName,
     txFee: MILLIAVAX,
-    creationTxFee: CENTIAVAX,
+    createAssetTxFee: CENTIAVAX,
     createSubnetTx: ONEAVAX,
     createChainTx: ONEAVAX,
     minConsumption: 0.1,

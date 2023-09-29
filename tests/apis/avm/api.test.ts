@@ -1478,7 +1478,7 @@ describe("AVMAPI", (): void => {
     })
 
     test("buildCreateAssetTx - Variable Cap", async (): Promise<void> => {
-      avm.setCreationTxFee(new BN(avalanche.getNetwork().P["creationTxFee"]))
+      avm.setCreationTxFee(new BN(avalanche.getNetwork().P.createAssetTxFee))
       const mintOutputs: SECPMintOutput[] = [secpMintOut1, secpMintOut2]
       const txu1: UnsignedTx = await avm.buildCreateAssetTx(
         set,

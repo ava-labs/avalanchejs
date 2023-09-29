@@ -175,13 +175,13 @@ export default class Avalanche extends AvalancheCore {
         avaxAssetAlias: response.assetSymbol,
         blockchainID: xchain["id"],
         vm: XChainVMName,
-        creationTxFee: fees.creationTxFee,
+        createAssetTxFee: fees.createAssetTxFee,
         txFee: fees.txFee
       },
       P: {
         alias: PChainAlias,
         blockchainID: DefaultPlatformChainID,
-        creationTxFee: fees.creationTxFee,
+        createAssetTxFee: fees.createAssetTxFee,
         createSubnetTx: fees.createSubnetTxFee,
         createChainTx: fees.createBlockchainTxFee,
         maxConsumption: response.maxConsumptionRate,

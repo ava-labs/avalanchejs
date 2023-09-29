@@ -273,7 +273,7 @@ export class PlatformVMAPI extends JRPCAPI {
    * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}
    */
   getDefaultCreationTxFee = (): BN => {
-    return new BN(this.core.getNetwork().P.creationTxFee)
+    return new BN(this.core.getNetwork().P.createAssetTxFee)
   }
 
   /**
