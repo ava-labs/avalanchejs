@@ -2552,7 +2552,9 @@ export class PlatformVMAPI extends JRPCAPI {
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
     amountToLock: BN,
-    changeThreshold: number = 1
+    changeThreshold: number = 1,
+    to: Buffer[] = [],
+    toThreshold: number = 0
   ): Promise<UnsignedTx> => {
     const caller = "buildDepositTx"
 
@@ -2618,7 +2620,9 @@ export class PlatformVMAPI extends JRPCAPI {
       memo,
       asOf,
       amountToLock,
-      changeThreshold
+      changeThreshold,
+      to,
+      toThreshold
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {

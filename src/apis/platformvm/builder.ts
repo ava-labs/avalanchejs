@@ -1326,7 +1326,9 @@ export class Builder {
     memo: Buffer = undefined,
     asOf: BN = zero,
     amountToLock: BN,
-    changeThreshold: number = 1
+    changeThreshold: number = 1,
+    to: Buffer[] = [],
+    toThreshold: number = 0
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
@@ -1334,8 +1336,8 @@ export class Builder {
 
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
-        [],
-        0,
+        to,
+        toThreshold,
         fromSigner.from,
         fromSigner.signer,
         changeAddresses,

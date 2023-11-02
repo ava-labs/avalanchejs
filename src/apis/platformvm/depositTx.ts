@@ -148,9 +148,11 @@ export class DepositTx extends BaseTx {
   }
 
   addOwnerAuth(auth: [number, Buffer][], sigs: Buffer[]): void {
-    auth.forEach((p) =>
-      this.addSignatureIdx(1, this.ownerAuth, p[0], undefined)
-    )
+    auth.forEach((p) => {
+      const pseudoAddr = Buffer.alloc(20)
+      pseudoAddr.writeUIntBE(auth.indexOf(p) + 1, 16, 4)
+      this.addSignatureIdx(1, this.ownerAuth, p[0], pseudoAddr)
+    })
     this.ownerSignatures = sigs
   }
 

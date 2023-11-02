@@ -7,6 +7,7 @@ import {
   AddressState
 } from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
+import { DefaultLocalGenesisPrivateKey2 } from "caminojs/utils"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
@@ -19,8 +20,7 @@ const avalanche: Avalanche = new Avalanche(
 /**
  * @ignore
  */
-let privKey: string =
-  "PrivateKey-vmRQiZeXEXYMyJhEiqdC2z5JhuDbxL8ix9UVvjgMu2Er1NepE"
+let privKey: string = `PrivateKey-${DefaultLocalGenesisPrivateKey2}`
 
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
@@ -40,7 +40,7 @@ const main = async (): Promise<any> => {
   await InitAvalanche()
 
   const address = pAddressStrings[0]
-  const state = AddressState.ROLE_KYC
+  const state = AddressState.OFFERS_CREATOR
   const remove = false
   const memo: Buffer = Buffer.from(
     "Utility function to create an AddressStateTx transaction"

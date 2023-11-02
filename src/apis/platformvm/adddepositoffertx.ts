@@ -121,10 +121,6 @@ export class Offer {
     }
   }
 
-  getMemo(): Buffer {
-    return this.memo
-  }
-
   deserialize(fields: object, encoding: SerializedEncoding = "hex"): this {
     const upgradeVersion = serialization.decoder(
       fields["upgradeVersion"],
@@ -424,6 +420,55 @@ export class Offer {
       )
     }
     return Buffer.concat(buffer, bsize)
+  }
+
+  getUpgradeVersionID(): UpgradeVersionID {
+    return this.upgradeVersionID
+  }
+  getInterestRateNominator(): Buffer {
+    return this.interestRateNominator
+  }
+  getStart(): Buffer {
+    return this.start
+  }
+  getEnd(): Buffer {
+    return this.end
+  }
+  getMinAmount(): Buffer {
+    return this.minAmount
+  }
+  getTotalMaxAmount(): Buffer {
+    return this.totalMaxAmount
+  }
+  getDepositedAmount(): Buffer {
+    return this.depositedAmount
+  }
+  getMinDuration(): Buffer {
+    return this.minDuration
+  }
+  getMaxDuration(): Buffer {
+    return this.maxDuration
+  }
+  getUnlockPeriodDuration(): Buffer {
+    return this.unlockPeriodDuration
+  }
+  getNoRewardsPeriodDuration(): Buffer {
+    return this.noRewardsPeriodDuration
+  }
+  getMemo(): Buffer {
+    return this.memo
+  }
+  getFlags(): Buffer {
+    return this.flags
+  }
+  getTotalMaxRewardAmount(): Buffer {
+    return this.totalMaxRewardAmount
+  }
+  getRewardedAmount(): Buffer {
+    return this.rewardedAmount
+  }
+  getOwnerAddress(): Buffer {
+    return this.ownerAddress
   }
 }
 
