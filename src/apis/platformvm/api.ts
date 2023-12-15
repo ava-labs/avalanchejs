@@ -655,6 +655,7 @@ export class PlatformVMAPI extends JRPCAPI {
           depositTxID: deposit.depositTxID,
           depositOfferID: deposit.depositOfferID,
           unlockedAmount: new BN(deposit.unlockedAmount),
+          unlockableAmount: new BN(deposit.unlockableAmount),
           claimedRewardAmount: new BN(deposit.claimedRewardAmount),
           start: new BN(deposit.start),
           duration: deposit.duration,

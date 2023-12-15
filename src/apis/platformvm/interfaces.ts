@@ -292,6 +292,7 @@ export interface APIDeposit {
   depositTxID: string
   depositOfferID: string
   unlockedAmount: BN
+  unlockableAmount: BN
   claimedRewardAmount: BN
   start: BN
   duration: number

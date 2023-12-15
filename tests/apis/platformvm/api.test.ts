@@ -2685,6 +2685,7 @@ describe("PlatformVMAPI", (): void => {
             start: "5",
             duration: 6,
             amount: "7",
+            unlockableAmount: "8",
             rewardOwner: {
               locktime: 0,
               threshold: 1,
@@ -2726,6 +2727,7 @@ describe("PlatformVMAPI", (): void => {
     expect(response.deposits[0].start).toStrictEqual(new BN("5"))
     expect(response.deposits[0].duration).toBe(6)
     expect(response.deposits[0].amount).toStrictEqual(new BN("7"))
+    expect(response.deposits[0].unlockableAmount).toStrictEqual(new BN("8"))
     expect(response.deposits[0].rewardOwner.locktime).toStrictEqual(new BN("0"))
     expect(response.deposits[0].rewardOwner.threshold).toBe(1)
     expect(response.deposits[0].rewardOwner.addresses).toStrictEqual([addrA])
