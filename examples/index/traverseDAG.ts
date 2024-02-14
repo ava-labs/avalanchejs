@@ -1,3 +1,4 @@
+import "dotenv/config"
 import { Avalanche, Buffer } from "../../src"
 import { Vertex } from "../../src/apis/avm"
 import { IndexAPI } from "../../src/apis/index"
@@ -6,10 +7,10 @@ import {
   GetLastAcceptedResponse
 } from "../../src/apis/index/interfaces"
 
-const ip: string = "indexer-demo.avax.network"
-const port: number = 443
-const protocol: string = "https"
-const networkID: number = 1
+const ip = process.env.IP_INDEXER
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const index: IndexAPI = avalanche.Index()
 

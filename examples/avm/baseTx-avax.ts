@@ -1,5 +1,6 @@
+import "dotenv/config"
 import createHash from "create-hash"
-import { Avalanche, BinTools, BN, Buffer } from "avalanche/dist"
+import { Avalanche, BinTools, BN, Buffer } from "../../src"
 import {
   AVMAPI,
   KeyChain,
@@ -13,18 +14,18 @@ import {
   UnsignedTx,
   Tx,
   BaseTx
-} from "avalanche/dist/apis/avm"
+} from "../../src/apis/avm"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey,
   Defaults
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 
 const bintools: BinTools = BinTools.getInstance()
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 
 const xBlockchainID: string = Defaults.network[networkID].X.blockchainID
 const avaxAssetID: string = Defaults.network[networkID].X.avaxAssetID

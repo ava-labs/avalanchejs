@@ -1,15 +1,16 @@
-import { Avalanche } from "avalanche/dist"
-import { PlatformVMAPI, KeyChain } from "avalanche/dist/apis/platformvm"
-import { GetStakeResponse } from "avalanche/dist/apis/platformvm/interfaces"
+import "dotenv/config"
+import { Avalanche } from "../../src"
+import { PlatformVMAPI, KeyChain } from "../../src/apis/platformvm"
+import { GetStakeResponse } from "../../src/apis/platformvm/interfaces"
 import {
   PrivateKeyPrefix,
   DefaultLocalGenesisPrivateKey
-} from "avalanche/dist/utils"
+} from "../../src/utils"
 
-const ip: string = "localhost"
-const port: number = 9650
-const protocol: string = "http"
-const networkID: number = 1337
+const ip = process.env.IP
+const port = Number(process.env.PORT)
+const protocol = process.env.PROTOCOL
+const networkID = Number(process.env.NETWORK_ID)
 const avalanche: Avalanche = new Avalanche(ip, port, protocol, networkID)
 const pchain: PlatformVMAPI = avalanche.PChain()
 const pKeychain: KeyChain = pchain.keyChain()
