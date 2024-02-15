@@ -1,25 +1,33 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
-    "baseUrl": ".",
-    "module": "commonjs",
-    "target": "ES2015",
-    "lib": ["dom", "es2016"],
+    "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "declarationMap": true,
-    "noFallthroughCasesInSwitch": true,
-    "strictFunctionTypes": true,
-    "esModuleInterop": true,
-    "typeRoots": ["./typings/**", "./node_modules/@types"]
+    "sourceMap": true,
+    "strict": true,
+    "module": "ESNext",
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "esnext",
+    "outDir": "./dist",
+    "baseUrl": "src",
+    "rootDir": "src",
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false
   },
-  "exclude": ["node_modules", "examples", "*/**/*.test.ts", "e2e_tests"],
-  "include": ["src/"],
-  "typeAcquisition": {
-    "enable": true,
-    "exclude": ["bn.js"]
+  "include": ["src", "index.d.ts"],
+  "ts-node": {
+    "esm": true,
+    "include": ["index.ts"],
+    "experimentalSpecifierResolution": "node"
   }
 }
