@@ -1,32 +1,33 @@
-name: Push to release branch
-
+name: Release
 on:
   push:
     branches:
       - release
-      - master
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    environment: production
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
-      - name: Create .npmrc
-        run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}' >> .npmrc
+          node-version: 20.x
       - name: Install dependencies
-        run: yarn install
+        run: yarn
       - name: Build library
-        run: yarn build
+        run: yarn build:prod
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_BRANCH: release
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: yarn run semantic-release
+      - name: Rebase master
+        run: |
+          git checkout master &&
+          git rebase release &&
+          git push origin master

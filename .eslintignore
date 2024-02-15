@@ -1,5 +1,1 @@
-/**/*.js
-/typings/*
-/tests/*
-/examples/*
-/web/*
+dist
