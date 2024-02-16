@@ -1,6 +1,6 @@
 import { ProofOfPossession } from './proofOfPossession';
 
-const pubkey = new Uint8Array([
+const publicKey = new Uint8Array([
   0x85, 0x02, 0x5b, 0xca, 0x6a, 0x30, 0x2d, 0xc6, 0x13, 0x38, 0xff, 0x49, 0xc8,
   0xba, 0xa5, 0x72, 0xde, 0xd3, 0xe8, 0x6f, 0x37, 0x59, 0x30, 0x4c, 0x7f, 0x61,
   0x8a, 0x2a, 0x25, 0x93, 0xc1, 0x87, 0xe0, 0x80, 0xa3, 0xcf, 0xde, 0xc9, 0x50,
@@ -20,27 +20,33 @@ const signature = new Uint8Array([
 
 describe('proofOfPossession', function () {
   it('can init', () => {
-    const proof = new ProofOfPossession(pubkey, signature);
-    expect(proof instanceof ProofOfPossession).toBe(true);
+    const [pop] = ProofOfPossession.fromBytes(
+      new Uint8Array([...publicKey, ...signature]),
+    );
+    expect(pop instanceof ProofOfPossession).toBe(true);
   });
 
   it('throws for invalid pubkey', () => {
     expect(() => {
-      const invalidPub = pubkey.slice(0, pubkey.length - 2);
-      new ProofOfPossession(invalidPub, signature);
+      const popBytes = new Uint8Array([...publicKey, ...signature]);
+      popBytes[2] = 0x00;
+      ProofOfPossession.fromBytes(popBytes);
     }).toThrow();
   });
 
   it('throws for invalid signature', () => {
     expect(() => {
-      const invalidSig = signature.slice(0, signature.length - 2);
-      new ProofOfPossession(pubkey, invalidSig);
+      const popBytes = new Uint8Array([...publicKey, ...signature]);
+      popBytes[64] = 0x00;
+      ProofOfPossession.fromBytes(popBytes);
     }).toThrow();
   });
 
   it('can call toString', () => {
-    const proof = new ProofOfPossession(pubkey, signature);
+    const [pop] = ProofOfPossession.fromBytes(
+      new Uint8Array([...publicKey, ...signature]),
+    );
     const expected = `0x85025bca6a302dc61338ff49c8baa572ded3e86f3759304c7f618a2a2593c187e080a3cfdec95040309ad1f1589530678b1d6133d17e3483220ad960b6fde11e4e1214a8ce21ef616227e5d5eef070d7500e6f7d4452c5a760620cc06795cbe218e072eba76d94788d9d01176ce4ecadfb96b47f942281894ddfadd1c1743f7f549f1d07d59d55655927f72bc6bf7c12`;
-    expect(proof.toString()).toEqual(expected);
+    expect(pop.toString()).toEqual(expected);
   });
 });

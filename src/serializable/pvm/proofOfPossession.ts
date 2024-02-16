@@ -1,6 +1,6 @@
 import { serializable } from '../common/types';
 import { bufferToHex, concatBytes } from '../../utils/buffer';
-import { BLS_PUBKEY_LENGTH, BLS_SIGNATURE_LENGTH } from '../../constants/bls';
+import * as bls from '../../utils/bls';
 import { TypeSymbols } from '../constants';
 
 /**
@@ -11,22 +11,34 @@ export class ProofOfPossession {
   _type = TypeSymbols.ProofOfPossession;
 
   constructor(
-    public readonly publicKey: Uint8Array,
-    public readonly signature: Uint8Array,
+    public readonly publicKey: bls.PublicKey,
+    public readonly signature: bls.Signature,
   ) {
-    if (publicKey.length !== BLS_PUBKEY_LENGTH)
-      throw new Error(`public key must be ${BLS_PUBKEY_LENGTH} bytes`);
-    if (signature.length !== BLS_SIGNATURE_LENGTH)
-      throw new Error(`signature must be ${BLS_SIGNATURE_LENGTH} bytes`);
+    publicKey.assertValidity();
+    signature.assertValidity();
+
+    if (
+      !bls.VerifyProofOfPossession(
+        publicKey,
+        signature,
+        bls.PublicKeyToBytes(publicKey),
+      )
+    ) {
+      throw new Error(`Invalid signature`);
+    }
   }
 
   static fromBytes(bytes: Uint8Array): [ProofOfPossession, Uint8Array] {
-    const pubkey = bytes.slice(0, BLS_PUBKEY_LENGTH);
-    const signature = bytes.slice(
-      BLS_PUBKEY_LENGTH,
-      BLS_PUBKEY_LENGTH + BLS_SIGNATURE_LENGTH,
+    const pubkey = bls.PublicKeyFromBytes(
+      bytes.slice(0, bls.PUBLIC_KEY_LENGTH),
     );
-    const rest = bytes.slice(BLS_PUBKEY_LENGTH + BLS_SIGNATURE_LENGTH);
+    const signature = bls.SignatureFromBytes(
+      bytes.slice(
+        bls.PUBLIC_KEY_LENGTH,
+        bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH,
+      ),
+    );
+    const rest = bytes.slice(bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH);
     return [new ProofOfPossession(pubkey, signature), rest];
   }
 
@@ -35,6 +47,9 @@ export class ProofOfPossession {
   }
 
   toBytes() {
-    return concatBytes(this.publicKey, this.signature);
+    return concatBytes(
+      bls.PublicKeyToBytes(this.publicKey),
+      bls.SignatureToBytes(this.signature),
+    );
   }
 }

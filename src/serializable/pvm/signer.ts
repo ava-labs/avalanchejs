@@ -3,6 +3,7 @@ import { ProofOfPossession } from './proofOfPossession';
 import { pack, unpack } from '../../utils/struct';
 import type { Codec } from '../codec';
 import { TypeSymbols } from '../constants';
+import * as bls from '../../utils/bls';
 
 @serializable()
 export class Signer {
@@ -41,8 +42,8 @@ export function createSignerOrSignerEmptyFromStrings(
   return publicKey && signature
     ? new Signer(
         new ProofOfPossession(
-          new Uint8Array(publicKey),
-          new Uint8Array(signature),
+          bls.PublicKeyFromBytes(publicKey),
+          bls.SignatureFromBytes(signature),
         ),
       )
     : new SignerEmpty();
