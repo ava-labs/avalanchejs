@@ -67,7 +67,7 @@
     "jest-mock": "29.7.0",
     "lint-staged": "15.2.2",
     "node-fetch": "3.3.2",
-    "prettier": "2.8.7",
+    "prettier": "3.2.5",
     "rollup": "4.9.6",
     "rollup-plugin-filesize": "10.0.0",
     "semantic-release": "21.0.1",
