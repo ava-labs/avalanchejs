@@ -55,7 +55,6 @@ import {
 } from './secp256k1';
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
-import * as bls from '../utils/bls';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -190,10 +189,7 @@ export const advanceTimeTx = () => new AdvanceTimeTx(bigIntPr());
 export const advanceTimeBytesTx = () => bigIntPrBytes();
 
 export const proofOfPossession = () =>
-  new ProofOfPossession(
-    bls.PublicKeyFromBytes(blsPublicKeyBytes()),
-    bls.SignatureFromBytes(blsSignatureBytes()),
-  );
+  new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes());
 
 export const signer = () => new Signer(proofOfPossession());
 export const signerBytes = () =>

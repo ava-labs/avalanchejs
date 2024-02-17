@@ -11,32 +11,25 @@ export class ProofOfPossession {
   _type = TypeSymbols.ProofOfPossession;
 
   constructor(
-    public readonly publicKey: bls.PublicKey,
-    public readonly signature: bls.Signature,
+    public readonly publicKey: Uint8Array,
+    public readonly signature: Uint8Array,
   ) {
-    publicKey.assertValidity();
-    signature.assertValidity();
+    const pk = bls.PublicKeyFromBytes(publicKey);
+    const sig = bls.SignatureFromBytes(signature);
 
-    if (
-      !bls.VerifyProofOfPossession(
-        publicKey,
-        signature,
-        bls.PublicKeyToBytes(publicKey),
-      )
-    ) {
+    pk.assertValidity();
+    sig.assertValidity();
+
+    if (!bls.VerifyProofOfPossession(pk, sig, bls.PublicKeyToBytes(pk))) {
       throw new Error(`Invalid signature`);
     }
   }
 
   static fromBytes(bytes: Uint8Array): [ProofOfPossession, Uint8Array] {
-    const pubkey = bls.PublicKeyFromBytes(
-      bytes.slice(0, bls.PUBLIC_KEY_LENGTH),
-    );
-    const signature = bls.SignatureFromBytes(
-      bytes.slice(
-        bls.PUBLIC_KEY_LENGTH,
-        bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH,
-      ),
+    const pubkey = bytes.slice(0, bls.PUBLIC_KEY_LENGTH);
+    const signature = bytes.slice(
+      bls.PUBLIC_KEY_LENGTH,
+      bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH,
     );
     const rest = bytes.slice(bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH);
     return [new ProofOfPossession(pubkey, signature), rest];
@@ -47,9 +40,6 @@ export class ProofOfPossession {
   }
 
   toBytes() {
-    return concatBytes(
-      bls.PublicKeyToBytes(this.publicKey),
-      bls.SignatureToBytes(this.signature),
-    );
+    return concatBytes(this.publicKey, this.signature);
   }
 }
