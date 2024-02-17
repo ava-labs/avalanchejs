@@ -49,6 +49,8 @@ describe('bls', () => {
     const pk = bls.publicKeyFromBytes(pkStr);
     const pop = bls.signatureFromBytes(hexToBuffer(popStr));
 
-    expect(bls.verifyProofOfPossession(pk, pop, pk.toRawBytes())).toEqual(true);
+    expect(
+      bls.verifyProofOfPossession(pk, pop, bls.publicKeyToBytes(pk)),
+    ).toEqual(true);
   });
 });
