@@ -1,14 +1,14 @@
 import { stringToBytes } from '@scure/base';
 import { hexToBuffer } from '../utils/buffer';
 import {
-  PublicKeyFromBytes,
-  PublicKeyToBytes,
-  SecretKeyFromBytes,
-  SecretKeyToBytes,
-  SignatureFromBytes,
-  SignatureToBytes,
-  Verify,
-  VerifyProofOfPossession,
+  publicKeyFromBytes,
+  publicKeyToBytes,
+  secretKeyFromBytes,
+  secretKeyToBytes,
+  signatureFromBytes,
+  signatureToBytes,
+  verify,
+  verifyProofOfPossession,
 } from './bls';
 
 const msgStr = 'test';
@@ -23,20 +23,20 @@ const sigStr =
 
 describe('bls', () => {
   it('serializes correctly', async () => {
-    const sk = SecretKeyFromBytes(skStr);
-    expect(SecretKeyToBytes(sk)).toEqual(hexToBuffer(skStr));
+    const sk = secretKeyFromBytes(skStr);
+    expect(secretKeyToBytes(sk)).toEqual(hexToBuffer(skStr));
 
-    const pk = PublicKeyFromBytes(pkStr);
-    expect(PublicKeyToBytes(pk)).toEqual(hexToBuffer(pkStr));
+    const pk = publicKeyFromBytes(pkStr);
+    expect(publicKeyToBytes(pk)).toEqual(hexToBuffer(pkStr));
 
-    const pk2 = PublicKeyFromBytes(hexToBuffer(pkStr));
-    expect(PublicKeyToBytes(pk2)).toEqual(hexToBuffer(pkStr));
+    const pk2 = publicKeyFromBytes(hexToBuffer(pkStr));
+    expect(publicKeyToBytes(pk2)).toEqual(hexToBuffer(pkStr));
 
-    const pop = SignatureFromBytes(hexToBuffer(popStr));
-    expect(SignatureToBytes(pop)).toEqual(hexToBuffer(popStr));
+    const pop = signatureFromBytes(hexToBuffer(popStr));
+    expect(signatureToBytes(pop)).toEqual(hexToBuffer(popStr));
 
-    const sig = SignatureFromBytes(hexToBuffer(sigStr));
-    expect(SignatureToBytes(sig)).toEqual(hexToBuffer(sigStr));
+    const sig = signatureFromBytes(hexToBuffer(sigStr));
+    expect(signatureToBytes(sig)).toEqual(hexToBuffer(sigStr));
   });
 
   it('generates signature correctly', async () => {
@@ -44,10 +44,10 @@ describe('bls', () => {
   });
 
   it('verifies signature correctly', async () => {
-    const pk = PublicKeyFromBytes(pkStr);
-    const sig = SignatureFromBytes(hexToBuffer(sigStr));
+    const pk = publicKeyFromBytes(pkStr);
+    const sig = signatureFromBytes(hexToBuffer(sigStr));
 
-    expect(Verify(pk, sig, stringToBytes('utf8', msgStr))).toEqual(true);
+    expect(verify(pk, sig, stringToBytes('utf8', msgStr))).toEqual(true);
   });
 
   it('generates proof of possession correctly', async () => {
@@ -55,9 +55,9 @@ describe('bls', () => {
   });
 
   it('verifies proof of possession correctly', async () => {
-    const pk = PublicKeyFromBytes(pkStr);
-    const pop = SignatureFromBytes(hexToBuffer(popStr));
+    const pk = publicKeyFromBytes(pkStr);
+    const pop = signatureFromBytes(hexToBuffer(popStr));
 
-    expect(VerifyProofOfPossession(pk, pop, pk.toRawBytes())).toEqual(true);
+    expect(verifyProofOfPossession(pk, pop, pk.toRawBytes())).toEqual(true);
   });
 });
