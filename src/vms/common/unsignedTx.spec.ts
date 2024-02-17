@@ -19,7 +19,7 @@ import { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx } from '../../serializable/avm';
 import { Address } from '../../serializable/fxs/common';
 import { Input, TransferInput } from '../../serializable/fxs/secp256k1';
-import { sign } from '../../utils';
+import { sign } from '../../crypto/secp256k1';
 import { AddressMap, AddressMaps } from '../../utils/addressMap';
 import { UnsignedTx } from './unsignedTx';
 

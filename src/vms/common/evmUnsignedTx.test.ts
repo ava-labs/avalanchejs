@@ -2,7 +2,7 @@ import { signature } from '../../fixtures/secp256k1';
 import { exportTx } from '../../fixtures/evm';
 import { testEthAddress1, testPrivateKey1 } from '../../fixtures/vms';
 import { Address } from '../../serializable/fxs/common';
-import { sign } from '../../utils';
+import { sign } from '../../crypto/secp256k1';
 import { AddressMap, AddressMaps } from '../../utils/addressMap';
 import { EVMUnsignedTx } from './evmUnsignedTx';
 
