@@ -1,5 +1,5 @@
 import { stringToBytes } from '@scure/base';
-import { hexToBuffer } from './buffer';
+import { hexToBuffer } from '../utils/buffer';
 import {
   PublicKeyFromBytes,
   PublicKeyToBytes,

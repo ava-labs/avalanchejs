@@ -5,7 +5,7 @@ export * from './buffer';
 export * from './bytesCompare';
 export * from './costs';
 export * from './devutils';
-export * from './secp256k1';
+export * from '../crypto/secp256k1';
 export * from './typeGuards';
 export * from './UTXOSet';
 export * from './addChecksum';

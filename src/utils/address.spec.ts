@@ -1,5 +1,5 @@
 import { base58check } from './base58';
-import * as secp from './secp256k1';
+import * as secp from '../crypto/secp256k1';
 import * as address from './address';
 
 describe('address', () => {

@@ -1,6 +1,6 @@
 import { serializable } from '../common/types';
 import { bufferToHex, concatBytes } from '../../utils/buffer';
-import * as bls from '../../utils/bls';
+import * as bls from '../../crypto/bls';
 import { TypeSymbols } from '../constants';
 
 /**
@@ -14,13 +14,13 @@ export class ProofOfPossession {
     public readonly publicKey: Uint8Array,
     public readonly signature: Uint8Array,
   ) {
-    const pk = bls.PublicKeyFromBytes(publicKey);
-    const sig = bls.SignatureFromBytes(signature);
+    const pk = bls.publicKeyFromBytes(publicKey);
+    const sig = bls.signatureFromBytes(signature);
 
     pk.assertValidity();
     sig.assertValidity();
 
-    if (!bls.VerifyProofOfPossession(pk, sig, bls.PublicKeyToBytes(pk))) {
+    if (!bls.verifyProofOfPossession(pk, sig, bls.publicKeyToBytes(pk))) {
       throw new Error(`Invalid signature`);
     }
   }
