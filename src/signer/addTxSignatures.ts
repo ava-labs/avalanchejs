@@ -1,5 +1,5 @@
 import type { UnsignedTx } from '../vms/common/unsignedTx';
-import { getPublicKey, sign } from '../utils';
+import { getPublicKey, sign } from '../crypto/secp256k1';
 
 export const addTxSignatures = async ({
   unsignedTx,

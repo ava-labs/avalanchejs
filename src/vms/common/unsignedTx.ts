@@ -6,13 +6,12 @@ import type { VM } from '../../serializable/constants';
 import { ValidVMs } from '../../serializable/constants';
 import { Address } from '../../serializable/fxs/common';
 import { Credential } from '../../serializable/fxs/secp256k1';
+import { bufferToHex, hexToBuffer } from '../../utils';
 import {
-  bufferToHex,
-  hexToBuffer,
   publicKeyBytesToAddress,
   publicKeyToEthAddress,
   recoverPublicKey,
-} from '../../utils';
+} from '../../crypto/secp256k1';
 import { AddressMaps } from '../../utils/addressMap';
 import { getManagerForVM, packTx } from '../../utils/packTx';
 import type { Transaction } from './transaction';

@@ -39,6 +39,11 @@ export function createSignerOrSignerEmptyFromStrings(
   signature?: Uint8Array,
 ) {
   return publicKey && signature
-    ? new Signer(new ProofOfPossession(publicKey, signature))
+    ? new Signer(
+        new ProofOfPossession(
+          new Uint8Array(publicKey),
+          new Uint8Array(signature),
+        ),
+      )
     : new SignerEmpty();
 }

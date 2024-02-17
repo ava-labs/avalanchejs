@@ -20,9 +20,7 @@ const signature = new Uint8Array([
 
 describe('proofOfPossession', function () {
   it('can init', () => {
-    const [pop] = ProofOfPossession.fromBytes(
-      new Uint8Array([...publicKey, ...signature]),
-    );
+    const pop = new ProofOfPossession(publicKey, signature);
     expect(pop instanceof ProofOfPossession).toBe(true);
   });
 
@@ -43,9 +41,7 @@ describe('proofOfPossession', function () {
   });
 
   it('can call toString', () => {
-    const [pop] = ProofOfPossession.fromBytes(
-      new Uint8Array([...publicKey, ...signature]),
-    );
+    const pop = new ProofOfPossession(publicKey, signature);
     const expected = `0x85025bca6a302dc61338ff49c8baa572ded3e86f3759304c7f618a2a2593c187e080a3cfdec95040309ad1f1589530678b1d6133d17e3483220ad960b6fde11e4e1214a8ce21ef616227e5d5eef070d7500e6f7d4452c5a760620cc06795cbe218e072eba76d94788d9d01176ce4ecadfb96b47f942281894ddfadd1c1743f7f549f1d07d59d55655927f72bc6bf7c12`;
     expect(pop.toString()).toEqual(expected);
   });
