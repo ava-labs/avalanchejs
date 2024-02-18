@@ -1,6 +1,6 @@
 import { serializable } from '../common/types';
 import { bufferToHex, concatBytes } from '../../utils/buffer';
-import * as bls from '../../crypto/bls';
+import { bls } from '../../crypto';
 import { TypeSymbols } from '../constants';
 
 /**
