@@ -1,4 +1,4 @@
-import { publicKeyToEthAddress } from '../../utils';
+import { publicKeyToEthAddress } from '../../crypto/secp256k1';
 import { UnsignedTx } from './unsignedTx';
 import { Address } from '../../serializable/fxs/common';
 

@@ -1,9 +1,9 @@
 import {
   getPublicKey,
-  hexToBuffer,
   publicKeyBytesToAddress,
   publicKeyToEthAddress,
-} from '../utils';
+} from '../crypto/secp256k1';
+import { hexToBuffer } from '../utils';
 
 export const testPrivateKey1 = hexToBuffer(
   '9c0523e7611e62f5dca291ad335e950db076c5ee31c4107355abde0d357bbd29',

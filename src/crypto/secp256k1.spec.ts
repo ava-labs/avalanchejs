@@ -1,6 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { base58check } from './base58';
-import { bufferToHex, hexToBuffer } from './buffer';
+import { base58check } from '../utils/base58';
+import { bufferToHex, hexToBuffer } from '../utils/buffer';
 import * as secp from './secp256k1';
 
 describe('secp256k1', function () {
