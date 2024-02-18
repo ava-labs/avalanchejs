@@ -56,18 +56,3 @@ export function verifyProofOfPossession(
     DST: proofOfPossessionDST,
   });
 }
-
-export function sign(msg: Uint8Array | string, sk: SecretKey): Uint8Array {
-  return bls12_381.sign(msg, sk, {
-    DST: signatureDST,
-  });
-}
-
-export function signProofOfPossession(
-  msg: Uint8Array | string,
-  sk: SecretKey,
-): Uint8Array {
-  return bls12_381.sign(msg, sk, {
-    DST: proofOfPossessionDST,
-  });
-}
