@@ -7,11 +7,7 @@ import { ValidVMs } from '../../serializable/constants';
 import { Address } from '../../serializable/fxs/common';
 import { Credential } from '../../serializable/fxs/secp256k1';
 import { bufferToHex, hexToBuffer } from '../../utils';
-import {
-  publicKeyBytesToAddress,
-  publicKeyToEthAddress,
-  recoverPublicKey,
-} from '../../crypto/secp256k1';
+import { secp256k1 } from '../../crypto';
 import { AddressMaps } from '../../utils/addressMap';
 import { getManagerForVM, packTx } from '../../utils/packTx';
 import type { Transaction } from './transaction';
@@ -129,7 +125,7 @@ export class UnsignedTx {
 
   getSigIndicesForPubKey(pubkey: Uint8Array) {
     const addrAvax = this.publicKeyBytesToAddress(pubkey);
-    const addrEvm = publicKeyToEthAddress(pubkey);
+    const addrEvm = secp256k1.publicKeyToEthAddress(pubkey);
 
     // Check against both addresses
     const coordinatesAvax = this.getSigIndicesForAddress(new Address(addrAvax));
@@ -171,7 +167,7 @@ export class UnsignedTx {
 
   addSignature(sig: Uint8Array) {
     const unsignedHash = sha256(this.toBytes());
-    const publicKey = recoverPublicKey(unsignedHash, sig);
+    const publicKey = secp256k1.recoverPublicKey(unsignedHash, sig);
     this.addSignatureForPubKey(sig, publicKey);
   }
 
@@ -185,7 +181,7 @@ export class UnsignedTx {
   }
 
   protected publicKeyBytesToAddress(pubKey: Uint8Array) {
-    return publicKeyBytesToAddress(pubKey);
+    return secp256k1.publicKeyBytesToAddress(pubKey);
   }
 
   hasAllSignatures() {
@@ -209,7 +205,7 @@ export class UnsignedTx {
           throw new Error('error: incorrect structure for credentials');
         }
         const sigBytes = hexToBuffer(sig);
-        const publicKey = recoverPublicKey(unsignedHash, sigBytes);
+        const publicKey = secp256k1.recoverPublicKey(unsignedHash, sigBytes);
         if (!this.hasPubkey(publicKey)) {
           valid = false;
         }
