@@ -1,5 +1,5 @@
 import type { UnsignedTx } from '../vms/common/unsignedTx';
-import { getPublicKey, sign } from '../crypto/secp256k1';
+import { secp256k1 } from '../crypto';
 
 export const addTxSignatures = async ({
   unsignedTx,
@@ -12,10 +12,10 @@ export const addTxSignatures = async ({
 
   await Promise.all(
     privateKeys.map(async (privateKey) => {
-      const publicKey = getPublicKey(privateKey);
+      const publicKey = secp256k1.getPublicKey(privateKey);
 
       if (unsignedTx.hasPubkey(publicKey)) {
-        const signature = await sign(unsignedBytes, privateKey);
+        const signature = await secp256k1.sign(unsignedBytes, privateKey);
         unsignedTx.addSignature(signature);
       }
     }),
