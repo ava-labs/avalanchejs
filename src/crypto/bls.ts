@@ -57,15 +57,17 @@ export function verifyProofOfPossession(
   });
 }
 
-// TODO: Uncomment once https://github.com/paulmillr/noble-curves/pull/117 is merged.
-// export function sign(msg: Uint8Array | string, sk: SecretKey): Uint8Array {
-//     return bls12_381.sign(msg, sk, {
-//         DST: signatureDST
-//     })
-// }
+export function sign(msg: Uint8Array | string, sk: SecretKey): Uint8Array {
+  return bls12_381.sign(msg, sk, {
+    DST: signatureDST,
+  });
+}
 
-// export function signProofOfPossession(msg: Uint8Array | string, sk: SecretKey): Uint8Array {
-//     return bls12_381.sign(msg, sk, {
-//         DST: proofOfPossessionDST
-//     })
-// }
+export function signProofOfPossession(
+  msg: Uint8Array | string,
+  sk: SecretKey,
+): Uint8Array {
+  return bls12_381.sign(msg, sk, {
+    DST: proofOfPossessionDST,
+  });
+}

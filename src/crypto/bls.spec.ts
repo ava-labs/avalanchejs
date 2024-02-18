@@ -1,8 +1,9 @@
 import { stringToBytes } from '@scure/base';
+import { bytesToHex } from '@noble/hashes/utils';
 import { hexToBuffer } from '../utils/buffer';
 import * as bls from './bls';
 
-const msgStr = 'test';
+const msg = stringToBytes('utf8', 'test');
 const skStr =
   '233428aaadf8a5d11ebba263d97b85a286750540f4abd04f109321e07b746277';
 const pkStr =
@@ -31,26 +32,30 @@ describe('bls', () => {
   });
 
   it('generates signature correctly', async () => {
-    // TODO
+    const sk = bls.secretKeyFromBytes(skStr);
+    expect(bytesToHex(bls.sign(msg, sk))).toEqual(sigStr);
   });
 
   it('verifies signature correctly', async () => {
     const pk = bls.publicKeyFromBytes(pkStr);
     const sig = bls.signatureFromBytes(hexToBuffer(sigStr));
 
-    expect(bls.verify(pk, sig, stringToBytes('utf8', msgStr))).toEqual(true);
+    expect(bls.verify(pk, sig, msg)).toEqual(true);
   });
 
   it('generates proof of possession correctly', async () => {
-    // TODO
+    const sk = bls.secretKeyFromBytes(skStr);
+    const pk = bls.publicKeyFromBytes(pkStr);
+    const pkBytes = bls.publicKeyToBytes(pk);
+
+    expect(bytesToHex(bls.signProofOfPossession(pkBytes, sk))).toEqual(popStr);
   });
 
   it('verifies proof of possession correctly', async () => {
     const pk = bls.publicKeyFromBytes(pkStr);
     const pop = bls.signatureFromBytes(hexToBuffer(popStr));
+    const pkBytes = bls.publicKeyToBytes(pk);
 
-    expect(
-      bls.verifyProofOfPossession(pk, pop, bls.publicKeyToBytes(pk)),
-    ).toEqual(true);
+    expect(bls.verifyProofOfPossession(pk, pop, pkBytes)).toEqual(true);
   });
 });
