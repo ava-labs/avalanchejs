@@ -1,5 +1,4 @@
 import { stringToBytes } from '@scure/base';
-import { bytesToHex } from '@noble/hashes/utils';
 import { hexToBuffer } from '../utils/buffer';
 import * as bls from './bls';
 
@@ -33,7 +32,7 @@ describe('bls', () => {
 
   it('generates signature correctly', async () => {
     const sk = bls.secretKeyFromBytes(skStr);
-    expect(bytesToHex(bls.sign(msg, sk))).toEqual(sigStr);
+    expect(bls.sign(msg, sk)).toEqual(hexToBuffer(sigStr));
   });
 
   it('verifies signature correctly', async () => {
@@ -48,7 +47,7 @@ describe('bls', () => {
     const pk = bls.publicKeyFromBytes(pkStr);
     const pkBytes = bls.publicKeyToBytes(pk);
 
-    expect(bytesToHex(bls.signProofOfPossession(pkBytes, sk))).toEqual(popStr);
+    expect(bls.signProofOfPossession(pkBytes, sk)).toEqual(hexToBuffer(popStr));
   });
 
   it('verifies proof of possession correctly', async () => {
