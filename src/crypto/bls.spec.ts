@@ -30,11 +30,24 @@ describe('bls', () => {
     expect(bls.signatureToBytes(sig)).toEqual(hexToBuffer(sigStr));
   });
 
+  it('generates signature correctly', async () => {
+    const sk = bls.secretKeyFromBytes(skStr);
+    expect(bls.sign(msg, sk)).toEqual(hexToBuffer(sigStr));
+  });
+
   it('verifies signature correctly', async () => {
     const pk = bls.publicKeyFromBytes(pkStr);
     const sig = bls.signatureFromBytes(hexToBuffer(sigStr));
 
     expect(bls.verify(pk, sig, msg)).toEqual(true);
+  });
+
+  it('generates proof of possession correctly', async () => {
+    const sk = bls.secretKeyFromBytes(skStr);
+    const pk = bls.publicKeyFromBytes(pkStr);
+    const pkBytes = bls.publicKeyToBytes(pk);
+
+    expect(bls.signProofOfPossession(pkBytes, sk)).toEqual(hexToBuffer(popStr));
   });
 
   it('verifies proof of possession correctly', async () => {
