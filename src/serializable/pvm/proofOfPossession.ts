@@ -21,7 +21,7 @@ export class ProofOfPossession {
     sig.assertValidity();
 
     if (!bls.verifyProofOfPossession(pk, sig, bls.publicKeyToBytes(pk))) {
-      throw new Error(`Invalid signature`);
+      throw new Error(`Invalid proof of possession`);
     }
   }
 
