@@ -19,7 +19,7 @@ import { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx } from '../../serializable/avm';
 import { Address } from '../../serializable/fxs/common';
 import { Input, TransferInput } from '../../serializable/fxs/secp256k1';
-import { sign } from '../../utils';
+import { secp256k1 } from '../../crypto';
 import { AddressMap, AddressMaps } from '../../utils/addressMap';
 import { UnsignedTx } from './unsignedTx';
 
@@ -64,11 +64,11 @@ describe('UnsignedTx', () => {
 
     expect(unsignedTx.hasAllSignatures()).toBeFalsy();
 
-    const sig = await sign(unsignedBytes, testPrivateKey1);
+    const sig = await secp256k1.sign(unsignedBytes, testPrivateKey1);
     unsignedTx.addSignature(sig);
     expect(unsignedTx.hasAllSignatures()).toBeFalsy();
 
-    const sig2 = await sign(unsignedBytes, testPrivateKey2);
+    const sig2 = await secp256k1.sign(unsignedBytes, testPrivateKey2);
     unsignedTx.addSignature(sig2);
 
     expect(unsignedTx.hasAllSignatures()).toBeTruthy();

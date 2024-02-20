@@ -2,7 +2,7 @@ import { signature } from '../../fixtures/secp256k1';
 import { exportTx } from '../../fixtures/evm';
 import { testEthAddress1, testPrivateKey1 } from '../../fixtures/vms';
 import { Address } from '../../serializable/fxs/common';
-import { sign } from '../../utils';
+import { secp256k1 } from '../../crypto';
 import { AddressMap, AddressMaps } from '../../utils/addressMap';
 import { EVMUnsignedTx } from './evmUnsignedTx';
 
@@ -22,7 +22,7 @@ describe('EVMUnsignedTx', () => {
 
     expect(unsignedTx.hasAllSignatures()).toBeFalsy();
 
-    const sig = await sign(unsignedBytes, testPrivateKey1);
+    const sig = await secp256k1.sign(unsignedBytes, testPrivateKey1);
     unsignedTx.addSignature(sig);
 
     expect(unsignedTx.hasAllSignatures()).toBeTruthy();

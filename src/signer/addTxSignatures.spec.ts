@@ -7,7 +7,7 @@ import { id } from '../fixtures/common';
 import { BaseTx } from '../serializable/avm';
 import { transferableOutput, utxoId } from '../fixtures/avax';
 import { Input, TransferInput } from '../serializable/fxs/secp256k1';
-import { AddressMaps, AddressMap, getPublicKey, hexToBuffer } from '../utils';
+import { AddressMaps, AddressMap, hexToBuffer } from '../utils';
 import { Address } from '../serializable/fxs/common';
 import {
   testAddress1,
@@ -18,6 +18,7 @@ import {
   testPublicKey2,
 } from '../fixtures/vms';
 import { addTxSignatures } from './addTxSignatures';
+import { secp256k1 } from '../crypto';
 
 describe('addTxSignatures', () => {
   beforeEach(() => {
@@ -30,7 +31,7 @@ describe('addTxSignatures', () => {
     const unknownPrivateKey = hexToBuffer(
       '1d4ff8f6582d995354f5c03a28a043d22aa1bb6aa15879a632134aaf1f225cf4',
     );
-    const unknownPublicKey = getPublicKey(unknownPrivateKey);
+    const unknownPublicKey = secp256k1.getPublicKey(unknownPrivateKey);
 
     const unsignedTx = new UnsignedTx(
       new BaseTx(
@@ -74,14 +75,12 @@ describe('addTxSignatures', () => {
     expect(hasPubkeySpy).toHaveBeenNthCalledWith(3, unknownPublicKey);
 
     expect(addSignatureSpy).toHaveBeenCalledTimes(2);
-    expect(addSignatureSpy).toHaveBeenNthCalledWith(
-      1,
+    expect(addSignatureSpy).toHaveBeenCalledWith(
       hexToBuffer(
         '0x7b3da43d8e4103d1078061872075cbcbb5de0108f3d897752c894757cf0e9c4113949ca2a5568483763e1fa0e74b4f4dd9b2a6e40909d0729f87c7dddfc1e70601',
       ),
     );
-    expect(addSignatureSpy).toHaveBeenNthCalledWith(
-      2,
+    expect(addSignatureSpy).toHaveBeenCalledWith(
       hexToBuffer(
         '0x04e2072e34fd5d7cc729afb8bfe7c5865754c3c448b9b3247b16cabbf06378393edf405274048bef74c02862ae032c0b86dda7c28bebf63f4d1de4f517bd710500',
       ),
