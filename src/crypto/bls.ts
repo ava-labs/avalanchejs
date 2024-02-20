@@ -58,6 +58,8 @@ export function verifyProofOfPossession(
 }
 
 export function sign(msg: Uint8Array | string, sk: SecretKey): Uint8Array {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error Will error until a version of @noble/curves is released with https://github.com/paulmillr/noble-curves/pull/117
   return bls12_381.sign(msg, sk, {
     DST: signatureDST,
   });
@@ -67,6 +69,8 @@ export function signProofOfPossession(
   msg: Uint8Array | string,
   sk: SecretKey,
 ): Uint8Array {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error Will error until a version of @noble/curves is released with https://github.com/paulmillr/noble-curves/pull/117
   return bls12_381.sign(msg, sk, {
     DST: proofOfPossessionDST,
   });
