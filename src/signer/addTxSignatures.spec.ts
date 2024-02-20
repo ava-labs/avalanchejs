@@ -7,7 +7,7 @@ import { id } from '../fixtures/common';
 import { BaseTx } from '../serializable/avm';
 import { transferableOutput, utxoId } from '../fixtures/avax';
 import { Input, TransferInput } from '../serializable/fxs/secp256k1';
-import { AddressMaps, AddressMap, getPublicKey, hexToBuffer } from '../utils';
+import { AddressMaps, AddressMap, hexToBuffer } from '../utils';
 import { Address } from '../serializable/fxs/common';
 import {
   testAddress1,
@@ -18,6 +18,7 @@ import {
   testPublicKey2,
 } from '../fixtures/vms';
 import { addTxSignatures } from './addTxSignatures';
+import { secp256k1 } from '../crypto';
 
 describe('addTxSignatures', () => {
   beforeEach(() => {
@@ -30,7 +31,7 @@ describe('addTxSignatures', () => {
     const unknownPrivateKey = hexToBuffer(
       '1d4ff8f6582d995354f5c03a28a043d22aa1bb6aa15879a632134aaf1f225cf4',
     );
-    const unknownPublicKey = getPublicKey(unknownPrivateKey);
+    const unknownPublicKey = secp256k1.getPublicKey(unknownPrivateKey);
 
     const unsignedTx = new UnsignedTx(
       new BaseTx(

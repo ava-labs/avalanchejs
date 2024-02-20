@@ -59,7 +59,7 @@ import { avm, pvm, evm } from '@avalabs/avalanchejs';
 ## Importing Essentials
 
 ```ts
-import { avm /** X-chain */, pvm /** P-chain */, evm /** C-chain */, utils } from "@avalabs/avalanchejs"
+import { avm /** X-chain */, pvm /** P-chain */, evm /** C-chain */, utils, secp256k1 } from "@avalabs/avalanchejs"
 
 // example calls
 const exportTx = avm.newExportTx(...) // constructs a new export tx from X
@@ -67,7 +67,7 @@ const addValidatorTx = pvm.newAddPermissionlessValidatorTx(...) // constructs a 
 const importTx = evm.newImportTx(...) // constructs a new import tx to C
 
 const publicKeyBytes = utils.hexToBuffer(publicKeyHex)
-const signature = utils.signHash(bytes, privateKeyBytes)
+const signature = secp256k1.signHash(bytes, privateKeyBytes)
 ```
 
 Please check out the `examples` folder for more info.

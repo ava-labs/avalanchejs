@@ -2,7 +2,7 @@ import { ripemd160 } from '@noble/hashes/ripemd160';
 import { sha256 } from '@noble/hashes/sha256';
 import * as secp from '@noble/secp256k1';
 import { Address } from 'micro-eth-signer';
-import { concatBytes, hexToBuffer } from './buffer';
+import { concatBytes, hexToBuffer } from '../utils/buffer';
 
 export function randomPrivateKey() {
   return secp.utils.randomPrivateKey();

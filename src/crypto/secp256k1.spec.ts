@@ -1,17 +1,17 @@
 import { sha256 } from '@noble/hashes/sha256';
-import { base58check } from './base58';
-import { bufferToHex, hexToBuffer } from './buffer';
-import * as secp from './secp256k1';
+import { base58check } from '../utils/base58';
+import { bufferToHex, hexToBuffer } from '../utils/buffer';
+import * as secp256k1 from './secp256k1';
 
 describe('secp256k1', function () {
   it('works correctly', async () => {
     const key = '24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5';
     const privKey = base58check.decode(key);
-    const pubKey = secp.getPublicKey(privKey);
+    const pubKey = secp256k1.getPublicKey(privKey);
 
-    expect(base58check.encode(secp.publicKeyBytesToAddress(pubKey))).toEqual(
-      'Q4MzFZZDPHRPAHFeDs3NiyyaZDvxHKivf',
-    );
+    expect(
+      base58check.encode(secp256k1.publicKeyBytesToAddress(pubKey)),
+    ).toEqual('Q4MzFZZDPHRPAHFeDs3NiyyaZDvxHKivf');
 
     const tests = [
       {
@@ -52,10 +52,14 @@ describe('secp256k1', function () {
     for (const test of tests) {
       const hash = sha256(test.msg);
 
-      await expect(secp.sign(test.msg, privKey)).resolves.toEqual(test.sig);
-      await expect(secp.signHash(hash, privKey)).resolves.toEqual(test.sig);
-      expect(secp.recoverPublicKey(hash, test.sig)).toEqual(pubKey);
-      expect(secp.verify(test.sig, hash, pubKey)).toEqual(true);
+      await expect(secp256k1.sign(test.msg, privKey)).resolves.toEqual(
+        test.sig,
+      );
+      await expect(secp256k1.signHash(hash, privKey)).resolves.toEqual(
+        test.sig,
+      );
+      expect(secp256k1.recoverPublicKey(hash, test.sig)).toEqual(pubKey);
+      expect(secp256k1.verify(test.sig, hash, pubKey)).toEqual(true);
     }
   });
 
@@ -64,7 +68,7 @@ describe('secp256k1', function () {
       '04e68acfc0253a10620dff706b0a1b1f1f5833ea3beb3bde2250d5f271f3563606672ebc45e0b7ea2e816ecb70ca03137b1c9476eec63d4632e990020b7b6fba39',
     );
 
-    const ethAddrKey = bufferToHex(secp.publicKeyToEthAddress(publicKey));
+    const ethAddrKey = bufferToHex(secp256k1.publicKeyToEthAddress(publicKey));
     expect(ethAddrKey).toBe(
       '0x90F8bf6A479f320ead074411a4B0e7944Ea8c9C1'.toLocaleLowerCase(),
     );
