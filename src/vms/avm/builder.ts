@@ -19,7 +19,7 @@ import { BaseTx } from '../../serializable/avm/baseTx';
 import type { UTXOCalculationResult } from '../utils/calculateSpend';
 import { calculateUTXOSpend } from '../utils/calculateSpend';
 import { useAvmAndCorethUTXOs } from './utxoCalculationFns';
-import { baseTxUnsafe } from '../common';
+import { baseTxUnsafeAvm } from '../common';
 
 /**
  *
@@ -216,7 +216,7 @@ export function newBaseTx(
 
   return new UnsignedTx(
     new BaseTx(
-      baseTxUnsafe(context, allOutputs, inputs, defaultedOptions.memo),
+      baseTxUnsafeAvm(context, allOutputs, inputs, defaultedOptions.memo),
     ),
     inputUTXOs,
     addressMaps,
@@ -259,7 +259,7 @@ const exportTxUnsafe = (
 
   return new UnsignedTx(
     new ExportTx(
-      baseTxUnsafe(context, changeOutputs, inputs, memo),
+      baseTxUnsafeAvm(context, changeOutputs, inputs, memo),
       Id.fromString(destinationChain),
       outputs,
     ),
