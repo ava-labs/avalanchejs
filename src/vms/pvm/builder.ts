@@ -42,7 +42,7 @@ import {
 } from './utxoCalculationFns';
 import { NodeId } from '../../serializable/fxs/common/nodeId';
 import { createSignerOrSignerEmptyFromStrings } from '../../serializable/pvm/signer';
-import { baseTxUnsafe } from '../common';
+import { baseTxUnsafePvm } from '../common';
 
 /*
   Builder is useful for building transactions that are specific to a chain.
@@ -88,7 +88,7 @@ export function newBaseTx(
 
   return new UnsignedTx(
     new BaseTx(
-      baseTxUnsafe(context, allOutputs, inputs, defaultedOptions.memo),
+      baseTxUnsafePvm(context, allOutputs, inputs, defaultedOptions.memo),
     ),
     inputUTXOs,
     addressMaps,
