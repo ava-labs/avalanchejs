@@ -8,3 +8,4 @@ export * from './fxs/common';
 export * as pvmSerial from './pvm';
 export * from './primitives';
 export * from './constants';
+export * from './codec';
