@@ -2,13 +2,14 @@
   "name": "@avalabs/avalanchejs",
   "version": "4.0.4",
   "description": "Avalanche Platform JS Library",
-  "main": "dist/es/index.js",
+  "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "type": "module",
   "exports": {
     "import": "./dist/es/index.js",
-    "require": "./dist/index.js"
+    "require": "./dist/index.cjs",
+    "default": "./dist/es/index.js"
   },
   "files": [
     "dist",

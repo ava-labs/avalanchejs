@@ -13,7 +13,7 @@ export default {
   ], // we don't want these dependencies bundled in the dist folder
   output: [
     {
-      file: 'dist/index.js',
+      file: 'dist/index.cjs',
       format: 'cjs',
       plugins: [terser()],
       sourcemap: process.env.BUILD === 'production' ? false : true,
