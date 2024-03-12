@@ -2,7 +2,7 @@
   "name": "@avalabs/avalanchejs",
   "version": "4.0.3",
   "description": "Avalanche Platform JS Library",
-  "main": "dist/index.js",
+  "main": "dist/es/index.js",
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "type": "module",
