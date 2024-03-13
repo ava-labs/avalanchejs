@@ -1,6 +1,6 @@
 {
   "name": "@avalabs/avalanchejs",
-  "version": "4.0.4",
+  "version": "4.0.5",
   "description": "Avalanche Platform JS Library",
   "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
