@@ -16,7 +16,7 @@ Using AvalancheJS, developers can:
 
 ### Requirements
 
-AvalancheJS requires Node.js LTS version 20.11.1 or higher to compile.
+AvalancheJS requires Node.js LTS version 18 or higher to compile. (FORKED)
 
 ## Installation
 
