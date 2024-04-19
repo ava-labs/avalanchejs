@@ -31,6 +31,7 @@ export const getContextFromURI = async (
   const { blockchainID: cBlockchainID } = await info.getBlockchainId('C');
 
   const { networkID } = await info.getNetworkId();
+  const networkIDNum = Number.parseInt(networkID);
 
   return Object.freeze({
     xBlockchainID,
@@ -46,7 +47,7 @@ export const getContextFromURI = async (
     addPrimaryNetworkDelegatorFee,
     addSubnetValidatorFee,
     addSubnetDelegatorFee,
-    networkID,
-    hrp: getHRP(networkID),
+    networkID: networkIDNum,
+    hrp: getHRP(networkIDNum),
   });
 };
