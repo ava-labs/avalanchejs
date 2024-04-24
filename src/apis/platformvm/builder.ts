@@ -1146,7 +1146,9 @@ export class Builder {
     feeAssetID: Buffer = undefined,
     memo: Buffer = undefined,
     asOf: BN = zero,
-    changeThreshold: number = 1
+    changeThreshold: number = 1,
+    executorAddress: Buffer = undefined,
+    executorAuth: [number, Buffer][] = [],
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
@@ -1187,8 +1189,16 @@ export class Builder {
       memo,
       address,
       state,
-      remove
+      remove,
+      executorAddress,
     )
+
+    if (executorAddress) {
+      executorAuth.forEach((signer): void => {
+        baseTx.addSignatureIdx(signer[0], signer[1])
+      })
+      owners.push(new OutputOwners([executorAddress], ZeroBN, 1))
+    }
 
     baseTx.setOutputOwners(owners)
     return new UnsignedTx(baseTx)

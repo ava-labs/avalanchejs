@@ -2382,7 +2382,9 @@ export class PlatformVMAPI extends JRPCAPI {
     remove: boolean = false,
     memo: Buffer = undefined,
     asOf: BN = ZeroBN,
-    changeThreshold: number = 1
+    changeThreshold: number = 1,
+    executorAddress: string = undefined,
+    executorAuth: [number, string][] = [],
   ): Promise<UnsignedTx> => {
     const caller = "buildAddressStateTx"
 
@@ -2403,6 +2405,16 @@ export class PlatformVMAPI extends JRPCAPI {
     const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
     const fee: BN = this.getTxFee()
 
+    var authAddress: Buffer
+    var auth: [number, Buffer][] = []
+
+    if (executorAddress) {
+      authAddress = this.parseAddress(executorAddress)
+      executorAuth.forEach((o) => {
+        auth.push([o[0], this.parseAddress(o[1])])
+      })
+    }
+
     const builtUnsignedTx: UnsignedTx = await this._getBuilder(
       utxoset
     ).buildAddressStateTx(
@@ -2418,7 +2430,9 @@ export class PlatformVMAPI extends JRPCAPI {
       avaxAssetID,
       memo,
       asOf,
-      changeThreshold
+      changeThreshold,
+      authAddress,
+      auth
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {

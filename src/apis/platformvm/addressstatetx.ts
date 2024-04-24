@@ -13,8 +13,10 @@ import {
   DefaultTransactionVersionNumber
 } from "../../utils/constants"
 import { Serialization, SerializedEncoding } from "../../utils/serialization"
-import { UpgradeVersionID } from "../../common"
+import { Credential, SigIdx, Signature, UpgradeVersionID } from "../../common"
 import { SubnetAuth } from "../../apis/platformvm/subnetauth"
+import { KeyChain, KeyPair } from "./keychain"
+import { SelectCredentialClass } from "./credentials"
 
 /**
  * @ignore
@@ -94,7 +96,8 @@ export class AddressStateTx extends BaseTx {
   // Remove or add the flag ?
   protected remove: boolean
   protected executor = Buffer.alloc(20)
-  protected executorAuth: SubnetAuth
+  protected executorAuth: SubnetAuth = new SubnetAuth()
+  protected sigIdxs: SigIdx[] = [] // idxs of signers
 
   /**
    * Returns the id of the [[AddressStateTx]]
@@ -130,6 +133,37 @@ export class AddressStateTx extends BaseTx {
   getExecutorAuth(): SubnetAuth {
     return this.executorAuth
   }
+
+  addSignatureIdx(addressIdx: number, address: Buffer): void {
+    const addressIndex: Buffer = Buffer.alloc(4)
+    addressIndex.writeUInt32BE(addressIdx, 0)
+    this.executorAuth.addAddressIndex(addressIndex)
+
+    const sigidx: SigIdx = new SigIdx()
+    sigidx.fromBuffer(addressIndex)
+    sigidx.setSource(address)
+    this.sigIdxs.push(sigidx)
+  }
+
+  sign(msg: Buffer, kc: KeyChain): Credential[] {
+    const creds: Credential[] = super.sign(msg, kc)
+    
+    if (this.upgradeVersionID.version() > 0) {
+      const cred: Credential = SelectCredentialClass(
+        PlatformVMConstants.SECPCREDENTIAL
+      )
+      for (const sigidx of this.sigIdxs) {
+        const keypair: KeyPair = kc.getKey(sigidx.getSource())
+        const signval: Buffer = keypair.sign(msg)
+        const sig: Signature = new Signature()
+        sig.fromBuffer(signval)
+        cred.addSignature(sig)
+      }
+      creds.push(cred)
+    }
+    return creds
+  }
+
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[AddressStateTx]], parses it, populates the class, and returns the length of the [[AddressStateTx]] in bytes.
@@ -214,11 +248,10 @@ export class AddressStateTx extends BaseTx {
     outs: TransferableOutput[] = undefined,
     ins: TransferableInput[] = undefined,
     memo: Buffer = undefined,
-    address: string | Buffer = undefined,
+    address: Buffer = undefined,
     state: number = undefined,
     remove: boolean = undefined,
-    executor: string | Buffer = undefined,
-    executorAuth: SubnetAuth = undefined
+    executor: Buffer = undefined,
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     this.upgradeVersionID = new UpgradeVersionID(version)
@@ -236,16 +269,7 @@ export class AddressStateTx extends BaseTx {
       this.remove = remove
     }
     if (typeof executor != "undefined") {
-      if (typeof executor === "string") {
-        this.executor = bintools.stringToAddress(executor)
-      } else {
-        this.executor = executor
-      }
-    }
-    if (typeof executorAuth !== "undefined") {
-      this.executorAuth = executorAuth
-    } else {
-      this.executorAuth = new SubnetAuth()
+      this.executor = executor
     }
   }
 }
