@@ -147,7 +147,7 @@ export class AddressStateTx extends BaseTx {
 
   sign(msg: Buffer, kc: KeyChain): Credential[] {
     const creds: Credential[] = super.sign(msg, kc)
-    
+
     if (this.upgradeVersionID.version() > 0) {
       const cred: Credential = SelectCredentialClass(
         PlatformVMConstants.SECPCREDENTIAL
@@ -163,7 +163,6 @@ export class AddressStateTx extends BaseTx {
     }
     return creds
   }
-
 
   /**
    * Takes a {@link https://github.com/feross/buffer|Buffer} containing an [[AddressStateTx]], parses it, populates the class, and returns the length of the [[AddressStateTx]] in bytes.
@@ -251,7 +250,7 @@ export class AddressStateTx extends BaseTx {
     address: Buffer = undefined,
     state: number = undefined,
     remove: boolean = undefined,
-    executor: Buffer = undefined,
+    executor: Buffer = undefined
   ) {
     super(networkID, blockchainID, outs, ins, memo)
     this.upgradeVersionID = new UpgradeVersionID(version)

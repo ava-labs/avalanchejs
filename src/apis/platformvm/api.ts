@@ -241,6 +241,15 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
+   * Gets the CreateAssetTx fee.
+   *
+   * @returns The CreateAssetTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateAssetTxFee = (): BN => {
+    return new BN(this.core.getNetwork().P.createAssetTxFee ?? 0)
+  }
+
+  /**
    * Gets the CreateSubnetTx fee.
    *
    * @returns The CreateSubnetTx fee as a {@link https://github.com/indutny/bn.js/|BN}
@@ -2384,7 +2393,7 @@ export class PlatformVMAPI extends JRPCAPI {
     asOf: BN = ZeroBN,
     changeThreshold: number = 1,
     executorAddress: string = undefined,
-    executorAuth: [number, string][] = [],
+    executorAuth: [number, string][] = []
   ): Promise<UnsignedTx> => {
     const caller = "buildAddressStateTx"
 

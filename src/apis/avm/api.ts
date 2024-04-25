@@ -197,6 +197,15 @@ export class AVMAPI extends JRPCAPI {
   }
 
   /**
+   * Gets the CreateAssetTx fee.
+   *
+   * @returns The CreateAssetTx fee as a {@link https://github.com/indutny/bn.js/|BN}
+   */
+  getCreateAssetTxFee = (): BN => {
+    return new BN(this.core.getNetwork().X.createAssetTxFee ?? 0)
+  }
+
+  /**
    * Gets the default creation fee for this chain.
    *
    * @returns The default creation fee as a {@link https://github.com/indutny/bn.js/|BN}

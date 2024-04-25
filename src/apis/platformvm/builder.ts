@@ -1148,7 +1148,7 @@ export class Builder {
     asOf: BN = zero,
     changeThreshold: number = 1,
     executorAddress: Buffer = undefined,
-    executorAuth: [number, Buffer][] = [],
+    executorAuth: [number, Buffer][] = []
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
     let outs: TransferableOutput[] = []
@@ -1190,7 +1190,7 @@ export class Builder {
       address,
       state,
       remove,
-      executorAddress,
+      executorAddress
     )
 
     if (executorAddress) {
