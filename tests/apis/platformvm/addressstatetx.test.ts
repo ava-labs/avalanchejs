@@ -98,11 +98,10 @@ describe("AddressStateTxV1", (): void => {
     [],
     [],
     Buffer.from("addressStateTx-v1"),
-    addressStateAddress,
+    bintools.stringToAddress(addressStateAddress),
     AddressState.KYC_EXPIRED,
     true,
-    executorAddress,
-    undefined
+    bintools.stringToAddress(executorAddress)
   )
   console.log(addressStateTx.toBuffer().toString("hex"))
   const addressStateTxHex: string =

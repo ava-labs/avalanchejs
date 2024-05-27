@@ -61,6 +61,14 @@ Or into your TypeScript project like this:
 import { Camino } from "@c4tplatform/caminojs"
 ```
 
+## Versioning & releases
+This project uses [SemVer](https://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/chain4travel/caminojs/tags).
+A manual release process is followed and consists of the following steps:
+ - version of the package.json is manually updated
+ - a new tag is created with an identical version
+ - a release is created and published based on the newly created tag. Auto-generated release notes are encouraged.
+ - the publishing of the release triggers the workflow responsible for publishing the library as a npm package.
+
 ## Importing essentials
 
 ```js

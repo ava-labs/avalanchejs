@@ -11,7 +11,6 @@ import { ExamplesConfig } from "../common/examplesConfig"
 import { DefaultLocalGenesisPrivateKey2 } from "caminojs/utils"
 import { ZeroBN } from "caminojs/common"
 
-
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
   config.host,
@@ -49,12 +48,12 @@ const main = async (): Promise<any> => {
     "Utility function to create an AddressStateTx transaction"
   )
 
-  let unsignedTx: UnsignedTx 
+  let unsignedTx: UnsignedTx
   let tx: Tx
   let txid: string
   let status: any
 
-  try{
+  try {
     unsignedTx = await pchain.buildAddressStateTx(
       0,
       undefined,
@@ -70,13 +69,15 @@ const main = async (): Promise<any> => {
     txid = await pchain.issueTx(tx)
     console.log(`Success! TXID: ${txid}`)
 
-    while ((status = (await pchain.getTxStatus(txid))as GetTxStatusResponse).status !== 'Committed'){
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    while (
+      (status = (await pchain.getTxStatus(txid)) as GetTxStatusResponse)
+        .status !== "Committed"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
-    console.log('Status', status)
-  
-  } catch(e) {
-    console.log('Failed: ', e.message)
+    console.log("Status", status)
+  } catch (e) {
+    console.log("Failed: ", e.message)
   }
 
   // This should fail because UV1 requires auth
@@ -95,7 +96,7 @@ const main = async (): Promise<any> => {
     tx = unsignedTx.sign(pKeychain)
     txid = await pchain.issueTx(tx)
     console.log(`This should not happen: ${txid}`)
-  } catch(e) {
+  } catch (e) {
     console.log(`Successfully failed!`)
   }
 
@@ -119,12 +120,15 @@ const main = async (): Promise<any> => {
     txid = await pchain.issueTx(tx)
     console.log(`Success! TXID: ${txid}`)
 
-    while ((status = (await pchain.getTxStatus(txid))as GetTxStatusResponse).status !== 'Committed'){
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    while (
+      (status = (await pchain.getTxStatus(txid)) as GetTxStatusResponse)
+        .status !== "Committed"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
-    console.log('Status', status)
-  } catch(e) {
-    console.log('Failed: ', e.message)
+    console.log("Status", status)
+  } catch (e) {
+    console.log("Failed: ", e.message)
   }
 }
 
