@@ -55,7 +55,8 @@ import {
   DepositOffer,
   GetDepositsResponse,
   GetClaimablesResponse,
-  ClaimAmountParams
+  ClaimAmountParams,
+  GetCurrentSupplyResponse
 } from "src/apis/platformvm/interfaces"
 import { ErrorResponseObject } from "src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
@@ -310,10 +311,13 @@ describe("PlatformVMAPI", (): void => {
 
   test("getCurrentSupply", async (): Promise<void> => {
     const supply: BN = new BN("1000000000000", 10)
-    const result: Promise<BN> = api.getCurrentSupply()
+    const height = new BN("1000000000000", 10)
+
+    const result: Promise<GetCurrentSupplyResponse> = api.getCurrentSupply()
     const payload: object = {
       result: {
-        supply
+        supply,
+        height
       }
     }
     const responseObj: HttpResponse = {
@@ -321,10 +325,11 @@ describe("PlatformVMAPI", (): void => {
     }
 
     mockAxios.mockResponse(responseObj)
-    const response: BN = await result
+    const response: GetCurrentSupplyResponse = await result
 
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
-    expect(response.toString(10)).toBe(supply.toString(10))
+    expect(response.supply.toString(10)).toBe(supply.toString(10))
+    expect(response.height.toString(10)).toBe(height.toString(10))
   })
 
   test("getValidatorsAt", async (): Promise<void> => {

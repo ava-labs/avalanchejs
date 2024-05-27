@@ -360,3 +360,7 @@ export interface ClaimAmountParams {
 export interface UpgradePhasesReply {
   SunrisePhase: number
 }
+export interface GetCurrentSupplyResponse {
+  supply: BN
+  height: BN
+}

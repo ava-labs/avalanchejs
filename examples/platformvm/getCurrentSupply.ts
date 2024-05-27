@@ -1,5 +1,8 @@
 import { Avalanche, BN } from "caminojs/index"
-import { PlatformVMAPI } from "caminojs/apis/platformvm"
+import {
+  GetCurrentSupplyResponse,
+  PlatformVMAPI
+} from "caminojs/apis/platformvm"
 import { ExamplesConfig } from "../common/examplesConfig"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
@@ -20,8 +23,9 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
 
-  const currentSupply: BN = await pchain.getCurrentSupply()
-  console.log(currentSupply.toString())
+  const currentSupply: GetCurrentSupplyResponse =
+    await pchain.getCurrentSupply()
+  console.log(currentSupply)
 }
 
 main()

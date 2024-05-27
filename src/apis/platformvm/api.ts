@@ -82,7 +82,8 @@ import {
   Owner,
   OwnerParam,
   MultisigAliasParams,
-  UpgradePhasesReply
+  UpgradePhasesReply,
+  GetCurrentSupplyResponse
 } from "./interfaces"
 import { TransferableInput } from "./inputs"
 import { TransferableOutput } from "./outputs"
@@ -1114,13 +1115,16 @@ export class PlatformVMAPI extends JRPCAPI {
   }
 
   /**
-   * Returns an upper bound on the amount of tokens that exist. Not monotonically increasing because this number can go down if a staker"s reward is denied.
+   * Returns an upper bound on the amount of tokens that exist along with the P-chain height. Not monotonically increasing because this number can go down if a staker"s reward is denied.
    */
-  getCurrentSupply = async (): Promise<BN> => {
+  getCurrentSupply = async (): Promise<GetCurrentSupplyResponse> => {
     const response: RequestResponseData = await this.callMethod(
       "platform.getCurrentSupply"
     )
-    return new BN(response.data.result.supply, 10)
+    return {
+      supply: new BN(response.data.result.supply, 10),
+      height: new BN(response.data.result.height, 10)
+    }
   }
 
   /**
