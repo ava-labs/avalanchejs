@@ -51,6 +51,7 @@ import {
 } from "src/apis/avm/interfaces"
 import { CENTIAVAX } from "src/utils"
 import { MILLIAVAX } from "src/utils"
+import { GetBlockResponse } from "../../../src/common"
 
 /**
  * @ignore
@@ -356,6 +357,31 @@ describe("AVMAPI", (): void => {
     expect(JSON.stringify(response)).toBe(JSON.stringify(respobj))
   })
 
+  test("getBlockByHeight", async (): Promise<void> => {
+    const height: number = 0
+    const encoding: string = "hexnc"
+    const result: Promise<GetBlockResponse> = api.getBlockByHeight(
+      height,
+      encoding
+    )
+
+    const block: string =
+      "0x0000000000144a977f00a8157a944de27c5b24dfaf9e683f6be2024891363725e6d265841f360000000000000000000000005fcb13d0000000000000000000000000000000000000000000000000000000000000000000000000"
+    const payload: object = {
+      result: {
+        block,
+        encoding
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+    mockAxios.mockResponse(responseObj)
+    const response: GetBlockResponse = await result
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response.block).toBe(block)
+  })
+
   test("getBalance includePartial", async (): Promise<void> => {
     const balance: BN = new BN("100", 10)
     const respobj = {
@@ -384,7 +410,7 @@ describe("AVMAPI", (): void => {
     const response: object = await result
     const calledWith: object = {
       baseURL: "https://127.0.0.1:9650",
-      data: '{"id":9,"method":"avm.getBalance","params":{"address":"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
+      data: '{"id":10,"method":"avm.getBalance","params":{"address":"X-local1d6kkj0qh4wcmus3tk59npwt3rluc6en77ajgr4","assetID":"ATH","includePartial":true},"jsonrpc":"2.0"}',
       headers: {
         "Content-Type": "application/json;charset=UTF-8"
       },

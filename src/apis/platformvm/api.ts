@@ -6,6 +6,8 @@ import { Buffer } from "buffer/"
 import BN from "bn.js"
 import AvalancheCore from "../../camino"
 import {
+  GetBlockByHeightParams,
+  GetBlockResponse,
   JRPCAPI,
   OutputOwners,
   RequestResponseData,
@@ -448,6 +450,28 @@ export class PlatformVMAPI extends JRPCAPI {
       "platform.getValidatorsAt",
       params
     )
+    return response.data.result
+  }
+  /**
+   * Gets the block at given height
+   * @param height The P-Chain height to get the block at.
+   * @param encoding
+   *
+   * @returns Promise GetBlockResponse
+   */
+  getBlockByHeight = async (
+    height: number,
+    encoding: string
+  ): Promise<GetBlockResponse> => {
+    const params: GetBlockByHeightParams = {
+      height,
+      encoding
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "platform.getBlockByHeight",
+      params
+    )
+
     return response.data.result
   }
 

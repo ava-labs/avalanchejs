@@ -64,7 +64,11 @@ import {
   MintNFTParams,
   IMinterSet
 } from "./interfaces"
-import { IssueTxParams } from "../../common"
+import {
+  GetBlockByHeightParams,
+  GetBlockResponse,
+  IssueTxParams
+} from "../../common"
 
 /**
  * @ignore
@@ -110,6 +114,28 @@ export class AVMAPI extends JRPCAPI {
    */
   getBlockchainID = (): string => this.blockchainID
 
+  /**
+   * Gets the block at given height
+   * @param height The X-Chain height to get the block at.
+   * @param encoding
+   *
+   * @returns Promise GetBlockResponse
+   */
+  getBlockByHeight = async (
+    height: number,
+    encoding: string
+  ): Promise<GetBlockResponse> => {
+    const params: GetBlockByHeightParams = {
+      height,
+      encoding
+    }
+    const response: RequestResponseData = await this.callMethod(
+      "avm.getBlockByHeight",
+      params
+    )
+
+    return response.data.result
+  }
   /**
    * Takes an address string and returns its {@link https://github.com/feross/buffer|Buffer} representation if valid.
    *
