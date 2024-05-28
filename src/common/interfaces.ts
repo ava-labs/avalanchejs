@@ -65,3 +65,12 @@ export interface Serialized {
   notes: string
   fields: object
 }
+export interface GetBlockByHeightParams {
+  height: number
+  encoding: string
+}
+
+export interface GetBlockResponse {
+  block: object
+  encoding: string
+}

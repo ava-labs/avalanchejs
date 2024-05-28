@@ -61,7 +61,7 @@ import {
 import { ErrorResponseObject } from "src/utils/errors"
 import { HttpResponse } from "jest-mock-axios/dist/lib/mock-axios-types"
 import { Builder } from "src/apis/platformvm/builder"
-import { OutputOwners, SigIdx, ZeroBN } from "src/common"
+import { GetBlockResponse, OutputOwners, SigIdx, ZeroBN } from "src/common"
 import {
   BaseTx,
   ClaimAmount,
@@ -360,6 +360,30 @@ describe("PlatformVMAPI", (): void => {
     expect(mockAxios.request).toHaveBeenCalledTimes(1)
   })
 
+  test("getBlockByHeight", async (): Promise<void> => {
+    const height: number = 0
+    const encoding: string = "hexnc"
+    const result: Promise<GetBlockResponse> = api.getBlockByHeight(
+      height,
+      encoding
+    )
+
+    const block: string =
+      "0x0000000000026e44093d690ef46df3d1409ab2ce3bdd28ee33c1391a412e5e758a500e4e50fb0000000000000000"
+    const payload: object = {
+      result: {
+        block,
+        encoding
+      }
+    }
+    const responseObj: HttpResponse = {
+      data: payload
+    }
+    mockAxios.mockResponse(responseObj)
+    const response: GetBlockResponse = await result
+    expect(mockAxios.request).toHaveBeenCalledTimes(1)
+    expect(response.block).toBe(block)
+  })
   test("getHeight", async (): Promise<void> => {
     const height: BN = new BN("100", 10)
     const result: Promise<BN> = api.getHeight()
