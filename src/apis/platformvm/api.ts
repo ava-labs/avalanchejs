@@ -95,6 +95,8 @@ import { Auth, LockMode, Builder, FromSigner, NodeOwner } from "./builder"
 import { Network } from "../../utils/networks"
 import { Spender } from "./spender"
 import { Offer } from "./adddepositoffertx"
+import type { Proposal } from "./addproposaltx"
+import { SubnetAuth } from "./subnetauth"
 
 /**
  * @ignore
@@ -3172,5 +3174,156 @@ export class PlatformVMAPI extends JRPCAPI {
       return new Builder(new Spender(this), true)
     }
     return new Builder(utxoSet, false)
+  }
+
+  /**
+   * Build an unsigned [[AddProposalTx]].
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+   * @param proposalDescription Optional contains arbitrary bytes, up to 256 bytes
+   * @param proposal The proposal content that will be created.
+   * @param proposerAddress The P-address of proposer in Buffer.
+   * @param version Optional. Transaction version number, default 0.
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildAddProposalTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: FromType,
+    changeAddresses: string[],
+    proposalDescription: Buffer,
+    proposal: Proposal,
+    proposerAddress: Buffer,
+    version: number = DefaultTransactionVersionNumber,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = ZeroBN,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    const caller = "buildAddProposalTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
+      changeAddresses,
+      caller
+    )
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getTxFee()
+    const proposerAuth = new SubnetAuth()
+    const addressIdx = Buffer.alloc(4)
+    proposerAuth.addAddressIndex(addressIdx)
+
+    const builtUnsignedTx: UnsignedTx = await this._getBuilder(
+      utxoset
+    ).buildAddProposalTx(
+      networkID,
+      blockchainID,
+      fromSigner,
+      change,
+      proposalDescription,
+      proposal,
+      proposerAddress,
+      proposerAuth,
+      version,
+      memo,
+      fee,
+      avaxAssetID,
+      asOf,
+      changeThreshold
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
+  }
+
+  /**
+   * Build an unsigned [[AddVoteTx]].
+   *
+   * @param utxoset A set of UTXOs that the transaction is built on
+   * @param fromAddresses The addresses being used to send the funds from the UTXOs {@link https://github.com/feross/buffer|Buffer}
+   * @param changeAddresses The addresses that can spend the change remaining from the spent UTXOs.
+   * @param proposalID The proposalID of teh proposal in string
+   * @param voteOptionIndex The index of vote option.
+   * @param voterAddress The P-address of voter in Buffer.
+   * @param version Optional. Transaction version number, default 0.
+   * @param memo Optional contains arbitrary bytes, up to 256 bytes
+   * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
+   *
+   * @returns An unsigned transaction created from the passed in parameters.
+   */
+  buildAddVoteTx = async (
+    utxoset: UTXOSet,
+    fromAddresses: FromType,
+    changeAddresses: string[],
+    proposalID: string,
+    voteOptionIndex: number,
+    voterAddress: Buffer,
+    version: number = DefaultTransactionVersionNumber,
+    memo: PayloadBase | Buffer = undefined,
+    asOf: BN = ZeroBN,
+    changeThreshold: number = 1
+  ): Promise<UnsignedTx> => {
+    const caller = "buildAddVoteTx"
+
+    const fromSigner = this._parseFromSigner(fromAddresses, caller)
+    const change: Buffer[] = this._cleanAddressArrayBuffer(
+      changeAddresses,
+      caller
+    )
+
+    if (memo instanceof PayloadBase) {
+      memo = memo.getPayload()
+    }
+
+    const avaxAssetID: Buffer = await this.getAVAXAssetID()
+    const networkID: number = this.core.getNetworkID()
+    const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
+    const fee: BN = this.getTxFee()
+    const proposalIDBuf = bintools.cb58Decode(proposalID)
+    const voterAuth = new SubnetAuth()
+    const addressIdx = Buffer.alloc(4)
+    voterAuth.addAddressIndex(addressIdx)
+
+    const builtUnsignedTx: UnsignedTx = await this._getBuilder(
+      utxoset
+    ).buildAddVoteTx(
+      networkID,
+      blockchainID,
+      fromSigner,
+      change,
+      proposalIDBuf,
+      voteOptionIndex,
+      voterAddress,
+      voterAuth,
+      version,
+      memo,
+      fee,
+      avaxAssetID,
+      asOf,
+      changeThreshold
+    )
+
+    if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {
+      /* istanbul ignore next */
+      throw new GooseEggCheckError("Failed Goose Egg Check")
+    }
+
+    return builtUnsignedTx
   }
 }

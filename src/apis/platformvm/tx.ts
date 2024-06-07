@@ -3,9 +3,7 @@
  * @module API-PlatformVM-Transactions
  */
 import { Buffer } from "buffer/"
-import BinTools from "../../utils/bintools"
-import { PlatformVMConstants } from "./constants"
-import { SelectCredentialClass } from "./credentials"
+import createHash from "create-hash"
 import {
   MultisigKeyChain,
   SignerKeyChain,
@@ -14,25 +12,29 @@ import {
   StandardUnsignedTx
 } from "../../common"
 import { Credential } from "../../common/credentials"
-import createHash from "create-hash"
-import { BaseTx } from "./basetx"
-import { ImportTx } from "./importtx"
-import { ExportTx } from "./exporttx"
+import BinTools from "../../utils/bintools"
+import { TransactionError } from "../../utils/errors"
 import { SerializedEncoding } from "../../utils/serialization"
+import { AddDepositOfferTx } from "./adddepositoffertx"
+import { AddProposalTx } from "./addproposaltx"
+import { AddressStateTx } from "./addressstatetx"
+import { AddSubnetValidatorTx } from "./addsubnetvalidatortx"
+import { AddVoteTx } from "./addvotetx"
+import { BaseTx } from "./basetx"
+import { ClaimTx } from "./claimtx"
+import { PlatformVMConstants } from "./constants"
+import { CreateSubnetTx } from "./createsubnettx"
+import { SelectCredentialClass } from "./credentials"
+import { DepositTx } from "./depositTx"
+import { ExportTx } from "./exporttx"
+import { ImportTx } from "./importtx"
+import { MultisigAliasTx } from "./multisigaliastx"
+import { RegisterNodeTx } from "./registernodetx"
 import {
   AddDelegatorTx,
   AddValidatorTx,
   CaminoAddValidatorTx
 } from "./validationtx"
-import { CreateSubnetTx } from "./createsubnettx"
-import { TransactionError } from "../../utils/errors"
-import { AddSubnetValidatorTx } from "./addsubnetvalidatortx"
-import { RegisterNodeTx } from "./registernodetx"
-import { DepositTx } from "./depositTx"
-import { AddressStateTx } from "./addressstatetx"
-import { ClaimTx } from "./claimtx"
-import { MultisigAliasTx } from "./multisigaliastx"
-import { AddDepositOfferTx } from "./adddepositoffertx"
 
 /**
  * @ignore
@@ -75,6 +77,10 @@ export const SelectTxClass = (txtype: number, ...args: any[]): BaseTx => {
     return new MultisigAliasTx(...args)
   } else if (txtype === PlatformVMConstants.ADDDEPOSITOFFERTX) {
     return new AddDepositOfferTx(...args)
+  } else if (txtype === PlatformVMConstants.ADDPROPOSALTX) {
+    return new AddProposalTx(...args)
+  } else if (txtype === PlatformVMConstants.ADDVOTETX) {
+    return new AddVoteTx(...args)
   }
   /* istanbul ignore next */
   throw new TransactionError("Error - SelectTxClass: unknown txtype")

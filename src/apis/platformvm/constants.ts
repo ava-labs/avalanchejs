@@ -62,6 +62,18 @@ export class PlatformVMConstants {
   static SECPMULTISIGCREDENTIAL: number =
     PlatformVMConstants.CUSTOM_TYPE_ID + 12
   static ADDDEPOSITOFFERTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 15
+  // DAC proposal
+  static ADDPROPOSALTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 16
+  static ADDVOTETX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 17
+  static FINISHPROPOSALSTX: number = PlatformVMConstants.CUSTOM_TYPE_ID + 18
+  static BASEFEEPORPOSAL_TYPE_ID: number =
+    PlatformVMConstants.CUSTOM_TYPE_ID + 19
+  static SIMPLEVOTE_TYPE_ID: number = PlatformVMConstants.CUSTOM_TYPE_ID + 21
+  static ADDMEMBERPORPOSAL_TYPE_ID: number =
+    PlatformVMConstants.CUSTOM_TYPE_ID + 22
+  static ADMINPROPOSAL_TYPE_ID: number = PlatformVMConstants.CUSTOM_TYPE_ID + 23
+  static EXCLUDEMEMBERPORPOSAL_TYPE_ID: number =
+    PlatformVMConstants.CUSTOM_TYPE_ID + 24
 
   // Length Constants
   static ASSETIDLEN: number = 32
