@@ -9,7 +9,7 @@ import { getChainIdFromContext } from '../utils/getChainIdFromContext';
 const P_CHAIN_ADDRESS = process.env.P_CHAIN_ADDRESS;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 
-const main = async () => {
+const main = async (destinationChain: 'C' | 'X') => {
   if (!P_CHAIN_ADDRESS || !PRIVATE_KEY) {
     throw new Error('Missing environment variable(s).');
   }
@@ -22,7 +22,7 @@ const main = async () => {
 
   const tx = newExportTx(
     context,
-    getChainIdFromContext('X', context),
+    getChainIdFromContext(destinationChain, context),
     [bech32ToBytes(P_CHAIN_ADDRESS)],
     utxos,
     [
@@ -40,4 +40,4 @@ const main = async () => {
   return pvmapi.issueSignedTx(tx.getSignedTx());
 };
 
-main().then(console.log);
+main('C').then(console.log);
