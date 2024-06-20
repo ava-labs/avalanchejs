@@ -93,11 +93,12 @@ jobs:
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: find_comment
+        if: ${{ github.event.pull_request.number }}
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: "Found errors/fatal log records."
       - name: Create PR comment if errors/fatal logs produced
-        if: ${{ steps.check-logs.outputs.errors > 0 || steps.check-logs.outputs.fatal > 0 }}
+        if: ${{ github.event.pull_request.number }} && (${{ steps.check-logs.outputs.errors > 0 || steps.check-logs.outputs.fatal > 0 }})
         uses: peter-evans/create-or-update-comment@v2
         with:
           issue-number: ${{ github.event.pull_request.number }}
