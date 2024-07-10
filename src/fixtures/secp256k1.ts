@@ -10,6 +10,7 @@ import { Credential } from '../serializable/fxs/secp256k1/credential';
 import { OutputOwnersList } from '../serializable/fxs/secp256k1/outputOwnersList';
 import { Signature } from '../serializable/fxs/secp256k1/signature';
 import { concatBytes, hexToBuffer } from '../utils/buffer';
+import { base58check } from '../utils/base58';
 import { addresses, addressesBytes } from './common';
 import {
   bigIntPr,
@@ -105,3 +106,16 @@ export const signature2 = () =>
 export const credentialBytes = () =>
   concatBytes(bytesForInt(2), signatureBytes(), signature2Bytes());
 export const credential = () => new Credential([signature(), signature2()]);
+
+/**
+ * @see https://github.com/ava-labs/avalanchego/blob/master/utils/crypto/secp256k1/test_keys.go#L8
+ * @returns Returns 5 private keys
+ */
+export const testKeys = () =>
+  [
+    '24jUJ9vZexUM6expyMcT48LBx27k1m7xpraoV62oSQAHdziao5',
+    '2MMvUMsxx6zsHSNXJdFD8yc5XkancvwyKPwpw4xUK3TCGDuNBY',
+    'cxb7KpGWhDMALTjNNSJ7UQkkomPesyWAPUaWRGdyeBNzR6f35',
+    'ewoqjP7PxY4yr3iLTpLisriqt94hdyDFNgchSxGGztUrTXtNN',
+    '2RWLv6YVEXDiWLpaCbXhhqxtLbnFaKQsWPSSMSPhpWo47uJAeV',
+  ].map(base58check.decode);

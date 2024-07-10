@@ -1,4 +1,4 @@
-import type { TransferInput, TransferableInput } from 'serializable';
+import type { TransferInput, TransferableInput } from '../../../serializable';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/secp256k1fx/input.go#L14

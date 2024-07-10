@@ -1,4 +1,9 @@
 /**
+ * @see https://github.com/ava-labs/avalanchego/pull/2682/files#diff-405f8744e9d1e46ef736babec06fb58d04b5d413d90eb0a28a40787d6fe85c79R69
+ */
+const FEE_GAS_FACTOR = 10n;
+
+/**
  * @see https://github.com/ava-labs/avalanchego/blob/13a3f103fd12df1e89a60c0c922b38e17872c6f6/vms/components/fee/dimensions.go#L10-L16
  */
 export enum FeeDimensions {
@@ -31,9 +36,25 @@ export const toGas = (
   complexities: Dimensions,
   weights: Dimensions,
 ): bigint => {
-  return Object.entries(complexities).reduce(
-    (agg, [feeDimension, complexity]) =>
-      agg + complexity * weights[feeDimension],
-    0n,
+  return (
+    Object.entries(complexities).reduce(
+      (agg, [feeDimension, complexity]) =>
+        agg + complexity * weights[feeDimension],
+      0n,
+    ) / FEE_GAS_FACTOR
   );
 };
+
+export const addDimensions = (
+  left: Dimensions,
+  right: Dimensions,
+): Dimensions => ({
+  [FeeDimensions.Bandwidth]:
+    left[FeeDimensions.Bandwidth] + right[FeeDimensions.Bandwidth],
+  [FeeDimensions.DBRead]:
+    left[FeeDimensions.DBRead] + right[FeeDimensions.DBRead],
+  [FeeDimensions.DBWrite]:
+    left[FeeDimensions.DBWrite] + right[FeeDimensions.DBWrite],
+  [FeeDimensions.Compute]:
+    left[FeeDimensions.Compute] + right[FeeDimensions.Compute],
+});
