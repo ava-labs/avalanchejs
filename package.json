@@ -1,6 +1,6 @@
 {
   "name": "@c4tplatform/caminojs",
-  "version": "1.1.0-rc1",
+  "version": "1.1.0-rc2",
   "description": "Camino Platform JS Library",
   "main": "dist/index.js",
   "scripts": {

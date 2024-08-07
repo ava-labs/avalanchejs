@@ -58,6 +58,10 @@ export const GWEI: BN = WEI.mul(new BN(1000000000))
 export const AVAXGWEI: BN = NANOAVAX.clone()
 export const AVAXSTAKECAP: BN = ONEAVAX.mul(new BN(3000000))
 
+export const KopernikusID = "1002"
+export const ColumbusID = "1001"
+export const CaminoID = "1000"
+
 /**
  * Rules used when merging sets
  */
