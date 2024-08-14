@@ -49,6 +49,11 @@ export class TransferableOutput {
     return this.assetId.toString();
   }
 
+  // TODO: Should we add this here?
+  getOutput() {
+    return this.output;
+  }
+
   amount() {
     return this.output.amount();
   }
