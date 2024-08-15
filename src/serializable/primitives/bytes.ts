@@ -33,4 +33,9 @@ export class Bytes extends Primitives {
   toBytes() {
     return concatBytes(bytesForInt(this.bytes.length), this.bytes);
   }
+
+  // TODO: Is this okay or is there some other way of getting the length that is preferred?
+  get length() {
+    return this.bytes.length;
+  }
 }
