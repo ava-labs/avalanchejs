@@ -15,7 +15,7 @@ import {
   StakeableLockIn,
   StakeableLockOut,
 } from '../../../../serializable/pvm';
-import { makeDimension } from '../../../common/fees/dimensions';
+import { makeDimensions } from '../../../common/fees/dimensions';
 import {
   authComplexity,
   inputComplexity,
@@ -52,25 +52,25 @@ describe('Complexity', () => {
     test('empty transferable output', () => {
       const result = outputComplexity([]);
 
-      expect(result).toEqual(makeDimension(0, 0, 0, 0));
+      expect(result).toEqual(makeDimensions(0, 0, 0, 0));
     });
 
     test('any can spend', () => {
       const result = outputComplexity([makeTransferableOutput()]);
 
-      expect(result).toEqual(makeDimension(60, 0, 1, 0));
+      expect(result).toEqual(makeDimensions(60, 0, 1, 0));
     });
 
     test('one owner', () => {
       const result = outputComplexity([makeTransferableOutput(1)]);
 
-      expect(result).toEqual(makeDimension(80, 0, 1, 0));
+      expect(result).toEqual(makeDimensions(80, 0, 1, 0));
     });
 
     test('three owners', () => {
       const result = outputComplexity([makeTransferableOutput(3)]);
 
-      expect(result).toEqual(makeDimension(120, 0, 1, 0));
+      expect(result).toEqual(makeDimensions(120, 0, 1, 0));
     });
 
     test('locked stakeable', () => {
@@ -84,7 +84,7 @@ describe('Complexity', () => {
         ),
       ]);
 
-      expect(result).toEqual(makeDimension(132, 0, 1, 0));
+      expect(result).toEqual(makeDimensions(132, 0, 1, 0));
     });
   });
 
@@ -93,7 +93,7 @@ describe('Complexity', () => {
       const result = inputComplexity([makeTransferableInput()]);
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           92,
           1,
           1,
@@ -106,7 +106,7 @@ describe('Complexity', () => {
       const result = inputComplexity([makeTransferableInput(1)]);
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           161,
           1,
           1,
@@ -119,7 +119,7 @@ describe('Complexity', () => {
       const result = inputComplexity([makeTransferableInput(3)]);
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           299,
           1,
           1,
@@ -141,7 +141,7 @@ describe('Complexity', () => {
       ]);
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           311,
           1,
           1,
@@ -155,19 +155,19 @@ describe('Complexity', () => {
     test('any can spend', () => {
       const result = ownerComplexity(makeOutputOwners());
 
-      expect(result).toEqual(makeDimension(16, 0, 0, 0));
+      expect(result).toEqual(makeDimensions(16, 0, 0, 0));
     });
 
     test('one owner', () => {
       const result = ownerComplexity(makeOutputOwners(1));
 
-      expect(result).toEqual(makeDimension(36, 0, 0, 0));
+      expect(result).toEqual(makeDimensions(36, 0, 0, 0));
     });
 
     test('three owners', () => {
       const result = ownerComplexity(makeOutputOwners(3));
 
-      expect(result).toEqual(makeDimension(76, 0, 0, 0));
+      expect(result).toEqual(makeDimensions(76, 0, 0, 0));
     });
   });
 
@@ -175,14 +175,14 @@ describe('Complexity', () => {
     test('empty signer', () => {
       const result = signerComplexity(new SignerEmpty());
 
-      expect(result).toEqual(makeDimension(0, 0, 0, 0));
+      expect(result).toEqual(makeDimensions(0, 0, 0, 0));
     });
 
     test('bls pop', () => {
       const result = signerComplexity(signer());
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           144,
           0,
           0,
@@ -198,7 +198,7 @@ describe('Complexity', () => {
       const result = authComplexity(new Input([]));
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           8,
           0,
           0,
@@ -211,7 +211,7 @@ describe('Complexity', () => {
       const result = authComplexity(new Input([int()]));
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           77,
           0,
           0,
@@ -224,7 +224,7 @@ describe('Complexity', () => {
       const result = authComplexity(new Input(ints()));
 
       expect(result).toEqual(
-        makeDimension(
+        makeDimensions(
           215,
           0,
           0,

@@ -27,7 +27,7 @@ import {
   FeeDimensions,
   addDimensions,
   getEmptyDimensions,
-  makeDimension,
+  makeDimensions,
 } from '../../../common/fees/dimensions';
 import type { Serializable } from '../../../common/types';
 
@@ -147,10 +147,12 @@ const INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
 /**
  * Returns the complexity outputs add to a transaction.
  */
-export const outputComplexity = (output: TransferableOutput[]): Dimensions => {
+export const outputComplexity = (
+  transferableOutputs: TransferableOutput[],
+): Dimensions => {
   let complexity = getEmptyDimensions();
 
-  for (const out of output) {
+  for (const transferableOutput of transferableOutputs) {
     // outputComplexity logic
     const outComplexity: Dimensions = {
       [FeeDimensions.Bandwidth]:
@@ -163,12 +165,13 @@ export const outputComplexity = (output: TransferableOutput[]): Dimensions => {
     let numberOfAddresses = 0;
 
     // TODO: Double check this if logic.
-    if (isStakeableLockOut(out.output)) {
+    if (isStakeableLockOut(transferableOutput.output)) {
       outComplexity[FeeDimensions.Bandwidth] +=
         INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH;
-      numberOfAddresses = out.output.getOutputOwners().addrs.length;
-    } else if (isTransferOut(out.output)) {
-      numberOfAddresses = out.output.outputOwners.addrs.length;
+      numberOfAddresses =
+        transferableOutput.output.getOutputOwners().addrs.length;
+    } else if (isTransferOut(transferableOutput.output)) {
+      numberOfAddresses = transferableOutput.output.outputOwners.addrs.length;
     }
 
     const addressBandwidth = numberOfAddresses * SHORT_ID_LEN;
@@ -187,10 +190,12 @@ export const outputComplexity = (output: TransferableOutput[]): Dimensions => {
  *
  * It includes the complexity that the corresponding credentials will add.
  */
-export const inputComplexity = (inputs: TransferableInput[]): Dimensions => {
+export const inputComplexity = (
+  transferableInputs: TransferableInput[],
+): Dimensions => {
   let complexity = getEmptyDimensions();
 
-  for (const input of inputs) {
+  for (const transferableInput of transferableInputs) {
     const inputComplexity: Dimensions = {
       [FeeDimensions.Bandwidth]:
         INTRINSIC_INPUT_BANDWIDTH +
@@ -201,12 +206,12 @@ export const inputComplexity = (inputs: TransferableInput[]): Dimensions => {
     };
 
     // TODO: Double check this if logic.
-    if (isStakeableLockIn(input.input)) {
+    if (isStakeableLockIn(transferableInput.input)) {
       inputComplexity[FeeDimensions.Bandwidth] +=
         INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH;
     }
 
-    const numberOfSignatures = input.sigIndicies().length;
+    const numberOfSignatures = transferableInput.sigIndicies().length;
 
     const signatureBandwidth =
       numberOfSignatures * INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH;
@@ -225,7 +230,7 @@ export const signerComplexity = (signer: Signer | SignerEmpty): Dimensions => {
     return getEmptyDimensions();
   }
 
-  return makeDimension(
+  return makeDimensions(
     INTRINSIC_POP_BANDWIDTH,
     0,
     0,
@@ -233,14 +238,14 @@ export const signerComplexity = (signer: Signer | SignerEmpty): Dimensions => {
   );
 };
 
-export const ownerComplexity = (owner: OutputOwners): Dimensions => {
-  const numberOfAddresses = owner.addrs.length;
+export const ownerComplexity = (outputOwners: OutputOwners): Dimensions => {
+  const numberOfAddresses = outputOwners.addrs.length;
   const addressBandwidth = numberOfAddresses * SHORT_ID_LEN;
 
   const bandwidth =
     addressBandwidth + INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH;
 
-  return makeDimension(bandwidth, 0, 0, 0);
+  return makeDimensions(bandwidth, 0, 0, 0);
 };
 
 /**
@@ -264,7 +269,7 @@ export const authComplexity = (input: Serializable): Dimensions => {
 
   const bandwidth = signatureBandwidth + INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH;
 
-  return makeDimension(
+  return makeDimensions(
     bandwidth,
     0,
     0,
@@ -273,15 +278,15 @@ export const authComplexity = (input: Serializable): Dimensions => {
 };
 
 // See: vms/platformvm/txs/fee/complexity.go:583
-const baseTxComplexity = (tx: BaseTx): Dimensions => {
-  const outputsComplexity = outputComplexity(tx.outputs);
-  const inputsComplexity = inputComplexity(tx.inputs);
+const baseTxComplexity = (baseTx: BaseTx): Dimensions => {
+  const outputsComplexity = outputComplexity(baseTx.outputs);
+  const inputsComplexity = inputComplexity(baseTx.inputs);
 
   const complexity = addDimensions(outputsComplexity, inputsComplexity);
 
   // TODO: Verify if .toBytes().length is correct.
   // See: vms/platformvm/txs/fee/complexity.go:598
-  complexity[FeeDimensions.Bandwidth] += tx.memo.toBytes().length;
+  complexity[FeeDimensions.Bandwidth] += baseTx.memo.toBytes().length;
 
   return getEmptyDimensions();
 };
