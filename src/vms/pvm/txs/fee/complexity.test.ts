@@ -1,6 +1,6 @@
 import { utxoId } from '../../../../fixtures/avax';
 import { address, id } from '../../../../fixtures/common';
-import { bigIntPr, int } from '../../../../fixtures/primitives';
+import { bigIntPr, int, ints } from '../../../../fixtures/primitives';
 import { signer } from '../../../../fixtures/pvm';
 import {
   Input,
@@ -17,6 +17,7 @@ import {
 } from '../../../../serializable/pvm';
 import { makeDimension } from '../../../common/fees/dimensions';
 import {
+  authComplexity,
   inputComplexity,
   outputComplexity,
   ownerComplexity,
@@ -185,9 +186,58 @@ describe('Complexity', () => {
           144,
           0,
           0,
-          // TODO: Implement complexity
+          // TODO: Implement compute
           0,
         ),
+      );
+    });
+  });
+
+  describe('authComplexity', () => {
+    test('any can spend', () => {
+      const result = authComplexity(new Input([]));
+
+      expect(result).toEqual(
+        makeDimension(
+          8,
+          0,
+          0,
+          0, // TODO: Implement
+        ),
+      );
+    });
+
+    test('one owner', () => {
+      const result = authComplexity(new Input([int()]));
+
+      expect(result).toEqual(
+        makeDimension(
+          77,
+          0,
+          0,
+          0, // TODO: Implement
+        ),
+      );
+    });
+
+    test('three owners', () => {
+      const result = authComplexity(new Input(ints()));
+
+      expect(result).toEqual(
+        makeDimension(
+          215,
+          0,
+          0,
+          0, // TODO: Implement
+        ),
+      );
+    });
+
+    test('invalid auth type', () => {
+      expect(() => {
+        authComplexity(int());
+      }).toThrow(
+        'Unable to calculate auth complexity of transaction. Expected Input as subnet auth.',
       );
     });
   });

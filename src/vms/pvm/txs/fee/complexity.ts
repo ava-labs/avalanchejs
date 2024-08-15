@@ -5,6 +5,7 @@ import {
 import { SIGNATURE_LENGTH } from '../../../../crypto/secp256k1';
 import type { OutputOwners } from '../../../../serializable';
 import { NodeId } from '../../../../serializable';
+import { Input } from '../../../../serializable/fxs/secp256k1';
 import type {
   BaseTx,
   TransferableInput,
@@ -12,6 +13,7 @@ import type {
 } from '../../../../serializable/avax';
 import type {
   AddPermissionlessValidatorTx,
+  AddSubnetValidatorTx,
   Signer,
 } from '../../../../serializable/pvm';
 import { SignerEmpty } from '../../../../serializable/pvm';
@@ -27,6 +29,7 @@ import {
   getEmptyDimensions,
   makeDimension,
 } from '../../../common/fees/dimensions';
+import type { Serializable } from '../../../common/types';
 
 /**
  * Number of bytes per long.
@@ -130,6 +133,17 @@ const INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
+const INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+    INTRINSIC_SUBNET_VALIDATOR_BANDWIDTH + // Subnet Validator
+    INT_LEN + // Subnet auth typeID
+    INT_LEN, // Subnet auth credential typeID
+  [FeeDimensions.DBRead]: 2,
+  [FeeDimensions.DBWrite]: 1,
+  [FeeDimensions.Compute]: 0,
+};
+
 /**
  * Returns the complexity outputs add to a transaction.
  */
@@ -220,17 +234,42 @@ export const signerComplexity = (signer: Signer | SignerEmpty): Dimensions => {
 };
 
 export const ownerComplexity = (owner: OutputOwners): Dimensions => {
-  const complexity = getEmptyDimensions();
-
   const numberOfAddresses = owner.addrs.length;
   const addressBandwidth = numberOfAddresses * SHORT_ID_LEN;
 
   const bandwidth =
     addressBandwidth + INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH;
 
-  complexity[FeeDimensions.Bandwidth] = bandwidth;
+  return makeDimension(bandwidth, 0, 0, 0);
+};
 
-  return complexity;
+/**
+ * Returns the complexity an authorization adds to a transaction.
+ * It does not include the typeID of the authorization.
+ * It does include the complexity that the corresponding credential will add.
+ * It does not include the typeID of the credential.
+ */
+export const authComplexity = (input: Serializable): Dimensions => {
+  // TODO: Not a fan of this. May be better to re-type `subnetAuth` as `Input` in `AddSubnetValidatorTx`?
+  if (!(input instanceof Input)) {
+    throw new Error(
+      'Unable to calculate auth complexity of transaction. Expected Input as subnet auth.',
+    );
+  }
+
+  const numberOfSignatures = input.values().length;
+
+  const signatureBandwidth =
+    numberOfSignatures * INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH;
+
+  const bandwidth = signatureBandwidth + INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH;
+
+  return makeDimension(
+    bandwidth,
+    0,
+    0,
+    0, // TODO: Add compute complexity.
+  );
 };
 
 // See: vms/platformvm/txs/fee/complexity.go:583
@@ -251,10 +290,19 @@ export const addPermissionlessValidatorTx = (
   tx: AddPermissionlessValidatorTx,
 ): Dimensions => {
   return addDimensions(
+    INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
     baseTxComplexity(tx.baseTx),
     signerComplexity(tx.signer),
     outputComplexity(tx.stake),
     ownerComplexity(tx.getValidatorRewardsOwner()),
     ownerComplexity(tx.getDelegatorRewardsOwner()),
+  );
+};
+
+export const addSubnetValidatorTx = (tx: AddSubnetValidatorTx): Dimensions => {
+  return addDimensions(
+    INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    baseTxComplexity(tx.baseTx),
+    authComplexity(tx.subnetAuth),
   );
 };
