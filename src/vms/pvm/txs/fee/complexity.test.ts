@@ -18,6 +18,14 @@ import {
 import { hexToBuffer, unpackWithManager } from '../../../../utils';
 import { FeeDimensions, makeDimensions } from '../../../common/fees/dimensions';
 import {
+  authComplexity,
+  inputComplexity,
+  outputComplexity,
+  ownerComplexity,
+  signerComplexity,
+  txComplexity,
+} from './complexity';
+import {
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
@@ -30,13 +38,7 @@ import {
   INTRINSIC_INPUT_DB_WRITE,
   INTRINSIC_OUTPUT_DB_WRITE,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
-  authComplexity,
-  inputComplexity,
-  outputComplexity,
-  ownerComplexity,
-  signerComplexity,
-  txComplexity,
-} from './complexity';
+} from './constants';
 
 const makeOutputOwners = (numOfAddresses = 0) =>
   new OutputOwners(
