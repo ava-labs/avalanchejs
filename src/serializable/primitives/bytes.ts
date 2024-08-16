@@ -35,6 +35,11 @@ export class Bytes extends Primitives {
   }
 
   // TODO: Is this okay or is there some other way of getting the length that is preferred?
+  /**
+   * Returns the length of the bytes (Uint8Array).
+   *
+   * Useful for calculating tx complexity.
+   */
   get length() {
     return this.bytes.length;
   }

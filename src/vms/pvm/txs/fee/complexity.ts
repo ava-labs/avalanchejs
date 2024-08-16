@@ -4,10 +4,8 @@ import {
 } from '../../../../crypto/bls';
 import { SIGNATURE_LENGTH } from '../../../../crypto/secp256k1';
 import type { OutputOwners } from '../../../../serializable';
-import { NodeId } from '../../../../serializable';
 import { Input } from '../../../../serializable/fxs/secp256k1';
 import {
-  isBaseTx,
   type BaseTx,
   type TransferableInput,
   type TransferableOutput,
@@ -16,6 +14,7 @@ import type {
   AddPermissionlessDelegatorTx,
   AddPermissionlessValidatorTx,
   AddSubnetValidatorTx,
+  BaseTx as PvmBaseTx,
   CreateChainTx,
   CreateSubnetTx,
   ExportTx,
@@ -33,6 +32,7 @@ import {
   isCreateSubnetTx,
   isExportTx,
   isImportTx,
+  isPvmBaseTx,
   isRemoveSubnetValidatorTx,
   isTransferSubnetOwnershipTx,
 } from '../../../../serializable/pvm';
@@ -71,14 +71,14 @@ const SHORT_ID_LEN = 20;
 const INT_LEN = 4;
 
 const INTRINSIC_VALIDATOR_BANDWIDTH =
-  NodeId.length + // Node ID (Short ID = 20)
+  SHORT_ID_LEN + // Node ID (Short ID = 20)
   LONG_LEN + // Start
   LONG_LEN + // End
   LONG_LEN; // Weight
 
 const INTRINSIC_SUBNET_VALIDATOR_BANDWIDTH =
   INTRINSIC_VALIDATOR_BANDWIDTH + // Validator
-  +ID_LEN; // Subnet ID (ID Length = 32)
+  ID_LEN; // Subnet ID (ID Length = 32)
 
 const INTRINSIC_OUTPUT_BANDWIDTH =
   ID_LEN + // assetID
@@ -124,11 +124,11 @@ const INTRINSIC_POP_BANDWIDTH =
   PUBLIC_KEY_LENGTH + // Public key
   BLS_SIGNATURE_LENGTH; // Signature
 
-const INTRINSIC_INPUT_DB_READ = 1;
-const INTRINSIC_INPUT_DB_WRITE = 1;
-const INTRINSIC_OUTPUT_DB_WRITE = 1;
+export const INTRINSIC_INPUT_DB_READ = 1;
+export const INTRINSIC_INPUT_DB_WRITE = 1;
+export const INTRINSIC_OUTPUT_DB_WRITE = 1;
 
-const INTRINSIC_BASE_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_BASE_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     2 + // codec version
     INT_LEN + // typeID
@@ -143,7 +143,7 @@ const INTRINSIC_BASE_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     ID_LEN + // Subnet ID
@@ -158,34 +158,44 @@ const INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
-    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
-    INTRINSIC_VALIDATOR_BANDWIDTH + // Validator
-    ID_LEN + // Subnet ID
-    INT_LEN + // Signer typeID
-    INT_LEN + // Num stake outs
-    INT_LEN + // Validator rewards typeID
-    INT_LEN + // Delegator rewards typeID
-    INT_LEN, // Delegation shares
-  [FeeDimensions.DBRead]: 1,
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] + INT_LEN, // owner typeID
+  [FeeDimensions.DBRead]: 0,
   [FeeDimensions.DBWrite]: 1,
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES: Dimensions = {
-  [FeeDimensions.Bandwidth]:
-    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
-    INTRINSIC_VALIDATOR_BANDWIDTH + // Validator
-    ID_LEN + // Subnet ID
-    INT_LEN + // Num stake outs
-    INT_LEN, // Delegator rewards typeID
-  [FeeDimensions.DBRead]: 1,
-  [FeeDimensions.DBWrite]: 1,
-  [FeeDimensions.Compute]: 0,
-};
+export const INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES: Dimensions =
+  {
+    [FeeDimensions.Bandwidth]:
+      INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+      INTRINSIC_VALIDATOR_BANDWIDTH + // Validator
+      ID_LEN + // Subnet ID
+      INT_LEN + // Signer typeID
+      INT_LEN + // Num stake outs
+      INT_LEN + // Validator rewards typeID
+      INT_LEN + // Delegator rewards typeID
+      INT_LEN, // Delegation shares
+    [FeeDimensions.DBRead]: 1,
+    [FeeDimensions.DBWrite]: 1,
+    [FeeDimensions.Compute]: 0,
+  };
 
-const INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES: Dimensions =
+  {
+    [FeeDimensions.Bandwidth]:
+      INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+      INTRINSIC_VALIDATOR_BANDWIDTH + // Validator
+      ID_LEN + // Subnet ID
+      INT_LEN + // Num stake outs
+      INT_LEN, // Delegator rewards typeID
+    [FeeDimensions.DBRead]: 1,
+    [FeeDimensions.DBWrite]: 1,
+    [FeeDimensions.Compute]: 0,
+  };
+
+export const INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     INTRINSIC_SUBNET_VALIDATOR_BANDWIDTH + // Subnet Validator
@@ -196,7 +206,7 @@ const INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_EXPORT_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_EXPORT_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     ID_LEN + // destination chain ID
@@ -206,7 +216,7 @@ const INTRINSIC_EXPORT_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_IMPORT_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_IMPORT_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     ID_LEN + // source chain ID
@@ -216,7 +226,7 @@ const INTRINSIC_IMPORT_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     SHORT_ID_LEN + // nodeID
@@ -228,7 +238,7 @@ const INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Compute]: 0,
 };
 
-const INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES: Dimensions = {
+export const INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     ID_LEN + // subnetID
@@ -260,7 +270,6 @@ export const outputComplexity = (
 
     let numberOfAddresses = 0;
 
-    // TODO: Double check this if logic.
     if (isStakeableLockOut(transferableOutput.output)) {
       outComplexity[FeeDimensions.Bandwidth] +=
         INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH;
@@ -301,7 +310,6 @@ export const inputComplexity = (
       [FeeDimensions.Compute]: 0, // TODO: Add compute complexity.
     };
 
-    // TODO: Double check this if logic.
     if (isStakeableLockIn(transferableInput.input)) {
       inputComplexity[FeeDimensions.Bandwidth] +=
         INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH;
@@ -373,18 +381,15 @@ export const authComplexity = (input: Serializable): Dimensions => {
   );
 };
 
-// See: vms/platformvm/txs/fee/complexity.go:583
 const baseTxComplexity = (baseTx: BaseTx): Dimensions => {
   const outputsComplexity = outputComplexity(baseTx.outputs);
   const inputsComplexity = inputComplexity(baseTx.inputs);
 
   const complexity = addDimensions(outputsComplexity, inputsComplexity);
 
-  // TODO: Verify if .toBytes().length is correct.
-  // See: vms/platformvm/txs/fee/complexity.go:598
-  complexity[FeeDimensions.Bandwidth] += baseTx.memo.toBytes().length;
+  complexity[FeeDimensions.Bandwidth] += baseTx.memo.length;
 
-  return getEmptyDimensions();
+  return complexity;
 };
 
 const addPermissionlessValidatorTx = (
@@ -419,8 +424,11 @@ const addSubnetValidatorTx = (tx: AddSubnetValidatorTx): Dimensions => {
   );
 };
 
-const baseTx = (tx: BaseTx): Dimensions => {
-  return addDimensions(INTRINSIC_BASE_TX_COMPLEXITIES, baseTxComplexity(tx));
+const baseTx = (tx: PvmBaseTx): Dimensions => {
+  return addDimensions(
+    INTRINSIC_BASE_TX_COMPLEXITIES,
+    baseTxComplexity(tx.baseTx),
+  );
 };
 
 const createChainTx = (tx: CreateChainTx): Dimensions => {
@@ -440,6 +448,7 @@ const createChainTx = (tx: CreateChainTx): Dimensions => {
 
 const createSubnetTx = (tx: CreateSubnetTx): Dimensions => {
   return addDimensions(
+    INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
     baseTxComplexity(tx.baseTx),
     ownerComplexity(tx.getSubnetOwners()),
   );
@@ -499,7 +508,7 @@ export const txComplexity = (tx: Transaction): Dimensions => {
     return removeSubnetValidatorTx(tx);
   } else if (isTransferSubnetOwnershipTx(tx)) {
     return transferSubnetOwnershipTx(tx);
-  } else if (isBaseTx(tx)) {
+  } else if (isPvmBaseTx(tx)) {
     return baseTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
