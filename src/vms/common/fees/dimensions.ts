@@ -48,3 +48,15 @@ export const addDimensions = (...dimensions: Dimensions[]): Dimensions => {
   }
   return result;
 };
+
+export const dimensionsToGas = (
+  dimensions: Dimensions,
+  weights: Dimensions,
+): bigint => {
+  return BigInt(
+    dimensions[FeeDimensions.Bandwidth] * weights[FeeDimensions.Bandwidth] +
+      dimensions[FeeDimensions.DBRead] * weights[FeeDimensions.DBRead] +
+      dimensions[FeeDimensions.DBWrite] * weights[FeeDimensions.DBWrite] +
+      dimensions[FeeDimensions.Compute] * weights[FeeDimensions.Compute],
+  );
+};
