@@ -9,14 +9,14 @@ type DimensionValue = number;
 
 export type Dimensions = Record<FeeDimensions, DimensionValue>;
 
-export const getEmptyDimensions = (): Dimensions => ({
+export const createEmptyDimensions = (): Dimensions => ({
   [FeeDimensions.Bandwidth]: 0,
   [FeeDimensions.DBRead]: 0,
   [FeeDimensions.DBWrite]: 0,
   [FeeDimensions.Compute]: 0,
 });
 
-export const makeDimensions = (
+export const createDimensions = (
   bandwidth: DimensionValue,
   dbRead: DimensionValue,
   dbWrite: DimensionValue,

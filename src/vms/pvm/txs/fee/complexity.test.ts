@@ -16,14 +16,14 @@ import {
   StakeableLockOut,
 } from '../../../../serializable/pvm';
 import { hexToBuffer, unpackWithManager } from '../../../../utils';
-import { makeDimensions } from '../../../common/fees/dimensions';
+import { createDimensions } from '../../../common/fees/dimensions';
 import {
-  authComplexity,
-  inputComplexity,
-  outputComplexity,
-  ownerComplexity,
-  signerComplexity,
-  txComplexity,
+  getAuthComplexity,
+  getInputComplexity,
+  getOutputComplexity,
+  getOwnerComplexity,
+  getSignerComplexity,
+  getTxComplexity,
 } from './complexity';
 import {
   TEST_TRANSACTIONS,
@@ -62,33 +62,33 @@ const txHexToPVMTransaction = (txHex: string) => {
 };
 
 describe('Complexity', () => {
-  describe('outputComplexity', () => {
+  describe('getOutputComplexity', () => {
     test('empty transferable output', () => {
-      const result = outputComplexity([]);
+      const result = getOutputComplexity([]);
 
-      expect(result).toEqual(makeDimensions(0, 0, 0, 0));
+      expect(result).toEqual(createDimensions(0, 0, 0, 0));
     });
 
     test('any can spend', () => {
-      const result = outputComplexity([makeTransferableOutput()]);
+      const result = getOutputComplexity([makeTransferableOutput()]);
 
-      expect(result).toEqual(makeDimensions(60, 0, 1, 0));
+      expect(result).toEqual(createDimensions(60, 0, 1, 0));
     });
 
     test('one owner', () => {
-      const result = outputComplexity([makeTransferableOutput(1)]);
+      const result = getOutputComplexity([makeTransferableOutput(1)]);
 
-      expect(result).toEqual(makeDimensions(80, 0, 1, 0));
+      expect(result).toEqual(createDimensions(80, 0, 1, 0));
     });
 
     test('three owners', () => {
-      const result = outputComplexity([makeTransferableOutput(3)]);
+      const result = getOutputComplexity([makeTransferableOutput(3)]);
 
-      expect(result).toEqual(makeDimensions(120, 0, 1, 0));
+      expect(result).toEqual(createDimensions(120, 0, 1, 0));
     });
 
     test('locked stakeable', () => {
-      const result = outputComplexity([
+      const result = getOutputComplexity([
         new TransferableOutput(
           id(),
           new StakeableLockOut(
@@ -98,16 +98,16 @@ describe('Complexity', () => {
         ),
       ]);
 
-      expect(result).toEqual(makeDimensions(132, 0, 1, 0));
+      expect(result).toEqual(createDimensions(132, 0, 1, 0));
     });
   });
 
-  describe('inputComplexity', () => {
+  describe('getInputComplexity', () => {
     test('any can spend', () => {
-      const result = inputComplexity([makeTransferableInput()]);
+      const result = getInputComplexity([makeTransferableInput()]);
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           92,
           1,
           1,
@@ -117,10 +117,10 @@ describe('Complexity', () => {
     });
 
     test('one owner', () => {
-      const result = inputComplexity([makeTransferableInput(1)]);
+      const result = getInputComplexity([makeTransferableInput(1)]);
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           161,
           1,
           1,
@@ -130,10 +130,10 @@ describe('Complexity', () => {
     });
 
     test('three owners', () => {
-      const result = inputComplexity([makeTransferableInput(3)]);
+      const result = getInputComplexity([makeTransferableInput(3)]);
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           299,
           1,
           1,
@@ -143,7 +143,7 @@ describe('Complexity', () => {
     });
 
     test('locked stakeable', () => {
-      const result = inputComplexity([
+      const result = getInputComplexity([
         new TransferableInput(
           utxoId(),
           id(),
@@ -155,7 +155,7 @@ describe('Complexity', () => {
       ]);
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           311,
           1,
           1,
@@ -165,38 +165,38 @@ describe('Complexity', () => {
     });
   });
 
-  describe('ownerComplexity', () => {
+  describe('getOwnerComplexity', () => {
     test('any can spend', () => {
-      const result = ownerComplexity(makeOutputOwners());
+      const result = getOwnerComplexity(makeOutputOwners());
 
-      expect(result).toEqual(makeDimensions(16, 0, 0, 0));
+      expect(result).toEqual(createDimensions(16, 0, 0, 0));
     });
 
     test('one owner', () => {
-      const result = ownerComplexity(makeOutputOwners(1));
+      const result = getOwnerComplexity(makeOutputOwners(1));
 
-      expect(result).toEqual(makeDimensions(36, 0, 0, 0));
+      expect(result).toEqual(createDimensions(36, 0, 0, 0));
     });
 
     test('three owners', () => {
-      const result = ownerComplexity(makeOutputOwners(3));
+      const result = getOwnerComplexity(makeOutputOwners(3));
 
-      expect(result).toEqual(makeDimensions(76, 0, 0, 0));
+      expect(result).toEqual(createDimensions(76, 0, 0, 0));
     });
   });
 
-  describe('signerComplexity', () => {
+  describe('getSignerComplexity', () => {
     test('empty signer', () => {
-      const result = signerComplexity(new SignerEmpty());
+      const result = getSignerComplexity(new SignerEmpty());
 
-      expect(result).toEqual(makeDimensions(0, 0, 0, 0));
+      expect(result).toEqual(createDimensions(0, 0, 0, 0));
     });
 
     test('bls pop', () => {
-      const result = signerComplexity(signer());
+      const result = getSignerComplexity(signer());
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           144,
           0,
           0,
@@ -207,12 +207,12 @@ describe('Complexity', () => {
     });
   });
 
-  describe('authComplexity', () => {
+  describe('getAuthComplexity', () => {
     test('any can spend', () => {
-      const result = authComplexity(new Input([]));
+      const result = getAuthComplexity(new Input([]));
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           8,
           0,
           0,
@@ -222,10 +222,10 @@ describe('Complexity', () => {
     });
 
     test('one owner', () => {
-      const result = authComplexity(new Input([int()]));
+      const result = getAuthComplexity(new Input([int()]));
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           77,
           0,
           0,
@@ -235,10 +235,10 @@ describe('Complexity', () => {
     });
 
     test('three owners', () => {
-      const result = authComplexity(new Input(ints()));
+      const result = getAuthComplexity(new Input(ints()));
 
       expect(result).toEqual(
-        makeDimensions(
+        createDimensions(
           215,
           0,
           0,
@@ -249,18 +249,18 @@ describe('Complexity', () => {
 
     test('invalid auth type', () => {
       expect(() => {
-        authComplexity(int());
+        getAuthComplexity(int());
       }).toThrow(
         'Unable to calculate auth complexity of transaction. Expected Input as subnet auth.',
       );
     });
   });
 
-  describe('txComplexity', () => {
+  describe('getTxComplexity', () => {
     test.each(TEST_TRANSACTIONS)('$name', ({ txHex, expectedComplexity }) => {
       const tx = txHexToPVMTransaction(txHex);
 
-      const result = txComplexity(tx);
+      const result = getTxComplexity(tx);
 
       expect(result).toEqual(expectedComplexity);
     });
@@ -271,7 +271,7 @@ describe('Complexity', () => {
         const tx = txHexToPVMTransaction(txHex);
 
         expect(() => {
-          txComplexity(tx);
+          getTxComplexity(tx);
         }).toThrow('Unsupported transaction type.');
       },
     );

@@ -40,8 +40,8 @@ import type { Dimensions } from '../../../common/fees/dimensions';
 import {
   FeeDimensions,
   addDimensions,
-  getEmptyDimensions,
-  makeDimensions,
+  createEmptyDimensions,
+  createDimensions,
 } from '../../../common/fees/dimensions';
 import type { Serializable } from '../../../common/types';
 import type { Transaction } from '../../../common';
@@ -76,10 +76,10 @@ import {
 /**
  * Returns the complexity outputs add to a transaction.
  */
-export const outputComplexity = (
+export const getOutputComplexity = (
   transferableOutputs: TransferableOutput[],
 ): Dimensions => {
-  let complexity = getEmptyDimensions();
+  let complexity = createEmptyDimensions();
 
   for (const transferableOutput of transferableOutputs) {
     // outputComplexity logic
@@ -118,10 +118,10 @@ export const outputComplexity = (
  *
  * It includes the complexity that the corresponding credentials will add.
  */
-export const inputComplexity = (
+export const getInputComplexity = (
   transferableInputs: TransferableInput[],
 ): Dimensions => {
-  let complexity = getEmptyDimensions();
+  let complexity = createEmptyDimensions();
 
   for (const transferableInput of transferableInputs) {
     const inputComplexity: Dimensions = {
@@ -152,12 +152,14 @@ export const inputComplexity = (
   return complexity;
 };
 
-export const signerComplexity = (signer: Signer | SignerEmpty): Dimensions => {
+export const getSignerComplexity = (
+  signer: Signer | SignerEmpty,
+): Dimensions => {
   if (signer instanceof SignerEmpty) {
-    return getEmptyDimensions();
+    return createEmptyDimensions();
   }
 
-  return makeDimensions(
+  return createDimensions(
     INTRINSIC_POP_BANDWIDTH,
     0,
     0,
@@ -165,14 +167,14 @@ export const signerComplexity = (signer: Signer | SignerEmpty): Dimensions => {
   );
 };
 
-export const ownerComplexity = (outputOwners: OutputOwners): Dimensions => {
+export const getOwnerComplexity = (outputOwners: OutputOwners): Dimensions => {
   const numberOfAddresses = outputOwners.addrs.length;
   const addressBandwidth = numberOfAddresses * SHORT_ID_LEN;
 
   const bandwidth =
     addressBandwidth + INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH;
 
-  return makeDimensions(bandwidth, 0, 0, 0);
+  return createDimensions(bandwidth, 0, 0, 0);
 };
 
 /**
@@ -181,7 +183,7 @@ export const ownerComplexity = (outputOwners: OutputOwners): Dimensions => {
  * It does include the complexity that the corresponding credential will add.
  * It does not include the typeID of the credential.
  */
-export const authComplexity = (input: Serializable): Dimensions => {
+export const getAuthComplexity = (input: Serializable): Dimensions => {
   // TODO: Not a fan of this. May be better to re-type `subnetAuth` as `Input` in `AddSubnetValidatorTx`?
   if (!(input instanceof Input)) {
     throw new Error(
@@ -196,7 +198,7 @@ export const authComplexity = (input: Serializable): Dimensions => {
 
   const bandwidth = signatureBandwidth + INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH;
 
-  return makeDimensions(
+  return createDimensions(
     bandwidth,
     0,
     0,
@@ -204,9 +206,9 @@ export const authComplexity = (input: Serializable): Dimensions => {
   );
 };
 
-const baseTxComplexity = (baseTx: BaseTx): Dimensions => {
-  const outputsComplexity = outputComplexity(baseTx.outputs);
-  const inputsComplexity = inputComplexity(baseTx.inputs);
+const getBaseTxComplexity = (baseTx: BaseTx): Dimensions => {
+  const outputsComplexity = getOutputComplexity(baseTx.outputs);
+  const inputsComplexity = getInputComplexity(baseTx.inputs);
 
   const complexity = addDimensions(outputsComplexity, inputsComplexity);
 
@@ -220,11 +222,11 @@ const addPermissionlessValidatorTx = (
 ): Dimensions => {
   return addDimensions(
     INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    signerComplexity(tx.signer),
-    outputComplexity(tx.stake),
-    ownerComplexity(tx.getValidatorRewardsOwner()),
-    ownerComplexity(tx.getDelegatorRewardsOwner()),
+    getBaseTxComplexity(tx.baseTx),
+    getSignerComplexity(tx.signer),
+    getOutputComplexity(tx.stake),
+    getOwnerComplexity(tx.getValidatorRewardsOwner()),
+    getOwnerComplexity(tx.getDelegatorRewardsOwner()),
   );
 };
 
@@ -233,24 +235,24 @@ const addPermissionlessDelegatorTx = (
 ): Dimensions => {
   return addDimensions(
     INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    ownerComplexity(tx.getDelegatorRewardsOwner()),
-    outputComplexity(tx.stake),
+    getBaseTxComplexity(tx.baseTx),
+    getOwnerComplexity(tx.getDelegatorRewardsOwner()),
+    getOutputComplexity(tx.stake),
   );
 };
 
 const addSubnetValidatorTx = (tx: AddSubnetValidatorTx): Dimensions => {
   return addDimensions(
     INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    authComplexity(tx.subnetAuth),
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.subnetAuth),
   );
 };
 
 const baseTx = (tx: PvmBaseTx): Dimensions => {
   return addDimensions(
     INTRINSIC_BASE_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
+    getBaseTxComplexity(tx.baseTx),
   );
 };
 
@@ -259,45 +261,45 @@ const createChainTx = (tx: CreateChainTx): Dimensions => {
   bandwidth += tx.chainName.value().length;
   bandwidth += tx.genesisData.length;
 
-  const dynamicComplexity = makeDimensions(bandwidth, 0, 0, 0);
+  const dynamicComplexity = createDimensions(bandwidth, 0, 0, 0);
 
   return addDimensions(
     INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
     dynamicComplexity,
-    baseTxComplexity(tx.baseTx),
-    authComplexity(tx.subnetAuth),
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.subnetAuth),
   );
 };
 
 const createSubnetTx = (tx: CreateSubnetTx): Dimensions => {
   return addDimensions(
     INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    ownerComplexity(tx.getSubnetOwners()),
+    getBaseTxComplexity(tx.baseTx),
+    getOwnerComplexity(tx.getSubnetOwners()),
   );
 };
 
 const exportTx = (tx: ExportTx): Dimensions => {
   return addDimensions(
     INTRINSIC_EXPORT_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    outputComplexity(tx.outs),
+    getBaseTxComplexity(tx.baseTx),
+    getOutputComplexity(tx.outs),
   );
 };
 
 const importTx = (tx: ImportTx): Dimensions => {
   return addDimensions(
     INTRINSIC_IMPORT_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    inputComplexity(tx.ins),
+    getBaseTxComplexity(tx.baseTx),
+    getInputComplexity(tx.ins),
   );
 };
 
 const removeSubnetValidatorTx = (tx: RemoveSubnetValidatorTx): Dimensions => {
   return addDimensions(
     INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    authComplexity(tx.subnetAuth),
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.subnetAuth),
   );
 };
 
@@ -306,13 +308,13 @@ const transferSubnetOwnershipTx = (
 ): Dimensions => {
   return addDimensions(
     INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
-    baseTxComplexity(tx.baseTx),
-    authComplexity(tx.subnetAuth),
-    ownerComplexity(tx.getSubnetOwners()),
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.subnetAuth),
+    getOwnerComplexity(tx.getSubnetOwners()),
   );
 };
 
-export const txComplexity = (tx: Transaction): Dimensions => {
+export const getTxComplexity = (tx: Transaction): Dimensions => {
   if (isAddPermissionlessValidatorTx(tx)) {
     return addPermissionlessValidatorTx(tx);
   } else if (isAddPermissionlessDelegatorTx(tx)) {

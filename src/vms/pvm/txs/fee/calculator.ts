@@ -3,7 +3,7 @@ import {
   dimensionsToGas,
   type Dimensions,
 } from '../../../common/fees/dimensions';
-import { txComplexity } from './complexity';
+import { getTxComplexity } from './complexity';
 
 /**
  * Calculates the minimum required fee, in nAVAX, that an unsigned
@@ -16,7 +16,7 @@ export const calculateFee = (
   weights: Dimensions,
   price: bigint,
 ): bigint => {
-  const complexity = txComplexity(tx);
+  const complexity = getTxComplexity(tx);
 
   const gas = dimensionsToGas(complexity, weights);
 

@@ -12,9 +12,9 @@ export const NoSigMatchError = new Error('No addresses match UTXO owners');
 /**
  * The idea here is to verify that a given set of utxos contains any utxos that share addresses
  * with the fromAddresses array. If not we should be throwing an error as the tx is being formulated
- * incoreectly
+ * incorrectly
  *
- * @param set the utxo or data set, this can change depening on the calcFn
+ * @param set the utxo or data set, this can change depending on the calcFn
  * @param getTransferOutput a callback that takes a utxo and gets the output
  * @param fromAddresses the addresses the utxos should belong to
  * @param options
