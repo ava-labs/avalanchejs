@@ -82,7 +82,6 @@ export const getOutputComplexity = (
   let complexity = createEmptyDimensions();
 
   for (const transferableOutput of transferableOutputs) {
-    // outputComplexity logic
     const outComplexity: Dimensions = {
       [FeeDimensions.Bandwidth]:
         INTRINSIC_OUTPUT_BANDWIDTH + INTRINSIC_SECP256K1_FX_OUTPUT_BANDWIDTH,
@@ -106,7 +105,6 @@ export const getOutputComplexity = (
 
     outComplexity[FeeDimensions.Bandwidth] += addressBandwidth;
 
-    // Finish with OutputComplexity logic
     complexity = addDimensions(complexity, outComplexity);
   }
 
@@ -145,7 +143,6 @@ export const getInputComplexity = (
 
     inputComplexity[FeeDimensions.Bandwidth] += signatureBandwidth;
 
-    // Finalize
     complexity = addDimensions(complexity, inputComplexity);
   }
 

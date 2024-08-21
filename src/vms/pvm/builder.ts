@@ -140,24 +140,6 @@ export function newImportTx(
     throw new Error('no UTXOs available to import');
   }
 
-  const outputs: TransferableOutput[] = [];
-
-  for (const [assetID, amount] of Object.entries(importedAmounts)) {
-    if (assetID === context.avaxAssetID) {
-      continue;
-    }
-
-    outputs.push(
-      TransferableOutput.fromNative(
-        assetID,
-        amount,
-        toAddresses,
-        locktime,
-        threshold,
-      ),
-    );
-  }
-
   let inputs: TransferableInput[] = [];
   let changeOutputs: TransferableOutput[] = [];
 
