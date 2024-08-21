@@ -23,7 +23,7 @@ export class TransferableOutput {
   static fromNative(
     assetId: string,
     amt: bigint,
-    addresses: Uint8Array[],
+    addresses: readonly Uint8Array[],
     locktime?: bigint,
     threshold?: number,
   ) {

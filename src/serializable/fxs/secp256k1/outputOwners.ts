@@ -21,7 +21,11 @@ export class OutputOwners {
     public readonly addrs: Address[],
   ) {}
 
-  static fromNative(address: Uint8Array[], locktime = 0n, threshold = 1) {
+  static fromNative(
+    address: readonly Uint8Array[],
+    locktime = 0n,
+    threshold = 1,
+  ) {
     return new OutputOwners(
       new BigIntPr(locktime),
       new Int(threshold),

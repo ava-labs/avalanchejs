@@ -43,40 +43,6 @@ import {
 import { NodeId } from '../../serializable/fxs/common/nodeId';
 import { createSignerOrSignerEmptyFromStrings } from '../../serializable/pvm/signer';
 import { baseTxUnsafePvm } from '../common';
-import type { Dimensions } from '../common/fees/dimensions';
-import {
-  addDimensions,
-  createDimensions,
-  createEmptyDimensions,
-} from '../common/fees/dimensions';
-import {
-  ID_LEN,
-  INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
-  INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
-  INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-  INTRINSIC_BASE_TX_COMPLEXITIES,
-  INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
-  INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
-  INTRINSIC_EXPORT_TX_COMPLEXITIES,
-  INTRINSIC_IMPORT_TX_COMPLEXITIES,
-  INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-  INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
-  getAuthComplexity,
-  getInputComplexity,
-  getOutputComplexity,
-  getOwnerComplexity,
-  getSignerComplexity,
-} from './txs/fee';
-
-/*
-  Builder is useful for building transactions that are specific to a chain.
- */
-
-const getMemoComplexity = (
-  spendOptions: Required<SpendOptions>,
-): Dimensions => {
-  return createDimensions(spendOptions.memo.length, 0, 0, 0);
-};
 
 /**
  * @param fromAddresses - used for selecting which utxos are signable
@@ -104,16 +70,6 @@ export function newBaseTx(
     toBurn.set(assetId, (toBurn.get(assetId) || 0n) + out.output.amount());
   });
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const outputComplexity = getOutputComplexity(outputs);
-
-  const complexity = addDimensions(
-    INTRINSIC_BASE_TX_COMPLEXITIES,
-    memoComplexity,
-    outputComplexity,
-  );
-
   const { inputs, inputUTXOs, changeOutputs, addressMaps } = calculateUTXOSpend(
     toBurn,
     undefined,
@@ -121,7 +77,6 @@ export function newBaseTx(
     fromAddresses,
     defaultedOptions,
     [useUnlockedUTXOs, useConsolidateOutputs],
-    complexity,
   );
 
   const allOutputs = [...outputs, ...changeOutputs];
@@ -145,7 +100,7 @@ export function newBaseTx(
   @param threshold - the threshold to write on the utxo
   @param locktime - the locktime to write onto the utxo
 
-  @returns a unsignedTx
+  @returns UnsignedTx
 */
 export function newImportTx(
   context: Context,
@@ -203,19 +158,6 @@ export function newImportTx(
     );
   }
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const inputComplexity = getInputComplexity(importedInputs);
-
-  const outputComplexity = getOutputComplexity(outputs);
-
-  const complexity = addDimensions(
-    INTRINSIC_IMPORT_TX_COMPLEXITIES,
-    memoComplexity,
-    inputComplexity,
-    outputComplexity,
-  );
-
   let inputs: TransferableInput[] = [];
   let changeOutputs: TransferableOutput[] = [];
 
@@ -231,7 +173,6 @@ export function newImportTx(
       fromAddresses,
       defaultedOptions,
       [useUnlockedUTXOs],
-      complexity,
     );
     inputs = spendRes.inputs;
     changeOutputs = spendRes.changeOutputs;
@@ -325,7 +266,6 @@ export function newAddValidatorTx(
       addressesFromBytes(fromAddressesBytes),
       defaultedOptions,
       [useSpendableLockedUTXOs, useUnlockedUTXOs, useConsolidateOutputs],
-      createEmptyDimensions(),
     );
 
   const validatorTx = new AddValidatorTx(
@@ -351,7 +291,7 @@ export function newAddValidatorTx(
  * @param utxos list of utxos to choose from
  * @param outputs list of outputs to create.
  * @param options used for filtering UTXO's
- * @returns unsignedTx containing an exportTx
+ * @returns UnsignedTx containing an exportTx
  */
 
 export function newExportTx(
@@ -367,16 +307,6 @@ export function newExportTx(
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
   const toBurn = getToBurn(context, outputs, context.baseTxFee);
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const outputComplexity = getOutputComplexity(outputs);
-
-  const complexity = addDimensions(
-    INTRINSIC_EXPORT_TX_COMPLEXITIES,
-    memoComplexity,
-    outputComplexity,
-  );
-
   const { inputs, changeOutputs, addressMaps, inputUTXOs } = calculateUTXOSpend(
     toBurn,
     undefined,
@@ -384,7 +314,6 @@ export function newExportTx(
     fromAddresses,
     defaultedOptions,
     [useUnlockedUTXOs],
-    complexity,
   );
 
   outputs.sort(compareTransferableOutputs);
@@ -418,7 +347,7 @@ export function newExportTx(
  * @param options - used for filtering utxos
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
- * @returns unsignedTx
+ * @returns UnsignedTx
  */
 
 export function newAddDelegatorTx(
@@ -448,7 +377,6 @@ export function newAddDelegatorTx(
       addressesFromBytes(fromAddressesBytes),
       defaultedOptions,
       [useSpendableLockedUTXOs, useUnlockedUTXOs, useConsolidateOutputs],
-      createEmptyDimensions(),
     );
 
   const addDelegatorTx = new AddDelegatorTx(
@@ -476,7 +404,7 @@ export function newAddDelegatorTx(
  * @param options used for filtering utxos
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
- * @returns unsignedTx
+ * @returns UnsignedTx
  */
 export function newCreateSubnetTx(
   context: Context,
@@ -489,18 +417,6 @@ export function newCreateSubnetTx(
 ) {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const ownerComplexity = getOwnerComplexity(
-    OutputOwners.fromNative(subnetOwners, locktime, threshold),
-  );
-
-  const complexity = addDimensions(
-    INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
-    memoComplexity,
-    ownerComplexity,
-  );
-
   const { inputs, addressMaps, changeOutputs, inputUTXOs } = calculateUTXOSpend(
     new Map([[context.avaxAssetID, context.createSubnetTxFee]]),
     undefined,
@@ -508,7 +424,6 @@ export function newCreateSubnetTx(
     addressesFromBytes(fromAddressesBytes),
     defaultedOptions,
     [useUnlockedUTXOs],
-    complexity,
   );
 
   const createSubnetTx = new CreateSubnetTx(
@@ -558,24 +473,6 @@ export function newCreateBlockchainTx(
     new TextEncoder().encode(JSON.stringify(genesisData)),
   );
 
-  const dynamicComplexity = createDimensions(
-    fxIds.length * ID_LEN +
-      chainName.length +
-      genesisBytes.length +
-      defaultedOptions.memo.length,
-    0,
-    0,
-    0,
-  );
-
-  const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-
-  const complexity = addDimensions(
-    INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
-    dynamicComplexity,
-    authComplexity,
-  );
-
   const { inputs, addressMaps, changeOutputs, inputUTXOs } = calculateUTXOSpend(
     new Map([[context.avaxAssetID, context.createBlockchainTxFee]]),
     undefined,
@@ -583,7 +480,6 @@ export function newCreateBlockchainTx(
     addressesFromBytes(fromAddressesBytes),
     defaultedOptions,
     [useUnlockedUTXOs],
-    complexity,
   );
 
   const createChainTx = new CreateChainTx(
@@ -619,16 +515,6 @@ export function newAddSubnetValidatorTx(
 ) {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-
-  const complexity = addDimensions(
-    INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-    memoComplexity,
-    authComplexity,
-  );
-
   const { inputs, addressMaps, changeOutputs, inputUTXOs } = calculateUTXOSpend(
     new Map([[context.avaxAssetID, context.addSubnetValidatorFee]]),
     undefined,
@@ -636,7 +522,6 @@ export function newAddSubnetValidatorTx(
     addressesFromBytes(fromAddressesBytes),
     defaultedOptions,
     [useUnlockedUTXOs],
-    complexity,
   );
 
   const addSubnetValidatorTx = new AddSubnetValidatorTx(
@@ -670,16 +555,6 @@ export function newRemoveSubnetValidatorTx(
 ) {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-
-  const complexity = addDimensions(
-    INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-    memoComplexity,
-    authComplexity,
-  );
-
   const { inputs, addressMaps, changeOutputs, inputUTXOs } = calculateUTXOSpend(
     new Map([[context.avaxAssetID, context.baseTxFee]]),
     undefined,
@@ -687,7 +562,6 @@ export function newRemoveSubnetValidatorTx(
     addressesFromBytes(fromAddressesBytes),
     defaultedOptions,
     [useUnlockedUTXOs],
-    complexity,
   );
 
   const removeSubnetValidatorTx = new RemoveSubnetValidatorTx(
@@ -773,20 +647,6 @@ export function newAddPermissionlessValidatorTx(
     0n,
   );
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const signerComplexity = getSignerComplexity(signer);
-  const validatorOwnerComplexity = getOwnerComplexity(validatorOutputOwners);
-  const delegatorOwnerComplexity = getOwnerComplexity(delegatorOutputOwners);
-
-  const complexity = addDimensions(
-    INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
-    memoComplexity,
-    signerComplexity,
-    validatorOwnerComplexity,
-    delegatorOwnerComplexity,
-  );
-
   const { addressMaps, changeOutputs, inputUTXOs, inputs, stakeOutputs } =
     calculateUTXOSpend(
       toBurn,
@@ -795,7 +655,6 @@ export function newAddPermissionlessValidatorTx(
       addressesFromBytes(fromAddressesBytes),
       defaultedOptions,
       [useSpendableLockedUTXOs, useUnlockedUTXOs, useConsolidateOutputs],
-      complexity,
     );
 
   const validatorTx = new AddPermissionlessValidatorTx(
@@ -879,16 +738,6 @@ export function newAddPermissionlessDelegatorTx(
     threshold,
   );
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const ownerComplexity = getOwnerComplexity(delegatorRewardsOwner);
-
-  const complexity = addDimensions(
-    INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
-    memoComplexity,
-    ownerComplexity,
-  );
-
   const { addressMaps, changeOutputs, inputUTXOs, inputs, stakeOutputs } =
     calculateUTXOSpend(
       toBurn,
@@ -897,7 +746,6 @@ export function newAddPermissionlessDelegatorTx(
       addressesFromBytes(fromAddressesBytes),
       defaultedOptions,
       [useSpendableLockedUTXOs, useUnlockedUTXOs, useConsolidateOutputs],
-      complexity,
     );
 
   const delegatorTx = new AddPermissionlessDelegatorTx(
@@ -941,7 +789,7 @@ export function newAddPermissionlessDelegatorTx(
  * @param uptimeRequirement the minimum percentage a validator must be online and responsive to receive a reward
  * @param subnetAuth specifies indices of existing subnet owners
  * @param options used for filtering utxos
- * @returns unsignedTx containing a TransformSubnetTx
+ * @returns UnsignedTx containing a TransformSubnetTx
  */
 export function newTransformSubnetTx(
   context: Context,
@@ -973,7 +821,6 @@ export function newTransformSubnetTx(
     addressesFromBytes(fromAddressesBytes),
     defaultedOptions,
     [useUnlockedUTXOs],
-    createEmptyDimensions(),
   );
 
   return new UnsignedTx(
@@ -1016,7 +863,7 @@ export function newTransformSubnetTx(
  * @param options used for filtering utxos
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
- * @returns unsignedTx containing a TransferSubnetOwnershipTx
+ * @returns UnsignedTx containing a TransferSubnetOwnershipTx
  */
 export function newTransferSubnetOwnershipTx(
   context: Context,
@@ -1031,21 +878,6 @@ export function newTransferSubnetOwnershipTx(
 ) {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
-
-  const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-
-  const ownerComplexity = getOwnerComplexity(
-    OutputOwners.fromNative(subnetOwners, locktime, threshold),
-  );
-
-  const complexity = addDimensions(
-    INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
-    memoComplexity,
-    authComplexity,
-    ownerComplexity,
-  );
-
   const { inputs, addressMaps, changeOutputs, inputUTXOs } = calculateUTXOSpend(
     new Map([[context.avaxAssetID, context.baseTxFee]]),
     undefined,
@@ -1053,7 +885,6 @@ export function newTransferSubnetOwnershipTx(
     addressesFromBytes(fromAddressesBytes),
     defaultedOptions,
     [useUnlockedUTXOs],
-    complexity,
   );
 
   return new UnsignedTx(

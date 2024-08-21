@@ -5,7 +5,7 @@ import type { TransferableInput } from './transferableInput';
 export abstract class AvaxTx extends Transaction {
   abstract baseTx?: BaseTx;
 
-  getInputs(): TransferableInput[] {
+  getInputs(): readonly TransferableInput[] {
     return this.baseTx?.inputs ?? [];
   }
   getBlockchainId() {

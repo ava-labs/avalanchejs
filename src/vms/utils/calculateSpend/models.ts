@@ -6,7 +6,6 @@ import type {
 import type { Address } from '../../../serializable/fxs/common';
 import type { SpendOptionsRequired } from '../../common';
 import type { AddressMaps } from '../../../utils/addressMap';
-import type { Dimensions } from '../../common/fees/dimensions';
 
 export interface UTXOCalculationResult {
   inputs: TransferableInput[];
@@ -22,7 +21,6 @@ export interface UTXOCalculationState extends UTXOCalculationResult {
   fromAddresses: Address[];
   amountsToStake: Map<string, bigint>;
   options: SpendOptionsRequired;
-  complexity: Dimensions;
 }
 
 export type UTXOCalculationFn = (

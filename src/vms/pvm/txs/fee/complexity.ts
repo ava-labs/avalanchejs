@@ -77,7 +77,7 @@ import {
  * Returns the complexity outputs add to a transaction.
  */
 export const getOutputComplexity = (
-  transferableOutputs: TransferableOutput[],
+  transferableOutputs: readonly TransferableOutput[],
 ): Dimensions => {
   let complexity = createEmptyDimensions();
 
@@ -119,7 +119,7 @@ export const getOutputComplexity = (
  * It includes the complexity that the corresponding credentials will add.
  */
 export const getInputComplexity = (
-  transferableInputs: TransferableInput[],
+  transferableInputs: readonly TransferableInput[],
 ): Dimensions => {
   let complexity = createEmptyDimensions();
 

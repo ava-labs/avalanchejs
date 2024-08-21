@@ -4,10 +4,6 @@ import type { Address } from '../../../serializable/fxs/common';
 import { AddressMaps } from '../../../utils/addressMap';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import type { SpendOptionsRequired } from '../../common';
-import {
-  createEmptyDimensions,
-  type Dimensions,
-} from '../../common/fees/dimensions';
 import type {
   UTXOCalculationFn,
   UTXOCalculationResult,
@@ -64,14 +60,6 @@ export function calculateUTXOSpend(
   fromAddresses: Address[],
   options: SpendOptionsRequired,
   utxoCalculationFns: [UTXOCalculationFn, ...UTXOCalculationFn[]],
-  /**
-   * Complexity needed to calculate the fee for the transaction.
-   *
-   * Defaults to empty dimensions (ie 0).
-   * This means that either the tx type is unsupported, or the vm is unsupported.
-   * Essentially, if the complexity is empty, you should ignore it and calculate based on static fees.
-   */
-  complexity: Dimensions = createEmptyDimensions(),
 ): UTXOCalculationResult {
   const startState: UTXOCalculationState = {
     amountsToBurn,
@@ -79,7 +67,6 @@ export function calculateUTXOSpend(
     amountsToStake,
     fromAddresses,
     options,
-    complexity,
     ...defaultSpendResult(),
   };
   const result = (

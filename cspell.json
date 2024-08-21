@@ -19,5 +19,5 @@
   "ignoreRegExpList": ["/.*[0-9].*/"],
   "language": "en",
   "minWordLength": 5,
-  "words": ["avalabs", "locktime", "stakeable", "unstakeable", "utxo", "utxos"]
+  "words": ["amounter", "avalabs", "locktime", "stakeable", "unstakeable", "utxo", "utxos"]
 }

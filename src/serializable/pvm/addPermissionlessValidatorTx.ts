@@ -24,7 +24,7 @@ export class AddPermissionlessValidatorTx extends PVMTx {
     public readonly baseTx: BaseTx,
     public readonly subnetValidator: SubnetValidator,
     public readonly signer: Signer | SignerEmpty,
-    public readonly stake: TransferableOutput[],
+    public readonly stake: readonly TransferableOutput[],
     public readonly validatorRewardsOwner: Serializable,
     public readonly delegatorRewardsOwner: Serializable,
     public readonly shares: Int,

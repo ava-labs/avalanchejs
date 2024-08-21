@@ -21,7 +21,7 @@ export class AddPermissionlessDelegatorTx extends PVMTx {
   constructor(
     public readonly baseTx: BaseTx,
     public readonly subnetValidator: SubnetValidator,
-    public readonly stake: TransferableOutput[],
+    public readonly stake: readonly TransferableOutput[],
     public readonly delegatorRewardsOwner: Serializable,
   ) {
     super();
