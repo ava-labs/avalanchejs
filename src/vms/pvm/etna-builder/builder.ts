@@ -5,18 +5,20 @@
  * PVM transactions post e-upgrade (etna), which uses dynamic fees based on transaction complexity.
  */
 
-import { PlatformChainID, PrimaryNetworkID } from '../../constants/networkIDs';
-import type { Address } from '../../serializable';
-import { Input, NodeId, OutputOwners, Stringpr } from '../../serializable';
+import {
+  PlatformChainID,
+  PrimaryNetworkID,
+} from '../../../constants/networkIDs';
+import { Input, NodeId, OutputOwners, Stringpr } from '../../../serializable';
 import {
   Bytes,
   Id,
   Int,
   TransferableInput,
   TransferableOutput,
-} from '../../serializable';
-import { BaseTx as AvaxBaseTx } from '../../serializable/avax';
-import type { Utxo } from '../../serializable/avax/utxo';
+} from '../../../serializable';
+import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
+import type { Utxo } from '../../../serializable/avax/utxo';
 import {
   AddPermissionlessDelegatorTx,
   AddPermissionlessValidatorTx,
@@ -29,16 +31,16 @@ import {
   RemoveSubnetValidatorTx,
   SubnetValidator,
   TransferSubnetOwnershipTx,
-} from '../../serializable/pvm';
-import { createSignerOrSignerEmptyFromStrings } from '../../serializable/pvm/signer';
-import { AddressMaps, addressesFromBytes } from '../../utils';
-import { getImportedInputsFromUtxos } from '../../utils/builderUtils';
-import { compareTransferableOutputs } from '../../utils/sort';
-import { baseTxUnsafePvm, type SpendOptions, UnsignedTx } from '../common';
-import { defaultSpendOptions } from '../common/defaultSpendOptions';
-import type { Dimensions } from '../common/fees/dimensions';
-import { addDimensions, createDimensions } from '../common/fees/dimensions';
-import type { Context } from '../context';
+} from '../../../serializable/pvm';
+import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
+import { AddressMaps, addressesFromBytes } from '../../../utils';
+import { getImportedInputsFromUtxos } from '../../../utils/builderUtils';
+import { compareTransferableOutputs } from '../../../utils/sort';
+import { baseTxUnsafePvm, type SpendOptions, UnsignedTx } from '../../common';
+import { defaultSpendOptions } from '../../common/defaultSpendOptions';
+import type { Dimensions } from '../../common/fees/dimensions';
+import { addDimensions, createDimensions } from '../../common/fees/dimensions';
+import type { Context } from '../../context';
 import {
   ID_LEN,
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
@@ -56,72 +58,26 @@ import {
   getOutputComplexity,
   getOwnerComplexity,
   getSignerComplexity,
-} from './txs/fee';
+} from '../txs/fee';
+import { spend } from './spend';
 
-type SpendResult = Readonly<{
-  changeOutputs: readonly TransferableOutput[];
+const getAddressMaps = ({
+  inputs,
+  inputUTXOs,
+  minIssuanceTime,
+  fromAddressesBytes,
+}: {
   inputs: readonly TransferableInput[];
-  stakeOutputs: readonly TransferableOutput[];
-}>;
-
-type SpendProps = Readonly<{
-  /**
-   * Contains the currently accrued transaction complexity that
-   * will be used to calculate the required fees to be burned.
-   */
-  complexity: Dimensions;
-  /**
-   * Contains the amount of extra AVAX that spend can produce in
-   * the change outputs in addition to the consumed and not burned AVAX.
-   */
-  excessAVAX: bigint;
-  /**
-   * List of Addresses that are used for selecting which UTXOs are signable.
-   */
-  fromAddresses: readonly Address[];
-  /**
-   * Optionally specifies the output owners to use for the unlocked
-   * AVAX change output if no additional AVAX was needed to be burned.
-   * If this value is `undefined`, the default change owner is used.
-   */
-  ownerOverride?: OutputOwners;
-  spendOptions: Required<SpendOptions>;
-  /**
-   * Maps `assetID` to the amount of the asset to spend without
-   * producing an output. This is typically used for fees.
-   * However, it can also be used to consume some of an asset that
-   * will be produced in separate outputs, such as ExportedOutputs.
-   *
-   * Only unlocked UTXOs are able to be burned here.
-   */
-  toBurn: Map<string, bigint>;
-  /**
-   * Maps `assetID` to the amount of the asset to spend and place info
-   * the staked outputs. First locked UTXOs are attempted to be used for
-   * these funds, and then unlocked UTXOs will be attempted to be used.
-   * There is no preferential ordering on the unlock times.
-   */
-  toStake?: Map<string, bigint>;
-  /**
-   * List of UTXOs that are available to be spent.
-   */
-  utxos: readonly Utxo[];
-}>;
-
-// TODO: Move this to it's own file.
-const spend = ({
-  complexity,
-  excessAVAX,
-  fromAddresses,
-  ownerOverride,
-  spendOptions,
-  toBurn,
-  toStake,
-  utxos,
-}: SpendProps):
-  | [error: null, inputsAndOutputs: SpendResult]
-  | [error: Error, inputsAndOutputs: null] => {
-  return [new Error('Not implemented'), null];
+  inputUTXOs: readonly Utxo[];
+  minIssuanceTime: bigint;
+  fromAddressesBytes: readonly Uint8Array[];
+}): AddressMaps => {
+  return AddressMaps.fromTransferableInputs(
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  );
 };
 
 const getMemoComplexity = (
@@ -194,21 +150,30 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     outputComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses,
-    spendOptions: defaultedOptions,
-    toBurn,
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses,
+      spendOptions: defaultedOptions,
+      toBurn,
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const allOutputs = [...outputs, ...changeOutputs].sort(
     compareTransferableOutputs,
@@ -328,15 +293,18 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       [context.avaxAssetID, context.baseTxFee - importedAvax],
     ]);
 
-    const [error, spendResults] = spend({
-      complexity,
-      // TODO: Check this
-      excessAVAX: 0n,
-      fromAddresses,
-      spendOptions: defaultedOptions,
-      toBurn,
-      utxos,
-    });
+    const [error, spendResults] = spend(
+      {
+        complexity,
+        // TODO: Check this
+        excessAVAX: 0n,
+        fromAddresses,
+        spendOptions: defaultedOptions,
+        toBurn,
+        utxos,
+      },
+      context,
+    );
 
     if (error) {
       throw error;
@@ -417,21 +385,30 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     outputComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses,
-    spendOptions: defaultedOptions,
-    toBurn,
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses,
+      spendOptions: defaultedOptions,
+      toBurn,
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   return new UnsignedTx(
     new ExportTx(
@@ -487,21 +464,30 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
     ownerComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn: new Map([[context.avaxAssetID, context.createSubnetTxFee]]),
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn: new Map([[context.avaxAssetID, context.createSubnetTxFee]]),
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const createSubnetTx = new CreateSubnetTx(
     AvaxBaseTx.fromNative(
@@ -591,21 +577,30 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
     authComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn: new Map([[context.avaxAssetID, context.createBlockchainTxFee]]),
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn: new Map([[context.avaxAssetID, context.createBlockchainTxFee]]),
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const createChainTx = new CreateChainTx(
     AvaxBaseTx.fromNative(
@@ -677,21 +672,30 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
     authComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn: new Map([[context.avaxAssetID, context.addSubnetValidatorFee]]),
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn: new Map([[context.avaxAssetID, context.addSubnetValidatorFee]]),
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const addSubnetValidatorTx = new AddSubnetValidatorTx(
     AvaxBaseTx.fromNative(
@@ -752,21 +756,30 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
     authComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn: new Map([[context.avaxAssetID, context.baseTxFee]]),
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn: new Map([[context.avaxAssetID, context.baseTxFee]]),
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const removeSubnetValidatorTx = new RemoveSubnetValidatorTx(
     AvaxBaseTx.fromNative(
@@ -916,22 +929,31 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     delegatorOwnerComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn,
-    toStake,
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn,
+      toStake,
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs, stakeOutputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs, stakeOutputs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const validatorTx = new AddPermissionlessValidatorTx(
     AvaxBaseTx.fromNative(
@@ -1061,22 +1083,31 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     ownerComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn,
-    toStake,
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn,
+      toStake,
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs, stakeOutputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs, stakeOutputs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   const delegatorTx = new AddPermissionlessDelegatorTx(
     AvaxBaseTx.fromNative(
@@ -1167,21 +1198,30 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
     ownerComplexity,
   );
 
-  const [error, spendResults] = spend({
-    complexity,
-    // TODO: Check this
-    excessAVAX: 0n,
-    fromAddresses: addressesFromBytes(fromAddressesBytes),
-    spendOptions: defaultedOptions,
-    toBurn: new Map([[context.avaxAssetID, context.baseTxFee]]),
-    utxos,
-  });
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      // TODO: Check this
+      excessAVAX: 0n,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      spendOptions: defaultedOptions,
+      toBurn: new Map([[context.avaxAssetID, context.baseTxFee]]),
+      utxos,
+    },
+    context,
+  );
 
   if (error) {
     throw error;
   }
 
-  const { changeOutputs, inputs } = spendResults;
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    fromAddressesBytes,
+  });
 
   return new UnsignedTx(
     new TransferSubnetOwnershipTx(

@@ -1,3 +1,4 @@
+import { createDimensions } from '../vms/common/fees/dimensions';
 import type { Context } from '../vms/context';
 
 export const testContext: Context = {
@@ -16,4 +17,8 @@ export const testContext: Context = {
   addSubnetDelegatorFee: 1000000n,
   networkID: 1,
   hrp: 'avax',
+
+  // TODO: Adjust these based on what we want for the tests.
+  gasPrice: 1n,
+  complexityWeights: createDimensions(1, 1, 1, 1),
 };
