@@ -18,6 +18,8 @@ import type { Context } from '../../context';
 import { SpendHelper } from './spendHelper';
 
 /**
+ * @internal
+ *
  * Separates the provided UTXOs into two lists:
  * - `locked` contains UTXOs that have a locktime greater than or equal to `minIssuanceTime`.
  * - `unlocked` contains UTXOs that have a locktime less than `minIssuanceTime`.
@@ -27,7 +29,7 @@ import { SpendHelper } from './spendHelper';
  *
  * @returns Object containing two lists of UTXOs.
  */
-const splitByLocktime = (
+export const splitByLocktime = (
   utxos: readonly Utxo[],
   minIssuanceTime: bigint,
 ): { readonly locked: readonly Utxo[]; readonly unlocked: readonly Utxo[] } => {
@@ -46,6 +48,8 @@ const splitByLocktime = (
 };
 
 /**
+ * @internal
+ *
  * Separates the provided UTXOs into two lists:
  * - `other` contains UTXOs that have an asset ID different from `assetId`.
  * - `requested` contains UTXOs that have an asset ID equal to `assetId`.
@@ -55,7 +59,7 @@ const splitByLocktime = (
  *
  * @returns Object containing two lists of UTXOs.
  */
-const splitByAssetId = (
+export const splitByAssetId = (
   utxos: readonly Utxo[],
   assetId: string,
 ): { readonly other: readonly Utxo[]; readonly requested: readonly Utxo[] } => {
@@ -74,6 +78,8 @@ const splitByAssetId = (
 };
 
 /**
+ * @internal
+ *
  * Returns the TransferOutput that was, potentially, wrapped by a stakeable lockout.
  *
  * If the output was stakeable and locked, the locktime is returned.
@@ -81,15 +87,25 @@ const splitByAssetId = (
  *
  * If the output is not an error is returned.
  */
-const unwrapOutput = (
+export const unwrapOutput = (
   output: Serializable,
 ):
   | [error: null, transferOutput: TransferOutput, locktime: bigint]
   | [error: Error, transferOutput: null, locktime: null] => {
-  if (isStakeableLockOut(output) && isTransferOut(output.transferOut)) {
-    return [null, output.transferOut, output.lockTime.value()];
-  } else if (isTransferOut(output)) {
-    return [null, output, 0n];
+  try {
+    if (isStakeableLockOut(output) && isTransferOut(output.transferOut)) {
+      return [null, output.transferOut, output.lockTime.value()];
+    } else if (isTransferOut(output)) {
+      return [null, output, 0n];
+    }
+  } catch (error) {
+    return [
+      new Error('An unexpected error occurred while unwrapping output', {
+        cause: error instanceof Error ? error : undefined,
+      }),
+      null,
+      null,
+    ];
   }
 
   return [new Error('Unknown output type'), null, null];
