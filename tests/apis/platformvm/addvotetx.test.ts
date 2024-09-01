@@ -4,7 +4,7 @@ import { AddVoteTx } from "src/apis/platformvm/addvotetx"
 import { BinTools } from "../../../src"
 import { Serialization } from "../../../src/utils"
 
-describe("AddProposalTx", (): void => {
+describe("AddVoteTx", (): void => {
   const bintools = BinTools.getInstance()
   const serialization = Serialization.getInstance()
   const addVoteTxHex: string =

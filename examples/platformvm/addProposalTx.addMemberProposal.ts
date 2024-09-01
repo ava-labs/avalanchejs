@@ -1,7 +1,9 @@
 import {
   AddMemberProposal,
+  AddProposalTx,
   KeyChain,
-  PlatformVMAPI
+  PlatformVMAPI,
+  UnsignedTx
 } from "caminojs/apis/platformvm"
 import { Avalanche, BinTools, Buffer } from "caminojs/index"
 import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
@@ -14,7 +16,9 @@ const avalanche: Avalanche = new Avalanche(
   config.protocol,
   config.networkID
 )
-
+// BEFORE RUNNING THIS EXAMPLE:
+// crateUser, importKey to PlatformVM and setAddressState
+//You can do this via requests published in camino-postman-collection repository
 /**
  * @ignore
  */
@@ -43,7 +47,7 @@ const main = async (): Promise<any> => {
 
   let startTimestamp = Math.floor(startDate.getTime() / 1000)
   let endTimestamp = Math.floor(endDate.getTime() / 1000)
-  const txs = await pchain.getUTXOs(pAddressStrings)
+  const platformVMUTXOResponse = await pchain.getUTXOs(pAddressStrings)
   const proposal = new AddMemberProposal(
     startTimestamp,
     endTimestamp,
@@ -51,7 +55,7 @@ const main = async (): Promise<any> => {
   )
   try {
     let unsignedTx = await pchain.buildAddProposalTx(
-      txs.utxos, // utxoset
+      platformVMUTXOResponse.utxos, // utxoset
       pAddressStrings, // fromAddresses
       pAddressStrings, // changeAddresses
       bintools.stringToBuffer("hello world"), // description
@@ -60,9 +64,16 @@ const main = async (): Promise<any> => {
       0, // version
       Buffer.alloc(20) // memo
     )
+
     const tx = unsignedTx.sign(pKeychain)
-    const txid: string = await pchain.issueTx(tx)
-    console.log(`Success! TXID: ${txid}`)
+    const hex = tx.toStringHex().slice(2)
+    const unsignedTx2 = new UnsignedTx()
+    unsignedTx2.fromBuffer(Buffer.from(hex, "hex"))
+    const addProposalTx = unsignedTx2.getTransaction() as AddProposalTx
+    const addProposalTxTypeName: string = addProposalTx.getTypeName()
+    const addProposalTxTypeID: number = addProposalTx.getTypeID()
+
+    console.log(addProposalTxTypeID, addProposalTxTypeName)
   } catch (e) {
     console.log(e)
   }

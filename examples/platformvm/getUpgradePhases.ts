@@ -24,7 +24,7 @@ const main = async (): Promise<any> => {
     const phases = await pchain.getUpgradePhases()
     console.log(phases)
   } catch (e: any) {
-    if ((e.message as string).indexOf("platform.GetUpgradePhases") > 0)
+    if ((e.message as string)?.indexOf("platform.GetUpgradePhases") > 0)
       console.log("Not implemented")
     else console.log(e)
   }

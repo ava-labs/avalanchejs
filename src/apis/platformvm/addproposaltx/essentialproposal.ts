@@ -39,7 +39,7 @@ export class VoteOption extends NBytes {
 export abstract class EssentialProposal {
   protected start: Buffer = Buffer.alloc(8)
   protected end: Buffer = Buffer.alloc(8)
-  protected options: VoteOption[]
+  protected options: VoteOption[] // TODO: define in each Proposal separatelly
   protected numOptions: Buffer = Buffer.alloc(4)
 
   constructor(start?: Buffer, end?: Buffer) {

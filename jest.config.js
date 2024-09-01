@@ -8,7 +8,12 @@ module.exports = {
     "**/?(*.)+(spec|test).+(ts|tsx|js)"
   ],
   transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest"
+    "^.+\\.(ts|tsx)$": [
+      "ts-jest",
+      {
+        tsconfig: "tsconfig.json"
+      }
+    ]
   },
   transformIgnorePatterns: [
     "<rootDir>/node_modules/(?!ethereum-cryptography|keccak)"
@@ -18,11 +23,6 @@ module.exports = {
   collectCoverage: true,
   coverageReporters: ["html"],
   modulePathIgnorePatterns: ["node_modules"],
-  globals: {
-    "ts-jest": {
-      tsconfig: "tsconfig.json"
-    }
-  },
   moduleNameMapper: {
     "^src(.*)$": "<rootDir>/src$1"
   },

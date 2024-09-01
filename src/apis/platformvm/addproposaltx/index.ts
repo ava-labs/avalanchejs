@@ -21,6 +21,7 @@ import { AddMemberProposal } from "./addmemberproposal"
 import { AdminProposal } from "./adminproposal"
 import { BaseFeeProposal } from "./basefeeproposal"
 import { ExcludeMemberProposal } from "./excludememberproposal"
+import { GeneralProposal } from "./generalproposal"
 /**
  * @ignore
  */
@@ -31,7 +32,8 @@ export {
   AddMemberProposal,
   AdminProposal,
   BaseFeeProposal,
-  ExcludeMemberProposal
+  ExcludeMemberProposal,
+  GeneralProposal
 }
 export const DEFAULT_CAMINOGO_CODEC_VERSION = 0
 export type Proposal =
@@ -39,6 +41,7 @@ export type Proposal =
   | AddMemberProposal
   | ExcludeMemberProposal
   | AdminProposal // TODO: extend this alias type for further supported proposal types
+  | GeneralProposal
 export class ProposalWrapper {
   private _typeID: number
   private proposal: Proposal
@@ -89,6 +92,9 @@ export class ProposalWrapper {
         break
       case PlatformVMConstants.ADMINPROPOSAL_TYPE_ID:
         proposal = new AdminProposal()
+        break
+      case PlatformVMConstants.GENERALPROPOSAL_TYPE_ID:
+        proposal = new GeneralProposal()
         break
       default:
         throw `Unsupported proposal type: ${this._typeID}`
