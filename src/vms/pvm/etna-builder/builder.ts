@@ -9,7 +9,13 @@ import {
   PlatformChainID,
   PrimaryNetworkID,
 } from '../../../constants/networkIDs';
-import { Input, NodeId, OutputOwners, Stringpr } from '../../../serializable';
+import {
+  Input,
+  NodeId,
+  OutputOwners,
+  Stringpr,
+  TransferInput,
+} from '../../../serializable';
 import {
   Bytes,
   Id,
@@ -33,8 +39,8 @@ import {
   TransferSubnetOwnershipTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
-import { AddressMaps, addressesFromBytes } from '../../../utils';
-import { getImportedInputsFromUtxos } from '../../../utils/builderUtils';
+import { AddressMaps, addressesFromBytes, isTransferOut } from '../../../utils';
+import { matchOwners } from '../../../utils/matchOwners';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import { baseTxUnsafePvm, type SpendOptions, UnsignedTx } from '../../common';
 import { defaultSpendOptions } from '../../common/defaultSpendOptions';
@@ -137,7 +143,9 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
 
   outputs.forEach((out) => {
     const assetId = out.assetId.value();
-    toBurn.set(assetId, (toBurn.get(assetId) || 0n) + out.output.amount());
+    const amountToBurn = (toBurn.get(assetId) ?? 0n) + out.amount();
+
+    toBurn.set(assetId, amountToBurn);
   });
 
   const memoComplexity = getMemoComplexity(defaultedOptions);
@@ -192,7 +200,7 @@ export type NewImportTxProps = TxProps<{
   /**
    * The locktime to write onto the UTXO.
    */
-  locktime: bigint;
+  locktime?: bigint;
   /**
    * Base58 string of the source chain ID.
    */
@@ -200,7 +208,7 @@ export type NewImportTxProps = TxProps<{
   /**
    * The threshold to write on the UTXO.
    */
-  threshold: number;
+  threshold?: number;
   /**
    * List of addresses to import into.
    */
@@ -229,19 +237,46 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
-  utxos = utxos.filter(
-    // Currently - only AVAX is allowed to be imported to the P-chain
-    (utxo) => utxo.assetId.toString() === context.avaxAssetID,
-  );
+  const importedInputs: TransferableInput[] = [];
+  const importedAmounts: Record<string, bigint> = {};
 
-  const { importedAmounts, importedInputs, inputUTXOs } =
-    getImportedInputsFromUtxos(
-      utxos,
-      fromAddressesBytes,
-      defaultedOptions.minIssuanceTime,
+  for (const utxo of utxos) {
+    const out = utxo.output;
+
+    if (!isTransferOut(out)) {
+      continue;
+    }
+
+    const { sigIndicies: inputSigIndices } =
+      matchOwners(
+        utxo.getOutputOwners(),
+        fromAddresses,
+        // TODO: Verify this.
+        options?.minIssuanceTime ?? BigInt(Math.ceil(Date.now() / 1_000)),
+      ) || {};
+
+    if (inputSigIndices === undefined) {
+      // We couldn't spend this UTXO, so we skip to the next one.
+      continue;
+    }
+
+    importedInputs.push(
+      new TransferableInput(
+        utxo.utxoId,
+        utxo.assetId,
+        new TransferInput(
+          out.amt,
+          new Input(inputSigIndices.map((value) => new Int(value))),
+        ),
+      ),
     );
 
-  const importedAvax = importedAmounts[context.avaxAssetID] ?? 0n;
+    const assetId = utxo.getAssetId();
+
+    importedAmounts[assetId] = (importedAmounts[assetId] ?? 0n) + out.amount();
+  }
+
+  const importedAvax = importedAmounts[context.avaxAssetID];
 
   importedInputs.sort(TransferableInput.compare);
   const addressMaps = AddressMaps.fromTransferableInputs(
@@ -250,7 +285,8 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     defaultedOptions.minIssuanceTime,
     fromAddressesBytes,
   );
-  if (!importedInputs.length) {
+
+  if (importedInputs.length === 0) {
     throw new Error('no UTXOs available to import');
   }
 
@@ -285,51 +321,47 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     outputComplexity,
   );
 
-  let inputs: TransferableInput[] = [];
-  let changeOutputs: TransferableOutput[] = [];
+  const toBurn = new Map<string, bigint>();
+  let excessAVAX = 0n;
 
-  if (importedAvax < context.baseTxFee) {
-    const toBurn = new Map<string, bigint>([
-      [context.avaxAssetID, context.baseTxFee - importedAvax],
-    ]);
-
-    const [error, spendResults] = spend(
-      {
-        complexity,
-        // TODO: Check this
-        excessAVAX: 0n,
-        fromAddresses,
-        spendOptions: defaultedOptions,
-        toBurn,
-        utxos,
-      },
-      context,
-    );
-
-    if (error) {
-      throw error;
-    }
-
-    inputs = [...spendResults.inputs];
-    changeOutputs = [...spendResults.changeOutputs];
-  } else if (importedAvax > context.baseTxFee) {
-    changeOutputs.push(
-      TransferableOutput.fromNative(
-        context.avaxAssetID,
-        importedAvax - context.baseTxFee,
-        toAddresses,
-        locktime,
-        threshold,
-      ),
-    );
+  if (importedAvax && importedAvax < context.baseTxFee) {
+    toBurn.set(context.avaxAssetID, context.baseTxFee - importedAvax);
+  } else {
+    excessAVAX = importedAvax - context.baseTxFee;
   }
+
+  console.log('excessAVAX', excessAVAX);
+
+  const [error, spendResults] = spend(
+    {
+      complexity,
+      excessAVAX,
+      fromAddresses,
+      ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
+      spendOptions: defaultedOptions,
+      toBurn,
+      utxos,
+    },
+    context,
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+
+  // NOTE: ChangeOutput amount should equal the excessAVAX amount.
+  console.log('changeOutputs', changeOutputs);
+  // NOTE: Inputs should be an empty array.
+  console.log('inputs', inputs);
 
   return new UnsignedTx(
     new ImportTx(
       new AvaxBaseTx(
         new Int(context.networkID),
         PlatformChainID,
-        changeOutputs,
+        [...outputs, ...changeOutputs].sort(compareTransferableOutputs),
         inputs,
         new Bytes(defaultedOptions.memo),
       ),
@@ -372,7 +404,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
 
   outputs.forEach((output) => {
     const assetId = output.assetId.value();
-    toBurn.set(assetId, (toBurn.get(assetId) || 0n) + output.output.amount());
+    toBurn.set(assetId, (toBurn.get(assetId) ?? 0n) + output.output.amount());
   });
 
   const memoComplexity = getMemoComplexity(defaultedOptions);
@@ -431,12 +463,12 @@ export type NewCreateSubnetTxProps = TxProps<{
   /**
    * The locktime to write onto the UTXO.
    */
-  locktime: bigint;
+  locktime?: bigint;
   subnetOwners: readonly Uint8Array[];
   /**
    * The threshold to write on the UTXO.
    */
-  threshold: number;
+  threshold?: number;
 }>;
 
 /**

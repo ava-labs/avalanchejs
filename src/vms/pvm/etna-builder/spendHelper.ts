@@ -68,9 +68,9 @@ export class SpendHelper {
   addInput(utxo: Utxo, transferableInput: TransferableInput): SpendHelper {
     const newInputComplexity = getInputComplexity([transferableInput]);
 
-    this.inputs = [...this.inputs, transferableInput];
     this.complexity = addDimensions(this.complexity, newInputComplexity);
 
+    this.inputs = [...this.inputs, transferableInput];
     this.inputUTXOs = [...this.inputUTXOs, utxo];
 
     return this;
@@ -81,12 +81,12 @@ export class SpendHelper {
    * Change outputs are outputs that are sent back to the sender.
    *
    * @param {TransferableOutput} transferableOutput - The change output to be added.
-   * @returns {Dimensions} The complexity of the change output.
+   * @returns {SpendHelper} The current instance of SpendHelper for chaining.
    */
-  addChangeOutput(transferableOutput: TransferableOutput): Dimensions {
+  addChangeOutput(transferableOutput: TransferableOutput): SpendHelper {
     this.changeOutputs = [...this.changeOutputs, transferableOutput];
 
-    return getOutputComplexity([transferableOutput]);
+    return this.addOutputComplexity(transferableOutput);
   }
 
   /**
@@ -94,12 +94,12 @@ export class SpendHelper {
    * Staked outputs are outputs that are staked by the sender.
    *
    * @param {TransferableOutput} transferableOutput - The staked output to be added.
-   * @returns {Dimensions} The complexity of the staked output.
+   * @returns {SpendHelper} The current instance of SpendHelper for chaining.
    */
-  addStakedOutput(transferableOutput: TransferableOutput): Dimensions {
+  addStakedOutput(transferableOutput: TransferableOutput): SpendHelper {
     this.stakeOutputs = [...this.stakeOutputs, transferableOutput];
 
-    return getOutputComplexity([transferableOutput]);
+    return this.addOutputComplexity(transferableOutput);
   }
 
   /**
@@ -123,7 +123,7 @@ export class SpendHelper {
    * @returns {boolean} - Returns true if the asset should be consumed, false otherwise.
    */
   shouldConsumeLockedAsset(assetId: string): boolean {
-    return this.toStake.has(assetId) && this.toStake.get(assetId) !== 0n;
+    return this.toStake.get(assetId) !== 0n;
   }
 
   /**
@@ -134,8 +134,7 @@ export class SpendHelper {
    */
   shouldConsumeAsset(assetId: string): boolean {
     return (
-      (this.toBurn.has(assetId) && this.toBurn.get(assetId) !== 0n) ||
-      this.shouldConsumeLockedAsset(assetId)
+      this.toBurn.get(assetId) !== 0n || this.shouldConsumeLockedAsset(assetId)
     );
   }
 
@@ -150,7 +149,12 @@ export class SpendHelper {
     const assetToStake = this.toStake.get(assetId) ?? 0n;
 
     // Stake any value that should be staked
-    const toStake = bigIntMin(assetToStake, amount);
+    const toStake = bigIntMin(
+      // Amount we still need to stake
+      assetToStake,
+      // Amount available to stake
+      amount,
+    );
 
     this.toStake.set(assetId, assetToStake - toStake);
 
@@ -168,10 +172,16 @@ export class SpendHelper {
     const assetToBurn = this.toBurn.get(assetId) ?? 0n;
 
     // Burn any value that should be burned
-    const toBurn = bigIntMin(assetToBurn, amount);
+    const toBurn = bigIntMin(
+      // Amount we still need to burn
+      assetToBurn,
+      // Amount available to burn
+      amount,
+    );
 
     this.toBurn.set(assetId, assetToBurn - toBurn);
 
+    // Stake any remaining value that should be staked
     return this.consumeLockedAsset(assetId, amount - toBurn);
   }
 

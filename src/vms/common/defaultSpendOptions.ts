@@ -10,6 +10,9 @@ export const defaultSpendOptions = (
     threshold: 1,
     memo: new Uint8Array(),
     locktime: 0n,
-    ...options,
+    // Only include options that are not undefined
+    ...Object.fromEntries(
+      Object.entries(options || {}).filter(([, v]) => v !== undefined),
+    ),
   };
 };
