@@ -1,1 +1,22 @@
-export * from './builder';
+export {
+  type NewBaseTxProps,
+  newBaseTx as experimentalNewBaseTx,
+  type NewImportTxProps,
+  newImportTx as experimentalNewImportTx,
+  type NewExportTxProps,
+  newExportTx as experimentalNewExportTx,
+  type NewCreateSubnetTxProps,
+  newCreateSubnetTx as experimentalNewCreateSubnetTx,
+  type NewCreateChainTxProps,
+  newCreateChainTx as experimentalNewCreateChainTx,
+  type NewAddSubnetValidatorTxProps,
+  newAddSubnetValidatorTx as experimentalNewAddSubnetValidatorTx,
+  type NewRemoveSubnetValidatorTxProps,
+  newRemoveSubnetValidatorTx as experimentalNewRemoveSubnetValidatorTx,
+  type NewAddPermissionlessDelegatorTxProps,
+  newAddPermissionlessDelegatorTx as experimentalNewAddPermissionlessDelegatorTx,
+  type NewAddPermissionlessValidatorTxProps,
+  newAddPermissionlessValidatorTx as experimentalNewAddPermissionlessValidatorTx,
+  type NewTransferSubnetOwnershipTxProps,
+  newTransferSubnetOwnershipTx as experimentalNewTransferSubnetOwnershipTx,
+} from './builder';
