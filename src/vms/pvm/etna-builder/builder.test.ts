@@ -289,12 +289,11 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           [
             TransferableOutput.fromNative(
               testContext.avaxAssetID,
-              // TODO: What is the expected value here?
-              49_999_000_000n - expectedFee,
+              // TODO: How to remove this "magic" number. How do we calculate it correctly from utxos?
+              50_000_000_000n - expectedFee,
               [testAddress1],
             ),
           ],
-          // TODO: Add an input here?
           [],
           memo ?? new Uint8Array(),
         ),
@@ -348,7 +347,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           [
             TransferableOutput.fromNative(
               testContext.avaxAssetID,
-              // TODO: Possibly need to adjust this value?
+              // TODO: Remove magic number. How to calculate it correctly from utxos?
               45_000_000_000n - expectedFee,
               fromAddressesBytes,
             ),

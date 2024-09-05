@@ -161,7 +161,6 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses,
       spendOptions: defaultedOptions,
@@ -330,8 +329,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     excessAVAX = importedAvax - context.baseTxFee;
   }
 
-  console.log('excessAVAX', excessAVAX);
-
   const [error, spendResults] = spend(
     {
       complexity,
@@ -350,11 +347,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
-
-  // NOTE: ChangeOutput amount should equal the excessAVAX amount.
-  console.log('changeOutputs', changeOutputs);
-  // NOTE: Inputs should be an empty array.
-  console.log('inputs', inputs);
 
   return new UnsignedTx(
     new ImportTx(
@@ -420,7 +412,6 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses,
       spendOptions: defaultedOptions,
@@ -499,7 +490,6 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
@@ -612,7 +602,6 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
@@ -707,7 +696,6 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
@@ -791,7 +779,6 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
@@ -964,7 +951,6 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
@@ -1118,7 +1104,6 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
@@ -1233,7 +1218,6 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   const [error, spendResults] = spend(
     {
       complexity,
-      // TODO: Check this
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,

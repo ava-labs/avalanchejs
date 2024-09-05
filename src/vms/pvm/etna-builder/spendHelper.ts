@@ -123,7 +123,7 @@ export class SpendHelper {
    * @returns {boolean} - Returns true if the asset should be consumed, false otherwise.
    */
   shouldConsumeLockedAsset(assetId: string): boolean {
-    return this.toStake.get(assetId) !== 0n;
+    return this.toStake.has(assetId) && this.toStake.get(assetId) !== 0n;
   }
 
   /**
@@ -134,7 +134,8 @@ export class SpendHelper {
    */
   shouldConsumeAsset(assetId: string): boolean {
     return (
-      this.toBurn.get(assetId) !== 0n || this.shouldConsumeLockedAsset(assetId)
+      (this.toBurn.has(assetId) && this.toBurn.get(assetId) !== 0n) ||
+      this.shouldConsumeLockedAsset(assetId)
     );
   }
 

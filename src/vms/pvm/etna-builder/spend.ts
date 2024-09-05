@@ -141,7 +141,7 @@ type SpendProps = Readonly<{
    * Contains the amount of extra AVAX that spend can produce in
    * the change outputs in addition to the consumed and not burned AVAX.
    */
-  excessAVAX: bigint;
+  excessAVAX?: bigint;
   /**
    * List of Addresses that are used for selecting which UTXOs are signable.
    */
@@ -187,7 +187,7 @@ type SpendProps = Readonly<{
 export const spend = (
   {
     complexity,
-    excessAVAX: _excessAVAX,
+    excessAVAX: _excessAVAX = 0n,
     fromAddresses,
     ownerOverride: _ownerOverride,
     spendOptions,
@@ -246,7 +246,6 @@ export const spend = (
       spendHelper.addInput(
         utxo,
         // TODO: Verify this.
-        // TransferableInput.fromUtxoAndSigindicies(utxo, inputSigIndices),
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
@@ -403,7 +402,6 @@ export const spend = (
       spendHelper.addInput(
         utxo,
         // TODO: Verify this.
-        // TransferableInput.fromUtxoAndSigindicies(utxo, inputSigIndices),
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
