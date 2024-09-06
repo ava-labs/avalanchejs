@@ -2,6 +2,7 @@ import { utxoId } from '../../../../fixtures/avax';
 import { address, id } from '../../../../fixtures/common';
 import { bigIntPr, int, ints } from '../../../../fixtures/primitives';
 import { signer } from '../../../../fixtures/pvm';
+import { txHexToTransaction } from '../../../../fixtures/transactions';
 import {
   Input,
   OutputOwners,
@@ -15,7 +16,6 @@ import {
   StakeableLockIn,
   StakeableLockOut,
 } from '../../../../serializable/pvm';
-import { hexToBuffer, unpackWithManager } from '../../../../utils';
 import { createDimensions } from '../../../common/fees/dimensions';
 import {
   getAuthComplexity,
@@ -53,14 +53,10 @@ const makeTransferableInput = (numOfSigInts = 0) =>
     ),
   );
 
-const txHexToPVMTransaction = (txHex: string) => {
-  const txBytes = hexToBuffer(txHex);
-
-  // console.log('txBytes length:', txBytes.length, '=== expected bandwidth');
-
-  return unpackWithManager('PVM', txBytes);
-};
-
+/**
+ * These tests are based off the tests found in the AvalancheGo repository:
+ * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/complexity_test.go
+ */
 describe('Complexity', () => {
   describe('getOutputComplexity', () => {
     test('empty transferable output', () => {
@@ -258,7 +254,7 @@ describe('Complexity', () => {
 
   describe('getTxComplexity', () => {
     test.each(TEST_TRANSACTIONS)('$name', ({ txHex, expectedComplexity }) => {
-      const tx = txHexToPVMTransaction(txHex);
+      const tx = txHexToTransaction('PVM', txHex);
 
       const result = getTxComplexity(tx);
 
@@ -268,7 +264,7 @@ describe('Complexity', () => {
     test.each(TEST_UNSUPPORTED_TRANSACTIONS)(
       'unsupported tx - $name',
       ({ txHex }) => {
-        const tx = txHexToPVMTransaction(txHex);
+        const tx = txHexToTransaction('PVM', txHex);
 
         expect(() => {
           getTxComplexity(tx);

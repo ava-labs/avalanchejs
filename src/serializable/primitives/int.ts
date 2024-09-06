@@ -4,6 +4,11 @@ import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
 
+/**
+ * Number of bytes per int.
+ */
+export const INT_LEN = 4;
+
 @serializable()
 export class Int extends Primitives {
   _type = TypeSymbols.Int;
@@ -12,7 +17,7 @@ export class Int extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Int, Uint8Array] {
-    return [new Int(bufferToNumber(buf.slice(0, 4))), buf.slice(4)];
+    return [new Int(bufferToNumber(buf.slice(0, INT_LEN))), buf.slice(INT_LEN)];
   }
 
   [customInspectSymbol]() {
@@ -24,7 +29,7 @@ export class Int extends Primitives {
   }
 
   toBytes() {
-    return padLeft(hexToBuffer(this.int.toString(16)), 4);
+    return padLeft(hexToBuffer(this.int.toString(16)), INT_LEN);
   }
 
   value() {

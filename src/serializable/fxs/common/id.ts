@@ -6,6 +6,11 @@ import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
 import { TypeSymbols } from '../../constants';
 
+/**
+ * Number of bytes per ID.
+ */
+export const ID_LEN = 32;
+
 @serializable()
 export class Id extends Primitives {
   _type = TypeSymbols.Id;
@@ -14,7 +19,7 @@ export class Id extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Id, Uint8Array] {
-    return [new Id(buf.slice(0, 32)), buf.slice(32)];
+    return [new Id(buf.slice(0, ID_LEN)), buf.slice(ID_LEN)];
   }
 
   static compare(id1: Id, id2: Id): number {
@@ -26,7 +31,7 @@ export class Id extends Primitives {
   }
 
   toBytes() {
-    return padLeft(this.idVal, 32);
+    return padLeft(this.idVal, ID_LEN);
   }
 
   toJSON() {

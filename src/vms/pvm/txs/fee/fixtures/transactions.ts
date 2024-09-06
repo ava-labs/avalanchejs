@@ -1,3 +1,8 @@
+/**
+ * These test transactions are based off of AvalancheGo's test transactions.
+ * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/calculator_test.go
+ */
+
 import type { Dimensions } from '../../../../common/fees/dimensions';
 import {
   FeeDimensions,

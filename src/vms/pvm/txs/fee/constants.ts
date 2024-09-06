@@ -1,3 +1,7 @@
+/**
+ * The INTRINSIC constants are based on the following constants from the AvalancheGo codebase:
+ * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/complexity.go
+ */
 import type { Dimensions } from '../../../common/fees/dimensions';
 import { FeeDimensions } from '../../../common/fees/dimensions';
 import {
@@ -5,25 +9,15 @@ import {
   SIGNATURE_LENGTH as BLS_SIGNATURE_LENGTH,
 } from '../../../../crypto/bls';
 import { SIGNATURE_LENGTH } from '../../../../crypto/secp256k1';
+import { INT_LEN } from '../../../../serializable/primitives/int';
+import { SHORT_LEN } from '../../../../serializable/primitives/short';
+import { SHORT_ID_LEN } from '../../../../serializable/fxs/common/nodeId';
+import { ID_LEN } from '../../../../serializable/fxs/common/id';
 
 /**
  * Number of bytes per long.
  */
 const LONG_LEN = 8;
-
-export const ID_LEN = 32;
-
-/**
- * Number of bytes per short.
- */
-const SHORT_LEN = 2;
-
-export const SHORT_ID_LEN = 20;
-
-/**
- * Number of bytes per int.
- */
-const INT_LEN = 4;
 
 const INTRINSIC_VALIDATOR_BANDWIDTH =
   SHORT_ID_LEN + // Node ID (Short ID = 20)

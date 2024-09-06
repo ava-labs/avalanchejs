@@ -1,5 +1,14 @@
+/**
+ * @module
+ *
+ * The functions in this module are based off the complexity calculations found in the AvalancheGo repository.
+ * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/complexity.go
+ */
+
 import type { OutputOwners } from '../../../../serializable';
 import { Input } from '../../../../serializable/fxs/secp256k1';
+import { SHORT_ID_LEN } from '../../../../serializable/fxs/common/nodeId';
+import { ID_LEN } from '../../../../serializable/fxs/common/id';
 import {
   type BaseTx,
   type TransferableInput,
@@ -46,7 +55,6 @@ import {
 import type { Serializable } from '../../../common/types';
 import type { Transaction } from '../../../common';
 import {
-  ID_LEN,
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
@@ -70,7 +78,6 @@ import {
   INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH,
   INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
-  SHORT_ID_LEN,
 } from './constants';
 
 /**

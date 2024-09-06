@@ -34,7 +34,6 @@ export class Bytes extends Primitives {
     return concatBytes(bytesForInt(this.bytes.length), this.bytes);
   }
 
-  // TODO: Is this okay or is there some other way of getting the length that is preferred?
   /**
    * Returns the length of the bytes (Uint8Array).
    *

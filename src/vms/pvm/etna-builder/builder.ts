@@ -25,6 +25,7 @@ import {
 } from '../../../serializable';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import type { Utxo } from '../../../serializable/avax/utxo';
+import { ID_LEN } from '../../../serializable/fxs/common/id';
 import {
   AddPermissionlessDelegatorTx,
   AddPermissionlessValidatorTx,
@@ -48,7 +49,6 @@ import type { Dimensions } from '../../common/fees/dimensions';
 import { addDimensions, createDimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
 import {
-  ID_LEN,
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,

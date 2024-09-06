@@ -34,12 +34,7 @@ export const createDimensions = (
  * @returns The sum of the dimensions.
  */
 export const addDimensions = (...dimensions: Dimensions[]): Dimensions => {
-  const result: Dimensions = {
-    [FeeDimensions.Bandwidth]: 0,
-    [FeeDimensions.DBRead]: 0,
-    [FeeDimensions.DBWrite]: 0,
-    [FeeDimensions.Compute]: 0,
-  };
+  const result = createEmptyDimensions();
   for (const dimension of dimensions) {
     result[FeeDimensions.Bandwidth] += dimension[FeeDimensions.Bandwidth];
     result[FeeDimensions.DBRead] += dimension[FeeDimensions.DBRead];
