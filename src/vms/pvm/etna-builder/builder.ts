@@ -137,9 +137,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     [...fromAddressesBytes],
     options,
   );
-  const toBurn = new Map<string, bigint>([
-    [context.avaxAssetID, context.baseTxFee],
-  ]);
+  const toBurn = new Map<string, bigint>();
 
   outputs.forEach((out) => {
     const assetId = out.assetId.value();
@@ -250,8 +248,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       matchOwners(
         utxo.getOutputOwners(),
         fromAddresses,
-        // TODO: Verify this.
-        options?.minIssuanceTime ?? BigInt(Math.ceil(Date.now() / 1_000)),
+        defaultedOptions.minIssuanceTime,
       ) || {};
 
     if (inputSigIndices === undefined) {
@@ -275,6 +272,10 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     importedAmounts[assetId] = (importedAmounts[assetId] ?? 0n) + out.amount();
   }
 
+  if (importedInputs.length === 0) {
+    throw new Error('no UTXOs available to import');
+  }
+
   const importedAvax = importedAmounts[context.avaxAssetID];
 
   importedInputs.sort(TransferableInput.compare);
@@ -284,10 +285,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     defaultedOptions.minIssuanceTime,
     fromAddressesBytes,
   );
-
-  if (importedInputs.length === 0) {
-    throw new Error('no UTXOs available to import');
-  }
 
   const outputs: TransferableOutput[] = [];
 
@@ -321,18 +318,11 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   );
 
   const toBurn = new Map<string, bigint>();
-  let excessAVAX = 0n;
-
-  if (importedAvax && importedAvax < context.baseTxFee) {
-    toBurn.set(context.avaxAssetID, context.baseTxFee - importedAvax);
-  } else {
-    excessAVAX = importedAvax - context.baseTxFee;
-  }
 
   const [error, spendResults] = spend(
     {
       complexity,
-      excessAVAX,
+      excessAVAX: importedAvax,
       fromAddresses,
       ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
       spendOptions: defaultedOptions,
@@ -390,9 +380,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-  const toBurn = new Map<string, bigint>([
-    [context.avaxAssetID, context.baseTxFee],
-  ]);
+  const toBurn = new Map<string, bigint>();
 
   outputs.forEach((output) => {
     const assetId = output.assetId.value();
@@ -493,7 +481,6 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn: new Map([[context.avaxAssetID, context.createSubnetTxFee]]),
       utxos,
     },
     context,
@@ -605,7 +592,6 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn: new Map([[context.avaxAssetID, context.createBlockchainTxFee]]),
       utxos,
     },
     context,
@@ -699,7 +685,6 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn: new Map([[context.avaxAssetID, context.addSubnetValidatorFee]]),
       utxos,
     },
     context,
@@ -782,7 +767,6 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn: new Map([[context.avaxAssetID, context.baseTxFee]]),
       utxos,
     },
     context,
@@ -908,10 +892,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
   context,
 ) => {
   const isPrimaryNetwork = subnetId === PrimaryNetworkID.toString();
-  const fee = isPrimaryNetwork
-    ? context.addPrimaryNetworkValidatorFee
-    : context.addSubnetValidatorFee;
-  const toBurn = new Map<string, bigint>([[context.avaxAssetID, fee]]);
+  const toBurn = new Map<string, bigint>();
 
   const assetId = stakingAssetId ?? context.avaxAssetID;
 
@@ -1070,9 +1051,6 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   context,
 ) => {
   const isPrimaryNetwork = subnetId === PrimaryNetworkID.toString();
-  const fee = isPrimaryNetwork
-    ? context.addPrimaryNetworkDelegatorFee
-    : context.addSubnetDelegatorFee;
 
   const assetId = stakingAssetId ?? context.avaxAssetID;
 
@@ -1080,7 +1058,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   if (isPrimaryNetwork && assetId !== context.avaxAssetID)
     throw new Error('Staking asset ID must be AVAX for the primary network.');
 
-  const toBurn = new Map<string, bigint>([[context.avaxAssetID, fee]]);
+  const toBurn = new Map<string, bigint>();
   const toStake = new Map<string, bigint>([[assetId, weight]]);
 
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
@@ -1221,7 +1199,6 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn: new Map([[context.avaxAssetID, context.baseTxFee]]),
       utxos,
     },
     context,

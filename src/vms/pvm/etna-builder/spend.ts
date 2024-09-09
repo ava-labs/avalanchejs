@@ -161,7 +161,7 @@ type SpendProps = Readonly<{
    *
    * Only unlocked UTXOs are able to be burned here.
    */
-  toBurn: Map<string, bigint>;
+  toBurn?: Map<string, bigint>;
   /**
    * Maps `assetID` to the amount of the asset to spend and place info
    * the staked outputs. First locked UTXOs are attempted to be used for
@@ -191,7 +191,7 @@ export const spend = (
     fromAddresses,
     ownerOverride: _ownerOverride,
     spendOptions,
-    toBurn,
+    toBurn = new Map(),
     toStake = new Map(),
     utxos,
   }: SpendProps,
