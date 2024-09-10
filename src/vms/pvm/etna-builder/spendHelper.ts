@@ -7,7 +7,7 @@ import type { Dimensions } from '../../common/fees/dimensions';
 import { addDimensions, dimensionsToGas } from '../../common/fees/dimensions';
 import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
-interface SpendHelperProps {
+export interface SpendHelperProps {
   changeOutputs: readonly TransferableOutput[];
   complexity: Dimensions;
   gasPrice: bigint;
@@ -147,6 +147,10 @@ export class SpendHelper {
    * @returns {bigint} The remaining amount of the asset after consumption.
    */
   consumeLockedAsset(assetId: string, amount: bigint): bigint {
+    if (amount < 0n) {
+      throw new Error('Amount to consume must be greater than or equal to 0');
+    }
+
     const assetToStake = this.toStake.get(assetId) ?? 0n;
 
     // Stake any value that should be staked
@@ -170,6 +174,10 @@ export class SpendHelper {
    * @returns {bigint} The remaining amount of the asset after consumption.
    */
   consumeAsset(assetId: string, amount: bigint): bigint {
+    if (amount < 0n) {
+      throw new Error('Amount to consume must be greater than or equal to 0');
+    }
+
     const assetToBurn = this.toBurn.get(assetId) ?? 0n;
 
     // Burn any value that should be burned
