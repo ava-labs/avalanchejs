@@ -11,11 +11,10 @@ import {
 } from '../../../serializable';
 import type { Utxo } from '../../../serializable/avax/utxo';
 import { StakeableLockIn, StakeableLockOut } from '../../../serializable/pvm';
-import { isStakeableLockOut, isTransferOut } from '../../../utils';
+import { getUtxoInfo } from '../../../utils';
 import { matchOwners } from '../../../utils/matchOwners';
 import type { SpendOptions } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
-import type { Serializable } from '../../common/types';
 import type { Context } from '../../context';
 import { SpendHelper } from './spendHelper';
 
@@ -90,40 +89,6 @@ export const splitByAssetId = (
   return { other, requested };
 };
 
-/**
- * @internal
- *
- * Returns the TransferOutput that was, potentially, wrapped by a stakeable lockout.
- *
- * If the output was stakeable and locked, the locktime is returned.
- * Otherwise, the locktime returned will be 0n.
- *
- * If the output is not an error is returned.
- */
-export const unwrapOutput = (
-  output: Serializable,
-):
-  | [error: null, transferOutput: TransferOutput, locktime: bigint]
-  | [error: Error, transferOutput: null, locktime: null] => {
-  try {
-    if (isStakeableLockOut(output) && isTransferOut(output.transferOut)) {
-      return [null, output.transferOut, output.lockTime.value()];
-    } else if (isTransferOut(output)) {
-      return [null, output, 0n];
-    }
-  } catch (error) {
-    return [
-      new Error('An unexpected error occurred while unwrapping output', {
-        cause: error instanceof Error ? error : undefined,
-      }),
-      null,
-      null,
-    ];
-  }
-
-  return [new Error('Unknown output type'), null, null];
-};
-
 type SpendResult = Readonly<{
   changeOutputs: readonly TransferableOutput[];
   inputs: readonly TransferableInput[];
@@ -133,12 +98,11 @@ type SpendResult = Readonly<{
 
 type SpendProps = Readonly<{
   /**
-   * Contains the currently accrued transaction complexity that
-   * will be used to calculate the required fees to be burned.
+   * The initial complexity of the transaction.
    */
   complexity: Dimensions;
   /**
-   * Contains the amount of extra AVAX that spend can produce in
+   * The extra AVAX that spend can produce in
    * the change outputs in addition to the consumed and not burned AVAX.
    */
   excessAVAX?: bigint;
@@ -225,15 +189,9 @@ export const spend = (
         continue;
       }
 
-      const [unwrapError, out, locktime] = unwrapOutput(utxo.output);
-
-      if (unwrapError) {
-        return [unwrapError, null];
-      }
-
       const { sigIndicies: inputSigIndices } =
         matchOwners(
-          out.outputOwners,
+          utxo.getOutputOwners(),
           [...fromAddresses],
           spendOptions.minIssuanceTime,
         ) || {};
@@ -243,6 +201,8 @@ export const spend = (
         continue;
       }
 
+      const utxoInfo = getUtxoInfo(utxo);
+
       spendHelper.addInput(
         utxo,
         // TODO: Verify this.
@@ -250,15 +210,18 @@ export const spend = (
           utxo.utxoId,
           utxo.assetId,
           new StakeableLockIn(
-            new BigIntPr(locktime),
-            new TransferInput(out.amt, Input.fromNative(inputSigIndices)),
+            new BigIntPr(utxoInfo.locktime),
+            new TransferInput(
+              new BigIntPr(utxoInfo.amount),
+              Input.fromNative(inputSigIndices),
+            ),
           ),
         ),
       );
 
       const excess = spendHelper.consumeLockedAsset(
-        utxo.assetId.toString(),
-        out.amount(),
+        utxoInfo.assetId,
+        utxoInfo.amount,
       );
 
       spendHelper.addStakedOutput(
@@ -266,10 +229,10 @@ export const spend = (
         new TransferableOutput(
           utxo.assetId,
           new StakeableLockOut(
-            new BigIntPr(locktime),
+            new BigIntPr(utxoInfo.locktime),
             new TransferOutput(
-              new BigIntPr(out.amount() - excess),
-              out.outputOwners,
+              new BigIntPr(utxoInfo.amount - excess),
+              utxo.getOutputOwners(),
             ),
           ),
         ),
@@ -285,8 +248,8 @@ export const spend = (
         new TransferableOutput(
           utxo.assetId,
           new StakeableLockOut(
-            new BigIntPr(locktime),
-            new TransferOutput(new BigIntPr(excess), out.outputOwners),
+            new BigIntPr(utxoInfo.locktime),
+            new TransferOutput(new BigIntPr(excess), utxo.getOutputOwners()),
           ),
         ),
       );
@@ -320,15 +283,9 @@ export const spend = (
         continue;
       }
 
-      const [unwrapError, out] = unwrapOutput(utxo.output);
-
-      if (unwrapError) {
-        return [unwrapError, null];
-      }
-
       const { sigIndicies: inputSigIndices } =
         matchOwners(
-          out.outputOwners,
+          utxo.getOutputOwners(),
           [...fromAddresses],
           spendOptions.minIssuanceTime,
         ) || {};
@@ -338,6 +295,8 @@ export const spend = (
         continue;
       }
 
+      const utxoInfo = getUtxoInfo(utxo);
+
       spendHelper.addInput(
         utxo,
         // TODO: Verify this.
@@ -345,11 +304,14 @@ export const spend = (
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          new TransferInput(out.amt, Input.fromNative(inputSigIndices)),
+          new TransferInput(
+            new BigIntPr(utxoInfo.amount),
+            Input.fromNative(inputSigIndices),
+          ),
         ),
       );
 
-      const excess = spendHelper.consumeAsset(assetId, out.amount());
+      const excess = spendHelper.consumeAsset(assetId, utxoInfo.amount);
 
       if (excess === 0n) {
         continue;
@@ -381,15 +343,9 @@ export const spend = (
         break;
       }
 
-      const [error, out] = unwrapOutput(utxo.output);
-
-      if (error) {
-        return [error, null];
-      }
-
       const { sigIndicies: inputSigIndices } =
         matchOwners(
-          out.outputOwners,
+          utxo.getOutputOwners(),
           [...fromAddresses],
           spendOptions.minIssuanceTime,
         ) || {};
@@ -399,19 +355,24 @@ export const spend = (
         continue;
       }
 
+      const utxoInfo = getUtxoInfo(utxo);
+
       spendHelper.addInput(
         utxo,
         // TODO: Verify this.
         new TransferableInput(
           utxo.utxoId,
           utxo.assetId,
-          new TransferInput(out.amt, Input.fromNative(inputSigIndices)),
+          new TransferInput(
+            new BigIntPr(utxoInfo.amount),
+            Input.fromNative(inputSigIndices),
+          ),
         ),
       );
 
       const excess = spendHelper.consumeAsset(
         context.avaxAssetID,
-        out.amount(),
+        utxoInfo.amount,
       );
 
       excessAVAX += excess;
