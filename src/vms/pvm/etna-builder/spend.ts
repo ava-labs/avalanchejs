@@ -96,7 +96,7 @@ type SpendResult = Readonly<{
   stakeOutputs: readonly TransferableOutput[];
 }>;
 
-type SpendProps = Readonly<{
+export type SpendProps = Readonly<{
   /**
    * The initial complexity of the transaction.
    */
@@ -153,7 +153,7 @@ export const spend = (
     complexity,
     excessAVAX: _excessAVAX = 0n,
     fromAddresses,
-    ownerOverride: _ownerOverride,
+    ownerOverride,
     spendOptions,
     toBurn = new Map(),
     toStake = new Map(),
@@ -164,8 +164,8 @@ export const spend = (
   | [error: null, inputsAndOutputs: SpendResult]
   | [error: Error, inputsAndOutputs: null] => {
   try {
-    let ownerOverride =
-      _ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
+    let changeOwners =
+      ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
     let excessAVAX: bigint = _excessAVAX;
 
     const spendHelper = new SpendHelper({
@@ -379,7 +379,7 @@ export const spend = (
 
       // If we need to consume additional AVAX, we should be returning the
       // change to the change address.
-      ownerOverride = OutputOwners.fromNative(spendOptions.changeAddresses);
+      changeOwners = OutputOwners.fromNative(spendOptions.changeAddresses);
     }
 
     // Verify
@@ -402,7 +402,7 @@ export const spend = (
     spendHelper.addOutputComplexity(
       new TransferableOutput(
         Id.fromString(context.avaxAssetID),
-        new TransferOutput(new BigIntPr(0n), ownerOverride),
+        new TransferOutput(new BigIntPr(0n), changeOwners),
       ),
     );
 
@@ -415,7 +415,7 @@ export const spend = (
           Id.fromString(context.avaxAssetID),
           new TransferOutput(
             new BigIntPr(excessAVAX - requiredFeeWithChange),
-            ownerOverride,
+            changeOwners,
           ),
         ),
       );

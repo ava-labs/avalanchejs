@@ -67,51 +67,25 @@ import { proofOfPossession } from '../../../fixtures/pvm';
 const testContext: Context = {
   ..._testContext,
 
-  // These are 0 in this context (dynamic fees).
-  // TODO: Should we assume the context of these will just be setting the values
-  // to 0n, or should we remove logic in the builder that bundles these static fees
-  // into the initialization of toBurn?
-  addPrimaryNetworkValidatorFee: 0n,
-  addPrimaryNetworkDelegatorFee: 0n,
-  addSubnetValidatorFee: 0n,
-  addSubnetDelegatorFee: 0n,
-  baseTxFee: 0n,
-  createAssetTxFee: 0n,
-  createSubnetTxFee: 0n,
-  createBlockchainTxFee: 0n,
-  transformSubnetTxFee: 0n,
-
   // Required context for post-Etna
   gasPrice: 1n,
   complexityWeights: createDimensions(1, 10, 100, 1000),
 };
 
-const addInputAmounts = (
-  inputs: readonly TransferableInput[],
+const addTransferableAmounts = (
+  transferableItems:
+    | readonly TransferableOutput[]
+    | readonly TransferableInput[],
 ): Map<string, bigint> => {
-  const consumed = new Map<string, bigint>();
+  const amounts = new Map<string, bigint>();
 
-  for (const input of inputs) {
-    const assetId = input.getAssetId();
+  for (const transferable of transferableItems) {
+    const assetId = transferable.getAssetId();
 
-    consumed.set(assetId, (consumed.get(assetId) ?? 0n) + input.amount());
+    amounts.set(assetId, (amounts.get(assetId) ?? 0n) + transferable.amount());
   }
 
-  return consumed;
-};
-
-const addOutputAmounts = (
-  outputs: readonly TransferableOutput[],
-): Map<string, bigint> => {
-  const produced = new Map<string, bigint>();
-
-  for (const output of outputs) {
-    const assetId = output.getAssetId();
-
-    produced.set(assetId, (produced.get(assetId) ?? 0n) + output.amount());
-  }
-
-  return produced;
+  return amounts;
 };
 
 const addAmounts = (...amounts: Map<string, bigint>[]): Map<string, bigint> => {
@@ -162,8 +136,14 @@ const checkFeeIsCorrect = ({
   expectedAmountConsumed: Record<string, string>,
   expectedFee: bigint,
 ] => {
-  const amountConsumed = addInputAmounts([...inputs, ...additionalInputs]);
-  const amountProduced = addOutputAmounts([...outputs, ...additionalOutputs]);
+  const amountConsumed = addTransferableAmounts([
+    ...inputs,
+    ...additionalInputs,
+  ]);
+  const amountProduced = addTransferableAmounts([
+    ...outputs,
+    ...additionalOutputs,
+  ]);
 
   const expectedFee = calculateFee(
     unsignedTx.getTx(),
