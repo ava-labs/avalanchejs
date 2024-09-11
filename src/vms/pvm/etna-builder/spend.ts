@@ -40,8 +40,10 @@ export const splitByLocktime = (
   for (const utxo of utxos) {
     let utxoOwnersLocktime: bigint;
 
+    // TODO: Remove this try catch in the future in favor of
+    // filtering out unusable utxos similar to useUnlockedUtxos/useSpendableLockedUTXOs
     try {
-      utxoOwnersLocktime = utxo.getOutputOwners().locktime.value();
+      utxoOwnersLocktime = getUtxoInfo(utxo).stakeableLocktime;
     } catch (error) {
       // If we can't get the locktime, we can't spend the UTXO.
       // TODO: Is this the right thing to do?
@@ -210,7 +212,7 @@ export const spend = (
           utxo.utxoId,
           utxo.assetId,
           new StakeableLockIn(
-            new BigIntPr(utxoInfo.locktime),
+            new BigIntPr(utxoInfo.stakeableLocktime),
             new TransferInput(
               new BigIntPr(utxoInfo.amount),
               Input.fromNative(inputSigIndices),
@@ -229,7 +231,7 @@ export const spend = (
         new TransferableOutput(
           utxo.assetId,
           new StakeableLockOut(
-            new BigIntPr(utxoInfo.locktime),
+            new BigIntPr(utxoInfo.stakeableLocktime),
             new TransferOutput(
               new BigIntPr(utxoInfo.amount - excess),
               utxo.getOutputOwners(),
@@ -248,7 +250,7 @@ export const spend = (
         new TransferableOutput(
           utxo.assetId,
           new StakeableLockOut(
-            new BigIntPr(utxoInfo.locktime),
+            new BigIntPr(utxoInfo.stakeableLocktime),
             new TransferOutput(new BigIntPr(excess), utxo.getOutputOwners()),
           ),
         ),
