@@ -1,7 +1,7 @@
 import { getHRP } from '../../constants/networkIDs';
 import { Info } from '../../info/info';
 import { AVMApi } from '../avm/api';
-import { createEmptyDimensions } from '../common/fees/dimensions';
+import { createDimensions } from '../common/fees/dimensions';
 import type { Context } from './model';
 
 /*
@@ -52,6 +52,6 @@ export const getContextFromURI = async (
 
     // TODO: Populate these values once they are exposed by the API
     gasPrice: 0n,
-    complexityWeights: createEmptyDimensions(),
+    complexityWeights: createDimensions(1, 1, 1, 1),
   });
 };
