@@ -46,7 +46,7 @@ export const getContextFromURI = async (
     addPrimaryNetworkDelegatorFee,
     addSubnetValidatorFee,
     addSubnetDelegatorFee,
-    networkID,
+    networkID: Number(networkID),
     hrp: getHRP(networkID),
   });
 };

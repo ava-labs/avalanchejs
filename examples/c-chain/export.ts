@@ -5,12 +5,13 @@ import { getContextFromURI } from '../../src/vms/context';
 import { newExportTxFromBaseFee } from '../../src/vms/evm';
 import { evmapi } from '../chain_apis';
 
-const C_CHAIN_ADDRESS = process.env.C_CHAIN_ADDRESS;
-const X_CHAIN_ADDRESS = process.env.X_CHAIN_ADDRESS;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const C_CHAIN_ADDRESS = process.env.C_CHAIN_ADDRESS;
+const P_CHAIN_ADDRESS = process.env.P_CHAIN_ADDRESS;
 
 const main = async () => {
-  if (!C_CHAIN_ADDRESS || !X_CHAIN_ADDRESS || !PRIVATE_KEY) {
+  console.log({ url: process.env.AVAX_PUBLIC_URL });
+  if (!C_CHAIN_ADDRESS || !P_CHAIN_ADDRESS || !PRIVATE_KEY) {
     throw new Error('Missing environment variable(s).');
   }
 
@@ -19,17 +20,18 @@ const main = async () => {
   );
 
   const context = await getContextFromURI(process.env.AVAX_PUBLIC_URL);
+  console.log({ context });
   const txCount = await provider.getTransactionCount(C_CHAIN_ADDRESS);
   const baseFee = await evmapi.getBaseFee();
-  const xAddressBytes = bech32ToBytes(X_CHAIN_ADDRESS);
+  const pAddressBytes = bech32ToBytes(P_CHAIN_ADDRESS);
 
   const tx = newExportTxFromBaseFee(
     context,
     baseFee / BigInt(1e9),
     BigInt(0.1 * 1e9),
-    context.xBlockchainID,
+    context.pBlockchainID,
     hexToBuffer(C_CHAIN_ADDRESS),
-    [xAddressBytes],
+    [pAddressBytes],
     BigInt(txCount),
   );
 
