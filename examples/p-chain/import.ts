@@ -5,28 +5,29 @@ import { newImportTx } from '../../src/vms/pvm';
 import { pvmapi } from '../chain_apis';
 import { getChainIdFromContext } from '../utils/getChainIdFromContext';
 
-const P_CHAIN_ADDRESS = process.env.P_CHAIN_ADDRESS;
-const X_CHAIN_ADDRESS = process.env.X_CHAIN_ADDRESS;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const P_CHAIN_ADDRESS = process.env.P_CHAIN_ADDRESS;
+const CORETH_ADDRESS = process.env.CORETH_ADDRESS;
 
 const main = async () => {
-  if (!P_CHAIN_ADDRESS || !X_CHAIN_ADDRESS || !PRIVATE_KEY) {
+  if (!P_CHAIN_ADDRESS || !CORETH_ADDRESS || !PRIVATE_KEY) {
     throw new Error('Missing environment variable(s).');
   }
 
   const context = await getContextFromURI(process.env.AVAX_PUBLIC_URL);
+  console.log({ context });
 
   const { utxos } = await pvmapi.getUTXOs({
-    sourceChain: 'X',
+    sourceChain: 'C',
     addresses: [P_CHAIN_ADDRESS],
   });
 
   const importTx = newImportTx(
     context,
-    getChainIdFromContext('X', context),
+    getChainIdFromContext('C', context),
     utxos,
     [bech32ToBytes(P_CHAIN_ADDRESS)],
-    [bech32ToBytes(X_CHAIN_ADDRESS)],
+    [bech32ToBytes(CORETH_ADDRESS)],
   );
 
   await addTxSignatures({
