@@ -55,7 +55,7 @@ export type GetNodeIpResponse = {
 };
 
 export type GetNetworkIdResponse = {
-  networkID: number;
+  networkID: string;
 };
 
 export type GetNetworkNameResponse = {
