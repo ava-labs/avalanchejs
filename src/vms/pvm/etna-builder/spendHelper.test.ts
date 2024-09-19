@@ -3,7 +3,10 @@ import {
   transferableOutput,
   utxo,
 } from '../../../fixtures/avax';
-import { createDimensions } from '../../common/fees/dimensions';
+import {
+  createDimensions,
+  dimensionsToGas,
+} from '../../common/fees/dimensions';
 import type { SpendHelperProps } from './spendHelper';
 import { SpendHelper } from './spendHelper';
 
@@ -23,27 +26,31 @@ const DEFAULT_PROPS: SpendHelperProps = {
 };
 
 describe('src/vms/pvm/etna-builder/spendHelper', () => {
-  describe('SpendHelper', () => {
-    test('initialized with correct values', () => {
-      const spendHelper = new SpendHelper(DEFAULT_PROPS);
+  test('initialized with correct values', () => {
+    const spendHelper = new SpendHelper(DEFAULT_PROPS);
 
-      expect(spendHelper).toBeInstanceOf(SpendHelper);
+    expect(spendHelper).toBeInstanceOf(SpendHelper);
 
-      const results = spendHelper.getInputsOutputs();
+    const results = spendHelper.getInputsOutputs();
 
-      expect(results.changeOutputs).toEqual([]);
-      expect(results.inputs).toEqual([]);
-      expect(results.inputUTXOs).toEqual([]);
-      expect(results.stakeOutputs).toEqual([]);
-    });
+    expect(results.changeOutputs).toEqual([]);
+    expect(results.fee).toBe(
+      dimensionsToGas(DEFAULT_PROPS.complexity, DEFAULT_WEIGHTS) *
+        DEFAULT_GAS_PRICE,
+    );
+    expect(results.inputs).toEqual([]);
+    expect(results.inputUTXOs).toEqual([]);
+    expect(results.stakeOutputs).toEqual([]);
   });
 
   test('adding inputs and outputs', () => {
     const spendHelper = new SpendHelper(DEFAULT_PROPS);
 
-    expect(spendHelper.calculateFee()).toBe(30n);
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [],
+      fee:
+        dimensionsToGas(DEFAULT_PROPS.complexity, DEFAULT_WEIGHTS) *
+        DEFAULT_GAS_PRICE,
       inputs: [],
       inputUTXOs: [],
       stakeOutputs: [],
@@ -58,9 +65,9 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     spendHelper.addInput(inputUtxo, inputTransferableInput);
 
-    expect(spendHelper.calculateFee()).toBe(1251n);
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [],
+      fee: 1251n,
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [],
@@ -70,9 +77,9 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     spendHelper.addChangeOutput(changeOutput);
 
-    expect(spendHelper.calculateFee()).toBe(1560n);
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [changeOutput],
+      fee: 1560n,
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [],
@@ -82,9 +89,9 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     spendHelper.addStakedOutput(stakeOutput);
 
-    expect(spendHelper.calculateFee()).toBe(1869n);
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [changeOutput],
+      fee: 1869n,
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [stakeOutput],

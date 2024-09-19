@@ -220,7 +220,7 @@ describe('pvmBuilder', () => {
   });
 
   it('AddValidatorTx - stakeable locked', () => {
-    const utxos = testUtxos();
+    const utxos: Utxo[] = testUtxos();
     const lockTime = BigInt(Math.floor(new Date().getTime() / 1000)) + 10000n;
     const lockedUtxo = new Utxo(
       new UTXOID(testUTXOID1, new Int(0)),
@@ -265,7 +265,7 @@ describe('pvmBuilder', () => {
   });
 
   it('AddDelegatorTx', () => {
-    const utxos = testUtxos();
+    const utxos: Utxo[] = testUtxos();
     const lockTime = BigInt(Math.floor(new Date().getTime() / 1000)) + 10000n;
     const lockedUtxo = new Utxo(
       new UTXOID(testUTXOID1, new Int(0)),

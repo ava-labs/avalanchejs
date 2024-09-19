@@ -177,7 +177,7 @@ export const spend = (
       inputs: [],
       stakeOutputs: [],
       toBurn,
-      toStake: toStake ?? new Map(),
+      toStake,
       weights: context.complexityWeights,
     });
 
@@ -396,7 +396,7 @@ export const spend = (
       throw new Error(
         `Insufficient funds: provided UTXOs need ${
           requiredFee - excessAVAX
-        } more nAVAX (${context.avaxAssetID})`,
+        } more nAVAX (asset id: ${context.avaxAssetID})`,
       );
     }
 

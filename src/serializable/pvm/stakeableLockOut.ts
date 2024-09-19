@@ -11,12 +11,14 @@ import { TypeSymbols } from '../constants';
  * @see https://docs.avax.network/specs/platform-transaction-serialization#stakeablelockin
  */
 @serializable()
-export class StakeableLockOut implements Amounter {
+export class StakeableLockOut<TransferOut extends Amounter = Amounter>
+  implements Amounter
+{
   _type = TypeSymbols.StakeableLockOut;
 
   constructor(
     public readonly lockTime: BigIntPr,
-    public readonly transferOut: Amounter,
+    public readonly transferOut: TransferOut,
   ) {}
 
   amount() {

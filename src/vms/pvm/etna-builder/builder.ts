@@ -65,7 +65,7 @@ import {
   getOwnerComplexity,
   getSignerComplexity,
 } from '../txs/fee';
-import { spend } from './spend';
+import { spend } from './experimental-spend';
 
 const getAddressMaps = ({
   inputs,
@@ -317,8 +317,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     outputComplexity,
   );
 
-  const toBurn = new Map<string, bigint>();
-
   const [error, spendResults] = spend(
     {
       complexity,
@@ -326,7 +324,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       fromAddresses,
       ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
       spendOptions: defaultedOptions,
-      toBurn,
       utxos,
     },
     context,
@@ -892,7 +889,6 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
   context,
 ) => {
   const isPrimaryNetwork = subnetId === PrimaryNetworkID.toString();
-  const toBurn = new Map<string, bigint>();
 
   const assetId = stakingAssetId ?? context.avaxAssetID;
 
@@ -935,7 +931,6 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn,
       toStake,
       utxos,
     },
@@ -1058,7 +1053,6 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   if (isPrimaryNetwork && assetId !== context.avaxAssetID)
     throw new Error('Staking asset ID must be AVAX for the primary network.');
 
-  const toBurn = new Map<string, bigint>();
   const toStake = new Map<string, bigint>([[assetId, weight]]);
 
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
@@ -1085,7 +1079,6 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       spendOptions: defaultedOptions,
-      toBurn,
       toStake,
       utxos,
     },

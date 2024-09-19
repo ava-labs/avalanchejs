@@ -1,10 +1,16 @@
-import type { TransferableOutput } from '../../../serializable';
+import type { OutputOwners, TransferableOutput } from '../../../serializable';
 import { TransferableInput } from '../../../serializable';
 import type { Utxo } from '../../../serializable/avax/utxo';
+import { isTransferOut } from '../../../utils';
 import { bigIntMin } from '../../../utils/bigintMath';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import type { Dimensions } from '../../common/fees/dimensions';
-import { addDimensions, dimensionsToGas } from '../../common/fees/dimensions';
+import {
+  addDimensions,
+  createEmptyDimensions,
+  dimensionsToGas,
+} from '../../common/fees/dimensions';
+import { consolidateOutputs } from '../../utils/consolidateOutputs';
 import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
 export interface SpendHelperProps {
@@ -26,13 +32,15 @@ export interface SpendHelperProps {
  */
 export class SpendHelper {
   private readonly gasPrice: bigint;
+  private readonly initialComplexity: Dimensions;
   private readonly toBurn: Map<string, bigint>;
   private readonly toStake: Map<string, bigint>;
   private readonly weights: Dimensions;
 
-  private complexity: Dimensions;
   private changeOutputs: readonly TransferableOutput[];
   private inputs: readonly TransferableInput[];
+  private inputComplexity: Dimensions = createEmptyDimensions();
+  private outputComplexity: Dimensions = createEmptyDimensions();
   private stakeOutputs: readonly TransferableOutput[];
 
   private inputUTXOs: readonly Utxo[] = [];
@@ -48,11 +56,11 @@ export class SpendHelper {
     weights,
   }: SpendHelperProps) {
     this.gasPrice = gasPrice;
+    this.initialComplexity = complexity;
     this.toBurn = toBurn;
     this.toStake = toStake;
     this.weights = weights;
 
-    this.complexity = complexity;
     this.changeOutputs = changeOutputs;
     this.inputs = inputs;
     this.stakeOutputs = stakeOutputs;
@@ -68,7 +76,10 @@ export class SpendHelper {
   addInput(utxo: Utxo, transferableInput: TransferableInput): SpendHelper {
     const newInputComplexity = getInputComplexity([transferableInput]);
 
-    this.complexity = addDimensions(this.complexity, newInputComplexity);
+    this.inputComplexity = addDimensions(
+      this.inputComplexity,
+      newInputComplexity,
+    );
 
     this.inputs = [...this.inputs, transferableInput];
     this.inputUTXOs = [...this.inputUTXOs, utxo];
@@ -86,7 +97,7 @@ export class SpendHelper {
   addChangeOutput(transferableOutput: TransferableOutput): SpendHelper {
     this.changeOutputs = [...this.changeOutputs, transferableOutput];
 
-    return this.addOutputComplexity(transferableOutput);
+    return this;
   }
 
   /**
@@ -99,7 +110,7 @@ export class SpendHelper {
   addStakedOutput(transferableOutput: TransferableOutput): SpendHelper {
     this.stakeOutputs = [...this.stakeOutputs, transferableOutput];
 
-    return this.addOutputComplexity(transferableOutput);
+    return this;
   }
 
   /**
@@ -111,9 +122,27 @@ export class SpendHelper {
   addOutputComplexity(transferableOutput: TransferableOutput): SpendHelper {
     const newOutputComplexity = getOutputComplexity([transferableOutput]);
 
-    this.complexity = addDimensions(this.complexity, newOutputComplexity);
+    this.outputComplexity = addDimensions(
+      this.outputComplexity,
+      newOutputComplexity,
+    );
 
     return this;
+  }
+
+  private getComplexity(): Dimensions {
+    return addDimensions(
+      this.initialComplexity,
+      getInputComplexity(this.inputs),
+      getOutputComplexity(this.changeOutputs),
+      getOutputComplexity(this.stakeOutputs),
+      this.outputComplexity,
+    );
+  }
+
+  private consolidateOutputs(): void {
+    this.changeOutputs = consolidateOutputs(this.changeOutputs);
+    this.stakeOutputs = consolidateOutputs(this.stakeOutputs);
   }
 
   /**
@@ -151,19 +180,19 @@ export class SpendHelper {
       throw new Error('Amount to consume must be greater than or equal to 0');
     }
 
-    const assetToStake = this.toStake.get(assetId) ?? 0n;
+    const remainingAmountToStake = this.toStake.get(assetId) ?? 0n;
 
     // Stake any value that should be staked
-    const toStake = bigIntMin(
+    const amountToStake = bigIntMin(
       // Amount we still need to stake
-      assetToStake,
+      remainingAmountToStake,
       // Amount available to stake
       amount,
     );
 
-    this.toStake.set(assetId, assetToStake - toStake);
+    this.toStake.set(assetId, remainingAmountToStake - amountToStake);
 
-    return amount - toStake;
+    return amount - amountToStake;
   }
 
   /**
@@ -178,20 +207,20 @@ export class SpendHelper {
       throw new Error('Amount to consume must be greater than or equal to 0');
     }
 
-    const assetToBurn = this.toBurn.get(assetId) ?? 0n;
+    const remainingAmountToBurn = this.toBurn.get(assetId) ?? 0n;
 
     // Burn any value that should be burned
-    const toBurn = bigIntMin(
+    const amountToBurn = bigIntMin(
       // Amount we still need to burn
-      assetToBurn,
+      remainingAmountToBurn,
       // Amount available to burn
       amount,
     );
 
-    this.toBurn.set(assetId, assetToBurn - toBurn);
+    this.toBurn.set(assetId, remainingAmountToBurn - amountToBurn);
 
     // Stake any remaining value that should be staked
-    return this.consumeLockedAsset(assetId, amount - toBurn);
+    return this.consumeLockedAsset(assetId, amount - amountToBurn);
   }
 
   /**
@@ -200,9 +229,33 @@ export class SpendHelper {
    * @returns {bigint} The fee for the SpendHelper.
    */
   calculateFee(): bigint {
-    const gas = dimensionsToGas(this.complexity, this.weights);
+    this.consolidateOutputs();
+
+    const gas = dimensionsToGas(this.getComplexity(), this.weights);
 
     return gas * this.gasPrice;
+  }
+
+  calculateFeeWithTemporaryOutputComplexity(
+    transferableOutput: TransferableOutput,
+  ): bigint {
+    const oldOutputComplexity = this.outputComplexity;
+    this.addOutputComplexity(transferableOutput);
+
+    const fee = this.calculateFee();
+
+    this.outputComplexity = oldOutputComplexity;
+
+    return fee;
+  }
+
+  hasChangeOutput(assetId: string, outputOwners: OutputOwners): boolean {
+    return this.changeOutputs.some(
+      (output) =>
+        output.assetId.value() === assetId &&
+        isTransferOut(output) &&
+        output.outputOwners.equals(outputOwners),
+    );
   }
 
   /**
@@ -241,10 +294,13 @@ export class SpendHelper {
    */
   getInputsOutputs(): {
     changeOutputs: readonly TransferableOutput[];
+    fee: bigint;
     inputs: readonly TransferableInput[];
     inputUTXOs: readonly Utxo[];
     stakeOutputs: readonly TransferableOutput[];
   } {
+    const fee = this.calculateFee();
+
     const sortedInputs = [...this.inputs].sort(TransferableInput.compare);
     const sortedChangeOutputs = [...this.changeOutputs].sort(
       compareTransferableOutputs,
@@ -255,6 +311,7 @@ export class SpendHelper {
 
     return {
       changeOutputs: sortedChangeOutputs,
+      fee,
       inputs: sortedInputs,
       inputUTXOs: this.inputUTXOs,
       stakeOutputs: sortedStakeOutputs,

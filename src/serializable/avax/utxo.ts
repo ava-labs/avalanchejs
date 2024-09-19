@@ -12,13 +12,13 @@ import { TypeSymbols } from '../constants';
  * @see https://docs.avax.network/specs/avm-transaction-serialization#unsigned-Exporttx
  */
 @serializable()
-export class Utxo {
+export class Utxo<Output extends Serializable = Serializable> {
   _type = TypeSymbols.UTXO;
 
   constructor(
     public readonly utxoId: UTXOID,
     public readonly assetId: Id,
-    public readonly output: Serializable,
+    public readonly output: Output,
   ) {}
 
   static fromBytes(bytes: Uint8Array, codec: Codec): [Utxo, Uint8Array] {
