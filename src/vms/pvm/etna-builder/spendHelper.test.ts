@@ -16,9 +16,10 @@ const DEFAULT_WEIGHTS = createDimensions(1, 2, 3, 4);
 
 const DEFAULT_PROPS: SpendHelperProps = {
   changeOutputs: [],
-  complexity: createDimensions(1, 1, 1, 1),
   gasPrice: DEFAULT_GAS_PRICE,
+  initialComplexity: createDimensions(1, 1, 1, 1),
   inputs: [],
+  shouldConsolidateOutputs: false,
   stakeOutputs: [],
   toBurn: new Map<string, bigint>(),
   toStake: new Map<string, bigint>(),
@@ -35,7 +36,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(results.changeOutputs).toEqual([]);
     expect(results.fee).toBe(
-      dimensionsToGas(DEFAULT_PROPS.complexity, DEFAULT_WEIGHTS) *
+      dimensionsToGas(DEFAULT_PROPS.initialComplexity, DEFAULT_WEIGHTS) *
         DEFAULT_GAS_PRICE,
     );
     expect(results.inputs).toEqual([]);
@@ -49,7 +50,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [],
       fee:
-        dimensionsToGas(DEFAULT_PROPS.complexity, DEFAULT_WEIGHTS) *
+        dimensionsToGas(DEFAULT_PROPS.initialComplexity, DEFAULT_WEIGHTS) *
         DEFAULT_GAS_PRICE,
       inputs: [],
       inputUTXOs: [],

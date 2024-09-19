@@ -15,9 +15,10 @@ import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
 export interface SpendHelperProps {
   changeOutputs: readonly TransferableOutput[];
-  complexity: Dimensions;
   gasPrice: bigint;
+  initialComplexity: Dimensions;
   inputs: readonly TransferableInput[];
+  shouldConsolidateOutputs: boolean;
   stakeOutputs: readonly TransferableOutput[];
   toBurn: Map<string, bigint>;
   toStake: Map<string, bigint>;
@@ -33,6 +34,7 @@ export interface SpendHelperProps {
 export class SpendHelper {
   private readonly gasPrice: bigint;
   private readonly initialComplexity: Dimensions;
+  private readonly shouldConsolidateOutputs: boolean;
   private readonly toBurn: Map<string, bigint>;
   private readonly toStake: Map<string, bigint>;
   private readonly weights: Dimensions;
@@ -47,16 +49,18 @@ export class SpendHelper {
 
   constructor({
     changeOutputs,
-    complexity,
     gasPrice,
+    initialComplexity,
     inputs,
+    shouldConsolidateOutputs,
     stakeOutputs,
     toBurn,
     toStake,
     weights,
   }: SpendHelperProps) {
     this.gasPrice = gasPrice;
-    this.initialComplexity = complexity;
+    this.initialComplexity = initialComplexity;
+    this.shouldConsolidateOutputs = shouldConsolidateOutputs;
     this.toBurn = toBurn;
     this.toStake = toStake;
     this.weights = weights;
@@ -141,8 +145,10 @@ export class SpendHelper {
   }
 
   private consolidateOutputs(): void {
-    this.changeOutputs = consolidateOutputs(this.changeOutputs);
-    this.stakeOutputs = consolidateOutputs(this.stakeOutputs);
+    if (this.shouldConsolidateOutputs) {
+      this.changeOutputs = consolidateOutputs(this.changeOutputs);
+      this.stakeOutputs = consolidateOutputs(this.stakeOutputs);
+    }
   }
 
   /**

@@ -65,7 +65,7 @@ import {
   getOwnerComplexity,
   getSignerComplexity,
 } from '../txs/fee';
-import { spend } from './experimental-spend';
+import { spend, useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend';
 
 const getAddressMaps = ({
   inputs,
@@ -158,13 +158,15 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses,
+      initialComplexity: complexity,
+      shouldConsolidateOutputs: true,
       spendOptions: defaultedOptions,
       toBurn,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -319,13 +321,14 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: importedAvax,
       fromAddresses,
+      initialComplexity: complexity,
       ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
       spendOptions: defaultedOptions,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -396,13 +399,14 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses,
+      initialComplexity: complexity,
       spendOptions: defaultedOptions,
       toBurn,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -474,12 +478,13 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -585,12 +590,13 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -678,12 +684,13 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -760,12 +767,13 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
@@ -927,13 +935,15 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      shouldConsolidateOutputs: true,
       spendOptions: defaultedOptions,
       toStake,
       utxos,
     },
+    [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
   );
 
@@ -1075,13 +1085,15 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      shouldConsolidateOutputs: true,
       spendOptions: defaultedOptions,
       toStake,
       utxos,
     },
+    [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
   );
 
@@ -1188,12 +1200,13 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
 
   const [error, spendResults] = spend(
     {
-      complexity,
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
     },
+    [useUnlockedUTXOs],
     context,
   );
 
