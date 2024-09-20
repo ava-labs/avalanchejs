@@ -3,6 +3,10 @@ import {
   transferableOutput,
   utxo,
 } from '../../../fixtures/avax';
+import { id } from '../../../fixtures/common';
+import { stakeableLockOut } from '../../../fixtures/pvm';
+import { TransferableOutput } from '../../../serializable';
+import { isTransferOut } from '../../../utils';
 import {
   createDimensions,
   dimensionsToGas,
@@ -335,5 +339,91 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
         );
       });
     });
+  });
+
+  test('no consolidated outputs when `shouldConsolidateOutputs` is `false`', () => {
+    const spendHelper = new SpendHelper(DEFAULT_PROPS);
+
+    spendHelper.addChangeOutput(transferableOutput());
+    spendHelper.addChangeOutput(transferableOutput());
+
+    const stakedTransferableOutput = new TransferableOutput(
+      id(),
+      stakeableLockOut(),
+    );
+
+    spendHelper.addStakedOutput(stakedTransferableOutput);
+    spendHelper.addStakedOutput(stakedTransferableOutput);
+
+    // Calculate fee to trigger potential consolidation.
+    spendHelper.calculateFee();
+
+    const result = spendHelper.getInputsOutputs();
+
+    expect(result.changeOutputs).toHaveLength(2);
+    expect(result.stakeOutputs).toHaveLength(2);
+  });
+
+  test('consolidating outputs when `shouldConsolidateOutputs` is `true`', () => {
+    const spendHelper = new SpendHelper({
+      ...DEFAULT_PROPS,
+      shouldConsolidateOutputs: true,
+    });
+
+    spendHelper.addChangeOutput(transferableOutput());
+    spendHelper.addChangeOutput(transferableOutput());
+
+    const stakedTransferableOutput = new TransferableOutput(
+      id(),
+      stakeableLockOut(),
+    );
+
+    spendHelper.addStakedOutput(stakedTransferableOutput);
+    spendHelper.addStakedOutput(stakedTransferableOutput);
+
+    // Calculate fee to trigger potential consolidation.
+    spendHelper.calculateFee();
+
+    const result = spendHelper.getInputsOutputs();
+
+    expect(result.changeOutputs).toHaveLength(1);
+    expect(result.stakeOutputs).toHaveLength(1);
+  });
+
+  test('calculate fee with temporary output complexity', () => {
+    const spendHelper = new SpendHelper(DEFAULT_PROPS);
+
+    const originalFee = spendHelper.calculateFee();
+
+    const temporaryOutput = transferableOutput();
+
+    expect(
+      spendHelper.calculateFeeWithTemporaryOutputComplexity(temporaryOutput),
+    ).toBeGreaterThan(originalFee);
+
+    expect(spendHelper.calculateFee()).toBe(originalFee);
+  });
+
+  test('hasChangeOutput returns `true` when there is an AVAX change output', () => {
+    const spendHelper = new SpendHelper(DEFAULT_PROPS);
+
+    const changeOutput = transferableOutput();
+
+    if (!isTransferOut(changeOutput.output)) {
+      throw new Error('Output is not a TransferOutput');
+    }
+
+    const assetId = changeOutput.getAssetId();
+    const outputOwners = changeOutput.output.outputOwners;
+
+    expect(spendHelper.hasChangeOutput(assetId, outputOwners)).toBe(false);
+
+    spendHelper.addChangeOutput(changeOutput);
+
+    expect(spendHelper.hasChangeOutput(assetId, outputOwners)).toBe(true);
+
+    expect(spendHelper.hasChangeOutput('other-asset', outputOwners)).toBe(
+      false,
+    );
   });
 });

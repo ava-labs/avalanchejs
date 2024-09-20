@@ -255,12 +255,19 @@ export class SpendHelper {
     return fee;
   }
 
+  /**
+   * Determines if a change output with a matching asset ID and output owners exists.
+   *
+   * @param assetId The asset ID to check
+   * @param outputOwners The expected output owners on the asset ID
+   * @returns {boolean} True if a change output with matching assetId and outputOwners exists, false otherwise
+   */
   hasChangeOutput(assetId: string, outputOwners: OutputOwners): boolean {
     return this.changeOutputs.some(
-      (output) =>
-        output.assetId.value() === assetId &&
-        isTransferOut(output) &&
-        output.outputOwners.equals(outputOwners),
+      (transferableOutput) =>
+        transferableOutput.assetId.value() === assetId &&
+        isTransferOut(transferableOutput.output) &&
+        transferableOutput.output.outputOwners.equals(outputOwners),
     );
   }
 

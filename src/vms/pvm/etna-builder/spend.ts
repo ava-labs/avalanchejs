@@ -1,20 +1,15 @@
-import type { Address } from '../../../serializable';
-import {
-  BigIntPr,
-  OutputOwners,
-  TransferInput,
+import type {
+  Address,
   TransferableInput,
   TransferableOutput,
-  TransferOutput,
-  Id,
 } from '../../../serializable';
+import { OutputOwners } from '../../../serializable';
 import type { Utxo } from '../../../serializable/avax/utxo';
-import { StakeableLockIn, StakeableLockOut } from '../../../serializable/pvm';
-import { getUtxoInfo, isStakeableLockOut, isTransferOut } from '../../../utils';
 import type { SpendOptions } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
-import { verifySignaturesMatch } from '../../utils/calculateSpend/utils';
+import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
+import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
 import { SpendHelper } from './spendHelper';
 
 type SpendResult = Readonly<{
@@ -91,378 +86,6 @@ export type SpendProps = Readonly<{
   utxos: readonly Utxo[];
 }>;
 
-type SpendReducerState = Readonly<
-  Required<Omit<SpendProps, 'shouldConsolidateOutputs'>>
->;
-
-type SpendReducerFunction = (
-  state: SpendReducerState,
-  spendHelper: SpendHelper,
-  context: Context,
-) => SpendReducerState;
-
-const verifyAssetsConsumed: SpendReducerFunction = (state, spendHelper) => {
-  const verifyError = spendHelper.verifyAssetsConsumed();
-
-  if (verifyError) {
-    throw verifyError;
-  }
-
-  return state;
-};
-
-export const IncorrectStakeableLockOutError = new Error(
-  'StakeableLockOut transferOut must be a TransferOutput.',
-);
-
-export const useSpendableLockedUTXOs: SpendReducerFunction = (
-  state,
-  spendHelper,
-) => {
-  // 1. Filter out the UTXOs that are not usable.
-  const usableUTXOs: Utxo<StakeableLockOut<TransferOutput>>[] = state.utxos
-    // Filter out non stakeable lockouts and lockouts that are not stakeable yet.
-    .filter((utxo): utxo is Utxo<StakeableLockOut<TransferOutput>> => {
-      // 1a. Ensure UTXO output is a StakeableLockOut.
-      if (!isStakeableLockOut(utxo.output)) {
-        return false;
-      }
-
-      // 1b. Ensure UTXO is stakeable.
-      if (!(state.spendOptions.minIssuanceTime < utxo.output.getLocktime())) {
-        return false;
-      }
-
-      // 1c. Ensure there are funds to stake.
-      if ((state.toStake.get(utxo.assetId.value()) ?? 0n) === 0n) {
-        return false;
-      }
-
-      // 1d. Ensure transferOut is a TransferOutput.
-      if (!isTransferOut(utxo.output.transferOut)) {
-        throw IncorrectStakeableLockOutError;
-      }
-
-      return true;
-    });
-
-  // 2. Verify signatures match.
-  const verifiedUsableUTXOs = verifySignaturesMatch(
-    usableUTXOs,
-    (utxo) => utxo.output.transferOut,
-    state.fromAddresses,
-    state.spendOptions,
-  );
-
-  // 3. Do all the logic for spending based on the UTXOs.
-  for (const { sigData, data: utxo } of verifiedUsableUTXOs) {
-    const utxoInfo = getUtxoInfo(utxo);
-    const remainingAmountToStake: bigint =
-      state.toStake.get(utxoInfo.assetId) ?? 0n;
-
-    // 3a. If we have already reached the stake amount, there is nothing left to run beyond here.
-    if (remainingAmountToStake === 0n) {
-      continue;
-    }
-
-    // 3b. Add the input.
-    spendHelper.addInput(
-      utxo,
-      new TransferableInput(
-        utxo.utxoId,
-        utxo.assetId,
-        new StakeableLockIn(
-          // StakeableLockOut
-          new BigIntPr(utxoInfo.stakeableLocktime),
-          TransferInput.fromNative(
-            // TransferOutput
-            utxoInfo.amount,
-            sigData.sigIndicies,
-          ),
-        ),
-      ),
-    );
-
-    // 3c. Consume the locked asset and get the remaining amount.
-    const remainingAmount = spendHelper.consumeLockedAsset(
-      utxoInfo.assetId,
-      utxoInfo.amount,
-    );
-
-    // 3d. Add the stake output.
-    spendHelper.addStakedOutput(
-      new TransferableOutput(
-        utxo.assetId,
-        new StakeableLockOut(
-          new BigIntPr(utxoInfo.stakeableLocktime),
-          new TransferOutput(
-            new BigIntPr(utxoInfo.amount - remainingAmount),
-            utxo.getOutputOwners(),
-          ),
-        ),
-      ),
-    );
-
-    // 3e. Add the change output if there is any remaining amount.
-    if (remainingAmount > 0n) {
-      spendHelper.addChangeOutput(
-        new TransferableOutput(
-          utxo.assetId,
-          new StakeableLockOut(
-            new BigIntPr(utxoInfo.stakeableLocktime),
-            new TransferOutput(
-              new BigIntPr(remainingAmount),
-              utxo.getOutputOwners(),
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-  // 4. Add all remaining stake amounts assuming they are unlocked.
-  for (const [assetId, amount] of state.toStake) {
-    if (amount === 0n) {
-      continue;
-    }
-
-    spendHelper.addStakedOutput(
-      TransferableOutput.fromNative(
-        assetId,
-        amount,
-        state.spendOptions.changeAddresses,
-      ),
-    );
-  }
-
-  return state;
-};
-
-export const useUnlockedUTXOs: SpendReducerFunction = (
-  state,
-  spendHelper,
-  context,
-) => {
-  // 1. Filter out the UTXOs that are not usable.
-  const usableUTXOs: Utxo<TransferOutput | StakeableLockOut<TransferOutput>>[] =
-    state.utxos
-      // Filter out non stakeable lockouts and lockouts that are not stakeable yet.
-      .filter(
-        (
-          utxo,
-        ): utxo is Utxo<TransferOutput | StakeableLockOut<TransferOutput>> => {
-          if (isTransferOut(utxo.output)) {
-            return true;
-          }
-
-          if (isStakeableLockOut(utxo.output)) {
-            if (!isTransferOut(utxo.output.transferOut)) {
-              throw IncorrectStakeableLockOutError;
-            }
-
-            return (
-              utxo.output.getLocktime() < state.spendOptions.minIssuanceTime
-            );
-          }
-
-          return false;
-        },
-      );
-
-  // 2. Verify signatures match.
-  const verifiedUsableUTXOs = verifySignaturesMatch(
-    usableUTXOs,
-    (utxo) =>
-      isTransferOut(utxo.output) ? utxo.output : utxo.output.transferOut,
-    state.fromAddresses,
-    state.spendOptions,
-  );
-
-  // 3. Split verified usable UTXOs into AVAX assetId UTXOs and other assetId UTXOs.
-  const [otherVerifiedUsableUTXOs, avaxVerifiedUsableUTXOs] =
-    verifiedUsableUTXOs.reduce(
-      (result, { sigData, data: utxo }) => {
-        if (utxo.assetId.value() === context.avaxAssetID) {
-          return [result[0], [...result[1], { sigData, data: utxo }]];
-        }
-
-        return [[...result[0], { sigData, data: utxo }], result[1]];
-      },
-      [[], []] as [
-        other: typeof verifiedUsableUTXOs,
-        avax: typeof verifiedUsableUTXOs,
-      ],
-    );
-
-  // 4. Handle all the non-AVAX asset UTXOs first.
-  for (const { sigData, data: utxo } of otherVerifiedUsableUTXOs) {
-    const utxoInfo = getUtxoInfo(utxo);
-    const remainingAmountToBurn: bigint =
-      state.toBurn.get(utxoInfo.assetId) ?? 0n;
-    const remainingAmountToStake: bigint =
-      state.toStake.get(utxoInfo.assetId) ?? 0n;
-
-    // 4a. If we have already reached the burn/stake amount, there is nothing left to run beyond here.
-    if (remainingAmountToBurn === 0n && remainingAmountToStake === 0n) {
-      continue;
-    }
-
-    // 4b. Add the input.
-    spendHelper.addInput(
-      utxo,
-      new TransferableInput(
-        utxo.utxoId,
-        utxo.assetId,
-        TransferInput.fromNative(utxoInfo.amount, sigData.sigIndicies),
-      ),
-    );
-
-    // 4c. Consume the asset and get the remaining amount.
-    const remainingAmount = spendHelper.consumeAsset(
-      utxoInfo.assetId,
-      utxoInfo.amount,
-    );
-
-    // 4d. If "amountToStake" is greater than 0, add the stake output.
-    // TODO: Implement or determine if needed.
-
-    // 4e. Add the change output if there is any remaining amount.
-    if (remainingAmount > 0n) {
-      spendHelper.addChangeOutput(
-        new TransferableOutput(
-          utxo.assetId,
-          new TransferableOutput(
-            utxo.assetId,
-            new TransferOutput(
-              new BigIntPr(remainingAmount),
-              OutputOwners.fromNative(
-                state.spendOptions.changeAddresses,
-                0n,
-                1,
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-  }
-
-  // 5. Handle AVAX asset UTXOs last to account for fees.
-  let excessAVAX = state.excessAVAX;
-  let clearOwnerOverride = false;
-  for (const { sigData, data: utxo } of avaxVerifiedUsableUTXOs) {
-    const requiredFee = spendHelper.calculateFee();
-
-    // If we don't need to burn or stake additional AVAX and we have
-    // consumed enough AVAX to pay the required fee, we should stop
-    // consuming UTXOs.
-    if (
-      !spendHelper.shouldConsumeAsset(context.avaxAssetID) &&
-      excessAVAX >= requiredFee
-    ) {
-      break;
-    }
-
-    const utxoInfo = getUtxoInfo(utxo);
-
-    spendHelper.addInput(
-      utxo,
-      new TransferableInput(
-        utxo.utxoId,
-        utxo.assetId,
-        TransferInput.fromNative(utxoInfo.amount, sigData.sigIndicies),
-      ),
-    );
-
-    const remainingAmount = spendHelper.consumeAsset(
-      context.avaxAssetID,
-      utxoInfo.amount,
-    );
-
-    excessAVAX += remainingAmount;
-
-    // The ownerOverride is no longer needed. Clear it.
-    clearOwnerOverride = true;
-  }
-
-  return {
-    ...state,
-    excessAVAX,
-    ownerOverride: clearOwnerOverride ? null : state.ownerOverride,
-  };
-};
-
-export const handleFee: SpendReducerFunction = (
-  state,
-  spendHelper,
-  context,
-) => {
-  const requiredFee = spendHelper.calculateFee();
-
-  if (state.excessAVAX < requiredFee) {
-    throw new Error(
-      `Insufficient funds: provided UTXOs need ${
-        requiredFee - state.excessAVAX
-      } more nAVAX (asset id: ${context.avaxAssetID})`,
-    );
-  }
-
-  // No need to add a change output.
-  if (state.excessAVAX === requiredFee) {
-    return state;
-  }
-
-  // Use the change owner override if it exists, otherwise use the default change owner.
-  // This is used for import transactions.
-  const changeOwners =
-    state.ownerOverride ||
-    OutputOwners.fromNative(state.spendOptions.changeAddresses);
-
-  // TODO: Clean-up if this is no longer needed.
-  // Additionally, no need for public .addOutputComplexity().
-  //
-  // Pre-consolidation code.
-  //
-  // spendHelper.addOutputComplexity(
-  //   new TransferableOutput(
-  //     Id.fromString(context.avaxAssetID),
-  //     new TransferOutput(new BigIntPr(0n), changeOwners),
-  //   ),
-  // );
-  //
-  // Recalculate the fee with the change output.
-  // const requiredFeeWithChange = spendHelper.calculateFee();
-
-  // Calculate the fee with a temporary output complexity if a change output is needed.
-  const requiredFeeWithChange: bigint = spendHelper.hasChangeOutput(
-    context.avaxAssetID,
-    changeOwners,
-  )
-    ? requiredFee
-    : spendHelper.calculateFeeWithTemporaryOutputComplexity(
-        new TransferableOutput(
-          Id.fromString(context.avaxAssetID),
-          new TransferOutput(new BigIntPr(0n), changeOwners),
-        ),
-      );
-
-  // Add a change output if needed.
-  if (state.excessAVAX > requiredFeeWithChange) {
-    // It is worth adding the change output.
-    spendHelper.addChangeOutput(
-      new TransferableOutput(
-        Id.fromString(context.avaxAssetID),
-        new TransferOutput(
-          new BigIntPr(state.excessAVAX - requiredFeeWithChange),
-          changeOwners,
-        ),
-      ),
-    );
-  }
-
-  return state;
-};
-
 /**
  * Processes the spending of assets, including burning and staking, from a list of UTXOs.
  *
@@ -470,8 +93,10 @@ export const handleFee: SpendReducerFunction = (
  * @param {SpendReducerFunction[]} spendReducers - The list of functions that will be executed to process the spend operation.
  * @param {Context} context - The context in which the spend operation is executed.
  *
- * @returns {[null, SpendResult] | [Error, null]} - A tuple where the first element is either null or an error,
+ * @returns {SpendResult} - A tuple where the first element is either null or an error,
  * and the second element is either the result of the spend operation or null.
+ *
+ * @throws {Error} - Thrown error or an unexpected error if is not an instance of Error.
  */
 export const spend = (
   {
@@ -487,9 +112,7 @@ export const spend = (
   }: SpendProps,
   spendReducers: readonly SpendReducerFunction[],
   context: Context,
-):
-  | [error: null, inputsAndOutputs: SpendResult]
-  | [error: Error, inputsAndOutputs: null] => {
+): SpendResult => {
   try {
     const changeOwners =
       ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
@@ -521,24 +144,24 @@ export const spend = (
     const spendReducerFunctions: readonly SpendReducerFunction[] = [
       ...spendReducers,
       // useSpendableLockedUTXOs,
+      // TODO: Should we just default include this? Used on every builder.
       // useUnlockedUTXOs,
       verifyAssetsConsumed,
-      handleFee,
+      handleFeeAndChange,
       // Consolidation and sorting happens in the SpendHelper.
     ];
 
     // Run all the spend calculation reducer logic.
-    spendReducerFunctions.reduce((state, next) => {
-      return next(state, spendHelper, context);
+    spendReducerFunctions.reduce((state, reducer) => {
+      return reducer(state, spendHelper, context);
     }, initialState);
 
-    return [null, spendHelper.getInputsOutputs()];
+    return spendHelper.getInputsOutputs();
   } catch (error) {
-    return [
-      error instanceof Error
-        ? error
-        : new Error('An unexpected error occurred during spend calculation'),
-      null,
-    ];
+    if (error instanceof Error) {
+      throw error;
+    }
+
+    throw new Error('An unexpected error occurred during spend calculation');
   }
 };

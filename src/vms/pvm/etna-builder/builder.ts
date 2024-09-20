@@ -65,7 +65,8 @@ import {
   getOwnerComplexity,
   getSignerComplexity,
 } from '../txs/fee';
-import { spend, useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend';
+import { spend } from './spend';
+import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 
 const getAddressMaps = ({
   inputs,
@@ -156,7 +157,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     outputComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses,
@@ -169,10 +170,6 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -319,7 +316,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     outputComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: importedAvax,
       fromAddresses,
@@ -331,10 +328,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
 
@@ -397,7 +390,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     outputComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses,
@@ -409,10 +402,6 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -476,7 +465,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
     ownerComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -487,10 +476,6 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -588,7 +573,7 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
     authComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -599,10 +584,6 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -682,7 +663,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
     authComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -693,10 +674,6 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -765,7 +742,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
     authComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -776,10 +753,6 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -933,7 +906,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     delegatorOwnerComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -946,10 +919,6 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs, stakeOutputs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -1083,7 +1052,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     ownerComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -1096,10 +1065,6 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs, stakeOutputs } = spendResults;
   const addressMaps = getAddressMaps({
@@ -1198,7 +1163,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
     ownerComplexity,
   );
 
-  const [error, spendResults] = spend(
+  const spendResults = spend(
     {
       excessAVAX: 0n,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -1209,10 +1174,6 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
     [useUnlockedUTXOs],
     context,
   );
-
-  if (error) {
-    throw error;
-  }
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
   const addressMaps = getAddressMaps({
