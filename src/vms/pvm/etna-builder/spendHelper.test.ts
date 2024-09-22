@@ -231,113 +231,113 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
         }).toThrow('Amount to consume must be greater than or equal to 0');
       });
     });
+  });
 
-    describe('SpendHelper.consumeAsset', () => {
-      const testCases = [
-        {
-          description: 'consumes the full amount',
-          toBurn: new Map([['asset', 1n]]),
-          asset: 'asset',
-          amount: 1n,
-          expected: 0n,
-        },
-        {
-          description: 'consumes a partial amount',
-          toBurn: new Map([['asset', 1n]]),
-          asset: 'asset',
-          amount: 2n,
-          expected: 1n,
-        },
-        {
-          description: 'consumes nothing',
-          toBurn: new Map([['asset', 1n]]),
-          asset: 'asset',
-          amount: 0n,
-          expected: 0n,
-        },
-        {
-          description: 'consumes nothing when asset not in toBurn',
-          toBurn: new Map(),
-          asset: 'asset',
-          amount: 1n,
-          expected: 1n,
-        },
-        {
-          description: 'consumes nothing when asset in toBurn with 0 value',
-          toBurn: new Map([['asset', 0n]]),
-          asset: 'asset',
-          amount: 1n,
-          expected: 1n,
-        },
-        {
-          description: 'consumes nothing when asset in toStake with 0 value',
-          toBurn: new Map([['asset', 1n]]),
-          toStake: new Map([['asset', 0n]]),
-          asset: 'asset',
-          amount: 1n,
-          expected: 0n,
-        },
-      ];
+  describe('SpendHelper.consumeAsset', () => {
+    const testCases = [
+      {
+        description: 'consumes the full amount',
+        toBurn: new Map([['asset', 1n]]),
+        asset: 'asset',
+        amount: 1n,
+        expected: 0n,
+      },
+      {
+        description: 'consumes a partial amount',
+        toBurn: new Map([['asset', 1n]]),
+        asset: 'asset',
+        amount: 2n,
+        expected: 1n,
+      },
+      {
+        description: 'consumes nothing',
+        toBurn: new Map([['asset', 1n]]),
+        asset: 'asset',
+        amount: 0n,
+        expected: 0n,
+      },
+      {
+        description: 'consumes nothing when asset not in toBurn',
+        toBurn: new Map(),
+        asset: 'asset',
+        amount: 1n,
+        expected: 1n,
+      },
+      {
+        description: 'consumes nothing when asset in toBurn with 0 value',
+        toBurn: new Map([['asset', 0n]]),
+        asset: 'asset',
+        amount: 1n,
+        expected: 1n,
+      },
+      {
+        description: 'consumes nothing when asset in toStake with 0 value',
+        toBurn: new Map([['asset', 1n]]),
+        toStake: new Map([['asset', 0n]]),
+        asset: 'asset',
+        amount: 1n,
+        expected: 0n,
+      },
+    ];
 
-      test.each(testCases)(
-        '$description',
-        ({ toBurn, asset, amount, expected }) => {
-          const spendHelper = new SpendHelper({
-            ...DEFAULT_PROPS,
-            toBurn,
-          });
+    test.each(testCases)(
+      '$description',
+      ({ toBurn, asset, amount, expected }) => {
+        const spendHelper = new SpendHelper({
+          ...DEFAULT_PROPS,
+          toBurn,
+        });
 
-          expect(spendHelper.consumeAsset(asset, amount)).toBe(expected);
-        },
-      );
+        expect(spendHelper.consumeAsset(asset, amount)).toBe(expected);
+      },
+    );
 
-      test('throws an error when amount is negative', () => {
-        const spendHelper = new SpendHelper(DEFAULT_PROPS);
+    test('throws an error when amount is negative', () => {
+      const spendHelper = new SpendHelper(DEFAULT_PROPS);
 
-        expect(() => {
-          spendHelper.consumeAsset('asset', -1n);
-        }).toThrow('Amount to consume must be greater than or equal to 0');
+      expect(() => {
+        spendHelper.consumeAsset('asset', -1n);
+      }).toThrow('Amount to consume must be greater than or equal to 0');
+    });
+  });
+
+  describe('SpendHelper.verifyAssetsConsumed', () => {
+    test('returns null when all assets consumed', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+        toBurn: new Map([['asset', 0n]]),
+        toStake: new Map([['asset', 0n]]),
       });
+
+      expect(spendHelper.verifyAssetsConsumed()).toBe(null);
     });
 
-    describe('SpendHelper.verifyAssetsConsumed', () => {
-      test('returns null when all assets consumed', () => {
-        const spendHelper = new SpendHelper({
-          ...DEFAULT_PROPS,
-          toBurn: new Map([['asset', 0n]]),
-          toStake: new Map([['asset', 0n]]),
-        });
-
-        expect(spendHelper.verifyAssetsConsumed()).toBe(null);
+    test('returns an error when stake assets not consumed', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+        toBurn: new Map([['test-asset', 1n]]),
+        toStake: new Map([['test-asset', 1n]]),
       });
 
-      test('returns an error when stake assets not consumed', () => {
-        const spendHelper = new SpendHelper({
-          ...DEFAULT_PROPS,
-          toBurn: new Map([['test-asset', 1n]]),
-          toStake: new Map([['test-asset', 1n]]),
-        });
+      expect(spendHelper.verifyAssetsConsumed()).toEqual(
+        new Error(
+          'Insufficient funds! Provided UTXOs need 1 more units of asset test-asset to stake',
+        ),
+      );
+    });
 
-        expect(spendHelper.verifyAssetsConsumed()).toEqual(
-          new Error(
-            'Insufficient funds! Provided UTXOs need 1 more units of asset test-asset to stake',
-          ),
-        );
+    test('returns an error when burn assets not consumed', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+        toBurn: new Map([['test-asset', 1n]]),
+        toStake: new Map([['test-asset', 0n]]),
       });
 
-      test('returns an error when burn assets not consumed', () => {
-        const spendHelper = new SpendHelper({
-          ...DEFAULT_PROPS,
-          toBurn: new Map([['test-asset', 1n]]),
-          toStake: new Map([['test-asset', 0n]]),
-        });
-
-        expect(spendHelper.verifyAssetsConsumed()).toEqual(
-          new Error(
-            'Insufficient funds! Provided UTXOs need 1 more units of asset test-asset',
-          ),
-        );
-      });
+      expect(spendHelper.verifyAssetsConsumed()).toEqual(
+        new Error(
+          'Insufficient funds! Provided UTXOs need 1 more units of asset test-asset',
+        ),
+      );
     });
   });
 
