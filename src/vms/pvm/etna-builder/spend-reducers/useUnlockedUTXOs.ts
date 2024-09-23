@@ -15,7 +15,32 @@ import {
 } from '../../../../utils';
 import { verifySignaturesMatch } from '../../../utils/calculateSpend/utils';
 import { IncorrectStakeableLockOutError } from './errors';
-import type { SpendReducerFunction } from './types';
+import type { SpendReducerFunction, SpendReducerState } from './types';
+
+/**
+ * Is responsible for filtering out the usable UTXOs from the list of UTXOs.
+ *
+ * @internal - Only exported for testing.
+ */
+export const getUsableUTXOsFilter =
+  (state: SpendReducerState) =>
+  (
+    utxo: Utxo,
+  ): utxo is Utxo<TransferOutput | StakeableLockOut<TransferOutput>> => {
+    if (isTransferOut(utxo.output)) {
+      return true;
+    }
+
+    if (isStakeableLockOut(utxo.output)) {
+      if (!isTransferOut(utxo.output.transferOut)) {
+        throw IncorrectStakeableLockOutError;
+      }
+
+      return utxo.output.getLocktime() < state.spendOptions.minIssuanceTime;
+    }
+
+    return false;
+  };
 
 export const useUnlockedUTXOs: SpendReducerFunction = (
   state,
@@ -26,27 +51,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
   const usableUTXOs: Utxo<TransferOutput | StakeableLockOut<TransferOutput>>[] =
     state.utxos
       // Filter out non stakeable lockouts and lockouts that are not stakeable yet.
-      .filter(
-        (
-          utxo,
-        ): utxo is Utxo<TransferOutput | StakeableLockOut<TransferOutput>> => {
-          if (isTransferOut(utxo.output)) {
-            return true;
-          }
-
-          if (isStakeableLockOut(utxo.output)) {
-            if (!isTransferOut(utxo.output.transferOut)) {
-              throw IncorrectStakeableLockOutError;
-            }
-
-            return (
-              utxo.output.getLocktime() < state.spendOptions.minIssuanceTime
-            );
-          }
-
-          return false;
-        },
-      );
+      .filter(getUsableUTXOsFilter(state));
 
   // 2. Verify signatures match.
   const verifiedUsableUTXOs = verifySignaturesMatch(
