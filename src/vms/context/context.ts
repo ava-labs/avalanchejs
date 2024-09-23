@@ -31,7 +31,8 @@ export const getContextFromURI = async (
   const { blockchainID: pBlockchainID } = await info.getBlockchainId('P');
   const { blockchainID: cBlockchainID } = await info.getBlockchainId('C');
 
-  const { networkID } = await info.getNetworkId();
+  const { networkID: networkIDstring } = await info.getNetworkId();
+  const networkID = Number(networkIDstring);
 
   return Object.freeze({
     xBlockchainID,
