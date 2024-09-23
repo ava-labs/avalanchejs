@@ -1,9 +1,12 @@
 import { addTxSignatures, networkIDs, pvm, utils } from '../../../src';
 import { getEnvVars } from '../../utils/getEnvVars';
 import { getEtnaContextFromURI } from './utils/etna-context';
+import { getRandomNodeId } from './utils/random-node-id';
 
 const AMOUNT_TO_VALIDATE_AVAX: number = 1;
 const DAYS_TO_VALIDATE: number = 21;
+
+const nodeId = getRandomNodeId();
 
 const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
@@ -21,8 +24,6 @@ const main = async () => {
   const endTime = new Date(startTime.timestamp);
   endTime.setDate(endTime.getDate() + DAYS_TO_VALIDATE);
   const end: bigint = BigInt(endTime.getTime() / 1_000);
-
-  const nodeId = 'NodeID-HKLp5269LH8DcrLvNDoJquQs2w1LwLCga';
 
   const publicKey = utils.hexToBuffer(
     '0x8f95423f7142d00a48e1014a3de8d28907d420dc33b3052a6dee03a3f2941a393c2351e354704ca66a3fc29870282e15',
@@ -58,4 +59,6 @@ const main = async () => {
   return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-main().then(console.log);
+main()
+  .then(console.log)
+  .then(() => console.log('Validate node ID:', nodeId));

@@ -3,7 +3,7 @@ import { getEnvVars } from '../../utils/getEnvVars';
 import { getEtnaContextFromURI } from './utils/etna-context';
 
 const AMOUNT_TO_DELEGATE_AVAX: number = 1;
-const DAYS_TO_DELEGATE: number = 21;
+const DAYS_TO_DELEGATE: number = 14;
 
 const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
@@ -22,7 +22,8 @@ const main = async () => {
   endTime.setDate(endTime.getDate() + DAYS_TO_DELEGATE);
   const end: bigint = BigInt(endTime.getTime() / 1_000);
 
-  const nodeId = 'NodeID-HKLp5269LH8DcrLvHPc2PHjGczBQD3td4';
+  // TODO: Get this from an argument.
+  const nodeId = 'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M';
 
   const tx = pvm.e.newAddPermissionlessDelegatorTx(
     {
