@@ -1,5 +1,6 @@
 import { testContext } from '../../../../../fixtures/context';
 import { Address, OutputOwners } from '../../../../../serializable';
+import type { SpendOptions } from '../../../../common';
 import { defaultSpendOptions } from '../../../../common/defaultSpendOptions';
 import { createDimensions } from '../../../../common/fees/dimensions';
 import type { SpendHelperProps } from '../../spendHelper';
@@ -13,9 +14,12 @@ export const CHANGE_OWNERS: OutputOwners = OutputOwners.fromNative([
   CHANGE_ADDRESS.toBytes(),
 ]);
 
-export const getInitialReducerState = (
-  state: Partial<SpendReducerState> = {},
-): SpendReducerState => ({
+export const getInitialReducerState = ({
+  spendOptions,
+  ...state
+}: Partial<Omit<SpendReducerState, 'spendOptions'>> & {
+  spendOptions?: SpendOptions;
+} = {}): SpendReducerState => ({
   excessAVAX: 0n,
   initialComplexity: createDimensions(1, 1, 1, 1),
   fromAddresses: [CHANGE_ADDRESS],
@@ -24,6 +28,7 @@ export const getInitialReducerState = (
     state?.fromAddresses?.map((address) => address.toBytes()) ?? [
       CHANGE_ADDRESS.toBytes(),
     ],
+    spendOptions,
   ),
   toBurn: new Map(),
   toStake: new Map(),
