@@ -7,6 +7,12 @@ import {
   getInitialReducerState,
   getSpendHelper,
 } from './fixtures/reducers';
+import {
+  BigIntPr,
+  Id,
+  TransferOutput,
+  TransferableOutput,
+} from '../../../../serializable';
 
 describe('handleFeeAndChange', () => {
   test('throws an error if excessAVAX is less than the required fee', () => {
@@ -25,15 +31,11 @@ describe('handleFeeAndChange', () => {
     const state = getInitialReducerState({ excessAVAX: 4n });
     const spendHelper = getSpendHelper();
     const addChangeOutputSpy = jest.spyOn(spendHelper, 'addChangeOutput');
-    const calculateFeeWithTemporaryOutputComplexitySpy = jest.spyOn(
-      spendHelper,
-      'calculateFeeWithTemporaryOutputComplexity',
-    );
+    const calculateFeeSpy = jest.spyOn(spendHelper, 'calculateFee');
 
-    expect(handleFeeAndChange(state, getSpendHelper(), testContext)).toEqual(
-      state,
-    );
-    expect(calculateFeeWithTemporaryOutputComplexitySpy).not.toHaveBeenCalled();
+    expect(handleFeeAndChange(state, spendHelper, testContext)).toEqual(state);
+    expect(calculateFeeSpy).toHaveBeenCalledTimes(1);
+    expect(calculateFeeSpy).toHaveBeenCalledWith();
     expect(addChangeOutputSpy).not.toHaveBeenCalled();
   });
 
@@ -45,17 +47,18 @@ describe('handleFeeAndChange', () => {
     const spendHelper = getSpendHelper();
 
     const addChangeOutputSpy = jest.spyOn(spendHelper, 'addChangeOutput');
-    const calculateFeeWithTemporaryOutputComplexitySpy = jest.spyOn(
-      spendHelper,
-      'calculateFeeWithTemporaryOutputComplexity',
-    );
+    const calculateFeeSpy = jest.spyOn(spendHelper, 'calculateFee');
 
     expect(handleFeeAndChange(state, spendHelper, testContext)).toEqual({
       ...state,
       excessAVAX,
     });
-    expect(calculateFeeWithTemporaryOutputComplexitySpy).toHaveBeenCalledTimes(
-      1,
+    expect(calculateFeeSpy).toHaveBeenCalledTimes(2);
+    expect(calculateFeeSpy).toHaveBeenCalledWith(
+      new TransferableOutput(
+        Id.fromString(testContext.avaxAssetID),
+        new TransferOutput(new BigIntPr(0n), CHANGE_OWNERS),
+      ),
     );
     expect(addChangeOutputSpy).toHaveBeenCalledTimes(1);
 

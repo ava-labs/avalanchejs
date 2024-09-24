@@ -72,17 +72,16 @@ export const handleFeeAndChange: SpendReducerFunction = (
     } else {
       // Calculate the fee with a temporary output complexity
       // as if we added the change output.
-      const requiredFeeWithChangeOutput =
-        spendHelper.calculateFeeWithTemporaryOutputComplexity(
-          new TransferableOutput(
-            Id.fromString(context.avaxAssetID),
-            new TransferOutput(new BigIntPr(0n), changeOwners),
-          ),
-        );
+      const requiredFeeWithChangeOutput = spendHelper.calculateFee(
+        new TransferableOutput(
+          Id.fromString(context.avaxAssetID),
+          new TransferOutput(new BigIntPr(0n), changeOwners),
+        ),
+      );
 
       // If the excess AVAX is greater than the new fee, add a change output.
       // Otherwise, ignore and burn the excess because it can't be returned
-      // (ie we can't pay the fee to return the excess).
+      // (ie there is no point in adding a change output if you can't afford to add it).
       if (state.excessAVAX > requiredFeeWithChangeOutput) {
         spendHelper.addChangeOutput(
           new TransferableOutput(

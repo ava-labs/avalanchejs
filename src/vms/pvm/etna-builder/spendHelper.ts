@@ -41,8 +41,6 @@ export class SpendHelper {
 
   private changeOutputs: readonly TransferableOutput[];
   private inputs: readonly TransferableInput[];
-  private inputComplexity: Dimensions = createEmptyDimensions();
-  private outputComplexity: Dimensions = createEmptyDimensions();
   private stakeOutputs: readonly TransferableOutput[];
 
   private inputUTXOs: readonly Utxo[] = [];
@@ -78,13 +76,6 @@ export class SpendHelper {
    * @returns {SpendHelper} The current instance of SpendHelper for chaining.
    */
   addInput(utxo: Utxo, transferableInput: TransferableInput): SpendHelper {
-    const newInputComplexity = getInputComplexity([transferableInput]);
-
-    this.inputComplexity = addDimensions(
-      this.inputComplexity,
-      newInputComplexity,
-    );
-
     this.inputs = [...this.inputs, transferableInput];
     this.inputUTXOs = [...this.inputUTXOs, utxo];
 
@@ -118,29 +109,19 @@ export class SpendHelper {
   }
 
   /**
-   * Adds a transferable output to the SpendHelper.
-   *
-   * @param {TransferableOutput} transferableOutput - The transferable output to be added.
-   * @returns {SpendHelper} The current instance of SpendHelper for chaining.
+   * When computing the complexity/fee of a transaction that needs change but doesn't yet have
+   * a corresponding change output, `additionalComplexity` may be used to calculate the complexity
+   * and therefore the fee as if the change output was already added.
    */
-  addOutputComplexity(transferableOutput: TransferableOutput): SpendHelper {
-    const newOutputComplexity = getOutputComplexity([transferableOutput]);
-
-    this.outputComplexity = addDimensions(
-      this.outputComplexity,
-      newOutputComplexity,
-    );
-
-    return this;
-  }
-
-  private getComplexity(): Dimensions {
+  private getComplexity(
+    additionalComplexity: Dimensions = createEmptyDimensions(),
+  ): Dimensions {
     return addDimensions(
       this.initialComplexity,
       getInputComplexity(this.inputs),
       getOutputComplexity(this.changeOutputs),
       getOutputComplexity(this.stakeOutputs),
-      this.outputComplexity,
+      additionalComplexity,
     );
   }
 
@@ -231,28 +212,22 @@ export class SpendHelper {
 
   /**
    * Calculates the fee for the SpendHelper based on its complexity and gas price.
+   * Provide an empty change output as a parameter to calculate the fee as if the change output was already added.
    *
+   * @param {TransferableOutput} additionalOutput - The change output that has not yet been added to the SpendHelper.
    * @returns {bigint} The fee for the SpendHelper.
    */
-  calculateFee(): bigint {
+  calculateFee(additionalOutput?: TransferableOutput): bigint {
     this.consolidateOutputs();
 
-    const gas = dimensionsToGas(this.getComplexity(), this.weights);
+    const gas = dimensionsToGas(
+      this.getComplexity(
+        additionalOutput ? getOutputComplexity([additionalOutput]) : undefined,
+      ),
+      this.weights,
+    );
 
     return gas * this.gasPrice;
-  }
-
-  calculateFeeWithTemporaryOutputComplexity(
-    transferableOutput: TransferableOutput,
-  ): bigint {
-    const oldOutputComplexity = this.outputComplexity;
-    this.addOutputComplexity(transferableOutput);
-
-    const fee = this.calculateFee();
-
-    this.outputComplexity = oldOutputComplexity;
-
-    return fee;
   }
 
   /**

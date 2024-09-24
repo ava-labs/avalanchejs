@@ -61,10 +61,6 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
       stakeOutputs: [],
     });
 
-    spendHelper.addOutputComplexity(transferableOutput());
-
-    expect(spendHelper.calculateFee()).toBe(339n);
-
     const inputUtxo = utxo();
     const inputTransferableInput = transferableInput();
 
@@ -72,7 +68,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [],
-      fee: 1251n,
+      fee: 942n,
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [],
@@ -84,7 +80,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [changeOutput],
-      fee: 1560n,
+      fee: 1251n,
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [],
@@ -96,7 +92,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [changeOutput],
-      fee: 1869n,
+      fee: 1560n,
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [stakeOutput],
@@ -397,9 +393,9 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     const temporaryOutput = transferableOutput();
 
-    expect(
-      spendHelper.calculateFeeWithTemporaryOutputComplexity(temporaryOutput),
-    ).toBeGreaterThan(originalFee);
+    expect(spendHelper.calculateFee(temporaryOutput)).toBeGreaterThan(
+      originalFee,
+    );
 
     expect(spendHelper.calculateFee()).toBe(originalFee);
   });

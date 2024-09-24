@@ -63,19 +63,31 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
   );
 
   // 3. Split verified usable UTXOs into AVAX assetId UTXOs and other assetId UTXOs.
-  const [otherVerifiedUsableUTXOs, avaxVerifiedUsableUTXOs] =
-    verifiedUsableUTXOs.reduce(
-      (result, { sigData, data: utxo }) => {
-        if (utxo.assetId.value() === context.avaxAssetID) {
-          return [result[0], [...result[1], { sigData, data: utxo }]];
+  const { otherVerifiedUsableUTXOs, avaxVerifiedUsableUTXOs } =
+    verifiedUsableUTXOs.reduce<{
+      avaxVerifiedUsableUTXOs: typeof verifiedUsableUTXOs;
+      otherVerifiedUsableUTXOs: typeof verifiedUsableUTXOs;
+    }>(
+      (result, verifiedUsableUTXO) => {
+        if (verifiedUsableUTXO.data.assetId.value() === context.avaxAssetID) {
+          return {
+            ...result,
+            avaxVerifiedUsableUTXOs: [
+              ...result.avaxVerifiedUsableUTXOs,
+              verifiedUsableUTXO,
+            ],
+          };
         }
 
-        return [[...result[0], { sigData, data: utxo }], result[1]];
+        return {
+          ...result,
+          otherVerifiedUsableUTXOs: [
+            ...result.otherVerifiedUsableUTXOs,
+            verifiedUsableUTXO,
+          ],
+        };
       },
-      [[], []] as [
-        other: typeof verifiedUsableUTXOs,
-        avax: typeof verifiedUsableUTXOs,
-      ],
+      { otherVerifiedUsableUTXOs: [], avaxVerifiedUsableUTXOs: [] },
     );
 
   // 4. Handle all the non-AVAX asset UTXOs first.

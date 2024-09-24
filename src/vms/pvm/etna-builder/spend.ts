@@ -58,7 +58,7 @@ export type SpendProps = Readonly<{
    */
   ownerOverride?: OutputOwners | null;
   /**
-   * Whether to consolidate outputs.
+   * Whether to consolidate change and stake outputs.
    *
    * @default false
    */
@@ -100,7 +100,7 @@ export type SpendProps = Readonly<{
  */
 export const spend = (
   {
-    excessAVAX: _excessAVAX = 0n,
+    excessAVAX = 0n,
     fromAddresses,
     initialComplexity,
     ownerOverride,
@@ -116,7 +116,6 @@ export const spend = (
   try {
     const changeOwners =
       ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
-    const excessAVAX: bigint = _excessAVAX;
 
     const spendHelper = new SpendHelper({
       changeOutputs: [],
@@ -143,9 +142,6 @@ export const spend = (
 
     const spendReducerFunctions: readonly SpendReducerFunction[] = [
       ...spendReducers,
-      // useSpendableLockedUTXOs,
-      // TODO: Should we just default include this? Used on every builder.
-      // useUnlockedUTXOs,
       verifyAssetsConsumed,
       handleFeeAndChange,
       // Consolidation and sorting happens in the SpendHelper.
