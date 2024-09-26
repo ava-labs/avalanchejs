@@ -235,7 +235,12 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
   const { importedInputs, importedAmounts } = utxos
-    .filter((utxo): utxo is Utxo<TransferOutput> => isTransferOut(utxo.output))
+    .filter(
+      (utxo): utxo is Utxo<TransferOutput> =>
+        isTransferOut(utxo.output) &&
+        // Currently - only AVAX is allowed to be imported to the P-Chain
+        utxo.assetId.toString() === context.avaxAssetID,
+    )
     .reduce<{
       importedInputs: TransferableInput[];
       importedAmounts: Record<string, bigint>;

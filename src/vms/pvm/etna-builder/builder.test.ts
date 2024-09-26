@@ -940,7 +940,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
   });
 
   describe('ImportTx', () => {
-    it('should create an ImportTx with both AVAX and non-AVAX assets', () => {
+    it('should create an ImportTx with only AVAX and not non-AVAX assets', () => {
       const utxos = [
         getLockedUTXO(), // Locked and should be ignored.
         getNotTransferOutput(), // Invalid and should be ignored.
@@ -982,14 +982,9 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           testContext.networkID,
           testContext.pBlockchainID,
           [
-            // "Other" assets are first. Sorted by TransferableInput.compare
-            TransferableOutput.fromNative('mars', BigInt(9 * 1e9), [
-              testAddress1,
-            ]),
-            TransferableOutput.fromNative('jupiter', BigInt(26 * 1e9), [
-              testAddress1,
-            ]),
-            // AVAX come last.
+            // Only AVAX asset here.
+            // _If_ we did p-chain did support other assets, they would come first,
+            // sorted by TransferableInput.compare.
             TransferableOutput.fromNative(
               testContext.avaxAssetID,
               BigInt((35 + 28) * 1e9) - expectedFee,
@@ -1003,9 +998,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         [
           TransferableInput.fromUtxoAndSigindicies(utxos[2], [0]),
           TransferableInput.fromUtxoAndSigindicies(utxos[3], [0]),
-          TransferableInput.fromUtxoAndSigindicies(utxos[4], [0]),
-          TransferableInput.fromUtxoAndSigindicies(utxos[5], [0]),
-          TransferableInput.fromUtxoAndSigindicies(utxos[6], [0]),
         ],
       );
 
