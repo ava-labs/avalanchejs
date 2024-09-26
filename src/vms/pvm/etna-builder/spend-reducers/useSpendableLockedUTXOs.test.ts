@@ -162,30 +162,6 @@ describe('useSpendableLockedUTXOs', () => {
     expect(stakeOutputs).toHaveLength(0);
   });
 
-  it('should add stake outputs even with no UTXOs', () => {
-    const toBurn = new Map();
-    const toStake = new Map([[testContext.avaxAssetID, 1_000n]]);
-
-    const initialState = getInitialReducerState({
-      excessAVAX: 0n,
-      spendOptions: {
-        minIssuanceTime: 100n,
-      },
-      toBurn,
-      toStake,
-      utxos: [],
-    });
-
-    const spendHelper = getSpendHelper({ toBurn, toStake });
-
-    useSpendableLockedUTXOs(initialState, spendHelper, testContext);
-    const { stakeOutputs } = spendHelper.getInputsOutputs();
-
-    expect(stakeOutputs).toHaveLength(1);
-    expect(stakeOutputs[0].assetId.toString()).toEqual(testContext.avaxAssetID);
-    expect(stakeOutputs[0].amount()).toEqual(1_000n);
-  });
-
   it('should add spendable locked UTXO with change', () => {
     const toBurn = new Map();
     const toStake = new Map([[testAvaxAssetID.toString(), 1_000n]]);

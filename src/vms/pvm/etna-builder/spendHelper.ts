@@ -160,9 +160,12 @@ export class SpendHelper {
    *
    * @param {string} assetId - The ID of the asset to consume.
    * @param {bigint} amount - The amount of the asset to consume.
-   * @returns {bigint} The remaining amount of the asset after consumption.
+   * @returns A tuple of the remaining amount in the first position and the amount to stake in the second position.
    */
-  consumeLockedAsset(assetId: string, amount: bigint): bigint {
+  consumeLockedAsset(
+    assetId: string,
+    amount: bigint,
+  ): [remainingAmount: bigint, amountToStake: bigint] {
     if (amount < 0n) {
       throw new Error('Amount to consume must be greater than or equal to 0');
     }
@@ -179,7 +182,7 @@ export class SpendHelper {
 
     this.toStake.set(assetId, remainingAmountToStake - amountToStake);
 
-    return amount - amountToStake;
+    return [amount - amountToStake, amountToStake];
   }
 
   /**
@@ -187,9 +190,12 @@ export class SpendHelper {
    *
    * @param {string} assetId - The ID of the asset to consume.
    * @param {bigint} amount - The amount of the asset to consume.
-   * @returns {bigint} The remaining amount of the asset after consumption.
+   * @returns A tuple of the remaining amount in the first position and the amount to stake in the second position.
    */
-  consumeAsset(assetId: string, amount: bigint): bigint {
+  consumeAsset(
+    assetId: string,
+    amount: bigint,
+  ): [remainingAmount: bigint, amountToStake: bigint] {
     if (amount < 0n) {
       throw new Error('Amount to consume must be greater than or equal to 0');
     }

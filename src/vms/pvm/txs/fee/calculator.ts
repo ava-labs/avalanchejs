@@ -10,8 +10,6 @@ import { getTxComplexity } from './complexity';
  * transaction must pay for valid inclusion into a block.
  */
 export const calculateFee = (
-  // TODO: Do we need this to be UnsignedTx?
-  // If so, we can use .getTx() to get the Transaction.
   tx: Transaction,
   weights: Dimensions,
   price: bigint,

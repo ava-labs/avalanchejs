@@ -188,7 +188,6 @@ export const getOwnerComplexity = (outputOwners: OutputOwners): Dimensions => {
  * It does not include the typeID of the credential.
  */
 export const getAuthComplexity = (input: Serializable): Dimensions => {
-  // TODO: Not a fan of this. May be better to re-type `subnetAuth` as `Input` in `AddSubnetValidatorTx`?
   if (!(input instanceof Input)) {
     throw new Error(
       'Unable to calculate auth complexity of transaction. Expected Input as subnet auth.',

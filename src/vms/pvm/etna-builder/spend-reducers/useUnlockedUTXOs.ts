@@ -90,6 +90,12 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       { otherVerifiedUsableUTXOs: [], avaxVerifiedUsableUTXOs: [] },
     );
 
+  const changeOwner = OutputOwners.fromNative(
+    state.spendOptions.changeAddresses,
+    0n,
+    1,
+  );
+
   // 4. Handle all the non-AVAX asset UTXOs first.
   for (const { sigData, data: utxo } of otherVerifiedUsableUTXOs) {
     const utxoInfo = getUtxoInfo(utxo);
@@ -114,30 +120,27 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
     );
 
     // 4c. Consume the asset and get the remaining amount.
-    const remainingAmount = spendHelper.consumeAsset(
+    const [remainingAmount, amountToStake] = spendHelper.consumeAsset(
       utxoInfo.assetId,
       utxoInfo.amount,
     );
 
     // 4d. If "amountToStake" is greater than 0, add the stake output.
-    // TODO: Implement or determine if needed.
+    if (amountToStake > 0n) {
+      spendHelper.addStakedOutput(
+        new TransferableOutput(
+          utxo.assetId,
+          new TransferOutput(new BigIntPr(amountToStake), changeOwner),
+        ),
+      );
+    }
 
     // 4e. Add the change output if there is any remaining amount.
     if (remainingAmount > 0n) {
       spendHelper.addChangeOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferableOutput(
-            utxo.assetId,
-            new TransferOutput(
-              new BigIntPr(remainingAmount),
-              OutputOwners.fromNative(
-                state.spendOptions.changeAddresses,
-                0n,
-                1,
-              ),
-            ),
-          ),
+          new TransferOutput(new BigIntPr(remainingAmount), changeOwner),
         ),
       );
     }
@@ -170,10 +173,19 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       ),
     );
 
-    const remainingAmount = spendHelper.consumeAsset(
+    const [remainingAmount, amountToStake] = spendHelper.consumeAsset(
       context.avaxAssetID,
       utxoInfo.amount,
     );
+
+    if (amountToStake > 0n) {
+      spendHelper.addStakedOutput(
+        new TransferableOutput(
+          utxo.assetId,
+          new TransferOutput(new BigIntPr(amountToStake), changeOwner),
+        ),
+      );
+    }
 
     excessAVAX += remainingAmount;
 

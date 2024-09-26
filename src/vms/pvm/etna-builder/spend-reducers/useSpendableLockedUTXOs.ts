@@ -33,7 +33,7 @@ export const getUsableUTXOsFilter =
     }
 
     // 1b. Ensure UTXO is stakeable.
-    if (!(state.spendOptions.minIssuanceTime < utxo.output.getLocktime())) {
+    if (state.spendOptions.minIssuanceTime >= utxo.output.getLocktime()) {
       return false;
     }
 
@@ -43,7 +43,7 @@ export const getUsableUTXOsFilter =
     }
 
     // 1d. Filter out UTXOs that aren't needed for staking.
-    if ((state.toStake.get(utxo.assetId.value()) ?? 0n) === 0n) {
+    if (!state.toStake.has(utxo.assetId.value())) {
       return false;
     }
 
@@ -85,19 +85,14 @@ export const useSpendableLockedUTXOs: SpendReducerFunction = (
         utxo.utxoId,
         utxo.assetId,
         new StakeableLockIn(
-          // StakeableLockOut
           new BigIntPr(utxoInfo.stakeableLocktime),
-          TransferInput.fromNative(
-            // TransferOutput
-            utxoInfo.amount,
-            sigData.sigIndicies,
-          ),
+          TransferInput.fromNative(utxoInfo.amount, sigData.sigIndicies),
         ),
       ),
     );
 
     // 3c. Consume the locked asset and get the remaining amount.
-    const remainingAmount = spendHelper.consumeLockedAsset(
+    const [remainingAmount] = spendHelper.consumeLockedAsset(
       utxoInfo.assetId,
       utxoInfo.amount,
     );
@@ -131,21 +126,6 @@ export const useSpendableLockedUTXOs: SpendReducerFunction = (
         ),
       );
     }
-  }
-
-  // 4. Add all remaining stake amounts assuming they are unlocked.
-  for (const [assetId, amount] of state.toStake) {
-    if (amount === 0n) {
-      continue;
-    }
-
-    spendHelper.addStakedOutput(
-      TransferableOutput.fromNative(
-        assetId,
-        amount,
-        state.spendOptions.changeAddresses,
-      ),
-    );
   }
 
   return state;

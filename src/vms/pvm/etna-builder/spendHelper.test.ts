@@ -167,65 +167,65 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
       expect(spendHelper.shouldConsumeAsset('asset')).toBe(false);
     });
+  });
 
-    describe('SpendHelper.consumeLockedAsset', () => {
-      const testCases = [
-        {
-          description: 'consumes the full amount',
-          toStake: new Map([['asset', 1n]]),
-          asset: 'asset',
-          amount: 1n,
-          expected: 0n,
-        },
-        {
-          description: 'consumes a partial amount',
-          toStake: new Map([['asset', 1n]]),
-          asset: 'asset',
-          amount: 2n,
-          expected: 1n,
-        },
-        {
-          description: 'consumes nothing',
-          toStake: new Map([['asset', 1n]]),
-          asset: 'asset',
-          amount: 0n,
-          expected: 0n,
-        },
-        {
-          description: 'consumes nothing when asset not in toStake',
-          toStake: new Map(),
-          asset: 'asset',
-          amount: 1n,
-          expected: 1n,
-        },
-        {
-          description: 'consumes nothing when asset in toStake with 0 value',
-          toStake: new Map([['asset', 0n]]),
-          asset: 'asset',
-          amount: 1n,
-          expected: 1n,
-        },
-      ];
+  describe('SpendHelper.consumeLockedAsset', () => {
+    const testCases = [
+      {
+        description: 'consumes the full amount',
+        toStake: new Map([['asset', 1n]]),
+        asset: 'asset',
+        amount: 1n,
+        expected: 0n,
+      },
+      {
+        description: 'consumes a partial amount',
+        toStake: new Map([['asset', 1n]]),
+        asset: 'asset',
+        amount: 2n,
+        expected: 1n,
+      },
+      {
+        description: 'consumes nothing',
+        toStake: new Map([['asset', 1n]]),
+        asset: 'asset',
+        amount: 0n,
+        expected: 0n,
+      },
+      {
+        description: 'consumes nothing when asset not in toStake',
+        toStake: new Map(),
+        asset: 'asset',
+        amount: 1n,
+        expected: 1n,
+      },
+      {
+        description: 'consumes nothing when asset in toStake with 0 value',
+        toStake: new Map([['asset', 0n]]),
+        asset: 'asset',
+        amount: 1n,
+        expected: 1n,
+      },
+    ];
 
-      test.each(testCases)(
-        '$description',
-        ({ toStake, asset, amount, expected }) => {
-          const spendHelper = new SpendHelper({
-            ...DEFAULT_PROPS,
-            toStake,
-          });
+    test.each(testCases)(
+      '$description',
+      ({ toStake, asset, amount, expected }) => {
+        const spendHelper = new SpendHelper({
+          ...DEFAULT_PROPS,
+          toStake,
+        });
 
-          expect(spendHelper.consumeLockedAsset(asset, amount)).toBe(expected);
-        },
-      );
+        expect(spendHelper.consumeLockedAsset(asset, amount)[0]).toBe(expected);
+      },
+    );
 
-      test('throws an error when amount is negative', () => {
-        const spendHelper = new SpendHelper(DEFAULT_PROPS);
+    test('throws an error when amount is negative', () => {
+      const spendHelper = new SpendHelper(DEFAULT_PROPS);
 
-        expect(() => {
-          spendHelper.consumeLockedAsset('asset', -1n);
-        }).toThrow('Amount to consume must be greater than or equal to 0');
-      });
+      expect(() => {
+        spendHelper.consumeLockedAsset('asset', -1n);
+      }).toThrow('Amount to consume must be greater than or equal to 0');
     });
   });
 
@@ -284,7 +284,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
           toBurn,
         });
 
-        expect(spendHelper.consumeAsset(asset, amount)).toBe(expected);
+        expect(spendHelper.consumeAsset(asset, amount)[0]).toBe(expected);
       },
     );
 
