@@ -9,6 +9,7 @@ import {
   PlatformChainID,
   PrimaryNetworkID,
 } from '../../../constants/networkIDs';
+import type { TransferOutput } from '../../../serializable';
 import {
   Input,
   NodeId,
@@ -233,43 +234,48 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
-  const importedInputs: TransferableInput[] = [];
-  const importedAmounts: Record<string, bigint> = {};
+  const { importedInputs, importedAmounts } = utxos
+    .filter((utxo): utxo is Utxo<TransferOutput> => isTransferOut(utxo.output))
+    .reduce<{
+      importedInputs: TransferableInput[];
+      importedAmounts: Record<string, bigint>;
+    }>(
+      (acc, utxo) => {
+        const { sigIndicies: inputSigIndices } =
+          matchOwners(
+            utxo.getOutputOwners(),
+            fromAddresses,
+            defaultedOptions.minIssuanceTime,
+          ) || {};
 
-  for (const utxo of utxos) {
-    const out = utxo.output;
+        if (inputSigIndices === undefined) {
+          // We couldn't spend this UTXO, so we skip to the next one.
+          return acc;
+        }
 
-    if (!isTransferOut(out)) {
-      continue;
-    }
+        const assetId = utxo.getAssetId();
 
-    const { sigIndicies: inputSigIndices } =
-      matchOwners(
-        utxo.getOutputOwners(),
-        fromAddresses,
-        defaultedOptions.minIssuanceTime,
-      ) || {};
-
-    if (inputSigIndices === undefined) {
-      // We couldn't spend this UTXO, so we skip to the next one.
-      continue;
-    }
-
-    importedInputs.push(
-      new TransferableInput(
-        utxo.utxoId,
-        utxo.assetId,
-        new TransferInput(
-          out.amt,
-          new Input(inputSigIndices.map((value) => new Int(value))),
-        ),
-      ),
+        return {
+          importedInputs: [
+            ...acc.importedInputs,
+            new TransferableInput(
+              utxo.utxoId,
+              utxo.assetId,
+              new TransferInput(
+                utxo.output.amt,
+                new Input(inputSigIndices.map((value) => new Int(value))),
+              ),
+            ),
+          ],
+          importedAmounts: {
+            ...acc.importedAmounts,
+            [assetId]:
+              (acc.importedAmounts[assetId] ?? 0n) + utxo.output.amount(),
+          },
+        };
+      },
+      { importedInputs: [], importedAmounts: {} },
     );
-
-    const assetId = utxo.getAssetId();
-
-    importedAmounts[assetId] = (importedAmounts[assetId] ?? 0n) + out.amount();
-  }
 
   if (importedInputs.length === 0) {
     throw new Error('no UTXOs available to import');
@@ -277,7 +283,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 
   const importedAvax = importedAmounts[context.avaxAssetID];
 
-  importedInputs.sort(TransferableInput.compare);
   const addressMaps = AddressMaps.fromTransferableInputs(
     importedInputs,
     utxos,
@@ -285,14 +290,9 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     fromAddressesBytes,
   );
 
-  const outputs: TransferableOutput[] = [];
-
-  for (const [assetID, amount] of Object.entries(importedAmounts)) {
-    if (assetID === context.avaxAssetID) {
-      continue;
-    }
-
-    outputs.push(
+  const outputs: TransferableOutput[] = Object.entries(importedAmounts)
+    .filter(([assetID]) => assetID !== context.avaxAssetID)
+    .map(([assetID, amount]) =>
       TransferableOutput.fromNative(
         assetID,
         amount,
@@ -301,7 +301,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
         threshold,
       ),
     );
-  }
 
   const memoComplexity = getMemoComplexity(defaultedOptions);
 
@@ -341,7 +340,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
         new Bytes(defaultedOptions.memo),
       ),
       Id.fromString(sourceChainId),
-      importedInputs,
+      importedInputs.sort(TransferableInput.compare),
     ),
     inputUTXOs,
     addressMaps,

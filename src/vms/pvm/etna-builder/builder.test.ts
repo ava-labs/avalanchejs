@@ -1,5 +1,7 @@
 import { testContext as _testContext } from '../../../fixtures/context';
 import {
+  getLockedUTXO,
+  getNotTransferOutput,
   getTransferableInputForTest,
   getTransferableOutForTest,
   getValidUtxo,
@@ -931,6 +933,80 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         Id.fromHex(testSubnetId),
         Input.fromNative(subnetAuth),
         getRewardsOwners(),
+      );
+
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
+  });
+
+  describe('ImportTx', () => {
+    it('should create an ImportTx with both AVAX and non-AVAX assets', () => {
+      const utxos = [
+        getLockedUTXO(), // Locked and should be ignored.
+        getNotTransferOutput(), // Invalid and should be ignored.
+        // AVAX Assets
+        getValidUtxo(new BigIntPr(BigInt(35 * 1e9)), testAvaxAssetID),
+        getValidUtxo(new BigIntPr(BigInt(28 * 1e9)), testAvaxAssetID),
+        // Non-AVAX Assets (Jupiter)
+        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), Id.fromString('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), Id.fromString('jupiter')),
+        // Non-AVAX Asset (Mars)
+        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
+      ];
+
+      const unsignedTx = newImportTx(
+        {
+          fromAddressesBytes,
+          sourceChainId: testContext.cBlockchainID,
+          toAddresses: [testAddress1],
+          utxos,
+        },
+        testContext,
+      );
+
+      const { baseTx, ins: importedIns } = unsignedTx.getTx() as ImportTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          additionalInputs: importedIns,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new ImportTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [
+            // "Other" assets are first. Sorted by TransferableInput.compare
+            TransferableOutput.fromNative('mars', BigInt(9 * 1e9), [
+              testAddress1,
+            ]),
+            TransferableOutput.fromNative('jupiter', BigInt(26 * 1e9), [
+              testAddress1,
+            ]),
+            // AVAX come last.
+            TransferableOutput.fromNative(
+              testContext.avaxAssetID,
+              BigInt((35 + 28) * 1e9) - expectedFee,
+              [testAddress1],
+            ),
+          ],
+          [],
+          new Uint8Array(),
+        ),
+        Id.fromString(testContext.cBlockchainID),
+        [
+          TransferableInput.fromUtxoAndSigindicies(utxos[2], [0]),
+          TransferableInput.fromUtxoAndSigindicies(utxos[3], [0]),
+          TransferableInput.fromUtxoAndSigindicies(utxos[4], [0]),
+          TransferableInput.fromUtxoAndSigindicies(utxos[5], [0]),
+          TransferableInput.fromUtxoAndSigindicies(utxos[6], [0]),
+        ],
       );
 
       expectTxs(unsignedTx.getTx(), expectedTx);
