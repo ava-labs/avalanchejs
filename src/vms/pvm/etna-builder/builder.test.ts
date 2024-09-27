@@ -234,7 +234,12 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
 
     test('newImportTx', () => {
-      const utxos = testUtxos();
+      const VALID_AMOUNT = BigInt(50 * 1e9);
+      const utxos = [
+        getLockedUTXO(),
+        getNotTransferOutput(),
+        getValidUtxo(new BigIntPr(VALID_AMOUNT)),
+      ];
 
       const unsignedTx = newImportTx(
         {
@@ -271,8 +276,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           [
             TransferableOutput.fromNative(
               testContext.avaxAssetID,
-              // TODO: How to remove this "magic" number. How do we calculate it correctly from utxos?
-              50_000_000_000n - expectedFee,
+              VALID_AMOUNT - expectedFee,
               [testAddress1],
             ),
           ],
@@ -287,10 +291,16 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
 
     test('newExportTx', () => {
-      const utxos = testUtxos();
+      const VALID_AMOUNT = BigInt(50 * 1e9);
+      const OUT_AMOUNT = BigInt(5 * 1e9);
+      const utxos = [
+        getLockedUTXO(),
+        getNotTransferOutput(),
+        getValidUtxo(new BigIntPr(VALID_AMOUNT)),
+      ];
       const tnsOut = TransferableOutput.fromNative(
         testContext.avaxAssetID,
-        BigInt(5 * 1e9),
+        OUT_AMOUNT,
         [toAddress],
       );
 
@@ -329,8 +339,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           [
             TransferableOutput.fromNative(
               testContext.avaxAssetID,
-              // TODO: Remove magic number. How to calculate it correctly from utxos?
-              45_000_000_000n - expectedFee,
+              VALID_AMOUNT - OUT_AMOUNT - expectedFee,
               fromAddressesBytes,
             ),
           ],
