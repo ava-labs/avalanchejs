@@ -3,6 +3,11 @@ import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
 
+/**
+ * Number of bytes per short.
+ */
+export const SHORT_LEN = 2;
+
 @serializable()
 export class Short extends Primitives {
   _type = TypeSymbols.Short;
@@ -11,7 +16,10 @@ export class Short extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Short, Uint8Array] {
-    return [new Short(bufferToNumber(buf.slice(0, 2))), buf.slice(2)];
+    return [
+      new Short(bufferToNumber(buf.slice(0, SHORT_LEN))),
+      buf.slice(SHORT_LEN),
+    ];
   }
 
   toJSON() {
@@ -19,7 +27,7 @@ export class Short extends Primitives {
   }
 
   toBytes() {
-    return padLeft(hexToBuffer(this.short.toString(16)), 2);
+    return padLeft(hexToBuffer(this.short.toString(16)), SHORT_LEN);
   }
 
   value() {

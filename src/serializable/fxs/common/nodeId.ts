@@ -6,6 +6,12 @@ import { Primitives } from '../../primitives/primatives';
 import { TypeSymbols } from '../../constants';
 
 export const NodeIDPrefix = 'NodeID-';
+
+/**
+ * Number of bytes per NodeId.
+ */
+export const SHORT_ID_LEN = 20;
+
 @serializable()
 export class NodeId extends Primitives {
   _type = TypeSymbols.NodeId;
@@ -14,7 +20,7 @@ export class NodeId extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [NodeId, Uint8Array] {
-    return [new NodeId(buf.slice(0, 20)), buf.slice(20)];
+    return [new NodeId(buf.slice(0, SHORT_ID_LEN)), buf.slice(SHORT_ID_LEN)];
   }
 
   [customInspectSymbol](_, options: any) {
@@ -22,7 +28,7 @@ export class NodeId extends Primitives {
   }
 
   toBytes() {
-    return padLeft(this.idVal, 20);
+    return padLeft(this.idVal, SHORT_ID_LEN);
   }
 
   toJSON() {

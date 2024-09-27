@@ -14,9 +14,10 @@ import {
 } from '../serializable/fxs/secp256k1';
 import { BigIntPr, Int, Bytes } from '../serializable/primitives';
 import { StakeableLockIn, StakeableLockOut } from '../serializable/pvm';
-import { hexToBuffer } from '../utils';
+import { hexToBuffer, unpackWithManager } from '../utils';
 import { testContext } from './context';
 import { stringToBytes } from '@scure/base';
+import type { VM } from '../serializable';
 
 export const cAddressForTest = '0xfd4DFC8f567caD8a275989982c5f8f1fC82B7563';
 export const privateKeyForTest =
@@ -190,3 +191,9 @@ export const getOutputForTest = () =>
     new BigIntPr(BigInt(0.1 * 1e9)),
     Id.fromString(testContext.avaxAssetID),
   );
+
+export const txHexToTransaction = (vm: VM, txHex: string) => {
+  const txBytes = hexToBuffer(txHex);
+
+  return unpackWithManager(vm, txBytes);
+};

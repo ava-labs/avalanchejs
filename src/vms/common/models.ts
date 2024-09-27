@@ -1,6 +1,6 @@
 export type SpendOptions = {
   minIssuanceTime?: bigint;
-  changeAddresses?: Uint8Array[];
+  changeAddresses?: readonly Uint8Array[];
   threshold?: number;
   memo?: Uint8Array;
   locktime?: bigint;

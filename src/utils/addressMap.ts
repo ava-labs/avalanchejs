@@ -96,10 +96,10 @@ export class AddressMaps {
   // this is a stopgap to quickly fix AddressMap not deriving the order post sorting TransferableInputs. Can probably
   // be simplified a lot by just deriving the sigIndicies right before returning the unsingedTx
   static fromTransferableInputs(
-    inputs: TransferableInput[],
-    inputUtxos: Utxo[],
+    inputs: readonly TransferableInput[],
+    inputUtxos: readonly Utxo[],
     minIssuanceTime: bigint,
-    fromAddressesBytes?: Uint8Array[],
+    fromAddressesBytes?: readonly Uint8Array[],
   ) {
     const utxoMap = inputUtxos.reduce((agg, utxo) => {
       return agg.set(utxo.utxoId.ID(), utxo);

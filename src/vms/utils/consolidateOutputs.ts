@@ -46,7 +46,7 @@ const combine = (a: TransferableOutput, b: TransferableOutput) => {
 };
 
 export const consolidateOutputs = (
-  outputs: TransferableOutput[],
+  outputs: readonly TransferableOutput[],
 ): TransferableOutput[] => {
   return consolidate(outputs, canCombine, combine);
 };

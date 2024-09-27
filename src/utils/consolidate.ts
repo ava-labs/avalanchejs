@@ -9,7 +9,7 @@
  * @returns an array combined elements
  */
 export const consolidate = <T>(
-  arr: T[],
+  arr: readonly T[],
   canCombine: (a: T, b: T) => boolean,
   combine: (a: T, b: T) => T,
 ): T[] => {

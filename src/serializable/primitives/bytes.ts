@@ -33,4 +33,13 @@ export class Bytes extends Primitives {
   toBytes() {
     return concatBytes(bytesForInt(this.bytes.length), this.bytes);
   }
+
+  /**
+   * Returns the length of the bytes (Uint8Array).
+   *
+   * Useful for calculating tx complexity.
+   */
+  get length() {
+    return this.bytes.length;
+  }
 }

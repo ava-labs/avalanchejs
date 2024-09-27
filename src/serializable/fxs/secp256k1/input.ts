@@ -16,7 +16,7 @@ export class Input {
 
   constructor(private readonly sigIndices: Int[]) {}
 
-  static fromNative(sigIndicies: number[]) {
+  static fromNative(sigIndicies: readonly number[]) {
     return new Input(sigIndicies.map((i) => new Int(i)));
   }
 

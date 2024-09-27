@@ -4,6 +4,9 @@ import * as secp from '@noble/secp256k1';
 import { Address } from 'micro-eth-signer';
 import { concatBytes, hexToBuffer } from '../utils/buffer';
 
+/** Number of bytes per signature */
+export const SIGNATURE_LENGTH = 65;
+
 export function randomPrivateKey() {
   return secp.utils.randomPrivateKey();
 }

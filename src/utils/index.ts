@@ -11,6 +11,7 @@ export * from './addChecksum';
 export * from './addressMap';
 export * from './getTransferableInputsByTx';
 export * from './getTransferableOutputsByTx';
+export * from './getUtxoInfo';
 export * from './getBurnedAmountByTx';
 export * from './validateBurnedAmount';
 export { unpackWithManager, getManagerForVM, packTx } from './packTx';

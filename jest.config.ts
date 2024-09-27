@@ -15,4 +15,7 @@ module.exports = {
   testEnvironment: 'node',
   coverageProvider: 'v8',
   extensionsToTreatAsEsm: ['.ts'],
+  // Experimental to fix issues with BigInt serialization
+  // See: https://jestjs.io/docs/configuration#workerthreads
+  workerThreads: true,
 };

@@ -31,8 +31,8 @@ export const baseTxUnsafeAvm = (
  */
 export const baseTxUnsafePvm = (
   context: Context,
-  changeOutputs: TransferableOutput[],
-  inputs: TransferableInput[],
+  changeOutputs: readonly TransferableOutput[],
+  inputs: readonly TransferableInput[],
   memo: Uint8Array,
 ) => {
   return AvaxBaseTx.fromNative(

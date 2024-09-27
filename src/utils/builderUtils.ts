@@ -11,8 +11,8 @@ type GetImportedInputsFromUtxosOutput = {
 };
 
 export const getImportedInputsFromUtxos = (
-  utxos: Utxo[],
-  fromAddressesBytes: Uint8Array[],
+  utxos: readonly Utxo[],
+  fromAddressesBytes: readonly Uint8Array[],
   minIssuanceTime: bigint,
 ): GetImportedInputsFromUtxosOutput => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);

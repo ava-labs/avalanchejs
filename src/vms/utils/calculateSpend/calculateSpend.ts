@@ -4,7 +4,11 @@ import type { Address } from '../../../serializable/fxs/common';
 import { AddressMaps } from '../../../utils/addressMap';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import type { SpendOptionsRequired } from '../../common';
-import type { UTXOCalculationFn, UTXOCalculationResult } from './models';
+import type {
+  UTXOCalculationFn,
+  UTXOCalculationResult,
+  UTXOCalculationState,
+} from './models';
 
 export const defaultSpendResult = (): UTXOCalculationResult => ({
   inputs: [],
@@ -21,7 +25,7 @@ export const defaultSpendResult = (): UTXOCalculationResult => ({
  * @param state the state from previous action function
  * @returns UTXOCalculationResult
  */
-function deepCopyState(state) {
+function deepCopyState(state: UTXOCalculationState): UTXOCalculationState {
   return {
     ...state,
     amountsToBurn: new Map([...state.amountsToBurn]),
@@ -57,7 +61,7 @@ export function calculateUTXOSpend(
   options: SpendOptionsRequired,
   utxoCalculationFns: [UTXOCalculationFn, ...UTXOCalculationFn[]],
 ): UTXOCalculationResult {
-  const startState = {
+  const startState: UTXOCalculationState = {
     amountsToBurn,
     utxos,
     amountsToStake,
@@ -102,7 +106,7 @@ export function calculateUTXOSpend(
         stakeOutputs.sort(compareTransferableOutputs);
         return { stakeOutputs, ...state };
       },
-      function getAdressMaps({ inputs, inputUTXOs, ...state }) {
+      function getAddressMaps({ inputs, inputUTXOs, ...state }) {
         const addressMaps = AddressMaps.fromTransferableInputs(
           inputs,
           inputUTXOs,
@@ -111,21 +115,20 @@ export function calculateUTXOSpend(
         );
         return { inputs, inputUTXOs, ...state, addressMaps };
       },
-    ] as UTXOCalculationFn[]
+    ] satisfies UTXOCalculationFn[]
   ).reduce((state, next) => {
     // to prevent mutation we deep copy the arrays and maps before passing off to
     // the next operator
     return next(deepCopyState(state));
   }, startState);
-  const {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    amountsToBurn: _amountsToBurn,
-    amountsToStake: _amountsToStake,
-    fromAddresses: _fromAddresses,
-    options: _options,
-    utxos: _utxos,
-    /* eslint-enable @typescript-eslint/no-unused-vars */
-    ...calculationResults
-  } = result;
-  return calculationResults;
+
+  const calculationResult: UTXOCalculationResult = {
+    inputs: result.inputs,
+    inputUTXOs: result.inputUTXOs,
+    stakeOutputs: result.stakeOutputs,
+    changeOutputs: result.changeOutputs,
+    addressMaps: result.addressMaps,
+  };
+
+  return calculationResult;
 }
