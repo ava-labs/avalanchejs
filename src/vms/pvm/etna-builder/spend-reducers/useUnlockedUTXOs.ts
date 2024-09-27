@@ -27,19 +27,18 @@ export const getUsableUTXOsFilter =
   (
     utxo: Utxo,
   ): utxo is Utxo<TransferOutput | StakeableLockOut<TransferOutput>> => {
-    if (isTransferOut(utxo.output)) {
-      return true;
+    if (!(isStakeableLockOut(utxo.output) || isTransferOut(utxo.output))) {
+      return false;
     }
 
-    if (isStakeableLockOut(utxo.output)) {
-      if (!isTransferOut(utxo.output.transferOut)) {
-        throw IncorrectStakeableLockOutError;
-      }
-
-      return utxo.output.getLocktime() < state.spendOptions.minIssuanceTime;
+    if (
+      isStakeableLockOut(utxo.output) &&
+      !isTransferOut(utxo.output.transferOut)
+    ) {
+      throw IncorrectStakeableLockOutError;
     }
 
-    return false;
+    return utxo.output.getLocktime() < state.spendOptions.minIssuanceTime;
   };
 
 export const useUnlockedUTXOs: SpendReducerFunction = (
