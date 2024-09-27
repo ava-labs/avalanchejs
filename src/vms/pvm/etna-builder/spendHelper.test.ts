@@ -99,11 +99,13 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
     });
   });
 
-  describe('SpendHelper.shouldConsumeLockedAsset', () => {
+  describe('SpendHelper.shouldConsumeLockedStakeableAsset', () => {
     test('returns false for asset not in toStake', () => {
       const spendHelper = new SpendHelper(DEFAULT_PROPS);
 
-      expect(spendHelper.shouldConsumeLockedAsset('asset')).toBe(false);
+      expect(spendHelper.shouldConsumeLockedStakeableAsset('asset')).toBe(
+        false,
+      );
     });
 
     test('returns false for asset in toStake with 0 value', () => {
@@ -112,7 +114,9 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
         toStake: new Map([['asset', 0n]]),
       });
 
-      expect(spendHelper.shouldConsumeLockedAsset('asset')).toBe(false);
+      expect(spendHelper.shouldConsumeLockedStakeableAsset('asset')).toBe(
+        false,
+      );
     });
 
     test('returns true for asset in toStake with non-0 value', () => {
@@ -121,7 +125,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
         toStake: new Map([['asset', 1n]]),
       });
 
-      expect(spendHelper.shouldConsumeLockedAsset('asset')).toBe(true);
+      expect(spendHelper.shouldConsumeLockedStakeableAsset('asset')).toBe(true);
     });
   });
 
@@ -169,7 +173,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
     });
   });
 
-  describe('SpendHelper.consumeLockedAsset', () => {
+  describe('SpendHelper.consumeLockedStakeableAsset', () => {
     const testCases = [
       {
         description: 'consumes the full amount',
@@ -216,7 +220,9 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
           toStake,
         });
 
-        expect(spendHelper.consumeLockedAsset(asset, amount)[0]).toBe(expected);
+        expect(spendHelper.consumeLockedStakableAsset(asset, amount)[0]).toBe(
+          expected,
+        );
       },
     );
 
@@ -224,7 +230,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
       const spendHelper = new SpendHelper(DEFAULT_PROPS);
 
       expect(() => {
-        spendHelper.consumeLockedAsset('asset', -1n);
+        spendHelper.consumeLockedStakableAsset('asset', -1n);
       }).toThrow('Amount to consume must be greater than or equal to 0');
     });
   });

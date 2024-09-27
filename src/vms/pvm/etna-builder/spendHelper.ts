@@ -133,12 +133,12 @@ export class SpendHelper {
   }
 
   /**
-   * Determines if a locked asset should be consumed based on its asset ID.
+   * Determines if a locked stakeable asset should be consumed based on its asset ID.
    *
    * @param {string} assetId - The ID of the asset to check.
    * @returns {boolean} - Returns true if the asset should be consumed, false otherwise.
    */
-  shouldConsumeLockedAsset(assetId: string): boolean {
+  shouldConsumeLockedStakeableAsset(assetId: string): boolean {
     return this.toStake.has(assetId) && this.toStake.get(assetId) !== 0n;
   }
 
@@ -151,18 +151,18 @@ export class SpendHelper {
   shouldConsumeAsset(assetId: string): boolean {
     return (
       (this.toBurn.has(assetId) && this.toBurn.get(assetId) !== 0n) ||
-      this.shouldConsumeLockedAsset(assetId)
+      this.shouldConsumeLockedStakeableAsset(assetId)
     );
   }
 
   /**
-   * Consumes a locked asset based on its asset ID and amount.
+   * Consumes a locked stakeable asset based on its asset ID and amount.
    *
    * @param {string} assetId - The ID of the asset to consume.
    * @param {bigint} amount - The amount of the asset to consume.
    * @returns A tuple of the remaining amount in the first position and the amount to stake in the second position.
    */
-  consumeLockedAsset(
+  consumeLockedStakableAsset(
     assetId: string,
     amount: bigint,
   ): [remainingAmount: bigint, amountToStake: bigint] {
@@ -213,7 +213,7 @@ export class SpendHelper {
     this.toBurn.set(assetId, remainingAmountToBurn - amountToBurn);
 
     // Stake any remaining value that should be staked
-    return this.consumeLockedAsset(assetId, amount - amountToBurn);
+    return this.consumeLockedStakableAsset(assetId, amount - amountToBurn);
   }
 
   /**

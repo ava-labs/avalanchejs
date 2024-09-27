@@ -92,7 +92,7 @@ export const useSpendableLockedUTXOs: SpendReducerFunction = (
     );
 
     // 3c. Consume the locked asset and get the remaining amount.
-    const [remainingAmount] = spendHelper.consumeLockedAsset(
+    const [remainingAmount] = spendHelper.consumeLockedStakableAsset(
       utxoInfo.assetId,
       utxoInfo.amount,
     );
