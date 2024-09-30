@@ -15,3 +15,4 @@ export * from './getUtxoInfo';
 export * from './getBurnedAmountByTx';
 export * from './validateBurnedAmount';
 export { unpackWithManager, getManagerForVM, packTx } from './packTx';
+export * from './base58ToHex';
