@@ -52,7 +52,6 @@ export const getContextFromURI = async (
     hrp: getHRP(networkID),
 
     // TODO: Populate these values once they are exposed by the API
-    gasPrice: 0n,
     complexityWeights: createDimensions(1, 1, 1, 1),
   });
 };

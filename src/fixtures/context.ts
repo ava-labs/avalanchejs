@@ -19,6 +19,5 @@ export const testContext: Context = {
   hrp: 'avax',
 
   // TODO: Adjust these based on what we want for the tests.
-  gasPrice: 1n,
   complexityWeights: createDimensions(1, 1, 1, 1),
 };

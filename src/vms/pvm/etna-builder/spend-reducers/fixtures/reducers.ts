@@ -33,6 +33,7 @@ export const getInitialReducerState = ({
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
+  gasPrice: 1n,
   ...state,
 });
 
@@ -49,7 +50,7 @@ export const getSpendHelper = ({
 > = {}) => {
   return new SpendHelper({
     changeOutputs: [],
-    gasPrice: testContext.gasPrice,
+    gasPrice: 1n,
     initialComplexity,
     inputs: [],
     shouldConsolidateOutputs,

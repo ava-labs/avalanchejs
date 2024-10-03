@@ -5,6 +5,7 @@ import { hexToBuffer } from '../../utils';
 import type { GetAssetDescriptionResponse } from '../common/apiModels';
 import { AvaxApi } from '../common/avaxApi';
 import type {
+  FeeConfigResponse,
   GetBalanceParams,
   GetBalanceResponse,
   GetBlockchainsResponse,
@@ -214,5 +215,12 @@ export class PVMApi extends AvaxApi {
 
   validates(validatesParams: ValidatesParams): Promise<ValidatesResponse> {
     return this.callRpc<ValidatesResponse>('validates', validatesParams);
+  }
+
+  // Post-Etna API
+
+  // get feeConfig for P-Chain
+  getFeeConfig(): Promise<FeeConfigResponse> {
+    return this.callRpc<FeeConfigResponse>('getFeeConfig');
   }
 }

@@ -69,3 +69,7 @@ export type GetBlockchainIDResponse = {
 export type isBootstrapped = {
   isBootstrapped: boolean;
 };
+
+export type GetEtnaTimeResponse = {
+  etnaTime: string;
+};

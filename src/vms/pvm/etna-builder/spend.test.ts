@@ -39,6 +39,7 @@ const getInitialReducerState = (
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
+  gasPrice: 1n,
   ...state,
 });
 

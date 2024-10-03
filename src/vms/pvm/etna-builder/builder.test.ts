@@ -70,7 +70,6 @@ const testContext: Context = {
   ..._testContext,
 
   // Required context for post-Etna
-  gasPrice: 1n,
   complexityWeights: createDimensions(1, 10, 100, 1000),
 };
 
@@ -125,12 +124,14 @@ const checkFeeIsCorrect = ({
   unsignedTx,
   inputs,
   outputs,
+  gasPrice,
   additionalInputs = [],
   additionalOutputs = [],
 }: {
   unsignedTx: UnsignedTx;
   inputs: readonly TransferableInput[];
   outputs: readonly TransferableOutput[];
+  gasPrice: bigint;
   additionalInputs?: readonly TransferableInput[];
   additionalOutputs?: readonly TransferableOutput[];
 }): [
@@ -150,7 +151,7 @@ const checkFeeIsCorrect = ({
   const expectedFee = calculateFee(
     unsignedTx.getTx(),
     testContext.complexityWeights,
-    testContext.gasPrice,
+    gasPrice,
   );
 
   const expectedAmountBurned = addAmounts(
@@ -187,12 +188,14 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     {
       name: 'no memo',
       memo: undefined,
+      gasPrice: 10_000n,
     },
     {
       name: 'with memo',
       memo: Buffer.from('memo'),
+      gasPrice: 10_000n,
     },
-  ])('$name', ({ memo }) => {
+  ])('$name', ({ memo, gasPrice }) => {
     test('newBaseTx', () => {
       const utxos = testUtxos();
 
@@ -210,6 +213,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
             memo,
           },
           utxos,
+          gasPrice,
         },
         testContext,
       );
@@ -228,6 +232,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         unsignedTx: utx,
         inputs,
         outputs,
+        gasPrice,
       });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -250,6 +255,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           sourceChainId: testContext.cBlockchainID,
           toAddresses: [testAddress1],
           utxos,
+          gasPrice,
         },
         testContext,
       );
@@ -265,6 +271,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalInputs: importedIns,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -313,6 +320,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           },
           outputs: [tnsOut],
           utxos,
+          gasPrice,
         },
         testContext,
       );
@@ -328,6 +336,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: exportedOuts,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -364,6 +373,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           },
           subnetOwners: [toAddress],
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
+          gasPrice,
         },
         testContext,
       );
@@ -374,7 +384,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, gasPrice });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -408,6 +418,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           vmId: Id.fromHex(testVMId).toString(),
+          gasPrice,
         },
         testContext,
       );
@@ -418,7 +429,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, gasPrice });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -457,6 +468,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           start: 100n,
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: 1_800_000n,
+          gasPrice,
         },
         testContext,
       );
@@ -467,7 +479,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, gasPrice });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -505,6 +517,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetAuth: [0],
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
+          gasPrice,
         },
         testContext,
       );
@@ -515,7 +528,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, gasPrice });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -556,6 +569,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: PrimaryNetworkID.toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
+          gasPrice,
         },
         testContext,
       );
@@ -572,6 +586,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -622,6 +637,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
+          gasPrice,
         },
         testContext,
       );
@@ -638,6 +654,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -693,6 +710,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
             getValidUtxo(new BigIntPr(2n * stakeAmount), stakingAssetId),
           ],
           weight: stakeAmount,
+          gasPrice,
         },
         testContext,
       );
@@ -709,6 +727,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
+          gasPrice,
         });
 
       expect(stake.length).toEqual(1);
@@ -744,6 +763,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: PrimaryNetworkID.toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
+          gasPrice,
         },
         testContext,
       );
@@ -760,6 +780,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -803,6 +824,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
+          gasPrice,
         },
         testContext,
       );
@@ -819,6 +841,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -867,6 +890,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
             getValidUtxo(new BigIntPr(2n * stakeAmount), stakingAssetId),
           ],
           weight: stakeAmount,
+          gasPrice,
         },
         testContext,
       );
@@ -885,6 +909,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
+          gasPrice,
         });
 
       expect(stake.length).toEqual(1);
@@ -917,6 +942,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           subnetOwners: [toAddress],
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
+          gasPrice,
         },
         testContext,
       );
@@ -927,7 +953,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, gasPrice });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -950,6 +976,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
   describe('ImportTx', () => {
     it('should create an ImportTx with only AVAX and not non-AVAX assets', () => {
+      const gasPrice = 10_000n;
       const utxos = [
         getLockedUTXO(), // Locked and should be ignored.
         getNotTransferOutput(), // Invalid and should be ignored.
@@ -969,6 +996,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           sourceChainId: testContext.cBlockchainID,
           toAddresses: [testAddress1],
           utxos,
+          gasPrice,
         },
         testContext,
       );
@@ -982,6 +1010,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalInputs: importedIns,
+          gasPrice,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);

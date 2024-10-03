@@ -84,6 +84,7 @@ export type SpendProps = Readonly<{
    * List of UTXOs that are available to be spent.
    */
   utxos: readonly Utxo[];
+  gasPrice: bigint;
 }>;
 
 /**
@@ -109,6 +110,7 @@ export const spend = (
     toBurn = new Map(),
     toStake = new Map(),
     utxos,
+    gasPrice,
   }: SpendProps,
   spendReducers: readonly SpendReducerFunction[],
   context: Context,
@@ -119,7 +121,7 @@ export const spend = (
 
     const spendHelper = new SpendHelper({
       changeOutputs: [],
-      gasPrice: context.gasPrice,
+      gasPrice,
       initialComplexity,
       inputs: [],
       shouldConsolidateOutputs,
@@ -138,6 +140,7 @@ export const spend = (
       toBurn,
       toStake,
       utxos,
+      gasPrice,
     };
 
     const spendReducerFunctions: readonly SpendReducerFunction[] = [

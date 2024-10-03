@@ -18,6 +18,5 @@ export type Context = {
   readonly addSubnetDelegatorFee: bigint;
 
   // Post-etna
-  readonly gasPrice: bigint;
   readonly complexityWeights: Dimensions;
 };

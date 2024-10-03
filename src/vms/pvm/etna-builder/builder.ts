@@ -107,6 +107,7 @@ type CommonTxProps = Readonly<{
    * List of UTXOs that are available to be spent.
    */
   utxos: readonly Utxo[];
+  gasPrice: bigint;
 }>;
 
 type TxProps<T extends Record<string, unknown>> = CommonTxProps & Readonly<T>;
@@ -131,7 +132,7 @@ export type NewBaseTxProps = TxProps<{
  * @returns {UnsignedTx} An UnsignedTx.
  */
 export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
-  { fromAddressesBytes, options, outputs, utxos },
+  { fromAddressesBytes, options, outputs, utxos, gasPrice },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
@@ -167,6 +168,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
       spendOptions: defaultedOptions,
       toBurn,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -228,6 +230,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     threshold,
     toAddresses,
     utxos,
+    gasPrice,
   },
   context,
 ) => {
@@ -328,6 +331,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
       spendOptions: defaultedOptions,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -371,7 +375,7 @@ export type NewExportTxProps = TxProps<{
  * @returns {UnsignedTx} An UnsignedTx.
  */
 export const newExportTx: TxBuilderFn<NewExportTxProps> = (
-  { destinationChainId, fromAddressesBytes, options, outputs, utxos },
+  { destinationChainId, fromAddressesBytes, options, outputs, utxos, gasPrice },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
@@ -402,6 +406,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
       spendOptions: defaultedOptions,
       toBurn,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -452,7 +457,15 @@ export type NewCreateSubnetTxProps = TxProps<{
  * @returns {UnsignedTx} An UnsignedTx.
  */
 export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
-  { fromAddressesBytes, locktime, options, subnetOwners, threshold, utxos },
+  {
+    fromAddressesBytes,
+    locktime,
+    options,
+    subnetOwners,
+    threshold,
+    utxos,
+    gasPrice,
+  },
   context,
 ) => {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
@@ -476,6 +489,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -548,6 +562,7 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
     subnetId,
     utxos,
     vmId,
+    gasPrice,
   },
   context,
 ) => {
@@ -584,6 +599,7 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -652,6 +668,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
     subnetId,
     utxos,
     weight,
+    gasPrice,
   },
   context,
 ) => {
@@ -674,6 +691,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -731,7 +749,15 @@ export type NewRemoveSubnetValidatorTxProps = TxProps<{
 export const newRemoveSubnetValidatorTx: TxBuilderFn<
   NewRemoveSubnetValidatorTxProps
 > = (
-  { fromAddressesBytes, nodeId, options, subnetAuth, subnetId, utxos },
+  {
+    fromAddressesBytes,
+    nodeId,
+    options,
+    subnetAuth,
+    subnetId,
+    utxos,
+    gasPrice,
+  },
   context,
 ) => {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
@@ -753,6 +779,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,
@@ -870,6 +897,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     threshold = 1,
     utxos,
     weight,
+    gasPrice,
   },
   context,
 ) => {
@@ -919,6 +947,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
       spendOptions: defaultedOptions,
       toStake,
       utxos,
+      gasPrice,
     },
     [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
@@ -1025,6 +1054,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     threshold = 1,
     utxos,
     weight,
+    gasPrice,
   },
   context,
 ) => {
@@ -1065,6 +1095,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
       spendOptions: defaultedOptions,
       toStake,
       utxos,
+      gasPrice,
     },
     [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
@@ -1147,6 +1178,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
     subnetOwners,
     threshold = 1,
     utxos,
+    gasPrice,
   },
   context,
 ) => {
@@ -1174,6 +1206,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
+      gasPrice,
     },
     [useUnlockedUTXOs],
     context,

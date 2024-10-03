@@ -249,3 +249,12 @@ export interface ValidatesParams {
 export interface ValidatesResponse {
   blockchainIDs: string[];
 }
+
+export interface FeeConfigResponse {
+  weights: [number, number, number, number];
+  maxCapacity: number;
+  maxPerSecond: number;
+  targetPerSecond: number;
+  minPrice: number;
+  excessConversionConstant: number;
+}
