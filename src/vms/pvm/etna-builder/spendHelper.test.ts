@@ -4,6 +4,7 @@ import {
   utxo,
 } from '../../../fixtures/avax';
 import { id } from '../../../fixtures/common';
+import { testFeeConfig } from '../../../fixtures/feeConfig';
 import { stakeableLockOut } from '../../../fixtures/pvm';
 import { TransferableOutput } from '../../../serializable';
 import { isTransferOut } from '../../../utils';
@@ -16,18 +17,31 @@ import { SpendHelper } from './spendHelper';
 
 const DEFAULT_GAS_PRICE = 3n;
 
-const DEFAULT_WEIGHTS = createDimensions(1, 2, 3, 4);
+const DEFAULT_WEIGHTS = createDimensions({
+  bandwidth: 1,
+  dbRead: 2,
+  dbWrite: 3,
+  compute: 4,
+});
 
 const DEFAULT_PROPS: SpendHelperProps = {
   changeOutputs: [],
-  gasPrice: DEFAULT_GAS_PRICE,
-  initialComplexity: createDimensions(1, 1, 1, 1),
+  initialComplexity: createDimensions({
+    bandwidth: 1,
+    dbRead: 1,
+    dbWrite: 1,
+    compute: 1,
+  }),
   inputs: [],
   shouldConsolidateOutputs: false,
   stakeOutputs: [],
   toBurn: new Map<string, bigint>(),
   toStake: new Map<string, bigint>(),
-  weights: DEFAULT_WEIGHTS,
+  feeConfig: {
+    ...testFeeConfig,
+    minPrice: DEFAULT_GAS_PRICE,
+    weights: DEFAULT_WEIGHTS,
+  },
 };
 
 describe('src/vms/pvm/etna-builder/spendHelper', () => {

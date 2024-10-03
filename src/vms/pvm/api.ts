@@ -4,7 +4,9 @@ import { getPVMManager } from '../../serializable/pvm/codec';
 import { hexToBuffer } from '../../utils';
 import type { GetAssetDescriptionResponse } from '../common/apiModels';
 import { AvaxApi } from '../common/avaxApi';
+import { createDimensions } from '../common/fees/dimensions';
 import type {
+  FeeConfig,
   FeeConfigResponse,
   GetBalanceParams,
   GetBalanceResponse,
@@ -220,7 +222,29 @@ export class PVMApi extends AvaxApi {
   // Post-Etna API
 
   // get feeConfig for P-Chain
-  getFeeConfig(): Promise<FeeConfigResponse> {
-    return this.callRpc<FeeConfigResponse>('getFeeConfig');
+  async getFeeConfig(): Promise<FeeConfig> {
+    const resp = await this.callRpc<FeeConfigResponse>('getFeeConfig');
+    const {
+      weights,
+      maxCapacity,
+      maxPerSecond,
+      targetPerSecond,
+      minPrice,
+      excessConversionConstant,
+    } = resp;
+    const [bandwidth, dbRead, dbWrite, compute] = weights;
+    return {
+      weights: createDimensions({
+        bandwidth,
+        dbRead,
+        dbWrite,
+        compute,
+      }),
+      maxCapacity: BigInt(maxCapacity),
+      maxPerSecond: BigInt(maxPerSecond),
+      targetPerSecond: BigInt(targetPerSecond),
+      minPrice: BigInt(minPrice),
+      excessConversionConstant: BigInt(excessConversionConstant),
+    };
   }
 }

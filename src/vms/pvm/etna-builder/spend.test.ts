@@ -11,6 +11,7 @@ import {
   handleFeeAndChange,
 } from './spend-reducers';
 import { spend } from './spend';
+import { testFeeConfig } from '../../../fixtures/feeConfig';
 
 jest.mock('./spend-reducers', () => ({
   verifyAssetsConsumed: jest.fn<SpendReducerFunction>((state) => state),
@@ -28,7 +29,12 @@ const getInitialReducerState = (
   state: Partial<SpendReducerState> = {},
 ): SpendReducerState => ({
   excessAVAX: 0n,
-  initialComplexity: createDimensions(1, 1, 1, 1),
+  initialComplexity: createDimensions({
+    bandwidth: 1,
+    dbRead: 1,
+    dbWrite: 1,
+    compute: 1,
+  }),
   fromAddresses: [CHANGE_ADDRESS],
   ownerOverride: null,
   spendOptions: defaultSpendOptions(
@@ -39,7 +45,7 @@ const getInitialReducerState = (
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
-  gasPrice: 1n,
+  feeConfig: testFeeConfig,
   ...state,
 });
 

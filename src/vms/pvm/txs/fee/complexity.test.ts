@@ -62,25 +62,33 @@ describe('Complexity', () => {
     test('empty transferable output', () => {
       const result = getOutputComplexity([]);
 
-      expect(result).toEqual(createDimensions(0, 0, 0, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 0, dbRead: 0, dbWrite: 0, compute: 0 }),
+      );
     });
 
     test('any can spend', () => {
       const result = getOutputComplexity([makeTransferableOutput()]);
 
-      expect(result).toEqual(createDimensions(60, 0, 1, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 60, dbRead: 0, dbWrite: 1, compute: 0 }),
+      );
     });
 
     test('one owner', () => {
       const result = getOutputComplexity([makeTransferableOutput(1)]);
 
-      expect(result).toEqual(createDimensions(80, 0, 1, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 80, dbRead: 0, dbWrite: 1, compute: 0 }),
+      );
     });
 
     test('three owners', () => {
       const result = getOutputComplexity([makeTransferableOutput(3)]);
 
-      expect(result).toEqual(createDimensions(120, 0, 1, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 120, dbRead: 0, dbWrite: 1, compute: 0 }),
+      );
     });
 
     test('locked stakeable', () => {
@@ -94,7 +102,9 @@ describe('Complexity', () => {
         ),
       ]);
 
-      expect(result).toEqual(createDimensions(132, 0, 1, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 132, dbRead: 0, dbWrite: 1, compute: 0 }),
+      );
     });
   });
 
@@ -103,12 +113,12 @@ describe('Complexity', () => {
       const result = getInputComplexity([makeTransferableInput()]);
 
       expect(result).toEqual(
-        createDimensions(
-          92,
-          1,
-          1,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 92,
+          dbRead: 1,
+          dbWrite: 1,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
 
@@ -116,12 +126,12 @@ describe('Complexity', () => {
       const result = getInputComplexity([makeTransferableInput(1)]);
 
       expect(result).toEqual(
-        createDimensions(
-          161,
-          1,
-          1,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 161,
+          dbRead: 1,
+          dbWrite: 1,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
 
@@ -129,12 +139,12 @@ describe('Complexity', () => {
       const result = getInputComplexity([makeTransferableInput(3)]);
 
       expect(result).toEqual(
-        createDimensions(
-          299,
-          1,
-          1,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 299,
+          dbRead: 1,
+          dbWrite: 1,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
 
@@ -151,12 +161,12 @@ describe('Complexity', () => {
       ]);
 
       expect(result).toEqual(
-        createDimensions(
-          311,
-          1,
-          1,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 311,
+          dbRead: 1,
+          dbWrite: 1,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
   });
@@ -165,19 +175,25 @@ describe('Complexity', () => {
     test('any can spend', () => {
       const result = getOwnerComplexity(makeOutputOwners());
 
-      expect(result).toEqual(createDimensions(16, 0, 0, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 16, dbRead: 0, dbWrite: 0, compute: 0 }),
+      );
     });
 
     test('one owner', () => {
       const result = getOwnerComplexity(makeOutputOwners(1));
 
-      expect(result).toEqual(createDimensions(36, 0, 0, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 36, dbRead: 0, dbWrite: 0, compute: 0 }),
+      );
     });
 
     test('three owners', () => {
       const result = getOwnerComplexity(makeOutputOwners(3));
 
-      expect(result).toEqual(createDimensions(76, 0, 0, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 76, dbRead: 0, dbWrite: 0, compute: 0 }),
+      );
     });
   });
 
@@ -185,20 +201,21 @@ describe('Complexity', () => {
     test('empty signer', () => {
       const result = getSignerComplexity(new SignerEmpty());
 
-      expect(result).toEqual(createDimensions(0, 0, 0, 0));
+      expect(result).toEqual(
+        createDimensions({ bandwidth: 0, dbRead: 0, dbWrite: 0, compute: 0 }),
+      );
     });
 
     test('bls pop', () => {
       const result = getSignerComplexity(signer());
 
       expect(result).toEqual(
-        createDimensions(
-          144,
-          0,
-          0,
-          // TODO: Implement compute
-          0,
-        ),
+        createDimensions({
+          bandwidth: 144,
+          dbRead: 0,
+          dbWrite: 0,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
   });
@@ -208,12 +225,12 @@ describe('Complexity', () => {
       const result = getAuthComplexity(new Input([]));
 
       expect(result).toEqual(
-        createDimensions(
-          8,
-          0,
-          0,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 8,
+          dbRead: 0,
+          dbWrite: 0,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
 
@@ -221,12 +238,12 @@ describe('Complexity', () => {
       const result = getAuthComplexity(new Input([int()]));
 
       expect(result).toEqual(
-        createDimensions(
-          77,
-          0,
-          0,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 77,
+          dbRead: 0,
+          dbWrite: 0,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
 
@@ -234,12 +251,12 @@ describe('Complexity', () => {
       const result = getAuthComplexity(new Input(ints()));
 
       expect(result).toEqual(
-        createDimensions(
-          215,
-          0,
-          0,
-          0, // TODO: Implement
-        ),
+        createDimensions({
+          bandwidth: 215,
+          dbRead: 0,
+          dbWrite: 0,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
 

@@ -11,7 +11,7 @@ import type {
   GetTxFeeResponse,
   isBootstrapped,
   UptimeResponse,
-  GetEtnaTimeResponse,
+  GetUpgradesResponse,
 } from './model';
 
 export class Info extends Api {
@@ -79,8 +79,8 @@ export class Info extends Api {
 
   // Post-Etna API
 
-  // get etna activation time
-  getEtnaTime(): Promise<GetEtnaTimeResponse> {
-    return this.callRpc<GetEtnaTimeResponse>('upgrades');
+  // get upgrades info
+  getEtnaTime(): Promise<GetUpgradesResponse> {
+    return this.callRpc<GetUpgradesResponse>('upgrades');
   }
 }

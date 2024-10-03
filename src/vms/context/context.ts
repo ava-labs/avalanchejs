@@ -1,7 +1,6 @@
 import { getHRP } from '../../constants/networkIDs';
 import { Info } from '../../info/info';
 import { AVMApi } from '../avm/api';
-import { createDimensions } from '../common/fees/dimensions';
 import type { Context } from './model';
 
 /*
@@ -50,8 +49,5 @@ export const getContextFromURI = async (
     addSubnetDelegatorFee,
     networkID,
     hrp: getHRP(networkID),
-
-    // TODO: Populate these values once they are exposed by the API
-    complexityWeights: createDimensions(1, 1, 1, 1),
   });
 };

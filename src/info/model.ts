@@ -70,6 +70,19 @@ export type isBootstrapped = {
   isBootstrapped: boolean;
 };
 
-export type GetEtnaTimeResponse = {
+export type GetUpgradesResponse = {
+  apricotPhaselTime: string;
+  apricotPhase2Time: string;
+  apricotPhase3Time: string;
+  apricotPhase4Time: string;
+  apricotPhase4MinPChainHeight: number;
+  apricotPhase5Time: string;
+  apricotPhasePre6Time: string;
+  apricotPhase6Time: string;
+  apricotPhasePost6Time: string;
+  banffTime: string;
+  cortinaTime: string;
+  cortinaXChainStopVertexID: string;
+  durangoTime: string;
   etnaTime: string;
 };

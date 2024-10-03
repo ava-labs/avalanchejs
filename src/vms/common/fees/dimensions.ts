@@ -16,12 +16,17 @@ export const createEmptyDimensions = (): Dimensions => ({
   [FeeDimensions.Compute]: 0,
 });
 
-export const createDimensions = (
-  bandwidth: DimensionValue,
-  dbRead: DimensionValue,
-  dbWrite: DimensionValue,
-  compute: DimensionValue,
-): Dimensions => ({
+export const createDimensions = ({
+  bandwidth,
+  dbRead,
+  dbWrite,
+  compute,
+}: {
+  bandwidth: DimensionValue;
+  dbRead: DimensionValue;
+  dbWrite: DimensionValue;
+  compute: DimensionValue;
+}): Dimensions => ({
   [FeeDimensions.Bandwidth]: bandwidth,
   [FeeDimensions.DBRead]: dbRead,
   [FeeDimensions.DBWrite]: dbWrite,

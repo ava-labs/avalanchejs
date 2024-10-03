@@ -163,12 +163,12 @@ export const getSignerComplexity = (
     return createEmptyDimensions();
   }
 
-  return createDimensions(
-    INTRINSIC_POP_BANDWIDTH,
-    0,
-    0,
-    0, // TODO: Add compute complexity.
-  );
+  return createDimensions({
+    bandwidth: INTRINSIC_POP_BANDWIDTH,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0, // TODO: Add compute complexity.
+  });
 };
 
 export const getOwnerComplexity = (outputOwners: OutputOwners): Dimensions => {
@@ -178,7 +178,7 @@ export const getOwnerComplexity = (outputOwners: OutputOwners): Dimensions => {
   const bandwidth =
     addressBandwidth + INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH;
 
-  return createDimensions(bandwidth, 0, 0, 0);
+  return createDimensions({ bandwidth, dbRead: 0, dbWrite: 0, compute: 0 });
 };
 
 /**
@@ -202,10 +202,7 @@ export const getAuthComplexity = (input: Serializable): Dimensions => {
   const bandwidth = signatureBandwidth + INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH;
 
   return createDimensions(
-    bandwidth,
-    0,
-    0,
-    0, // TODO: Add compute complexity.
+    { bandwidth, dbRead: 0, dbWrite: 0, compute: 0 }, // TODO: Add compute complexity.
   );
 };
 
@@ -264,7 +261,12 @@ const createChainTx = (tx: CreateChainTx): Dimensions => {
   bandwidth += tx.chainName.value().length;
   bandwidth += tx.genesisData.length;
 
-  const dynamicComplexity = createDimensions(bandwidth, 0, 0, 0);
+  const dynamicComplexity = createDimensions({
+    bandwidth,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0,
+  });
 
   return addDimensions(
     INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
