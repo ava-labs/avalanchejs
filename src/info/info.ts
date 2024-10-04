@@ -11,6 +11,7 @@ import type {
   GetTxFeeResponse,
   isBootstrapped,
   UptimeResponse,
+  GetUpgradesInfoResponse,
 } from './model';
 
 export class Info extends Api {
@@ -74,5 +75,12 @@ export class Info extends Api {
 
   getVMs(): Promise<Map<string, string[]>> {
     return this.callRpc<Map<string, string[]>>('getVMs');
+  }
+
+  // Post-Etna API
+
+  // get upgrades info
+  getUpgradesInfo(): Promise<GetUpgradesInfoResponse> {
+    return this.callRpc<GetUpgradesInfoResponse>('upgrades');
   }
 }

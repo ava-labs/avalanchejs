@@ -8,6 +8,7 @@ import type { Utxo } from '../../../serializable/avax/utxo';
 import type { SpendOptions } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
+import type { FeeConfig } from '../models';
 import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
 import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
 import { SpendHelper } from './spendHelper';
@@ -84,6 +85,7 @@ export type SpendProps = Readonly<{
    * List of UTXOs that are available to be spent.
    */
   utxos: readonly Utxo[];
+  feeConfig: FeeConfig;
 }>;
 
 /**
@@ -109,6 +111,7 @@ export const spend = (
     toBurn = new Map(),
     toStake = new Map(),
     utxos,
+    feeConfig,
   }: SpendProps,
   spendReducers: readonly SpendReducerFunction[],
   context: Context,
@@ -119,14 +122,13 @@ export const spend = (
 
     const spendHelper = new SpendHelper({
       changeOutputs: [],
-      gasPrice: context.gasPrice,
       initialComplexity,
       inputs: [],
       shouldConsolidateOutputs,
       stakeOutputs: [],
       toBurn,
       toStake,
-      weights: context.complexityWeights,
+      feeConfig,
     });
 
     const initialState: SpendReducerState = {
@@ -138,6 +140,7 @@ export const spend = (
       toBurn,
       toStake,
       utxos,
+      feeConfig,
     };
 
     const spendReducerFunctions: readonly SpendReducerFunction[] = [

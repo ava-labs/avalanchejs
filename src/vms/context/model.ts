@@ -1,5 +1,3 @@
-import type { Dimensions } from '../common/fees/dimensions';
-
 export type Context = {
   readonly networkID: number;
   readonly hrp: string;
@@ -16,8 +14,4 @@ export type Context = {
   readonly addPrimaryNetworkDelegatorFee: bigint;
   readonly addSubnetValidatorFee: bigint;
   readonly addSubnetDelegatorFee: bigint;
-
-  // Post-etna
-  readonly gasPrice: bigint;
-  readonly complexityWeights: Dimensions;
 };

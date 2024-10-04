@@ -9,8 +9,5 @@ export const getEtnaContextFromURI = async (
 ): Promise<Context.Context> => {
   const context = await Context.getContextFromURI(uri);
 
-  return {
-    ...context,
-    gasPrice: 10_000n,
-  };
+  return context;
 };

@@ -1,5 +1,6 @@
 import type { TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
+import type { Dimensions } from '../common/fees/dimensions';
 
 export type GetAssetDescriptionResponse = {
   assetId: string;
@@ -248,4 +249,22 @@ export interface ValidatesParams {
 
 export interface ValidatesResponse {
   blockchainIDs: string[];
+}
+
+export interface FeeConfigResponse {
+  weights: [number, number, number, number]; // Weights to merge fee dimensions into a single gas value.
+  maxCapacity: number; // Maximum amount of gas the chain is allowed to store for future use.
+  maxPerSecond: number; // Maximum amount of gas the chain is allowed to consume per second.
+  targetPerSecond: number; // Target amount of gas the chain should consume per second to keep the fees stable.
+  minPrice: number; // Minimum price per unit of gas.
+  excessConversionConstant: number; // Constant used to convert excess gas to a gas price.
+}
+
+export interface FeeConfig {
+  weights: Dimensions;
+  maxCapacity: bigint;
+  maxPerSecond: bigint;
+  targetPerSecond: bigint;
+  minPrice: bigint;
+  excessConversionConstant: bigint;
 }

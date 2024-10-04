@@ -11,18 +11,18 @@ import {
   dimensionsToGas,
 } from '../../common/fees/dimensions';
 import { consolidateOutputs } from '../../utils/consolidateOutputs';
+import type { FeeConfig } from '../models';
 import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
 export interface SpendHelperProps {
   changeOutputs: readonly TransferableOutput[];
-  gasPrice: bigint;
   initialComplexity: Dimensions;
   inputs: readonly TransferableInput[];
   shouldConsolidateOutputs: boolean;
   stakeOutputs: readonly TransferableOutput[];
   toBurn: Map<string, bigint>;
   toStake: Map<string, bigint>;
-  weights: Dimensions;
+  feeConfig: FeeConfig;
 }
 
 /**
@@ -47,21 +47,20 @@ export class SpendHelper {
 
   constructor({
     changeOutputs,
-    gasPrice,
     initialComplexity,
     inputs,
     shouldConsolidateOutputs,
     stakeOutputs,
     toBurn,
     toStake,
-    weights,
+    feeConfig,
   }: SpendHelperProps) {
-    this.gasPrice = gasPrice;
+    this.gasPrice = feeConfig.minPrice;
+    this.weights = feeConfig.weights;
     this.initialComplexity = initialComplexity;
     this.shouldConsolidateOutputs = shouldConsolidateOutputs;
     this.toBurn = toBurn;
     this.toStake = toStake;
-    this.weights = weights;
 
     this.changeOutputs = changeOutputs;
     this.inputs = inputs;

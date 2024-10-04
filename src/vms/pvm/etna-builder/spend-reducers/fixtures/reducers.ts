@@ -1,4 +1,4 @@
-import { testContext } from '../../../../../fixtures/context';
+import { testFeeConfig } from '../../../../../fixtures/feeConfig';
 import { Address, OutputOwners } from '../../../../../serializable';
 import type { SpendOptions } from '../../../../common';
 import { defaultSpendOptions } from '../../../../common/defaultSpendOptions';
@@ -21,7 +21,12 @@ export const getInitialReducerState = ({
   spendOptions?: SpendOptions;
 } = {}): SpendReducerState => ({
   excessAVAX: 0n,
-  initialComplexity: createDimensions(1, 1, 1, 1),
+  initialComplexity: createDimensions({
+    bandwidth: 1,
+    dbRead: 1,
+    dbWrite: 1,
+    compute: 1,
+  }),
   fromAddresses: [CHANGE_ADDRESS],
   ownerOverride: null,
   spendOptions: defaultSpendOptions(
@@ -33,11 +38,17 @@ export const getInitialReducerState = ({
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
+  feeConfig: testFeeConfig,
   ...state,
 });
 
 export const getSpendHelper = ({
-  initialComplexity = createDimensions(1, 1, 1, 1),
+  initialComplexity = createDimensions({
+    bandwidth: 1,
+    dbRead: 1,
+    dbWrite: 1,
+    compute: 1,
+  }),
   shouldConsolidateOutputs = false,
   toBurn = new Map(),
   toStake = new Map(),
@@ -49,13 +60,12 @@ export const getSpendHelper = ({
 > = {}) => {
   return new SpendHelper({
     changeOutputs: [],
-    gasPrice: testContext.gasPrice,
     initialComplexity,
     inputs: [],
     shouldConsolidateOutputs,
     stakeOutputs: [],
     toBurn,
     toStake,
-    weights: testContext.complexityWeights,
+    feeConfig: testFeeConfig,
   });
 };
