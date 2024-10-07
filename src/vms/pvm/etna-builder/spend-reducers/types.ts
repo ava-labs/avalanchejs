@@ -3,7 +3,7 @@ import type { SpendProps } from '../spend';
 import type { SpendHelper } from '../spendHelper';
 
 export type SpendReducerState = Readonly<
-  Required<Omit<SpendProps, 'shouldConsolidateOutputs'>>
+  Required<Omit<SpendProps, 'feeState' | 'shouldConsolidateOutputs'>>
 >;
 
 export type SpendReducerFunction = (

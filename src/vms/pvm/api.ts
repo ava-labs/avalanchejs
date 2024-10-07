@@ -8,6 +8,8 @@ import { createDimensions } from '../common/fees/dimensions';
 import type {
   FeeConfig,
   FeeConfigResponse,
+  FeeState,
+  FeeStateResponse,
   GetBalanceParams,
   GetBalanceResponse,
   GetBlockchainsResponse,
@@ -245,6 +247,17 @@ export class PVMApi extends AvaxApi {
       targetPerSecond: BigInt(targetPerSecond),
       minPrice: BigInt(minPrice),
       excessConversionConstant: BigInt(excessConversionConstant),
+    };
+  }
+
+  async getFeeState(): Promise<FeeState> {
+    const resp = await this.callRpc<FeeStateResponse>('getFeeState');
+
+    return {
+      capacity: BigInt(resp.capacity),
+      excess: BigInt(resp.excess),
+      price: BigInt(resp.price),
+      timestamp: resp.timestamp,
     };
   }
 }

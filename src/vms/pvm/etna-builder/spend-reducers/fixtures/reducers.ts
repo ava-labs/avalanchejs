@@ -1,8 +1,10 @@
-import { testFeeConfig } from '../../../../../fixtures/feeConfig';
+import { testContext } from '../../../../../fixtures/context';
+import { feeState as testFeeState } from '../../../../../fixtures/pvm';
 import { Address, OutputOwners } from '../../../../../serializable';
 import type { SpendOptions } from '../../../../common';
 import { defaultSpendOptions } from '../../../../common/defaultSpendOptions';
 import { createDimensions } from '../../../../common/fees/dimensions';
+import type { FeeState } from '../../../models';
 import type { SpendHelperProps } from '../../spendHelper';
 import { SpendHelper } from '../../spendHelper';
 import type { SpendReducerState } from '../types';
@@ -38,11 +40,11 @@ export const getInitialReducerState = ({
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
-  feeConfig: testFeeConfig,
   ...state,
 });
 
 export const getSpendHelper = ({
+  feeState = testFeeState(),
   initialComplexity = createDimensions({
     bandwidth: 1,
     dbRead: 1,
@@ -56,16 +58,20 @@ export const getSpendHelper = ({
   Pick<
     SpendHelperProps,
     'initialComplexity' | 'shouldConsolidateOutputs' | 'toBurn' | 'toStake'
-  >
+  > & { feeState: FeeState }
 > = {}) => {
   return new SpendHelper({
     changeOutputs: [],
+    gasPrice:
+      feeState.price < testContext.platformFeeConfig.minPrice
+        ? testContext.platformFeeConfig.minPrice
+        : feeState.price,
     initialComplexity,
     inputs: [],
     shouldConsolidateOutputs,
     stakeOutputs: [],
     toBurn,
     toStake,
-    feeConfig: testFeeConfig,
+    weights: testContext.platformFeeConfig.weights,
   });
 };

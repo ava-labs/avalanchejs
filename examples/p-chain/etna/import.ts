@@ -9,6 +9,7 @@ const main = async () => {
   const context = await getEtnaContextFromURI(AVAX_PUBLIC_URL);
 
   const pvmApi = new pvm.PVMApi(AVAX_PUBLIC_URL);
+  const feeState = await pvmApi.getFeeState();
 
   const { utxos } = await pvmApi.getUTXOs({
     sourceChain: 'X',
@@ -17,6 +18,7 @@ const main = async () => {
 
   const importTx = pvm.e.newImportTx(
     {
+      feeState,
       fromAddressesBytes: [utils.bech32ToBytes(X_CHAIN_ADDRESS)],
       sourceChainId: context.xBlockchainID,
       toAddresses: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],

@@ -10,14 +10,16 @@ const SEND_AVAX_AMOUNT: number = 0.001;
 const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
 
-  const pvmApi = new pvm.PVMApi(AVAX_PUBLIC_URL);
-
   const context = await getEtnaContextFromURI(AVAX_PUBLIC_URL);
+
+  const pvmApi = new pvm.PVMApi(AVAX_PUBLIC_URL);
+  const feeState = await pvmApi.getFeeState();
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
 
   const tx = pvm.e.newBaseTx(
     {
+      feeState,
       fromAddressesBytes: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
       outputs: [
         TransferableOutput.fromNative(

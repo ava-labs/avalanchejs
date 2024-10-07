@@ -62,9 +62,11 @@ import {
   blsPublicKeyBytes,
   blsSignatureBytes,
 } from '../../../fixtures/primitives';
-import { proofOfPossession } from '../../../fixtures/pvm';
-import type { FeeConfig } from '../models';
-import { testFeeConfig } from '../../../fixtures/feeConfig';
+import {
+  feeState as testFeeState,
+  proofOfPossession,
+} from '../../../fixtures/pvm';
+import type { FeeState } from '../models';
 
 const addTransferableAmounts = (
   transferableItems:
@@ -117,14 +119,14 @@ const checkFeeIsCorrect = ({
   unsignedTx,
   inputs,
   outputs,
-  feeConfig,
+  feeState,
   additionalInputs = [],
   additionalOutputs = [],
 }: {
   unsignedTx: UnsignedTx;
   inputs: readonly TransferableInput[];
   outputs: readonly TransferableOutput[];
-  feeConfig: FeeConfig;
+  feeState: FeeState;
   additionalInputs?: readonly TransferableInput[];
   additionalOutputs?: readonly TransferableOutput[];
 }): [
@@ -141,7 +143,13 @@ const checkFeeIsCorrect = ({
     ...additionalOutputs,
   ]);
 
-  const expectedFee = calculateFee(unsignedTx.getTx(), feeConfig);
+  const expectedFee = calculateFee(
+    unsignedTx.getTx(),
+    testContext.platformFeeConfig.weights,
+    feeState.price < testContext.platformFeeConfig.minPrice
+      ? testContext.platformFeeConfig.minPrice
+      : feeState.price,
+  );
 
   const expectedAmountBurned = addAmounts(
     new Map([[testAvaxAssetID.toString(), expectedFee]]),
@@ -170,6 +178,7 @@ const checkFeeIsCorrect = ({
 describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
   const nodeId = 'NodeID-2m38qc95mhHXtrhjyGbe7r2NhniqHHJRB';
   const toAddress = hexToBuffer('0x5432112345123451234512');
+  const feeState = testFeeState();
   const fromAddressesBytes = [testOwnerXAddress.toBytes()];
   const getRewardsOwners = () => OutputOwners.fromNative([toAddress]);
 
@@ -177,14 +186,12 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     {
       name: 'no memo',
       memo: undefined,
-      feeConfig: testFeeConfig,
     },
     {
       name: 'with memo',
       memo: Buffer.from('memo'),
-      feeConfig: testFeeConfig,
     },
-  ])('$name', ({ memo, feeConfig }) => {
+  ])('$name', ({ memo }) => {
     test('newBaseTx', () => {
       const utxos = testUtxos();
 
@@ -197,12 +204,12 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const utx = newBaseTx(
         {
           fromAddressesBytes,
+          feeState,
           outputs: [transferableOutput],
           options: {
             memo,
           },
           utxos,
-          feeConfig,
         },
         testContext,
       );
@@ -221,7 +228,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         unsignedTx: utx,
         inputs,
         outputs,
-        feeConfig,
+        feeState,
       });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -238,13 +245,13 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newImportTx(
         {
           fromAddressesBytes,
+          feeState,
           options: {
             memo,
           },
           sourceChainId: testContext.cBlockchainID,
           toAddresses: [testAddress1],
           utxos,
-          feeConfig,
         },
         testContext,
       );
@@ -260,7 +267,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalInputs: importedIns,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -303,13 +310,13 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newExportTx(
         {
           destinationChainId: testContext.cBlockchainID,
+          feeState,
           fromAddressesBytes,
           options: {
             memo,
           },
           outputs: [tnsOut],
           utxos,
-          feeConfig,
         },
         testContext,
       );
@@ -325,7 +332,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: exportedOuts,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -357,12 +364,12 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newCreateSubnetTx(
         {
           fromAddressesBytes,
+          feeState,
           options: {
             memo,
           },
           subnetOwners: [toAddress],
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
-          feeConfig,
         },
         testContext,
       );
@@ -373,7 +380,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeConfig });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeState });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -397,6 +404,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newCreateChainTx(
         {
           chainName: 'Random Chain Name',
+          feeState,
           fromAddressesBytes,
           fxIds: [],
           genesisData: testGenesisData,
@@ -407,7 +415,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           vmId: Id.fromHex(testVMId).toString(),
-          feeConfig,
         },
         testContext,
       );
@@ -418,7 +425,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeConfig });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeState });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -447,6 +454,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newAddSubnetValidatorTx(
         {
           end: 190_000_000n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -457,7 +465,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           start: 100n,
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: 1_800_000n,
-          feeConfig,
         },
         testContext,
       );
@@ -468,7 +475,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeConfig });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeState });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -499,6 +506,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newRemoveSubnetValidatorTx(
         {
           fromAddressesBytes,
+          feeState,
           nodeId,
           options: {
             memo,
@@ -506,7 +514,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetAuth: [0],
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
-          feeConfig,
         },
         testContext,
       );
@@ -517,7 +524,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeConfig });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeState });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -545,6 +552,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         {
           delegatorRewardsOwner: [],
           end: 120n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -558,7 +566,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: PrimaryNetworkID.toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
-          feeConfig,
         },
         testContext,
       );
@@ -575,7 +582,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -613,6 +620,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         {
           delegatorRewardsOwner: [],
           end: 120n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -626,7 +634,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
-          feeConfig,
         },
         testContext,
       );
@@ -643,7 +650,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -682,6 +689,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         {
           delegatorRewardsOwner: [],
           end: 120n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -699,7 +707,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
             getValidUtxo(new BigIntPr(2n * stakeAmount), stakingAssetId),
           ],
           weight: stakeAmount,
-          feeConfig,
         },
         testContext,
       );
@@ -716,7 +723,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
-          feeConfig,
+          feeState,
         });
 
       expect(stake.length).toEqual(1);
@@ -742,6 +749,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newAddPermissionlessDelegatorTx(
         {
           end: 120n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -752,7 +760,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: PrimaryNetworkID.toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
-          feeConfig,
         },
         testContext,
       );
@@ -769,7 +776,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -803,6 +810,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newAddPermissionlessDelegatorTx(
         {
           end: 120n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -813,7 +821,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
           weight: stakeAmount,
-          feeConfig,
         },
         testContext,
       );
@@ -830,7 +837,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -865,6 +872,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newAddPermissionlessDelegatorTx(
         {
           end: 120n,
+          feeState,
           fromAddressesBytes,
           nodeId,
           options: {
@@ -879,7 +887,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
             getValidUtxo(new BigIntPr(2n * stakeAmount), stakingAssetId),
           ],
           weight: stakeAmount,
-          feeConfig,
         },
         testContext,
       );
@@ -898,7 +905,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalOutputs: stake,
-          feeConfig,
+          feeState,
         });
 
       expect(stake.length).toEqual(1);
@@ -924,6 +931,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newTransferSubnetOwnershipTx(
         {
           fromAddressesBytes,
+          feeState,
           options: {
             memo,
           },
@@ -931,7 +939,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           subnetOwners: [toAddress],
           utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
-          feeConfig,
         },
         testContext,
       );
@@ -942,7 +949,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(txMemo.toString()).toEqual(memo ? 'memo' : '');
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
-        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeConfig });
+        checkFeeIsCorrect({ unsignedTx, inputs, outputs, feeState });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
@@ -965,7 +972,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
   describe('ImportTx', () => {
     it('should create an ImportTx with only AVAX and not non-AVAX assets', () => {
-      const feeConfig = testFeeConfig;
       const utxos = [
         getLockedUTXO(), // Locked and should be ignored.
         getNotTransferOutput(), // Invalid and should be ignored.
@@ -982,10 +988,10 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const unsignedTx = newImportTx(
         {
           fromAddressesBytes,
+          feeState,
           sourceChainId: testContext.cBlockchainID,
           toAddresses: [testAddress1],
           utxos,
-          feeConfig,
         },
         testContext,
       );
@@ -999,7 +1005,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           additionalInputs: importedIns,
-          feeConfig,
+          feeState,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);

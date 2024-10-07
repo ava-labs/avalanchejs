@@ -252,7 +252,12 @@ export interface ValidatesResponse {
 }
 
 export interface FeeConfigResponse {
-  weights: [number, number, number, number]; // Weights to merge fee dimensions into a single gas value.
+  weights: [
+    bandwidth: number,
+    dbRead: number,
+    dbWrite: number,
+    compute: number,
+  ]; // Weights to merge fee dimensions into a single gas value.
   maxCapacity: number; // Maximum amount of gas the chain is allowed to store for future use.
   maxPerSecond: number; // Maximum amount of gas the chain is allowed to consume per second.
   targetPerSecond: number; // Target amount of gas the chain should consume per second to keep the fees stable.
@@ -265,6 +270,23 @@ export interface FeeConfig {
   maxCapacity: bigint;
   maxPerSecond: bigint;
   targetPerSecond: bigint;
+  /** Minimum gas price */
   minPrice: bigint;
   excessConversionConstant: bigint;
+}
+
+export interface FeeStateResponse {
+  capacity: number;
+  excess: number;
+  price: number;
+  timestamp: string;
+}
+
+export interface FeeState {
+  capacity: bigint;
+  excess: bigint;
+  /** Price to use for dynamic fee calculation */
+  price: bigint;
+  /** ISO8601 DateTime */
+  timestamp: string;
 }

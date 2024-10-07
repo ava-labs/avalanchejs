@@ -10,8 +10,9 @@ import {
   type SpendReducerState,
   handleFeeAndChange,
 } from './spend-reducers';
+import type { SpendProps } from './spend';
 import { spend } from './spend';
-import { testFeeConfig } from '../../../fixtures/feeConfig';
+import { feeState as testFeeState } from '../../../fixtures/pvm';
 
 jest.mock('./spend-reducers', () => ({
   verifyAssetsConsumed: jest.fn<SpendReducerFunction>((state) => state),
@@ -25,9 +26,7 @@ const CHANGE_OWNERS: OutputOwners = OutputOwners.fromNative([
   CHANGE_ADDRESS.toBytes(),
 ]);
 
-const getInitialReducerState = (
-  state: Partial<SpendReducerState> = {},
-): SpendReducerState => ({
+const getSpendProps = (state: Partial<SpendReducerState> = {}): SpendProps => ({
   excessAVAX: 0n,
   initialComplexity: createDimensions({
     bandwidth: 1,
@@ -35,6 +34,7 @@ const getInitialReducerState = (
     dbWrite: 1,
     compute: 1,
   }),
+  feeState: testFeeState(),
   fromAddresses: [CHANGE_ADDRESS],
   ownerOverride: null,
   spendOptions: defaultSpendOptions(
@@ -45,7 +45,6 @@ const getInitialReducerState = (
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
-  feeConfig: testFeeConfig,
   ...state,
 });
 
@@ -55,11 +54,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
   test.skip('calls spend reducers', () => {
     const testReducer = jest.fn<SpendReducerFunction>((state) => state);
 
-    spend(
-      getInitialReducerState({ excessAVAX: 1_000n }),
-      [testReducer],
-      testContext,
-    );
+    spend(getSpendProps({ excessAVAX: 1_000n }), [testReducer], testContext);
 
     expect(testReducer).toHaveBeenCalledTimes(1);
     expect(verifyAssetsConsumed).toHaveBeenCalledTimes(1);
@@ -72,11 +67,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     });
 
     expect(() =>
-      spend(
-        getInitialReducerState({ excessAVAX: 1_000n }),
-        [testReducer],
-        testContext,
-      ),
+      spend(getSpendProps({ excessAVAX: 1_000n }), [testReducer], testContext),
     ).toThrow('Test error');
   });
 
@@ -86,18 +77,14 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     });
 
     expect(() =>
-      spend(
-        getInitialReducerState({ excessAVAX: 1_000n }),
-        [testReducer],
-        testContext,
-      ),
+      spend(getSpendProps({ excessAVAX: 1_000n }), [testReducer], testContext),
     ).toThrow('An unexpected error occurred during spend calculation');
   });
 
   test('change owners in state should default to change addresses', () => {
     expect.assertions(1);
 
-    const initialState = getInitialReducerState({ excessAVAX: 1_000n });
+    const initialState = getSpendProps({ excessAVAX: 1_000n });
     const testReducer = jest.fn<SpendReducerFunction>((state) => {
       expect(state.ownerOverride).toEqual(
         OutputOwners.fromNative(initialState.spendOptions.changeAddresses),
@@ -111,7 +98,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
   test('change owners in state should be ownerOverride if provided', () => {
     expect.assertions(1);
 
-    const initialState = getInitialReducerState({
+    const initialState = getSpendProps({
       excessAVAX: 1_000n,
       ownerOverride: CHANGE_OWNERS,
     });
