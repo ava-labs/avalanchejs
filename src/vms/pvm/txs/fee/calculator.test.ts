@@ -1,4 +1,3 @@
-import { testFeeConfig } from '../../../../fixtures/feeConfig';
 import { txHexToTransaction } from '../../../../fixtures/transactions';
 import { calculateFee } from './calculator';
 import {
@@ -13,11 +12,11 @@ describe('Calculator', () => {
     test.each(TEST_TRANSACTIONS)(
       'calculates the fee for $name',
       ({ txHex, expectedDynamicFee }) => {
-        const result = calculateFee(txHexToTransaction('PVM', txHex), {
-          ...testFeeConfig,
-          weights: TEST_DYNAMIC_WEIGHTS,
-          minPrice: TEST_DYNAMIC_PRICE,
-        });
+        const result = calculateFee(
+          txHexToTransaction('PVM', txHex),
+          TEST_DYNAMIC_WEIGHTS,
+          TEST_DYNAMIC_PRICE,
+        );
 
         expect(result).toBe(expectedDynamicFee);
       },
@@ -29,11 +28,7 @@ describe('Calculator', () => {
         const tx = txHexToTransaction('PVM', txHex);
 
         expect(() => {
-          calculateFee(tx, {
-            ...testFeeConfig,
-            weights: TEST_DYNAMIC_WEIGHTS,
-            minPrice: TEST_DYNAMIC_PRICE,
-          });
+          calculateFee(tx, TEST_DYNAMIC_WEIGHTS, TEST_DYNAMIC_PRICE);
         }).toThrow('Unsupported transaction type.');
       },
     );

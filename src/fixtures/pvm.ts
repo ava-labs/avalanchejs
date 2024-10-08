@@ -55,6 +55,7 @@ import {
 } from './secp256k1';
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
+import type { FeeState } from '../vms/pvm';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -290,3 +291,10 @@ export const transformSubnetTxBytes = () =>
     bytesForInt(10),
     inputBytes(),
   );
+
+export const feeState = (): FeeState => ({
+  capacity: 1n,
+  excess: 1n,
+  price: 1n,
+  timestamp: new Date().toISOString(),
+});

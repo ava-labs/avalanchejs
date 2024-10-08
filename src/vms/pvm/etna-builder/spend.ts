@@ -8,7 +8,7 @@ import type { Utxo } from '../../../serializable/avax/utxo';
 import type { SpendOptions } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
-import type { FeeConfig } from '../models';
+import type { FeeState } from '../models';
 import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
 import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
 import { SpendHelper } from './spendHelper';
@@ -42,6 +42,7 @@ export type SpendProps = Readonly<{
    * the change outputs in addition to the consumed and not burned AVAX.
    */
   excessAVAX?: bigint;
+  feeState: FeeState;
   /**
    * List of Addresses that are used for selecting which UTXOs are signable.
    */
@@ -85,7 +86,6 @@ export type SpendProps = Readonly<{
    * List of UTXOs that are available to be spent.
    */
   utxos: readonly Utxo[];
-  feeConfig: FeeConfig;
 }>;
 
 /**
@@ -103,6 +103,7 @@ export type SpendProps = Readonly<{
 export const spend = (
   {
     excessAVAX = 0n,
+    feeState,
     fromAddresses,
     initialComplexity,
     ownerOverride,
@@ -111,7 +112,6 @@ export const spend = (
     toBurn = new Map(),
     toStake = new Map(),
     utxos,
-    feeConfig,
   }: SpendProps,
   spendReducers: readonly SpendReducerFunction[],
   context: Context,
@@ -120,15 +120,21 @@ export const spend = (
     const changeOwners =
       ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
 
+    const gasPrice: bigint =
+      feeState.price < context.platformFeeConfig.minPrice
+        ? context.platformFeeConfig.minPrice
+        : feeState.price;
+
     const spendHelper = new SpendHelper({
       changeOutputs: [],
+      gasPrice,
       initialComplexity,
       inputs: [],
       shouldConsolidateOutputs,
       stakeOutputs: [],
       toBurn,
       toStake,
-      feeConfig,
+      weights: context.platformFeeConfig.weights,
     });
 
     const initialState: SpendReducerState = {
@@ -140,7 +146,6 @@ export const spend = (
       toBurn,
       toStake,
       utxos,
-      feeConfig,
     };
 
     const spendReducerFunctions: readonly SpendReducerFunction[] = [

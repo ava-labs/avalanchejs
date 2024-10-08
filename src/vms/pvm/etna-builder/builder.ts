@@ -49,7 +49,7 @@ import { defaultSpendOptions } from '../../common/defaultSpendOptions';
 import type { Dimensions } from '../../common/fees/dimensions';
 import { addDimensions, createDimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
-import type { FeeConfig } from '../models';
+import type { FeeState } from '../models';
 import {
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
@@ -104,6 +104,7 @@ const getMemoComplexity = (
  * Common properties used in all PVM transaction builder functions.
  */
 type CommonTxProps = Readonly<{
+  feeState: FeeState;
   /**
    * List of addresses that are used for selecting which UTXOs are signable.
    */
@@ -113,7 +114,6 @@ type CommonTxProps = Readonly<{
    * List of UTXOs that are available to be spent.
    */
   utxos: readonly Utxo[];
-  feeConfig: FeeConfig;
 }>;
 
 type TxProps<T extends Record<string, unknown>> = CommonTxProps & Readonly<T>;
@@ -138,7 +138,7 @@ export type NewBaseTxProps = TxProps<{
  * @returns {UnsignedTx} An UnsignedTx.
  */
 export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
-  { fromAddressesBytes, options, outputs, utxos, feeConfig },
+  { feeState, fromAddressesBytes, options, outputs, utxos },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
@@ -168,13 +168,13 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses,
       initialComplexity: complexity,
       shouldConsolidateOutputs: true,
       spendOptions: defaultedOptions,
       toBurn,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -229,6 +229,7 @@ export type NewImportTxProps = TxProps<{
  */
 export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   {
+    feeState,
     fromAddressesBytes,
     locktime,
     options,
@@ -236,7 +237,6 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     threshold,
     toAddresses,
     utxos,
-    feeConfig,
   },
   context,
 ) => {
@@ -332,12 +332,12 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   const spendResults = spend(
     {
       excessAVAX: importedAvax,
+      feeState,
       fromAddresses,
       initialComplexity: complexity,
       ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
       spendOptions: defaultedOptions,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -381,14 +381,7 @@ export type NewExportTxProps = TxProps<{
  * @returns {UnsignedTx} An UnsignedTx.
  */
 export const newExportTx: TxBuilderFn<NewExportTxProps> = (
-  {
-    destinationChainId,
-    fromAddressesBytes,
-    options,
-    outputs,
-    utxos,
-    feeConfig,
-  },
+  { destinationChainId, feeState, fromAddressesBytes, options, outputs, utxos },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
@@ -414,12 +407,12 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses,
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       toBurn,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -472,12 +465,12 @@ export type NewCreateSubnetTxProps = TxProps<{
 export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   {
     fromAddressesBytes,
+    feeState,
     locktime,
     options,
     subnetOwners,
     threshold,
     utxos,
-    feeConfig,
   },
   context,
 ) => {
@@ -498,11 +491,11 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -567,6 +560,7 @@ export type NewCreateChainTxProps = TxProps<{
 export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   {
     chainName,
+    feeState,
     fromAddressesBytes,
     fxIds,
     genesisData,
@@ -575,7 +569,6 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
     subnetId,
     utxos,
     vmId,
-    feeConfig,
   },
   context,
 ) => {
@@ -609,11 +602,11 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -674,6 +667,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
 > = (
   {
     end,
+    feeState,
     fromAddressesBytes,
     nodeId,
     options,
@@ -682,7 +676,6 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
     subnetId,
     utxos,
     weight,
-    feeConfig,
   },
   context,
 ) => {
@@ -701,11 +694,11 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -765,12 +758,12 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
 > = (
   {
     fromAddressesBytes,
+    feeState,
     nodeId,
     options,
     subnetAuth,
     subnetId,
     utxos,
-    feeConfig,
   },
   context,
 ) => {
@@ -789,11 +782,11 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,
@@ -897,6 +890,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
   {
     delegatorRewardsOwner,
     end,
+    feeState,
     fromAddressesBytes,
     locktime = 0n,
     nodeId,
@@ -911,7 +905,6 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     threshold = 1,
     utxos,
     weight,
-    feeConfig,
   },
   context,
 ) => {
@@ -955,13 +948,13 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       shouldConsolidateOutputs: true,
       spendOptions: defaultedOptions,
       toStake,
       utxos,
-      feeConfig,
     },
     [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
@@ -1057,6 +1050,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 > = (
   {
     end,
+    feeState,
     fromAddressesBytes,
     locktime = 0n,
     nodeId,
@@ -1068,7 +1062,6 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     threshold = 1,
     utxos,
     weight,
-    feeConfig,
   },
   context,
 ) => {
@@ -1103,13 +1096,13 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       shouldConsolidateOutputs: true,
       spendOptions: defaultedOptions,
       toStake,
       utxos,
-      feeConfig,
     },
     [useSpendableLockedUTXOs, useUnlockedUTXOs],
     context,
@@ -1185,6 +1178,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
 > = (
   {
     fromAddressesBytes,
+    feeState,
     locktime = 0n,
     options,
     subnetAuth,
@@ -1192,7 +1186,6 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
     subnetOwners,
     threshold = 1,
     utxos,
-    feeConfig,
   },
   context,
 ) => {
@@ -1216,11 +1209,11 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   const spendResults = spend(
     {
       excessAVAX: 0n,
+      feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       spendOptions: defaultedOptions,
       utxos,
-      feeConfig,
     },
     [useUnlockedUTXOs],
     context,

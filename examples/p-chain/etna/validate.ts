@@ -11,9 +11,10 @@ const nodeId = getRandomNodeId();
 const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
 
-  const pvmApi = new pvm.PVMApi(AVAX_PUBLIC_URL);
-
   const context = await getEtnaContextFromURI(AVAX_PUBLIC_URL);
+
+  const pvmApi = new pvm.PVMApi(AVAX_PUBLIC_URL);
+  const feeState = await pvmApi.getFeeState();
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
 
@@ -37,6 +38,7 @@ const main = async () => {
     {
       end,
       delegatorRewardsOwner: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
+      feeState,
       fromAddressesBytes: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
       nodeId,
       publicKey,
