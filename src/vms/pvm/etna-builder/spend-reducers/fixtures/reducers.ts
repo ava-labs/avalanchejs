@@ -62,10 +62,7 @@ export const getSpendHelper = ({
 > = {}) => {
   return new SpendHelper({
     changeOutputs: [],
-    gasPrice:
-      feeState.price < testContext.platformFeeConfig.minPrice
-        ? testContext.platformFeeConfig.minPrice
-        : feeState.price,
+    gasPrice: feeState.price,
     initialComplexity,
     inputs: [],
     shouldConsolidateOutputs,

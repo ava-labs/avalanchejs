@@ -146,9 +146,7 @@ const checkFeeIsCorrect = ({
   const expectedFee = calculateFee(
     unsignedTx.getTx(),
     testContext.platformFeeConfig.weights,
-    feeState.price < testContext.platformFeeConfig.minPrice
-      ? testContext.platformFeeConfig.minPrice
-      : feeState.price,
+    feeState.price,
   );
 
   const expectedAmountBurned = addAmounts(
