@@ -201,9 +201,12 @@ export const getAuthComplexity = (input: Serializable): Dimensions => {
 
   const bandwidth = signatureBandwidth + INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH;
 
-  return createDimensions(
-    { bandwidth, dbRead: 0, dbWrite: 0, compute: 0 }, // TODO: Add compute complexity.
-  );
+  return createDimensions({
+    bandwidth,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0, // TODO: Add compute complexity.
+  });
 };
 
 const getBaseTxComplexity = (baseTx: BaseTx): Dimensions => {

@@ -120,10 +120,7 @@ export const spend = (
     const changeOwners =
       ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
 
-    const gasPrice: bigint =
-      feeState.price < context.platformFeeConfig.minPrice
-        ? context.platformFeeConfig.minPrice
-        : feeState.price;
+    const gasPrice: bigint = feeState.price;
 
     const spendHelper = new SpendHelper({
       changeOutputs: [],

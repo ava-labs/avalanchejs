@@ -1,6 +1,6 @@
 import { TransferableOutput, addTxSignatures, pvm, utils } from '../../../src';
 import { getEnvVars } from '../../utils/getEnvVars';
-import { getEtnaContextFromURI } from './utils/etna-context';
+import { setupEtnaExample } from './utils/etna-helper';
 
 const AMOUNT_TO_EXPORT_AVAX: number = 0.001;
 
@@ -8,10 +8,7 @@ const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY, X_CHAIN_ADDRESS } =
     getEnvVars();
 
-  const context = await getEtnaContextFromURI(AVAX_PUBLIC_URL);
-
-  const pvmApi = new pvm.PVMApi(AVAX_PUBLIC_URL);
-  const feeState = await pvmApi.getFeeState();
+  const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
 
   const { utxos } = await pvmApi.getUTXOs({
     addresses: [P_CHAIN_ADDRESS],
