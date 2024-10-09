@@ -1,4 +1,3 @@
-import type { Context } from '../vms/context/model';
 import {
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
@@ -12,29 +11,28 @@ import {
   isTransferSubnetOwnershipTx,
 } from '../serializable/pvm';
 import type { UnsignedTx } from '../vms/common';
-import type { FeeState } from '../vms/pvm';
-import { calculateFee } from '../vms/pvm/txs/fee/calculator';
 
 export const validateAvaxBurnedAmountEtna = ({
   unsignedTx,
-  context,
   burnedAmount,
-  feeState,
+  baseFee,
+  feeTolerance,
 }: {
   unsignedTx: UnsignedTx;
-  context: Context;
   burnedAmount: bigint;
-  feeState: FeeState;
+  baseFee: bigint; // pvm dynamic fee caculator: @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
+  feeTolerance: number; // tolerance percentage range where the burned amount is considered valid. e.g.: with FeeTolerance = 20% -> (expectedFee <= burnedAmount <= expectedFee * 1.2)
 }): { isValid: boolean; txFee: bigint } => {
   const tx = unsignedTx.getTx();
 
-  const expectedFee = calculateFee(
-    unsignedTx.getTx(),
-    context.platformFeeConfig.weights,
-    feeState.price < context.platformFeeConfig.minPrice
-      ? context.platformFeeConfig.minPrice
-      : feeState.price,
-  );
+  const feeToleranceInt = Math.floor(feeTolerance);
+
+  if (feeToleranceInt < 1 || feeToleranceInt > 100) {
+    throw new Error('feeTolerance must be [1,100]');
+  }
+
+  const min = baseFee;
+  const max = (baseFee * (100n + BigInt(feeToleranceInt))) / 100n;
 
   if (
     isPvmBaseTx(tx) ||
@@ -49,7 +47,7 @@ export const validateAvaxBurnedAmountEtna = ({
     isTransferSubnetOwnershipTx(tx)
   ) {
     return {
-      isValid: burnedAmount >= expectedFee,
+      isValid: burnedAmount >= min && burnedAmount <= max,
       txFee: burnedAmount,
     };
   }

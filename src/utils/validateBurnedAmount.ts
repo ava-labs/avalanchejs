@@ -4,7 +4,6 @@ import type { EVMTx } from '../serializable/evm';
 import { isImportExportTx as isEvmImportExportTx } from '../serializable/evm';
 import { getBurnedAmountByTx } from './getBurnedAmountByTx';
 import type { AvaxTx } from '../serializable/avax';
-import type { FeeState } from '../vms/pvm';
 import { validateEvmBurnedAmount } from './validateEvmBurnedAmount';
 import type { GetUpgradesInfoResponse } from '../info/model';
 import { isEtnaEnabled } from './isEtnaEnabled';
@@ -39,22 +38,25 @@ const isPreEtnaTx = (tx: Transaction) => {
   );
 };
 
+/**
+ * baseFee:
+ * - evm fee: fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
+ * - pvm dynamic fee caculator: @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
+ */
 export const validateBurnedAmount = ({
   unsignedTx,
   context,
-  feeState,
   upgradesInfo,
   burnedAmount,
-  evmBaseFee,
-  evmFeeTolerance,
+  baseFee,
+  feeTolerance,
 }: {
   unsignedTx: UnsignedTx;
   context: Context;
-  feeState: FeeState;
   upgradesInfo: GetUpgradesInfoResponse;
   burnedAmount?: bigint;
-  evmBaseFee?: bigint; // fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
-  evmFeeTolerance?: number; // tolerance percentage range where the burned amount is considered valid. e.g.: with evmFeeTolerance = 20% -> (evmBaseFee * 0.8 <= burnedAmount <= evmBaseFee * 1.2)
+  baseFee: bigint;
+  feeTolerance: number; // tolerance percentage range where the burned amount is considered valid.
 }): { isValid: boolean; txFee: bigint } => {
   const tx = unsignedTx.getTx();
   const burned = burnedAmount ?? _getBurnedAmount(tx, context);
@@ -63,16 +65,16 @@ export const validateBurnedAmount = ({
     return validateEvmBurnedAmount({
       unsignedTx,
       burnedAmount: burned,
-      evmBaseFee,
-      evmFeeTolerance,
+      baseFee,
+      feeTolerance,
     });
   }
   if (isEtnaEnabled(upgradesInfo) || !isPreEtnaTx(tx)) {
     return validateAvaxBurnedAmountEtna({
       unsignedTx,
-      context,
+      baseFee,
       burnedAmount: burned,
-      feeState,
+      feeTolerance,
     });
   }
   return validateAvaxBurnedAmountPreEtna({

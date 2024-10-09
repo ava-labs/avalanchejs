@@ -24,13 +24,9 @@ import {
 } from '../vms/pvm';
 import { TransferableOutput } from '../serializable';
 import { nodeId } from '../fixtures/common';
-import { feeState as testFeeState } from '../fixtures/pvm';
 import { testSubnetId } from '../fixtures/transactions';
 import { blsPublicKeyBytes, blsSignatureBytes } from '../fixtures/primitives';
 import { validateAvaxBurnedAmountEtna } from './validateAvaxBurnedAmountEtna';
-
-const incorrectBurnedAmount = 1n;
-const correctBurnedAmount = 1000000n;
 
 const utxoMock = new Utxo(
   utxoId(),
@@ -91,14 +87,12 @@ describe('validateAvaxBurnedAmountEtna', () => {
         try {
           validateAvaxBurnedAmountEtna({
             unsignedTx,
-            context: testContext,
-            burnedAmount: correctBurnedAmount,
-            feeState: testFeeState(),
+            burnedAmount: 1000000n,
+            baseFee: 1n,
+            feeTolerance: 20,
           });
         } catch (error) {
-          expect((error as Error).message).toEqual(
-            'Unsupported transaction type.',
-          );
+          expect((error as Error).message).toEqual('tx type is not supported');
         }
       });
     });
@@ -113,6 +107,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         [utxoMock],
         [outputMock],
       ),
+      baseFee: 3830000n,
+      burnedAmount: 3840000n,
     },
     {
       name: 'export from P',
@@ -123,6 +119,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         [utxoMock],
         [outputMock],
       ),
+      baseFee: 4190000n,
+      burnedAmount: 4390000n,
     },
     {
       name: 'import to P',
@@ -133,6 +131,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         [testAddress2],
         [testAddress1],
       ),
+      baseFee: 3380000n,
+      burnedAmount: 3980000n,
     },
     {
       name: 'create subnet',
@@ -142,6 +142,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         [testAddress1],
         [testAddress1],
       ),
+      baseFee: 3430000n,
+      burnedAmount: 3930000n,
     },
     {
       name: 'create blockchain',
@@ -156,6 +158,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         {},
         [0],
       ),
+      baseFee: 5340000n,
+      burnedAmount: 5660000n,
     },
     {
       name: 'add subnet validator',
@@ -170,6 +174,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         'subnet',
         [0],
       ),
+      baseFee: 4660000n,
+      burnedAmount: 4960000n,
     },
     {
       name: 'remove subnet validator',
@@ -181,6 +187,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         Id.fromHex(testSubnetId).toString(),
         [0],
       ),
+      baseFee: 4420000n,
+      burnedAmount: 4420000n,
     },
     {
       name: 'add permissionless validator (subnet)',
@@ -202,6 +210,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         blsPublicKeyBytes(),
         blsSignatureBytes(),
       ),
+      baseFee: 6570000n,
+      burnedAmount: 7570000n,
     },
     {
       name: 'add permissionless delegator (subnet)',
@@ -219,6 +229,8 @@ describe('validateAvaxBurnedAmountEtna', () => {
         1,
         0n,
       ),
+      baseFee: 4850000n,
+      burnedAmount: 4900000n,
     },
     {
       name: 'transfer subnet ownership',
@@ -230,35 +242,37 @@ describe('validateAvaxBurnedAmountEtna', () => {
         [0, 2],
         [testAddress2],
       ),
+      baseFee: 5300000n,
+      burnedAmount: 5900000n,
     },
   ];
 
-  describe.each(testData)('$name', ({ unsignedTx }) => {
+  describe.each(testData)('$name', ({ unsignedTx, baseFee, burnedAmount }) => {
     it('returns true if burned amount is correct', () => {
       const result = validateAvaxBurnedAmountEtna({
         unsignedTx,
-        context: testContext,
-        burnedAmount: correctBurnedAmount,
-        feeState: testFeeState(),
+        burnedAmount,
+        baseFee,
+        feeTolerance: 20,
       });
 
       expect(result).toStrictEqual({
         isValid: true,
-        txFee: correctBurnedAmount,
+        txFee: burnedAmount,
       });
     });
 
     it('returns false if burned amount is not correct', () => {
       const result = validateAvaxBurnedAmountEtna({
         unsignedTx,
-        context: testContext,
-        burnedAmount: incorrectBurnedAmount,
-        feeState: { ...testFeeState(), price: 10_000n },
+        burnedAmount: burnedAmount * 30n,
+        feeTolerance: 20,
+        baseFee,
       });
 
       expect(result).toStrictEqual({
         isValid: false,
-        txFee: incorrectBurnedAmount,
+        txFee: burnedAmount * 30n,
       });
     });
   });

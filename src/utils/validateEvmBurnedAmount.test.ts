@@ -30,39 +30,39 @@ describe('validateEvmBurnedAmount', () => {
       [testAddress1],
       1n,
     );
-    it('throws if evmFeeTolerance is incorrect', () => {
+    it('throws if feeTolerance is incorrect', () => {
       expect(() =>
         validateEvmBurnedAmount({
           unsignedTx,
           burnedAmount: (280750n * 75n) / 100n, // 25% lower,
-          evmBaseFee: 25n,
-          evmFeeTolerance: 0.5,
+          baseFee: 25n,
+          feeTolerance: 0.5,
         }),
-      ).toThrowError('evmFeeTolerance must be [1,100]');
+      ).toThrowError('feeTolerance must be [1,100]');
 
       expect(() =>
         validateEvmBurnedAmount({
           unsignedTx,
           burnedAmount: (280750n * 75n) / 100n, // 25% lower,
-          evmBaseFee: 25n,
-          evmFeeTolerance: 101,
+          baseFee: 25n,
+          feeTolerance: 101,
         }),
-      ).toThrowError('evmFeeTolerance must be [1,100]');
+      ).toThrowError('feeTolerance must be [1,100]');
     });
 
     it('returns true if burned amount is in the tolerance range', () => {
       const resultLower = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 75n) / 100n, // 25% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       const resultHigher = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 125n) / 100n, // 25% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       expect(resultLower).toStrictEqual({
@@ -79,15 +79,15 @@ describe('validateEvmBurnedAmount', () => {
       const resultLower = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 49n) / 100n, // 51% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       const resultHigher = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 151n) / 100n, // 51% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       expect(resultLower).toStrictEqual({
@@ -115,15 +115,15 @@ describe('validateEvmBurnedAmount', () => {
       const resultLower = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 75n) / 100n, // 25% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       const resultHigher = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 125n) / 100n, // 25% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       expect(resultLower).toStrictEqual({
@@ -140,15 +140,15 @@ describe('validateEvmBurnedAmount', () => {
       const resultLower = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 49n) / 100n, // 51% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       const resultHigher = validateEvmBurnedAmount({
         unsignedTx,
         burnedAmount: (280750n * 151n) / 100n, // 51% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
+        baseFee: 25n,
+        feeTolerance: 50.9,
       });
 
       expect(resultLower).toStrictEqual({

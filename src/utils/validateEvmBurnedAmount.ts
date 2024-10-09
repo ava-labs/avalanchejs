@@ -5,30 +5,27 @@ import { costCorethTx } from './costs';
 export const validateEvmBurnedAmount = ({
   unsignedTx,
   burnedAmount,
-  evmBaseFee,
-  evmFeeTolerance,
+  baseFee,
+  feeTolerance,
 }: {
   unsignedTx: UnsignedTx;
   burnedAmount: bigint;
-  evmBaseFee?: bigint; // fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
-  evmFeeTolerance?: number; // tolerance percentage range where the burned amount is considered valid. e.g.: with evmFeeTolerance = 20% -> (evmBaseFee * 0.8 <= burnedAmount <= evmBaseFee * 1.2)
+  baseFee: bigint; // fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
+  feeTolerance: number; // tolerance percentage range where the burned amount is considered valid. e.g.: with feeTolerance = 20% -> (baseFee * 0.8 <= burnedAmount <= baseFee * 1.2)
 }): { isValid: boolean; txFee: bigint } => {
   const tx = unsignedTx.getTx();
 
   if (!isEvmImportExportTx(tx)) {
     throw new Error(`tx type is not supported`);
   }
-  if (!evmBaseFee || !evmFeeTolerance) {
-    throw new Error('missing evm fee data');
-  }
 
-  const feeToleranceInt = Math.floor(evmFeeTolerance);
+  const feeToleranceInt = Math.floor(feeTolerance);
 
   if (feeToleranceInt < 1 || feeToleranceInt > 100) {
-    throw new Error('evmFeeTolerance must be [1,100]');
+    throw new Error('feeTolerance must be [1,100]');
   }
 
-  const feeAmount = evmBaseFee * costCorethTx(unsignedTx);
+  const feeAmount = baseFee * costCorethTx(unsignedTx);
   const min = (feeAmount * (100n - BigInt(feeToleranceInt))) / 100n;
   const max = (feeAmount * (100n + BigInt(feeToleranceInt))) / 100n;
 
