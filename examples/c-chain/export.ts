@@ -28,7 +28,7 @@ const main = async () => {
   const tx = newExportTxFromBaseFee(
     context,
     baseFee / BigInt(1e9),
-    BigInt(0.1 * 1e9),
+    BigInt(4.9 * 1e9),
     context.pBlockchainID,
     hexToBuffer(C_CHAIN_ADDRESS),
     [pAddressBytes],
