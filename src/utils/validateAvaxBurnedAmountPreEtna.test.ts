@@ -1,6 +1,5 @@
-import { testAddress1, testAddress2, testEthAddress1 } from '../fixtures/vms';
+import { testAddress1, testAddress2 } from '../fixtures/vms';
 import { testContext } from '../fixtures/context';
-import { newExportTxFromBaseFee, newImportTxFromBaseFee } from '../vms/evm';
 import { Utxo } from '../serializable/avax/utxo';
 import { utxoId } from '../fixtures/avax';
 import { Address, Id } from '../serializable/fxs/common';
@@ -28,10 +27,10 @@ import {
 } from '../vms/pvm';
 import { TransferableOutput } from '../serializable';
 import { nodeId } from '../fixtures/common';
-import { validateBurnedAmount } from './validateBurnedAmount';
 import { testSubnetId } from '../fixtures/transactions';
 import { PrimaryNetworkID } from '../constants/networkIDs';
 import { blsPublicKeyBytes, blsSignatureBytes } from '../fixtures/primitives';
+import { validateAvaxBurnedAmountPreEtna } from './validateAvaxBurnedAmountPreEtna';
 
 const utxoMock = new Utxo(
   utxoId(),
@@ -54,200 +53,7 @@ const outputMock = new TransferableOutput(
   ),
 );
 
-describe('validateBurnedAmount', () => {
-  describe('missing burned amount', () => {
-    it('calculates the burned amount', () => {
-      const unsignedTx = avmBaseTx(
-        testContext,
-        [testAddress1],
-        [utxoMock],
-        [outputMock],
-      );
-
-      const result = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-      });
-
-      expect(result).toStrictEqual({
-        isValid: true,
-        txFee: testContext.baseTxFee,
-      });
-    });
-  });
-
-  describe('export from C', () => {
-    const unsignedTx = newExportTxFromBaseFee(
-      testContext,
-      25n,
-      1000000000n,
-      'X',
-      testEthAddress1,
-      [testAddress1],
-      1n,
-    );
-
-    it('throws if fee data is missing', () => {
-      expect(() =>
-        validateBurnedAmount({
-          unsignedTx,
-          context: testContext,
-          burnedAmount: (280750n * 75n) / 100n, // 25% lower
-        }),
-      ).toThrowError('missing evm fee data');
-
-      expect(() =>
-        validateBurnedAmount({
-          unsignedTx,
-          context: testContext,
-          burnedAmount: (280750n * 75n) / 100n, // 25% lower
-          evmBaseFee: 25n,
-        }),
-      ).toThrowError('missing evm fee data');
-    });
-
-    it('throws if evmFeeTolerance is incorrect', () => {
-      expect(() =>
-        validateBurnedAmount({
-          unsignedTx,
-          context: testContext,
-          burnedAmount: (280750n * 75n) / 100n, // 25% lower,
-          evmBaseFee: 25n,
-          evmFeeTolerance: 0.5,
-        }),
-      ).toThrowError('evmFeeTolerance must be [1,100]');
-
-      expect(() =>
-        validateBurnedAmount({
-          unsignedTx,
-          context: testContext,
-          burnedAmount: (280750n * 75n) / 100n, // 25% lower,
-          evmBaseFee: 25n,
-          evmFeeTolerance: 101,
-        }),
-      ).toThrowError('evmFeeTolerance must be [1,100]');
-    });
-
-    it('returns true if burned amount is in the tolerance range', () => {
-      const resultLower = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 75n) / 100n, // 25% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      const resultHigher = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 125n) / 100n, // 25% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      expect(resultLower).toStrictEqual({
-        isValid: true,
-        txFee: (280750n * 75n) / 100n,
-      });
-      expect(resultHigher).toStrictEqual({
-        isValid: true,
-        txFee: (280750n * 125n) / 100n,
-      });
-    });
-
-    it('returns false if burned amount is not in the tolerance range', () => {
-      const resultLower = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 49n) / 100n, // 51% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      const resultHigher = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 151n) / 100n, // 51% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      expect(resultLower).toStrictEqual({
-        isValid: false,
-        txFee: (280750n * 49n) / 100n,
-      });
-      expect(resultHigher).toStrictEqual({
-        isValid: false,
-        txFee: (280750n * 151n) / 100n,
-      });
-    });
-  });
-
-  describe('import to C', () => {
-    const unsignedTx = newImportTxFromBaseFee(
-      testContext,
-      testEthAddress1,
-      [testAddress1],
-      [utxoMock],
-      'X',
-      25n,
-    );
-
-    it('returns true if burned amount is in the tolerance range', () => {
-      const resultLower = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 75n) / 100n, // 25% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      const resultHigher = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 125n) / 100n, // 25% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      expect(resultLower).toStrictEqual({
-        isValid: true,
-        txFee: (280750n * 75n) / 100n,
-      });
-      expect(resultHigher).toStrictEqual({
-        isValid: true,
-        txFee: (280750n * 125n) / 100n,
-      });
-    });
-
-    it('returns false if burned amount is not in the tolerance range', () => {
-      const resultLower = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 49n) / 100n, // 51% lower
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      const resultHigher = validateBurnedAmount({
-        unsignedTx,
-        context: testContext,
-        burnedAmount: (280750n * 151n) / 100n, // 51% higher
-        evmBaseFee: 25n,
-        evmFeeTolerance: 50.9,
-      });
-
-      expect(resultLower).toStrictEqual({
-        isValid: false,
-        txFee: (280750n * 49n) / 100n,
-      });
-      expect(resultHigher).toStrictEqual({
-        isValid: false,
-        txFee: (280750n * 151n) / 100n,
-      });
-    });
-  });
-
+describe('validateAvaxBurnedAmountPreEtna', () => {
   const testData = [
     {
       name: 'base tx on X',
@@ -514,7 +320,7 @@ describe('validateBurnedAmount', () => {
 
   describe.each(testData)('$name', ({ unsignedTx, correctBurnedAmount }) => {
     it('returns true if burned amount is correct', () => {
-      const result = validateBurnedAmount({
+      const result = validateAvaxBurnedAmountPreEtna({
         unsignedTx,
         context: testContext,
         burnedAmount: correctBurnedAmount,
@@ -527,7 +333,7 @@ describe('validateBurnedAmount', () => {
     });
 
     it('returns false if burned amount is not correct', () => {
-      const result = validateBurnedAmount({
+      const result = validateAvaxBurnedAmountPreEtna({
         unsignedTx,
         context: testContext,
         burnedAmount: correctBurnedAmount - 1n,

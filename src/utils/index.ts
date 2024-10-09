@@ -14,4 +14,5 @@ export * from './getTransferableOutputsByTx';
 export * from './getUtxoInfo';
 export * from './getBurnedAmountByTx';
 export * from './validateBurnedAmount';
+export * from './isEtnaEnabled';
 export { unpackWithManager, getManagerForVM, packTx } from './packTx';
