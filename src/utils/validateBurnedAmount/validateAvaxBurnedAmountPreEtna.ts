@@ -1,4 +1,4 @@
-import type { Context } from '../vms/context/model';
+import type { Context } from '../../vms/context/model';
 import {
   isAddDelegatorTx,
   isAddPermissionlessDelegatorTx,
@@ -13,15 +13,24 @@ import {
   isRemoveSubnetValidatorTx,
   isTransferSubnetOwnershipTx,
   isTransformSubnetTx,
-} from '../serializable/pvm';
-import type { UnsignedTx } from '../vms/common';
+} from '../../serializable/pvm';
+import type { UnsignedTx } from '../../vms/common';
 import {
   isAvmBaseTx,
   isExportTx as isAvmExportTx,
   isImportTx as isAvmImportTx,
-} from '../serializable/avm';
-import { PrimaryNetworkID } from '../constants/networkIDs';
+} from '../../serializable/avm';
+import { PrimaryNetworkID } from '../../constants/networkIDs';
 
+/**
+ * Validate burned amount for pre-etna avalanche x/p transactions
+ *
+ * @param unsignedTx: unsigned transaction
+ * @param context
+ * @param burnedAmount: burned amount in nAVAX
+ * @return {boolean} isValid: : true if the burned amount is valid, false otherwise.
+ * @return {bigint} txFee: burned amount in nAVAX
+ */
 export const validateAvaxBurnedAmountPreEtna = ({
   unsignedTx,
   context,

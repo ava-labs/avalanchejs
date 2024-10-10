@@ -1,24 +1,24 @@
-import type { Context } from '../vms/context/model';
-import type { Transaction, UnsignedTx } from '../vms/common';
-import type { EVMTx } from '../serializable/evm';
-import { isImportExportTx as isEvmImportExportTx } from '../serializable/evm';
-import { getBurnedAmountByTx } from './getBurnedAmountByTx';
-import type { AvaxTx } from '../serializable/avax';
+import type { Context } from '../../vms/context/model';
+import type { Transaction, UnsignedTx } from '../../vms/common';
+import type { EVMTx } from '../../serializable/evm';
+import { isImportExportTx as isEvmImportExportTx } from '../../serializable/evm';
+import { getBurnedAmountByTx } from '../getBurnedAmountByTx';
+import type { AvaxTx } from '../../serializable/avax';
 import { validateEvmBurnedAmount } from './validateEvmBurnedAmount';
-import type { GetUpgradesInfoResponse } from '../info/model';
-import { isEtnaEnabled } from './isEtnaEnabled';
+import type { GetUpgradesInfoResponse } from '../../info/model';
+import { isEtnaEnabled } from '../isEtnaEnabled';
 import { validateAvaxBurnedAmountEtna } from './validateAvaxBurnedAmountEtna';
 import { validateAvaxBurnedAmountPreEtna } from './validateAvaxBurnedAmountPreEtna';
 import {
   isAvmBaseTx,
   isExportTx as isAvmExportTx,
   isImportTx as isAvmImportTx,
-} from '../serializable/avm';
+} from '../../serializable/avm';
 import {
   isAddDelegatorTx,
   isAddValidatorTx,
   isTransformSubnetTx,
-} from '../serializable/pvm';
+} from '../../serializable/pvm';
 
 const _getBurnedAmount = (tx: Transaction, context: Context) => {
   const burnedAmounts = getBurnedAmountByTx(tx as AvaxTx | EVMTx);
@@ -39,9 +39,16 @@ const isPreEtnaTx = (tx: Transaction) => {
 };
 
 /**
- * baseFee:
- * - evm fee: fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
- * - pvm dynamic fee caculator: @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
+ * Validate burned amount for avalanche transactions
+ *
+ * @param unsignedTx: unsigned transaction
+ * @param burnedAmount: burned amount in nAVAX
+ * @param baseFee
+ ** c-chain: fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
+ ** x/p-chain: pvm dynamic fee caculator, https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
+ * @param feeTolerance: tolerance percentage range where the burned amount is considered valid. e.g.: with FeeTolerance = 20% -> (expectedFee <= burnedAmount <= expectedFee * 1.2)
+ * @return {boolean} isValid: : true if the burned amount is valid, false otherwise.
+ * @return {bigint} txFee: burned amount in nAVAX
  */
 export const validateBurnedAmount = ({
   unsignedTx,

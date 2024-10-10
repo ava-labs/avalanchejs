@@ -1,15 +1,15 @@
-import { testAddress1, testAddress2 } from '../fixtures/vms';
-import { testContext } from '../fixtures/context';
-import { Utxo } from '../serializable/avax/utxo';
-import { utxoId } from '../fixtures/avax';
-import { Address, Id } from '../serializable/fxs/common';
-import { OutputOwners, TransferOutput } from '../serializable/fxs/secp256k1';
-import { BigIntPr, Int } from '../serializable/primitives';
+import { testAddress1, testAddress2 } from '../../fixtures/vms';
+import { testContext } from '../../fixtures/context';
+import { Utxo } from '../../serializable/avax/utxo';
+import { utxoId } from '../../fixtures/avax';
+import { Address, Id } from '../../serializable/fxs/common';
+import { OutputOwners, TransferOutput } from '../../serializable/fxs/secp256k1';
+import { BigIntPr, Int } from '../../serializable/primitives';
 import {
   newBaseTx as avmBaseTx,
   newExportTx as avmExportTx,
   newImportTx as avmImportTx,
-} from '../vms/avm';
+} from '../../vms/avm';
 import {
   newBaseTx as pvmBaseTx,
   newExportTx as pvmExportTx,
@@ -21,11 +21,14 @@ import {
   newAddPermissionlessDelegatorTx,
   newRemoveSubnetValidatorTx,
   newTransferSubnetOwnershipTx,
-} from '../vms/pvm';
-import { TransferableOutput } from '../serializable';
-import { nodeId } from '../fixtures/common';
-import { testSubnetId } from '../fixtures/transactions';
-import { blsPublicKeyBytes, blsSignatureBytes } from '../fixtures/primitives';
+} from '../../vms/pvm';
+import { TransferableOutput } from '../../serializable';
+import { nodeId } from '../../fixtures/common';
+import { testSubnetId } from '../../fixtures/transactions';
+import {
+  blsPublicKeyBytes,
+  blsSignatureBytes,
+} from '../../fixtures/primitives';
 import { validateAvaxBurnedAmountEtna } from './validateAvaxBurnedAmountEtna';
 
 const utxoMock = new Utxo(

@@ -9,9 +9,19 @@ import {
   isImportTx as isPvmImportTx,
   isRemoveSubnetValidatorTx,
   isTransferSubnetOwnershipTx,
-} from '../serializable/pvm';
-import type { UnsignedTx } from '../vms/common';
+} from '../../serializable/pvm';
+import type { UnsignedTx } from '../../vms/common';
 
+/**
+ * Validate burned amount for post-etna avalanche transactions
+ *
+ * @param unsignedTx: unsigned transaction
+ * @param burnedAmount: burned amount in nAVAX
+ * @param baseFee: pvm dynamic fee caculator, https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
+ * @param feeTolerance: tolerance percentage range where the burned amount is considered valid. e.g.: with FeeTolerance = 20% -> (expectedFee <= burnedAmount <= expectedFee * 1.2)
+ * @return {boolean} isValid: : true if the burned amount is valid, false otherwise.
+ * @return {bigint} txFee: burned amount in nAVAX
+ */
 export const validateAvaxBurnedAmountEtna = ({
   unsignedTx,
   burnedAmount,
@@ -20,8 +30,8 @@ export const validateAvaxBurnedAmountEtna = ({
 }: {
   unsignedTx: UnsignedTx;
   burnedAmount: bigint;
-  baseFee: bigint; // pvm dynamic fee caculator: @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
-  feeTolerance: number; // tolerance percentage range where the burned amount is considered valid. e.g.: with FeeTolerance = 20% -> (expectedFee <= burnedAmount <= expectedFee * 1.2)
+  baseFee: bigint;
+  feeTolerance: number;
 }): { isValid: boolean; txFee: bigint } => {
   const tx = unsignedTx.getTx();
 

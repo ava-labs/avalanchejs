@@ -1,11 +1,11 @@
-import { testAddress1, testEthAddress1 } from '../fixtures/vms';
-import { testContext } from '../fixtures/context';
-import { newExportTxFromBaseFee, newImportTxFromBaseFee } from '../vms/evm';
-import { Utxo } from '../serializable/avax/utxo';
-import { utxoId } from '../fixtures/avax';
-import { Address, Id } from '../serializable/fxs/common';
-import { OutputOwners, TransferOutput } from '../serializable/fxs/secp256k1';
-import { BigIntPr, Int } from '../serializable/primitives';
+import { testAddress1, testEthAddress1 } from '../../fixtures/vms';
+import { testContext } from '../../fixtures/context';
+import { newExportTxFromBaseFee, newImportTxFromBaseFee } from '../../vms/evm';
+import { Utxo } from '../../serializable/avax/utxo';
+import { utxoId } from '../../fixtures/avax';
+import { Address, Id } from '../../serializable/fxs/common';
+import { OutputOwners, TransferOutput } from '../../serializable/fxs/secp256k1';
+import { BigIntPr, Int } from '../../serializable/primitives';
 import { validateEvmBurnedAmount } from './validateEvmBurnedAmount';
 
 const utxoMock = new Utxo(
