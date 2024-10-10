@@ -29,7 +29,7 @@ const _getBurnedAmount = (tx: Transaction, context: Context) => {
   return burnedAmounts.get(context.avaxAssetID) ?? 0n;
 };
 
-// Supported transactions for Etna
+// Check supported pvm transactions for Etna
 // Todo: add isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynmamic fee is implemented
 const isEtnaSupported = (tx: Transaction) => {
   return (
