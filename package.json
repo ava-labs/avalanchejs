@@ -28,7 +28,8 @@
     "lint": "eslint --fix --ignore-path .gitignore \"./**/*.ts*\"",
     "lint:check": "eslint --ignore-path .gitignore \"./**/*.ts*\"",
     "typecheck": "tsc --skipLibCheck --noEmit",
-    "example": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/c-chain/export.ts",
+    "export-c": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/c-chain/export.ts",
+    "import-p": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/import.ts",
     "prepare": "husky install"
   },
   "dependencies": {
