@@ -76,7 +76,7 @@ export const validateBurnedAmount = ({
       feeTolerance,
     });
   }
-  if (isEtnaEnabled(upgradesInfo) || !isPreEtnaTx(tx)) {
+  if (isEtnaEnabled(upgradesInfo) && !isPreEtnaTx(tx)) {
     return validateAvaxBurnedAmountEtna({
       unsignedTx,
       baseFee,
