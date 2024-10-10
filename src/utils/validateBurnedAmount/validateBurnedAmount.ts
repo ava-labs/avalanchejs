@@ -71,7 +71,7 @@ export const validateBurnedAmount = ({
 }: {
   unsignedTx: UnsignedTx;
   context: Context;
-  upgradesInfo: GetUpgradesInfoResponse;
+  upgradesInfo?: GetUpgradesInfoResponse;
   burnedAmount?: bigint;
   baseFee: bigint;
   feeTolerance: number;
@@ -81,7 +81,7 @@ export const validateBurnedAmount = ({
 
   if (
     isEvmImportExportTx(tx) ||
-    (isEtnaEnabled(upgradesInfo) && isEtnaSupported(tx))
+    (upgradesInfo && isEtnaEnabled(upgradesInfo) && isEtnaSupported(tx))
   ) {
     const feeAmount = isEvmImportExportTx(tx)
       ? baseFee * costCorethTx(unsignedTx)
