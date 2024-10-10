@@ -9,7 +9,7 @@ import type { GetUpgradesInfoResponse } from '../../info/model';
 import { isEtnaEnabled } from '../isEtnaEnabled';
 import { validateStaticBurnedAmount } from './validateStaticBurnedAmount';
 import { costCorethTx } from '../costs';
-import { calculateFee } from '../../vms/pvm';
+import { calculateFee } from '../../vms/pvm/txs/fee/calculator';
 
 import {
   isAddPermissionlessDelegatorTx,
