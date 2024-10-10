@@ -23,7 +23,7 @@ import {
 import { PrimaryNetworkID } from '../../constants/networkIDs';
 
 /**
- * Validate burned amount for pre-etna avalanche x/p transactions
+ * Validate static burned amount for avalanche x/p transactions
  *
  * @param unsignedTx: unsigned transaction
  * @param context
@@ -31,7 +31,7 @@ import { PrimaryNetworkID } from '../../constants/networkIDs';
  * @return {boolean} isValid: : true if the burned amount is valid, false otherwise.
  * @return {bigint} txFee: burned amount in nAVAX
  */
-export const validateAvaxBurnedAmountPreEtna = ({
+export const validateStaticBurnedAmount = ({
   unsignedTx,
   context,
   burnedAmount,

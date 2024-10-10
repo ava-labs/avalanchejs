@@ -4,20 +4,24 @@ import type { EVMTx } from '../../serializable/evm';
 import { isImportExportTx as isEvmImportExportTx } from '../../serializable/evm';
 import { getBurnedAmountByTx } from '../getBurnedAmountByTx';
 import type { AvaxTx } from '../../serializable/avax';
-import { validateEvmBurnedAmount } from './validateEvmBurnedAmount';
+import { validateDynamicBurnedAmount } from './validateDynamicBurnedAmount';
 import type { GetUpgradesInfoResponse } from '../../info/model';
 import { isEtnaEnabled } from '../isEtnaEnabled';
-import { validateAvaxBurnedAmountEtna } from './validateAvaxBurnedAmountEtna';
-import { validateAvaxBurnedAmountPreEtna } from './validateAvaxBurnedAmountPreEtna';
+import { validateStaticBurnedAmount } from './validateStaticBurnedAmount';
+import { costCorethTx } from '../costs';
+import { calculateFee } from '../../vms/pvm';
+
 import {
-  isAvmBaseTx,
-  isExportTx as isAvmExportTx,
-  isImportTx as isAvmImportTx,
-} from '../../serializable/avm';
-import {
-  isAddDelegatorTx,
-  isAddValidatorTx,
-  isTransformSubnetTx,
+  isAddPermissionlessDelegatorTx,
+  isAddPermissionlessValidatorTx,
+  isAddSubnetValidatorTx,
+  isCreateChainTx,
+  isCreateSubnetTx,
+  isPvmBaseTx,
+  isExportTx as isPvmExportTx,
+  isImportTx as isPvmImportTx,
+  isRemoveSubnetValidatorTx,
+  isTransferSubnetOwnershipTx,
 } from '../../serializable/pvm';
 
 const _getBurnedAmount = (tx: Transaction, context: Context) => {
@@ -25,16 +29,23 @@ const _getBurnedAmount = (tx: Transaction, context: Context) => {
   return burnedAmounts.get(context.avaxAssetID) ?? 0n;
 };
 
-// Transactions that are deprecated or not implemented for Etna
-// Todo: remove isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynmamic fee is implemented
-const isPreEtnaTx = (tx: Transaction) => {
+// Supported transactions for Etna
+// Todo: add isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynmamic fee is implemented
+const isEtnaSupported = (tx: Transaction) => {
   return (
-    isAvmBaseTx(tx) || // not implemented
-    isAvmExportTx(tx) || // not implemented
-    isAvmImportTx(tx) || // not implemented
-    isAddValidatorTx(tx) || // deprecated
-    isAddDelegatorTx(tx) || // deprecated
-    isTransformSubnetTx(tx) // deprecated
+    // isAvmBaseTx(tx) || // not implemented
+    // isAvmExportTx(tx) || // not implemented
+    // isAvmImportTx(tx) || // not implemented
+    isPvmBaseTx(tx) ||
+    isPvmExportTx(tx) ||
+    isPvmImportTx(tx) ||
+    isAddPermissionlessValidatorTx(tx) ||
+    isAddPermissionlessDelegatorTx(tx) ||
+    isAddSubnetValidatorTx(tx) ||
+    isCreateChainTx(tx) ||
+    isCreateSubnetTx(tx) ||
+    isRemoveSubnetValidatorTx(tx) ||
+    isTransferSubnetOwnershipTx(tx)
   );
 };
 
@@ -63,28 +74,25 @@ export const validateBurnedAmount = ({
   upgradesInfo: GetUpgradesInfoResponse;
   burnedAmount?: bigint;
   baseFee: bigint;
-  feeTolerance: number; // tolerance percentage range where the burned amount is considered valid.
+  feeTolerance: number;
 }): { isValid: boolean; txFee: bigint } => {
   const tx = unsignedTx.getTx();
   const burned = burnedAmount ?? _getBurnedAmount(tx, context);
 
-  if (isEvmImportExportTx(tx)) {
-    return validateEvmBurnedAmount({
-      unsignedTx,
+  if (
+    isEvmImportExportTx(tx) ||
+    (isEtnaEnabled(upgradesInfo) && isEtnaSupported(tx))
+  ) {
+    const feeAmount = isEvmImportExportTx(tx)
+      ? baseFee * costCorethTx(unsignedTx)
+      : calculateFee(tx, context.platformFeeConfig.weights, baseFee);
+    return validateDynamicBurnedAmount({
       burnedAmount: burned,
-      baseFee,
+      feeAmount,
       feeTolerance,
     });
   }
-  if (isEtnaEnabled(upgradesInfo) && !isPreEtnaTx(tx)) {
-    return validateAvaxBurnedAmountEtna({
-      unsignedTx,
-      baseFee,
-      burnedAmount: burned,
-      feeTolerance,
-    });
-  }
-  return validateAvaxBurnedAmountPreEtna({
+  return validateStaticBurnedAmount({
     unsignedTx,
     context,
     burnedAmount: burned,

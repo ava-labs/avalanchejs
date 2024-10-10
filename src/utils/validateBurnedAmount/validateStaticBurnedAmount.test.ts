@@ -33,7 +33,7 @@ import {
   blsPublicKeyBytes,
   blsSignatureBytes,
 } from '../../fixtures/primitives';
-import { validateAvaxBurnedAmountPreEtna } from './validateAvaxBurnedAmountPreEtna';
+import { validateStaticBurnedAmount } from './validateStaticBurnedAmount';
 
 const utxoMock = new Utxo(
   utxoId(),
@@ -56,7 +56,7 @@ const outputMock = new TransferableOutput(
   ),
 );
 
-describe('validateAvaxBurnedAmountPreEtna', () => {
+describe('validateStaticBurnedAmount', () => {
   const testData = [
     {
       name: 'base tx on X',
@@ -323,7 +323,7 @@ describe('validateAvaxBurnedAmountPreEtna', () => {
 
   describe.each(testData)('$name', ({ unsignedTx, correctBurnedAmount }) => {
     it('returns true if burned amount is correct', () => {
-      const result = validateAvaxBurnedAmountPreEtna({
+      const result = validateStaticBurnedAmount({
         unsignedTx,
         context: testContext,
         burnedAmount: correctBurnedAmount,
@@ -336,7 +336,7 @@ describe('validateAvaxBurnedAmountPreEtna', () => {
     });
 
     it('returns false if burned amount is not correct', () => {
-      const result = validateAvaxBurnedAmountPreEtna({
+      const result = validateStaticBurnedAmount({
         unsignedTx,
         context: testContext,
         burnedAmount: correctBurnedAmount - 1n,
