@@ -5,13 +5,13 @@ import type {
 } from '../../../serializable';
 import { OutputOwners } from '../../../serializable';
 import type { Utxo } from '../../../serializable/avax/utxo';
-import type { SpendOptions } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
 import type { FeeState } from '../models';
 import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
 import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
 import { SpendHelper } from './spendHelper';
+import type { BuilderSpendOptions } from './types';
 
 type SpendResult = Readonly<{
   /**
@@ -51,6 +51,7 @@ export type SpendProps = Readonly<{
    * The initial complexity of the transaction.
    */
   initialComplexity: Dimensions;
+  minIssuanceTime: bigint;
   /**
    * Optionally specifies the output owners to use for the unlocked
    * AVAX change output if no additional AVAX was needed to be burned.
@@ -65,7 +66,7 @@ export type SpendProps = Readonly<{
    * @default false
    */
   shouldConsolidateOutputs?: boolean;
-  spendOptions: Required<SpendOptions>;
+  spendOptions: Required<BuilderSpendOptions>;
   /**
    * Maps `assetID` to the amount of the asset to spend without
    * producing an output. This is typically used for fees.
@@ -106,6 +107,7 @@ export const spend = (
     feeState,
     fromAddresses,
     initialComplexity,
+    minIssuanceTime,
     ownerOverride,
     shouldConsolidateOutputs = false,
     spendOptions,
@@ -138,6 +140,7 @@ export const spend = (
       excessAVAX,
       initialComplexity,
       fromAddresses,
+      minIssuanceTime,
       ownerOverride: changeOwners,
       spendOptions,
       toBurn,

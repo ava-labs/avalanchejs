@@ -38,7 +38,7 @@ export const getUsableUTXOsFilter =
       throw IncorrectStakeableLockOutError;
     }
 
-    return utxo.output.getLocktime() < state.spendOptions.minIssuanceTime;
+    return utxo.output.getLocktime() < state.minIssuanceTime;
   };
 
 export const useUnlockedUTXOs: SpendReducerFunction = (
@@ -58,7 +58,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
     (utxo) =>
       isTransferOut(utxo.output) ? utxo.output : utxo.output.transferOut,
     state.fromAddresses,
-    state.spendOptions,
+    state.minIssuanceTime,
   );
 
   // 3. Split verified usable UTXOs into AVAX assetId UTXOs and other assetId UTXOs.

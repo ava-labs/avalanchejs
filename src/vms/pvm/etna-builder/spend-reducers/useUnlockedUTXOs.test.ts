@@ -32,9 +32,7 @@ describe('useUnlockedUTXOs', () => {
   describe('getUsableUTXOsFilter', () => {
     test('returns `true` if UTXO output is a TransferOutput and the locktime is less than the minIssuanceTime', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
       const utxo = getValidUtxo();
       expect(getUsableUTXOsFilter(state)(utxo)).toBe(true);
@@ -42,9 +40,7 @@ describe('useUnlockedUTXOs', () => {
 
     test('returns `false` if UTXO output is a TransferOutput and the locktime is equal or greater than the minIssuanceTime', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
       const utxo = getLockedUTXO(new BigIntPr(100n), 100n);
       expect(getUsableUTXOsFilter(state)(utxo)).toBe(false);
@@ -52,9 +48,7 @@ describe('useUnlockedUTXOs', () => {
 
     test('returns `true` if UTXO output is a StakeableLockOut and the locktime is less than the minIssuanceTime', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
 
       const utxo = getStakeableLockoutOutput(testUTXOID1, 100n, 50n);
@@ -64,9 +58,7 @@ describe('useUnlockedUTXOs', () => {
 
     test('returns `false` if UTXO output is a StakeableLockOut and the locktime is equal or greater than the minIssuanceTime', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
 
       const utxo = getStakeableLockoutOutput(testUTXOID1, 100n, 100n);
@@ -76,9 +68,7 @@ describe('useUnlockedUTXOs', () => {
 
     test('throws an error if UTXO output is a StakeableLockOut and the transferOut is not a TransferOutput', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
 
       const invalidUTXO = new Utxo(

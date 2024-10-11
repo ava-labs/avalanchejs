@@ -30,6 +30,7 @@ export const getInitialReducerState = ({
     compute: 1,
   }),
   fromAddresses: [CHANGE_ADDRESS],
+  minIssuanceTime: BigInt(Math.floor(new Date().getTime() / 1000)),
   ownerOverride: null,
   spendOptions: defaultSpendOptions(
     state?.fromAddresses?.map((address) => address.toBytes()) ?? [

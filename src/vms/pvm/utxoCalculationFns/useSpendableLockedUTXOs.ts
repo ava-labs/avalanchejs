@@ -75,7 +75,7 @@ export function useSpendableLockedUTXOs({
       return lockedOutput.transferOut as TransferOutput;
     },
     fromAddresses,
-    options,
+    options.minIssuanceTime,
   ).forEach(({ sigData, data: { utxo, assetId, lockedOutput } }) => {
     const out = lockedOutput.transferOut as TransferOutput;
     const remainingAmountToStake = amountsToStake.get(assetId) ?? 0n;
