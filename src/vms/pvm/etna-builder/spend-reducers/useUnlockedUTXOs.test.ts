@@ -115,7 +115,7 @@ describe('useUnlockedUTXOs', () => {
     const { inputs } = spendHelper.getInputsOutputs();
 
     expect(state.excessAVAX).toEqual(10_000n - 4_900n - 4_900n);
-    expect(state.ownerOverride).toBe(null);
+    expect(state.changeOwnerOverride).toBe(null);
     expect(inputs).toHaveLength(1);
     expect(inputs[0].getAssetId()).toEqual(testContext.avaxAssetID);
   });

@@ -11,7 +11,17 @@ import type { FeeState } from '../models';
 import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
 import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
 import { SpendHelper } from './spendHelper';
-import type { BuilderSpendOptions } from './types';
+
+const getChangeAddressesBytes = (
+  changeAddressesBytes: readonly Uint8Array[] | undefined,
+  fromAddresses: readonly Uint8Array[],
+): readonly Uint8Array[] => {
+  if (changeAddressesBytes && changeAddressesBytes.length > 0) {
+    return changeAddressesBytes;
+  }
+
+  return [...fromAddresses];
+};
 
 type SpendResult = Readonly<{
   /**
@@ -38,6 +48,20 @@ type SpendResult = Readonly<{
 
 export type SpendProps = Readonly<{
   /**
+   * List of addresses that are used for change outputs.
+   *
+   * Defaults to the addresses provided in `fromAddressesBytes`.
+   */
+  changeAddressesBytes?: readonly Uint8Array[];
+  /**
+   * Optionally specifies the output owners to use for the unlocked
+   * AVAX change output if no additional AVAX was needed to be burned.
+   * If this value is `undefined` or `null`, the default change owner is used.
+   *
+   * Used in ImportTx.
+   */
+  changeOwnerOverride?: OutputOwners | null;
+  /**
    * The extra AVAX that spend can produce in
    * the change outputs in addition to the consumed and not burned AVAX.
    */
@@ -53,20 +77,11 @@ export type SpendProps = Readonly<{
   initialComplexity: Dimensions;
   minIssuanceTime: bigint;
   /**
-   * Optionally specifies the output owners to use for the unlocked
-   * AVAX change output if no additional AVAX was needed to be burned.
-   * If this value is `undefined` or `null`, the default change owner is used.
-   *
-   * Used in ImportTx.
-   */
-  ownerOverride?: OutputOwners | null;
-  /**
    * Whether to consolidate change and stake outputs.
    *
    * @default false
    */
   shouldConsolidateOutputs?: boolean;
-  spendOptions: Required<BuilderSpendOptions>;
   /**
    * Maps `assetID` to the amount of the asset to spend without
    * producing an output. This is typically used for fees.
@@ -103,14 +118,14 @@ export type SpendProps = Readonly<{
  */
 export const spend = (
   {
+    changeAddressesBytes: _changeAddressesBytes,
+    changeOwnerOverride,
     excessAVAX = 0n,
     feeState,
     fromAddresses,
     initialComplexity,
     minIssuanceTime,
-    ownerOverride,
     shouldConsolidateOutputs = false,
-    spendOptions,
     toBurn = new Map(),
     toStake = new Map(),
     utxos,
@@ -119,8 +134,13 @@ export const spend = (
   context: Context,
 ): SpendResult => {
   try {
+    const changeAddressesBytes = getChangeAddressesBytes(
+      _changeAddressesBytes,
+      fromAddresses.map((address) => address.toBytes()),
+    );
+
     const changeOwners =
-      ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
+      changeOwnerOverride || OutputOwners.fromNative(changeAddressesBytes);
 
     const gasPrice: bigint = feeState.price;
 
@@ -137,12 +157,12 @@ export const spend = (
     });
 
     const initialState: SpendReducerState = {
+      changeAddressesBytes,
+      changeOwnerOverride: changeOwners,
       excessAVAX,
       initialComplexity,
       fromAddresses,
       minIssuanceTime,
-      ownerOverride: changeOwners,
-      spendOptions,
       toBurn,
       toStake,
       utxos,

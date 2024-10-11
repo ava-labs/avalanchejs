@@ -45,8 +45,8 @@ export const handleFeeAndChange: SpendReducerFunction = (
   // Use the change owner override if it exists, otherwise use the default change owner.
   // This is used on "import" transactions.
   const changeOwners =
-    state.ownerOverride ??
-    OutputOwners.fromNative(state.spendOptions.changeAddresses);
+    state.changeOwnerOverride ??
+    OutputOwners.fromNative(state.changeAddressesBytes);
 
   const requiredFee = spendHelper.calculateFee();
 

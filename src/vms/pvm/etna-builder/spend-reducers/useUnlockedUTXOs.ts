@@ -90,7 +90,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
     );
 
   const changeOwner = OutputOwners.fromNative(
-    state.spendOptions.changeAddresses,
+    state.changeAddressesBytes,
     0n,
     1,
   );
@@ -147,7 +147,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
 
   // 5. Handle AVAX asset UTXOs last to account for fees.
   let excessAVAX = state.excessAVAX;
-  let clearOwnerOverride = false;
+  let clearChangeOwnerOverride = false;
   for (const { sigData, data: utxo } of avaxVerifiedUsableUTXOs) {
     const requiredFee = spendHelper.calculateFee();
 
@@ -189,12 +189,14 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
     excessAVAX += remainingAmount;
 
     // The ownerOverride is no longer needed. Clear it.
-    clearOwnerOverride = true;
+    clearChangeOwnerOverride = true;
   }
 
   return {
     ...state,
+    changeOwnerOverride: clearChangeOwnerOverride
+      ? null
+      : state.changeOwnerOverride,
     excessAVAX,
-    ownerOverride: clearOwnerOverride ? null : state.ownerOverride,
   };
 };
