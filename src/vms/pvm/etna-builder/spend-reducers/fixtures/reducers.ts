@@ -17,10 +17,7 @@ export const CHANGE_OWNERS: OutputOwners = OutputOwners.fromNative([
 export const getInitialReducerState = ({
   ...state
 }: Partial<SpendReducerState> = {}): SpendReducerState => ({
-  changeAddressesBytes: state?.fromAddresses?.map((address) =>
-    address.toBytes(),
-  ) ?? [CHANGE_ADDRESS.toBytes()],
-  changeOwnerOverride: null,
+  changeOutputOwners: CHANGE_OWNERS,
   excessAVAX: 0n,
   initialComplexity: createDimensions({
     bandwidth: 1,

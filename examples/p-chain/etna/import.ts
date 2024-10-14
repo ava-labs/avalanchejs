@@ -18,7 +18,7 @@ const main = async () => {
       feeState,
       fromAddressesBytes: [utils.bech32ToBytes(X_CHAIN_ADDRESS)],
       sourceChainId: context.xBlockchainID,
-      toAddresses: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
+      toAddressesBytes: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
       utxos,
     },
     context,

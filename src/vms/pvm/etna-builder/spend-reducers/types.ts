@@ -3,14 +3,7 @@ import type { SpendProps } from '../spend';
 import type { SpendHelper } from '../spendHelper';
 
 export type SpendReducerState = Readonly<
-  Required<
-    Omit<
-      SpendProps,
-      'changeAddressesBytes' | 'feeState' | 'shouldConsolidateOutputs'
-    >
-  > & {
-    changeAddressesBytes: readonly Uint8Array[];
-  }
+  Required<Omit<SpendProps, 'feeState' | 'shouldConsolidateOutputs'>>
 >;
 
 export type SpendReducerFunction = (

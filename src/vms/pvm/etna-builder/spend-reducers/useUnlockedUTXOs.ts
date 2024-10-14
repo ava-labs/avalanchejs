@@ -1,6 +1,5 @@
 import {
   BigIntPr,
-  OutputOwners,
   TransferInput,
   TransferOutput,
   TransferableInput,
@@ -89,12 +88,6 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       { otherVerifiedUsableUTXOs: [], avaxVerifiedUsableUTXOs: [] },
     );
 
-  const changeOwner = OutputOwners.fromNative(
-    state.changeAddressesBytes,
-    0n,
-    1,
-  );
-
   // 4. Handle all the non-AVAX asset UTXOs first.
   for (const { sigData, data: utxo } of otherVerifiedUsableUTXOs) {
     const utxoInfo = getUtxoInfo(utxo);
@@ -129,7 +122,10 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       spendHelper.addStakedOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferOutput(new BigIntPr(amountToStake), changeOwner),
+          new TransferOutput(
+            new BigIntPr(amountToStake),
+            state.changeOutputOwners,
+          ),
         ),
       );
     }
@@ -139,7 +135,10 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       spendHelper.addChangeOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferOutput(new BigIntPr(remainingAmount), changeOwner),
+          new TransferOutput(
+            new BigIntPr(remainingAmount),
+            state.changeOutputOwners,
+          ),
         ),
       );
     }
@@ -147,7 +146,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
 
   // 5. Handle AVAX asset UTXOs last to account for fees.
   let excessAVAX = state.excessAVAX;
-  let clearChangeOwnerOverride = false;
+
   for (const { sigData, data: utxo } of avaxVerifiedUsableUTXOs) {
     const requiredFee = spendHelper.calculateFee();
 
@@ -181,22 +180,19 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       spendHelper.addStakedOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferOutput(new BigIntPr(amountToStake), changeOwner),
+          new TransferOutput(
+            new BigIntPr(amountToStake),
+            state.changeOutputOwners,
+          ),
         ),
       );
     }
 
     excessAVAX += remainingAmount;
-
-    // The ownerOverride is no longer needed. Clear it.
-    clearChangeOwnerOverride = true;
   }
 
   return {
     ...state,
-    changeOwnerOverride: clearChangeOwnerOverride
-      ? null
-      : state.changeOwnerOverride,
     excessAVAX,
   };
 };

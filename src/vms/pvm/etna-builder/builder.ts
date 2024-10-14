@@ -69,6 +69,24 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 
+/**
+ * Creates OutputOwners used for change outputs with the specified
+ * `changeAddressBytes` if provided, otherwise uses the `fromAddressesBytes`.
+ */
+const getChangeOutputOwners = ({
+  fromAddressesBytes,
+  changeAddressesBytes,
+}: {
+  fromAddressesBytes: readonly Uint8Array[];
+  changeAddressesBytes?: readonly Uint8Array[];
+}): OutputOwners => {
+  return OutputOwners.fromNative(
+    changeAddressesBytes ?? fromAddressesBytes,
+    0n,
+    1,
+  );
+};
+
 const getAddressMaps = ({
   inputs,
   inputUTXOs,
@@ -154,9 +172,9 @@ export type NewBaseTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM base transaction (`BaseTx`) using calculated dynamic fees.
  *
- * @param props {NewBaseTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   {
@@ -192,7 +210,10 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses,
@@ -225,35 +246,37 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   );
 };
 
-export type NewImportTxProps = TxProps<{
-  /**
-   * The locktime to write onto the UTXO.
-   */
-  locktime?: bigint;
-  /**
-   * Base58 string of the source chain ID.
-   */
-  sourceChainId: string;
-  /**
-   * The threshold to write on the UTXO.
-   */
-  threshold?: number;
-  /**
-   * List of addresses to import into.
-   */
-  toAddresses: readonly Uint8Array[];
-}>;
+export type NewImportTxProps = Omit<
+  TxProps<{
+    /**
+     * The locktime to write onto the UTXO.
+     */
+    locktime?: bigint;
+    /**
+     * Base58 string of the source chain ID.
+     */
+    sourceChainId: string;
+    /**
+     * The threshold to write on the UTXO.
+     */
+    threshold?: number;
+    /**
+     * List of addresses to import into.
+     */
+    toAddressesBytes: readonly Uint8Array[];
+  }>,
+  'changeAddressesBytes'
+>;
 
 /**
  * Creates a new unsigned PVM import transaction (`ImportTx`) using calculated dynamic fees.
  *
- * @param props {NewImportTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   {
-    changeAddressesBytes,
     feeState,
     fromAddressesBytes,
     locktime,
@@ -261,7 +284,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     minIssuanceTime = getDefaultMinIssuanceTime(),
     sourceChainId,
     threshold,
-    toAddresses,
+    toAddressesBytes,
     utxos,
   },
   context,
@@ -329,13 +352,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   const outputs: TransferableOutput[] = Object.entries(importedAmounts)
     .filter(([assetID]) => assetID !== context.avaxAssetID)
     .map(([assetID, amount]) =>
-      TransferableOutput.fromNative(
-        assetID,
-        amount,
-        toAddresses,
-        locktime,
-        threshold,
-      ),
+      TransferableOutput.fromNative(assetID, amount, toAddressesBytes),
     );
 
   const memoComplexity = getMemoComplexity(memo);
@@ -353,9 +370,8 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
-      changeOwnerOverride: OutputOwners.fromNative(
-        toAddresses,
+      changeOutputOwners: OutputOwners.fromNative(
+        toAddressesBytes,
         locktime,
         threshold,
       ),
@@ -403,9 +419,9 @@ export type NewExportTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM export transaction (`ExportTx`) using calculated dynamic fees.
  *
- * @param props {NewExportTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newExportTx: TxBuilderFn<NewExportTxProps> = (
   {
@@ -441,7 +457,10 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses,
@@ -494,9 +513,9 @@ export type NewCreateSubnetTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM create subnet transaction (`CreateSubnetTx`) using calculated dynamic fees.
  *
- * @param props {NewCreateSubnetTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   {
@@ -526,7 +545,10 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -590,9 +612,9 @@ export type NewCreateChainTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM create chain transaction (`CreateChainTx`) using calculated dynamic fees.
  *
- * @param props {NewCreateChainTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   {
@@ -638,7 +660,10 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -696,9 +721,9 @@ export type NewAddSubnetValidatorTxProps = TxProps<{
  * Creates a new unsigned PVM add subnet validator transaction
  * (`AddSubnetValidatorTx`) using calculated dynamic fees.
  *
- * @param props {NewAddSubnetValidatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newAddSubnetValidatorTx: TxBuilderFn<
   NewAddSubnetValidatorTxProps
@@ -731,7 +756,10 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -788,9 +816,9 @@ export type NewRemoveSubnetValidatorTxProps = TxProps<{
  * Creates a new unsigned PVM remove subnet validator transaction
  * (`RemoveSubnetValidatorTx`) using calculated dynamic fees.
  *
- * @param props {NewRemoveSubnetValidatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newRemoveSubnetValidatorTx: TxBuilderFn<
   NewRemoveSubnetValidatorTxProps
@@ -820,7 +848,10 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -920,9 +951,9 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
  * Creates a new unsigned PVM add permissionless validator transaction
  * (`AddPermissionlessValidatorTx`) using calculated dynamic fees.
  *
- * @param props {NewAddPermissionlessValidatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newAddPermissionlessValidatorTx: TxBuilderFn<
   NewAddPermissionlessValidatorTxProps
@@ -987,7 +1018,10 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -1082,9 +1116,9 @@ export type NewAddPermissionlessDelegatorTxProps = TxProps<{
  * Creates a new unsigned PVM add permissionless delegator transaction
  * (`AddPermissionlessDelegatorTx`) using calculated dynamic fees.
  *
- * @param props {NewAddPermissionlessDelegatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   NewAddPermissionlessDelegatorTxProps
@@ -1136,7 +1170,10 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
@@ -1211,9 +1248,9 @@ export type NewTransferSubnetOwnershipTxProps = TxProps<{
  * Creates a new unsigned PVM transfer subnet ownership transaction
  * (`TransferSubnetOwnershipTx`) using calculated dynamic fees.
  *
- * @param props {NewTransferSubnetOwnershipTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newTransferSubnetOwnershipTx: TxBuilderFn<
   NewTransferSubnetOwnershipTxProps
@@ -1250,7 +1287,10 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
 
   const spendResults = spend(
     {
-      changeAddressesBytes,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),

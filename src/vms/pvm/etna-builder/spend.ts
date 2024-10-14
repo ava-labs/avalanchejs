@@ -12,17 +12,6 @@ import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
 import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
 import { SpendHelper } from './spendHelper';
 
-const getChangeAddressesBytes = (
-  changeAddressesBytes: readonly Uint8Array[] | undefined,
-  fromAddresses: readonly Uint8Array[],
-): readonly Uint8Array[] => {
-  if (changeAddressesBytes && changeAddressesBytes.length > 0) {
-    return changeAddressesBytes;
-  }
-
-  return [...fromAddresses];
-};
-
 type SpendResult = Readonly<{
   /**
    * The consolidated and sorted change outputs.
@@ -48,19 +37,9 @@ type SpendResult = Readonly<{
 
 export type SpendProps = Readonly<{
   /**
-   * List of addresses that are used for change outputs.
-   *
-   * Defaults to the addresses provided in `fromAddressesBytes`.
+   * Output owners for the change outputs.
    */
-  changeAddressesBytes?: readonly Uint8Array[];
-  /**
-   * Optionally specifies the output owners to use for the unlocked
-   * AVAX change output if no additional AVAX was needed to be burned.
-   * If this value is `undefined` or `null`, the default change owner is used.
-   *
-   * Used in ImportTx.
-   */
-  changeOwnerOverride?: OutputOwners | null;
+  changeOutputOwners: OutputOwners;
   /**
    * The extra AVAX that spend can produce in
    * the change outputs in addition to the consumed and not burned AVAX.
@@ -118,8 +97,7 @@ export type SpendProps = Readonly<{
  */
 export const spend = (
   {
-    changeAddressesBytes: _changeAddressesBytes,
-    changeOwnerOverride,
+    changeOutputOwners,
     excessAVAX = 0n,
     feeState,
     fromAddresses,
@@ -134,13 +112,11 @@ export const spend = (
   context: Context,
 ): SpendResult => {
   try {
-    const changeAddressesBytes = getChangeAddressesBytes(
-      _changeAddressesBytes,
-      fromAddresses.map((address) => address.toBytes()),
-    );
-
     const changeOwners =
-      changeOwnerOverride || OutputOwners.fromNative(changeAddressesBytes);
+      changeOutputOwners ||
+      OutputOwners.fromNative(
+        fromAddresses.map((address) => address.toBytes()),
+      );
 
     const gasPrice: bigint = feeState.price;
 
@@ -157,8 +133,7 @@ export const spend = (
     });
 
     const initialState: SpendReducerState = {
-      changeAddressesBytes,
-      changeOwnerOverride: changeOwners,
+      changeOutputOwners: changeOwners,
       excessAVAX,
       initialComplexity,
       fromAddresses,

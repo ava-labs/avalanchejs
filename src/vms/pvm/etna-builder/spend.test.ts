@@ -27,7 +27,7 @@ const CHANGE_OWNERS: OutputOwners = OutputOwners.fromNative([
 ]);
 
 const getSpendProps = (state: Partial<SpendReducerState> = {}): SpendProps => ({
-  changeOwnerOverride: null,
+  changeOutputOwners: CHANGE_OWNERS,
   excessAVAX: 0n,
   initialComplexity: createDimensions({
     bandwidth: 1,
@@ -77,12 +77,12 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     ).toThrow('An unexpected error occurred during spend calculation');
   });
 
-  test('change owners in state should default to from addresses', () => {
+  test('change output owners in state should default to from addresses', () => {
     expect.assertions(1);
 
     const initialState = getSpendProps({ excessAVAX: 1_000n });
     const testReducer = jest.fn<SpendReducerFunction>((state) => {
-      expect(state.changeOwnerOverride).toEqual(
+      expect(state.changeOutputOwners).toEqual(
         OutputOwners.fromNative(
           initialState.fromAddresses.map((address) => address.toBytes()),
         ),
@@ -93,41 +93,21 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     spend(initialState, [testReducer], testContext);
   });
 
-  test('change owners in state should be change addresses', () => {
+  test('change output owners in state should be value provided', () => {
     expect.assertions(1);
 
     const changeAddressesBytes = [
       bech32ToBytes('P-fuji1t43hr35eu9enk7tfyqq4ukpww4stpzf74kxjfk'),
     ];
 
+    const OWNERS = OutputOwners.fromNative(changeAddressesBytes);
+
     const initialState = getSpendProps({
-      changeAddressesBytes,
+      changeOutputOwners: OWNERS,
       excessAVAX: 1_000n,
     });
     const testReducer = jest.fn<SpendReducerFunction>((state) => {
-      expect(state.changeOwnerOverride).toEqual(
-        OutputOwners.fromNative(changeAddressesBytes),
-      );
-      return state;
-    });
-
-    spend(initialState, [testReducer], testContext);
-  });
-
-  test('change owners in state should be ownerOverride if provided', () => {
-    expect.assertions(1);
-
-    const changeAddressesBytes = [
-      bech32ToBytes('P-fuji1t43hr35eu9enk7tfyqq4ukpww4stpzf74kxjfk'),
-    ];
-
-    const initialState = getSpendProps({
-      changeAddressesBytes,
-      changeOwnerOverride: CHANGE_OWNERS,
-      excessAVAX: 1_000n,
-    });
-    const testReducer = jest.fn<SpendReducerFunction>((state) => {
-      expect(state.changeOwnerOverride).toBe(CHANGE_OWNERS);
+      expect(state.changeOutputOwners).toBe(OWNERS);
       return state;
     });
 
