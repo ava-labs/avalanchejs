@@ -33,7 +33,7 @@ export const getUsableUTXOsFilter =
     }
 
     // 1b. Ensure UTXO is stakeable.
-    if (state.spendOptions.minIssuanceTime >= utxo.output.getLocktime()) {
+    if (state.minIssuanceTime >= utxo.output.getLocktime()) {
       return false;
     }
 
@@ -64,7 +64,7 @@ export const useSpendableLockedUTXOs: SpendReducerFunction = (
     usableUTXOs,
     (utxo) => utxo.output.transferOut,
     state.fromAddresses,
-    state.spendOptions,
+    state.minIssuanceTime,
   );
 
   // 3. Do all the logic for spending based on the UTXOs.

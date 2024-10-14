@@ -44,8 +44,7 @@ import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/
 import { AddressMaps, addressesFromBytes, isTransferOut } from '../../../utils';
 import { matchOwners } from '../../../utils/matchOwners';
 import { compareTransferableOutputs } from '../../../utils/sort';
-import { baseTxUnsafePvm, type SpendOptions, UnsignedTx } from '../../common';
-import { defaultSpendOptions } from '../../common/defaultSpendOptions';
+import { baseTxUnsafePvm, UnsignedTx } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
 import { addDimensions, createDimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
@@ -70,6 +69,24 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 
+/**
+ * Creates OutputOwners used for change outputs with the specified
+ * `changeAddressBytes` if provided, otherwise uses the `fromAddressesBytes`.
+ */
+const getChangeOutputOwners = ({
+  fromAddressesBytes,
+  changeAddressesBytes,
+}: {
+  fromAddressesBytes: readonly Uint8Array[];
+  changeAddressesBytes?: readonly Uint8Array[];
+}): OutputOwners => {
+  return OutputOwners.fromNative(
+    changeAddressesBytes ?? fromAddressesBytes,
+    0n,
+    1,
+  );
+};
+
 const getAddressMaps = ({
   inputs,
   inputUTXOs,
@@ -89,27 +106,49 @@ const getAddressMaps = ({
   );
 };
 
-const getMemoComplexity = (
-  spendOptions: Required<SpendOptions>,
-): Dimensions => {
+const getMemoComplexity = (memo: Uint8Array): Dimensions => {
   return createDimensions({
-    bandwidth: spendOptions.memo.length,
+    bandwidth: memo.length,
     dbRead: 0,
     dbWrite: 0,
     compute: 0,
   });
 };
 
+const getDefaultMinIssuanceTime = (): bigint => {
+  return BigInt(Math.floor(new Date().getTime() / 1000));
+};
+
 /**
  * Common properties used in all PVM transaction builder functions.
  */
 type CommonTxProps = Readonly<{
+  /**
+   * List of addresses that are used for change outputs.
+   *
+   * Defaults to the addresses provided in `fromAddressesBytes`.
+   */
+  changeAddressesBytes?: readonly Uint8Array[];
+  /**
+   * The current fee state returned from `PVMApi.getFeeState()`.
+   */
   feeState: FeeState;
   /**
    * List of addresses that are used for selecting which UTXOs are signable.
    */
   fromAddressesBytes: readonly Uint8Array[];
-  options?: SpendOptions;
+  /**
+   * Contains arbitrary bytes (up to 256 bytes).
+   *
+   * Defaults to an empty byte array.
+   */
+  memo?: Uint8Array;
+  /**
+   * Minimum time in Unix seconds.
+   *
+   * Defaults to the current time in Unix seconds.
+   */
+  minIssuanceTime?: bigint;
   /**
    * List of UTXOs that are available to be spent.
    */
@@ -133,19 +172,23 @@ export type NewBaseTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM base transaction (`BaseTx`) using calculated dynamic fees.
  *
- * @param props {NewBaseTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
-  { feeState, fromAddressesBytes, options, outputs, utxos },
+  {
+    changeAddressesBytes,
+    feeState,
+    fromAddressesBytes,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
+    outputs,
+    utxos,
+  },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
-  const defaultedOptions = defaultSpendOptions(
-    [...fromAddressesBytes],
-    options,
-  );
   const toBurn = new Map<string, bigint>();
 
   outputs.forEach((out) => {
@@ -155,7 +198,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     toBurn.set(assetId, amountToBurn);
   });
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -167,12 +210,16 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses,
       initialComplexity: complexity,
+      minIssuanceTime,
       shouldConsolidateOutputs: true,
-      spendOptions: defaultedOptions,
       toBurn,
       utxos,
     },
@@ -184,7 +231,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -193,55 +240,56 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   );
 
   return new UnsignedTx(
-    new BaseTx(
-      baseTxUnsafePvm(context, allOutputs, inputs, defaultedOptions.memo),
-    ),
+    new BaseTx(baseTxUnsafePvm(context, allOutputs, inputs, memo)),
     inputUTXOs,
     addressMaps,
   );
 };
 
-export type NewImportTxProps = TxProps<{
-  /**
-   * The locktime to write onto the UTXO.
-   */
-  locktime?: bigint;
-  /**
-   * Base58 string of the source chain ID.
-   */
-  sourceChainId: string;
-  /**
-   * The threshold to write on the UTXO.
-   */
-  threshold?: number;
-  /**
-   * List of addresses to import into.
-   */
-  toAddresses: readonly Uint8Array[];
-}>;
+export type NewImportTxProps = Omit<
+  TxProps<{
+    /**
+     * The locktime to write onto the UTXO.
+     */
+    locktime?: bigint;
+    /**
+     * Base58 string of the source chain ID.
+     */
+    sourceChainId: string;
+    /**
+     * The threshold to write on the UTXO.
+     */
+    threshold?: number;
+    /**
+     * List of addresses to import into.
+     */
+    toAddressesBytes: readonly Uint8Array[];
+  }>,
+  'changeAddressesBytes'
+>;
 
 /**
  * Creates a new unsigned PVM import transaction (`ImportTx`) using calculated dynamic fees.
  *
- * @param props {NewImportTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   {
     feeState,
     fromAddressesBytes,
     locktime,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     sourceChainId,
     threshold,
-    toAddresses,
+    toAddressesBytes,
     utxos,
   },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
   const { importedInputs, importedAmounts } = utxos
     .filter(
@@ -256,11 +304,8 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     }>(
       (acc, utxo) => {
         const { sigIndicies: inputSigIndices } =
-          matchOwners(
-            utxo.getOutputOwners(),
-            fromAddresses,
-            defaultedOptions.minIssuanceTime,
-          ) || {};
+          matchOwners(utxo.getOutputOwners(), fromAddresses, minIssuanceTime) ||
+          {};
 
         if (inputSigIndices === undefined) {
           // We couldn't spend this UTXO, so we skip to the next one.
@@ -300,23 +345,17 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
   const addressMaps = AddressMaps.fromTransferableInputs(
     importedInputs,
     utxos,
-    defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   );
 
   const outputs: TransferableOutput[] = Object.entries(importedAmounts)
     .filter(([assetID]) => assetID !== context.avaxAssetID)
     .map(([assetID, amount]) =>
-      TransferableOutput.fromNative(
-        assetID,
-        amount,
-        toAddresses,
-        locktime,
-        threshold,
-      ),
+      TransferableOutput.fromNative(assetID, amount, toAddressesBytes),
     );
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const inputComplexity = getInputComplexity(importedInputs);
 
@@ -331,12 +370,16 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 
   const spendResults = spend(
     {
+      changeOutputOwners: OutputOwners.fromNative(
+        toAddressesBytes,
+        locktime,
+        threshold,
+      ),
       excessAVAX: importedAvax,
       feeState,
       fromAddresses,
       initialComplexity: complexity,
-      ownerOverride: OutputOwners.fromNative(toAddresses, locktime, threshold),
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       utxos,
     },
     [useUnlockedUTXOs],
@@ -352,7 +395,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
         PlatformChainID,
         [...outputs, ...changeOutputs].sort(compareTransferableOutputs),
         inputs,
-        new Bytes(defaultedOptions.memo),
+        new Bytes(memo),
       ),
       Id.fromString(sourceChainId),
       importedInputs.sort(TransferableInput.compare),
@@ -376,17 +419,25 @@ export type NewExportTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM export transaction (`ExportTx`) using calculated dynamic fees.
  *
- * @param props {NewExportTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newExportTx: TxBuilderFn<NewExportTxProps> = (
-  { destinationChainId, feeState, fromAddressesBytes, options, outputs, utxos },
+  {
+    changeAddressesBytes,
+    destinationChainId,
+    feeState,
+    fromAddressesBytes,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
+    outputs,
+    utxos,
+  },
   context,
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
   const toBurn = new Map<string, bigint>();
 
   outputs.forEach((output) => {
@@ -394,7 +445,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     toBurn.set(assetId, (toBurn.get(assetId) ?? 0n) + output.output.amount());
   });
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -406,11 +457,15 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses,
       initialComplexity: complexity,
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       toBurn,
       utxos,
     },
@@ -422,7 +477,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -433,7 +488,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
         PlatformChainID,
         changeOutputs,
         inputs,
-        new Bytes(defaultedOptions.memo),
+        new Bytes(memo),
       ),
       Id.fromString(destinationChainId),
       [...outputs].sort(compareTransferableOutputs),
@@ -458,25 +513,25 @@ export type NewCreateSubnetTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM create subnet transaction (`CreateSubnetTx`) using calculated dynamic fees.
  *
- * @param props {NewCreateSubnetTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   {
+    changeAddressesBytes,
     fromAddressesBytes,
     feeState,
     locktime,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     subnetOwners,
     threshold,
     utxos,
   },
   context,
 ) => {
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(
     OutputOwners.fromNative(subnetOwners, locktime, threshold),
@@ -490,11 +545,15 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       utxos,
     },
     [useUnlockedUTXOs],
@@ -505,7 +564,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -515,7 +574,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
       context.pBlockchainID,
       changeOutputs,
       inputs,
-      defaultedOptions.memo,
+      memo,
     ),
     OutputOwners.fromNative(subnetOwners, locktime, threshold),
   );
@@ -553,18 +612,20 @@ export type NewCreateChainTxProps = TxProps<{
 /**
  * Creates a new unsigned PVM create chain transaction (`CreateChainTx`) using calculated dynamic fees.
  *
- * @param props {NewCreateChainTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   {
+    changeAddressesBytes,
     chainName,
     feeState,
     fromAddressesBytes,
     fxIds,
     genesisData,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     subnetAuth,
     subnetId,
     utxos,
@@ -572,8 +633,6 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   },
   context,
 ) => {
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
   const genesisBytes = new Bytes(
     new TextEncoder().encode(JSON.stringify(genesisData)),
   );
@@ -585,7 +644,7 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
       fxIds.length * ID_LEN +
       chainName.length +
       genesisBytes.length +
-      defaultedOptions.memo.length,
+      memo.length,
     dbRead: 0,
     dbWrite: 0,
     compute: 0,
@@ -601,11 +660,15 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       utxos,
     },
     [useUnlockedUTXOs],
@@ -616,7 +679,7 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -626,7 +689,7 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
       context.pBlockchainID,
       changeOutputs,
       inputs,
-      defaultedOptions.memo,
+      memo,
     ),
     Id.fromString(subnetId),
     new Stringpr(chainName),
@@ -658,19 +721,21 @@ export type NewAddSubnetValidatorTxProps = TxProps<{
  * Creates a new unsigned PVM add subnet validator transaction
  * (`AddSubnetValidatorTx`) using calculated dynamic fees.
  *
- * @param props {NewAddSubnetValidatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newAddSubnetValidatorTx: TxBuilderFn<
   NewAddSubnetValidatorTxProps
 > = (
   {
+    changeAddressesBytes,
     end,
     feeState,
     fromAddressesBytes,
     nodeId,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     start,
     subnetAuth,
     subnetId,
@@ -679,9 +744,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -693,11 +756,15 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       utxos,
     },
     [useUnlockedUTXOs],
@@ -708,7 +775,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -718,7 +785,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
       context.pBlockchainID,
       changeOutputs,
       inputs,
-      defaultedOptions.memo,
+      memo,
     ),
     SubnetValidator.fromNative(
       nodeId,
@@ -749,27 +816,27 @@ export type NewRemoveSubnetValidatorTxProps = TxProps<{
  * Creates a new unsigned PVM remove subnet validator transaction
  * (`RemoveSubnetValidatorTx`) using calculated dynamic fees.
  *
- * @param props {NewRemoveSubnetValidatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newRemoveSubnetValidatorTx: TxBuilderFn<
   NewRemoveSubnetValidatorTxProps
 > = (
   {
+    changeAddressesBytes,
     fromAddressesBytes,
     feeState,
     nodeId,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     subnetAuth,
     subnetId,
     utxos,
   },
   context,
 ) => {
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -781,11 +848,15 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       utxos,
     },
     [useUnlockedUTXOs],
@@ -796,7 +867,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -806,7 +877,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
       context.pBlockchainID,
       changeOutputs,
       inputs,
-      defaultedOptions.memo,
+      memo,
     ),
     NodeId.fromString(nodeId),
     Id.fromString(subnetId),
@@ -835,7 +906,7 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
   /**
    * The BLS public key.
    */
-  publicKey: Uint8Array;
+  publicKey?: Uint8Array;
   /**
    * The addresses which will receive the rewards from the delegated stake.
    * Given addresses will share the reward UTXO.
@@ -849,7 +920,7 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
   /**
    * The BLS signature.
    */
-  signature: Uint8Array;
+  signature?: Uint8Array;
   /**
    * Which asset to stake. Defaults to AVAX.
    */
@@ -880,21 +951,23 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
  * Creates a new unsigned PVM add permissionless validator transaction
  * (`AddPermissionlessValidatorTx`) using calculated dynamic fees.
  *
- * @param props {NewAddPermissionlessValidatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newAddPermissionlessValidatorTx: TxBuilderFn<
   NewAddPermissionlessValidatorTxProps
 > = (
   {
+    changeAddressesBytes,
     delegatorRewardsOwner,
     end,
     feeState,
     fromAddressesBytes,
     locktime = 0n,
     nodeId,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     publicKey,
     rewardAddresses,
     shares,
@@ -918,8 +991,6 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
 
   const toStake = new Map<string, bigint>([[assetId, weight]]);
 
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
   const signer = createSignerOrSignerEmptyFromStrings(publicKey, signature);
   const validatorOutputOwners = OutputOwners.fromNative(
     rewardAddresses,
@@ -931,7 +1002,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     0n,
   );
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const signerComplexity = getSignerComplexity(signer);
   const validatorOwnerComplexity = getOwnerComplexity(validatorOutputOwners);
@@ -947,12 +1018,16 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
+      minIssuanceTime,
       shouldConsolidateOutputs: true,
-      spendOptions: defaultedOptions,
       toStake,
       utxos,
     },
@@ -964,7 +1039,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -974,7 +1049,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
       context.pBlockchainID,
       changeOutputs,
       inputs,
-      defaultedOptions.memo,
+      memo,
     ),
     SubnetValidator.fromNative(
       nodeId,
@@ -1041,20 +1116,22 @@ export type NewAddPermissionlessDelegatorTxProps = TxProps<{
  * Creates a new unsigned PVM add permissionless delegator transaction
  * (`AddPermissionlessDelegatorTx`) using calculated dynamic fees.
  *
- * @param props {NewAddPermissionlessDelegatorTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   NewAddPermissionlessDelegatorTxProps
 > = (
   {
+    changeAddressesBytes,
     end,
     feeState,
     fromAddressesBytes,
     locktime = 0n,
     nodeId,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     rewardAddresses,
     stakingAssetId,
     start,
@@ -1075,15 +1152,13 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 
   const toStake = new Map<string, bigint>([[assetId, weight]]);
 
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
   const delegatorRewardsOwner = OutputOwners.fromNative(
     rewardAddresses,
     locktime,
     threshold,
   );
 
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(delegatorRewardsOwner);
 
@@ -1095,12 +1170,16 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
+      minIssuanceTime,
       shouldConsolidateOutputs: true,
-      spendOptions: defaultedOptions,
       toStake,
       utxos,
     },
@@ -1112,7 +1191,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -1122,7 +1201,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
       context.pBlockchainID,
       changeOutputs,
       inputs,
-      defaultedOptions.memo,
+      memo,
     ),
     SubnetValidator.fromNative(
       nodeId,
@@ -1169,18 +1248,20 @@ export type NewTransferSubnetOwnershipTxProps = TxProps<{
  * Creates a new unsigned PVM transfer subnet ownership transaction
  * (`TransferSubnetOwnershipTx`) using calculated dynamic fees.
  *
- * @param props {NewTransferSubnetOwnershipTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newTransferSubnetOwnershipTx: TxBuilderFn<
   NewTransferSubnetOwnershipTxProps
 > = (
   {
+    changeAddressesBytes,
     fromAddressesBytes,
     feeState,
     locktime = 0n,
-    options,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
     subnetAuth,
     subnetId,
     subnetOwners,
@@ -1189,9 +1270,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   },
   context,
 ) => {
-  const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
-
-  const memoComplexity = getMemoComplexity(defaultedOptions);
+  const memoComplexity = getMemoComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -1208,11 +1287,15 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
-      spendOptions: defaultedOptions,
+      minIssuanceTime,
       utxos,
     },
     [useUnlockedUTXOs],
@@ -1223,7 +1306,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,
-    minIssuanceTime: defaultedOptions.minIssuanceTime,
+    minIssuanceTime,
     fromAddressesBytes,
   });
 
@@ -1234,7 +1317,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
         context.pBlockchainID,
         changeOutputs,
         inputs,
-        defaultedOptions.memo,
+        memo,
       ),
       Id.fromString(subnetId),
       Input.fromNative(subnetAuth),

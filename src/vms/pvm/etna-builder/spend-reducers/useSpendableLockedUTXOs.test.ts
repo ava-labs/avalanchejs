@@ -39,9 +39,7 @@ describe('useSpendableLockedUTXOs', () => {
 
     test('returns `false` if UTXO output is a stakeable lockout but locktime is greater than minIssuanceTime', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
 
       const utxo = getStakeableLockoutOutput(testUTXOID1, 50n, 200n);
@@ -51,9 +49,7 @@ describe('useSpendableLockedUTXOs', () => {
 
     test('returns `false` if UTXO output is a stakeable lockout with valid locktime but not used in toStake', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 300n,
-        },
+        minIssuanceTime: 300n,
       });
 
       const utxo = getStakeableLockoutOutput(testUTXOID1, 50n, 100n);
@@ -65,9 +61,7 @@ describe('useSpendableLockedUTXOs', () => {
       const testAssetId = Id.fromString('testasset');
 
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
         toStake: new Map([[testAssetId.toString(), 100n]]),
       });
 
@@ -83,9 +77,7 @@ describe('useSpendableLockedUTXOs', () => {
 
     test('throws an error if UTXO output is a StakeableLockOut and the transferOut is not a TransferOutput', () => {
       const state = getInitialReducerState({
-        spendOptions: {
-          minIssuanceTime: 100n,
-        },
+        minIssuanceTime: 100n,
       });
 
       const invalidUTXO = new Utxo(
@@ -117,9 +109,7 @@ describe('useSpendableLockedUTXOs', () => {
         Address.fromString('P-fuji1y50xa9363pn3d5gjhcz3ltp3fj6vq8x8a5txxg'),
       ],
       excessAVAX: 0n,
-      spendOptions: {
-        minIssuanceTime: 100n,
-      },
+      minIssuanceTime: 100n,
       toBurn,
       toStake,
       utxos: [getStakeableLockoutOutput(testUTXOID1, 10_000n, 300n)],
@@ -138,9 +128,7 @@ describe('useSpendableLockedUTXOs', () => {
 
     const initialState = getInitialReducerState({
       excessAVAX: 0n,
-      spendOptions: {
-        minIssuanceTime: 100n,
-      },
+      minIssuanceTime: 100n,
       toBurn,
       toStake,
       utxos: [getStakeableLockoutOutput(testUTXOID1, 10_000n, 300n)],
@@ -169,9 +157,7 @@ describe('useSpendableLockedUTXOs', () => {
     const initialState = getInitialReducerState({
       fromAddresses: [testOwnerXAddress],
       excessAVAX: 0n,
-      spendOptions: {
-        minIssuanceTime: 100n,
-      },
+      minIssuanceTime: 100n,
       toBurn,
       toStake,
       utxos: [
@@ -202,9 +188,7 @@ describe('useSpendableLockedUTXOs', () => {
     const initialState = getInitialReducerState({
       fromAddresses: [testOwnerXAddress],
       excessAVAX: 0n,
-      spendOptions: {
-        minIssuanceTime: 100n,
-      },
+      minIssuanceTime: 100n,
       toBurn,
       toStake,
       utxos: [

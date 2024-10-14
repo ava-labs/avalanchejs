@@ -8,6 +8,6 @@ export type SpendOptions = {
 
 export type SpendOptionsRequired = Required<SpendOptions>;
 
-//the strign is address in hex
+//the string is address in hex
 export type SigMapping = Map<string, number>;
 export type SigMappings = SigMapping[];

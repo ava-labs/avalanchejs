@@ -1,7 +1,6 @@
 import {
   BigIntPr,
   Id,
-  OutputOwners,
   TransferOutput,
   TransferableOutput,
 } from '../../../../serializable';
@@ -42,18 +41,12 @@ export const handleFeeAndChange: SpendReducerFunction = (
   spendHelper,
   context,
 ) => {
-  // Use the change owner override if it exists, otherwise use the default change owner.
-  // This is used on "import" transactions.
-  const changeOwners =
-    state.ownerOverride ??
-    OutputOwners.fromNative(state.spendOptions.changeAddresses);
-
   const requiredFee = spendHelper.calculateFee();
 
   // Checks for an existing change output that is for the AVAX asset assigned to the change owner.
   const hasExistingChangeOutput: boolean = spendHelper.hasChangeOutput(
     context.avaxAssetID,
-    changeOwners,
+    state.changeOutputOwners,
   );
 
   if (canPayFeeAndNeedsChange(state.excessAVAX, requiredFee, context)) {
@@ -65,7 +58,7 @@ export const handleFeeAndChange: SpendReducerFunction = (
           Id.fromString(context.avaxAssetID),
           new TransferOutput(
             new BigIntPr(state.excessAVAX - requiredFee),
-            changeOwners,
+            state.changeOutputOwners,
           ),
         ),
       );
@@ -75,7 +68,7 @@ export const handleFeeAndChange: SpendReducerFunction = (
       const requiredFeeWithChangeOutput = spendHelper.calculateFee(
         new TransferableOutput(
           Id.fromString(context.avaxAssetID),
-          new TransferOutput(new BigIntPr(0n), changeOwners),
+          new TransferOutput(new BigIntPr(0n), state.changeOutputOwners),
         ),
       );
 
@@ -88,7 +81,7 @@ export const handleFeeAndChange: SpendReducerFunction = (
             Id.fromString(context.avaxAssetID),
             new TransferOutput(
               new BigIntPr(state.excessAVAX - requiredFeeWithChangeOutput),
-              changeOwners,
+              state.changeOutputOwners,
             ),
           ),
         );

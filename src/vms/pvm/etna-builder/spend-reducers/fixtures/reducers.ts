@@ -1,8 +1,6 @@
 import { testContext } from '../../../../../fixtures/context';
 import { feeState as testFeeState } from '../../../../../fixtures/pvm';
 import { Address, OutputOwners } from '../../../../../serializable';
-import type { SpendOptions } from '../../../../common';
-import { defaultSpendOptions } from '../../../../common/defaultSpendOptions';
 import { createDimensions } from '../../../../common/fees/dimensions';
 import type { FeeState } from '../../../models';
 import type { SpendHelperProps } from '../../spendHelper';
@@ -17,11 +15,9 @@ export const CHANGE_OWNERS: OutputOwners = OutputOwners.fromNative([
 ]);
 
 export const getInitialReducerState = ({
-  spendOptions,
   ...state
-}: Partial<Omit<SpendReducerState, 'spendOptions'>> & {
-  spendOptions?: SpendOptions;
-} = {}): SpendReducerState => ({
+}: Partial<SpendReducerState> = {}): SpendReducerState => ({
+  changeOutputOwners: CHANGE_OWNERS,
   excessAVAX: 0n,
   initialComplexity: createDimensions({
     bandwidth: 1,
@@ -30,13 +26,7 @@ export const getInitialReducerState = ({
     compute: 1,
   }),
   fromAddresses: [CHANGE_ADDRESS],
-  ownerOverride: null,
-  spendOptions: defaultSpendOptions(
-    state?.fromAddresses?.map((address) => address.toBytes()) ?? [
-      CHANGE_ADDRESS.toBytes(),
-    ],
-    spendOptions,
-  ),
+  minIssuanceTime: BigInt(Math.floor(new Date().getTime() / 1000)),
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],

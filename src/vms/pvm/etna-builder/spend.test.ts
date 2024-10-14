@@ -2,7 +2,6 @@ import { jest } from '@jest/globals';
 
 import { testContext } from '../../../fixtures/context';
 import { Address, OutputOwners } from '../../../serializable';
-import { defaultSpendOptions } from '../../common/defaultSpendOptions';
 import { createDimensions } from '../../common/fees/dimensions';
 import {
   verifyAssetsConsumed,
@@ -13,6 +12,7 @@ import {
 import type { SpendProps } from './spend';
 import { spend } from './spend';
 import { feeState as testFeeState } from '../../../fixtures/pvm';
+import { bech32ToBytes } from '../../../utils';
 
 jest.mock('./spend-reducers', () => ({
   verifyAssetsConsumed: jest.fn<SpendReducerFunction>((state) => state),
@@ -27,6 +27,7 @@ const CHANGE_OWNERS: OutputOwners = OutputOwners.fromNative([
 ]);
 
 const getSpendProps = (state: Partial<SpendReducerState> = {}): SpendProps => ({
+  changeOutputOwners: CHANGE_OWNERS,
   excessAVAX: 0n,
   initialComplexity: createDimensions({
     bandwidth: 1,
@@ -36,12 +37,7 @@ const getSpendProps = (state: Partial<SpendReducerState> = {}): SpendProps => ({
   }),
   feeState: testFeeState(),
   fromAddresses: [CHANGE_ADDRESS],
-  ownerOverride: null,
-  spendOptions: defaultSpendOptions(
-    state?.fromAddresses?.map((address) => address.toBytes()) ?? [
-      CHANGE_ADDRESS.toBytes(),
-    ],
-  ),
+  minIssuanceTime: BigInt(Math.floor(new Date().getTime() / 1000)),
   toBurn: new Map(),
   toStake: new Map(),
   utxos: [],
@@ -81,13 +77,15 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     ).toThrow('An unexpected error occurred during spend calculation');
   });
 
-  test('change owners in state should default to change addresses', () => {
+  test('change output owners in state should default to from addresses', () => {
     expect.assertions(1);
 
     const initialState = getSpendProps({ excessAVAX: 1_000n });
     const testReducer = jest.fn<SpendReducerFunction>((state) => {
-      expect(state.ownerOverride).toEqual(
-        OutputOwners.fromNative(initialState.spendOptions.changeAddresses),
+      expect(state.changeOutputOwners).toEqual(
+        OutputOwners.fromNative(
+          initialState.fromAddresses.map((address) => address.toBytes()),
+        ),
       );
       return state;
     });
@@ -95,15 +93,21 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     spend(initialState, [testReducer], testContext);
   });
 
-  test('change owners in state should be ownerOverride if provided', () => {
+  test('change output owners in state should be value provided', () => {
     expect.assertions(1);
 
+    const changeAddressesBytes = [
+      bech32ToBytes('P-fuji1t43hr35eu9enk7tfyqq4ukpww4stpzf74kxjfk'),
+    ];
+
+    const OWNERS = OutputOwners.fromNative(changeAddressesBytes);
+
     const initialState = getSpendProps({
+      changeOutputOwners: OWNERS,
       excessAVAX: 1_000n,
-      ownerOverride: CHANGE_OWNERS,
     });
     const testReducer = jest.fn<SpendReducerFunction>((state) => {
-      expect(state.ownerOverride).toBe(CHANGE_OWNERS);
+      expect(state.changeOutputOwners).toBe(OWNERS);
       return state;
     });
 

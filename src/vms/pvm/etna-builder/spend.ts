@@ -5,7 +5,6 @@ import type {
 } from '../../../serializable';
 import { OutputOwners } from '../../../serializable';
 import type { Utxo } from '../../../serializable/avax/utxo';
-import type { SpendOptions } from '../../common';
 import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
 import type { FeeState } from '../models';
@@ -38,6 +37,10 @@ type SpendResult = Readonly<{
 
 export type SpendProps = Readonly<{
   /**
+   * Output owners for the change outputs.
+   */
+  changeOutputOwners: OutputOwners;
+  /**
    * The extra AVAX that spend can produce in
    * the change outputs in addition to the consumed and not burned AVAX.
    */
@@ -51,21 +54,13 @@ export type SpendProps = Readonly<{
    * The initial complexity of the transaction.
    */
   initialComplexity: Dimensions;
-  /**
-   * Optionally specifies the output owners to use for the unlocked
-   * AVAX change output if no additional AVAX was needed to be burned.
-   * If this value is `undefined` or `null`, the default change owner is used.
-   *
-   * Used in ImportTx.
-   */
-  ownerOverride?: OutputOwners | null;
+  minIssuanceTime: bigint;
   /**
    * Whether to consolidate change and stake outputs.
    *
    * @default false
    */
   shouldConsolidateOutputs?: boolean;
-  spendOptions: Required<SpendOptions>;
   /**
    * Maps `assetID` to the amount of the asset to spend without
    * producing an output. This is typically used for fees.
@@ -102,13 +97,13 @@ export type SpendProps = Readonly<{
  */
 export const spend = (
   {
+    changeOutputOwners,
     excessAVAX = 0n,
     feeState,
     fromAddresses,
     initialComplexity,
-    ownerOverride,
+    minIssuanceTime,
     shouldConsolidateOutputs = false,
-    spendOptions,
     toBurn = new Map(),
     toStake = new Map(),
     utxos,
@@ -118,7 +113,10 @@ export const spend = (
 ): SpendResult => {
   try {
     const changeOwners =
-      ownerOverride || OutputOwners.fromNative(spendOptions.changeAddresses);
+      changeOutputOwners ||
+      OutputOwners.fromNative(
+        fromAddresses.map((address) => address.toBytes()),
+      );
 
     const gasPrice: bigint = feeState.price;
 
@@ -135,11 +133,11 @@ export const spend = (
     });
 
     const initialState: SpendReducerState = {
+      changeOutputOwners: changeOwners,
       excessAVAX,
       initialComplexity,
       fromAddresses,
-      ownerOverride: changeOwners,
-      spendOptions,
+      minIssuanceTime,
       toBurn,
       toStake,
       utxos,

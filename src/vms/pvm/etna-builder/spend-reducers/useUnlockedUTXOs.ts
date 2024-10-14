@@ -1,6 +1,5 @@
 import {
   BigIntPr,
-  OutputOwners,
   TransferInput,
   TransferOutput,
   TransferableInput,
@@ -38,7 +37,7 @@ export const getUsableUTXOsFilter =
       throw IncorrectStakeableLockOutError;
     }
 
-    return utxo.output.getLocktime() < state.spendOptions.minIssuanceTime;
+    return utxo.output.getLocktime() < state.minIssuanceTime;
   };
 
 export const useUnlockedUTXOs: SpendReducerFunction = (
@@ -58,7 +57,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
     (utxo) =>
       isTransferOut(utxo.output) ? utxo.output : utxo.output.transferOut,
     state.fromAddresses,
-    state.spendOptions,
+    state.minIssuanceTime,
   );
 
   // 3. Split verified usable UTXOs into AVAX assetId UTXOs and other assetId UTXOs.
@@ -88,12 +87,6 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       },
       { otherVerifiedUsableUTXOs: [], avaxVerifiedUsableUTXOs: [] },
     );
-
-  const changeOwner = OutputOwners.fromNative(
-    state.spendOptions.changeAddresses,
-    0n,
-    1,
-  );
 
   // 4. Handle all the non-AVAX asset UTXOs first.
   for (const { sigData, data: utxo } of otherVerifiedUsableUTXOs) {
@@ -129,7 +122,10 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       spendHelper.addStakedOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferOutput(new BigIntPr(amountToStake), changeOwner),
+          new TransferOutput(
+            new BigIntPr(amountToStake),
+            state.changeOutputOwners,
+          ),
         ),
       );
     }
@@ -139,7 +135,10 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       spendHelper.addChangeOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferOutput(new BigIntPr(remainingAmount), changeOwner),
+          new TransferOutput(
+            new BigIntPr(remainingAmount),
+            state.changeOutputOwners,
+          ),
         ),
       );
     }
@@ -147,7 +146,7 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
 
   // 5. Handle AVAX asset UTXOs last to account for fees.
   let excessAVAX = state.excessAVAX;
-  let clearOwnerOverride = false;
+
   for (const { sigData, data: utxo } of avaxVerifiedUsableUTXOs) {
     const requiredFee = spendHelper.calculateFee();
 
@@ -181,20 +180,19 @@ export const useUnlockedUTXOs: SpendReducerFunction = (
       spendHelper.addStakedOutput(
         new TransferableOutput(
           utxo.assetId,
-          new TransferOutput(new BigIntPr(amountToStake), changeOwner),
+          new TransferOutput(
+            new BigIntPr(amountToStake),
+            state.changeOutputOwners,
+          ),
         ),
       );
     }
 
     excessAVAX += remainingAmount;
-
-    // The ownerOverride is no longer needed. Clear it.
-    clearOwnerOverride = true;
   }
 
   return {
     ...state,
     excessAVAX,
-    ownerOverride: clearOwnerOverride ? null : state.ownerOverride,
   };
 };
