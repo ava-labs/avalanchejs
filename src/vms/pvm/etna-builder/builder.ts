@@ -875,7 +875,7 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
   /**
    * The BLS public key.
    */
-  publicKey: Uint8Array;
+  publicKey?: Uint8Array;
   /**
    * The addresses which will receive the rewards from the delegated stake.
    * Given addresses will share the reward UTXO.
@@ -889,7 +889,7 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
   /**
    * The BLS signature.
    */
-  signature: Uint8Array;
+  signature?: Uint8Array;
   /**
    * Which asset to stake. Defaults to AVAX.
    */
