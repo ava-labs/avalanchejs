@@ -37,6 +37,7 @@ export class Codec {
   UnpackPrefix = <T extends Serializable>(buf: Uint8Array): [T, Uint8Array] => {
     let typeId: Int;
     [typeId, buf] = unpack(buf, [Int]);
+    console.log('typeId', typeId, this.typeIdToType);
     const type = this.typeIdToType[typeId.value()];
 
     if (type === undefined) {

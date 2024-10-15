@@ -198,3 +198,17 @@ export const INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.DBWrite]: 1,
   [FeeDimensions.Compute]: 0,
 };
+
+export const INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    INT_LEN + // nodeID
+    LONG_LEN + // weight
+    LONG_LEN + // balance
+    INT_LEN + // remaining balance owner threshold
+    INT_LEN + // remaining balance owner num addresses
+    INT_LEN + // deactivation owner threshold
+    INT_LEN, // deactivation owner num addresses
+  [FeeDimensions.DBRead]: 1,
+  [FeeDimensions.DBWrite]: 4, // weight diff + pub key diff + subnetID/nodeID + validationID
+  [FeeDimensions.Compute]: 0,
+};

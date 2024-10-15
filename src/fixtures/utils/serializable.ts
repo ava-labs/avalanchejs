@@ -22,6 +22,10 @@ export const testSerialization = (
 
   describe(name, () => {
     it('serializes correctly', () => {
+      if (name === 'ConvertSubnetTx') {
+        console.log('a', entityFixture().toBytes(codec()));
+        console.log('b', bytesFixture());
+      }
       expect(entityFixture().toBytes(codec())).toStrictEqual(bytesFixture());
     });
   });

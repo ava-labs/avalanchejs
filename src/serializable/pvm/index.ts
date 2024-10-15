@@ -19,6 +19,7 @@ import { AddPermissionlessDelegatorTx } from './addPermissionlessDelegatorTx';
 import { AbstractSubnetTx } from './abstractSubnetTx';
 import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
+import { ConvertSubnetTx } from './convertSubnetTx';
 
 export * from './typeGuards';
 export {
@@ -44,4 +45,5 @@ export {
   ProofOfPossession,
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
+  ConvertSubnetTx,
 };
