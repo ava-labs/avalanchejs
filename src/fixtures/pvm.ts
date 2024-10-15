@@ -28,7 +28,16 @@ import {
   transferableOutput,
   transferableOutputBytes,
 } from './avax';
-import { id, idBytes, nodeId, nodeIdBytes } from './common';
+import {
+  address,
+  addressBytes,
+  addresses,
+  addressesBytes,
+  id,
+  idBytes,
+  nodeId,
+  nodeIdBytes,
+} from './common';
 import {
   bigIntPr,
   bigIntPrBytes,
@@ -56,6 +65,9 @@ import {
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
 import type { FeeState } from '../vms/pvm';
+import { ConvertSubnetTx } from '../serializable/pvm/convertSubnetTx';
+import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
+import { ConvertSubnetValidator } from '../serializable/fxs/pvm/convertSubnetValidator';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -192,6 +204,9 @@ export const advanceTimeBytesTx = () => bigIntPrBytes();
 export const proofOfPossession = () =>
   new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes());
 
+export const proofOfPossessionBytes = () =>
+  concatBytes(blsPublicKeyBytes(), blsSignatureBytes());
+
 export const signer = () => new Signer(proofOfPossession());
 export const signerBytes = () =>
   concatBytes(blsPublicKeyBytes(), blsSignatureBytes());
@@ -290,6 +305,55 @@ export const transformSubnetTxBytes = () =>
     intBytes(),
     bytesForInt(10),
     inputBytes(),
+  );
+
+export const convertSubnetValidator = () =>
+  new ConvertSubnetValidator(
+    nodeId(),
+    bigIntPr(),
+    bigIntPr(),
+    proofOfPossession(),
+    pChainOwner(),
+    pChainOwner(),
+  );
+
+export const convertSubnetValidatorBytes = () =>
+  concatBytes(
+    nodeIdBytes(),
+    bigIntPrBytes(),
+    bigIntPrBytes(),
+    proofOfPossessionBytes(),
+    pChainOwnerBytes(),
+    pChainOwnerBytes(),
+  );
+
+export const convertSubnetTx = () =>
+  new ConvertSubnetTx(
+    baseTx(),
+    id(),
+    id(),
+    address(),
+    makeList(convertSubnetValidator)(),
+    input(),
+  );
+
+export const convertSubnetTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    idBytes(),
+    idBytes(),
+    addressBytes(),
+    makeListBytes(convertSubnetValidatorBytes)(),
+    inputBytes(),
+  );
+
+export const pChainOwner = () => new PChainOwner(int(), addresses()());
+
+export const pChainOwnerBytes = () =>
+  concatBytes(
+    // threshold:
+    intBytes(),
+    addressesBytes(),
   );
 
 export const feeState = (): FeeState => ({

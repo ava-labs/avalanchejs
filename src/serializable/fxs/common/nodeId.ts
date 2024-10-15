@@ -4,6 +4,7 @@ import { hexToBuffer, padLeft } from '../../../utils/buffer';
 import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
 import { TypeSymbols } from '../../constants';
+// import { bytesCompare } from '../../../utils';
 
 export const NodeIDPrefix = 'NodeID-';
 
@@ -53,4 +54,8 @@ export class NodeId extends Primitives {
   value() {
     return this.toString();
   }
+
+  // static compare(id1: NodeId, id2: NodeId): number {
+  //   return bytesCompare(id1.toBytes(), id2.toBytes());
+  // }
 }
