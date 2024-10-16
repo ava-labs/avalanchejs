@@ -1,12 +1,12 @@
 import { pack, unpack } from '../../../utils/struct';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
-import { NodeId } from '../common/nodeId';
-import { BigIntPr } from '../../primitives';
+import { BigIntPr, Bytes } from '../../primitives';
 import { TypeSymbols } from '../../constants';
 import { ProofOfPossession } from '../../pvm/proofOfPossession';
 import { PChainOwner } from './pChainOwner';
 import { emptyNodeId } from '../../../constants/zeroValue';
+import { NodeId } from '../common';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/convert_subnet_tx.go#86
@@ -16,7 +16,7 @@ export class ConvertSubnetValidator {
   _type = TypeSymbols.ConvertSubnetValidator;
 
   constructor(
-    public readonly nodeId: NodeId,
+    public readonly nodeId: Bytes,
     public readonly weight: BigIntPr,
     public readonly balance: BigIntPr,
     public readonly signer: ProofOfPossession,
@@ -38,7 +38,7 @@ export class ConvertSubnetValidator {
       rest,
     ] = unpack(
       bytes,
-      [NodeId, BigIntPr, BigIntPr, ProofOfPossession, PChainOwner, PChainOwner],
+      [Bytes, BigIntPr, BigIntPr, ProofOfPossession, PChainOwner, PChainOwner],
       codec,
     );
 
@@ -78,7 +78,9 @@ export class ConvertSubnetValidator {
       throw new Error('Weight must be greater than 0');
     }
 
-    if (this.nodeId === emptyNodeId) {
+    const nodeId = new NodeId(this.nodeId.toBytesWithoutLength());
+
+    if (nodeId === emptyNodeId) {
       throw new Error('Node ID must be non-empty');
     }
     return true;

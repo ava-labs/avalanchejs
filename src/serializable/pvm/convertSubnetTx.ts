@@ -6,9 +6,9 @@ import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
 import { TypeSymbols } from '../constants';
-import { Address } from '../fxs/common';
 import { Id } from '../fxs/common';
 import { ConvertSubnetValidator } from '../fxs/pvm/convertSubnetValidator';
+import { Bytes } from '../primitives/bytes';
 import { AbstractSubnetTx } from './abstractSubnetTx';
 
 @serializable()
@@ -19,7 +19,7 @@ export class ConvertSubnetTx extends AbstractSubnetTx {
     public readonly baseTx: BaseTx,
     public readonly subnetID: Id,
     public readonly chainID: Id,
-    public readonly address: Address,
+    public readonly address: Bytes,
     public readonly validators: ConvertSubnetValidator[],
     public readonly subnetAuth: Serializable,
   ) {
@@ -37,7 +37,7 @@ export class ConvertSubnetTx extends AbstractSubnetTx {
     const [baseTx, subnetID, chainID, address, validators, subnetAuth, rest] =
       unpack(
         bytes,
-        [BaseTx, Id, Id, Address, toListStruct(ConvertSubnetValidator), Codec],
+        [BaseTx, Id, Id, Bytes, toListStruct(ConvertSubnetValidator), Codec],
         codec,
       );
     return [
