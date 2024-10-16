@@ -212,3 +212,16 @@ export const INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES: Dimensions = {
   [FeeDimensions.DBWrite]: 4, // weight diff + pub key diff + subnetID/nodeID + validationID
   [FeeDimensions.Compute]: 0,
 };
+
+export const INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    ID_LEN + // subnetID
+    ID_LEN + // chainID
+    INT_LEN + // address length
+    INT_LEN + // validators length
+    INT_LEN + // subnetAuth typeID
+    INT_LEN, // subnetAuthCredential typeID
+  [FeeDimensions.DBRead]: 2, // subnet auth + manager lookup
+  [FeeDimensions.DBWrite]: 2, // manager + weight
+  [FeeDimensions.Compute]: 0,
+};
