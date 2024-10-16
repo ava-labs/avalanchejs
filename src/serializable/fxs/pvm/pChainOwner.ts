@@ -1,5 +1,5 @@
 import { concatBytes } from '@noble/hashes/utils';
-import { packList, toListStruct } from '../../../utils/serializeList';
+import { toListStruct } from '../../../utils/serializeList';
 import { pack, unpack } from '../../../utils/struct';
 import { serializable } from '../../common/types';
 import { Int } from '../../primitives';
@@ -29,9 +29,6 @@ export class PChainOwner {
   }
 
   toBytes(codec: Codec) {
-    return concatBytes(
-      pack([this.threshold, this.addresses], codec),
-      // packList(this.addresses, codec),
-    );
+    return concatBytes(pack([this.threshold, this.addresses], codec));
   }
 }

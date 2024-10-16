@@ -29,8 +29,6 @@ import {
   transferableOutputBytes,
 } from './avax';
 import {
-  address,
-  addressBytes,
   addresses,
   addressesBytes,
   id,
@@ -309,7 +307,7 @@ export const transformSubnetTxBytes = () =>
 
 export const convertSubnetValidator = () =>
   new ConvertSubnetValidator(
-    nodeId(),
+    bytes(),
     bigIntPr(),
     bigIntPr(),
     proofOfPossession(),
@@ -319,7 +317,7 @@ export const convertSubnetValidator = () =>
 
 export const convertSubnetValidatorBytes = () =>
   concatBytes(
-    nodeIdBytes(),
+    bytesBytes(),
     bigIntPrBytes(),
     bigIntPrBytes(),
     proofOfPossessionBytes(),
@@ -332,7 +330,7 @@ export const convertSubnetTx = () =>
     baseTx(),
     id(),
     id(),
-    address(),
+    bytes(),
     makeList(convertSubnetValidator)(),
     input(),
   );
@@ -342,8 +340,9 @@ export const convertSubnetTxBytes = () =>
     baseTxbytes(),
     idBytes(),
     idBytes(),
-    addressBytes(),
+    bytesBytes(),
     makeListBytes(convertSubnetValidatorBytes)(),
+    bytesForInt(10),
     inputBytes(),
   );
 
