@@ -24,10 +24,7 @@ export class ConvertSubnetValidator {
     public readonly deactivationOwner: PChainOwner,
   ) {}
 
-  static fromBytes(
-    bytes: Uint8Array,
-    codec: Codec,
-  ): [ConvertSubnetValidator, Uint8Array] {
+  static fromBytes(bytes: Uint8Array): [ConvertSubnetValidator, Uint8Array] {
     const [
       nodeId,
       weight,
@@ -36,11 +33,14 @@ export class ConvertSubnetValidator {
       remainingBalanceOwner,
       deactivationOwner,
       rest,
-    ] = unpack(
-      bytes,
-      [Bytes, BigIntPr, BigIntPr, ProofOfPossession, PChainOwner, PChainOwner],
-      codec,
-    );
+    ] = unpack(bytes, [
+      Bytes,
+      BigIntPr,
+      BigIntPr,
+      ProofOfPossession,
+      PChainOwner,
+      PChainOwner,
+    ]);
 
     return [
       new ConvertSubnetValidator(
@@ -68,10 +68,6 @@ export class ConvertSubnetValidator {
       codec,
     );
   }
-
-  // static compare(nodeId1: NodeId, nodeId2: NodeId): number {
-  //   return NodeId.compare(nodeId1, nodeId2);
-  // }
 
   verify(): boolean {
     if (this.weight === new BigIntPr(0n)) {

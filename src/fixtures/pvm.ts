@@ -350,8 +350,7 @@ export const pChainOwner = () => new PChainOwner(int(), addresses()());
 
 export const pChainOwnerBytes = () =>
   concatBytes(
-    // threshold:
-    intBytes(),
+    intBytes(), // threshold
     addressesBytes(),
   );
 

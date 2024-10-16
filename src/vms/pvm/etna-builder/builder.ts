@@ -11,7 +11,6 @@ import {
 } from '../../../constants/networkIDs';
 import type { TransferOutput } from '../../../serializable';
 import {
-  Address,
   Input,
   NodeId,
   OutputOwners,
@@ -70,11 +69,9 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import { convertSubnetValidatorFromBytes } from '../../../utils/convertSubnetValidatorsFromBytes';
-// import { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
 import {
-  getAddressComplexity,
   getConvertSubnetValidatorsComplexity,
-  getMemoComplexity,
+  getBandwidthComplexity,
 } from './getComplexity';
 
 /**
@@ -197,7 +194,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     toBurn.set(assetId, amountToBurn);
   });
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -354,7 +351,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       TransferableOutput.fromNative(assetID, amount, toAddressesBytes),
     );
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const inputComplexity = getInputComplexity(importedInputs);
 
@@ -444,7 +441,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     toBurn.set(assetId, (toBurn.get(assetId) ?? 0n) + output.output.amount());
   });
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -530,7 +527,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(
     OutputOwners.fromNative(subnetOwners, locktime, threshold),
@@ -743,7 +740,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -835,7 +832,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -1001,7 +998,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     0n,
   );
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const signerComplexity = getSignerComplexity(signer);
   const validatorOwnerComplexity = getOwnerComplexity(validatorOutputOwners);
@@ -1157,7 +1154,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     threshold,
   );
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(delegatorRewardsOwner);
 
@@ -1269,7 +1266,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -1374,9 +1371,9 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-  const addressComplexity = getAddressComplexity(address);
+  const addressComplexity = getBandwidthComplexity(address);
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
 
   const complexity = addDimensions(
@@ -1412,9 +1409,6 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   });
 
   const convertSubnetValidators = convertSubnetValidatorFromBytes(validators);
-  // const sortedValidators = convertSubnetValidators.toSorted((a, b) =>
-  //   ConvertSubnetValidator.compare(a.nodeId, b.nodeId),
-  // );
 
   return new UnsignedTx(
     new ConvertSubnetTx(
@@ -1427,7 +1421,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       ),
       Id.fromString(subnetId),
       Id.fromString(chainId),
-      Address.fromBytes(address)[0],
+      new Bytes(address),
       convertSubnetValidators,
       Input.fromNative(subnetAuth),
     ),

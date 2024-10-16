@@ -1,4 +1,4 @@
-import type { NodeId } from '../../../serializable/fxs/common/nodeId';
+import type { Bytes } from '../../../serializable';
 import { SHORT_ID_LEN } from '../../../serializable/fxs/common/nodeId';
 import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
 import { Signer } from '../../../serializable/pvm';
@@ -12,27 +12,11 @@ import {
 import { getSignerComplexity } from '../txs/fee';
 import { INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES } from '../txs/fee/constants';
 
-export const getMemoComplexity = (memo: Uint8Array): Dimensions => {
+export const getBandwidthComplexity = (
+  value: Uint8Array | Bytes,
+): Dimensions => {
   return createDimensions({
-    bandwidth: memo.length,
-    dbRead: 0,
-    dbWrite: 0,
-    compute: 0,
-  });
-};
-
-export const getAddressComplexity = (address: Uint8Array): Dimensions => {
-  return createDimensions({
-    bandwidth: address.length,
-    dbRead: 0,
-    dbWrite: 0,
-    compute: 0,
-  });
-};
-
-export const getNodeIdComplexity = (nodeId: NodeId): Dimensions => {
-  return createDimensions({
-    bandwidth: nodeId.toBytes().length,
+    bandwidth: value.length,
     dbRead: 0,
     dbWrite: 0,
     compute: 0,
@@ -57,7 +41,7 @@ export const getConvertSubnetValidatorsComplexity = (
 export const getConvertSubnetValidatorComplexity = (
   validator: ConvertSubnetValidator,
 ): Dimensions => {
-  const nodeIdComplexity = getNodeIdComplexity(validator.nodeId);
+  const nodeIdComplexity = getBandwidthComplexity(validator.nodeId);
   const signerComplexity = getSignerComplexity(new Signer(validator.signer));
   const addressComplexity = createDimensions({
     bandwidth:
