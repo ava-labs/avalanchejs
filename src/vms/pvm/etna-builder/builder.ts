@@ -65,14 +65,12 @@ import {
   getOutputComplexity,
   getOwnerComplexity,
   getSignerComplexity,
+  getBandwidthComplexity,
+  getConvertSubnetValidatorsComplexity,
 } from '../txs/fee';
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import { convertSubnetValidatorFromBytes } from '../../../utils/convertSubnetValidatorsFromBytes';
-import {
-  getConvertSubnetValidatorsComplexity,
-  getBandwidthComplexity,
-} from './getComplexity';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -1367,13 +1365,14 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
     subnetAuth,
     chainId,
     address,
-    validators,
+    validators: validatorBytes,
   },
   context,
 ) => {
   const memoComplexity = getBandwidthComplexity(memo);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
   const addressComplexity = getBandwidthComplexity(address);
+  const validators = convertSubnetValidatorFromBytes(validatorBytes);
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
 
   const complexity = addDimensions(
@@ -1408,8 +1407,6 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
     fromAddressesBytes,
   });
 
-  const convertSubnetValidators = convertSubnetValidatorFromBytes(validators);
-
   return new UnsignedTx(
     new ConvertSubnetTx(
       AvaxBaseTx.fromNative(
@@ -1422,7 +1419,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       Id.fromString(subnetId),
       Id.fromString(chainId),
       new Bytes(address),
-      convertSubnetValidators,
+      validators,
       Input.fromNative(subnetAuth),
     ),
     inputUTXOs,

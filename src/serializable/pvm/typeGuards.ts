@@ -16,6 +16,7 @@ import type { Signer, SignerEmpty } from './signer';
 import type { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TypeSymbols } from '../constants';
 import type { TransformSubnetTx } from './transformSubnetTx';
+import type { ConvertSubnetTx } from './convertSubnetTx';
 
 export function isPvmBaseTx(tx: Transaction): tx is BaseTx {
   return tx._type === TypeSymbols.PvmBaseTx;
@@ -85,6 +86,10 @@ export function isImportTx(tx: Transaction): tx is ImportTx {
 
 export function isRewardValidatorTx(tx: Transaction): tx is RewardValidatorTx {
   return tx._type === TypeSymbols.RewardValidatorTx;
+}
+
+export function isConvertSubnetTx(tx: Transaction): tx is ConvertSubnetTx {
+  return tx._type === TypeSymbols.ConvertSubnetTx;
 }
 
 export function isEmptySigner(
