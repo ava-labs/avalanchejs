@@ -5,7 +5,7 @@
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/complexity.go
  */
 
-import type { OutputOwners } from '../../../../serializable';
+import type { Bytes, OutputOwners } from '../../../../serializable';
 import { Input } from '../../../../serializable/fxs/secp256k1';
 import { SHORT_ID_LEN } from '../../../../serializable/fxs/common/nodeId';
 import { ID_LEN } from '../../../../serializable/fxs/common/id';
@@ -24,9 +24,10 @@ import type {
   ExportTx,
   ImportTx,
   RemoveSubnetValidatorTx,
-  Signer,
   TransferSubnetOwnershipTx,
+  ConvertSubnetTx,
 } from '../../../../serializable/pvm';
+import { Signer } from '../../../../serializable/pvm/signer';
 import {
   SignerEmpty,
   isAddPermissionlessDelegatorTx,
@@ -54,11 +55,14 @@ import {
 } from '../../../common/fees/dimensions';
 import type { Serializable } from '../../../common/types';
 import type { Transaction } from '../../../common';
+import { isConvertSubnetTx } from '../../../../serializable/pvm/typeGuards';
 import {
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_BASE_TX_COMPLEXITIES,
+  INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
+  INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES,
   INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
   INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
   INTRINSIC_EXPORT_TX_COMPLEXITIES,
@@ -79,6 +83,7 @@ import {
   INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
 } from './constants';
+import type { ConvertSubnetValidator } from '../../../../serializable/fxs/pvm/convertSubnetValidator';
 
 /**
  * Returns the complexity outputs add to a transaction.
@@ -209,6 +214,53 @@ export const getAuthComplexity = (input: Serializable): Dimensions => {
   });
 };
 
+export const getBandwidthComplexity = (
+  value: Uint8Array | Bytes,
+): Dimensions => {
+  return createDimensions({
+    bandwidth: value.length,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0,
+  });
+};
+
+export const getConvertSubnetValidatorsComplexity = (
+  validators: ConvertSubnetValidator[],
+): Dimensions => {
+  let complexity = createEmptyDimensions();
+
+  for (const validator of validators) {
+    complexity = addDimensions(
+      complexity,
+      getConvertSubnetValidatorComplexity(validator),
+    );
+  }
+  return complexity;
+};
+
+export const getConvertSubnetValidatorComplexity = (
+  validator: ConvertSubnetValidator,
+): Dimensions => {
+  const nodeIdComplexity = getBandwidthComplexity(validator.nodeId);
+  const signerComplexity = getSignerComplexity(new Signer(validator.signer));
+  const addressComplexity = createDimensions({
+    bandwidth:
+      (validator.remainingBalanceOwner.addresses.length +
+        validator.deactivationOwner.addresses.length) *
+      SHORT_ID_LEN,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0,
+  });
+  return addDimensions(
+    INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES,
+    nodeIdComplexity,
+    signerComplexity,
+    addressComplexity,
+  );
+};
+
 const getBaseTxComplexity = (baseTx: BaseTx): Dimensions => {
   const outputsComplexity = getOutputComplexity(baseTx.outputs);
   const inputsComplexity = getInputComplexity(baseTx.inputs);
@@ -322,6 +374,15 @@ const transferSubnetOwnershipTx = (
   );
 };
 
+const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
+  return addDimensions(
+    INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.subnetAuth),
+    getConvertSubnetValidatorsComplexity(tx.validators),
+  );
+};
+
 export const getTxComplexity = (tx: Transaction): Dimensions => {
   if (isAddPermissionlessValidatorTx(tx)) {
     return addPermissionlessValidatorTx(tx);
@@ -343,6 +404,8 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return transferSubnetOwnershipTx(tx);
   } else if (isPvmBaseTx(tx)) {
     return baseTx(tx);
+  } else if (isConvertSubnetTx(tx)) {
+    return convertSubnetTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }

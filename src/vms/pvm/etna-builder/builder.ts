@@ -39,13 +39,13 @@ import {
   RemoveSubnetValidatorTx,
   SubnetValidator,
   TransferSubnetOwnershipTx,
+  ConvertSubnetTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
 import { AddressMaps, addressesFromBytes, isTransferOut } from '../../../utils';
 import { matchOwners } from '../../../utils/matchOwners';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import { baseTxUnsafePvm, UnsignedTx } from '../../common';
-import type { Dimensions } from '../../common/fees/dimensions';
 import { addDimensions, createDimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
 import type { FeeState } from '../models';
@@ -65,9 +65,12 @@ import {
   getOutputComplexity,
   getOwnerComplexity,
   getSignerComplexity,
+  getBandwidthComplexity,
+  getConvertSubnetValidatorsComplexity,
 } from '../txs/fee';
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
+import { convertSubnetValidatorFromBytes } from '../../../utils/convertSubnetValidatorsFromBytes';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -104,15 +107,6 @@ const getAddressMaps = ({
     minIssuanceTime,
     fromAddressesBytes,
   );
-};
-
-const getMemoComplexity = (memo: Uint8Array): Dimensions => {
-  return createDimensions({
-    bandwidth: memo.length,
-    dbRead: 0,
-    dbWrite: 0,
-    compute: 0,
-  });
 };
 
 const getDefaultMinIssuanceTime = (): bigint => {
@@ -198,7 +192,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     toBurn.set(assetId, amountToBurn);
   });
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -355,7 +349,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       TransferableOutput.fromNative(assetID, amount, toAddressesBytes),
     );
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const inputComplexity = getInputComplexity(importedInputs);
 
@@ -445,7 +439,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     toBurn.set(assetId, (toBurn.get(assetId) ?? 0n) + output.output.amount());
   });
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -531,7 +525,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(
     OutputOwners.fromNative(subnetOwners, locktime, threshold),
@@ -744,7 +738,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -836,7 +830,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -1002,7 +996,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     0n,
   );
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const signerComplexity = getSignerComplexity(signer);
   const validatorOwnerComplexity = getOwnerComplexity(validatorOutputOwners);
@@ -1158,7 +1152,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     threshold,
   );
 
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(delegatorRewardsOwner);
 
@@ -1270,7 +1264,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getMemoComplexity(memo);
+  const memoComplexity = getBandwidthComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -1322,6 +1316,111 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
       Id.fromString(subnetId),
       Input.fromNative(subnetAuth),
       OutputOwners.fromNative(subnetOwners, locktime, threshold),
+    ),
+    inputUTXOs,
+    addressMaps,
+  );
+};
+
+export type NewConvertSubnetTxProps = TxProps<{
+  /**
+   * Specifies which chain the manager is deployed on
+   */
+  chainId: string;
+  /**
+   * Specifies the subnet to be converted
+   */
+  subnetId: string;
+  /**
+   * Specifies the address of the manager
+   */
+  address: Uint8Array;
+  /**
+   * Initial pay-as-you-go validators for the Subnet
+   */
+  validators: readonly Uint8Array[];
+  /**
+   * Indices of existing subnet owners.
+   */
+  subnetAuth: readonly number[];
+}>;
+
+/**
+ * Creates a new unsigned PVM convert subnet transaction
+ * (`NewConvertSubnetTx`) using calculated dynamic fees.
+ *
+ * @param props {NewConvertSubnetTxProps}
+ * @param context {Context}
+ * @returns {UnsignedTx} An UnsignedTx.
+ */
+export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
+  {
+    fromAddressesBytes,
+    feeState,
+    subnetId,
+    utxos,
+    memo = new Uint8Array(),
+    minIssuanceTime = BigInt(Math.floor(new Date().getTime() / 1000)),
+    changeAddressesBytes,
+    subnetAuth,
+    chainId,
+    address,
+    validators: validatorBytes,
+  },
+  context,
+) => {
+  const memoComplexity = getBandwidthComplexity(memo);
+  const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
+  const addressComplexity = getBandwidthComplexity(address);
+  const validators = convertSubnetValidatorFromBytes(validatorBytes);
+  const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
+
+  const complexity = addDimensions(
+    validatorComplexity,
+    memoComplexity,
+    addressComplexity,
+    authComplexity,
+  );
+
+  const spendResults = spend(
+    {
+      excessAVAX: 0n,
+      feeState,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      minIssuanceTime,
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
+      utxos,
+    },
+    [useUnlockedUTXOs],
+    context,
+  );
+
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  });
+
+  return new UnsignedTx(
+    new ConvertSubnetTx(
+      AvaxBaseTx.fromNative(
+        context.networkID,
+        context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        memo,
+      ),
+      Id.fromString(subnetId),
+      Id.fromString(chainId),
+      new Bytes(address),
+      validators,
+      Input.fromNative(subnetAuth),
     ),
     inputUTXOs,
     addressMaps,

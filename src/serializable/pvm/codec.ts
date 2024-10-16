@@ -18,6 +18,7 @@ import { RemoveSubnetValidatorTx } from './removeSubnetValidatorTx';
 import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
 import { BaseTx } from './baseTx';
+import { ConvertSubnetTx } from './convertSubnetTx';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/codec.go#L35
@@ -57,6 +58,8 @@ export const codec = new Codec([
 
   TransferSubnetOwnershipTx, // 33
   BaseTx, // 34
+
+  ConvertSubnetTx, // 35
 ]);
 
 let manager: Manager;
