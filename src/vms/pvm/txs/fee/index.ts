@@ -18,4 +18,6 @@ export {
   getOwnerComplexity,
   getSignerComplexity,
   getTxComplexity,
+  getBytesComplexity,
+  getConvertSubnetValidatorsComplexity,
 } from './complexity';
