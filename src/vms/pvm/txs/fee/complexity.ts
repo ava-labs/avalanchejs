@@ -214,15 +214,14 @@ export const getAuthComplexity = (input: Serializable): Dimensions => {
   });
 };
 
-export const getBandwidthComplexity = (
-  value: Uint8Array | Bytes,
+export const getBytesComplexity = (
+  ...bytes: (Uint8Array | Bytes)[]
 ): Dimensions => {
-  return createDimensions({
-    bandwidth: value.length,
-    dbRead: 0,
-    dbWrite: 0,
-    compute: 0,
+  const result = createEmptyDimensions();
+  bytes.forEach((b) => {
+    result[FeeDimensions.Bandwidth] += b.length;
   });
+  return result;
 };
 
 export const getConvertSubnetValidatorsComplexity = (
@@ -242,7 +241,7 @@ export const getConvertSubnetValidatorsComplexity = (
 export const getConvertSubnetValidatorComplexity = (
   validator: ConvertSubnetValidator,
 ): Dimensions => {
-  const nodeIdComplexity = getBandwidthComplexity(validator.nodeId);
+  const nodeIdComplexity = getBytesComplexity(validator.nodeId);
   const signerComplexity = getSignerComplexity(new Signer(validator.signer));
   const addressComplexity = createDimensions({
     bandwidth:
@@ -377,6 +376,7 @@ const transferSubnetOwnershipTx = (
 const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   return addDimensions(
     INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
+    getBytesComplexity(tx.address),
     getBaseTxComplexity(tx.baseTx),
     getAuthComplexity(tx.subnetAuth),
     getConvertSubnetValidatorsComplexity(tx.validators),

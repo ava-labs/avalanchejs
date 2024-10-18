@@ -65,7 +65,7 @@ import {
   getOutputComplexity,
   getOwnerComplexity,
   getSignerComplexity,
-  getBandwidthComplexity,
+  getBytesComplexity,
   getConvertSubnetValidatorsComplexity,
 } from '../txs/fee';
 import { spend } from './spend';
@@ -192,7 +192,7 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     toBurn.set(assetId, amountToBurn);
   });
 
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -349,7 +349,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       TransferableOutput.fromNative(assetID, amount, toAddressesBytes),
     );
 
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const inputComplexity = getInputComplexity(importedInputs);
 
@@ -439,7 +439,7 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     toBurn.set(assetId, (toBurn.get(assetId) ?? 0n) + output.output.amount());
   });
 
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const outputComplexity = getOutputComplexity(outputs);
 
@@ -525,7 +525,7 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   },
   context,
 ) => {
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(
     OutputOwners.fromNative(subnetOwners, locktime, threshold),
@@ -738,7 +738,7 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -830,7 +830,7 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -996,7 +996,7 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     0n,
   );
 
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const signerComplexity = getSignerComplexity(signer);
   const validatorOwnerComplexity = getOwnerComplexity(validatorOutputOwners);
@@ -1152,7 +1152,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     threshold,
   );
 
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const ownerComplexity = getOwnerComplexity(delegatorRewardsOwner);
 
@@ -1264,7 +1264,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   },
   context,
 ) => {
-  const memoComplexity = getBandwidthComplexity(memo);
+  const memoComplexity = getBytesComplexity(memo);
 
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
 
@@ -1369,16 +1369,14 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   },
   context,
 ) => {
-  const memoComplexity = getBandwidthComplexity(memo);
+  const bytesComplexity = getBytesComplexity(memo, address);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-  const addressComplexity = getBandwidthComplexity(address);
   const validators = convertSubnetValidatorFromBytes(validatorBytes);
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
 
   const complexity = addDimensions(
+    bytesComplexity,
     validatorComplexity,
-    memoComplexity,
-    addressComplexity,
     authComplexity,
   );
 

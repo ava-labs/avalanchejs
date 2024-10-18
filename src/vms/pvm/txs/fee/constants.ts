@@ -215,6 +215,7 @@ export const INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES: Dimensions = {
 
 export const INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     ID_LEN + // subnetID
     ID_LEN + // chainID
     INT_LEN + // address length
