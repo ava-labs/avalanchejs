@@ -14,7 +14,7 @@ import type {
   GetUpgradesInfoResponse,
 } from './model';
 
-export class Info extends Api {
+export class InfoApi extends Api {
   constructor(private readonly baseURL: string = AVAX_PUBLIC_URL) {
     super(baseURL, '/ext/info', 'info');
   }

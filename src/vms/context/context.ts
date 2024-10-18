@@ -1,5 +1,5 @@
+import { InfoApi } from '../../info';
 import { getHRP } from '../../constants/networkIDs';
-import { Info } from '../../info/info';
 import { AVMApi } from '../avm/api';
 import { PVMApi } from '../pvm';
 import type { Context } from './model';
@@ -16,7 +16,7 @@ export const getContextFromURI = async (
   const { assetID: avaxAssetID } = await xChainApi.getAssetDescription(
     assetDescription,
   );
-  const info = new Info(baseURL);
+  const info = new InfoApi(baseURL);
   const {
     txFee: baseTxFee,
     createAssetTxFee,
