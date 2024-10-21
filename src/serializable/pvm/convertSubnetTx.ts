@@ -1,5 +1,5 @@
 import { concatBytes } from '../../utils/buffer';
-import { toListStruct } from '../../utils/serializeList';
+import { packList, toListStruct } from '../../utils/serializeList';
 import { pack, unpack } from '../../utils/struct';
 import { BaseTx } from '../avax/baseTx';
 import { Codec } from '../codec/codec';
@@ -54,16 +54,8 @@ export class ConvertSubnetTx extends AbstractSubnetTx {
 
   toBytes(codec: Codec) {
     return concatBytes(
-      pack(
-        [
-          this.baseTx,
-          this.subnetID,
-          this.chainID,
-          this.address,
-          this.validators,
-        ],
-        codec,
-      ),
+      pack([this.baseTx, this.subnetID, this.chainID, this.address], codec),
+      packList(this.validators, codec),
       codec.PackPrefix(this.subnetAuth),
     );
   }

@@ -1,12 +1,14 @@
 import { pack, unpack } from '../../../utils/struct';
-import type { Codec } from '../../codec/codec';
+import { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
 import { BigIntPr } from '../../primitives';
 import { TypeSymbols } from '../../constants';
-import { ProofOfPossession } from '../../pvm/proofOfPossession';
-import { PChainOwner } from './pChainOwner';
 import { emptyNodeId } from '../../../constants/zeroValue';
 import { NodeId } from '../common';
+import { concatBytes } from '@noble/hashes/utils';
+import type { SignerEmpty } from '../../pvm';
+import type { Signer } from '../../pvm';
+import { PChainOwner } from './pChainOwner';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/convert_subnet_tx.go#86
@@ -19,7 +21,7 @@ export class ConvertSubnetValidator {
     public readonly nodeId: NodeId,
     public readonly weight: BigIntPr,
     public readonly balance: BigIntPr,
-    public readonly signer: ProofOfPossession,
+    public readonly signer: Signer | SignerEmpty,
     public readonly remainingBalanceOwner: PChainOwner,
     public readonly deactivationOwner: PChainOwner,
   ) {}
@@ -28,11 +30,19 @@ export class ConvertSubnetValidator {
     return this.balance.value();
   }
 
+  getRemainingBalanceOwner() {
+    return this.remainingBalanceOwner;
+  }
+
+  getDeactivationOwner() {
+    return this.deactivationOwner;
+  }
+
   static fromNative(
     nodeId: string,
     weight: bigint,
     balance: bigint,
-    signer: ProofOfPossession,
+    signer: Signer | SignerEmpty,
     remainingBalanceOwner: PChainOwner,
     deactivationOwner: PChainOwner,
   ) {
@@ -46,7 +56,10 @@ export class ConvertSubnetValidator {
     );
   }
 
-  static fromBytes(bytes: Uint8Array): [ConvertSubnetValidator, Uint8Array] {
+  static fromBytes(
+    bytes: Uint8Array,
+    codec: Codec,
+  ): [ConvertSubnetValidator, Uint8Array] {
     const [
       nodeId,
       weight,
@@ -55,14 +68,11 @@ export class ConvertSubnetValidator {
       remainingBalanceOwner,
       deactivationOwner,
       rest,
-    ] = unpack(bytes, [
-      NodeId,
-      BigIntPr,
-      BigIntPr,
-      ProofOfPossession,
-      PChainOwner,
-      PChainOwner,
-    ]);
+    ] = unpack(
+      bytes,
+      [NodeId, BigIntPr, BigIntPr, Codec, PChainOwner, PChainOwner],
+      codec,
+    );
 
     return [
       new ConvertSubnetValidator(
@@ -78,16 +88,10 @@ export class ConvertSubnetValidator {
   }
 
   toBytes(codec: Codec) {
-    return pack(
-      [
-        this.nodeId,
-        this.weight,
-        this.balance,
-        this.signer,
-        this.remainingBalanceOwner,
-        this.deactivationOwner,
-      ],
-      codec,
+    return concatBytes(
+      pack([this.nodeId, this.weight, this.balance], codec),
+      codec.PackPrefix(this.signer),
+      pack([this.remainingBalanceOwner, this.deactivationOwner], codec),
     );
   }
 

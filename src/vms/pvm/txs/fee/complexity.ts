@@ -27,7 +27,7 @@ import type {
   TransferSubnetOwnershipTx,
   ConvertSubnetTx,
 } from '../../../../serializable/pvm';
-import { Signer } from '../../../../serializable/pvm/signer';
+import type { Signer } from '../../../../serializable/pvm/signer';
 import {
   SignerEmpty,
   isAddPermissionlessDelegatorTx,
@@ -242,11 +242,11 @@ export const getConvertSubnetValidatorComplexity = (
   validator: ConvertSubnetValidator,
 ): Dimensions => {
   const nodeIdComplexity = getBytesComplexity(validator.nodeId.toBytes());
-  const signerComplexity = getSignerComplexity(new Signer(validator.signer));
+  const signerComplexity = getSignerComplexity(validator.signer);
   const addressComplexity = createDimensions({
     bandwidth:
-      (validator.remainingBalanceOwner.addresses.length +
-        validator.deactivationOwner.addresses.length) *
+      (validator.getRemainingBalanceOwner().addresses.length +
+        validator.getDeactivationOwner().addresses.length) *
       SHORT_ID_LEN,
     dbRead: 0,
     dbWrite: 0,

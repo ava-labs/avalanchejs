@@ -312,7 +312,7 @@ export const convertSubnetValidator = () =>
     nodeId(),
     bigIntPr(),
     bigIntPr(),
-    proofOfPossession(),
+    signer(),
     pChainOwner(),
     pChainOwner(),
   );
@@ -322,7 +322,8 @@ export const convertSubnetValidatorBytes = () =>
     nodeIdBytes(),
     bigIntPrBytes(),
     bigIntPrBytes(),
-    proofOfPossessionBytes(),
+    bytesForInt(28),
+    signerBytes(),
     pChainOwnerBytes(),
     pChainOwnerBytes(),
   );
