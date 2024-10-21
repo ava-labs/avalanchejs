@@ -1,17 +1,28 @@
 import { utxoId } from '../../../../fixtures/avax';
 import { address, id } from '../../../../fixtures/common';
-import { bigIntPr, int, ints } from '../../../../fixtures/primitives';
+import {
+  bigIntPr,
+  blsPublicKeyBytes,
+  blsSignatureBytes,
+  int,
+  ints,
+} from '../../../../fixtures/primitives';
 import { signer } from '../../../../fixtures/pvm';
 import { txHexToTransaction } from '../../../../fixtures/transactions';
 import {
+  Address,
   Input,
+  Int,
   OutputOwners,
   TransferInput,
   TransferOutput,
   TransferableInput,
   TransferableOutput,
 } from '../../../../serializable';
+import { ConvertSubnetValidator } from '../../../../serializable/fxs/pvm/convertSubnetValidator';
+import { PChainOwner } from '../../../../serializable/fxs/pvm/pChainOwner';
 import {
+  ProofOfPossession,
   SignerEmpty,
   StakeableLockIn,
   StakeableLockOut,
@@ -19,6 +30,7 @@ import {
 import { createDimensions } from '../../../common/fees/dimensions';
 import {
   getAuthComplexity,
+  getConvertSubnetValidatorComplexity,
   getInputComplexity,
   getOutputComplexity,
   getOwnerComplexity,
@@ -265,6 +277,101 @@ describe('Complexity', () => {
         getAuthComplexity(int());
       }).toThrow(
         'Unable to calculate auth complexity of transaction. Expected Input as subnet auth.',
+      );
+    });
+  });
+
+  describe('getConvertSubnetValidatorComplexity', () => {
+    test('any can spend', () => {
+      const pChainOwner = new PChainOwner(new Int(0), []);
+      const validator = ConvertSubnetValidator.fromNative(
+        'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
+        1n,
+        1n,
+        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+        pChainOwner,
+        pChainOwner,
+      );
+      const result = getConvertSubnetValidatorComplexity(validator);
+
+      expect(result).toEqual(
+        createDimensions({
+          bandwidth: 200,
+          dbRead: 0,
+          dbWrite: 4,
+          compute: 0, // TODO: Implement
+        }),
+      );
+    });
+    test('single remaining balance owner', () => {
+      const pChainOwner = new PChainOwner(new Int(1), [
+        Address.fromString('P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs'),
+      ]);
+      const pChainOwner1 = new PChainOwner(new Int(0), []);
+      const validator = ConvertSubnetValidator.fromNative(
+        'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
+        1n,
+        1n,
+        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+        pChainOwner,
+        pChainOwner1,
+      );
+      const result = getConvertSubnetValidatorComplexity(validator);
+
+      expect(result).toEqual(
+        createDimensions({
+          bandwidth: 220,
+          dbRead: 0,
+          dbWrite: 4,
+          compute: 0, // TODO: Implement
+        }),
+      );
+    });
+    test('single deactivation owner', () => {
+      const pChainOwner = new PChainOwner(new Int(1), [
+        Address.fromString('P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs'),
+      ]);
+      const pChainOwner1 = new PChainOwner(new Int(0), []);
+      const validator = ConvertSubnetValidator.fromNative(
+        'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
+        1n,
+        1n,
+        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+        pChainOwner1,
+        pChainOwner,
+      );
+      const result = getConvertSubnetValidatorComplexity(validator);
+
+      expect(result).toEqual(
+        createDimensions({
+          bandwidth: 220,
+          dbRead: 0,
+          dbWrite: 4,
+          compute: 0, // TODO: Implement
+        }),
+      );
+    });
+    test('remaining balance owner and deactivation owner', () => {
+      const pChainOwner = new PChainOwner(new Int(1), [
+        Address.fromString('P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs'),
+      ]);
+      const validator = ConvertSubnetValidator.fromNative(
+        'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
+        1n,
+        1n,
+        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+        pChainOwner,
+        pChainOwner,
+      );
+      const result = getConvertSubnetValidatorComplexity(validator);
+
+      expect(result).toEqual(
+        createDimensions({
+          bandwidth: 240,
+          dbRead: 0,
+          dbWrite: 4,
+          compute: 0, // TODO: Implement
+        }),
       );
     });
   });

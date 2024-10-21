@@ -11,6 +11,7 @@ import {
 } from '../../../constants/networkIDs';
 import type { TransferOutput } from '../../../serializable';
 import {
+  Address,
   Input,
   NodeId,
   OutputOwners,
@@ -70,7 +71,7 @@ import {
 } from '../txs/fee';
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
-import { convertSubnetValidatorFromBytes } from '../../../utils/convertSubnetValidatorsFromBytes';
+import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -1338,7 +1339,7 @@ export type NewConvertSubnetTxProps = TxProps<{
   /**
    * Initial pay-as-you-go validators for the Subnet
    */
-  validators: readonly Uint8Array[];
+  validators: ConvertSubnetValidator[];
   /**
    * Indices of existing subnet owners.
    */
@@ -1365,14 +1366,21 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
     subnetAuth,
     chainId,
     address,
-    validators: validatorBytes,
+    validators,
   },
   context,
 ) => {
   const bytesComplexity = getBytesComplexity(memo, address);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-  const validators = convertSubnetValidatorFromBytes(validatorBytes);
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
+
+  const toBurn = new Map<string, bigint>();
+  for (const validator of validators) {
+    toBurn.set(
+      context.avaxAssetID,
+      (toBurn.get(context.avaxAssetID) ?? 0n) + validator.getBalance(),
+    );
+  }
 
   const complexity = addDimensions(
     bytesComplexity,
@@ -1392,6 +1400,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
         fromAddressesBytes,
       }),
       utxos,
+      toBurn,
     },
     [useUnlockedUTXOs],
     context,
@@ -1416,7 +1425,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       ),
       Id.fromString(subnetId),
       Id.fromString(chainId),
-      new Bytes(address),
+      new Address(address),
       validators,
       Input.fromNative(subnetAuth),
     ),

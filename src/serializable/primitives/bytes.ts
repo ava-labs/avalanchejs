@@ -34,10 +34,6 @@ export class Bytes extends Primitives {
     return concatBytes(bytesForInt(this.bytes.length), this.bytes);
   }
 
-  toBytesWithoutLength() {
-    return this.bytes;
-  }
-
   /**
    * Returns the length of the bytes (Uint8Array).
    *

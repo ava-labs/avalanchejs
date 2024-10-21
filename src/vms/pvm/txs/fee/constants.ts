@@ -208,7 +208,7 @@ export const INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES: Dimensions = {
     INT_LEN + // remaining balance owner num addresses
     INT_LEN + // deactivation owner threshold
     INT_LEN, // deactivation owner num addresses
-  [FeeDimensions.DBRead]: 1,
+  [FeeDimensions.DBRead]: 0,
   [FeeDimensions.DBWrite]: 4, // weight diff + pub key diff + subnetID/nodeID + validationID
   [FeeDimensions.Compute]: 0,
 };

@@ -241,7 +241,7 @@ export const getConvertSubnetValidatorsComplexity = (
 export const getConvertSubnetValidatorComplexity = (
   validator: ConvertSubnetValidator,
 ): Dimensions => {
-  const nodeIdComplexity = getBytesComplexity(validator.nodeId);
+  const nodeIdComplexity = getBytesComplexity(validator.nodeId.toBytes());
   const signerComplexity = getSignerComplexity(new Signer(validator.signer));
   const addressComplexity = createDimensions({
     bandwidth:
@@ -376,7 +376,7 @@ const transferSubnetOwnershipTx = (
 const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   return addDimensions(
     INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
-    getBytesComplexity(tx.address),
+    getBytesComplexity(tx.address.toBytes()),
     getBaseTxComplexity(tx.baseTx),
     getAuthComplexity(tx.subnetAuth),
     getConvertSubnetValidatorsComplexity(tx.validators),

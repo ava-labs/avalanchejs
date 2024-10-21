@@ -1,7 +1,7 @@
 import { pack, unpack } from '../../../utils/struct';
 import type { Codec } from '../../codec/codec';
 import { serializable } from '../../common/types';
-import { BigIntPr, Bytes } from '../../primitives';
+import { BigIntPr } from '../../primitives';
 import { TypeSymbols } from '../../constants';
 import { ProofOfPossession } from '../../pvm/proofOfPossession';
 import { PChainOwner } from './pChainOwner';
@@ -16,13 +16,35 @@ export class ConvertSubnetValidator {
   _type = TypeSymbols.ConvertSubnetValidator;
 
   constructor(
-    public readonly nodeId: Bytes,
+    public readonly nodeId: NodeId,
     public readonly weight: BigIntPr,
     public readonly balance: BigIntPr,
     public readonly signer: ProofOfPossession,
     public readonly remainingBalanceOwner: PChainOwner,
     public readonly deactivationOwner: PChainOwner,
   ) {}
+
+  getBalance() {
+    return this.balance.value();
+  }
+
+  static fromNative(
+    nodeId: string,
+    weight: bigint,
+    balance: bigint,
+    signer: ProofOfPossession,
+    remainingBalanceOwner: PChainOwner,
+    deactivationOwner: PChainOwner,
+  ) {
+    return new ConvertSubnetValidator(
+      NodeId.fromString(nodeId),
+      new BigIntPr(weight),
+      new BigIntPr(balance),
+      signer,
+      remainingBalanceOwner,
+      deactivationOwner,
+    );
+  }
 
   static fromBytes(bytes: Uint8Array): [ConvertSubnetValidator, Uint8Array] {
     const [
@@ -34,7 +56,7 @@ export class ConvertSubnetValidator {
       deactivationOwner,
       rest,
     ] = unpack(bytes, [
-      Bytes,
+      NodeId,
       BigIntPr,
       BigIntPr,
       ProofOfPossession,
@@ -74,9 +96,7 @@ export class ConvertSubnetValidator {
       throw new Error('Weight must be greater than 0');
     }
 
-    const nodeId = new NodeId(this.nodeId.toBytesWithoutLength());
-
-    if (nodeId === emptyNodeId) {
+    if (this.nodeId === emptyNodeId) {
       throw new Error('Node ID must be non-empty');
     }
     return true;
