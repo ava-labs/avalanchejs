@@ -17,7 +17,7 @@ export class ConvertSubnetValidator {
   _type = TypeSymbols.ConvertSubnetValidator;
 
   constructor(
-    public readonly nodeId: Bytes,
+    public readonly nodeId: NodeId,
     public readonly weight: BigIntPr,
     public readonly balance: BigIntPr,
     public readonly signer: ProofOfPossession,
@@ -34,7 +34,7 @@ export class ConvertSubnetValidator {
     deactivationOwner: PChainOwner,
   ) {
     return new ConvertSubnetValidator(
-      new Bytes(stringToBytes('utf8', nodeId)),
+      NodeId.fromString(nodeId),
       new BigIntPr(weight),
       new BigIntPr(balance),
       signer,
@@ -53,7 +53,7 @@ export class ConvertSubnetValidator {
       deactivationOwner,
       rest,
     ] = unpack(bytes, [
-      Bytes,
+      NodeId,
       BigIntPr,
       BigIntPr,
       ProofOfPossession,
@@ -93,9 +93,9 @@ export class ConvertSubnetValidator {
       throw new Error('Weight must be greater than 0');
     }
 
-    const nodeId = new NodeId(this.nodeId.toBytesWithoutLength());
+    // const nodeId = new NodeId(this.nodeId.toBytesWithoutLength());
 
-    if (nodeId === emptyNodeId) {
+    if (this.nodeId === emptyNodeId) {
       throw new Error('Node ID must be non-empty');
     }
     return true;
