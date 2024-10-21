@@ -1,4 +1,4 @@
-import { bytesToString } from '@scure/base';
+import { bytesToString, stringToBytes } from '@scure/base';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
 import { bufferToHex, concatBytes } from '../../utils/buffer';
 import { serializable } from '../common/types';

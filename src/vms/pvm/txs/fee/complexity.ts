@@ -241,7 +241,7 @@ export const getConvertSubnetValidatorsComplexity = (
 export const getConvertSubnetValidatorComplexity = (
   validator: ConvertSubnetValidator,
 ): Dimensions => {
-  const nodeIdComplexity = getBytesComplexity(validator.nodeId);
+  const nodeIdComplexity = getBytesComplexity(validator.nodeId.toBytes());
   const signerComplexity = getSignerComplexity(new Signer(validator.signer));
   const addressComplexity = createDimensions({
     bandwidth:

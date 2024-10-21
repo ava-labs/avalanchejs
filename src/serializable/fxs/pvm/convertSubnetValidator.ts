@@ -7,6 +7,7 @@ import { ProofOfPossession } from '../../pvm/proofOfPossession';
 import { PChainOwner } from './pChainOwner';
 import { emptyNodeId } from '../../../constants/zeroValue';
 import { NodeId } from '../common';
+import { stringToBytes } from '@scure/base';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/convert_subnet_tx.go#86
@@ -23,6 +24,24 @@ export class ConvertSubnetValidator {
     public readonly remainingBalanceOwner: PChainOwner,
     public readonly deactivationOwner: PChainOwner,
   ) {}
+
+  static fromNative(
+    nodeId: string,
+    weight: bigint,
+    balance: bigint,
+    signer: ProofOfPossession,
+    remainingBalanceOwner: PChainOwner,
+    deactivationOwner: PChainOwner,
+  ) {
+    return new ConvertSubnetValidator(
+      new Bytes(stringToBytes('utf8', nodeId)),
+      new BigIntPr(weight),
+      new BigIntPr(balance),
+      signer,
+      remainingBalanceOwner,
+      deactivationOwner,
+    );
+  }
 
   static fromBytes(bytes: Uint8Array): [ConvertSubnetValidator, Uint8Array] {
     const [

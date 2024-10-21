@@ -71,6 +71,7 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import { convertSubnetValidatorFromBytes } from '../../../utils/convertSubnetValidatorsFromBytes';
+import { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -1338,7 +1339,7 @@ export type NewConvertSubnetTxProps = TxProps<{
   /**
    * Initial pay-as-you-go validators for the Subnet
    */
-  validators: readonly Uint8Array[];
+  validators: ConvertSubnetValidator[];
   /**
    * Indices of existing subnet owners.
    */
@@ -1365,13 +1366,13 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
     subnetAuth,
     chainId,
     address,
-    validators: validatorBytes,
+    validators,
   },
   context,
 ) => {
   const bytesComplexity = getBytesComplexity(memo, address);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-  const validators = convertSubnetValidatorFromBytes(validatorBytes);
+  // const validators = convertSubnetValidatorFromBytes(validatorBytes);
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
 
   const complexity = addDimensions(
