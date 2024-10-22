@@ -245,8 +245,8 @@ export const getConvertSubnetValidatorComplexity = (
   const signerComplexity = getSignerComplexity(validator.signer);
   const addressComplexity = createDimensions({
     bandwidth:
-      (validator.getRemainingBalanceOwner().addresses.length +
-        validator.getDeactivationOwner().addresses.length) *
+      (validator.getRemainingBalanceOwner().addrs.length +
+        validator.getDeactivationOwner().addrs.length) *
       SHORT_ID_LEN,
     dbRead: 0,
     dbWrite: 0,

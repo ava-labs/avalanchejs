@@ -1,3 +1,4 @@
+import { utils } from '../../../..';
 import { utxoId } from '../../../../fixtures/avax';
 import { address, id } from '../../../../fixtures/common';
 import {
@@ -10,9 +11,7 @@ import {
 import { signer } from '../../../../fixtures/pvm';
 import { txHexToTransaction } from '../../../../fixtures/transactions';
 import {
-  Address,
   Input,
-  Int,
   OutputOwners,
   TransferInput,
   TransferOutput,
@@ -20,7 +19,6 @@ import {
   TransferableOutput,
 } from '../../../../serializable';
 import { ConvertSubnetValidator } from '../../../../serializable/fxs/pvm/convertSubnetValidator';
-import { PChainOwner } from '../../../../serializable/fxs/pvm/pChainOwner';
 import {
   ProofOfPossession,
   SignerEmpty,
@@ -283,7 +281,7 @@ describe('Complexity', () => {
 
   describe('getConvertSubnetValidatorComplexity', () => {
     test('any can spend', () => {
-      const pChainOwner = new PChainOwner(new Int(0), []);
+      const pChainOwner = OutputOwners.fromNative([], 0n, 1);
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
@@ -304,17 +302,23 @@ describe('Complexity', () => {
       );
     });
     test('single remaining balance owner', () => {
-      const pChainOwner = new PChainOwner(new Int(1), [
-        Address.fromString('P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs'),
-      ]);
-      const pChainOwner1 = new PChainOwner(new Int(0), []);
+      const remainingBalanceOwner = OutputOwners.fromNative(
+        [
+          utils.bech32ToBytes(
+            'P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs',
+          ),
+        ],
+        0n,
+        1,
+      );
+      const deactivationOwner = OutputOwners.fromNative([], 0n, 1);
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
         1n,
         new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
-        pChainOwner,
-        pChainOwner1,
+        remainingBalanceOwner,
+        deactivationOwner,
       );
       const result = getConvertSubnetValidatorComplexity(validator);
 
@@ -328,17 +332,23 @@ describe('Complexity', () => {
       );
     });
     test('single deactivation owner', () => {
-      const pChainOwner = new PChainOwner(new Int(1), [
-        Address.fromString('P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs'),
-      ]);
-      const pChainOwner1 = new PChainOwner(new Int(0), []);
+      const deactivationOwner = OutputOwners.fromNative(
+        [
+          utils.bech32ToBytes(
+            'P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs',
+          ),
+        ],
+        0n,
+        1,
+      );
+      const remainingBalanceOwner = OutputOwners.fromNative([], 0n, 1);
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
         1n,
         new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
-        pChainOwner1,
-        pChainOwner,
+        remainingBalanceOwner,
+        deactivationOwner,
       );
       const result = getConvertSubnetValidatorComplexity(validator);
 
@@ -352,9 +362,15 @@ describe('Complexity', () => {
       );
     });
     test('remaining balance owner and deactivation owner', () => {
-      const pChainOwner = new PChainOwner(new Int(1), [
-        Address.fromString('P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs'),
-      ]);
+      const pChainOwner = OutputOwners.fromNative(
+        [
+          utils.bech32ToBytes(
+            'P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs',
+          ),
+        ],
+        0n,
+        1,
+      );
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,

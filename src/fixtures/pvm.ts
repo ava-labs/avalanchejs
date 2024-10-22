@@ -31,8 +31,6 @@ import {
 import {
   address,
   addressBytes,
-  addresses,
-  addressesBytes,
   id,
   idBytes,
   nodeId,
@@ -66,7 +64,6 @@ import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
 import type { FeeState } from '../vms/pvm';
 import { ConvertSubnetTx } from '../serializable/pvm/convertSubnetTx';
-import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
 import { ConvertSubnetValidator } from '../serializable/fxs/pvm/convertSubnetValidator';
 
 export const validator = () =>
@@ -313,8 +310,8 @@ export const convertSubnetValidator = () =>
     bigIntPr(),
     bigIntPr(),
     signer(),
-    pChainOwner(),
-    pChainOwner(),
+    outputOwner(),
+    outputOwner(),
   );
 
 export const convertSubnetValidatorBytes = () =>
@@ -324,8 +321,10 @@ export const convertSubnetValidatorBytes = () =>
     bigIntPrBytes(),
     bytesForInt(28),
     signerBytes(),
-    pChainOwnerBytes(),
-    pChainOwnerBytes(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+    bytesForInt(11),
+    outputOwnerBytes(),
   );
 
 export const convertSubnetTx = () =>
@@ -347,14 +346,6 @@ export const convertSubnetTxBytes = () =>
     makeListBytes(convertSubnetValidatorBytes)(),
     bytesForInt(10),
     inputBytes(),
-  );
-
-export const pChainOwner = () => new PChainOwner(int(), addresses()());
-
-export const pChainOwnerBytes = () =>
-  concatBytes(
-    intBytes(), // threshold
-    addressesBytes(),
   );
 
 export const feeState = (): FeeState => ({
