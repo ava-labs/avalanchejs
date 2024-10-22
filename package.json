@@ -29,6 +29,7 @@
     "lint:check": "eslint --ignore-path .gitignore \"./**/*.ts*\"",
     "typecheck": "tsc --skipLibCheck --noEmit",
     "example": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/c-chain/export.ts",
+    "example:convertSubnet": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/convertSubnetTx.ts",
     "prepare": "husky install"
   },
   "dependencies": {
