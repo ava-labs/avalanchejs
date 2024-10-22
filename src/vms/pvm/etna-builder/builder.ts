@@ -1433,7 +1433,6 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       ),
       Id.fromString(subnetId),
       Id.fromString(chainId),
-      // new Address(address),
       new Bytes(address),
       sortedValidators,
       Input.fromNative(subnetAuth),

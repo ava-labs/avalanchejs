@@ -307,14 +307,9 @@ export const transformSubnetTxBytes = () =>
 
 export const convertSubnetValidator = () =>
   new ConvertSubnetValidator(
-    // nodeId(),
     bytes(),
     bigIntPr(),
     bigIntPr(),
-
-    // signer(),
-    // outputOwner(),
-    // outputOwner(),
     proofOfPossession(),
     pChainOwner(),
     pChainOwner(),
@@ -322,18 +317,9 @@ export const convertSubnetValidator = () =>
 
 export const convertSubnetValidatorBytes = () =>
   concatBytes(
-    // nodeIdBytes(),
     bytesBytes(),
     bigIntPrBytes(),
     bigIntPrBytes(),
-
-    // bytesForInt(28),
-    // signerBytes(),
-    // bytesForInt(11),
-    // outputOwnerBytes(),
-    // bytesForInt(11),
-    // outputOwnerBytes(),
-
     proofOfPossessionBytes(),
     pChainOwnerBytes(),
     pChainOwnerBytes(),
@@ -344,7 +330,6 @@ export const convertSubnetTx = () =>
     baseTx(),
     id(),
     id(),
-    // address(),
     bytes(),
     makeList(convertSubnetValidator)(),
     input(),
@@ -355,7 +340,6 @@ export const convertSubnetTxBytes = () =>
     baseTxbytes(),
     idBytes(),
     idBytes(),
-    // addressBytes(),
     bytesBytes(),
     makeListBytes(convertSubnetValidatorBytes)(),
     bytesForInt(10),

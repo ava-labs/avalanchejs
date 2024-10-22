@@ -282,7 +282,6 @@ describe('Complexity', () => {
 
   describe('getConvertSubnetValidatorComplexity', () => {
     test('any can spend', () => {
-      // const pChainOwner = OutputOwners.fromNative([], 0n, 1);
       const pChainOwner = PChainOwner.fromNative([], 1);
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
@@ -304,15 +303,6 @@ describe('Complexity', () => {
       );
     });
     test('single remaining balance owner', () => {
-      // const remainingBalanceOwner = OutputOwners.fromNative(
-      //   [
-      //     utils.bech32ToBytes(
-      //       'P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs',
-      //     ),
-      //   ],
-      //   0n,
-      //   1,
-      // );
       const remainingBalanceOwner = PChainOwner.fromNative(
         [
           utils.bech32ToBytes(
@@ -321,7 +311,6 @@ describe('Complexity', () => {
         ],
         1,
       );
-      // const deactivationOwner = OutputOwners.fromNative([], 0n, 1);
       const deactivationOwner = PChainOwner.fromNative([], 1);
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
@@ -343,15 +332,6 @@ describe('Complexity', () => {
       );
     });
     test('single deactivation owner', () => {
-      // const deactivationOwner = OutputOwners.fromNative(
-      //   [
-      //     utils.bech32ToBytes(
-      //       'P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs',
-      //     ),
-      //   ],
-      //   0n,
-      //   1,
-      // );
       const deactivationOwner = PChainOwner.fromNative(
         [
           utils.bech32ToBytes(
@@ -360,7 +340,6 @@ describe('Complexity', () => {
         ],
         1,
       );
-      // const remainingBalanceOwner = OutputOwners.fromNative([], 0n, 1);
       const remainingBalanceOwner = PChainOwner.fromNative([], 1);
       const validator = ConvertSubnetValidator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
@@ -382,15 +361,6 @@ describe('Complexity', () => {
       );
     });
     test('remaining balance owner and deactivation owner', () => {
-      // const pChainOwner = OutputOwners.fromNative(
-      //   [
-      //     utils.bech32ToBytes(
-      //       'P-custom1p8ddr5wfmfq0zv3n2wnst0cm2pfccaudm3wsrs',
-      //     ),
-      //   ],
-      //   0n,
-      //   1,
-      // );
       const pChainOwner = PChainOwner.fromNative(
         [
           utils.bech32ToBytes(
