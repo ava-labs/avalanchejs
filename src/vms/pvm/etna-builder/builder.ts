@@ -43,7 +43,12 @@ import {
   ConvertSubnetTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
-import { AddressMaps, addressesFromBytes, isTransferOut } from '../../../utils';
+import {
+  AddressMaps,
+  addressesFromBytes,
+  bytesCompare,
+  isTransferOut,
+} from '../../../utils';
 import { matchOwners } from '../../../utils/matchOwners';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import { baseTxUnsafePvm, UnsignedTx } from '../../common';
@@ -1374,8 +1379,12 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
 
+  const sortedValidators = validators.sort((a, b) =>
+    bytesCompare(a.nodeId.toBytes(), b.nodeId.toBytes()),
+  );
+
   const toBurn = new Map<string, bigint>();
-  for (const validator of validators) {
+  for (const validator of sortedValidators) {
     toBurn.set(
       context.avaxAssetID,
       (toBurn.get(context.avaxAssetID) ?? 0n) + validator.getBalance(),
@@ -1426,7 +1435,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       Id.fromString(subnetId),
       Id.fromString(chainId),
       new Address(address),
-      validators,
+      sortedValidators,
       Input.fromNative(subnetAuth),
     ),
     inputUTXOs,
