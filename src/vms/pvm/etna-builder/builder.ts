@@ -1375,6 +1375,10 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   },
   context,
 ) => {
+  if (validators.find((validator) => validator.getWeight() <= 0n)) {
+    throw new Error('Validator weight must be greater than 0');
+  }
+
   const bytesComplexity = getBytesComplexity(memo, address);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
   const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);

@@ -1076,4 +1076,39 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expectTxs(unsignedTx.getTx(), expectedTx);
     });
   });
+
+  describe.each([
+    {
+      name: 'should throw error if weight on a validator is 0',
+      validator: ConvertSubnetValidator.fromNative(
+        nodeId,
+        BigInt(0 * 1e9),
+        BigInt(0 * 1e9),
+        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+        PChainOwner.fromNative([testAddress1], 1),
+        PChainOwner.fromNative([testAddress1], 1),
+      ),
+    },
+  ])('$name', ({ validator }) => {
+    const utxos = testUtxos();
+    try {
+      newConvertSubnetTx(
+        {
+          fromAddressesBytes,
+          feeState,
+          utxos,
+          subnetAuth: [0],
+          subnetId: Id.fromHex(testSubnetId).toString(),
+          address: testAddress1,
+          validators: [validator],
+          chainId: 'h5vH4Zz53MTN2jf72axZCfo1VbG1cMR6giR4Ra2TTpEmqxDWB',
+        },
+        testContext,
+      );
+    } catch (error) {
+      expect((error as Error).message).toEqual(
+        'Validator weight must be greater than 0',
+      );
+    }
+  });
 });

@@ -28,6 +28,14 @@ export class ConvertSubnetValidator {
     return this.balance;
   }
 
+  getNodeId() {
+    return this.nodeId;
+  }
+
+  getWeight() {
+    return this.weight.value();
+  }
+
   getRemainingBalanceOwner() {
     return this.remainingBalanceOwner as PChainOwner;
   }
@@ -97,19 +105,5 @@ export class ConvertSubnetValidator {
       ],
       codec,
     );
-  }
-
-  verify(): boolean {
-    if (this.weight === new BigIntPr(0n)) {
-      throw new Error('Weight must be greater than 0');
-    }
-
-    // const nodeId = new NodeId(this.nodeId.toBytesWithoutLength());
-
-    // TODO: Properly add this logic back with new types.
-    // if (this.nodeId === emptyNodeId) {
-    //   throw new Error('Node ID must be non-empty');
-    // }
-    return true;
   }
 }
