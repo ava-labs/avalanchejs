@@ -41,7 +41,7 @@ const main = async () => {
   console.log('NodeId=', `"${nodeIdResponse.nodeID}"`);
   console.log('BLS_PUBLIC_KEY=', `"${nodeIdResponse.nodePOP.publicKey}"`);
   console.log(
-    'PROOF_OF_POSSESSION=',
+    'BLS_SIGNATURE=',
     `"${nodeIdResponse.nodePOP.proofOfPossession}"`,
   );
 };
