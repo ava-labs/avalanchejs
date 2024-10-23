@@ -11,7 +11,6 @@ import {
 } from '../../../constants/networkIDs';
 import type { TransferOutput } from '../../../serializable';
 import {
-  Address,
   Input,
   NodeId,
   OutputOwners,
@@ -1387,7 +1386,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   for (const validator of sortedValidators) {
     toBurn.set(
       context.avaxAssetID,
-      (toBurn.get(context.avaxAssetID) ?? 0n) + validator.getBalance(),
+      (toBurn.get(context.avaxAssetID) ?? 0n) + validator.getBalance().value(),
     );
   }
 
@@ -1434,7 +1433,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       ),
       Id.fromString(subnetId),
       Id.fromString(chainId),
-      new Address(address),
+      new Bytes(address),
       sortedValidators,
       Input.fromNative(subnetAuth),
     ),

@@ -1,15 +1,12 @@
 import { pack, unpack } from '../../../utils/struct';
-import { Codec } from '../../codec/codec';
+import type { Codec } from '../../codec';
 import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
-import { BigIntPr } from '../../primitives';
+import { BigIntPr, Bytes } from '../../primitives';
 import { TypeSymbols } from '../../constants';
-import { emptyNodeId } from '../../../constants/zeroValue';
+import { ProofOfPossession } from '../../pvm';
 import { NodeId } from '../common';
-import { concatBytes } from '@noble/hashes/utils';
-import type { SignerEmpty } from '../../pvm';
-import type { Signer } from '../../pvm';
-import type { OutputOwners } from '../secp256k1';
+import { PChainOwner } from './pChainOwner';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/convert_subnet_tx.go#86
@@ -19,36 +16,36 @@ export class ConvertSubnetValidator {
   _type = TypeSymbols.ConvertSubnetValidator;
 
   constructor(
-    public readonly nodeId: NodeId,
+    public readonly nodeId: Bytes,
     public readonly weight: BigIntPr,
     public readonly balance: BigIntPr,
-    public readonly signer: Signer | SignerEmpty,
+    public readonly signer: ProofOfPossession,
     public readonly remainingBalanceOwner: Serializable,
     public readonly deactivationOwner: Serializable,
   ) {}
 
   getBalance() {
-    return this.balance.value();
+    return this.balance;
   }
 
   getRemainingBalanceOwner() {
-    return this.remainingBalanceOwner as OutputOwners;
+    return this.remainingBalanceOwner as PChainOwner;
   }
 
   getDeactivationOwner() {
-    return this.deactivationOwner as OutputOwners;
+    return this.deactivationOwner as PChainOwner;
   }
 
   static fromNative(
     nodeId: string,
     weight: bigint,
     balance: bigint,
-    signer: Signer | SignerEmpty,
-    remainingBalanceOwner: OutputOwners,
-    deactivationOwner: OutputOwners,
+    signer: ProofOfPossession,
+    remainingBalanceOwner: PChainOwner,
+    deactivationOwner: PChainOwner,
   ) {
     return new ConvertSubnetValidator(
-      NodeId.fromString(nodeId),
+      new Bytes(NodeId.fromString(nodeId).toBytes()),
       new BigIntPr(weight),
       new BigIntPr(balance),
       signer,
@@ -69,7 +66,11 @@ export class ConvertSubnetValidator {
       remainingBalanceOwner,
       deactivationOwner,
       rest,
-    ] = unpack(bytes, [NodeId, BigIntPr, BigIntPr, Codec, Codec, Codec], codec);
+    ] = unpack(
+      bytes,
+      [Bytes, BigIntPr, BigIntPr, ProofOfPossession, PChainOwner, PChainOwner],
+      codec,
+    );
 
     return [
       new ConvertSubnetValidator(
@@ -85,11 +86,16 @@ export class ConvertSubnetValidator {
   }
 
   toBytes(codec: Codec) {
-    return concatBytes(
-      pack([this.nodeId, this.weight, this.balance], codec),
-      codec.PackPrefix(this.signer),
-      codec.PackPrefix(this.remainingBalanceOwner),
-      codec.PackPrefix(this.deactivationOwner),
+    return pack(
+      [
+        this.nodeId,
+        this.weight,
+        this.balance,
+        this.signer,
+        this.remainingBalanceOwner,
+        this.deactivationOwner,
+      ],
+      codec,
     );
   }
 
@@ -98,9 +104,12 @@ export class ConvertSubnetValidator {
       throw new Error('Weight must be greater than 0');
     }
 
-    if (this.nodeId === emptyNodeId) {
-      throw new Error('Node ID must be non-empty');
-    }
+    // const nodeId = new NodeId(this.nodeId.toBytesWithoutLength());
+
+    // TODO: Properly add this logic back with new types.
+    // if (this.nodeId === emptyNodeId) {
+    //   throw new Error('Node ID must be non-empty');
+    // }
     return true;
   }
 }

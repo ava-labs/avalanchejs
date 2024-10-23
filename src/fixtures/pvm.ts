@@ -29,8 +29,8 @@ import {
   transferableOutputBytes,
 } from './avax';
 import {
-  address,
-  addressBytes,
+  addresses,
+  addressesBytes,
   id,
   idBytes,
   nodeId,
@@ -65,6 +65,7 @@ import { makeList, makeListBytes } from './utils/makeList';
 import type { FeeState } from '../vms/pvm';
 import { ConvertSubnetTx } from '../serializable/pvm/convertSubnetTx';
 import { ConvertSubnetValidator } from '../serializable/fxs/pvm/convertSubnetValidator';
+import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -306,25 +307,22 @@ export const transformSubnetTxBytes = () =>
 
 export const convertSubnetValidator = () =>
   new ConvertSubnetValidator(
-    nodeId(),
+    bytes(),
     bigIntPr(),
     bigIntPr(),
-    signer(),
-    outputOwner(),
-    outputOwner(),
+    proofOfPossession(),
+    pChainOwner(),
+    pChainOwner(),
   );
 
 export const convertSubnetValidatorBytes = () =>
   concatBytes(
-    nodeIdBytes(),
+    bytesBytes(),
     bigIntPrBytes(),
     bigIntPrBytes(),
-    bytesForInt(28),
-    signerBytes(),
-    bytesForInt(11),
-    outputOwnerBytes(),
-    bytesForInt(11),
-    outputOwnerBytes(),
+    proofOfPossessionBytes(),
+    pChainOwnerBytes(),
+    pChainOwnerBytes(),
   );
 
 export const convertSubnetTx = () =>
@@ -332,7 +330,7 @@ export const convertSubnetTx = () =>
     baseTx(),
     id(),
     id(),
-    address(),
+    bytes(),
     makeList(convertSubnetValidator)(),
     input(),
   );
@@ -342,10 +340,18 @@ export const convertSubnetTxBytes = () =>
     baseTxbytes(),
     idBytes(),
     idBytes(),
-    addressBytes(),
+    bytesBytes(),
     makeListBytes(convertSubnetValidatorBytes)(),
     bytesForInt(10),
     inputBytes(),
+  );
+
+export const pChainOwner = () => new PChainOwner(int(), addresses()());
+
+export const pChainOwnerBytes = () =>
+  concatBytes(
+    intBytes(), // threshold
+    addressesBytes(),
   );
 
 export const feeState = (): FeeState => ({

@@ -241,12 +241,12 @@ export const getConvertSubnetValidatorsComplexity = (
 export const getConvertSubnetValidatorComplexity = (
   validator: ConvertSubnetValidator,
 ): Dimensions => {
-  const nodeIdComplexity = getBytesComplexity(validator.nodeId.toBytes());
+  const nodeIdComplexity = getBytesComplexity(validator.nodeId);
   const signerComplexity = getSignerComplexity(validator.signer);
   const addressComplexity = createDimensions({
     bandwidth:
-      (validator.getRemainingBalanceOwner().addrs.length +
-        validator.getDeactivationOwner().addrs.length) *
+      (validator.getRemainingBalanceOwner().getAddresses().length +
+        validator.getDeactivationOwner().getAddresses().length) *
       SHORT_ID_LEN,
     dbRead: 0,
     dbWrite: 0,
@@ -376,7 +376,7 @@ const transferSubnetOwnershipTx = (
 const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   return addDimensions(
     INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
-    getBytesComplexity(tx.address.toBytes()),
+    getBytesComplexity(tx.address),
     getBaseTxComplexity(tx.baseTx),
     getAuthComplexity(tx.subnetAuth),
     getConvertSubnetValidatorsComplexity(tx.validators),
