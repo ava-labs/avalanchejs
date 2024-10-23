@@ -2,7 +2,7 @@ import { addTxSignatures, pvm, utils } from '../../../src';
 import { getEnvVars } from '../../utils/getEnvVars';
 import { setupEtnaExample } from './utils/etna-helper';
 
-const main = async () => {
+const createSubnetTxExample = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
 
   const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
@@ -29,4 +29,4 @@ const main = async () => {
   return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-main().then(console.log);
+createSubnetTxExample().then(console.log);

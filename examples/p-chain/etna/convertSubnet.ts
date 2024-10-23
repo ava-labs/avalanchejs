@@ -8,8 +8,27 @@ import { getEnvVars } from '../../utils/getEnvVars';
 const AMOUNT_TO_VALIDATE_AVAX: number = 1;
 const BALANCE_AVAX: number = 1;
 
-const main = async () => {
-  const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
+/**
+ * Converts a subnet to permissionless subnet.
+ *
+ * **Note** A subnet must be created (createSubnetTx) and a chain must be created (createChainTx)
+ * before a subnet can be converted from permissioned to permissionless.
+ * @param BLS_PUBLIC_KEY BLS key from info.getNodeID on AVAX_PUBLIC_URL
+ * @param BLS_SIGNATURE BLS signature from info.getNodeID on AVAX_PUBLIC_URL
+ * @param NODE_ID the ID of the node from info.getNodeID on AVAX_PUBLIC_URL.
+ * @param chainId the ID of the chain that is created via `createChainTx`.
+ * @param subnetId the ID of the subnet that is created via `createSubnetTx`.
+ * @returns The resulting transaction's ID.
+ */
+const convertSubnetTxExmaple = async () => {
+  const {
+    AVAX_PUBLIC_URL,
+    P_CHAIN_ADDRESS,
+    PRIVATE_KEY,
+    NODE_ID,
+    BLS_PUBLIC_KEY,
+    BLS_SIGNATURE,
+  } = getEnvVars();
   const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
@@ -17,20 +36,15 @@ const main = async () => {
   const testPAddr = utils.bech32ToBytes(P_CHAIN_ADDRESS);
 
   const pChainOwner = PChainOwner.fromNative([testPAddr], 1);
-  const nodeId = 'NodeID-7eRvnfs2a2PvrPHUuCRRpPVAoVjbWxaFG';
 
-  const publicKey = utils.hexToBuffer(
-    '0x8f95423f7142d00a48e1014a3de8d28907d420dc33b3052a6dee03a3f2941a393c2351e354704ca66a3fc29870282e15',
-  );
+  const publicKey = utils.hexToBuffer(BLS_PUBLIC_KEY);
 
-  const signature = utils.hexToBuffer(
-    '0x86a3ab4c45cfe31cae34c1d06f212434ac71b1be6cfe046c80c162e057614a94a5bc9f1ded1a7029deb0ba4ca7c9b71411e293438691be79c2dbf19d1ca7c3eadb9c756246fc5de5b7b89511c7d7302ae051d9e03d7991138299b5ed6a570a98',
-  );
+  const signature = utils.hexToBuffer(BLS_SIGNATURE);
 
   const signer = new ProofOfPossession(publicKey, signature);
 
   const validator = ConvertSubnetValidator.fromNative(
-    nodeId,
+    NODE_ID,
     BigInt(AMOUNT_TO_VALIDATE_AVAX * 1e9),
     BigInt(BALANCE_AVAX * 1e9),
     signer,
@@ -44,7 +58,7 @@ const main = async () => {
       fromAddressesBytes: [testPAddr],
       subnetId: '', // subnetId from createSubnetTx
       utxos,
-      chainId: 'h5vH4Zz53MTN2jf72axZCfo1VbG1cMR6giR4Ra2TTpEmqxDWB',
+      chainId: '', // chainId from createChainTx
       validators: [validator],
       subnetAuth: [0],
       address: testPAddr,
@@ -60,4 +74,4 @@ const main = async () => {
   return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-main().then(console.log);
+convertSubnetTxExmaple().then(console.log);

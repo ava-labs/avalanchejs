@@ -4,18 +4,18 @@ import { getContextFromURI } from '../../src/vms/context';
 import { newImportTxFromBaseFee } from '../../src/vms/evm';
 import { evmapi } from '../chain_apis';
 import { getChainIdFromContext } from '../utils/getChainIdFromContext';
-
-const C_CHAIN_ADDRESS = process.env.C_CHAIN_ADDRESS;
-const CORETH_ADDRESS = process.env.CORETH_ADDRESS;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+import { getEnvVars } from '../utils/getEnvVars';
 
 const main = async (sourceChain: 'X' | 'P') => {
+  const { AVAX_PUBLIC_URL, C_CHAIN_ADDRESS, PRIVATE_KEY, CORETH_ADDRESS } =
+    getEnvVars();
+
   if (!C_CHAIN_ADDRESS || !CORETH_ADDRESS || !PRIVATE_KEY) {
     throw new Error('Missing environment variable(s).');
   }
 
   const baseFee = await evmapi.getBaseFee();
-  const context = await getContextFromURI(process.env.AVAX_PUBLIC_URL);
+  const context = await getContextFromURI(AVAX_PUBLIC_URL);
 
   const { utxos } = await evmapi.getUTXOs({
     sourceChain,
