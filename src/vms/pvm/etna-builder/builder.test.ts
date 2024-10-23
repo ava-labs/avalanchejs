@@ -38,6 +38,8 @@ import {
   Signer,
   TransferSubnetOwnershipTx,
   AddPermissionlessDelegatorTx,
+  ConvertSubnetTx,
+  ProofOfPossession,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
@@ -48,6 +50,7 @@ import {
   newAddPermissionlessValidatorTx,
   newAddSubnetValidatorTx,
   newBaseTx,
+  newConvertSubnetTx,
   newCreateChainTx,
   newCreateSubnetTx,
   newExportTx,
@@ -67,6 +70,8 @@ import {
   proofOfPossession,
 } from '../../../fixtures/pvm';
 import type { FeeState } from '../models';
+import { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
+import { PChainOwner } from '../../../serializable/fxs/pvm/pChainOwner';
 
 const addTransferableAmounts = (
   transferableItems:
@@ -1004,6 +1009,70 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         ],
       );
 
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
+  });
+
+  describe('ConvertSubnetTx', () => {
+    it('should create an ConvertSubnetTx', () => {
+      const utxoInputAmt = BigInt(50 * 1e9);
+      const utxos = testUtxos();
+      const signer = new ProofOfPossession(
+        blsPublicKeyBytes(),
+        blsSignatureBytes(),
+      );
+      const pChainOwner = PChainOwner.fromNative([testAddress1], 1);
+
+      const validator = ConvertSubnetValidator.fromNative(
+        nodeId,
+        BigInt(1 * 1e9),
+        BigInt(0 * 1e9),
+        signer,
+        pChainOwner,
+        pChainOwner,
+      );
+
+      const unsignedTx = newConvertSubnetTx(
+        {
+          fromAddressesBytes,
+          feeState,
+          utxos,
+          subnetAuth: [0],
+          subnetId: Id.fromHex(testSubnetId).toString(),
+          address: testAddress1,
+          validators: [validator],
+          chainId: 'h5vH4Zz53MTN2jf72axZCfo1VbG1cMR6giR4Ra2TTpEmqxDWB',
+        },
+        testContext,
+      );
+
+      const { baseTx } = unsignedTx.getTx() as ConvertSubnetTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new ConvertSubnetTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(utxoInputAmt - expectedFee)],
+          [getTransferableInputForTest(utxoInputAmt)],
+          new Uint8Array(),
+        ),
+        Id.fromHex(testSubnetId),
+        Id.fromString('h5vH4Zz53MTN2jf72axZCfo1VbG1cMR6giR4Ra2TTpEmqxDWB'),
+        new Bytes(testAddress1),
+        [validator],
+        Input.fromNative([0]),
+      );
       expectTxs(unsignedTx.getTx(), expectedTx);
     });
   });

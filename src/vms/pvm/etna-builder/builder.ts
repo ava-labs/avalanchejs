@@ -76,6 +76,7 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
+import { INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES } from '../txs/fee/constants';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -1391,6 +1392,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   }
 
   const complexity = addDimensions(
+    INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
     bytesComplexity,
     validatorComplexity,
     authComplexity,
