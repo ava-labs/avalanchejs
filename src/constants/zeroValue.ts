@@ -1,4 +1,4 @@
-import { Id, NodeId } from '../serializable/fxs/common';
+import { Id } from '../serializable/fxs/common';
 import { OutputOwners } from '../serializable/fxs/secp256k1';
 import {
   SepkSignatureLength,
@@ -13,7 +13,6 @@ export const zeroOutputOwners = new OutputOwners(
 );
 
 export const emptyId = new Id(new Uint8Array(32));
-export const emptyNodeId = new NodeId(new Uint8Array(20));
 export const emptySignature = new Signature(
   new Uint8Array(Array(SepkSignatureLength).fill(0)),
 );
