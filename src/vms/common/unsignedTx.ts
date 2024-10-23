@@ -159,6 +159,9 @@ export class UnsignedTx {
   }
 
   addSignatureAt(sig: Uint8Array, index: number, subIndex: number) {
+    // console.log('index', index);
+    // console.log('subIndex', subIndex);
+    // console.log('this.getCredentials()', this.getCredentials().length);
     if (index >= this.getCredentials().length) {
       throw new Error('index out of bounds');
     }
@@ -166,6 +169,8 @@ export class UnsignedTx {
   }
 
   addSignature(sig: Uint8Array) {
+    console.log('this.getCredentials()', this.getCredentials());
+
     const unsignedHash = sha256(this.toBytes());
     const publicKey = secp256k1.recoverPublicKey(unsignedHash, sig);
     this.addSignatureForPubKey(sig, publicKey);
@@ -173,8 +178,10 @@ export class UnsignedTx {
 
   private addSignatureForPubKey(sig: Uint8Array, publicKey: Uint8Array) {
     const coordinates = this.getSigIndicesForPubKey(publicKey);
+
     if (coordinates) {
       coordinates.forEach(([index, subIndex]) => {
+        console.log('index', index, subIndex, sig);
         this.addSignatureAt(sig, index, subIndex);
       });
     }
