@@ -65,6 +65,7 @@ import {
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
+  INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
   getAuthComplexity,
   getInputComplexity,
   getOutputComplexity,
@@ -76,7 +77,6 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
-import { INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES } from '../txs/fee/constants';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -1353,7 +1353,7 @@ export type NewConvertSubnetTxProps = TxProps<{
 
 /**
  * Creates a new unsigned PVM convert subnet transaction
- * (`NewConvertSubnetTx`) using calculated dynamic fees.
+ * (`ConvertSubnetTx`) using calculated dynamic fees.
  *
  * @param props {NewConvertSubnetTxProps}
  * @param context {Context}

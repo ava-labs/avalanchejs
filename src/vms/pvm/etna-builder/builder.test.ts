@@ -1077,19 +1077,15 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
   });
 
-  describe.each([
-    {
-      name: 'should throw error if weight on a validator is 0',
-      validator: ConvertSubnetValidator.fromNative(
-        nodeId,
-        BigInt(0 * 1e9),
-        BigInt(0 * 1e9),
-        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
-        PChainOwner.fromNative([testAddress1], 1),
-        PChainOwner.fromNative([testAddress1], 1),
-      ),
-    },
-  ])('$name', ({ validator }) => {
+  it('should throw error if weight on a validator is 0', () => {
+    const validator = ConvertSubnetValidator.fromNative(
+      nodeId,
+      BigInt(0 * 1e9),
+      BigInt(0 * 1e9),
+      new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+      PChainOwner.fromNative([testAddress1], 1),
+      PChainOwner.fromNative([testAddress1], 1),
+    );
     const utxos = testUtxos();
     try {
       newConvertSubnetTx(
