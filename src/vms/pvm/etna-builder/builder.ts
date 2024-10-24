@@ -49,8 +49,8 @@ import {
   addressesFromBytes,
   bytesCompare,
   isTransferOut,
+  matchOwners,
 } from '../../../utils';
-import { matchOwners } from '../../../utils/matchOwners';
 import { compareTransferableOutputs } from '../../../utils/sort';
 import { baseTxUnsafePvm, UnsignedTx } from '../../common';
 import { addDimensions, createDimensions } from '../../common/fees/dimensions';

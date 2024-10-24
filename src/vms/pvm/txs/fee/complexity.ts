@@ -48,7 +48,7 @@ import {
   isStakeableLockIn,
   isStakeableLockOut,
   isTransferOut,
-} from '../../../../utils';
+} from '../../../../utils/typeGuards';
 import type { Dimensions } from '../../../common/fees/dimensions';
 import {
   FeeDimensions,
