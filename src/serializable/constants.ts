@@ -83,6 +83,8 @@ export enum TypeSymbols {
   ConvertSubnetTx = 'pvm.ConvertSubnetTx',
   ConvertSubnetValidator = 'pvm.ConvertSubnetValidator',
   IncreaseBalanceTx = 'pvm.IncreaseBalanceTx',
+  RegisterSubnetValidatorTx = 'pvm.RegisterSubnetValidatorTx',
+  RegisterSubnetValidator = 'pvm.RegisterSubnetValidator',
 
   PChainOwner = 'pvm.PChainOwner',
 

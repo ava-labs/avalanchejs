@@ -22,6 +22,7 @@ import {
   isPvmBaseTx,
   isExportTx as isPvmExportTx,
   isImportTx as isPvmImportTx,
+  isRegisterSubnetValidatorTx,
   isRemoveSubnetValidatorTx,
   isTransferSubnetOwnershipTx,
 } from '../../serializable/pvm';
@@ -49,7 +50,8 @@ const isEtnaSupported = (tx: Transaction) => {
     isRemoveSubnetValidatorTx(tx) ||
     isTransferSubnetOwnershipTx(tx) ||
     isConvertSubnetTx(tx) ||
-    isIncreaseBalanceTx(tx)
+    isIncreaseBalanceTx(tx) ||
+    isRegisterSubnetValidatorTx(tx)
   );
 };
 
