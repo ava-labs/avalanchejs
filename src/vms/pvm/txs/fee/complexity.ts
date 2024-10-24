@@ -55,7 +55,10 @@ import {
 } from '../../../common/fees/dimensions';
 import type { Serializable } from '../../../common/types';
 import type { Transaction } from '../../../common';
-import { isConvertSubnetTx } from '../../../../serializable/pvm/typeGuards';
+import {
+  isConvertSubnetTx,
+  isRegisterSubnetValidatorTx,
+} from '../../../../serializable/pvm/typeGuards';
 import {
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
@@ -73,6 +76,7 @@ import {
   INTRINSIC_OUTPUT_BANDWIDTH,
   INTRINSIC_OUTPUT_DB_WRITE,
   INTRINSIC_POP_BANDWIDTH,
+  INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_OUTPUT_BANDWIDTH,
@@ -84,6 +88,9 @@ import {
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
 } from './constants';
 import type { ConvertSubnetValidator } from '../../../../serializable/fxs/pvm/convertSubnetValidator';
+import type { RegisterSubnetValidatorTx } from '../../../../serializable/pvm/registerSubnetValidatorTx';
+import type { RegisterSubnetValidator } from '../../../../serializable/pvm/registerSubnetValidator';
+import { INT_LEN } from '../../../../serializable/primitives/int';
 
 /**
  * Returns the complexity outputs add to a transaction.
@@ -260,6 +267,33 @@ export const getConvertSubnetValidatorComplexity = (
   );
 };
 
+export const getRegisterSubnetValidatorComplexity = (
+  tx: RegisterSubnetValidator,
+): Dimensions => {
+  const remainingBalanceOwnerComplexity =
+    tx.remainingBalanceOwner.addresses.length * SHORT_ID_LEN + INT_LEN;
+  const disableOwnerComplexity =
+    tx.disableOwner.addresses.length * SHORT_ID_LEN + INT_LEN;
+
+  const ownerComplexity = createDimensions({
+    bandwidth: remainingBalanceOwnerComplexity + disableOwnerComplexity,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0,
+  });
+
+  return addDimensions(
+    getBytesComplexity(
+      tx.subnetId.toBytes(),
+      tx.nodeId,
+      tx.blsPublicKey,
+      tx.expiry.toBytes(),
+      tx.weight.toBytes(),
+    ),
+    ownerComplexity,
+  );
+};
+
 const getBaseTxComplexity = (baseTx: BaseTx): Dimensions => {
   const outputsComplexity = getOutputComplexity(baseTx.outputs);
   const inputsComplexity = getInputComplexity(baseTx.inputs);
@@ -383,6 +417,16 @@ const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   );
 };
 
+const registerSubnetValidatorTx = (
+  tx: RegisterSubnetValidatorTx,
+): Dimensions => {
+  return addDimensions(
+    INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getRegisterSubnetValidatorComplexity(tx.message),
+  );
+};
+
 export const getTxComplexity = (tx: Transaction): Dimensions => {
   if (isAddPermissionlessValidatorTx(tx)) {
     return addPermissionlessValidatorTx(tx);
@@ -406,6 +450,8 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return baseTx(tx);
   } else if (isConvertSubnetTx(tx)) {
     return convertSubnetTx(tx);
+  } else if (isRegisterSubnetValidatorTx(tx)) {
+    return registerSubnetValidatorTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }

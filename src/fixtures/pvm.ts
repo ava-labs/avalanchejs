@@ -66,6 +66,8 @@ import type { FeeState } from '../vms/pvm';
 import { ConvertSubnetTx } from '../serializable/pvm/convertSubnetTx';
 import { ConvertSubnetValidator } from '../serializable/fxs/pvm/convertSubnetValidator';
 import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
+import { RegisterSubnetValidatorTx } from '../serializable/pvm/registerSubnetValidatorTx';
+import { RegisterSubnetValidator } from '../serializable/pvm/registerSubnetValidator';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -344,6 +346,44 @@ export const convertSubnetTxBytes = () =>
     makeListBytes(convertSubnetValidatorBytes)(),
     bytesForInt(10),
     inputBytes(),
+  );
+
+export const registerSubnetValidatorTx = () =>
+  new RegisterSubnetValidatorTx(
+    baseTx(),
+    bigIntPr(),
+    proofOfPossession(),
+    registerSubnetValidator(),
+  );
+
+export const registerSubnetValidatorTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    bigIntPrBytes(),
+    proofOfPossessionBytes(),
+    registerSubnetValidatorBytes(),
+  );
+
+export const registerSubnetValidator = () =>
+  new RegisterSubnetValidator(
+    id(),
+    bytes(),
+    bytes(),
+    bigIntPr(),
+    pChainOwner(),
+    pChainOwner(),
+    bigIntPr(),
+  );
+
+export const registerSubnetValidatorBytes = () =>
+  concatBytes(
+    idBytes(),
+    bytesBytes(),
+    bytesBytes(),
+    bigIntPrBytes(),
+    pChainOwnerBytes(),
+    pChainOwnerBytes(),
+    bigIntPrBytes(),
   );
 
 export const pChainOwner = () => new PChainOwner(int(), addresses()());

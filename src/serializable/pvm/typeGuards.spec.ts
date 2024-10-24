@@ -18,6 +18,7 @@ import {
   isPvmBaseTx,
   isTransferSubnetOwnershipTx,
   isTransformSubnetTx,
+  isRegisterSubnetValidatorTx,
 } from './typeGuards';
 
 const cases: [any, TypeSymbols][] = [
@@ -38,6 +39,7 @@ const cases: [any, TypeSymbols][] = [
   [isRewardValidatorTx, TypeSymbols.RewardValidatorTx],
   [isTransferSubnetOwnershipTx, TypeSymbols.TransferSubnetOwnershipTx],
   [isTransformSubnetTx, TypeSymbols.TransformSubnetTx],
+  [isRegisterSubnetValidatorTx, TypeSymbols.RegisterSubnetValidatorTx],
 ];
 
 const guards = cases.map((caseItem) => caseItem[0]);

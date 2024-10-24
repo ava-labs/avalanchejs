@@ -226,3 +226,14 @@ export const INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.DBWrite]: 2, // manager + weight
   [FeeDimensions.Compute]: 0,
 };
+
+export const INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+    LONG_LEN + // balance
+    SIGNATURE_LENGTH + // proof of possession
+    INT_LEN, // message length
+  [FeeDimensions.DBRead]: 0,
+  [FeeDimensions.DBWrite]: 0,
+  [FeeDimensions.Compute]: 0, // TODO: Include PoP verification time
+};
