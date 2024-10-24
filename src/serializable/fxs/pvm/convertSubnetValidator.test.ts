@@ -1,3 +1,4 @@
+import { testPVMCodec } from '../../../fixtures/codec';
 import {
   convertSubnetValidator,
   convertSubnetValidatorBytes,
@@ -10,4 +11,5 @@ testSerialization(
   ConvertSubnetValidator,
   convertSubnetValidator,
   convertSubnetValidatorBytes,
+  testPVMCodec,
 );

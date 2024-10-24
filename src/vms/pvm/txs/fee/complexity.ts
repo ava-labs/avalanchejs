@@ -26,6 +26,7 @@ import type {
   RemoveSubnetValidatorTx,
   TransferSubnetOwnershipTx,
   ConvertSubnetTx,
+  IncreaseBalanceTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -33,10 +34,12 @@ import {
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
   isAddSubnetValidatorTx,
+  isConvertSubnetTx,
   isCreateChainTx,
   isCreateSubnetTx,
   isExportTx,
   isImportTx,
+  isIncreaseBalanceTx,
   isPvmBaseTx,
   isRemoveSubnetValidatorTx,
   isTransferSubnetOwnershipTx,
@@ -55,7 +58,6 @@ import {
 } from '../../../common/fees/dimensions';
 import type { Serializable } from '../../../common/types';
 import type { Transaction } from '../../../common';
-import { isConvertSubnetTx } from '../../../../serializable/pvm/typeGuards';
 import {
   INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
@@ -67,6 +69,7 @@ import {
   INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
   INTRINSIC_EXPORT_TX_COMPLEXITIES,
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
+  INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
   INTRINSIC_INPUT_BANDWIDTH,
   INTRINSIC_INPUT_DB_READ,
   INTRINSIC_INPUT_DB_WRITE,
@@ -383,6 +386,13 @@ const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   );
 };
 
+const increaseBalanceTx = (tx: IncreaseBalanceTx): Dimensions => {
+  return addDimensions(
+    INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+  );
+};
+
 export const getTxComplexity = (tx: Transaction): Dimensions => {
   if (isAddPermissionlessValidatorTx(tx)) {
     return addPermissionlessValidatorTx(tx);
@@ -406,6 +416,8 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return baseTx(tx);
   } else if (isConvertSubnetTx(tx)) {
     return convertSubnetTx(tx);
+  } else if (isIncreaseBalanceTx(tx)) {
+    return increaseBalanceTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }

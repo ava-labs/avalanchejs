@@ -18,6 +18,7 @@ import {
   isConvertSubnetTx,
   isCreateChainTx,
   isCreateSubnetTx,
+  isIncreaseBalanceTx,
   isPvmBaseTx,
   isExportTx as isPvmExportTx,
   isImportTx as isPvmImportTx,
@@ -31,7 +32,7 @@ const _getBurnedAmount = (tx: Transaction, context: Context) => {
 };
 
 // Check supported pvm transactions for Etna
-// Todo: add isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynmamic fee is implemented
+// Todo: add isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynamic fee is implemented
 const isEtnaSupported = (tx: Transaction) => {
   return (
     // isAvmBaseTx(tx) || // not implemented
@@ -47,7 +48,8 @@ const isEtnaSupported = (tx: Transaction) => {
     isCreateSubnetTx(tx) ||
     isRemoveSubnetValidatorTx(tx) ||
     isTransferSubnetOwnershipTx(tx) ||
-    isConvertSubnetTx(tx)
+    isConvertSubnetTx(tx) ||
+    isIncreaseBalanceTx(tx)
   );
 };
 

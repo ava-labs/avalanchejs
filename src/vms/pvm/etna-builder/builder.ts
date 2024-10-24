@@ -11,6 +11,7 @@ import {
 } from '../../../constants/networkIDs';
 import type { TransferOutput } from '../../../serializable';
 import {
+  BigIntPr,
   Input,
   NodeId,
   OutputOwners,
@@ -40,6 +41,7 @@ import {
   SubnetValidator,
   TransferSubnetOwnershipTx,
   ConvertSubnetTx,
+  IncreaseBalanceTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
 import {
@@ -77,6 +79,7 @@ import {
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
+import { INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES } from '../txs/fee/constants';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
@@ -1355,22 +1358,22 @@ export type NewConvertSubnetTxProps = TxProps<{
  * Creates a new unsigned PVM convert subnet transaction
  * (`ConvertSubnetTx`) using calculated dynamic fees.
  *
- * @param props {NewConvertSubnetTxProps}
- * @param context {Context}
- * @returns {UnsignedTx} An UnsignedTx.
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
  */
 export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   {
-    fromAddressesBytes,
+    address,
+    chainId,
+    changeAddressesBytes,
     feeState,
-    subnetId,
-    utxos,
+    fromAddressesBytes,
     memo = new Uint8Array(),
     minIssuanceTime = BigInt(Math.floor(new Date().getTime() / 1000)),
-    changeAddressesBytes,
     subnetAuth,
-    chainId,
-    address,
+    subnetId,
+    utxos,
     validators,
   },
   context,
@@ -1404,17 +1407,17 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
 
   const spendResults = spend(
     {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
       excessAVAX: 0n,
       feeState,
       fromAddresses: addressesFromBytes(fromAddressesBytes),
       initialComplexity: complexity,
       minIssuanceTime,
-      changeOutputOwners: getChangeOutputOwners({
-        changeAddressesBytes,
-        fromAddressesBytes,
-      }),
-      utxos,
       toBurn,
+      utxos,
     },
     [useUnlockedUTXOs],
     context,
@@ -1442,6 +1445,84 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       new Bytes(address),
       sortedValidators,
       Input.fromNative(subnetAuth),
+    ),
+    inputUTXOs,
+    addressMaps,
+  );
+};
+
+export type IncreaseBalanceTxProps = TxProps<{
+  balance: bigint;
+  validationId: string;
+}>;
+
+/**
+ * Creates a new unsigned PVM convert subnet transaction
+ * (`ConvertSubnetTx`) using calculated dynamic fees.
+ *
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
+ */
+export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
+  {
+    balance,
+    changeAddressesBytes,
+    feeState,
+    fromAddressesBytes,
+    memo = new Uint8Array(),
+    minIssuanceTime = BigInt(Math.floor(new Date().getTime() / 1000)),
+    utxos,
+    validationId,
+  },
+  context,
+) => {
+  const toBurn = new Map<string, bigint>([[context.avaxAssetID, balance]]);
+
+  const bytesComplexity = getBytesComplexity(memo);
+
+  const complexity = addDimensions(
+    INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+    bytesComplexity,
+  );
+
+  const spendResults = spend(
+    {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
+      excessAVAX: 0n,
+      feeState,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      minIssuanceTime,
+      toBurn,
+      utxos,
+    },
+    [useUnlockedUTXOs],
+    context,
+  );
+
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  });
+
+  return new UnsignedTx(
+    new IncreaseBalanceTx(
+      AvaxBaseTx.fromNative(
+        context.networkID,
+        context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        memo,
+      ),
+      Id.fromString(validationId),
+      new BigIntPr(balance),
     ),
     inputUTXOs,
     addressMaps,
