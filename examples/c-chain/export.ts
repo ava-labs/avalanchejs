@@ -10,10 +10,6 @@ const main = async () => {
   const { AVAX_PUBLIC_URL, C_CHAIN_ADDRESS, PRIVATE_KEY, X_CHAIN_ADDRESS } =
     getEnvVars();
 
-  if (!C_CHAIN_ADDRESS || !X_CHAIN_ADDRESS || !PRIVATE_KEY) {
-    throw new Error('Missing environment variable(s).');
-  }
-
   const provider = new JsonRpcProvider(AVAX_PUBLIC_URL + '/ext/bc/C/rpc');
 
   const context = await getContextFromURI(AVAX_PUBLIC_URL);

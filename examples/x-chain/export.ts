@@ -11,10 +11,6 @@ const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY, X_CHAIN_ADDRESS } =
     getEnvVars();
 
-  if (!P_CHAIN_ADDRESS || !X_CHAIN_ADDRESS || !PRIVATE_KEY) {
-    throw new Error('Missing environment variable(s).');
-  }
-
   const context = await getContextFromURI(AVAX_PUBLIC_URL);
 
   const { utxos } = await avmapi.getUTXOs({

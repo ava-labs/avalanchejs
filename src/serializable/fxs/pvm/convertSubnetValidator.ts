@@ -1,6 +1,5 @@
 import { pack, unpack } from '../../../utils/struct';
 import type { Codec } from '../../codec';
-import type { Serializable } from '../../common/types';
 import { serializable } from '../../common/types';
 import { BigIntPr, Bytes } from '../../primitives';
 import { TypeSymbols } from '../../constants';
@@ -20,8 +19,8 @@ export class ConvertSubnetValidator {
     public readonly weight: BigIntPr,
     public readonly balance: BigIntPr,
     public readonly signer: ProofOfPossession,
-    public readonly remainingBalanceOwner: Serializable,
-    public readonly deactivationOwner: Serializable,
+    public readonly remainingBalanceOwner: PChainOwner,
+    public readonly deactivationOwner: PChainOwner,
   ) {}
 
   getBalance() {
@@ -37,11 +36,11 @@ export class ConvertSubnetValidator {
   }
 
   getRemainingBalanceOwner() {
-    return this.remainingBalanceOwner as PChainOwner;
+    return this.remainingBalanceOwner;
   }
 
   getDeactivationOwner() {
-    return this.deactivationOwner as PChainOwner;
+    return this.deactivationOwner;
   }
 
   static fromNative(

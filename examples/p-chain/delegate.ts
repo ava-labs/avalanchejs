@@ -9,10 +9,6 @@ import { getEnvVars } from '../utils/getEnvVars';
 const main = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
 
-  if (!P_CHAIN_ADDRESS || !PRIVATE_KEY) {
-    throw new Error('Missing environment variable(s).');
-  }
-
   const { utxos } = await pvmapi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
   const context = await getContextFromURI(AVAX_PUBLIC_URL);
   const startTime = await new PVMApi().getTimestamp();

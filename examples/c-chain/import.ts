@@ -10,10 +10,6 @@ const main = async (sourceChain: 'X' | 'P') => {
   const { AVAX_PUBLIC_URL, C_CHAIN_ADDRESS, PRIVATE_KEY, CORETH_ADDRESS } =
     getEnvVars();
 
-  if (!C_CHAIN_ADDRESS || !CORETH_ADDRESS || !PRIVATE_KEY) {
-    throw new Error('Missing environment variable(s).');
-  }
-
   const baseFee = await evmapi.getBaseFee();
   const context = await getContextFromURI(AVAX_PUBLIC_URL);
 
