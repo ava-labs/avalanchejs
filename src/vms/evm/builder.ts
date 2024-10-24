@@ -9,9 +9,8 @@ import {
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
 import { addressesFromBytes } from '../../utils';
-import { AddressMap, AddressMaps } from '../../utils/addressMap';
+import { AddressMap, AddressMaps, matchOwners } from '../../utils/addressMap';
 import { costCorethTx } from '../../utils/costs';
-import { matchOwners } from '../../utils/matchOwners';
 import { compareEVMOutputs } from '../../utils/sort';
 import { EVMUnsignedTx } from '../common/evmUnsignedTx';
 import type { UnsignedTx } from '../common/unsignedTx';

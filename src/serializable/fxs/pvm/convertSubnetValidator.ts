@@ -3,7 +3,7 @@ import type { Codec } from '../../codec';
 import { serializable } from '../../common/types';
 import { BigIntPr, Bytes } from '../../primitives';
 import { TypeSymbols } from '../../constants';
-import { ProofOfPossession } from '../../pvm';
+import { ProofOfPossession } from '../../pvm/proofOfPossession';
 import { NodeId } from '../common';
 import { PChainOwner } from './pChainOwner';
 

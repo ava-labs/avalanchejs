@@ -19,6 +19,7 @@ import {
   RemoveSubnetValidatorTx,
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
+  IncreaseBalanceTx,
 } from '../serializable/pvm';
 import {
   baseTx,
@@ -345,6 +346,12 @@ export const convertSubnetTxBytes = () =>
     bytesForInt(10),
     inputBytes(),
   );
+
+export const increaseBalanceTx = () =>
+  new IncreaseBalanceTx(baseTx(), id(), bigIntPr());
+
+export const increaseBalanceTxBytes = () =>
+  concatBytes(baseTxbytes(), idBytes(), bigIntPrBytes());
 
 export const pChainOwner = () => new PChainOwner(int(), addresses()());
 

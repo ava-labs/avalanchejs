@@ -20,6 +20,7 @@ import { AbstractSubnetTx } from './abstractSubnetTx';
 import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
 import { ConvertSubnetTx } from './convertSubnetTx';
+import { IncreaseBalanceTx } from './increaseBalanceTx';
 
 export * from './typeGuards';
 export {
@@ -46,4 +47,5 @@ export {
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
   ConvertSubnetTx,
+  IncreaseBalanceTx,
 };

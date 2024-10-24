@@ -1,7 +1,7 @@
 import { TransferableInput } from '../serializable/avax';
 import type { Utxo } from '../serializable/avax/utxo';
+import { matchOwners } from './addressMap';
 import { addressesFromBytes } from './addressesFromBytes';
-import { matchOwners } from './matchOwners';
 import { isTransferOut } from './typeGuards';
 
 type GetImportedInputsFromUtxosOutput = {
