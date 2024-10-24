@@ -9,6 +9,7 @@ export {
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
+  INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
 } from './constants';
 
 export {
@@ -18,4 +19,6 @@ export {
   getOwnerComplexity,
   getSignerComplexity,
   getTxComplexity,
+  getBytesComplexity,
+  getConvertSubnetValidatorsComplexity,
 } from './complexity';

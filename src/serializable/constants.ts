@@ -80,6 +80,11 @@ export enum TypeSymbols {
   TransformSubnetTx = 'pvm.TransformSubnetTx',
   TransferSubnetOwnershipTx = 'pvm.TransferSubnetOwnershipTx',
 
+  ConvertSubnetTx = 'pvm.ConvertSubnetTx',
+  ConvertSubnetValidator = 'pvm.ConvertSubnetValidator',
+
+  PChainOwner = 'pvm.PChainOwner',
+
   // EVM
   EvmExportTx = 'evm.ExportTx',
   EvmInput = 'evm.Input',

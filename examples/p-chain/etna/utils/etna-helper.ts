@@ -1,4 +1,4 @@
-import { Context, Info, pvm } from '../../../../src';
+import { Context, info, pvm } from '../../../../src';
 import type { FeeState } from '../../../../src/vms/pvm';
 
 export const setupEtnaExample = async (
@@ -12,9 +12,9 @@ export const setupEtnaExample = async (
   const pvmApi = new pvm.PVMApi(uri);
   const feeState = await pvmApi.getFeeState();
 
-  const info = new Info(uri);
+  const infoApi = new info.InfoApi(uri);
 
-  const { etnaTime } = await info.getUpgradesInfo();
+  const { etnaTime } = await infoApi.getUpgradesInfo();
 
   const etnaDateTime = new Date(etnaTime);
   const now = new Date();

@@ -15,6 +15,7 @@ import {
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
   isAddSubnetValidatorTx,
+  isConvertSubnetTx,
   isCreateChainTx,
   isCreateSubnetTx,
   isPvmBaseTx,
@@ -45,7 +46,8 @@ const isEtnaSupported = (tx: Transaction) => {
     isCreateChainTx(tx) ||
     isCreateSubnetTx(tx) ||
     isRemoveSubnetValidatorTx(tx) ||
-    isTransferSubnetOwnershipTx(tx)
+    isTransferSubnetOwnershipTx(tx) ||
+    isConvertSubnetTx(tx)
   );
 };
 
