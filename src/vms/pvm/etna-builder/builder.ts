@@ -1452,13 +1452,21 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
 };
 
 export type IncreaseBalanceTxProps = TxProps<{
+  /**
+   * Amount to increase the balance by.
+   *
+   * Must be greater than 0.
+   */
   balance: bigint;
+  /**
+   * ID corresponding to the validator
+   */
   validationId: string;
 }>;
 
 /**
- * Creates a new unsigned PVM convert subnet transaction
- * (`ConvertSubnetTx`) using calculated dynamic fees.
+ * Creates a new unsigned PVM increase balance transaction
+ * (`IncreaseBalanceTx`) using calculated dynamic fees.
  *
  * @param props
  * @param context
@@ -1477,6 +1485,10 @@ export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
   },
   context,
 ) => {
+  if (balance <= 0n) {
+    throw new Error('Balance must be greater than 0');
+  }
+
   const toBurn = new Map<string, bigint>([[context.avaxAssetID, balance]]);
 
   const bytesComplexity = getBytesComplexity(memo);
@@ -1505,6 +1517,7 @@ export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
   );
 
   const { changeOutputs, inputs, inputUTXOs } = spendResults;
+
   const addressMaps = getAddressMaps({
     inputs,
     inputUTXOs,

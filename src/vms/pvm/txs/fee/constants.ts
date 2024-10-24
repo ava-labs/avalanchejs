@@ -79,7 +79,7 @@ export const INTRINSIC_OUTPUT_DB_WRITE = 1;
 
 export const INTRINSIC_BASE_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
-    2 + // codec version
+    SHORT_LEN + // codec version
     INT_LEN + // typeID
     INT_LEN + // networkID
     ID_LEN + // blockchainID

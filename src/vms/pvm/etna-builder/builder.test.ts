@@ -40,6 +40,7 @@ import {
   AddPermissionlessDelegatorTx,
   ConvertSubnetTx,
   ProofOfPossession,
+  IncreaseBalanceTx,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
@@ -55,6 +56,7 @@ import {
   newCreateSubnetTx,
   newExportTx,
   newImportTx,
+  newIncreaseBalanceTx,
   newRemoveSubnetValidatorTx,
   newTransferSubnetOwnershipTx,
 } from './builder';
@@ -127,6 +129,7 @@ const checkFeeIsCorrect = ({
   feeState,
   additionalInputs = [],
   additionalOutputs = [],
+  additionalFee = 0n,
 }: {
   unsignedTx: UnsignedTx;
   inputs: readonly TransferableInput[];
@@ -134,6 +137,7 @@ const checkFeeIsCorrect = ({
   feeState: FeeState;
   additionalInputs?: readonly TransferableInput[];
   additionalOutputs?: readonly TransferableOutput[];
+  additionalFee?: bigint;
 }): [
   amountConsumed: Record<string, string>,
   expectedAmountConsumed: Record<string, string>,
@@ -155,7 +159,7 @@ const checkFeeIsCorrect = ({
   );
 
   const expectedAmountBurned = addAmounts(
-    new Map([[testAvaxAssetID.toString(), expectedFee]]),
+    new Map([[testAvaxAssetID.toString(), expectedFee + additionalFee]]),
   );
 
   const expectedAmountConsumed = addAmounts(
@@ -1022,11 +1026,12 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         blsSignatureBytes(),
       );
       const pChainOwner = PChainOwner.fromNative([testAddress1], 1);
+      const validatorBalanceAmount = BigInt(1 * 1e9);
 
       const validator = ConvertSubnetValidator.fromNative(
         nodeId,
         BigInt(1 * 1e9),
-        BigInt(0 * 1e9),
+        validatorBalanceAmount,
         signer,
         pChainOwner,
         pChainOwner,
@@ -1055,6 +1060,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           inputs,
           outputs,
           feeState,
+          additionalFee: validatorBalanceAmount,
         });
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
@@ -1063,7 +1069,11 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
-          [getTransferableOutForTest(utxoInputAmt - expectedFee)],
+          [
+            getTransferableOutForTest(
+              utxoInputAmt - expectedFee - validatorBalanceAmount,
+            ),
+          ],
           [getTransferableInputForTest(utxoInputAmt)],
           new Uint8Array(),
         ),
@@ -1075,36 +1085,125 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       );
       expectTxs(unsignedTx.getTx(), expectedTx);
     });
+
+    it('should throw error if weight on a validator is 0', () => {
+      const validator = ConvertSubnetValidator.fromNative(
+        nodeId,
+        BigInt(0 * 1e9),
+        BigInt(0 * 1e9),
+        new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
+        PChainOwner.fromNative([testAddress1], 1),
+        PChainOwner.fromNative([testAddress1], 1),
+      );
+      const utxos = testUtxos();
+      try {
+        newConvertSubnetTx(
+          {
+            fromAddressesBytes,
+            feeState,
+            utxos,
+            subnetAuth: [0],
+            subnetId: Id.fromHex(testSubnetId).toString(),
+            address: testAddress1,
+            validators: [validator],
+            chainId: 'h5vH4Zz53MTN2jf72axZCfo1VbG1cMR6giR4Ra2TTpEmqxDWB',
+          },
+          testContext,
+        );
+      } catch (error) {
+        expect((error as Error).message).toEqual(
+          'Validator weight must be greater than 0',
+        );
+      }
+    });
   });
 
-  it('should throw error if weight on a validator is 0', () => {
-    const validator = ConvertSubnetValidator.fromNative(
-      nodeId,
-      BigInt(0 * 1e9),
-      BigInt(0 * 1e9),
-      new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes()),
-      PChainOwner.fromNative([testAddress1], 1),
-      PChainOwner.fromNative([testAddress1], 1),
-    );
-    const utxos = testUtxos();
-    try {
-      newConvertSubnetTx(
+  describe('IncreaseBalanceTx', () => {
+    it('should create an IncreaseBalanceTx', () => {
+      const validUtxoAmount = BigInt(30 * 1e9);
+      const balance = BigInt(1 * 1e9);
+      const validationId = 'test';
+
+      const utxos = [
+        getLockedUTXO(), // Locked and should be ignored.
+        getNotTransferOutput(), // Invalid and should be ignored.
+        // AVAX Assets
+        getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
+        // Non-AVAX Assets (Jupiter)
+        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), Id.fromString('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), Id.fromString('jupiter')),
+        // Non-AVAX Asset (Mars)
+        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
+      ];
+
+      const unsignedTx = newIncreaseBalanceTx(
         {
+          balance,
           fromAddressesBytes,
           feeState,
           utxos,
-          subnetAuth: [0],
-          subnetId: Id.fromHex(testSubnetId).toString(),
-          address: testAddress1,
-          validators: [validator],
-          chainId: 'h5vH4Zz53MTN2jf72axZCfo1VbG1cMR6giR4Ra2TTpEmqxDWB',
+          validationId,
         },
         testContext,
       );
-    } catch (error) {
-      expect((error as Error).message).toEqual(
-        'Validator weight must be greater than 0',
+
+      const { baseTx } = unsignedTx.getTx() as IncreaseBalanceTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+          additionalFee: balance,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new IncreaseBalanceTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(validUtxoAmount - expectedFee - balance)],
+          [getTransferableInputForTest(validUtxoAmount)],
+          new Uint8Array(),
+        ),
+        Id.fromString(validationId),
+        new BigIntPr(balance),
       );
-    }
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
+  });
+
+  it('should throw an error if the balance is less than or equal to 0', () => {
+    const validationId = 'test';
+    const utxos = testUtxos();
+
+    expect(() => {
+      newIncreaseBalanceTx(
+        {
+          balance: 0n,
+          fromAddressesBytes,
+          feeState,
+          utxos,
+          validationId,
+        },
+        testContext,
+      );
+    }).toThrow('Balance must be greater than 0');
+
+    expect(() => {
+      newIncreaseBalanceTx(
+        {
+          balance: -1n,
+          fromAddressesBytes,
+          feeState,
+          utxos,
+          validationId,
+        },
+        testContext,
+      );
+    }).toThrow('Balance must be greater than 0');
   });
 });
