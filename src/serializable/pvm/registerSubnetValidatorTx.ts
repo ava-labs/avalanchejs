@@ -6,7 +6,6 @@ import { serializable } from '../common/types';
 import { TypeSymbols } from '../constants';
 import { BigIntPr, Bytes } from '../primitives';
 import { PVMTx } from './abstractTx';
-import { RegisterSubnetValidator } from './registerSubnetValidator';
 
 @serializable()
 export class RegisterSubnetValidatorTx extends PVMTx {
@@ -16,7 +15,7 @@ export class RegisterSubnetValidatorTx extends PVMTx {
     public readonly baseTx: BaseTx,
     public readonly balance: BigIntPr,
     public readonly blsSignature: Bytes,
-    public readonly message: RegisterSubnetValidator,
+    public readonly message: Bytes,
   ) {
     super();
   }
@@ -25,13 +24,13 @@ export class RegisterSubnetValidatorTx extends PVMTx {
     baseTx: BaseTx,
     balance: bigint,
     blsSignature: Uint8Array,
-    message: RegisterSubnetValidator,
+    message: Uint8Array,
   ): RegisterSubnetValidatorTx {
     return new RegisterSubnetValidatorTx(
       baseTx,
       new BigIntPr(balance),
       new Bytes(blsSignature),
-      message,
+      new Bytes(message),
     );
   }
 
@@ -41,7 +40,7 @@ export class RegisterSubnetValidatorTx extends PVMTx {
   ): [RegisterSubnetValidatorTx, Uint8Array] {
     const [baseTx, balance, blsSignature, message, rest] = unpack(
       bytes,
-      [BaseTx, BigIntPr, Bytes, RegisterSubnetValidator],
+      [BaseTx, BigIntPr, Bytes, Bytes],
       codec,
     );
     return [

@@ -356,20 +356,10 @@ export const increaseBalanceTxBytes = () =>
   concatBytes(baseTxbytes(), idBytes(), bigIntPrBytes());
 
 export const registerSubnetValidatorTx = () =>
-  new RegisterSubnetValidatorTx(
-    baseTx(),
-    bigIntPr(),
-    bytes(),
-    registerSubnetValidator(),
-  );
+  new RegisterSubnetValidatorTx(baseTx(), bigIntPr(), bytes(), bytes());
 
 export const registerSubnetValidatorTxBytes = () =>
-  concatBytes(
-    baseTxbytes(),
-    bigIntPrBytes(),
-    bytesBytes(),
-    registerSubnetValidatorBytes(),
-  );
+  concatBytes(baseTxbytes(), bigIntPrBytes(), bytesBytes(), bytesBytes());
 
 export const registerSubnetValidator = () =>
   new RegisterSubnetValidator(

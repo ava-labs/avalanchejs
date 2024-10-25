@@ -431,7 +431,7 @@ const registerSubnetValidatorTx = (
   return addDimensions(
     INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
-    getRegisterSubnetValidatorComplexity(tx.message),
+    getBytesComplexity(tx.message),
   );
 };
 

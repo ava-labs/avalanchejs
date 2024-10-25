@@ -76,7 +76,6 @@ import {
   getBytesComplexity,
   getConvertSubnetValidatorsComplexity,
   INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-  getRegisterSubnetValidatorComplexity,
 } from '../txs/fee';
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
@@ -84,7 +83,6 @@ import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/conve
 import { INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES } from '../txs/fee/constants';
 import type { PChainOwner } from '../../../serializable/fxs/pvm/pChainOwner';
 import { RegisterSubnetValidatorTx } from '../../../serializable/pvm/registerSubnetValidatorTx';
-import type { RegisterSubnetValidator } from '../../../serializable/pvm/registerSubnetValidator';
 
 /**
  * Creates OutputOwners used for change outputs with the specified
