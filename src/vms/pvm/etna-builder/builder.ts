@@ -42,6 +42,7 @@ import {
   TransferSubnetOwnershipTx,
   ConvertSubnetTx,
   IncreaseBalanceTx,
+  DisableSubnetValidatorTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
 import {
@@ -1536,6 +1537,94 @@ export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
       ),
       Id.fromString(validationId),
       new BigIntPr(balance),
+    ),
+    inputUTXOs,
+    addressMaps,
+  );
+};
+
+export type DisableSubnetValidatorTxProps = TxProps<{
+  /**
+   * Indices of owners.
+   */
+  disableAuth: readonly number[];
+  /**
+   * ID corresponding to the validator
+   */
+  validationId: string;
+}>;
+
+/**
+ * Creates a new unsigned PVM disable subnet validator transaction
+ * (`DisableSubnetValidatorTx`) using calculated dynamic fees.
+ *
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
+ */
+export const newDisableSubnetValidatorTx: TxBuilderFn<
+  DisableSubnetValidatorTxProps
+> = (
+  {
+    changeAddressesBytes,
+    disableAuth,
+    feeState,
+    fromAddressesBytes,
+    memo = new Uint8Array(),
+    minIssuanceTime = BigInt(Math.floor(new Date().getTime() / 1000)),
+    utxos,
+    validationId,
+  },
+  context,
+) => {
+  const disableAuthInput = Input.fromNative(disableAuth);
+
+  const bytesComplexity = getBytesComplexity(memo);
+  const authComplexity = getAuthComplexity(disableAuthInput);
+
+  const complexity = addDimensions(
+    INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+    bytesComplexity,
+    authComplexity,
+  );
+
+  const spendResults = spend(
+    {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
+      excessAVAX: 0n,
+      feeState,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      minIssuanceTime,
+      utxos,
+    },
+    [useUnlockedUTXOs],
+    context,
+  );
+
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  });
+
+  return new UnsignedTx(
+    new DisableSubnetValidatorTx(
+      AvaxBaseTx.fromNative(
+        context.networkID,
+        context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        memo,
+      ),
+      Id.fromString(validationId),
+      disableAuthInput,
     ),
     inputUTXOs,
     addressMaps,

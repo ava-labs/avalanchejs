@@ -27,6 +27,7 @@ import type {
   TransferSubnetOwnershipTx,
   ConvertSubnetTx,
   IncreaseBalanceTx,
+  DisableSubnetValidatorTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -37,6 +38,7 @@ import {
   isConvertSubnetTx,
   isCreateChainTx,
   isCreateSubnetTx,
+  isDisableSubnetValidatorTx,
   isExportTx,
   isImportTx,
   isIncreaseBalanceTx,
@@ -67,6 +69,7 @@ import {
   INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES,
   INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
   INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
+  INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_EXPORT_TX_COMPLEXITIES,
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
   INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
@@ -393,6 +396,14 @@ const increaseBalanceTx = (tx: IncreaseBalanceTx): Dimensions => {
   );
 };
 
+const disableSubnetValidatorTx = (tx: DisableSubnetValidatorTx): Dimensions => {
+  return addDimensions(
+    INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.getDisableAuth()),
+  );
+};
+
 export const getTxComplexity = (tx: Transaction): Dimensions => {
   if (isAddPermissionlessValidatorTx(tx)) {
     return addPermissionlessValidatorTx(tx);
@@ -418,6 +429,8 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return convertSubnetTx(tx);
   } else if (isIncreaseBalanceTx(tx)) {
     return increaseBalanceTx(tx);
+  } else if (isDisableSubnetValidatorTx(tx)) {
+    return disableSubnetValidatorTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }

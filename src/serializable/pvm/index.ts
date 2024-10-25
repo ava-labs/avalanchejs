@@ -21,6 +21,7 @@ import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
 import { ConvertSubnetTx } from './convertSubnetTx';
 import { IncreaseBalanceTx } from './increaseBalanceTx';
+import { DisableSubnetValidatorTx } from './disableSubnetValidatorTx';
 
 export * from './typeGuards';
 export {
@@ -48,4 +49,5 @@ export {
   TransformSubnetTx,
   ConvertSubnetTx,
   IncreaseBalanceTx,
+  DisableSubnetValidatorTx,
 };

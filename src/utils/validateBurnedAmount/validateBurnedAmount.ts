@@ -18,6 +18,7 @@ import {
   isConvertSubnetTx,
   isCreateChainTx,
   isCreateSubnetTx,
+  isDisableSubnetValidatorTx,
   isIncreaseBalanceTx,
   isPvmBaseTx,
   isExportTx as isPvmExportTx,
@@ -49,7 +50,8 @@ const isEtnaSupported = (tx: Transaction) => {
     isRemoveSubnetValidatorTx(tx) ||
     isTransferSubnetOwnershipTx(tx) ||
     isConvertSubnetTx(tx) ||
-    isIncreaseBalanceTx(tx)
+    isIncreaseBalanceTx(tx) ||
+    isDisableSubnetValidatorTx(tx)
   );
 };
 
@@ -60,7 +62,7 @@ const isEtnaSupported = (tx: Transaction) => {
  * @param burnedAmount: burned amount in nAVAX
  * @param baseFee
  ** c-chain: fetched from the network and converted into nAvax (https://docs.avax.network/quickstart/transaction-fees#c-chain-fees)
- ** x/p-chain: pvm dynamic fee caculator, https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
+ ** x/p-chain: pvm dynamic fee calculator, https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/fee/dynamic_calculator.go
  * @param feeTolerance: tolerance percentage range where the burned amount is considered valid. e.g.: with FeeTolerance = 20% -> (expectedFee <= burnedAmount <= expectedFee * 1.2)
  * @return {boolean} isValid: : true if the burned amount is valid, false otherwise.
  * @return {bigint} txFee: burned amount in nAVAX
