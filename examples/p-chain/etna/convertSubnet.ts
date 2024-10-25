@@ -28,7 +28,7 @@ const convertSubnetTxExample = async () => {
     NODE_ID,
     BLS_PUBLIC_KEY,
     BLS_SIGNATURE,
-  } = getEnvVars();
+  } = getEnvVars(['BLS_PUBLIC_KEY', 'BLS_SIGNATURE', 'NODE_ID']);
   const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
