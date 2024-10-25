@@ -359,7 +359,7 @@ export const registerSubnetValidatorTx = () =>
   new RegisterSubnetValidatorTx(
     baseTx(),
     bigIntPr(),
-    proofOfPossession(),
+    bytes(),
     registerSubnetValidator(),
   );
 
@@ -367,7 +367,7 @@ export const registerSubnetValidatorTxBytes = () =>
   concatBytes(
     baseTxbytes(),
     bigIntPrBytes(),
-    proofOfPossessionBytes(),
+    bytesBytes(),
     registerSubnetValidatorBytes(),
   );
 

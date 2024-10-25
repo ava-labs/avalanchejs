@@ -1,6 +1,6 @@
 import { serializable } from '../common/types';
 import { TypeSymbols } from '../constants';
-import { Id } from '../fxs/common';
+import { Id, NodeId } from '../fxs/common';
 import { BigIntPr, Bytes } from '../primitives';
 import { PChainOwner } from '../fxs/pvm/pChainOwner';
 import type { Codec } from '../codec';
@@ -27,7 +27,7 @@ export class RegisterSubnetValidator {
 
   static fromNative(
     subnetId: string,
-    nodeId: Uint8Array,
+    nodeId: string,
     blsPublicKey: Uint8Array,
     expiry: bigint,
     remainingBalanceOwner: PChainOwner,
@@ -36,7 +36,7 @@ export class RegisterSubnetValidator {
   ): RegisterSubnetValidator {
     return new RegisterSubnetValidator(
       Id.fromString(subnetId),
-      new Bytes(nodeId),
+      new Bytes(NodeId.fromString(nodeId).toBytes()),
       new Bytes(blsPublicKey),
       new BigIntPr(expiry),
       remainingBalanceOwner,
@@ -65,7 +65,7 @@ export class RegisterSubnetValidator {
     );
     return [
       new RegisterSubnetValidator(
-        subnetId,
+        Id.fromString(subnetId.toString()),
         nodeId,
         blsPublicKey,
         expiry,

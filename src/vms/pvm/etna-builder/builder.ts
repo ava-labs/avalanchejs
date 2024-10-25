@@ -28,7 +28,6 @@ import {
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import type { Utxo } from '../../../serializable/avax/utxo';
 import { ID_LEN } from '../../../serializable/fxs/common/id';
-import type { ProofOfPossession } from '../../../serializable/pvm';
 import {
   AddPermissionlessDelegatorTx,
   AddPermissionlessValidatorTx,

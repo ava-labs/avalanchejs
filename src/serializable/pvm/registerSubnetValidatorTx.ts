@@ -6,7 +6,6 @@ import { serializable } from '../common/types';
 import { TypeSymbols } from '../constants';
 import { BigIntPr, Bytes } from '../primitives';
 import { PVMTx } from './abstractTx';
-import { ProofOfPossession } from './proofOfPossession';
 import { RegisterSubnetValidator } from './registerSubnetValidator';
 
 @serializable()
@@ -16,7 +15,7 @@ export class RegisterSubnetValidatorTx extends PVMTx {
   constructor(
     public readonly baseTx: BaseTx,
     public readonly balance: BigIntPr,
-    public readonly proofOfPossession: ProofOfPossession,
+    public readonly blsSignature: Bytes,
     public readonly message: RegisterSubnetValidator,
   ) {
     super();
@@ -25,13 +24,13 @@ export class RegisterSubnetValidatorTx extends PVMTx {
   static fromNative(
     baseTx: BaseTx,
     balance: bigint,
-    proofOfPossession: ProofOfPossession,
+    blsSignature: Uint8Array,
     message: RegisterSubnetValidator,
   ): RegisterSubnetValidatorTx {
     return new RegisterSubnetValidatorTx(
       baseTx,
       new BigIntPr(balance),
-      proofOfPossession,
+      new Bytes(blsSignature),
       message,
     );
   }
@@ -40,28 +39,20 @@ export class RegisterSubnetValidatorTx extends PVMTx {
     bytes: Uint8Array,
     codec: Codec,
   ): [RegisterSubnetValidatorTx, Uint8Array] {
-    const [baseTx, balance, proofOfPossession, message, rest] = unpack(
+    const [baseTx, balance, blsSignature, message, rest] = unpack(
       bytes,
-      [BaseTx, BigIntPr, ProofOfPossession, Bytes],
+      [BaseTx, BigIntPr, Bytes, RegisterSubnetValidator],
       codec,
     );
     return [
-      new RegisterSubnetValidatorTx(
-        baseTx,
-        balance,
-        proofOfPossession,
-        RegisterSubnetValidator.fromBytes(message.toBytes(), codec)[0],
-      ),
+      new RegisterSubnetValidatorTx(baseTx, balance, blsSignature, message),
       rest,
     ];
   }
 
   toBytes(codec: Codec) {
     return concatBytes(
-      pack(
-        [this.baseTx, this.balance, this.proofOfPossession, this.message],
-        codec,
-      ),
+      pack([this.baseTx, this.balance, this.blsSignature, this.message], codec),
     );
   }
 }
