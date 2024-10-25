@@ -1,6 +1,6 @@
-import type { MatchOwnerResult } from '../../../../utils/matchOwners';
-import { matchOwners } from '../../../../utils/matchOwners';
 import type { Address, TransferOutput } from '../../../../serializable';
+import type { MatchOwnerResult } from '../../../../utils';
+import { matchOwners } from '../../../../utils';
 
 export type verifySigMatchItem<T> = Required<{
   sigData: MatchOwnerResult;

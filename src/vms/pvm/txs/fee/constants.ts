@@ -79,7 +79,7 @@ export const INTRINSIC_OUTPUT_DB_WRITE = 1;
 
 export const INTRINSIC_BASE_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
-    2 + // codec version
+    SHORT_LEN + // codec version
     INT_LEN + // typeID
     INT_LEN + // networkID
     ID_LEN + // blockchainID
@@ -224,5 +224,46 @@ export const INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES: Dimensions = {
     INT_LEN, // subnetAuthCredential typeID
   [FeeDimensions.DBRead]: 2, // subnet auth + manager lookup
   [FeeDimensions.DBWrite]: 2, // manager + weight
+  [FeeDimensions.Compute]: 0,
+};
+
+export const INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+    LONG_LEN + // balance
+    SIGNATURE_LENGTH + // proof of possession
+    INT_LEN, // message length
+  [FeeDimensions.DBRead]: 0, // TODO: Implement
+  [FeeDimensions.DBWrite]: 0, // TODO: Implement
+  [FeeDimensions.Compute]: 0, // TODO: Include PoP verification time
+};
+
+export const INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES: Dimensions =
+  {
+    [FeeDimensions.Bandwidth]:
+      INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] + INT_LEN, // message length
+    [FeeDimensions.DBRead]: 0, // TODO: Implement
+    [FeeDimensions.DBWrite]: 0, // TODO: Implement
+    [FeeDimensions.Compute]: 0,
+  };
+
+export const INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+    ID_LEN + // validationId
+    LONG_LEN, // balance
+  [FeeDimensions.DBRead]: 0, // TODO: Implement
+  [FeeDimensions.DBWrite]: 0, // TODO: Implement
+  [FeeDimensions.Compute]: 0,
+};
+
+export const INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
+  [FeeDimensions.Bandwidth]:
+    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+    ID_LEN + // validationId
+    INT_LEN + // auth typeId
+    INT_LEN, // auth credential typeId
+  [FeeDimensions.DBRead]: 0, // TODO: Implement
+  [FeeDimensions.DBWrite]: 0, // TODO: Implement
   [FeeDimensions.Compute]: 0,
 };

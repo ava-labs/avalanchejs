@@ -20,7 +20,7 @@ const BALANCE_AVAX: number = 1;
  * @param subnetId the ID of the subnet that is created via `createSubnetTx`.
  * @returns The resulting transaction's ID.
  */
-const convertSubnetTxExmaple = async () => {
+const convertSubnetTxExample = async () => {
   const {
     AVAX_PUBLIC_URL,
     P_CHAIN_ADDRESS,
@@ -28,7 +28,7 @@ const convertSubnetTxExmaple = async () => {
     NODE_ID,
     BLS_PUBLIC_KEY,
     BLS_SIGNATURE,
-  } = getEnvVars();
+  } = getEnvVars(['BLS_PUBLIC_KEY', 'BLS_SIGNATURE', 'NODE_ID']);
   const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
@@ -74,4 +74,4 @@ const convertSubnetTxExmaple = async () => {
   return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-convertSubnetTxExmaple().then(console.log);
+convertSubnetTxExample().then(console.log);
