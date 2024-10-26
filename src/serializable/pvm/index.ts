@@ -20,6 +20,7 @@ import { AbstractSubnetTx } from './abstractSubnetTx';
 import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
 import { ConvertSubnetTx } from './convertSubnetTx';
+import { SetSubnetValidatorWeightTx } from './setSubnetValidatorWeightTx';
 import { IncreaseBalanceTx } from './increaseBalanceTx';
 import { DisableSubnetValidatorTx } from './disableSubnetValidatorTx';
 
@@ -48,6 +49,7 @@ export {
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
   ConvertSubnetTx,
+  SetSubnetValidatorWeightTx,
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
 };

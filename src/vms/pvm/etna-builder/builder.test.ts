@@ -42,6 +42,7 @@ import {
   ProofOfPossession,
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
+  SetSubnetValidatorWeightTx,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
@@ -60,6 +61,7 @@ import {
   newImportTx,
   newIncreaseBalanceTx,
   newRemoveSubnetValidatorTx,
+  newSetSubnetValidatorWeightTx,
   newTransferSubnetOwnershipTx,
 } from './builder';
 import { testAddress1 } from '../../../fixtures/vms';
@@ -68,6 +70,7 @@ import { PrimaryNetworkID } from '../../../constants/networkIDs';
 import {
   blsPublicKeyBytes,
   blsSignatureBytes,
+  warpMessageBytes,
 } from '../../../fixtures/primitives';
 import {
   feeState as testFeeState,
@@ -1117,6 +1120,54 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           'Validator weight must be greater than 0',
         );
       }
+    });
+  });
+
+  describe('SetSubnetValidatorWeightTx', () => {
+    it('should create a SetSubnetValidatorWeightTx', () => {
+      // Example Warp Message
+      const message = warpMessageBytes();
+
+      const validUtxoAmount = BigInt(30 * 1e9);
+      const utxos = [
+        getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
+      ];
+
+      const unsignedTx = newSetSubnetValidatorWeightTx(
+        {
+          fromAddressesBytes,
+          feeState,
+          message,
+          utxos,
+        },
+        testContext,
+      );
+
+      const { baseTx } = unsignedTx.getTx() as SetSubnetValidatorWeightTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new SetSubnetValidatorWeightTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(validUtxoAmount - expectedFee)],
+          [getTransferableInputForTest(validUtxoAmount)],
+          new Uint8Array(),
+        ),
+        new Bytes(message),
+      );
+
+      expectTxs(unsignedTx.getTx(), expectedTx);
     });
   });
 

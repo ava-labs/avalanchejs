@@ -28,6 +28,7 @@ import type {
   ConvertSubnetTx,
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
+  SetSubnetValidatorWeightTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -44,6 +45,7 @@ import {
   isIncreaseBalanceTx,
   isPvmBaseTx,
   isRemoveSubnetValidatorTx,
+  isSetSubnetValidatorWeightTx,
   isTransferSubnetOwnershipTx,
 } from '../../../../serializable/pvm';
 import {
@@ -85,6 +87,7 @@ import {
   INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_TRANSFERABLE_INPUT_BANDWIDTH,
+  INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
   INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH,
   INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
@@ -228,6 +231,16 @@ export const getBytesComplexity = (
     result[FeeDimensions.Bandwidth] += b.length;
   });
   return result;
+};
+
+export const getWarpComplexity = (message: Bytes): Dimensions => {
+  // TODO: Finish implementation.
+  return createDimensions({
+    bandwidth: message.length,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0,
+  });
 };
 
 export const getConvertSubnetValidatorsComplexity = (
@@ -389,6 +402,16 @@ const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   );
 };
 
+const setSubnetValidatorWeightTx = (
+  tx: SetSubnetValidatorWeightTx,
+): Dimensions => {
+  return addDimensions(
+    INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getWarpComplexity(tx.message),
+  );
+};
+
 const increaseBalanceTx = (tx: IncreaseBalanceTx): Dimensions => {
   return addDimensions(
     INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
@@ -427,6 +450,8 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return baseTx(tx);
   } else if (isConvertSubnetTx(tx)) {
     return convertSubnetTx(tx);
+  } else if (isSetSubnetValidatorWeightTx(tx)) {
+    return setSubnetValidatorWeightTx(tx);
   } else if (isIncreaseBalanceTx(tx)) {
     return increaseBalanceTx(tx);
   } else if (isDisableSubnetValidatorTx(tx)) {

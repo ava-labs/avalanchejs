@@ -21,6 +21,7 @@ import {
   TransformSubnetTx,
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
+  SetSubnetValidatorWeightTx,
 } from '../serializable/pvm';
 import {
   baseTx,
@@ -355,6 +356,12 @@ export const convertSubnetTxBytes = () =>
     bytesForInt(10),
     inputBytes(),
   );
+
+export const setSubnetValidatorWeightTx = () =>
+  new SetSubnetValidatorWeightTx(baseTx(), bytes());
+
+export const setSubnetValidatorWeightTxBytes = () =>
+  concatBytes(baseTxbytes(), bytesBytes());
 
 export const increaseBalanceTx = () =>
   new IncreaseBalanceTx(baseTx(), id(), bigIntPr());

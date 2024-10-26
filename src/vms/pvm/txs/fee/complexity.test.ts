@@ -7,10 +7,12 @@ import {
   blsSignatureBytes,
   int,
   ints,
+  warpMessageBytes,
 } from '../../../../fixtures/primitives';
 import { signer } from '../../../../fixtures/pvm';
 import { txHexToTransaction } from '../../../../fixtures/transactions';
 import {
+  Bytes,
   Input,
   OutputOwners,
   TransferInput,
@@ -35,6 +37,7 @@ import {
   getOwnerComplexity,
   getSignerComplexity,
   getTxComplexity,
+  getWarpComplexity,
 } from './complexity';
 import {
   TEST_TRANSACTIONS,
@@ -276,6 +279,37 @@ describe('Complexity', () => {
         getAuthComplexity(int());
       }).toThrow(
         'Unable to calculate auth complexity of transaction. Expected Input as subnet auth.',
+      );
+    });
+  });
+
+  describe('getWarpComplexity', () => {
+    // Example Warp Message
+    const warpMessage = warpMessageBytes();
+
+    test('complexity from empty warp message', () => {
+      const result = getWarpComplexity(new Bytes(new Uint8Array(0)));
+
+      expect(result).toEqual(
+        createDimensions({
+          bandwidth: 0,
+          dbRead: 0,
+          dbWrite: 0,
+          compute: 0,
+        }),
+      );
+    });
+
+    test('complexity from warp message', () => {
+      const result = getWarpComplexity(new Bytes(warpMessage));
+
+      expect(result).toEqual(
+        createDimensions({
+          bandwidth: warpMessage.length,
+          dbRead: 0,
+          dbWrite: 0,
+          compute: 0,
+        }),
       );
     });
   });
