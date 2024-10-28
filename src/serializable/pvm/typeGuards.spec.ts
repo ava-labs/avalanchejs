@@ -20,6 +20,8 @@ import {
   isTransformSubnetTx,
   isConvertSubnetTx,
   isIncreaseBalanceTx,
+  isDisableSubnetValidatorTx,
+  isSetSubnetValidatorWeightTx,
 } from './typeGuards';
 
 const cases: [any, TypeSymbols][] = [
@@ -41,7 +43,9 @@ const cases: [any, TypeSymbols][] = [
   [isTransferSubnetOwnershipTx, TypeSymbols.TransferSubnetOwnershipTx],
   [isTransformSubnetTx, TypeSymbols.TransformSubnetTx],
   [isConvertSubnetTx, TypeSymbols.ConvertSubnetTx],
+  [isSetSubnetValidatorWeightTx, TypeSymbols.SetSubnetValidatorWeightTx],
   [isIncreaseBalanceTx, TypeSymbols.IncreaseBalanceTx],
+  [isDisableSubnetValidatorTx, TypeSymbols.DisableSubnetValidatorTx],
 ];
 
 const guards = cases.map((caseItem) => caseItem[0]);

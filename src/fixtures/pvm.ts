@@ -20,6 +20,8 @@ import {
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
   IncreaseBalanceTx,
+  DisableSubnetValidatorTx,
+  SetSubnetValidatorWeightTx,
 } from '../serializable/pvm';
 import {
   baseTx,
@@ -306,6 +308,14 @@ export const transformSubnetTxBytes = () =>
     inputBytes(),
   );
 
+export const pChainOwner = () => new PChainOwner(int(), addresses()());
+
+export const pChainOwnerBytes = () =>
+  concatBytes(
+    intBytes(), // threshold
+    addressesBytes(),
+  );
+
 export const convertSubnetValidator = () =>
   new ConvertSubnetValidator(
     bytes(),
@@ -347,19 +357,23 @@ export const convertSubnetTxBytes = () =>
     inputBytes(),
   );
 
+export const setSubnetValidatorWeightTx = () =>
+  new SetSubnetValidatorWeightTx(baseTx(), bytes());
+
+export const setSubnetValidatorWeightTxBytes = () =>
+  concatBytes(baseTxbytes(), bytesBytes());
+
 export const increaseBalanceTx = () =>
   new IncreaseBalanceTx(baseTx(), id(), bigIntPr());
 
 export const increaseBalanceTxBytes = () =>
   concatBytes(baseTxbytes(), idBytes(), bigIntPrBytes());
 
-export const pChainOwner = () => new PChainOwner(int(), addresses()());
+export const disableSubnetValidatorTx = () =>
+  new DisableSubnetValidatorTx(baseTx(), id(), input());
 
-export const pChainOwnerBytes = () =>
-  concatBytes(
-    intBytes(), // threshold
-    addressesBytes(),
-  );
+export const disableSubnetValidatorTxBytes = () =>
+  concatBytes(baseTxbytes(), idBytes(), bytesForInt(10), inputBytes());
 
 export const feeState = (): FeeState => ({
   capacity: 1n,

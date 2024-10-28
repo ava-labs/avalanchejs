@@ -41,6 +41,8 @@ import {
   ConvertSubnetTx,
   ProofOfPossession,
   IncreaseBalanceTx,
+  DisableSubnetValidatorTx,
+  SetSubnetValidatorWeightTx,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
@@ -54,10 +56,12 @@ import {
   newConvertSubnetTx,
   newCreateChainTx,
   newCreateSubnetTx,
+  newDisableSubnetValidatorTx,
   newExportTx,
   newImportTx,
   newIncreaseBalanceTx,
   newRemoveSubnetValidatorTx,
+  newSetSubnetValidatorWeightTx,
   newTransferSubnetOwnershipTx,
 } from './builder';
 import { testAddress1 } from '../../../fixtures/vms';
@@ -66,6 +70,7 @@ import { PrimaryNetworkID } from '../../../constants/networkIDs';
 import {
   blsPublicKeyBytes,
   blsSignatureBytes,
+  warpMessageBytes,
 } from '../../../fixtures/primitives';
 import {
   feeState as testFeeState,
@@ -1118,6 +1123,54 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
   });
 
+  describe('SetSubnetValidatorWeightTx', () => {
+    it('should create a SetSubnetValidatorWeightTx', () => {
+      // Example Warp Message
+      const message = warpMessageBytes();
+
+      const validUtxoAmount = BigInt(30 * 1e9);
+      const utxos = [
+        getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
+      ];
+
+      const unsignedTx = newSetSubnetValidatorWeightTx(
+        {
+          fromAddressesBytes,
+          feeState,
+          message,
+          utxos,
+        },
+        testContext,
+      );
+
+      const { baseTx } = unsignedTx.getTx() as SetSubnetValidatorWeightTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new SetSubnetValidatorWeightTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(validUtxoAmount - expectedFee)],
+          [getTransferableInputForTest(validUtxoAmount)],
+          new Uint8Array(),
+        ),
+        new Bytes(message),
+      );
+
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
+  });
+
   describe('IncreaseBalanceTx', () => {
     it('should create an IncreaseBalanceTx', () => {
       const validUtxoAmount = BigInt(30 * 1e9);
@@ -1205,5 +1258,61 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         testContext,
       );
     }).toThrow('Balance must be greater than 0');
+  });
+
+  describe('DisableSubnetValidatorTx', () => {
+    it('should create a DisabledSubnetValidatorTx', () => {
+      const validUtxoAmount = BigInt(30 * 1e9);
+      const validationId = 'test';
+
+      const utxos = [
+        getLockedUTXO(), // Locked and should be ignored.
+        getNotTransferOutput(), // Invalid and should be ignored.
+        // AVAX Assets
+        getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
+        // Non-AVAX Assets (Jupiter)
+        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), Id.fromString('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), Id.fromString('jupiter')),
+        // Non-AVAX Asset (Mars)
+        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
+      ];
+
+      const unsignedTx = newDisableSubnetValidatorTx(
+        {
+          disableAuth: [0],
+          fromAddressesBytes,
+          feeState,
+          utxos,
+          validationId,
+        },
+        testContext,
+      );
+
+      const { baseTx } = unsignedTx.getTx() as DisableSubnetValidatorTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new DisableSubnetValidatorTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(validUtxoAmount - expectedFee)],
+          [getTransferableInputForTest(validUtxoAmount)],
+          new Uint8Array(),
+        ),
+        Id.fromString(validationId),
+        Input.fromNative([0]),
+      );
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
   });
 });

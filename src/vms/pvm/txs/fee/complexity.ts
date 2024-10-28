@@ -27,6 +27,8 @@ import type {
   TransferSubnetOwnershipTx,
   ConvertSubnetTx,
   IncreaseBalanceTx,
+  DisableSubnetValidatorTx,
+  SetSubnetValidatorWeightTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -37,11 +39,13 @@ import {
   isConvertSubnetTx,
   isCreateChainTx,
   isCreateSubnetTx,
+  isDisableSubnetValidatorTx,
   isExportTx,
   isImportTx,
   isIncreaseBalanceTx,
   isPvmBaseTx,
   isRemoveSubnetValidatorTx,
+  isSetSubnetValidatorWeightTx,
   isTransferSubnetOwnershipTx,
 } from '../../../../serializable/pvm';
 import {
@@ -67,6 +71,7 @@ import {
   INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES,
   INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
   INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
+  INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_EXPORT_TX_COMPLEXITIES,
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
   INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
@@ -82,6 +87,7 @@ import {
   INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_TRANSFERABLE_INPUT_BANDWIDTH,
+  INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
   INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH,
   INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
@@ -225,6 +231,16 @@ export const getBytesComplexity = (
     result[FeeDimensions.Bandwidth] += b.length;
   });
   return result;
+};
+
+export const getWarpComplexity = (message: Bytes): Dimensions => {
+  // TODO: Finish implementation.
+  return createDimensions({
+    bandwidth: message.length,
+    dbRead: 0,
+    dbWrite: 0,
+    compute: 0,
+  });
 };
 
 export const getConvertSubnetValidatorsComplexity = (
@@ -386,10 +402,28 @@ const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   );
 };
 
+const setSubnetValidatorWeightTx = (
+  tx: SetSubnetValidatorWeightTx,
+): Dimensions => {
+  return addDimensions(
+    INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getWarpComplexity(tx.message),
+  );
+};
+
 const increaseBalanceTx = (tx: IncreaseBalanceTx): Dimensions => {
   return addDimensions(
     INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
+  );
+};
+
+const disableSubnetValidatorTx = (tx: DisableSubnetValidatorTx): Dimensions => {
+  return addDimensions(
+    INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.getDisableAuth()),
   );
 };
 
@@ -416,8 +450,12 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return baseTx(tx);
   } else if (isConvertSubnetTx(tx)) {
     return convertSubnetTx(tx);
+  } else if (isSetSubnetValidatorWeightTx(tx)) {
+    return setSubnetValidatorWeightTx(tx);
   } else if (isIncreaseBalanceTx(tx)) {
     return increaseBalanceTx(tx);
+  } else if (isDisableSubnetValidatorTx(tx)) {
+    return disableSubnetValidatorTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }
