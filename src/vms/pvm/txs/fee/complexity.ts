@@ -29,6 +29,7 @@ import type {
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
   SetSubnetValidatorWeightTx,
+  RegisterSubnetValidatorTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -44,6 +45,7 @@ import {
   isImportTx,
   isIncreaseBalanceTx,
   isPvmBaseTx,
+  isRegisterSubnetValidatorTx,
   isRemoveSubnetValidatorTx,
   isSetSubnetValidatorWeightTx,
   isTransferSubnetOwnershipTx,
@@ -81,6 +83,7 @@ import {
   INTRINSIC_OUTPUT_BANDWIDTH,
   INTRINSIC_OUTPUT_DB_WRITE,
   INTRINSIC_POP_BANDWIDTH,
+  INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_OUTPUT_BANDWIDTH,
@@ -402,6 +405,16 @@ const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
   );
 };
 
+const registerSubnetValidatorTx = (
+  tx: RegisterSubnetValidatorTx,
+): Dimensions => {
+  return addDimensions(
+    INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getWarpComplexity(tx.message),
+  );
+};
+
 const setSubnetValidatorWeightTx = (
   tx: SetSubnetValidatorWeightTx,
 ): Dimensions => {
@@ -450,6 +463,8 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return baseTx(tx);
   } else if (isConvertSubnetTx(tx)) {
     return convertSubnetTx(tx);
+  } else if (isRegisterSubnetValidatorTx(tx)) {
+    return registerSubnetValidatorTx(tx);
   } else if (isSetSubnetValidatorWeightTx(tx)) {
     return setSubnetValidatorWeightTx(tx);
   } else if (isIncreaseBalanceTx(tx)) {

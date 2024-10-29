@@ -15,6 +15,7 @@ import {
 import { expectTxs } from '../../../fixtures/utils/expectTx';
 import {
   BigIntPr,
+  BlsSignature,
   Bytes,
   Id,
   Input,
@@ -43,6 +44,7 @@ import {
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
   SetSubnetValidatorWeightTx,
+  RegisterSubnetValidatorTx,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
@@ -60,6 +62,7 @@ import {
   newExportTx,
   newImportTx,
   newIncreaseBalanceTx,
+  newRegisterSubnetValidatorTx,
   newRemoveSubnetValidatorTx,
   newSetSubnetValidatorWeightTx,
   newTransferSubnetOwnershipTx,
@@ -184,7 +187,11 @@ const checkFeeIsCorrect = ({
     [...amountConsumed].map(([k, v]) => [k, formatBigIntToHumanReadable(v)]),
   );
 
-  return [safeAmountConsumed, safeExpectedAmountConsumed, expectedFee];
+  return [
+    safeAmountConsumed,
+    safeExpectedAmountConsumed,
+    expectedFee + additionalFee,
+  ];
 };
 
 describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
@@ -1074,11 +1081,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
-          [
-            getTransferableOutForTest(
-              utxoInputAmt - expectedFee - validatorBalanceAmount,
-            ),
-          ],
+          [getTransferableOutForTest(utxoInputAmt - expectedFee)],
           [getTransferableInputForTest(utxoInputAmt)],
           new Uint8Array(),
         ),
@@ -1120,6 +1123,60 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
           'Validator weight must be greater than 0',
         );
       }
+    });
+  });
+
+  describe('RegisterSubnetValidatorTx', () => {
+    it('should create a RegisterSubnetValidatorTx', () => {
+      const balance = BigInt(10 * 1e9);
+      const signatureBytes = blsSignatureBytes();
+      const message = warpMessageBytes();
+
+      const validUtxoAmount = BigInt(30 * 1e9);
+      const utxos = [
+        getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
+      ];
+
+      const unsignedTx = newRegisterSubnetValidatorTx(
+        {
+          balance,
+          blsSignature: signatureBytes,
+          fromAddressesBytes,
+          feeState,
+          message,
+          utxos,
+        },
+        testContext,
+      );
+
+      const { baseTx } = unsignedTx.getTx() as SetSubnetValidatorWeightTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+          additionalFee: balance,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new RegisterSubnetValidatorTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(validUtxoAmount - expectedFee)],
+          [getTransferableInputForTest(validUtxoAmount)],
+          new Uint8Array(),
+        ),
+        new BigIntPr(balance),
+        BlsSignature.fromSignatureBytes(signatureBytes),
+        new Bytes(message),
+      );
+
+      expectTxs(unsignedTx.getTx(), expectedTx);
     });
   });
 
@@ -1218,7 +1275,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
-          [getTransferableOutForTest(validUtxoAmount - expectedFee - balance)],
+          [getTransferableOutForTest(validUtxoAmount - expectedFee)],
           [getTransferableInputForTest(validUtxoAmount)],
           new Uint8Array(),
         ),

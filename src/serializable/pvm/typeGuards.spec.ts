@@ -22,6 +22,7 @@ import {
   isIncreaseBalanceTx,
   isDisableSubnetValidatorTx,
   isSetSubnetValidatorWeightTx,
+  isRegisterSubnetValidatorTx,
 } from './typeGuards';
 
 const cases: [any, TypeSymbols][] = [
@@ -43,6 +44,7 @@ const cases: [any, TypeSymbols][] = [
   [isTransferSubnetOwnershipTx, TypeSymbols.TransferSubnetOwnershipTx],
   [isTransformSubnetTx, TypeSymbols.TransformSubnetTx],
   [isConvertSubnetTx, TypeSymbols.ConvertSubnetTx],
+  [isRegisterSubnetValidatorTx, TypeSymbols.RegisterSubnetValidatorTx],
   [isSetSubnetValidatorWeightTx, TypeSymbols.SetSubnetValidatorWeightTx],
   [isIncreaseBalanceTx, TypeSymbols.IncreaseBalanceTx],
   [isDisableSubnetValidatorTx, TypeSymbols.DisableSubnetValidatorTx],

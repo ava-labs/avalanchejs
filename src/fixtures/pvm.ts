@@ -52,6 +52,7 @@ import {
   stringPrBytes,
   byte,
   byteByte,
+  blsSignature,
 } from './primitives';
 import {
   input,
@@ -69,6 +70,7 @@ import type { FeeState } from '../vms/pvm';
 import { ConvertSubnetTx } from '../serializable/pvm/convertSubnetTx';
 import { ConvertSubnetValidator } from '../serializable/fxs/pvm/convertSubnetValidator';
 import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
+import { RegisterSubnetValidatorTx } from '../serializable/pvm/registerSubnetValidatorTx';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -355,6 +357,17 @@ export const convertSubnetTxBytes = () =>
     makeListBytes(convertSubnetValidatorBytes)(),
     bytesForInt(10),
     inputBytes(),
+  );
+
+export const registerSubnetValidatorTx = () =>
+  new RegisterSubnetValidatorTx(baseTx(), bigIntPr(), blsSignature(), bytes());
+
+export const registerSubnetValidatorTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    bigIntPrBytes(),
+    blsSignatureBytes(),
+    bytesBytes(),
   );
 
 export const setSubnetValidatorWeightTx = () =>

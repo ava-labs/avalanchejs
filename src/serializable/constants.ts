@@ -20,6 +20,7 @@ export enum TypeSymbols {
   Id = 'common.Id',
   Address = 'common.Address',
   NodeId = 'common.NodeId',
+  BlsSignature = 'common.BlsSignature',
 
   // PRIMITIVES
   Int = 'primitives.Int',
@@ -82,6 +83,7 @@ export enum TypeSymbols {
 
   ConvertSubnetTx = 'pvm.ConvertSubnetTx',
   ConvertSubnetValidator = 'pvm.ConvertSubnetValidator',
+  RegisterSubnetValidatorTx = 'pvm.RegisterSubnetValidatorTx',
   SetSubnetValidatorWeightTx = 'pvm.SetSubnetValidatorWeightTx',
   IncreaseBalanceTx = 'pvm.IncreaseBalanceTx',
   DisableSubnetValidatorTx = 'pvm.DisableSubnetValidatorTx',

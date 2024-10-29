@@ -12,6 +12,7 @@ import {
 import type { TransferOutput } from '../../../serializable';
 import {
   BigIntPr,
+  BlsSignature,
   Input,
   NodeId,
   OutputOwners,
@@ -44,6 +45,7 @@ import {
   IncreaseBalanceTx,
   DisableSubnetValidatorTx,
   SetSubnetValidatorWeightTx,
+  RegisterSubnetValidatorTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
 import {
@@ -83,6 +85,7 @@ import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
 import {
   INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+  INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
 } from '../txs/fee/constants';
 import { getWarpComplexity } from '../txs/fee/complexity';
@@ -1451,6 +1454,106 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
       new Bytes(address),
       sortedValidators,
       Input.fromNative(subnetAuth),
+    ),
+    inputUTXOs,
+    addressMaps,
+  );
+};
+
+export type NewRegisterSubnetValidatorTx = TxProps<{
+  /**
+   * Must be less than or equal to the sum of the AVAX inputs minus
+   * the sum of the AVAX outputs minus the fee.
+   */
+  balance: bigint;
+  /**
+   * BLS signature of the key included in the `message`.
+   */
+  blsSignature: Uint8Array;
+  /**
+   * Warp message bytes.
+   *
+   * Expected to be a signed Warp message containing an AddressCall payload
+   * with the RegisterSubnetValidator message.
+   */
+  message: Uint8Array;
+}>;
+
+/**
+ * Creates a new unsigned PVM register subnet validator transaction
+ * (`RegisterSubnetValidatorTx`) using calculated dynamic fees.
+ *
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
+ */
+export const newRegisterSubnetValidatorTx: TxBuilderFn<
+  NewRegisterSubnetValidatorTx
+> = (
+  {
+    balance,
+    blsSignature,
+    changeAddressesBytes,
+    feeState,
+    fromAddressesBytes,
+    memo = new Uint8Array(),
+    message,
+    minIssuanceTime = BigInt(Math.floor(new Date().getTime() / 1000)),
+    utxos,
+  },
+  context,
+) => {
+  const messageBytes = new Bytes(message);
+
+  const toBurn = new Map<string, bigint>([[context.avaxAssetID, balance]]);
+
+  const bytesComplexity = getBytesComplexity(memo);
+  const warpComplexity = getWarpComplexity(messageBytes);
+
+  const complexity = addDimensions(
+    INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    bytesComplexity,
+    warpComplexity,
+  );
+
+  const spendResults = spend(
+    {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
+      excessAVAX: 0n,
+      feeState,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      minIssuanceTime,
+      toBurn,
+      utxos,
+    },
+    [useUnlockedUTXOs],
+    context,
+  );
+
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  });
+
+  return new UnsignedTx(
+    new RegisterSubnetValidatorTx(
+      AvaxBaseTx.fromNative(
+        context.networkID,
+        context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        memo,
+      ),
+      new BigIntPr(balance),
+      BlsSignature.fromSignatureBytes(blsSignature),
+      messageBytes,
     ),
     inputUTXOs,
     addressMaps,

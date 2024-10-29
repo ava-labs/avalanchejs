@@ -231,7 +231,7 @@ export const INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
     LONG_LEN + // balance
-    SIGNATURE_LENGTH + // proof of possession
+    BLS_SIGNATURE_LENGTH + // proof of possession
     INT_LEN, // message length
   [FeeDimensions.DBRead]: 0, // TODO: Implement
   [FeeDimensions.DBWrite]: 0, // TODO: Implement
