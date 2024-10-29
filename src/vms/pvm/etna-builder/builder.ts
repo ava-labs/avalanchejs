@@ -1467,13 +1467,14 @@ export type NewRegisterSubnetValidatorTx = TxProps<{
    */
   balance: bigint;
   /**
-   * BLS signature of the key included in the `message`.
+   * A BLS signature proving ownership of the BLS public key specified in the
+   * `message` for this validator.
    */
   blsSignature: Uint8Array;
   /**
    * Warp message bytes.
    *
-   * Expected to be a signed Warp message containing an AddressCall payload
+   * Expected to be a signed Warp message containing an AddressedCall payload
    * with the RegisterSubnetValidator message.
    */
   message: Uint8Array;
