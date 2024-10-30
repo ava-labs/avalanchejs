@@ -1350,7 +1350,7 @@ export type NewConvertSubnetTxProps = TxProps<{
    */
   subnetId: string;
   /**
-   * Specifies the address of the manager
+   * Specifies the address of the validator manager
    */
   address: Uint8Array;
   /**
@@ -1564,6 +1564,8 @@ export const newRegisterSubnetValidatorTx: TxBuilderFn<
 export type SetSubnetValidatorWeightTxProps = TxProps<{
   /**
    * Warp message bytes.
+   *
+   * A ValidatorWeight message payload.
    */
   message: Uint8Array;
 }>;
