@@ -46,8 +46,14 @@ export type UptimeResponse = {
   weightedAveragePercentage: string;
 };
 
+export type NodePOP = {
+  publicKey: string;
+  proofOfPossession: string;
+};
+
 export type GetNodeIdResponse = {
   nodeID: string;
+  nodePOP: NodePOP;
 };
 
 export type GetNodeIpResponse = {
