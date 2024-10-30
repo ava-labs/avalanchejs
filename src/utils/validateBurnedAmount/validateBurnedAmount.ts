@@ -23,6 +23,7 @@ import {
   isPvmBaseTx,
   isExportTx as isPvmExportTx,
   isImportTx as isPvmImportTx,
+  isRegisterSubnetValidatorTx,
   isRemoveSubnetValidatorTx,
   isSetSubnetValidatorWeightTx,
   isTransferSubnetOwnershipTx,
@@ -51,6 +52,7 @@ const isEtnaSupported = (tx: Transaction) => {
     isRemoveSubnetValidatorTx(tx) ||
     isTransferSubnetOwnershipTx(tx) ||
     isConvertSubnetTx(tx) ||
+    isRegisterSubnetValidatorTx(tx) ||
     isSetSubnetValidatorWeightTx(tx) ||
     isIncreaseBalanceTx(tx) ||
     isDisableSubnetValidatorTx(tx)

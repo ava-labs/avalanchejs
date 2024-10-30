@@ -22,6 +22,7 @@ import { ConvertSubnetTx } from './convertSubnetTx';
 import { IncreaseBalanceTx } from './increaseBalanceTx';
 import { DisableSubnetValidatorTx } from './disableSubnetValidatorTx';
 import { SetSubnetValidatorWeightTx } from './setSubnetValidatorWeightTx';
+import { RegisterSubnetValidatorTx } from './registerSubnetValidatorTx';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/codec.go#L35
@@ -63,8 +64,7 @@ export const codec = new Codec([
   BaseTx, // 34
 
   ConvertSubnetTx, // 35
-  // Replace these with the actual txs when they are implemented
-  ...new Array(1), // 36 RegisterSubnetValidatorTx
+  RegisterSubnetValidatorTx, // 36
   SetSubnetValidatorWeightTx, // 37
   IncreaseBalanceTx, // 38
   DisableSubnetValidatorTx, // 39

@@ -20,6 +20,7 @@ import type { ConvertSubnetTx } from './convertSubnetTx';
 import type { IncreaseBalanceTx } from './increaseBalanceTx';
 import type { DisableSubnetValidatorTx } from './disableSubnetValidatorTx';
 import type { SetSubnetValidatorWeightTx } from './setSubnetValidatorWeightTx';
+import type { RegisterSubnetValidatorTx } from './registerSubnetValidatorTx';
 
 export function isPvmBaseTx(tx: Transaction): tx is BaseTx {
   return tx._type === TypeSymbols.PvmBaseTx;
@@ -93,6 +94,12 @@ export function isRewardValidatorTx(tx: Transaction): tx is RewardValidatorTx {
 
 export function isConvertSubnetTx(tx: Transaction): tx is ConvertSubnetTx {
   return tx._type === TypeSymbols.ConvertSubnetTx;
+}
+
+export function isRegisterSubnetValidatorTx(
+  tx: Transaction,
+): tx is RegisterSubnetValidatorTx {
+  return tx._type === TypeSymbols.RegisterSubnetValidatorTx;
 }
 
 export function isSetSubnetValidatorWeightTx(
