@@ -44,9 +44,7 @@ const getSpendProps = (state: Partial<SpendReducerState> = {}): SpendProps => ({
 });
 
 describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
-  // TODO: Enable.
-  // Test is broken due to mocks not working. Needs investigation.
-  test.skip('calls spend reducers', () => {
+  test('calls spend reducers', () => {
     const testReducer = vi.fn<SpendReducerFunction>((state) => state);
 
     spend(getSpendProps({ excessAVAX: 1_000n }), [testReducer], testContext);
