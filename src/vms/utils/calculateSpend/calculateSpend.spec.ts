@@ -1,4 +1,6 @@
 import { BigIntPr, Int } from '../../../serializable/primitives';
+import { describe, it, expect } from 'vitest';
+
 import { testContext } from '../../../fixtures/context';
 import {
   fromAddressBytes,

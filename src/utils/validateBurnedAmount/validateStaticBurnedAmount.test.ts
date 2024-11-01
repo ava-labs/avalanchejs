@@ -1,4 +1,6 @@
 import { testAddress1, testAddress2 } from '../../fixtures/vms';
+import { describe, it, expect } from 'vitest';
+
 import { testContext } from '../../fixtures/context';
 import { Utxo } from '../../serializable/avax/utxo';
 import { utxoId } from '../../fixtures/avax';

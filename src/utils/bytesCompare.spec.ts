@@ -1,4 +1,5 @@
 import { bytesCompare, bytesEqual } from './bytesCompare';
+import { describe, it, expect } from 'vitest';
 
 describe('bytesCompare', () => {
   it('compares bytes', () => {

@@ -1,11 +1,10 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Codec, Manager } from '.';
 import { createAssetTx, createAssetTxBytes } from '../../fixtures/avax';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
 import { concatBytes } from '../../utils/buffer';
 import { CreateAssetTx } from '../avm/createAssetTx';
 import { Bytes, Short, Stringpr } from '../primitives';
-import { jest } from '@jest/globals';
-import type { Mock } from 'jest-mock';
 
 describe('Manager', () => {
   it('registers multiple codecs', () => {
@@ -37,14 +36,14 @@ describe('using the codecs', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('chooses the right codec', () => {
-    CreateAssetTx.fromBytes = jest.fn(() => [
+    CreateAssetTx.fromBytes = vi.fn<() => [CreateAssetTx, Uint8Array]>(() => [
       createAssetTx(),
       new Uint8Array(),
-    ]) as Mock<() => [CreateAssetTx, Uint8Array]>;
+    ]);
 
     const input = concatBytes(new Short(1).toBytes(), createAssetTxBytes());
 
@@ -58,7 +57,7 @@ describe('using the codecs', () => {
 
   it('packs with correct prefix', () => {
     const tx = createAssetTx();
-    codec1.PackPrefix = jest.fn(() =>
+    codec1.PackPrefix = vi.fn(() =>
       concatBytes(bytesForInt(2), createAssetTxBytes()),
     );
     const bytes = m.packCodec(tx, 1);

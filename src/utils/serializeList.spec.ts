@@ -1,4 +1,6 @@
 import { TransferableInput } from '../serializable/avax';
+import { describe, it, expect } from 'vitest';
+
 import { transferableInputs, transferableInputsBytes } from '../fixtures/avax';
 import { testCodec } from '../fixtures/codec';
 import { address, addressesBytes } from '../fixtures/common';

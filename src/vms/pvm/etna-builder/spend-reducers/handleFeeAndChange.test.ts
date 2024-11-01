@@ -1,5 +1,4 @@
-import { jest } from '@jest/globals';
-
+import { describe, expect, test, vi } from 'vitest';
 import { testContext } from '../../../../fixtures/context';
 import { handleFeeAndChange } from './handleFeeAndChange';
 import {
@@ -30,8 +29,8 @@ describe('handleFeeAndChange', () => {
   test('returns original state if excessAVAX equals the required fee', () => {
     const state = getInitialReducerState({ excessAVAX: 4n });
     const spendHelper = getSpendHelper();
-    const addChangeOutputSpy = jest.spyOn(spendHelper, 'addChangeOutput');
-    const calculateFeeSpy = jest.spyOn(spendHelper, 'calculateFee');
+    const addChangeOutputSpy = vi.spyOn(spendHelper, 'addChangeOutput');
+    const calculateFeeSpy = vi.spyOn(spendHelper, 'calculateFee');
 
     expect(handleFeeAndChange(state, spendHelper, testContext)).toEqual(state);
     expect(calculateFeeSpy).toHaveBeenCalledTimes(1);
@@ -46,8 +45,8 @@ describe('handleFeeAndChange', () => {
     });
     const spendHelper = getSpendHelper();
 
-    const addChangeOutputSpy = jest.spyOn(spendHelper, 'addChangeOutput');
-    const calculateFeeSpy = jest.spyOn(spendHelper, 'calculateFee');
+    const addChangeOutputSpy = vi.spyOn(spendHelper, 'addChangeOutput');
+    const calculateFeeSpy = vi.spyOn(spendHelper, 'calculateFee');
 
     expect(handleFeeAndChange(state, spendHelper, testContext)).toEqual({
       ...state,
@@ -76,7 +75,7 @@ describe('handleFeeAndChange', () => {
     });
     const spendHelper = getSpendHelper();
 
-    const addChangeOutputSpy = jest.spyOn(spendHelper, 'addChangeOutput');
+    const addChangeOutputSpy = vi.spyOn(spendHelper, 'addChangeOutput');
 
     expect(handleFeeAndChange(state, spendHelper, testContext)).toEqual(state);
 

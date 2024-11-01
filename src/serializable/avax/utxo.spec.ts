@@ -1,4 +1,6 @@
 import { hexToBuffer } from '../../utils/buffer';
+import { describe, it } from 'vitest';
+
 import { getPVMManager } from '../pvm/codec';
 import { Utxo } from './utxo';
 

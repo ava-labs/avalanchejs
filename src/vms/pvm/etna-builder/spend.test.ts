@@ -1,5 +1,4 @@
-import { jest } from '@jest/globals';
-
+import { describe, expect, test, vi } from 'vitest';
 import { testContext } from '../../../fixtures/context';
 import { Address, OutputOwners } from '../../../serializable';
 import { createDimensions } from '../../common/fees/dimensions';
@@ -14,9 +13,9 @@ import { spend } from './spend';
 import { feeState as testFeeState } from '../../../fixtures/pvm';
 import { bech32ToBytes } from '../../../utils';
 
-jest.mock('./spend-reducers', () => ({
-  verifyAssetsConsumed: jest.fn<SpendReducerFunction>((state) => state),
-  handleFeeAndChange: jest.fn<SpendReducerFunction>((state) => state),
+vi.mock('./spend-reducers', () => ({
+  verifyAssetsConsumed: vi.fn<SpendReducerFunction>((state) => state),
+  handleFeeAndChange: vi.fn<SpendReducerFunction>((state) => state),
 }));
 
 const CHANGE_ADDRESS = Address.fromString(
@@ -48,7 +47,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
   // TODO: Enable.
   // Test is broken due to mocks not working. Needs investigation.
   test.skip('calls spend reducers', () => {
-    const testReducer = jest.fn<SpendReducerFunction>((state) => state);
+    const testReducer = vi.fn<SpendReducerFunction>((state) => state);
 
     spend(getSpendProps({ excessAVAX: 1_000n }), [testReducer], testContext);
 
@@ -58,7 +57,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
   });
 
   test('catches thrown errors and re-throws', () => {
-    const testReducer = jest.fn<SpendReducerFunction>(() => {
+    const testReducer = vi.fn<SpendReducerFunction>(() => {
       throw new Error('Test error');
     });
 
@@ -68,7 +67,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
   });
 
   test('catches thrown non-error and throws error', () => {
-    const testReducer = jest.fn<SpendReducerFunction>(() => {
+    const testReducer = vi.fn<SpendReducerFunction>(() => {
       throw 'not-an-error';
     });
 
@@ -81,7 +80,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
     expect.assertions(1);
 
     const initialState = getSpendProps({ excessAVAX: 1_000n });
-    const testReducer = jest.fn<SpendReducerFunction>((state) => {
+    const testReducer = vi.fn<SpendReducerFunction>((state) => {
       expect(state.changeOutputOwners).toEqual(
         OutputOwners.fromNative(
           initialState.fromAddresses.map((address) => address.toBytes()),
@@ -106,7 +105,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
       changeOutputOwners: OWNERS,
       excessAVAX: 1_000n,
     });
-    const testReducer = jest.fn<SpendReducerFunction>((state) => {
+    const testReducer = vi.fn<SpendReducerFunction>((state) => {
       expect(state.changeOutputOwners).toBe(OWNERS);
       return state;
     });

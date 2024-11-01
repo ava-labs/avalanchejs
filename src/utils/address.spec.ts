@@ -1,4 +1,6 @@
 import { base58check } from './base58';
+import { describe, it, expect } from 'vitest';
+
 import { secp256k1 } from '../crypto';
 import * as address from './address';
 

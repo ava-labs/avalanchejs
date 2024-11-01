@@ -1,4 +1,6 @@
 import { UTXOID } from './utxoId';
+import { describe, it, expect } from 'vitest';
+
 import { utxoId, utxoIdBytes } from '../../fixtures/avax';
 import { testSerialization } from '../../fixtures/utils/serializable';
 import { Id } from '../fxs/common';

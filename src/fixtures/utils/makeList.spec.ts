@@ -1,4 +1,6 @@
 import { concatBytes } from '../../utils/buffer';
+import { describe, it, expect } from 'vitest';
+
 import { address, addressBytes } from '../common';
 import { bytesForInt } from './bytesFor';
 import { makeList, makeListBytes } from './makeList';

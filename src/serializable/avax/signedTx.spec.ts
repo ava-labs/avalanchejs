@@ -1,4 +1,6 @@
 import { signedTx, signedTxBytes } from '../../fixtures/avax';
+import { describe, it, expect } from 'vitest';
+
 import { getAVMManager } from '../avm/codec';
 import { SignedTx } from './signedTx';
 

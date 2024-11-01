@@ -1,5 +1,4 @@
-import { jest } from '@jest/globals';
-
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UnsignedTx } from '../vms';
 import { BaseTx as AvaxBaseTx, TransferableInput } from '../serializable/avax';
 import { bigIntPr, bytes, int } from '../fixtures/primitives';
@@ -22,12 +21,12 @@ import { secp256k1 } from '../crypto';
 
 describe('addTxSignatures', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('adds the signatures correctly', async () => {
-    const hasPubkeySpy = jest.spyOn(UnsignedTx.prototype, 'hasPubkey');
-    const addSignatureSpy = jest.spyOn(UnsignedTx.prototype, 'addSignature');
+    const hasPubkeySpy = vi.spyOn(UnsignedTx.prototype, 'hasPubkey');
+    const addSignatureSpy = vi.spyOn(UnsignedTx.prototype, 'addSignature');
     const unknownPrivateKey = hexToBuffer(
       '1d4ff8f6582d995354f5c03a28a043d22aa1bb6aa15879a632134aaf1f225cf4',
     );

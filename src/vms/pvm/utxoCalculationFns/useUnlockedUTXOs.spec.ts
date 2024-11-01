@@ -1,4 +1,6 @@
 import { fromAddressBytes, getValidUtxo } from '../../../fixtures/transactions';
+import { describe, it, expect } from 'vitest';
+
 import { addressesFromBytes } from '../../../utils';
 import { testContext } from '../../../fixtures/context';
 import { useUnlockedUTXOs } from './useUnlockedUTXOs';

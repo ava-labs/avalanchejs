@@ -1,4 +1,6 @@
 import { id, idBytes } from '../../../fixtures/common';
+import { describe, it, expect } from 'vitest';
+
 import { testSerialization } from '../../../fixtures/utils/serializable';
 import { Id } from './id';
 

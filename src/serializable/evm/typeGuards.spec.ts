@@ -4,6 +4,8 @@ import {
   isImportExportTx,
   isEvmTx,
 } from './typeGuards';
+import { describe, it, expect } from 'vitest';
+
 import { TypeSymbols } from '../constants';
 import type { Transaction } from '../../vms/common';
 import { onlyChecksOneGuard } from '../../fixtures/utils/typeguards';

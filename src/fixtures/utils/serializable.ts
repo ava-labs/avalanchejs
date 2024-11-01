@@ -1,4 +1,6 @@
 import type { Codec } from '../../serializable/codec';
+import { describe, it, expect } from 'vitest';
+
 import type {
   Serializable,
   SerializableStatic,

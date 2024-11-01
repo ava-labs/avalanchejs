@@ -1,4 +1,6 @@
 import { isStakeableLockOut, isTransferOut } from '../../utils';
+import { describe, it, expect } from 'vitest';
+
 import {
   getStakeableLockedTransferableOutForTest,
   getTransferableOutForTest,

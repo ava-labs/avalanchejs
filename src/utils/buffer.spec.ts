@@ -1,4 +1,5 @@
 import { bufferToBigInt, bufferToNumber, padLeft } from './buffer';
+import { describe, it, expect } from 'vitest';
 
 describe('bufferToBigInt', () => {
   it('converts Uint8Arrays correctly', async () => {

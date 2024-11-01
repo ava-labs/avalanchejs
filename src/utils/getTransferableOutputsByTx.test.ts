@@ -2,6 +2,8 @@ import {
   exportTx as evmExportTx,
   importTx as evmImportTx,
 } from '../fixtures/evm';
+import { describe, it, expect } from 'vitest';
+
 import { getTransferableOutputsByTx } from './getTransferableOutputsByTx';
 import {
   avmBaseTx,

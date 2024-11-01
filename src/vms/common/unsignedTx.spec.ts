@@ -3,6 +3,8 @@ import {
   transferableOutputs,
   utxoId,
 } from '../../fixtures/avax';
+import { describe, beforeEach, it, expect } from 'vitest';
+
 import { id } from '../../fixtures/common';
 import { bigIntPr, bytes, int } from '../../fixtures/primitives';
 import { signature, transferOutput } from '../../fixtures/secp256k1';

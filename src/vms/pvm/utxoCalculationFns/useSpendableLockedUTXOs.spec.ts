@@ -1,4 +1,6 @@
 import { Id } from '../../../serializable/fxs/common';
+import { describe, it, expect } from 'vitest';
+
 import { testContext } from '../../../fixtures/context';
 import {
   fromAddressBytes,

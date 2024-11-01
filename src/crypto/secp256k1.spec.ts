@@ -1,4 +1,6 @@
 import { sha256 } from '@noble/hashes/sha256';
+import { describe, it, expect } from 'vitest';
+
 import { base58check } from '../utils/base58';
 import { bufferToHex, hexToBuffer } from '../utils/buffer';
 import * as secp256k1 from './secp256k1';

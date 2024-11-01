@@ -1,4 +1,6 @@
 import { utils } from '../../../..';
+import { describe, test, expect } from 'vitest';
+
 import { utxoId } from '../../../../fixtures/avax';
 import { address, id } from '../../../../fixtures/common';
 import {

@@ -1,4 +1,5 @@
 import { base58, base58check } from './base58';
+import { describe, it, expect } from 'vitest';
 
 describe('base58', () => {
   it('encodes and decodes correctly', async () => {

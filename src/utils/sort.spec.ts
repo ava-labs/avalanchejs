@@ -1,43 +1,28 @@
-import { jest } from '@jest/globals';
+import { describe, expect, it, vi } from 'vitest';
 import { testCodec, testPVMCodec } from '../fixtures/codec';
 import {
   getStakeableLockedTransferableOutForTest,
   getTransferableOutForTest,
 } from '../fixtures/transactions';
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-jest.unstable_mockModule('./bytesCompare', () => ({
-  bytesCompare: jest.fn(),
-}));
-
-const { bytesCompare } = await import('./bytesCompare');
-const { compareTransferableOutputs } = await import('./sort');
+import { compareTransferableOutputs } from './sort';
 
 describe('compareTransferableOutputs', () => {
   const avmCodec = testCodec();
   const pvmCodec = testPVMCodec();
 
-  beforeEach(() => {
-    jest.restoreAllMocks();
-    (bytesCompare as jest.Mock).mockReturnValueOnce(-1);
-  });
-
   it('sorts transferable outputs correctly', () => {
     const transferableOutput1 = getTransferableOutForTest(1n);
     const transferableOutput2 = getTransferableOutForTest(2n);
 
-    const result = compareTransferableOutputs(
-      transferableOutput1,
-      transferableOutput2,
-    );
+    const toBytesMock1 = vi.spyOn(transferableOutput1, 'toBytes');
+    const toBytesMock2 = vi.spyOn(transferableOutput2, 'toBytes');
 
-    expect(result).toEqual(-1);
-    expect(bytesCompare).toBeCalledTimes(1);
-    expect(bytesCompare).toBeCalledWith(
-      transferableOutput1.toBytes(avmCodec),
-      transferableOutput2.toBytes(avmCodec),
-    );
+    compareTransferableOutputs(transferableOutput1, transferableOutput2);
+
+    expect(toBytesMock1).toBeCalledTimes(1);
+    expect(toBytesMock2).toBeCalledTimes(1);
+    expect(toBytesMock1).toBeCalledWith(avmCodec);
+    expect(toBytesMock2).toBeCalledWith(avmCodec);
   });
 
   it('sorts stakeable locked outs correctly', () => {
@@ -50,16 +35,15 @@ describe('compareTransferableOutputs', () => {
       200n,
     );
 
-    const result = compareTransferableOutputs(
-      transferableOutput1,
-      transferableOutput2,
-    );
+    const toBytesMock1 = vi.spyOn(transferableOutput1, 'toBytes');
+    const toBytesMock2 = vi.spyOn(transferableOutput2, 'toBytes');
 
-    expect(result).toEqual(-1);
-    expect(bytesCompare).toBeCalledWith(
-      transferableOutput1.toBytes(pvmCodec),
-      transferableOutput2.toBytes(pvmCodec),
-    );
+    compareTransferableOutputs(transferableOutput1, transferableOutput2);
+
+    expect(toBytesMock1).toBeCalledTimes(1);
+    expect(toBytesMock2).toBeCalledTimes(1);
+    expect(toBytesMock1).toBeCalledWith(pvmCodec);
+    expect(toBytesMock2).toBeCalledWith(pvmCodec);
   });
 
   it('sorts transferable outputs and stakeable locked outs correctly', () => {
@@ -69,15 +53,14 @@ describe('compareTransferableOutputs', () => {
       100n,
     );
 
-    const result = compareTransferableOutputs(
-      transferableOutput1,
-      transferableOutput2,
-    );
+    const toBytesMock1 = vi.spyOn(transferableOutput1, 'toBytes');
+    const toBytesMock2 = vi.spyOn(transferableOutput2, 'toBytes');
 
-    expect(result).toEqual(-1);
-    expect(bytesCompare).toBeCalledWith(
-      transferableOutput1.toBytes(avmCodec),
-      transferableOutput2.toBytes(pvmCodec),
-    );
+    compareTransferableOutputs(transferableOutput1, transferableOutput2);
+
+    expect(toBytesMock1).toBeCalledTimes(1);
+    expect(toBytesMock2).toBeCalledTimes(1);
+    expect(toBytesMock1).toBeCalledWith(avmCodec);
+    expect(toBytesMock2).toBeCalledWith(pvmCodec);
   });
 });

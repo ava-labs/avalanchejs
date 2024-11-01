@@ -1,4 +1,6 @@
 import { stringToBytes } from '@scure/base';
+import { describe, it, expect } from 'vitest';
+
 import { hexToBuffer } from '../utils/buffer';
 import * as bls from './bls';
 

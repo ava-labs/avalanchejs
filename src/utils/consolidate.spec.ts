@@ -1,4 +1,5 @@
 import { consolidate } from './consolidate';
+import { describe, it, expect } from 'vitest';
 
 describe('consolidate', () => {
   it('combines elements', () => {

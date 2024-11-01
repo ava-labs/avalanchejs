@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { address } from '../fixtures/common';
 import { Address } from '../serializable/fxs/common';
 import { AddressMap, AddressMaps, matchOwners } from './addressMap';
@@ -14,7 +14,7 @@ describe('AddressMap', () => {
   let testMap: AddressMap;
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     testMap = new AddressMap();
   });
 
@@ -40,7 +40,7 @@ describe('AddressMap', () => {
 
   describe('forEachHex', () => {
     it('iterates over the storage correctly', () => {
-      const callbackMock = jest.fn();
+      const callbackMock = vi.fn();
       testMap.set(testAddress1, 3);
       testMap.set(testAddress2, 1);
 
@@ -62,7 +62,7 @@ describe('AddressMap', () => {
     });
 
     it('reorders and iterates over the storage correctly', () => {
-      const callbackMock = jest.fn();
+      const callbackMock = vi.fn();
       testMap.set(testAddress1, 3);
       testMap.set(testAddress2, 1);
 
@@ -111,12 +111,12 @@ describe('AddressMaps', () => {
   testAddressMaps.push(testMap2);
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   describe('forEach', () => {
     it('iterates over the indices correctly', () => {
-      const callbackMock = jest.fn();
+      const callbackMock = vi.fn();
       testAddressMaps.forEach(callbackMock);
 
       expect(callbackMock).toBeCalledTimes(3);
@@ -141,7 +141,7 @@ describe('AddressMaps', () => {
     });
 
     it('iterates over the ordered indices correctly', () => {
-      const callbackMock = jest.fn();
+      const callbackMock = vi.fn();
       testAddressMaps.forEach(callbackMock, true);
 
       expect(callbackMock).toBeCalledTimes(3);
