@@ -1,5 +1,5 @@
 import { isStakeableLockOut, isTransferOut } from '../../utils';
-import { describe, it, expect } from 'vitest';
+import { assert, describe, it, expect } from 'vitest';
 
 import {
   getStakeableLockedTransferableOutForTest,
@@ -28,7 +28,7 @@ describe('consolidateOutputs', () => {
         conslidatedOutput.output.outputOwners.equals(a.output.outputOwners),
       ).toBeTruthy();
     } else {
-      fail(
+      assert.fail(
         'The consolidated output and first test output should both be transferOuts.',
       );
     }
@@ -60,7 +60,7 @@ describe('consolidateOutputs', () => {
           .equals(a.output.getOutputOwners()),
       ).toBeTruthy();
     } else {
-      fail(
+      assert.fail(
         'The consolidated output and first test output should both be stakeableLockouts.',
       );
     }
@@ -91,7 +91,7 @@ describe('consolidateOutputs', () => {
         consolidated[0].output.outputOwners.equals(tOutA.output.outputOwners),
       ).toBeTruthy();
     } else {
-      fail(
+      assert.fail(
         'The consolidated output and first test output should both be transferOuts.',
       );
     }
@@ -110,7 +110,7 @@ describe('consolidateOutputs', () => {
           .equals(stlOutA.output.getOutputOwners()),
       ).toBeTruthy();
     } else {
-      fail(
+      assert.fail(
         'The consolidated output and third test output should both be stakeableLockouts.',
       );
     }
