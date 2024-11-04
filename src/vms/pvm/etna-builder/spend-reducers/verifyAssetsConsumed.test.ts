@@ -1,5 +1,4 @@
-import { jest } from '@jest/globals';
-
+import { describe, expect, test, vi } from 'vitest';
 import { testContext } from '../../../../fixtures/context';
 import { getInitialReducerState, getSpendHelper } from './fixtures/reducers';
 import { verifyAssetsConsumed } from './verifyAssetsConsumed';
@@ -8,7 +7,7 @@ describe('verifyAssetsConsumed', () => {
   test('returns original state if all assets are consumed', () => {
     const initialState = getInitialReducerState();
     const spendHelper = getSpendHelper();
-    const spy = jest.spyOn(spendHelper, 'verifyAssetsConsumed');
+    const spy = vi.spyOn(spendHelper, 'verifyAssetsConsumed');
 
     const state = verifyAssetsConsumed(initialState, spendHelper, testContext);
 
@@ -22,7 +21,7 @@ describe('verifyAssetsConsumed', () => {
 
     // Mock the verifyAssetsConsumed method to throw an error
     // Testing for this function can be found in the spendHelper.test.ts file
-    spendHelper.verifyAssetsConsumed = jest.fn(() => {
+    spendHelper.verifyAssetsConsumed = vi.fn(() => {
       throw new Error('Test error');
     });
 

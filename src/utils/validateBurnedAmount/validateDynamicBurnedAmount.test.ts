@@ -1,4 +1,5 @@
 import { validateDynamicBurnedAmount } from './validateDynamicBurnedAmount';
+import { describe, it, expect } from 'vitest';
 
 describe('validateDynamicBurnedAmount', () => {
   it('throws an expected error if feeTolerance is less than 1', () => {

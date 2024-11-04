@@ -3,6 +3,8 @@ import {
   importTx as avmImportTx,
   transferableInputs,
 } from '../fixtures/avax';
+import { describe, it, expect } from 'vitest';
+
 import { importTx as pvmImportTx } from '../fixtures/pvm';
 import {
   importTx as evmImportTx,

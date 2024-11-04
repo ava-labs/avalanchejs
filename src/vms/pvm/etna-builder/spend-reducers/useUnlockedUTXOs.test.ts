@@ -1,4 +1,6 @@
 import { testContext } from '../../../../fixtures/context';
+import { describe, test, expect, it } from 'vitest';
+
 import { getUsableUTXOsFilter, useUnlockedUTXOs } from './useUnlockedUTXOs';
 import { getInitialReducerState, getSpendHelper } from './fixtures/reducers';
 import {

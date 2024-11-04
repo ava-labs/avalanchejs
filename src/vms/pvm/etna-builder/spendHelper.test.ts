@@ -3,6 +3,8 @@ import {
   transferableOutput,
   utxo,
 } from '../../../fixtures/avax';
+import { describe, test, expect } from 'vitest';
+
 import { id } from '../../../fixtures/common';
 import { stakeableLockOut } from '../../../fixtures/pvm';
 import { TransferableOutput } from '../../../serializable';
