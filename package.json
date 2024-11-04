@@ -43,8 +43,8 @@
     "micro-eth-signer": "0.7.2"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.7.1",
-    "@commitlint/config-conventional": "17.7.0",
+    "@commitlint/cli": "19.5.0",
+    "@commitlint/config-conventional": "19.5.0",
     "@rollup/plugin-node-resolve": "15.2.3",
     "@rollup/plugin-terser": "0.4.3",
     "@rollup/plugin-typescript": "11.1.6",
@@ -56,7 +56,7 @@
     "@types/node": "20.11.10",
     "@typescript-eslint/eslint-plugin": "6.18.1",
     "@typescript-eslint/parser": "6.18.1",
-    "commitizen": "4.3.0",
+    "commitizen": "4.3.1",
     "cz-conventional-changelog": "3.3.0",
     "dotenv": "16.4.2",
     "eslint": "8.49.0",
@@ -76,10 +76,10 @@
   },
   "packageManager": "yarn@1.22.19",
   "engines": {
-    "node": "^20"
+    "node": ">=20"
   },
   "volta": {
-    "node": "20.11.0",
+    "node": "22.11.0",
     "yarn": "1.22.19"
   },
   "repository": {
@@ -100,10 +100,6 @@
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }
-  },
-  "resolutions": {
-    "http-cache-semantics": "4.1.1",
-    "json5": "2.2.3"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
