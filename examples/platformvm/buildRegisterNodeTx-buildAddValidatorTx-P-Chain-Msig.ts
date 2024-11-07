@@ -137,7 +137,6 @@ const sendAddValidatorTx = async (): Promise<any> => {
 
   const unsignedTx: UnsignedTx = await pchain.buildCaminoAddValidatorTx(
     utxoSet,
-    [msigAlias],
     [[msigAlias], pAddressStrings],
     [msigAlias],
     nodeID,

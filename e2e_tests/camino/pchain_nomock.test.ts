@@ -160,7 +160,6 @@ describe("Camino-PChain-Add-Validator", (): void => {
             dummyUtxoSet,
             [P(addrAdminString)],
             [P(addrAdminString)],
-            [P(addrAdminString)],
             adminNodeId,
             {
               address: P(addrAdminString),
@@ -189,7 +188,6 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             dummyUtxoSet,
-            [P(addrAdminString)],
             [P(addrAdminString)],
             [P(addrAdminString)],
             node6Id,
@@ -263,7 +261,6 @@ describe("Camino-PChain-Add-Validator", (): void => {
           const stakeAmount: any = await pChain.getMinStake()
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             dummyUtxoSet,
-            [P(addrBString)], // "X-kopernikus1s93gzmzuvv7gz8q4l83xccrdchh8mtm3xm5s2g"
             [P(addrBString)],
             [P(addrBString)],
             node6Id,
@@ -1301,7 +1298,6 @@ describe("Camino-PChain-Multisig", (): void => {
 
           const unsignedTx: UnsignedTx = await pChain.buildCaminoAddValidatorTx(
             utxoSet,
-            [P(multiSigAliasAddr)],
             [[P(multiSigAliasAddr)], [pAddressStrings[5]]],
             [P(multiSigAliasAddr)],
             node7Id, // the node where the alias is registered

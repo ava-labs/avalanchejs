@@ -2307,7 +2307,6 @@ export class PlatformVMAPI extends JRPCAPI {
    */
   buildCaminoAddValidatorTx = async (
     utxoset: UTXOSet,
-    toAddresses: string[],
     fromAddresses: FromType,
     changeAddresses: string[],
     nodeID: string,
@@ -2324,8 +2323,6 @@ export class PlatformVMAPI extends JRPCAPI {
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     const caller = "buildCaminoAddValidatorTx"
-
-    const to: Buffer[] = this._cleanAddressArrayBuffer(toAddresses, caller)
 
     const fromSigner = this._parseFromSigner(fromAddresses, caller)
 
@@ -2372,7 +2369,6 @@ export class PlatformVMAPI extends JRPCAPI {
     ).buildCaminoAddValidatorTx(
       this.core.getNetworkID(),
       bintools.cb58Decode(this.blockchainID),
-      to,
       fromSigner,
       change,
       NodeIDStringToBuffer(nodeID),
