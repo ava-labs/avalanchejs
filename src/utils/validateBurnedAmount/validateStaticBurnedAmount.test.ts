@@ -222,7 +222,7 @@ describe('validateStaticBurnedAmount', () => {
         1,
         2,
         3,
-        4,
+        4n,
         5,
         6,
         [0, 2],
