@@ -5,6 +5,7 @@ export * as avmSerial from './avm';
 export * as evmSerial from './evm';
 export * from './fxs/secp256k1';
 export * from './fxs/common';
+export * from './fxs/pvm';
 export * as pvmSerial from './pvm';
 export * from './primitives';
 export * from './constants';
