@@ -342,11 +342,6 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.49.0.tgz#86f79756004a97fa4df866835093f1df3d03c333"
   integrity sha512-1S8uAY/MTJqVx0SC4epBq+N2yhuwtNwLbJYNZyhL2pO1ZVKn5HFXav5T41Ryzy9K9V7ZId2JB2oy/W4aCd9/2w==
 
-"@ethereumjs/rlp@5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@ethereumjs/rlp/-/rlp-5.0.0.tgz#dd81b32b2237bc32fb1b54534f8ff246a6c89d9b"
-  integrity sha512-WuS1l7GJmB0n0HsXLozCoEFc9IwYgf3l0gCkKVYgR67puVF1O4OpEaN0hWmm1c+iHUHFCKt1hJrvy5toLg+6ag==
-
 "@gar/promisify@^1.1.3":
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
@@ -450,22 +445,34 @@
   dependencies:
     "@noble/hashes" "1.3.2"
 
-"@noble/curves@1.3.0", "@noble/curves@~1.3.0":
+"@noble/curves@1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.3.0.tgz#01be46da4fd195822dab821e72f71bf4aeec635e"
   integrity sha512-t01iSXPuN+Eqzb4eBX0S5oubSqXbK/xXa1Ne18Hj8f9pStxztHCE2gfboSp/dZRLSqfuLpRK2nDXDK+W9puocA==
   dependencies:
     "@noble/hashes" "1.3.3"
 
+"@noble/curves@~1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.6.0.tgz#be5296ebcd5a1730fccea4786d420f87abfeb40b"
+  integrity sha512-TlaHRXDehJuRNR9TfZDNQ45mMEd5dwUwmicsafcIX4SsNiqnCHKjE/1alYPd/lDRVhxdhUAlv8uEhMCI5zjIJQ==
+  dependencies:
+    "@noble/hashes" "1.5.0"
+
 "@noble/hashes@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.2.tgz#6f26dbc8fbc7205873ce3cee2f690eba0d421b39"
   integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
 
-"@noble/hashes@1.3.3", "@noble/hashes@~1.3.3":
+"@noble/hashes@1.3.3":
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.3.tgz#39908da56a4adc270147bb07968bf3b16cfe1699"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
+
+"@noble/hashes@1.5.0", "@noble/hashes@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.5.0.tgz#abadc5ca20332db2b1b2aa3e496e9af1213570b0"
+  integrity sha512-1j6kQFb7QRru7eKN3ZDvRcP13rugwdxZqCjbiAVZfIJwgj2A65UmT4TgARXGlXgnRkORLTDTrO19ZErt7+QXgA==
 
 "@noble/secp256k1@2.0.0":
   version "2.0.0"
@@ -4275,21 +4282,19 @@ merge@^2.1.1:
   resolved "https://registry.yarnpkg.com/merge/-/merge-2.1.1.tgz#59ef4bf7e0b3e879186436e8481c06a6c162ca98"
   integrity sha512-jz+Cfrg9GWOZbQAnDQ4hlVnQky+341Yk5ru8bZSe6sIDTCIg8n9i/u7hSQGSVOF3C7lH6mGtqjkiT9G4wFLL0w==
 
-micro-eth-signer@0.7.2:
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/micro-eth-signer/-/micro-eth-signer-0.7.2.tgz#e07b6524ce47a75d80752eaba69823396529b2a2"
-  integrity sha512-uFH23nqPNdg2KZ9ZdvLG4GO3bTAOWRhwGTsecY4Et2IdQOJ26x6inu8lJ9oyslnYL/0o1vnETCGhMimMvO0SqQ==
+micro-eth-signer@0.12.2:
+  version "0.12.2"
+  resolved "https://registry.yarnpkg.com/micro-eth-signer/-/micro-eth-signer-0.12.2.tgz#5c3e06fa5e1758dd6db96a495fac055b2dcfb5a8"
+  integrity sha512-QW6alq+3e6TOW9cjhUpX0TxG8RxcNsH8eXiM4jJErpYKrvG/aP9OqElGQMbBdBWzGvCPjfP+knrPXwCH0rwCgA==
   dependencies:
-    "@ethereumjs/rlp" "5.0.0"
-    "@noble/curves" "~1.3.0"
-    "@noble/hashes" "~1.3.3"
-    "@scure/base" "~1.1.5"
-    micro-packed "~0.5.1"
+    "@noble/curves" "~1.6.0"
+    "@noble/hashes" "~1.5.0"
+    micro-packed "~0.6.3"
 
-micro-packed@~0.5.1:
-  version "0.5.3"
-  resolved "https://registry.yarnpkg.com/micro-packed/-/micro-packed-0.5.3.tgz#b2bc45ccf10347b5f253d3a566f0c86fc0652445"
-  integrity sha512-zWRoH+qUb/ZMp9gVZhexvRGCENDM5HEQF4sflqpdilUHWK2/zKR7/MT8GBctnTwbhNJwy1iuk5q6+TYP7/twYA==
+micro-packed@~0.6.3:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/micro-packed/-/micro-packed-0.6.3.tgz#125e36bcfd4aa03dbdb31c81cda3bfea84367ae0"
+  integrity sha512-VmVkyc7lIzAq/XCPFuLc/CwQ7Ehs5XDK3IwqsZHiBIDttAI9Gs7go6Lv4lNRuAIKrGKcRTtthFKUNyHS0S4wJQ==
   dependencies:
     "@scure/base" "~1.1.5"
 
