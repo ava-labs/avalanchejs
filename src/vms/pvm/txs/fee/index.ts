@@ -22,3 +22,5 @@ export {
   getBytesComplexity,
   getConvertSubnetValidatorsComplexity,
 } from './complexity';
+
+export { calculateFee } from './calculator';
