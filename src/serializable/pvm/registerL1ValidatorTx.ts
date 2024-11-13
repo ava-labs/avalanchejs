@@ -8,8 +8,8 @@ import { BigIntPr, Bytes } from '../primitives';
 import { PVMTx } from './abstractTx';
 
 @serializable()
-export class RegisterSubnetValidatorTx extends PVMTx {
-  _type = TypeSymbols.RegisterSubnetValidatorTx;
+export class RegisterL1ValidatorTx extends PVMTx {
+  _type = TypeSymbols.RegisterL1ValidatorTx;
 
   constructor(
     public readonly baseTx: BaseTx,
@@ -23,14 +23,14 @@ export class RegisterSubnetValidatorTx extends PVMTx {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [registerSubnetValidatorTx: RegisterSubnetValidatorTx, rest: Uint8Array] {
+  ): [registerSubnetValidatorTx: RegisterL1ValidatorTx, rest: Uint8Array] {
     const [baseTx, balance, blsSignature, message, rest] = unpack(
       bytes,
       [BaseTx, BigIntPr, BlsSignature, Bytes],
       codec,
     );
     return [
-      new RegisterSubnetValidatorTx(baseTx, balance, blsSignature, message),
+      new RegisterL1ValidatorTx(baseTx, balance, blsSignature, message),
       rest,
     ];
   }

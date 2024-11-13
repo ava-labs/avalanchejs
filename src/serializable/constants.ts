@@ -81,12 +81,12 @@ export enum TypeSymbols {
   TransformSubnetTx = 'pvm.TransformSubnetTx',
   TransferSubnetOwnershipTx = 'pvm.TransferSubnetOwnershipTx',
 
-  ConvertSubnetTx = 'pvm.ConvertSubnetTx',
-  ConvertSubnetValidator = 'pvm.ConvertSubnetValidator',
-  RegisterSubnetValidatorTx = 'pvm.RegisterSubnetValidatorTx',
-  SetSubnetValidatorWeightTx = 'pvm.SetSubnetValidatorWeightTx',
-  IncreaseBalanceTx = 'pvm.IncreaseBalanceTx',
-  DisableSubnetValidatorTx = 'pvm.DisableSubnetValidatorTx',
+  L1Validator = 'pvm.L1Validator',
+  ConvertSubnetToL1Tx = 'pvm.ConvertSubnetToL1Tx',
+  RegisterL1ValidatorTx = 'pvm.RegisterL1ValidatorTx',
+  SetL1ValidatorWeightTx = 'pvm.SetL1ValidatorWeightTx',
+  IncreaseL1ValidatorBalanceTx = 'pvm.IncreaseL1ValidatorBalanceTx',
+  DisableL1ValidatorTx = 'pvm.DisableL1ValidatorTx',
 
   PChainOwner = 'pvm.PChainOwner',
 

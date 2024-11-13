@@ -41,11 +41,11 @@ import {
   RemoveSubnetValidatorTx,
   SubnetValidator,
   TransferSubnetOwnershipTx,
-  ConvertSubnetTx,
-  IncreaseBalanceTx,
-  DisableSubnetValidatorTx,
-  SetSubnetValidatorWeightTx,
-  RegisterSubnetValidatorTx,
+  ConvertSubnetToL1Tx,
+  IncreaseL1ValidatorBalanceTx,
+  DisableL1ValidatorTx,
+  SetL1ValidatorWeightTx,
+  RegisterL1ValidatorTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
 import {
@@ -71,7 +71,7 @@ import {
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
-  INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
+  INTRINSIC_CONVERT_SUBNET_TO_L1_TX_COMPLEXITIES,
   getAuthComplexity,
   getInputComplexity,
   getOutputComplexity,
@@ -82,11 +82,11 @@ import {
 } from '../txs/fee';
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
-import type { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
+import type { L1Validator } from '../../../serializable/fxs/pvm/L1Validator';
 import {
   INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
-  INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
-  INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
+  INTRINSIC_REGISTER_L1_VALIDATOR_TX_COMPLEXITIES,
+  INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
 } from '../txs/fee/constants';
 import { getWarpComplexity } from '../txs/fee/complexity';
 
@@ -1340,7 +1340,7 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
   );
 };
 
-export type NewConvertSubnetTxProps = TxProps<{
+export type NewConvertSubnetToL1TxProps = TxProps<{
   /**
    * Specifies which chain the manager is deployed on
    */
@@ -1354,9 +1354,9 @@ export type NewConvertSubnetTxProps = TxProps<{
    */
   address: Uint8Array;
   /**
-   * Initial pay-as-you-go validators for the Subnet
+   * Initial continuous-fee-paying validators for the L1
    */
-  validators: ConvertSubnetValidator[];
+  validators: L1Validator[];
   /**
    * Indices of existing subnet owners.
    */
@@ -1364,14 +1364,16 @@ export type NewConvertSubnetTxProps = TxProps<{
 }>;
 
 /**
- * Creates a new unsigned PVM convert subnet transaction
- * (`ConvertSubnetTx`) using calculated dynamic fees.
+ * Creates a new unsigned PVM convert subnet to L1 transaction
+ * (`ConvertSubnetToL1Tx`) using calculated dynamic fees.
  *
  * @param props
  * @param context
  * @returns An UnsignedTx.
  */
-export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
+export const newConvertSubnetToL1Tx: TxBuilderFn<
+  NewConvertSubnetToL1TxProps
+> = (
   {
     address,
     chainId,
@@ -1408,7 +1410,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   }
 
   const complexity = addDimensions(
-    INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
+    INTRINSIC_CONVERT_SUBNET_TO_L1_TX_COMPLEXITIES,
     bytesComplexity,
     validatorComplexity,
     authComplexity,
@@ -1441,7 +1443,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   });
 
   return new UnsignedTx(
-    new ConvertSubnetTx(
+    new ConvertSubnetToL1Tx(
       AvaxBaseTx.fromNative(
         context.networkID,
         context.pBlockchainID,
@@ -1460,7 +1462,7 @@ export const newConvertSubnetTx: TxBuilderFn<NewConvertSubnetTxProps> = (
   );
 };
 
-export type NewRegisterSubnetValidatorTx = TxProps<{
+export type NewRegisterL1ValidatorTx = TxProps<{
   /**
    * Must be less than or equal to the sum of the AVAX inputs minus
    * the sum of the AVAX outputs minus the fee.
@@ -1475,22 +1477,20 @@ export type NewRegisterSubnetValidatorTx = TxProps<{
    * Warp message bytes.
    *
    * Expected to be a signed Warp message containing an AddressedCall payload
-   * with the RegisterSubnetValidator message.
+   * with the RegisterL1ValidatorMessage.
    */
   message: Uint8Array;
 }>;
 
 /**
- * Creates a new unsigned PVM register subnet validator transaction
- * (`RegisterSubnetValidatorTx`) using calculated dynamic fees.
+ * Creates a new unsigned PVM register L1 validator transaction
+ * (`RegisterL1ValidatorTx`) using calculated dynamic fees.
  *
  * @param props
  * @param context
  * @returns An UnsignedTx.
  */
-export const newRegisterSubnetValidatorTx: TxBuilderFn<
-  NewRegisterSubnetValidatorTx
-> = (
+export const newRegisterL1ValidatorTx: TxBuilderFn<NewRegisterL1ValidatorTx> = (
   {
     balance,
     blsSignature,
@@ -1512,7 +1512,7 @@ export const newRegisterSubnetValidatorTx: TxBuilderFn<
   const warpComplexity = getWarpComplexity(messageBytes);
 
   const complexity = addDimensions(
-    INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    INTRINSIC_REGISTER_L1_VALIDATOR_TX_COMPLEXITIES,
     bytesComplexity,
     warpComplexity,
   );
@@ -1544,7 +1544,7 @@ export const newRegisterSubnetValidatorTx: TxBuilderFn<
   });
 
   return new UnsignedTx(
-    new RegisterSubnetValidatorTx(
+    new RegisterL1ValidatorTx(
       AvaxBaseTx.fromNative(
         context.networkID,
         context.pBlockchainID,
@@ -1561,25 +1561,25 @@ export const newRegisterSubnetValidatorTx: TxBuilderFn<
   );
 };
 
-export type SetSubnetValidatorWeightTxProps = TxProps<{
+export type SetL1ValidatorWeightTxProps = TxProps<{
   /**
    * Warp message bytes.
    *
-   * A ValidatorWeight message payload.
+   * A L1ValidatorWeightMessage payload.
    */
   message: Uint8Array;
 }>;
 
 /**
- * Creates a new unsigned PVM set subnet validator weight transaction
- * (`SetSubnetValidatorWeightTx`) using calculated dynamic fees.
+ * Creates a new unsigned PVM set L1 validator weight transaction
+ * (`SetL1ValidatorWeightTx`) using calculated dynamic fees.
  *
  * @param props
  * @param context
  * @returns An UnsignedTx.
  */
-export const newSetSubnetValidatorWeightTx: TxBuilderFn<
-  SetSubnetValidatorWeightTxProps
+export const newSetL1ValidatorWeightTx: TxBuilderFn<
+  SetL1ValidatorWeightTxProps
 > = (
   {
     changeAddressesBytes,
@@ -1598,7 +1598,7 @@ export const newSetSubnetValidatorWeightTx: TxBuilderFn<
   const warpComplexity = getWarpComplexity(messageBytes);
 
   const complexity = addDimensions(
-    INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
+    INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
     memoComplexity,
     warpComplexity,
   );
@@ -1629,7 +1629,7 @@ export const newSetSubnetValidatorWeightTx: TxBuilderFn<
   });
 
   return new UnsignedTx(
-    new SetSubnetValidatorWeightTx(
+    new SetL1ValidatorWeightTx(
       AvaxBaseTx.fromNative(
         context.networkID,
         context.pBlockchainID,
@@ -1644,7 +1644,7 @@ export const newSetSubnetValidatorWeightTx: TxBuilderFn<
   );
 };
 
-export type IncreaseBalanceTxProps = TxProps<{
+export type IncreaseL1ValidatorBalanceTxProps = TxProps<{
   /**
    * Amount to increase the balance by.
    *
@@ -1658,14 +1658,16 @@ export type IncreaseBalanceTxProps = TxProps<{
 }>;
 
 /**
- * Creates a new unsigned PVM increase balance transaction
- * (`IncreaseBalanceTx`) using calculated dynamic fees.
+ * Creates a new unsigned PVM increase L1 validator balance transaction
+ * (`IncreaseL1ValidatorBalanceTx`) using calculated dynamic fees.
  *
  * @param props
  * @param context
  * @returns An UnsignedTx.
  */
-export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
+export const newIncreaseL1ValidatorBalanceTx: TxBuilderFn<
+  IncreaseL1ValidatorBalanceTxProps
+> = (
   {
     balance,
     changeAddressesBytes,
@@ -1719,7 +1721,7 @@ export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
   });
 
   return new UnsignedTx(
-    new IncreaseBalanceTx(
+    new IncreaseL1ValidatorBalanceTx(
       AvaxBaseTx.fromNative(
         context.networkID,
         context.pBlockchainID,
@@ -1735,7 +1737,7 @@ export const newIncreaseBalanceTx: TxBuilderFn<IncreaseBalanceTxProps> = (
   );
 };
 
-export type DisableSubnetValidatorTxProps = TxProps<{
+export type DisableL1ValidatorTxProps = TxProps<{
   /**
    * Indices of owners.
    */
@@ -1748,15 +1750,13 @@ export type DisableSubnetValidatorTxProps = TxProps<{
 
 /**
  * Creates a new unsigned PVM disable subnet validator transaction
- * (`DisableSubnetValidatorTx`) using calculated dynamic fees.
+ * (`DisableL1ValidatorTx`) using calculated dynamic fees.
  *
  * @param props
  * @param context
  * @returns An UnsignedTx.
  */
-export const newDisableSubnetValidatorTx: TxBuilderFn<
-  DisableSubnetValidatorTxProps
-> = (
+export const newDisableL1ValidatorTx: TxBuilderFn<DisableL1ValidatorTxProps> = (
   {
     changeAddressesBytes,
     disableAuth,
@@ -1807,7 +1807,7 @@ export const newDisableSubnetValidatorTx: TxBuilderFn<
   });
 
   return new UnsignedTx(
-    new DisableSubnetValidatorTx(
+    new DisableL1ValidatorTx(
       AvaxBaseTx.fromNative(
         context.networkID,
         context.pBlockchainID,

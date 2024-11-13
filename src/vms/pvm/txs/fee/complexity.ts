@@ -25,11 +25,11 @@ import type {
   ImportTx,
   RemoveSubnetValidatorTx,
   TransferSubnetOwnershipTx,
-  ConvertSubnetTx,
-  IncreaseBalanceTx,
-  DisableSubnetValidatorTx,
-  SetSubnetValidatorWeightTx,
-  RegisterSubnetValidatorTx,
+  ConvertSubnetToL1Tx,
+  IncreaseL1ValidatorBalanceTx,
+  DisableL1ValidatorTx,
+  SetL1ValidatorWeightTx,
+  RegisterL1ValidatorTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -37,17 +37,17 @@ import {
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
   isAddSubnetValidatorTx,
-  isConvertSubnetTx,
+  isConvertSubnetToL1Tx,
   isCreateChainTx,
   isCreateSubnetTx,
-  isDisableSubnetValidatorTx,
+  isDisableL1ValidatorTx,
   isExportTx,
   isImportTx,
-  isIncreaseBalanceTx,
+  isIncreaseL1ValidatorBalanceTx,
   isPvmBaseTx,
-  isRegisterSubnetValidatorTx,
+  isRegisterL1ValidatorTx,
   isRemoveSubnetValidatorTx,
-  isSetSubnetValidatorWeightTx,
+  isSetL1ValidatorWeightTx,
   isTransferSubnetOwnershipTx,
 } from '../../../../serializable/pvm';
 import {
@@ -69,11 +69,11 @@ import {
   INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_BASE_TX_COMPLEXITIES,
-  INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
-  INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES,
+  INTRINSIC_CONVERT_SUBNET_TO_L1_TX_COMPLEXITIES,
+  INTRINSIC_L1_VALIDATOR_COMPLEXITIES,
   INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES,
   INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES,
-  INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+  INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_EXPORT_TX_COMPLEXITIES,
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
   INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
@@ -83,19 +83,19 @@ import {
   INTRINSIC_OUTPUT_BANDWIDTH,
   INTRINSIC_OUTPUT_DB_WRITE,
   INTRINSIC_POP_BANDWIDTH,
-  INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+  INTRINSIC_REGISTER_L1_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_OUTPUT_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_OUTPUT_OWNERS_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH,
   INTRINSIC_SECP256K1_FX_TRANSFERABLE_INPUT_BANDWIDTH,
-  INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
+  INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
   INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH,
   INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
 } from './constants';
-import type { ConvertSubnetValidator } from '../../../../serializable/fxs/pvm/convertSubnetValidator';
+import type { L1Validator } from '../../../../serializable/fxs/pvm/L1Validator';
 
 /**
  * Returns the complexity outputs add to a transaction.
@@ -246,22 +246,19 @@ export const getWarpComplexity = (message: Bytes): Dimensions => {
   });
 };
 
-export const getConvertSubnetValidatorsComplexity = (
-  validators: ConvertSubnetValidator[],
+export const getL1ValidatorsComplexity = (
+  validators: L1Validator[],
 ): Dimensions => {
   let complexity = createEmptyDimensions();
 
   for (const validator of validators) {
-    complexity = addDimensions(
-      complexity,
-      getConvertSubnetValidatorComplexity(validator),
-    );
+    complexity = addDimensions(complexity, getL1ValidatorComplexity(validator));
   }
   return complexity;
 };
 
-export const getConvertSubnetValidatorComplexity = (
-  validator: ConvertSubnetValidator,
+export const getL1ValidatorComplexity = (
+  validator: L1Validator,
 ): Dimensions => {
   const nodeIdComplexity = getBytesComplexity(validator.nodeId);
   const signerComplexity = getSignerComplexity(validator.signer);
@@ -275,7 +272,7 @@ export const getConvertSubnetValidatorComplexity = (
     compute: 0,
   });
   return addDimensions(
-    INTRINSIC_CONVERT_SUBNET_VALIDATOR_COMPLEXITIES,
+    INTRINSIC_L1_VALIDATOR_COMPLEXITIES,
     nodeIdComplexity,
     signerComplexity,
     addressComplexity,
@@ -395,46 +392,44 @@ const transferSubnetOwnershipTx = (
   );
 };
 
-const convertSubnetTx = (tx: ConvertSubnetTx): Dimensions => {
+const convertSubnetToL1Tx = (tx: ConvertSubnetToL1Tx): Dimensions => {
   return addDimensions(
-    INTRINSIC_CONVERT_SUBNET_TX_COMPLEXITIES,
+    INTRINSIC_CONVERT_SUBNET_TO_L1_TX_COMPLEXITIES,
     getBytesComplexity(tx.address),
     getBaseTxComplexity(tx.baseTx),
     getAuthComplexity(tx.subnetAuth),
-    getConvertSubnetValidatorsComplexity(tx.validators),
+    getL1ValidatorsComplexity(tx.validators),
   );
 };
 
-const registerSubnetValidatorTx = (
-  tx: RegisterSubnetValidatorTx,
-): Dimensions => {
+const registerL1ValidatorTx = (tx: RegisterL1ValidatorTx): Dimensions => {
   return addDimensions(
-    INTRINSIC_REGISTER_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    INTRINSIC_REGISTER_L1_VALIDATOR_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
     getWarpComplexity(tx.message),
   );
 };
 
-const setSubnetValidatorWeightTx = (
-  tx: SetSubnetValidatorWeightTx,
-): Dimensions => {
+const setL1ValidatorWeightTx = (tx: SetL1ValidatorWeightTx): Dimensions => {
   return addDimensions(
-    INTRINSIC_SET_SUBNET_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
+    INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
     getWarpComplexity(tx.message),
   );
 };
 
-const increaseBalanceTx = (tx: IncreaseBalanceTx): Dimensions => {
+const increaseL1ValidatorBalanceTx = (
+  tx: IncreaseL1ValidatorBalanceTx,
+): Dimensions => {
   return addDimensions(
     INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
   );
 };
 
-const disableSubnetValidatorTx = (tx: DisableSubnetValidatorTx): Dimensions => {
+const disableL1ValidatorTx = (tx: DisableL1ValidatorTx): Dimensions => {
   return addDimensions(
-    INTRINSIC_DISABLE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
+    INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
     getAuthComplexity(tx.getDisableAuth()),
   );
@@ -461,16 +456,16 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return transferSubnetOwnershipTx(tx);
   } else if (isPvmBaseTx(tx)) {
     return baseTx(tx);
-  } else if (isConvertSubnetTx(tx)) {
-    return convertSubnetTx(tx);
-  } else if (isRegisterSubnetValidatorTx(tx)) {
-    return registerSubnetValidatorTx(tx);
-  } else if (isSetSubnetValidatorWeightTx(tx)) {
-    return setSubnetValidatorWeightTx(tx);
-  } else if (isIncreaseBalanceTx(tx)) {
-    return increaseBalanceTx(tx);
-  } else if (isDisableSubnetValidatorTx(tx)) {
-    return disableSubnetValidatorTx(tx);
+  } else if (isConvertSubnetToL1Tx(tx)) {
+    return convertSubnetToL1Tx(tx);
+  } else if (isRegisterL1ValidatorTx(tx)) {
+    return registerL1ValidatorTx(tx);
+  } else if (isSetL1ValidatorWeightTx(tx)) {
+    return setL1ValidatorWeightTx(tx);
+  } else if (isIncreaseL1ValidatorBalanceTx(tx)) {
+    return increaseL1ValidatorBalanceTx(tx);
+  } else if (isDisableL1ValidatorTx(tx)) {
+    return disableL1ValidatorTx(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }

@@ -19,9 +19,11 @@ import {
   RemoveSubnetValidatorTx,
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
-  IncreaseBalanceTx,
-  DisableSubnetValidatorTx,
-  SetSubnetValidatorWeightTx,
+  ConvertSubnetToL1Tx,
+  RegisterL1ValidatorTx,
+  SetL1ValidatorWeightTx,
+  IncreaseL1ValidatorBalanceTx,
+  DisableL1ValidatorTx,
 } from '../serializable/pvm';
 import {
   baseTx,
@@ -67,10 +69,8 @@ import {
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
 import type { FeeState } from '../vms/pvm';
-import { ConvertSubnetTx } from '../serializable/pvm/convertSubnetTx';
-import { ConvertSubnetValidator } from '../serializable/fxs/pvm/convertSubnetValidator';
+import { L1Validator } from '../serializable/fxs/pvm/L1Validator';
 import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
-import { RegisterSubnetValidatorTx } from '../serializable/pvm/registerSubnetValidatorTx';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -318,8 +318,8 @@ export const pChainOwnerBytes = () =>
     addressesBytes(),
   );
 
-export const convertSubnetValidator = () =>
-  new ConvertSubnetValidator(
+export const l1Validator = () =>
+  new L1Validator(
     bytes(),
     bigIntPr(),
     bigIntPr(),
@@ -328,7 +328,7 @@ export const convertSubnetValidator = () =>
     pChainOwner(),
   );
 
-export const convertSubnetValidatorBytes = () =>
+export const l1ValidatorBytes = () =>
   concatBytes(
     bytesBytes(),
     bigIntPrBytes(),
@@ -338,31 +338,31 @@ export const convertSubnetValidatorBytes = () =>
     pChainOwnerBytes(),
   );
 
-export const convertSubnetTx = () =>
-  new ConvertSubnetTx(
+export const convertSubnetToL1Tx = () =>
+  new ConvertSubnetToL1Tx(
     baseTx(),
     id(),
     id(),
     bytes(),
-    makeList(convertSubnetValidator)(),
+    makeList(l1Validator)(),
     input(),
   );
 
-export const convertSubnetTxBytes = () =>
+export const convertSubnetToL1TxBytes = () =>
   concatBytes(
     baseTxbytes(),
     idBytes(),
     idBytes(),
     bytesBytes(),
-    makeListBytes(convertSubnetValidatorBytes)(),
+    makeListBytes(l1ValidatorBytes)(),
     bytesForInt(10),
     inputBytes(),
   );
 
-export const registerSubnetValidatorTx = () =>
-  new RegisterSubnetValidatorTx(baseTx(), bigIntPr(), blsSignature(), bytes());
+export const registerL1ValidatorTx = () =>
+  new RegisterL1ValidatorTx(baseTx(), bigIntPr(), blsSignature(), bytes());
 
-export const registerSubnetValidatorTxBytes = () =>
+export const registerL1ValidatorTxBytes = () =>
   concatBytes(
     baseTxbytes(),
     bigIntPrBytes(),
@@ -370,22 +370,22 @@ export const registerSubnetValidatorTxBytes = () =>
     bytesBytes(),
   );
 
-export const setSubnetValidatorWeightTx = () =>
-  new SetSubnetValidatorWeightTx(baseTx(), bytes());
+export const setL1ValidatorWeightTx = () =>
+  new SetL1ValidatorWeightTx(baseTx(), bytes());
 
-export const setSubnetValidatorWeightTxBytes = () =>
+export const setL1ValidatorWeightTxBytes = () =>
   concatBytes(baseTxbytes(), bytesBytes());
 
-export const increaseBalanceTx = () =>
-  new IncreaseBalanceTx(baseTx(), id(), bigIntPr());
+export const increaseL1ValidatorBalanceTx = () =>
+  new IncreaseL1ValidatorBalanceTx(baseTx(), id(), bigIntPr());
 
-export const increaseBalanceTxBytes = () =>
+export const increaseL1ValidatorBalanceTxBytes = () =>
   concatBytes(baseTxbytes(), idBytes(), bigIntPrBytes());
 
-export const disableSubnetValidatorTx = () =>
-  new DisableSubnetValidatorTx(baseTx(), id(), input());
+export const disableL1ValidatorTx = () =>
+  new DisableL1ValidatorTx(baseTx(), id(), input());
 
-export const disableSubnetValidatorTxBytes = () =>
+export const disableL1ValidatorTxBytes = () =>
   concatBytes(baseTxbytes(), idBytes(), bytesForInt(10), inputBytes());
 
 export const feeState = (): FeeState => ({

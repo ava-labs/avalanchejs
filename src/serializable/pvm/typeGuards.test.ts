@@ -20,11 +20,11 @@ import {
   isPvmBaseTx,
   isTransferSubnetOwnershipTx,
   isTransformSubnetTx,
-  isConvertSubnetTx,
-  isIncreaseBalanceTx,
-  isDisableSubnetValidatorTx,
-  isSetSubnetValidatorWeightTx,
-  isRegisterSubnetValidatorTx,
+  isConvertSubnetToL1Tx,
+  isIncreaseL1ValidatorBalanceTx,
+  isDisableL1ValidatorTx,
+  isSetL1ValidatorWeightTx,
+  isRegisterL1ValidatorTx,
 } from './typeGuards';
 
 const cases: [any, TypeSymbols][] = [
@@ -45,11 +45,11 @@ const cases: [any, TypeSymbols][] = [
   [isRewardValidatorTx, TypeSymbols.RewardValidatorTx],
   [isTransferSubnetOwnershipTx, TypeSymbols.TransferSubnetOwnershipTx],
   [isTransformSubnetTx, TypeSymbols.TransformSubnetTx],
-  [isConvertSubnetTx, TypeSymbols.ConvertSubnetTx],
-  [isRegisterSubnetValidatorTx, TypeSymbols.RegisterSubnetValidatorTx],
-  [isSetSubnetValidatorWeightTx, TypeSymbols.SetSubnetValidatorWeightTx],
-  [isIncreaseBalanceTx, TypeSymbols.IncreaseBalanceTx],
-  [isDisableSubnetValidatorTx, TypeSymbols.DisableSubnetValidatorTx],
+  [isConvertSubnetToL1Tx, TypeSymbols.ConvertSubnetToL1Tx],
+  [isRegisterL1ValidatorTx, TypeSymbols.RegisterL1ValidatorTx],
+  [isSetL1ValidatorWeightTx, TypeSymbols.SetL1ValidatorWeightTx],
+  [isIncreaseL1ValidatorBalanceTx, TypeSymbols.IncreaseL1ValidatorBalanceTx],
+  [isDisableL1ValidatorTx, TypeSymbols.DisableL1ValidatorTx],
 ];
 
 const guards = cases.map((caseItem) => caseItem[0]);

@@ -8,11 +8,11 @@ import { NodeId } from '../common';
 import { PChainOwner } from './pChainOwner';
 
 /**
- * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/convert_subnet_tx.go#86
+ * @see https://github.com/avalanche-foundation/ACPs/blob/main/ACPs/77-reinventing-subnets/README.md#convertsubnettol1tx
  */
 @serializable()
-export class ConvertSubnetValidator {
-  _type = TypeSymbols.ConvertSubnetValidator;
+export class L1Validator {
+  _type = TypeSymbols.L1Validator;
 
   constructor(
     public readonly nodeId: Bytes,
@@ -51,7 +51,7 @@ export class ConvertSubnetValidator {
     remainingBalanceOwner: PChainOwner,
     deactivationOwner: PChainOwner,
   ) {
-    return new ConvertSubnetValidator(
+    return new L1Validator(
       new Bytes(NodeId.fromString(nodeId).toBytes()),
       new BigIntPr(weight),
       new BigIntPr(balance),
@@ -61,10 +61,7 @@ export class ConvertSubnetValidator {
     );
   }
 
-  static fromBytes(
-    bytes: Uint8Array,
-    codec: Codec,
-  ): [ConvertSubnetValidator, Uint8Array] {
+  static fromBytes(bytes: Uint8Array, codec: Codec): [L1Validator, Uint8Array] {
     const [
       nodeId,
       weight,
@@ -80,7 +77,7 @@ export class ConvertSubnetValidator {
     );
 
     return [
-      new ConvertSubnetValidator(
+      new L1Validator(
         nodeId,
         weight,
         balance,

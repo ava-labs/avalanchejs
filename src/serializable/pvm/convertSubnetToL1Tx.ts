@@ -7,20 +7,20 @@ import type { Serializable } from '../common/types';
 import { serializable } from '../common/types';
 import { TypeSymbols } from '../constants';
 import { Id } from '../fxs/common';
-import { ConvertSubnetValidator } from '../fxs/pvm/convertSubnetValidator';
+import { L1Validator } from '../fxs/pvm/L1Validator';
 import { Bytes } from '../primitives';
 import { AbstractSubnetTx } from './abstractSubnetTx';
 
 @serializable()
-export class ConvertSubnetTx extends AbstractSubnetTx {
-  _type = TypeSymbols.ConvertSubnetTx;
+export class ConvertSubnetToL1Tx extends AbstractSubnetTx {
+  _type = TypeSymbols.ConvertSubnetToL1Tx;
 
   constructor(
     public readonly baseTx: BaseTx,
     public readonly subnetID: Id,
     public readonly chainID: Id,
     public readonly address: Bytes,
-    public readonly validators: ConvertSubnetValidator[],
+    public readonly validators: L1Validator[],
     public readonly subnetAuth: Serializable,
   ) {
     super();
@@ -33,15 +33,15 @@ export class ConvertSubnetTx extends AbstractSubnetTx {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [ConvertSubnetTx, Uint8Array] {
+  ): [ConvertSubnetToL1Tx, Uint8Array] {
     const [baseTx, subnetID, chainID, address, validators, subnetAuth, rest] =
       unpack(
         bytes,
-        [BaseTx, Id, Id, Bytes, toListStruct(ConvertSubnetValidator), Codec],
+        [BaseTx, Id, Id, Bytes, toListStruct(L1Validator), Codec],
         codec,
       );
     return [
-      new ConvertSubnetTx(
+      new ConvertSubnetToL1Tx(
         baseTx,
         subnetID,
         chainID,
