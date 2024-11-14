@@ -173,10 +173,13 @@ export class UnsignedTx {
 
   private addSignatureForPubKey(sig: Uint8Array, publicKey: Uint8Array) {
     const coordinates = this.getSigIndicesForPubKey(publicKey);
-    if (coordinates) {
-      coordinates.forEach(([index, subIndex]) => {
-        this.addSignatureAt(sig, index, subIndex);
-      });
+    for (let i = 0; i < this.credentials.length; i++) {
+      if (coordinates) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        coordinates.forEach(([_, subIndex]) => {
+          this.addSignatureAt(sig, i, subIndex);
+        });
+      }
     }
   }
 
