@@ -13,7 +13,7 @@ const increaseBalanceTx = async () => {
 
   const testPAddr = utils.bech32ToBytes(P_CHAIN_ADDRESS);
 
-  const unsignedTx = pvm.e.newIncreaseBalanceTx(
+  const unsignedTx = pvm.e.newIncreaseL1ValidatorBalanceTx(
     {
       balance: BigInt(BALANCE_AVAX * 1e9),
       feeState,

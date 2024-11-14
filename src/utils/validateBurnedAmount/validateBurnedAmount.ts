@@ -15,17 +15,17 @@ import {
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
   isAddSubnetValidatorTx,
-  isConvertSubnetTx,
+  isConvertSubnetToL1Tx,
   isCreateChainTx,
   isCreateSubnetTx,
-  isDisableSubnetValidatorTx,
-  isIncreaseBalanceTx,
+  isDisableL1ValidatorTx,
+  isIncreaseL1ValidatorBalanceTx,
   isPvmBaseTx,
   isExportTx as isPvmExportTx,
   isImportTx as isPvmImportTx,
-  isRegisterSubnetValidatorTx,
+  isRegisterL1ValidatorTx,
   isRemoveSubnetValidatorTx,
-  isSetSubnetValidatorWeightTx,
+  isSetL1ValidatorWeightTx,
   isTransferSubnetOwnershipTx,
 } from '../../serializable/pvm';
 
@@ -51,11 +51,11 @@ const isEtnaSupported = (tx: Transaction) => {
     isCreateSubnetTx(tx) ||
     isRemoveSubnetValidatorTx(tx) ||
     isTransferSubnetOwnershipTx(tx) ||
-    isConvertSubnetTx(tx) ||
-    isRegisterSubnetValidatorTx(tx) ||
-    isSetSubnetValidatorWeightTx(tx) ||
-    isIncreaseBalanceTx(tx) ||
-    isDisableSubnetValidatorTx(tx)
+    isConvertSubnetToL1Tx(tx) ||
+    isRegisterL1ValidatorTx(tx) ||
+    isSetL1ValidatorWeightTx(tx) ||
+    isIncreaseL1ValidatorBalanceTx(tx) ||
+    isDisableL1ValidatorTx(tx)
   );
 };
 

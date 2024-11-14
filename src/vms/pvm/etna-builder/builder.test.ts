@@ -41,12 +41,12 @@ import {
   Signer,
   TransferSubnetOwnershipTx,
   AddPermissionlessDelegatorTx,
-  ConvertSubnetTx,
+  ConvertSubnetToL1Tx,
   ProofOfPossession,
-  IncreaseBalanceTx,
-  DisableSubnetValidatorTx,
-  SetSubnetValidatorWeightTx,
-  RegisterSubnetValidatorTx,
+  IncreaseL1ValidatorBalanceTx,
+  DisableL1ValidatorTx,
+  SetL1ValidatorWeightTx,
+  RegisterL1ValidatorTx,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
@@ -57,16 +57,16 @@ import {
   newAddPermissionlessValidatorTx,
   newAddSubnetValidatorTx,
   newBaseTx,
-  newConvertSubnetTx,
+  newConvertSubnetToL1Tx,
   newCreateChainTx,
   newCreateSubnetTx,
-  newDisableSubnetValidatorTx,
+  newDisableL1ValidatorTx,
   newExportTx,
   newImportTx,
-  newIncreaseBalanceTx,
-  newRegisterSubnetValidatorTx,
+  newIncreaseL1ValidatorBalanceTx,
+  newRegisterL1ValidatorTx,
   newRemoveSubnetValidatorTx,
-  newSetSubnetValidatorWeightTx,
+  newSetL1ValidatorWeightTx,
   newTransferSubnetOwnershipTx,
 } from './builder';
 import { testAddress1 } from '../../../fixtures/vms';
@@ -82,7 +82,7 @@ import {
   proofOfPossession,
 } from '../../../fixtures/pvm';
 import type { FeeState } from '../models';
-import { ConvertSubnetValidator } from '../../../serializable/fxs/pvm/convertSubnetValidator';
+import { L1Validator } from '../../../serializable/fxs/pvm/L1Validator';
 import { PChainOwner } from '../../../serializable/fxs/pvm/pChainOwner';
 
 const addTransferableAmounts = (
@@ -1031,8 +1031,8 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
   });
 
-  describe('ConvertSubnetTx', () => {
-    it('should create an ConvertSubnetTx', () => {
+  describe('ConvertSubnetToL1Tx', () => {
+    it('should create an ConvertSubnetToL1Tx', () => {
       const utxoInputAmt = BigInt(50 * 1e9);
       const utxos = testUtxos();
       const signer = new ProofOfPossession(
@@ -1042,7 +1042,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       const pChainOwner = PChainOwner.fromNative([testAddress1], 1);
       const validatorBalanceAmount = BigInt(1 * 1e9);
 
-      const validator = ConvertSubnetValidator.fromNative(
+      const validator = L1Validator.fromNative(
         nodeId,
         BigInt(1 * 1e9),
         validatorBalanceAmount,
@@ -1051,7 +1051,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         pChainOwner,
       );
 
-      const unsignedTx = newConvertSubnetTx(
+      const unsignedTx = newConvertSubnetToL1Tx(
         {
           fromAddressesBytes,
           feeState,
@@ -1065,7 +1065,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         testContext,
       );
 
-      const { baseTx } = unsignedTx.getTx() as ConvertSubnetTx;
+      const { baseTx } = unsignedTx.getTx() as ConvertSubnetToL1Tx;
       const { inputs, outputs } = baseTx;
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
@@ -1079,7 +1079,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
-      const expectedTx = new ConvertSubnetTx(
+      const expectedTx = new ConvertSubnetToL1Tx(
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
@@ -1097,7 +1097,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
 
     it('should throw error if weight on a validator is 0', () => {
-      const validator = ConvertSubnetValidator.fromNative(
+      const validator = L1Validator.fromNative(
         nodeId,
         BigInt(0 * 1e9),
         BigInt(0 * 1e9),
@@ -1107,7 +1107,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       );
       const utxos = testUtxos();
       try {
-        newConvertSubnetTx(
+        newConvertSubnetToL1Tx(
           {
             fromAddressesBytes,
             feeState,
@@ -1128,8 +1128,8 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
   });
 
-  describe('RegisterSubnetValidatorTx', () => {
-    it('should create a RegisterSubnetValidatorTx', () => {
+  describe('RegisterL1ValidatorTx', () => {
+    it('should create a RegisterL1ValidatorTx', () => {
       const balance = BigInt(10 * 1e9);
       const signatureBytes = blsSignatureBytes();
       const message = warpMessageBytes();
@@ -1139,7 +1139,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
       ];
 
-      const unsignedTx = newRegisterSubnetValidatorTx(
+      const unsignedTx = newRegisterL1ValidatorTx(
         {
           balance,
           blsSignature: signatureBytes,
@@ -1151,7 +1151,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         testContext,
       );
 
-      const { baseTx } = unsignedTx.getTx() as SetSubnetValidatorWeightTx;
+      const { baseTx } = unsignedTx.getTx() as SetL1ValidatorWeightTx;
       const { inputs, outputs } = baseTx;
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
@@ -1165,7 +1165,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
-      const expectedTx = new RegisterSubnetValidatorTx(
+      const expectedTx = new RegisterL1ValidatorTx(
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
@@ -1182,8 +1182,8 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
   });
 
-  describe('SetSubnetValidatorWeightTx', () => {
-    it('should create a SetSubnetValidatorWeightTx', () => {
+  describe('SetL1ValidatorWeightTx', () => {
+    it('should create a SetL1ValidatorWeightTx', () => {
       // Example Warp Message
       const message = warpMessageBytes();
 
@@ -1192,7 +1192,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
       ];
 
-      const unsignedTx = newSetSubnetValidatorWeightTx(
+      const unsignedTx = newSetL1ValidatorWeightTx(
         {
           fromAddressesBytes,
           feeState,
@@ -1202,7 +1202,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         testContext,
       );
 
-      const { baseTx } = unsignedTx.getTx() as SetSubnetValidatorWeightTx;
+      const { baseTx } = unsignedTx.getTx() as SetL1ValidatorWeightTx;
       const { inputs, outputs } = baseTx;
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
@@ -1215,7 +1215,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
-      const expectedTx = new SetSubnetValidatorWeightTx(
+      const expectedTx = new SetL1ValidatorWeightTx(
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
@@ -1230,8 +1230,8 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     });
   });
 
-  describe('IncreaseBalanceTx', () => {
-    it('should create an IncreaseBalanceTx', () => {
+  describe('IncreaseL1ValidatorBalanceTx', () => {
+    it('should create an IncreaseL1ValidatorBalanceTx', () => {
       const validUtxoAmount = BigInt(30 * 1e9);
       const balance = BigInt(1 * 1e9);
       const validationId = 'test';
@@ -1248,7 +1248,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
       ];
 
-      const unsignedTx = newIncreaseBalanceTx(
+      const unsignedTx = newIncreaseL1ValidatorBalanceTx(
         {
           balance,
           fromAddressesBytes,
@@ -1259,7 +1259,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         testContext,
       );
 
-      const { baseTx } = unsignedTx.getTx() as IncreaseBalanceTx;
+      const { baseTx } = unsignedTx.getTx() as IncreaseL1ValidatorBalanceTx;
       const { inputs, outputs } = baseTx;
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
@@ -1273,7 +1273,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
-      const expectedTx = new IncreaseBalanceTx(
+      const expectedTx = new IncreaseL1ValidatorBalanceTx(
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,
@@ -1293,7 +1293,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     const utxos = testUtxos();
 
     expect(() => {
-      newIncreaseBalanceTx(
+      newIncreaseL1ValidatorBalanceTx(
         {
           balance: 0n,
           fromAddressesBytes,
@@ -1306,7 +1306,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     }).toThrow('Balance must be greater than 0');
 
     expect(() => {
-      newIncreaseBalanceTx(
+      newIncreaseL1ValidatorBalanceTx(
         {
           balance: -1n,
           fromAddressesBytes,
@@ -1319,7 +1319,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     }).toThrow('Balance must be greater than 0');
   });
 
-  describe('DisableSubnetValidatorTx', () => {
+  describe('DisableL1ValidatorTx', () => {
     it('should create a DisabledSubnetValidatorTx', () => {
       const validUtxoAmount = BigInt(30 * 1e9);
       const validationId = 'test';
@@ -1336,7 +1336,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
       ];
 
-      const unsignedTx = newDisableSubnetValidatorTx(
+      const unsignedTx = newDisableL1ValidatorTx(
         {
           disableAuth: [0],
           fromAddressesBytes,
@@ -1347,7 +1347,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         testContext,
       );
 
-      const { baseTx } = unsignedTx.getTx() as DisableSubnetValidatorTx;
+      const { baseTx } = unsignedTx.getTx() as DisableL1ValidatorTx;
       const { inputs, outputs } = baseTx;
 
       const [amountConsumed, expectedAmountConsumed, expectedFee] =
@@ -1360,7 +1360,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
       expect(amountConsumed).toEqual(expectedAmountConsumed);
 
-      const expectedTx = new DisableSubnetValidatorTx(
+      const expectedTx = new DisableL1ValidatorTx(
         AvaxBaseTx.fromNative(
           testContext.networkID,
           testContext.pBlockchainID,

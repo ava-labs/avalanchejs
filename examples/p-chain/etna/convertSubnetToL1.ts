@@ -1,15 +1,19 @@
-import { addTxSignatures, pvm, utils } from '../../../src';
+import {
+  L1Validator,
+  PChainOwner,
+  addTxSignatures,
+  pvm,
+  pvmSerial,
+  utils,
+} from '../../../src';
 import { setupEtnaExample } from './utils/etna-helper';
-import { ConvertSubnetValidator } from '../../../src/serializable/fxs/pvm/convertSubnetValidator';
-import { ProofOfPossession } from '../../../src/serializable/pvm';
-import { PChainOwner } from '../../../src/serializable/fxs/pvm/pChainOwner';
 import { getEnvVars } from '../../utils/getEnvVars';
 
 const AMOUNT_TO_VALIDATE_AVAX: number = 1;
 const BALANCE_AVAX: number = 1;
 
 /**
- * Converts a subnet to permissionless subnet.
+ * Converts a subnet to L1.
  *
  * **Note** A subnet must be created (createSubnetTx) and a chain must be created (createChainTx)
  * before a subnet can be converted from permissioned to permissionless.
@@ -20,7 +24,7 @@ const BALANCE_AVAX: number = 1;
  * @param subnetId the ID of the subnet that is created via `createSubnetTx`.
  * @returns The resulting transaction's ID.
  */
-const convertSubnetTxExample = async () => {
+const convertSubnetToL1TxExample = async () => {
   const {
     AVAX_PUBLIC_URL,
     P_CHAIN_ADDRESS,
@@ -41,9 +45,9 @@ const convertSubnetTxExample = async () => {
 
   const signature = utils.hexToBuffer(BLS_SIGNATURE);
 
-  const signer = new ProofOfPossession(publicKey, signature);
+  const signer = new pvmSerial.ProofOfPossession(publicKey, signature);
 
-  const validator = ConvertSubnetValidator.fromNative(
+  const validator = L1Validator.fromNative(
     NODE_ID,
     BigInt(AMOUNT_TO_VALIDATE_AVAX * 1e9),
     BigInt(BALANCE_AVAX * 1e9),
@@ -52,7 +56,7 @@ const convertSubnetTxExample = async () => {
     pChainOwner,
   );
 
-  const tx = pvm.e.newConvertSubnetTx(
+  const tx = pvm.e.newConvertSubnetToL1Tx(
     {
       feeState,
       fromAddressesBytes: [testPAddr],
@@ -74,4 +78,4 @@ const convertSubnetTxExample = async () => {
   return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-convertSubnetTxExample().then(console.log);
+convertSubnetToL1TxExample().then(console.log);

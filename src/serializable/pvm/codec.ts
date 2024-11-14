@@ -18,11 +18,11 @@ import { RemoveSubnetValidatorTx } from './removeSubnetValidatorTx';
 import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
 import { BaseTx } from './baseTx';
-import { ConvertSubnetTx } from './convertSubnetTx';
-import { IncreaseBalanceTx } from './increaseBalanceTx';
-import { DisableSubnetValidatorTx } from './disableSubnetValidatorTx';
-import { SetSubnetValidatorWeightTx } from './setSubnetValidatorWeightTx';
-import { RegisterSubnetValidatorTx } from './registerSubnetValidatorTx';
+import { ConvertSubnetToL1Tx } from './convertSubnetToL1Tx';
+import { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceTx';
+import { DisableL1ValidatorTx } from './disableL1ValidatorTx';
+import { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
+import { RegisterL1ValidatorTx } from './registerL1ValidatorTx';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/codec.go#L35
@@ -63,11 +63,11 @@ export const codec = new Codec([
   TransferSubnetOwnershipTx, // 33
   BaseTx, // 34
 
-  ConvertSubnetTx, // 35
-  RegisterSubnetValidatorTx, // 36
-  SetSubnetValidatorWeightTx, // 37
-  IncreaseBalanceTx, // 38
-  DisableSubnetValidatorTx, // 39
+  ConvertSubnetToL1Tx, // 35
+  RegisterL1ValidatorTx, // 36
+  SetL1ValidatorWeightTx, // 37
+  IncreaseL1ValidatorBalanceTx, // 38
+  DisableL1ValidatorTx, // 39
 ]);
 
 let manager: Manager;

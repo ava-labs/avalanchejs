@@ -9,8 +9,8 @@ import { PVMTx } from './abstractTx';
 import type { Input } from '../fxs/secp256k1';
 
 @serializable()
-export class DisableSubnetValidatorTx extends PVMTx {
-  _type = TypeSymbols.DisableSubnetValidatorTx;
+export class DisableL1ValidatorTx extends PVMTx {
+  _type = TypeSymbols.DisableL1ValidatorTx;
 
   constructor(
     public readonly baseTx: BaseTx,
@@ -23,16 +23,13 @@ export class DisableSubnetValidatorTx extends PVMTx {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [disableSubnetValidatorTx: DisableSubnetValidatorTx, rest: Uint8Array] {
+  ): [disableSubnetValidatorTx: DisableL1ValidatorTx, rest: Uint8Array] {
     const [baseTx, validationId, disableAuth, rest] = unpack(
       bytes,
       [BaseTx, Id, Codec],
       codec,
     );
-    return [
-      new DisableSubnetValidatorTx(baseTx, validationId, disableAuth),
-      rest,
-    ];
+    return [new DisableL1ValidatorTx(baseTx, validationId, disableAuth), rest];
   }
 
   toBytes(codec: Codec) {

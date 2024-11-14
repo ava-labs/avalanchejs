@@ -19,11 +19,11 @@ import { AddPermissionlessDelegatorTx } from './addPermissionlessDelegatorTx';
 import { AbstractSubnetTx } from './abstractSubnetTx';
 import { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TransformSubnetTx } from './transformSubnetTx';
-import { ConvertSubnetTx } from './convertSubnetTx';
-import { RegisterSubnetValidatorTx } from './registerSubnetValidatorTx';
-import { SetSubnetValidatorWeightTx } from './setSubnetValidatorWeightTx';
-import { IncreaseBalanceTx } from './increaseBalanceTx';
-import { DisableSubnetValidatorTx } from './disableSubnetValidatorTx';
+import { ConvertSubnetToL1Tx } from './convertSubnetToL1Tx';
+import { RegisterL1ValidatorTx } from './registerL1ValidatorTx';
+import { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
+import { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceTx';
+import { DisableL1ValidatorTx } from './disableL1ValidatorTx';
 
 export * from './typeGuards';
 export {
@@ -49,9 +49,9 @@ export {
   ProofOfPossession,
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
-  ConvertSubnetTx,
-  RegisterSubnetValidatorTx,
-  SetSubnetValidatorWeightTx,
-  IncreaseBalanceTx,
-  DisableSubnetValidatorTx,
+  ConvertSubnetToL1Tx,
+  RegisterL1ValidatorTx,
+  SetL1ValidatorWeightTx,
+  IncreaseL1ValidatorBalanceTx,
+  DisableL1ValidatorTx,
 };

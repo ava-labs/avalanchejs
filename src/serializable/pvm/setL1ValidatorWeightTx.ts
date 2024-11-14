@@ -7,8 +7,8 @@ import { Bytes } from '../primitives';
 import { PVMTx } from './abstractTx';
 
 @serializable()
-export class SetSubnetValidatorWeightTx extends PVMTx {
-  _type = TypeSymbols.SetSubnetValidatorWeightTx;
+export class SetL1ValidatorWeightTx extends PVMTx {
+  _type = TypeSymbols.SetL1ValidatorWeightTx;
 
   constructor(public readonly baseTx: BaseTx, public readonly message: Bytes) {
     super();
@@ -17,10 +17,10 @@ export class SetSubnetValidatorWeightTx extends PVMTx {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [SetSubnetValidatorWeightTx, Uint8Array] {
+  ): [SetL1ValidatorWeightTx, Uint8Array] {
     const [baseTx, message, rest] = unpack(bytes, [BaseTx, Bytes], codec);
 
-    return [new SetSubnetValidatorWeightTx(baseTx, message), rest];
+    return [new SetL1ValidatorWeightTx(baseTx, message), rest];
   }
 
   toBytes(codec: Codec): Uint8Array {

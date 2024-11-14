@@ -22,7 +22,7 @@ import {
   TransferableInput,
   TransferableOutput,
 } from '../../../../serializable';
-import { ConvertSubnetValidator } from '../../../../serializable/fxs/pvm/convertSubnetValidator';
+import { L1Validator } from '../../../../serializable/fxs/pvm/L1Validator';
 import { PChainOwner } from '../../../../serializable/fxs/pvm/pChainOwner';
 import {
   ProofOfPossession,
@@ -33,7 +33,7 @@ import {
 import { createDimensions } from '../../../common/fees/dimensions';
 import {
   getAuthComplexity,
-  getConvertSubnetValidatorComplexity,
+  getL1ValidatorComplexity,
   getInputComplexity,
   getOutputComplexity,
   getOwnerComplexity,
@@ -316,10 +316,10 @@ describe('Complexity', () => {
     });
   });
 
-  describe('getConvertSubnetValidatorComplexity', () => {
+  describe('getL1ValidatorComplexity', () => {
     test('any can spend', () => {
       const pChainOwner = PChainOwner.fromNative([], 1);
-      const validator = ConvertSubnetValidator.fromNative(
+      const validator = L1Validator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
         1n,
@@ -327,7 +327,7 @@ describe('Complexity', () => {
         pChainOwner,
         pChainOwner,
       );
-      const result = getConvertSubnetValidatorComplexity(validator);
+      const result = getL1ValidatorComplexity(validator);
 
       expect(result).toEqual(
         createDimensions({
@@ -348,7 +348,7 @@ describe('Complexity', () => {
         1,
       );
       const deactivationOwner = PChainOwner.fromNative([], 1);
-      const validator = ConvertSubnetValidator.fromNative(
+      const validator = L1Validator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
         1n,
@@ -356,7 +356,7 @@ describe('Complexity', () => {
         remainingBalanceOwner,
         deactivationOwner,
       );
-      const result = getConvertSubnetValidatorComplexity(validator);
+      const result = getL1ValidatorComplexity(validator);
 
       expect(result).toEqual(
         createDimensions({
@@ -377,7 +377,7 @@ describe('Complexity', () => {
         1,
       );
       const remainingBalanceOwner = PChainOwner.fromNative([], 1);
-      const validator = ConvertSubnetValidator.fromNative(
+      const validator = L1Validator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
         1n,
@@ -385,7 +385,7 @@ describe('Complexity', () => {
         remainingBalanceOwner,
         deactivationOwner,
       );
-      const result = getConvertSubnetValidatorComplexity(validator);
+      const result = getL1ValidatorComplexity(validator);
 
       expect(result).toEqual(
         createDimensions({
@@ -405,7 +405,7 @@ describe('Complexity', () => {
         ],
         1,
       );
-      const validator = ConvertSubnetValidator.fromNative(
+      const validator = L1Validator.fromNative(
         'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M',
         1n,
         1n,
@@ -413,7 +413,7 @@ describe('Complexity', () => {
         pChainOwner,
         pChainOwner,
       );
-      const result = getConvertSubnetValidatorComplexity(validator);
+      const result = getL1ValidatorComplexity(validator);
 
       expect(result).toEqual(
         createDimensions({

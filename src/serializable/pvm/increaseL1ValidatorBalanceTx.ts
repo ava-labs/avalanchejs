@@ -8,8 +8,8 @@ import { BigIntPr } from '../primitives';
 import { PVMTx } from './abstractTx';
 
 @serializable()
-export class IncreaseBalanceTx extends PVMTx {
-  _type = TypeSymbols.IncreaseBalanceTx;
+export class IncreaseL1ValidatorBalanceTx extends PVMTx {
+  _type = TypeSymbols.IncreaseL1ValidatorBalanceTx;
 
   constructor(
     public readonly baseTx: BaseTx,
@@ -28,14 +28,17 @@ export class IncreaseBalanceTx extends PVMTx {
   static fromBytes(
     bytes: Uint8Array,
     codec: Codec,
-  ): [increaseBalanceTx: IncreaseBalanceTx, rest: Uint8Array] {
+  ): [increaseBalanceTx: IncreaseL1ValidatorBalanceTx, rest: Uint8Array] {
     const [baseTx, validationId, balance, rest] = unpack(
       bytes,
       [BaseTx, Id, BigIntPr],
       codec,
     );
 
-    return [new IncreaseBalanceTx(baseTx, validationId, balance), rest];
+    return [
+      new IncreaseL1ValidatorBalanceTx(baseTx, validationId, balance),
+      rest,
+    ];
   }
 
   toBytes(codec: Codec) {
