@@ -1,5 +1,7 @@
-export const upgradesInfo = {
-  apricotPhaselTime: '2020-12-05T05:00:00Z',
+import type { GetUpgradesInfoResponse } from '../info';
+
+export const upgradesInfo: GetUpgradesInfoResponse = {
+  apricotPhase1Time: '2020-12-05T05:00:00Z',
   apricotPhase2Time: '2020-12-05T05:00:00Z',
   apricotPhase3Time: '2020-12-05T05:00:00Z',
   apricotPhase4Time: '2020-12-05T05:00:00Z',

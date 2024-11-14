@@ -77,7 +77,7 @@ export type isBootstrapped = {
 };
 
 export type GetUpgradesInfoResponse = {
-  apricotPhaselTime: string;
+  apricotPhase1Time: string;
   apricotPhase2Time: string;
   apricotPhase3Time: string;
   apricotPhase4Time: string;
