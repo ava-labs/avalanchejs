@@ -10,6 +10,12 @@ import { isTransferableOutput } from '../serializable/avax';
 import { getTransferableInputsByTx } from './getTransferableInputsByTx';
 import { getTransferableOutputsByTx } from './getTransferableOutputsByTx';
 import type { EVMTx } from '../serializable/evm/abstractTx';
+import {
+  isConvertSubnetToL1Tx,
+  isIncreaseL1ValidatorBalanceTx,
+  isRegisterL1ValidatorTx,
+} from '../serializable/pvm';
+import type { Context } from '../vms/context';
 
 const _reducer = (
   assetAmountMap: Map<string, bigint>,
@@ -56,14 +62,38 @@ export const getOutputAmounts = (tx: AvaxTx | EVMTx) => {
   }, new Map<string, bigint>());
 };
 
-export const getBurnedAmountByTx = (tx: AvaxTx | EVMTx) => {
+const getValidatorBalanceSpendByTx = (tx: AvaxTx | EVMTx) => {
+  if (isConvertSubnetToL1Tx(tx)) {
+    return tx.validators.reduce(
+      (sum, validator) => sum + validator.balance.value(),
+      0n,
+    );
+  } else if (isRegisterL1ValidatorTx(tx)) {
+    return tx.balance.value();
+  } else if (isIncreaseL1ValidatorBalanceTx(tx)) {
+    return tx.balance.value();
+  }
+
+  return 0n;
+};
+
+export const getBurnedAmountByTx = (tx: AvaxTx | EVMTx, context: Context) => {
   const inputAmounts = getInputAmounts(tx);
   const outputAmounts = getOutputAmounts(tx);
   const burnedAmounts = new Map<string, bigint>();
+  const validatorBalance = getValidatorBalanceSpendByTx(tx);
 
   for (const [id, inputAmount] of inputAmounts.entries()) {
     const outputAmount = outputAmounts.get(id) ?? 0n;
     burnedAmounts.set(id, inputAmount - outputAmount);
+  }
+
+  if (validatorBalance) {
+    const burnedAvax = burnedAmounts.get(context.avaxAssetID);
+
+    if (burnedAvax) {
+      burnedAmounts.set(context.avaxAssetID, burnedAvax - validatorBalance);
+    }
   }
 
   return burnedAmounts;

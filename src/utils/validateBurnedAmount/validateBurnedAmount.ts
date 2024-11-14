@@ -30,7 +30,7 @@ import {
 } from '../../serializable/pvm';
 
 const _getBurnedAmount = (tx: Transaction, context: Context) => {
-  const burnedAmounts = getBurnedAmountByTx(tx as AvaxTx | EVMTx);
+  const burnedAmounts = getBurnedAmountByTx(tx as AvaxTx | EVMTx, context);
   return burnedAmounts.get(context.avaxAssetID) ?? 0n;
 };
 

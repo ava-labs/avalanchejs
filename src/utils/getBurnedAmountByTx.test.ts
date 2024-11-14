@@ -7,7 +7,7 @@ import { newExportTxFromBaseFee, newImportTxFromBaseFee } from '../vms/evm';
 import { getBurnedAmountByTx } from './getBurnedAmountByTx';
 import { testContext } from '../fixtures/context';
 import { testEthAddress1, testAddress1, testAddress2 } from '../fixtures/vms';
-import { nodeId } from '../fixtures/common';
+import { id, nodeId } from '../fixtures/common';
 import { Utxo } from '../serializable/avax/utxo';
 import { OutputOwners, TransferOutput } from '../serializable/fxs/secp256k1';
 import { Address, Id } from '../serializable/fxs/common';
@@ -30,6 +30,18 @@ import type { EVMTx } from '../serializable/evm/abstractTx';
 import { testUTXOID1, testUTXOID2 } from '../fixtures/transactions';
 import { costCorethTx } from './costs';
 import { StakeableLockOut } from '../serializable/pvm';
+import {
+  newConvertSubnetToL1Tx,
+  newIncreaseL1ValidatorBalanceTx,
+  newRegisterL1ValidatorTx,
+} from '../vms/pvm/etna-builder';
+import { feeState, l1Validator } from '../fixtures/pvm';
+import {
+  bigIntPr,
+  blsSignatureBytes,
+  bytesBytes,
+  stringPr,
+} from '../fixtures/primitives';
 
 const getUtxoMock = (
   utxoId: Id,
@@ -95,7 +107,7 @@ describe('getBurnedAmountByTx', () => {
         1n,
       );
 
-      const amounts = getBurnedAmountByTx(tx.getTx() as EVMTx);
+      const amounts = getBurnedAmountByTx(tx.getTx() as EVMTx, testContext);
       expect(amounts.size).toEqual(1);
       expect(amounts.get(testContext.avaxAssetID)).toEqual(
         baseFee * costCorethTx(tx),
@@ -116,7 +128,7 @@ describe('getBurnedAmountByTx', () => {
         baseFee,
       );
 
-      const amounts = getBurnedAmountByTx(tx.getTx() as EVMTx);
+      const amounts = getBurnedAmountByTx(tx.getTx() as EVMTx, testContext);
       expect(amounts.size).toEqual(1);
       expect(amounts.get(testContext.avaxAssetID)).toEqual(
         baseFee * costCorethTx(tx),
@@ -139,7 +151,7 @@ describe('getBurnedAmountByTx', () => {
           [output],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -164,7 +176,7 @@ describe('getBurnedAmountByTx', () => {
           [output1, output2, output3],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -192,7 +204,7 @@ describe('getBurnedAmountByTx', () => {
           [output1, output2, output3],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -221,7 +233,7 @@ describe('getBurnedAmountByTx', () => {
           [output],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -243,7 +255,7 @@ describe('getBurnedAmountByTx', () => {
           [output1, output2, output3],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -266,7 +278,7 @@ describe('getBurnedAmountByTx', () => {
           [output1, output2, output3],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -288,7 +300,7 @@ describe('getBurnedAmountByTx', () => {
           [testAddress1],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -313,7 +325,7 @@ describe('getBurnedAmountByTx', () => {
           [output],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -335,7 +347,7 @@ describe('getBurnedAmountByTx', () => {
           [output1, output2, output3],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -358,7 +370,7 @@ describe('getBurnedAmountByTx', () => {
           [output1, output2, output3],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -380,7 +392,7 @@ describe('getBurnedAmountByTx', () => {
           [testAddress1],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.baseTxFee,
@@ -407,7 +419,7 @@ describe('getBurnedAmountByTx', () => {
           3,
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addPrimaryNetworkValidatorFee,
@@ -442,7 +454,7 @@ describe('getBurnedAmountByTx', () => {
           3,
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addPrimaryNetworkValidatorFee,
@@ -473,7 +485,7 @@ describe('getBurnedAmountByTx', () => {
           3,
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addPrimaryNetworkValidatorFee,
@@ -499,7 +511,7 @@ describe('getBurnedAmountByTx', () => {
           [testAddress1],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addPrimaryNetworkDelegatorFee,
@@ -533,7 +545,7 @@ describe('getBurnedAmountByTx', () => {
           [testAddress1],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addPrimaryNetworkDelegatorFee,
@@ -563,7 +575,7 @@ describe('getBurnedAmountByTx', () => {
           [testAddress1],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addPrimaryNetworkDelegatorFee,
@@ -584,7 +596,7 @@ describe('getBurnedAmountByTx', () => {
           [testAddress1],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.createSubnetTxFee,
@@ -610,7 +622,7 @@ describe('getBurnedAmountByTx', () => {
           [0],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.createBlockchainTxFee,
@@ -637,12 +649,76 @@ describe('getBurnedAmountByTx', () => {
           [0],
         ).getTx() as AvaxTx;
 
-        const amounts = getBurnedAmountByTx(tx);
+        const amounts = getBurnedAmountByTx(tx, testContext);
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(
           testContext.addSubnetValidatorFee,
         );
       });
     });
+
+    it('calculates the burned amount of ConvertSubnetToL1 tx correctly', () => {
+      const utxo1 = getUtxoMock(testUTXOID1, 5000000n);
+      const utxo2 = getUtxoMock(testUTXOID2, 6000000n);
+
+      const tx = newConvertSubnetToL1Tx(
+        {
+          address: testAddress1,
+          chainId: id().toString(),
+          feeState: feeState(),
+          fromAddressesBytes: [testAddress1],
+          subnetAuth: [0],
+          subnetId: id().toString(),
+          utxos: [utxo1, utxo2],
+          validators: [l1Validator()],
+        },
+        testContext,
+      ).getTx() as AvaxTx;
+
+      const amounts = getBurnedAmountByTx(tx, testContext);
+      expect(amounts.size).toEqual(1);
+      expect(amounts.get(testContext.avaxAssetID)).toEqual(749n);
+    });
+  });
+
+  it('calculates the burned amount of RegisterL1Validator tx correctly', () => {
+    const utxo1 = getUtxoMock(testUTXOID1, 5000000n);
+    const utxo2 = getUtxoMock(testUTXOID2, 6000000n);
+
+    const tx = newRegisterL1ValidatorTx(
+      {
+        feeState: feeState(),
+        fromAddressesBytes: [testAddress1],
+        utxos: [utxo1, utxo2],
+        balance: bigIntPr().value(),
+        blsSignature: blsSignatureBytes(),
+        message: bytesBytes(),
+      },
+      testContext,
+    ).getTx() as AvaxTx;
+
+    const amounts = getBurnedAmountByTx(tx, testContext);
+    expect(amounts.size).toEqual(1);
+    expect(amounts.get(testContext.avaxAssetID)).toEqual(416n);
+  });
+
+  it('calculates the burned amount of RegisterL1Validator tx correctly', () => {
+    const utxo1 = getUtxoMock(testUTXOID1, 5000000n);
+    const utxo2 = getUtxoMock(testUTXOID2, 6000000n);
+
+    const tx = newIncreaseL1ValidatorBalanceTx(
+      {
+        feeState: feeState(),
+        fromAddressesBytes: [testAddress1],
+        utxos: [utxo1, utxo2],
+        balance: bigIntPr().value(),
+        validationId: stringPr().value(),
+      },
+      testContext,
+    ).getTx() as AvaxTx;
+
+    const amounts = getBurnedAmountByTx(tx, testContext);
+    expect(amounts.size).toEqual(1);
+    expect(amounts.get(testContext.avaxAssetID)).toEqual(342n);
   });
 });
