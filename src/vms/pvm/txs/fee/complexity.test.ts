@@ -420,7 +420,7 @@ describe('Complexity', () => {
           bandwidth: 240,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });

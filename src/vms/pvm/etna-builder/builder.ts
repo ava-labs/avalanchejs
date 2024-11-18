@@ -84,7 +84,7 @@ import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
 import type { L1Validator } from '../../../serializable/fxs/pvm/L1Validator';
 import {
-  INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+  INTRINSIC_INCREASE_L1_VALIDATOR_BALANCE_TX_COMPLEXITIES,
   INTRINSIC_REGISTER_L1_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
 } from '../txs/fee/constants';
@@ -1689,7 +1689,7 @@ export const newIncreaseL1ValidatorBalanceTx: TxBuilderFn<
   const bytesComplexity = getBytesComplexity(memo);
 
   const complexity = addDimensions(
-    INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+    INTRINSIC_INCREASE_L1_VALIDATOR_BALANCE_TX_COMPLEXITIES,
     bytesComplexity,
   );
 
@@ -1775,7 +1775,7 @@ export const newDisableL1ValidatorTx: TxBuilderFn<DisableL1ValidatorTxProps> = (
   const authComplexity = getAuthComplexity(disableAuthInput);
 
   const complexity = addDimensions(
-    INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+    INTRINSIC_INCREASE_L1_VALIDATOR_BALANCE_TX_COMPLEXITIES,
     bytesComplexity,
     authComplexity,
   );

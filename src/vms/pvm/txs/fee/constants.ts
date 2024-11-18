@@ -112,8 +112,8 @@ export const INTRINSIC_CREATE_CHAIN_TX_COMPLEXITIES: Dimensions = {
     INT_LEN + // genesis length
     INT_LEN + // subnetAuth typeID
     INT_LEN, // subnetAuthCredential typeID
-  [FeeDimensions.DBRead]: 1,
-  [FeeDimensions.DBWrite]: 1,
+  [FeeDimensions.DBRead]: 3, // get subnet auth + check for subnet transformation + check for subnet conversion
+  [FeeDimensions.DBWrite]: 1, // put chain
   [FeeDimensions.Compute]: 0,
 };
 
@@ -121,7 +121,7 @@ export const INTRINSIC_CREATE_SUBNET_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] + INT_LEN, // owner typeID
   [FeeDimensions.DBRead]: 0,
-  [FeeDimensions.DBWrite]: 1,
+  [FeeDimensions.DBWrite]: 1, // write subnet owner
   [FeeDimensions.Compute]: 0,
 };
 
@@ -136,8 +136,8 @@ export const INTRINSIC_ADD_PERMISSIONLESS_VALIDATOR_TX_COMPLEXITIES: Dimensions 
       INT_LEN + // Validator rewards typeID
       INT_LEN + // Delegator rewards typeID
       INT_LEN, // Delegation shares
-    [FeeDimensions.DBRead]: 1,
-    [FeeDimensions.DBWrite]: 1,
+    [FeeDimensions.DBRead]: 1, // get staking config
+    [FeeDimensions.DBWrite]: 3, // put current staker + write weight diff + write pk diff
     [FeeDimensions.Compute]: 0,
   };
 
@@ -149,8 +149,8 @@ export const INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES: Dimensions 
       ID_LEN + // Subnet ID
       INT_LEN + // Num stake outs
       INT_LEN, // Delegator rewards typeID
-    [FeeDimensions.DBRead]: 1,
-    [FeeDimensions.DBWrite]: 1,
+    [FeeDimensions.DBRead]: 1, // get staking config
+    [FeeDimensions.DBWrite]: 2, // put current staker + write weight diff
     [FeeDimensions.Compute]: 0,
   };
 
@@ -160,8 +160,8 @@ export const INTRINSIC_ADD_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
     INTRINSIC_SUBNET_VALIDATOR_BANDWIDTH + // Subnet Validator
     INT_LEN + // Subnet auth typeID
     INT_LEN, // Subnet auth credential typeID
-  [FeeDimensions.DBRead]: 2,
-  [FeeDimensions.DBWrite]: 1,
+  [FeeDimensions.DBRead]: 3, // get subnet auth + check for subnet transformation + check for subnet conversion
+  [FeeDimensions.DBWrite]: 3, // put current staker + write weight diff + write pk diff
   [FeeDimensions.Compute]: 0,
 };
 
@@ -192,8 +192,8 @@ export const INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
     ID_LEN + // subnetID
     INT_LEN + // subnetAuth typeId
     INT_LEN, // subnetAuth credential typeId
-  [FeeDimensions.DBRead]: 2,
-  [FeeDimensions.DBWrite]: 1,
+  [FeeDimensions.DBRead]: 1, // read subnet auth
+  [FeeDimensions.DBWrite]: 3, // delete validator + write weight diff + write pk diff
   [FeeDimensions.Compute]: 0,
 };
 
@@ -204,8 +204,8 @@ export const INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES: Dimensions = {
     INT_LEN + // subnetAuth typeID
     INT_LEN + // owner typeID
     INT_LEN, // subnetAuth credential typeID
-  [FeeDimensions.DBRead]: 1,
-  [FeeDimensions.DBWrite]: 1,
+  [FeeDimensions.DBRead]: 1, // read subnet auth
+  [FeeDimensions.DBWrite]: 1, // set subnet owner
   [FeeDimensions.Compute]: 0,
 };
 
@@ -232,8 +232,8 @@ export const INTRINSIC_CONVERT_SUBNET_TO_L1_TX_COMPLEXITIES: Dimensions = {
     INT_LEN + // validators length
     INT_LEN + // subnetAuth typeID
     INT_LEN, // subnetAuthCredential typeID
-  [FeeDimensions.DBRead]: 2, // subnet auth + manager lookup
-  [FeeDimensions.DBWrite]: 2, // manager + weight
+  [FeeDimensions.DBRead]: 3, // subnet auth + transformation lookup + conversion lookup
+  [FeeDimensions.DBWrite]: 2, // write conversion manager + total weight
   [FeeDimensions.Compute]: 0,
 };
 
@@ -243,28 +243,29 @@ export const INTRINSIC_REGISTER_L1_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
     LONG_LEN + // balance
     BLS_SIGNATURE_LENGTH + // proof of possession
     INT_LEN, // message length
-  [FeeDimensions.DBRead]: 0, // TODO: Implement
-  [FeeDimensions.DBWrite]: 0, // TODO: Implement
-  [FeeDimensions.Compute]: 0, // TODO: Include PoP verification time
+  [FeeDimensions.DBRead]: 5, // conversion owner + expiry lookup + sov lookup + subnetID/nodeID lookup + weight lookup
+  [FeeDimensions.DBWrite]: 6, // write current staker + expiry + write weight diff + write pk diff + subnetID/nodeID lookup + weight lookup
+  [FeeDimensions.Compute]: INTRINSIC_BLS_POP_VERIFY_COMPUTE,
 };
 
 export const INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
     INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] + INT_LEN, // message length
-  [FeeDimensions.DBRead]: 0, // TODO: Implement
-  [FeeDimensions.DBWrite]: 0, // TODO: Implement
+  [FeeDimensions.DBRead]: 3, // read staker + read conversion + read weight
+  [FeeDimensions.DBWrite]: 5, // remaining balance utxo + write weight diff + write pk diff + weights lookup + validator write
   [FeeDimensions.Compute]: 0,
 };
 
-export const INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES: Dimensions = {
-  [FeeDimensions.Bandwidth]:
-    INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
-    ID_LEN + // validationId
-    LONG_LEN, // balance
-  [FeeDimensions.DBRead]: 0, // TODO: Implement
-  [FeeDimensions.DBWrite]: 0, // TODO: Implement
-  [FeeDimensions.Compute]: 0,
-};
+export const INTRINSIC_INCREASE_L1_VALIDATOR_BALANCE_TX_COMPLEXITIES: Dimensions =
+  {
+    [FeeDimensions.Bandwidth]:
+      INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+      ID_LEN + // validationId
+      LONG_LEN, // balance
+    [FeeDimensions.DBRead]: 1, // read staker
+    [FeeDimensions.DBWrite]: 5, // weight diff + deactivated weight diff + public key diff + delete staker + write staker
+    [FeeDimensions.Compute]: 0,
+  };
 
 export const INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.Bandwidth]:
@@ -272,7 +273,7 @@ export const INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
     ID_LEN + // validationId
     INT_LEN + // auth typeId
     INT_LEN, // auth credential typeId
-  [FeeDimensions.DBRead]: 0, // TODO: Implement
-  [FeeDimensions.DBWrite]: 0, // TODO: Implement
+  [FeeDimensions.DBRead]: 1, // read staker
+  [FeeDimensions.DBWrite]: 6, // write remianing balance utxo + weight diff + deactivated weight diff + public key diff + delete staker + write staker
   [FeeDimensions.Compute]: 0,
 };
