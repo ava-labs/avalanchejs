@@ -1,3 +1,4 @@
+import type { PChainOwner } from '../../serializable';
 import type { TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
 import type { Dimensions } from '../common/fees/dimensions';
@@ -304,4 +305,35 @@ export interface FeeState {
   price: bigint;
   /** ISO8601 DateTime */
   timestamp: string;
+}
+
+export interface GetL1ValidatorResponse {
+  subnetID: string;
+  nodeID: string;
+  publicKey: string;
+  remainingBalanceOwner: {
+    addresses: string[];
+    locktime: string;
+    threshold: string;
+  };
+  deactivationOwner: {
+    addresses: string[];
+    locktime: string;
+    threshold: string;
+  };
+  startTime: string;
+  weight: string;
+  minNonce: string;
+  balance: string;
+  height: string;
+}
+
+export interface L1ValidatorDetails {
+  subnetID: string;
+  nodeID: string;
+  publicKey: string;
+  remainingBalanceOwner: PChainOwner;
+  deactivationOwner: PChainOwner;
+  weight: bigint;
+  balance: bigint;
 }

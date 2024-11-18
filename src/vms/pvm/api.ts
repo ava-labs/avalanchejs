@@ -1,11 +1,14 @@
+import { PChainOwner } from '../../serializable';
 import { TransferableOutput } from '../../serializable/avax';
 import { Utxo } from '../../serializable/avax/utxo';
 import { getPVMManager } from '../../serializable/pvm/codec';
-import { hexToBuffer } from '../../utils';
+import { hexToBuffer, parse } from '../../utils';
 import type { GetAssetDescriptionResponse } from '../common/apiModels';
 import { AvaxApi } from '../common/avaxApi';
 import { createDimensions } from '../common/fees/dimensions';
 import type {
+  GetL1ValidatorResponse,
+  L1ValidatorDetails,
   FeeConfig,
   FeeConfigResponse,
   FeeState,
@@ -264,6 +267,31 @@ export class PVMApi extends AvaxApi {
       excess: BigInt(resp.excess),
       price: BigInt(resp.price),
       timestamp: resp.timestamp,
+    };
+  }
+
+  async getL1Validator(validationID: string): Promise<L1ValidatorDetails> {
+    const resp = await this.callRpc<GetL1ValidatorResponse>('getL1Validator', {
+      validationID,
+    });
+
+    const deactivationOwner = PChainOwner.fromNative(
+      resp.deactivationOwner.addresses.map((a) => parse(a)[2]),
+      Number(resp.deactivationOwner.threshold),
+    );
+    const remainingBalanceOwner = PChainOwner.fromNative(
+      resp.remainingBalanceOwner.addresses.map((a) => parse(a)[2]),
+      Number(resp.remainingBalanceOwner.threshold),
+    );
+
+    return {
+      balance: BigInt(resp.balance),
+      nodeID: resp.nodeID,
+      publicKey: resp.publicKey,
+      subnetID: resp.subnetID,
+      weight: BigInt(resp.weight),
+      deactivationOwner,
+      remainingBalanceOwner,
     };
   }
 }
