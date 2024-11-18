@@ -69,6 +69,16 @@ export const INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH =
   INT_LEN + // Signature index
   SIGNATURE_LENGTH; // Signature
 
+export const INTRINSIC_SECP256K1_FX_SIGNATURE_COMPUTE = 200; // secp256k1 signature verification time is around 200us
+
+export const INTRINSIC_BLS_AGGREGATE_COMPUTE = 5; // BLS public key aggregation time is around 5 us
+export const INTRINSIC_BLS_VERIFY_COMPUTE = 1_000; // BLS verification time is around 1000us
+export const INTRINSIC_BLS_PUBLIC_KEY_VALIDATION_COMPUTE = 50; // BLS public key validation time is around 50us
+export const INTRINSIC_BLS_POP_VERIFY_COMPUTE =
+  INTRINSIC_BLS_PUBLIC_KEY_VALIDATION_COMPUTE + INTRINSIC_BLS_VERIFY_COMPUTE;
+
+export const INTRINSIC_WARP_DB_READS = 3 + 20; // chainID -> subnetID mapping + apply weight diffs + apply pk diffs + diff application reads
+
 export const INTRINSIC_POP_BANDWIDTH =
   PUBLIC_KEY_LENGTH + // Public key
   BLS_SIGNATURE_LENGTH; // Signature

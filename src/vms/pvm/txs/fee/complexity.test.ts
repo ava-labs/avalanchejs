@@ -133,7 +133,7 @@ describe('Complexity', () => {
           bandwidth: 92,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 0,
         }),
       );
     });
@@ -146,7 +146,7 @@ describe('Complexity', () => {
           bandwidth: 161,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 200,
         }),
       );
     });
@@ -159,7 +159,7 @@ describe('Complexity', () => {
           bandwidth: 299,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 600,
         }),
       );
     });
@@ -181,7 +181,7 @@ describe('Complexity', () => {
           bandwidth: 311,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 600,
         }),
       );
     });
@@ -230,7 +230,7 @@ describe('Complexity', () => {
           bandwidth: 144,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -245,7 +245,7 @@ describe('Complexity', () => {
           bandwidth: 8,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 0,
         }),
       );
     });
@@ -258,7 +258,7 @@ describe('Complexity', () => {
           bandwidth: 77,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 200,
         }),
       );
     });
@@ -271,7 +271,7 @@ describe('Complexity', () => {
           bandwidth: 215,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 600,
         }),
       );
     });
@@ -334,7 +334,7 @@ describe('Complexity', () => {
           bandwidth: 200,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -363,7 +363,7 @@ describe('Complexity', () => {
           bandwidth: 220,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -392,7 +392,7 @@ describe('Complexity', () => {
           bandwidth: 220,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
