@@ -78,7 +78,7 @@ import {
   getOwnerComplexity,
   getSignerComplexity,
   getBytesComplexity,
-  getConvertSubnetValidatorsComplexity,
+  getL1ValidatorsComplexity,
 } from '../txs/fee';
 import { spend } from './spend';
 import { useSpendableLockedUTXOs, useUnlockedUTXOs } from './spend-reducers';
@@ -1395,7 +1395,7 @@ export const newConvertSubnetToL1Tx: TxBuilderFn<
 
   const bytesComplexity = getBytesComplexity(memo, address);
   const authComplexity = getAuthComplexity(Input.fromNative(subnetAuth));
-  const validatorComplexity = getConvertSubnetValidatorsComplexity(validators);
+  const validatorComplexity = getL1ValidatorsComplexity(validators);
 
   const sortedValidators = validators.sort((a, b) =>
     bytesCompare(a.nodeId.toBytes(), b.nodeId.toBytes()),

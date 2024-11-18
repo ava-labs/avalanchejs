@@ -20,7 +20,7 @@ export {
   getSignerComplexity,
   getTxComplexity,
   getBytesComplexity,
-  getL1ValidatorsComplexity as getConvertSubnetValidatorsComplexity,
+  getL1ValidatorsComplexity,
 } from './complexity';
 
 export { calculateFee } from './calculator';
