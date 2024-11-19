@@ -274,6 +274,6 @@ export const INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
     INT_LEN + // auth typeId
     INT_LEN, // auth credential typeId
   [FeeDimensions.DBRead]: 1, // read staker
-  [FeeDimensions.DBWrite]: 6, // write remianing balance utxo + weight diff + deactivated weight diff + public key diff + delete staker + write staker
+  [FeeDimensions.DBWrite]: 6, // write remaining balance utxo + weight diff + deactivated weight diff + public key diff + delete staker + write staker
   [FeeDimensions.Compute]: 0,
 };

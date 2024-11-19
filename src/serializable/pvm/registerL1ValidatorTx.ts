@@ -29,6 +29,7 @@ export class RegisterL1ValidatorTx extends PVMTx {
       [BaseTx, BigIntPr, BlsSignature, Bytes],
       codec,
     );
+
     return [
       new RegisterL1ValidatorTx(baseTx, balance, blsSignature, message),
       rest,

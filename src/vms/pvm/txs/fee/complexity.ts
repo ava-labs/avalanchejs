@@ -96,8 +96,12 @@ import {
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
   INTRINSIC_SECP256K1_FX_SIGNATURE_COMPUTE,
   INTRINSIC_BLS_POP_VERIFY_COMPUTE,
+  INTRINSIC_BLS_AGGREGATE_COMPUTE,
+  INTRINSIC_BLS_VERIFY_COMPUTE,
+  INTRINSIC_WARP_DB_READS,
 } from './constants';
 import type { L1Validator } from '../../../../serializable/fxs/pvm/L1Validator';
+import { getWarpMessageNumOfSigners } from './utils';
 
 /**
  * Returns the complexity outputs add to a transaction.
@@ -245,12 +249,17 @@ export const getBytesComplexity = (
 };
 
 export const getWarpComplexity = (message: Bytes): Dimensions => {
-  // TODO: Finish implementation.
+  const numberOfSigners = getWarpMessageNumOfSigners(message);
+
+  const aggregationCompute = numberOfSigners * INTRINSIC_BLS_AGGREGATE_COMPUTE;
+
+  const compute: number = aggregationCompute + INTRINSIC_BLS_VERIFY_COMPUTE;
+
   return createDimensions({
     bandwidth: message.length,
-    dbRead: 0,
+    dbRead: INTRINSIC_WARP_DB_READS,
     dbWrite: 0,
-    compute: 0,
+    compute,
   });
 };
 

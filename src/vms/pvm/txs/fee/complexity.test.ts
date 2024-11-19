@@ -45,6 +45,11 @@ import {
   TEST_TRANSACTIONS,
   TEST_UNSUPPORTED_TRANSACTIONS,
 } from './fixtures/transactions';
+import {
+  INTRINSIC_BLS_AGGREGATE_COMPUTE,
+  INTRINSIC_BLS_VERIFY_COMPUTE,
+  INTRINSIC_WARP_DB_READS,
+} from './constants';
 
 const makeOutputOwners = (numOfAddresses = 0) =>
   new OutputOwners(
@@ -295,22 +300,25 @@ describe('Complexity', () => {
       expect(result).toEqual(
         createDimensions({
           bandwidth: 0,
-          dbRead: 0,
+          dbRead: INTRINSIC_WARP_DB_READS,
           dbWrite: 0,
-          compute: 0,
+          compute: INTRINSIC_BLS_VERIFY_COMPUTE,
         }),
       );
     });
 
     test('complexity from warp message', () => {
       const result = getWarpComplexity(new Bytes(warpMessage));
+      const numOfSigners = 1;
 
       expect(result).toEqual(
         createDimensions({
           bandwidth: warpMessage.length,
-          dbRead: 0,
+          dbRead: INTRINSIC_WARP_DB_READS,
           dbWrite: 0,
-          compute: 0,
+          compute:
+            INTRINSIC_BLS_VERIFY_COMPUTE +
+            INTRINSIC_BLS_AGGREGATE_COMPUTE * numOfSigners,
         }),
       );
     });

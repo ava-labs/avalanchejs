@@ -9,12 +9,15 @@ import { id } from '../../../fixtures/common';
 import { stakeableLockOut } from '../../../fixtures/pvm';
 import { TransferableOutput } from '../../../serializable';
 import { isTransferOut } from '../../../utils';
+import type { Dimensions } from '../../common/fees/dimensions';
 import {
+  addDimensions,
   createDimensions,
   dimensionsToGas,
 } from '../../common/fees/dimensions';
 import type { SpendHelperProps } from './spendHelper';
 import { SpendHelper } from './spendHelper';
+import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
 const DEFAULT_GAS_PRICE = 3n;
 
@@ -42,6 +45,12 @@ const DEFAULT_PROPS: SpendHelperProps = {
   weights: DEFAULT_WEIGHTS,
 };
 
+const expectedFee = (...dimensions: Dimensions[]): bigint => {
+  const totalDimensions = addDimensions(...dimensions);
+
+  return dimensionsToGas(totalDimensions, DEFAULT_WEIGHTS) * DEFAULT_GAS_PRICE;
+};
+
 describe('src/vms/pvm/etna-builder/spendHelper', () => {
   test('initialized with correct values', () => {
     const spendHelper = new SpendHelper(DEFAULT_PROPS);
@@ -65,9 +74,7 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [],
-      fee:
-        dimensionsToGas(DEFAULT_PROPS.initialComplexity, DEFAULT_WEIGHTS) *
-        DEFAULT_GAS_PRICE,
+      fee: expectedFee(DEFAULT_PROPS.initialComplexity),
       inputs: [],
       inputUTXOs: [],
       stakeOutputs: [],
@@ -80,7 +87,10 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [],
-      fee: 942n,
+      fee: expectedFee(
+        DEFAULT_PROPS.initialComplexity,
+        getInputComplexity([inputTransferableInput]),
+      ),
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [],
@@ -92,7 +102,11 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [changeOutput],
-      fee: 1251n,
+      fee: expectedFee(
+        DEFAULT_PROPS.initialComplexity,
+        getInputComplexity([inputTransferableInput]),
+        getOutputComplexity([changeOutput]),
+      ),
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [],
@@ -104,7 +118,11 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
 
     expect(spendHelper.getInputsOutputs()).toEqual({
       changeOutputs: [changeOutput],
-      fee: 1560n,
+      fee: expectedFee(
+        DEFAULT_PROPS.initialComplexity,
+        getInputComplexity([inputTransferableInput]),
+        getOutputComplexity([changeOutput, stakeOutput]),
+      ),
       inputs: [inputTransferableInput],
       inputUTXOs: [inputUtxo],
       stakeOutputs: [stakeOutput],
