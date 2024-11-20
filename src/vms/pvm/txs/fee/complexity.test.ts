@@ -45,6 +45,11 @@ import {
   TEST_TRANSACTIONS,
   TEST_UNSUPPORTED_TRANSACTIONS,
 } from './fixtures/transactions';
+import {
+  INTRINSIC_BLS_AGGREGATE_COMPUTE,
+  INTRINSIC_BLS_VERIFY_COMPUTE,
+  INTRINSIC_WARP_DB_READS,
+} from './constants';
 
 const makeOutputOwners = (numOfAddresses = 0) =>
   new OutputOwners(
@@ -133,7 +138,7 @@ describe('Complexity', () => {
           bandwidth: 92,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 0,
         }),
       );
     });
@@ -146,7 +151,7 @@ describe('Complexity', () => {
           bandwidth: 161,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 200,
         }),
       );
     });
@@ -159,7 +164,7 @@ describe('Complexity', () => {
           bandwidth: 299,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 600,
         }),
       );
     });
@@ -181,7 +186,7 @@ describe('Complexity', () => {
           bandwidth: 311,
           dbRead: 1,
           dbWrite: 1,
-          compute: 0, // TODO: Implement
+          compute: 600,
         }),
       );
     });
@@ -230,7 +235,7 @@ describe('Complexity', () => {
           bandwidth: 144,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -245,7 +250,7 @@ describe('Complexity', () => {
           bandwidth: 8,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 0,
         }),
       );
     });
@@ -258,7 +263,7 @@ describe('Complexity', () => {
           bandwidth: 77,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 200,
         }),
       );
     });
@@ -271,7 +276,7 @@ describe('Complexity', () => {
           bandwidth: 215,
           dbRead: 0,
           dbWrite: 0,
-          compute: 0, // TODO: Implement
+          compute: 600,
         }),
       );
     });
@@ -289,28 +294,24 @@ describe('Complexity', () => {
     // Example Warp Message
     const warpMessage = warpMessageBytes();
 
-    test('complexity from empty warp message', () => {
-      const result = getWarpComplexity(new Bytes(new Uint8Array(0)));
-
-      expect(result).toEqual(
-        createDimensions({
-          bandwidth: 0,
-          dbRead: 0,
-          dbWrite: 0,
-          compute: 0,
-        }),
-      );
+    test('throws "not enough bytes" error from empty warp message', () => {
+      expect(() => {
+        getWarpComplexity(new Bytes(new Uint8Array()));
+      }).toThrow('not enough bytes');
     });
 
     test('complexity from warp message', () => {
       const result = getWarpComplexity(new Bytes(warpMessage));
+      const numOfSigners = 1;
 
       expect(result).toEqual(
         createDimensions({
           bandwidth: warpMessage.length,
-          dbRead: 0,
+          dbRead: INTRINSIC_WARP_DB_READS,
           dbWrite: 0,
-          compute: 0,
+          compute:
+            INTRINSIC_BLS_VERIFY_COMPUTE +
+            INTRINSIC_BLS_AGGREGATE_COMPUTE * numOfSigners,
         }),
       );
     });
@@ -334,7 +335,7 @@ describe('Complexity', () => {
           bandwidth: 200,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -363,7 +364,7 @@ describe('Complexity', () => {
           bandwidth: 220,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -392,7 +393,7 @@ describe('Complexity', () => {
           bandwidth: 220,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });
@@ -420,7 +421,7 @@ describe('Complexity', () => {
           bandwidth: 240,
           dbRead: 0,
           dbWrite: 4,
-          compute: 0, // TODO: Implement
+          compute: 1_050,
         }),
       );
     });

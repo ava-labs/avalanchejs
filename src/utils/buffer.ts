@@ -33,4 +33,30 @@ export function padLeft(bytes: Uint8Array, length: number) {
   return out;
 }
 
+/**
+ * Calculates the number of `1`s (set bits) in the binary
+ * representation a big-endian byte slice.
+ *
+ * @param input A Uint8Array
+ * @returns The number of bits set to 1 in the binary representation of the input
+ *
+ * @example
+ * ```ts
+ * hammingWeight(new Uint8Array([0, 1, 2, 3, 4, 5])); // 7
+ * ```
+ */
+export const hammingWeight = (input: Uint8Array): number => {
+  let count = 0;
+
+  for (let i = 0; i < input.length; i++) {
+    let num = input[i];
+    while (num !== 0) {
+      count += num & 1;
+      num >>= 1;
+    }
+  }
+
+  return count;
+};
+
 export { concatBytes, strip0x, add0x };

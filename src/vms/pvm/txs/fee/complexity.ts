@@ -76,7 +76,7 @@ import {
   INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_EXPORT_TX_COMPLEXITIES,
   INTRINSIC_IMPORT_TX_COMPLEXITIES,
-  INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+  INTRINSIC_INCREASE_L1_VALIDATOR_BALANCE_TX_COMPLEXITIES,
   INTRINSIC_INPUT_BANDWIDTH,
   INTRINSIC_INPUT_DB_READ,
   INTRINSIC_INPUT_DB_WRITE,
@@ -94,8 +94,16 @@ import {
   INTRINSIC_STAKEABLE_LOCKED_INPUT_BANDWIDTH,
   INTRINSIC_STAKEABLE_LOCKED_OUTPUT_BANDWIDTH,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
+  INTRINSIC_SECP256K1_FX_SIGNATURE_COMPUTE,
+  INTRINSIC_BLS_POP_VERIFY_COMPUTE,
+  INTRINSIC_BLS_AGGREGATE_COMPUTE,
+  INTRINSIC_BLS_VERIFY_COMPUTE,
+  INTRINSIC_WARP_DB_READS,
 } from './constants';
 import type { L1Validator } from '../../../../serializable/fxs/pvm/L1Validator';
+import { WarpMessage, getWarpManager } from '../../../../serializable/pvm/warp';
+
+const warpManager = getWarpManager();
 
 /**
  * Returns the complexity outputs add to a transaction.
@@ -152,7 +160,7 @@ export const getInputComplexity = (
         INTRINSIC_SECP256K1_FX_TRANSFERABLE_INPUT_BANDWIDTH,
       [FeeDimensions.DBRead]: INTRINSIC_INPUT_DB_READ,
       [FeeDimensions.DBWrite]: INTRINSIC_INPUT_DB_WRITE,
-      [FeeDimensions.Compute]: 0, // TODO: Add compute complexity.
+      [FeeDimensions.Compute]: 0,
     };
 
     if (isStakeableLockIn(transferableInput.input)) {
@@ -166,6 +174,9 @@ export const getInputComplexity = (
       numberOfSignatures * INTRINSIC_SECP256K1_FX_SIGNATURE_BANDWIDTH;
 
     inputComplexity[FeeDimensions.Bandwidth] += signatureBandwidth;
+
+    inputComplexity[FeeDimensions.Compute] +=
+      numberOfSignatures * INTRINSIC_SECP256K1_FX_SIGNATURE_COMPUTE;
 
     complexity = addDimensions(complexity, inputComplexity);
   }
@@ -184,7 +195,7 @@ export const getSignerComplexity = (
     bandwidth: INTRINSIC_POP_BANDWIDTH,
     dbRead: 0,
     dbWrite: 0,
-    compute: 0, // TODO: Add compute complexity.
+    compute: INTRINSIC_BLS_POP_VERIFY_COMPUTE,
   });
 };
 
@@ -218,11 +229,14 @@ export const getAuthComplexity = (input: Serializable): Dimensions => {
 
   const bandwidth = signatureBandwidth + INTRINSIC_SECP256K1_FX_INPUT_BANDWIDTH;
 
+  const signatureCompute =
+    numberOfSignatures * INTRINSIC_SECP256K1_FX_SIGNATURE_COMPUTE;
+
   return createDimensions({
     bandwidth,
     dbRead: 0,
     dbWrite: 0,
-    compute: 0, // TODO: Add compute complexity.
+    compute: signatureCompute,
   });
 };
 
@@ -237,12 +251,19 @@ export const getBytesComplexity = (
 };
 
 export const getWarpComplexity = (message: Bytes): Dimensions => {
-  // TODO: Finish implementation.
+  const numberOfSigners = warpManager
+    .unpack(message.bytes, WarpMessage)
+    .signature.numOfSigners();
+
+  const aggregationCompute = numberOfSigners * INTRINSIC_BLS_AGGREGATE_COMPUTE;
+
+  const compute: number = aggregationCompute + INTRINSIC_BLS_VERIFY_COMPUTE;
+
   return createDimensions({
     bandwidth: message.length,
-    dbRead: 0,
+    dbRead: INTRINSIC_WARP_DB_READS,
     dbWrite: 0,
-    compute: 0,
+    compute,
   });
 };
 
@@ -422,7 +443,7 @@ const increaseL1ValidatorBalanceTx = (
   tx: IncreaseL1ValidatorBalanceTx,
 ): Dimensions => {
   return addDimensions(
-    INTRINSIC_INCREASE_BALANCE_TX_COMPLEXITIES,
+    INTRINSIC_INCREASE_L1_VALIDATOR_BALANCE_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
   );
 };

@@ -1,4 +1,9 @@
-import { bufferToBigInt, bufferToNumber, padLeft } from './buffer';
+import {
+  bufferToBigInt,
+  bufferToNumber,
+  hammingWeight,
+  padLeft,
+} from './buffer';
 import { describe, it, expect } from 'vitest';
 
 describe('bufferToBigInt', () => {
@@ -77,5 +82,33 @@ describe('padLeft', () => {
   it('no-ops if already at size', () => {
     const res = padLeft(new Uint8Array([0xaf, 0x72, 0x72]), 2);
     expect(res).toStrictEqual(new Uint8Array([0xaf, 0x72, 0x72]));
+  });
+});
+
+describe('hammingWeight()', () => {
+  it('should return expected number of `1` bits from bytes', () => {
+    expect(hammingWeight(new Uint8Array([0]))).toBe(0);
+    expect(hammingWeight(new Uint8Array([1]))).toBe(1);
+    expect(hammingWeight(new Uint8Array([2]))).toBe(1);
+    expect(hammingWeight(new Uint8Array([3]))).toBe(2);
+    expect(hammingWeight(new Uint8Array([4]))).toBe(1);
+    expect(hammingWeight(new Uint8Array([5]))).toBe(2);
+    expect(hammingWeight(new Uint8Array([6]))).toBe(2);
+    expect(hammingWeight(new Uint8Array([7]))).toBe(3);
+    expect(hammingWeight(new Uint8Array([8]))).toBe(1);
+    expect(hammingWeight(new Uint8Array([9]))).toBe(2);
+
+    expect(hammingWeight(new Uint8Array([0, 0]))).toBe(0);
+    expect(hammingWeight(new Uint8Array([0, 1]))).toBe(1);
+    expect(hammingWeight(new Uint8Array([0, 2]))).toBe(1);
+    expect(hammingWeight(new Uint8Array([0, 3]))).toBe(2);
+
+    expect(hammingWeight(new Uint8Array([1, 1]))).toBe(2);
+    expect(hammingWeight(new Uint8Array([1, 2]))).toBe(2);
+    expect(hammingWeight(new Uint8Array([1, 3]))).toBe(3);
+
+    expect(hammingWeight(new Uint8Array([3, 1]))).toBe(3);
+    expect(hammingWeight(new Uint8Array([3, 2]))).toBe(3);
+    expect(hammingWeight(new Uint8Array([3, 3]))).toBe(4);
   });
 });

@@ -95,4 +95,9 @@ export enum TypeSymbols {
   EvmInput = 'evm.Input',
   EvmOutput = 'evm.Output',
   EvmImportTx = 'evm.ImportTx',
+
+  // Warp
+  WarpMessage = 'warp.Message',
+  WarpUnsignedMessage = 'warp.UnsignedMessage',
+  WarpSignature = 'warp.Signature',
 }
