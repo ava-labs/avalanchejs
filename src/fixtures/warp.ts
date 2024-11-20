@@ -13,6 +13,7 @@ import {
   int,
   intBytes,
 } from './primitives';
+import { bytesForInt } from './utils/bytesFor';
 
 export const warpUnsignedMessage = () =>
   new WarpUnsignedMessage(int(), id(), bytes());
@@ -29,4 +30,4 @@ export const warpMessage = () =>
   new WarpMessage(warpUnsignedMessage(), warpSignature());
 
 export const warpMessageBytes = () =>
-  concatBytes(warpUnsignedMessageBytes(), warpSignatureBytes());
+  concatBytes(warpUnsignedMessageBytes(), bytesForInt(0), warpSignatureBytes());
