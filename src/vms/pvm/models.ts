@@ -215,6 +215,21 @@ export interface GetStakingAssetIDResponse {
   assetID: string;
 }
 
+export interface GetSubnetParams {
+  subnetID: string;
+}
+
+export interface GetSubnetResponse {
+  isPermissioned: boolean;
+  controlKeys: string[];
+  threshold: string;
+  locktime: string;
+  subnetTransformationTxID: string;
+  conversionID: string;
+  managerChainID: string;
+  managerAddress: string | null;
+}
+
 export interface GetSubnetsParams {
   ids: string[];
 }
