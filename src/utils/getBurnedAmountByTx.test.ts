@@ -39,8 +39,8 @@ import { feeState, l1Validator } from '../fixtures/pvm';
 import {
   bigIntPr,
   blsSignatureBytes,
-  bytesBytes,
   stringPr,
+  warpMessageBytes,
 } from '../fixtures/primitives';
 
 const getUtxoMock = (
@@ -677,10 +677,7 @@ describe('getBurnedAmountByTx', () => {
 
       const amounts = getBurnedAmountByTx(tx, testContext);
       expect(amounts.size).toEqual(1);
-      expect(amounts.get(testContext.avaxAssetID)).toEqual(
-        // Magic number. This needs refactored. Is this even correct?
-        2_200n,
-      );
+      expect(amounts.get(testContext.avaxAssetID)).toEqual(2_200n);
     });
   });
 
@@ -695,20 +692,17 @@ describe('getBurnedAmountByTx', () => {
         utxos: [utxo1, utxo2],
         balance: bigIntPr().value(),
         blsSignature: blsSignatureBytes(),
-        message: bytesBytes(),
+        message: warpMessageBytes(),
       },
       testContext,
     ).getTx() as AvaxTx;
 
     const amounts = getBurnedAmountByTx(tx, testContext);
     expect(amounts.size).toEqual(1);
-    expect(amounts.get(testContext.avaxAssetID)).toEqual(
-      // Magic number. This needs refactored. Is this even correct?
-      2_710n,
-    );
+    expect(amounts.get(testContext.avaxAssetID)).toEqual(3_002n);
   });
 
-  it('calculates the burned amount of RegisterL1Validator tx correctly', () => {
+  it('calculates the burned amount of IncreaseL1ValidatorBalance tx correctly', () => {
     const utxo1 = getUtxoMock(testUTXOID1, 5000000n);
     const utxo2 = getUtxoMock(testUTXOID2, 6000000n);
 
@@ -725,9 +719,6 @@ describe('getBurnedAmountByTx', () => {
 
     const amounts = getBurnedAmountByTx(tx, testContext);
     expect(amounts.size).toEqual(1);
-    expect(amounts.get(testContext.avaxAssetID)).toEqual(
-      // Magic number. This needs refactored. Is this even correct?
-      548n,
-    );
+    expect(amounts.get(testContext.avaxAssetID)).toEqual(548n);
   });
 });

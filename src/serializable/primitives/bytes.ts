@@ -9,7 +9,7 @@ import { TypeSymbols } from '../constants';
 @serializable()
 export class Bytes extends Primitives {
   _type = TypeSymbols.Bytes;
-  constructor(private readonly bytes: Uint8Array) {
+  constructor(public readonly bytes: Uint8Array) {
     super();
   }
 

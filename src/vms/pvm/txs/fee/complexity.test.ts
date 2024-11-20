@@ -294,17 +294,10 @@ describe('Complexity', () => {
     // Example Warp Message
     const warpMessage = warpMessageBytes();
 
-    test('complexity from empty warp message', () => {
-      const result = getWarpComplexity(new Bytes(new Uint8Array(0)));
-
-      expect(result).toEqual(
-        createDimensions({
-          bandwidth: 0,
-          dbRead: INTRINSIC_WARP_DB_READS,
-          dbWrite: 0,
-          compute: INTRINSIC_BLS_VERIFY_COMPUTE,
-        }),
-      );
+    test('throws "not enough bytes" error from empty warp message', () => {
+      expect(() => {
+        getWarpComplexity(new Bytes(new Uint8Array()));
+      }).toThrow('not enough bytes');
     });
 
     test('complexity from warp message', () => {

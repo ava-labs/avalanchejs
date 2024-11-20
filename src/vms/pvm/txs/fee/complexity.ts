@@ -101,7 +101,9 @@ import {
   INTRINSIC_WARP_DB_READS,
 } from './constants';
 import type { L1Validator } from '../../../../serializable/fxs/pvm/L1Validator';
-import { getWarpMessageNumOfSigners } from './utils';
+import { WarpMessage, getWarpManager } from '../../../../serializable/pvm/warp';
+
+const warpManager = getWarpManager();
 
 /**
  * Returns the complexity outputs add to a transaction.
@@ -249,7 +251,9 @@ export const getBytesComplexity = (
 };
 
 export const getWarpComplexity = (message: Bytes): Dimensions => {
-  const numberOfSigners = getWarpMessageNumOfSigners(message);
+  const numberOfSigners = warpManager
+    .unpack(message.bytes, WarpMessage)
+    .signature.numOfSigners();
 
   const aggregationCompute = numberOfSigners * INTRINSIC_BLS_AGGREGATE_COMPUTE;
 
