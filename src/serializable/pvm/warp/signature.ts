@@ -33,7 +33,7 @@ export class WarpSignature {
   }
 
   /**
-   * Number of public keys that participated in the
+   * Number of BLS public keys that participated in the
    * {@linkcode BlsSignature}. This is exposed because users of the signatures
    * typically impose a verification fee that is a function of the number of signers.
    *
