@@ -5,7 +5,6 @@ import { serializable } from '../../common/types';
 import { TypeSymbols } from '../../constants';
 import { BlsSignature } from '../../fxs/common';
 import { Bytes } from '../../primitives';
-import { INT_LEN } from '../../primitives/int';
 
 @serializable()
 export class WarpSignature {
@@ -34,13 +33,13 @@ export class WarpSignature {
   }
 
   /**
-   * Number of [bls.PublicKeys] that participated in the
+   * Number of public keys that participated in the
    * {@linkcode BlsSignature}. This is exposed because users of the signatures
    * typically impose a verification fee that is a function of the number of signers.
    *
    * This is used to calculate the Warp complexity in transactions.
    */
   numOfSigners(): number {
-    return hammingWeight(this.signers.toBytes().slice(INT_LEN));
+    return hammingWeight(this.signers.bytes);
   }
 }
