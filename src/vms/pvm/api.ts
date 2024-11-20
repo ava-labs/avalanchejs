@@ -28,6 +28,8 @@ import type {
   GetStakeResponse,
   GetStakingAssetIDParams,
   GetStakingAssetIDResponse,
+  GetSubnetParams,
+  GetSubnetResponse,
   GetSubnetsParams,
   GetSubnetsResponse,
   GetTimestampResponse,
@@ -182,6 +184,10 @@ export class PVMApi extends AvaxApi {
       'getStakingAssetID',
       getStakingAssetIDParams,
     );
+  }
+
+  getSubnet(getSubnetParams: GetSubnetParams): Promise<GetSubnetResponse> {
+    return this.callRpc<GetSubnetResponse>('getSubnet', getSubnetParams);
   }
 
   getSubnets(getSubnetsParams: GetSubnetsParams): Promise<GetSubnetsResponse> {
