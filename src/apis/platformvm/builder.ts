@@ -1822,6 +1822,9 @@ export class Builder {
     fee: BN = zero,
     feeAssetID: Buffer = undefined,
     asOf: BN = zero,
+    stakeAmount: BN = zero,
+    stakeAssetID: Buffer,
+    toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
@@ -1831,19 +1834,20 @@ export class Builder {
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
-        0,
+        toThreshold,
         fromSigner.from,
         fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
-      aad.addAssetAmount(feeAssetID, zero, fee)
+      //aad.addAssetAmount(feeAssetID, zero, fee)
+      aad.addAssetAmount(stakeAssetID, stakeAmount, fee) // TODO: @VjeraTurk Is it ok like so?
 
       const minSpendableErr: Error = await this.spender.getMinimumSpendable(
         aad,
         asOf,
         zero,
-        "Unlocked"
+        "Bond"
       )
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()

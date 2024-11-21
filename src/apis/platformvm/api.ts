@@ -3201,7 +3201,8 @@ export class PlatformVMAPI extends JRPCAPI {
     version: number = DefaultTransactionVersionNumber,
     memo: PayloadBase | Buffer = undefined,
     asOf: BN = ZeroBN,
-    changeThreshold: number = 1
+    stakeAmount: BN
+    //changeThreshould: number = 1 // TODO: Is it safe to remove?
   ): Promise<UnsignedTx> => {
     const caller = "buildAddProposalTx"
 
@@ -3239,7 +3240,8 @@ export class PlatformVMAPI extends JRPCAPI {
       fee,
       avaxAssetID,
       asOf,
-      changeThreshold
+      stakeAmount,
+      avaxAssetID
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {

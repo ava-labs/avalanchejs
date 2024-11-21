@@ -9,6 +9,7 @@ import {
   PrivateKeyPrefix
 } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
+import BN from "bn.js"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
@@ -39,6 +40,7 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
+  const bondAmount: any = await pchain.getMinStake()
   let startDate = new Date()
   startDate.setDate(startDate.getDate() + 1)
   let endDate = new Date(startDate)
@@ -53,6 +55,8 @@ const main = async (): Promise<any> => {
   proposal.addBaseFeeOption(3000000)
 
   try {
+    const locktime: BN = new BN(0)
+    const hundred: BN = new BN(100000000000)
     let unsignedTx = await pchain.buildAddProposalTx(
       platformVMUTXOResponse.utxos, // utxoset
       pAddressStrings, // fromAddresses
@@ -61,7 +65,9 @@ const main = async (): Promise<any> => {
       proposal, // proposal
       pKeychain.getAddresses()[0], // proposerAddress
       0, // version
-      Buffer.alloc(20) // memo
+      Buffer.alloc(20), // memo
+      locktime,
+      hundred
     )
     const tx = unsignedTx.sign(pKeychain)
     const txid: string = await pchain.issueTx(tx)

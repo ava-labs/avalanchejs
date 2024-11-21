@@ -8,6 +8,7 @@ import {
 import { Avalanche, BinTools, Buffer } from "caminojs/index"
 import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
+import BN from "bn.js"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
@@ -40,6 +41,8 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
+  // TODO: @VjeraTurk should be able to get bondAmount from node?
+  const bondAmount: any = await pchain.getMinStake()
   let startDate = new Date()
   startDate.setDate(startDate.getDate() + 1)
   let endDate = new Date(startDate)
@@ -54,6 +57,8 @@ const main = async (): Promise<any> => {
     targetAddress
   )
   try {
+    const locktime: BN = new BN(0) // TODO: What should be the lock time?
+    const hundred: BN = new BN(100000000000) // TODO: replace with bondAmount
     let unsignedTx = await pchain.buildAddProposalTx(
       platformVMUTXOResponse.utxos, // utxoset
       pAddressStrings, // fromAddresses
@@ -62,7 +67,9 @@ const main = async (): Promise<any> => {
       proposal, // proposal
       pKeychain.getAddresses()[0], // proposerAddress
       0, // version
-      Buffer.alloc(20) // memo
+      Buffer.alloc(20), // memo
+      locktime,
+      hundred // stakeAmount
     )
 
     const tx = unsignedTx.sign(pKeychain)
@@ -72,9 +79,11 @@ const main = async (): Promise<any> => {
     const addProposalTx = unsignedTx2.getTransaction() as AddProposalTx
     const addProposalTxTypeName: string = addProposalTx.getTypeName()
     const addProposalTxTypeID: number = addProposalTx.getTypeID()
-
+    const txid: string = await pchain.issueTx(tx)
     console.log(addProposalTxTypeID, addProposalTxTypeName)
+    console.log(`Success! TXID: ${txid}`)
   } catch (e) {
+    // TODO: @VjeraTurk give instruction how to overcome "couldn't issue tx: proposal is semantically invalid: there is already active proposal of this type"
     console.log(e)
   }
 }
