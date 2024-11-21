@@ -42,4 +42,13 @@ export class DisableL1ValidatorTx extends PVMTx {
   getDisableAuth() {
     return this.disableAuth as Input;
   }
+
+  getSigIndices(): number[][] {
+    return [
+      ...this.getInputs().map((input) => {
+        return input.sigIndicies();
+      }),
+      this.getDisableAuth().values(),
+    ].filter((indicies): indicies is number[] => indicies !== undefined);
+  }
 }
