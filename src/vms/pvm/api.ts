@@ -292,6 +292,9 @@ export class PVMApi extends AvaxApi {
       weight: BigInt(resp.weight),
       deactivationOwner,
       remainingBalanceOwner,
+      startTime: BigInt(resp.startTime),
+      height: BigInt(resp.height),
+      minNonce: BigInt(resp.minNonce),
     };
   }
 }

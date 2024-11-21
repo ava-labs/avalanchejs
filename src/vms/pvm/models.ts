@@ -336,4 +336,7 @@ export interface L1ValidatorDetails {
   deactivationOwner: PChainOwner;
   weight: bigint;
   balance: bigint;
+  startTime: bigint;
+  minNonce: bigint;
+  height: bigint;
 }
