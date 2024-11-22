@@ -42,7 +42,6 @@ const InitAvalanche = async () => {
 const main = async (): Promise<any> => {
   await InitAvalanche()
   // TODO: @VjeraTurk should be able to get bondAmount from node?
-  const bondAmount: any = await pchain.getMinStake()
   let startDate = new Date()
   startDate.setDate(startDate.getDate() + 1)
   let endDate = new Date(startDate)
@@ -58,7 +57,6 @@ const main = async (): Promise<any> => {
   )
   try {
     const locktime: BN = new BN(0) // TODO: What should be the lock time?
-    const hundred: BN = new BN(100000000000) // TODO: replace with bondAmount
     let unsignedTx = await pchain.buildAddProposalTx(
       platformVMUTXOResponse.utxos, // utxoset
       pAddressStrings, // fromAddresses
@@ -68,8 +66,7 @@ const main = async (): Promise<any> => {
       pKeychain.getAddresses()[0], // proposerAddress
       0, // version
       Buffer.alloc(20), // memo
-      locktime,
-      hundred // stakeAmount
+      locktime
     )
 
     const tx = unsignedTx.sign(pKeychain)

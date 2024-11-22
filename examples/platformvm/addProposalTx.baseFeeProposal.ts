@@ -40,7 +40,6 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
-  const bondAmount: any = await pchain.getMinStake()
   let startDate = new Date()
   startDate.setDate(startDate.getDate() + 1)
   let endDate = new Date(startDate)
@@ -56,7 +55,6 @@ const main = async (): Promise<any> => {
 
   try {
     const locktime: BN = new BN(0)
-    const hundred: BN = new BN(100000000000)
     let unsignedTx = await pchain.buildAddProposalTx(
       platformVMUTXOResponse.utxos, // utxoset
       pAddressStrings, // fromAddresses
@@ -66,8 +64,7 @@ const main = async (): Promise<any> => {
       pKeychain.getAddresses()[0], // proposerAddress
       0, // version
       Buffer.alloc(20), // memo
-      locktime,
-      hundred
+      locktime
     )
     const tx = unsignedTx.sign(pKeychain)
     const txid: string = await pchain.issueTx(tx)
