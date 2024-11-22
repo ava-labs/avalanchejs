@@ -17,8 +17,7 @@ export class AddressedCall {
     bytes: Uint8Array,
     codec: Codec,
   ): [AddressedCall, Uint8Array] {
-    const [sourceAddress, payloadBytes] = unpack(bytes, [Bytes, Bytes], codec);
-    const [payload, rest] = codec.UnpackPrefix<Bytes>(payloadBytes.bytes);
+    const [sourceAddress, payload, rest] = unpack(bytes, [Bytes, Bytes], codec);
     return [new AddressedCall(sourceAddress, payload), rest];
   }
 
