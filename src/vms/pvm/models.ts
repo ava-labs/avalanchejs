@@ -1,5 +1,7 @@
+import type { PChainOwner } from '../../serializable';
 import type { TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
+import type { Dimensions } from '../common/fees/dimensions';
 
 export type GetAssetDescriptionResponse = {
   assetId: string;
@@ -214,6 +216,21 @@ export interface GetStakingAssetIDResponse {
   assetID: string;
 }
 
+export interface GetSubnetParams {
+  subnetID: string;
+}
+
+export interface GetSubnetResponse {
+  isPermissioned: boolean;
+  controlKeys: string[];
+  threshold: string;
+  locktime: string;
+  subnetTransformationTxID: string;
+  conversionID: string;
+  managerChainID: string;
+  managerAddress: string | null;
+}
+
 export interface GetSubnetsParams {
   ids: string[];
 }
@@ -248,4 +265,78 @@ export interface ValidatesParams {
 
 export interface ValidatesResponse {
   blockchainIDs: string[];
+}
+
+export interface FeeConfigResponse {
+  weights: [
+    bandwidth: number,
+    dbRead: number,
+    dbWrite: number,
+    compute: number,
+  ]; // Weights to merge fee dimensions into a single gas value.
+  maxCapacity: number; // Maximum amount of gas the chain is allowed to store for future use.
+  maxPerSecond: number; // Maximum amount of gas the chain is allowed to consume per second.
+  targetPerSecond: number; // Target amount of gas the chain should consume per second to keep the fees stable.
+  minPrice: number; // Minimum price per unit of gas.
+  excessConversionConstant: number; // Constant used to convert excess gas to a gas price.
+}
+
+export interface FeeConfig {
+  weights: Dimensions;
+  maxCapacity: bigint;
+  maxPerSecond: bigint;
+  targetPerSecond: bigint;
+  /** Minimum gas price */
+  minPrice: bigint;
+  excessConversionConstant: bigint;
+}
+
+export interface FeeStateResponse {
+  capacity: number;
+  excess: number;
+  price: number;
+  timestamp: string;
+}
+
+export interface FeeState {
+  capacity: bigint;
+  excess: bigint;
+  /** Price to use for dynamic fee calculation */
+  price: bigint;
+  /** ISO8601 DateTime */
+  timestamp: string;
+}
+
+export interface GetL1ValidatorResponse {
+  subnetID: string;
+  nodeID: string;
+  publicKey: string;
+  remainingBalanceOwner: {
+    addresses: string[];
+    locktime: string;
+    threshold: string;
+  };
+  deactivationOwner: {
+    addresses: string[];
+    locktime: string;
+    threshold: string;
+  };
+  startTime: string;
+  weight: string;
+  minNonce: string;
+  balance: string;
+  height: string;
+}
+
+export interface L1ValidatorDetails {
+  subnetID: string;
+  nodeID: string;
+  publicKey: string;
+  remainingBalanceOwner: PChainOwner;
+  deactivationOwner: PChainOwner;
+  weight: bigint;
+  balance: bigint;
+  startTime: bigint;
+  minNonce: bigint;
+  height: bigint;
 }

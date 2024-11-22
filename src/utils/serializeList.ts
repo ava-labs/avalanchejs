@@ -54,7 +54,7 @@ export const unpackCodecList = {
 };
 
 export const packList = (
-  serializables: Serializable[],
+  serializables: readonly Serializable[],
   codec: Codec,
 ): Uint8Array => {
   return concatBytes(

@@ -20,6 +20,7 @@ export enum TypeSymbols {
   Id = 'common.Id',
   Address = 'common.Address',
   NodeId = 'common.NodeId',
+  BlsSignature = 'common.BlsSignature',
 
   // PRIMITIVES
   Int = 'primitives.Int',
@@ -80,9 +81,23 @@ export enum TypeSymbols {
   TransformSubnetTx = 'pvm.TransformSubnetTx',
   TransferSubnetOwnershipTx = 'pvm.TransferSubnetOwnershipTx',
 
+  L1Validator = 'pvm.L1Validator',
+  ConvertSubnetToL1Tx = 'pvm.ConvertSubnetToL1Tx',
+  RegisterL1ValidatorTx = 'pvm.RegisterL1ValidatorTx',
+  SetL1ValidatorWeightTx = 'pvm.SetL1ValidatorWeightTx',
+  IncreaseL1ValidatorBalanceTx = 'pvm.IncreaseL1ValidatorBalanceTx',
+  DisableL1ValidatorTx = 'pvm.DisableL1ValidatorTx',
+
+  PChainOwner = 'pvm.PChainOwner',
+
   // EVM
   EvmExportTx = 'evm.ExportTx',
   EvmInput = 'evm.Input',
   EvmOutput = 'evm.Output',
   EvmImportTx = 'evm.ImportTx',
+
+  // Warp
+  WarpMessage = 'warp.Message',
+  WarpUnsignedMessage = 'warp.UnsignedMessage',
+  WarpSignature = 'warp.Signature',
 }

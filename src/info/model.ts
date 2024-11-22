@@ -46,8 +46,14 @@ export type UptimeResponse = {
   weightedAveragePercentage: string;
 };
 
+export type NodePOP = {
+  publicKey: string;
+  proofOfPossession: string;
+};
+
 export type GetNodeIdResponse = {
   nodeID: string;
+  nodePOP: NodePOP;
 };
 
 export type GetNodeIpResponse = {
@@ -55,7 +61,7 @@ export type GetNodeIpResponse = {
 };
 
 export type GetNetworkIdResponse = {
-  networkID: number;
+  networkID: string;
 };
 
 export type GetNetworkNameResponse = {
@@ -68,4 +74,21 @@ export type GetBlockchainIDResponse = {
 
 export type isBootstrapped = {
   isBootstrapped: boolean;
+};
+
+export type GetUpgradesInfoResponse = {
+  apricotPhase1Time: string;
+  apricotPhase2Time: string;
+  apricotPhase3Time: string;
+  apricotPhase4Time: string;
+  apricotPhase4MinPChainHeight: number;
+  apricotPhase5Time: string;
+  apricotPhasePre6Time: string;
+  apricotPhase6Time: string;
+  apricotPhasePost6Time: string;
+  banffTime: string;
+  cortinaTime: string;
+  cortinaXChainStopVertexID: string;
+  durangoTime: string;
+  etnaTime: string;
 };

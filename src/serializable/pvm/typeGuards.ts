@@ -16,6 +16,11 @@ import type { Signer, SignerEmpty } from './signer';
 import type { TransferSubnetOwnershipTx } from './transferSubnetOwnershipTx';
 import { TypeSymbols } from '../constants';
 import type { TransformSubnetTx } from './transformSubnetTx';
+import type { ConvertSubnetToL1Tx } from './convertSubnetToL1Tx';
+import type { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceTx';
+import type { DisableL1ValidatorTx } from './disableL1ValidatorTx';
+import type { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
+import type { RegisterL1ValidatorTx } from './registerL1ValidatorTx';
 
 export function isPvmBaseTx(tx: Transaction): tx is BaseTx {
   return tx._type === TypeSymbols.PvmBaseTx;
@@ -85,6 +90,36 @@ export function isImportTx(tx: Transaction): tx is ImportTx {
 
 export function isRewardValidatorTx(tx: Transaction): tx is RewardValidatorTx {
   return tx._type === TypeSymbols.RewardValidatorTx;
+}
+
+export function isConvertSubnetToL1Tx(
+  tx: Transaction,
+): tx is ConvertSubnetToL1Tx {
+  return tx._type === TypeSymbols.ConvertSubnetToL1Tx;
+}
+
+export function isRegisterL1ValidatorTx(
+  tx: Transaction,
+): tx is RegisterL1ValidatorTx {
+  return tx._type === TypeSymbols.RegisterL1ValidatorTx;
+}
+
+export function isSetL1ValidatorWeightTx(
+  tx: Transaction,
+): tx is SetL1ValidatorWeightTx {
+  return tx._type === TypeSymbols.SetL1ValidatorWeightTx;
+}
+
+export function isIncreaseL1ValidatorBalanceTx(
+  tx: Transaction,
+): tx is IncreaseL1ValidatorBalanceTx {
+  return tx._type === TypeSymbols.IncreaseL1ValidatorBalanceTx;
+}
+
+export function isDisableL1ValidatorTx(
+  tx: Transaction,
+): tx is DisableL1ValidatorTx {
+  return tx._type === TypeSymbols.DisableL1ValidatorTx;
 }
 
 export function isEmptySigner(

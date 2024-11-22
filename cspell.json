@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+  "version": "0.2",
+  "dictionaries": [
+    "companies",
+    "css",
+    "en_us",
+    "en-gb",
+    "fullstack",
+    "html",
+    "lorem-ipsum",
+    "node",
+    "npm",
+    "softwareTerms",
+    "sql",
+    "typescript"
+  ],
+  "ignorePaths": ["node_modules", "__generated__", "build", "dist", "out"],
+  "ignoreRegExpList": ["/.*[0-9].*/"],
+  "language": "en",
+  "minWordLength": 5,
+  "words": [
+    "amounter",
+    "avalabs",
+    "locktime",
+    "permissioned",
+    "stakeable",
+    "unstakeable",
+    "utxo",
+    "utxos"
+  ]
+}

@@ -19,6 +19,11 @@ import {
   RemoveSubnetValidatorTx,
   TransferSubnetOwnershipTx,
   TransformSubnetTx,
+  ConvertSubnetToL1Tx,
+  RegisterL1ValidatorTx,
+  SetL1ValidatorWeightTx,
+  IncreaseL1ValidatorBalanceTx,
+  DisableL1ValidatorTx,
 } from '../serializable/pvm';
 import {
   baseTx,
@@ -28,7 +33,14 @@ import {
   transferableOutput,
   transferableOutputBytes,
 } from './avax';
-import { id, idBytes, nodeId, nodeIdBytes } from './common';
+import {
+  addresses,
+  addressesBytes,
+  id,
+  idBytes,
+  nodeId,
+  nodeIdBytes,
+} from './common';
 import {
   bigIntPr,
   bigIntPrBytes,
@@ -42,6 +54,7 @@ import {
   stringPrBytes,
   byte,
   byteByte,
+  blsSignature,
 } from './primitives';
 import {
   input,
@@ -55,6 +68,9 @@ import {
 } from './secp256k1';
 import { bytesForInt } from './utils/bytesFor';
 import { makeList, makeListBytes } from './utils/makeList';
+import type { FeeState } from '../vms/pvm';
+import { L1Validator } from '../serializable/fxs/pvm/L1Validator';
+import { PChainOwner } from '../serializable/fxs/pvm/pChainOwner';
 
 export const validator = () =>
   new Validator(nodeId(), bigIntPr(), bigIntPr(), bigIntPr());
@@ -191,6 +207,9 @@ export const advanceTimeBytesTx = () => bigIntPrBytes();
 export const proofOfPossession = () =>
   new ProofOfPossession(blsPublicKeyBytes(), blsSignatureBytes());
 
+export const proofOfPossessionBytes = () =>
+  concatBytes(blsPublicKeyBytes(), blsSignatureBytes());
+
 export const signer = () => new Signer(proofOfPossession());
 export const signerBytes = () =>
   concatBytes(blsPublicKeyBytes(), blsSignatureBytes());
@@ -264,7 +283,7 @@ export const transformSubnetTx = () =>
     int(),
     int(),
     int(),
-    int(),
+    bigIntPr(),
     byte(),
     int(),
     input(),
@@ -284,9 +303,94 @@ export const transformSubnetTxBytes = () =>
     intBytes(),
     intBytes(),
     intBytes(),
-    intBytes(),
+    bigIntPrBytes(),
     byteByte(),
     intBytes(),
     bytesForInt(10),
     inputBytes(),
   );
+
+export const pChainOwner = () => new PChainOwner(int(), addresses()());
+
+export const pChainOwnerBytes = () =>
+  concatBytes(
+    intBytes(), // threshold
+    addressesBytes(),
+  );
+
+export const l1Validator = () =>
+  new L1Validator(
+    bytes(),
+    bigIntPr(),
+    bigIntPr(),
+    proofOfPossession(),
+    pChainOwner(),
+    pChainOwner(),
+  );
+
+export const l1ValidatorBytes = () =>
+  concatBytes(
+    bytesBytes(),
+    bigIntPrBytes(),
+    bigIntPrBytes(),
+    proofOfPossessionBytes(),
+    pChainOwnerBytes(),
+    pChainOwnerBytes(),
+  );
+
+export const convertSubnetToL1Tx = () =>
+  new ConvertSubnetToL1Tx(
+    baseTx(),
+    id(),
+    id(),
+    bytes(),
+    makeList(l1Validator)(),
+    input(),
+  );
+
+export const convertSubnetToL1TxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    idBytes(),
+    idBytes(),
+    bytesBytes(),
+    makeListBytes(l1ValidatorBytes)(),
+    bytesForInt(10),
+    inputBytes(),
+  );
+
+export const registerL1ValidatorTx = () =>
+  new RegisterL1ValidatorTx(baseTx(), bigIntPr(), blsSignature(), bytes());
+
+export const registerL1ValidatorTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    bigIntPrBytes(),
+    blsSignatureBytes(),
+    bytesBytes(),
+  );
+
+export const setL1ValidatorWeightTx = () =>
+  new SetL1ValidatorWeightTx(baseTx(), bytes());
+
+export const setL1ValidatorWeightTxBytes = () =>
+  concatBytes(baseTxbytes(), bytesBytes());
+
+export const increaseL1ValidatorBalanceTx = () =>
+  new IncreaseL1ValidatorBalanceTx(baseTx(), id(), bigIntPr());
+
+export const increaseL1ValidatorBalanceTxBytes = () =>
+  concatBytes(baseTxbytes(), idBytes(), bigIntPrBytes());
+
+export const disableL1ValidatorTx = () =>
+  new DisableL1ValidatorTx(baseTx(), id(), input());
+
+export const disableL1ValidatorTxBytes = () =>
+  concatBytes(baseTxbytes(), idBytes(), bytesForInt(10), inputBytes());
+
+export const feeState = (): FeeState => ({
+  capacity: 1n,
+  excess: 1n,
+  price: 1n,
+  timestamp: new Date().toISOString(),
+});

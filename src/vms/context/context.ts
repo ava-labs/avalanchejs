@@ -1,6 +1,7 @@
+import { InfoApi } from '../../info';
 import { getHRP } from '../../constants/networkIDs';
-import { Info } from '../../info/info';
 import { AVMApi } from '../avm/api';
+import { PVMApi } from '../pvm';
 import type { Context } from './model';
 
 /*
@@ -10,11 +11,12 @@ export const getContextFromURI = async (
   baseURL?: string,
   assetDescription = 'AVAX',
 ): Promise<Context> => {
+  const pChainApi = new PVMApi(baseURL);
   const xChainApi = new AVMApi(baseURL);
   const { assetID: avaxAssetID } = await xChainApi.getAssetDescription(
     assetDescription,
   );
-  const info = new Info(baseURL);
+  const info = new InfoApi(baseURL);
   const {
     txFee: baseTxFee,
     createAssetTxFee,
@@ -30,7 +32,10 @@ export const getContextFromURI = async (
   const { blockchainID: pBlockchainID } = await info.getBlockchainId('P');
   const { blockchainID: cBlockchainID } = await info.getBlockchainId('C');
 
-  const { networkID } = await info.getNetworkId();
+  const { networkID: networkIDstring } = await info.getNetworkId();
+  const networkID = Number(networkIDstring);
+
+  const platformFeeConfig = await pChainApi.getFeeConfig();
 
   return Object.freeze({
     xBlockchainID,
@@ -48,5 +53,6 @@ export const getContextFromURI = async (
     addSubnetDelegatorFee,
     networkID,
     hrp: getHRP(networkID),
+    platformFeeConfig,
   });
 };

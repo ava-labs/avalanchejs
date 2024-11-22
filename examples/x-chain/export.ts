@@ -5,17 +5,13 @@ import { newExportTx } from '../../src/vms/avm';
 import { getContextFromURI } from '../../src/vms/context';
 import { avmapi } from '../chain_apis';
 import { getChainIdFromContext } from '../utils/getChainIdFromContext';
-
-const P_CHAIN_ADDRESS = process.env.P_CHAIN_ADDRESS;
-const X_CHAIN_ADDRESS = process.env.X_CHAIN_ADDRESS;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+import { getEnvVars } from '../utils/getEnvVars';
 
 const main = async () => {
-  if (!P_CHAIN_ADDRESS || !X_CHAIN_ADDRESS || !PRIVATE_KEY) {
-    throw new Error('Missing environment variable(s).');
-  }
+  const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY, X_CHAIN_ADDRESS } =
+    getEnvVars();
 
-  const context = await getContextFromURI(process.env.AVAX_PUBLIC_URL);
+  const context = await getContextFromURI(AVAX_PUBLIC_URL);
 
   const { utxos } = await avmapi.getUTXOs({
     addresses: [X_CHAIN_ADDRESS],

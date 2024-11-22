@@ -24,7 +24,7 @@ export class UnsignedTx {
   credentials: Credential[];
   constructor(
     readonly tx: Transaction,
-    readonly utxos: Utxo[],
+    readonly utxos: readonly Utxo[],
     readonly addressMaps: AddressMaps,
     credentials?: Credential[],
   ) {

@@ -1,7 +1,7 @@
 import { TransferableInput } from '../serializable/avax';
 import type { Utxo } from '../serializable/avax/utxo';
+import { matchOwners } from './addressMap';
 import { addressesFromBytes } from './addressesFromBytes';
-import { matchOwners } from './matchOwners';
 import { isTransferOut } from './typeGuards';
 
 type GetImportedInputsFromUtxosOutput = {
@@ -11,8 +11,8 @@ type GetImportedInputsFromUtxosOutput = {
 };
 
 export const getImportedInputsFromUtxos = (
-  utxos: Utxo[],
-  fromAddressesBytes: Uint8Array[],
+  utxos: readonly Utxo[],
+  fromAddressesBytes: readonly Uint8Array[],
   minIssuanceTime: bigint,
 ): GetImportedInputsFromUtxosOutput => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);

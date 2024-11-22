@@ -1,3 +1,5 @@
+import type { FeeConfig } from '../pvm';
+
 export type Context = {
   readonly networkID: number;
   readonly hrp: string;
@@ -14,4 +16,7 @@ export type Context = {
   readonly addPrimaryNetworkDelegatorFee: bigint;
   readonly addSubnetValidatorFee: bigint;
   readonly addSubnetDelegatorFee: bigint;
+
+  // Post Etna
+  readonly platformFeeConfig: FeeConfig;
 };

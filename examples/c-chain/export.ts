@@ -4,21 +4,15 @@ import { bech32ToBytes, hexToBuffer } from '../../src/utils';
 import { getContextFromURI } from '../../src/vms/context';
 import { newExportTxFromBaseFee } from '../../src/vms/evm';
 import { evmapi } from '../chain_apis';
-
-const C_CHAIN_ADDRESS = process.env.C_CHAIN_ADDRESS;
-const X_CHAIN_ADDRESS = process.env.X_CHAIN_ADDRESS;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
+import { getEnvVars } from '../utils/getEnvVars';
 
 const main = async () => {
-  if (!C_CHAIN_ADDRESS || !X_CHAIN_ADDRESS || !PRIVATE_KEY) {
-    throw new Error('Missing environment variable(s).');
-  }
+  const { AVAX_PUBLIC_URL, C_CHAIN_ADDRESS, PRIVATE_KEY, X_CHAIN_ADDRESS } =
+    getEnvVars();
 
-  const provider = new JsonRpcProvider(
-    process.env.AVAX_PUBLIC_URL + '/ext/bc/C/rpc',
-  );
+  const provider = new JsonRpcProvider(AVAX_PUBLIC_URL + '/ext/bc/C/rpc');
 
-  const context = await getContextFromURI(process.env.AVAX_PUBLIC_URL);
+  const context = await getContextFromURI(AVAX_PUBLIC_URL);
   const txCount = await provider.getTransactionCount(C_CHAIN_ADDRESS);
   const baseFee = await evmapi.getBaseFee();
   const xAddressBytes = bech32ToBytes(X_CHAIN_ADDRESS);

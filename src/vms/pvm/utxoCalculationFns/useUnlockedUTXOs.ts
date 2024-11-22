@@ -54,7 +54,7 @@ export function useUnlockedUTXOs({
       ) as TransferOutput;
     },
     fromAddresses,
-    options,
+    options.minIssuanceTime,
   ).forEach(({ sigData, data: utxo }) => {
     const remainingAmountToBurn = amountsToBurn.get(utxo.assetId.value()) ?? 0n;
 

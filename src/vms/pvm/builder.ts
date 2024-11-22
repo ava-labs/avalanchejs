@@ -44,10 +44,6 @@ import { NodeId } from '../../serializable/fxs/common/nodeId';
 import { createSignerOrSignerEmptyFromStrings } from '../../serializable/pvm/signer';
 import { baseTxUnsafePvm } from '../common';
 
-/*
-  Builder is useful for building transactions that are specific to a chain.
- */
-
 /**
  * @param fromAddresses - used for selecting which utxos are signable
  * @param utxoSet - list of utxos to spend from
@@ -104,7 +100,7 @@ export function newBaseTx(
   @param threshold - the threshold to write on the utxo
   @param locktime - the locktime to write onto the utxo
 
-  @returns a unsignedTx
+  @returns UnsignedTx
 */
 export function newImportTx(
   context: Context,
@@ -143,6 +139,7 @@ export function newImportTx(
   if (!importedInputs.length) {
     throw new Error('no UTXOs available to import');
   }
+
   let inputs: TransferableInput[] = [];
   let changeOutputs: TransferableOutput[] = [];
 
@@ -216,7 +213,7 @@ const getToBurn = (
  * @param start The Unix time based on p-chain timestamp when the validator starts validating the Primary Network.
  * @param end The Unix time based on p-chain timestamp when the validator stops validating the Primary Network (and staked AVAX is returned).
  * @param weight The amount being delegated in nAVAX
- * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+ * @param rewardAddresses The addresses which will receive the rewards from the delegated stake.
  * @param shares A number for the percentage times 10,000 of reward to be given to the validator when someone delegates to them.
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
@@ -276,7 +273,7 @@ export function newAddValidatorTx(
  * @param utxos list of utxos to choose from
  * @param outputs list of outputs to create.
  * @param options used for filtering UTXO's
- * @returns unsingedTx containing an exportTx
+ * @returns UnsignedTx containing an exportTx
  */
 
 export function newExportTx(
@@ -328,11 +325,11 @@ export function newExportTx(
  * @param start The Unix time based on p-chain timestamp when the validator starts validating the Primary Network.
  * @param end The Unix time based on p-chain timestamp when the validator stops validating the Primary Network (and staked AVAX is returned).
  * @param weight The amount being delegated in nAVAX
- * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+ * @param rewardAddresses The addresses which will receive the rewards from the delegated stake.
  * @param options - used for filtering utxos
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
- * @returns UnsingedTx
+ * @returns UnsignedTx
  */
 
 export function newAddDelegatorTx(
@@ -385,11 +382,11 @@ export function newAddDelegatorTx(
  * @param context
  * @param utxos list of utxos to choose from
  * @param fromAddressesBytes used for filtering utxos
- * @param rewardAddresses The addresses which will recieve the rewards from the delegated stake.
+ * @param rewardAddresses The addresses which will receive the rewards from the delegated stake.
  * @param options used for filtering utxos
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
- * @returns UnsingedTx
+ * @returns UnsignedTx
  */
 export function newCreateSubnetTx(
   context: Context,
@@ -454,6 +451,10 @@ export function newCreateBlockchainTx(
 ) {
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
 
+  const genesisBytes = new Bytes(
+    new TextEncoder().encode(JSON.stringify(genesisData)),
+  );
+
   const { inputs, addressMaps, changeOutputs, inputUTXOs } = calculateUTXOSpend(
     new Map([[context.avaxAssetID, context.createBlockchainTxFee]]),
     undefined,
@@ -475,7 +476,7 @@ export function newCreateBlockchainTx(
     new Stringpr(chainName),
     Id.fromString(vmID),
     fxIds.map(Id.fromString.bind(Id)),
-    new Bytes(new TextEncoder().encode(JSON.stringify(genesisData))),
+    genesisBytes,
     Input.fromNative(subnetAuth),
   );
 
@@ -616,6 +617,18 @@ export function newAddPermissionlessValidatorTx(
   const toStake = new Map<string, bigint>([[assetId, weight]]);
 
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+
+  const signer = createSignerOrSignerEmptyFromStrings(publicKey, signature);
+  const validatorOutputOwners = OutputOwners.fromNative(
+    rewardAddresses,
+    locktime,
+    threshold,
+  );
+  const delegatorOutputOwners = OutputOwners.fromNative(
+    delegatorRewardsOwner,
+    0n,
+  );
+
   const { addressMaps, changeOutputs, inputUTXOs, inputs, stakeOutputs } =
     calculateUTXOSpend(
       toBurn,
@@ -641,10 +654,10 @@ export function newAddPermissionlessValidatorTx(
       weight,
       Id.fromString(subnetID),
     ),
-    createSignerOrSignerEmptyFromStrings(publicKey, signature),
+    signer,
     stakeOutputs,
-    OutputOwners.fromNative(rewardAddresses, locktime, threshold),
-    OutputOwners.fromNative(delegatorRewardsOwner, 0n),
+    validatorOutputOwners,
+    delegatorOutputOwners,
     new Int(shares),
   );
   return new UnsignedTx(validatorTx, inputUTXOs, addressMaps);
@@ -700,6 +713,13 @@ export function newAddPermissionlessDelegatorTx(
   const toStake = new Map<string, bigint>([[assetId, weight]]);
 
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+
+  const delegatorRewardsOwner = OutputOwners.fromNative(
+    rewardAddresses,
+    locktime,
+    threshold,
+  );
+
   const { addressMaps, changeOutputs, inputUTXOs, inputs, stakeOutputs } =
     calculateUTXOSpend(
       toBurn,
@@ -726,7 +746,7 @@ export function newAddPermissionlessDelegatorTx(
       Id.fromString(subnetID),
     ),
     stakeOutputs,
-    OutputOwners.fromNative(rewardAddresses, locktime, threshold),
+    delegatorRewardsOwner,
   );
   return new UnsignedTx(delegatorTx, inputUTXOs, addressMaps);
 }
@@ -751,7 +771,7 @@ export function newAddPermissionlessDelegatorTx(
  * @param uptimeRequirement the minimum percentage a validator must be online and responsive to receive a reward
  * @param subnetAuth specifies indices of existing subnet owners
  * @param options used for filtering utxos
- * @returns UnsingedTx containing a TransformSubnetTx
+ * @returns UnsignedTx containing a TransformSubnetTx
  */
 export function newTransformSubnetTx(
   context: Context,
@@ -768,7 +788,7 @@ export function newTransformSubnetTx(
   minStakeDuration: number,
   maxStakeDuration: number,
   minDelegationFee: number,
-  minDelegatorStake: number,
+  minDelegatorStake: bigint,
   maxValidatorWeightFactor: number,
   uptimeRequirement: number,
   subnetAuth: number[],
@@ -805,7 +825,7 @@ export function newTransformSubnetTx(
       new Int(minStakeDuration),
       new Int(maxStakeDuration),
       new Int(minDelegationFee),
-      new Int(minDelegatorStake),
+      new BigIntPr(minDelegatorStake),
       new Byte(hexToBuffer(maxValidatorWeightFactor.toString(16))),
       new Int(uptimeRequirement),
       Input.fromNative(subnetAuth),
@@ -825,7 +845,7 @@ export function newTransformSubnetTx(
  * @param options used for filtering utxos
  * @param threshold Opional. The number of signatures required to spend the funds in the resultant reward UTXO. Default 1.
  * @param locktime Optional. The locktime field created in the resulting reward outputs
- * @returns UnsingedTx containing a TransferSubnetOwnershipTx
+ * @returns UnsignedTx containing a TransferSubnetOwnershipTx
  */
 export function newTransferSubnetOwnershipTx(
   context: Context,

@@ -19,8 +19,8 @@ export class BaseTx {
   constructor(
     public readonly NetworkId: Int,
     public readonly BlockchainId: Id,
-    public readonly outputs: TransferableOutput[],
-    public readonly inputs: TransferableInput[],
+    public readonly outputs: readonly TransferableOutput[],
+    public readonly inputs: readonly TransferableInput[],
     public readonly memo: Bytes,
   ) {}
 
@@ -45,8 +45,8 @@ export class BaseTx {
   static fromNative(
     networkId: number,
     blockchainId: string,
-    outputs: TransferableOutput[],
-    inputs: TransferableInput[],
+    outputs: readonly TransferableOutput[],
+    inputs: readonly TransferableInput[],
     memo: Uint8Array,
   ) {
     return new BaseTx(

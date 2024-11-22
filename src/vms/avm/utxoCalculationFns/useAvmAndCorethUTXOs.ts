@@ -35,7 +35,7 @@ export const useAvmAndCorethUTXOs = ({
       .filter((utxo) => !!isTransferOut(utxo.output as TransferOutput)),
     (utxo) => utxo.output as TransferOutput,
     fromAddresses,
-    options,
+    options.minIssuanceTime,
   ).forEach(({ sigData, data: utxo }) => {
     const utxoTransferout = utxo.output as TransferOutput;
 

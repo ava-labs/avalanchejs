@@ -9,7 +9,7 @@ import { TypeSymbols } from '../constants';
 @serializable()
 export class Bytes extends Primitives {
   _type = TypeSymbols.Bytes;
-  constructor(private readonly bytes: Uint8Array) {
+  constructor(public readonly bytes: Uint8Array) {
     super();
   }
 
@@ -32,5 +32,14 @@ export class Bytes extends Primitives {
 
   toBytes() {
     return concatBytes(bytesForInt(this.bytes.length), this.bytes);
+  }
+
+  /**
+   * Returns the length of the bytes (Uint8Array).
+   *
+   * Useful for calculating tx complexity.
+   */
+  get length() {
+    return this.bytes.length;
   }
 }

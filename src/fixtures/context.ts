@@ -1,3 +1,4 @@
+import { createDimensions } from '../vms/common/fees/dimensions';
 import type { Context } from '../vms/context';
 
 export const testContext: Context = {
@@ -16,4 +17,17 @@ export const testContext: Context = {
   addSubnetDelegatorFee: 1000000n,
   networkID: 1,
   hrp: 'avax',
+  platformFeeConfig: {
+    weights: createDimensions({
+      bandwidth: 1,
+      dbRead: 1,
+      dbWrite: 1,
+      compute: 1,
+    }),
+    maxCapacity: 1_000_000n,
+    maxPerSecond: 1_000n,
+    targetPerSecond: 500n,
+    minPrice: 1n,
+    excessConversionConstant: 5_000n,
+  },
 };
