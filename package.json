@@ -33,6 +33,7 @@
     "example:createSubnetTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/createSubnet.ts",
     "example:createChainTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/createChain.ts",
     "example:convertSubnetTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/convertSubnet.ts",
+    "example:setL1ValidatorWeightTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/setL1ValidatorWeight.ts",
     "prepare": "husky install"
   },
   "dependencies": {

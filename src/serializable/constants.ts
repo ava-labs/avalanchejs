@@ -100,4 +100,9 @@ export enum TypeSymbols {
   WarpMessage = 'warp.Message',
   WarpUnsignedMessage = 'warp.UnsignedMessage',
   WarpSignature = 'warp.Signature',
+  WarpL1ValidatorWeight = 'warp.L1ValidatorWeight',
+  WarpRegisterL1Validator = 'warp.RegisterL1Validator',
+  WarpHash = 'warp.Hash',
+  WarpPayload = 'warp.Payload',
+  WarpAddressedCall = 'warp.AddressedCall',
 }
