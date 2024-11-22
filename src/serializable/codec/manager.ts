@@ -29,6 +29,11 @@ export class Manager {
     return unpacker.fromBytes(rest, codec)[0] as FromBytesReturn<T>;
   };
 
+  unpackPrefix = <T extends Serializable>(buff: Uint8Array): T => {
+    const [codec, rest] = this.getCodecFromBuffer(buff);
+    return codec.UnpackPrefix<T>(rest)[0];
+  };
+
   unpackTransaction = (buff: Uint8Array): Transaction => {
     const [codec, rest] = this.getCodecFromBuffer(buff);
     return codec.UnpackPrefix<Transaction>(rest)[0];
