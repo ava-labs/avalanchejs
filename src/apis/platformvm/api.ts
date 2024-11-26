@@ -3187,7 +3187,6 @@ export class PlatformVMAPI extends JRPCAPI {
    * @param version Optional. Transaction version number, default 0.
    * @param memo Optional contains arbitrary bytes, up to 256 bytes
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
-   * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned transaction created from the passed in parameters.
    */
@@ -3200,8 +3199,7 @@ export class PlatformVMAPI extends JRPCAPI {
     proposerAddress: Buffer,
     version: number = DefaultTransactionVersionNumber,
     memo: PayloadBase | Buffer = undefined,
-    asOf: BN = ZeroBN,
-    changeThreshold: number = 1
+    asOf: BN = ZeroBN
   ): Promise<UnsignedTx> => {
     const caller = "buildAddProposalTx"
 
@@ -3217,6 +3215,14 @@ export class PlatformVMAPI extends JRPCAPI {
 
     const avaxAssetID: Buffer = await this.getAVAXAssetID()
     const networkID: number = this.core.getNetworkID()
+
+    // TODO: @VjeraTurk get bondAmount from node
+    let stakeAmount = new BN(1000000000000)
+
+    if (networkID == 1002 || networkID == 1001) {
+      stakeAmount = new BN(100000000000)
+    }
+
     const blockchainID: Buffer = bintools.cb58Decode(this.blockchainID)
     const fee: BN = this.getTxFee()
     const proposerAuth = new SubnetAuth()
@@ -3239,7 +3245,8 @@ export class PlatformVMAPI extends JRPCAPI {
       fee,
       avaxAssetID,
       asOf,
-      changeThreshold
+      stakeAmount,
+      avaxAssetID
     )
 
     if (!(await this.checkGooseEgg(builtUnsignedTx, this.getCreationTxFee()))) {

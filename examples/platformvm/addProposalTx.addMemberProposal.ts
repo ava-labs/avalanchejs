@@ -8,6 +8,7 @@ import {
 import { Avalanche, BinTools, Buffer } from "caminojs/index"
 import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
+import BN from "bn.js"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
@@ -40,6 +41,7 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
+  // TODO: @VjeraTurk get bondAmount from node
   let startDate = new Date()
   startDate.setDate(startDate.getDate() + 1)
   let endDate = new Date(startDate)
@@ -72,8 +74,9 @@ const main = async (): Promise<any> => {
     const addProposalTx = unsignedTx2.getTransaction() as AddProposalTx
     const addProposalTxTypeName: string = addProposalTx.getTypeName()
     const addProposalTxTypeID: number = addProposalTx.getTypeID()
-
+    const txid: string = await pchain.issueTx(tx)
     console.log(addProposalTxTypeID, addProposalTxTypeName)
+    console.log(`Success! TXID: ${txid}`)
   } catch (e) {
     console.log(e)
   }

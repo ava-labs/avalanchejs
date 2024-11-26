@@ -9,6 +9,7 @@ import {
   PrivateKeyPrefix
 } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
+import BN from "bn.js"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(

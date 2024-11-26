@@ -39,7 +39,6 @@ const InitAvalanche = async () => {
 
   pAddressStrings = pchain.keyChain().getAddressStrings()
 }
-//TODO: @VjeraTurk add missing example for adding vote to General and Base Fee Proposal
 const main = async (): Promise<any> => {
   await InitAvalanche()
   const platformVMUTXOResponse = await pchain.getUTXOs(pAddressStrings)
@@ -47,8 +46,8 @@ const main = async (): Promise<any> => {
 
   const proposal = new GeneralProposal()
   try {
-    //let unsignedTx = await pchain.buildAddVoteTx()
-    //TODO:  @VjeraTurk add missing example for adding vote to General
+    // let unsignedTx = await pchain.buildAddVoteTx()
+    // TODO: @VjeraTurk add missing example for adding vote to General and Base Fee Proposal
     //console.log(unsignedTx)
   } catch (e) {
     console.log(e)

@@ -8,6 +8,7 @@ import {
 import { Avalanche, BinTools, Buffer } from "caminojs/index"
 import { DefaultLocalGenesisPrivateKey, PrivateKeyPrefix } from "caminojs/utils"
 import { ExamplesConfig } from "../common/examplesConfig"
+import BN from "bn.js"
 
 const config: ExamplesConfig = require("../common/examplesConfig.json")
 const avalanche: Avalanche = new Avalanche(
@@ -24,8 +25,6 @@ let privKey: string = `${PrivateKeyPrefix}${DefaultLocalGenesisPrivateKey}`
 let pchain: PlatformVMAPI
 let pKeychain: KeyChain
 let pAddressStrings: string[]
-const targetAddress = "P-kopernikus122gtala73kjrf34xtdq0d9vssqlccxjjam7kk8"
-const bintools: BinTools = BinTools.getInstance()
 const InitAvalanche = async () => {
   await avalanche.fetchNetworkSettings()
   pchain = avalanche.PChain()
@@ -37,10 +36,11 @@ const InitAvalanche = async () => {
 
 const main = async (): Promise<any> => {
   await InitAvalanche()
+  const bondAmount: any = await pchain.getMinStake()
   let startDate = new Date()
   startDate.setDate(startDate.getDate() + 1)
   let endDate = new Date(startDate)
-  endDate.setDate(endDate.getDate() + 60)
+  endDate.setDate(endDate.getDate() + 10)
 
   let startTimestamp: number = Math.floor(startDate.getTime() / 1000)
   let endTimestamp = Math.floor(endDate.getTime() / 1000)
@@ -94,6 +94,8 @@ const main = async (): Promise<any> => {
 
     console.log(addProposalTxTypeID, addProposalTxTypeName)
     console.log(hex)
+    const txid: string = await pchain.issueTx(tx)
+    console.log(`Success! TXID: ${txid}`)
   } catch (e) {
     console.log(e)
   }

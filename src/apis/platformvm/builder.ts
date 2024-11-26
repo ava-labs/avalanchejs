@@ -1804,6 +1804,9 @@ export class Builder {
    * @param fee Optional. The amount of fees to burn in its smallest denomination, represented as {@link https://github.com/indutny/bn.js/|BN}
    * @param feeAssetID Optional. The assetID of the fees being burned
    * @param asOf Optional. The timestamp to verify the transaction against as a {@link https://github.com/indutny/bn.js/|BN}
+   * @param stakeAmount A {@link https://github.com/indutny/bn.js/|BN} for the amount of stake to be delegated in nAVAX.
+   * @param stakeAssetID
+   * @param toThreshold Optional. The number of signatures required to spend the funds in the resultant UTXO
    * @param changeThreshold Optional. The number of signatures required to spend the funds in the resultant change UTXO
    *
    * @returns An unsigned AddProposalTx created from the passed in parameters.
@@ -1822,6 +1825,9 @@ export class Builder {
     fee: BN = zero,
     feeAssetID: Buffer = undefined,
     asOf: BN = zero,
+    stakeAmount: BN = zero,
+    stakeAssetID: Buffer,
+    toThreshold: number = 1,
     changeThreshold: number = 1
   ): Promise<UnsignedTx> => {
     let ins: TransferableInput[] = []
@@ -1831,19 +1837,19 @@ export class Builder {
     if (this._feeCheck(fee, feeAssetID)) {
       const aad: AssetAmountDestination = new AssetAmountDestination(
         [],
-        0,
+        toThreshold,
         fromSigner.from,
         fromSigner.signer,
         changeAddresses,
         changeThreshold
       )
-      aad.addAssetAmount(feeAssetID, zero, fee)
+      aad.addAssetAmount(stakeAssetID, stakeAmount, fee)
 
       const minSpendableErr: Error = await this.spender.getMinimumSpendable(
         aad,
         asOf,
         zero,
-        "Unlocked"
+        "Bond"
       )
       if (typeof minSpendableErr === "undefined") {
         ins = aad.getInputs()
