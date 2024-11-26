@@ -248,7 +248,9 @@ describe('matchOwners', () => {
   const owner1 = address();
   const owner2 = Address.fromHex('7db97c7cece249c2b98bdc0226cc4c2a57bf52fc');
   const ownerAddresses: Uint8Array[] = [owner1.toBytes(), owner2.toBytes()];
+  // NOTE: the ownerAddresses will be sorted in the OutputOwners -- owner2 is at index 0.
   const goodOwner = OutputOwners.fromNative(ownerAddresses, 0n, 1);
+  const goodOwnerMultisig = OutputOwners.fromNative(ownerAddresses, 0n, 2);
   const threasholdTooHigh = OutputOwners.fromNative(ownerAddresses, 0n, 5);
   const wrongOwner = OutputOwners.fromNative(
     [hexToBuffer('0x12345123451234512345')],
@@ -287,6 +289,15 @@ describe('matchOwners', () => {
       sigindices: [1],
       expectedSigIndices: [1],
       expectedAddressMap: new AddressMap([[owner1, 1]]),
+    },
+    {
+      testCase: goodOwnerMultisig,
+      sigindices: [0, 1],
+      expectedSigIndices: [0, 1],
+      expectedAddressMap: new AddressMap([
+        [owner2, 0],
+        [owner1, 1],
+      ]),
     },
     {
       testCase: goodOwner,
