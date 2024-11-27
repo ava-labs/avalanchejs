@@ -308,6 +308,13 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       );
 
       expectTxs(unsignedTx.getTx(), expectedTx);
+
+      // Ensure that the unsigned tx utxos are the filtered utxos,
+      // and not the inputUtxos registered in the spend helper.
+      // This is only relevant for the ImportTx.
+      expect(unsignedTx.utxos).toHaveLength(1);
+      expect(unsignedTx.utxos).not.toContain(utxos[0]);
+      expect(unsignedTx.utxos).not.toContain(utxos[1]);
     });
 
     test('newExportTx', () => {
