@@ -309,9 +309,10 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       utxo.assetId.toString() === context.avaxAssetID,
   );
 
-  const { importedInputs, importedAmounts } = filteredUtxos.reduce<{
+  const { importedInputs, importedAmounts, inputUtxos } = filteredUtxos.reduce<{
     importedInputs: TransferableInput[];
     importedAmounts: Record<string, bigint>;
+    inputUtxos: Utxo[];
   }>(
     (acc, utxo) => {
       const { sigIndicies: inputSigIndices } =
@@ -342,9 +343,10 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
           [assetId]:
             (acc.importedAmounts[assetId] ?? 0n) + utxo.output.amount(),
         },
+        inputUtxos: [...acc.inputUtxos, utxo],
       };
     },
-    { importedInputs: [], importedAmounts: {} },
+    { importedInputs: [], importedAmounts: {}, inputUtxos: [] },
   );
 
   if (importedInputs.length === 0) {
@@ -397,6 +399,9 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     context,
   );
 
+  // Note: We don't use the `inputUTXOs` from `spendResults`
+  // for the `UnsignedTx` because we want to use the original
+  // UTXOs that were imported.
   const { changeOutputs, inputs } = spendResults;
 
   return new UnsignedTx(
@@ -411,7 +416,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       Id.fromString(sourceChainId),
       importedInputs.sort(TransferableInput.compare),
     ),
-    filteredUtxos,
+    inputUtxos,
     addressMaps,
   );
 };
