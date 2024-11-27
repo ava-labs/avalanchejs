@@ -302,50 +302,50 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
-  const { importedInputs, importedAmounts } = utxos
-    .filter(
-      (utxo): utxo is Utxo<TransferOutput> =>
-        isTransferOut(utxo.output) &&
-        // Currently - only AVAX is allowed to be imported to the P-Chain
-        utxo.assetId.toString() === context.avaxAssetID,
-    )
-    .reduce<{
-      importedInputs: TransferableInput[];
-      importedAmounts: Record<string, bigint>;
-    }>(
-      (acc, utxo) => {
-        const { sigIndicies: inputSigIndices } =
-          matchOwners(utxo.getOutputOwners(), fromAddresses, minIssuanceTime) ||
-          {};
+  const filteredUtxos = utxos.filter(
+    (utxo): utxo is Utxo<TransferOutput> =>
+      isTransferOut(utxo.output) &&
+      // Currently - only AVAX is allowed to be imported to the P-Chain
+      utxo.assetId.toString() === context.avaxAssetID,
+  );
 
-        if (inputSigIndices === undefined) {
-          // We couldn't spend this UTXO, so we skip to the next one.
-          return acc;
-        }
+  const { importedInputs, importedAmounts } = filteredUtxos.reduce<{
+    importedInputs: TransferableInput[];
+    importedAmounts: Record<string, bigint>;
+  }>(
+    (acc, utxo) => {
+      const { sigIndicies: inputSigIndices } =
+        matchOwners(utxo.getOutputOwners(), fromAddresses, minIssuanceTime) ||
+        {};
 
-        const assetId = utxo.getAssetId();
+      if (inputSigIndices === undefined) {
+        // We couldn't spend this UTXO, so we skip to the next one.
+        return acc;
+      }
 
-        return {
-          importedInputs: [
-            ...acc.importedInputs,
-            new TransferableInput(
-              utxo.utxoId,
-              utxo.assetId,
-              new TransferInput(
-                utxo.output.amt,
-                new Input(inputSigIndices.map((value) => new Int(value))),
-              ),
+      const assetId = utxo.getAssetId();
+
+      return {
+        importedInputs: [
+          ...acc.importedInputs,
+          new TransferableInput(
+            utxo.utxoId,
+            utxo.assetId,
+            new TransferInput(
+              utxo.output.amt,
+              new Input(inputSigIndices.map((value) => new Int(value))),
             ),
-          ],
-          importedAmounts: {
-            ...acc.importedAmounts,
-            [assetId]:
-              (acc.importedAmounts[assetId] ?? 0n) + utxo.output.amount(),
-          },
-        };
-      },
-      { importedInputs: [], importedAmounts: {} },
-    );
+          ),
+        ],
+        importedAmounts: {
+          ...acc.importedAmounts,
+          [assetId]:
+            (acc.importedAmounts[assetId] ?? 0n) + utxo.output.amount(),
+        },
+      };
+    },
+    { importedInputs: [], importedAmounts: {} },
+  );
 
   if (importedInputs.length === 0) {
     throw new Error('no UTXOs available to import');
@@ -355,7 +355,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 
   const addressMaps = AddressMaps.fromTransferableInputs(
     importedInputs,
-    utxos,
+    filteredUtxos,
     minIssuanceTime,
     fromAddressesBytes,
   );
@@ -391,7 +391,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       fromAddresses,
       initialComplexity: complexity,
       minIssuanceTime,
-      utxos,
+      utxos: filteredUtxos,
     },
     [useUnlockedUTXOs],
     context,
