@@ -302,7 +302,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 ) => {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
-  const { importedInputs, importedAmounts } = utxos
+  const { importedInputs, importedAmounts, inputUTXOs } = utxos
     .filter(
       (utxo): utxo is Utxo<TransferOutput> =>
         isTransferOut(utxo.output) &&
@@ -311,6 +311,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     )
     .reduce<{
       importedInputs: TransferableInput[];
+      inputUTXOs: Utxo<TransferOutput>[];
       importedAmounts: Record<string, bigint>;
     }>(
       (acc, utxo) => {
@@ -326,6 +327,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
         const assetId = utxo.getAssetId();
 
         return {
+          inputUTXOs: [...acc.inputUTXOs, utxo],
           importedInputs: [
             ...acc.importedInputs,
             new TransferableInput(
@@ -344,7 +346,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
           },
         };
       },
-      { importedInputs: [], importedAmounts: {} },
+      { importedInputs: [], importedAmounts: {}, inputUTXOs: [] },
     );
 
   if (importedInputs.length === 0) {
@@ -397,7 +399,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     context,
   );
 
-  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const { changeOutputs, inputs } = spendResults;
 
   return new UnsignedTx(
     new ImportTx(
