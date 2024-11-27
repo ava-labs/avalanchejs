@@ -397,7 +397,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
     context,
   );
 
-  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+  const { changeOutputs, inputs } = spendResults;
 
   return new UnsignedTx(
     new ImportTx(
@@ -411,7 +411,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       Id.fromString(sourceChainId),
       importedInputs.sort(TransferableInput.compare),
     ),
-    inputUTXOs,
+    filteredUtxos,
     addressMaps,
   );
 };
