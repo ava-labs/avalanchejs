@@ -18,8 +18,6 @@ const avalanche: Avalanche = new Avalanche(
   config.protocol,
   config.networkID
 )
-// BEFORE RUNNING THIS EXAMPLE:
-// crateUser, importKey to PlatformVM and setAddressState
 /**
  * @ignore
  */

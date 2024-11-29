@@ -17,9 +17,6 @@ const avalanche: Avalanche = new Avalanche(
   config.protocol,
   config.networkID
 )
-// BEFORE RUNNING THIS EXAMPLE:
-// crateUser, importKey to PlatformVM and setAddressState
-//You can do this via requests published in camino-postman-collection repository
 /**
  * @ignore
  */
