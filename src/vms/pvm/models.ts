@@ -10,6 +10,7 @@ export type GetAssetDescriptionResponse = {
   denomination: number;
 };
 
+// https://docs.avax.network/api-reference/p-chain/api#platformgetcurrentvalidators
 export type GetCurrentValidatorsResponse = {
   validators: {
     accruedDelegateeReward: string;
@@ -24,6 +25,15 @@ export type GetCurrentValidatorsResponse = {
       threshold: string;
       addresses: string[];
     };
+    delegationRewardOwner: {
+      locktime: string;
+      threshold: string;
+      addresses: string[];
+    };
+    signer: {
+      publicKey: string;
+      proofOfPosession: string;
+    };
     delegatorCount: string;
     delegatorWeight: string;
     potentialReward: string;
@@ -36,7 +46,7 @@ export type GetCurrentValidatorsResponse = {
       endTime: string;
       stakeAmount: string;
       nodeID: string;
-      delegationRewardOwner: {
+      rewardOwner: {
         locktime: string;
         threshold: string;
         addresses: string[];
@@ -51,6 +61,7 @@ export type GetPendingValidatorsParams = {
   nodeIDs?: string[];
 };
 
+// https://docs.avax.network/api-reference/p-chain/api#platformgetpendingvalidators
 export type GetPendingValidatorsResponse = {
   validators: {
     txID: string;
@@ -61,6 +72,10 @@ export type GetPendingValidatorsResponse = {
     delegationFee: string;
     connected: boolean;
     weight: string;
+    signer: {
+      publicKey: string;
+      proofOfPosession: string;
+    };
   }[];
   delegators: {
     txID: string;
@@ -319,7 +334,6 @@ export interface GetL1ValidatorResponse {
   deactivationOwner: {
     addresses: string[];
     locktime: string;
-    threshold: string;
   };
   startTime: string;
   weight: string;
