@@ -334,6 +334,7 @@ export interface GetL1ValidatorResponse {
   deactivationOwner: {
     addresses: string[];
     locktime: string;
+    threshold: string;
   };
   startTime: string;
   weight: string;
