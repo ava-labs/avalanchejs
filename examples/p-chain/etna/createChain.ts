@@ -1,7 +1,8 @@
-import { addTxSignatures, pvm, utils } from '../../../src';
+import { pvm, utils } from '../../../src';
 import { setupEtnaExample } from './utils/etna-helper';
 import { testGenesisData } from '../../../src/fixtures/transactions';
 import { getEnvVars } from '../../utils/getEnvVars';
+import { addSigToAllCreds } from './utils/addSignatureToAllCred';
 
 /**
  * Create a new chain on the P-Chain.
@@ -38,10 +39,7 @@ const createChainTxExample = async () => {
     context,
   );
 
-  await addTxSignatures({
-    unsignedTx: tx,
-    privateKeys: [utils.hexToBuffer(PRIVATE_KEY)],
-  });
+  await addSigToAllCreds(tx, utils.hexToBuffer(PRIVATE_KEY));
 
   return pvmApi.issueSignedTx(tx.getSignedTx());
 };
