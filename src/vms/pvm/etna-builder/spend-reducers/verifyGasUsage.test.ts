@@ -22,7 +22,7 @@ describe('verifyGasUsage', () => {
     // Mock the verifyGasUsage method to throw an error
     // Testing for this function can be found in the spendHelper.test.ts file
     spendHelper.verifyGasUsage = vi.fn(() => {
-      throw new Error('Test error');
+      return new Error('Test error');
     });
 
     expect(() =>

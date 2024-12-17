@@ -22,7 +22,7 @@ describe('verifyAssetsConsumed', () => {
     // Mock the verifyAssetsConsumed method to throw an error
     // Testing for this function can be found in the spendHelper.test.ts file
     spendHelper.verifyAssetsConsumed = vi.fn(() => {
-      throw new Error('Test error');
+      return new Error('Test error');
     });
 
     expect(() =>
