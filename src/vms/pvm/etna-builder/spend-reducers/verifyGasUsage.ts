@@ -5,10 +5,7 @@ import type { SpendReducerFunction } from './types';
  *
  * Calls the spendHelper's verifyGasUsage method.
  */
-export const verifyGasUsage: SpendReducerFunction = (
-  state,
-  spendHelper,
-) => {
+export const verifyGasUsage: SpendReducerFunction = (state, spendHelper) => {
   const verifyError = spendHelper.verifyGasUsage();
 
   if (verifyError) {

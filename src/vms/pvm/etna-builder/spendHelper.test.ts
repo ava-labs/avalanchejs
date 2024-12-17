@@ -374,6 +374,37 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
       );
     });
   });
+  describe('SpendHelper.verifyGasUsage', () => {
+    test('returns null when gas is under capacity', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+      });
+
+      const changeOutput = transferableOutput();
+
+      spendHelper.addChangeOutput(changeOutput);
+
+      expect(spendHelper.verifyGasUsage()).toBe(null);
+    });
+
+    test('returns an error when gas is over capacity', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+        feeState: {
+          ...DEFAULT_FEE_STATE,
+          capacity: 0n,
+        },
+      });
+
+      const changeOutput = transferableOutput();
+
+      spendHelper.addChangeOutput(changeOutput);
+
+      expect(spendHelper.verifyGasUsage()).toEqual(
+        new Error('Gas usage of transaction (113) exceeds capacity (0)'),
+      );
+    });
+  });
 
   test('no consolidated outputs when `shouldConsolidateOutputs` is `false`', () => {
     const spendHelper = new SpendHelper(DEFAULT_PROPS);

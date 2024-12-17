@@ -296,7 +296,7 @@ export class SpendHelper {
 
     return null;
   }
-  
+
   /**
    * Verifies that gas usage does not exceed the fee state maximum.
    *
@@ -305,7 +305,9 @@ export class SpendHelper {
   verifyGasUsage(): Error | null {
     const gas = this.calculateGas();
     if (this.feeState.capacity <= gas) {
-      return new Error(`Gas usage of transaction (${gas.toString()}) exceeds capacity (${this.feeState.capacity.toString()})`)
+      return new Error(
+        `Gas usage of transaction (${gas.toString()}) exceeds capacity (${this.feeState.capacity.toString()})`,
+      );
     }
 
     return null;

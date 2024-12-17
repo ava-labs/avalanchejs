@@ -389,7 +389,7 @@ export const disableL1ValidatorTxBytes = () =>
   concatBytes(baseTxbytes(), idBytes(), bytesForInt(10), inputBytes());
 
 export const feeState = (): FeeState => ({
-  capacity: 1n,
+  capacity: 1_000_000_000n,
   excess: 1n,
   price: 1n,
   timestamp: new Date().toISOString(),
