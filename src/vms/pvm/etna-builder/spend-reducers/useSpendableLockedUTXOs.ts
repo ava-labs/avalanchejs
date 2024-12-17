@@ -50,6 +50,11 @@ export const getUsableUTXOsFilter =
     return true;
   };
 
+/**
+ * Reducer function that is responsible for spending UTXOs that are locked and stakeable.
+ *
+ * NOTE: Time locked UTXOs can not be used to pay fees.
+ */
 export const useSpendableLockedUTXOs: SpendReducerFunction = (
   state,
   spendHelper,
