@@ -118,11 +118,9 @@ export const spend = (
         fromAddresses.map((address) => address.toBytes()),
       );
 
-    const gasPrice: bigint = feeState.price;
-
     const spendHelper = new SpendHelper({
       changeOutputs: [],
-      gasPrice,
+      feeState,
       initialComplexity,
       inputs: [],
       shouldConsolidateOutputs,

@@ -52,7 +52,7 @@ export const getSpendHelper = ({
 > = {}) => {
   return new SpendHelper({
     changeOutputs: [],
-    gasPrice: feeState.price,
+    feeState,
     initialComplexity,
     inputs: [],
     shouldConsolidateOutputs,

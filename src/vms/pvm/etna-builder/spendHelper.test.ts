@@ -6,7 +6,8 @@ import {
 import { describe, test, expect } from 'vitest';
 
 import { id } from '../../../fixtures/common';
-import { stakeableLockOut } from '../../../fixtures/pvm';
+import type { FeeState } from '../models';
+import { stakeableLockOut, feeState } from '../../../fixtures/pvm';
 import { TransferableOutput } from '../../../serializable';
 import { isTransferOut } from '../../../utils';
 import type { Dimensions } from '../../common/fees/dimensions';
@@ -20,6 +21,7 @@ import { SpendHelper } from './spendHelper';
 import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
 const DEFAULT_GAS_PRICE = 3n;
+const DEFAULT_FEE_STATE: FeeState = { ...feeState(), price: DEFAULT_GAS_PRICE };
 
 const DEFAULT_WEIGHTS = createDimensions({
   bandwidth: 1,
@@ -30,7 +32,7 @@ const DEFAULT_WEIGHTS = createDimensions({
 
 const DEFAULT_PROPS: SpendHelperProps = {
   changeOutputs: [],
-  gasPrice: DEFAULT_GAS_PRICE,
+  feeState: DEFAULT_FEE_STATE,
   initialComplexity: createDimensions({
     bandwidth: 1,
     dbRead: 1,
