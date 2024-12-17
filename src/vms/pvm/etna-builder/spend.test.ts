@@ -4,6 +4,7 @@ import { Address, OutputOwners } from '../../../serializable';
 import { createDimensions } from '../../common/fees/dimensions';
 import {
   verifyAssetsConsumed,
+  verifyGasUsage,
   type SpendReducerFunction,
   type SpendReducerState,
   handleFeeAndChange,
@@ -14,6 +15,7 @@ import { feeState as testFeeState } from '../../../fixtures/pvm';
 import { bech32ToBytes } from '../../../utils';
 
 vi.mock('./spend-reducers', () => ({
+  verifyGasUsage: vi.fn<SpendReducerFunction>((state) => state),
   verifyAssetsConsumed: vi.fn<SpendReducerFunction>((state) => state),
   handleFeeAndChange: vi.fn<SpendReducerFunction>((state) => state),
 }));
@@ -51,6 +53,7 @@ describe('./src/vms/pvm/etna-builder/spend.test.ts', () => {
 
     expect(testReducer).toHaveBeenCalledTimes(1);
     expect(verifyAssetsConsumed).toHaveBeenCalledTimes(1);
+    expect(verifyGasUsage).toHaveBeenCalledTimes(1);
     expect(handleFeeAndChange).toHaveBeenCalledTimes(1);
   });
 

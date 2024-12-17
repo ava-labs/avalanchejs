@@ -218,13 +218,13 @@ export class SpendHelper {
   }
 
   /**
-   * Calculates the fee for the SpendHelper based on its complexity and gas price.
+   * Calculates the gas usage for the SpendHelper based on its complexity and the weights.
    * Provide an empty change output as a parameter to calculate the fee as if the change output was already added.
    *
    * @param {TransferableOutput} additionalOutput - The change output that has not yet been added to the SpendHelper.
-   * @returns {bigint} The fee for the SpendHelper.
+   * @returns {bigint} The gas usage for the SpendHelper.
    */
-  calculateFee(additionalOutput?: TransferableOutput): bigint {
+  private calculateGas(additionalOutput?: TransferableOutput): bigint {
     this.consolidateOutputs();
 
     const gas = dimensionsToGas(
@@ -233,6 +233,19 @@ export class SpendHelper {
       ),
       this.weights,
     );
+
+    return gas;
+  }
+
+  /**
+   * Calculates the fee for the SpendHelper based on its complexity and gas price.
+   * Provide an empty change output as a parameter to calculate the fee as if the change output was already added.
+   *
+   * @param {TransferableOutput} additionalOutput - The change output that has not yet been added to the SpendHelper.
+   * @returns {bigint} The fee for the SpendHelper.
+   */
+  calculateFee(additionalOutput?: TransferableOutput): bigint {
+    const gas = this.calculateGas(additionalOutput);
 
     const gasPrice = this.feeState.price;
 
@@ -279,6 +292,20 @@ export class SpendHelper {
       return new Error(
         `Insufficient funds! Provided UTXOs need ${amount} more units of asset ${assetId}`,
       );
+    }
+
+    return null;
+  }
+  
+  /**
+   * Verifies that gas usage does not exceed the fee state maximum.
+   *
+   * @returns {Error | null} An error if gas usage exceeds maximum, null otherwise.
+   */
+  verifyGasUsage(): Error | null {
+    const gas = this.calculateGas();
+    if (this.feeState.capacity <= gas) {
+      return new Error(`Gas usage of transaction (${gas.toString()}) exceeds capacity (${this.feeState.capacity.toString()})`)
     }
 
     return null;
