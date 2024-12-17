@@ -304,7 +304,7 @@ export class SpendHelper {
    */
   verifyGasUsage(): Error | null {
     const gas = this.calculateGas();
-    if (this.feeState.capacity <= gas) {
+    if (this.feeState.capacity < gas) {
       return new Error(
         `Gas usage of transaction (${gas.toString()}) exceeds capacity (${this.feeState.capacity.toString()})`,
       );
