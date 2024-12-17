@@ -6,7 +6,8 @@ import {
 import { describe, test, expect } from 'vitest';
 
 import { id } from '../../../fixtures/common';
-import { stakeableLockOut } from '../../../fixtures/pvm';
+import type { FeeState } from '../models';
+import { stakeableLockOut, feeState } from '../../../fixtures/pvm';
 import { TransferableOutput } from '../../../serializable';
 import { isTransferOut } from '../../../utils';
 import type { Dimensions } from '../../common/fees/dimensions';
@@ -20,6 +21,7 @@ import { SpendHelper } from './spendHelper';
 import { getInputComplexity, getOutputComplexity } from '../txs/fee';
 
 const DEFAULT_GAS_PRICE = 3n;
+const DEFAULT_FEE_STATE: FeeState = { ...feeState(), price: DEFAULT_GAS_PRICE };
 
 const DEFAULT_WEIGHTS = createDimensions({
   bandwidth: 1,
@@ -30,7 +32,7 @@ const DEFAULT_WEIGHTS = createDimensions({
 
 const DEFAULT_PROPS: SpendHelperProps = {
   changeOutputs: [],
-  gasPrice: DEFAULT_GAS_PRICE,
+  feeState: DEFAULT_FEE_STATE,
   initialComplexity: createDimensions({
     bandwidth: 1,
     dbRead: 1,
@@ -369,6 +371,37 @@ describe('src/vms/pvm/etna-builder/spendHelper', () => {
         new Error(
           'Insufficient funds! Provided UTXOs need 1 more units of asset test-asset',
         ),
+      );
+    });
+  });
+  describe('SpendHelper.verifyGasUsage', () => {
+    test('returns null when gas is under capacity', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+      });
+
+      const changeOutput = transferableOutput();
+
+      spendHelper.addChangeOutput(changeOutput);
+
+      expect(spendHelper.verifyGasUsage()).toBe(null);
+    });
+
+    test('returns an error when gas is over capacity', () => {
+      const spendHelper = new SpendHelper({
+        ...DEFAULT_PROPS,
+        feeState: {
+          ...DEFAULT_FEE_STATE,
+          capacity: 0n,
+        },
+      });
+
+      const changeOutput = transferableOutput();
+
+      spendHelper.addChangeOutput(changeOutput);
+
+      expect(spendHelper.verifyGasUsage()).toEqual(
+        new Error('Gas usage of transaction (113) exceeds capacity (0)'),
       );
     });
   });

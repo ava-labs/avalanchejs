@@ -9,7 +9,11 @@ import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
 import type { FeeState } from '../models';
 import type { SpendReducerFunction, SpendReducerState } from './spend-reducers';
-import { handleFeeAndChange, verifyAssetsConsumed } from './spend-reducers';
+import {
+  handleFeeAndChange,
+  verifyAssetsConsumed,
+  verifyGasUsage,
+} from './spend-reducers';
 import { SpendHelper } from './spendHelper';
 
 type SpendResult = Readonly<{
@@ -118,11 +122,9 @@ export const spend = (
         fromAddresses.map((address) => address.toBytes()),
       );
 
-    const gasPrice: bigint = feeState.price;
-
     const spendHelper = new SpendHelper({
       changeOutputs: [],
-      gasPrice,
+      feeState,
       initialComplexity,
       inputs: [],
       shouldConsolidateOutputs,
@@ -147,6 +149,7 @@ export const spend = (
       ...spendReducers,
       verifyAssetsConsumed,
       handleFeeAndChange,
+      verifyGasUsage, // This should happen after change is added
       // Consolidation and sorting happens in the SpendHelper.
     ];
 
