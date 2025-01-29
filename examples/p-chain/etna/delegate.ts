@@ -23,7 +23,7 @@ const main = async () => {
   // TODO: Get this from an argument.
   const nodeId = 'NodeID-MqgFXT8JhorbEW2LpTDGePBBhv55SSp3M';
 
-  const tx = pvm.e.newAddPermissionlessDelegatorTx(
+  const tx = pvm.newAddPermissionlessDelegatorTx(
     {
       end,
       feeState,

@@ -24,7 +24,7 @@ const createChainTxExample = async () => {
   const vmId = 'rWhpuQPF1kb72esV2momhMuTYGkEb1oL29pt2EBXWmSy4kxnT'; // platform vmId
   const subnetId = ''; // subnetId from createSubnetTx
 
-  const tx = pvm.e.newCreateChainTx(
+  const tx = pvm.newCreateChainTx(
     {
       feeState,
       fromAddressesBytes: [testPAddr],

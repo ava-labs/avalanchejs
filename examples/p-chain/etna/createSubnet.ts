@@ -11,7 +11,7 @@ const createSubnetTxExample = async () => {
 
   const testPAddr = utils.bech32ToBytes(P_CHAIN_ADDRESS);
 
-  const tx = pvm.e.newCreateSubnetTx(
+  const tx = pvm.newCreateSubnetTx(
     {
       feeState,
       fromAddressesBytes: [testPAddr],

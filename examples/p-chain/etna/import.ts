@@ -13,7 +13,7 @@ const main = async () => {
     addresses: [P_CHAIN_ADDRESS],
   });
 
-  const importTx = pvm.e.newImportTx(
+  const importTx = pvm.newImportTx(
     {
       feeState,
       fromAddressesBytes: [utils.bech32ToBytes(X_CHAIN_ADDRESS)],

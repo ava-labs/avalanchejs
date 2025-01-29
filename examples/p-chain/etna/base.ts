@@ -14,7 +14,7 @@ const main = async () => {
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
 
-  const tx = pvm.e.newBaseTx(
+  const tx = pvm.newBaseTx(
     {
       feeState,
       fromAddressesBytes: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],

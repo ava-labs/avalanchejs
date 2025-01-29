@@ -33,7 +33,7 @@ const main = async () => {
 
   const signature = utils.hexToBuffer(BLS_SIGNATURE);
 
-  const tx = pvm.e.newAddPermissionlessValidatorTx(
+  const tx = pvm.newAddPermissionlessValidatorTx(
     {
       end,
       delegatorRewardsOwner: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],

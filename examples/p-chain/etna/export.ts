@@ -14,7 +14,7 @@ const main = async () => {
     addresses: [P_CHAIN_ADDRESS],
   });
 
-  const exportTx = pvm.e.newExportTx(
+  const exportTx = pvm.newExportTx(
     {
       destinationChainId: context.xBlockchainID,
       feeState,

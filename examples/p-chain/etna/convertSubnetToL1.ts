@@ -56,7 +56,7 @@ const convertSubnetToL1TxExample = async () => {
     pChainOwner,
   );
 
-  const tx = pvm.e.newConvertSubnetToL1Tx(
+  const tx = pvm.newConvertSubnetToL1Tx(
     {
       feeState,
       fromAddressesBytes: [testPAddr],
