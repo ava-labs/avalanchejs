@@ -5,6 +5,7 @@ import type {
   BuildGenesisResponse,
   GetAllBalancesParams,
   GetAllBalancesResponse,
+  GetTxFeeResponse,
 } from './models';
 
 export class AVMApi extends AvaxApi {
@@ -32,5 +33,9 @@ export class AVMApi extends AvaxApi {
       'getAllBalances',
       getAllBalancesParams,
     );
+  }
+
+  getTxFee(): Promise<GetTxFeeResponse> {
+    return this.callRpc<GetTxFeeResponse>('getTxFee');
   }
 }

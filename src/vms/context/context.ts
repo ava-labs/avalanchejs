@@ -17,17 +17,10 @@ export const getContextFromURI = async (
     assetDescription,
   );
   const info = new InfoApi(baseURL);
-  const {
-    txFee: baseTxFee,
-    createAssetTxFee,
-    createSubnetTxFee,
-    transformSubnetTxFee,
-    createBlockchainTxFee,
-    addPrimaryNetworkValidatorFee,
-    addPrimaryNetworkDelegatorFee,
-    addSubnetValidatorFee,
-    addSubnetDelegatorFee,
-  } = await info.getTxFee();
+  const { txFee: baseTxFee, createAssetTxFee } = await xChainApi.getTxFee();
+
+  const feeState = await pChainApi.getFeeState();
+
   const { blockchainID: xBlockchainID } = await info.getBlockchainId('X');
   const { blockchainID: pBlockchainID } = await info.getBlockchainId('P');
   const { blockchainID: cBlockchainID } = await info.getBlockchainId('C');
@@ -44,15 +37,9 @@ export const getContextFromURI = async (
     avaxAssetID,
     baseTxFee,
     createAssetTxFee,
-    createSubnetTxFee,
-    transformSubnetTxFee,
-    createBlockchainTxFee,
-    addPrimaryNetworkValidatorFee,
-    addPrimaryNetworkDelegatorFee,
-    addSubnetValidatorFee,
-    addSubnetDelegatorFee,
     networkID,
     hrp: getHRP(networkID),
     platformFeeConfig,
+    feeState,
   });
 };

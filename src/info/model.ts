@@ -21,26 +21,6 @@ export type GetPeersResponse = {
   peers: Peer[];
 };
 
-export type GetTxFeeApiResponse = {
-  txFee: string;
-  creationTxFee: string;
-  createAssetTxFee: string;
-  createSubnetTxFee: string;
-  createBlockchainTxFee: string;
-};
-
-export type GetTxFeeResponse = {
-  txFee: bigint;
-  createAssetTxFee: bigint;
-  createSubnetTxFee: bigint;
-  transformSubnetTxFee: bigint;
-  createBlockchainTxFee: bigint;
-  addPrimaryNetworkValidatorFee: bigint;
-  addPrimaryNetworkDelegatorFee: bigint;
-  addSubnetValidatorFee: bigint;
-  addSubnetDelegatorFee: bigint;
-};
-
 export type UptimeResponse = {
   rewardingStakePercentage: string;
   weightedAveragePercentage: string;

@@ -35,3 +35,8 @@ export interface GetAddressTxsResponse {
   txIDs: string[];
   cursor: bigint;
 }
+
+export interface GetTxFeeResponse {
+  txFee: string;
+  createAssetTxFee: string;
+}

@@ -33,11 +33,14 @@ describe('AVMBuilder', () => {
   it('importTx', async () => {
     const toAddress = hexToBuffer('0x5432112345123451234512');
     const tx = newImportTx(
+      {
+        sourceChainId: testContext.cBlockchainID,
+        utxos,
+        toAddressesBytes: [toAddress],
+        fromAddressesBytes: [testOwnerXAddress.toBytes()],
+        feeState: testContext.feeState,
+      },
       testContext,
-      testContext.cBlockchainID,
-      utxos,
-      [toAddress],
-      [testOwnerXAddress.toBytes()],
     );
 
     const importTx = tx.getTx() as ImportTx;
@@ -60,11 +63,14 @@ describe('AVMBuilder', () => {
     );
 
     const tx = newImportTx(
+      {
+        sourceChainId: testContext.cBlockchainID,
+        utxos,
+        toAddressesBytes: [toAddress],
+        fromAddressesBytes: [testOwnerXAddress.toBytes()],
+        feeState: testContext.feeState,
+      },
       testContext,
-      testContext.cBlockchainID,
-      utxos,
-      [toAddress],
-      [testOwnerXAddress.toBytes()],
     );
 
     const importTx = tx.getTx() as ImportTx;
@@ -84,11 +90,14 @@ describe('AVMBuilder', () => {
 
     expect(() =>
       newImportTx(
+        {
+          sourceChainId: testContext.cBlockchainID,
+          utxos,
+          toAddressesBytes: [toAddress],
+          fromAddressesBytes: [testOwnerXAddress.toBytes()],
+          feeState: testContext.feeState,
+        },
         testContext,
-        testContext.cBlockchainID,
-        utxos,
-        [toAddress],
-        [testOwnerXAddress.toBytes()],
       ),
     ).toThrow();
   });
@@ -101,11 +110,14 @@ describe('AVMBuilder', () => {
       [toAddress],
     );
     const tx = newExportTx(
+      {
+        destinationChainId: testContext.cBlockchainID,
+        fromAddressesBytes: [testOwnerXAddress.toBytes()],
+        utxos,
+        outputs: [tnsOut],
+        feeState: testContext.feeState,
+      },
       testContext,
-      testContext.cBlockchainID,
-      [testOwnerXAddress.toBytes()],
-      utxos,
-      [tnsOut],
     );
     const exportTx = tx.getTx() as ExportTx;
     expect(exportTx.outs as TransferableOutput[]).toEqual([tnsOut]);
@@ -141,11 +153,14 @@ describe('AVMBuilder', () => {
     utxos.pop();
     expect(() =>
       newExportTx(
+        {
+          destinationChainId: testContext.cBlockchainID,
+          fromAddressesBytes: [testOwnerXAddress.toBytes()],
+          utxos,
+          outputs: [tnsOut],
+          feeState: testContext.feeState,
+        },
         testContext,
-        testContext.cBlockchainID,
-        [testOwnerXAddress.toBytes()],
-        utxos,
-        [tnsOut],
       ),
     ).toThrow();
   });

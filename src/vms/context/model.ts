@@ -1,4 +1,4 @@
-import type { FeeConfig } from '../pvm';
+import type { FeeConfig, FeeState } from '../pvm';
 
 export type Context = {
   readonly networkID: number;
@@ -9,14 +9,8 @@ export type Context = {
   readonly avaxAssetID: string;
   readonly baseTxFee: bigint;
   readonly createAssetTxFee: bigint;
-  readonly createSubnetTxFee: bigint;
-  readonly transformSubnetTxFee: bigint;
-  readonly createBlockchainTxFee: bigint;
-  readonly addPrimaryNetworkValidatorFee: bigint;
-  readonly addPrimaryNetworkDelegatorFee: bigint;
-  readonly addSubnetValidatorFee: bigint;
-  readonly addSubnetDelegatorFee: bigint;
 
   // Post Etna
   readonly platformFeeConfig: FeeConfig;
+  readonly feeState: FeeState;
 };

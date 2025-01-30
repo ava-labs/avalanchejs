@@ -8,13 +8,6 @@ export const testContext: Context = {
   avaxAssetID: 'FvwEAhmxKfeiG8SnEvq42hc6whRyY3EFYAvebMqDNDGCgxN5Z',
   baseTxFee: 1000000n,
   createAssetTxFee: 10000000n,
-  createSubnetTxFee: 1000000000n,
-  transformSubnetTxFee: 10000000000n,
-  createBlockchainTxFee: 1000000000n,
-  addPrimaryNetworkValidatorFee: 0n,
-  addPrimaryNetworkDelegatorFee: 0n,
-  addSubnetValidatorFee: 1000000n,
-  addSubnetDelegatorFee: 1000000n,
   networkID: 1,
   hrp: 'avax',
   platformFeeConfig: {
@@ -29,5 +22,11 @@ export const testContext: Context = {
     targetPerSecond: 500n,
     minPrice: 1n,
     excessConversionConstant: 5_000n,
+  },
+  feeState: {
+    capacity: 1000000n,
+    excess: 100000n,
+    price: 1n,
+    timestamp: '2024-12-16T17:19:07Z',
   },
 };
