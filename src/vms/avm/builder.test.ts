@@ -24,6 +24,7 @@ import { BigIntPr, Int } from '../../serializable/primitives';
 import { hexToBuffer } from '../../utils';
 import { newExportTx, newImportTx } from '../pvm';
 import { newBaseTx } from './builder';
+import { checkFeeIsCorrect } from '../pvm/etna-builder/utils/feeForTesting';
 
 describe('AVMBuilder', () => {
   let utxos: Utxo[];
@@ -62,7 +63,7 @@ describe('AVMBuilder', () => {
       ),
     );
 
-    const tx = newImportTx(
+    const unsignedTx = newImportTx(
       {
         sourceChainId: testContext.cBlockchainID,
         utxos,
@@ -73,13 +74,28 @@ describe('AVMBuilder', () => {
       testContext,
     );
 
-    const importTx = tx.getTx() as ImportTx;
+    const importTx = unsignedTx.getTx() as ImportTx;
+    const { inputs, outputs } = importTx.baseTx;
+    const [, expectedAmountConsumed, expectedFee] = checkFeeIsCorrect({
+      unsignedTx,
+      inputs,
+      outputs,
+      feeState: testContext.feeState,
+    });
 
     expect(importTx.ins).toHaveLength(1);
     expect(importTx.ins[0].assetId).toEqual(testAvaxAssetID);
     expect(Number(importTx.ins[0].amount())).toEqual(50 * 1e5);
+
+    const expectedAmountConsumedOriginal = expectedAmountConsumed[
+      testContext.avaxAssetID
+    ]
+      .slice(0, -1) //remove n
+      .replaceAll('_', '');
+    const expectedAmountConsumedBigInt = BigInt(expectedAmountConsumedOriginal);
+
     expect((importTx.baseTx.outputs as TransferableOutput[])[0].amount()).toBe(
-      BigInt(40 * 1e5),
+      expectedAmountConsumedBigInt - expectedFee,
     );
     expect(importTx.ins[0].utxoID.ID()).toEqual(utxos[2].ID());
   });
@@ -120,6 +136,19 @@ describe('AVMBuilder', () => {
       testContext,
     );
     const exportTx = tx.getTx() as ExportTx;
+    const { inputs, outputs } = exportTx.baseTx;
+    const [, expectedAmountConsumed, expectedFee] = checkFeeIsCorrect({
+      unsignedTx: tx,
+      inputs,
+      outputs,
+      feeState: testContext.feeState,
+    });
+    const expectedAmountConsumedOriginal = expectedAmountConsumed[
+      testContext.avaxAssetID
+    ]
+      .slice(0, -1) //remove n
+      .replaceAll('_', '');
+    const expectedAmountConsumedBigInt = BigInt(expectedAmountConsumedOriginal);
     expect(exportTx.outs as TransferableOutput[]).toEqual([tnsOut]);
     expect(exportTx.baseTx.inputs as TransferableInput[]).toEqual([
       new TransferableInput(
@@ -136,7 +165,7 @@ describe('AVMBuilder', () => {
       new TransferableOutput(
         testAvaxAssetID,
         new TransferOutput(
-          new BigIntPr(44999000000n),
+          new BigIntPr(expectedAmountConsumedBigInt - expectedFee),
           OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
         ),
       ),
