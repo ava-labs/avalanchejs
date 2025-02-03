@@ -22,10 +22,7 @@ import {
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
 import { hexToBuffer } from '../../utils';
-import { newExportTx, newImportTx } from '../pvm';
-import { newBaseTx } from './builder';
-import { checkFeeIsCorrect } from '../pvm/etna-builder/utils/feeForTesting';
-import { feeState } from '../../fixtures/pvm';
+import { newBaseTx, newExportTx, newImportTx } from './builder';
 
 describe('AVMBuilder', () => {
   let utxos: Utxo[];
@@ -35,14 +32,11 @@ describe('AVMBuilder', () => {
   it('importTx', async () => {
     const toAddress = hexToBuffer('0x5432112345123451234512');
     const tx = newImportTx(
-      {
-        sourceChainId: testContext.cBlockchainID,
-        utxos,
-        toAddressesBytes: [toAddress],
-        fromAddressesBytes: [testOwnerXAddress.toBytes()],
-        feeState: feeState(),
-      },
       testContext,
+      testContext.cBlockchainID,
+      utxos,
+      [toAddress],
+      [testOwnerXAddress.toBytes()],
     );
 
     const importTx = tx.getTx() as ImportTx;
@@ -64,39 +58,21 @@ describe('AVMBuilder', () => {
       ),
     );
 
-    const unsignedTx = newImportTx(
-      {
-        sourceChainId: testContext.cBlockchainID,
-        utxos,
-        toAddressesBytes: [toAddress],
-        fromAddressesBytes: [testOwnerXAddress.toBytes()],
-        feeState: feeState(),
-      },
+    const tx = newImportTx(
       testContext,
+      testContext.cBlockchainID,
+      utxos,
+      [toAddress],
+      [testOwnerXAddress.toBytes()],
     );
 
-    const importTx = unsignedTx.getTx() as ImportTx;
-    const { inputs, outputs } = importTx.baseTx;
-    const [, expectedAmountConsumed, expectedFee] = checkFeeIsCorrect({
-      unsignedTx,
-      inputs,
-      outputs,
-      feeState: feeState(),
-    });
+    const importTx = tx.getTx() as ImportTx;
 
     expect(importTx.ins).toHaveLength(1);
     expect(importTx.ins[0].assetId).toEqual(testAvaxAssetID);
     expect(Number(importTx.ins[0].amount())).toEqual(50 * 1e5);
-
-    const expectedAmountConsumedOriginal = expectedAmountConsumed[
-      testContext.avaxAssetID
-    ]
-      .slice(0, -1) //remove n
-      .replaceAll('_', '');
-    const expectedAmountConsumedBigInt = BigInt(expectedAmountConsumedOriginal);
-
     expect((importTx.baseTx.outputs as TransferableOutput[])[0].amount()).toBe(
-      expectedAmountConsumedBigInt - expectedFee,
+      BigInt(40 * 1e5),
     );
     expect(importTx.ins[0].utxoID.ID()).toEqual(utxos[2].ID());
   });
@@ -107,14 +83,11 @@ describe('AVMBuilder', () => {
 
     expect(() =>
       newImportTx(
-        {
-          sourceChainId: testContext.cBlockchainID,
-          utxos,
-          toAddressesBytes: [toAddress],
-          fromAddressesBytes: [testOwnerXAddress.toBytes()],
-          feeState: feeState(),
-        },
         testContext,
+        testContext.cBlockchainID,
+        utxos,
+        [toAddress],
+        [testOwnerXAddress.toBytes()],
       ),
     ).toThrow();
   });
@@ -127,29 +100,13 @@ describe('AVMBuilder', () => {
       [toAddress],
     );
     const tx = newExportTx(
-      {
-        destinationChainId: testContext.cBlockchainID,
-        fromAddressesBytes: [testOwnerXAddress.toBytes()],
-        utxos,
-        outputs: [tnsOut],
-        feeState: feeState(),
-      },
       testContext,
+      testContext.cBlockchainID,
+      [testOwnerXAddress.toBytes()],
+      utxos,
+      [tnsOut],
     );
     const exportTx = tx.getTx() as ExportTx;
-    const { inputs, outputs } = exportTx.baseTx;
-    const [, expectedAmountConsumed, expectedFee] = checkFeeIsCorrect({
-      unsignedTx: tx,
-      inputs,
-      outputs,
-      feeState: feeState(),
-    });
-    const expectedAmountConsumedOriginal = expectedAmountConsumed[
-      testContext.avaxAssetID
-    ]
-      .slice(0, -1) //remove n
-      .replaceAll('_', '');
-    const expectedAmountConsumedBigInt = BigInt(expectedAmountConsumedOriginal);
     expect(exportTx.outs as TransferableOutput[]).toEqual([tnsOut]);
     expect(exportTx.baseTx.inputs as TransferableInput[]).toEqual([
       new TransferableInput(
@@ -166,7 +123,7 @@ describe('AVMBuilder', () => {
       new TransferableOutput(
         testAvaxAssetID,
         new TransferOutput(
-          new BigIntPr(expectedAmountConsumedBigInt - expectedFee),
+          new BigIntPr(44999000000n),
           OutputOwners.fromNative([testOwnerXAddress.toBytes()]),
         ),
       ),
@@ -183,14 +140,11 @@ describe('AVMBuilder', () => {
     utxos.pop();
     expect(() =>
       newExportTx(
-        {
-          destinationChainId: testContext.cBlockchainID,
-          fromAddressesBytes: [testOwnerXAddress.toBytes()],
-          utxos,
-          outputs: [tnsOut],
-          feeState: feeState(),
-        },
         testContext,
+        testContext.cBlockchainID,
+        [testOwnerXAddress.toBytes()],
+        utxos,
+        [tnsOut],
       ),
     ).toThrow();
   });
