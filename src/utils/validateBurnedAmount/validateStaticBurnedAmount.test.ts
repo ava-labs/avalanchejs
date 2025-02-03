@@ -12,18 +12,8 @@ import {
   newExportTx as avmExportTx,
   newImportTx as avmImportTx,
 } from '../../vms/avm';
-import {
-  newBaseTx as pvmBaseTx,
-  newExportTx as pvmExportTx,
-  newImportTx as pvmImportTx,
-  newRemoveSubnetValidatorTx,
-  newTransferSubnetOwnershipTx,
-} from '../../vms/pvm';
 import { TransferableOutput } from '../../serializable';
-import { nodeId } from '../../fixtures/common';
-import { testSubnetId } from '../../fixtures/transactions';
 import { validateStaticBurnedAmount } from './validateStaticBurnedAmount';
-import { feeState } from '../../fixtures/pvm';
 
 const utxoMock = new Utxo(
   utxoId(),
@@ -77,77 +67,6 @@ describe('validateStaticBurnedAmount', () => {
         [utxoMock],
         [testAddress2],
         [testAddress1],
-      ),
-      correctBurnedAmount: testContext.baseTxFee,
-    },
-    {
-      name: 'base tx on P',
-      unsignedTx: pvmBaseTx(
-        {
-          fromAddressesBytes: [testAddress1],
-          utxos: [utxoMock],
-          outputs: [outputMock],
-          feeState: feeState(),
-        },
-        testContext,
-      ),
-      correctBurnedAmount: testContext.baseTxFee,
-    },
-    {
-      name: 'export from P',
-      unsignedTx: pvmExportTx(
-        {
-          destinationChainId: 'C',
-          fromAddressesBytes: [testAddress1],
-          utxos: [utxoMock],
-          outputs: [outputMock],
-          feeState: feeState(),
-        },
-        testContext,
-      ),
-      correctBurnedAmount: testContext.baseTxFee,
-    },
-    {
-      name: 'import to P',
-      unsignedTx: pvmImportTx(
-        {
-          sourceChainId: 'C',
-          utxos: [utxoMock],
-          toAddressesBytes: [testAddress2],
-          fromAddressesBytes: [testAddress1],
-          feeState: feeState(),
-        },
-        testContext,
-      ),
-      correctBurnedAmount: testContext.baseTxFee,
-    },
-    {
-      name: 'remove subnet validator',
-      unsignedTx: newRemoveSubnetValidatorTx(
-        {
-          utxos: [utxoMock],
-          fromAddressesBytes: [testAddress1],
-          nodeId: nodeId().toString(),
-          subnetId: Id.fromHex(testSubnetId).toString(),
-          subnetAuth: [0],
-          feeState: feeState(),
-        },
-        testContext,
-      ),
-      correctBurnedAmount: testContext.baseTxFee,
-    },
-    {
-      name: 'transfer subnet ownership',
-      unsignedTx: newTransferSubnetOwnershipTx(
-        {
-          utxos: [utxoMock],
-          fromAddressesBytes: [testAddress1],
-          subnetId: Id.fromHex(testSubnetId).toString(),
-          subnetAuth: [0, 2],
-          subnetOwners: [testAddress2],
-          feeState: feeState(),
-        },
-        testContext,
       ),
       correctBurnedAmount: testContext.baseTxFee,
     },

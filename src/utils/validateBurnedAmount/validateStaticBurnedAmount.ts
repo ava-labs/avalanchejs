@@ -1,11 +1,4 @@
 import type { Context } from '../../vms/context/model';
-import {
-  isPvmBaseTx,
-  isExportTx as isPvmExportTx,
-  isImportTx as isPvmImportTx,
-  isRemoveSubnetValidatorTx,
-  isTransferSubnetOwnershipTx,
-} from '../../serializable/pvm';
 import type { UnsignedTx } from '../../vms/common';
 import {
   isAvmBaseTx,
@@ -14,7 +7,7 @@ import {
 } from '../../serializable/avm';
 
 /**
- * Validate static burned amount for avalanche x/p transactions
+ * Validate static burned amount for avalanche x transactions
  *
  * @param unsignedTx: unsigned transaction
  * @param context
@@ -33,16 +26,7 @@ export const validateStaticBurnedAmount = ({
 }): { isValid: boolean; txFee: bigint } => {
   const tx = unsignedTx.getTx();
 
-  if (
-    isAvmBaseTx(tx) ||
-    isPvmBaseTx(tx) ||
-    isAvmExportTx(tx) ||
-    isAvmImportTx(tx) ||
-    isPvmExportTx(tx) ||
-    isPvmImportTx(tx) ||
-    isRemoveSubnetValidatorTx(tx) ||
-    isTransferSubnetOwnershipTx(tx)
-  ) {
+  if (isAvmBaseTx(tx) || isAvmExportTx(tx) || isAvmImportTx(tx)) {
     return validate(burnedAmount, context.baseTxFee);
   }
 
