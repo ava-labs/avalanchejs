@@ -23,6 +23,7 @@ import { TransferableOutput } from '../../serializable';
 import { nodeId } from '../../fixtures/common';
 import { testSubnetId } from '../../fixtures/transactions';
 import { validateStaticBurnedAmount } from './validateStaticBurnedAmount';
+import { feeState } from '../../fixtures/pvm';
 
 const utxoMock = new Utxo(
   utxoId(),
@@ -86,7 +87,7 @@ describe('validateStaticBurnedAmount', () => {
           fromAddressesBytes: [testAddress1],
           utxos: [utxoMock],
           outputs: [outputMock],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),
@@ -100,7 +101,7 @@ describe('validateStaticBurnedAmount', () => {
           fromAddressesBytes: [testAddress1],
           utxos: [utxoMock],
           outputs: [outputMock],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),
@@ -114,7 +115,7 @@ describe('validateStaticBurnedAmount', () => {
           utxos: [utxoMock],
           toAddressesBytes: [testAddress2],
           fromAddressesBytes: [testAddress1],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),
@@ -129,7 +130,7 @@ describe('validateStaticBurnedAmount', () => {
           nodeId: nodeId().toString(),
           subnetId: Id.fromHex(testSubnetId).toString(),
           subnetAuth: [0],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),
@@ -144,7 +145,7 @@ describe('validateStaticBurnedAmount', () => {
           subnetId: Id.fromHex(testSubnetId).toString(),
           subnetAuth: [0, 2],
           subnetOwners: [testAddress2],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),

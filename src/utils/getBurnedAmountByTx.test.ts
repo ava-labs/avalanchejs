@@ -305,7 +305,7 @@ describe('getBurnedAmountByTx', () => {
             fromAddressesBytes: [testAddress1],
             utxos: [utxo1, utxo2],
             outputs: [output],
-            feeState: testContext.feeState,
+            feeState: feeState(),
           },
           testContext,
         );
@@ -317,7 +317,7 @@ describe('getBurnedAmountByTx', () => {
           unsignedTx,
           inputs,
           outputs,
-          feeState: testContext.feeState,
+          feeState: feeState(),
         });
 
         expect(amounts.size).toEqual(1);
@@ -336,7 +336,7 @@ describe('getBurnedAmountByTx', () => {
             fromAddressesBytes: [testAddress1],
             utxos: [utxo],
             outputs: [output1, output2, output3],
-            feeState: testContext.feeState,
+            feeState: feeState(),
           },
           testContext,
         );
@@ -348,7 +348,7 @@ describe('getBurnedAmountByTx', () => {
           unsignedTx,
           inputs,
           outputs,
-          feeState: testContext.feeState,
+          feeState: feeState(),
         });
 
         expect(amounts.size).toEqual(1);
@@ -368,7 +368,7 @@ describe('getBurnedAmountByTx', () => {
             fromAddressesBytes: [testAddress1],
             utxos: [utxo1, utxo2],
             outputs: [output1, output2, output3],
-            feeState: testContext.feeState,
+            feeState: feeState(),
           },
           testContext,
         );
@@ -380,7 +380,7 @@ describe('getBurnedAmountByTx', () => {
           unsignedTx,
           inputs,
           outputs,
-          feeState: testContext.feeState,
+          feeState: feeState(),
         });
 
         expect(amounts.size).toEqual(1);
@@ -399,7 +399,7 @@ describe('getBurnedAmountByTx', () => {
             utxos: [utxo1, utxo2],
             toAddressesBytes: [testAddress2],
             fromAddressesBytes: [testAddress1],
-            feeState: testContext.feeState,
+            feeState: feeState(),
           },
           testContext,
         );
@@ -411,7 +411,7 @@ describe('getBurnedAmountByTx', () => {
           unsignedTx,
           inputs,
           outputs,
-          feeState: testContext.feeState,
+          feeState: feeState(),
         });
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
@@ -428,7 +428,7 @@ describe('getBurnedAmountByTx', () => {
             utxos: [utxo1, utxo2],
             fromAddressesBytes: [testAddress1],
             subnetOwners: [testAddress1],
-            feeState: testContext.feeState,
+            feeState: feeState(),
           },
           testContext,
         );
@@ -440,7 +440,7 @@ describe('getBurnedAmountByTx', () => {
           unsignedTx,
           inputs,
           outputs,
-          feeState: testContext.feeState,
+          feeState: feeState(),
         });
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
@@ -456,7 +456,7 @@ describe('getBurnedAmountByTx', () => {
         const unsignedTx = newAddSubnetValidatorTx(
           {
             end: 1n,
-            feeState: testContext.feeState,
+            feeState: feeState(),
             fromAddressesBytes: [testAddress1],
             nodeId: nodeId().toString(),
             start: 0n,
@@ -474,7 +474,7 @@ describe('getBurnedAmountByTx', () => {
           unsignedTx,
           inputs,
           outputs,
-          feeState: testContext.feeState,
+          feeState: feeState(),
         });
         expect(amounts.size).toEqual(1);
         expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);

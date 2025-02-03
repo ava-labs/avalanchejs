@@ -18,7 +18,6 @@ export const getContextFromURI = async (
   );
   const info = new InfoApi(baseURL);
   const { txFee, createAssetTxFee } = await xChainApi.getTxFee();
-  const feeState = await pChainApi.getFeeState();
 
   const { blockchainID: xBlockchainID } = await info.getBlockchainId('X');
   const { blockchainID: pBlockchainID } = await info.getBlockchainId('P');
@@ -39,6 +38,5 @@ export const getContextFromURI = async (
     networkID,
     hrp: getHRP(networkID),
     platformFeeConfig,
-    feeState,
   });
 };

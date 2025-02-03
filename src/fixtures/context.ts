@@ -23,10 +23,4 @@ export const testContext: Context = {
     minPrice: 1n,
     excessConversionConstant: 5_000n,
   },
-  feeState: {
-    capacity: 1000000n,
-    excess: 100000n,
-    price: 1n,
-    timestamp: '2024-12-16T17:19:07Z',
-  },
 };

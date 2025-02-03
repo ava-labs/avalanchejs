@@ -1,4 +1,4 @@
-import type { FeeConfig, FeeState } from '../pvm';
+import type { FeeConfig } from '../pvm';
 
 export type Context = {
   readonly networkID: number;
@@ -12,5 +12,4 @@ export type Context = {
 
   // Post Etna
   readonly platformFeeConfig: FeeConfig;
-  readonly feeState: FeeState;
 };

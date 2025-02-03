@@ -25,6 +25,7 @@ import { hexToBuffer } from '../../utils';
 import { newExportTx, newImportTx } from '../pvm';
 import { newBaseTx } from './builder';
 import { checkFeeIsCorrect } from '../pvm/etna-builder/utils/feeForTesting';
+import { feeState } from '../../fixtures/pvm';
 
 describe('AVMBuilder', () => {
   let utxos: Utxo[];
@@ -39,7 +40,7 @@ describe('AVMBuilder', () => {
         utxos,
         toAddressesBytes: [toAddress],
         fromAddressesBytes: [testOwnerXAddress.toBytes()],
-        feeState: testContext.feeState,
+        feeState: feeState(),
       },
       testContext,
     );
@@ -69,7 +70,7 @@ describe('AVMBuilder', () => {
         utxos,
         toAddressesBytes: [toAddress],
         fromAddressesBytes: [testOwnerXAddress.toBytes()],
-        feeState: testContext.feeState,
+        feeState: feeState(),
       },
       testContext,
     );
@@ -80,7 +81,7 @@ describe('AVMBuilder', () => {
       unsignedTx,
       inputs,
       outputs,
-      feeState: testContext.feeState,
+      feeState: feeState(),
     });
 
     expect(importTx.ins).toHaveLength(1);
@@ -111,7 +112,7 @@ describe('AVMBuilder', () => {
           utxos,
           toAddressesBytes: [toAddress],
           fromAddressesBytes: [testOwnerXAddress.toBytes()],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),
@@ -131,7 +132,7 @@ describe('AVMBuilder', () => {
         fromAddressesBytes: [testOwnerXAddress.toBytes()],
         utxos,
         outputs: [tnsOut],
-        feeState: testContext.feeState,
+        feeState: feeState(),
       },
       testContext,
     );
@@ -141,7 +142,7 @@ describe('AVMBuilder', () => {
       unsignedTx: tx,
       inputs,
       outputs,
-      feeState: testContext.feeState,
+      feeState: feeState(),
     });
     const expectedAmountConsumedOriginal = expectedAmountConsumed[
       testContext.avaxAssetID
@@ -187,7 +188,7 @@ describe('AVMBuilder', () => {
           fromAddressesBytes: [testOwnerXAddress.toBytes()],
           utxos,
           outputs: [tnsOut],
-          feeState: testContext.feeState,
+          feeState: feeState(),
         },
         testContext,
       ),
