@@ -40,3 +40,8 @@ export interface GetTxFeeResponse {
   txFee: string;
   createAssetTxFee: string;
 }
+
+export interface TxFee {
+  txFee: bigint;
+  createAssetTxFee: bigint;
+}

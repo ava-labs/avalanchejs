@@ -1,5 +1,5 @@
-import { addTxSignatures, pvm, utils } from '../../../src';
-import { getEnvVars } from '../../utils/getEnvVars';
+import { addTxSignatures, pvm, utils } from '../../src';
+import { getEnvVars } from '../utils/getEnvVars';
 import { setupEtnaExample } from './utils/etna-helper';
 
 const createSubnetTxExample = async () => {

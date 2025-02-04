@@ -6,6 +6,7 @@ import type {
   GetAllBalancesParams,
   GetAllBalancesResponse,
   GetTxFeeResponse,
+  TxFee,
 } from './models';
 
 export class AVMApi extends AvaxApi {
@@ -35,7 +36,11 @@ export class AVMApi extends AvaxApi {
     );
   }
 
-  getTxFee(): Promise<GetTxFeeResponse> {
-    return this.callRpc<GetTxFeeResponse>('getTxFee');
-  }
+  getTxFee = async (): Promise<TxFee> => {
+    const txFee = await this.callRpc<GetTxFeeResponse>('getTxFee');
+    return {
+      txFee: BigInt(txFee.txFee),
+      createAssetTxFee: BigInt(txFee.createAssetTxFee),
+    };
+  };
 }

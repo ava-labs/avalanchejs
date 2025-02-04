@@ -1,6 +1,6 @@
-import { addTxSignatures, pvm, utils } from '../../../src';
+import { addTxSignatures, pvm, utils } from '../../src';
 import { setupEtnaExample } from './utils/etna-helper';
-import { getEnvVars } from '../../utils/getEnvVars';
+import { getEnvVars } from '../utils/getEnvVars';
 
 const BALANCE_AVAX: number = 1;
 const VALIDATION_ID: string = '';

@@ -1,4 +1,4 @@
-import { secp256k1, type UnsignedTx } from '../../../../src';
+import { secp256k1, type UnsignedTx } from '../../../src';
 
 export const addSigToAllCreds = async (
   unsignedTx: UnsignedTx,

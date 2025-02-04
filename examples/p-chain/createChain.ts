@@ -1,7 +1,7 @@
-import { pvm, utils } from '../../../src';
+import { pvm, utils } from '../../src';
 import { setupEtnaExample } from './utils/etna-helper';
-import { testGenesisData } from '../../../src/fixtures/transactions';
-import { getEnvVars } from '../../utils/getEnvVars';
+import { testGenesisData } from '../../src/fixtures/transactions';
+import { getEnvVars } from '../utils/getEnvVars';
 import { addSigToAllCreds } from './utils/addSignatureToAllCred';
 
 /**
