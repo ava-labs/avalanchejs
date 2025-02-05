@@ -5,8 +5,6 @@ import { isImportExportTx as isEvmImportExportTx } from '../../serializable/evm'
 import { getBurnedAmountByTx } from '../getBurnedAmountByTx';
 import type { AvaxTx } from '../../serializable/avax';
 import { validateDynamicBurnedAmount } from './validateDynamicBurnedAmount';
-import type { GetUpgradesInfoResponse } from '../../info/model';
-import { isEtnaEnabled } from '../isEtnaEnabled';
 import { validateStaticBurnedAmount } from './validateStaticBurnedAmount';
 import { costCorethTx } from '../costs';
 import { calculateFee } from '../../vms/pvm/txs/fee/calculator';
@@ -34,13 +32,9 @@ const _getBurnedAmount = (tx: Transaction, context: Context) => {
   return burnedAmounts.get(context.avaxAssetID) ?? 0n;
 };
 
-// Check supported pvm transactions for Etna
-// Todo: add isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynamic fee is implemented
-const isEtnaSupported = (tx: Transaction) => {
+// Todo: create isAvmTx for isAvmBaseTx, isAvmExportTx and isAvmImportTx when avm dynamic fee is implemented
+const isPvmTx = (tx: Transaction) => {
   return (
-    // isAvmBaseTx(tx) || // not implemented
-    // isAvmExportTx(tx) || // not implemented
-    // isAvmImportTx(tx) || // not implemented
     isPvmBaseTx(tx) ||
     isPvmExportTx(tx) ||
     isPvmImportTx(tx) ||
@@ -74,14 +68,12 @@ const isEtnaSupported = (tx: Transaction) => {
 export const validateBurnedAmount = ({
   unsignedTx,
   context,
-  upgradesInfo,
   burnedAmount,
   baseFee,
   feeTolerance,
 }: {
   unsignedTx: UnsignedTx;
   context: Context;
-  upgradesInfo?: GetUpgradesInfoResponse;
   burnedAmount?: bigint;
   baseFee: bigint;
   feeTolerance: number;
@@ -89,10 +81,7 @@ export const validateBurnedAmount = ({
   const tx = unsignedTx.getTx();
   const burned = burnedAmount ?? _getBurnedAmount(tx, context);
 
-  if (
-    isEvmImportExportTx(tx) ||
-    (upgradesInfo && isEtnaEnabled(upgradesInfo) && isEtnaSupported(tx))
-  ) {
+  if (isEvmImportExportTx(tx) || isPvmTx(tx)) {
     const feeAmount = isEvmImportExportTx(tx)
       ? baseFee * costCorethTx(unsignedTx)
       : calculateFee(tx, context.platformFeeConfig.weights, baseFee);

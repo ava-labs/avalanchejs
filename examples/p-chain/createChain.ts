@@ -1,7 +1,7 @@
-import { pvm, utils } from '../../../src';
+import { pvm, utils } from '../../src';
 import { setupEtnaExample } from './utils/etna-helper';
-import { testGenesisData } from '../../../src/fixtures/transactions';
-import { getEnvVars } from '../../utils/getEnvVars';
+import { testGenesisData } from '../../src/fixtures/transactions';
+import { getEnvVars } from '../utils/getEnvVars';
 import { addSigToAllCreds } from './utils/addSignatureToAllCred';
 
 /**
@@ -24,7 +24,7 @@ const createChainTxExample = async () => {
   const vmId = 'rWhpuQPF1kb72esV2momhMuTYGkEb1oL29pt2EBXWmSy4kxnT'; // platform vmId
   const subnetId = ''; // subnetId from createSubnetTx
 
-  const tx = pvm.e.newCreateChainTx(
+  const tx = pvm.newCreateChainTx(
     {
       feeState,
       fromAddressesBytes: [testPAddr],

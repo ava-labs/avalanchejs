@@ -22,8 +22,7 @@ import {
 } from '../../serializable/fxs/secp256k1';
 import { BigIntPr, Int } from '../../serializable/primitives';
 import { hexToBuffer } from '../../utils';
-import { newExportTx, newImportTx } from '../pvm';
-import { newBaseTx } from './builder';
+import { newBaseTx, newExportTx, newImportTx } from './builder';
 
 describe('AVMBuilder', () => {
   let utxos: Utxo[];

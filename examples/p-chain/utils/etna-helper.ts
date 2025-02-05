@@ -1,5 +1,5 @@
-import { Context, info, pvm } from '../../../../src';
-import type { FeeState } from '../../../../src/vms/pvm';
+import { Context, info, pvm } from '../../../src';
+import type { FeeState } from '../../../src/vms/pvm';
 
 export const setupEtnaExample = async (
   uri: string,

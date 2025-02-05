@@ -30,9 +30,9 @@
     "typecheck": "tsc --skipLibCheck --noEmit",
     "example": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/c-chain/export.ts",
     "example:generateKeys": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/generate-keys.ts",
-    "example:createSubnetTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/createSubnet.ts",
-    "example:createChainTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/createChain.ts",
-    "example:convertSubnetTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/etna/convertSubnet.ts",
+    "example:createSubnetTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/createSubnet.ts",
+    "example:createChainTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/createChain.ts",
+    "example:convertSubnetTx": "NODE_OPTIONS='--loader ts-node/esm' ts-node examples/p-chain/convertSubnet.ts",
     "prepare": "husky install"
   },
   "dependencies": {
