@@ -21,6 +21,7 @@ export enum TypeSymbols {
   Address = 'common.Address',
   NodeId = 'common.NodeId',
   BlsSignature = 'common.BlsSignature',
+  BlsPublicKey = 'common.BlsPublicKey',
 
   // PRIMITIVES
   Int = 'primitives.Int',
@@ -29,7 +30,7 @@ export enum TypeSymbols {
   Byte = 'primitives.Byte',
   Bytes = 'primitives.Bytes',
   Short = 'primitives.Short',
-
+  Bool = 'primitives.Bool',
   // SECP256k1FX
   Input = 'secp256k1fx.Input',
   TransferInput = 'secp256k1fx.TransferInput',
@@ -100,4 +101,13 @@ export enum TypeSymbols {
   WarpMessage = 'warp.Message',
   WarpUnsignedMessage = 'warp.UnsignedMessage',
   WarpSignature = 'warp.Signature',
+
+  // Warp AddressedCall Payloads
+  AddressedCall = 'warp.AddressedCall',
+  RegisterL1ValidatorMessage = 'warp.RegisterL1ValidatorMessage',
+  L1ValidatorWeightMessage = 'warp.L1ValidatorWeightMessage',
+  SubnetToL1ConversionMessage = 'warp.SubnetToL1ConversionMessage',
+  L1ValidatorRegistrationMessage = 'warp.L1ValidatorRegistrationMessage',
+  ValidatorData = 'warp.ValidatorData',
+  ConversionData = 'warp.ConversionData',
 }

@@ -1,6 +1,8 @@
+import { BlsPublicKey } from '../serializable/fxs/common/blsPublicKey';
 import { BlsSignature } from '../serializable/fxs/common/blsSignature';
 import {
   BigIntPr,
+  Bool,
   Byte,
   Bytes,
   Int,
@@ -18,6 +20,10 @@ export const intsBytes = () =>
   concatBytes(bytesForInt(3), bytesForInt(3), bytesForInt(2), bytesForInt(1));
 
 export const ints = () => [new Int(3), new Int(2), new Int(1)];
+
+export const boolBytes = (val = true) => new Uint8Array([val ? 0x01 : 0x00]);
+
+export const bool = (val = true) => new Bool(val);
 
 export const byteByte = () => new Uint8Array([0x01]);
 
@@ -49,6 +55,9 @@ export const blsPublicKeyBytes = () =>
     0x7f, 0x61, 0x8a, 0x2a, 0x25, 0x93, 0xc1, 0x87, 0xe0, 0x80, 0xa3, 0xcf,
     0xde, 0xc9, 0x50, 0x40, 0x30, 0x9a, 0xd1, 0xf1, 0x58, 0x95, 0x30, 0x67,
   ]);
+
+export const blsPublicKey = () =>
+  BlsPublicKey.fromBytes(blsPublicKeyBytes())[0];
 
 export const blsSignatureBytes = () =>
   new Uint8Array([
