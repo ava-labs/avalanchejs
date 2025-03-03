@@ -19,11 +19,12 @@ const canPayFeeAndNeedsChange = (
   context: Context,
 ): boolean => {
   // Not enough funds to pay the fee.
+  // NOTE: Time locked UTXOs can not be used to pay fees.
   if (excessAVAX < requiredFee) {
     throw new Error(
       `Insufficient funds: provided UTXOs need ${
         requiredFee - excessAVAX
-      } more nAVAX (asset id: ${context.avaxAssetID})`,
+      } more unlocked nAVAX (asset id: ${context.avaxAssetID}) to cover fee.`,
     );
   }
 

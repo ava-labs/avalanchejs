@@ -1,32 +1,32 @@
 import { describe, expect, test, vi } from 'vitest';
 import { testContext } from '../../../../fixtures/context';
 import { getInitialReducerState, getSpendHelper } from './fixtures/reducers';
-import { verifyAssetsConsumed } from './verifyAssetsConsumed';
+import { verifyGasUsage } from './verifyGasUsage';
 
-describe('verifyAssetsConsumed', () => {
-  test('returns original state if all assets are consumed', () => {
+describe('verifyGasUsage', () => {
+  test('returns original state if gas is under the threshold', () => {
     const initialState = getInitialReducerState();
     const spendHelper = getSpendHelper();
-    const spy = vi.spyOn(spendHelper, 'verifyAssetsConsumed');
+    const spy = vi.spyOn(spendHelper, 'verifyGasUsage');
 
-    const state = verifyAssetsConsumed(initialState, spendHelper, testContext);
+    const state = verifyGasUsage(initialState, spendHelper, testContext);
 
     expect(state).toBe(initialState);
     expect(spy).toHaveBeenCalledTimes(1);
   });
 
-  test('throws an error if some assets are not consumed', () => {
+  test('throws an error if gas is over the threshold', () => {
     const initialState = getInitialReducerState();
     const spendHelper = getSpendHelper();
 
-    // Mock the verifyAssetsConsumed method to throw an error
+    // Mock the verifyGasUsage method to throw an error
     // Testing for this function can be found in the spendHelper.test.ts file
-    spendHelper.verifyAssetsConsumed = vi.fn(() => {
+    spendHelper.verifyGasUsage = vi.fn(() => {
       return new Error('Test error');
     });
 
     expect(() =>
-      verifyAssetsConsumed(initialState, spendHelper, testContext),
+      verifyGasUsage(initialState, spendHelper, testContext),
     ).toThrow('Test error');
   });
 });

@@ -1,35 +1,32 @@
-import { addTxSignatures, pvm, utils } from '../../../src';
+import { addTxSignatures, pvm, utils } from '../../src';
+import { getEnvVars } from '../utils/getEnvVars';
 import { setupEtnaExample } from './utils/etna-helper';
-import { getEnvVars } from '../../utils/getEnvVars';
 
-const BALANCE_AVAX: number = 1;
-const VALIDATION_ID: string = '';
-
-const increaseBalanceTx = async () => {
+const createSubnetTxExample = async () => {
   const { AVAX_PUBLIC_URL, P_CHAIN_ADDRESS, PRIVATE_KEY } = getEnvVars();
+
   const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
 
   const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
 
   const testPAddr = utils.bech32ToBytes(P_CHAIN_ADDRESS);
 
-  const unsignedTx = pvm.e.newIncreaseL1ValidatorBalanceTx(
+  const tx = pvm.newCreateSubnetTx(
     {
-      balance: BigInt(BALANCE_AVAX * 1e9),
       feeState,
       fromAddressesBytes: [testPAddr],
       utxos,
-      validationId: VALIDATION_ID,
+      subnetOwners: [testPAddr],
     },
     context,
   );
 
   await addTxSignatures({
-    unsignedTx,
+    unsignedTx: tx,
     privateKeys: [utils.hexToBuffer(PRIVATE_KEY)],
   });
 
-  return pvmApi.issueSignedTx(unsignedTx.getSignedTx());
+  return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-await increaseBalanceTx().then(console.log);
+createSubnetTxExample().then(console.log);

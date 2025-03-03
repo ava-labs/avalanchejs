@@ -20,16 +20,12 @@ import {
 import {
   newExportTx as pvmExportTx,
   newImportTx as pvmImportTx,
-  newAddValidatorTx,
-  newAddDelegatorTx,
   newCreateSubnetTx,
-  newCreateBlockchainTx,
   newAddSubnetValidatorTx,
 } from '../vms/pvm';
 import type { EVMTx } from '../serializable/evm/abstractTx';
 import { testUTXOID1, testUTXOID2 } from '../fixtures/transactions';
 import { costCorethTx } from './costs';
-import { StakeableLockOut } from '../serializable/pvm';
 import {
   newConvertSubnetToL1Tx,
   newIncreaseL1ValidatorBalanceTx,
@@ -42,6 +38,13 @@ import {
   stringPr,
   warpMessageBytes,
 } from '../fixtures/primitives';
+import { checkFeeIsCorrect } from '../vms/pvm/etna-builder/utils/feeForTesting';
+import type {
+  AddSubnetValidatorTx,
+  CreateSubnetTx,
+  ExportTx,
+  ImportTx,
+} from '../serializable/pvm';
 
 const getUtxoMock = (
   utxoId: Id,
@@ -56,26 +59,6 @@ const getUtxoMock = (
       new OutputOwners(new BigIntPr(0n), new Int(1), [
         Address.fromBytes(testAddress1)[0],
       ]),
-    ),
-  );
-
-const getStakeableLockoutUtxoMock = (
-  utxoId: Id,
-  lockTime: bigint,
-  amount = 100000000n,
-  assetId: string = testContext.avaxAssetID,
-) =>
-  new Utxo(
-    new UTXOID(utxoId, new Int(0)),
-    Id.fromString(assetId),
-    new StakeableLockOut(
-      new BigIntPr(lockTime),
-      new TransferOutput(
-        new BigIntPr(amount),
-        new OutputOwners(new BigIntPr(0n), new Int(1), [
-          Address.fromBytes(testAddress1)[0],
-        ]),
-      ),
     ),
   );
 
@@ -312,348 +295,189 @@ describe('getBurnedAmountByTx', () => {
   describe('P chain transactions', () => {
     describe('export tx', () => {
       it('calculates the burned amount of export tx correctly (multiple inputs)', () => {
-        // 110000000n total input -> 100000000n ouput + 1000000n fee -> 9000000n change
         const utxo1 = getUtxoMock(testUTXOID1, 50000000n);
         const utxo2 = getUtxoMock(testUTXOID2, 60000000n);
         const output = getOutputMock(100000000n);
 
-        const tx = pvmExportTx(
+        const unsignedTx = pvmExportTx(
+          {
+            destinationChainId: 'C',
+            fromAddressesBytes: [testAddress1],
+            utxos: [utxo1, utxo2],
+            outputs: [output],
+            feeState: feeState(),
+          },
           testContext,
-          'C',
-          [testAddress1],
-          [utxo1, utxo2],
-          [output],
-        ).getTx() as AvaxTx;
+        );
+        const tx = unsignedTx.getTx() as ExportTx;
+        const { inputs, outputs } = tx.baseTx;
 
         const amounts = getBurnedAmountByTx(tx, testContext);
+        const [, , expectedFee] = checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState: feeState(),
+        });
+
         expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.baseTxFee,
-        );
+        expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
       });
 
       it('calculates the burned amount of export tx correctly (multiple outputs)', () => {
-        // 150000000n total input -> 140000000n ouput + 1000000n fee -> 9000000n change
         const utxo = getUtxoMock(testUTXOID1, 150000000n);
         const output1 = getOutputMock(100000000n);
         const output2 = getOutputMock(30000000n);
         const output3 = getOutputMock(10000000n);
 
-        const tx = pvmExportTx(
+        const unsignedTx = pvmExportTx(
+          {
+            destinationChainId: 'C',
+            fromAddressesBytes: [testAddress1],
+            utxos: [utxo],
+            outputs: [output1, output2, output3],
+            feeState: feeState(),
+          },
           testContext,
-          'C',
-          [testAddress1],
-          [utxo],
-          [output1, output2, output3],
-        ).getTx() as AvaxTx;
+        );
+        const tx = unsignedTx.getTx() as ExportTx;
+        const { inputs, outputs } = tx.baseTx;
 
         const amounts = getBurnedAmountByTx(tx, testContext);
+        const [, , expectedFee] = checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState: feeState(),
+        });
+
         expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.baseTxFee,
-        );
+        expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
       });
 
       it('calculates the burned amount of export tx correctly (multiple inputs and outputs)', () => {
-        // 150000000n total input -> 140000000n ouput + 1000000n fee -> 9000000n change
         const utxo1 = getUtxoMock(testUTXOID1, 70000000n);
         const utxo2 = getUtxoMock(testUTXOID1, 80000000n);
         const output1 = getOutputMock(100000000n);
         const output2 = getOutputMock(30000000n);
         const output3 = getOutputMock(10000000n);
 
-        const tx = pvmExportTx(
+        const unsignedTx = pvmExportTx(
+          {
+            destinationChainId: 'C',
+            fromAddressesBytes: [testAddress1],
+            utxos: [utxo1, utxo2],
+            outputs: [output1, output2, output3],
+            feeState: feeState(),
+          },
           testContext,
-          'C',
-          [testAddress1],
-          [utxo1, utxo2],
-          [output1, output2, output3],
-        ).getTx() as AvaxTx;
+        );
+        const tx = unsignedTx.getTx() as ExportTx;
+        const { inputs, outputs } = tx.baseTx;
 
         const amounts = getBurnedAmountByTx(tx, testContext);
+        const [, , expectedFee] = checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState: feeState(),
+        });
+
         expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.baseTxFee,
-        );
+        expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
       });
     });
 
     describe('import tx', () => {
       it('calculates the burned amount of import tx correctly', () => {
-        // 110000000n total input -> 1000000n fee -> 9000000n change
         const utxo1 = getUtxoMock(testUTXOID1, 50000000n);
         const utxo2 = getUtxoMock(testUTXOID2, 60000000n);
 
-        const tx = pvmImportTx(
+        const unsignedTx = pvmImportTx(
+          {
+            sourceChainId: 'C',
+            utxos: [utxo1, utxo2],
+            toAddressesBytes: [testAddress2],
+            fromAddressesBytes: [testAddress1],
+            feeState: feeState(),
+          },
           testContext,
-          'C',
-          [utxo1, utxo2],
-          [testAddress2],
-          [testAddress1],
-        ).getTx() as AvaxTx;
+        );
+        const tx = unsignedTx.getTx() as ImportTx;
+        const { inputs, outputs } = tx.baseTx;
 
         const amounts = getBurnedAmountByTx(tx, testContext);
+        const [, , expectedFee] = checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState: feeState(),
+        });
         expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.baseTxFee,
-        );
-      });
-    });
-
-    describe('add validator tx', () => {
-      it('calculates the burned amount of add validator tx correctly', () => {
-        // 110000000n total input -> 100000000n stake + 0 fee -> 10000000n change
-        const weight = 100000000n;
-        const utxo1 = getUtxoMock(testUTXOID1, 50000000n);
-        const utxo2 = getUtxoMock(testUTXOID2, 60000000n);
-
-        const tx = newAddValidatorTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          [testAddress1],
-          3,
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addPrimaryNetworkValidatorFee,
-        );
-      });
-
-      it('calculates the burned amount of add validator tx correctly (stakeable lock out)', () => {
-        // 110000000n total input -> 100000000n stake + 0 fee -> 10000000n change
-        const weight = 100000000n;
-        const lockTime =
-          BigInt(Math.floor(new Date().getTime() / 1000)) + 10000n;
-        const utxo1 = getStakeableLockoutUtxoMock(
-          testUTXOID1,
-          lockTime,
-          50000000n,
-        );
-        const utxo2 = getStakeableLockoutUtxoMock(
-          testUTXOID2,
-          lockTime,
-          60000000n,
-        );
-
-        const tx = newAddValidatorTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          [testAddress1],
-          3,
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addPrimaryNetworkValidatorFee,
-        );
-      });
-
-      it('calculates the burned amount of add validator tx correctly (hybrid)', () => {
-        // 110000000n total input -> 100000000n stake + 0 fee -> 10000000n change
-        const weight = 100000000n;
-        const lockTime =
-          BigInt(Math.floor(new Date().getTime() / 1000)) + 10000n;
-        const utxo1 = getStakeableLockoutUtxoMock(
-          testUTXOID1,
-          lockTime,
-          50000000n,
-        );
-        const utxo2 = getUtxoMock(testUTXOID2, 60000000n);
-
-        const tx = newAddValidatorTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          [testAddress1],
-          3,
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addPrimaryNetworkValidatorFee,
-        );
-      });
-    });
-
-    describe('add delegator tx', () => {
-      it('calculates the burned amount of add delegator tx correctly', () => {
-        // 110000000n total input -> 100000000n stake + 0 fee -> 10000000n change
-        const weight = 100000000n;
-        const utxo1 = getUtxoMock(testUTXOID1, 50000000n);
-        const utxo2 = getUtxoMock(testUTXOID2, 60000000n);
-
-        const tx = newAddDelegatorTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          [testAddress1],
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addPrimaryNetworkDelegatorFee,
-        );
-      });
-
-      it('calculates the burned amount of add delegator tx correctly (stakeable lock out)', () => {
-        // 110000000n total input -> 100000000n stake + 0 fee -> 10000000n change
-        const weight = 100000000n;
-        const lockTime =
-          BigInt(Math.floor(new Date().getTime() / 1000)) + 10000n;
-        const utxo1 = getStakeableLockoutUtxoMock(
-          testUTXOID1,
-          lockTime,
-          50000000n,
-        );
-        const utxo2 = getStakeableLockoutUtxoMock(
-          testUTXOID2,
-          lockTime,
-          60000000n,
-        );
-
-        const tx = newAddDelegatorTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          [testAddress1],
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addPrimaryNetworkDelegatorFee,
-        );
-      });
-
-      it('calculates the burned amount of add delegator tx correctly (hybrid)', () => {
-        // 110000000n total input -> 100000000n stake + 0 fee -> 10000000n change
-        const weight = 100000000n;
-        const lockTime =
-          BigInt(Math.floor(new Date().getTime() / 1000)) + 10000n;
-        const utxo1 = getStakeableLockoutUtxoMock(
-          testUTXOID1,
-          lockTime,
-          50000000n,
-        );
-        const utxo2 = getUtxoMock(testUTXOID2, 60000000n);
-
-        const tx = newAddDelegatorTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          [testAddress1],
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addPrimaryNetworkDelegatorFee,
-        );
+        expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
       });
     });
 
     describe('create subnet tx', () => {
       it('calculates the burned amount of create subnet tx correctly', () => {
-        // 1100000000n total input -> 1000000000n fee -> 100000000n change
         const utxo1 = getUtxoMock(testUTXOID1, 500000000n);
         const utxo2 = getUtxoMock(testUTXOID2, 600000000n);
 
-        const tx = newCreateSubnetTx(
+        const unsignedTx = newCreateSubnetTx(
+          {
+            utxos: [utxo1, utxo2],
+            fromAddressesBytes: [testAddress1],
+            subnetOwners: [testAddress1],
+            feeState: feeState(),
+          },
           testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          [testAddress1],
-        ).getTx() as AvaxTx;
+        );
+        const tx = unsignedTx.getTx() as CreateSubnetTx;
+        const { inputs, outputs } = tx.baseTx;
 
         const amounts = getBurnedAmountByTx(tx, testContext);
+        const [, , expectedFee] = checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState: feeState(),
+        });
         expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.createSubnetTxFee,
-        );
-      });
-    });
-
-    describe('create blockchain', () => {
-      it('calculates the burned amount of create blockchain tx correctly', () => {
-        // 1100000000n total input -> 1000000000n fee -> 100000000n change
-        const utxo1 = getUtxoMock(testUTXOID1, 500000000n);
-        const utxo2 = getUtxoMock(testUTXOID2, 600000000n);
-
-        const tx = newCreateBlockchainTx(
-          testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          'subnet',
-          'chain',
-          'vm',
-          ['fx1', 'fx2'],
-          {},
-          [0],
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.createBlockchainTxFee,
-        );
+        expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
       });
     });
 
     describe('add subnet validor tx', () => {
       it('calculates the burned amount of add subnet validor tx correctly', () => {
-        // 1100000n total input -> 0 stake + 1000000n fee -> 100000n change
         const weight = 10000000n;
         const utxo1 = getUtxoMock(testUTXOID1, 500000n);
         const utxo2 = getUtxoMock(testUTXOID2, 600000n);
 
-        const tx = newAddSubnetValidatorTx(
+        const unsignedTx = newAddSubnetValidatorTx(
+          {
+            end: 1n,
+            feeState: feeState(),
+            fromAddressesBytes: [testAddress1],
+            nodeId: nodeId().toString(),
+            start: 0n,
+            subnetAuth: [0],
+            subnetId: 'subnet',
+            utxos: [utxo1, utxo2],
+            weight,
+          },
           testContext,
-          [utxo1, utxo2],
-          [testAddress1],
-          nodeId().toString(),
-          0n,
-          1n,
-          weight,
-          'subnet',
-          [0],
-        ).getTx() as AvaxTx;
-
-        const amounts = getBurnedAmountByTx(tx, testContext);
-        expect(amounts.size).toEqual(1);
-        expect(amounts.get(testContext.avaxAssetID)).toEqual(
-          testContext.addSubnetValidatorFee,
         );
+        const tx = unsignedTx.getTx() as AddSubnetValidatorTx;
+        const { inputs, outputs } = tx.baseTx;
+        const amounts = getBurnedAmountByTx(tx, testContext);
+        const [, , expectedFee] = checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState: feeState(),
+        });
+        expect(amounts.size).toEqual(1);
+        expect(amounts.get(testContext.avaxAssetID)).toEqual(expectedFee);
       });
     });
 

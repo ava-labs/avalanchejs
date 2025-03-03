@@ -8,7 +8,6 @@ import type {
   GetNodeIpResponse,
   GetNodeVersionReply,
   GetPeersResponse,
-  GetTxFeeResponse,
   isBootstrapped,
   UptimeResponse,
   GetUpgradesInfoResponse,
@@ -49,24 +48,6 @@ export class InfoApi extends Api {
 
   isBootstrapped(chain: string): Promise<isBootstrapped> {
     return this.callRpc<isBootstrapped>('peers', { chain });
-  }
-  /**
-   * @link https://docs.avax.network/apis/avalanchego/apis/info#infogettxfee
-   */
-  async getTxFee(): Promise<GetTxFeeResponse> {
-    const resp = await this.callRpc<GetTxFeeResponse>('getTxFee');
-
-    return {
-      txFee: BigInt(resp.txFee),
-      createAssetTxFee: BigInt(resp.createAssetTxFee),
-      createSubnetTxFee: BigInt(resp.createSubnetTxFee),
-      transformSubnetTxFee: BigInt(resp.transformSubnetTxFee),
-      createBlockchainTxFee: BigInt(resp.createBlockchainTxFee),
-      addPrimaryNetworkValidatorFee: BigInt(resp.addPrimaryNetworkValidatorFee),
-      addPrimaryNetworkDelegatorFee: BigInt(resp.addPrimaryNetworkDelegatorFee),
-      addSubnetValidatorFee: BigInt(resp.addSubnetValidatorFee),
-      addSubnetDelegatorFee: BigInt(resp.addSubnetDelegatorFee),
-    };
   }
 
   uptime(): Promise<UptimeResponse> {

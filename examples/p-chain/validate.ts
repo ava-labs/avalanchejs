@@ -1,10 +1,12 @@
-import { PrimaryNetworkID } from '../../src/constants/networkIDs';
-import { addTxSignatures } from '../../src/signer';
-import { bech32ToBytes, hexToBuffer } from '../../src/utils';
-import { getContextFromURI } from '../../src/vms/context';
-import { PVMApi, newAddPermissionlessValidatorTx } from '../../src/vms/pvm';
-import { pvmapi } from '../chain_apis';
+import { addTxSignatures, networkIDs, pvm, utils } from '../../src';
 import { getEnvVars } from '../utils/getEnvVars';
+import { setupEtnaExample } from './utils/etna-helper';
+import { getRandomNodeId } from './utils/random-node-id';
+
+const AMOUNT_TO_VALIDATE_AVAX: number = 1;
+const DAYS_TO_VALIDATE: number = 21;
+
+const nodeId = getRandomNodeId();
 
 const main = async () => {
   const {
@@ -13,46 +15,51 @@ const main = async () => {
     PRIVATE_KEY,
     BLS_PUBLIC_KEY,
     BLS_SIGNATURE,
-    NODE_ID,
   } = getEnvVars();
 
-  const { utxos } = await pvmapi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
-  const context = await getContextFromURI(AVAX_PUBLIC_URL);
-  const startTime = await new PVMApi().getTimestamp();
-  const startDate = new Date(startTime.timestamp);
-  const start = BigInt(startDate.getTime() / 1000);
-  const endTime = new Date(startTime.timestamp);
-  endTime.setDate(endTime.getDate() + 21);
-  const end = BigInt(endTime.getTime() / 1000);
-  const nodeID = NODE_ID;
-  const blsPublicKey = hexToBuffer(BLS_PUBLIC_KEY);
-  const blsSignature = hexToBuffer(BLS_SIGNATURE);
+  const { context, feeState, pvmApi } = await setupEtnaExample(AVAX_PUBLIC_URL);
 
-  const tx = newAddPermissionlessValidatorTx(
+  const { utxos } = await pvmApi.getUTXOs({ addresses: [P_CHAIN_ADDRESS] });
+
+  const startTime = await pvmApi.getTimestamp();
+  const startDate = new Date(startTime.timestamp);
+  const start: bigint = BigInt(startDate.getTime() / 1_000);
+
+  const endTime = new Date(startTime.timestamp);
+  endTime.setDate(endTime.getDate() + DAYS_TO_VALIDATE);
+  const end: bigint = BigInt(endTime.getTime() / 1_000);
+
+  const publicKey = utils.hexToBuffer(BLS_PUBLIC_KEY);
+
+  const signature = utils.hexToBuffer(BLS_SIGNATURE);
+
+  const tx = pvm.newAddPermissionlessValidatorTx(
+    {
+      end,
+      delegatorRewardsOwner: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
+      feeState,
+      fromAddressesBytes: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
+      nodeId,
+      publicKey,
+      rewardAddresses: [utils.bech32ToBytes(P_CHAIN_ADDRESS)],
+      shares: 20 * 1e4,
+      signature,
+      start,
+      subnetId: networkIDs.PrimaryNetworkID.toString(),
+      utxos,
+      weight: BigInt(AMOUNT_TO_VALIDATE_AVAX * 1e9),
+    },
     context,
-    utxos,
-    [bech32ToBytes(P_CHAIN_ADDRESS)],
-    nodeID,
-    PrimaryNetworkID.toString(),
-    start,
-    end,
-    BigInt(1e9),
-    [bech32ToBytes(P_CHAIN_ADDRESS)],
-    [bech32ToBytes(P_CHAIN_ADDRESS)],
-    1e4 * 20,
-    undefined,
-    1,
-    0n,
-    blsPublicKey,
-    blsSignature,
   );
 
   await addTxSignatures({
     unsignedTx: tx,
-    privateKeys: [hexToBuffer(PRIVATE_KEY)],
+    privateKeys: [utils.hexToBuffer(PRIVATE_KEY)],
   });
 
-  return pvmapi.issueSignedTx(tx.getSignedTx());
+  return pvmApi.issueSignedTx(tx.getSignedTx());
 };
 
-main().then(console.log);
+main()
+  .then(console.log)
+  .then(() => console.log('Validate node ID:', nodeId));

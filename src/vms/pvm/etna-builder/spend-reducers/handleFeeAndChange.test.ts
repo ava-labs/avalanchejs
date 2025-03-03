@@ -22,7 +22,7 @@ describe('handleFeeAndChange', () => {
         testContext,
       ),
     ).toThrow(
-      `Insufficient funds: provided UTXOs need 4 more nAVAX (asset id: ${testContext.avaxAssetID})`,
+      `Insufficient funds: provided UTXOs need 4 more unlocked nAVAX (asset id: ${testContext.avaxAssetID}) to cover fee.`,
     );
   });
 

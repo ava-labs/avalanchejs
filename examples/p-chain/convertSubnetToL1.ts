@@ -5,9 +5,9 @@ import {
   pvm,
   pvmSerial,
   utils,
-} from '../../../src';
+} from '../../src';
 import { setupEtnaExample } from './utils/etna-helper';
-import { getEnvVars } from '../../utils/getEnvVars';
+import { getEnvVars } from '../utils/getEnvVars';
 
 const AMOUNT_TO_VALIDATE_AVAX: number = 1;
 const BALANCE_AVAX: number = 1;
@@ -56,7 +56,7 @@ const convertSubnetToL1TxExample = async () => {
     pChainOwner,
   );
 
-  const tx = pvm.e.newConvertSubnetToL1Tx(
+  const tx = pvm.newConvertSubnetToL1Tx(
     {
       feeState,
       fromAddressesBytes: [testPAddr],
