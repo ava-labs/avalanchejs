@@ -16,25 +16,7 @@ $ run yarn run semantic-release -d
 
 */
 
-const commitAnalyzerSetting = [
-  '@semantic-release/commit-analyzer',
-  {
-    preset: 'angular',
-    releaseRules: [
-      {
-        type: 'feat',
-        release: 'minor',
-      },
-      {
-        type: '*',
-        release: 'patch',
-      },
-    ],
-    parserOpts: {
-      noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
-    },
-  },
-];
+const commitAnalyzerSetting = ['@semantic-release/commit-analyzer'];
 
 const githubSetting = [
   '@semantic-release/github',
