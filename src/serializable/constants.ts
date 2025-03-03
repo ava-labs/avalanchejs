@@ -21,6 +21,7 @@ export enum TypeSymbols {
   Address = 'common.Address',
   NodeId = 'common.NodeId',
   BlsSignature = 'common.BlsSignature',
+  BlsPublicKey = 'common.BlsPublicKey',
 
   // PRIMITIVES
   Int = 'primitives.Int',
@@ -100,4 +101,9 @@ export enum TypeSymbols {
   WarpMessage = 'warp.Message',
   WarpUnsignedMessage = 'warp.UnsignedMessage',
   WarpSignature = 'warp.Signature',
+
+  // Warp Payloads
+  AddressedCall = 'warp.AddressedCall',
+  RegisterL1ValidatorPayload = 'warp.RegisterL1ValidatorPayload',
+  L1ValidatorWeightPayload = 'warp.L1ValidatorWeightPayload',
 }

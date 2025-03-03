@@ -25,6 +25,7 @@ import { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
 import { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceTx';
 import { DisableL1ValidatorTx } from './disableL1ValidatorTx';
 
+export * as warp from './warp';
 export * from './typeGuards';
 export {
   BaseTx,
