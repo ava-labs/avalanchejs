@@ -16,7 +16,12 @@ $ run yarn run semantic-release -d
 
 */
 
-const commitAnalyzerSetting = ['@semantic-release/commit-analyzer'];
+const commitAnalyzerSetting = [
+  '@semantic-release/commit-analyzer',
+  {
+    preset: 'angular',
+  },
+];
 
 const githubSetting = [
   '@semantic-release/github',
