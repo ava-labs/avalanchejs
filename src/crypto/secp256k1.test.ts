@@ -54,12 +54,16 @@ describe('secp256k1', function () {
     for (const test of tests) {
       const hash = sha256(test.msg);
 
-      await expect(secp256k1.sign(test.msg, privKey)).resolves.toEqual(
-        test.sig,
-      );
-      await expect(secp256k1.signHash(hash, privKey)).resolves.toEqual(
-        test.sig,
-      );
+      await expect(
+        secp256k1.sign(test.msg, privKey, { extraEntropy: false }),
+      ).resolves.toEqual(test.sig);
+      await expect(
+        secp256k1.signHash(hash, privKey, { extraEntropy: false }),
+      ).resolves.toEqual(test.sig);
+      const defaultSig = await secp256k1.sign(test.msg, privKey);
+      expect(defaultSig).not.toEqual(test.sig); // Entropy is added
+      expect(secp256k1.recoverPublicKey(hash, defaultSig)).toEqual(pubKey);
+      expect(secp256k1.verify(defaultSig, hash, pubKey)).toEqual(true);
       expect(secp256k1.recoverPublicKey(hash, test.sig)).toEqual(pubKey);
       expect(secp256k1.verify(test.sig, hash, pubKey)).toEqual(true);
     }
