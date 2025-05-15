@@ -9,6 +9,10 @@ export function bufferToNumber(buf: Uint8Array) {
   return Number.parseInt(bytesToHex(buf), 16);
 }
 
+export function bufferToBool(buf: Uint8Array) {
+  return bufferToNumber(buf) === 1;
+}
+
 export function bufferToHex(buf: Uint8Array) {
   return add0x(bytesToHex(buf));
 }
