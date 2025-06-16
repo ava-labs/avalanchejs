@@ -18,12 +18,13 @@ export const validateDynamicBurnedAmount = ({
 }): { isValid: boolean; txFee: bigint } => {
   const feeToleranceInt = Math.floor(feeTolerance);
 
-  if (feeToleranceInt < 1 || feeToleranceInt > 100) {
-    throw new Error('feeTolerance must be [1,100]');
+  if (feeToleranceInt < 0) {
+    throw new Error('feeTolerance must be be non-negative.');
   }
 
-  const min = (feeAmount * (100n - BigInt(feeToleranceInt))) / 100n;
-  const max = (feeAmount * (100n + BigInt(feeToleranceInt))) / 100n;
+  const delta = (feeAmount * BigInt(feeToleranceInt)) / 100n;
+  const min = delta > feeAmount ? 0n : feeAmount - delta;
+  const max = feeAmount + delta;
 
   return {
     isValid: burnedAmount >= min && burnedAmount <= max,
