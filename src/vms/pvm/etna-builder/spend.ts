@@ -75,7 +75,7 @@ export type SpendProps = Readonly<{
    */
   toBurn?: Map<string, bigint>;
   /**
-   * Maps `assetID` to the amount of the asset to spend and place info
+   * Maps `assetID` to the amount of the asset to spend and place into
    * the staked outputs. First locked UTXOs are attempted to be used for
    * these funds, and then unlocked UTXOs will be attempted to be used.
    * There is no preferential ordering on the unlock times.
