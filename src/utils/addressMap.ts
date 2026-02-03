@@ -133,7 +133,7 @@ export class AddressMaps {
   }
 
   // this is a stopgap to quickly fix AddressMap not deriving the order post sorting TransferableInputs. Can probably
-  // be simplified a lot by just deriving the sigIndicies right before returning the unsingedTx
+  // be simplified a lot by just deriving the sigIndicies right before returning the unsignedTx
   static fromTransferableInputs(
     inputs: readonly TransferableInput[],
     inputUtxos: readonly Utxo[],
