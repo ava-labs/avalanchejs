@@ -9,7 +9,7 @@ type NodeIdResponse = {
 
 /**
  * Generate a new private/public key pair and console log out the needed environment variables
- * needed to run the examples. Please these values in a `.env` file.
+ * needed to run the examples. Place these values in a `.env` file.
  */
 const main = async () => {
   const { AVAX_PUBLIC_URL } = getEnvVars();
