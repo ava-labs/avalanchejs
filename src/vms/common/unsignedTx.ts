@@ -12,7 +12,7 @@ import { AddressMaps } from '../../utils/addressMap';
 import { getManagerForVM, packTx } from '../../utils/packTx';
 import type { Transaction } from './transaction';
 
-type UnsingedTxSerialize = {
+type UnsignedTxSerialize = {
   txBytes: string;
   utxos: string[];
   addressMaps: [string, number][][];
@@ -51,7 +51,7 @@ export class UnsignedTx {
   }
 
   static fromJSON(jsonString: string) {
-    const res = JSON.parse(jsonString) as UnsingedTxSerialize;
+    const res = JSON.parse(jsonString) as UnsignedTxSerialize;
 
     const fields = [
       'txBytes',
