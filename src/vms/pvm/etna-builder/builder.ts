@@ -46,6 +46,8 @@ import {
   DisableL1ValidatorTx,
   SetL1ValidatorWeightTx,
   RegisterL1ValidatorTx,
+  AddAutoRenewedValidatorTx,
+  SetAutoRenewedValidatorConfigTx,
 } from '../../../serializable/pvm';
 import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
 import {
@@ -76,6 +78,8 @@ import {
   INTRINSIC_REMOVE_SUBNET_VALIDATOR_TX_COMPLEXITIES,
   INTRINSIC_SET_L1_VALIDATOR_WEIGHT_TX_COMPLEXITIES,
   INTRINSIC_TRANSFER_SUBNET_OWNERSHIP_TX_COMPLEXITIES,
+  INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES,
+  INTRINSIC_SET_AUTO_RENEWED_VALIDATOR_CONFIG_TX_COMPLEXITIES,
   getAuthComplexity,
   getInputComplexity,
   getOutputComplexity,
@@ -1821,6 +1825,277 @@ export const newDisableL1ValidatorTx: TxBuilderFn<DisableL1ValidatorTxProps> = (
       ),
       Id.fromString(validationId),
       disableAuthInput,
+    ),
+    inputUTXOs,
+    addressMaps,
+  );
+};
+
+export type NewAddAutoRenewedValidatorTxProps = TxProps<{
+  /**
+   * The addresses which will receive the delegator portion of the rewards.
+   */
+  delegatorRewardsOwner: readonly Uint8Array[];
+  /**
+   * Optional. The number locktime field created in the resulting reward outputs.
+   * @default 0n
+   */
+  locktime?: bigint;
+  /**
+   * The node ID of the validator being added.
+   */
+  nodeId: string;
+  /**
+   * The BLS public key.
+   */
+  publicKey?: Uint8Array;
+  /**
+   * The addresses which will receive the validator portion of the rewards.
+   * Given addresses will share the reward UTXO.
+   */
+  rewardAddresses: readonly Uint8Array[];
+  /**
+   * A number for the percentage times 10,000 of reward to be given to the
+   * validator when someone delegates to them.
+   */
+  shares: number;
+  /**
+   * The BLS signature.
+   */
+  signature?: Uint8Array;
+  /**
+   * Optional. The number of signatures required to spend the funds in the
+   * resultant reward UTXO.
+   *
+   * @default 1
+   */
+  threshold?: number;
+  /**
+   * The amount being locked for validation in nAVAX.
+   */
+  weight: bigint;
+  /**
+   * The addresses authorized to modify the auto-renew config.
+   */
+  ownerAddresses: readonly Uint8Array[];
+  /**
+   * Percentage of rewards to restake, expressed in millionths (percentage * 10,000).
+   * Range [0..1_000_000]: 0 = withdraw all rewards, 1_000_000 = restake all rewards.
+   */
+  autoCompoundRewardShares: number;
+  /**
+   * Validation cycle duration in seconds.
+   */
+  period: bigint;
+}>;
+
+/**
+ * Creates a new unsigned PVM add auto-renewed validator transaction
+ * (`AddAutoRenewedValidatorTx`) using calculated dynamic fees.
+ *
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
+ */
+export const newAddAutoRenewedValidatorTx: TxBuilderFn<
+  NewAddAutoRenewedValidatorTxProps
+> = (
+  {
+    changeAddressesBytes,
+    delegatorRewardsOwner,
+    feeState,
+    fromAddressesBytes,
+    locktime = 0n,
+    nodeId,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
+    publicKey,
+    rewardAddresses,
+    shares,
+    signature,
+    threshold = 1,
+    utxos,
+    weight,
+    ownerAddresses,
+    autoCompoundRewardShares,
+    period,
+  },
+  context,
+) => {
+  const toStake = new Map<string, bigint>([[context.avaxAssetID, weight]]);
+
+  const signer = createSignerOrSignerEmptyFromStrings(publicKey, signature);
+  const validatorOutputOwners = OutputOwners.fromNative(
+    rewardAddresses,
+    locktime,
+    threshold,
+  );
+  const delegatorOutputOwners = OutputOwners.fromNative(
+    delegatorRewardsOwner,
+    0n,
+  );
+  const ownerOutputOwners = OutputOwners.fromNative(ownerAddresses, 0n);
+
+  const memoComplexity = getBytesComplexity(memo);
+  const signerComplexity = getSignerComplexity(signer);
+  const validatorOwnerComplexity = getOwnerComplexity(validatorOutputOwners);
+  const delegatorOwnerComplexity = getOwnerComplexity(delegatorOutputOwners);
+  const ownerComplexity = getOwnerComplexity(ownerOutputOwners);
+
+  const complexity = addDimensions(
+    INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES,
+    memoComplexity,
+    signerComplexity,
+    validatorOwnerComplexity,
+    delegatorOwnerComplexity,
+    ownerComplexity,
+  );
+
+  const spendResults = spend(
+    {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
+      excessAVAX: 0n,
+      feeState,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      minIssuanceTime,
+      shouldConsolidateOutputs: true,
+      toStake,
+      utxos,
+    },
+    [useSpendableLockedUTXOs, useUnlockedUTXOs],
+    context,
+  );
+
+  const { changeOutputs, inputs, inputUTXOs, stakeOutputs } = spendResults;
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  });
+
+  const validatorTx = new AddAutoRenewedValidatorTx(
+    AvaxBaseTx.fromNative(
+      context.networkID,
+      context.pBlockchainID,
+      changeOutputs,
+      inputs,
+      memo,
+    ),
+    NodeId.fromString(nodeId),
+    signer,
+    stakeOutputs,
+    validatorOutputOwners,
+    delegatorOutputOwners,
+    ownerOutputOwners,
+    new Int(shares),
+    new BigIntPr(weight),
+    new Int(autoCompoundRewardShares),
+    new BigIntPr(period),
+  );
+  return new UnsignedTx(validatorTx, inputUTXOs, addressMaps);
+};
+
+export type NewSetAutoRenewedValidatorConfigTxProps = TxProps<{
+  /**
+   * ID of the transaction that created the auto-renewed validator.
+   */
+  validatorTxId: string;
+  /**
+   * Indices of owners authorized to modify the config.
+   */
+  auth: readonly number[];
+  /**
+   * Percentage of rewards to restake, expressed in millionths (percentage * 10,000).
+   * Range [0..1_000_000]: 0 = withdraw all rewards, 1_000_000 = restake all rewards.
+   */
+  autoCompoundRewardShares: number;
+  /**
+   * Duration of the next validation cycle in seconds.
+   * Set to 0 to stop validating at the end of the current cycle.
+   */
+  period: bigint;
+}>;
+
+/**
+ * Creates a new unsigned PVM set auto-renewed validator config transaction
+ * (`SetAutoRenewedValidatorConfigTx`) using calculated dynamic fees.
+ *
+ * @param props
+ * @param context
+ * @returns An UnsignedTx.
+ */
+export const newSetAutoRenewedValidatorConfigTx: TxBuilderFn<
+  NewSetAutoRenewedValidatorConfigTxProps
+> = (
+  {
+    changeAddressesBytes,
+    auth,
+    feeState,
+    fromAddressesBytes,
+    memo = new Uint8Array(),
+    minIssuanceTime = getDefaultMinIssuanceTime(),
+    utxos,
+    validatorTxId,
+    autoCompoundRewardShares,
+    period,
+  },
+  context,
+) => {
+  const authInput = Input.fromNative(auth);
+
+  const bytesComplexity = getBytesComplexity(memo);
+  const authComplexity = getAuthComplexity(authInput);
+
+  const complexity = addDimensions(
+    INTRINSIC_SET_AUTO_RENEWED_VALIDATOR_CONFIG_TX_COMPLEXITIES,
+    bytesComplexity,
+    authComplexity,
+  );
+
+  const spendResults = spend(
+    {
+      changeOutputOwners: getChangeOutputOwners({
+        changeAddressesBytes,
+        fromAddressesBytes,
+      }),
+      excessAVAX: 0n,
+      feeState,
+      fromAddresses: addressesFromBytes(fromAddressesBytes),
+      initialComplexity: complexity,
+      minIssuanceTime,
+      utxos,
+    },
+    [useUnlockedUTXOs],
+    context,
+  );
+
+  const { changeOutputs, inputs, inputUTXOs } = spendResults;
+
+  const addressMaps = getAddressMaps({
+    inputs,
+    inputUTXOs,
+    minIssuanceTime,
+    fromAddressesBytes,
+  });
+
+  return new UnsignedTx(
+    new SetAutoRenewedValidatorConfigTx(
+      AvaxBaseTx.fromNative(
+        context.networkID,
+        context.pBlockchainID,
+        changeOutputs,
+        inputs,
+        memo,
+      ),
+      Id.fromString(validatorTxId),
+      authInput,
+      new Int(autoCompoundRewardShares),
+      new BigIntPr(period),
     ),
     inputUTXOs,
     addressMaps,

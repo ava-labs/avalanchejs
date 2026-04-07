@@ -277,3 +277,36 @@ export const INTRINSIC_DISABLE_L1_VALIDATOR_TX_COMPLEXITIES: Dimensions = {
   [FeeDimensions.DBWrite]: 6, // write remaining balance utxo + weight diff + deactivated weight diff + public key diff + delete staker + write staker
   [FeeDimensions.Compute]: 0,
 };
+
+export const INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES: Dimensions =
+  {
+    [FeeDimensions.Bandwidth]:
+      INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+      SHORT_ID_LEN + // Node ID
+      INT_LEN + // Signer typeID
+      INT_LEN + // Num stake outs
+      INT_LEN + // Validator rewards typeID
+      INT_LEN + // Delegator rewards typeID
+      INT_LEN + // Owner typeID
+      INT_LEN + // Delegation shares
+      LONG_LEN + // Weight
+      INT_LEN + // AutoCompoundRewardShares
+      LONG_LEN, // Period
+    [FeeDimensions.DBRead]: 0,
+    [FeeDimensions.DBWrite]: 3, // put staker + write weight diff + write pk diff
+    [FeeDimensions.Compute]: 0,
+  };
+
+export const INTRINSIC_SET_AUTO_RENEWED_VALIDATOR_CONFIG_TX_COMPLEXITIES: Dimensions =
+  {
+    [FeeDimensions.Bandwidth]:
+      INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+      ID_LEN + // TxID
+      INT_LEN + // Auth typeID
+      INT_LEN + // Auth credential typeID
+      INT_LEN + // AutoCompoundRewardShares
+      LONG_LEN, // Period
+    [FeeDimensions.DBRead]: 1, // read tx
+    [FeeDimensions.DBWrite]: 1, // update staker
+    [FeeDimensions.Compute]: 0,
+  };

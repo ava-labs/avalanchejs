@@ -24,6 +24,9 @@ import { RegisterL1ValidatorTx } from './registerL1ValidatorTx';
 import { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
 import { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceTx';
 import { DisableL1ValidatorTx } from './disableL1ValidatorTx';
+import { AddAutoRenewedValidatorTx } from './addAutoRenewedValidatorTx';
+import { SetAutoRenewedValidatorConfigTx } from './setAutoRenewedValidatorConfigTx';
+import { RewardAutoRenewedValidatorTx } from './rewardAutoRenewedValidatorTx';
 
 export * as warp from './warp';
 export * from './typeGuards';
@@ -55,4 +58,7 @@ export {
   SetL1ValidatorWeightTx,
   IncreaseL1ValidatorBalanceTx,
   DisableL1ValidatorTx,
+  AddAutoRenewedValidatorTx,
+  SetAutoRenewedValidatorConfigTx,
+  RewardAutoRenewedValidatorTx,
 };

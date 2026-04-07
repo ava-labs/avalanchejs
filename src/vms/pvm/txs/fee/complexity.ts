@@ -30,6 +30,8 @@ import type {
   DisableL1ValidatorTx,
   SetL1ValidatorWeightTx,
   RegisterL1ValidatorTx,
+  AddAutoRenewedValidatorTx,
+  SetAutoRenewedValidatorConfigTx,
 } from '../../../../serializable/pvm';
 import type { Signer } from '../../../../serializable/pvm/signer';
 import {
@@ -49,6 +51,8 @@ import {
   isRemoveSubnetValidatorTx,
   isSetL1ValidatorWeightTx,
   isTransferSubnetOwnershipTx,
+  isAddAutoRenewedValidatorTx,
+  isSetAutoRenewedValidatorConfigTx,
 } from '../../../../serializable/pvm';
 import {
   isStakeableLockIn,
@@ -99,6 +103,8 @@ import {
   INTRINSIC_BLS_AGGREGATE_COMPUTE,
   INTRINSIC_BLS_VERIFY_COMPUTE,
   INTRINSIC_WARP_DB_READS,
+  INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES,
+  INTRINSIC_SET_AUTO_RENEWED_VALIDATOR_CONFIG_TX_COMPLEXITIES,
 } from './constants';
 import type { L1Validator } from '../../../../serializable/fxs/pvm/L1Validator';
 import { WarpMessage, getWarpManager } from '../../../../serializable/pvm/warp';
@@ -456,6 +462,30 @@ const disableL1ValidatorTx = (tx: DisableL1ValidatorTx): Dimensions => {
   );
 };
 
+const addAutoRenewedValidatorTxComplexity = (
+  tx: AddAutoRenewedValidatorTx,
+): Dimensions => {
+  return addDimensions(
+    INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getSignerComplexity(tx.signer),
+    getOutputComplexity(tx.stake),
+    getOwnerComplexity(tx.getValidatorRewardsOwner()),
+    getOwnerComplexity(tx.getDelegatorRewardsOwner()),
+    getOwnerComplexity(tx.getOwner()),
+  );
+};
+
+const setAutoRenewedValidatorConfigTxComplexity = (
+  tx: SetAutoRenewedValidatorConfigTx,
+): Dimensions => {
+  return addDimensions(
+    INTRINSIC_SET_AUTO_RENEWED_VALIDATOR_CONFIG_TX_COMPLEXITIES,
+    getBaseTxComplexity(tx.baseTx),
+    getAuthComplexity(tx.getAuth()),
+  );
+};
+
 export const getTxComplexity = (tx: Transaction): Dimensions => {
   if (isAddPermissionlessValidatorTx(tx)) {
     return addPermissionlessValidatorTx(tx);
@@ -487,6 +517,10 @@ export const getTxComplexity = (tx: Transaction): Dimensions => {
     return increaseL1ValidatorBalanceTx(tx);
   } else if (isDisableL1ValidatorTx(tx)) {
     return disableL1ValidatorTx(tx);
+  } else if (isAddAutoRenewedValidatorTx(tx)) {
+    return addAutoRenewedValidatorTxComplexity(tx);
+  } else if (isSetAutoRenewedValidatorConfigTx(tx)) {
+    return setAutoRenewedValidatorConfigTxComplexity(tx);
   } else {
     throw new Error('Unsupported transaction type.');
   }

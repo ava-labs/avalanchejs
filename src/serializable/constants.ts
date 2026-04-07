@@ -89,6 +89,10 @@ export enum TypeSymbols {
   IncreaseL1ValidatorBalanceTx = 'pvm.IncreaseL1ValidatorBalanceTx',
   DisableL1ValidatorTx = 'pvm.DisableL1ValidatorTx',
 
+  AddAutoRenewedValidatorTx = 'pvm.AddAutoRenewedValidatorTx',
+  SetAutoRenewedValidatorConfigTx = 'pvm.SetAutoRenewedValidatorConfigTx',
+  RewardAutoRenewedValidatorTx = 'pvm.RewardAutoRenewedValidatorTx',
+
   PChainOwner = 'pvm.PChainOwner',
 
   // EVM
