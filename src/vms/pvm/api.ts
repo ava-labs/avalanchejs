@@ -103,6 +103,7 @@ export class PVMApi extends AvaxApi {
     );
     return {
       ...resp,
+      staked: BigInt(resp.staked),
       stakedOutputs: resp.stakedOutputs.map((bytes) =>
         getPVMManager().unpack(hexToBuffer(bytes), TransferableOutput),
       ),
