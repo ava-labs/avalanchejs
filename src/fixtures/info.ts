@@ -15,4 +15,8 @@ export const upgradesInfo: GetUpgradesInfoResponse = {
   cortinaXChainStopVertexID: '11111111111111111111111111111111LpoYY',
   durangoTime: '2020-12-05T05:00:00Z',
   etnaTime: '2020-12-05T05:00:00Z',
+  fortunaTime: '2025-04-08T15:00:00Z',
+  graniteEpochDuration: 300000000000,
+  graniteTime: '2025-11-19T16:00:00Z',
+  heliconTime: '9999-12-01T00:00:00Z',
 };

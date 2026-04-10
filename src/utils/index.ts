@@ -15,4 +15,5 @@ export * from './getUtxoInfo';
 export * from './getBurnedAmountByTx';
 export * from './validateBurnedAmount/validateBurnedAmount';
 export * from './isEtnaEnabled';
+export * from './isHeliconEnabled';
 export { unpackWithManager, getManagerForVM, packTx } from './packTx';
