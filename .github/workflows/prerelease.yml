@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feat/acp-236
 jobs:
   release:
     name: Prerelease
