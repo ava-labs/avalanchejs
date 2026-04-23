@@ -54,7 +54,7 @@ export class SetAutoRenewedValidatorConfigTx extends PVMTx {
     );
   }
 
-  getAuth() {
+  getSubnetAuth() {
     return this.auth as Input;
   }
 
@@ -63,7 +63,7 @@ export class SetAutoRenewedValidatorConfigTx extends PVMTx {
       ...this.getInputs().map((input) => {
         return input.sigIndicies();
       }),
-      this.getAuth().values(),
+      this.getSubnetAuth().values(),
     ].filter((indicies): indicies is number[] => indicies !== undefined);
   }
 }
