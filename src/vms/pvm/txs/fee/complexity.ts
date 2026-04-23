@@ -482,7 +482,7 @@ const setAutoRenewedValidatorConfigTxComplexity = (
   return addDimensions(
     INTRINSIC_SET_AUTO_RENEWED_VALIDATOR_CONFIG_TX_COMPLEXITIES,
     getBaseTxComplexity(tx.baseTx),
-    getAuthComplexity(tx.getSubnetAuth()),
+    getAuthComplexity(tx.getAuth()),
   );
 };
 
