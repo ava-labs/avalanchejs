@@ -84,10 +84,6 @@ module.exports = {
       name: 'master',
       prerelease: 'alpha',
     },
-    {
-      name: 'feat/acp-236',
-      prerelease: 'canary',
-    },
   ],
   plugins,
 };
