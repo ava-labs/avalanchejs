@@ -48,8 +48,12 @@ import {
   RegisterL1ValidatorTx,
   AddAutoRenewedValidatorTx,
   SetAutoRenewedValidatorConfigTx,
+  ProofOfPossession,
 } from '../../../serializable/pvm';
-import { createSignerOrSignerEmptyFromStrings } from '../../../serializable/pvm/signer';
+import {
+  createSignerOrSignerEmptyFromStrings,
+  Signer,
+} from '../../../serializable/pvm/signer';
 import {
   AddressMaps,
   addressesFromBytes,
@@ -1848,7 +1852,7 @@ export type NewAddAutoRenewedValidatorTxProps = TxProps<{
   /**
    * The BLS public key.
    */
-  publicKey?: Uint8Array;
+  publicKey: Uint8Array;
   /**
    * The addresses which will receive the validator portion of the rewards.
    * Given addresses will share the reward UTXO.
@@ -1862,7 +1866,7 @@ export type NewAddAutoRenewedValidatorTxProps = TxProps<{
   /**
    * The BLS signature.
    */
-  signature?: Uint8Array;
+  signature: Uint8Array;
   /**
    * Optional. The number of signatures required to spend the funds in the
    * resultant reward UTXO.
@@ -1924,7 +1928,7 @@ export const newAddAutoRenewedValidatorTx: TxBuilderFn<
 ) => {
   const toStake = new Map<string, bigint>([[context.avaxAssetID, weight]]);
 
-  const signer = createSignerOrSignerEmptyFromStrings(publicKey, signature);
+  const signer = new Signer(new ProofOfPossession(publicKey, signature));
   const validatorOutputOwners = OutputOwners.fromNative(
     rewardAddresses,
     locktime,

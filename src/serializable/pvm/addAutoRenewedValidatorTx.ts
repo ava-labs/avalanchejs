@@ -8,7 +8,7 @@ import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
 import { BigIntPr, Int } from '../primitives';
 import { packList, toListStruct } from '../../utils/serializeList';
-import type { Signer, SignerEmpty } from './signer';
+import { Signer } from './signer';
 import type { OutputOwners } from '../fxs/secp256k1';
 import { NodeId } from '../fxs/common/nodeId';
 import { TypeSymbols } from '../constants';
@@ -20,7 +20,7 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
   constructor(
     public readonly baseTx: BaseTx,
     public readonly nodeId: NodeId,
-    public readonly signer: Signer | SignerEmpty,
+    public readonly signer: Signer,
     public readonly stake: readonly TransferableOutput[],
     public readonly validatorRewardsOwner: Serializable,
     public readonly delegatorRewardsOwner: Serializable,
@@ -79,6 +79,12 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
       ],
       codec,
     );
+
+    if (!(signer instanceof Signer)) {
+      throw new Error(
+        'AddAutoRenewedValidatorTx requires a non-empty BLS Signer',
+      );
+    }
 
     return [
       new AddAutoRenewedValidatorTx(
