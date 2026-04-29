@@ -300,9 +300,16 @@ export class SpendHelper {
   /**
    * Verifies that gas usage does not exceed the fee state maximum.
    *
+   * @param {boolean} allowWithZeroCapacity - Whether to skip this check if platform.getFeeState reports capacity is 0.
    * @returns {Error | null} An error if gas usage exceeds maximum, null otherwise.
    */
-  verifyGasUsage(): Error | null {
+  verifyGasUsage(allowWithZeroCapacity: boolean = false): Error | null {
+    // On a freshly booted local network with no P-chain transactions, no blocks are produced → time doesn't advance → capacity never refills.
+    // platform.getFeeState RPC calls keep returning capacity: 0, which would prevent the transaction from being submitted.
+    if (allowWithZeroCapacity && this.feeState.capacity === 0n) {
+      return null;
+    }
+
     const gas = this.calculateGas();
     if (this.feeState.capacity < gas) {
       return new Error(

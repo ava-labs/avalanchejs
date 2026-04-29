@@ -24,6 +24,9 @@ import {
   SetL1ValidatorWeightTx,
   IncreaseL1ValidatorBalanceTx,
   DisableL1ValidatorTx,
+  AddAutoRenewedValidatorTx,
+  SetAutoRenewedValidatorConfigTx,
+  RewardAutoRenewedValidatorTx,
 } from '../serializable/pvm';
 import {
   baseTx,
@@ -387,6 +390,65 @@ export const disableL1ValidatorTx = () =>
 
 export const disableL1ValidatorTxBytes = () =>
   concatBytes(baseTxbytes(), idBytes(), bytesForInt(10), inputBytes());
+
+export const addAutoRenewedValidatorTx = () =>
+  new AddAutoRenewedValidatorTx(
+    baseTx(),
+    nodeId(),
+    signer(),
+    makeList(transferableOutput)(),
+    outputOwner(),
+    outputOwner(),
+    outputOwner(),
+    int(),
+    bigIntPr(),
+    int(),
+    bigIntPr(),
+  );
+
+export const addAutoRenewedValidatorTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    nodeIdBytes(),
+    bytesForInt(28),
+    signerBytes(),
+    makeListBytes(transferableOutputBytes)(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+    bytesForInt(11),
+    outputOwnerBytes(),
+    intBytes(),
+    bigIntPrBytes(),
+    intBytes(),
+    bigIntPrBytes(),
+  );
+
+export const setAutoRenewedValidatorConfigTx = () =>
+  new SetAutoRenewedValidatorConfigTx(
+    baseTx(),
+    id(),
+    input(),
+    int(),
+    bigIntPr(),
+  );
+
+export const setAutoRenewedValidatorConfigTxBytes = () =>
+  concatBytes(
+    baseTxbytes(),
+    idBytes(),
+    bytesForInt(10),
+    inputBytes(),
+    intBytes(),
+    bigIntPrBytes(),
+  );
+
+export const rewardAutoRenewedValidatorTx = () =>
+  new RewardAutoRenewedValidatorTx(id(), bigIntPr());
+
+export const rewardAutoRenewedValidatorTxBytes = () =>
+  concatBytes(idBytes(), bigIntPrBytes());
 
 export const feeState = (): FeeState => ({
   capacity: 999_999n,

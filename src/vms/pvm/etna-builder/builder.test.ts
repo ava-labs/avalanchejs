@@ -47,10 +47,13 @@ import {
   DisableL1ValidatorTx,
   SetL1ValidatorWeightTx,
   RegisterL1ValidatorTx,
+  AddAutoRenewedValidatorTx,
+  SetAutoRenewedValidatorConfigTx,
 } from '../../../serializable/pvm';
 import { BaseTx as AvaxBaseTx } from '../../../serializable/avax';
 import { hexToBuffer } from '../../../utils';
 import {
+  newAddAutoRenewedValidatorTx,
   newAddPermissionlessDelegatorTx,
   newAddPermissionlessValidatorTx,
   newAddSubnetValidatorTx,
@@ -64,6 +67,7 @@ import {
   newIncreaseL1ValidatorBalanceTx,
   newRegisterL1ValidatorTx,
   newRemoveSubnetValidatorTx,
+  newSetAutoRenewedValidatorConfigTx,
   newSetL1ValidatorWeightTx,
   newTransferSubnetOwnershipTx,
 } from './builder';
@@ -1266,6 +1270,123 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         Id.fromString(validationId),
         Input.fromNative([0]),
       );
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
+  });
+
+  describe('AddAutoRenewedValidatorTx', () => {
+    it('should create an AddAutoRenewedValidatorTx', () => {
+      const utxoInputAmt = AvaxToNAvax(2);
+      const stakeAmount = 1_800_000n;
+      const shares = 20_000;
+      const autoCompoundRewardShares = 500_000;
+      const period = 1_209_600n; // 14 days in seconds
+
+      const unsignedTx = newAddAutoRenewedValidatorTx(
+        {
+          delegatorRewardsOwner: [toAddress],
+          feeState,
+          fromAddressesBytes,
+          nodeId,
+          publicKey: blsPublicKeyBytes(),
+          rewardAddresses: [toAddress],
+          shares,
+          signature: blsSignatureBytes(),
+          utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
+          weight: stakeAmount,
+          ownerAddresses: [toAddress],
+          autoCompoundRewardShares,
+          period,
+        },
+        testContext,
+      );
+
+      const { baseTx, stake } = unsignedTx.getTx() as AddAutoRenewedValidatorTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          additionalOutputs: stake,
+          feeState,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new AddAutoRenewedValidatorTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(utxoInputAmt - stakeAmount - expectedFee)],
+          [getTransferableInputForTest(utxoInputAmt)],
+          new Uint8Array(),
+        ),
+        NodeId.fromString(nodeId),
+        new Signer(proofOfPossession()),
+        [getTransferableOutForTest(stakeAmount)],
+        OutputOwners.fromNative([toAddress], 0n, 1),
+        OutputOwners.fromNative([toAddress], 0n, 1),
+        OutputOwners.fromNative([toAddress], 0n, 1),
+        new Int(shares),
+        new BigIntPr(stakeAmount),
+        new Int(autoCompoundRewardShares),
+        new BigIntPr(period),
+      );
+
+      expectTxs(unsignedTx.getTx(), expectedTx);
+    });
+  });
+
+  describe('SetAutoRenewedValidatorConfigTx', () => {
+    it('should create a SetAutoRenewedValidatorConfigTx', () => {
+      const utxoInputAmt = AvaxToNAvax(2);
+      const validatorTxId = 'test';
+      const auth = [0, 1];
+      const autoCompoundRewardShares = 750_000;
+      const period = 2_419_200n; // 28 days in seconds
+
+      const unsignedTx = newSetAutoRenewedValidatorConfigTx(
+        {
+          fromAddressesBytes,
+          feeState,
+          utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
+          validatorTxId,
+          auth,
+          autoCompoundRewardShares,
+          period,
+        },
+        testContext,
+      );
+
+      const { baseTx } = unsignedTx.getTx() as SetAutoRenewedValidatorConfigTx;
+      const { inputs, outputs } = baseTx;
+
+      const [amountConsumed, expectedAmountConsumed, expectedFee] =
+        checkFeeIsCorrect({
+          unsignedTx,
+          inputs,
+          outputs,
+          feeState,
+        });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+
+      const expectedTx = new SetAutoRenewedValidatorConfigTx(
+        AvaxBaseTx.fromNative(
+          testContext.networkID,
+          testContext.pBlockchainID,
+          [getTransferableOutForTest(utxoInputAmt - expectedFee)],
+          [getTransferableInputForTest(utxoInputAmt)],
+          new Uint8Array(),
+        ),
+        Id.fromString(validatorTxId),
+        Input.fromNative(auth),
+        new Int(autoCompoundRewardShares),
+        new BigIntPr(period),
+      );
+
       expectTxs(unsignedTx.getTx(), expectedTx);
     });
   });
