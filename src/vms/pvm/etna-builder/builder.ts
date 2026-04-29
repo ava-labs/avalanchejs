@@ -1205,10 +1205,11 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     additionalOutputsComplexity,
   );
 
-  const additionalAvaxToBurn = (additionalOutputs ?? []).reduce(
-    (sum, output) => sum + output.amount(),
-    0n,
-  );
+  const additionalToBurn = (additionalOutputs ?? []).reduce((map, output) => {
+    const id = output.assetId.toString();
+    map.set(id, (map.get(id) ?? 0n) + output.amount());
+    return map;
+  }, new Map<string, bigint>());
 
   const spendResults = spend(
     {
@@ -1222,10 +1223,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
       initialComplexity: complexity,
       minIssuanceTime,
       shouldConsolidateOutputs: true,
-      toBurn:
-        additionalAvaxToBurn > 0n
-          ? new Map([[context.avaxAssetID, additionalAvaxToBurn]])
-          : new Map(),
+      toBurn: additionalToBurn,
       toStake,
       utxos,
     },
