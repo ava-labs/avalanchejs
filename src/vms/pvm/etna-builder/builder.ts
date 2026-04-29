@@ -1224,7 +1224,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
       shouldConsolidateOutputs: true,
       toBurn:
         additionalAvaxToBurn > 0n
-          ? new Map([[assetId, additionalAvaxToBurn]])
+          ? new Map([[context.avaxAssetID, additionalAvaxToBurn]])
           : new Map(),
       toStake,
       utxos,
