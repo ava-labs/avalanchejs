@@ -19,7 +19,7 @@ export const validateDynamicBurnedAmount = ({
   const feeToleranceInt = Math.floor(feeTolerance);
 
   if (feeToleranceInt < 0) {
-    throw new Error('feeTolerance must be be non-negative.');
+    throw new Error('feeTolerance must be non-negative.');
   }
 
   const delta = (feeAmount * BigInt(feeToleranceInt)) / 100n;

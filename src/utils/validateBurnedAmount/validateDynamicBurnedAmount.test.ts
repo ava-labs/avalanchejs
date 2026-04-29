@@ -9,7 +9,7 @@ describe('validateDynamicBurnedAmount', () => {
         feeAmount: 280750n,
         feeTolerance: -1,
       }),
-    ).toThrowError('feeTolerance must be be non-negative.');
+    ).toThrowError('feeTolerance must be non-negative.');
   });
 
   it('returns false if burned amount is over the tolerance range', () => {
