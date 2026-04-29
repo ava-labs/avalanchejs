@@ -701,6 +701,59 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expectTxs(unsignedTx.getTx(), expectedTx);
     });
 
+    test('newAddPermissionlessDelegator - with additionalOutputs', () => {
+      const utxoInputAmt = AvaxToNAvax(2);
+      const stakeAmount = 1_800_000n;
+      const feeOutputAmt = 50_000n;
+      const escrowAddressBytes = hexToBuffer('0x1234567890abcdef1234');
+
+      const additionalOutputs = [
+        TransferableOutput.fromNative(testContext.avaxAssetID, feeOutputAmt, [
+          escrowAddressBytes,
+        ]),
+      ];
+
+      const unsignedTx = newAddPermissionlessDelegatorTx(
+        {
+          additionalOutputs,
+          end: 120n,
+          feeState,
+          fromAddressesBytes,
+          nodeId,
+          memo,
+          rewardAddresses: [],
+          start: 0n,
+          subnetId: PrimaryNetworkID.toString(),
+          utxos: [getValidUtxo(new BigIntPr(utxoInputAmt))],
+          weight: stakeAmount,
+        },
+        testContext,
+      );
+
+      const { baseTx, stake } =
+        unsignedTx.getTx() as AddPermissionlessDelegatorTx;
+      const { inputs, outputs } = baseTx;
+
+      // additionalOutputs should be included in baseTx outputs
+      const feeOutput = outputs.find((o) => o.amount() === feeOutputAmt);
+      expect(feeOutput).toBeDefined();
+      expect(feeOutput?.assetId.toString()).toEqual(testContext.avaxAssetID);
+
+      // Total outputs should include change + fee output
+      expect(outputs.length).toBeGreaterThanOrEqual(2);
+
+      // fee output is already in baseTx.outputs; only stake is outside
+      const [amountConsumed, expectedAmountConsumed] = checkFeeIsCorrect({
+        unsignedTx,
+        inputs,
+        outputs,
+        additionalOutputs: stake,
+        feeState,
+      });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+    });
+
     test('newAddPermissionlessDelegator - subnet', () => {
       const utxoInputAmt = AvaxToNAvax(2);
       const stakeAmount = 1_800_000n;

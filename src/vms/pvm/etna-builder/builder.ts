@@ -1134,6 +1134,13 @@ export type NewAddPermissionlessDelegatorTxProps = TxProps<{
    * The amount being delegated in nAVAX.
    */
   weight: bigint;
+  /**
+   * Optional. Additional outputs to include in the base transaction outputs.
+   * These outputs are collected on top of the staked amount and network fee.
+   * Useful for atomic fee collection (e.g. a convenience fee sent to a
+   * Core-controlled escrow address alongside the delegation).
+   */
+  additionalOutputs?: readonly TransferableOutput[];
 }>;
 
 /**
@@ -1163,6 +1170,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     threshold = 1,
     utxos,
     weight,
+    additionalOutputs,
   },
   context,
 ) => {
@@ -1186,10 +1194,20 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 
   const ownerComplexity = getOwnerComplexity(delegatorRewardsOwner);
 
+  const additionalOutputsComplexity = getOutputComplexity(
+    additionalOutputs ?? [],
+  );
+
   const complexity = addDimensions(
     INTRINSIC_ADD_PERMISSIONLESS_DELEGATOR_TX_COMPLEXITIES,
     memoComplexity,
     ownerComplexity,
+    additionalOutputsComplexity,
+  );
+
+  const additionalAvaxToBurn = (additionalOutputs ?? []).reduce(
+    (sum, output) => sum + output.amount(),
+    0n,
   );
 
   const spendResults = spend(
@@ -1204,6 +1222,10 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
       initialComplexity: complexity,
       minIssuanceTime,
       shouldConsolidateOutputs: true,
+      toBurn:
+        additionalAvaxToBurn > 0n
+          ? new Map([[assetId, additionalAvaxToBurn]])
+          : new Map(),
       toStake,
       utxos,
     },
@@ -1223,7 +1245,7 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     AvaxBaseTx.fromNative(
       context.networkID,
       context.pBlockchainID,
-      changeOutputs,
+      [...changeOutputs, ...(additionalOutputs ?? [])],
       inputs,
       memo,
     ),
