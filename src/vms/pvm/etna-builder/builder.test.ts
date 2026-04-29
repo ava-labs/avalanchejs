@@ -754,6 +754,76 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
       expect(amountConsumed).toEqual(expectedAmountConsumed);
     });
 
+    test('newAddPermissionlessDelegator - with additionalOutputs of mixed assetIds', () => {
+      const utxoInputAmt = AvaxToNAvax(2);
+      const stakeAmount = 1_800_000n;
+      const avaxFeeAmt = 50_000n;
+      const subnetTokenAmt = 30_000n;
+      const subnetTokenId = Id.fromHex('0102');
+      const escrowAddressBytes = hexToBuffer('0x1234567890abcdef1234');
+
+      const additionalOutputs = [
+        TransferableOutput.fromNative(testContext.avaxAssetID, avaxFeeAmt, [
+          escrowAddressBytes,
+        ]),
+        TransferableOutput.fromNative(
+          subnetTokenId.toString(),
+          subnetTokenAmt,
+          [escrowAddressBytes],
+        ),
+      ];
+
+      const unsignedTx = newAddPermissionlessDelegatorTx(
+        {
+          additionalOutputs,
+          end: 120n,
+          feeState,
+          fromAddressesBytes,
+          nodeId,
+          memo,
+          rewardAddresses: [],
+          start: 0n,
+          subnetId: PrimaryNetworkID.toString(),
+          utxos: [
+            getValidUtxo(new BigIntPr(utxoInputAmt)),
+            getValidUtxo(new BigIntPr(2n * subnetTokenAmt), subnetTokenId),
+          ],
+          weight: stakeAmount,
+        },
+        testContext,
+      );
+
+      const { baseTx, stake } =
+        unsignedTx.getTx() as AddPermissionlessDelegatorTx;
+      const { inputs, outputs } = baseTx;
+
+      // Both additional outputs should be present in baseTx outputs
+      const avaxFeeOutput = outputs.find(
+        (o) =>
+          o.assetId.toString() === testContext.avaxAssetID &&
+          o.amount() === avaxFeeAmt,
+      );
+      expect(avaxFeeOutput).toBeDefined();
+
+      const subnetTokenOutput = outputs.find(
+        (o) =>
+          o.assetId.toString() === subnetTokenId.toString() &&
+          o.amount() === subnetTokenAmt,
+      );
+      expect(subnetTokenOutput).toBeDefined();
+
+      // fee output and subnet token output are already in baseTx.outputs; only stake is outside
+      const [amountConsumed, expectedAmountConsumed] = checkFeeIsCorrect({
+        unsignedTx,
+        inputs,
+        outputs,
+        additionalOutputs: stake,
+        feeState,
+      });
+
+      expect(amountConsumed).toEqual(expectedAmountConsumed);
+    });
+
     test('newAddPermissionlessDelegator - subnet', () => {
       const utxoInputAmt = AvaxToNAvax(2);
       const stakeAmount = 1_800_000n;
