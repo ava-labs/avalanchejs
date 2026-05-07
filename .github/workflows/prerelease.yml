@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feat/delegator-tx-fee-output
 jobs:
   release:
     name: Prerelease

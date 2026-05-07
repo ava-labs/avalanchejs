@@ -84,6 +84,10 @@ module.exports = {
       name: 'master',
       prerelease: 'alpha',
     },
+    {
+      name: 'feat/delegator-tx-fee-output',
+      prerelease: 'fee-output',
+    },
   ],
   plugins,
 };
