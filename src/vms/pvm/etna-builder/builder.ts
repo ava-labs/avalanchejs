@@ -1243,7 +1243,9 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     AvaxBaseTx.fromNative(
       context.networkID,
       context.pBlockchainID,
-      [...changeOutputs, ...(additionalOutputs ?? [])],
+      [...changeOutputs, ...(additionalOutputs ?? [])].sort(
+        compareTransferableOutputs,
+      ),
       inputs,
       memo,
     ),
