@@ -1,26 +1,54 @@
-name: Publish Package
+name: Release
 
 on:
   push:
+    branches:
+      - master
+      - release
     tags:
       - 'v*'
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: read
+  id-token: write  # Required for OIDC publishing
+  contents: write  # Required for semantic-release to push tags/commits
 
 jobs:
-  publish:
+  release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-          package-manager-cache: false # never use caching in release builds
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm test
-      - run: npm publish --provenance
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build:prod
+
+      - name: Version & Tag
+        if: github.ref_type == 'branch'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: yarn run semantic-release
+
+      - name: Publish
+        if: github.ref_type == 'tag'
+        run: npm publish --provenance
+
+      - name: Rebase master
+        if: github.ref_name == 'release' && github.ref_type == 'branch'
+        run: |
+          git checkout master &&
+          git rebase release &&
+          git push origin master
