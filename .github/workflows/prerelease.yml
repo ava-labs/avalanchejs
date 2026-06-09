@@ -24,6 +24,5 @@ jobs:
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: yarn run semantic-release

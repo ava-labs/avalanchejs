@@ -46,7 +46,7 @@ const gitSetting = [
 const npmRelease = [
   '@semantic-release/npm',
   {
-    npmPublish: true,
+    npmPublish: false,
   },
 ];
 
