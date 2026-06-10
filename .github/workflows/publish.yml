@@ -22,4 +22,4 @@ jobs:
           package-manager-cache: false # never use caching in release builds
       - run: yarn install --frozen-lockfile
       - run: yarn build:prod
-      - run: npm publish # Or: npm stage publish
+      - run: npm publish --tag=latest # Or: npm stage publish
