@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
@@ -44,7 +44,15 @@ jobs:
 
       - name: Publish
         if: github.ref_type == 'tag'
-        run: npm publish --provenance
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          npm version "$VERSION" --no-git-tag-version
+          if [[ "$VERSION" == *"-"* ]]; then
+            DIST_TAG=$(echo "$VERSION" | grep -oP '(?<=-)[a-zA-Z]+')
+            npm publish --provenance --tag "$DIST_TAG"
+          else
+            npm publish --provenance --tag latest
+          fi
 
       - name: Rebase master
         if: github.ref_name == 'release' && github.ref_type == 'branch'
