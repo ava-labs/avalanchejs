@@ -1453,7 +1453,6 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         OutputOwners.fromNative([toAddress], 0n, 1),
         OutputOwners.fromNative([toAddress], 0n, 1),
         new Int(shares),
-        new BigIntPr(stakeAmount),
         new Int(autoCompoundRewardShares),
         new BigIntPr(period),
       );
