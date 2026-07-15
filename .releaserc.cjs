@@ -84,6 +84,10 @@ module.exports = {
       name: 'master',
       prerelease: 'alpha',
     },
+    {
+      name: 'fix/acp-236-alignment',
+      prerelease: 'canary',
+    },
   ],
   plugins,
 };

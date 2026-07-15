@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - fix/acp-236-alignment
 jobs:
   release:
     name: Prerelease
