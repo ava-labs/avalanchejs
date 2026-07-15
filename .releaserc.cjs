@@ -72,7 +72,6 @@ if (process.env && process.env.BRANCH_NAME === 'release') {
     changelogGen,
     releaseNotesGen,
     npmRelease,
-    gitSetting,
   ];
 }
 
