@@ -282,6 +282,7 @@ export const INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES: Dimensions =
   {
     [FeeDimensions.Bandwidth]:
       INTRINSIC_BASE_TX_COMPLEXITIES[FeeDimensions.Bandwidth] +
+      INT_LEN + // Node ID length prefix
       SHORT_ID_LEN + // Node ID
       INT_LEN + // Signer typeID
       INT_LEN + // Num stake outs
@@ -289,7 +290,6 @@ export const INTRINSIC_ADD_AUTO_RENEWED_VALIDATOR_TX_COMPLEXITIES: Dimensions =
       INT_LEN + // Delegator rewards typeID
       INT_LEN + // Owner typeID
       INT_LEN + // Delegation shares
-      LONG_LEN + // Weight
       INT_LEN + // AutoCompoundRewardShares
       LONG_LEN, // Period
     [FeeDimensions.DBRead]: 0,

@@ -2019,7 +2019,6 @@ export const newAddAutoRenewedValidatorTx: TxBuilderFn<
     delegatorOutputOwners,
     ownerOutputOwners,
     new Int(shares),
-    new BigIntPr(weight),
     new Int(autoCompoundRewardShares),
     new BigIntPr(period),
   );
