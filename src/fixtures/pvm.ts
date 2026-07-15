@@ -401,7 +401,6 @@ export const addAutoRenewedValidatorTx = () =>
     outputOwner(),
     outputOwner(),
     int(),
-    bigIntPr(),
     int(),
     bigIntPr(),
   );
@@ -409,6 +408,7 @@ export const addAutoRenewedValidatorTx = () =>
 export const addAutoRenewedValidatorTxBytes = () =>
   concatBytes(
     baseTxbytes(),
+    bytesForInt(nodeIdBytes().length),
     nodeIdBytes(),
     bytesForInt(28),
     signerBytes(),
@@ -420,7 +420,6 @@ export const addAutoRenewedValidatorTxBytes = () =>
     bytesForInt(11),
     outputOwnerBytes(),
     intBytes(),
-    bigIntPrBytes(),
     intBytes(),
     bigIntPrBytes(),
   );

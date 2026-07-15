@@ -472,7 +472,7 @@ const addAutoRenewedValidatorTxComplexity = (
     getOutputComplexity(tx.stake),
     getOwnerComplexity(tx.getValidatorRewardsOwner()),
     getOwnerComplexity(tx.getDelegatorRewardsOwner()),
-    getOwnerComplexity(tx.getOwner()),
+    getOwnerComplexity(tx.getValidatorAuthority()),
   );
 };
 
