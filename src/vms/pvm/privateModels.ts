@@ -8,7 +8,7 @@ export interface GetRewardUTXOsServerResponse {
 }
 
 export interface GetStakeServerResponse {
-  staked: bigint;
+  staked: string;
   stakedOutputs: string[];
 }
 
