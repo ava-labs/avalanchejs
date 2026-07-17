@@ -28,10 +28,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false # never use caching in release builds
 
-      # npm trusted publishing (OIDC) requires npm >= 11.5.1
-      - name: Ensure npm supports trusted publishing
-        run: npm install -g npm@latest
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
