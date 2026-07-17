@@ -86,7 +86,7 @@ module.exports = {
     },
     {
       name: 'fix/oidc-publishing-pr',
-      prerelease: 'canary',
+      prerelease: 'dev',
     },
   ],
   plugins,
