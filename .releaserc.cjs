@@ -84,6 +84,10 @@ module.exports = {
       name: 'master',
       prerelease: 'alpha',
     },
+    {
+      name: 'fix/oidc-publishing-pr',
+      prerelease: 'canary',
+    },
   ],
   plugins,
 };
