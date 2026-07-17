@@ -6,7 +6,7 @@ import { serializable } from '../common/types';
 import { Codec } from '../codec';
 import { concatBytes } from '../../utils/buffer';
 import { pack, unpack } from '../../utils/struct';
-import { BigIntPr, Int } from '../primitives';
+import { BigIntPr, Bytes, Int } from '../primitives';
 import { packList, toListStruct } from '../../utils/serializeList';
 import { Signer } from './signer';
 import type { OutputOwners } from '../fxs/secp256k1';
@@ -24,9 +24,8 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
     public readonly stake: readonly TransferableOutput[],
     public readonly validatorRewardsOwner: Serializable,
     public readonly delegatorRewardsOwner: Serializable,
-    public readonly owner: Serializable,
-    public readonly shares: Int,
-    public readonly weight: BigIntPr,
+    public readonly validatorAuthority: Serializable,
+    public readonly delegationShares: Int,
     public readonly autoCompoundRewardShares: Int,
     public readonly period: BigIntPr,
   ) {
@@ -41,8 +40,8 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
     return this.delegatorRewardsOwner as OutputOwners;
   }
 
-  getOwner() {
-    return this.owner as OutputOwners;
+  getValidatorAuthority() {
+    return this.validatorAuthority as OutputOwners;
   }
 
   static fromBytes(
@@ -51,14 +50,13 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
   ): [AddAutoRenewedValidatorTx, Uint8Array] {
     const [
       baseTx,
-      nodeId,
+      nodeIdBytes,
       signer,
       stakeOuts,
       validatorRewardsOwner,
       delegatorRewardsOwner,
-      owner,
+      validatorAuthority,
       delegationShares,
-      weight,
       autoCompoundRewardShares,
       period,
       rest,
@@ -66,14 +64,13 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
       bytes,
       [
         BaseTx,
-        NodeId,
+        Bytes,
         Codec,
         toListStruct(TransferableOutput),
         Codec,
         Codec,
         Codec,
         Int,
-        BigIntPr,
         Int,
         BigIntPr,
       ],
@@ -89,14 +86,13 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
     return [
       new AddAutoRenewedValidatorTx(
         baseTx,
-        nodeId,
+        new NodeId(nodeIdBytes.bytes),
         signer,
         stakeOuts,
         validatorRewardsOwner,
         delegatorRewardsOwner,
-        owner,
+        validatorAuthority,
         delegationShares,
-        weight,
         autoCompoundRewardShares,
         period,
       ),
@@ -106,14 +102,14 @@ export class AddAutoRenewedValidatorTx extends PVMTx {
 
   toBytes(codec: Codec): Uint8Array {
     return concatBytes(
-      pack([this.baseTx, this.nodeId], codec),
+      pack([this.baseTx], codec),
+      new Bytes(this.nodeId.toBytes()).toBytes(),
       codec.PackPrefix(this.signer),
       packList(this.stake, codec),
       codec.PackPrefix(this.validatorRewardsOwner),
       codec.PackPrefix(this.delegatorRewardsOwner),
-      codec.PackPrefix(this.owner),
-      this.shares.toBytes(),
-      this.weight.toBytes(),
+      codec.PackPrefix(this.validatorAuthority),
+      this.delegationShares.toBytes(),
       this.autoCompoundRewardShares.toBytes(),
       this.period.toBytes(),
     );
