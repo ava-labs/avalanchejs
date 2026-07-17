@@ -1,31 +1,65 @@
-name: Publish Package
+name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - master
+      - release
 
 permissions:
-  id-token: write # Required for OIDC
-  contents: read
+  id-token: write # Required for npm trusted publishing (OIDC provenance)
+  contents: write # Required for semantic-release to push tags/commits
 
 jobs:
-  publish:
+  release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v6
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false # never use caching in release builds
-      - run: yarn install --frozen-lockfile
-      - run: yarn build:prod
-      - name: Publish to npm
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build:prod
+
+      - name: Version & Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: yarn run semantic-release
+
+      - name: Publish
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          if [[ "${GITHUB_REF_NAME}" == *alpha* ]]; then
-            npm publish --tag=alpha
-          else
-            npm publish --tag=latest
+          VERSION="$(node -p "require('./package.json').version")"
+          PUBLISHED="$(npm view "@avalabs/avalanchejs@${VERSION}" version 2>/dev/null || true)"
+          if [ -n "${PUBLISHED}" ]; then
+            echo "Version ${VERSION} already published, skipping."
+            exit 0
           fi
+          # release -> latest, prerelease branches -> the branch name (matches semantic-release's channel)
+          if [ "${BRANCH_NAME}" = "release" ]; then
+            DIST_TAG="latest"
+          else
+            DIST_TAG="${BRANCH_NAME}"
+          fi
+          npm publish --provenance --tag "${DIST_TAG}"
+
+      - name: Rebase master
+        if: github.ref_name == 'release'
+        run: |
+          git checkout master &&
+          git rebase release &&
+          git push origin master
