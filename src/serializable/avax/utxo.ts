@@ -1,6 +1,13 @@
 import { concatBytes } from '@noble/hashes/utils';
 import { UTXOID } from '.';
-import { isRewardsOwner, isStakeableLockOut, isTransferOut } from '../../utils';
+import {
+  isNftMintOut,
+  isNftTransferOut,
+  isRewardsOwner,
+  isSecpMintOut,
+  isStakeableLockOut,
+  isTransferOut,
+} from '../../utils';
 import { pack, unpack } from '../../utils/struct';
 import { Codec } from '../codec/codec';
 import type { Serializable } from '../common/types';
@@ -40,7 +47,19 @@ export class Utxo<Output extends Serializable = Serializable> {
     if (isRewardsOwner(this.output)) {
       return this.output;
     }
-    throw new Error('unable to get output owner');
+    // nftfx and mint outputs also carry OutputOwners, so there is no reason to
+    // fail on them. Reporting owners here does not imply they are spendable —
+    // the spend reducers (see useAvmAndCorethUTXOs) already filter to
+    // secp256k1fx.TransferOutput independently.
+    if (isNftTransferOut(this.output)) {
+      return this.output.outputOwners;
+    }
+    if (isNftMintOut(this.output) || isSecpMintOut(this.output)) {
+      return this.output.getOutputOwners();
+    }
+    throw new Error(
+      `unable to get output owner for output type: ${this.output._type}`,
+    );
   }
 
   toBytes(codec) {
