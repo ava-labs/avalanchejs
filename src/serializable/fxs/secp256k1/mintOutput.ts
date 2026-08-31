@@ -19,6 +19,10 @@ export class MintOutput {
     return [new MintOutput(owners), bytes];
   }
 
+  getOutputOwners() {
+    return this.outputOwners;
+  }
+
   toBytes(codec) {
     return this.outputOwners.toBytes(codec);
   }
