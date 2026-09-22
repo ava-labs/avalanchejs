@@ -1,6 +1,10 @@
 import { customInspectSymbol } from '../../../constants/node';
 import { base58check } from '../../../utils/base58';
-import { hexToBuffer, padLeft } from '../../../utils/buffer';
+import {
+  hexToBuffer,
+  padLeftStrict,
+  requireBytes,
+} from '../../../utils/buffer';
 import { bytesCompare } from '../../../utils/bytesCompare';
 import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
@@ -19,6 +23,7 @@ export class Id extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Id, Uint8Array] {
+    requireBytes(buf, ID_LEN, 'Id');
     return [new Id(buf.slice(0, ID_LEN)), buf.slice(ID_LEN)];
   }
 
@@ -31,7 +36,7 @@ export class Id extends Primitives {
   }
 
   toBytes() {
-    return padLeft(this.idVal, ID_LEN);
+    return padLeftStrict(this.idVal, ID_LEN, 'Id');
   }
 
   toJSON() {
@@ -43,7 +48,9 @@ export class Id extends Primitives {
   }
 
   static fromString(str: string) {
-    return Id.fromBytes(base58check.decode(str))[0];
+    // Not routed through fromBytes: that decodes a wire buffer and requires a
+    // full width Id, whereas a base58check string drops leading zero bytes.
+    return new Id(padLeftStrict(base58check.decode(str), ID_LEN, 'Id'));
   }
 
   static fromHex(hex: string): Id {

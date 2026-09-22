@@ -1,6 +1,10 @@
 import { customInspectSymbol } from '../../../constants/node';
 import { base58check } from '../../../utils/base58';
-import { hexToBuffer, padLeft } from '../../../utils/buffer';
+import {
+  hexToBuffer,
+  padLeftStrict,
+  requireBytes,
+} from '../../../utils/buffer';
 import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
 import { TypeSymbols } from '../../constants';
@@ -20,6 +24,7 @@ export class NodeId extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [NodeId, Uint8Array] {
+    requireBytes(buf, SHORT_ID_LEN, 'NodeId');
     return [new NodeId(buf.slice(0, SHORT_ID_LEN)), buf.slice(SHORT_ID_LEN)];
   }
 
@@ -28,7 +33,7 @@ export class NodeId extends Primitives {
   }
 
   toBytes() {
-    return padLeft(this.idVal, SHORT_ID_LEN);
+    return padLeftStrict(this.idVal, SHORT_ID_LEN, 'NodeId');
   }
 
   toJSON() {
@@ -43,7 +48,15 @@ export class NodeId extends Primitives {
     if (!str.includes(NodeIDPrefix)) {
       throw new Error('ID is missing prefix');
     }
-    return this.fromBytes(base58check.decode(str.replace(NodeIDPrefix, '')))[0];
+    // Not routed through fromBytes: that decodes a wire buffer and requires a
+    // full width NodeId, whereas a base58check string drops leading zero bytes.
+    return new NodeId(
+      padLeftStrict(
+        base58check.decode(str.replace(NodeIDPrefix, '')),
+        SHORT_ID_LEN,
+        'NodeId',
+      ),
+    );
   }
 
   static fromHex(hex: string): NodeId {

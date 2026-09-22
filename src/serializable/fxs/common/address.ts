@@ -1,9 +1,19 @@
 import { customInspectSymbol } from '../../../constants/node';
 import { bech32ToBytes, formatBech32 } from '../../../utils/address';
-import { bufferToHex, hexToBuffer, padLeft } from '../../../utils/buffer';
+import {
+  bufferToHex,
+  hexToBuffer,
+  padLeftStrict,
+  requireBytes,
+} from '../../../utils/buffer';
 import { serializable } from '../../common/types';
 import { Primitives } from '../../primitives/primatives';
 import { TypeSymbols } from '../../constants';
+
+/**
+ * Number of bytes per address.
+ */
+export const ADDRESS_LEN = 20;
 
 @serializable()
 export class Address extends Primitives {
@@ -13,7 +23,8 @@ export class Address extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Address, Uint8Array] {
-    return [new Address(buf.slice(0, 20)), buf.slice(20)];
+    requireBytes(buf, ADDRESS_LEN, 'Address');
+    return [new Address(buf.slice(0, ADDRESS_LEN)), buf.slice(ADDRESS_LEN)];
   }
 
   [customInspectSymbol](_, options: any) {
@@ -26,7 +37,17 @@ export class Address extends Primitives {
 
   //decodes from bech32 Addresses
   static fromString(addr: string): Address {
-    return new Address(bech32ToBytes(addr));
+    const bytes = bech32ToBytes(addr);
+
+    // Without this a malformed address that decodes short would be left padded
+    // at serialization time, silently becoming a different address.
+    if (bytes.length !== ADDRESS_LEN) {
+      throw new Error(
+        `invalid address ${addr}: decoded to ${bytes.length} bytes, expected ${ADDRESS_LEN}`,
+      );
+    }
+
+    return new Address(bytes);
   }
 
   static fromHex(hex: string): Address {
@@ -38,7 +59,7 @@ export class Address extends Primitives {
   }
 
   toBytes() {
-    return padLeft(this.address, 20);
+    return padLeftStrict(this.address, ADDRESS_LEN, 'Address');
   }
 
   toString(hrp = 'avax') {
