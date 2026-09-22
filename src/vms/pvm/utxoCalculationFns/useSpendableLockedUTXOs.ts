@@ -1,4 +1,4 @@
-import { verifySignaturesMatch } from '../../../vms/utils/calculateSpend/utils';
+import { selectSignaturesMatch } from '../../../vms/utils/calculateSpend/utils';
 import {
   TransferableOutput,
   TransferOutput,
@@ -69,7 +69,7 @@ export function useSpendableLockedUTXOs({
 
       return options.minIssuanceTime < lockedOutput.lockTime.value();
     });
-  verifySignaturesMatch(
+  selectSignaturesMatch(
     usableUTXOs,
     ({ lockedOutput }) => {
       return lockedOutput.transferOut as TransferOutput;

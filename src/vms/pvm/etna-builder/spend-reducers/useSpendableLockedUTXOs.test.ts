@@ -10,6 +10,7 @@ import { getInitialReducerState, getSpendHelper } from './fixtures/reducers';
 import {
   getLockedUTXO,
   getStakeableLockoutOutput,
+  getValidUtxo,
   testAvaxAssetID,
   testOwnerXAddress,
   testUTXOID1,
@@ -19,6 +20,8 @@ import {
   Address,
   BigIntPr,
   Int,
+  OutputOwners,
+  TransferOutput,
   TransferableOutput,
 } from '../../../../serializable';
 import { Utxo } from '../../../../serializable/avax/utxo';
@@ -119,9 +122,54 @@ describe('useSpendableLockedUTXOs', () => {
 
     const spendHelper = getSpendHelper({ toBurn, toStake });
 
+    // Nothing in the caller's UTXO set is signable with these fromAddresses,
+    // so the transaction really is misformulated and must fail loudly.
     expect(() =>
       useSpendableLockedUTXOs(initialState, spendHelper, testContext),
     ).toThrow(NoSigMatchError);
+  });
+
+  it('should skip unsignable locked UTXOs when something else is signable', () => {
+    const toBurn = new Map([[testContext.avaxAssetID, 4_900n]]);
+    const toStake = new Map([[testContext.avaxAssetID, 4_900n]]);
+
+    // A locked UTXO owned by someone else, alongside one the caller owns.
+    // The foreign UTXO must not abort the spend: any third party can place
+    // one in anyone else's UTXO set, so aborting would let them block every
+    // staking build for that address.
+    const foreignLockedUTXO = new Utxo(
+      new UTXOID(testUTXOID2, new Int(0)),
+      testAvaxAssetID,
+      new StakeableLockOut(
+        new BigIntPr(300n),
+        new TransferOutput(
+          new BigIntPr(1n),
+          OutputOwners.fromNative([
+            hexToBuffer('0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'),
+          ]),
+        ),
+      ),
+    );
+
+    const initialState = getInitialReducerState({
+      // The victim's own address: the unlocked UTXO below is theirs, the
+      // locked one above is not.
+      fromAddresses: [testOwnerXAddress],
+      excessAVAX: 0n,
+      minIssuanceTime: 100n,
+      toBurn,
+      toStake,
+      // The locked subset contains only the foreign UTXO, so this exercises
+      // the path where the locked reducer finds nothing signable but the
+      // caller still has spendable funds for useUnlockedUTXOs.
+      utxos: [foreignLockedUTXO, getValidUtxo(new BigIntPr(10_000n))],
+    });
+
+    const spendHelper = getSpendHelper({ toBurn, toStake });
+
+    expect(() =>
+      useSpendableLockedUTXOs(initialState, spendHelper, testContext),
+    ).not.toThrow();
   });
 
   it('should do nothing if UTXO has no remaining amount to stake', () => {

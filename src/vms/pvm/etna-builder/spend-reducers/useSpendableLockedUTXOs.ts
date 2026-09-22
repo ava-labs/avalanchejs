@@ -14,8 +14,12 @@ import {
   getUtxoInfo,
   isStakeableLockOut,
   isTransferOut,
+  matchOwners,
 } from '../../../../utils';
-import { verifySignaturesMatch } from '../../../utils/calculateSpend/utils';
+import {
+  NoSigMatchError,
+  selectSignaturesMatch,
+} from '../../../utils/calculateSpend/utils';
 import { IncorrectStakeableLockOutError } from './errors';
 import type { SpendReducerFunction, SpendReducerState } from './types';
 
@@ -64,13 +68,47 @@ export const useSpendableLockedUTXOs: SpendReducerFunction = (
     // Filter out non stakeable lockouts and lockouts that are not stakeable yet.
     .filter(getUsableUTXOsFilter(state));
 
-  // 2. Verify signatures match.
-  const verifiedUsableUTXOs = verifySignaturesMatch(
+  // 2. Keep only the locked UTXOs this caller can actually sign for.
+  //
+  // An unsignable locked UTXO is skipped rather than aborting the spend.
+  // getUsableUTXOsFilter selects by shape alone, and any third party can put
+  // a matching shape in the victim's UTXO set (a StakeableLockOut naming them
+  // among N-of-M owners, or with a future inner-owners locktime). Treating
+  // that as fatal would stop the spend before useUnlockedUTXOs ever saw the
+  // caller's own spendable UTXOs.
+  const verifiedUsableUTXOs = selectSignaturesMatch(
     usableUTXOs,
     (utxo) => utxo.output.transferOut,
     state.fromAddresses,
     state.minIssuanceTime,
   );
+
+  // A signature mismatch is still an error — just not one a foreign UTXO can
+  // trigger. It is fatal only when *nothing* the caller passed is signable,
+  // which is the case the original check was written for: fromAddresses does
+  // not correspond to these UTXOs, so the transaction is misformulated.
+  // Judging that against the whole UTXO set rather than this shape-filtered
+  // subset is the entire difference.
+  if (usableUTXOs.length > 0 && verifiedUsableUTXOs.length === 0) {
+    const hasAnySignableUTXO = state.utxos.some((utxo) => {
+      const output = isStakeableLockOut(utxo.output)
+        ? utxo.output.transferOut
+        : utxo.output;
+
+      return (
+        isTransferOut(output) &&
+        matchOwners(
+          output.outputOwners,
+          [...state.fromAddresses],
+          state.minIssuanceTime,
+        ) !== undefined
+      );
+    });
+
+    if (!hasAnySignableUTXO) {
+      throw NoSigMatchError;
+    }
+  }
 
   // 3. Do all the logic for spending based on the UTXOs.
   for (const { sigData, data: utxo } of verifiedUsableUTXOs) {
