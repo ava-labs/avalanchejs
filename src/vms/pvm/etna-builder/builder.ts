@@ -100,18 +100,30 @@ import { getWarpComplexity } from '../txs/fee/complexity';
 /**
  * Creates OutputOwners used for change outputs with the specified
  * `changeAddressBytes` if provided, otherwise uses the `fromAddressesBytes`.
+ *
+ * The threshold matters: this owner is applied to every change output *and*,
+ * in the staking builders, to the staked principal returned when the staking
+ * period ends. Defaulting it to 1 over the full address list silently
+ * downgrades an M-of-N account to 1-of-N, so any single cosigner — or anyone
+ * who compromised one key, which is exactly what multisig exists to tolerate —
+ * could spend the change immediately and the principal on unlock. Callers that
+ * spend M-of-N UTXOs must be able to ask for M-of-N back.
  */
 const getChangeOutputOwners = ({
   fromAddressesBytes,
   changeAddressesBytes,
+  changeOwnerThreshold = 1,
+  changeOwnerLocktime = 0n,
 }: {
   fromAddressesBytes: readonly Uint8Array[];
   changeAddressesBytes?: readonly Uint8Array[];
+  changeOwnerThreshold?: number;
+  changeOwnerLocktime?: bigint;
 }): OutputOwners => {
   return OutputOwners.fromNative(
     changeAddressesBytes ?? fromAddressesBytes,
-    0n,
-    1,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
   );
 };
 
@@ -146,8 +158,31 @@ type CommonTxProps = Readonly<{
    * List of addresses that are used for change outputs.
    *
    * Defaults to the addresses provided in `fromAddressesBytes`.
+   *
+   * Note: the owner built from these addresses is applied to every change
+   * output, and in the staking builders to the staked principal as well. Its
+   * threshold and locktime come from `changeOwnerThreshold` and
+   * `changeOwnerLocktime`, not from the UTXOs being spent.
    */
   changeAddressesBytes?: readonly Uint8Array[];
+  /**
+   * Optional. Number of signatures required to spend the change outputs (and,
+   * in the staking builders, the staked principal).
+   *
+   * Spending M-of-N UTXOs does *not* set this for you. Leave it at the
+   * default only for single-key accounts; a multisig caller should pass its
+   * own threshold or the funds come back spendable by any one signer.
+   *
+   * @default 1
+   */
+  changeOwnerThreshold?: number;
+  /**
+   * Optional. Locktime applied to the change outputs (and, in the staking
+   * builders, the staked principal).
+   *
+   * @default 0n
+   */
+  changeOwnerLocktime?: bigint;
   /**
    * The current fee state returned from `PVMApi.getFeeState()`.
    */
@@ -198,6 +233,8 @@ export type NewBaseTxProps = TxProps<{
 export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     feeState,
     fromAddressesBytes,
     memo = new Uint8Array(),
@@ -231,6 +268,8 @@ export const newBaseTx: TxBuilderFn<NewBaseTxProps> = (
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -450,6 +489,8 @@ export type NewExportTxProps = TxProps<{
 export const newExportTx: TxBuilderFn<NewExportTxProps> = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     destinationChainId,
     feeState,
     fromAddressesBytes,
@@ -483,6 +524,8 @@ export const newExportTx: TxBuilderFn<NewExportTxProps> = (
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -544,6 +587,8 @@ export type NewCreateSubnetTxProps = TxProps<{
 export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     fromAddressesBytes,
     feeState,
     locktime,
@@ -571,6 +616,8 @@ export const newCreateSubnetTx: TxBuilderFn<NewCreateSubnetTxProps> = (
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -643,6 +690,8 @@ export type NewCreateChainTxProps = TxProps<{
 export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     chainName,
     feeState,
     fromAddressesBytes,
@@ -686,6 +735,8 @@ export const newCreateChainTx: TxBuilderFn<NewCreateChainTxProps> = (
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -754,6 +805,8 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     end,
     feeState,
     fromAddressesBytes,
@@ -782,6 +835,8 @@ export const newAddSubnetValidatorTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -849,6 +904,8 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     fromAddressesBytes,
     feeState,
     nodeId,
@@ -874,6 +931,8 @@ export const newRemoveSubnetValidatorTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -919,7 +978,13 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
    */
   end: bigint;
   /**
-   * Optional. The number locktime field created in the resulting reward outputs.
+   * Optional. Locktime applied to the reward owners — both the validator
+   * rewards owner built from `rewardAddresses` and the delegation-fee rewards
+   * owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerLocktime`.
+   *
    * @default 0n
    */
   locktime?: bigint;
@@ -959,8 +1024,12 @@ export type NewAddPermissionlessValidatorTxProps = TxProps<{
    */
   subnetId: string;
   /**
-   * Optional. The number of signatures required to spend the funds in the
-   * resultant reward UTXO.
+   * Optional. Number of signatures required to spend the reward UTXOs — both
+   * the validator rewards owner built from `rewardAddresses` and the
+   * delegation-fee rewards owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerThreshold`.
    *
    * @default 1
    */
@@ -984,6 +1053,8 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     delegatorRewardsOwner,
     end,
     feeState,
@@ -1021,9 +1092,14 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     locktime,
     threshold,
   );
+  // The delegation-fee rewards owner gets the same threshold and locktime the
+  // caller asked for. It was previously forced to 1-of-N regardless, so a
+  // validator run by a multisig group handed every delegation-fee reward UTXO
+  // it would ever earn to any single one of its key holders.
   const delegatorOutputOwners = OutputOwners.fromNative(
     delegatorRewardsOwner,
-    0n,
+    locktime,
+    threshold,
   );
 
   const memoComplexity = getBytesComplexity(memo);
@@ -1044,6 +1120,8 @@ export const newAddPermissionlessValidatorTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1098,7 +1176,13 @@ export type NewAddPermissionlessDelegatorTxProps = TxProps<{
    */
   end: bigint;
   /**
-   * Optional. The number locktime field created in the resulting reward outputs.
+   * Optional. Locktime applied to the reward owners — both the validator
+   * rewards owner built from `rewardAddresses` and the delegation-fee rewards
+   * owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerLocktime`.
+   *
    * @default 0n
    */
   locktime?: bigint;
@@ -1124,8 +1208,12 @@ export type NewAddPermissionlessDelegatorTxProps = TxProps<{
    */
   subnetId: string;
   /**
-   * Optional. The number of signatures required to spend the funds in the
-   * resultant reward UTXO.
+   * Optional. Number of signatures required to spend the reward UTXOs — both
+   * the validator rewards owner built from `rewardAddresses` and the
+   * delegation-fee rewards owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerThreshold`.
    *
    * @default 1
    */
@@ -1156,6 +1244,8 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     end,
     feeState,
     fromAddressesBytes,
@@ -1215,6 +1305,8 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1265,7 +1357,13 @@ export const newAddPermissionlessDelegatorTx: TxBuilderFn<
 
 export type NewTransferSubnetOwnershipTxProps = TxProps<{
   /**
-   * Optional. The number locktime field created in the resulting reward outputs.
+   * Optional. Locktime applied to the reward owners — both the validator
+   * rewards owner built from `rewardAddresses` and the delegation-fee rewards
+   * owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerLocktime`.
+   *
    * @default 0n
    */
   locktime?: bigint;
@@ -1282,8 +1380,12 @@ export type NewTransferSubnetOwnershipTxProps = TxProps<{
    */
   subnetOwners: readonly Uint8Array[];
   /**
-   * Optional. The number of signatures required to spend the funds in the
-   * resultant reward UTXO.
+   * Optional. Number of signatures required to spend the reward UTXOs — both
+   * the validator rewards owner built from `rewardAddresses` and the
+   * delegation-fee rewards owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerThreshold`.
    *
    * @default 1
    */
@@ -1303,6 +1405,8 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     fromAddressesBytes,
     feeState,
     locktime = 0n,
@@ -1335,6 +1439,8 @@ export const newTransferSubnetOwnershipTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1412,6 +1518,8 @@ export const newConvertSubnetToL1Tx: TxBuilderFn<
     address,
     chainId,
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     feeState,
     fromAddressesBytes,
     memo = new Uint8Array(),
@@ -1454,6 +1562,8 @@ export const newConvertSubnetToL1Tx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1529,6 +1639,8 @@ export const newRegisterL1ValidatorTx: TxBuilderFn<NewRegisterL1ValidatorTx> = (
     balance,
     blsSignature,
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     feeState,
     fromAddressesBytes,
     memo = new Uint8Array(),
@@ -1555,6 +1667,8 @@ export const newRegisterL1ValidatorTx: TxBuilderFn<NewRegisterL1ValidatorTx> = (
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1617,6 +1731,8 @@ export const newSetL1ValidatorWeightTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     feeState,
     fromAddressesBytes,
     memo = new Uint8Array(),
@@ -1641,6 +1757,8 @@ export const newSetL1ValidatorWeightTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1705,6 +1823,8 @@ export const newIncreaseL1ValidatorBalanceTx: TxBuilderFn<
   {
     balance,
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     feeState,
     fromAddressesBytes,
     memo = new Uint8Array(),
@@ -1731,6 +1851,8 @@ export const newIncreaseL1ValidatorBalanceTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1793,6 +1915,8 @@ export type DisableL1ValidatorTxProps = TxProps<{
 export const newDisableL1ValidatorTx: TxBuilderFn<DisableL1ValidatorTxProps> = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     disableAuth,
     feeState,
     fromAddressesBytes,
@@ -1818,6 +1942,8 @@ export const newDisableL1ValidatorTx: TxBuilderFn<DisableL1ValidatorTxProps> = (
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -1863,7 +1989,13 @@ export type NewAddAutoRenewedValidatorTxProps = TxProps<{
    */
   delegatorRewardsOwner: readonly Uint8Array[];
   /**
-   * Optional. The number locktime field created in the resulting reward outputs.
+   * Optional. Locktime applied to the reward owners — both the validator
+   * rewards owner built from `rewardAddresses` and the delegation-fee rewards
+   * owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerLocktime`.
+   *
    * @default 0n
    */
   locktime?: bigint;
@@ -1890,8 +2022,12 @@ export type NewAddAutoRenewedValidatorTxProps = TxProps<{
    */
   signature: Uint8Array;
   /**
-   * Optional. The number of signatures required to spend the funds in the
-   * resultant reward UTXO.
+   * Optional. Number of signatures required to spend the reward UTXOs — both
+   * the validator rewards owner built from `rewardAddresses` and the
+   * delegation-fee rewards owner built from `delegatorRewardsOwner`.
+   *
+   * It does *not* govern the staked principal or the change outputs; those
+   * use `changeOwnerThreshold`.
    *
    * @default 1
    */
@@ -1902,8 +2038,28 @@ export type NewAddAutoRenewedValidatorTxProps = TxProps<{
   weight: bigint;
   /**
    * The addresses authorized to modify the auto-renew config.
+   *
+   * These become the transaction's `validatorAuthority`, the only thing that
+   * authorises a later SetAutoRenewedValidatorConfigTx. How many of them must
+   * sign is set by `ownerThreshold`, which defaults to 1 — so listing several
+   * addresses without raising it means any one of them can change the config
+   * (including setting `period` to 0) alone. The owner is immutable once the
+   * transaction is accepted.
    */
   ownerAddresses: readonly Uint8Array[];
+  /**
+   * Optional. Number of signatures from `ownerAddresses` required to modify
+   * the auto-renew config.
+   *
+   * @default 1
+   */
+  ownerThreshold?: number;
+  /**
+   * Optional. Locktime on the auto-renew config authority.
+   *
+   * @default 0n
+   */
+  ownerLocktime?: bigint;
   /**
    * Percentage of rewards to restake, expressed in millionths (percentage * 10,000).
    * Range [0..1_000_000]: 0 = withdraw all rewards, 1_000_000 = restake all rewards.
@@ -1928,6 +2084,8 @@ export const newAddAutoRenewedValidatorTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     delegatorRewardsOwner,
     feeState,
     fromAddressesBytes,
@@ -1943,6 +2101,8 @@ export const newAddAutoRenewedValidatorTx: TxBuilderFn<
     utxos,
     weight,
     ownerAddresses,
+    ownerThreshold = 1,
+    ownerLocktime = 0n,
     autoCompoundRewardShares,
     period,
   },
@@ -1956,11 +2116,23 @@ export const newAddAutoRenewedValidatorTx: TxBuilderFn<
     locktime,
     threshold,
   );
+  // The delegation-fee rewards owner gets the same threshold and locktime the
+  // caller asked for. It was previously forced to 1-of-N regardless, so a
+  // validator run by a multisig group handed every delegation-fee reward UTXO
+  // it would ever earn to any single one of its key holders.
   const delegatorOutputOwners = OutputOwners.fromNative(
     delegatorRewardsOwner,
-    0n,
+    locktime,
+    threshold,
   );
-  const ownerOutputOwners = OutputOwners.fromNative(ownerAddresses, 0n);
+  // validatorAuthority: the sole authorisation for later
+  // SetAutoRenewedValidatorConfigTx changes. Forced to 1-of-N it let any one
+  // listed key holder stop validation (period = 0) on their own.
+  const ownerOutputOwners = OutputOwners.fromNative(
+    ownerAddresses,
+    ownerLocktime,
+    ownerThreshold,
+  );
 
   const memoComplexity = getBytesComplexity(memo);
   const signerComplexity = getSignerComplexity(signer);
@@ -1981,6 +2153,8 @@ export const newAddAutoRenewedValidatorTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
@@ -2059,6 +2233,8 @@ export const newSetAutoRenewedValidatorConfigTx: TxBuilderFn<
 > = (
   {
     changeAddressesBytes,
+    changeOwnerLocktime,
+    changeOwnerThreshold,
     auth,
     feeState,
     fromAddressesBytes,
@@ -2086,6 +2262,8 @@ export const newSetAutoRenewedValidatorConfigTx: TxBuilderFn<
     {
       changeOutputOwners: getChangeOutputOwners({
         changeAddressesBytes,
+        changeOwnerLocktime,
+        changeOwnerThreshold,
         fromAddressesBytes,
       }),
       excessAVAX: 0n,
