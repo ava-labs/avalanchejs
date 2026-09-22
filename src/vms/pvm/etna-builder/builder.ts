@@ -402,6 +402,17 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
 
   const importedAvax = importedAmounts[context.avaxAssetID];
 
+  // Sort before deriving the signature coordinates, not after.
+  //
+  // An AddressMap's storage position *is* the credential index, and the
+  // credential list follows ImportTx.ins, which is this array in sorted
+  // order. Building the maps from the unsorted array and sorting afterwards
+  // routes each signature into some other input's credential whenever the
+  // supplied order differs from UTXOID order and the inputs have different
+  // signers. hasAllSignatures still reports the tx complete, so the wallet
+  // issues a transaction the node then rejects.
+  importedInputs.sort(TransferableInput.compare);
+
   const addressMaps = AddressMaps.fromTransferableInputs(
     importedInputs,
     filteredUtxos,
@@ -461,7 +472,7 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
         new Bytes(memo),
       ),
       Id.fromString(sourceChainId),
-      importedInputs.sort(TransferableInput.compare),
+      importedInputs,
     ),
     inputUtxos,
     addressMaps,

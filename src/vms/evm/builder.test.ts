@@ -1,5 +1,5 @@
 import { testContext } from '../../fixtures/context';
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 import {
   getTransferableInputForTest,
@@ -54,7 +54,12 @@ describe('CorethBuilder', () => {
     expectTxs(tx.getTx(), expectedTx);
   });
 
-  it('importTx', () => {
+  it('importTx burns the fee rather than charging it to an unspendable UTXO', () => {
+    // The UTXO set contains getLockedUTXO(): a fee-asset TransferOutput owned
+    // by the signer but with a future locktime, so matchOwners rejects it and
+    // it never becomes an input. It used to absorb the whole fee budget
+    // before that check ran, leaving the spendable 50 AVAX UTXO paid out in
+    // full — a zero-burn import that coreth rejects for insufficient funds.
     const tx = newImportTxFromBaseFee(
       testContext,
       toAddress,
@@ -64,6 +69,9 @@ describe('CorethBuilder', () => {
       baseFee,
     );
 
+    const importedAmount = 50000000000n;
+    const burned = 280750n;
+
     const expectedTx = new ImportTx(
       new Int(testContext.networkID),
       Id.fromString(testContext.cBlockchainID),
@@ -72,12 +80,25 @@ describe('CorethBuilder', () => {
       [
         new Output(
           Address.fromString('C-avax12sepzg69zg69zg69zg69zg69zg69zg69l25vwz'),
-          new BigIntPr(50000000000n),
+          new BigIntPr(importedAmount - burned),
           testAvaxAssetID,
         ),
       ],
     );
 
     expectTxs(tx.getTx(), expectedTx);
+
+    // sum(inputs) - sum(outputs) must equal the fee exactly.
+    const built = tx.getTx() as ImportTx;
+    const inSum = built.importedInputs.reduce(
+      (acc, input) => acc + input.amount(),
+      0n,
+    );
+    const outSum = built.Outs.reduce(
+      (acc, out) => acc + out.amount.value(),
+      0n,
+    );
+
+    expect(inSum - outSum).toEqual(burned);
   });
 });

@@ -305,6 +305,13 @@ export function newImportTx(
   sourceChain: string,
   fee = 0n,
   feeAssetId = context.avaxAssetID,
+  /**
+   * UTXOs whose owners' locktime is above this are treated as unspendable.
+   * Defaults to now, so an atomic UTXO whose locktime has already passed is
+   * importable; the previous hard-coded 0n excluded every locktime >= 1
+   * forever, however long expired.
+   */
+  minIssuanceTime = BigInt(Math.floor(new Date().getTime() / 1000)),
 ): UnsignedTx {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
 
@@ -319,6 +326,22 @@ export function newImportTx(
     const assetID: string = atomic.getAssetId();
     const output = atomic.output as TransferOutput;
     const amount = output.amount();
+
+    // Establish that this UTXO can actually be spent *before* charging any
+    // fee against it. Charging first and skipping afterwards left the fee
+    // budget consumed by a UTXO that never becomes an input, so the later
+    // spendable UTXOs were paid out in full and the tx under-burned — which
+    // coreth rejects. A third party can supply such a UTXO (an atomic output
+    // naming the victim among N-of-M owners, or with a non-zero locktime),
+    // so this ordering is what keeps them from blocking every C-chain import.
+    const sigData = matchOwners(
+      output.outputOwners,
+      fromAddresses,
+      minIssuanceTime,
+    );
+
+    if (!sigData) return;
+
     let infeeamount = amount;
     if (feeAssetId && fee && feepaid < fee && feeAssetId === assetID) {
       feepaid += infeeamount;
@@ -329,10 +352,6 @@ export function newImportTx(
         infeeamount = 0n;
       }
     }
-
-    const sigData = matchOwners(output.outputOwners, fromAddresses, 0n);
-
-    if (!sigData) return;
 
     const xferin: TransferableInput = new TransferableInput(
       atomic.utxoId,
@@ -348,7 +367,22 @@ export function newImportTx(
     map.set(assetID, infeeamount);
   });
 
+  // The spendable fee-asset inputs must actually cover the fee. Emitting a
+  // tx that burns less than `fee` produces an insufficient-funds rejection at
+  // the node with an error that points at the fee rather than at the UTXO set.
+  if (fee && feepaid < fee) {
+    throw new Error(
+      `insufficient funds for fee: need ${fee}, spendable fee-asset UTXOs cover ${feepaid}`,
+    );
+  }
+
   for (const [assetID, amount] of map.entries()) {
+    // coreth rejects a zero-amount EVMOutput, which is what a fee-asset UTXO
+    // whose whole value went to the fee would produce.
+    if (amount === 0n) {
+      continue;
+    }
+
     // Create single EVMOutput for each assetID
     outs.push(
       new Output(
@@ -364,7 +398,7 @@ export function newImportTx(
   const addressMaps = AddressMaps.fromTransferableInputs(
     ins,
     atomics,
-    0n,
+    minIssuanceTime,
     fromAddressesBytes,
   );
   outs = outs.sort(compareEVMOutputs);
