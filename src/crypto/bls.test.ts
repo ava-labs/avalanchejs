@@ -60,3 +60,30 @@ describe('bls', () => {
     expect(bls.verifyProofOfPossession(pk, pop, pkBytes)).toEqual(true);
   });
 });
+
+describe('bls secret key serialization', () => {
+  // `sk.toString(16)` drops leading zeros, so keys with a leading zero byte
+  // used to serialize to fewer than 32 bytes and would not round trip.
+  const leadingZeroSkStr = '00' + skStr.slice(2);
+
+  it('pads a secret key with a leading zero byte to 32 bytes', () => {
+    const sk = bls.secretKeyFromBytes(leadingZeroSkStr);
+    const serialized = bls.secretKeyToBytes(sk);
+
+    expect(serialized.length).toBe(bls.SECRET_KEY_LENGTH);
+    expect(serialized).toEqual(hexToBuffer(leadingZeroSkStr));
+  });
+
+  it('round trips a secret key with a leading zero byte', () => {
+    const sk = bls.secretKeyFromBytes(leadingZeroSkStr);
+
+    expect(bls.secretKeyFromBytes(bls.secretKeyToBytes(sk))).toEqual(sk);
+  });
+
+  it('always serializes to a fixed width', () => {
+    expect(bls.secretKeyToBytes(1n).length).toBe(bls.SECRET_KEY_LENGTH);
+    expect(bls.secretKeyToBytes(bls.secretKeyFromBytes(skStr)).length).toBe(
+      bls.SECRET_KEY_LENGTH,
+    );
+  });
+});

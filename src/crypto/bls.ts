@@ -1,6 +1,6 @@
 import { bls12_381 } from '@noble/curves/bls12-381';
 import type { ProjPointType } from '@noble/curves/abstract/weierstrass';
-import { hexToBuffer } from '../utils/buffer';
+import { toFixedWidthBytes } from '../utils/buffer';
 
 export type PublicKey = ProjPointType<bigint>;
 export type SecretKey = bigint;
@@ -8,6 +8,7 @@ export type Signature = ProjPointType<typeof bls12_381.fields.Fp2.ZERO>;
 export type Message = ProjPointType<typeof bls12_381.fields.Fp2.ZERO>;
 
 export const PUBLIC_KEY_LENGTH = 48;
+export const SECRET_KEY_LENGTH = 32;
 export const SIGNATURE_LENGTH = 96;
 
 const signatureDST = 'BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_';
@@ -18,7 +19,9 @@ export function secretKeyFromBytes(skBytes: Uint8Array | string): SecretKey {
 }
 
 export function secretKeyToBytes(sk: SecretKey): Uint8Array {
-  return hexToBuffer(sk.toString(16));
+  // A scalar's hex representation drops leading zeros, so pad to the full
+  // width rather than emitting a short key that will not round trip.
+  return toFixedWidthBytes(sk, SECRET_KEY_LENGTH, 'secret key');
 }
 
 export function publicKeyFromBytes(pkBytes: Uint8Array | string): PublicKey {
