@@ -1,8 +1,17 @@
 import { customInspectSymbol } from '../../constants/node';
-import { bufferToBigInt, hexToBuffer, padLeft } from '../../utils/buffer';
+import {
+  bufferToBigInt,
+  requireBytes,
+  toFixedWidthBytes,
+} from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
+
+/**
+ * Number of bytes per bigint.
+ */
+export const BIGINT_LEN = 8;
 
 // typescript doesn't like BigInt as a class name
 @serializable()
@@ -17,7 +26,11 @@ export class BigIntPr extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [BigIntPr, Uint8Array] {
-    return [new BigIntPr(bufferToBigInt(buf.slice(0, 8))), buf.slice(8)];
+    requireBytes(buf, BIGINT_LEN, 'BigIntPr');
+    return [
+      new BigIntPr(bufferToBigInt(buf.slice(0, BIGINT_LEN))),
+      buf.slice(BIGINT_LEN),
+    ];
   }
 
   toJSON() {
@@ -25,7 +38,7 @@ export class BigIntPr extends Primitives {
   }
 
   toBytes() {
-    return padLeft(hexToBuffer(this.bigint.toString(16)), 8);
+    return toFixedWidthBytes(this.bigint, BIGINT_LEN, 'BigIntPr');
   }
 
   value(): bigint {

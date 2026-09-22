@@ -1,6 +1,6 @@
 import { bytesToString } from '@scure/base';
 import { bytesForInt } from '../../fixtures/utils/bytesFor';
-import { bufferToHex, concatBytes } from '../../utils/buffer';
+import { bufferToHex, concatBytes, requireBytes } from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Int } from './int';
 import { Primitives } from './primatives';
@@ -23,11 +23,12 @@ export class Bytes extends Primitives {
 
   static fromBytes(buf: Uint8Array): [Bytes, Uint8Array] {
     const [len, remaining] = Int.fromBytes(buf);
+    const length = len.value();
+    // The length prefix is attacker controlled, so reject a payload that
+    // declares more bytes than it carries rather than silently truncating.
+    requireBytes(remaining, length, 'Bytes');
 
-    return [
-      new Bytes(remaining.slice(0, len.value())),
-      remaining.slice(len.value()),
-    ];
+    return [new Bytes(remaining.slice(0, length)), remaining.slice(length)];
   }
 
   toBytes() {

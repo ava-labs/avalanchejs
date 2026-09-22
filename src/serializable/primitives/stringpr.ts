@@ -1,7 +1,11 @@
-import { concatBytes, hexToBuffer, padLeft } from '../../utils/buffer';
+import {
+  concatBytes,
+  requireBytes,
+  toFixedWidthBytes,
+} from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
-import { Short } from './short';
+import { Short, SHORT_LEN } from './short';
 import { TypeSymbols } from '../constants';
 
 @serializable()
@@ -13,11 +17,12 @@ export class Stringpr extends Primitives {
 
   static fromBytes(buf: Uint8Array): [Stringpr, Uint8Array] {
     const [length, remaining] = Short.fromBytes(buf);
+    const byteLength = length.value();
+    requireBytes(remaining, byteLength, 'Stringpr');
+
     return [
-      new Stringpr(
-        new TextDecoder().decode(remaining.slice(0, length.value())),
-      ),
-      remaining.slice(length.value()),
+      new Stringpr(new TextDecoder().decode(remaining.slice(0, byteLength))),
+      remaining.slice(byteLength),
     ];
   }
 
@@ -26,9 +31,13 @@ export class Stringpr extends Primitives {
   }
 
   toBytes() {
+    // The length prefix counts UTF-8 bytes, which is not the same as
+    // `string.length` (UTF-16 code units) for any non-ASCII character.
+    const encoded = new TextEncoder().encode(this.string);
+
     return concatBytes(
-      padLeft(hexToBuffer(this.string.length.toString(16)), 2),
-      new TextEncoder().encode(this.string),
+      toFixedWidthBytes(encoded.length, SHORT_LEN, 'Stringpr length'),
+      encoded,
     );
   }
 

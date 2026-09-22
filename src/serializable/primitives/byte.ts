@@ -1,7 +1,12 @@
-import { bufferToHex } from '../../utils/buffer';
+import { bufferToHex, padLeftStrict, requireBytes } from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
+
+/**
+ * Number of bytes per byte.
+ */
+export const BYTE_LEN = 1;
 
 @serializable()
 export class Byte extends Primitives {
@@ -11,7 +16,8 @@ export class Byte extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Byte, Uint8Array] {
-    return [new Byte(buf.slice(0, 1)), buf.slice(1)];
+    requireBytes(buf, BYTE_LEN, 'Byte');
+    return [new Byte(buf.slice(0, BYTE_LEN)), buf.slice(BYTE_LEN)];
   }
 
   toJSON() {
@@ -19,6 +25,6 @@ export class Byte extends Primitives {
   }
 
   toBytes() {
-    return this.byte;
+    return padLeftStrict(this.byte, BYTE_LEN, 'Byte');
   }
 }

@@ -1,4 +1,8 @@
-import { bufferToNumber, hexToBuffer, padLeft } from '../../utils/buffer';
+import {
+  bufferToNumber,
+  requireBytes,
+  toFixedWidthBytes,
+} from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
@@ -16,6 +20,7 @@ export class Short extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Short, Uint8Array] {
+    requireBytes(buf, SHORT_LEN, 'Short');
     return [
       new Short(bufferToNumber(buf.slice(0, SHORT_LEN))),
       buf.slice(SHORT_LEN),
@@ -27,7 +32,7 @@ export class Short extends Primitives {
   }
 
   toBytes() {
-    return padLeft(hexToBuffer(this.short.toString(16)), SHORT_LEN);
+    return toFixedWidthBytes(this.short, SHORT_LEN, 'Short');
   }
 
   value() {

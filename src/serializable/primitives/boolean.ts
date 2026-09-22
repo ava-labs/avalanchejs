@@ -1,4 +1,4 @@
-import { bufferToBool, hexToBuffer, padLeft } from '../../utils/buffer';
+import { requireBytes, toFixedWidthBytes } from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
@@ -16,10 +16,17 @@ export class Bool extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Bool, Uint8Array] {
-    return [
-      new Bool(bufferToBool(buf.slice(0, BOOL_LEN))),
-      buf.slice(BOOL_LEN),
-    ];
+    requireBytes(buf, BOOL_LEN, 'Bool');
+    const value = buf[0];
+
+    // Only 0 and 1 are canonical. Treating any other byte as false meant a
+    // non-canonical encoding decoded silently and re-serialized to different
+    // bytes, invalidating any signature taken over the original.
+    if (value > 1) {
+      throw new Error(`invalid bool: expected 0 or 1, got ${value}`);
+    }
+
+    return [new Bool(value === 1), buf.slice(BOOL_LEN)];
   }
 
   toJSON() {
@@ -27,7 +34,7 @@ export class Bool extends Primitives {
   }
 
   toBytes() {
-    return padLeft(hexToBuffer(this.bool ? '1' : '0'), BOOL_LEN);
+    return toFixedWidthBytes(this.bool ? 1 : 0, BOOL_LEN, 'Bool');
   }
 
   value() {

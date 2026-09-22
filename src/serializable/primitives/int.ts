@@ -1,5 +1,9 @@
 import { customInspectSymbol } from '../../constants/node';
-import { bufferToNumber, hexToBuffer, padLeft } from '../../utils/buffer';
+import {
+  bufferToNumber,
+  requireBytes,
+  toFixedWidthBytes,
+} from '../../utils/buffer';
 import { serializable } from '../common/types';
 import { Primitives } from './primatives';
 import { TypeSymbols } from '../constants';
@@ -17,6 +21,7 @@ export class Int extends Primitives {
   }
 
   static fromBytes(buf: Uint8Array): [Int, Uint8Array] {
+    requireBytes(buf, INT_LEN, 'Int');
     return [new Int(bufferToNumber(buf.slice(0, INT_LEN))), buf.slice(INT_LEN)];
   }
 
@@ -29,7 +34,7 @@ export class Int extends Primitives {
   }
 
   toBytes() {
-    return padLeft(hexToBuffer(this.int.toString(16)), INT_LEN);
+    return toFixedWidthBytes(this.int, INT_LEN, 'Int');
   }
 
   value() {
