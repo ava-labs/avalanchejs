@@ -47,17 +47,25 @@ describe('linear-time deserialisation', () => {
   });
 
   it('scales linearly, not quadratically, with input size', () => {
-    const time = (count: number) => {
+    // Timing ratios are noisy: a single run is dominated by JIT warmup and GC,
+    // which made this assertion flake ~17% of the time. Take the minimum of
+    // several runs — the minimum is the least contaminated estimator, since
+    // interference can only ever make a run slower.
+    const fastest = (count: number, runs = 5) => {
       const bytes = sigIndexListBytes(count);
-      const started = performance.now();
-      Input.fromBytes(bytes);
-      return performance.now() - started;
+      let best = Infinity;
+      for (let i = 0; i < runs; i++) {
+        const started = performance.now();
+        Input.fromBytes(bytes);
+        best = Math.min(best, performance.now() - started);
+      }
+      return best;
     };
 
-    time(16_384); // warm up
+    fastest(16_384, 3); // warm up the JIT before measuring
 
-    const small = time(65_536);
-    const large = time(262_144); // 4x the elements
+    const small = fastest(65_536);
+    const large = fastest(262_144); // 4x the elements
 
     // Linear predicts ~4x (measured 3.3x), quadratic ~16x (measured 13.5x).
     // 8x separates them with room for jitter in both directions.
