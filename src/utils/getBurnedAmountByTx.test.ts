@@ -7,7 +7,7 @@ import { newExportTxFromBaseFee, newImportTxFromBaseFee } from '../vms/evm';
 import { getBurnedAmountByTx } from './getBurnedAmountByTx';
 import { testContext } from '../fixtures/context';
 import { testEthAddress1, testAddress1, testAddress2 } from '../fixtures/vms';
-import { id, nodeId } from '../fixtures/common';
+import { id, idFromLabel, nodeId } from '../fixtures/common';
 import { Utxo } from '../serializable/avax/utxo';
 import { OutputOwners, TransferOutput } from '../serializable/fxs/secp256k1';
 import { Address, Id } from '../serializable/fxs/common';
@@ -35,7 +35,6 @@ import { feeState, l1Validator } from '../fixtures/pvm';
 import {
   bigIntPr,
   blsSignatureBytes,
-  stringPr,
   warpMessageBytes,
 } from '../fixtures/primitives';
 import { checkFeeIsCorrect } from '../vms/pvm/etna-builder/utils/feeForTesting';
@@ -84,7 +83,7 @@ describe('getBurnedAmountByTx', () => {
         testContext,
         baseFee,
         1000000000n,
-        'X',
+        testContext.xBlockchainID,
         testEthAddress1,
         [testAddress1],
         1n,
@@ -107,7 +106,7 @@ describe('getBurnedAmountByTx', () => {
         testEthAddress1,
         [testAddress1],
         [utxo1, utxo2],
-        'X',
+        testContext.xBlockchainID,
         baseFee,
       );
 
@@ -210,7 +209,7 @@ describe('getBurnedAmountByTx', () => {
 
         const tx = avmExportTx(
           testContext,
-          'P',
+          testContext.pBlockchainID,
           [testAddress1],
           [utxo1, utxo2],
           [output],
@@ -232,7 +231,7 @@ describe('getBurnedAmountByTx', () => {
 
         const tx = avmExportTx(
           testContext,
-          'P',
+          testContext.pBlockchainID,
           [testAddress1],
           [utxo],
           [output1, output2, output3],
@@ -255,7 +254,7 @@ describe('getBurnedAmountByTx', () => {
 
         const tx = avmExportTx(
           testContext,
-          'P',
+          testContext.pBlockchainID,
           [testAddress1],
           [utxo1, utxo2],
           [output1, output2, output3],
@@ -277,7 +276,7 @@ describe('getBurnedAmountByTx', () => {
 
         const tx = avmImportTx(
           testContext,
-          'P',
+          testContext.pBlockchainID,
           [utxo1, utxo2],
           [testAddress2],
           [testAddress1],
@@ -301,7 +300,7 @@ describe('getBurnedAmountByTx', () => {
 
         const unsignedTx = pvmExportTx(
           {
-            destinationChainId: 'C',
+            destinationChainId: testContext.cBlockchainID,
             fromAddressesBytes: [testAddress1],
             utxos: [utxo1, utxo2],
             outputs: [output],
@@ -332,7 +331,7 @@ describe('getBurnedAmountByTx', () => {
 
         const unsignedTx = pvmExportTx(
           {
-            destinationChainId: 'C',
+            destinationChainId: testContext.cBlockchainID,
             fromAddressesBytes: [testAddress1],
             utxos: [utxo],
             outputs: [output1, output2, output3],
@@ -364,7 +363,7 @@ describe('getBurnedAmountByTx', () => {
 
         const unsignedTx = pvmExportTx(
           {
-            destinationChainId: 'C',
+            destinationChainId: testContext.cBlockchainID,
             fromAddressesBytes: [testAddress1],
             utxos: [utxo1, utxo2],
             outputs: [output1, output2, output3],
@@ -395,7 +394,7 @@ describe('getBurnedAmountByTx', () => {
 
         const unsignedTx = pvmImportTx(
           {
-            sourceChainId: 'C',
+            sourceChainId: testContext.cBlockchainID,
             utxos: [utxo1, utxo2],
             toAddressesBytes: [testAddress2],
             fromAddressesBytes: [testAddress1],
@@ -461,7 +460,7 @@ describe('getBurnedAmountByTx', () => {
             nodeId: nodeId().toString(),
             start: 0n,
             subnetAuth: [0],
-            subnetId: 'subnet',
+            subnetId: idFromLabel('subnet').toString(),
             utxos: [utxo1, utxo2],
             weight,
           },
@@ -536,7 +535,7 @@ describe('getBurnedAmountByTx', () => {
         fromAddressesBytes: [testAddress1],
         utxos: [utxo1, utxo2],
         balance: bigIntPr().value(),
-        validationId: stringPr().value(),
+        validationId: idFromLabel('validation').toString(),
       },
       testContext,
     ).getTx() as AvaxTx;

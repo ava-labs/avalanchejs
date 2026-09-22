@@ -1,5 +1,5 @@
 import { customInspectSymbol } from '../../../constants/node';
-import { base58check } from '../../../utils/base58';
+import { base58check, decodeBase58Check } from '../../../utils/base58';
 import {
   hexToBuffer,
   padLeftStrict,
@@ -48,9 +48,16 @@ export class Id extends Primitives {
   }
 
   static fromString(str: string) {
-    // Not routed through fromBytes: that decodes a wire buffer and requires a
-    // full width Id, whereas a base58check string drops leading zero bytes.
-    return new Id(padLeftStrict(base58check.decode(str), ID_LEN, 'Id'));
+    // Bounded and exact: decodeBase58Check rejects an oversized string before
+    // paying the quadratic base58 decode, verifies the checksum, and requires
+    // exactly ID_LEN bytes.
+    //
+    // No padding is needed here. base58 encodes each leading zero byte as a
+    // '1', so a genuine CB58 identifier always decodes back to the full 32
+    // bytes (the all-zero PlatformChainID included) — only the *string* gets
+    // shorter. Left padding a short payload would therefore silently repair a
+    // truncated identifier into a different, valid-looking one.
+    return new Id(decodeBase58Check(str, ID_LEN));
   }
 
   static fromHex(hex: string): Id {

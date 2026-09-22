@@ -33,10 +33,10 @@ describe('getOutputOwners', () => {
   function makeUtxo(output: ConstructorParameters<typeof Utxo>[2]) {
     return new Utxo(
       UTXOID.fromNative(
-        '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1',
+        '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa',
         0,
       ),
-      Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1'),
+      Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa'),
       output,
     );
   }
@@ -78,10 +78,10 @@ describe('getUtxoInfo', () => {
     (_label, makeOutput) => {
       const utxo = new Utxo(
         UTXOID.fromNative(
-          '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1',
+          '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa',
           0,
         ),
-        Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1'),
+        Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa'),
         makeOutput(),
       );
 
@@ -96,10 +96,10 @@ describe('getUtxoInfo', () => {
     const output = secpTransferOutput();
     const utxo = new Utxo(
       UTXOID.fromNative(
-        '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1',
+        '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa',
         0,
       ),
-      Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1'),
+      Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa'),
       output,
     );
 
@@ -115,10 +115,10 @@ describe('nftfx UTXO through the AVM codec', () => {
     const manager = getAVMManager();
     const utxo = new Utxo(
       UTXOID.fromNative(
-        '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1',
+        '2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa',
         1,
       ),
-      Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCLTX4a1'),
+      Id.fromString('2QouvFWUbjuySRxeX5xMbue4WeWDHDyMySwE9YeQNJzCKxFyRa'),
       nftTransferOutput(),
     );
 

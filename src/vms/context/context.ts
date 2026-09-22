@@ -1,8 +1,31 @@
 import { InfoApi } from '../../info';
 import { getHRP } from '../../constants/networkIDs';
+import { Id } from '../../serializable/fxs/common/id';
 import { AVMApi } from '../avm/api';
 import { PVMApi } from '../pvm';
 import type { Context } from './model';
+
+/**
+ * Rejects an identifier the node did not return in a usable form.
+ *
+ * The node is untrusted, and these strings are frozen into the Context that
+ * every builder reuses for the life of the session. They are decoded on every
+ * transaction build, so an unusable one must fail here, once, rather than on
+ * each builder call. Decoding also bounds the string: base58 decoding is
+ * quadratic in the input length, so a multi-hundred-KB "blockchainID" would
+ * otherwise block the JS thread on every build.
+ */
+const requireValidId = (value: string, field: string): string => {
+  try {
+    Id.fromString(value);
+  } catch (error) {
+    throw new Error(
+      `node returned an invalid ${field}: ${(error as Error).message}`,
+    );
+  }
+
+  return value;
+};
 
 /*
 grabs some basic info about an avm chain
@@ -29,10 +52,10 @@ export const getContextFromURI = async (
   const platformFeeConfig = await pChainApi.getFeeConfig();
 
   return Object.freeze({
-    xBlockchainID,
-    pBlockchainID,
-    cBlockchainID,
-    avaxAssetID,
+    xBlockchainID: requireValidId(xBlockchainID, 'xBlockchainID'),
+    pBlockchainID: requireValidId(pBlockchainID, 'pBlockchainID'),
+    cBlockchainID: requireValidId(cBlockchainID, 'cBlockchainID'),
+    avaxAssetID: requireValidId(avaxAssetID, 'avaxAssetID'),
     baseTxFee: txFee,
     createAssetTxFee: createAssetTxFee,
     networkID,

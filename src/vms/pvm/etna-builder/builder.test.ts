@@ -1,3 +1,4 @@
+import { idFromLabel } from '../../../fixtures/common';
 import { testContext } from '../../../fixtures/context';
 import { describe, test, expect, it } from 'vitest';
 
@@ -994,10 +995,10 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         getValidUtxo(new BigIntPr(BigInt(35 * 1e9)), testAvaxAssetID),
         getValidUtxo(new BigIntPr(BigInt(28 * 1e9)), testAvaxAssetID),
         // Non-AVAX Assets (Jupiter)
-        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), Id.fromString('jupiter')),
-        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), Id.fromString('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), idFromLabel('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), idFromLabel('jupiter')),
         // Non-AVAX Asset (Mars)
-        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
+        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), idFromLabel('mars')),
       ];
 
       const unsignedTx = newImportTx(
@@ -1256,7 +1257,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
     it('should create an IncreaseL1ValidatorBalanceTx', () => {
       const validUtxoAmount = BigInt(30 * 1e9);
       const balance = BigInt(1 * 1e9);
-      const validationId = 'test';
+      const validationId = idFromLabel('validation').toString();
 
       const utxos = [
         getLockedUTXO(), // Locked and should be ignored.
@@ -1264,10 +1265,10 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         // AVAX Assets
         getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
         // Non-AVAX Assets (Jupiter)
-        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), Id.fromString('jupiter')),
-        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), Id.fromString('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), idFromLabel('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), idFromLabel('jupiter')),
         // Non-AVAX Asset (Mars)
-        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
+        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), idFromLabel('mars')),
       ];
 
       const unsignedTx = newIncreaseL1ValidatorBalanceTx(
@@ -1311,7 +1312,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
   });
 
   it('should throw an error if the balance is less than or equal to 0', () => {
-    const validationId = 'test';
+    const validationId = idFromLabel('validation').toString();
     const utxos = testUtxos();
 
     expect(() => {
@@ -1344,7 +1345,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
   describe('DisableL1ValidatorTx', () => {
     it('should create a DisabledSubnetValidatorTx', () => {
       const validUtxoAmount = BigInt(30 * 1e9);
-      const validationId = 'test';
+      const validationId = idFromLabel('validation').toString();
 
       const utxos = [
         getLockedUTXO(), // Locked and should be ignored.
@@ -1352,10 +1353,10 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
         // AVAX Assets
         getValidUtxo(new BigIntPr(validUtxoAmount), testAvaxAssetID),
         // Non-AVAX Assets (Jupiter)
-        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), Id.fromString('jupiter')),
-        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), Id.fromString('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(15 * 1e9)), idFromLabel('jupiter')),
+        getValidUtxo(new BigIntPr(BigInt(11 * 1e9)), idFromLabel('jupiter')),
         // Non-AVAX Asset (Mars)
-        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), Id.fromString('mars')),
+        getValidUtxo(new BigIntPr(BigInt(9 * 1e9)), idFromLabel('mars')),
       ];
 
       const unsignedTx = newDisableL1ValidatorTx(
@@ -1464,7 +1465,7 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
   describe('SetAutoRenewedValidatorConfigTx', () => {
     it('should create a SetAutoRenewedValidatorConfigTx', () => {
       const utxoInputAmt = AvaxToNAvax(2);
-      const validatorTxId = 'test';
+      const validatorTxId = idFromLabel('validatorTx').toString();
       const auth = [0, 1];
       const autoCompoundRewardShares = 750_000;
       const period = 2_419_200n; // 28 days in seconds

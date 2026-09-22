@@ -1,3 +1,5 @@
+import { sha256 } from '@noble/hashes/sha256';
+import { utf8ToBytes } from '@noble/hashes/utils';
 import { Address } from '../serializable/fxs/common/address';
 import { Id } from '../serializable/fxs/common/id';
 import { NodeId } from '../serializable/fxs/common/nodeId';
@@ -43,3 +45,15 @@ export const addressesBytes = () =>
   ]);
 
 export const addresses = () => makeList(address);
+
+/**
+ * A valid, deterministic {@link Id} derived from a human readable label.
+ *
+ * Tests want distinct, recognisable asset/chain IDs. They cannot spell them as
+ * `Id.fromString('jupiter')`: that is not a real CB58 identifier, and
+ * Id.fromString now rejects a payload that is not exactly 32 bytes with a
+ * matching checksum. Hashing the label keeps the readability and produces a
+ * genuine identifier.
+ */
+export const idFromLabel = (label: string): Id =>
+  Id.fromBytes(sha256(utf8ToBytes(label)))[0];

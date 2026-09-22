@@ -1,5 +1,5 @@
 import { customInspectSymbol } from '../../../constants/node';
-import { base58check } from '../../../utils/base58';
+import { base58check, decodeBase58Check } from '../../../utils/base58';
 import {
   hexToBuffer,
   padLeftStrict,
@@ -48,14 +48,12 @@ export class NodeId extends Primitives {
     if (!str.includes(NodeIDPrefix)) {
       throw new Error('ID is missing prefix');
     }
-    // Not routed through fromBytes: that decodes a wire buffer and requires a
-    // full width NodeId, whereas a base58check string drops leading zero bytes.
+    // Bounded and exact, for the same reasons as Id.fromString: a NodeID that
+    // decodes to the wrong width must be rejected, not silently reshaped into
+    // a different node's ID and staked under. No padding — base58 preserves
+    // leading zero bytes, so a genuine NodeID always decodes to 20 bytes.
     return new NodeId(
-      padLeftStrict(
-        base58check.decode(str.replace(NodeIDPrefix, '')),
-        SHORT_ID_LEN,
-        'NodeId',
-      ),
+      decodeBase58Check(str.replace(NodeIDPrefix, ''), SHORT_ID_LEN),
     );
   }
 

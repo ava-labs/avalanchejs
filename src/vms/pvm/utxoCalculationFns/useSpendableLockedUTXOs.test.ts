@@ -1,4 +1,4 @@
-import { Id } from '../../../serializable/fxs/common';
+import { idFromLabel } from '../../../fixtures/common';
 import { describe, it, expect } from 'vitest';
 
 import { testContext } from '../../../fixtures/context';
@@ -123,7 +123,7 @@ describe('src/vms/pvm/spend/useSpendableLockedUTXOs.spec.ts', () => {
           testUTXOID1,
           stakeableUtxoAmt2,
           undefined,
-          Id.fromString('1'),
+          idFromLabel('1'),
         ),
       ],
       fromAddresses: addressesFromBytes(fromAddressBytes),

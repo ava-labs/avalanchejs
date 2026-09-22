@@ -52,7 +52,7 @@ describe('validateStaticBurnedAmount', () => {
       name: 'export from X',
       unsignedTx: avmExportTx(
         testContext,
-        'P',
+        testContext.pBlockchainID,
         [testAddress1],
         [utxoMock],
         [outputMock],
@@ -63,7 +63,7 @@ describe('validateStaticBurnedAmount', () => {
       name: 'import from X',
       unsignedTx: avmImportTx(
         testContext,
-        'P',
+        testContext.pBlockchainID,
         [utxoMock],
         [testAddress2],
         [testAddress1],

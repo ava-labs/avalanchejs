@@ -1,3 +1,4 @@
+import { idFromLabel } from '../../../../fixtures/common';
 import { testContext } from '../../../../fixtures/context';
 import { describe, test, expect, it } from 'vitest';
 
@@ -16,7 +17,6 @@ import {
 import {
   Address,
   BigIntPr,
-  Id,
   Int,
   TransferableOutput,
 } from '../../../../serializable';
@@ -132,7 +132,7 @@ describe('useUnlockedUTXOs', () => {
       toStake,
       utxos: [
         getValidUtxo(new BigIntPr(10_000n)),
-        getValidUtxo(new BigIntPr(5_000n), Id.fromString('testasset')),
+        getValidUtxo(new BigIntPr(5_000n), idFromLabel('testasset')),
       ],
     });
 
@@ -148,8 +148,8 @@ describe('useUnlockedUTXOs', () => {
   });
 
   it('should consume other verified usable UTXOs with a toBurn or toStake match', () => {
-    const testAssetId = Id.fromString('testasset');
-    const testAssetId2 = Id.fromString('testasset2');
+    const testAssetId = idFromLabel('testasset');
+    const testAssetId2 = idFromLabel('testasset2');
     const toBurn = new Map([
       [testContext.avaxAssetID, 4_900n],
       [testAssetId.toString(), 1_900n],

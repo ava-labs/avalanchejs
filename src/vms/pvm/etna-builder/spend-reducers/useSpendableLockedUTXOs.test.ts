@@ -1,3 +1,4 @@
+import { idFromLabel } from '../../../../fixtures/common';
 import { testContext } from '../../../../fixtures/context';
 import { describe, test, expect, it } from 'vitest';
 
@@ -17,7 +18,6 @@ import {
 import {
   Address,
   BigIntPr,
-  Id,
   Int,
   TransferableOutput,
 } from '../../../../serializable';
@@ -60,7 +60,7 @@ describe('useSpendableLockedUTXOs', () => {
     });
 
     test('returns `true` if UTXO output is a stakeable lockout with valid locktime and used in toStake', () => {
-      const testAssetId = Id.fromString('testasset');
+      const testAssetId = idFromLabel('testasset');
 
       const state = getInitialReducerState({
         minIssuanceTime: 100n,

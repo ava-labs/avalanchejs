@@ -1,4 +1,9 @@
-import { base58, base58check } from './base58';
+import {
+  base58,
+  base58check,
+  decodeBase58Check,
+  maxBase58Length,
+} from './base58';
 import { describe, it, expect } from 'vitest';
 
 describe('base58', () => {
@@ -47,6 +52,61 @@ describe('base58', () => {
       expect(base58.decode(string)).toEqual(buffer);
       expect(base58check.encode(buffer)).toEqual(checksum);
       expect(base58check.decode(checksum)).toEqual(buffer);
+    }
+  });
+});
+
+describe('base58check integrity', () => {
+  // A genuine 32-byte identifier, produced by the encoder itself.
+  const valid = base58check.encode(new Uint8Array(32).fill(7));
+
+  it('rejects a string whose checksum does not match the payload', () => {
+    // Flip one character of the payload. Base58-decodes fine, but the
+    // trailing 4 bytes no longer equal sha256(payload)[-4:]. Before the
+    // checksum was verified this silently produced a *different* 32-byte id,
+    // which then got embedded in a transaction the user signs.
+    const corrupted = (valid[0] === 'a' ? 'b' : 'a') + valid.slice(1);
+
+    expect(() => base58check.decode(corrupted)).toThrow(/checksum mismatch/);
+  });
+
+  it('rejects a string that decodes to fewer bytes than the checksum', () => {
+    // '' and '1' previously yielded an empty payload, which Id zero-extended
+    // into the all-zero id, i.e. the Primary Network / P-Chain ID.
+    expect(() => base58check.decode('')).toThrow(/at least 4/);
+    expect(() => base58check.decode('1')).toThrow(/at least 4/);
+  });
+
+  it('round-trips a valid payload unchanged', () => {
+    const payload = new Uint8Array(32).fill(7);
+    expect(base58check.decode(base58check.encode(payload))).toEqual(payload);
+  });
+});
+
+describe('decodeBase58Check bounds', () => {
+  it('rejects an oversized string before decoding it', () => {
+    // base58 decoding is O(n^2) in the string length, so an unbounded
+    // node- or dApp-supplied identifier lets the attacker choose how long the
+    // single JS thread blocks. The length check must run *before* the decode.
+    const huge = 'z'.repeat(50_000);
+
+    const started = Date.now();
+    expect(() => decodeBase58Check(huge, 32)).toThrow(/expected at most/);
+    // Unbounded, decoding 200k base58 characters takes many seconds.
+    expect(Date.now() - started).toBeLessThan(1_000);
+  });
+
+  it('rejects a payload that is not the expected width', () => {
+    const twentyBytes = base58check.encode(new Uint8Array(20).fill(3));
+
+    expect(() => decodeBase58Check(twentyBytes, 32)).toThrow(/expected 32/);
+    expect(decodeBase58Check(twentyBytes, 20)).toHaveLength(20);
+  });
+
+  it('maxBase58Length bounds the real encoder', () => {
+    for (const width of [20, 24, 32, 36]) {
+      const encoded = base58.encode(new Uint8Array(width).fill(0xff));
+      expect(encoded.length).toBeLessThanOrEqual(maxBase58Length(width));
     }
   });
 });
