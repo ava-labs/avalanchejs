@@ -17,6 +17,13 @@ export const unpackList = <T extends SerializableStatic>(
   return unpackListForEach(buf, serializable.fromBytes, codec);
 };
 
+/**
+ * Reads `len` elements, where `len` is declared by the message itself.
+ *
+ * The loop is bounded by the buffer emptying rather than by `len`, and each
+ * element parser consumes in O(1) (see {@link unpack}), so total work stays
+ * linear in the input even when the declared count is enormous.
+ */
 export const unpackListForEach = <T extends unpackFunc>(
   buf: Uint8Array,
   callback: T,

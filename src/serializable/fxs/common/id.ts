@@ -24,7 +24,7 @@ export class Id extends Primitives {
 
   static fromBytes(buf: Uint8Array): [Id, Uint8Array] {
     requireBytes(buf, ID_LEN, 'Id');
-    return [new Id(buf.slice(0, ID_LEN)), buf.slice(ID_LEN)];
+    return [new Id(buf.slice(0, ID_LEN)), buf.subarray(ID_LEN)];
   }
 
   static compare(id1: Id, id2: Id): number {

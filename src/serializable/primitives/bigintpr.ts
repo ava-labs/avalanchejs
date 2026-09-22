@@ -29,7 +29,7 @@ export class BigIntPr extends Primitives {
     requireBytes(buf, BIGINT_LEN, 'BigIntPr');
     return [
       new BigIntPr(bufferToBigInt(buf.slice(0, BIGINT_LEN))),
-      buf.slice(BIGINT_LEN),
+      buf.subarray(BIGINT_LEN),
     ];
   }
 

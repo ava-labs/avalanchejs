@@ -17,6 +17,16 @@ export type ReturnTypes<T extends readonly any[]> = {
   [i in keyof T]: FromBytesReturn<T[i]>;
 };
 
+/**
+ * Reads a fixed sequence of fields from `buffer`.
+ *
+ * Invariant every `fromBytes` must uphold: consuming a field is O(1) in the
+ * size of the unread remainder. Each one returns the remainder as a `subarray`
+ * view, never a copying `slice`. A copy per field would make parsing an
+ * n-byte message of m fields cost O(n*m) — and the message itself declares m,
+ * so a single multi-MiB input of 4-byte fields would block the thread for
+ * minutes.
+ */
 export function unpack<O extends readonly any[]>(
   buffer: Uint8Array,
   sers: O,

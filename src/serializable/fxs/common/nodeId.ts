@@ -25,7 +25,7 @@ export class NodeId extends Primitives {
 
   static fromBytes(buf: Uint8Array): [NodeId, Uint8Array] {
     requireBytes(buf, SHORT_ID_LEN, 'NodeId');
-    return [new NodeId(buf.slice(0, SHORT_ID_LEN)), buf.slice(SHORT_ID_LEN)];
+    return [new NodeId(buf.slice(0, SHORT_ID_LEN)), buf.subarray(SHORT_ID_LEN)];
   }
 
   [customInspectSymbol](_, options: any) {

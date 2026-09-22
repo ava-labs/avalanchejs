@@ -26,7 +26,7 @@ export class Bool extends Primitives {
       throw new Error(`invalid bool: expected 0 or 1, got ${value}`);
     }
 
-    return [new Bool(value === 1), buf.slice(BOOL_LEN)];
+    return [new Bool(value === 1), buf.subarray(BOOL_LEN)];
   }
 
   toJSON() {

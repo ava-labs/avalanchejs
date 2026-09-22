@@ -30,7 +30,7 @@ export class Signature {
   static fromBytes(bytes: Uint8Array): [Signature, Uint8Array] {
     return [
       new Signature(bytes.slice(0, SepkSignatureLength)),
-      bytes.slice(SepkSignatureLength),
+      bytes.subarray(SepkSignatureLength),
     ];
   }
 

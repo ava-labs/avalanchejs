@@ -21,8 +21,8 @@ export class Stringpr extends Primitives {
     requireBytes(remaining, byteLength, 'Stringpr');
 
     return [
-      new Stringpr(new TextDecoder().decode(remaining.slice(0, byteLength))),
-      remaining.slice(byteLength),
+      new Stringpr(new TextDecoder().decode(remaining.subarray(0, byteLength))),
+      remaining.subarray(byteLength),
     ];
   }
 

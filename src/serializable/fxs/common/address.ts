@@ -24,7 +24,7 @@ export class Address extends Primitives {
 
   static fromBytes(buf: Uint8Array): [Address, Uint8Array] {
     requireBytes(buf, ADDRESS_LEN, 'Address');
-    return [new Address(buf.slice(0, ADDRESS_LEN)), buf.slice(ADDRESS_LEN)];
+    return [new Address(buf.slice(0, ADDRESS_LEN)), buf.subarray(ADDRESS_LEN)];
   }
 
   [customInspectSymbol](_, options: any) {

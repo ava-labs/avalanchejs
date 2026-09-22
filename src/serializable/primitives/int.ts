@@ -22,7 +22,10 @@ export class Int extends Primitives {
 
   static fromBytes(buf: Uint8Array): [Int, Uint8Array] {
     requireBytes(buf, INT_LEN, 'Int');
-    return [new Int(bufferToNumber(buf.slice(0, INT_LEN))), buf.slice(INT_LEN)];
+    return [
+      new Int(bufferToNumber(buf.slice(0, INT_LEN))),
+      buf.subarray(INT_LEN),
+    ];
   }
 
   [customInspectSymbol]() {

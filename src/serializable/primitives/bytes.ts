@@ -28,7 +28,7 @@ export class Bytes extends Primitives {
     // declares more bytes than it carries rather than silently truncating.
     requireBytes(remaining, length, 'Bytes');
 
-    return [new Bytes(remaining.slice(0, length)), remaining.slice(length)];
+    return [new Bytes(remaining.slice(0, length)), remaining.subarray(length)];
   }
 
   toBytes() {

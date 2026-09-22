@@ -17,7 +17,7 @@ export class Byte extends Primitives {
 
   static fromBytes(buf: Uint8Array): [Byte, Uint8Array] {
     requireBytes(buf, BYTE_LEN, 'Byte');
-    return [new Byte(buf.slice(0, BYTE_LEN)), buf.slice(BYTE_LEN)];
+    return [new Byte(buf.slice(0, BYTE_LEN)), buf.subarray(BYTE_LEN)];
   }
 
   toJSON() {

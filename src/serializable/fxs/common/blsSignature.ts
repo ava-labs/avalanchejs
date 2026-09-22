@@ -26,7 +26,7 @@ export class BlsSignature extends Primitives {
   ): [blsSignature: BlsSignature, rest: Uint8Array] {
     const blsSignatureBytes = bytes.slice(0, SIGNATURE_LENGTH);
     const signature = signatureFromBytes(blsSignatureBytes);
-    const rest = bytes.slice(SIGNATURE_LENGTH);
+    const rest = bytes.subarray(SIGNATURE_LENGTH);
 
     return [new BlsSignature(signature), rest];
   }

@@ -23,7 +23,7 @@ export class Short extends Primitives {
     requireBytes(buf, SHORT_LEN, 'Short');
     return [
       new Short(bufferToNumber(buf.slice(0, SHORT_LEN))),
-      buf.slice(SHORT_LEN),
+      buf.subarray(SHORT_LEN),
     ];
   }
 

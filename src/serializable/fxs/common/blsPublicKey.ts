@@ -26,7 +26,7 @@ export class BlsPublicKey extends Primitives {
   ): [blsPublicKey: BlsPublicKey, rest: Uint8Array] {
     const blsPublicKeyBytes = bytes.slice(0, PUBLIC_KEY_LENGTH);
     const publicKey = publicKeyFromBytes(blsPublicKeyBytes);
-    const rest = bytes.slice(PUBLIC_KEY_LENGTH);
+    const rest = bytes.subarray(PUBLIC_KEY_LENGTH);
 
     return [new BlsPublicKey(publicKey), rest];
   }

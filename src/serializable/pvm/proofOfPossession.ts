@@ -31,7 +31,7 @@ export class ProofOfPossession {
       bls.PUBLIC_KEY_LENGTH,
       bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH,
     );
-    const rest = bytes.slice(bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH);
+    const rest = bytes.subarray(bls.PUBLIC_KEY_LENGTH + bls.SIGNATURE_LENGTH);
     return [new ProofOfPossession(pubkey, signature), rest];
   }
 
