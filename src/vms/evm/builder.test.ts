@@ -19,7 +19,8 @@ import { newExportTxFromBaseFee, newImportTxFromBaseFee } from './builder';
 describe('CorethBuilder', () => {
   const baseFee = 25n;
   const fromAddress = testOwnerXAddress.toBytes();
-  const toAddress = hexToBuffer('0x5432112345123451234512');
+  // a realistic 20 byte address; a short one is not a valid bech32 address
+  const toAddress = hexToBuffer('0x5432112345123451234512345123451234512345');
 
   it('exportTx', () => {
     const tx = newExportTxFromBaseFee(
@@ -70,7 +71,7 @@ describe('CorethBuilder', () => {
       [getTransferableInputForTest()],
       [
         new Output(
-          Address.fromString('C-avax12sepzg69zg69zg69zgmpqwf3'),
+          Address.fromString('C-avax12sepzg69zg69zg69zg69zg69zg69zg69l25vwz'),
           new BigIntPr(50000000000n),
           testAvaxAssetID,
         ),

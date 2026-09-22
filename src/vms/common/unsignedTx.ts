@@ -100,7 +100,19 @@ export class UnsignedTx {
   }
 
   hasPubkey(pubKey: Uint8Array) {
-    return this.hasAddress(new Address(this.publicKeyBytesToAddress(pubKey)));
+    return this.getAddressHexesForPubKey(pubKey).some((addressHex) =>
+      this.hasAddress(Address.fromHex(addressHex)),
+    );
+  }
+
+  /**
+   * The addresses a signature from `pubKey` is allowed to satisfy, as hex.
+   *
+   * Overridden for EVM txs, where a pubkey maps to both an AVAX and an eth
+   * style address.
+   */
+  protected getAddressHexesForPubKey(pubKey: Uint8Array): string[] {
+    return [new Address(this.publicKeyBytesToAddress(pubKey)).toHex()];
   }
 
   getAddresses() {
@@ -198,7 +210,7 @@ export class UnsignedTx {
     if (!hasNoPlaceholders) return false;
     let valid = true;
 
-    this.addressMaps.forEach((coordinates) => {
+    this.addressMaps.forEach((coordinates, addressHex) => {
       coordinates.forEach(([index, subIndex]) => {
         const sig = allSigsHex[index]?.[subIndex];
         if (!sig) {
@@ -206,7 +218,10 @@ export class UnsignedTx {
         }
         const sigBytes = hexToBuffer(sig);
         const publicKey = secp256k1.recoverPublicKey(unsignedHash, sigBytes);
-        if (!this.hasPubkey(publicKey)) {
+        // The signature must come from the address that owns this slot, not
+        // merely from some address on the tx, otherwise one signer's signature
+        // duplicated across slots would satisfy a multisig threshold.
+        if (!this.getAddressHexesForPubKey(publicKey).includes(addressHex)) {
           valid = false;
         }
       });
