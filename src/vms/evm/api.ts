@@ -5,6 +5,7 @@ import { Api } from '../common/baseApi';
 import { ChainApi } from '../common/chainAPI';
 import type { GetAtomicTxParams, GetAtomicTxStatusResponse } from './model';
 import type { GetAtomicTxServerResponse } from './privateModels';
+import { requireNonNegativeBigInt } from '../../utils/nodeFees';
 
 export class EVMApi extends ChainApi {
   ethAPI: EthereumAPI;
@@ -56,7 +57,20 @@ class EthereumAPI extends Api {
     super(baseURL, '/ext/bc/C/rpc');
   }
 
+  /**
+   * The C-chain base fee, as reported by the node.
+   *
+   * Unit: **wei**. The atomic-tx builders
+   * (`newExportTxFromBaseFee`/`newImportTxFromBaseFee`) expect **nAVAX**, so
+   * callers must divide by 1e9 before passing it on — see
+   * `examples/c-chain/export.ts`. A missed conversion multiplies the burn by
+   * 1e9. The value is multiplied straight into the amount debited from the
+   * caller's C-chain account, so bound it with the builders' `maxFee`.
+   */
   async getBaseFee() {
-    return BigInt(await this.callRpc<string>('eth_baseFee'));
+    return requireNonNegativeBigInt(
+      await this.callRpc<string>('eth_baseFee'),
+      'eth_baseFee',
+    );
   }
 }

@@ -7,6 +7,7 @@ import type { Utxo } from '../../serializable/avax/utxo';
 import { ExportTx, ImportTx } from '../../serializable/avm';
 import { Id } from '../../serializable/fxs/common';
 import { addressesFromBytes } from '../../utils';
+import { assertFeeWithinMax } from '../../utils/nodeFees';
 import { AddressMaps } from '../../utils/addressMap';
 import { getImportedInputsFromUtxos } from '../../utils/builderUtils';
 import { compareTransferableOutputs } from '../../utils/sort';
@@ -62,6 +63,12 @@ export function newImportTx(
     defaultedOptions.minIssuanceTime,
     fromAddressesBytes,
   );
+  assertFeeWithinMax(
+    context.baseTxFee,
+    defaultedOptions.maxFee,
+    'X-chain base tx fee',
+  );
+
   const importedAvax = importedAmounts[context.avaxAssetID] ?? 0n;
 
   let inputOutputs: UTXOCalculationResult = {
@@ -146,6 +153,14 @@ export function newExportTx(
 ) {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+  // context.baseTxFee is whatever avm.getTxFee reported; the AVM builders burn
+  // it outright and the excess is destroyed once the network accepts the tx.
+  assertFeeWithinMax(
+    context.baseTxFee,
+    defaultedOptions.maxFee,
+    'X-chain base tx fee',
+  );
+
   const toBurn = new Map<string, bigint>([
     [context.avaxAssetID, context.baseTxFee],
   ]);
@@ -193,6 +208,14 @@ export function newBaseTx(
 ) {
   const fromAddresses = addressesFromBytes(fromAddressesBytes);
   const defaultedOptions = defaultSpendOptions(fromAddressesBytes, options);
+  // context.baseTxFee is whatever avm.getTxFee reported; the AVM builders burn
+  // it outright and the excess is destroyed once the network accepts the tx.
+  assertFeeWithinMax(
+    context.baseTxFee,
+    defaultedOptions.maxFee,
+    'X-chain base tx fee',
+  );
+
   const toBurn = new Map<string, bigint>([
     [context.avaxAssetID, context.baseTxFee],
   ]);

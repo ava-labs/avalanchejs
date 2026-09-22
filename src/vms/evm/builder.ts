@@ -15,6 +15,7 @@ import { compareEVMOutputs } from '../../utils/sort';
 import { EVMUnsignedTx } from '../common/evmUnsignedTx';
 import type { UnsignedTx } from '../common/unsignedTx';
 import type { Context } from '../context';
+import { assertFeeWithinMax } from '../../utils/nodeFees';
 
 export type EVMExportOptions = {
   locktime: bigint;
@@ -33,7 +34,12 @@ const defaultEVMExportOptions = (
 
 /**
  * similar to new exportTX, except it estimates the price from base fee automatically
- * @param baseFee dynamic fee fetched from evmapi
+ * @param baseFee the C-chain base fee, **in nAVAX**.
+ *
+ * `EVMApi.getBaseFee()` returns **wei**, so convert before passing it here:
+ * `baseFee / BigInt(1e9)` (as `examples/c-chain/export.ts` and
+ * `examples/c-chain/import.ts` do). Passing the raw wei value multiplies the
+ * burned fee by 1e9.
  * @param amount amount to export
  * @param destinationChain chainID of the destination chain
  * @param fromAddress address that can sign this tx
@@ -53,6 +59,16 @@ export function newExportTxFromBaseFee(
   nonce: bigint,
   assetId?: string,
   options?: Partial<EVMExportOptions>,
+  /**
+   * Optional. The most AVAX, in nAVAX, this transaction may burn.
+   *
+   * The fee is `baseFee * costCorethTx(tx)`, and `baseFee` comes from the
+   * RPC node, which also serves your balance. Without a ceiling the node
+   * decides how much of your C-chain AVAX is destroyed, and
+   * validateBurnedAmount cannot detect it because it recomputes the
+   * expectation from the same baseFee.
+   */
+  maxFee?: bigint,
 ) {
   const fee = estimateExportCost(
     context,
@@ -65,6 +81,8 @@ export function newExportTxFromBaseFee(
     assetId,
     options,
   );
+
+  assertFeeWithinMax(fee, maxFee, 'C-chain atomic export fee');
 
   return newExportTx(
     context,
@@ -215,14 +233,16 @@ export function newExportTx(
   correct tx
   * @param toAddresses address on C-chain
   * @param fromAddress address that can sign this tx
-  * @param sourceChain chainID of the source chain
-   * @param baseFee dynamic fee fetched from evmapi
-   * @param feeAssetId the assetId that the fee is measured in. defaults to AVAX
-   * @returns UnsignedTx
-
-
-  basefee is in nAvax
-   */
+ * @param sourceChain chainID of the source chain
+ * @param baseFee the C-chain base fee, **in nAVAX**.
+ *
+ * `EVMApi.getBaseFee()` returns **wei**, so convert before passing it here:
+ * `baseFee / BigInt(1e9)` (as `examples/c-chain/export.ts` and
+ * `examples/c-chain/import.ts` do). Passing the raw wei value multiplies the
+ * burned fee by 1e9.
+ * @param feeAssetId the assetId that the fee is measured in. defaults to AVAX
+ * @returns UnsignedTx
+ */
 export function newImportTxFromBaseFee(
   context: Context,
   toAddress: Uint8Array,
@@ -231,6 +251,16 @@ export function newImportTxFromBaseFee(
   sourceChain: string,
   baseFee = 0n,
   feeAssetId?: string,
+  /**
+   * Optional. The most AVAX, in nAVAX, this transaction may burn.
+   *
+   * The fee is `baseFee * costCorethTx(tx)`, and `baseFee` comes from the
+   * RPC node, which also serves your balance. Without a ceiling the node
+   * decides how much of your C-chain AVAX is destroyed, and
+   * validateBurnedAmount cannot detect it because it recomputes the
+   * expectation from the same baseFee.
+   */
+  maxFee?: bigint,
 ) {
   const fee = estimateImportCost(
     context,
@@ -241,6 +271,8 @@ export function newImportTxFromBaseFee(
     baseFee,
     feeAssetId,
   );
+
+  assertFeeWithinMax(fee, maxFee, 'C-chain atomic import fee');
 
   return newImportTx(
     context,
@@ -259,7 +291,8 @@ export function newImportTxFromBaseFee(
  * @param fromAddressesBytes addresses that are able to sign utxos
  * @param atomics list of available utxos
  * @param sourceChain base58 id of the chain to import from
- * @param baseFee baseFee from EVMAPI.getBaseFee
+ * @param baseFee the C-chain base fee in nAVAX (EVMApi.getBaseFee() returns
+ * wei; divide by 1e9)
  * @param feeAssetId base58 ID of the asset to use for fee
  * @returns BigInt
  */

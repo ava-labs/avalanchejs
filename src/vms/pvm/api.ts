@@ -6,6 +6,10 @@ import { hexToBuffer, parse } from '../../utils';
 import type { GetAssetDescriptionResponse } from '../common/apiModels';
 import { AvaxApi } from '../common/avaxApi';
 import { createDimensions } from '../common/fees/dimensions';
+import {
+  requireNonNegativeBigInt,
+  requireNonNegativeInteger,
+} from '../../utils/nodeFees';
 import type {
   GetL1ValidatorResponse,
   L1ValidatorDetails,
@@ -245,28 +249,50 @@ export class PVMApi extends AvaxApi {
       excessConversionConstant,
     } = resp;
     const [bandwidth, dbRead, dbWrite, compute] = weights;
+
+    // These multiply transaction complexity into gas, and gas times the
+    // node's price is the AVAX burned. A negative or fractional weight would
+    // otherwise reach the arithmetic and either throw a bare RangeError deep
+    // inside dimensionsToGas or silently distort the fee.
     return {
       weights: createDimensions({
-        bandwidth,
-        dbRead,
-        dbWrite,
-        compute,
+        bandwidth: requireNonNegativeInteger(bandwidth, 'feeConfig.weights[0]'),
+        dbRead: requireNonNegativeInteger(dbRead, 'feeConfig.weights[1]'),
+        dbWrite: requireNonNegativeInteger(dbWrite, 'feeConfig.weights[2]'),
+        compute: requireNonNegativeInteger(compute, 'feeConfig.weights[3]'),
       }),
-      maxCapacity: BigInt(maxCapacity),
-      maxPerSecond: BigInt(maxPerSecond),
-      targetPerSecond: BigInt(targetPerSecond),
-      minPrice: BigInt(minPrice),
-      excessConversionConstant: BigInt(excessConversionConstant),
+      maxCapacity: requireNonNegativeBigInt(
+        maxCapacity,
+        'feeConfig.maxCapacity',
+      ),
+      maxPerSecond: requireNonNegativeBigInt(
+        maxPerSecond,
+        'feeConfig.maxPerSecond',
+      ),
+      targetPerSecond: requireNonNegativeBigInt(
+        targetPerSecond,
+        'feeConfig.targetPerSecond',
+      ),
+      minPrice: requireNonNegativeBigInt(minPrice, 'feeConfig.minPrice'),
+      excessConversionConstant: requireNonNegativeBigInt(
+        excessConversionConstant,
+        'feeConfig.excessConversionConstant',
+      ),
     };
   }
 
   async getFeeState(): Promise<FeeState> {
     const resp = await this.callRpc<FeeStateResponse>('getFeeState');
 
+    // `price` is multiplied by gas to give the AVAX every P-chain builder
+    // burns; `capacity` is the only thing verifyGasUsage checks against, and
+    // the same node supplies it. Well-formedness is all that can be enforced
+    // here — the ceiling that actually bounds the burn is the caller's
+    // `maxFee`, which the node does not control.
     return {
-      capacity: BigInt(resp.capacity),
-      excess: BigInt(resp.excess),
-      price: BigInt(resp.price),
+      capacity: requireNonNegativeBigInt(resp.capacity, 'feeState.capacity'),
+      excess: requireNonNegativeBigInt(resp.excess, 'feeState.excess'),
+      price: requireNonNegativeBigInt(resp.price, 'feeState.price'),
       timestamp: resp.timestamp,
     };
   }

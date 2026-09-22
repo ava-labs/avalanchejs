@@ -4,6 +4,7 @@ import type { Utxo } from '../../../serializable/avax/utxo';
 import { isTransferOut } from '../../../utils';
 import { bigIntMin } from '../../../utils/bigintMath';
 import { compareTransferableOutputs } from '../../../utils/sort';
+import { assertFeeWithinMax } from '../../../utils/nodeFees';
 import type { Dimensions } from '../../common/fees/dimensions';
 import {
   addDimensions,
@@ -24,6 +25,8 @@ export interface SpendHelperProps {
   toBurn: Map<string, bigint>;
   toStake: Map<string, bigint>;
   weights: Dimensions;
+  /** Optional ceiling on the computed fee; see SpendProps.maxFee. */
+  maxFee?: bigint;
 }
 
 /**
@@ -39,6 +42,7 @@ export class SpendHelper {
   private readonly toBurn: Map<string, bigint>;
   private readonly toStake: Map<string, bigint>;
   private readonly weights: Dimensions;
+  private readonly maxFee?: bigint;
 
   private changeOutputs: readonly TransferableOutput[];
   private inputs: readonly TransferableInput[];
@@ -56,6 +60,7 @@ export class SpendHelper {
     toBurn,
     toStake,
     weights,
+    maxFee,
   }: SpendHelperProps) {
     this.feeState = feeState;
     this.initialComplexity = initialComplexity;
@@ -63,6 +68,7 @@ export class SpendHelper {
     this.toBurn = toBurn;
     this.toStake = toStake;
     this.weights = weights;
+    this.maxFee = maxFee;
 
     this.changeOutputs = changeOutputs;
     this.inputs = inputs;
@@ -249,7 +255,16 @@ export class SpendHelper {
 
     const gasPrice = this.feeState.price;
 
-    return gas * gasPrice;
+    const fee = gas * gasPrice;
+
+    // Enforced here rather than only on the final result so the caller gets
+    // the real reason. `gasPrice` is the node's number; an inflated one that
+    // happens to exceed the wallet balance would otherwise surface as
+    // "insufficient funds", which reads like the user's problem rather than
+    // the node's. The partial fee only ever grows, so failing early is safe.
+    assertFeeWithinMax(fee, this.maxFee, 'P-chain fee');
+
+    return fee;
   }
 
   /**

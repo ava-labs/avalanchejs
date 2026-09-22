@@ -4,6 +4,7 @@ import type {
   TransferableOutput,
 } from '../../../serializable';
 import { OutputOwners } from '../../../serializable';
+import { assertFeeWithinMax } from '../../../utils/nodeFees';
 import type { Utxo } from '../../../serializable/avax/utxo';
 import type { Dimensions } from '../../common/fees/dimensions';
 import type { Context } from '../../context';
@@ -85,6 +86,20 @@ export type SpendProps = Readonly<{
    * List of UTXOs that are available to be spent.
    */
   utxos: readonly Utxo[];
+  /**
+   * Optional. The most AVAX, in nAVAX, the caller is willing to burn as the
+   * transaction fee.
+   *
+   * The fee is `gas * feeState.price`, and both the price and the `weights`
+   * that produce the gas come from the RPC node. That node also serves the
+   * UTXOs, so it knows the wallet's balance and can report a price chosen to
+   * burn all of it; the shipped `validateBurnedAmount` cannot detect this
+   * because it recomputes the expectation from the same numbers. This is the
+   * only bound the node does not control. Builders throw when it is exceeded.
+   *
+   * @default undefined - no ceiling is enforced
+   */
+  maxFee?: bigint;
 }>;
 
 /**
@@ -111,6 +126,7 @@ export const spend = (
     toBurn = new Map(),
     toStake = new Map(),
     utxos,
+    maxFee,
   }: SpendProps,
   spendReducers: readonly SpendReducerFunction[],
   context: Context,
@@ -132,6 +148,7 @@ export const spend = (
       toBurn,
       toStake,
       weights: context.platformFeeConfig.weights,
+      maxFee,
     });
 
     const initialState: SpendReducerState = {
@@ -158,7 +175,15 @@ export const spend = (
       return reducer(state, spendHelper, context);
     }, initialState);
 
-    return spendHelper.getInputsOutputs();
+    const result = spendHelper.getInputsOutputs();
+
+    // The last line of defence, and the only one the node does not control.
+    // Everything above computed `fee` from the node's gas price and weights;
+    // an inflated price simply pulls in more of the caller's UTXOs and burns
+    // them. Checked after the spend so the reported number is the real one.
+    assertFeeWithinMax(result.fee, maxFee, 'P-chain fee');
+
+    return result;
   } catch (error) {
     if (error instanceof Error) {
       throw error;

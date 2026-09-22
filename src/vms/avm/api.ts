@@ -1,5 +1,6 @@
 import { getAVMManager } from '../../serializable/avm/codec';
 import { AvaxApi } from '../common/avaxApi';
+import { requireNonNegativeBigInt } from '../../utils/nodeFees';
 import type {
   BuildGenesisParams,
   BuildGenesisResponse,
@@ -36,11 +37,22 @@ export class AVMApi extends AvaxApi {
     );
   }
 
+  /**
+   * The static X-chain fees, as reported by the node.
+   *
+   * These are burned verbatim by the AVM builders, so a node that inflates
+   * them decides how much of the caller's AVAX is destroyed. Only
+   * well-formedness can be checked here; the bound that matters is
+   * `SpendOptions.maxFee`, which the node does not control.
+   */
   getTxFee = async (): Promise<TxFee> => {
     const txFee = await this.callRpc<GetTxFeeResponse>('getTxFee');
     return {
-      txFee: BigInt(txFee.txFee),
-      createAssetTxFee: BigInt(txFee.createAssetTxFee),
+      txFee: requireNonNegativeBigInt(txFee.txFee, 'getTxFee.txFee'),
+      createAssetTxFee: requireNonNegativeBigInt(
+        txFee.createAssetTxFee,
+        'getTxFee.createAssetTxFee',
+      ),
     };
   };
 }
