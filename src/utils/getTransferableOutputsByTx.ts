@@ -5,6 +5,7 @@ import {
 } from '../serializable/evm';
 import { isExportTx as isAvmExportTx } from '../serializable/avm';
 import {
+  isAddAutoRenewedValidatorTx,
   isAddDelegatorTx,
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
@@ -35,7 +36,8 @@ export const getTransferableOutputsByTx = (tx: AvaxTx | EVMTx) => {
     isAddValidatorTx(tx) ||
     isAddDelegatorTx(tx) ||
     isAddPermissionlessValidatorTx(tx) ||
-    isAddPermissionlessDelegatorTx(tx)
+    isAddPermissionlessDelegatorTx(tx) ||
+    isAddAutoRenewedValidatorTx(tx)
   ) {
     const outs: (TransferableOutput | OutputOwners)[] = [
       ...(tx.baseTx?.outputs ?? []),
@@ -48,6 +50,8 @@ export const getTransferableOutputsByTx = (tx: AvaxTx | EVMTx) => {
     } else if (isAddDelegatorTx(tx)) {
       outs.push(tx.getRewardsOwner());
     } else if (isAddPermissionlessValidatorTx(tx)) {
+      outs.push(tx.getValidatorRewardsOwner(), tx.getDelegatorRewardsOwner());
+    } else if (isAddAutoRenewedValidatorTx(tx)) {
       outs.push(tx.getValidatorRewardsOwner(), tx.getDelegatorRewardsOwner());
     } else {
       outs.push(tx.getDelegatorRewardsOwner());

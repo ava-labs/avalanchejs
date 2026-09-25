@@ -21,6 +21,9 @@ import type { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceT
 import type { DisableL1ValidatorTx } from './disableL1ValidatorTx';
 import type { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
 import type { RegisterL1ValidatorTx } from './registerL1ValidatorTx';
+import type { AddAutoRenewedValidatorTx } from './addAutoRenewedValidatorTx';
+import type { SetAutoRenewedValidatorConfigTx } from './setAutoRenewedValidatorConfigTx';
+import type { RewardAutoRenewedValidatorTx } from './rewardAutoRenewedValidatorTx';
 
 export function isPvmBaseTx(tx: Transaction): tx is BaseTx {
   return tx._type === TypeSymbols.PvmBaseTx;
@@ -120,6 +123,24 @@ export function isDisableL1ValidatorTx(
   tx: Transaction,
 ): tx is DisableL1ValidatorTx {
   return tx._type === TypeSymbols.DisableL1ValidatorTx;
+}
+
+export function isAddAutoRenewedValidatorTx(
+  tx: Transaction,
+): tx is AddAutoRenewedValidatorTx {
+  return tx._type === TypeSymbols.AddAutoRenewedValidatorTx;
+}
+
+export function isSetAutoRenewedValidatorConfigTx(
+  tx: Transaction,
+): tx is SetAutoRenewedValidatorConfigTx {
+  return tx._type === TypeSymbols.SetAutoRenewedValidatorConfigTx;
+}
+
+export function isRewardAutoRenewedValidatorTx(
+  tx: Transaction,
+): tx is RewardAutoRenewedValidatorTx {
+  return tx._type === TypeSymbols.RewardAutoRenewedValidatorTx;
 }
 
 export function isEmptySigner(

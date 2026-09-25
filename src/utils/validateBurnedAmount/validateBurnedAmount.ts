@@ -10,6 +10,7 @@ import { costCorethTx } from '../costs';
 import { calculateFee } from '../../vms/pvm/txs/fee/calculator';
 
 import {
+  isAddAutoRenewedValidatorTx,
   isAddPermissionlessDelegatorTx,
   isAddPermissionlessValidatorTx,
   isAddSubnetValidatorTx,
@@ -23,6 +24,8 @@ import {
   isImportTx as isPvmImportTx,
   isRegisterL1ValidatorTx,
   isRemoveSubnetValidatorTx,
+  isRewardAutoRenewedValidatorTx,
+  isSetAutoRenewedValidatorConfigTx,
   isSetL1ValidatorWeightTx,
   isTransferSubnetOwnershipTx,
 } from '../../serializable/pvm';
@@ -49,7 +52,10 @@ const isPvmTx = (tx: Transaction) => {
     isRegisterL1ValidatorTx(tx) ||
     isSetL1ValidatorWeightTx(tx) ||
     isIncreaseL1ValidatorBalanceTx(tx) ||
-    isDisableL1ValidatorTx(tx)
+    isDisableL1ValidatorTx(tx) ||
+    isSetAutoRenewedValidatorConfigTx(tx) ||
+    isRewardAutoRenewedValidatorTx(tx) ||
+    isAddAutoRenewedValidatorTx(tx)
   );
 };
 

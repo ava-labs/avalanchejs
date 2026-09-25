@@ -23,6 +23,9 @@ import { IncreaseL1ValidatorBalanceTx } from './increaseL1ValidatorBalanceTx';
 import { DisableL1ValidatorTx } from './disableL1ValidatorTx';
 import { SetL1ValidatorWeightTx } from './setL1ValidatorWeightTx';
 import { RegisterL1ValidatorTx } from './registerL1ValidatorTx';
+import { AddAutoRenewedValidatorTx } from './addAutoRenewedValidatorTx';
+import { SetAutoRenewedValidatorConfigTx } from './setAutoRenewedValidatorConfigTx';
+import { RewardAutoRenewedValidatorTx } from './rewardAutoRenewedValidatorTx';
 
 /**
  * @see https://github.com/ava-labs/avalanchego/blob/master/vms/platformvm/txs/codec.go#L35
@@ -68,6 +71,10 @@ export const codec = new Codec([
   SetL1ValidatorWeightTx, // 37
   IncreaseL1ValidatorBalanceTx, // 38
   DisableL1ValidatorTx, // 39
+
+  AddAutoRenewedValidatorTx, // 40
+  SetAutoRenewedValidatorConfigTx, // 41
+  RewardAutoRenewedValidatorTx, // 42
 ]);
 
 let manager: Manager;

@@ -2,23 +2,14 @@ import { validateDynamicBurnedAmount } from './validateDynamicBurnedAmount';
 import { describe, it, expect } from 'vitest';
 
 describe('validateDynamicBurnedAmount', () => {
-  it('throws an expected error if feeTolerance is less than 1', () => {
+  it('throws an expected error if feeTolerance is less than 0', () => {
     expect(() =>
       validateDynamicBurnedAmount({
         burnedAmount: (280750n * 75n) / 100n, // 25% lower,
         feeAmount: 280750n,
-        feeTolerance: 0.5,
+        feeTolerance: -1,
       }),
-    ).toThrowError('feeTolerance must be [1,100]');
-  });
-  it('throws an expected error if feeTolerance is greater than 100', () => {
-    expect(() =>
-      validateDynamicBurnedAmount({
-        burnedAmount: (280750n * 75n) / 100n, // 25% lower,
-        feeAmount: 280750n,
-        feeTolerance: 101,
-      }),
-    ).toThrowError('feeTolerance must be [1,100]');
+    ).toThrowError('feeTolerance must be be non-negative.');
   });
 
   it('returns false if burned amount is over the tolerance range', () => {
@@ -59,7 +50,7 @@ describe('validateDynamicBurnedAmount', () => {
     const resultHigher = validateDynamicBurnedAmount({
       burnedAmount: (280750n * 125n) / 100n, // 25% higher
       feeAmount: 280750n,
-      feeTolerance: 50.9,
+      feeTolerance: 500.9,
     });
     expect(resultHigher).toStrictEqual({
       isValid: true,

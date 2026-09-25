@@ -3,7 +3,11 @@ import { getEVMManager } from '../../serializable/evm/codec';
 import { hexToBuffer } from '../../utils';
 import { Api } from '../common/baseApi';
 import { ChainApi } from '../common/chainAPI';
-import type { GetAtomicTxParams, GetAtomicTxStatusResponse } from './model';
+import type {
+  GetAtomicTxParams,
+  GetAtomicTxResponse,
+  GetAtomicTxStatusResponse,
+} from './model';
 import type { GetAtomicTxServerResponse } from './privateModels';
 
 export class EVMApi extends ChainApi {
@@ -18,15 +22,22 @@ export class EVMApi extends ChainApi {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise with the signedTX unmarshalled from the bytes
+   * @returns Returns a Promise with the signedTX unmarshalled from the bytes and the height of the block that accepted it
    */
 
-  getAtomicTx = async (getTxParams: GetAtomicTxParams) => {
+  getAtomicTx = async (
+    getTxParams: GetAtomicTxParams,
+  ): Promise<GetAtomicTxResponse> => {
     const resp = await this.callRpc<GetAtomicTxServerResponse>('getAtomicTx', {
       ...getTxParams,
       encoding: 'hex',
     });
-    return this.manager.unpack(hexToBuffer(resp.tx), SignedTx);
+    return {
+      tx: this.manager.unpack(hexToBuffer(resp.tx), SignedTx),
+      encoding: resp.encoding,
+      blockHeight:
+        resp.blockHeight === undefined ? undefined : BigInt(resp.blockHeight),
+    };
   };
 
   /**
@@ -41,7 +52,9 @@ export class EVMApi extends ChainApi {
    *
    * @param txID The string representation of the transaction ID
    *
-   * @returns Returns a Promise {status: string, blockHeight: string} containing the status retrieved from the node
+   * @returns Returns a Promise {status: string, blockHeight?: string} containing the status retrieved from the node
+   *
+   * @deprecated Deprecated by the node since avalanchego v1.15.0 (Helicon). Use {@link getAtomicTx} instead.
    */
 
   getAtomicTxStatus(txID: string): Promise<GetAtomicTxStatusResponse> {

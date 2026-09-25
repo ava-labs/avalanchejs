@@ -71,4 +71,8 @@ export type GetUpgradesInfoResponse = {
   cortinaXChainStopVertexID: string;
   durangoTime: string;
   etnaTime: string;
+  fortunaTime: string;
+  graniteEpochDuration: number;
+  graniteTime: string;
+  heliconTime: string;
 };
