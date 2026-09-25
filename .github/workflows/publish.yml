@@ -8,7 +8,7 @@ on:
 
 permissions:
   id-token: write # Required for npm trusted publishing (OIDC provenance)
-  contents: write # Required for semantic-release to push tags/commits
+  contents: write # Required for semantic-release to push tags and create GitHub releases
 
 jobs:
   release:
@@ -56,10 +56,3 @@ jobs:
             DIST_TAG="${BRANCH_NAME}"
           fi
           npm publish --provenance --tag "${DIST_TAG}"
-
-      - name: Rebase master
-        if: github.ref_name == 'release'
-        run: |
-          git checkout master &&
-          git rebase release &&
-          git push origin master
