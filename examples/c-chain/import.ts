@@ -24,7 +24,7 @@ const main = async (sourceChain: 'X' | 'P') => {
     [bech32ToBytes(CORETH_ADDRESS)],
     utxos,
     getChainIdFromContext(sourceChain, context),
-    baseFee / BigInt(1e9),
+    baseFee,
   );
 
   await addTxSignatures({
