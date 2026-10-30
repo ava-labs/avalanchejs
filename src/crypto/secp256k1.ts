@@ -11,12 +11,25 @@ export function randomPrivateKey() {
   return secp.utils.randomPrivateKey();
 }
 
-export function sign(msg: Uint8Array | string, privKey: Uint8Array) {
-  return signHash(sha256(msg), privKey);
+export type SignOptions = Parameters<typeof secp.signAsync>[2];
+
+export function sign(
+  msg: Uint8Array | string,
+  privKey: Uint8Array,
+  options: SignOptions = {},
+) {
+  return signHash(sha256(msg), privKey, options);
 }
 
-export async function signHash(hash: Uint8Array, privKey: Uint8Array) {
-  const sig = await secp.signAsync(hash, privKey);
+export async function signHash(
+  hash: Uint8Array,
+  privKey: Uint8Array,
+  options: SignOptions = {},
+) {
+  const sig = await secp.signAsync(hash, privKey, {
+    extraEntropy: true,
+    ...options,
+  });
 
   if (sig.recovery !== undefined) {
     return concatBytes(sig.toCompactRawBytes(), new Uint8Array([sig.recovery]));
