@@ -7,23 +7,6 @@ export interface BuildGenesisResponse {
   encoding: string;
 }
 
-export interface GetAllBalancesParams {
-  address: string;
-}
-
-export interface GetAllBalancesResponse {
-  balances: { asset: string; balance: number }[];
-}
-
-export interface GetBalanceParams {
-  address: string;
-  assetID: string;
-}
-
-export interface GetBalanceResponse {
-  balance: number;
-}
-
 export interface GetAddressTxsParams {
   address: string;
   cursor?: bigint;

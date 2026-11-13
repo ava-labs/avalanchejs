@@ -1,5 +1,4 @@
 import { PChainOwner } from '../../serializable';
-import { TransferableOutput } from '../../serializable/avax';
 import { Utxo } from '../../serializable/avax/utxo';
 import { getPVMManager } from '../../serializable/pvm/codec';
 import { hexToBuffer, parse } from '../../utils';
@@ -13,8 +12,6 @@ import type {
   FeeConfigResponse,
   FeeState,
   FeeStateResponse,
-  GetBalanceParams,
-  GetBalanceResponse,
   GetBlockchainsResponse,
   GetBlockchainStatusResponse,
   GetCurrentSupplyResponse,
@@ -27,8 +24,6 @@ import type {
   GetPendingValidatorsResponse,
   GetRewardUTXOsParams,
   GetRewardUTXOsResponse,
-  GetStakeParams,
-  GetStakeResponse,
   GetStakingAssetIDParams,
   GetStakingAssetIDResponse,
   GetSubnetParams,
@@ -48,10 +43,7 @@ import type {
   ValidatesParams,
   ValidatesResponse,
 } from './models';
-import type {
-  GetRewardUTXOsServerResponse,
-  GetStakeServerResponse,
-} from './privateModels';
+import type { GetRewardUTXOsServerResponse } from './privateModels';
 
 export class PVMApi extends AvaxApi {
   constructor(baseURL?: string) {
@@ -96,20 +88,6 @@ export class PVMApi extends AvaxApi {
     };
   }
 
-  async getStake(getStakeParams: GetStakeParams): Promise<GetStakeResponse> {
-    const resp = await this.callRpc<GetStakeServerResponse>(
-      'getStake',
-      getStakeParams,
-    );
-    return {
-      ...resp,
-      staked: BigInt(resp.staked),
-      stakedOutputs: resp.stakedOutputs.map((bytes) =>
-        getPVMManager().unpack(hexToBuffer(bytes), TransferableOutput),
-      ),
-    };
-  }
-
   getValidatorsAt(
     getValidatorsAtParams: GetValidatorsAtParams,
   ): Promise<GetValidatorsAtResponse> {
@@ -130,35 +108,6 @@ export class PVMApi extends AvaxApi {
       'getMaxStakeAmount',
       getMaxStakeAmountParams,
     );
-  }
-
-  /**
-   * @link https://docs.avax.network/apis/avalanchego/apis/p-chain#platformgetbalance
-   *
-   * @param GetBalanceParams
-   * @returns GetBalanceResponse
-   */
-  async getBalance(
-    GetBalanceParams: GetBalanceParams,
-  ): Promise<GetBalanceResponse> {
-    const resp = await this.callRpc<{
-      balance: string;
-      unlocked: string;
-      lockedStakeable: string;
-      lockedNotStakeable: string;
-      utxoIDs: {
-        txID: string;
-        outputIndex: number;
-      }[];
-    }>('getBalance', GetBalanceParams);
-
-    return {
-      balance: BigInt(resp.balance),
-      unlocked: BigInt(resp.unlocked),
-      lockedStakeable: BigInt(resp.lockedStakeable),
-      lockedNotStakeable: BigInt(resp.lockedNotStakeable),
-      utxoIDs: resp.utxoIDs,
-    };
   }
 
   getBlockchains(): Promise<GetBlockchainsResponse> {
