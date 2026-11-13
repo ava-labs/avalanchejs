@@ -52,13 +52,3 @@ export interface IssueTxResponse {
 export interface GetTxParams {
   txID: string;
 }
-
-export interface GetTxStatusParams {
-  txID: string;
-  includeReason?: boolean | true;
-}
-
-export interface GetTxStatusResponse {
-  status: string;
-  reason: string;
-}

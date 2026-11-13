@@ -1,5 +1,4 @@
 import type { PChainOwner } from '../../serializable';
-import type { TransferableOutput } from '../../serializable/avax';
 import type { Utxo } from '../../serializable/avax/utxo';
 import type { Dimensions } from '../common/fees/dimensions';
 
@@ -95,15 +94,6 @@ export interface GetRewardUTXOsResponse {
   utxos: Utxo[];
 }
 
-export interface GetStakeParams {
-  addresses: string[];
-}
-
-export interface GetStakeResponse {
-  staked: bigint;
-  stakedOutputs: TransferableOutput[];
-}
-
 export interface GetRewardUTXOsParams {
   txID: string;
 }
@@ -134,21 +124,6 @@ export interface SampleValidatorsParams {
 
 export interface SampleValidatorsResponse {
   validators: string[];
-}
-
-export interface GetBalanceParams {
-  addresses: string[];
-}
-
-export interface GetBalanceResponse {
-  balance: bigint;
-  unlocked: bigint;
-  lockedStakeable: bigint;
-  lockedNotStakeable: bigint;
-  utxoIDs: {
-    txID: string;
-    outputIndex: number;
-  }[];
 }
 
 export interface StartIndex {
@@ -193,17 +168,6 @@ export interface GetTxStatusResponse {
 
 export interface GetCurrentSupplyResponse {
   supply: bigint;
-}
-
-export interface GetBalanceResponse {
-  balance: bigint;
-  unlocked: bigint;
-  lockedStakeable: bigint;
-  lockedNotStakeable: bigint;
-  utxoIDs: {
-    txID: string;
-    outputIndex: number;
-  }[];
 }
 
 export interface GetBlockchainsResponse {

@@ -3,8 +3,6 @@ import { AvaxApi } from '../common/avaxApi';
 import type {
   BuildGenesisParams,
   BuildGenesisResponse,
-  GetAllBalancesParams,
-  GetAllBalancesResponse,
   GetTxFeeResponse,
   TxFee,
 } from './models';
@@ -26,15 +24,6 @@ export class AVMApi extends AvaxApi {
   ): Promise<BuildGenesisResponse> => {
     return await this.callRpc<BuildGenesisResponse>('buildGenesis', params);
   };
-
-  getAllBalances(
-    getAllBalancesParams: GetAllBalancesParams,
-  ): Promise<GetAllBalancesResponse> {
-    return this.callRpc<GetAllBalancesResponse>(
-      'getAllBalances',
-      getAllBalancesParams,
-    );
-  }
 
   getTxFee = async (): Promise<TxFee> => {
     const txFee = await this.callRpc<GetTxFeeResponse>('getTxFee');
