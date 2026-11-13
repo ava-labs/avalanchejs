@@ -7,11 +7,6 @@ export interface GetRewardUTXOsServerResponse {
   utxos: string[];
 }
 
-export interface GetStakeServerResponse {
-  staked: string;
-  stakedOutputs: string[];
-}
-
 export interface GetTxServerResponse {
   tx: any;
 }

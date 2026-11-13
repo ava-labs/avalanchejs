@@ -5,14 +5,8 @@
 import { SignedTx } from '../../serializable/avax';
 import { hexToBuffer } from '../../utils';
 import type { GetAddressTxsParams, GetAddressTxsResponse } from '../avm/models';
-import type { GetBalanceParams, GetBalanceResponse } from '../pvm';
 import type { GetTxServerResponse } from '../pvm/privateModels';
-import type {
-  GetAssetDescriptionResponse,
-  GetTxParams,
-  GetTxStatusParams,
-  GetTxStatusResponse,
-} from './apiModels';
+import type { GetAssetDescriptionResponse, GetTxParams } from './apiModels';
 import { ChainApi } from './chainAPI';
 
 export class AvaxApi extends ChainApi {
@@ -36,17 +30,6 @@ export class AvaxApi extends ChainApi {
       encoding: 'json',
     });
   };
-
-  getTxStatus(getTxStatus: GetTxStatusParams): Promise<GetTxStatusResponse> {
-    return this.callRpc<GetTxStatusResponse>('getTxStatus', {
-      includeReason: true,
-      ...getTxStatus,
-    });
-  }
-
-  getBalance(getBalanceParams: GetBalanceParams): Promise<GetBalanceResponse> {
-    return this.callRpc<GetBalanceResponse>('getBalance', getBalanceParams);
-  }
 
   getAddressTxs(
     GetAddressTxsParams: GetAddressTxsParams,

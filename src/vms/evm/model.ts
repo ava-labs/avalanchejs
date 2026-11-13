@@ -10,9 +10,3 @@ export interface GetAtomicTxResponse {
   // Omitted by pre-Helicon nodes while the tx is still processing
   blockHeight?: bigint;
 }
-
-export interface GetAtomicTxStatusResponse {
-  status: string;
-  // Omitted when the status is not Accepted
-  blockHeight?: string;
-}

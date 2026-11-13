@@ -3,11 +3,7 @@ import { getEVMManager } from '../../serializable/evm/codec';
 import { hexToBuffer } from '../../utils';
 import { Api } from '../common/baseApi';
 import { ChainApi } from '../common/chainAPI';
-import type {
-  GetAtomicTxParams,
-  GetAtomicTxResponse,
-  GetAtomicTxStatusResponse,
-} from './model';
+import type { GetAtomicTxParams, GetAtomicTxResponse } from './model';
 import type { GetAtomicTxServerResponse } from './privateModels';
 
 export class EVMApi extends ChainApi {
@@ -45,22 +41,6 @@ export class EVMApi extends ChainApi {
    */
   getBaseFee() {
     return this.ethAPI.getBaseFee();
-  }
-
-  /**
-   * Returns the status of a provided atomic transaction ID by calling the node's `getAtomicTxStatus` method.
-   *
-   * @param txID The string representation of the transaction ID
-   *
-   * @returns Returns a Promise {status: string, blockHeight?: string} containing the status retrieved from the node
-   *
-   * @deprecated Deprecated by the node since avalanchego v1.15.0 (Helicon). Use {@link getAtomicTx} instead.
-   */
-
-  getAtomicTxStatus(txID: string): Promise<GetAtomicTxStatusResponse> {
-    return this.callRpc<GetAtomicTxStatusResponse>('getAtomicTxStatus', {
-      txID,
-    });
   }
 }
 
