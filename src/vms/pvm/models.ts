@@ -16,7 +16,8 @@ export type GetCurrentValidatorsResponse = {
     txID: string;
     startTime: string;
     endTime: string;
-    stakeAmount: string;
+    /** @deprecated not returned by current AvalancheGo nodes, use `weight` */
+    stakeAmount?: string;
     nodeID: string;
     weight: string;
     validationRewardOwner: {
@@ -31,7 +32,7 @@ export type GetCurrentValidatorsResponse = {
     };
     signer: {
       publicKey: string;
-      proofOfPosession: string;
+      proofOfPossession: string;
     };
     delegatorCount: string;
     delegatorWeight: string;
@@ -39,11 +40,14 @@ export type GetCurrentValidatorsResponse = {
     delegationFee: string;
     uptime: string;
     connected: boolean;
-    delegators: {
+    /** only returned when the request names the validators in `nodeIDs` */
+    delegators?: {
       txID: string;
       startTime: string;
       endTime: string;
-      stakeAmount: string;
+      weight: string;
+      /** @deprecated not returned by current AvalancheGo nodes, use `weight` */
+      stakeAmount?: string;
       nodeID: string;
       rewardOwner: {
         locktime: string;
@@ -73,7 +77,7 @@ export type GetPendingValidatorsResponse = {
     weight: string;
     signer: {
       publicKey: string;
-      proofOfPosession: string;
+      proofOfPossession: string;
     };
   }[];
   delegators: {
