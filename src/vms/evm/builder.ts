@@ -318,6 +318,13 @@ export function newImportTx(
   atomics.forEach((atomic) => {
     const assetID: string = atomic.getAssetId();
     const output = atomic.output as TransferOutput;
+
+    // Skip UTXOs we can't spend before they are counted towards the fee,
+    // otherwise the fee is "paid" by an input that never makes it into the tx.
+    const sigData = matchOwners(output.outputOwners, fromAddresses, 0n);
+
+    if (!sigData) return;
+
     const amount = output.amount();
     let infeeamount = amount;
     if (feeAssetId && fee && feepaid < fee && feeAssetId === assetID) {
@@ -329,10 +336,6 @@ export function newImportTx(
         infeeamount = 0n;
       }
     }
-
-    const sigData = matchOwners(output.outputOwners, fromAddresses, 0n);
-
-    if (!sigData) return;
 
     const xferin: TransferableInput = new TransferableInput(
       atomic.utxoId,
