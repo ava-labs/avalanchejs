@@ -1051,6 +1051,24 @@ describe('./src/vms/pvm/etna-builder/builder.test.ts', () => {
 
       expectTxs(unsignedTx.getTx(), expectedTx);
     });
+
+    it('should not spend the imported UTXOs again to cover the fee', () => {
+      // 440 nAVAX does not cover the 457 nAVAX import fee at this fee state.
+      const utxos = [getValidUtxo(new BigIntPr(440n), testAvaxAssetID)];
+
+      expect(() =>
+        newImportTx(
+          {
+            fromAddressesBytes,
+            feeState,
+            sourceChainId: testContext.cBlockchainID,
+            toAddressesBytes: [testAddress1],
+            utxos,
+          },
+          testContext,
+        ),
+      ).toThrow('Insufficient funds');
+    });
   });
 
   describe('ConvertSubnetToL1Tx', () => {

@@ -401,7 +401,10 @@ export const newImportTx: TxBuilderFn<NewImportTxProps> = (
       fromAddresses,
       initialComplexity: complexity,
       minIssuanceTime,
-      utxos: filteredUtxos,
+      // The provided UTXOs are atomic UTXOs of the source chain. They only
+      // exist in shared memory, so they can't be spent again as P-Chain
+      // inputs to cover the fee.
+      utxos: [],
     },
     [useUnlockedUTXOs],
     context,
