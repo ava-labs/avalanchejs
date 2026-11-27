@@ -47,7 +47,7 @@ export class InfoApi extends Api {
   }
 
   isBootstrapped(chain: string): Promise<isBootstrapped> {
-    return this.callRpc<isBootstrapped>('peers', { chain });
+    return this.callRpc<isBootstrapped>('isBootstrapped', { chain });
   }
 
   uptime(): Promise<UptimeResponse> {
